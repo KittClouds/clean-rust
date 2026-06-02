@@ -1,10 +1,11 @@
 use phoenix_semantic_v2::{
-    CanonicalEventId, DocumentArchive, DocumentManifest, EventIdentityMembershipId,
-    EventIdentityMembershipRecord, EventIdentityScopeSidecar, EventIdentityState, EventMentionId,
-    EventMentionPacket, EventModalitySemantics, EventSourceSemantics, ScopeOrd, TemporalAnchorId,
-    TemporalAnchorRecord, TemporalAxisId, TemporalAxisKind, TemporalAxisRecord, TemporalClaimAtom,
-    TemporalConstraintId, TemporalConstraintKind, TemporalConstraintRecord, TemporalReferenceEdge,
-    TemporalTimexId, TemporalTimexRecord,
+    BeliefSourceKind, BeliefStateAtom, BeliefStateKind, CanonicalEventId, DocumentArchive,
+    DocumentManifest, EventIdentityMembershipId, EventIdentityMembershipRecord,
+    EventIdentityScopeSidecar, EventIdentityState, EventMentionId, EventMentionPacket,
+    EventModalitySemantics, EventSourceSemantics, ScopeOrd, TemporalAnchorId, TemporalAnchorRecord,
+    TemporalAxisId, TemporalAxisKind, TemporalAxisRecord, TemporalClaimAtom, TemporalConstraintId,
+    TemporalConstraintKind, TemporalConstraintRecord, TemporalReferenceEdge, TemporalTimexId,
+    TemporalTimexRecord, TemporalTruthStatus, TemporalWorldlineId,
 };
 use phoenix_types::{
     BiTemporalWindow, EventId, EventRecord, PredicateFrame, Proposition, ScopeKey, SemanticOrder,
@@ -174,6 +175,26 @@ fn sample_archive() -> DocumentArchive {
                 temporal: temporal_window(Some(100)),
                 evidence_refs: vec!["today".to_owned()],
             }],
+            belief_atoms: vec![
+                belief_atom(
+                    "belief:event:1",
+                    "event:1",
+                    "prop:1",
+                    "axis:world",
+                    TemporalTruthStatus::Observed,
+                    BeliefSourceKind::DirectObservation,
+                    840,
+                ),
+                belief_atom(
+                    "belief:event:2",
+                    "event:2",
+                    "prop:2",
+                    "axis:reported",
+                    TemporalTruthStatus::Reported,
+                    BeliefSourceKind::Quote,
+                    720,
+                ),
+            ],
             temporal_constraints: vec![TemporalConstraintRecord {
                 constraint_id: TemporalConstraintId("tconstraint:1".to_owned()),
                 document_id: "doc-1".to_owned(),
@@ -206,7 +227,10 @@ fn compiles_temporal_scope_from_substrate() {
     assert!(!batch.intervals.is_empty());
     assert!(!batch.timeline_segments.is_empty());
     assert!(!batch.memory_cards.is_empty());
+    assert_eq!(batch.belief_cards.len(), 2);
     assert!(batch.summary.timex_count >= 2);
+    assert_eq!(batch.summary.belief_atom_count, 2);
+    assert_eq!(batch.summary.belief_card_count, 2);
 }
 
 #[test]
@@ -222,7 +246,36 @@ fn replay_replaces_temporal_outputs_idempotently() {
 
     assert_eq!(replayed.intervals, sidecar.intervals);
     assert_eq!(replayed.timeline_segments, sidecar.timeline_segments);
+    assert_eq!(replayed.belief_cards, sidecar.belief_cards);
     assert_eq!(replayed.summary, sidecar.summary);
+}
+
+#[test]
+fn belief_cards_preserve_observed_and_reported_axes() {
+    let archive = sample_archive();
+    let mut batch = derive_scope_review_batch(&[archive], None, None);
+    run_temporal_scope(&mut batch, 200);
+
+    let observed = batch
+        .belief_cards
+        .iter()
+        .find(|card| card.event_id.as_deref() == Some("event:1"))
+        .expect("observed belief card");
+    let reported = batch
+        .belief_cards
+        .iter()
+        .find(|card| card.event_id.as_deref() == Some("event:2"))
+        .expect("reported belief card");
+
+    assert_eq!(
+        observed.strongest_truth_status,
+        TemporalTruthStatus::Observed
+    );
+    assert_eq!(
+        reported.strongest_truth_status,
+        TemporalTruthStatus::Reported
+    );
+    assert_eq!(reported.worldline_id.0, "worldline:reported");
 }
 
 #[test]
@@ -303,6 +356,43 @@ fn event_identity_sidecar_adds_canonical_ids() {
         .iter()
         .any(|card| card.event_id == "event:1"
             && card.canonical_event_id == Some(CanonicalEventId("canonical:event:1".to_owned()))));
+    assert!(batch.belief_cards.iter().any(|card| {
+        card.event_id.as_deref() == Some("event:1")
+            && card.canonical_event_id == Some(CanonicalEventId("canonical:event:1".to_owned()))
+    }));
+}
+
+fn belief_atom(
+    belief_id: &str,
+    event_id: &str,
+    proposition_id: &str,
+    axis_id: &str,
+    truth_status: TemporalTruthStatus,
+    source_kind: BeliefSourceKind,
+    confidence_millis: u32,
+) -> BeliefStateAtom {
+    BeliefStateAtom {
+        belief_id: belief_id.to_owned(),
+        document_id: "doc-1".to_owned(),
+        proposition_id: Some(proposition_id.to_owned()),
+        event_id: Some(event_id.to_owned()),
+        axis_id: TemporalAxisId(axis_id.to_owned()),
+        worldline_id: TemporalWorldlineId(format!(
+            "worldline:{}",
+            axis_id.strip_prefix("axis:").unwrap_or(axis_id)
+        )),
+        kind: if truth_status == TemporalTruthStatus::Reported {
+            BeliefStateKind::Reported
+        } else {
+            BeliefStateKind::Observed
+        },
+        truth_status,
+        source_kind,
+        confidence_millis,
+        temporal: temporal_window(Some(100)),
+        evidence_refs: vec![proposition_id.to_owned()],
+        ..BeliefStateAtom::default()
+    }
 }
 
 fn temporal_window(valid_from: Option<i64>) -> BiTemporalWindow {

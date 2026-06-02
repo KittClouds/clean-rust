@@ -15,4 +15,5 @@ phoenix-semantic-v2 = { path = "../phoenix-semantic-v2" }
 phoenix-scope-analysis = { path = "../phoenix-scope-analysis" }
 phoenix-store-native-core = { path = "../phoenix-store-native-core" }
 phoenix-store-overgraph = { path = "../phoenix-store-overgraph" }
+phoenix-time = { path = "../phoenix-time" }
 phoenix-types = { path = "../phoenix-types" }

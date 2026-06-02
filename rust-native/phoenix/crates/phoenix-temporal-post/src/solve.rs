@@ -1,10 +1,11 @@
 use std::collections::BTreeMap;
 
 use phoenix_semantic_v2::{
-    TemporalAnchorRecord, TemporalAxisKind, TemporalConflictKind, TemporalConflictRecord,
-    TemporalGapKind, TemporalGapRecord, TemporalIntervalRecord, TimelineSegmentId,
-    TimelineSegmentKind, TimelineSegmentRecord,
+    BeliefStateCard, TemporalAnchorRecord, TemporalAxisKind, TemporalConflictKind,
+    TemporalConflictRecord, TemporalGapKind, TemporalGapRecord, TemporalIntervalRecord,
+    TimelineSegmentId, TimelineSegmentKind, TimelineSegmentRecord,
 };
+use phoenix_time::TimeKernel;
 use phoenix_types::BiTemporalWindow;
 use rustc_hash::FxHashMap;
 use serde::{Deserialize, Serialize};
@@ -21,6 +22,8 @@ pub struct SolvedTemporalBatch {
     pub intervals: Vec<TemporalIntervalRecord>,
     #[serde(default)]
     pub timeline_segments: Vec<TimelineSegmentRecord>,
+    #[serde(default)]
+    pub belief_cards: Vec<BeliefStateCard>,
     #[serde(default)]
     pub conflicts: Vec<TemporalConflictRecord>,
     #[serde(default)]
@@ -130,10 +133,12 @@ pub fn solve_temporal_inputs(
         created_at,
         &axis_kind_by_id,
     );
+    let belief_cards = crate::build_belief_state_cards(&inputs.belief_atoms, created_at);
 
     SolvedTemporalBatch {
         intervals,
         timeline_segments,
+        belief_cards,
         conflicts,
         gaps,
         diagnostics,
@@ -246,13 +251,13 @@ fn build_segments(
             } else {
                 ((anchored_count * 1000) / cases.len()) as u32
             };
-            let temporal = merge_temporal(
+            let temporal = TimeKernel::merge_windows(
                 cases.iter().filter_map(|case| {
                     interval_by_event
                         .get(case.event_id.as_str())
                         .map(|row| row.temporal.clone())
                 }),
-                created_at,
+                Some(created_at),
             );
             let axis_kind = axis_kind_by_id
                 .get(axis_id_value.as_str())
@@ -291,42 +296,4 @@ fn interval_order_key(interval: Option<&TemporalIntervalRecord>) -> (i64, i64) {
         temporal.valid_from.unwrap_or(i64::MAX),
         temporal.recorded_from.unwrap_or(i64::MAX),
     )
-}
-
-fn merge_temporal<I>(windows: I, created_at: i64) -> BiTemporalWindow
-where
-    I: Iterator<Item = BiTemporalWindow>,
-{
-    let mut min_valid = None::<i64>;
-    let mut max_valid = None::<i64>;
-    let mut min_recorded = None::<i64>;
-    for window in windows {
-        if let Some(valid_from) = window.valid_from {
-            min_valid = Some(
-                min_valid
-                    .map(|current| current.min(valid_from))
-                    .unwrap_or(valid_from),
-            );
-        }
-        if let Some(valid_to) = window.valid_to {
-            max_valid = Some(
-                max_valid
-                    .map(|current| current.max(valid_to))
-                    .unwrap_or(valid_to),
-            );
-        }
-        if let Some(recorded_from) = window.recorded_from {
-            min_recorded = Some(
-                min_recorded
-                    .map(|current| current.min(recorded_from))
-                    .unwrap_or(recorded_from),
-            );
-        }
-    }
-    BiTemporalWindow {
-        valid_from: min_valid,
-        valid_to: max_valid,
-        recorded_from: min_recorded.or(Some(created_at)),
-        recorded_to: None,
-    }
 }

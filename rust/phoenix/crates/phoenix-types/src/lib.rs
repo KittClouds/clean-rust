@@ -5,9 +5,11 @@ use serde_json::Value;
 
 mod binary;
 mod deterministic;
+mod evidence;
 
 pub use binary::*;
 pub use deterministic::*;
+pub use evidence::*;
 
 macro_rules! string_id {
     ($name:ident) => {
@@ -888,6 +890,142 @@ pub struct AtlasRichScanCandidateSummary {
     pub review_reason: Option<String>,
 }
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub enum AtlasAliasRelation {
+    ExactKnownAlias,
+    FullDesignation,
+    Nickname,
+    Codename,
+    SpellingVariant,
+    TitleOrRole,
+    SameSurface,
+    RelatedButDistinct,
+    TypeConflict,
+    Ambiguous,
+    NewEntity,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub enum AtlasAliasProposalDecision {
+    Accept,
+    Propose,
+    Defer,
+    Reject,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub enum AtlasAliasProposalTarget {
+    KnownEntity {
+        entity_id: EntityId,
+        canonical_name: String,
+        kind: Option<EntityKind>,
+    },
+    RunLocalSurface {
+        key: String,
+        display: String,
+        kind: Option<String>,
+    },
+    NewEntity,
+    Deferred,
+}
+
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct AtlasAliasEvidence {
+    pub source: String,
+    pub confidence: f32,
+    pub note: String,
+}
+
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct AtlasAliasProposalSummary {
+    pub case_id: String,
+    pub document_id: DocumentId,
+    pub mention_id: MentionId,
+    pub surface: String,
+    pub normalized: String,
+    pub range: TextRange,
+    pub relation: AtlasAliasRelation,
+    pub target: AtlasAliasProposalTarget,
+    pub confidence: f32,
+    pub decision: AtlasAliasProposalDecision,
+    #[serde(default)]
+    pub evidence: Vec<AtlasAliasEvidence>,
+    pub rationale: String,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub enum AtlasIdentityReceiptAction {
+    KnownEntity,
+    AliasOfKnown,
+    FullDesignation,
+    Coreference,
+    MergeRunLocal,
+    Split,
+    Defer,
+    NewEntity,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub enum AtlasIdentityTargetSummary {
+    KnownEntity {
+        entity_id: EntityId,
+        canonical_name: String,
+        kind: Option<EntityKind>,
+    },
+    RunLocalEntity {
+        key: String,
+        display: String,
+        kind: Option<String>,
+    },
+    NewEntity {
+        key: String,
+        display: String,
+        kind: Option<String>,
+    },
+    Deferred,
+}
+
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct AtlasIdentityReceiptSummary {
+    pub receipt_id: String,
+    pub document_id: DocumentId,
+    pub action: AtlasIdentityReceiptAction,
+    #[serde(default)]
+    pub mention_ids: Vec<MentionId>,
+    pub surface: String,
+    pub target: AtlasIdentityTargetSummary,
+    pub confidence: f32,
+    pub reversible: bool,
+    #[serde(default)]
+    pub evidence: Vec<AtlasAliasEvidence>,
+    pub rationale: String,
+}
+
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct AtlasIdentityResolutionSummary {
+    pub node_count: usize,
+    pub edge_count: usize,
+    pub receipt_count: usize,
+    pub known_decisions: usize,
+    pub alias_decisions: usize,
+    pub coreference_decisions: usize,
+    pub merge_decisions: usize,
+    pub split_decisions: usize,
+    pub deferred_decisions: usize,
+    pub new_entity_decisions: usize,
+    #[serde(default)]
+    pub receipts: Vec<AtlasIdentityReceiptSummary>,
+}
+
 #[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct AtlasRichScanEmbeddingCounts {
@@ -913,6 +1051,14 @@ pub struct AtlasRichScanResult {
     pub relation_candidate_count: usize,
     #[serde(default)]
     pub candidate_suggestions: Vec<AtlasRichScanCandidateSummary>,
+    #[serde(default)]
+    pub alias_proposals: Vec<AtlasAliasProposalSummary>,
+    #[serde(default)]
+    pub identity_resolution: AtlasIdentityResolutionSummary,
+    #[serde(default)]
+    pub evidence_ledger: AtlasEvidenceLedgerSummary,
+    #[serde(default)]
+    pub dataset_factory: AtlasDatasetFactorySummary,
     #[serde(default)]
     pub applied_options: AtlasRichScanOptions,
     #[serde(default)]
@@ -1060,12 +1206,31 @@ pub struct ScanArtifact {
     pub diagnostics: Vec<Diagnostic>,
 }
 
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub enum FrameSlotSource {
+    Dependency,
+    DependencyAttachment,
+    ResolverLink,
+    MentionOverlap,
+    ProximityFallback,
+    UmrCue,
+}
+
+impl Default for FrameSlotSource {
+    fn default() -> Self {
+        Self::ProximityFallback
+    }
+}
+
 #[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct FrameSlot {
     pub range: TextRange,
     pub entity_ref: Option<MentionEntityRef>,
     pub confidence: f32,
+    #[serde(default)]
+    pub source: Option<FrameSlotSource>,
 }
 
 #[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
@@ -1099,6 +1264,96 @@ pub struct RelationCandidate {
     pub evidence: Vec<EvidenceSpan>,
 }
 
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub enum UmrLiteRole {
+    Actor,
+    Target,
+    Recipient,
+    Location,
+    Time,
+    Instrument,
+    Source,
+    Destination,
+    Cause,
+    Outcome,
+}
+
+impl Default for UmrLiteRole {
+    fn default() -> Self {
+        Self::Actor
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub enum UmrLiteScopeKind {
+    Polarity,
+    Modality,
+    Conditional,
+    Attribution,
+}
+
+impl Default for UmrLiteScopeKind {
+    fn default() -> Self {
+        Self::Modality
+    }
+}
+
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct UmrLiteArgument {
+    pub role: UmrLiteRole,
+    pub range: TextRange,
+    pub surface: String,
+    pub entity_ref: Option<MentionEntityRef>,
+    pub confidence: f32,
+    pub source: Option<FrameSlotSource>,
+}
+
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct UmrLiteScope {
+    pub kind: UmrLiteScopeKind,
+    pub value: String,
+    pub range: Option<TextRange>,
+    pub confidence: f32,
+}
+
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct UmrLiteFrame {
+    pub frame_id: String,
+    pub sentence_index: usize,
+    pub trigger_range: TextRange,
+    pub lemma: String,
+    pub event_class: String,
+    pub relation_type: String,
+    pub clause_range: TextRange,
+    pub confidence: f32,
+    #[serde(default)]
+    pub arguments: Vec<UmrLiteArgument>,
+    #[serde(default)]
+    pub scopes: Vec<UmrLiteScope>,
+    #[serde(default)]
+    pub evidence: Vec<EvidenceSpan>,
+}
+
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct FrameFactCandidate {
+    pub fact_id: String,
+    pub frame_id: String,
+    pub sentence_index: usize,
+    pub fact_kind: String,
+    pub subject: String,
+    pub predicate: String,
+    pub object: String,
+    pub confidence: f32,
+    #[serde(default)]
+    pub evidence: Vec<EvidenceSpan>,
+}
+
 #[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SentenceFrame {
@@ -1122,6 +1377,10 @@ pub struct StructureRequest {
 pub struct StructureArtifact {
     pub sentence_frames: Vec<SentenceFrame>,
     pub relations: Vec<RelationCandidate>,
+    #[serde(default)]
+    pub umr_frames: Vec<UmrLiteFrame>,
+    #[serde(default)]
+    pub frame_facts: Vec<FrameFactCandidate>,
     pub evidence_spans: Vec<EvidenceSpan>,
     pub diagnostics: Vec<Diagnostic>,
 }

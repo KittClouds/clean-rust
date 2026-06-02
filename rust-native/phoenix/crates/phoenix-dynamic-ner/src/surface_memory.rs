@@ -134,6 +134,7 @@ impl SurfaceEntryBuilder {
             }
         }
         if let Some(MentionEntityRef::Known(entity_id)) = mention.entity_ref.as_ref() {
+            self.known_count += 1;
             self.known_target.get_or_insert_with(|| entity_id.0.clone());
         }
     }

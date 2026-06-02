@@ -4,11 +4,11 @@ use phoenix_graph_kernel::{
     KernelVertexId, PhoenixGraphKernel,
 };
 use phoenix_semantic_v2::{
-    CanonicalEventId, CanonicalEventRecord, CausalEdgeAddition, CausalScopeSidecar,
-    DocumentArchive, EventIdentityScopeSidecar, GraphCompilerSummary, MemoryClaimAtom,
-    MemoryConflictRecord, MemoryContinuityGapRecord, MemoryEventRecord, MemoryScopeSidecar,
-    MemoryStateRecord, TemporalAnchorId, TemporalAnchorRecord, TemporalReferenceEdge,
-    TemporalScopeSidecar, TemporalTimexId, TemporalTimexRecord,
+    BeliefStateCard, CanonicalEventId, CanonicalEventRecord, CausalEdgeAddition,
+    CausalScopeSidecar, DocumentArchive, EventIdentityScopeSidecar, GraphCompilerSummary,
+    MemoryClaimAtom, MemoryConflictRecord, MemoryContinuityGapRecord, MemoryEventRecord,
+    MemoryScopeSidecar, MemoryStateRecord, TemporalAnchorId, TemporalAnchorRecord,
+    TemporalReferenceEdge, TemporalScopeSidecar, TemporalTimexId, TemporalTimexRecord,
 };
 use phoenix_types::{BiTemporalWindow, EntityId, SemanticNodeRef};
 use rustc_hash::FxHashMap;
@@ -217,6 +217,9 @@ pub(crate) fn compile_graph_projection_with_archives(
                     &target_id,
                 ));
             }
+        }
+        for card in &sidecar.belief_cards {
+            add_belief_card(&mut builder, card, &canonical_by_event);
         }
     }
 
@@ -1004,6 +1007,122 @@ fn time_anchor_vertex(record: &TemporalAnchorRecord) -> KernelVertex {
     }
 }
 
+fn add_belief_card(
+    builder: &mut GraphProjectionBuilder,
+    card: &BeliefStateCard,
+    canonical_by_event: &FxHashMap<String, CanonicalEventId>,
+) {
+    let card_id = belief_card_vertex_id(card.card_id.as_str());
+    let temporal = kernel_temporal(&card.temporal);
+    builder.add_vertex(belief_card_vertex(card));
+    if let Some(event_id) = belief_event_vertex_id(card, canonical_by_event) {
+        builder.add_vertex_if_missing(belief_event_placeholder_vertex(&event_id, card, &temporal));
+        builder.add_edge(edge(
+            &card_id,
+            &event_id,
+            "about_event",
+            KernelRelationClass::Temporal,
+            json!({"truthStatus": label_of(&card.strongest_truth_status)}),
+            Some(card.document_id.clone()),
+            Some(temporal.clone()),
+            provenance("belief", card.confidence_millis, &card.evidence_refs),
+        ));
+    }
+    if let Some(observer_id) = card.observer_entity_id.as_ref() {
+        builder.add_edge(edge(
+            &card_id,
+            &entity_vertex_id(observer_id),
+            "observer",
+            KernelRelationClass::Semantic,
+            json!({"beliefKind": label_of(&card.strongest_kind)}),
+            Some(card.document_id.clone()),
+            Some(temporal.clone()),
+            KernelProvenance::default(),
+        ));
+    }
+    let view_id = belief_view_id(card);
+    builder.add_vertex(view_vertex(
+        &view_id,
+        json!({
+            "plane": "belief",
+            "worldlineId": card.worldline_id,
+            "truthStatus": label_of(&card.strongest_truth_status),
+            "beliefKind": label_of(&card.strongest_kind),
+        }),
+    ));
+    builder.add_edge(edge(
+        &card_id,
+        &view_id,
+        "under_view",
+        KernelRelationClass::Narrative,
+        json!({"axisId": card.axis_id}),
+        Some(card.document_id.clone()),
+        Some(temporal),
+        KernelProvenance::default(),
+    ));
+}
+
+fn belief_card_vertex(card: &BeliefStateCard) -> KernelVertex {
+    KernelVertex {
+        id: KernelVertexId(belief_card_vertex_id(card.card_id.as_str())),
+        kind: "beliefState".to_owned(),
+        class: KernelVertexClass::Generic,
+        labels: vec![
+            label_of(&card.strongest_truth_status),
+            label_of(&card.strongest_kind),
+        ],
+        weight: card.confidence_millis as i64,
+        value: json!({
+            "truthStatus": label_of(&card.strongest_truth_status),
+            "beliefKind": label_of(&card.strongest_kind),
+            "confidenceMillis": card.confidence_millis,
+        }),
+        attributes: json!({
+            "axisId": card.axis_id,
+            "worldlineId": card.worldline_id,
+            "sourceBeliefIds": card.source_belief_ids,
+            "openConflictIds": card.open_conflict_ids,
+        }),
+        temporal: kernel_temporal(&card.temporal),
+        provenance: provenance("belief", card.confidence_millis, &card.evidence_refs),
+        entity_id: card
+            .observer_entity_id
+            .as_ref()
+            .map(|value| value.0.clone()),
+        search_chunk_id: None,
+        document_id: Some(card.document_id.clone()),
+        note_id: None,
+        narrative_id: None,
+        folder_id: None,
+        folder_path: None,
+        chapter_id: None,
+        chapters: Vec::new(),
+        boundary_id: None,
+        boundary_ordinal: None,
+        boundary_kind: None,
+        boundary_ordinals: Vec::new(),
+        entity_facet: None,
+        calendar_facet: None,
+    }
+}
+
+fn belief_event_placeholder_vertex(
+    vertex_id: &str,
+    card: &BeliefStateCard,
+    temporal: &KernelBiTemporal,
+) -> KernelVertex {
+    simple_vertex(
+        vertex_id,
+        "event",
+        KernelVertexClass::Event,
+        json!({
+            "label": card.event_id,
+            "eventType": "beliefTarget",
+        }),
+        Some(temporal.clone()),
+    )
+}
+
 fn temporal_reference_kernel_edge(
     record: &TemporalReferenceEdge,
     canonical_by_event: &FxHashMap<String, CanonicalEventId>,
@@ -1199,6 +1318,23 @@ fn canonical_or_raw_event_vertex_id(
             })
         })
         .unwrap_or_else(|| "graph::event::unknown".to_owned())
+}
+
+fn belief_event_vertex_id(
+    card: &BeliefStateCard,
+    canonical_by_event: &FxHashMap<String, CanonicalEventId>,
+) -> Option<String> {
+    card.canonical_event_id
+        .as_ref()
+        .map(canonical_event_vertex_id)
+        .or_else(|| {
+            card.event_id.as_deref().map(|event_id| {
+                canonical_by_event
+                    .get(event_id)
+                    .map(canonical_event_vertex_id)
+                    .unwrap_or_else(|| memory_event_vertex_id(event_id))
+            })
+        })
 }
 
 fn edge(
@@ -1456,6 +1592,19 @@ fn gap_vertex_id(gap_id: &str) -> String {
     format!("graph::gap::{gap_id}")
 }
 
+fn belief_card_vertex_id(card_id: &str) -> String {
+    format!("graph::belief::{}", slug(card_id))
+}
+
+fn belief_view_id(card: &BeliefStateCard) -> String {
+    format!(
+        "graph::view::belief::{}::{}::{}",
+        slug(card.worldline_id.0.as_str()),
+        slug(label_of(&card.strongest_truth_status).as_str()),
+        slug(label_of(&card.strongest_kind).as_str())
+    )
+}
+
 fn value_vertex_id(prefix: &str, source_id: &str) -> String {
     format!("graph::value::{prefix}::{source_id}")
 }
@@ -1490,9 +1639,57 @@ mod tests {
     use super::*;
     use phoenix_graph_kernel::{causal_path_candidate_views_from_snapshot, KernelGraphSnapshot};
     use phoenix_semantic_v2::{
-        CausalClaimStatus, CausalEdgeId, CausalRelationKind, DocumentCausalSubstrate,
+        BeliefStateCard, BeliefStateKind, CausalClaimStatus, CausalEdgeId, CausalRelationKind,
+        DocumentCausalSubstrate, TemporalAxisId, TemporalScopeSidecar, TemporalTruthStatus,
+        TemporalWorldlineId,
     };
     use phoenix_types::{CausalKind, ClaimId, ClaimRecord, EventId, EventRecord, Polarity};
+
+    #[test]
+    fn compile_graph_projection_materializes_belief_cards() {
+        let sidecar = TemporalScopeSidecar {
+            belief_cards: vec![BeliefStateCard {
+                card_id: "bcard:event:1".to_owned(),
+                document_id: "doc-belief".to_owned(),
+                event_id: Some("event:1".to_owned()),
+                axis_id: TemporalAxisId("axis:world".to_owned()),
+                worldline_id: TemporalWorldlineId("worldline:main".to_owned()),
+                strongest_kind: BeliefStateKind::Observed,
+                strongest_truth_status: TemporalTruthStatus::Observed,
+                confidence_millis: 840,
+                temporal: BiTemporalWindow {
+                    valid_from: Some(10),
+                    valid_to: Some(10),
+                    recorded_from: Some(100),
+                    recorded_to: None,
+                },
+                source_belief_ids: vec!["belief:event:1".to_owned()],
+                evidence_refs: vec!["prop:1".to_owned()],
+                ..BeliefStateCard::default()
+            }],
+            ..TemporalScopeSidecar::default()
+        };
+
+        let projection =
+            compile_graph_projection("scope", None, Some(&sidecar), None, None, Some(100));
+        let belief_id = belief_card_vertex_id("bcard:event:1");
+
+        assert!(projection
+            .graph_batch
+            .vertices
+            .iter()
+            .any(|vertex| vertex.id.0 == belief_id && vertex.kind == "beliefState"));
+        assert!(projection.graph_batch.edges.iter().any(|edge| {
+            edge.source_id.0 == belief_id
+                && edge.edge_type.0 == "about_event"
+                && edge.target_id.0 == "graph::event::memory::event:1"
+        }));
+        assert!(projection
+            .graph_batch
+            .edges
+            .iter()
+            .any(|edge| { edge.source_id.0 == belief_id && edge.edge_type.0 == "under_view" }));
+    }
 
     #[test]
     fn causal_claim_endpoint_is_materialized_for_runtime_paths() {

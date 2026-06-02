@@ -406,6 +406,101 @@ describe('NerService provider orchestration', () => {
     ]);
   });
 
+  it('honors broad model labels and generic role cues without story-name overrides', async () => {
+    const service = makeService();
+    service.fstProvider.scan.mockResolvedValue([
+      {
+        label: 'Red Arcadia',
+        kind: 'LOCATION',
+        confidence: 'medium',
+        rawScore: 0.62,
+        reasoning: '',
+        evidence: 'The Red Arcadia interior had settled around the Kharon Vel access.',
+        aliases: [],
+      },
+      {
+        label: 'Arcadia',
+        kind: 'CHARACTER',
+        confidence: 'medium',
+        rawScore: 0.62,
+        reasoning: '',
+        evidence: 'Arcadia had swallowed the transit seat.',
+        aliases: [],
+      },
+      {
+        label: 'Boundary Veir',
+        kind: 'CONCEPT',
+        confidence: 'medium',
+        rawScore: 0.58,
+        reasoning: '',
+        evidence: "A full city's worth of Boundary Veir sat on the other side.",
+        aliases: [],
+      },
+      {
+        label: 'The Titan',
+        kind: 'CREATURE',
+        confidence: 'medium',
+        rawScore: 0.57,
+        reasoning: '',
+        evidence: 'The Titan crossed the lane.',
+        aliases: [],
+      },
+      {
+        label: 'Titan guard',
+        kind: 'CHARACTER',
+        confidence: 'medium',
+        rawScore: 0.57,
+        reasoning: '',
+        evidence: 'The Titan guard stood at the access.',
+        aliases: [],
+      },
+      {
+        label: 'dwarf',
+        kind: 'UNKNOWN',
+        confidence: 'low',
+        rawScore: 0.46,
+        reasoning: '',
+        evidence: 'A dwarf yelled the same word three times.',
+        aliases: [],
+      },
+      {
+        label: 'devil boy',
+        kind: 'UNKNOWN',
+        confidence: 'low',
+        rawScore: 0.45,
+        reasoning: '',
+        evidence: 'A devil boy with powdered sugar darted past.',
+        aliases: [],
+      },
+    ]);
+
+    await service.runManualScan('fst', {
+      noteId: 'note-1',
+      noteTitle: 'Untitled Note',
+      plainText: [
+        'The Red Arcadia interior had settled around the Kharon Vel access.',
+        'Arcadia had swallowed the transit seat.',
+        "A full city's worth of Boundary Veir sat on the other side.",
+        'The Titan crossed the lane.',
+        'The Titan guard stood at the access.',
+        'A dwarf yelled the same word three times.',
+        'A devil boy with powdered sugar darted past.',
+      ].join(' '),
+    });
+
+    expect(service.suggestions()).toEqual(expect.arrayContaining([
+      expect.objectContaining({ label: 'Red Arcadia', kind: 'LOCATION' }),
+      expect.objectContaining({ label: 'Boundary Veir', kind: 'CONCEPT' }),
+      expect.objectContaining({ label: 'The Titan', kind: 'CREATURE' }),
+      expect.objectContaining({ label: 'Titan guard', kind: 'NPC' }),
+      expect.objectContaining({ label: 'devil boy', kind: 'NPC' }),
+    ]));
+    expect(service.suggestions()).not.toEqual(expect.arrayContaining([
+      expect.objectContaining({ label: 'Arcadia', kind: 'LOCATION' }),
+      expect.objectContaining({ label: 'dwarf', kind: 'NPC' }),
+    ]));
+  });
+
   it('keeps provider kind stable and records location context as review evidence', async () => {
     const service = makeService();
     service.fstProvider.scan.mockResolvedValue([

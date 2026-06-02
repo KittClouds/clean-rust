@@ -90,6 +90,217 @@ export interface AtlasRichScanCandidateSummary {
     reviewReason?: string | null;
 }
 
+export type AtlasAliasRelation =
+    | 'exactKnownAlias'
+    | 'fullDesignation'
+    | 'nickname'
+    | 'codename'
+    | 'spellingVariant'
+    | 'titleOrRole'
+    | 'sameSurface'
+    | 'relatedButDistinct'
+    | 'typeConflict'
+    | 'ambiguous'
+    | 'newEntity';
+
+export type AtlasAliasProposalDecision = 'accept' | 'propose' | 'defer' | 'reject';
+
+export type AtlasAliasProposalTarget =
+    | {
+          knownEntity: {
+              entityId: string;
+              canonicalName: string;
+              kind?: string | null;
+          };
+      }
+    | {
+          runLocalSurface: {
+              key: string;
+              display: string;
+              kind?: string | null;
+          };
+      }
+    | 'newEntity'
+    | 'deferred';
+
+export interface AtlasAliasEvidence {
+    source: string;
+    confidence: number;
+    note: string;
+}
+
+export interface AtlasAliasProposalSummary {
+    caseId: string;
+    documentId: string;
+    mentionId: string;
+    surface: string;
+    normalized: string;
+    range: { start: number; end: number };
+    relation: AtlasAliasRelation;
+    target: AtlasAliasProposalTarget;
+    confidence: number;
+    decision: AtlasAliasProposalDecision;
+    evidence?: AtlasAliasEvidence[];
+    rationale: string;
+}
+
+export type AtlasIdentityReceiptAction =
+    | 'knownEntity'
+    | 'aliasOfKnown'
+    | 'fullDesignation'
+    | 'coreference'
+    | 'mergeRunLocal'
+    | 'split'
+    | 'defer'
+    | 'newEntity';
+
+export type AtlasIdentityTargetSummary =
+    | {
+          knownEntity: {
+              entityId: string;
+              canonicalName: string;
+              kind?: string | null;
+          };
+      }
+    | {
+          runLocalEntity: {
+              key: string;
+              display: string;
+              kind?: string | null;
+          };
+      }
+    | {
+          newEntity: {
+              key: string;
+              display: string;
+              kind?: string | null;
+          };
+      }
+    | 'deferred';
+
+export interface AtlasIdentityReceiptSummary {
+    receiptId: string;
+    documentId: string;
+    action: AtlasIdentityReceiptAction;
+    mentionIds?: string[];
+    surface: string;
+    target: AtlasIdentityTargetSummary;
+    confidence: number;
+    reversible: boolean;
+    evidence?: AtlasAliasEvidence[];
+    rationale: string;
+}
+
+export interface AtlasIdentityResolutionSummary {
+    nodeCount: number;
+    edgeCount: number;
+    receiptCount: number;
+    knownDecisions: number;
+    aliasDecisions: number;
+    coreferenceDecisions?: number;
+    mergeDecisions: number;
+    splitDecisions: number;
+    deferredDecisions: number;
+    newEntityDecisions: number;
+    receipts?: AtlasIdentityReceiptSummary[];
+}
+
+export type AtlasEvidenceArtifactKind =
+    | 'mention'
+    | 'kindVote'
+    | 'aliasProposal'
+    | 'identityReceipt'
+    | 'candidateSuggestion'
+    | 'graphEdge'
+    | 'frameTrigger'
+    | 'frameArgument'
+    | 'frameFact'
+    | 'userCorrection'
+    | 'rejection'
+    | 'datasetExample';
+
+export type AtlasEvidenceDecisionStatus =
+    | 'observed'
+    | 'accepted'
+    | 'proposed'
+    | 'deferred'
+    | 'rejected'
+    | 'corrected'
+    | 'reverted';
+
+export type AtlasDatasetExampleKind =
+    | 'nerSpan'
+    | 'kindVote'
+    | 'aliasDecision'
+    | 'identityResolution'
+    | 'candidateSuggestion'
+    | 'graphEdge'
+    | 'frameExtraction';
+
+export interface AtlasEvidenceReceiptSummary {
+    receiptId: string;
+    scanId: string;
+    documentId?: string | null;
+    noteId?: string | null;
+    stage: string;
+    artifactKind: AtlasEvidenceArtifactKind;
+    decisionStatus: AtlasEvidenceDecisionStatus;
+    subject: string;
+    predicate?: string | null;
+    object?: string | null;
+    surface?: string | null;
+    normalized?: string | null;
+    range?: { start: number; end: number } | null;
+    confidence: number;
+    source: string;
+    sourceVersion: string;
+    mentionIds?: string[];
+    evidenceRefs?: string[];
+    supersedes?: string[];
+    reverts?: string[];
+    payload?: unknown;
+    createdAt: number;
+}
+
+export interface AtlasEvidenceLedgerSummary {
+    receiptCount: number;
+    countsByStage?: Record<string, number>;
+    countsByKind?: Record<string, number>;
+    countsByDecision?: Record<string, number>;
+}
+
+export interface AtlasDatasetExampleSummary {
+    exampleId: string;
+    snapshotId: string;
+    datasetKind: string;
+    exampleKind: AtlasDatasetExampleKind;
+    documentId?: string | null;
+    label: string;
+    inputText: string;
+    target?: unknown;
+    sourceReceiptIds?: string[];
+    split: string;
+    payload?: unknown;
+    createdAt: number;
+}
+
+export interface AtlasDatasetSnapshotSummary {
+    snapshotId: string;
+    scanId: string;
+    datasetKind: string;
+    exampleCount: number;
+    sourceReceiptCount: number;
+    countsByKind?: Record<string, number>;
+    examples?: AtlasDatasetExampleSummary[];
+    createdAt: number;
+}
+
+export interface AtlasDatasetFactorySummary {
+    snapshotCount: number;
+    exampleCount: number;
+    snapshots?: AtlasDatasetSnapshotSummary[];
+}
+
 export interface AtlasRichScanResult {
     scanId: string;
     processedDocuments: number;
@@ -101,6 +312,10 @@ export interface AtlasRichScanResult {
     embeddingCounts: { leaf: number; entity: number; lens: number };
     relationCandidateCount: number;
     candidateSuggestions: AtlasRichScanCandidateSummary[];
+    aliasProposals?: AtlasAliasProposalSummary[];
+    identityResolution?: AtlasIdentityResolutionSummary;
+    evidenceLedger?: AtlasEvidenceLedgerSummary;
+    datasetFactory?: AtlasDatasetFactorySummary;
     appliedOptions?: AtlasRichScanAppliedOptions;
     preservationCounts?: Record<string, number>;
     diagnostics?: Array<{ code: string; message: string }>;
@@ -1351,6 +1566,8 @@ function toRustEntityKind(kind: string): string | null {
         case 'LOCATION':
             return 'location';
         case 'NPC':
+            return 'npc';
+        case 'CREATURE':
             return 'npc';
         case 'ITEM':
             return 'item';

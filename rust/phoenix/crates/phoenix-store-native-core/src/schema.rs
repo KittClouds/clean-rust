@@ -113,6 +113,106 @@ const PHOENIX_QUERY_LOG: &[PhoenixColumnSpec] = &[
     col("created_at", PhoenixColumnType::Int, false, false),
 ];
 
+const EVIDENCE_LEDGER: &[PhoenixColumnSpec] = &[
+    col("receipt_id", PhoenixColumnType::String, false, true),
+    col("scan_id", PhoenixColumnType::String, false, false),
+    col("document_id", PhoenixColumnType::String, true, false),
+    col("note_id", PhoenixColumnType::String, true, false),
+    col("stage", PhoenixColumnType::String, false, false),
+    col("artifact_kind", PhoenixColumnType::String, false, false),
+    col("decision_status", PhoenixColumnType::String, false, false),
+    col("subject", PhoenixColumnType::String, false, false),
+    col("predicate", PhoenixColumnType::String, true, false),
+    col("object", PhoenixColumnType::String, true, false),
+    col("surface", PhoenixColumnType::String, true, false),
+    col("normalized", PhoenixColumnType::String, true, false),
+    col("range", PhoenixColumnType::Json, true, false),
+    col("confidence", PhoenixColumnType::Float, false, false),
+    col("source", PhoenixColumnType::String, false, false),
+    col("source_version", PhoenixColumnType::String, false, false),
+    col("mention_ids", PhoenixColumnType::Json, false, false),
+    col("payload", PhoenixColumnType::Json, false, false),
+    col("evidence_refs", PhoenixColumnType::Json, false, false),
+    col("supersedes", PhoenixColumnType::Json, false, false),
+    col("reverts", PhoenixColumnType::Json, false, false),
+    col("created_at", PhoenixColumnType::Int, false, false),
+];
+
+const DATASET_SNAPSHOTS: &[PhoenixColumnSpec] = &[
+    col("snapshot_id", PhoenixColumnType::String, false, true),
+    col("scan_id", PhoenixColumnType::String, false, false),
+    col("dataset_kind", PhoenixColumnType::String, false, false),
+    col("example_count", PhoenixColumnType::Int, false, false),
+    col("source_receipt_count", PhoenixColumnType::Int, false, false),
+    col("counts_by_kind", PhoenixColumnType::Json, false, false),
+    col("payload", PhoenixColumnType::Json, false, false),
+    col("created_at", PhoenixColumnType::Int, false, false),
+];
+
+const DATASET_EXAMPLES: &[PhoenixColumnSpec] = &[
+    col("example_id", PhoenixColumnType::String, false, true),
+    col("snapshot_id", PhoenixColumnType::String, false, false),
+    col("dataset_kind", PhoenixColumnType::String, false, false),
+    col("example_kind", PhoenixColumnType::String, false, false),
+    col("document_id", PhoenixColumnType::String, true, false),
+    col("label", PhoenixColumnType::String, false, false),
+    col("input_text", PhoenixColumnType::String, false, false),
+    col("target_json", PhoenixColumnType::Json, false, false),
+    col("source_receipt_ids", PhoenixColumnType::Json, false, false),
+    col("split", PhoenixColumnType::String, false, false),
+    col("payload", PhoenixColumnType::Json, false, false),
+    col("created_at", PhoenixColumnType::Int, false, false),
+];
+
+const SEMANTIC_FRAMES: &[PhoenixColumnSpec] = &[
+    col("frame_id", PhoenixColumnType::String, false, true),
+    col("scan_id", PhoenixColumnType::String, false, false),
+    col("document_id", PhoenixColumnType::String, false, false),
+    col("note_id", PhoenixColumnType::String, true, false),
+    col("sentence_index", PhoenixColumnType::Int, false, false),
+    col("trigger_range", PhoenixColumnType::Json, false, false),
+    col("lemma", PhoenixColumnType::String, false, false),
+    col("event_class", PhoenixColumnType::String, false, false),
+    col("relation_type", PhoenixColumnType::String, false, false),
+    col("clause_range", PhoenixColumnType::Json, false, false),
+    col("confidence", PhoenixColumnType::Float, false, false),
+    col("scope_ops", PhoenixColumnType::Json, false, false),
+    col("payload", PhoenixColumnType::Json, false, false),
+    col("evidence_refs", PhoenixColumnType::Json, false, false),
+    col("created_at", PhoenixColumnType::Int, false, false),
+];
+
+const SEMANTIC_FRAME_ARGUMENTS: &[PhoenixColumnSpec] = &[
+    col("argument_id", PhoenixColumnType::String, false, true),
+    col("frame_id", PhoenixColumnType::String, false, false),
+    col("scan_id", PhoenixColumnType::String, false, false),
+    col("document_id", PhoenixColumnType::String, false, false),
+    col("role", PhoenixColumnType::String, false, false),
+    col("range", PhoenixColumnType::Json, false, false),
+    col("surface", PhoenixColumnType::String, false, false),
+    col("entity_ref", PhoenixColumnType::Json, true, false),
+    col("confidence", PhoenixColumnType::Float, false, false),
+    col("source", PhoenixColumnType::String, true, false),
+    col("payload", PhoenixColumnType::Json, false, false),
+    col("evidence_refs", PhoenixColumnType::Json, false, false),
+    col("created_at", PhoenixColumnType::Int, false, false),
+];
+
+const SEMANTIC_FRAME_FACTS: &[PhoenixColumnSpec] = &[
+    col("fact_id", PhoenixColumnType::String, false, true),
+    col("frame_id", PhoenixColumnType::String, false, false),
+    col("scan_id", PhoenixColumnType::String, false, false),
+    col("document_id", PhoenixColumnType::String, false, false),
+    col("fact_kind", PhoenixColumnType::String, false, false),
+    col("subject", PhoenixColumnType::String, false, false),
+    col("predicate", PhoenixColumnType::String, false, false),
+    col("object", PhoenixColumnType::String, false, false),
+    col("confidence", PhoenixColumnType::Float, false, false),
+    col("payload", PhoenixColumnType::Json, false, false),
+    col("evidence_refs", PhoenixColumnType::Json, false, false),
+    col("created_at", PhoenixColumnType::Int, false, false),
+];
+
 const NOTES: &[PhoenixColumnSpec] = &[
     col("id", PhoenixColumnType::String, false, true),
     col("version", PhoenixColumnType::Int, false, true),
@@ -736,6 +836,12 @@ pub const ALL_RELATIONS: &[PhoenixRelationSpec] = &[
     PhoenixRelationSpec::new("phoenix_commits", PHOENIX_COMMITS),
     PhoenixRelationSpec::new("phoenix_ingest_log", PHOENIX_INGEST_LOG),
     PhoenixRelationSpec::new("phoenix_query_log", PHOENIX_QUERY_LOG),
+    PhoenixRelationSpec::new("evidence_ledger", EVIDENCE_LEDGER),
+    PhoenixRelationSpec::new("dataset_snapshots", DATASET_SNAPSHOTS),
+    PhoenixRelationSpec::new("dataset_examples", DATASET_EXAMPLES),
+    PhoenixRelationSpec::new("semantic_frames", SEMANTIC_FRAMES),
+    PhoenixRelationSpec::new("semantic_frame_arguments", SEMANTIC_FRAME_ARGUMENTS),
+    PhoenixRelationSpec::new("semantic_frame_facts", SEMANTIC_FRAME_FACTS),
     PhoenixRelationSpec::new("notes", NOTES),
     PhoenixRelationSpec::new("entities", ENTITIES),
     PhoenixRelationSpec::new("edges", EDGES),
@@ -807,6 +913,12 @@ pub const DERIVED_SNAPSHOT_RELATIONS: &[&str] = &[
     "graph_vertex_labels",
     "graph_named_rules",
     "graph_rule_results",
+    "evidence_ledger",
+    "dataset_snapshots",
+    "dataset_examples",
+    "semantic_frames",
+    "semantic_frame_arguments",
+    "semantic_frame_facts",
 ];
 
 pub const CONTENT_SNAPSHOT_RELATIONS: &[&str] = &[
@@ -839,6 +951,12 @@ pub const CONTENT_SNAPSHOT_RELATIONS: &[&str] = &[
     "scoped_documents",
     "scoped_entity_fields",
     "scoped_definitions",
+    "evidence_ledger",
+    "dataset_snapshots",
+    "dataset_examples",
+    "semantic_frames",
+    "semantic_frame_arguments",
+    "semantic_frame_facts",
 ];
 
 pub const CORE_RELATIONS: &[&str] = &[
@@ -864,4 +982,10 @@ pub const CORE_RELATIONS: &[&str] = &[
     "graph_edges",
     "graph_candidate_edges",
     "graph_properties",
+    "evidence_ledger",
+    "dataset_snapshots",
+    "dataset_examples",
+    "semantic_frames",
+    "semantic_frame_arguments",
+    "semantic_frame_facts",
 ];

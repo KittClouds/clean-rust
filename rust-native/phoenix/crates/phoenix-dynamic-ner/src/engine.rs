@@ -16,9 +16,12 @@ use crate::native_lane::NativeDiscoveryLane;
 use crate::router::SurfaceRouter;
 use crate::schema::DynamicSchemaBuilder;
 use crate::scoring::MentionWorkspace;
+use crate::semantic_router::SemanticLabelRouter;
 use crate::surface_memory::SurfaceMemoryReport;
-use crate::traits::{AdjudicationDecision, DynamicNerModel, MentionAdjudicator, ModelNerWindow};
-use crate::types::{LabelBankContext, MentionPacket, NerRoute};
+use crate::traits::{
+    AdjudicationDecision, DynamicNerModel, MentionAdjudicator, ModelNerRequest, ModelNerWindow,
+};
+use crate::types::{LabelBankContext, LabelPack, MentionPacket, NerRoute};
 
 // ---------------------------------------------------------------------------
 // Input / Output
@@ -91,6 +94,7 @@ pub enum NerError {
 pub struct PhoenixNerEngine {
     router: SurfaceRouter,
     dynamic_schema: DynamicSchemaBuilder,
+    semantic_label_router: Option<Box<dyn SemanticLabelRouter + Send + Sync>>,
     adjudicator: Option<Box<dyn MentionAdjudicator + Send + Sync>>,
     model_ner: Option<Box<dyn DynamicNerModel + Send + Sync>>,
     max_adjudication_cases: usize,
@@ -100,6 +104,7 @@ pub struct PhoenixNerEngine {
 pub struct PhoenixNerEngineBuilder {
     router: SurfaceRouter,
     schema: DynamicSchemaBuilder,
+    semantic_label_router: Option<Box<dyn SemanticLabelRouter + Send + Sync>>,
     adjudicator: Option<Box<dyn MentionAdjudicator + Send + Sync>>,
     model_ner: Option<Box<dyn DynamicNerModel + Send + Sync>>,
     max_adjudication_cases: usize,
@@ -110,6 +115,7 @@ impl PhoenixNerEngineBuilder {
         Self {
             router: SurfaceRouter::default(),
             schema: DynamicSchemaBuilder::default(),
+            semantic_label_router: None,
             adjudicator: None,
             model_ner: None,
             max_adjudication_cases: 48,
@@ -131,6 +137,14 @@ impl PhoenixNerEngineBuilder {
         self
     }
 
+    pub fn semantic_label_router(
+        mut self,
+        router: Box<dyn SemanticLabelRouter + Send + Sync>,
+    ) -> Self {
+        self.semantic_label_router = Some(router);
+        self
+    }
+
     pub fn max_adjudication_cases(mut self, max_cases: usize) -> Self {
         self.max_adjudication_cases = max_cases;
         self
@@ -145,6 +159,7 @@ impl PhoenixNerEngineBuilder {
         PhoenixNerEngine {
             router: self.router,
             dynamic_schema: self.schema,
+            semantic_label_router: self.semantic_label_router,
             adjudicator: self.adjudicator,
             model_ner: self.model_ner,
             max_adjudication_cases: self.max_adjudication_cases,
@@ -225,12 +240,14 @@ impl PhoenixNerEngine {
             input.surface_hits,
         );
         let routes = self.router.plan_routes(
+            input.text,
             input.sentences,
             &needs,
             &self.dynamic_schema,
             &known_candidates,
             &native_candidates,
             input.label_bank_context,
+            self.semantic_label_router.as_deref(),
         );
         if let Some(metrics) = metrics.as_deref_mut() {
             metrics.route_planning_ms = phase_started.elapsed().as_millis();
@@ -248,6 +265,12 @@ impl PhoenixNerEngine {
 
         // === Lane 3 + 4: Model + Adjudication (optional) ===
         let phase_started = Instant::now();
+        struct ModelRouteWork<'a> {
+            window: ModelNerWindow<'a>,
+            window_start_offset: u32,
+            label_pack: LabelPack,
+        }
+        let mut model_routes = Vec::<ModelRouteWork<'_>>::new();
         for route in routes {
             match route {
                 NerRoute::DeterministicOnly | NerRoute::NativeDiscovery => {}
@@ -257,7 +280,7 @@ impl PhoenixNerEngine {
                     window_end_sentence,
                     label_pack,
                 } => {
-                    if let Some(model) = self.model_ner.as_ref() {
+                    if self.model_ner.is_some() {
                         let (window_text, window_start_offset) = Self::extract_window_text(
                             input.text,
                             input.sentences,
@@ -269,58 +292,11 @@ impl PhoenixNerEngine {
                             window_start_sentence,
                             window_end_sentence,
                         };
-                        match model.discover(&window, &label_pack) {
-                            Ok(spans) => {
-                                for span in spans {
-                                    let doc_start =
-                                        window_start_offset + span.window_relative_range.start;
-                                    let doc_end =
-                                        window_start_offset + span.window_relative_range.end;
-
-                                    // Find sentence index
-                                    let mut sent_idx = window_start_sentence;
-                                    for idx in window_start_sentence..window_end_sentence {
-                                        if let Some(s) = input.sentences.get(idx as usize) {
-                                            if doc_start >= s.range.start && doc_start < s.range.end
-                                            {
-                                                sent_idx = idx;
-                                                break;
-                                            }
-                                        }
-                                    }
-
-                                    let vote = crate::types::MentionVote {
-                                        source: crate::types::MentionSourceKind::ModelDiscovery,
-                                        label: Some(span.label.clone()),
-                                        entity_ref: None,
-                                        confidence: span.confidence,
-                                        reason: crate::types::VoteReason::ModelLabel,
-                                    };
-                                    let doc_range = phoenix_types::TextRange {
-                                        start: doc_start,
-                                        end: doc_end,
-                                    };
-                                    if !Self::accept_model_span(
-                                        input.text,
-                                        doc_range,
-                                        span.surface.as_str(),
-                                        span.label.as_str(),
-                                    ) {
-                                        continue;
-                                    }
-                                    workspace.add_discovered_span(
-                                        doc_range,
-                                        span.surface.clone(),
-                                        sent_idx,
-                                        vote,
-                                    );
-                                }
-                            }
-                            Err(e) => diagnostics.push(Diagnostic {
-                                code: "NER_MODEL_FAIL".into(),
-                                message: e.to_string(),
-                            }),
-                        }
+                        model_routes.push(ModelRouteWork {
+                            window,
+                            window_start_offset,
+                            label_pack,
+                        });
                     }
                 }
 
@@ -377,6 +353,81 @@ impl PhoenixNerEngine {
             }
         }
 
+        if let Some(model) = self.model_ner.as_ref() {
+            if !model_routes.is_empty() {
+                let requests = model_routes
+                    .iter()
+                    .map(|work| ModelNerRequest {
+                        window: work.window,
+                        label_pack: &work.label_pack,
+                    })
+                    .collect::<Vec<_>>();
+                match model.discover_batch(&requests) {
+                    Ok(outputs) if outputs.len() == model_routes.len() => {
+                        for (work, spans) in model_routes.iter().zip(outputs) {
+                            for span in spans {
+                                let doc_start =
+                                    work.window_start_offset + span.window_relative_range.start;
+                                let doc_end =
+                                    work.window_start_offset + span.window_relative_range.end;
+
+                                // Find sentence index.
+                                let mut sent_idx = work.window.window_start_sentence;
+                                for idx in work.window.window_start_sentence
+                                    ..work.window.window_end_sentence
+                                {
+                                    if let Some(s) = input.sentences.get(idx as usize) {
+                                        if doc_start >= s.range.start && doc_start < s.range.end {
+                                            sent_idx = idx;
+                                            break;
+                                        }
+                                    }
+                                }
+
+                                let vote = crate::types::MentionVote {
+                                    source: crate::types::MentionSourceKind::ModelDiscovery,
+                                    label: Some(span.label.clone()),
+                                    entity_ref: None,
+                                    confidence: span.confidence,
+                                    reason: crate::types::VoteReason::ModelLabel,
+                                };
+                                let doc_range = phoenix_types::TextRange {
+                                    start: doc_start,
+                                    end: doc_end,
+                                };
+                                if !Self::accept_model_span(
+                                    input.text,
+                                    doc_range,
+                                    span.surface.as_str(),
+                                    span.label.as_str(),
+                                ) {
+                                    continue;
+                                }
+                                workspace.add_discovered_span(
+                                    doc_range,
+                                    span.surface.clone(),
+                                    sent_idx,
+                                    vote,
+                                );
+                            }
+                        }
+                    }
+                    Ok(outputs) => diagnostics.push(Diagnostic {
+                        code: "NER_MODEL_FAIL".into(),
+                        message: format!(
+                            "batch model returned {} outputs for {} requests",
+                            outputs.len(),
+                            model_routes.len()
+                        ),
+                    }),
+                    Err(e) => diagnostics.push(Diagnostic {
+                        code: "NER_MODEL_FAIL".into(),
+                        message: e.to_string(),
+                    }),
+                }
+            }
+        }
+
         if let Some(adj) = self.adjudicator.as_ref() {
             let cases = workspace.build_kind_adjudication_cases(
                 input.text,
@@ -395,6 +446,7 @@ impl PhoenixNerEngine {
                 }
             }
         }
+        workspace.apply_context_kind_hints(input.text, input.sentences);
         if let Some(metrics) = metrics.as_deref_mut() {
             metrics.model_and_adjudication_ms = phase_started.elapsed().as_millis();
         }
@@ -737,7 +789,7 @@ mod tests {
                     let label = match case.surface.as_str() {
                         "Rook" => "Character",
                         "Allied Table" => "Organization",
-                        "Mesa" => "Location",
+                        "Red Mesa" => "Location",
                         _ => return None,
                     };
                     Some(crate::traits::AdjudicationDecision {
@@ -810,6 +862,32 @@ mod tests {
         let result = engine.extract_mentions(&input).unwrap();
         assert!(!result.mentions.is_empty());
         assert_eq!(result.mentions[0].surface.as_str(), "Kamaria");
+    }
+
+    #[test]
+    fn known_first_name_can_emit_quoted_full_name_alias() {
+        let (lexicon, scope) = test_lexicon(&["Kai"]);
+        let text = "\u{201c}Riftmach Gearlock.\u{201d}\n\n\u{201c}Kai Gearlock,\u{201d} Kai said.";
+        let sentences = period_sentences(text);
+        let tokens = simple_tokens(text);
+        let engine = PhoenixNerEngineBuilder::new().build();
+        let input = SurfaceNerInput {
+            document_id: "doc1",
+            text,
+            tokens: &tokens,
+            sentences: &sentences,
+            scope: &scope,
+            lexicon: Some(&lexicon),
+            surface_hits: &[],
+            label_bank_context: None,
+        };
+
+        let result = engine.extract_mentions(&input).unwrap();
+
+        assert!(result
+            .mentions
+            .iter()
+            .any(|mention| mention.surface.as_str() == "Kai Gearlock"));
     }
 
     #[test]
@@ -973,7 +1051,7 @@ mod tests {
         for (surface, label) in [
             ("Rook", "Character"),
             ("Allied Table", "Organization"),
-            ("Mesa", "Location"),
+            ("Red Mesa", "Location"),
         ] {
             let mention = result
                 .mentions

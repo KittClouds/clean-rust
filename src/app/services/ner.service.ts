@@ -111,6 +111,10 @@ const KNOWN_LOCATION_SURFACES = new Set([
 
 const LOCATION_SUFFIX_PATTERN = /\b(?:citadel|works|tower|palace|house|harbor|port|city|capital|country|nation|realm|kingdom|empire|territory|province|region|mesa|keep|range|ranges|road|roads|route|routes|river|rivers|lock|locks|zone|zones|camp|camps)\b/iu;
 
+const CONCEPT_SURFACE_PATTERN = /\b(?:concept|theory|principle|rule|law|field|system|force|rank|state|claim|claims)\b/iu;
+
+const NPC_ROLE_SURFACE_PATTERN = /\b(?:guard|teenager|girl|woman|boy|vendor|folk|denizen|citizen|civilian|elder|soldier|warrior|mage|priest|healer|merchant)\b/iu;
+
 const KNOWN_NETWORK_SURFACES = new Set([
     'allied table',
     'atlas',
@@ -162,6 +166,12 @@ function resolvePhoenixScanKind(candidate: PhoenixDiscoveryCandidate, text: stri
     if (isLikelyNetworkEntityLabel(label, text)) {
         return 'NETWORK';
     }
+    if (isLikelyConceptEntityLabel(label, text)) {
+        return 'CONCEPT';
+    }
+    if (isLikelyNpcEntityLabel(label, text)) {
+        return 'NPC';
+    }
     if (normalized === 'CHARACTER') {
         return isLikelyCharacterName(label, text) ? 'CHARACTER' : 'UNKNOWN';
     }
@@ -175,7 +185,6 @@ function resolvePhoenixScanKind(candidate: PhoenixDiscoveryCandidate, text: stri
     if (isLikelyLocationEntityLabel(label, text)) {
         return 'LOCATION';
     }
-
     return normalized;
 }
 
@@ -188,6 +197,7 @@ function isPlausiblePhoenixDiscoveryCandidate(candidate: PhoenixDiscoveryCandida
     const normalized = label.toLocaleLowerCase();
     const words = normalized.split(/\s+/).filter(Boolean);
     const casedWords = label.split(/\s+/).filter(Boolean);
+    const kind = normalizeSuggestedEntityKind(String(candidate.kind || 'UNKNOWN'));
     if (!words.length || words.length > 4) {
         return false;
     }
@@ -196,21 +206,28 @@ function isPlausiblePhoenixDiscoveryCandidate(candidate: PhoenixDiscoveryCandida
     }
     const locationLike = isLikelyLocationEntityLabel(label, text);
     const networkLike = isLikelyNetworkEntityLabel(label, text);
+    const conceptLike = isLikelyConceptEntityLabel(label, text);
+    const npcLike = isLikelyNpcEntityLabel(label, text);
     if (words.length > 1 && (
         PHOENIX_DISCOVERY_STOPWORDS.has(words[0]) ||
         PHOENIX_DISCOVERY_STOPWORDS.has(words[words.length - 1])
-    ) && !locationLike && !networkLike) {
+    ) && !locationLike && !networkLike && !conceptLike && !npcLike && (kind === 'UNKNOWN' || kind === 'OTHER')) {
         return false;
     }
     if (words.length === 1 && COMMON_SENTENCE_STARTERS.has(words[0])) {
         return false;
     }
 
-    const kind = normalizeSuggestedEntityKind(String(candidate.kind || 'UNKNOWN'));
     if (locationLike) {
         return true;
     }
     if (networkLike) {
+        return true;
+    }
+    if (conceptLike) {
+        return true;
+    }
+    if (npcLike) {
         return true;
     }
     if (kind === 'CHARACTER') {
@@ -268,6 +285,35 @@ export function isLikelyNetworkEntityLabel(label: string, text: string): boolean
         `\\b(?:local|private|state-backed|federal|phantom|warden)\\s+${escaped}\\b`,
     ].join('|'), 'iu');
     return contextPattern.test(text);
+}
+
+export function isLikelyConceptEntityLabel(label: string, text: string): boolean {
+    const cleaned = cleanPhoenixCandidateLabel(label);
+    if (!cleaned) return false;
+
+    const normalized = cleaned.toLocaleLowerCase();
+    const words = normalized.split(/\s+/).filter(Boolean);
+    if (words.length > 1 && CONCEPT_SURFACE_PATTERN.test(cleaned)) {
+        return true;
+    }
+
+    const escaped = escapeRegExp(cleaned);
+    const contextPattern = new RegExp([
+        `\\b(?:boundary|full\\s+city(?:'|\\u2019)?s\\s+worth\\s+of|worth\\s+of)\\s+${escaped}\\b`,
+        `\\b${escaped}\\b\\s+(?:sitting|weight|pressure|field|settled|classification|rank|pulse|claim|claims)\\b`,
+    ].join('|'), 'iu');
+    return contextPattern.test(text);
+}
+
+export function isLikelyNpcEntityLabel(label: string, text: string): boolean {
+    const cleaned = cleanPhoenixCandidateLabel(label);
+    if (!cleaned) return false;
+
+    if (NPC_ROLE_SURFACE_PATTERN.test(cleaned)) {
+        return true;
+    }
+
+    return false;
 }
 
 function isLikelyCharacterName(label: string, text: string): boolean {
@@ -743,6 +789,24 @@ function buildKindVotes(
         });
     }
 
+    if (isLikelyConceptEntityLabel(label, text) && normalizedKind !== 'CONCEPT') {
+        votes.push({
+            kind: 'CONCEPT',
+            source: 'angular_concept_context',
+            confidence: 0.48,
+            reason: 'review_only_concept_context',
+        });
+    }
+
+    if (isLikelyNpcEntityLabel(label, text) && normalizedKind !== 'NPC') {
+        votes.push({
+            kind: 'NPC',
+            source: 'angular_npc_context',
+            confidence: 0.44,
+            reason: 'review_only_npc_context',
+        });
+    }
+
     if (isLikelyNetworkEntityLabel(label, text) && normalizedKind !== 'NETWORK') {
         votes.push({
             kind: 'NETWORK',
@@ -776,7 +840,12 @@ function requiresReview(
     if (normalizeDecisionStatus(upstreamStatus, kind, confidence) !== 'accepted') return true;
     const normalizedKind = normalizeKindVote(kind);
     return votes.some((vote) => (
-        (vote.source === 'angular_location_context' || vote.source === 'angular_network_context')
+        (
+            vote.source === 'angular_location_context'
+            || vote.source === 'angular_network_context'
+            || vote.source === 'angular_concept_context'
+            || vote.source === 'angular_npc_context'
+        )
         && vote.kind !== normalizedKind
     ));
 }
@@ -789,6 +858,12 @@ function reviewReason(kind: string, confidence: number, votes: NerKindVote[]): s
     }
     if (votes.some((vote) => vote.source === 'angular_network_context' && vote.kind !== normalizeKindVote(kind))) {
         return 'network_context_conflict';
+    }
+    if (votes.some((vote) => vote.source === 'angular_concept_context' && vote.kind !== normalizeKindVote(kind))) {
+        return 'concept_context_conflict';
+    }
+    if (votes.some((vote) => vote.source === 'angular_npc_context' && vote.kind !== normalizeKindVote(kind))) {
+        return 'npc_context_conflict';
     }
     return undefined;
 }

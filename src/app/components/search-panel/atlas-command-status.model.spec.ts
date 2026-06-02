@@ -99,7 +99,7 @@ describe('atlas command status model', () => {
             graphStatus: 'ready',
             manifoldMode: 'lorentz',
             manifoldStatus: 'loading',
-            manifoldStatuses: { hybrid: 'ready', hopf: 'stale', lorentz: 'loading' },
+            manifoldStatuses: { hybrid: 'ready', hopf: 'stale', lorentz: 'loading', product: 'idle' },
             dynamicNerStatus: 'cold',
             enabledLanes: ['lexical'],
             embeddingModelLabel: 'MDBR Leaf',
@@ -111,6 +111,7 @@ describe('atlas command status model', () => {
             ['Hybrid space', 'ready'],
             ['Hopf projection', 'stale'],
             ['Lorentz forest', 'loading'],
+            ['Product manifold', 'idle'],
         ]);
     });
 
@@ -135,7 +136,7 @@ describe('atlas command status model', () => {
             graphStatus: 'ready',
             manifoldMode: 'hybrid',
             manifoldStatus: 'ready',
-            manifoldStatuses: { hybrid: 'ready', hopf: 'stale', lorentz: 'idle' },
+            manifoldStatuses: { hybrid: 'ready', hopf: 'stale', lorentz: 'idle', product: 'idle' },
             dynamicNerStatus: 'ready',
             enabledLanes: ['lexical', 'graph'],
             embeddingModelLabel: 'MDBR Leaf',
@@ -154,6 +155,7 @@ describe('atlas command status model', () => {
             'semanticCandidate',
             'nliAdjudication',
             'lorentzForest',
+            'productManifold',
         ]);
         expect(status.sleepingCapabilities.find((capability) => capability.id === 'temporalGraph')?.status).toBe('idle');
         expect(status.sleepingCapabilities.find((capability) => capability.id === 'causalGraph')?.detail).toContain('read-only native store probe');

@@ -121,6 +121,40 @@ describe('graph rebuild entity linking', () => {
         expect(result.counters.shadowLinks).toBe(result.suggestions.length);
     });
 
+    it('links expanded fantasy full names back to their short canonical name', () => {
+        const anchors = [
+            anchor('a-rift', 'e-rift', 'Rift'),
+        ];
+        const nodes = [
+            node('e-rift', 'Rift', 'CHARACTER', [], 7),
+            node('e-kai', 'Kai', 'CHARACTER', [], 5),
+        ];
+        const mentions = [
+            ...anchors,
+            mention('m-riftmach', 'Riftmach Gearlock', 'dropped', 220, 238),
+        ];
+
+        const result = buildGraphRebuildEntityLinkSuggestions({
+            mentions,
+            entityAnchors: anchors,
+            nodes,
+            edges: [],
+            structuralPostProcess: buildGraphRebuildStructuralPostProcess(nodes, []),
+        });
+
+        expect(result.suggestions).toEqual(expect.arrayContaining([
+            expect.objectContaining({
+                id: 'entity-link:linker:m-riftmach:e-rift',
+                surface: 'Riftmach Gearlock',
+                candidateEntityId: 'e-rift',
+                decision: 'same_entity',
+                rationale: expect.arrayContaining([
+                    'linker: first-token stem',
+                ]),
+            }),
+        ]));
+    });
+
     it('stages relation duplicate suspicion as shadow-only review data', () => {
         const nodes = [
             node('e-kai', 'Kai', 'CHARACTER', []),

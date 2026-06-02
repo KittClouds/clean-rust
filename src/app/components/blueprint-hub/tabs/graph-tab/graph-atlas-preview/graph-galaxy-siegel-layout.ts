@@ -279,20 +279,44 @@ function buildDirectionGuide(nodes: GalaxyNode[]): GalaxyLorentzGuide {
 }
 
 function directedCurve(source: GalaxyNode, target: GalaxyNode, sourceInfo: SiegelInfo, targetInfo: SiegelInfo, link: GalaxyEdge): Float32Array {
-    const steps = 12;
+    const steps = 16;
     const positions = new Float32Array(steps * 6);
     const bridge = sourceInfo.lane !== targetInfo.lane;
     const lift = bridge ? 0.22 : 0.09;
+    const sourcePoint = vectorOf(source);
+    const targetPoint = vectorOf(target);
     const mid = {
         x: (source.x + target.x) * 0.5 + (target.x >= source.x ? lift : -lift * 0.4),
         y: (source.y + target.y) * 0.5 + (stableUnit(`${link.id}:siegel-y`) - 0.5) * (bridge ? 0.22 : 0.08),
         z: (source.z + target.z) * 0.5 + (stableUnit(`${link.id}:siegel-z`) - 0.5) * (bridge ? 0.56 : 0.18),
     };
+    const chord = normalize({
+        x: target.x - source.x,
+        y: target.y - source.y,
+        z: target.z - source.z,
+    }, { x: 1, y: 0, z: 0 });
+    const lane = laneDirection(bridge ? 'bridge' : targetInfo.lane || sourceInfo.lane);
+    const curlNormal = normalize(cross(chord, lane), lane);
+    const curlSign = stableUnit(`${link.id}:siegel-terminal`) > 0.5 ? 1 : -1;
+    const curlAmount = bridge ? 0.1 : 0.064;
     for (let index = 0; index < steps; index++) {
-        writeQuadratic(positions, index * 6, source, mid, target, index / steps);
-        writeQuadratic(positions, index * 6 + 3, source, mid, target, (index + 1) / steps);
+        writeVec(positions, index * 6, embellishedDirectedPoint(sourcePoint, mid, targetPoint, curlNormal, index / steps, curlAmount, curlSign));
+        writeVec(positions, index * 6 + 3, embellishedDirectedPoint(sourcePoint, mid, targetPoint, curlNormal, (index + 1) / steps, curlAmount, curlSign));
     }
     return positions;
+}
+
+function embellishedDirectedPoint(a: Vec3, b: Vec3, c: Vec3, normal: Vec3, t: number, amount: number, sign: number): Vec3 {
+    const point = quadraticPoint(a, b, c, t);
+    const curl = terminalFlourish(t, amount) * sign;
+    return add(point, scale(normal, curl));
+}
+
+function terminalFlourish(t: number, amount: number): number {
+    const width = 0.28;
+    const start = t < width ? Math.sin(Math.PI * t / width) : 0;
+    const end = t > 1 - width ? Math.sin(Math.PI * (1 - t) / width) : 0;
+    return amount * (end - start * 0.45);
 }
 
 function fallbackDepth(node: GalaxyNode, lane: string): number {
@@ -354,10 +378,30 @@ function pullPair(source: GalaxyNode, target: GalaxyNode, ideal: number, strengt
 }
 
 function writeQuadratic(buffer: Float32Array, offset: number, a: Vec3, b: Vec3, c: Vec3, t: number): void {
+    writeVec(buffer, offset, quadraticPoint(a, b, c, t));
+}
+
+function quadraticPoint(a: Vec3, b: Vec3, c: Vec3, t: number): Vec3 {
     const left = (1 - t) * (1 - t);
     const mid = 2 * (1 - t) * t;
     const right = t * t;
-    buffer[offset] = left * a.x + mid * b.x + right * c.x;
-    buffer[offset + 1] = left * a.y + mid * b.y + right * c.y;
-    buffer[offset + 2] = left * a.z + mid * b.z + right * c.z;
+    return {
+        x: left * a.x + mid * b.x + right * c.x,
+        y: left * a.y + mid * b.y + right * c.y,
+        z: left * a.z + mid * b.z + right * c.z,
+    };
+}
+
+function writeVec(buffer: Float32Array, offset: number, value: Vec3): void {
+    buffer[offset] = value.x;
+    buffer[offset + 1] = value.y;
+    buffer[offset + 2] = value.z;
+}
+
+function cross(left: Vec3, right: Vec3): Vec3 {
+    return {
+        x: left.y * right.z - left.z * right.y,
+        y: left.z * right.x - left.x * right.z,
+        z: left.x * right.y - left.y * right.x,
+    };
 }

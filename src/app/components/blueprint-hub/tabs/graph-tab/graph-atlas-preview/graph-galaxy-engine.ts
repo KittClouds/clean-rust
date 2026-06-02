@@ -792,10 +792,7 @@ const TAU = Math.PI * 2;
 const HOPF_RIBBON_SEGMENTS = 96;
 const HOPF_DATA_FIBER_GUIDE_LIMIT = 48;
 const HOPF_CROSS_FIBER_BRAID_LIMIT = 96;
-const HOPF_DATA_FIBER_MIN_SEGMENTS = 18;
-const HOPF_DATA_FIBER_PHASE_PAD_BASE = TAU * 0.045;
-const HOPF_DATA_FIBER_PHASE_PAD_RATIO = 0.09;
-const HOPF_DATA_FIBER_MIN_SEAM = TAU * 0.035;
+const HOPF_CROSS_FIBER_BRAID_SEGMENTS = 48;
 interface HopfBaseInfo extends Rgb {
     key: string;
     direction: { x: number; y: number; z: number };
@@ -1330,19 +1327,13 @@ function buildHopfCrossFiberBraid(source: GalaxyNode, target: GalaxyNode, link: 
 }
 
 function hopfBraidSegments(source: GalaxyNode, target: GalaxyNode, seed: number): Float32Array {
-    const segments = 18;
+    const segments = HOPF_CROSS_FIBER_BRAID_SEGMENTS;
     const positions = new Float32Array(segments * 2 * 3);
-    const midpoint = {
-        x: (source.x + target.x) * 0.34,
-        y: (source.y + target.y) * 0.34,
-        z: (source.z + target.z) * 0.34,
-    };
-    const twist = (seed - 0.5) * 0.32;
     for (let index = 0; index < segments; index++) {
         const a = index / segments;
         const b = (index + 1) / segments;
-        const left = hopfBraidPoint(source, target, midpoint, a, twist);
-        const right = hopfBraidPoint(source, target, midpoint, b, twist);
+        const left = hopfBraidPoint(source, target, a, seed);
+        const right = hopfBraidPoint(source, target, b, seed);
         const offset = index * 6;
         positions[offset] = left.x;
         positions[offset + 1] = left.y;
@@ -1357,17 +1348,47 @@ function hopfBraidSegments(source: GalaxyNode, target: GalaxyNode, seed: number)
 function hopfBraidPoint(
     source: GalaxyNode,
     target: GalaxyNode,
-    midpoint: { x: number; y: number; z: number },
     t: number,
-    twist: number,
+    seed: number,
 ): { x: number; y: number; z: number } {
-    const u = 1 - t;
-    const wobble = Math.sin(t * Math.PI) * twist;
+    const sourceRadius = Math.max(0.0001, Math.hypot(source.x, source.y, source.z));
+    const targetRadius = Math.max(0.0001, Math.hypot(target.x, target.y, target.z));
+    const sourceUnit = { x: source.x / sourceRadius, y: source.y / sourceRadius, z: source.z / sourceRadius };
+    const targetUnit = { x: target.x / targetRadius, y: target.y / targetRadius, z: target.z / targetRadius };
+    const normal = hopfBraidNormal(sourceUnit, targetUnit, seed);
+    const sweep = Math.sin(Math.PI * t);
+    const sign = seed < 0.5 ? -1 : 1;
+    const bend = (0.26 + seed * 0.16) * sweep * sign;
+    const spin = Math.sin(TAU * t + seed * TAU) * 0.055 * sweep;
+    const direction = normalizeVector({
+        x: sourceUnit.x * (1 - t) + targetUnit.x * t + normal.x * bend + (targetUnit.y * normal.z - targetUnit.z * normal.y) * spin,
+        y: sourceUnit.y * (1 - t) + targetUnit.y * t + normal.y * bend + (targetUnit.z * normal.x - targetUnit.x * normal.z) * spin,
+        z: sourceUnit.z * (1 - t) + targetUnit.z * t + normal.z * bend + (targetUnit.x * normal.y - targetUnit.y * normal.x) * spin,
+    }, sourceUnit);
+    const radius = sourceRadius * (1 - t) + targetRadius * t + 0.2 * sweep;
     return {
-        x: u * u * source.x + 2 * u * t * (midpoint.x + wobble) + t * t * target.x,
-        y: u * u * source.y + 2 * u * t * (midpoint.y - wobble * 0.42) + t * t * target.y,
-        z: u * u * source.z + 2 * u * t * (midpoint.z + wobble * 0.58) + t * t * target.z,
+        x: direction.x * radius,
+        y: direction.y * radius,
+        z: direction.z * radius,
     };
+}
+
+function hopfBraidNormal(
+    sourceUnit: { x: number; y: number; z: number },
+    targetUnit: { x: number; y: number; z: number },
+    seed: number,
+): { x: number; y: number; z: number } {
+    const cross = {
+        x: sourceUnit.y * targetUnit.z - sourceUnit.z * targetUnit.y,
+        y: sourceUnit.z * targetUnit.x - sourceUnit.x * targetUnit.z,
+        z: sourceUnit.x * targetUnit.y - sourceUnit.y * targetUnit.x,
+    };
+    const fallback = normalizeVector({
+        x: sourceUnit.y * (seed < 0.5 ? -1 : 1) - sourceUnit.z * 0.38,
+        y: sourceUnit.z + 0.22,
+        z: -sourceUnit.x + sourceUnit.y * 0.38,
+    }, stableVector(`hopf-braid:${seed.toFixed(6)}`));
+    return normalizeVector(cross, fallback);
 }
 
 function hopfRibbonSegments(direction: { x: number; y: number; z: number }, phases: number[]): Float32Array {
@@ -1393,69 +1414,7 @@ function hopfRibbonSegments(direction: { x: number; y: number; z: number }, phas
 }
 
 function hopfDataFiberSegments(info: HopfBaseInfo): Float32Array {
-    const samples = hopfSupportedPhaseSamples(info.phases);
-    if (samples.length < 2) return new Float32Array(0);
-    const positions = new Float32Array((samples.length - 1) * 2 * 3);
-    for (let index = 0; index < samples.length - 1; index++) {
-        const current = hopfStereographicProjection(info.direction, normalizePhaseRadians(samples[index]), 1);
-        const next = hopfStereographicProjection(info.direction, normalizePhaseRadians(samples[index + 1]), 1);
-        const offset = index * 6;
-        positions[offset] = current.x;
-        positions[offset + 1] = current.y;
-        positions[offset + 2] = current.z;
-        positions[offset + 3] = next.x;
-        positions[offset + 4] = next.y;
-        positions[offset + 5] = next.z;
-    }
-    return positions;
-}
-
-function hopfSupportedPhaseSamples(phases: number[]): number[] {
-    const sorted = [...new Set(phases.map(roundPhase))].sort((left, right) => left - right);
-    if (sorted.length < 2) return sorted;
-
-    let gapIndex = 0;
-    let largestGap = -1;
-    for (let index = 0; index < sorted.length; index++) {
-        const current = sorted[index];
-        const next = sorted[(index + 1) % sorted.length] + (index === sorted.length - 1 ? TAU : 0);
-        const gap = next - current;
-        if (gap > largestGap) {
-            largestGap = gap;
-            gapIndex = index;
-        }
-    }
-
-    const supportStart = sorted[(gapIndex + 1) % sorted.length];
-    const rawEnd = sorted[gapIndex];
-    const supportEnd = rawEnd < supportStart ? rawEnd + TAU : rawEnd;
-    const supportSpan = Math.max(0.035, supportEnd - supportStart);
-    const phasePad = Math.min(
-        Math.max(0, largestGap - HOPF_DATA_FIBER_MIN_SEAM) * 0.45,
-        HOPF_DATA_FIBER_PHASE_PAD_BASE + supportSpan * HOPF_DATA_FIBER_PHASE_PAD_RATIO,
-    );
-    const start = supportStart - phasePad;
-    const end = supportEnd + phasePad;
-    const span = Math.max(0.035, end - start);
-    const sampleCount = Math.min(
-        HOPF_RIBBON_SEGMENTS,
-        Math.max(HOPF_DATA_FIBER_MIN_SEGMENTS, Math.ceil((span / TAU) * HOPF_RIBBON_SEGMENTS)),
-    );
-    const samples = new Set<number>();
-    for (let index = 0; index <= sampleCount; index++) {
-        samples.add(roundUnwrappedPhase(start + (span * index) / sampleCount));
-    }
-    for (const phase of sorted) {
-        const unwrapped = phase < supportStart ? phase + TAU : phase;
-        if (unwrapped >= supportStart - 0.000001 && unwrapped <= supportEnd + 0.000001) {
-            samples.add(roundUnwrappedPhase(unwrapped));
-        }
-    }
-    return [...samples].sort((left, right) => left - right);
-}
-
-function roundUnwrappedPhase(value: number): number {
-    return Math.round(value * 1000000) / 1000000;
+    return hopfRibbonSegments(info.direction, info.phases);
 }
 
 function hopfStereographicProjection(direction: { x: number; y: number; z: number }, phase: number, scale: number): { x: number; y: number; z: number } {
@@ -1473,12 +1432,20 @@ function hopfStereographicProjection(direction: { x: number; y: number; z: numbe
     const inverse = 1 / Math.max(0.32, 1 - y2);
     const raw = { x: x1 * inverse, y: x2 * inverse, z: y1 * inverse };
     const norm = Math.hypot(raw.x, raw.y, raw.z);
-    const bound = norm > HOPF_MAX_RADIUS ? HOPF_MAX_RADIUS / norm : 1;
+    const compactNorm = hopfCompactRadius(norm);
+    const bound = norm > 0.0001 ? compactNorm / norm : 1;
     return {
         x: raw.x * bound * HOPF_PROJECTION_RADIUS * scale,
         y: raw.y * bound * HOPF_PROJECTION_RADIUS * scale,
         z: raw.z * bound * HOPF_PROJECTION_RADIUS * scale,
     };
+}
+
+function hopfCompactRadius(norm: number): number {
+    const knee = HOPF_MAX_RADIUS * 0.76;
+    if (norm <= knee) return norm;
+    const remaining = HOPF_MAX_RADIUS - knee;
+    return knee + remaining * (1 - Math.exp(-(norm - knee) / Math.max(0.0001, remaining)));
 }
 
 function hopfPhase(node: GalaxyNode, baseKey: string | null): number {

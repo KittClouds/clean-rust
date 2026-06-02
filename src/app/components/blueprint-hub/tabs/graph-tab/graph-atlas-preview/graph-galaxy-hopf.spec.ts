@@ -61,6 +61,7 @@ describe('Hopf galaxy visualization data', () => {
             'hopf:fiber:kai:causal',
         ]);
         expect((first.hopfRibbons?.[0]?.positions3d.length || 0) / 6).toBeGreaterThan(48);
+        expect(segmentLoopGap(first.hopfRibbons![0].positions3d)).toBeLessThan(0.00001);
     });
 
     it('does not emit Hopf guide geometry for the hybrid universe', () => {
@@ -83,8 +84,11 @@ describe('Hopf galaxy visualization data', () => {
         ], mergeGalaxySettings({ layoutMode: 'hopfProjection' }));
 
         const cross = scene.links.find((link) => link.id === 'cross-base')!;
+        const braid = scene.hopfRibbons?.find((ribbon) => ribbon.guideKind === 'crossFiberBraid');
         expect(cross.alpha).toBeLessThanOrEqual(0.07);
-        expect(scene.hopfRibbons?.some((ribbon) => ribbon.guideKind === 'crossFiberBraid')).toBe(true);
+        expect(braid).toBeTruthy();
+        expect((braid?.positions3d.length || 0) / 6).toBeGreaterThan(32);
+        expect(polylineLength(braid!.positions3d)).toBeGreaterThan(directSegmentLength(braid!.positions3d) * 1.05);
     });
 
     it('keeps low-count semantic fibers visible when high-importance fibers fill the guide budget', () => {
@@ -142,4 +146,29 @@ function positionOf(node: { x: number; y: number; z: number }): [number, number,
         Number(node.y.toFixed(6)),
         Number(node.z.toFixed(6)),
     ];
+}
+
+function segmentLoopGap(positions: Float32Array): number {
+    const last = positions.length - 3;
+    return Math.hypot(
+        positions[0] - positions[last],
+        positions[1] - positions[last + 1],
+        positions[2] - positions[last + 2],
+    );
+}
+
+function directSegmentLength(positions: Float32Array): number {
+    return segmentLoopGap(positions);
+}
+
+function polylineLength(positions: Float32Array): number {
+    let length = 0;
+    for (let offset = 0; offset < positions.length; offset += 6) {
+        length += Math.hypot(
+            positions[offset] - positions[offset + 3],
+            positions[offset + 1] - positions[offset + 4],
+            positions[offset + 2] - positions[offset + 5],
+        );
+    }
+    return length;
 }

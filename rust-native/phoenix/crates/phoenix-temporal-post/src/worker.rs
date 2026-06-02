@@ -1,11 +1,12 @@
 use std::collections::BTreeMap;
 
 use phoenix_semantic_v2::{
-    scope_storage_key, CanonicalEventId, DirtyScopeRecord, DocumentArchive, DocumentRevisionRef,
-    EventIdentityScopeSidecar, ScopeOrd, SessionArchive, TemporalAnchorRecord, TemporalAxisRecord,
-    TemporalClaimAtom, TemporalCompilerSummary, TemporalConflictRecord, TemporalConstraintRecord,
-    TemporalGapRecord, TemporalIntervalRecord, TemporalMemoryCard, TemporalReferenceEdge,
-    TemporalScopeSidecar, TemporalTimexRecord, TimelineSegmentRecord,
+    scope_storage_key, BeliefStateAtom, BeliefStateCard, CanonicalEventId, DirtyScopeRecord,
+    DocumentArchive, DocumentRevisionRef, EventIdentityScopeSidecar, ScopeOrd, SessionArchive,
+    TemporalAnchorRecord, TemporalAxisRecord, TemporalClaimAtom, TemporalCompilerSummary,
+    TemporalConflictRecord, TemporalConstraintRecord, TemporalGapRecord, TemporalIntervalRecord,
+    TemporalMemoryCard, TemporalReferenceEdge, TemporalScopeSidecar, TemporalTimexRecord,
+    TimelineSegmentRecord,
 };
 use phoenix_store_native_core::{
     PhoenixArchiveStoreV2, PhoenixScopeRuntimeStore, PhoenixTemporalPatchStore, ScopeImageSpec,
@@ -41,6 +42,8 @@ pub struct TemporalScopeReviewBatch {
     #[serde(default)]
     pub claim_atoms: Vec<TemporalClaimAtom>,
     #[serde(default)]
+    pub belief_atoms: Vec<BeliefStateAtom>,
+    #[serde(default)]
     pub anchors: Vec<TemporalAnchorRecord>,
     #[serde(default)]
     pub reference_edges: Vec<TemporalReferenceEdge>,
@@ -56,6 +59,8 @@ pub struct TemporalScopeReviewBatch {
     pub gaps: Vec<TemporalGapRecord>,
     #[serde(default)]
     pub memory_cards: Vec<TemporalMemoryCard>,
+    #[serde(default)]
+    pub belief_cards: Vec<BeliefStateCard>,
     pub temporal_generation: Option<u64>,
     pub summary: TemporalCompilerSummary,
     #[serde(default)]
@@ -110,6 +115,7 @@ pub fn derive_scope_review_batch(
         timex_profiles: normalized.timex_profiles,
         review_cases: normalized.review_cases,
         claim_atoms: normalized.claim_atoms,
+        belief_atoms: normalized.belief_atoms,
         anchors: normalized.anchors,
         reference_edges: normalized.reference_edges,
         constraints: normalized.constraints,
@@ -118,6 +124,7 @@ pub fn derive_scope_review_batch(
         conflicts: Vec::new(),
         gaps: Vec::new(),
         memory_cards: Vec::new(),
+        belief_cards: Vec::new(),
         temporal_generation: None,
         summary: TemporalCompilerSummary::default(),
         diagnostics: normalized.diagnostics,
@@ -177,6 +184,7 @@ pub fn run_temporal_scope(batch: &mut TemporalScopeReviewBatch, created_at: i64)
         timex_profiles: batch.timex_profiles.clone(),
         review_cases: batch.review_cases.clone(),
         claim_atoms: batch.claim_atoms.clone(),
+        belief_atoms: batch.belief_atoms.clone(),
         anchors: batch.anchors.clone(),
         reference_edges: batch.reference_edges.clone(),
         constraints: batch.constraints.clone(),
@@ -196,6 +204,7 @@ pub fn run_temporal_scope(batch: &mut TemporalScopeReviewBatch, created_at: i64)
     batch.conflicts = solved.conflicts.clone();
     batch.gaps = solved.gaps.clone();
     batch.memory_cards = memory_cards;
+    batch.belief_cards = solved.belief_cards.clone();
     batch.diagnostics = solved.diagnostics.clone();
     batch.summary = build_summary(batch, &solved);
 }
@@ -233,12 +242,14 @@ pub fn build_temporal_patch_sidecar(
         axes: batch.axes.clone(),
         reference_edges: batch.reference_edges.clone(),
         claim_atoms: batch.claim_atoms.clone(),
+        belief_atoms: batch.belief_atoms.clone(),
         constraints: batch.constraints.clone(),
         intervals: batch.intervals.clone(),
         timeline_segments: batch.timeline_segments.clone(),
         conflicts: batch.conflicts.clone(),
         gaps: batch.gaps.clone(),
         memory_cards: batch.memory_cards.clone(),
+        belief_cards: batch.belief_cards.clone(),
         summary: batch.summary.clone(),
     }
 }
@@ -276,12 +287,14 @@ pub fn apply_temporal_patch_sidecar(
     batch.axes = sidecar.axes.clone();
     batch.reference_edges = sidecar.reference_edges.clone();
     batch.claim_atoms = sidecar.claim_atoms.clone();
+    batch.belief_atoms = sidecar.belief_atoms.clone();
     batch.constraints = sidecar.constraints.clone();
     batch.intervals = sidecar.intervals.clone();
     batch.timeline_segments = sidecar.timeline_segments.clone();
     batch.conflicts = sidecar.conflicts.clone();
     batch.gaps = sidecar.gaps.clone();
     batch.memory_cards = sidecar.memory_cards.clone();
+    batch.belief_cards = sidecar.belief_cards.clone();
     batch.summary = sidecar.summary.clone();
 }
 
@@ -331,6 +344,12 @@ pub(crate) fn annotate_temporal_batch_with_event_identity(
     for claim in &mut batch.claim_atoms {
         claim.canonical_event_id = claim.event_id.as_deref().and_then(|event_id| {
             canonical_for(&canonical_by_event, claim.document_id.as_str(), event_id)
+        });
+    }
+
+    for atom in &mut batch.belief_atoms {
+        atom.canonical_event_id = atom.event_id.as_deref().and_then(|event_id| {
+            canonical_for(&canonical_by_event, atom.document_id.as_str(), event_id)
         });
     }
 
@@ -411,6 +430,12 @@ pub(crate) fn annotate_temporal_batch_with_event_identity(
             })
             .collect();
     }
+
+    for card in &mut batch.belief_cards {
+        card.canonical_event_id = card.event_id.as_deref().and_then(|event_id| {
+            canonical_for(&canonical_by_event, card.document_id.as_str(), event_id)
+        });
+    }
 }
 
 fn canonical_event_ids_by_event(
@@ -466,6 +491,12 @@ fn build_summary(
             .entry(interval.source_class.clone())
             .or_default() += 1;
     }
+    for atom in &batch.belief_atoms {
+        *source_class_counts
+            .entry(atom.source_kind.as_key().to_owned())
+            .or_default() += 1;
+    }
+    let truth_status_counts = crate::truth_status_counts(&batch.belief_atoms);
 
     TemporalCompilerSummary {
         timex_count: batch.timex_profiles.len(),
@@ -478,7 +509,10 @@ fn build_summary(
         conflict_count: solved.conflicts.len(),
         gap_count: solved.gaps.len(),
         memory_card_count: batch.memory_cards.len(),
+        belief_atom_count: batch.belief_atoms.len(),
+        belief_card_count: batch.belief_cards.len(),
         axis_counts,
         source_class_counts,
+        truth_status_counts,
     }
 }

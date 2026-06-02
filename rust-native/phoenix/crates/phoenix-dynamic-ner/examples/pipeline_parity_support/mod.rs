@@ -41,6 +41,7 @@ struct SurfaceSummary {
     count: usize,
     label: String,
     confidence: f32,
+    labels: BTreeMap<String, usize>,
 }
 
 pub(super) fn summarize(
@@ -50,6 +51,12 @@ pub(super) fn summarize(
     mentions: &[MentionPacket],
     surface_memory: &SurfaceMemoryReport,
 ) -> DocSummary {
+    let debug_watched_votes = std::env::var_os("PHOENIX_DYN_NER_DEBUG_WATCH_VOTES").is_some();
+    let watched = if debug_watched_votes {
+        watched_surfaces().into_iter().collect::<BTreeSet<_>>()
+    } else {
+        BTreeSet::new()
+    };
     let mut summary = DocSummary {
         doc: doc.to_owned(),
         backend,
@@ -74,10 +81,36 @@ pub(super) fn summarize(
             continue;
         }
         let label = best_label(mention);
+        let key = normalize_key(mention.surface.as_str());
+        if debug_watched_votes && watched.contains(&key) {
+            let votes = mention
+                .source_votes
+                .iter()
+                .map(|vote| {
+                    let label = vote
+                        .label
+                        .as_ref()
+                        .map(|label| label.as_str())
+                        .unwrap_or("-");
+                    format!(
+                        "{:?}:{:?}:{label}:{:.3}",
+                        vote.source, vote.reason, vote.confidence
+                    )
+                })
+                .collect::<Vec<_>>()
+                .join("|");
+            println!(
+                "WATCH_VOTES\tbackend={backend}\t{}\tstatus={:?}\tconf={:.3}\tbest={}\tvotes={}",
+                clean(mention.surface.as_str()),
+                mention.status,
+                mention.confidence,
+                clean(&label),
+                clean(&votes)
+            );
+        }
         if mention.is_exportable() {
             *summary.labels.entry(label.clone()).or_default() += 1;
         }
-        let key = normalize_key(mention.surface.as_str());
         let entry = summary
             .surfaces
             .entry(key)
@@ -88,8 +121,11 @@ pub(super) fn summarize(
                 ..Default::default()
             });
         entry.count += 1;
+        *entry.labels.entry(label.clone()).or_default() += 1;
         entry.confidence = entry.confidence.max(mention.confidence);
-        if mention.confidence >= entry.confidence {
+        if entry.labels.get(&label).copied().unwrap_or_default()
+            >= entry.labels.get(&entry.label).copied().unwrap_or_default()
+        {
             entry.label = label;
         }
     }
@@ -138,6 +174,27 @@ pub(super) fn print_summary(summary: &DocSummary) {
             surface.count,
             surface.confidence
         );
+    }
+    let watched = watched_surfaces();
+    if !watched.is_empty() {
+        println!("WATCH_SURFACES\tbackend={}", summary.backend);
+        for key in watched {
+            match summary.surfaces.get(&key) {
+                Some(surface) => println!(
+                    "WATCH_SURFACE\tbackend={}\t{}\tlabel={}\tcount={}\tmax_conf={:.3}",
+                    summary.backend,
+                    clean(&surface.surface),
+                    clean(&surface.label),
+                    surface.count,
+                    surface.confidence
+                ),
+                None => println!(
+                    "WATCH_SURFACE\tbackend={}\t{}\tlabel=missing\tcount=0\tmax_conf=0.000",
+                    summary.backend,
+                    clean(&key)
+                ),
+            }
+        }
     }
 }
 
@@ -253,11 +310,13 @@ fn best_label(mention: &MentionPacket) -> String {
 fn normalize_group(label: &str) -> &'static str {
     match label {
         "Character" | "Npc" | "NPC" | "Person" => "person",
+        "Creature" | "Species" | "Monster" => "creature",
         "Organization" | "Faction" | "Department" | "Alliance" => "organization",
         "Location" | "Region" | "Landmark" => "location",
         "Event" => "event",
         "Artifact" | "Item" | "Weapon" => "item",
-        "Concept" | "Ability" | "Spell" => "concept",
+        "Concept" | "Ability" | "Spell" | "Rank" => "concept",
+        "Pronoun" => "pronoun",
         _ => "other",
     }
 }
@@ -286,6 +345,19 @@ pub(super) fn clean(value: &str) -> String {
         .split_whitespace()
         .collect::<Vec<_>>()
         .join(" ")
+}
+
+fn watched_surfaces() -> Vec<String> {
+    std::env::var("PHOENIX_DYN_NER_WATCH_SURFACES")
+        .ok()
+        .map(|value| {
+            value
+                .split(',')
+                .map(normalize_key)
+                .filter(|key| !key.is_empty())
+                .collect()
+        })
+        .unwrap_or_default()
 }
 
 pub(super) fn story_lexicon() -> Result<Lexicon, String> {

@@ -13,6 +13,7 @@ use phoenix_types::SentenceSpan;
 use crate::known_lane::KnownCandidate;
 use crate::native_lane::{NativeCandidate, NativeDiscoveryLane};
 use crate::schema::DynamicSchemaBuilder;
+use crate::semantic_router::{SemanticLabelRouter, SemanticRouteInput};
 use crate::types::{AdjudicateCase, LabelBankContext, MentionKind, NerNeedVector, NerRoute};
 
 /// Budget cap: max model-discovery seeds per document.
@@ -163,12 +164,14 @@ impl SurfaceRouter {
     /// Plan routes from need vectors.
     pub fn plan_routes(
         &self,
+        text: &str,
         sentences: &[SentenceSpan],
         needs: &[NerNeedVector],
         schema_builder: &DynamicSchemaBuilder,
         known: &[KnownCandidate],
         native: &[NativeCandidate],
         label_bank_context: Option<&LabelBankContext<'_>>,
+        semantic_label_router: Option<&(dyn SemanticLabelRouter + Send + Sync)>,
     ) -> Vec<NerRoute> {
         let mut routes = Vec::new();
         let mut model_window_count = 0usize;
@@ -203,6 +206,7 @@ impl SurfaceRouter {
         }
 
         // Merge contiguous marked sentences into model-discovery windows.
+        let mut model_windows = Vec::<(usize, usize)>::new();
         let mut i = 0usize;
         while i < marked_model.len() {
             if !marked_model[i] {
@@ -213,16 +217,41 @@ impl SurfaceRouter {
             while i < marked_model.len() && marked_model[i] {
                 i += 1;
             }
-            let label_pack = schema_builder.build_pack_for_window_v2(
+            model_windows.push((start, i));
+        }
+
+        let semantic_hints = semantic_label_router
+            .map(|router| {
+                let inputs = model_windows
+                    .iter()
+                    .map(|(start, end)| SemanticRouteInput {
+                        document_text: text,
+                        window_text: window_text(text, sentences, *start, *end).unwrap_or(""),
+                        sentences,
+                        window_start_sentence: *start as u32,
+                        window_end_sentence: *end as u32,
+                        known,
+                        native,
+                        context_domain: label_bank_context
+                            .and_then(|context| context.domain_profile),
+                    })
+                    .collect::<Vec<_>>();
+                router.route_windows(&inputs)
+            })
+            .unwrap_or_else(|| vec![None; model_windows.len()]);
+
+        for ((start, end), semantic_hint) in model_windows.into_iter().zip(semantic_hints) {
+            let label_pack = schema_builder.build_pack_for_window_v3(
                 start as u32,
-                i as u32,
+                end as u32,
                 known,
                 native,
                 label_bank_context,
+                semantic_hint.as_ref(),
             );
             routes.push(NerRoute::ModelDiscovery {
                 window_start_sentence: start as u32,
-                window_end_sentence: i as u32,
+                window_end_sentence: end as u32,
                 label_pack,
             });
         }
@@ -323,6 +352,17 @@ fn sentence_index_for_range(sentences: &[SentenceSpan], start: u32, end: u32) ->
         .position(|sentence| midpoint >= sentence.range.start && midpoint < sentence.range.end)
 }
 
+fn window_text<'a>(
+    text: &'a str,
+    sentences: &[SentenceSpan],
+    start_sentence: usize,
+    end_sentence: usize,
+) -> Option<&'a str> {
+    let first = sentences.get(start_sentence)?;
+    let last = sentences.get(end_sentence.checked_sub(1)?)?;
+    text.get(first.range.start as usize..last.range.end as usize)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -419,12 +459,14 @@ mod tests {
         let router = SurfaceRouter::default();
         let needs = router.build_need_vectors(text, &sentences, &[], &native, &hits);
         let routes = router.plan_routes(
+            text,
             &sentences,
             &needs,
             &DynamicSchemaBuilder::default(),
             &[],
             &native,
             Some(&label_bank_context),
+            None,
         );
 
         assert!(needs[0].has_causal_or_temporal_cue);

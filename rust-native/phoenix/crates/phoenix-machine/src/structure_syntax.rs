@@ -89,6 +89,8 @@ pub(crate) fn build_structure_artifact(text: &str, scan: &ScanArtifact) -> Struc
     StructureArtifact {
         sentence_frames,
         relations,
+        umr_frames: Vec::new(),
+        frame_facts: Vec::new(),
         evidence_spans,
         diagnostics: vec![Diagnostic {
             code: "PX_MACHINE_STRUCTURE".to_owned(),

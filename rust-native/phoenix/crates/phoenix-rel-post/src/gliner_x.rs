@@ -15,10 +15,12 @@ use crate::ort_runtime::{load_session_with_intra_threads, recommended_thread_cou
 
 const DEFAULT_MAX_WIDTH: usize = 12;
 const DEFAULT_MAX_LEN: usize = 1024;
+const DEFAULT_BATCH_SIZE: usize = 2;
 const DEFAULT_ENT_TOKEN: &str = "<<ENT>>";
 const DEFAULT_SEP_TOKEN: &str = "<<SEP>>";
 const GLINER_X_ONNX_FILE_ENV: &str = "PHOENIX_GLINER_X_ONNX_FILE";
 const GLINER_X_THREADS_ENV: &str = "PHOENIX_GLINER_X_THREADS";
+const GLINER_X_BATCH_SIZE_ENV: &str = "PHOENIX_GLINER_X_BATCH_SIZE";
 
 #[derive(Debug, Error)]
 pub enum GlinerXError {
@@ -64,6 +66,12 @@ pub struct GlinerXModel {
     ent_token: String,
     sep_token: String,
     metadata: GlinerXMetadata,
+}
+
+struct PreparedXText<'a> {
+    sequence: usize,
+    text: &'a str,
+    tensors: crate::gliner_x_tensors::GlinerXTextTensors,
 }
 
 #[derive(Clone, Debug, Default, Deserialize)]
@@ -157,9 +165,157 @@ impl GlinerXModel {
             return Ok(Vec::new());
         }
         let labels = normalize_labels(labels)?;
-        let mut predictions = Vec::new();
+        let batch_size = gliner_x_batch_size();
+        if batch_size <= 1 || texts.len() <= 1 {
+            let mut predictions = Vec::new();
+            for (sequence, text) in texts.iter().enumerate() {
+                predictions.extend(self.predict_one(sequence, text, &labels)?);
+            }
+            return Ok(predictions);
+        }
+
+        let mut prepared = Vec::with_capacity(texts.len());
         for (sequence, text) in texts.iter().enumerate() {
-            predictions.extend(self.predict_one(sequence, text, &labels)?);
+            if text.trim().is_empty() {
+                continue;
+            }
+            let Some(tensors) = build_text_tensors(
+                text,
+                &self.tokenizer,
+                &labels,
+                &self.ent_token,
+                &self.sep_token,
+                self.max_len,
+            )?
+            else {
+                continue;
+            };
+            prepared.push(PreparedXText {
+                sequence,
+                text,
+                tensors,
+            });
+        }
+        prepared.sort_by_key(|item| (item.tensors.input_ids.len(), item.tensors.words.len()));
+
+        let mut predictions = Vec::new();
+        for chunk in prepared.chunks(batch_size) {
+            predictions.extend(self.predict_prepared_batch(chunk, &labels)?);
+        }
+        Ok(predictions)
+    }
+
+    fn predict_prepared_batch(
+        &self,
+        prepared: &[PreparedXText<'_>],
+        labels: &[String],
+    ) -> Result<Vec<GlinerXPrediction>, GlinerXError> {
+        if prepared.is_empty() {
+            return Ok(Vec::new());
+        }
+        if prepared.len() == 1 {
+            let item = &prepared[0];
+            return self.predict_one(item.sequence, item.text, labels);
+        }
+
+        let batch = prepared.len();
+        let max_seq_len = prepared
+            .iter()
+            .map(|item| item.tensors.input_ids.len())
+            .max()
+            .unwrap_or(0);
+        let max_word_count = prepared
+            .iter()
+            .map(|item| item.tensors.words.len())
+            .max()
+            .unwrap_or(0);
+        if max_seq_len == 0 || max_word_count == 0 {
+            return Ok(Vec::new());
+        }
+        let num_spans = max_word_count * self.max_width;
+        let num_labels = labels.len();
+
+        let mut input_ids = vec![0_i64; batch * max_seq_len];
+        let mut attention_mask = vec![0_i64; batch * max_seq_len];
+        let mut words_mask = vec![0_i64; batch * max_seq_len];
+        let mut text_lengths = vec![0_i64; batch];
+        let mut span_idx = vec![0_i64; batch * num_spans * 2];
+        let mut span_mask = vec![false; batch * num_spans];
+
+        for (batch_idx, item) in prepared.iter().enumerate() {
+            let seq_offset = batch_idx * max_seq_len;
+            let input_len = item.tensors.input_ids.len();
+            input_ids[seq_offset..seq_offset + input_len].copy_from_slice(&item.tensors.input_ids);
+            attention_mask[seq_offset..seq_offset + input_len]
+                .copy_from_slice(&item.tensors.attention_mask);
+            words_mask[seq_offset..seq_offset + input_len]
+                .copy_from_slice(&item.tensors.words_mask);
+            text_lengths[batch_idx] = item.tensors.words.len() as i64;
+
+            let (item_span_idx, item_span_mask) =
+                build_span_tensors(item.tensors.words.len(), self.max_width);
+            let span_idx_offset = batch_idx * num_spans * 2;
+            let span_mask_offset = batch_idx * num_spans;
+            span_idx[span_idx_offset..span_idx_offset + item_span_idx.len()]
+                .copy_from_slice(&item_span_idx);
+            span_mask[span_mask_offset..span_mask_offset + item_span_mask.len()]
+                .copy_from_slice(&item_span_mask);
+        }
+
+        let input_ids_tensor = Tensor::from_array(([batch, max_seq_len], input_ids))
+            .map_err(|error| GlinerXError::Inference(format!("input_ids: {error}")))?;
+        let attention_mask_tensor = Tensor::from_array(([batch, max_seq_len], attention_mask))
+            .map_err(|error| GlinerXError::Inference(format!("attention_mask: {error}")))?;
+        let words_mask_tensor = Tensor::from_array(([batch, max_seq_len], words_mask))
+            .map_err(|error| GlinerXError::Inference(format!("words_mask: {error}")))?;
+        let text_lengths_tensor = Tensor::from_array(([batch, 1], text_lengths))
+            .map_err(|error| GlinerXError::Inference(format!("text_lengths: {error}")))?;
+        let span_idx_tensor = Tensor::from_array(([batch, num_spans, 2], span_idx))
+            .map_err(|error| GlinerXError::Inference(format!("span_idx: {error}")))?;
+        let span_mask_tensor = Tensor::from_array(([batch, num_spans], span_mask))
+            .map_err(|error| GlinerXError::Inference(format!("span_mask: {error}")))?;
+
+        let inputs = ort::inputs! {
+            "input_ids" => input_ids_tensor,
+            "attention_mask" => attention_mask_tensor,
+            "words_mask" => words_mask_tensor,
+            "text_lengths" => text_lengths_tensor,
+            "span_idx" => span_idx_tensor,
+            "span_mask" => span_mask_tensor,
+        }
+        .map_err(|error| GlinerXError::Inference(format!("build inputs: {error}")))?;
+        let outputs = self
+            .session
+            .run(inputs)
+            .map_err(|error| GlinerXError::Inference(format!("session run: {error}")))?;
+        let logits = extract_logits(
+            outputs
+                .get("logits")
+                .ok_or_else(|| GlinerXError::Inference("missing logits output".to_owned()))?,
+        )?;
+
+        let per_sequence_logits = num_spans * num_labels;
+        let expected_len = batch * per_sequence_logits;
+        if logits.len() < expected_len {
+            return Err(GlinerXError::Inference(format!(
+                "batched logits too short: expected {expected_len}, got {}",
+                logits.len()
+            )));
+        }
+
+        let mut predictions = Vec::new();
+        for (batch_idx, item) in prepared.iter().enumerate() {
+            let start = batch_idx * per_sequence_logits;
+            let end = start + per_sequence_logits;
+            predictions.extend(decode_predictions(
+                item.sequence,
+                item.text,
+                &item.tensors.words,
+                labels,
+                self.max_width,
+                self.threshold,
+                &logits[start..end],
+            )?);
         }
         Ok(predictions)
     }
@@ -311,4 +467,12 @@ fn gliner_x_thread_count() -> usize {
         .and_then(|value| value.parse::<usize>().ok())
         .filter(|value| *value > 0)
         .unwrap_or_else(recommended_thread_count)
+}
+
+fn gliner_x_batch_size() -> usize {
+    env::var(GLINER_X_BATCH_SIZE_ENV)
+        .ok()
+        .and_then(|value| value.parse::<usize>().ok())
+        .filter(|value| *value > 0)
+        .unwrap_or(DEFAULT_BATCH_SIZE)
 }

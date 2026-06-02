@@ -1,6 +1,7 @@
 pub mod api;
 
 mod anchor;
+mod belief;
 mod graph;
 mod lens_consumer;
 mod normalize;
@@ -11,6 +12,7 @@ mod views;
 pub mod worker;
 
 pub use anchor::{choose_best_anchor, has_world_anchor_support};
+pub use belief::{build_belief_state_cards, default_worldline, truth_status_counts};
 pub use graph::{build_temporal_graph_stats, TemporalGraphStats};
 pub use lens_consumer::TemporalLensChunkConsumer;
 pub use normalize::{

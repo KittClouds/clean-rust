@@ -1,8 +1,8 @@
 use std::collections::BTreeMap;
 
 use phoenix_semantic_v2::{
-    CanonicalEventId, DocumentArchive, DocumentTemporalSubstrate, TemporalAnchorRecord,
-    TemporalAxisId, TemporalAxisKind, TemporalAxisRecord, TemporalClaimAtom,
+    BeliefStateAtom, CanonicalEventId, DocumentArchive, DocumentTemporalSubstrate,
+    TemporalAnchorRecord, TemporalAxisId, TemporalAxisKind, TemporalAxisRecord, TemporalClaimAtom,
     TemporalConstraintRecord, TemporalReferenceEdge,
 };
 use phoenix_types::BiTemporalWindow;
@@ -80,6 +80,8 @@ pub struct TemporalNormalizedInputs {
     #[serde(default)]
     pub claim_atoms: Vec<TemporalClaimAtom>,
     #[serde(default)]
+    pub belief_atoms: Vec<BeliefStateAtom>,
+    #[serde(default)]
     pub anchors: Vec<TemporalAnchorRecord>,
     #[serde(default)]
     pub reference_edges: Vec<TemporalReferenceEdge>,
@@ -95,6 +97,7 @@ pub fn normalize_temporal_inputs(archives: &[DocumentArchive]) -> TemporalNormal
     let mut timex_profiles = Vec::<TemporalTimexProfile>::new();
     let mut review_cases = Vec::<TemporalReviewCase>::new();
     let mut claim_atoms = Vec::<TemporalClaimAtom>::new();
+    let mut belief_atoms = Vec::<BeliefStateAtom>::new();
     let mut anchors = Vec::<TemporalAnchorRecord>::new();
     let mut reference_edges = Vec::<TemporalReferenceEdge>::new();
     let mut constraints = Vec::<TemporalConstraintRecord>::new();
@@ -264,6 +267,7 @@ pub fn normalize_temporal_inputs(archives: &[DocumentArchive]) -> TemporalNormal
         }
 
         claim_atoms.extend(substrate.temporal_claims.clone());
+        belief_atoms.extend(substrate.belief_atoms.clone());
         anchors.extend(substrate.anchor_candidates.clone());
         reference_edges.extend(substrate.reference_timex_edges.clone());
         reference_edges.extend(substrate.reference_event_edges.clone());
@@ -317,6 +321,7 @@ pub fn normalize_temporal_inputs(archives: &[DocumentArchive]) -> TemporalNormal
         timex_profiles,
         review_cases,
         claim_atoms,
+        belief_atoms,
         anchors,
         reference_edges,
         constraints,

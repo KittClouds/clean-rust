@@ -15,6 +15,10 @@ mod gliclass_instruct_runtime;
 mod gliner_bi;
 #[path = "../../../../../rust-native/phoenix/crates/phoenix-rel-post/src/gliner_bi_tensors.rs"]
 mod gliner_bi_tensors;
+#[path = "../../../../../rust-native/phoenix/crates/phoenix-rel-post/src/gliner_x.rs"]
+mod gliner_x;
+#[path = "../../../../../rust-native/phoenix/crates/phoenix-rel-post/src/gliner_x_tensors.rs"]
+mod gliner_x_tensors;
 #[allow(dead_code)]
 #[path = "../../../../../rust-native/phoenix/crates/phoenix-rel-post/src/ort_runtime.rs"]
 mod ort_runtime;
@@ -34,5 +38,6 @@ pub use gliclass_instruct_format::{
 };
 pub use gliner_bi::{
     GlinerBiError, GlinerBiLabelSet, GlinerBiModel, GlinerBiModelMetadata, GlinerBiOverlapPolicy,
-    GlinerBiPredictOptions, GlinerBiPrediction,
+    GlinerBiPredictOptions, GlinerBiPrediction, GlinerBiSequencePrediction,
 };
+pub use gliner_x::{GlinerXError, GlinerXMetadata, GlinerXModel, GlinerXPrediction};

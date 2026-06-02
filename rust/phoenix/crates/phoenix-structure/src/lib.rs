@@ -1,7 +1,10 @@
 use phoenix_types::{
-    ChunkKind, ChunkSpan, EvidenceSpan, FrameSlot, RelationCandidate, ResolverLink,
-    ResolverLinkKind, SentenceFrame, StructureArtifact, StructureRequest, TextRange, VerbFrame,
+    ChunkKind, ChunkSpan, EvidenceSpan, FrameSlot, FrameSlotSource, RelationCandidate,
+    ResolverLink, ResolverLinkKind, SentenceFrame, StructureArtifact, StructureRequest, TextRange,
+    VerbFrame,
 };
+
+mod umr_lite;
 
 pub struct PhoenixStructure;
 
@@ -17,6 +20,8 @@ impl PhoenixStructure {
     pub fn build_parts(&self, text: &str, scan: &phoenix_types::ScanArtifact) -> StructureArtifact {
         let mut evidence_spans = Vec::new();
         let mut relations = Vec::new();
+        let mut umr_frames = Vec::new();
+        let mut frame_facts = Vec::new();
         let sentence_frames = scan
             .sentences
             .iter()
@@ -56,6 +61,7 @@ impl PhoenixStructure {
                             &hit.event_class,
                             &hit.relation_type,
                             hit.transitivity.clone(),
+                            sentence.range,
                             &chunks,
                             &mentions,
                             &sentence_links,
@@ -67,6 +73,10 @@ impl PhoenixStructure {
                         .iter()
                         .map(|frame| relation_from_frame(sentence.index, frame)),
                 );
+                let (sentence_umr_frames, sentence_frame_facts) =
+                    umr_lite::frames_from_verb_frames(text, sentence.index, &verb_frames);
+                frame_facts.extend(sentence_frame_facts);
+                umr_frames.extend(sentence_umr_frames);
 
                 evidence_spans.extend(
                     scan.narrative_hits
@@ -106,6 +116,8 @@ impl PhoenixStructure {
         StructureArtifact {
             sentence_frames,
             relations,
+            umr_frames,
+            frame_facts,
             evidence_spans,
             diagnostics: Vec::new(),
         }
@@ -126,6 +138,7 @@ fn build_verb_frame(
     event_class: &str,
     relation_type: &str,
     transitivity: Option<phoenix_types::NarrativeTransitivity>,
+    sentence_range: TextRange,
     chunks: &[ChunkSpan],
     mentions: &[phoenix_types::MentionSpan],
     resolver_links: &[&ResolverLink],
@@ -134,7 +147,7 @@ fn build_verb_frame(
         .iter()
         .find(|chunk| chunk.kind == Some(ChunkKind::Clause) && contains(chunk.range, verb_range))
         .map(|chunk| chunk.range)
-        .unwrap_or(verb_range);
+        .unwrap_or(sentence_range);
     let subject_candidates = nearest_np_before(verb_range, chunks, mentions, resolver_links);
     let object_candidates = nearest_np_after(verb_range, chunks, mentions, resolver_links);
     let recipient_candidates =
@@ -233,10 +246,22 @@ fn slot_from_chunk(
     mentions: &[phoenix_types::MentionSpan],
     resolver_links: &[&ResolverLink],
 ) -> FrameSlot {
-    let entity_ref = mentions
+    let mention_entity_ref = mentions
         .iter()
         .find(|mention| overlaps(chunk.range, mention.range))
         .and_then(|mention| mention.entity_ref.clone());
+    let resolver_entity_ref = resolver_links
+        .iter()
+        .find(|link| overlaps(chunk.range, link.source_range))
+        .and_then(|link| link.target_entity.clone());
+    let entity_ref = mention_entity_ref.clone().or(resolver_entity_ref.clone());
+    let source = if mention_entity_ref.is_some() {
+        FrameSlotSource::MentionOverlap
+    } else if resolver_entity_ref.is_some() {
+        FrameSlotSource::ResolverLink
+    } else {
+        FrameSlotSource::ProximityFallback
+    };
     let entity_ref = entity_ref.or_else(|| {
         resolver_links
             .iter()
@@ -248,6 +273,7 @@ fn slot_from_chunk(
         range: chunk.range,
         entity_ref,
         confidence,
+        source: Some(source),
     }
 }
 
@@ -293,6 +319,7 @@ mod tests {
     use phoenix_types::{
         ChunkKind, ChunkSpan, EntityId, MentionEntityRef, MentionSource, MentionSpan,
         NarrativeVerbHit, ResolverLink, ResolverLinkKind, ScanArtifact, SentenceSpan, TextRange,
+        UmrLiteRole, UmrLiteScopeKind,
     };
 
     use super::*;
@@ -303,7 +330,7 @@ mod tests {
         let scan = ScanArtifact {
             sentences: vec![SentenceSpan {
                 index: 0,
-                range: TextRange { start: 0, end: 35 },
+                range: TextRange { start: 0, end: 30 },
             }],
             tokens: Vec::new(),
             mentions: vec![
@@ -317,7 +344,7 @@ mod tests {
                     sentence_index: 0,
                 },
                 MentionSpan {
-                    range: TextRange { start: 18, end: 22 },
+                    range: TextRange { start: 15, end: 19 },
                     surface: "Zoro".to_owned(),
                     kind: None,
                     entity_ref: Some(MentionEntityRef::Known(EntityId("zoro".to_owned()))),
@@ -336,29 +363,29 @@ mod tests {
                 },
                 ChunkSpan {
                     kind: Some(ChunkKind::Vp),
-                    range: TextRange { start: 6, end: 17 },
+                    range: TextRange { start: 6, end: 14 },
                     head: TextRange { start: 6, end: 14 },
                     modifiers: Vec::new(),
                     sentence_index: 0,
                 },
                 ChunkSpan {
                     kind: Some(ChunkKind::Np),
-                    range: TextRange { start: 18, end: 22 },
-                    head: TextRange { start: 18, end: 22 },
+                    range: TextRange { start: 15, end: 19 },
+                    head: TextRange { start: 15, end: 19 },
                     modifiers: Vec::new(),
                     sentence_index: 0,
                 },
                 ChunkSpan {
                     kind: Some(ChunkKind::Pp),
-                    range: TextRange { start: 23, end: 35 },
-                    head: TextRange { start: 23, end: 27 },
+                    range: TextRange { start: 20, end: 29 },
+                    head: TextRange { start: 20, end: 24 },
                     modifiers: Vec::new(),
                     sentence_index: 0,
                 },
             ],
             resolver_links: vec![ResolverLink {
-                source_range: TextRange { start: 30, end: 34 },
-                target_range: Some(TextRange { start: 18, end: 22 }),
+                source_range: TextRange { start: 25, end: 29 },
+                target_range: Some(TextRange { start: 15, end: 19 }),
                 target_entity: Some(MentionEntityRef::Known(EntityId("zoro".to_owned()))),
                 link_kind: Some(ResolverLinkKind::Pronoun),
                 confidence: 0.9,
@@ -390,7 +417,124 @@ mod tests {
         assert_eq!(artifact.relations.len(), 1);
         assert!(artifact.relations[0].subject.is_some());
         assert!(artifact.relations[0].object.is_some());
+        assert_eq!(artifact.umr_frames.len(), 1);
+        assert!(artifact.umr_frames[0]
+            .arguments
+            .iter()
+            .any(|argument| argument.role == UmrLiteRole::Actor
+                && argument.entity_ref
+                    == Some(MentionEntityRef::Known(EntityId("luffy".to_owned())))));
+        assert!(artifact.umr_frames[0]
+            .arguments
+            .iter()
+            .any(|argument| argument.role == UmrLiteRole::Target
+                && argument.entity_ref
+                    == Some(MentionEntityRef::Known(EntityId("zoro".to_owned())))));
+        assert!(artifact.umr_frames[0]
+            .arguments
+            .iter()
+            .any(|argument| argument.role == UmrLiteRole::Instrument
+                && argument.surface == "with fury"));
+        assert!(artifact
+            .frame_facts
+            .iter()
+            .any(|fact| fact.fact_kind == "directRelation" && fact.predicate == "attacks"));
         assert!(!artifact.evidence_spans.is_empty());
+    }
+
+    #[test]
+    fn umr_lite_captures_modality_negation_and_time() {
+        let structure = PhoenixStructure::new();
+        let text = "Ryan might not enter Arcadia before dawn.";
+        let scan = ScanArtifact {
+            sentences: vec![SentenceSpan {
+                index: 0,
+                range: TextRange {
+                    start: 0,
+                    end: text.len() as u32,
+                },
+            }],
+            tokens: Vec::new(),
+            mentions: vec![
+                MentionSpan {
+                    range: TextRange { start: 0, end: 4 },
+                    surface: "Ryan".to_owned(),
+                    kind: None,
+                    entity_ref: Some(MentionEntityRef::Known(EntityId("ryan".to_owned()))),
+                    source: Some(MentionSource::Known),
+                    confidence: 1.0,
+                    sentence_index: 0,
+                },
+                MentionSpan {
+                    range: TextRange { start: 21, end: 28 },
+                    surface: "Arcadia".to_owned(),
+                    kind: None,
+                    entity_ref: Some(MentionEntityRef::Known(EntityId("arcadia".to_owned()))),
+                    source: Some(MentionSource::Known),
+                    confidence: 1.0,
+                    sentence_index: 0,
+                },
+            ],
+            chunks: vec![
+                ChunkSpan {
+                    kind: Some(ChunkKind::Np),
+                    range: TextRange { start: 0, end: 4 },
+                    head: TextRange { start: 0, end: 4 },
+                    modifiers: Vec::new(),
+                    sentence_index: 0,
+                },
+                ChunkSpan {
+                    kind: Some(ChunkKind::Vp),
+                    range: TextRange { start: 15, end: 20 },
+                    head: TextRange { start: 15, end: 20 },
+                    modifiers: Vec::new(),
+                    sentence_index: 0,
+                },
+                ChunkSpan {
+                    kind: Some(ChunkKind::Np),
+                    range: TextRange { start: 21, end: 28 },
+                    head: TextRange { start: 21, end: 28 },
+                    modifiers: Vec::new(),
+                    sentence_index: 0,
+                },
+                ChunkSpan {
+                    kind: Some(ChunkKind::Pp),
+                    range: TextRange { start: 29, end: 40 },
+                    head: TextRange { start: 29, end: 35 },
+                    modifiers: Vec::new(),
+                    sentence_index: 0,
+                },
+            ],
+            resolver_links: Vec::new(),
+            narrative_hits: vec![NarrativeVerbHit {
+                range: TextRange { start: 15, end: 20 },
+                lemma: "enter".to_owned(),
+                event_class: "movement".to_owned(),
+                relation_type: "moves_to".to_owned(),
+                transitivity: None,
+                sentence_index: 0,
+                confidence: 0.9,
+            }],
+            diagnostics: Vec::new(),
+        };
+
+        let artifact = structure.build(&StructureRequest {
+            text: text.to_owned(),
+            scan,
+        });
+
+        let frame = &artifact.umr_frames[0];
+        assert!(frame
+            .scopes
+            .iter()
+            .any(|scope| scope.kind == UmrLiteScopeKind::Modality && scope.value == "might"));
+        assert!(frame
+            .scopes
+            .iter()
+            .any(|scope| scope.kind == UmrLiteScopeKind::Polarity && scope.value == "negative"));
+        assert!(frame.arguments.iter().any(
+            |argument| argument.role == UmrLiteRole::Time && argument.surface == "before dawn"
+        ));
     }
 
     #[test]

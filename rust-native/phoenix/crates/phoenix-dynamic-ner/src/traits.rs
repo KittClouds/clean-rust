@@ -24,10 +24,18 @@ pub struct DiscoveredSpan {
 // ---------------------------------------------------------------------------
 
 /// Input window for model-based NER.
+#[derive(Clone, Copy, Debug)]
 pub struct ModelNerWindow<'a> {
     pub text: &'a str,
     pub window_start_sentence: u32,
     pub window_end_sentence: u32,
+}
+
+/// A model-discovery request used by batch-capable model adapters.
+#[derive(Clone, Copy, Debug)]
+pub struct ModelNerRequest<'a> {
+    pub window: ModelNerWindow<'a>,
+    pub label_pack: &'a LabelPack,
 }
 
 /// Trait for dynamic NER models (e.g. GLiNER).
@@ -41,6 +49,21 @@ pub trait DynamicNerModel: Send + Sync {
         window: &ModelNerWindow<'_>,
         label_pack: &LabelPack,
     ) -> Result<Vec<DiscoveredSpan>, NerModelError>;
+
+    /// Find new entity spans for multiple windows.
+    ///
+    /// Model adapters can override this to batch by compatible label packs.
+    /// The default preserves old behavior.
+    fn discover_batch(
+        &self,
+        requests: &[ModelNerRequest<'_>],
+    ) -> Result<Vec<Vec<DiscoveredSpan>>, NerModelError> {
+        let mut outputs = Vec::with_capacity(requests.len());
+        for request in requests {
+            outputs.push(self.discover(&request.window, request.label_pack)?);
+        }
+        Ok(outputs)
+    }
 
     /// Verify/re-label existing uncertain candidates.
     fn verify(

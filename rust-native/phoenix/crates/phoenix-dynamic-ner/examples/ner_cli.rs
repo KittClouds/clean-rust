@@ -195,7 +195,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         println!("Sentence {}: {:?}", i, need);
     }
     let schema_builder = phoenix_dynamic_ner::DynamicSchemaBuilder::default();
-    let routes = router.plan_routes(input.sentences, &needs, &schema_builder, &[], &native, None);
+    let routes = router.plan_routes(
+        input.text,
+        input.sentences,
+        &needs,
+        &schema_builder,
+        &[],
+        &native,
+        None,
+        None,
+    );
     for route in routes {
         println!("Route: {:?}", route);
     }

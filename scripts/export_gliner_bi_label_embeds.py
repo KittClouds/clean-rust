@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import argparse
 import json
+import shutil
 from pathlib import Path
 
 import torch
@@ -16,7 +18,8 @@ except Exception:  # pragma: no cover - optional local tool dependency
 from gliner.model import BiEncoderSpanGLiNER
 
 
-MODEL_DIR = Path("gliner-bi-small-onnx")
+DEFAULT_MODEL = "knowledgator/gliner-bi-base-v2.0"
+DEFAULT_OUTPUT_DIR = Path("gliner-bi-base-v2.0-onnx")
 ONNX_NAME = "model_label_embeds.onnx"
 QUANTIZED_NAME = "model_label_embeds_quantized.onnx"
 EMBEDDINGS_NAME = "labels_embeddings.json"
@@ -62,6 +65,7 @@ COMMON_LABELS = [
     "Paper",
     "Party",
     "Person",
+    "Place",
     "Product",
     "Rank",
     "Region",
@@ -71,10 +75,18 @@ COMMON_LABELS = [
     "Role",
     "Ruling",
     "Spell",
+    "Species",
     "State",
     "Statute",
     "Theory",
     "Weapon",
+    "Monster",
+    "Nonhuman",
+    "Denizen",
+    "Date",
+    "FilePath",
+    "CliFlag",
+    "LogLevel",
 ]
 
 
@@ -125,8 +137,17 @@ def build_dummy_batch(model: BiEncoderSpanGLiNER) -> dict[str, torch.Tensor]:
     return {key: value.to("cpu") if isinstance(value, torch.Tensor) else value for key, value in batch.items()}
 
 
-def write_embeddings(model: BiEncoderSpanGLiNER, labels: list[str]) -> torch.Tensor:
-    labels_embeds = model.encode_labels(labels).detach().to("cpu").float().contiguous()
+def write_embeddings(
+    model_dir: Path,
+    model: BiEncoderSpanGLiNER,
+    labels: list[str],
+    batch_size: int,
+) -> torch.Tensor:
+    try:
+        labels_embeds = model.encode_labels(labels, batch_size=batch_size)
+    except TypeError:
+        labels_embeds = model.encode_labels(labels)
+    labels_embeds = labels_embeds.detach().to("cpu").float().contiguous()
     rows = [
         {
             "label": label,
@@ -139,17 +160,78 @@ def write_embeddings(model: BiEncoderSpanGLiNER, labels: list[str]) -> torch.Ten
         "hidden_size": labels_embeds.shape[1],
         "labels": rows,
     }
-    (MODEL_DIR / EMBEDDINGS_NAME).write_text(json.dumps(payload, separators=(",", ":")), encoding="utf-8")
+    (model_dir / EMBEDDINGS_NAME).write_text(
+        json.dumps(payload, separators=(",", ":")), encoding="utf-8"
+    )
     return labels_embeds
 
 
+def load_labels(label_files: list[Path], inline_labels: list[str]) -> list[str]:
+    labels: list[str] = []
+
+    def push(label: str) -> None:
+        clean = label.strip()
+        if clean and clean not in labels:
+            labels.append(clean)
+
+    for label in COMMON_LABELS:
+        push(label)
+    for label in inline_labels:
+        for part in label.split(","):
+            push(part)
+    for path in label_files:
+        payload = path.read_text(encoding="utf-8")
+        if path.suffix.lower() == ".json":
+            raw = json.loads(payload)
+            if not isinstance(raw, list):
+                raise ValueError(f"{path} must be a JSON list of labels")
+            for label in raw:
+                push(str(label))
+        else:
+            for line in payload.splitlines():
+                for part in line.split(","):
+                    push(part)
+    return labels
+
+
+def copy_label_tokenizer_fallback(model_dir: Path) -> None:
+    labels_dir = model_dir / "labels_tokenizer"
+    labels_tokenizer = labels_dir / "tokenizer.json"
+    text_tokenizer = model_dir / "tokenizer.json"
+    if labels_tokenizer.exists() or not text_tokenizer.exists():
+        return
+    labels_dir.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(text_tokenizer, labels_tokenizer)
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="Export a GLiNER-BI ONNX bundle with precomputed label embeddings."
+    )
+    parser.add_argument("--model", default=DEFAULT_MODEL)
+    parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT_DIR)
+    parser.add_argument("--label", action="append", default=[])
+    parser.add_argument("--label-file", type=Path, action="append", default=[])
+    parser.add_argument("--label-batch-size", type=int, default=8)
+    parser.add_argument("--opset", type=int, default=18)
+    parser.add_argument("--no-quantize", action="store_true")
+    return parser.parse_args()
+
+
 def main() -> None:
-    model = BiEncoderSpanGLiNER.from_pretrained(str(MODEL_DIR), load_tokenizer=True)
+    args = parse_args()
+    model_dir = args.output_dir
+    model_dir.mkdir(parents=True, exist_ok=True)
+    labels = load_labels(args.label_file, args.label)
+
+    model = BiEncoderSpanGLiNER.from_pretrained(args.model, load_tokenizer=True)
     model.eval()
+    model.save_pretrained(str(model_dir))
+    copy_label_tokenizer_fallback(model_dir)
     core = model.model.to("cpu").eval()
 
     batch = build_dummy_batch(model)
-    labels_embeds = write_embeddings(model, COMMON_LABELS)
+    labels_embeds = write_embeddings(model_dir, model, labels, args.label_batch_size)
 
     input_names = [
         "input_ids",
@@ -173,7 +255,7 @@ def main() -> None:
         "logits": {0: "batch_size", 1: "num_words", 2: "max_width", 3: "num_labels"},
     }
 
-    onnx_path = MODEL_DIR / ONNX_NAME
+    onnx_path = model_dir / ONNX_NAME
     torch.onnx.export(
         LabelEmbedsWrapper(core),
         inputs,
@@ -181,19 +263,32 @@ def main() -> None:
         input_names=input_names,
         output_names=output_names,
         dynamic_axes=dynamic_axes,
-        opset_version=18,
+        opset_version=args.opset,
         dynamo=False,
     )
 
-    if quantize_dynamic is not None:
+    if quantize_dynamic is not None and not args.no_quantize:
         quantize_dynamic(
             model_input=str(onnx_path),
-            model_output=str(MODEL_DIR / QUANTIZED_NAME),
+            model_output=str(model_dir / QUANTIZED_NAME),
             weight_type=QuantType.QUInt8,
         )
 
+    metadata = {
+        "source_model": args.model,
+        "onnx": ONNX_NAME,
+        "quantized_onnx": None if args.no_quantize else QUANTIZED_NAME,
+        "label_count": len(labels),
+        "labels_embeddings": EMBEDDINGS_NAME,
+    }
+    (model_dir / "phoenix_export.json").write_text(
+        json.dumps(metadata, indent=2), encoding="utf-8"
+    )
+
     print(f"wrote {onnx_path}")
-    print(f"wrote {MODEL_DIR / EMBEDDINGS_NAME}")
+    print(f"wrote {model_dir / EMBEDDINGS_NAME}")
+    if not args.no_quantize and quantize_dynamic is not None:
+        print(f"wrote {model_dir / QUANTIZED_NAME}")
 
 
 if __name__ == "__main__":

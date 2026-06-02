@@ -1,14 +1,14 @@
 param(
-    [string]$TargetDir = "G:\phoenix-target-overgraph",
-    [string]$ModelRoot = "G:\phoenix-models\glirel-large-v0",
-    [string]$GlinerModelRoot = "C:\Users\shuga\1kittroot\1code\Angular-build\rust-native\phoenix-gliner-smoke\models\gliner-x-small",
+    [string]$TargetDir = "D:\phoenix-target-overgraph",
+    [string]$ModelRoot = "D:\phoenix-models\glirel-large-v0",
+    [string]$GlinerModelRoot = (Join-Path $PSScriptRoot "..\..\phoenix-gliner-smoke\models\gliner-x-small"),
     [switch]$PersistMemory,
     [switch]$KeepStore
 )
 
 $ErrorActionPreference = "Stop"
 
-$repoRoot = "C:\Users\shuga\1kittroot\1code\Angular-build\rust-native\phoenix"
+$repoRoot = Split-Path -Parent $PSScriptRoot
 $manifestPath = Join-Path $repoRoot "Cargo.toml"
 $reportDir = Join-Path $repoRoot "reports\memory-smoke"
 New-Item -ItemType Directory -Force -Path $reportDir | Out-Null

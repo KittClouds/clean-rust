@@ -122,6 +122,8 @@ impl NativeStructureBuilder {
         StructureArtifact {
             sentence_frames,
             relations,
+            umr_frames: Vec::new(),
+            frame_facts: Vec::new(),
             evidence_spans,
             diagnostics: Vec::new(),
         }
@@ -265,6 +267,7 @@ fn slot_from_chunk(
         range: chunk.range,
         entity_ref,
         confidence,
+        source: None,
     }
 }
 

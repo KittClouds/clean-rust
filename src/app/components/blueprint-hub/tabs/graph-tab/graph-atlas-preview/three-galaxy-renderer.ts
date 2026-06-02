@@ -11,12 +11,17 @@ import type { GraphRendererMode, GraphRendererPointer, GraphRendererPort } from 
 
 const MAX_EDGE_SEGMENTS = 8;
 const MAX_EDGE_TUBE_SEGMENTS = 18;
+const HOPF_EDGE_SEGMENTS = 24;
+const HOPF_CROSS_EDGE_SEGMENTS = 32;
 const MAX_EDGE_STROKES = 5;
 const MAX_HOPF_RIBBON_GUIDES = 128;
 const MAX_HOPF_DATA_TUBES = 20;
 const MAX_HOPF_TORUS_TUBES = 12;
 const HOPF_TUBE_SEGMENTS = 96;
 const HOPF_TUBE_RADIAL_SEGMENTS = 6;
+const HOPF_LINE_SEGMENTS = 144;
+const HOPF_CROSS_BAND_LINE_SEGMENTS = 72;
+const HOPF_LINE_SEGMENT_LIMIT = 192;
 const MAX_LORENTZ_GUIDES = 260;
 const MAX_LORENTZ_TUBES = 40;
 const LORENTZ_TUBE_SEGMENTS = 64;
@@ -360,7 +365,8 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
         if (!scene.edgePairs.length) return null;
         const geometry = new THREE.BufferGeometry();
         const edgeCount = scene.edgePairs.length / 2;
-        const vertexCapacity = edgeCount * MAX_EDGE_TUBE_SEGMENTS * 2 * MAX_EDGE_STROKES;
+        const maxEdgeSegments = Math.max(MAX_EDGE_TUBE_SEGMENTS, HOPF_CROSS_EDGE_SEGMENTS);
+        const vertexCapacity = edgeCount * maxEdgeSegments * 2 * MAX_EDGE_STROKES;
         geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(vertexCapacity * 3), 3));
         geometry.setAttribute('color', new THREE.BufferAttribute(new Float32Array(vertexCapacity * 3), 3));
         const material = new THREE.LineBasicMaterial({
@@ -511,12 +517,14 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
             const ax = positions[source * 3], ay = positions[source * 3 + 1], az = positions[source * 3 + 2];
             const bx = positions[target * 3], by = positions[target * 3 + 1], bz = positions[target * 3 + 2];
             const surfaceEdge = this.capsSurfaceEdge(data, ax, ay, az, bx, by, bz);
-            const steps = surfaceEdge ? MAX_EDGE_SEGMENTS : baseSteps;
+            const hopfEdge = !surfaceEdge && !tubeMode && this.mode === '3d' && data.layoutMode === 'hopfProjection' && this.settings.edgeMode === 'curved';
+            const hopfCrossBase = hopfEdge && this.isHopfCrossBaseEdge(data, source, target);
+            const steps = surfaceEdge ? MAX_EDGE_SEGMENTS : hopfEdge ? (hopfCrossBase ? HOPF_CROSS_EDGE_SEGMENTS : HOPF_EDGE_SEGMENTS) : baseSteps;
             const curveScale = THREE.MathUtils.clamp(this.settings.edgeCurveStrength, 0.25, 1.2) * (interGalaxy ? 0.92 : 0.58);
             const lift = tubeMode
                 ? this.edgeTubeLift(data, edge, source, target)
                 : this.settings.edgeMode === 'curved'
-                ? (0.08 + Math.abs(source - target) * 0.002) * curveScale + (interGalaxy ? 0.18 : 0)
+                ? (0.08 + Math.abs(source - target) * 0.002) * curveScale + (interGalaxy ? 0.18 : 0) + (hopfCrossBase ? 0.1 : 0)
                 : 0;
             const dx = bx - ax;
             const dy = by - ay;
@@ -539,6 +547,9 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
                     } else if (tubeMode) {
                         cursor = this.writeTubeEdgeVertex(positionAttr, colorAttr, cursor, data, focus, edge, ax + ox, ay + oy, az, bx + ox, by + oy, bz, lift, t0, tone);
                         cursor = this.writeTubeEdgeVertex(positionAttr, colorAttr, cursor, data, focus, edge, ax + ox, ay + oy, az, bx + ox, by + oy, bz, lift, t1, tone);
+                    } else if (hopfEdge) {
+                        cursor = this.writeHopfEdgeVertex(positionAttr, colorAttr, cursor, data, focus, edge, ax + ox, ay + oy, az, bx + ox, by + oy, bz, lift, t0, tone, hopfCrossBase);
+                        cursor = this.writeHopfEdgeVertex(positionAttr, colorAttr, cursor, data, focus, edge, ax + ox, ay + oy, az, bx + ox, by + oy, bz, lift, t1, tone, hopfCrossBase);
                     } else {
                         cursor = this.writeEdgeVertex(positionAttr, colorAttr, cursor, data, focus, edge, ax + ox, ay + oy, az, bx + ox, by + oy, bz, lift, t0, tone);
                         cursor = this.writeEdgeVertex(positionAttr, colorAttr, cursor, data, focus, edge, ax + ox, ay + oy, az, bx + ox, by + oy, bz, lift, t1, tone);
@@ -550,6 +561,13 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
         positionAttr.needsUpdate = true;
         colorAttr.needsUpdate = true;
         this.edges.geometry.computeBoundingSphere();
+    }
+
+    private isHopfCrossBaseEdge(data: GalaxySceneV2, source: number, target: number): boolean {
+        if (data.layoutMode !== 'hopfProjection') return false;
+        const sourceBase = data.hopfBaseIds?.[source] || '';
+        const targetBase = data.hopfBaseIds?.[target] || '';
+        return Boolean(sourceBase && targetBase && sourceBase !== targetBase);
     }
 
     private rebuildLabels(data: GalaxySceneV2, positions: Float32Array): void {
@@ -1566,7 +1584,7 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
     private buildHopfTubeMesh(ribbon: GalaxyHopfRibbonView, index: number, layer: 'tubeCore' | 'tubeGlow', surface: GuideSurface): THREE.Mesh | null {
         const points = this.hopfRibbonPath(ribbon);
         if (points.length < 4) return null;
-        const closed = ribbon.guideKind !== 'dataFiber' && ribbon.guideKind !== 'crossFiberBraid';
+        const closed = ribbon.guideKind !== 'crossFiberBraid';
         const curve = new THREE.CatmullRomCurve3(points, closed, 'centripetal', 0.45);
         const radius = this.hopfTubeRadius(ribbon.guideKind, layer, surface);
         const geometry = new THREE.TubeGeometry(curve, HOPF_TUBE_SEGMENTS, radius, HOPF_TUBE_RADIAL_SEGMENTS, closed);
@@ -1592,11 +1610,19 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
 
     private hopfRibbonPath(ribbon: GalaxyHopfRibbonView): THREE.Vector3[] {
         const segmentCount = Math.floor(ribbon.positions3d.length / 6);
-        if (segmentCount < 4) return [];
+        if (segmentCount < 2) return [];
         const stride = Math.max(1, Math.floor(segmentCount / 72));
         const points: THREE.Vector3[] = [];
         for (let segment = 0; segment < segmentCount; segment += stride) {
             const offset = segment * 6;
+            points.push(new THREE.Vector3(
+                ribbon.positions3d[offset],
+                ribbon.positions3d[offset + 1],
+                ribbon.positions3d[offset + 2],
+            ));
+        }
+        if (ribbon.guideKind === 'crossFiberBraid') {
+            const offset = (segmentCount - 1) * 6 + 3;
             points.push(new THREE.Vector3(
                 ribbon.positions3d[offset],
                 ribbon.positions3d[offset + 1],
@@ -1631,17 +1657,36 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
     }
 
     private buildHopfRibbonLine(ribbons: GalaxyHopfRibbonView[], guideKind: GalaxyHopfRibbonView['guideKind'], surface: GuideSurface): THREE.LineSegments | null {
-        const vertexCount = ribbons.reduce((total, ribbon) => total + ribbon.positions3d.length / 3, 0);
+        const plans = ribbons
+            .map((ribbon) => ({
+                ribbon,
+                points: this.hopfRibbonPath(ribbon),
+                segmentCount: this.hopfRibbonLineSegmentCount(ribbon),
+                closed: ribbon.guideKind !== 'crossFiberBraid',
+            }))
+            .filter((plan) => plan.points.length >= 2 && plan.segmentCount > 0);
+        if (!plans.length) return null;
+
+        const vertexCount = plans.reduce((total, plan) => total + plan.segmentCount * 2, 0);
         const positions = new Float32Array(vertexCount * 3);
         const colors = new Float32Array(vertexCount * 3);
         let cursor = 0;
-        for (const [ribbonIndex, ribbon] of ribbons.entries()) {
-            for (let source = 0; source < ribbon.positions3d.length; source += 3) {
-                const phase = source / Math.max(3, ribbon.positions3d.length - 3);
-                positions[cursor] = ribbon.positions3d[source];
-                positions[cursor + 1] = ribbon.positions3d[source + 1];
-                positions[cursor + 2] = ribbon.positions3d[source + 2];
-                this.writeHopfRibbonColor(colors, cursor, ribbon, ribbonIndex, phase, surface);
+        for (const [ribbonIndex, plan] of plans.entries()) {
+            const curve = new THREE.CatmullRomCurve3(plan.points, plan.closed, 'centripetal', plan.closed ? 0.45 : 0.35);
+            for (let segment = 0; segment < plan.segmentCount; segment++) {
+                const startPhase = segment / plan.segmentCount;
+                const endPhase = (segment + 1) / plan.segmentCount;
+                const start = curve.getPoint(startPhase);
+                const end = curve.getPoint(endPhase);
+                positions[cursor] = start.x;
+                positions[cursor + 1] = start.y;
+                positions[cursor + 2] = start.z;
+                this.writeHopfRibbonColor(colors, cursor, plan.ribbon, ribbonIndex, startPhase, surface);
+                cursor += 3;
+                positions[cursor] = end.x;
+                positions[cursor + 1] = end.y;
+                positions[cursor + 2] = end.z;
+                this.writeHopfRibbonColor(colors, cursor, plan.ribbon, ribbonIndex, endPhase, surface);
                 cursor += 3;
             }
         }
@@ -1665,6 +1710,12 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
         line.userData['hopfLayer'] = 'line';
         line.userData['pickable'] = false;
         return line;
+    }
+
+    private hopfRibbonLineSegmentCount(ribbon: GalaxyHopfRibbonView): number {
+        const sourceSegments = Math.floor(ribbon.positions3d.length / 6);
+        const targetSegments = ribbon.guideKind === 'crossFiberBraid' ? HOPF_CROSS_BAND_LINE_SEGMENTS : HOPF_LINE_SEGMENTS;
+        return Math.max(2, Math.min(HOPF_LINE_SEGMENT_LIMIT, Math.max(sourceSegments, targetSegments)));
     }
 
     private hopfRibbonTint(ribbon: GalaxyHopfRibbonView, index: number, surface: GuideSurface): { r: number; g: number; b: number } {
@@ -2137,13 +2188,83 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
         const sign = this.stableUnit(`tube-edge:${edge}`) < 0.5 ? -1 : 1;
         const sweep = Math.sin(Math.PI * t);
         const braid = Math.sin(Math.PI * 2 * t + sign * 0.72) * lift * 0.08;
-        const lateral = lift * 0.34 * sweep * sign;
+        const flourish = this.tubeEdgeTerminalFlourish(data, t, lift, sign);
+        const lateral = lift * 0.34 * sweep * sign + flourish;
         positionAttr.setXYZ(
             cursor,
             THREE.MathUtils.lerp(ax, bx, t) + (-dy / xy) * lateral,
-            THREE.MathUtils.lerp(ay, by, t) + (dx / xy) * lateral + lift * 0.38 * sweep,
-            THREE.MathUtils.lerp(az, bz, t) + (this.mode === '3d' ? lift * 0.24 * sweep * sign + braid : 0),
+            THREE.MathUtils.lerp(ay, by, t) + (dx / xy) * lateral + lift * 0.38 * sweep + Math.abs(flourish) * 0.08,
+            THREE.MathUtils.lerp(az, bz, t) + (this.mode === '3d' ? lift * 0.24 * sweep * sign + braid + flourish * 0.42 : 0),
         );
+        this.writeEdgeColor(colorAttr, cursor, data, focus, edge, t, tone);
+        return cursor + 1;
+    }
+
+    private tubeEdgeTerminalFlourish(data: GalaxySceneV2, t: number, lift: number, sign: number): number {
+        if (data.layoutMode !== 'lorentzTree' && data.layoutMode !== 'siegelFinsler') return 0;
+        const width = 0.26;
+        const start = t < width ? Math.sin(Math.PI * t / width) : 0;
+        const end = t > 1 - width ? Math.sin(Math.PI * (1 - t) / width) : 0;
+        return lift * 0.2 * sign * (end - start * 0.42);
+    }
+
+    private writeHopfEdgeVertex(
+        positionAttr: THREE.BufferAttribute,
+        colorAttr: THREE.BufferAttribute,
+        cursor: number,
+        data: GalaxySceneV2,
+        focus: GalaxyFocusMask,
+        edge: number,
+        ax: number,
+        ay: number,
+        az: number,
+        bx: number,
+        by: number,
+        bz: number,
+        lift: number,
+        t: number,
+        tone = 1,
+        crossBase = false,
+    ): number {
+        const ar = Math.max(0.0001, Math.hypot(ax, ay, az));
+        const br = Math.max(0.0001, Math.hypot(bx, by, bz));
+        const au = { x: ax / ar, y: ay / ar, z: az / ar };
+        const bu = { x: bx / br, y: by / br, z: bz / br };
+        let nx = au.y * bu.z - au.z * bu.y;
+        let ny = au.z * bu.x - au.x * bu.z;
+        let nz = au.x * bu.y - au.y * bu.x;
+        let normalLength = Math.hypot(nx, ny, nz);
+        const seed = this.stableUnit(`hopf-edge:${edge}`);
+        const sign = seed < 0.5 ? -1 : 1;
+        if (normalLength < 0.0001) {
+            nx = au.y * sign - au.z * 0.38;
+            ny = au.z + 0.22;
+            nz = -au.x + au.y * 0.38;
+            normalLength = Math.hypot(nx, ny, nz) || 1;
+        }
+        nx /= normalLength;
+        ny /= normalLength;
+        nz /= normalLength;
+        const sweep = Math.sin(Math.PI * t);
+        const curveScale = THREE.MathUtils.clamp(this.settings.edgeCurveStrength, 0.25, 1.2);
+        const bend = (crossBase ? 0.36 : 0.18) * curveScale * sweep * sign;
+        const baseX = au.x * (1 - t) + bu.x * t;
+        const baseY = au.y * (1 - t) + bu.y * t;
+        const baseZ = au.z * (1 - t) + bu.z * t;
+        const sideX = ny * baseZ - nz * baseY;
+        const sideY = nz * baseX - nx * baseZ;
+        const sideZ = nx * baseY - ny * baseX;
+        const sideLength = Math.hypot(sideX, sideY, sideZ) || 1;
+        const spin = Math.sin(Math.PI * 2 * t + seed * Math.PI * 2) * (crossBase ? 0.075 : 0.034) * sweep;
+        let dx = baseX + nx * bend + (sideX / sideLength) * spin;
+        let dy = baseY + ny * bend + (sideY / sideLength) * spin;
+        let dz = baseZ + nz * bend + (sideZ / sideLength) * spin;
+        const directionLength = Math.hypot(dx, dy, dz) || 1;
+        dx /= directionLength;
+        dy /= directionLength;
+        dz /= directionLength;
+        const radius = THREE.MathUtils.lerp(ar, br, t) + lift * (crossBase ? 0.72 : 0.38) * sweep;
+        positionAttr.setXYZ(cursor, dx * radius, dy * radius, dz * radius);
         this.writeEdgeColor(colorAttr, cursor, data, focus, edge, t, tone);
         return cursor + 1;
     }

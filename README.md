@@ -18,7 +18,7 @@ Open `http://localhost:4200` for browser development.
 Run this in another terminal while `npm start` is running:
 
 ```powershell
-$env:CARGO_TARGET_DIR='G:\cargo-targets\Angular-build\tauri-dev'
+$env:CARGO_TARGET_DIR='D:\cargo-targets\Angular-build\tauri-dev'
 npm run desktop:dev
 ```
 
@@ -27,7 +27,7 @@ npm run desktop:dev
 Use `rust-native/phoenix` for current native Phoenix work:
 
 ```powershell
-$env:CARGO_TARGET_DIR='G:\cargo-targets\Angular-build\tauri-dev'
+$env:CARGO_TARGET_DIR='D:\cargo-targets\Angular-build\tauri-dev'
 cargo check --manifest-path "rust-native\phoenix\Cargo.toml" -p phoenix-dynamic-ner -p phoenix-embed
 ```
 

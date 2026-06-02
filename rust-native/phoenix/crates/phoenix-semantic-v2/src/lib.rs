@@ -9,6 +9,9 @@ use phoenix_types::{
 use serde::{Deserialize, Serialize};
 use zerocopy::{AsBytes, FromBytes, FromZeroes};
 
+mod temporal_belief;
+pub use temporal_belief::*;
+
 #[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DocumentVersionId(pub String);
@@ -536,6 +539,8 @@ pub struct DocumentTemporalSubstrate {
     pub reference_event_edges: Vec<TemporalReferenceEdge>,
     #[serde(default)]
     pub temporal_claims: Vec<TemporalClaimAtom>,
+    #[serde(default)]
+    pub belief_atoms: Vec<BeliefStateAtom>,
     #[serde(default)]
     pub temporal_constraints: Vec<TemporalConstraintRecord>,
     #[serde(default)]
@@ -1624,9 +1629,15 @@ pub struct TemporalCompilerSummary {
     #[serde(default)]
     pub memory_card_count: usize,
     #[serde(default)]
+    pub belief_atom_count: usize,
+    #[serde(default)]
+    pub belief_card_count: usize,
+    #[serde(default)]
     pub axis_counts: std::collections::BTreeMap<String, usize>,
     #[serde(default)]
     pub source_class_counts: std::collections::BTreeMap<String, usize>,
+    #[serde(default)]
+    pub truth_status_counts: std::collections::BTreeMap<String, usize>,
 }
 
 #[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
@@ -1649,6 +1660,8 @@ pub struct TemporalScopeSidecar {
     #[serde(default)]
     pub claim_atoms: Vec<TemporalClaimAtom>,
     #[serde(default)]
+    pub belief_atoms: Vec<BeliefStateAtom>,
+    #[serde(default)]
     pub constraints: Vec<TemporalConstraintRecord>,
     #[serde(default)]
     pub intervals: Vec<TemporalIntervalRecord>,
@@ -1660,6 +1673,8 @@ pub struct TemporalScopeSidecar {
     pub gaps: Vec<TemporalGapRecord>,
     #[serde(default)]
     pub memory_cards: Vec<TemporalMemoryCard>,
+    #[serde(default)]
+    pub belief_cards: Vec<BeliefStateCard>,
     pub summary: TemporalCompilerSummary,
 }
 

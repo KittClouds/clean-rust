@@ -18,6 +18,9 @@ use crate::gliner_bi_tensors::{
 };
 use crate::ort_runtime::{load_session_with_intra_threads, recommended_thread_count};
 
+const DEFAULT_BI_BATCH_SIZE: usize = 2;
+const GLINER_BI_BATCH_SIZE_ENV: &str = "PHOENIX_GLINER_BI_BATCH_SIZE";
+
 #[derive(Debug, Error)]
 pub enum GlinerBiError {
     #[error("failed to load GLiNER Bi-Encoder model: {0}")]
@@ -31,6 +34,17 @@ pub enum GlinerBiError {
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct GlinerBiPrediction {
+    pub text: String,
+    pub label: String,
+    pub span_start: usize,
+    pub span_end: usize,
+    pub score: f32,
+}
+
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct GlinerBiSequencePrediction {
+    pub sequence: usize,
     pub text: String,
     pub label: String,
     pub span_start: usize,
@@ -141,6 +155,12 @@ struct GlinerBiLabelCache {
 struct CachedSpanTensors {
     span_idx: Arc<Vec<i64>>,
     span_mask: Arc<Vec<bool>>,
+}
+
+struct PreparedBiText<'a> {
+    sequence: usize,
+    text: &'a str,
+    tensors: GlinerBiTextTensors,
 }
 
 #[derive(Default)]
@@ -367,6 +387,62 @@ impl GlinerBiModel {
         self.predict_with_label_set(text, label_set.as_ref(), options)
     }
 
+    pub fn predict_texts_with_options(
+        &self,
+        texts: &[&str],
+        labels: &[String],
+        options: &GlinerBiPredictOptions,
+    ) -> Result<Vec<GlinerBiSequencePrediction>, GlinerBiError> {
+        if texts.is_empty() || labels.is_empty() {
+            return Ok(Vec::new());
+        }
+        let label_set = self.cached_label_set(labels)?;
+        self.predict_texts_with_label_set(texts, label_set.as_ref(), options)
+    }
+
+    pub fn predict_texts_with_label_set(
+        &self,
+        texts: &[&str],
+        label_set: &GlinerBiLabelSet,
+        options: &GlinerBiPredictOptions,
+    ) -> Result<Vec<GlinerBiSequencePrediction>, GlinerBiError> {
+        if texts.is_empty() || label_set.label_count() == 0 {
+            return Ok(Vec::new());
+        }
+        let batch_size = gliner_bi_batch_size();
+        if batch_size <= 1 || texts.len() <= 1 || self.output_mode == GlinerBiOutputMode::Token {
+            return self.predict_texts_sequential(texts, label_set, options);
+        }
+
+        let mut prepared = Vec::with_capacity(texts.len());
+        for (sequence, text) in texts.iter().enumerate() {
+            if text.trim().is_empty() {
+                continue;
+            }
+            let Some(tensors) = build_text_tensors(
+                text,
+                &self.text_tokenizer,
+                self.text_cls_id,
+                self.text_sep_id,
+            )?
+            else {
+                continue;
+            };
+            prepared.push(PreparedBiText {
+                sequence,
+                text,
+                tensors,
+            });
+        }
+        prepared.sort_by_key(|item| (item.tensors.seq_len(), item.tensors.word_count()));
+
+        let mut predictions = Vec::new();
+        for chunk in prepared.chunks(batch_size) {
+            predictions.extend(self.predict_prepared_span_batch(chunk, label_set, options)?);
+        }
+        Ok(predictions)
+    }
+
     pub fn predict_with_label_set(
         &self,
         text: &str,
@@ -405,6 +481,189 @@ impl GlinerBiModel {
                 self.predict_with_token_tensors(text, label_set, options, text_tensors, None)
             }
         }
+    }
+
+    fn predict_texts_sequential(
+        &self,
+        texts: &[&str],
+        label_set: &GlinerBiLabelSet,
+        options: &GlinerBiPredictOptions,
+    ) -> Result<Vec<GlinerBiSequencePrediction>, GlinerBiError> {
+        let mut predictions = Vec::new();
+        for (sequence, text) in texts.iter().enumerate() {
+            predictions.extend(
+                self.predict_with_label_set(text, label_set, options)?
+                    .into_iter()
+                    .map(|prediction| sequence_prediction(sequence, prediction)),
+            );
+        }
+        Ok(predictions)
+    }
+
+    fn predict_prepared_span_batch(
+        &self,
+        prepared: &[PreparedBiText<'_>],
+        label_set: &GlinerBiLabelSet,
+        options: &GlinerBiPredictOptions,
+    ) -> Result<Vec<GlinerBiSequencePrediction>, GlinerBiError> {
+        if prepared.is_empty() {
+            return Ok(Vec::new());
+        }
+        if prepared.len() == 1 {
+            let item = &prepared[0];
+            return Ok(self
+                .predict_with_label_set(item.text, label_set, options)?
+                .into_iter()
+                .map(|prediction| sequence_prediction(item.sequence, prediction))
+                .collect());
+        }
+
+        let batch = prepared.len();
+        let max_seq_len = prepared
+            .iter()
+            .map(|item| item.tensors.seq_len())
+            .max()
+            .unwrap_or(0);
+        let max_word_count = prepared
+            .iter()
+            .map(|item| item.tensors.word_count())
+            .max()
+            .unwrap_or(0);
+        if max_seq_len == 0 || max_word_count == 0 {
+            return Ok(Vec::new());
+        }
+        let num_spans = max_word_count * self.max_width;
+        let num_labels = label_set.label_count();
+
+        let mut input_ids = vec![0_i64; batch * max_seq_len];
+        let mut attention_mask = vec![0_i64; batch * max_seq_len];
+        let mut words_mask = vec![0_i64; batch * max_seq_len];
+        let mut text_lengths = vec![0_i64; batch];
+        let mut span_idx = vec![0_i64; batch * num_spans * 2];
+        let mut span_mask = vec![false; batch * num_spans];
+
+        for (batch_idx, item) in prepared.iter().enumerate() {
+            let seq_offset = batch_idx * max_seq_len;
+            let input_len = item.tensors.seq_len();
+            input_ids[seq_offset..seq_offset + input_len].copy_from_slice(&item.tensors.input_ids);
+            attention_mask[seq_offset..seq_offset + input_len]
+                .copy_from_slice(&item.tensors.attention_mask);
+            words_mask[seq_offset..seq_offset + input_len]
+                .copy_from_slice(&item.tensors.words_mask);
+            text_lengths[batch_idx] = item.tensors.word_count() as i64;
+
+            let (item_span_idx, item_span_mask) =
+                build_span_tensors(item.tensors.word_count(), self.max_width);
+            let span_idx_offset = batch_idx * num_spans * 2;
+            let span_mask_offset = batch_idx * num_spans;
+            span_idx[span_idx_offset..span_idx_offset + item_span_idx.len()]
+                .copy_from_slice(&item_span_idx);
+            span_mask[span_mask_offset..span_mask_offset + item_span_mask.len()]
+                .copy_from_slice(&item_span_mask);
+        }
+
+        let input_ids_tensor = Tensor::from_array(([batch, max_seq_len], input_ids))
+            .map_err(|error| GlinerBiError::Inference(format!("input_ids: {error}")))?;
+        let attention_mask_tensor = Tensor::from_array(([batch, max_seq_len], attention_mask))
+            .map_err(|error| GlinerBiError::Inference(format!("attention_mask: {error}")))?;
+        let words_mask_tensor = Tensor::from_array(([batch, max_seq_len], words_mask))
+            .map_err(|error| GlinerBiError::Inference(format!("words_mask: {error}")))?;
+        let text_lengths_tensor = Tensor::from_array(([batch, 1], text_lengths))
+            .map_err(|error| GlinerBiError::Inference(format!("text_lengths: {error}")))?;
+        let span_idx_tensor = Tensor::from_array(([batch, num_spans, 2], span_idx))
+            .map_err(|error| GlinerBiError::Inference(format!("span_idx: {error}")))?;
+        let span_mask_tensor = Tensor::from_array(([batch, num_spans], span_mask))
+            .map_err(|error| GlinerBiError::Inference(format!("span_mask: {error}")))?;
+
+        let outputs = match &self.label_inputs {
+            GlinerBiLabelInputs::Tokenized => {
+                let labels_input_ids_tensor = Tensor::from_array((
+                    [label_set.label_count(), label_set.max_label_len],
+                    label_set.input_ids.clone(),
+                ))
+                .map_err(|error| GlinerBiError::Inference(format!("labels_input_ids: {error}")))?;
+                let labels_attention_mask_tensor = Tensor::from_array((
+                    [label_set.label_count(), label_set.max_label_len],
+                    label_set.attention_mask.clone(),
+                ))
+                .map_err(|error| {
+                    GlinerBiError::Inference(format!("labels_attention_mask: {error}"))
+                })?;
+
+                let inputs = ort::inputs! {
+                    "input_ids" => input_ids_tensor,
+                    "attention_mask" => attention_mask_tensor,
+                    "words_mask" => words_mask_tensor,
+                    "text_lengths" => text_lengths_tensor,
+                    "span_idx" => span_idx_tensor,
+                    "span_mask" => span_mask_tensor,
+                    "labels_input_ids" => labels_input_ids_tensor,
+                    "labels_attention_mask" => labels_attention_mask_tensor,
+                }
+                .map_err(|error| GlinerBiError::Inference(format!("build inputs: {error}")))?;
+
+                self.session
+                    .run(inputs)
+                    .map_err(|error| GlinerBiError::Inference(format!("session run: {error}")))?
+            }
+            GlinerBiLabelInputs::Embeddings(store) => {
+                let labels_embeds = store.embeddings_for(&label_set.labels)?;
+                let labels_embeds_tensor = Tensor::from_array((
+                    [label_set.label_count(), store.hidden_size],
+                    labels_embeds,
+                ))
+                .map_err(|error| GlinerBiError::Inference(format!("labels_embeds: {error}")))?;
+
+                let inputs = ort::inputs! {
+                    "input_ids" => input_ids_tensor,
+                    "attention_mask" => attention_mask_tensor,
+                    "words_mask" => words_mask_tensor,
+                    "text_lengths" => text_lengths_tensor,
+                    "span_idx" => span_idx_tensor,
+                    "span_mask" => span_mask_tensor,
+                    "labels_embeds" => labels_embeds_tensor,
+                }
+                .map_err(|error| GlinerBiError::Inference(format!("build inputs: {error}")))?;
+
+                self.session
+                    .run(inputs)
+                    .map_err(|error| GlinerBiError::Inference(format!("session run: {error}")))?
+            }
+        };
+        let logits = extract_logits(
+            outputs
+                .get("logits")
+                .ok_or_else(|| GlinerBiError::Inference("missing logits output".to_owned()))?,
+        )?;
+
+        let per_sequence_logits = num_spans * num_labels;
+        let expected_len = batch * per_sequence_logits;
+        if logits.len() < expected_len {
+            return Err(GlinerBiError::Inference(format!(
+                "batched logits too short: expected {expected_len}, got {}",
+                logits.len()
+            )));
+        }
+
+        let mut predictions = Vec::new();
+        for (batch_idx, item) in prepared.iter().enumerate() {
+            let start = batch_idx * per_sequence_logits;
+            let end = start + per_sequence_logits;
+            predictions.extend(
+                decode_predictions(
+                    item.text,
+                    &item.tensors.words,
+                    label_set,
+                    self.max_width,
+                    options.threshold,
+                    options.overlap_policy,
+                    &logits[start..end],
+                )?
+                .into_iter()
+                .map(|prediction| sequence_prediction(item.sequence, prediction)),
+            );
+        }
+        Ok(predictions)
     }
 
     pub fn predict_constrained(
@@ -865,6 +1124,28 @@ fn gliner_bi_thread_count() -> usize {
         .and_then(|value| value.parse::<usize>().ok())
         .filter(|&value| value > 0)
         .unwrap_or_else(recommended_thread_count)
+}
+
+fn gliner_bi_batch_size() -> usize {
+    env::var(GLINER_BI_BATCH_SIZE_ENV)
+        .ok()
+        .and_then(|value| value.parse::<usize>().ok())
+        .filter(|&value| value > 0)
+        .unwrap_or(DEFAULT_BI_BATCH_SIZE)
+}
+
+fn sequence_prediction(
+    sequence: usize,
+    prediction: GlinerBiPrediction,
+) -> GlinerBiSequencePrediction {
+    GlinerBiSequencePrediction {
+        sequence,
+        text: prediction.text,
+        label: prediction.label,
+        span_start: prediction.span_start,
+        span_end: prediction.span_end,
+        score: prediction.score,
+    }
 }
 
 fn load_json<T: for<'de> Deserialize<'de>>(path: &Path) -> Option<T> {

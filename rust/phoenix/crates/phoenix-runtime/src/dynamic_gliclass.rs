@@ -121,7 +121,7 @@ fn marked_text(case: &AdjudicationCase) -> String {
 
 fn kind_prompt(case: &AdjudicationCase) -> String {
     format!(
-        "Classify the exact marked mention, not the whole sentence. Marked mention: '{}'. Prefer person for named individual speakers or actors, organization for factions or institutions, and location for named places.",
+        "Classify the exact marked mention, not the whole sentence. Marked mention: '{}'. Prefer person for named individual speakers or actors, organization for factions or institutions, location for named places, concept for abstract world rules, and creature for species or nonhuman denizens.",
         case.surface
     )
 }
@@ -214,6 +214,16 @@ const KIND_HYPOTHESES: &[(&str, &str, &str)] = &[
         "The marked mention is an artifact.",
         "A named object, item, device, document, weapon, or created thing.",
     ),
+    (
+        "Concept",
+        "The marked mention is a concept.",
+        "An abstract idea, world rule, rank, force, field, classification, or metaphysical system.",
+    ),
+    (
+        "Creature",
+        "The marked mention is a creature or species.",
+        "A nonhuman species, monster, fantasy creature, or generic denizen group.",
+    ),
 ];
 
 #[cfg(test)]
@@ -235,6 +245,14 @@ mod tests {
         assert_eq!(
             label_for_hypothesis("The marked mention is a location."),
             Some("Location")
+        );
+        assert_eq!(
+            label_for_hypothesis("The marked mention is a concept."),
+            Some("Concept")
+        );
+        assert_eq!(
+            label_for_hypothesis("The marked mention is a creature or species."),
+            Some("Creature")
         );
     }
 }

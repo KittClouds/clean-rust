@@ -124,6 +124,8 @@ struct SurfaceLabelEvidence {
     score: f32,
     count: usize,
     known_count: usize,
+    context_count: usize,
+    strong_context_count: usize,
 }
 
 // ---------------------------------------------------------------------------
@@ -255,6 +257,64 @@ impl MentionWorkspace {
             .collect()
     }
 
+    pub fn apply_context_kind_hints(&mut self, text: &str, sentences: &[SentenceSpan]) {
+        for entry in self.entries.iter_mut() {
+            if entry.mention_kind != MentionKind::Named || entry_has_known_label(entry) {
+                continue;
+            }
+            let sentence = sentence_text(text, sentences, entry.sentence_index);
+            let Some(label) = surface_kind_hint(entry.surface.as_str(), sentence.as_str()) else {
+                continue;
+            };
+            if entry_has_label_group(entry, label.as_str()) {
+                if should_reinforce_context_hint(
+                    entry.surface.as_str(),
+                    sentence.as_str(),
+                    label.as_str(),
+                ) {
+                    let reason = if label_group(label.as_str()) == "person"
+                        && dialogue_speaker_hint(entry.surface.as_str(), sentence.as_str())
+                    {
+                        VoteReason::DialogueSpeaker
+                    } else {
+                        VoteReason::DependencyRole
+                    };
+                    entry.votes.push(MentionVote {
+                        source: MentionSourceKind::NativeDiscovery,
+                        label: Some(label.clone()),
+                        entity_ref: None,
+                        confidence: context_kind_hint_confidence(
+                            entry.surface.as_str(),
+                            sentence.as_str(),
+                            label.as_str(),
+                        ),
+                        reason,
+                    });
+                }
+                continue;
+            }
+            let reason = if label_group(label.as_str()) == "person"
+                && dialogue_speaker_hint(entry.surface.as_str(), sentence.as_str())
+            {
+                VoteReason::DialogueSpeaker
+            } else {
+                VoteReason::DependencyRole
+            };
+            let confidence = context_kind_hint_confidence(
+                entry.surface.as_str(),
+                sentence.as_str(),
+                label.as_str(),
+            );
+            entry.votes.push(MentionVote {
+                source: MentionSourceKind::NativeDiscovery,
+                label: Some(label),
+                entity_ref: None,
+                confidence,
+                reason,
+            });
+        }
+    }
+
     fn kind_adjudication_case(
         &self,
         entry: &WorkspaceEntry,
@@ -321,20 +381,31 @@ impl MentionWorkspace {
             if entry.mention_kind != MentionKind::Named || entry_has_known_label(entry) {
                 continue;
             }
-            let Some(prior) = priors.get(entry.normalized.as_str()) else {
-                continue;
-            };
-            if entry_has_label_group(entry, prior.label.as_str()) {
+            let (prior_label, prior_confidence, prior_has_known) =
+                if let Some(prior) = priors.get(entry.normalized.as_str()) {
+                    (prior.label.clone(), prior.confidence, prior.has_known)
+                } else if let Some(prior) =
+                    compound_alias_kind_prior(entry.normalized.as_str(), &priors)
+                {
+                    (
+                        prior.label.clone(),
+                        prior.confidence.max(0.78),
+                        prior.has_known,
+                    )
+                } else {
+                    continue;
+                };
+            if entry_has_label_group(entry, prior_label.as_str()) {
                 continue;
             }
-            if !prior.has_known && entry_has_non_model_label(entry) {
+            if !prior_has_known && entry_has_strong_non_model_label(entry) {
                 continue;
             }
             entry.votes.push(MentionVote {
                 source: MentionSourceKind::NativeDiscovery,
-                label: Some(prior.label.clone()),
+                label: Some(prior_label),
                 entity_ref: None,
-                confidence: prior.confidence,
+                confidence: prior_confidence,
                 reason: VoteReason::RepeatedSurface,
             });
         }
@@ -355,7 +426,8 @@ impl MentionWorkspace {
                 if !is_entity_label(label.as_str()) || vote.reason == VoteReason::RepeatedSurface {
                     continue;
                 }
-                let Some(weight) = surface_evidence_weight(vote) else {
+                let Some((weight, is_context, is_strong_context)) = surface_evidence_weight(vote)
+                else {
                     continue;
                 };
                 upsert_surface_evidence(
@@ -363,12 +435,35 @@ impl MentionWorkspace {
                     label,
                     weight,
                     vote.source == MentionSourceKind::KnownLexicon,
+                    is_context,
+                    is_strong_context,
                 );
             }
         }
 
         let mut priors = FxHashMap::<CompactString, SurfaceKindPrior>::default();
         for (surface, mut rows) in evidence {
+            if let Some(context_top) = rows
+                .iter()
+                .filter(|row| row.strong_context_count > 0)
+                .max_by(|left, right| {
+                    left.score
+                        .partial_cmp(&right.score)
+                        .unwrap_or(std::cmp::Ordering::Equal)
+                        .then_with(|| left.strong_context_count.cmp(&right.strong_context_count))
+                })
+            {
+                priors.insert(
+                    surface,
+                    SurfaceKindPrior {
+                        label: context_top.label.clone(),
+                        confidence: (0.76 + context_top.strong_context_count.min(3) as f32 * 0.04)
+                            .min(0.88),
+                        has_known: false,
+                    },
+                );
+                continue;
+            }
             rows.sort_by(|left, right| {
                 right
                     .score
@@ -387,8 +482,12 @@ impl MentionWorkspace {
             }
             let confidence = if has_known {
                 0.86
+            } else if top.count >= 6 && top.score >= runner_up + 1.2 {
+                0.92
+            } else if top.count >= 3 && top.score >= runner_up + 0.8 {
+                0.86
             } else {
-                (0.56 + top.count.min(5) as f32 * 0.04).min(0.74)
+                (0.56 + top.count.min(5) as f32 * 0.04).min(0.78)
             };
             priors.insert(
                 surface,
@@ -499,10 +598,11 @@ impl MentionWorkspace {
         let mut labels = Vec::<(EntityLabel, f32)>::new();
         for vote in votes {
             if let Some(label) = &vote.label {
+                let weight = vote.confidence * label_distribution_vote_weight(vote);
                 if let Some(existing) = labels.iter_mut().find(|(l, _)| l == label) {
-                    existing.1 += vote.confidence;
+                    existing.1 += weight;
                 } else {
-                    labels.push((label.clone(), vote.confidence));
+                    labels.push((label.clone(), weight));
                 }
             }
         }
@@ -524,10 +624,47 @@ impl MentionWorkspace {
     }
 }
 
-fn surface_evidence_weight(vote: &MentionVote) -> Option<f32> {
+fn label_distribution_vote_weight(vote: &MentionVote) -> f32 {
+    match vote.reason {
+        VoteReason::ExactCanonical | VoteReason::ExactAlias => 2.0,
+        VoteReason::AutoAlias | VoteReason::FuzzyAnchor => 1.65,
+        VoteReason::RepeatedSurface => 1.45,
+        VoteReason::NliSupport => 1.25,
+        VoteReason::DependencyRole | VoteReason::DialogueSpeaker => {
+            if vote.confidence >= 0.80 {
+                1.0
+            } else {
+                0.55
+            }
+        }
+        VoteReason::ModelLabel | VoteReason::ModelSpan => 1.0,
+        VoteReason::CapSpan | VoteReason::NominalRole => 0.85,
+        VoteReason::TitlePattern => 0.75,
+        VoteReason::NliContradiction | VoteReason::StopwordPenalty | VoteReason::GuardViolation => {
+            0.0
+        }
+    }
+}
+
+fn surface_evidence_weight(vote: &MentionVote) -> Option<(f32, bool, bool)> {
     match vote.source {
-        MentionSourceKind::KnownLexicon => Some(3.0 + vote.confidence),
-        MentionSourceKind::ModelDiscovery => Some(vote.confidence),
+        MentionSourceKind::KnownLexicon => Some((3.0 + vote.confidence, false, false)),
+        MentionSourceKind::ModelDiscovery => Some((vote.confidence, false, false)),
+        MentionSourceKind::NativeDiscovery
+            if vote.label.is_some()
+                && matches!(
+                    vote.reason,
+                    VoteReason::DependencyRole | VoteReason::DialogueSpeaker
+                ) =>
+        {
+            let strong_context = vote.confidence >= 0.80;
+            let score = if strong_context {
+                0.65 + vote.confidence * 0.5
+            } else {
+                0.20 + vote.confidence * 0.25
+            };
+            Some((score, true, strong_context))
+        }
         _ => None,
     }
 }
@@ -537,6 +674,8 @@ fn upsert_surface_evidence(
     label: &EntityLabel,
     score: f32,
     is_known: bool,
+    is_context: bool,
+    is_strong_context: bool,
 ) {
     let group = label_group(label.as_str());
     if let Some(row) = rows
@@ -549,14 +688,59 @@ fn upsert_surface_evidence(
             row.known_count += 1;
             row.label = label.clone();
         }
+        if is_context {
+            row.context_count += 1;
+            row.label = label.clone();
+        }
+        if is_strong_context {
+            row.strong_context_count += 1;
+            row.label = label.clone();
+        }
     } else {
         rows.push(SurfaceLabelEvidence {
             label: label.clone(),
             score,
             count: 1,
             known_count: usize::from(is_known),
+            context_count: usize::from(is_context),
+            strong_context_count: usize::from(is_strong_context),
         });
     }
+}
+
+fn compound_alias_kind_prior<'a>(
+    normalized: &str,
+    priors: &'a FxHashMap<CompactString, SurfaceKindPrior>,
+) -> Option<&'a SurfaceKindPrior> {
+    let mut words = normalized.split_whitespace();
+    let first = words.next()?;
+    if words.next().is_none() {
+        return None;
+    }
+
+    let exact_key = CompactString::from(first);
+    if let Some(prior) = priors.get(&exact_key) {
+        return Some(prior);
+    }
+    if first.len() < 4 {
+        return None;
+    }
+
+    priors
+        .iter()
+        .filter_map(|(alias, prior)| {
+            let alias = alias.as_str();
+            if alias.len() < 4
+                || alias.contains(' ')
+                || first.len() <= alias.len() + 2
+                || !first.starts_with(alias)
+            {
+                return None;
+            }
+            Some((alias.len(), prior))
+        })
+        .max_by_key(|(len, _)| *len)
+        .map(|(_, prior)| prior)
 }
 
 fn entry_has_known_label(entry: &WorkspaceEntry) -> bool {
@@ -566,14 +750,34 @@ fn entry_has_known_label(entry: &WorkspaceEntry) -> bool {
         .any(|vote| vote.source == MentionSourceKind::KnownLexicon && vote.label.is_some())
 }
 
-fn entry_has_non_model_label(entry: &WorkspaceEntry) -> bool {
+fn entry_has_strong_non_model_label(entry: &WorkspaceEntry) -> bool {
     entry.votes.iter().any(|vote| {
         vote.label.is_some()
             && !matches!(
                 vote.source,
                 MentionSourceKind::ModelDiscovery | MentionSourceKind::ModelVerify
             )
+            && !is_weak_context_vote(vote)
+            && matches!(
+                vote.reason,
+                VoteReason::ExactCanonical
+                    | VoteReason::ExactAlias
+                    | VoteReason::AutoAlias
+                    | VoteReason::FuzzyAnchor
+                    | VoteReason::DependencyRole
+                    | VoteReason::DialogueSpeaker
+                    | VoteReason::NliSupport
+            )
     })
+}
+
+fn is_weak_context_vote(vote: &MentionVote) -> bool {
+    vote.source == MentionSourceKind::NativeDiscovery
+        && matches!(
+            vote.reason,
+            VoteReason::DependencyRole | VoteReason::DialogueSpeaker
+        )
+        && vote.confidence < 0.80
 }
 
 fn entry_has_label_group(entry: &WorkspaceEntry, label: &str) -> bool {
@@ -588,11 +792,14 @@ fn entry_has_label_group(entry: &WorkspaceEntry, label: &str) -> bool {
 fn label_group(label: &str) -> &'static str {
     match label.to_ascii_lowercase().as_str() {
         "character" | "person" | "npc" => "person",
+        "creature" | "species" | "monster" | "nonhuman" | "denizen" => "creature",
         "organization" | "faction" | "alliance" | "department" => "organization",
         "location" | "region" | "landmark" => "location",
         "artifact" | "item" | "weapon" => "item",
         "ability" | "spell" => "ability",
         "event" => "event",
+        "concept" | "rank" | "role" | "title" | "state" | "goal" | "relationship" | "emotion"
+        | "theory" | "method" | "metric" | "risk" => "concept",
         _ => "other",
     }
 }
@@ -667,7 +874,15 @@ fn candidate_labels_for_entry(
     if let Some(label) = surface_kind_hint(entry.surface.as_str(), sentence.as_str()) {
         push_unique_label(&mut labels, label);
     }
-    for fallback in ["Character", "Organization", "Location", "Event", "Artifact"] {
+    for fallback in [
+        "Character",
+        "Organization",
+        "Location",
+        "Creature",
+        "Concept",
+        "Event",
+        "Artifact",
+    ] {
         if labels.len() >= 4 {
             break;
         }
@@ -710,12 +925,32 @@ fn canonical_kind_label(label: &str) -> EntityLabel {
         "event" => EntityLabel::new("Event"),
         "item" => EntityLabel::new("Artifact"),
         "ability" => EntityLabel::new("Ability"),
+        "creature" => EntityLabel::new("Creature"),
+        "concept" => EntityLabel::new("Concept"),
         _ => EntityLabel::new(label),
     }
 }
 
 fn surface_kind_hint(surface: &str, sentence: &str) -> Option<EntityLabel> {
     let normalized = surface.to_ascii_lowercase();
+    let normalized_sentence = normalize_context_sentence(sentence);
+    if let Some(label) = role_or_species_surface_hint(surface) {
+        return Some(label);
+    }
+    if item_context_hint(&normalized, &normalized_sentence) {
+        return Some(EntityLabel::new("Artifact"));
+    }
+    if organization_context_hint(&normalized, &normalized_sentence) {
+        return Some(EntityLabel::new("Organization"));
+    }
+    if strong_location_context_hint(&normalized, &normalized_sentence) {
+        return Some(EntityLabel::new("Location"));
+    }
+    if person_context_hint(&normalized, &normalized_sentence)
+        || dialogue_speaker_hint(surface, sentence)
+    {
+        return Some(EntityLabel::new("Character"));
+    }
     if dialogue_speaker_hint(surface, sentence) {
         return Some(EntityLabel::new("Character"));
     }
@@ -725,7 +960,232 @@ fn surface_kind_hint(surface: &str, sentence: &str) -> Option<EntityLabel> {
     if contains_kind_cue(&normalized, LOCATION_CUES) {
         return Some(EntityLabel::new("Location"));
     }
+    if contains_kind_cue(&normalized, ROLE_CUES) {
+        return Some(EntityLabel::new("NPC"));
+    }
+    if contains_kind_cue(&normalized, CREATURE_CUES) {
+        return Some(EntityLabel::new("Creature"));
+    }
+    if contains_kind_cue(&normalized, CONCEPT_CUES) {
+        return Some(EntityLabel::new("Concept"));
+    }
+    if weak_location_context_hint(&normalized, &normalized_sentence) {
+        return Some(EntityLabel::new("Location"));
+    }
     None
+}
+
+fn should_reinforce_context_hint(surface: &str, sentence: &str, label: &str) -> bool {
+    let normalized = surface.to_ascii_lowercase();
+    let normalized_sentence = normalize_context_sentence(sentence);
+    match label_group(label) {
+        "person" => {
+            person_context_hint(&normalized, &normalized_sentence)
+                || dialogue_speaker_hint(surface, sentence)
+        }
+        "concept" => contains_kind_cue(&normalized, CONCEPT_CUES),
+        "creature" => contains_kind_cue(&normalized, CREATURE_CUES),
+        _ => false,
+    }
+}
+
+fn context_kind_hint_confidence(surface: &str, sentence: &str, label: &str) -> f32 {
+    let normalized = surface.to_ascii_lowercase();
+    let normalized_sentence = normalize_context_sentence(sentence);
+    match label_group(label) {
+        "person" if person_context_hint(&normalized, &normalized_sentence) => 0.90,
+        "person" if dialogue_speaker_hint(surface, sentence) => 0.88,
+        "location" if strong_location_context_hint(&normalized, &normalized_sentence) => 0.84,
+        "location" if weak_location_context_hint(&normalized, &normalized_sentence) => 0.46,
+        "item" if item_context_hint(&normalized, &normalized_sentence) => 0.88,
+        "concept" if contains_kind_cue(&normalized, CONCEPT_CUES) => 1.0,
+        "creature" if contains_kind_cue(&normalized, CREATURE_CUES) => 0.92,
+        _ => 0.82,
+    }
+}
+
+fn normalize_context_sentence(value: &str) -> String {
+    value
+        .to_ascii_lowercase()
+        .replace(['\u{2018}', '\u{2019}'], "'")
+        .split_whitespace()
+        .collect::<Vec<_>>()
+        .join(" ")
+}
+
+fn organization_context_hint(surface: &str, sentence: &str) -> bool {
+    if surface.is_empty() || !sentence.contains(surface) {
+        return false;
+    }
+    if role_or_species_surface_hint(surface).is_some() {
+        return false;
+    }
+    let possessive = format!("{surface}'");
+    if phrase(sentence, &format!("{surface} corporation"))
+        || phrase(sentence, &format!("{surface} company"))
+        || phrase(sentence, &format!("{surface} organization"))
+        || phrase(sentence, &format!("{surface} security"))
+        || phrase(sentence, &format!("{surface} gang"))
+        || phrase(sentence, &format!("{surface} faction"))
+        || phrase(sentence, &format!("{surface} division"))
+        || phrase(sentence, &format!("the {surface} corporation"))
+        || phrase(sentence, &format!("the {surface} company"))
+        || phrase(sentence, &format!("the {surface} organization"))
+        || phrase(sentence, &format!("represent the {surface}"))
+        || phrase(sentence, &format!("represents the {surface}"))
+        || phrase(sentence, &format!("belong to a group called {surface}"))
+        || phrase(sentence, &format!("belongs to a group called {surface}"))
+        || phrase(sentence, &format!("group called {surface}"))
+        || phrase(sentence, &format!("members of {surface}"))
+        || phrase(sentence, &format!("member of {surface}"))
+        || phrase(sentence, &format!("on {surface} payroll"))
+        || phrase(sentence, &format!("on {surface}'s payroll"))
+        || phrase(sentence, &format!("on {possessive} payroll"))
+    {
+        return true;
+    }
+    contains_kind_cue(surface, ORG_CUES)
+}
+
+fn item_context_hint(surface: &str, sentence: &str) -> bool {
+    if surface.is_empty() || !sentence.contains(surface) {
+        return false;
+    }
+    phrase(sentence, &format!("sell {surface} to"))
+        || phrase(sentence, &format!("sell {surface} there"))
+        || phrase(sentence, &format!("sell {surface} anymore"))
+        || phrase(sentence, &format!("peddled {surface}"))
+        || phrase(sentence, &format!("gram of {surface}"))
+        || phrase(sentence, &format!("smelled of {surface}"))
+        || phrase(sentence, &format!("doses of {surface}"))
+        || phrase(sentence, &format!("{surface} drug"))
+        || phrase(sentence, &format!("{surface} business"))
+        || phrase(sentence, &format!("{surface} supply"))
+        || phrase(sentence, &format!("{surface} addicts"))
+        || phrase(sentence, &format!("no {surface} allowed"))
+        || phrase(sentence, &format!("produces their {surface}"))
+}
+
+fn strong_location_context_hint(surface: &str, sentence: &str) -> bool {
+    if surface.is_empty() || !sentence.contains(surface) {
+        return false;
+    }
+    if phrase(sentence, &format!("city called {surface}"))
+        || phrase(sentence, &format!("city called the {surface}"))
+        || phrase(sentence, &format!("casino called {surface}"))
+        || phrase(sentence, &format!("casino called the {surface}"))
+        || phrase(sentence, &format!("landmark called {surface}"))
+        || phrase(sentence, &format!("landmark called the {surface}"))
+        || phrase(sentence, &format!("address called {surface}"))
+        || phrase(sentence, &format!("area called {surface}"))
+        || phrase(sentence, &format!("district called {surface}"))
+        || phrase(sentence, &format!("{surface} access"))
+        || phrase(sentence, &format!("{surface} interior"))
+        || phrase(sentence, &format!("{surface} proper"))
+    {
+        return true;
+    }
+    if LOCATION_CUES
+        .iter()
+        .any(|cue| phrase_with_trailing_boundary(sentence, &format!("{surface} {cue}")))
+    {
+        return true;
+    }
+    contains_kind_cue(surface, LOCATION_CUES)
+}
+
+fn weak_location_context_hint(surface: &str, sentence: &str) -> bool {
+    if surface.is_empty() || !sentence.contains(surface) {
+        return false;
+    }
+    phrase(sentence, &format!("into {surface}"))
+        || phrase(sentence, &format!("through {surface}"))
+        || phrase(sentence, &format!("from {surface}"))
+        || phrase(sentence, &format!("inside {surface}"))
+}
+
+fn role_or_species_surface_hint(surface: &str) -> Option<EntityLabel> {
+    let normalized = surface.trim().to_ascii_lowercase();
+    if normalized.is_empty() {
+        return None;
+    }
+    if is_capitalized_family_alias(surface) {
+        return Some(EntityLabel::new("Character"));
+    }
+    if contains_kind_cue(&normalized, ROLE_CUES) {
+        return Some(EntityLabel::new("NPC"));
+    }
+    if contains_kind_cue(&normalized, CREATURE_CUES) {
+        return Some(EntityLabel::new("Creature"));
+    }
+    None
+}
+
+fn is_capitalized_family_alias(surface: &str) -> bool {
+    let trimmed = surface.trim();
+    let Some(first) = trimmed.chars().next() else {
+        return false;
+    };
+    first.is_ascii_uppercase()
+        && matches!(
+            trimmed.to_ascii_lowercase().as_str(),
+            "dad" | "mom" | "mum" | "father" | "mother" | "uncle" | "aunt"
+        )
+}
+
+fn person_context_hint(surface: &str, sentence: &str) -> bool {
+    if surface.is_empty() || !sentence.contains(surface) {
+        return false;
+    }
+    if phrase(sentence, &format!("my name is {surface}"))
+        || phrase(sentence, &format!("name is {surface}"))
+        || phrase(sentence, &format!("i'm {surface}"))
+        || phrase(sentence, &format!("i am {surface}"))
+        || phrase(sentence, &format!("{surface} introduced herself"))
+        || phrase(sentence, &format!("{surface} introduced himself"))
+        || phrase(sentence, &format!("{surface} replied"))
+        || phrase(sentence, &format!("{surface} answered"))
+        || phrase(sentence, &format!("{surface} asked"))
+        || phrase(sentence, &format!("{surface} told"))
+        || phrase(sentence, &format!("{surface} said"))
+        || phrase(sentence, &format!("{surface} laughed"))
+        || phrase(sentence, &format!("{surface} admitted"))
+        || phrase(sentence, &format!("{surface} insisted"))
+        || phrase(sentence, &format!("{surface} recognized"))
+    {
+        return true;
+    }
+    if ROLE_CUES
+        .iter()
+        .any(|cue| phrase(sentence, &format!("{cue} called {surface}")))
+    {
+        return true;
+    }
+    ROLE_CUES.iter().any(|cue| {
+        phrase(sentence, &format!("{surface}, a {cue}"))
+            || phrase(sentence, &format!("{surface}, an {cue}"))
+            || phrase(sentence, &format!("{surface}, the {cue}"))
+    })
+}
+
+fn phrase(sentence: &str, value: &str) -> bool {
+    sentence.contains(value)
+}
+
+fn phrase_with_trailing_boundary(sentence: &str, value: &str) -> bool {
+    let mut offset = 0usize;
+    while let Some(found) = sentence[offset..].find(value) {
+        let end = offset + found + value.len();
+        let boundary = sentence[end..]
+            .chars()
+            .next()
+            .is_none_or(|ch| !ch.is_ascii_alphanumeric());
+        if boundary {
+            return true;
+        }
+        offset = end;
+    }
+    false
 }
 
 fn contains_kind_cue(surface: &str, cues: &[&str]) -> bool {
@@ -771,15 +1231,22 @@ const ORG_CUES: &[&str] = &[
     "alliance",
     "allied",
     "association",
+    "business",
     "clan",
     "committee",
     "company",
+    "corporation",
     "council",
     "department",
+    "division",
     "faction",
+    "family",
+    "gang",
     "guild",
     "institute",
+    "mafia",
     "order",
+    "security",
     "society",
     "table",
     "team",
@@ -787,7 +1254,58 @@ const ORG_CUES: &[&str] = &[
 
 const LOCATION_CUES: &[&str] = &[
     "base", "camp", "city", "country", "district", "fort", "germany", "kingdom", "land", "mesa",
-    "mount", "province", "region", "river", "station", "town", "valley",
+    "mount", "province", "region", "river", "station", "tower", "town", "valley",
+];
+
+const ROLE_CUES: &[&str] = &[
+    "adventurer",
+    "assassin",
+    "boss",
+    "boy",
+    "caller",
+    "citizen",
+    "civilian",
+    "courier",
+    "denizen",
+    "elder",
+    "employee",
+    "genome",
+    "genomes",
+    "genius",
+    "girl",
+    "guard",
+    "healer",
+    "mage",
+    "man",
+    "merchant",
+    "mutant",
+    "priest",
+    "psycho",
+    "soldier",
+    "superhero",
+    "superheroine",
+    "teenager",
+    "vendor",
+    "warrior",
+    "woman",
+];
+
+const CREATURE_CUES: &[&str] = &[
+    "devil", "devils", "dwarf", "dwarves", "mongrel", "mongrels", "titan", "titans",
+];
+
+const CONCEPT_CUES: &[&str] = &[
+    "boundary",
+    "claim",
+    "field",
+    "force",
+    "law",
+    "principle",
+    "rank",
+    "rule",
+    "state",
+    "system",
+    "theory",
 ];
 
 fn is_surface_label_source(source: MentionSourceKind) -> bool {
@@ -805,6 +1323,11 @@ fn is_entity_label(label: &str) -> bool {
         "character"
             | "person"
             | "npc"
+            | "creature"
+            | "species"
+            | "monster"
+            | "nonhuman"
+            | "denizen"
             | "organization"
             | "faction"
             | "location"
@@ -816,6 +1339,13 @@ fn is_entity_label(label: &str) -> bool {
             | "weapon"
             | "ability"
             | "spell"
+            | "concept"
+            | "rank"
+            | "role"
+            | "state"
+            | "goal"
+            | "relationship"
+            | "theory"
     )
 }
 
@@ -1092,6 +1622,359 @@ mod tests {
     }
 
     #[test]
+    fn context_kind_hints_relabel_story_roles_without_name_patches() {
+        let text = "Have you seen a girl called Len? I represent the Augusti. The casino called the Bakuto stayed open.";
+        let sentences = vec![
+            SentenceSpan {
+                index: 0,
+                range: phoenix_types::TextRange { start: 0, end: 34 },
+            },
+            SentenceSpan {
+                index: 1,
+                range: phoenix_types::TextRange { start: 35, end: 59 },
+            },
+            SentenceSpan {
+                index: 2,
+                range: phoenix_types::TextRange {
+                    start: 60,
+                    end: text.len() as u32,
+                },
+            },
+        ];
+        let mut ws = MentionWorkspace::new("doc1", 0);
+        for (id, surface, start, sentence_index, bad_label) in [
+            (0, "Len", 29, 0, "Creature"),
+            (1, "Augusti", 51, 1, "Person"),
+            (2, "Bakuto", 86, 2, "Person"),
+        ] {
+            ws.entries.push(WorkspaceEntry {
+                id: LocalMentionId(id),
+                range: phoenix_types::TextRange {
+                    start,
+                    end: start + surface.len() as u32,
+                },
+                surface: CompactString::from(surface),
+                normalized: CompactString::from(surface.to_ascii_lowercase()),
+                mention_kind: MentionKind::Named,
+                entity_ref: None,
+                votes: SmallVec::from_elem(
+                    MentionVote {
+                        source: MentionSourceKind::ModelDiscovery,
+                        label: Some(EntityLabel::new(bad_label)),
+                        entity_ref: None,
+                        confidence: 0.70,
+                        reason: VoteReason::ModelLabel,
+                    },
+                    1,
+                ),
+                sentence_index,
+            });
+        }
+
+        ws.apply_context_kind_hints(text, &sentences);
+        let packets = ws.finalize_packets();
+
+        assert_eq!(packets[0].label_distribution[0].0.as_str(), "Character");
+        assert_eq!(packets[1].label_distribution[0].0.as_str(), "Organization");
+        assert_eq!(packets[2].label_distribution[0].0.as_str(), "Location");
+    }
+
+    #[test]
+    fn role_apposition_reinforces_person_prior_over_wrong_repeated_location() {
+        let text = "Rook, a Psycho from the Red Pack. Rook escaped. Rook froze the door.";
+        let sentences = test_sentence_spans(text);
+        let mut ws = MentionWorkspace::new("doc1", 0);
+        ws.entries
+            .push(model_entry_with_confidence(0, "Rook", "Person", 0, 0.64));
+        ws.entries
+            .push(model_entry_with_confidence(1, "Rook", "Location", 1, 0.70));
+        ws.entries
+            .push(model_entry_with_confidence(2, "Rook", "Location", 2, 0.70));
+
+        ws.apply_context_kind_hints(text, &sentences);
+        let packets = ws.finalize_packets();
+
+        for packet in packets
+            .iter()
+            .filter(|packet| packet.surface.as_str() == "Rook")
+        {
+            assert_eq!(
+                label_group(packet.label_distribution[0].0.as_str()),
+                "person",
+                "{:?}",
+                packet.source_votes
+            );
+        }
+    }
+
+    #[test]
+    fn repeated_person_surface_beats_weak_preposition_location_drift() {
+        let text = "Ryan said hello. Ryan laughed. Fortuna heard from Ryan. Ryan thanked everyone.";
+        let sentences = test_sentence_spans(text);
+        let mut ws = MentionWorkspace::new("doc1", 0);
+        for (id, label, sentence_index) in [
+            (0, "Person", 0),
+            (1, "Person", 1),
+            (2, "Location", 2),
+            (3, "Person", 3),
+        ] {
+            ws.entries.push(model_entry_with_confidence(
+                id,
+                "Ryan",
+                label,
+                sentence_index,
+                0.72,
+            ));
+        }
+        ws.entries
+            .iter_mut()
+            .find(|entry| entry.id == LocalMentionId(2))
+            .expect("weak location entry")
+            .votes
+            .push(MentionVote {
+                source: MentionSourceKind::NativeDiscovery,
+                label: Some(EntityLabel::new("Location")),
+                entity_ref: None,
+                confidence: 0.46,
+                reason: VoteReason::DependencyRole,
+            });
+
+        ws.apply_context_kind_hints(text, &sentences);
+        let packets = ws.finalize_packets();
+
+        for packet in packets
+            .iter()
+            .filter(|packet| packet.surface.as_str() == "Ryan")
+        {
+            assert_eq!(
+                label_group(packet.label_distribution[0].0.as_str()),
+                "person",
+                "{:?}",
+                packet.source_votes
+            );
+        }
+    }
+
+    #[test]
+    fn role_class_surfaces_beat_weak_place_and_group_context() {
+        let text = "Dad will return. The Genomes came from Rust Town. A Psycho gang moved in. Mongrel hissed.";
+        let sentences = test_sentence_spans(text);
+        let mut ws = MentionWorkspace::new("doc1", 0);
+        for (id, surface, bad_label, sentence_index) in [
+            (0, "Dad", "Location", 0),
+            (1, "Genomes", "Location", 1),
+            (2, "Psycho", "Organization", 2),
+            (3, "Mongrel", "Location", 3),
+        ] {
+            ws.entries.push(model_entry_with_confidence(
+                id,
+                surface,
+                bad_label,
+                sentence_index,
+                0.72,
+            ));
+        }
+
+        ws.apply_context_kind_hints(text, &sentences);
+        let packets = ws.finalize_packets();
+
+        assert_eq!(packet_label_group(&packets, "Dad"), "person");
+        assert!(matches!(
+            packet_label_group(&packets, "Genomes"),
+            "person" | "creature"
+        ));
+        assert_eq!(packet_label_group(&packets, "Psycho"), "person");
+        assert_eq!(packet_label_group(&packets, "Mongrel"), "creature");
+    }
+
+    #[test]
+    fn substance_context_relabels_named_drug_as_item() {
+        let text = "Dealers sell Bliss. Ryan smelled of Bliss. The Bliss drug spread.";
+        let sentences = test_sentence_spans(text);
+        let mut ws = MentionWorkspace::new("doc1", 0);
+        for (id, sentence_index) in [(0, 0), (1, 1), (2, 2)] {
+            ws.entries.push(model_entry_with_confidence(
+                id,
+                "Bliss",
+                "Location",
+                sentence_index,
+                0.72,
+            ));
+        }
+
+        ws.apply_context_kind_hints(text, &sentences);
+        let packets = ws.finalize_packets();
+
+        for packet in packets
+            .iter()
+            .filter(|packet| packet.surface.as_str() == "Bliss")
+        {
+            assert_eq!(
+                label_group(packet.label_distribution[0].0.as_str()),
+                "item",
+                "{:?}",
+                packet.source_votes
+            );
+        }
+    }
+
+    #[test]
+    fn location_context_repairs_repeated_place_surface_without_name_patch() {
+        let text = "The Red Arcadia interior had settled around the Kharon Vel access. The gate opened into Kharon Vel proper. Kharon Vel had lunch.";
+        let sentences = test_sentence_spans(text);
+        let mut ws = MentionWorkspace::new("doc1", 0);
+        for (id, surface, sentence_index, bad_label) in [
+            (0, "Red Arcadia", 0, "Organization"),
+            (1, "Kharon Vel", 0, "Person"),
+            (2, "Kharon Vel", 1, "Person"),
+            (3, "Kharon Vel", 2, "Person"),
+        ] {
+            ws.entries
+                .push(model_entry(id, surface, bad_label, sentence_index));
+        }
+
+        ws.apply_context_kind_hints(text, &sentences);
+        let packets = ws.finalize_packets();
+
+        for surface in ["Red Arcadia", "Kharon Vel"] {
+            let labels = packets
+                .iter()
+                .filter(|packet| packet.surface.as_str() == surface)
+                .map(|packet| packet.label_distribution[0].0.as_str())
+                .collect::<Vec<_>>();
+            assert!(
+                labels.iter().all(|label| *label == "Location"),
+                "{surface} labels: {labels:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn place_suffix_context_relabels_duplicate_native_cap_spans() {
+        let text = "The highway linked the city to the rest of the Campania region.";
+        let sentences = test_sentence_spans(text);
+        let mut ws = MentionWorkspace::new("doc1", 0);
+        ws.entries.push(native_cap_entry(0, "Campania", 0));
+        ws.entries.push(native_cap_entry(1, "Campania", 0));
+
+        ws.apply_context_kind_hints(text, &sentences);
+        let packets = ws.finalize_packets();
+        let labels = packets
+            .iter()
+            .filter(|packet| packet.surface.as_str() == "Campania")
+            .map(|packet| packet.label_distribution[0].0.as_str())
+            .collect::<Vec<_>>();
+
+        assert_eq!(labels.len(), 2);
+        assert!(
+            labels.iter().all(|label| *label == "Location"),
+            "Campania labels: {labels:?}"
+        );
+        assert!(!strong_location_context_hint(
+            "acid rain",
+            "acid rain towered over him like an angel of death."
+        ));
+    }
+
+    #[test]
+    fn abstract_and_species_cues_repair_kind_without_name_patch() {
+        let text = "The room held a full city's worth of Boundary Lattice. A dwarf argued by the ramp. A devil woman carried a parcel.";
+        let sentences = test_sentence_spans(text);
+        let mut ws = MentionWorkspace::new("doc1", 0);
+        let mut boundary = model_entry_with_confidence(0, "Boundary Lattice", "Creature", 0, 0.95);
+        boundary.votes.push(MentionVote {
+            source: MentionSourceKind::ModelDiscovery,
+            label: Some(EntityLabel::new("Concept")),
+            entity_ref: None,
+            confidence: 0.52,
+            reason: VoteReason::ModelLabel,
+        });
+        ws.entries.push(boundary);
+        ws.entries.push(model_entry(1, "dwarf", "Artifact", 1));
+        ws.entries
+            .push(model_entry(2, "devil woman", "Creature", 2));
+
+        ws.apply_context_kind_hints(text, &sentences);
+        let packets = ws.finalize_packets();
+        let boundary = packets
+            .iter()
+            .find(|packet| packet.surface.as_str() == "Boundary Lattice")
+            .unwrap();
+        let dwarf = packets
+            .iter()
+            .find(|packet| packet.surface.as_str() == "dwarf")
+            .unwrap();
+        let devil_woman = packets
+            .iter()
+            .find(|packet| packet.surface.as_str() == "devil woman")
+            .unwrap();
+
+        assert_eq!(boundary.label_distribution[0].0.as_str(), "Concept");
+        assert_eq!(dwarf.label_distribution[0].0.as_str(), "Creature");
+        assert_eq!(
+            label_group(devil_woman.label_distribution[0].0.as_str()),
+            "person"
+        );
+    }
+
+    #[test]
+    fn repeated_short_name_prior_repairs_compound_full_name_kind() {
+        let mut ws = MentionWorkspace::new("doc1", 0);
+        for id in 0..3 {
+            ws.entries
+                .push(model_entry(id, "Rift", "Person", id as u32));
+        }
+        ws.entries
+            .push(model_entry(3, "Riftmach Gearlock", "Creature", 3));
+        for id in 4..6 {
+            ws.entries
+                .push(model_entry(id, "Tempest", "Person", id as u32));
+        }
+        ws.entries
+            .push(model_entry(6, "Tempest Barish", "Creature", 6));
+        ws.entries.push(known_entry(7, "Kai", "Character", 7));
+        ws.entries.push(WorkspaceEntry {
+            id: LocalMentionId(8),
+            range: phoenix_types::TextRange { start: 80, end: 92 },
+            surface: CompactString::from("Kai Gearlock"),
+            normalized: CompactString::from("kai gearlock"),
+            mention_kind: MentionKind::Named,
+            entity_ref: None,
+            votes: SmallVec::from_elem(
+                MentionVote {
+                    source: MentionSourceKind::NativeDiscovery,
+                    label: None,
+                    entity_ref: None,
+                    confidence: 0.78,
+                    reason: VoteReason::CapSpan,
+                },
+                1,
+            ),
+            sentence_index: 8,
+        });
+
+        let packets = ws.finalize_packets();
+
+        for surface in ["Riftmach Gearlock", "Tempest Barish", "Kai Gearlock"] {
+            let packet = packets
+                .iter()
+                .find(|packet| packet.surface.as_str() == surface)
+                .expect(surface);
+            assert_eq!(
+                label_group(packet.label_distribution[0].0.as_str()),
+                "person"
+            );
+            assert!(packet.source_votes.iter().any(|vote| {
+                vote.reason == VoteReason::RepeatedSurface
+                    && vote
+                        .label
+                        .as_ref()
+                        .is_some_and(|label| label_group(label.as_str()) == "person")
+            }));
+        }
+    }
+
+    #[test]
     fn label_distribution_normalizes() {
         let votes: SmallVec<[MentionVote; 6]> = SmallVec::from_vec(vec![
             MentionVote {
@@ -1112,5 +1995,125 @@ mod tests {
         let dist = MentionWorkspace::build_label_distribution(&votes);
         let total: f32 = dist.iter().map(|(_, w)| *w).sum();
         assert!((total - 1.0).abs() < 0.01);
+    }
+
+    fn model_entry(id: u64, surface: &str, label: &str, sentence_index: u32) -> WorkspaceEntry {
+        model_entry_with_confidence(id, surface, label, sentence_index, 0.70)
+    }
+
+    fn native_cap_entry(id: u64, surface: &str, sentence_index: u32) -> WorkspaceEntry {
+        WorkspaceEntry {
+            id: LocalMentionId(id),
+            range: phoenix_types::TextRange {
+                start: id as u32 * 10,
+                end: id as u32 * 10 + surface.len() as u32,
+            },
+            surface: CompactString::from(surface),
+            normalized: CompactString::from(surface.to_ascii_lowercase()),
+            mention_kind: MentionKind::Named,
+            entity_ref: None,
+            votes: SmallVec::from_elem(
+                MentionVote {
+                    source: MentionSourceKind::NativeDiscovery,
+                    label: None,
+                    entity_ref: None,
+                    confidence: 0.78,
+                    reason: VoteReason::CapSpan,
+                },
+                1,
+            ),
+            sentence_index,
+        }
+    }
+
+    fn packet_label_group<'a>(packets: &'a [MentionPacket], surface: &str) -> &'a str {
+        packets
+            .iter()
+            .find(|packet| packet.surface.as_str() == surface)
+            .map(|packet| label_group(packet.label_distribution[0].0.as_str()))
+            .expect(surface)
+    }
+
+    fn model_entry_with_confidence(
+        id: u64,
+        surface: &str,
+        label: &str,
+        sentence_index: u32,
+        confidence: f32,
+    ) -> WorkspaceEntry {
+        WorkspaceEntry {
+            id: LocalMentionId(id),
+            range: phoenix_types::TextRange {
+                start: id as u32 * 10,
+                end: id as u32 * 10 + surface.len() as u32,
+            },
+            surface: CompactString::from(surface),
+            normalized: CompactString::from(surface.to_ascii_lowercase()),
+            mention_kind: MentionKind::Named,
+            entity_ref: None,
+            votes: SmallVec::from_elem(
+                MentionVote {
+                    source: MentionSourceKind::ModelDiscovery,
+                    label: Some(EntityLabel::new(label)),
+                    entity_ref: None,
+                    confidence,
+                    reason: VoteReason::ModelLabel,
+                },
+                1,
+            ),
+            sentence_index,
+        }
+    }
+
+    fn known_entry(id: u64, surface: &str, label: &str, sentence_index: u32) -> WorkspaceEntry {
+        WorkspaceEntry {
+            id: LocalMentionId(id),
+            range: phoenix_types::TextRange {
+                start: id as u32 * 10,
+                end: id as u32 * 10 + surface.len() as u32,
+            },
+            surface: CompactString::from(surface),
+            normalized: CompactString::from(surface.to_ascii_lowercase()),
+            mention_kind: MentionKind::Named,
+            entity_ref: None,
+            votes: SmallVec::from_elem(
+                MentionVote {
+                    source: MentionSourceKind::KnownLexicon,
+                    label: Some(EntityLabel::new(label)),
+                    entity_ref: None,
+                    confidence: 1.0,
+                    reason: VoteReason::ExactCanonical,
+                },
+                1,
+            ),
+            sentence_index,
+        }
+    }
+
+    fn test_sentence_spans(text: &str) -> Vec<SentenceSpan> {
+        let mut spans = Vec::new();
+        let mut start = 0usize;
+        for (idx, ch) in text.char_indices() {
+            if matches!(ch, '.' | '!' | '?') {
+                spans.push(SentenceSpan {
+                    index: spans.len(),
+                    range: phoenix_types::TextRange {
+                        start: start as u32,
+                        end: (idx + ch.len_utf8()) as u32,
+                    },
+                });
+                start = idx + ch.len_utf8() + 1;
+            }
+        }
+        if start < text.len() {
+            spans.push(SentenceSpan {
+                index: spans.len(),
+                range: phoenix_types::TextRange {
+                    start: start as u32,
+                    end: text.len() as u32,
+                },
+            });
+        }
+        spans
     }
 }

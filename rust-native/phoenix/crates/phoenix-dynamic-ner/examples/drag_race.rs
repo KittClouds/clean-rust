@@ -7,16 +7,20 @@ use std::time::{Duration, Instant};
 
 use compact_str::CompactString;
 use phoenix_alex::Lexicon;
-use phoenix_dynamic_ner::SurfaceRouter;
 use phoenix_dynamic_ner::{
-    DiscoveredSpan, DynamicNerModel, DynamicSchemaBuilder, EntityLabel, LabelPack, LocalMentionId,
-    MentionPacket, MentionVote, ModelNerWindow, NerModelError, PhoenixNerEngineBuilder,
-    SurfaceNerInput, VerificationCase,
+    resolve_aliases, resolve_identity_dag, AliasRegistryEntity, AliasResolutionInput,
+    DiscoveredSpan, DynamicNerModel, DynamicSchemaBuilder, EntityLabel, IdentityResolutionInput,
+    LabelPack, LocalMentionId, MentionKind, MentionPacket, MentionVote, ModelNerWindow,
+    NerModelError, PhoenixNerEngineBuilder, SurfaceNerInput, SurfaceRouter, VerificationCase,
 };
 use phoenix_rel_post::{GlinerBiModel, GlinerBiOverlapPolicy, GlinerBiPredictOptions};
 use phoenix_types::{
     EntityId, EntityKind, LexiconEntry, ScopeKey, SentenceSpan, TextRange, TokenClass, TokenSpan,
 };
+
+const STORY_NAMES: &[&str] = &[
+    "Aella", "Aurora", "Brynwyn", "Iriane", "Isolde", "Kai", "Phaeris", "Rowan", "Siofra",
+];
 
 struct CliGlinerModel {
     model: GlinerBiModel,
@@ -102,21 +106,31 @@ impl DynamicNerModel for CliGlinerModel {
 }
 
 fn story_lexicon() -> Result<Lexicon, String> {
-    let entries = [
-        "Aella", "Aurora", "Brynwyn", "Iriane", "Isolde", "Kai", "Phaeris", "Rowan", "Siofra",
-    ]
-    .into_iter()
-    .map(|name| LexiconEntry {
-        entity_id: EntityId(name.to_ascii_lowercase()),
-        label: name.to_owned(),
-        aliases: Vec::new(),
-        kind: Some(EntityKind::Character),
-        gender: None,
-        number: None,
-        scope: ScopeKey::default(),
-    })
-    .collect::<Vec<_>>();
+    let entries = STORY_NAMES
+        .iter()
+        .map(|name| LexiconEntry {
+            entity_id: EntityId(name.to_ascii_lowercase()),
+            label: (*name).to_owned(),
+            aliases: Vec::new(),
+            kind: Some(EntityKind::Character),
+            gender: None,
+            number: None,
+            scope: ScopeKey::default(),
+        })
+        .collect::<Vec<_>>();
     Lexicon::from_entries(&entries).map_err(|err| format!("{err:?}"))
+}
+
+fn story_alias_registry() -> Vec<AliasRegistryEntity> {
+    STORY_NAMES
+        .iter()
+        .map(|name| AliasRegistryEntity {
+            entity_id: EntityId(name.to_ascii_lowercase()),
+            canonical_name: (*name).to_owned(),
+            kind: Some(EntityKind::Character),
+            aliases: Vec::new(),
+        })
+        .collect()
 }
 
 fn naive_tokenize(text: &str) -> (Vec<TokenSpan>, Vec<SentenceSpan>) {
@@ -185,12 +199,13 @@ fn best_label(mention: &MentionPacket) -> String {
 
 fn normalize_group(label: &str) -> &'static str {
     match label {
-        "Character" | "Npc" | "Person" => "person",
-        "Organization" | "Faction" => "organization",
-        "Location" => "location",
+        "Character" | "Npc" | "NPC" | "Person" => "person",
+        "Creature" | "Species" | "Monster" => "creature",
+        "Organization" | "Faction" | "Department" | "Alliance" => "organization",
+        "Location" | "Region" | "Landmark" => "location",
         "Event" => "event",
         "Artifact" | "Item" | "Weapon" => "item",
-        "Concept" | "Ability" | "Spell" => "concept",
+        "Concept" | "Ability" | "Spell" | "Rank" => "concept",
         "Pronoun" => "pronoun",
         _ => "other",
     }
@@ -290,6 +305,22 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     let output = last_output.expect("at least one run");
+    let registry_entities = story_alias_registry();
+    let alias_report = resolve_aliases(&AliasResolutionInput {
+        document_id: "shortrun",
+        mentions: &output.mentions,
+        surface_memory: &output.surface_memory,
+        registry_entities: &registry_entities,
+    });
+    let identity_dag = resolve_identity_dag(&IdentityResolutionInput {
+        document_id: "shortrun",
+        mentions: &output.mentions,
+        mention_graph: &output.mention_graph,
+        surface_memory: &output.surface_memory,
+        alias_report: Some(&alias_report),
+        registry_entities: &registry_entities,
+        linker_candidates: &[],
+    });
     let timing_us: Vec<u128> = timings.iter().map(Duration::as_micros).collect();
     let best = timing_us.iter().copied().min().unwrap_or(0);
     let worst = timing_us.iter().copied().max().unwrap_or(0);
@@ -299,13 +330,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut source_counts: BTreeMap<String, usize> = BTreeMap::new();
     let mut status_counts: BTreeMap<String, usize> = BTreeMap::new();
     for mention in &output.mentions {
-        let label = best_label(mention);
-        let group = normalize_group(&label);
-        grouped
-            .entry(group)
-            .or_default()
-            .entry(mention.normalized.to_string())
-            .or_insert_with(|| mention.surface.to_string());
+        if mention.mention_kind == MentionKind::Named {
+            let label = best_label(mention);
+            let group = normalize_group(&label);
+            grouped
+                .entry(group)
+                .or_default()
+                .entry(mention.normalized.to_string())
+                .or_insert_with(|| mention.surface.to_string());
+        }
         for vote in &mention.source_votes {
             *source_counts
                 .entry(format!("{:?}", vote.source))
@@ -345,6 +378,25 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         output.mentions.len(),
         output.mention_graph.edges.len()
     );
+    println!(
+        "ALIAS proposals={} known={} run_local={} deferred={}",
+        alias_report.question_count,
+        alias_report.known_candidate_count,
+        alias_report.run_local_candidate_count,
+        alias_report.deferred_count
+    );
+    println!(
+        "IDENTITY nodes={} edges={} receipts={} known={} alias={} merge={} split={} defer={} new={}",
+        identity_dag.summary.node_count,
+        identity_dag.summary.edge_count,
+        identity_dag.summary.receipt_count,
+        identity_dag.summary.known_decisions,
+        identity_dag.summary.alias_decisions,
+        identity_dag.summary.merge_decisions,
+        identity_dag.summary.split_decisions,
+        identity_dag.summary.deferred_decisions,
+        identity_dag.summary.new_entity_decisions
+    );
     println!("SOURCES");
     for (source, count) in source_counts {
         println!("  {source}: {count}");
@@ -354,10 +406,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         println!("  {status}: {count}");
     }
     println!(
-        "SUMMARY model={} threshold={threshold:.2} overlap={overlap_policy:?} max_labels={max_labels} load_us={load_us} warm_us={warm_us} best_us={best} median_us={med} worst_us={worst} mentions={} mention_edges={}",
+        "SUMMARY model={} threshold={threshold:.2} overlap={overlap_policy:?} max_labels={max_labels} load_us={load_us} warm_us={warm_us} best_us={best} median_us={med} worst_us={worst} mentions={} mention_edges={} identity_receipts={}",
         model_path,
         output.mentions.len(),
-        output.mention_graph.edges.len()
+        output.mention_graph.edges.len(),
+        identity_dag.summary.receipt_count
     );
 
     if summary_only {

@@ -50,7 +50,7 @@ rust-native/phoenix
 Use `CARGO_TARGET_DIR` on `G:` to avoid polluting the repo and to keep build artifacts out of the branch:
 
 ```powershell
-$env:CARGO_TARGET_DIR='G:\cargo-targets\Angular-build\tauri-dev'
+$env:CARGO_TARGET_DIR='D:\cargo-targets\Angular-build\tauri-dev'
 cargo check --manifest-path "rust-native\phoenix\Cargo.toml" -p phoenix-embed -p phoenix-dynamic-ner -p phoenix-graph-post -p phoenix-store-overgraph
 ```
 
@@ -61,7 +61,7 @@ The older `rust/phoenix` tree is kept only because `src-tauri` currently depends
 Required local model directory for Dynamic NER:
 
 ```text
-gliner-bi-small-onnx/
+D:\hf-models\gliner-bi-base-v2.0-onnx\
 ```
 
 Important files in that directory:
@@ -75,7 +75,7 @@ tokenizer.json
 gliner_config.json
 ```
 
-The GLiNER-BI runner now prefers `model_label_embeds_quantized.onnx` by default so it uses precomputed label embeddings. This protects the `~1s` Dynamic NER path on `docs/shortrun.md`.
+The GLiNER-BI runner prefers `model_label_embeds_quantized.onnx` by default so it uses precomputed label embeddings. The current base-v2 bundle was exported from `knowledgator/gliner-bi-base-v2.0` with `scripts/export_gliner_bi_label_embeds.py`; keep it on `D:` on the new PC.
 
 MDBR leaf embeddings are resolved from the Transformers cache used by the frontend/Rust probe:
 
@@ -90,12 +90,12 @@ If that cache is missing, initialize the frontend model path once before running
 ### Dynamic NER Regression Check
 
 ```powershell
-$env:CARGO_TARGET_DIR='G:\cargo-targets\Angular-build\tauri-release'
+$env:CARGO_TARGET_DIR='D:\cargo-targets\Angular-build\tauri-release'
 $env:PHOENIX_DYN_NER_THRESHOLD='0.34'
 $env:PHOENIX_DYN_NER_OVERLAP_POLICY='highest-score'
 $env:PHOENIX_DYN_NER_MAX_LABELS='14'
 $env:PHOENIX_DYN_NER_SUMMARY_ONLY='1'
-cargo run --release -p phoenix-dynamic-ner --example drag_race -- "..\..\docs\shortrun.md" 1 "..\..\gliner-bi-small-onnx"
+cargo run --release -p phoenix-dynamic-ner --example drag_race -- "..\..\docs\shortrun.md" 1 "D:\hf-models\gliner-bi-base-v2.0-onnx"
 ```
 
 Expected warm run on this machine: roughly `0.75s-1.0s`.
@@ -103,7 +103,7 @@ Expected warm run on this machine: roughly `0.75s-1.0s`.
 ### Semantic Atlas Rust Probe
 
 ```powershell
-$env:CARGO_TARGET_DIR='G:\cargo-targets\Angular-build\tauri-release'
+$env:CARGO_TARGET_DIR='D:\cargo-targets\Angular-build\tauri-release'
 $env:MAX_ENTITIES='70'
 cargo run --release -p phoenix-embed --bin phoenix-mdbr-atlas-flat-probe -- "..\..\docs\shortrun.md"
 ```
@@ -117,4 +117,4 @@ Expected native Rust Semantic Atlas graph build is dominated by MDBR embedding. 
 - Do not compile old `rust/phoenix` as a general workspace target; use it only through `src-tauri` until the native host is fully moved to `rust-native/phoenix`.
 - Keep new native work in `rust-native/phoenix`.
 - Keep docs and benchmark source documents under `docs/`.
-- Keep build artifacts out of git; use `G:\cargo-targets\Angular-build\...` for Rust targets.
+- Keep build artifacts out of git; use `D:\cargo-targets\Angular-build\...` for Rust targets on the new PC.

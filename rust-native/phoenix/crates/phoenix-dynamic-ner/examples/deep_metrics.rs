@@ -381,11 +381,13 @@ fn best_label(mention: &MentionPacket) -> String {
 fn normalize_group(label: &str) -> &'static str {
     match label {
         "Character" | "Npc" | "NPC" | "Person" => "person",
+        "Creature" | "Species" | "Monster" => "creature",
         "Organization" | "Faction" | "Department" | "Alliance" => "organization",
         "Location" | "Region" | "Landmark" => "location",
         "Event" => "event",
         "Artifact" | "Item" | "Weapon" => "item",
-        "Concept" | "Ability" | "Spell" => "concept",
+        "Concept" | "Ability" | "Spell" | "Rank" => "concept",
+        "Pronoun" => "pronoun",
         _ => "other",
     }
 }

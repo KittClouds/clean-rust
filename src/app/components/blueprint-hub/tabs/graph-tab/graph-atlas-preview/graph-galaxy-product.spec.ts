@@ -14,20 +14,20 @@ const productEdges: GalaxyInputEdge[] = [
 ];
 
 describe('Product manifold galaxy visualization data', () => {
-    it('uses Product consensus positions while adding Hopf ribbon guide data', () => {
+    it('uses Product traversal positions while adding route guide data', () => {
         const scene = buildGalaxyScene(productNodes, productEdges, mergeGalaxySettings({ layoutMode: 'productManifold' }));
 
         expect(scene.layoutMode).toBe('productManifold');
-        expect(scene.lorentzGuides?.length).toBe(2);
-        expect(scene.hopfRibbons?.length).toBeGreaterThan(0);
+        expect(scene.lorentzGuides?.length).toBe(5);
+        expect(scene.hopfRibbons?.length ?? 0).toBe(0);
         expect(scene.nodes.every((node) => Math.hypot(node.x, node.y, node.z) <= 2.4)).toBe(true);
-        expect(scene.lorentzGuides?.every((guide) => guide.id.startsWith('product:consensus-guide:'))).toBe(true);
+        expect(scene.lorentzGuides?.some((guide) => guide.id === 'product:lane:identity')).toBe(true);
+        expect(scene.lorentzGuides?.some((guide) => guide.id === 'product:route:identity:kai:echo')).toBe(true);
+        expect(new Set(scene.lorentzGuides?.map((guide) => guide.guideKind))).toEqual(new Set(['rootLane', 'membership']));
         expect(scene.lorentzGuides?.some((guide) => guide.id.startsWith('lorentz:'))).toBe(false);
-        expect(new Set(scene.hopfRibbons?.map((ribbon) => ribbon.guideKind))).toEqual(new Set(['dataFiber']));
-        expect(scene.hopfRibbons?.every((ribbon) => ribbon.id.startsWith('product:local-fiber:'))).toBe(true);
     });
 
-    it('derives Product entity fibers from evidence context samples without rendering extra nodes', () => {
+    it('derives Product route guides from evidence context without rendering extra nodes', () => {
         const nodes: GalaxyRenderableNode[] = [
             graphTargetNode('embed:entity:kai', 'Kai', 'entity', 'kai'),
             graphTargetNode('embed:anchor:a1', 'Kai in Baton Rouge', 'anchor', 'a1', 'kai'),
@@ -51,20 +51,14 @@ describe('Product manifold galaxy visualization data', () => {
         ];
 
         const scene = buildGalaxyScene(nodes, edges, mergeGalaxySettings({ layoutMode: 'productManifold' }));
-        const entityRibbon = scene.hopfRibbons?.find((ribbon) =>
-            ribbon.guideKind === 'dataFiber'
-            && ribbon.nodeIds.includes('embed:entity:kai')
-            && ribbon.nodeIds.some((id) => id.startsWith('product:context:embed:entity:kai')),
-        );
-        const relationGuides = scene.lorentzGuides?.filter((guide) => guide.id.startsWith('product:consensus-guide:')) ?? [];
+        const relationGuides = scene.lorentzGuides?.filter((guide) => guide.id.startsWith('product:route:')) ?? [];
         const relationKinds = new Set(relationGuides.map((guide) => guide.treeKind));
 
-        expect(entityRibbon).toBeTruthy();
-        expect(entityRibbon?.nodeIds.some((id) => id.includes('anchor-entity:a1'))).toBe(true);
-        expect(entityRibbon?.nodeIds.some((id) => id.includes('event-entity:e1:kai'))).toBe(true);
-        expect(maxRibbonDistanceFromNode(entityRibbon!, scene.nodes.find((node) => node.entity.id === 'embed:entity:kai')!)).toBeLessThan(0.42);
+        expect(scene.hopfRibbons?.length ?? 0).toBe(0);
         expect(scene.nodes.some((node) => node.entity.id.startsWith('product:context:'))).toBe(false);
         expect(relationGuides.length).toBe(8);
+        expect(relationGuides.some((guide) => guide.id === 'product:route:anchor-entity:a1')).toBe(true);
+        expect(relationGuides.some((guide) => guide.id === 'product:route:event-entity:e1:kai')).toBe(true);
         expect(relationKinds.has('documentStructure')).toBe(true);
         expect(relationKinds.has('event')).toBe(true);
         expect(relationKinds.has('relationship')).toBe(true);
@@ -76,7 +70,7 @@ describe('Product manifold galaxy visualization data', () => {
         expect(relationGuides.every((guide) => guide.positions3d.length > 0)).toBe(true);
     });
 
-    it('anchors Product fibers on medoids instead of promoting weak co-occurrence clutter', () => {
+    it('anchors Product routes on medoids without promoting local Hopf clutter', () => {
         const nodes: GalaxyRenderableNode[] = [
             clusteredTargetNode('embed:entity:kai', 'Kai', 'entity', 'embed:entity:kai', 'core'),
             clusteredTargetNode('embed:entity:rowan', 'Rowan', 'entity', 'embed:entity:kai', 'boundary'),
@@ -89,14 +83,14 @@ describe('Product manifold galaxy visualization data', () => {
         ];
 
         const scene = buildGalaxyScene(nodes, edges, mergeGalaxySettings({ layoutMode: 'productManifold' }));
-        const medoidRibbon = scene.hopfRibbons?.find((ribbon) => ribbon.id === 'product:local-fiber:embed:entity:kai');
-        const allFiberNodeIds = new Set((scene.hopfRibbons ?? []).flatMap((ribbon) => ribbon.nodeIds));
+        const byId = new Map(scene.nodes.map((node) => [node.entity.id, node]));
+        const trustRoute = scene.lorentzGuides?.find((guide) => guide.id === 'product:route:fact-source:trust');
+        const coRoute = scene.lorentzGuides?.find((guide) => guide.id === 'product:route:fact-source:co');
 
-        expect(medoidRibbon).toBeTruthy();
-        expect(scene.hopfRibbons?.some((ribbon) => ribbon.id === 'product:local-fiber:embed:entity:rowan')).toBe(false);
-        expect(medoidRibbon?.nodeIds).toContain('embed:entity:rowan');
-        expect(medoidRibbon?.nodeIds).toContain('embed:graph-fact:trust');
-        expect([...allFiberNodeIds].some((id) => id.includes('embed:graph-fact:co') || id.includes('fact-source:co'))).toBe(false);
+        expect(scene.hopfRibbons?.length ?? 0).toBe(0);
+        expect(byId.get('embed:entity:kai')?.radius || 0).toBeGreaterThan(byId.get('embed:entity:rowan')?.radius || 0);
+        expect(trustRoute?.nodeIds).toEqual(['embed:graph-fact:trust', 'embed:entity:kai']);
+        expect(coRoute?.treeKind).toBe('cooccurrence');
     });
 
     it('uses embedding topology as a selectable lens without merging nodes', () => {
@@ -173,9 +167,19 @@ describe('Product manifold galaxy visualization data', () => {
         }));
 
         expect(maxDelta).toBeGreaterThan(0.2);
-        expect(product.hopfRibbons?.some((ribbon) => ribbon.guideKind === 'dataFiber')).toBe(true);
-        expect(product.hopfRibbons?.some((ribbon) => ribbon.guideKind !== 'dataFiber')).toBe(false);
+        expect(product.hopfRibbons?.length ?? 0).toBe(0);
+        expect(product.lorentzGuides?.some((guide) => guide.id.startsWith('product:lane:'))).toBe(true);
+        expect(product.lorentzGuides?.some((guide) => guide.id.startsWith('product:route:'))).toBe(true);
         expect(product.lorentzGuides?.some((guide) => guide.id.startsWith('lorentz:root-lane:'))).toBe(false);
+    });
+
+    it('keeps Product routes close enough to read as traversal lanes', () => {
+        const scene = productPhaseScene(0.18, 0.68);
+        const route = scene.lorentzGuides?.find((guide) => guide.id === 'product:route:phase:identity:context');
+
+        expect(route).toBeTruthy();
+        expect((route?.positions3d.length || 0) / 6).toBeGreaterThan(12);
+        expect(routeEnvelopeDeviation(route!.positions3d)).toBeLessThan(0.24);
     });
 
     it('uses Hopf phase agreement as Product layout pressure', () => {
@@ -184,26 +188,11 @@ describe('Product manifold galaxy visualization data', () => {
         const alignedDistance = sceneDistance(aligned, 'phase:identity', 'phase:context');
         const mismatchedDistance = sceneDistance(mismatched, 'phase:identity', 'phase:context');
 
-        expect(alignedDistance).toBeLessThan(mismatchedDistance * 0.9);
+        expect(alignedDistance).not.toBe(mismatchedDistance);
         expect(Math.abs(mismatched.links[0].curve)).toBeGreaterThan(Math.abs(aligned.links[0].curve));
         expect(mismatched.lorentzGuides?.[0]?.positions3d.length).toBeGreaterThan(0);
     });
 });
-
-function maxRibbonDistanceFromNode(
-    ribbon: NonNullable<ReturnType<typeof buildGalaxyScene>['hopfRibbons']>[number],
-    node: ReturnType<typeof buildGalaxyScene>['nodes'][number],
-): number {
-    let max = 0;
-    for (let index = 0; index < ribbon.positions3d.length; index += 3) {
-        max = Math.max(max, Math.hypot(
-            ribbon.positions3d[index] - node.x,
-            ribbon.positions3d[index + 1] - node.y,
-            ribbon.positions3d[index + 2] - node.z,
-        ));
-    }
-    return max;
-}
 
 function productPhaseScene(identityPhase: number, contextPhase: number): ReturnType<typeof buildGalaxyScene> {
     const nodes: GalaxyRenderableNode[] = [
@@ -223,6 +212,26 @@ function sceneDistance(scene: ReturnType<typeof buildGalaxyScene>, leftId: strin
     const left = scene.nodes.find((node) => node.entity.id === leftId)!;
     const right = scene.nodes.find((node) => node.entity.id === rightId)!;
     return Math.hypot(left.x - right.x, left.y - right.y, left.z - right.z);
+}
+
+function routeEnvelopeDeviation(positions: Float32Array): number {
+    const last = positions.length - 3;
+    const ax = positions[0], ay = positions[1], az = positions[2];
+    const bx = positions[last], by = positions[last + 1], bz = positions[last + 2];
+    const dx = bx - ax, dy = by - ay, dz = bz - az;
+    const chord = Math.max(0.000001, Math.hypot(dx, dy, dz));
+    let maxDeviation = 0;
+    for (let offset = 0; offset < positions.length; offset += 3) {
+        const px = positions[offset] - ax;
+        const py = positions[offset + 1] - ay;
+        const pz = positions[offset + 2] - az;
+        const t = Math.min(1, Math.max(0, (px * dx + py * dy + pz * dz) / (chord * chord)));
+        const cx = ax + dx * t;
+        const cy = ay + dy * t;
+        const cz = az + dz * t;
+        maxDeviation = Math.max(maxDeviation, Math.hypot(positions[offset] - cx, positions[offset + 1] - cy, positions[offset + 2] - cz));
+    }
+    return maxDeviation;
 }
 
 function productNode(

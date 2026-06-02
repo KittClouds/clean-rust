@@ -271,6 +271,7 @@ pub enum LabelBankSource {
     SourceFrameContext,
     GraphContext,
     DomainProfile,
+    SemanticRouter,
     UserType,
     Gazetteer,
 }

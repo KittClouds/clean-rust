@@ -391,23 +391,24 @@ function guideSegments(
     sourceBasin?: ProductBasin,
     targetBasin?: ProductBasin,
 ): Float32Array {
-    const steps = 12;
+    const steps = 16;
     const positions = new Float32Array(steps * 6);
     const sign = stableUnit(`${source.entity.id}:${target.entity.id}:${treeKind}`) > 0.5 ? 1 : -1;
     const obstruction = productObstructionScore(link, sourceInfo, targetInfo);
     const lane = obstruction > 0.55 ? 'obstruction' : canonicalRouteLane(treeKind || targetInfo.lane || sourceInfo.lane);
-    const center = sourceBasin && targetBasin
-        ? scale(add(sourceBasin.center, targetBasin.center), 0.5)
-        : scale(add(vectorOf(source), vectorOf(target)), 0.5);
-    const lift = obstruction > 0.55 ? 0.2 + obstruction * 0.18 : sameBasin ? 0.05 + support * 0.04 : 0.14 + support * 0.08;
+    const nodeCenter = scale(add(vectorOf(source), vectorOf(target)), 0.5);
+    const basinCenter = sourceBasin && targetBasin ? scale(add(sourceBasin.center, targetBasin.center), 0.5) : nodeCenter;
+    const center = add(scale(nodeCenter, 0.72), scale(basinCenter, 0.28));
+    const lift = obstruction > 0.55 ? 0.07 + obstruction * 0.05 : sameBasin ? 0.018 + support * 0.012 : 0.03 + support * 0.02;
     const tension = productHopfTension(sourceInfo, targetInfo);
     const braid = productHopfBraidDirection(sourceInfo, targetInfo, `${source.entity.id}:${target.entity.id}:${treeKind}`);
+    const lanePull = obstruction > 0.55 ? 0.24 : sameBasin ? 0.14 : 0.16;
     const laneTarget = {
-        x: (source.x + target.x) * 0.5 + (target.x < source.x ? 0.18 : 0),
-        y: routeLaneBand(lane) + (sameBasin ? 0.02 : 0.08 * sign),
+        x: (source.x + target.x) * 0.5 + (target.x < source.x ? 0.032 : 0),
+        y: routeLaneBand(lane) + (sameBasin ? 0.004 : 0.012 * sign),
         z: Math.max(source.z, target.z, center.z) + lift,
     };
-    const midpoint = add(add(scale(center, 0.28), scale(laneTarget, 0.72)), scale(braid, (0.026 + tension * 0.12) * sign));
+    const midpoint = add(add(scale(center, 1 - lanePull), scale(laneTarget, lanePull)), scale(braid, (0.006 + tension * 0.024) * sign));
     for (let index = 0; index < steps; index++) {
         const a = index / steps;
         const b = (index + 1) / steps;

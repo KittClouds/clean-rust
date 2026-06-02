@@ -5077,6 +5077,7 @@ fn frame_slot_from_mention(mention: &MentionSpan) -> FrameSlot {
         range: mention.range,
         entity_ref: mention.entity_ref.clone(),
         confidence: mention.confidence,
+        source: None,
     }
 }
 
@@ -6623,6 +6624,8 @@ impl PhoenixInvarantV3 {
         StructureArtifact {
             sentence_frames,
             relations,
+            umr_frames: Vec::new(),
+            frame_facts: Vec::new(),
             evidence_spans,
             diagnostics: vec![Diagnostic {
                 code: "PX_INVARANT_V2_STRUCTURE".to_owned(),

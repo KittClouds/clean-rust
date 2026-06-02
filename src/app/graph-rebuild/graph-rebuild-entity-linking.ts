@@ -315,14 +315,17 @@ function scoreLinkerCandidate(mentionTokens: string[], surface: string, node: Gr
             token.startsWith(mentionToken) ||
             mentionToken.startsWith(token) ||
             (token.length > 3 && mentionToken.length > 3 && token.slice(0, 3) === mentionToken.slice(0, 3))));
+        const firstTokenStem = firstTokenStemMatch(mentionTokens, candidateTokens);
         let candidateScore = tokenOverlap;
         if (contains) candidateScore = Math.max(candidateScore, 0.78);
+        if (firstTokenStem) candidateScore = Math.max(candidateScore, 0.74);
         if (prefix) candidateScore = Math.max(candidateScore, 0.48);
         if (candidateScore > score) {
             score = candidateScore;
             reasons.length = 0;
             if (tokenOverlap > 0) reasons.push(`token overlap ${Math.round(tokenOverlap * 100)}%`);
             if (contains) reasons.push('surface containment');
+            if (firstTokenStem) reasons.push('first-token stem');
             if (prefix) reasons.push('token prefix');
         }
     }
@@ -331,6 +334,14 @@ function scoreLinkerCandidate(mentionTokens: string[], surface: string, node: Gr
         reasons.push(`anchor support ${node.totalMentions}`);
     }
     return { score: clamp(score, 0, 1), reasons };
+}
+
+function firstTokenStemMatch(mentionTokens: string[], candidateTokens: string[]): boolean {
+    const mentionFirst = mentionTokens[0] || '';
+    const candidateFirst = candidateTokens[0] || '';
+    return candidateFirst.length >= 4
+        && mentionFirst.length > candidateFirst.length
+        && mentionFirst.startsWith(candidateFirst);
 }
 
 function linkerWindowId(mention: GraphRebuildMention): string {
@@ -420,7 +431,7 @@ function normalizedTokens(value: string): string[] {
 
 function kindFamily(kind: string): string {
     const normalized = String(kind || '').toUpperCase();
-    if (normalized === 'PERSON' || normalized === 'NPC') return 'CHARACTER';
+    if (normalized === 'PERSON' || normalized === 'NPC' || normalized === 'CREATURE') return 'CHARACTER';
     if (normalized === 'ORGANIZATION' || normalized === 'FACTION') return 'NETWORK';
     return normalized;
 }

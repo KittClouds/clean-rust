@@ -40,6 +40,6 @@ describe('phoenix runtime compatibility', () => {
 
         expect(isPhoenixWasmMismatchError(error)).toBe(true);
         expect(error.message).toContain('stale');
-        expect(error.message).toContain('npm run wasm:ensure');
+        expect(error.message).toContain('rebuild the active runtime');
     });
 });

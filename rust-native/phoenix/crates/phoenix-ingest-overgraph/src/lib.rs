@@ -18,20 +18,21 @@ use phoenix_machine::{
 };
 use phoenix_proposition::PropositionLowerer;
 use phoenix_semantic_v2::{
-    scope_storage_key, AliasConfirmation, AliasEntry, AliasPosting, CandidateEntity,
-    CandidateEvidence, ChunkId, ChunkRecord, CompactResolutionKind, CompactResolutionRow,
-    CorefClusterRecord, DirtyScopeRecord, DocumentArchive, DocumentCausalSubstrate,
-    DocumentEventIdentitySubstrate, DocumentManifest, DocumentOrd, DocumentOrdinalAssignment,
-    DocumentRevisionRef, DocumentSegmentHeader, DocumentSegmentKind, DocumentSegmentRef,
-    DocumentTemporalSubstrate, DocumentVersionId, EventIdentityDiagnosticRecord, EventMentionId,
-    EventMentionPacketSeed, EventModalitySemantics, EventParticipantSlot, EventSourceSemantics,
-    LexicalPostingsSegment, NativeCorefSummary, NativeErSummary, PreparedDocument,
-    PreparedDocumentSegment, RecordedTemporalBinding, ResolutionDecision, ResolvedMention,
-    ScopeLexSidecar, ScopeOrd, SemanticEntityRecord, SemanticRelationRecord, SessionArchive,
-    SurfaceTemporalCueRecord, TemporalAnchorId, TemporalAnchorRecord, TemporalAxisId,
-    TemporalAxisKind, TemporalAxisRecord, TemporalClaimAtom, TemporalConstraintId,
-    TemporalConstraintKind, TemporalConstraintRecord, TemporalDiagnosticRecord,
-    TemporalReferenceEdge, TemporalTimexId, TemporalTimexRecord,
+    scope_storage_key, AliasConfirmation, AliasEntry, AliasPosting, BeliefSourceKind,
+    BeliefStateAtom, BeliefStateKind, CandidateEntity, CandidateEvidence, ChunkId, ChunkRecord,
+    CompactResolutionKind, CompactResolutionRow, CorefClusterRecord, DirtyScopeRecord,
+    DocumentArchive, DocumentCausalSubstrate, DocumentEventIdentitySubstrate, DocumentManifest,
+    DocumentOrd, DocumentOrdinalAssignment, DocumentRevisionRef, DocumentSegmentHeader,
+    DocumentSegmentKind, DocumentSegmentRef, DocumentTemporalSubstrate, DocumentVersionId,
+    EventIdentityDiagnosticRecord, EventMentionId, EventMentionPacketSeed, EventModalitySemantics,
+    EventParticipantSlot, EventSourceSemantics, LexicalPostingsSegment, NativeCorefSummary,
+    NativeErSummary, PreparedDocument, PreparedDocumentSegment, RecordedTemporalBinding,
+    ResolutionDecision, ResolvedMention, ScopeLexSidecar, ScopeOrd, SemanticEntityRecord,
+    SemanticRelationRecord, SessionArchive, SurfaceTemporalCueRecord, TemporalAnchorId,
+    TemporalAnchorRecord, TemporalAxisId, TemporalAxisKind, TemporalAxisRecord, TemporalClaimAtom,
+    TemporalConstraintId, TemporalConstraintKind, TemporalConstraintRecord,
+    TemporalDiagnosticRecord, TemporalReferenceEdge, TemporalTimexId, TemporalTimexRecord,
+    TemporalTruthStatus, TemporalWorldlineId,
 };
 use phoenix_store_native_core::{
     BundleHeader, BundleKey, BundleKind, PhoenixArchiveStoreV2, PhoenixBundleStoreV2, StoreError,
@@ -9226,6 +9227,7 @@ fn build_document_temporal_substrate(
     let mut reference_timex_edges = Vec::<TemporalReferenceEdge>::new();
     let mut reference_event_edges = Vec::<TemporalReferenceEdge>::new();
     let mut temporal_claims = Vec::<TemporalClaimAtom>::new();
+    let mut belief_atoms = Vec::<BeliefStateAtom>::new();
     let mut temporal_constraints = Vec::<TemporalConstraintRecord>::new();
     let mut temporal_diagnostics = Vec::<TemporalDiagnosticRecord>::new();
     let mut last_event_by_axis = FxHashMap::<String, (String, usize)>::default();
@@ -9361,6 +9363,17 @@ fn build_document_temporal_substrate(
                 temporal: anchor_temporal.clone(),
                 evidence_refs: anchor_evidence.clone(),
             });
+            belief_atoms.push(build_belief_state_atom(
+                &document_id,
+                proposition,
+                event_id,
+                &axis_id,
+                axis_kind,
+                &snippet_lower,
+                snippet_range,
+                &anchor_temporal,
+                &event_fingerprint,
+            ));
 
             if let Some((previous_event_id, previous_sentence_index)) =
                 last_event_by_axis.get(&axis_id.0).cloned()
@@ -9454,9 +9467,167 @@ fn build_document_temporal_substrate(
         reference_timex_edges,
         reference_event_edges,
         temporal_claims,
+        belief_atoms,
         temporal_constraints,
         temporal_diagnostics,
     }
+}
+
+fn build_belief_state_atom(
+    document_id: &str,
+    proposition: &phoenix_types::Proposition,
+    event_id: &str,
+    axis_id: &TemporalAxisId,
+    axis_kind: TemporalAxisKind,
+    snippet_lower: &str,
+    range: Option<TextRange>,
+    temporal: &BiTemporalWindow,
+    event_fingerprint: &str,
+) -> BeliefStateAtom {
+    let truth_status = belief_truth_status(proposition, axis_kind, snippet_lower);
+    let kind = belief_state_kind(truth_status);
+    let source_kind = belief_source_kind(proposition, axis_kind, truth_status);
+    BeliefStateAtom {
+        belief_id: format!("belief:{event_fingerprint}"),
+        document_id: document_id.to_owned(),
+        proposition_id: Some(proposition.proposition_id.to_string()),
+        event_id: Some(event_id.to_owned()),
+        canonical_event_id: None,
+        observer_entity_id: belief_observer_entity_id(proposition),
+        subject_entity_id: proposition
+            .arguments
+            .iter()
+            .find_map(|argument| argument.entity_id.clone()),
+        axis_id: axis_id.clone(),
+        worldline_id: belief_worldline_id(axis_kind),
+        kind,
+        truth_status,
+        source_kind,
+        label: format!("{event_id}::{:?}", truth_status).to_ascii_lowercase(),
+        confidence_millis: belief_confidence_millis(truth_status, source_kind),
+        temporal: temporal.clone(),
+        range,
+        evidence_refs: vec![proposition.proposition_id.to_string()],
+    }
+}
+
+fn belief_observer_entity_id(proposition: &phoenix_types::Proposition) -> Option<EntityId> {
+    proposition
+        .attribution
+        .as_ref()
+        .and_then(|frame| frame.source_entity_id.clone())
+        .or_else(|| {
+            proposition
+                .quote
+                .as_ref()
+                .and_then(|frame| frame.speaker_entity_id.clone())
+        })
+}
+
+fn belief_truth_status(
+    proposition: &phoenix_types::Proposition,
+    axis_kind: TemporalAxisKind,
+    snippet_lower: &str,
+) -> TemporalTruthStatus {
+    if proposition_has_negative_polarity(proposition, snippet_lower) {
+        return TemporalTruthStatus::Negated;
+    }
+    if proposition.conditional.is_some() || axis_kind == TemporalAxisKind::Conditional {
+        return TemporalTruthStatus::Conditional;
+    }
+    if proposition.quote.is_some() || proposition.attribution.is_some() {
+        return TemporalTruthStatus::Reported;
+    }
+    match axis_kind {
+        TemporalAxisKind::World => TemporalTruthStatus::Observed,
+        TemporalAxisKind::Reported => TemporalTruthStatus::Reported,
+        TemporalAxisKind::Conditional => TemporalTruthStatus::Conditional,
+        TemporalAxisKind::Hypothetical => TemporalTruthStatus::Hypothetical,
+        TemporalAxisKind::Planned => TemporalTruthStatus::Planned,
+    }
+}
+
+fn proposition_has_negative_polarity(
+    proposition: &phoenix_types::Proposition,
+    snippet_lower: &str,
+) -> bool {
+    proposition.scope_ops.iter().any(|op| {
+        op.polarity
+            .as_ref()
+            .map(|value| {
+                let lower = value.as_str().to_ascii_lowercase();
+                lower.contains("neg") || lower.contains("false") || lower.contains("not")
+            })
+            .unwrap_or(false)
+    }) || snippet_lower.contains(" not ")
+        || snippet_lower.contains(" never ")
+        || snippet_lower.contains(" didn't ")
+        || snippet_lower.contains(" did not ")
+}
+
+fn belief_state_kind(truth_status: TemporalTruthStatus) -> BeliefStateKind {
+    match truth_status {
+        TemporalTruthStatus::Observed | TemporalTruthStatus::Asserted => BeliefStateKind::Observed,
+        TemporalTruthStatus::Reported => BeliefStateKind::Reported,
+        TemporalTruthStatus::Planned => BeliefStateKind::Intends,
+        TemporalTruthStatus::Negated | TemporalTruthStatus::Contradicted => {
+            BeliefStateKind::Contradicts
+        }
+        TemporalTruthStatus::Conditional | TemporalTruthStatus::Hypothetical => {
+            BeliefStateKind::Believes
+        }
+        TemporalTruthStatus::Inferred | TemporalTruthStatus::Unknown => BeliefStateKind::Believes,
+    }
+}
+
+fn belief_source_kind(
+    proposition: &phoenix_types::Proposition,
+    axis_kind: TemporalAxisKind,
+    truth_status: TemporalTruthStatus,
+) -> BeliefSourceKind {
+    if truth_status == TemporalTruthStatus::Negated {
+        return BeliefSourceKind::Negation;
+    }
+    if proposition.quote.is_some() {
+        return BeliefSourceKind::Quote;
+    }
+    if proposition.attribution.is_some() {
+        return BeliefSourceKind::Attribution;
+    }
+    match axis_kind {
+        TemporalAxisKind::World => BeliefSourceKind::DirectObservation,
+        TemporalAxisKind::Reported => BeliefSourceKind::Attribution,
+        TemporalAxisKind::Conditional => BeliefSourceKind::Conditional,
+        TemporalAxisKind::Hypothetical => BeliefSourceKind::Hypothetical,
+        TemporalAxisKind::Planned => BeliefSourceKind::Planned,
+    }
+}
+
+fn belief_confidence_millis(
+    truth_status: TemporalTruthStatus,
+    source_kind: BeliefSourceKind,
+) -> u32 {
+    match (truth_status, source_kind) {
+        (TemporalTruthStatus::Observed, BeliefSourceKind::DirectObservation) => 840,
+        (TemporalTruthStatus::Reported, BeliefSourceKind::Quote) => 720,
+        (TemporalTruthStatus::Reported, BeliefSourceKind::Attribution) => 690,
+        (TemporalTruthStatus::Negated, _) => 760,
+        (TemporalTruthStatus::Planned, _) => 680,
+        (TemporalTruthStatus::Conditional, _) => 620,
+        (TemporalTruthStatus::Hypothetical, _) => 560,
+        _ => 600,
+    }
+}
+
+fn belief_worldline_id(axis_kind: TemporalAxisKind) -> TemporalWorldlineId {
+    let label = match axis_kind {
+        TemporalAxisKind::World => "main",
+        TemporalAxisKind::Reported => "reported",
+        TemporalAxisKind::Conditional => "conditional",
+        TemporalAxisKind::Hypothetical => "hypothetical",
+        TemporalAxisKind::Planned => "planned",
+    };
+    TemporalWorldlineId(format!("worldline:{label}"))
 }
 
 fn build_document_event_identity_substrate(
@@ -10095,6 +10266,8 @@ fn build_causal_structure_artifact(
     StructureArtifact {
         sentence_frames,
         relations,
+        umr_frames: Vec::new(),
+        frame_facts: Vec::new(),
         evidence_spans,
         diagnostics: vec![Diagnostic {
             code: "PX_CAUSAL_SUBSTRATE_STRUCTURE".to_owned(),

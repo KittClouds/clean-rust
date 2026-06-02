@@ -19,6 +19,7 @@ phoenix-types = { path = "../phoenix-types" }
 
 [dev-dependencies]
 criterion = { version = "0.5", features = ["html_reports"] }
+phoenix-embed = { path = "../phoenix-embed" }
 phoenix-rel-post = { path = "../phoenix-rel-post" }
 serde_json.workspace = true
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }

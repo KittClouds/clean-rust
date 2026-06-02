@@ -37,6 +37,7 @@ type RendererProbe = {
     writeLorentzGuideColor(colors: Float32Array, offset: number, guide: Record<string, unknown>, index: number, phase: number, surface: string, focusScale?: number): void;
     nodeDensityFactors(data: { ids: string[] }, positions: Float32Array): Float32Array;
     productKleinLayerOpacity(layer: string): number;
+    tubeEdgeTerminalFlourish(data: { layoutMode: string }, t: number, lift: number, sign: number): number;
     capsSurfaceEdge(data: { layoutMode: string }, ax: number, ay: number, az: number, bx: number, by: number, bz: number): boolean;
     capsSurfacePoint(out: THREE.Vector3, ax: number, ay: number, az: number, bx: number, by: number, bz: number, t: number): boolean;
     writeLorentzGuidePositions(output: Float32Array, cursor: number, guide: Record<string, unknown>, data: { ids: string[] }, positions: Float32Array, indexById: Map<string, number>): number;
@@ -162,6 +163,14 @@ describe('Product manifold guide styling', () => {
         expect(renderer.edgeMaterialOpacity()).toBeLessThan(0.35);
         expect(renderer.edgeStrokeCount(data, 1)).toBeGreaterThan(renderer.edgeStrokeCount(data, 0));
         expect(renderer.edgeStrokeOffset(data, 1)).toBeGreaterThan(renderer.edgeStrokeOffset(data, 0));
+    });
+
+    it('adds a terminal curl only to Lorentz-style tube edges', () => {
+        const renderer = new ThreeGalaxyRenderer() as unknown as RendererProbe;
+
+        expect(renderer.tubeEdgeTerminalFlourish({ layoutMode: 'siegelFinsler' }, 0.9, 0.3, 1)).toBeGreaterThan(0);
+        expect(renderer.tubeEdgeTerminalFlourish({ layoutMode: 'siegelFinsler' }, 0.5, 0.3, 1)).toBe(0);
+        expect(renderer.tubeEdgeTerminalFlourish({ layoutMode: 'productManifold' }, 0.9, 0.3, 1)).toBe(0);
     });
 
     it('dims Lorentz guides by node focus without changing graph edge focus', () => {

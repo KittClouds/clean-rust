@@ -4,10 +4,12 @@
 //! domain profile, gazetteer-proximal labels, chunk-local labels.
 //! GLiNER gets a scalpel, not a junk drawer.
 
-use smallvec::{smallvec, SmallVec};
+use smallvec::SmallVec;
 
 use crate::known_lane::KnownCandidate;
+use crate::label_catalog;
 use crate::native_lane::NativeCandidate;
+use crate::semantic_router::SemanticRouteHint;
 use crate::types::{
     DomainProfile, EntityLabel, LabelBankContext, LabelBankSource, LabelPack, MentionKind,
 };
@@ -18,6 +20,8 @@ pub struct DynamicSchemaBuilder {
     pub max_labels: usize,
     /// Default domain profile when detection is ambiguous.
     pub default_domain: DomainProfile,
+    /// Minimum confidence for semantic-router hints to steer the domain.
+    pub semantic_domain_floor: f32,
 }
 
 impl Default for DynamicSchemaBuilder {
@@ -25,6 +29,7 @@ impl Default for DynamicSchemaBuilder {
         Self {
             max_labels: 14,
             default_domain: DomainProfile::General,
+            semantic_domain_floor: 0.34,
         }
     }
 }
@@ -43,14 +48,30 @@ impl DynamicSchemaBuilder {
 
     pub fn build_pack_for_window_v2(
         &self,
+        window_start: u32,
+        window_end: u32,
+        known: &[KnownCandidate],
+        native: &[NativeCandidate],
+        context: Option<&LabelBankContext<'_>>,
+    ) -> LabelPack {
+        self.build_pack_for_window_v3(window_start, window_end, known, native, context, None)
+    }
+
+    pub fn build_pack_for_window_v3(
+        &self,
         _window_start: u32,
         _window_end: u32,
         known: &[KnownCandidate],
         native: &[NativeCandidate],
         context: Option<&LabelBankContext<'_>>,
+        semantic_hint: Option<&SemanticRouteHint>,
     ) -> LabelPack {
+        let semantic_domain = semantic_hint
+            .filter(|hint| hint.confidence >= self.semantic_domain_floor)
+            .map(|hint| hint.domain_profile);
         let domain = context
             .and_then(|ctx| ctx.domain_profile)
+            .or(semantic_domain)
             .unwrap_or_else(|| self.detect_domain(known, native));
         let mut bank = LabelBankDraft::default();
 
@@ -68,6 +89,13 @@ impl DynamicSchemaBuilder {
                 LabelBankSource::GraphContext,
             );
         }
+        if let Some(hint) = semantic_hint {
+            Self::add_context_labels(
+                &mut bank,
+                hint.labels.as_slice(),
+                LabelBankSource::SemanticRouter,
+            );
+        }
         Self::add_domain_labels(&mut bank, domain);
         Self::add_gazetteer_proximal(&mut bank, known);
 
@@ -77,7 +105,7 @@ impl DynamicSchemaBuilder {
             labels: bank.labels,
             label_sources: bank.sources,
             seed_surfaces: known.iter().map(|c| c.surface.clone()).collect(),
-            negative_labels: negative_labels_for(domain),
+            negative_labels: label_catalog::negative_labels_for_domain(domain),
             max_labels: self.max_labels,
         }
     }
@@ -126,59 +154,13 @@ impl DynamicSchemaBuilder {
     }
 
     fn add_universal_core(bank: &mut LabelBankDraft) {
-        for label in UNIVERSAL_CORE {
+        for label in label_catalog::UNIVERSAL_CORE {
             bank.push(EntityLabel::new(label), LabelBankSource::Schema);
         }
     }
 
     fn add_domain_labels(bank: &mut LabelBankDraft, domain: DomainProfile) {
-        let domain_labels: &[&str] = match domain {
-            DomainProfile::Fantasy => {
-                &["Weapon", "Artifact", "Creature", "Ability", "Rank", "Spell"]
-            }
-            DomainProfile::Corporate => &[
-                "Executive",
-                "Department",
-                "Product",
-                "Metric",
-                "Initiative",
-                "Risk",
-            ],
-            DomainProfile::Technical => &[
-                "Library",
-                "Function",
-                "Module",
-                "Error",
-                "Benchmark",
-                "Algorithm",
-            ],
-            DomainProfile::Legal => &[
-                "Statute",
-                "Court",
-                "Ruling",
-                "Party",
-                "Jurisdiction",
-                "Claim",
-            ],
-            DomainProfile::Academic => &[
-                "Researcher",
-                "Institution",
-                "Paper",
-                "Theory",
-                "Dataset",
-                "Method",
-            ],
-            DomainProfile::Memory | DomainProfile::Story => &[
-                "State",
-                "Goal",
-                "Relationship",
-                "Object",
-                "Ability",
-                "Emotion",
-            ],
-            DomainProfile::General => &["Role", "Object", "Attribute"],
-        };
-        for label in domain_labels {
+        for label in label_catalog::labels_for_domain(domain) {
             bank.push(EntityLabel::new(label), LabelBankSource::DomainProfile);
         }
     }
@@ -227,9 +209,11 @@ struct LabelBankDraft {
 
 impl LabelBankDraft {
     fn push(&mut self, label: EntityLabel, source: LabelBankSource) {
-        if label.as_str().trim().is_empty() {
+        let raw = label.as_str().trim();
+        if raw.is_empty() {
             return;
         }
+        let label = EntityLabel::new(label_catalog::canonical_label(raw).unwrap_or(raw));
         if self
             .labels
             .iter()
@@ -247,18 +231,6 @@ impl LabelBankDraft {
     }
 }
 
-fn negative_labels_for(domain: DomainProfile) -> SmallVec<[EntityLabel; 8]> {
-    match domain {
-        DomainProfile::Technical => smallvec![
-            EntityLabel::new("FilePath"),
-            EntityLabel::new("CliFlag"),
-            EntityLabel::new("LogLevel")
-        ],
-        DomainProfile::Legal => smallvec![EntityLabel::new("Boilerplate")],
-        _ => SmallVec::new(),
-    }
-}
-
 fn is_technical_surface(surface: &str) -> bool {
     let lower = surface.to_ascii_lowercase();
     lower.contains('_')
@@ -273,8 +245,6 @@ fn is_technical_surface(surface: &str) -> bool {
         || lower.contains("hash")
         || lower.contains("assertion")
 }
-
-const UNIVERSAL_CORE: &[&str] = &["Character", "Organization", "Location", "Event", "Artifact"];
 
 #[cfg(test)]
 mod tests {
@@ -376,6 +346,43 @@ mod tests {
                 .count(),
             1
         );
+    }
+
+    #[test]
+    fn semantic_route_hint_can_steer_domain_and_label_pack() {
+        let builder = DynamicSchemaBuilder::default();
+        let hint = SemanticRouteHint::new(
+            DomainProfile::Story,
+            0.72,
+            SmallVec::from_vec(vec![EntityLabel::new("Npc"), EntityLabel::new("Creature")]),
+            "test-router",
+        );
+
+        let pack = builder.build_pack_for_window_v3(0, 1, &[], &[], None, Some(&hint));
+
+        assert_eq!(pack.domain, DomainProfile::Story);
+        assert!(has_source(&pack, "Npc", LabelBankSource::SemanticRouter));
+        assert!(pack.labels.iter().any(|label| label.as_str() == "Creature"));
+    }
+
+    #[test]
+    fn explicit_context_domain_overrides_semantic_route_hint() {
+        let builder = DynamicSchemaBuilder::default();
+        let hint = SemanticRouteHint::new(
+            DomainProfile::Story,
+            0.9,
+            SmallVec::from_vec(vec![EntityLabel::new("Npc")]),
+            "test-router",
+        );
+        let context = LabelBankContext {
+            domain_profile: Some(DomainProfile::Technical),
+            ..Default::default()
+        };
+
+        let pack = builder.build_pack_for_window_v3(0, 1, &[], &[], Some(&context), Some(&hint));
+
+        assert_eq!(pack.domain, DomainProfile::Technical);
+        assert!(pack.labels.iter().any(|label| label.as_str() == "Library"));
     }
 
     #[test]
