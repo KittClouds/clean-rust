@@ -22,6 +22,7 @@ import { db, type Entity as DexieEntity } from './lib/dexie/db';
 import { loadSettings } from './lib/dexie/settings.service';
 import { PhoenixUiApiService } from './services/phoenix-ui-api.service';
 import { PhoenixStoreService, type StoreBootSnapshot } from './services/phoenix-store.service';
+import { detectPhoenixRuntimeTarget } from './services/phoenix-backend.service';
 import { phoenixTransportAudit } from './services/phoenix-transport-audit';
 import {
   PhoenixWasmMismatchError,
@@ -90,30 +91,44 @@ export class AppComponent implements OnInit, OnDestroy {
       });
       this.setBootStep('settings:complete');
 
+      const nativePhoenixRuntime = detectPhoenixRuntimeTarget() === 'native';
       this.setBootStep('seed:start');
       const seedPromise = phoenixTransportAudit.measureBootPhase('seed.schemas', () => seedDefaultSchemas());
-      this.setBootStep('phoenix:runtime:start');
-      const runtimeLoadPromise = phoenixTransportAudit.measureBootPhase('phoenix.runtime', () => this.phoenixUiApi.loadRuntime());
+      let runtimeLoadPromise: Promise<void> | null = null;
+      if (nativePhoenixRuntime) {
+        this.setBootStep('phoenix:runtime:start');
+        runtimeLoadPromise = phoenixTransportAudit.measureBootPhase('phoenix.runtime', () => this.phoenixUiApi.loadRuntime());
+      } else {
+        this.setBootStep('phoenix:runtime:skipped:web');
+        console.info('[AppComponent] Phoenix native runtime unavailable in web mode; using Dexie/UI-only boot.');
+      }
 
       await seedPromise;
       console.log('[AppComponent] Seed complete');
       this.setBootStep('seed:complete');
 
-      this.setBootStep('phoenix:runtime:await');
-      await runtimeLoadPromise;
-      console.log(`[AppComponent] Phoenix runtime loaded (${this.phoenixUiApi.runtimeTarget})`);
-      this.orchestrator.completePhase('runtime_load');
-      this.setBootStep('phoenix:runtime:complete');
-      setPhoenixStoreBridge(this.phoenixStore);
-
-      this.setBootStep('dexie:hydrate:start');
-      try {
-        await phoenixTransportAudit.measureBootPhase('dexie.hydrate', () => this.hydrateDexieFromPhoenix());
-      } catch (error) {
-        console.error('[AppComponent] Dexie hydration failed; continuing with existing Dexie cache.', error);
+      if (runtimeLoadPromise) {
+        this.setBootStep('phoenix:runtime:await');
+        await runtimeLoadPromise;
+        console.log(`[AppComponent] Phoenix runtime loaded (${this.phoenixUiApi.runtimeTarget})`);
       }
-      this.setBootStep('dexie:hydrate:complete');
-      console.log('[AppComponent] Dexie hydrated from Phoenix backend');
+      this.orchestrator.completePhase('runtime_load');
+      this.setBootStep(runtimeLoadPromise ? 'phoenix:runtime:complete' : 'phoenix:runtime:skipped:web:complete');
+
+      if (nativePhoenixRuntime) {
+        setPhoenixStoreBridge(this.phoenixStore);
+
+        this.setBootStep('dexie:hydrate:start');
+        try {
+          await phoenixTransportAudit.measureBootPhase('dexie.hydrate', () => this.hydrateDexieFromPhoenix());
+        } catch (error) {
+          console.error('[AppComponent] Dexie hydration failed; continuing with existing Dexie cache.', error);
+        }
+        this.setBootStep('dexie:hydrate:complete');
+        console.log('[AppComponent] Dexie hydrated from Phoenix backend');
+      } else {
+        this.setBootStep('dexie:hydrate:skipped:web');
+      }
 
       this.setBootStep('registry+editor:start');
       await phoenixTransportAudit.measureBootPhase('registry.editor', async () => {
@@ -129,14 +144,18 @@ export class AppComponent implements OnInit, OnDestroy {
       this.orchestrator.completePhase('registry');
       this.setBootStep('registry+editor:complete');
 
-      this.setBootStep('phoenix:hydrateWithEntities:start');
-      await phoenixTransportAudit.measureBootPhase(
-        'phoenix.dictionaryHydrate',
-        () => this.phoenixUiApi.hydrateWithEntities(),
-      );
-      console.log('[AppComponent] Phoenix hydrated with entities');
+      if (nativePhoenixRuntime) {
+        this.setBootStep('phoenix:hydrateWithEntities:start');
+        await phoenixTransportAudit.measureBootPhase(
+          'phoenix.dictionaryHydrate',
+          () => this.phoenixUiApi.hydrateWithEntities(),
+        );
+        console.log('[AppComponent] Phoenix hydrated with entities');
+        this.setBootStep('phoenix:hydrateWithEntities:complete');
+      } else {
+        this.setBootStep('phoenix:hydrateWithEntities:skipped:web');
+      }
       this.orchestrator.completePhase('runtime_hydrate');
-      this.setBootStep('phoenix:hydrateWithEntities:complete');
 
       this.orchestrator.completePhase('ready');
       this.setBootStep('boot:ready');
@@ -144,6 +163,10 @@ export class AppComponent implements OnInit, OnDestroy {
 
       this.setBootStep('background:start');
       const factSheetPromise = (async () => {
+        if (!nativePhoenixRuntime) {
+          console.info('[AppComponent] FactSheet backend sync skipped for web runtime.');
+          return;
+        }
         try {
           await this.factSheetService.syncToBackend();
           console.log('[AppComponent] FactSheet schemas synced (background)');

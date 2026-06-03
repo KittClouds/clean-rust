@@ -14,7 +14,11 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideAppInitializer(() => {
-      registerPhoenixTaurpcBackendIfAvailable();
+      const hasNativeBackend = registerPhoenixTaurpcBackendIfAvailable();
+      if (!hasNativeBackend) {
+        console.info('[Boot] Phoenix native warmup skipped for web runtime.');
+        return;
+      }
       const phoenixUiApi = inject(PhoenixUiApiService);
       void phoenixUiApi.loadRuntime().catch((err) => {
         console.error('[Boot] Phoenix warmup failed:', err);

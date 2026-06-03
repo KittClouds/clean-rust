@@ -4,6 +4,8 @@ import { getSetting, setSetting } from '../dexie/settings.service';
 import { ScopeService } from './scope.service';
 import { PhoenixBackendService } from '../../services/phoenix-backend.service';
 import { PhoenixStoreService } from '../../services/phoenix-store.service';
+import { fetchOpenRouterStream, responseFormat } from '../../services/phoenix-taurpc-openrouter';
+import { PhoenixLocalChatStore } from './phoenix-chat-local-store';
 
 export interface Thread {
     id: string;
@@ -333,6 +335,7 @@ export class PhoenixChatService {
     private readonly phoenix = inject(PhoenixBackendService);
     private readonly scopeService = inject(ScopeService);
     private readonly storeService = inject(PhoenixStoreService);
+    private readonly localChat = new PhoenixLocalChatStore();
 
     readonly ready = signal(false);
     readonly initialized = signal(false);
@@ -355,10 +358,13 @@ export class PhoenixChatService {
             return;
         }
 
-        await this.storeService.initialize();
-
         const savedConfig = config ?? getSetting<ChatConfig | null>('openrouter:config', null) ?? undefined;
-        await this.applyRuntimeConfig(savedConfig);
+        if (this.usesNativeChatBackend()) {
+            await this.storeService.initialize();
+            await this.applyRuntimeConfig(savedConfig);
+        } else {
+            console.info('[PhoenixChatService] Native chat backend unavailable; using browser-local chat state.');
+        }
 
         this.ready.set(true);
         this.initialized.set(true);
@@ -369,8 +375,10 @@ export class PhoenixChatService {
     }
 
     async updateConfig(config: ChatConfig): Promise<void> {
-        await this.storeService.initialize();
-        await this.applyRuntimeConfig(config);
+        if (this.usesNativeChatBackend()) {
+            await this.storeService.initialize();
+            await this.applyRuntimeConfig(config);
+        }
     }
 
     async createThread(options?: CreateThreadOptions): Promise<Thread | null> {
@@ -378,6 +386,15 @@ export class PhoenixChatService {
         const scope = this.scopeService.activeScope();
         const worldId = options?.worldId || scope.id || 'default';
         const narrativeId = options?.narrativeId || scope.narrativeId || 'default';
+
+        if (!this.usesNativeChatBackend()) {
+            const thread = this.localChat.createThread(worldId, narrativeId);
+            this.currentThread.set(thread);
+            this.messages.set([]);
+            this.threads.set(this.localChat.listThreads(worldId));
+            setSetting('chat:activeThreadId', thread.id);
+            return thread;
+        }
 
         try {
             const raw = await this.phoenix.chatCreateThread(worldId, narrativeId);
@@ -398,6 +415,18 @@ export class PhoenixChatService {
         await this.ensureInitialized();
         this.loading.set(true);
         try {
+            if (!this.usesNativeChatBackend()) {
+                const thread = this.localChat.getThread(threadId);
+                if (!thread) {
+                    console.warn('[PhoenixChatService] Local thread not found (stale ID):', threadId);
+                    return;
+                }
+                this.currentThread.set(thread);
+                this.messages.set(this.localChat.listMessages(threadId));
+                setSetting('chat:activeThreadId', threadId);
+                return;
+            }
+
             const raw = await this.phoenix.chatGetThread(threadId);
             if (!raw) {
                 console.warn('[PhoenixChatService] Thread not found (stale ID):', threadId);
@@ -420,6 +449,11 @@ export class PhoenixChatService {
         const scope = this.scopeService.activeScope();
         const worldId = scope.id || '';
 
+        if (!this.usesNativeChatBackend()) {
+            this.threads.set(this.localChat.listThreads(worldId));
+            return;
+        }
+
         try {
             const payload = await this.phoenix.chatListThreads(worldId);
             this.threads.set(Array.isArray(payload) ? payload.map(toThread) : []);
@@ -431,6 +465,17 @@ export class PhoenixChatService {
 
     async deleteThread(threadId: string): Promise<boolean> {
         await this.ensureInitialized();
+        if (!this.usesNativeChatBackend()) {
+            const removed = this.localChat.deleteThread(threadId);
+            this.threads.update((threads) => threads.filter((thread) => thread.id !== threadId));
+            if (this.currentThread()?.id === threadId) {
+                this.currentThread.set(null);
+                this.messages.set([]);
+                setSetting('chat:activeThreadId', null);
+            }
+            return removed;
+        }
+
         try {
             await this.phoenix.chatDeleteThread(threadId);
             this.threads.update((threads) => threads.filter((thread) => thread.id !== threadId));
@@ -472,6 +517,16 @@ export class PhoenixChatService {
             return null;
         }
 
+        if (!this.usesNativeChatBackend()) {
+            const message = this.localChat.addMessage(thread.id, role, content, thread.narrative_id);
+            if (!message) {
+                return null;
+            }
+            this.messages.update((messages) => [...messages, message]);
+            this.threads.set(this.localChat.listThreads(thread.world_id));
+            return message;
+        }
+
         try {
             const raw = await this.phoenix.chatAddMessage(
                 thread.id,
@@ -500,6 +555,17 @@ export class PhoenixChatService {
 
     async updateMessage(messageId: string, content: string): Promise<boolean> {
         await this.ensureInitialized();
+        if (!this.usesNativeChatBackend()) {
+            const message = this.localChat.updateMessage(messageId, content);
+            if (!message) {
+                return false;
+            }
+            this.messages.update((messages) =>
+                messages.map((current) => (current.id === messageId ? message : current)),
+            );
+            return true;
+        }
+
         try {
             const raw = await this.phoenix.chatUpdateMessage(messageId, content);
             const message = raw ? toThreadMessage(raw) : null;
@@ -520,6 +586,17 @@ export class PhoenixChatService {
 
     async appendMessage(messageId: string, chunk: string): Promise<boolean> {
         await this.ensureInitialized();
+        if (!this.usesNativeChatBackend()) {
+            const message = this.localChat.appendMessage(messageId, chunk);
+            if (!message) {
+                return false;
+            }
+            this.messages.update((messages) =>
+                messages.map((current) => (current.id === messageId ? message : current)),
+            );
+            return true;
+        }
+
         try {
             const raw = await this.phoenix.chatAppendMessage(messageId, chunk);
             const message = raw ? toThreadMessage(raw) : null;
@@ -541,6 +618,15 @@ export class PhoenixChatService {
         const thread = this.currentThread();
         if (!thread) {
             return null;
+        }
+
+        if (!this.usesNativeChatBackend()) {
+            const message = this.localChat.addMessage(thread.id, 'assistant', '', thread.narrative_id, true);
+            if (!message) {
+                return null;
+            }
+            this.messages.update((messages) => [...messages, message]);
+            return message;
         }
 
         try {
@@ -569,6 +655,15 @@ export class PhoenixChatService {
             return false;
         }
 
+        if (!this.usesNativeChatBackend()) {
+            const cleared = this.localChat.clearThread(thread.id);
+            if (cleared) {
+                this.messages.set([]);
+                this.threads.set(this.localChat.listThreads(thread.world_id));
+            }
+            return cleared;
+        }
+
         try {
             await this.phoenix.chatClearThread(thread.id);
             this.messages.set([]);
@@ -585,6 +680,9 @@ export class PhoenixChatService {
         const thread = this.currentThread();
         if (!thread) {
             return '{}';
+        }
+        if (!this.usesNativeChatBackend()) {
+            return this.localChat.exportThread(thread.id);
         }
         try {
             return await this.phoenix.chatExportThread(thread.id);
@@ -606,6 +704,11 @@ export class PhoenixChatService {
             scopeId: options.scopeId || options.narrativeId || thread.narrative_id || '',
         };
 
+        if (!this.usesNativeChatBackend()) {
+            const snapshot = this.localChat.startRun(thread, prompt, normalized);
+            return snapshot.run;
+        }
+
         try {
             const raw = await this.phoenix.chatStartRun(
                 thread.id,
@@ -622,6 +725,9 @@ export class PhoenixChatService {
 
     async pollRun(runId: string): Promise<ChatRunSnapshot | null> {
         await this.ensureInitialized();
+        if (!this.usesNativeChatBackend()) {
+            return this.localChat.pollRun(runId);
+        }
         try {
             const raw = await this.phoenix.chatPollRun(runId);
             return raw ? toChatRunSnapshot(raw) : null;
@@ -633,6 +739,9 @@ export class PhoenixChatService {
 
     async getPlannerStep(runId: string): Promise<ChatPlannerStep | null> {
         await this.ensureInitialized();
+        if (!this.usesNativeChatBackend()) {
+            return null;
+        }
         try {
             const raw = await this.phoenix.chatGetPlannerStep(runId);
             return raw ? toChatPlannerStep(raw) : null;
@@ -647,6 +756,9 @@ export class PhoenixChatService {
         response: ChatPlannerModelResponse,
     ): Promise<ChatPlannerStep | null> {
         await this.ensureInitialized();
+        if (!this.usesNativeChatBackend()) {
+            return null;
+        }
         try {
             const raw = await this.phoenix.chatSubmitPlannerModelResponse(runId, response);
             return raw ? toChatPlannerStep(raw) : null;
@@ -658,6 +770,9 @@ export class PhoenixChatService {
 
     async advancePlannerRun(runId: string): Promise<ChatPlannerStep | null> {
         await this.ensureInitialized();
+        if (!this.usesNativeChatBackend()) {
+            return null;
+        }
         try {
             const raw = await this.phoenix.chatAdvancePlannerRun(runId);
             return raw ? toChatPlannerStep(raw) : null;
@@ -669,6 +784,9 @@ export class PhoenixChatService {
 
     async degradePlannerRun(runId: string, reason: string): Promise<ChatRunSnapshot | null> {
         await this.ensureInitialized();
+        if (!this.usesNativeChatBackend()) {
+            return this.localChat.pollRun(runId);
+        }
         try {
             const raw = await this.phoenix.chatDegradePlannerRun(runId, reason);
             this.scheduleSnapshot();
@@ -681,6 +799,9 @@ export class PhoenixChatService {
 
     async listPlannerArtifacts(runId: string): Promise<ChatWorkspaceArtifact[]> {
         await this.ensureInitialized();
+        if (!this.usesNativeChatBackend()) {
+            return this.localChat.emptyArtifacts();
+        }
         try {
             const payload = await this.phoenix.chatListPlannerArtifacts(runId);
             return Array.isArray(payload) ? payload.map(toChatWorkspaceArtifact) : [];
@@ -696,6 +817,9 @@ export class PhoenixChatService {
         pinned = true,
     ): Promise<ChatWorkspaceArtifact | null> {
         await this.ensureInitialized();
+        if (!this.usesNativeChatBackend()) {
+            return null;
+        }
         try {
             const payload = await this.phoenix.chatPinPlannerArtifact(runId, key, pinned);
             return payload ? toChatWorkspaceArtifact(payload) : null;
@@ -707,6 +831,9 @@ export class PhoenixChatService {
 
     async processPlannerRun(runId: string): Promise<boolean> {
         await this.ensureInitialized();
+        if (!this.usesNativeChatBackend()) {
+            return false;
+        }
         const config = getSetting<ChatConfig | null>('openrouter:config', null);
         if (!config?.apiKey?.trim()) {
             await this.degradePlannerRun(runId, 'Planner requires an OpenRouter API key.');
@@ -732,6 +859,9 @@ export class PhoenixChatService {
 
     async submitToolResults(runId: string, results: ToolResultSubmission[]): Promise<ChatRunSnapshot | null> {
         await this.ensureInitialized();
+        if (!this.usesNativeChatBackend()) {
+            return this.localChat.pollRun(runId);
+        }
         try {
             const payload = await this.phoenix.chatSubmitToolResults(runId, results);
             this.scheduleSnapshot();
@@ -749,6 +879,9 @@ export class PhoenixChatService {
         decisionJSON?: string,
     ): Promise<ChatRunSnapshot | null> {
         await this.ensureInitialized();
+        if (!this.usesNativeChatBackend()) {
+            return this.localChat.pollRun(runId);
+        }
         try {
             const payload = await this.phoenix.chatSubmitApproval(runId, approvalId, approved, decisionJSON);
             this.scheduleSnapshot();
@@ -761,6 +894,9 @@ export class PhoenixChatService {
 
     async resumeRun(runId: string): Promise<ChatRun | null> {
         await this.ensureInitialized();
+        if (!this.usesNativeChatBackend()) {
+            return this.localChat.pollRun(runId)?.run ?? null;
+        }
         try {
             const raw = await this.phoenix.chatResumeRun(runId);
             this.scheduleSnapshot();
@@ -773,6 +909,9 @@ export class PhoenixChatService {
 
     async cancelRun(runId: string): Promise<boolean> {
         await this.ensureInitialized();
+        if (!this.usesNativeChatBackend()) {
+            return this.localChat.pollRun(runId) !== null;
+        }
         try {
             await this.phoenix.chatCancelRun(runId);
             this.scheduleSnapshot();
@@ -785,6 +924,9 @@ export class PhoenixChatService {
 
     async listRunEvents(threadId: string, limit = 100): Promise<ChatRunEvent[]> {
         await this.ensureInitialized();
+        if (!this.usesNativeChatBackend()) {
+            return this.localChat.listRunEvents(threadId, limit);
+        }
         try {
             const payload = await this.phoenix.chatListRunEvents(threadId, limit);
             return Array.isArray(payload) ? payload.map(toChatRunEvent) : [];
@@ -796,6 +938,9 @@ export class PhoenixChatService {
 
     async markRunStreaming(runId: string, assistantMessageId: string): Promise<ChatRunSnapshot | null> {
         await this.ensureInitialized();
+        if (!this.usesNativeChatBackend()) {
+            return this.localChat.markRunStreaming(runId, assistantMessageId);
+        }
         try {
             const payload = await this.phoenix.chatMarkRunStreaming(runId, assistantMessageId);
             this.scheduleSnapshot();
@@ -813,6 +958,9 @@ export class PhoenixChatService {
         finalError?: string,
     ): Promise<ChatRunSnapshot | null> {
         await this.ensureInitialized();
+        if (!this.usesNativeChatBackend()) {
+            return this.localChat.completeRun(runId, assistantMessageId, finalResponse, finalError);
+        }
         try {
             const payload = await this.phoenix.chatCompleteRun(
                 runId,
@@ -857,18 +1005,36 @@ export class PhoenixChatService {
         }
 
         try {
+            const runtimeConfig = {
+                apiKey: config.apiKey,
+                model: config.model || DEFAULT_CHAT_MODEL,
+                temperature: config.temperature,
+                maxTokens: config.maxTokens,
+                reasoningEnabled: config.reasoningEnabled ?? false,
+                reasoningEffort: config.reasoningEffort ?? 'medium',
+                reasoningMaxTokens: config.reasoningMaxTokens,
+                includeReasoning: config.includeReasoning ?? false,
+            };
+            if (!this.usesNativeChatBackend()) {
+                const requestMessages = systemPrompt
+                    ? [{ role: 'system' as const, content: systemPrompt }, ...messages]
+                    : messages;
+                const response = await fetchOpenRouterStream(
+                    runtimeConfig.model,
+                    runtimeConfig,
+                    {
+                        messages: requestMessages,
+                        response_format: responseFormat(requestOptions?.structuredOutput),
+                    },
+                    callbacks,
+                );
+                callbacks.onComplete(response);
+                return;
+            }
+
             await this.phoenix.streamChat(
                 {
-                    config: {
-                        apiKey: config.apiKey,
-                        model: config.model || DEFAULT_CHAT_MODEL,
-                        temperature: config.temperature,
-                        maxTokens: config.maxTokens,
-                        reasoningEnabled: config.reasoningEnabled ?? false,
-                        reasoningEffort: config.reasoningEffort ?? 'medium',
-                        reasoningMaxTokens: config.reasoningMaxTokens,
-                        includeReasoning: config.includeReasoning ?? false,
-                    },
+                    config: runtimeConfig,
                     messages,
                     ...(systemPrompt ? { systemPrompt } : {}),
                     ...(requestOptions ? { requestOptions } : {}),
@@ -891,6 +1057,10 @@ export class PhoenixChatService {
     }
 
     private async loadMessages(threadId: string): Promise<void> {
+        if (!this.usesNativeChatBackend()) {
+            this.messages.set(this.localChat.listMessages(threadId));
+            return;
+        }
         try {
             const payload = await this.phoenix.chatListMessages(threadId);
             this.messages.set(Array.isArray(payload) ? payload.map(toThreadMessage) : []);
@@ -937,7 +1107,14 @@ export class PhoenixChatService {
         }
     }
 
+    private usesNativeChatBackend(): boolean {
+        return this.phoenix.target === 'native';
+    }
+
     private async triggerOm(threadId: string): Promise<void> {
+        if (!this.usesNativeChatBackend()) {
+            return;
+        }
         const config = getSetting<ChatConfig | null>('openrouter:config', null);
         if (!threadId || !config?.omEnabled || !config.apiKey?.trim()) {
             return;
@@ -960,6 +1137,9 @@ export class PhoenixChatService {
     }
 
     private scheduleSnapshot(): void {
+        if (!this.usesNativeChatBackend()) {
+            return;
+        }
         if (this.snapshotTimeout) {
             clearTimeout(this.snapshotTimeout);
         }
