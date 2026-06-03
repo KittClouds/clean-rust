@@ -25,7 +25,7 @@ describe('atlas command status model', () => {
             manifoldStatuses: { hybrid: 'ready', hopf: 'idle', lorentz: 'idle' },
             dynamicNerStatus: 'ready',
             enabledLanes: ['lexical', 'graph'],
-            embeddingModelLabel: 'MDBR Leaf',
+            embeddingModelLabel: 'MDBR Leaf MT',
             embeddingDimensionLabel: '384d',
         });
 
@@ -76,7 +76,7 @@ describe('atlas command status model', () => {
             manifoldStatuses: { hybrid: 'ready', hopf: 'stale', lorentz: 'idle' },
             dynamicNerStatus: 'cold',
             enabledLanes: ['lexical'],
-            embeddingModelLabel: 'MDBR Leaf',
+            embeddingModelLabel: 'MDBR Leaf MT',
             embeddingDimensionLabel: '384d',
         });
 
@@ -102,7 +102,7 @@ describe('atlas command status model', () => {
             manifoldStatuses: { hybrid: 'ready', hopf: 'stale', lorentz: 'loading', product: 'idle' },
             dynamicNerStatus: 'cold',
             enabledLanes: ['lexical'],
-            embeddingModelLabel: 'MDBR Leaf',
+            embeddingModelLabel: 'MDBR Leaf MT',
             embeddingDimensionLabel: '384d',
         });
 
@@ -139,7 +139,7 @@ describe('atlas command status model', () => {
             manifoldStatuses: { hybrid: 'ready', hopf: 'stale', lorentz: 'idle', product: 'idle' },
             dynamicNerStatus: 'ready',
             enabledLanes: ['lexical', 'graph'],
-            embeddingModelLabel: 'MDBR Leaf',
+            embeddingModelLabel: 'MDBR Leaf MT',
             embeddingDimensionLabel: '384d',
         });
 
@@ -180,7 +180,7 @@ describe('atlas command status model', () => {
             manifoldStatuses: { hybrid: 'ready', hopf: 'loading', lorentz: 'idle' },
             dynamicNerStatus: 'cold',
             enabledLanes: ['lexical'],
-            embeddingModelLabel: 'MDBR Leaf',
+            embeddingModelLabel: 'MDBR Leaf MT',
             embeddingDimensionLabel: '384d',
         });
 
@@ -236,3 +236,4 @@ function richScan(includeSemanticAtlas: boolean): AtlasRichScanResult {
         appliedOptions: { includeSemanticAtlas },
     };
 }
+

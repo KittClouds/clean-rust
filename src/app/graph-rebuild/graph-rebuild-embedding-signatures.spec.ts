@@ -6,7 +6,7 @@ import {
 } from './graph-rebuild-embedding-signatures';
 
 describe('embedding model adapter boundary', () => {
-    it('treats the current Leaf lane as retrieval with derived topology', () => {
+    it('keeps legacy Leaf-IR adapters as retrieval with derived topology', () => {
         const adapter = embeddingModelAdapterFromSelection({
             dynamicNerId: 'dynamic_ner',
             embeddingModelId: 'mongodb-leaf-ir',
@@ -36,7 +36,7 @@ describe('embedding model adapter boundary', () => {
         const leafMt = normalizeEmbeddingProfile({
             modelId: 'mongodb-leaf-mt',
             modelLabel: 'MDBR Leaf MT',
-            dimensionLabel: '786d',
+            dimensionLabel: '384d',
         });
         const jina = normalizeEmbeddingProfile({
             modelId: 'jina-v5-topology',
@@ -46,7 +46,8 @@ describe('embedding model adapter boundary', () => {
 
         expect(leafMt).toMatchObject({
             modelFamily: 'mdbr-leaf-mt',
-            selectedDimensions: 786,
+            nativeDimensions: 384,
+            selectedDimensions: 384,
             taskProfile: 'multi_task',
             topologySupport: 'native',
             supportsMultiVector: true,

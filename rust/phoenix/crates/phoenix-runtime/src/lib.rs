@@ -4394,6 +4394,28 @@ impl PhoenixRuntime {
             }
         }
         #[cfg(not(target_arch = "wasm32"))]
+        match dynamic_gliner::load_default_label_router() {
+            Ok(Some(router)) => {
+                engine_builder = engine_builder.semantic_label_router(router);
+                result.diagnostics.push(Diagnostic {
+                    code: "dynamicNer.semanticRouter".to_owned(),
+                    message: "Dynamic NER attached the semantic label router.".to_owned(),
+                });
+            }
+            Ok(None) => {
+                result.diagnostics.push(Diagnostic {
+                    code: "dynamicNer.semanticRouterOff".to_owned(),
+                    message: "Dynamic NER semantic label routing is disabled.".to_owned(),
+                });
+            }
+            Err(error) => {
+                result.diagnostics.push(Diagnostic {
+                    code: "dynamicNer.semanticRouterUnavailable".to_owned(),
+                    message: format!("Dynamic NER skipped semantic label routing: {error}"),
+                });
+            }
+        }
+        #[cfg(not(target_arch = "wasm32"))]
         match dynamic_gliclass::load_default_adjudicator() {
             Ok(adjudicator) => {
                 engine_builder = engine_builder

@@ -1,5 +1,7 @@
 import type {
     GraphRebuildChunk,
+    GraphRebuildCausalEdge,
+    GraphRebuildCausalSidecarInput,
     GraphRebuildEdge,
     GraphRebuildEntityAnchor,
     GraphRebuildEventAspect,
@@ -11,6 +13,7 @@ import type {
     GraphRebuildRelationship,
     GraphRebuildTemporalEdge,
 } from './graph-rebuild-snapshot';
+import { buildGraphRebuildCausalEdges } from './graph-rebuild-causal-graph';
 
 export interface DerivedGraphRebuildFacts {
     relationships: GraphRebuildRelationship[];
@@ -18,7 +21,7 @@ export interface DerivedGraphRebuildFacts {
     events: GraphRebuildEvent[];
     episodes: GraphRebuildEpisode[];
     temporalEdges: GraphRebuildTemporalEdge[];
-    causalEdges: GraphRebuildTemporalEdge[];
+    causalEdges: GraphRebuildCausalEdge[];
     memoryState: GraphRebuildMemoryState[];
 }
 
@@ -42,6 +45,7 @@ export function deriveGraphRebuildFacts(
     chunks: GraphRebuildChunk[],
     anchors: GraphRebuildEntityAnchor[],
     noteTexts: Record<string, string>,
+    causalSidecar?: GraphRebuildCausalSidecarInput,
 ): DerivedGraphRebuildFacts {
     const byChunk = new Map<string, GraphRebuildEntityAnchor[]>();
     for (const anchor of anchors) {
@@ -67,7 +71,7 @@ export function deriveGraphRebuildFacts(
     const edges = [...edgeMap.values()].sort((left, right) => right.weight - left.weight || left.type.localeCompare(right.type) || left.id.localeCompare(right.id));
     const episodes = buildEpisodes(events);
     const temporalEdges = buildTemporalEdges(events);
-    const causalEdges = buildCausalEdges(events, chunks, noteTexts);
+    const causalEdges = buildGraphRebuildCausalEdges(events, chunks, noteTexts, causalSidecar);
     return { relationships, edges, events, episodes, temporalEdges, causalEdges, memoryState };
 }
 
@@ -291,24 +295,6 @@ function buildTemporalEdges(events: GraphRebuildEvent[]): GraphRebuildTemporalEd
                 evidenceIds: [previous.id, event.id],
                 confidence: Math.max(0.62, 0.74 - index * 0.0001),
             });
-        }
-    }
-    return out;
-}
-
-function buildCausalEdges(events: GraphRebuildEvent[], chunks: GraphRebuildChunk[], noteTexts: Record<string, string>): GraphRebuildTemporalEdge[] {
-    const byChunk = new Map(chunks.map((chunk) => [chunk.id, chunk]));
-    const out: GraphRebuildTemporalEdge[] = [];
-    for (const noteEvents of eventsByNote(events)) {
-        for (let index = 1; index < noteEvents.length; index += 1) {
-            const previous = noteEvents[index - 1];
-            const current = noteEvents[index];
-            if (!previous || !current) continue;
-            if (!sharesEntity(previous, current)) continue;
-            const chunk = current.chunkId ? byChunk.get(current.chunkId) : null;
-            const text = chunk ? (noteTexts[chunk.noteId] || '').slice(chunk.start, chunk.end).toLowerCase() : '';
-            if (!hasAny(text, ['because', 'therefore', 'which meant', 'that meant', 'so '])) continue;
-            out.push({ id: `causal:${previous.id}:${current.id}`, sourceId: previous.id, targetId: current.id, relationType: 'causes_or_explains', evidenceIds: [previous.id, current.id], confidence: 0.66 });
         }
     }
     return out;

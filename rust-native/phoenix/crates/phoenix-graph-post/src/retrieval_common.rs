@@ -163,15 +163,7 @@ pub(crate) fn build_region_from_snapshot(
         expansion_hops,
         edge_allowed,
     );
-    let region = GraphRetrievedRegion {
-        vertex_count: expanded.snapshot.vertices.len(),
-        asserted_edge_count: expanded.snapshot.asserted_edges.len(),
-        candidate_edge_count: expanded.snapshot.candidate_edges.len(),
-        truncated: expanded.truncated,
-        anchor_vertex_ids,
-        seed_vertex_ids: expanded.seed_vertex_ids,
-        included_vertex_ids: expanded.included_vertex_ids,
-    };
+    let region = GraphRetrievedRegion::from_simple_expansion(anchor_vertex_ids, &expanded);
     record_region_build(
         region.vertex_count,
         region.asserted_edge_count,
@@ -316,6 +308,7 @@ pub(crate) fn build_region_from_view_profile(
                 .map(kernel_walk_seed_from_graph_seed)
         })
         .collect::<Vec<_>>();
+    let pcst_compacted = true;
     let walk = {
         let _timer = measure_graph_runtime(GraphRuntimeMetric::ExpandRegionFromView);
         bounded_walk_projected_graph(
@@ -329,6 +322,7 @@ pub(crate) fn build_region_from_view_profile(
                 max_per_family_fanout: 16,
                 max_per_island_expansion: region_node_limit.max(8),
                 profile,
+                compact: pcst_compacted,
                 ..KernelWalkBudget::default()
             },
             KernelWalkScoring::default(),
@@ -337,15 +331,7 @@ pub(crate) fn build_region_from_view_profile(
     };
     let region = {
         let _timer = measure_graph_runtime(GraphRuntimeMetric::AssembleRegionFromView);
-        GraphRetrievedRegion {
-            vertex_count: walk.snapshot.vertices.len(),
-            asserted_edge_count: walk.snapshot.asserted_edges.len(),
-            candidate_edge_count: walk.snapshot.candidate_edges.len(),
-            truncated: walk.truncated,
-            anchor_vertex_ids,
-            seed_vertex_ids: walk.seed_vertex_ids,
-            included_vertex_ids: walk.included_vertex_ids,
-        }
+        GraphRetrievedRegion::from_bounded_walk(anchor_vertex_ids, &walk, pcst_compacted)
     };
     record_region_build(
         region.vertex_count,

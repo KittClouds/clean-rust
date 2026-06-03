@@ -64,13 +64,11 @@ import {
   EMBEDDING_MODELS,
   DEFAULT_SEARCH_MODEL_ID,
   RETRIEVAL_LANE_OPTIONS,
-  TRUNCATE_DIMS,
   buildSearchSnippet,
   type ModelId,
   type SearchMode,
   type SearchPanelNote,
   type SearchResultView,
-  type TruncateDim,
 } from './search-panel.model';
 import {
   buildAtlasCommandStatus,
@@ -195,6 +193,58 @@ interface CompilerWorkbenchView {
   staging: PostprocessStagingView | null;
 }
 
+type Stage8LaneId =
+  | 'identity'
+  | 'aliases'
+  | 'frames'
+  | 'evidence'
+  | 'coref'
+  | 'ontology'
+  | 'temporal'
+  | 'belief'
+  | 'router';
+
+interface Stage8RouterView {
+  model: string;
+  dimension: string;
+  status: string;
+  detail: string;
+  gate: string;
+  budget: string;
+  timing: string;
+  tone: CompilerTone;
+}
+
+interface Stage8LaneView {
+  id: Stage8LaneId;
+  label: string;
+  value: number;
+  detail: string;
+  tone: CompilerTone;
+  queue?: CompilerQueueId;
+}
+
+interface Stage8ReviewItemView {
+  id: string;
+  label: string;
+  family: string;
+  detail: string;
+  action: string;
+  confidence: number;
+  tone: CompilerTone;
+  signals: string[];
+  queue?: CompilerQueueId;
+}
+
+interface Stage8WorkbenchView {
+  label: string;
+  detail: string;
+  router: Stage8RouterView;
+  lanes: Stage8LaneView[];
+  reviewItems: Stage8ReviewItemView[];
+  receipts: LastRunReceiptRow[];
+}
+
 const EMBEDDING_STAGE_LANES: Array<{ id: GraphRebuildSignalTargetLane; label: string }> = [
   { id: 'document_spine', label: 'Document spine' },
   { id: 'chunk_spine', label: 'Chunk spine' },
@@ -243,6 +293,7 @@ const EMBEDDING_STAGE_LANES: Array<{ id: GraphRebuildSignalTargetLane; label: st
     './search-panel.content.css',
     './search-panel.run-ledger.css',
     './search-panel.compiler-workbench.css',
+    './search-panel.stage8-workbench.css',
     './search-panel.pipeline-map.css',
     './search-panel.pipeline-map-panels.css',
     './search-panel.pipeline-map-rails.css',
@@ -282,7 +333,6 @@ export class SearchPanelComponent implements OnInit {
   readonly isDynamicScanning = computed(() => this.nerService.isAnalyzing() || this.atlasScan.running());
 
   readonly selectedModel = signal<ModelId>(DEFAULT_SEARCH_MODEL_ID);
-  readonly truncateDim = signal<TruncateDim>('full');
   readonly selectedRecipe = signal<AtlasRecipeId>('textGraph');
   readonly selectedCapabilityId = signal<AtlasCapabilityId>('assertedKernel');
   readonly selectedCapabilityIds = signal<AtlasCapabilityId[]>(capabilityIdsForRecipe('textGraph'));
@@ -306,7 +356,6 @@ export class SearchPanelComponent implements OnInit {
 
   readonly laneOptions = RETRIEVAL_LANE_OPTIONS;
   readonly models = EMBEDDING_MODELS;
-  readonly truncateDims = TRUNCATE_DIMS;
   readonly buildScopeModes: AtlasBuildScope['mode'][] = ['global', 'folder', 'note', 'multiNote'];
   readonly graphBuildRecipes = ATLAS_GRAPH_BUILD_RECIPE_IDS.map((id) => {
     const recipe = atlasRecipeDefinitionById(id);
@@ -421,9 +470,7 @@ export class SearchPanelComponent implements OnInit {
   );
   readonly embeddingsReady = computed(() => this.vectorStatus() === 'ready');
   readonly activeEmbeddingDimensionLabel = computed(() => {
-    const modelDims = this.selectedModelDefinition().dims;
-    const truncateDim = this.truncateDim();
-    return truncateDim === 'full' ? `${modelDims}d` : `${Math.min(Number(truncateDim), modelDims)}d`;
+    return `${this.selectedModelDefinition().dims}d`;
   });
   readonly headerSubtitle = computed(() => {
     const labels = this.enabledLaneLabels();
@@ -543,6 +590,18 @@ export class SearchPanelComponent implements OnInit {
       this.linkSuggestionDecisions(),
       this.selectedEmbeddingStageLanes(),
       this.entityLinkerStageEnabled(),
+    )
+  );
+  readonly stage8Workbench = computed<Stage8WorkbenchView>(() =>
+    buildStage8WorkbenchView(
+      this.fullAtlasPipeline.lastSnapshot(),
+      this.fullAtlasPipeline.lastReceipt(),
+      this.currentModelLabel(),
+      this.activeEmbeddingDimensionLabel(),
+      this.vectorStatus(),
+      this.dynamicNerLabel(),
+      this.reviewClusters(),
+      this.graphAwareLinkSuggestions(),
     )
   );
   readonly selectedRecipePlan = computed(() => this.atlasRuntime.recipeState(this.selectedRecipe(), this.atlasRunOptions()));
@@ -1764,6 +1823,203 @@ function buildPostprocessStagingView(
   }));
   const mode = receipt.postProcessMode === 'full' ? 'budget' : 'plan';
   return { title: mode === 'budget' ? 'Lane Budget Matrix' : 'Lane Plan Matrix', mode, targets, candidates, deferred, lanes };
+}
+
+function buildStage8WorkbenchView(
+  snapshot: GraphRebuildSnapshot | null,
+  receipt: GraphIndexRunReceipt | null,
+  modelLabel: string,
+  dimensionLabel: string,
+  vectorStatus: string,
+  dynamicNerStatus: string,
+  reviewClusters: ProductDiagnosticsReviewCluster[],
+  graphLinks: GraphRebuildLinkSuggestion[],
+): Stage8WorkbenchView {
+  const counters = snapshot?.counters || receipt?.counters;
+  const entityLinking = counters?.entityLinking;
+  const shadowLinks = counters?.shadowLinkSuggestions
+    ?? snapshot?.shadowLinkSuggestions?.length
+    ?? counters?.entityLinkSuggestions
+    ?? snapshot?.entityLinkSuggestions?.length
+    ?? 0;
+  const identityReviews = entityLinking?.candidateLinks ?? shadowLinks;
+  const aliasPatches = (snapshot?.finalLinkPatchLog?.patches || []).filter((patch) => patch.kind === 'alias_of').length;
+  const frameCount = (counters?.meaningFrameChunks ?? snapshot?.chunks.filter((chunk) => !!chunk.meaningFrame).length ?? 0)
+    + (counters?.relationships ?? snapshot?.relationships.length ?? 0)
+    + (counters?.events ?? snapshot?.events.length ?? 0);
+  const evidenceCount = counters?.anchorEvidence ?? snapshot?.entityAnchors.length ?? 0;
+  const resolution = counters?.resolution;
+  const corefCount = snapshot?.resolutionSuggestions?.length
+    ?? ((resolution?.ambiguousSurfaces || 0) + (resolution?.kindConflicts || 0) + (resolution?.possibleAliases || 0));
+  const temporalCount = (counters?.temporalEdges ?? snapshot?.temporalEdges.length ?? 0)
+    + (counters?.causalEdges ?? snapshot?.causalEdges.length ?? 0)
+    + (counters?.memoryState ?? snapshot?.memoryState.length ?? 0);
+  const beliefCount = (counters?.memoryState ?? snapshot?.memoryState.length ?? 0)
+    + (counters?.eventAspects ?? snapshot?.events.filter((event) => !!event.aspect).length ?? 0);
+  const embeddingTargets = counters?.embeddingTargets ?? snapshot?.embeddingTargets.length ?? 0;
+  const embeddingVectors = counters?.embeddingVectors ?? snapshot?.embeddingVectors.length ?? 0;
+  const receiptFailures = counters?.finalLinkReceiptFailures ?? snapshot?.finalLinkPatchLog?.counters.failedReceipts ?? 0;
+  const routerStage = stage8RouterStage(receipt);
+  const semanticReady = vectorStatus === 'ready'
+    || receipt?.modelReadiness?.some((model) => model.id === 'semanticEmbedding' && model.status === 'ready')
+    || false;
+  const routerTone: CompilerTone = vectorStatus === 'error'
+    ? 'danger'
+    : semanticReady
+      ? 'ready'
+      : dynamicNerStatus === 'ready'
+        ? 'review'
+        : 'quiet';
+
+  return {
+    label: 'Stage 8 Quality Deck',
+    detail: snapshot
+      ? `${snapshot.nodes.length} nodes / ${snapshot.edges.length} edges / ${reviewClusters.length} review families`
+      : 'Router and review lanes are staged for the next Full Atlas run',
+    router: {
+      model: modelLabel,
+      dimension: dimensionLabel,
+      status: semanticReady ? 'ready' : vectorStatus,
+      detail: `${embeddingTargets.toLocaleString()} targets / ${embeddingVectors.toLocaleString()} vectors`,
+      gate: 'lexical 0.48',
+      budget: '24 windows',
+      timing: routerStage ? `${routerStage.durationMs.toLocaleString()} ms` : 'pending',
+      tone: routerTone,
+    },
+    lanes: [
+      stage8Lane('identity', 'Identity', identityReviews, `${entityLinking?.sameEntity || 0} same / ${entityLinking?.ambiguous || 0} ambiguous`, identityReviews ? 'review' : 'quiet', 'identity'),
+      stage8Lane('aliases', 'Aliases', counters?.aliases || 0, `${aliasPatches} alias patches / ${entityLinking?.aliasOf || 0} linker votes`, aliasPatches ? 'review' : 'ready', 'identity'),
+      stage8Lane('frames', 'Frames', frameCount, `${counters?.relationships || 0} relations / ${counters?.events || 0} events`, frameCount ? 'ready' : 'quiet', 'bundles'),
+      stage8Lane('evidence', 'Evidence', evidenceCount, `${counters?.mentions || 0} mentions / ${counters?.acceptedAnchors || 0} anchors`, evidenceCount ? 'ready' : 'quiet', 'receipts'),
+      stage8Lane('coref', 'Coref', corefCount, `${resolution?.ambiguousSurfaces || 0} surfaces / ${resolution?.possibleAliases || 0} alias hints`, corefCount ? 'review' : 'quiet', 'identity'),
+      stage8Lane('ontology', 'Ontology', counters?.entities || snapshot?.nodes.length || 0, `${snapshot?.nodes.length || counters?.nodes || 0} nodes / ${snapshot?.edges.length || counters?.edges || 0} edges`, counters?.entities ? 'ready' : 'quiet'),
+      stage8Lane('temporal', 'Temporal', temporalCount, `${counters?.temporalEdges || 0} temporal / ${counters?.causalEdges || 0} causal`, temporalCount ? 'ready' : 'quiet', 'bundles'),
+      stage8Lane('belief', 'Belief', beliefCount, `${counters?.memoryState || 0} memory / ${counters?.eventAspects || 0} aspects`, beliefCount ? 'ready' : 'quiet', 'bundles'),
+      stage8Lane('router', 'Router', embeddingTargets, `${embeddingTargets} targets / ${embeddingVectors} vectors`, routerTone, 'lanes'),
+    ],
+    reviewItems: buildStage8ReviewItems(snapshot, reviewClusters, graphLinks),
+    receipts: buildLastRunReceiptRows(receipt).slice(0, 4),
+  };
+}
+
+function stage8RouterStage(receipt: GraphIndexRunReceipt | null): GraphIndexStageReceipt | undefined {
+  return receipt?.stageReceipts.find((stage) => {
+    const haystack = `${stage.id} ${stage.label}`.toLowerCase();
+    return haystack.includes('router')
+      || haystack.includes('semantic')
+      || haystack.includes('embedding')
+      || haystack.includes('signal');
+  });
+}
+
+function stage8Lane(
+  id: Stage8LaneId,
+  label: string,
+  value: number,
+  detail: string,
+  tone: CompilerTone,
+  queue?: CompilerQueueId,
+): Stage8LaneView {
+  return { id, label, value, detail, tone, queue };
+}
+
+function buildStage8ReviewItems(
+  snapshot: GraphRebuildSnapshot | null,
+  clusters: ProductDiagnosticsReviewCluster[],
+  graphLinks: GraphRebuildLinkSuggestion[],
+): Stage8ReviewItemView[] {
+  const items: Stage8ReviewItemView[] = [];
+  for (const cluster of clusters.slice(0, 3)) {
+    items.push(stage8ReviewItem({
+      id: `cluster:${cluster.id}`,
+      label: cluster.label,
+      family: cluster.kind === 'entity-link' ? 'Identity' : 'Graph',
+      detail: `${cluster.count} items / ${cluster.conflicts} conflicts`,
+      action: cluster.action,
+      confidence: cluster.confidence,
+      tone: cluster.conflicts ? 'danger' : 'review',
+      signals: cluster.signals,
+      queue: cluster.kind === 'entity-link' ? 'identity' : 'graph-links',
+    }));
+  }
+  for (const suggestion of (snapshot?.shadowLinkSuggestions || snapshot?.entityLinkSuggestions || []).slice(0, 2)) {
+    items.push(stage8ReviewItem({
+      id: `identity:${suggestion.id}`,
+      label: entityLinkItemTitle(suggestion),
+      family: 'Alias',
+      detail: `${suggestion.decision.replace(/_/g, ' ')} / ${suggestion.candidateKind || 'untyped'}`,
+      action: isShadowLink(suggestion) ? suggestion.promotionState : suggestion.status,
+      confidence: suggestion.rerankScore || suggestion.confidence,
+      tone: isShadowLink(suggestion) && suggestion.promotionBlockedReasons.length ? 'danger' : 'review',
+      signals: suggestion.rerankSignals || suggestion.rationale || [],
+      queue: 'identity',
+    }));
+  }
+  for (const suggestion of (snapshot?.resolutionSuggestions || []).slice(0, 2)) {
+    items.push(stage8ReviewItem({
+      id: `coref:${suggestion.id}`,
+      label: suggestion.surface,
+      family: 'Coref',
+      detail: `${suggestion.kind.replace(/_/g, ' ')} / ${suggestion.entityIds.length} entities`,
+      action: suggestion.status,
+      confidence: 0.5,
+      tone: 'review',
+      signals: [suggestion.rationale],
+      queue: 'identity',
+    }));
+  }
+  for (const patch of (snapshot?.finalLinkPatchLog?.patches || []).filter((row) => row.status === 'planned').slice(0, 2)) {
+    const failed = patch.receipts.some((receipt) => receipt.status === 'failed');
+    items.push(stage8ReviewItem({
+      id: `patch:${patch.id}`,
+      label: patch.operation,
+      family: 'Patch',
+      detail: `${patch.kind.replace(/_/g, ' ')} / ${patch.evidenceIds.length} evidence`,
+      action: failed ? 'blocked' : patch.status,
+      confidence: patch.confidence,
+      tone: failed ? 'danger' : 'ready',
+      signals: patch.receipts.map((receipt) => `${receipt.invariant}: ${receipt.status}`),
+      queue: 'final-patches',
+    }));
+  }
+  for (const link of graphLinks.slice(0, 2)) {
+    items.push(stage8ReviewItem({
+      id: `graph:${link.id}`,
+      label: `${link.sourceEntityId} -> ${link.targetEntityId}`,
+      family: 'Frame',
+      detail: `${link.suggestedRelationType} / ${link.structuralRole}`,
+      action: link.kind.replace(/_/g, ' '),
+      confidence: link.rerankScore || link.confidence,
+      tone: 'review',
+      signals: link.rerankSignals || link.rationale || [],
+      queue: 'graph-links',
+    }));
+  }
+  if (!items.length) {
+    items.push(stage8ReviewItem({
+      id: 'stage8:clear',
+      label: 'Review queue clear',
+      family: 'Ready',
+      detail: 'No high-blast decisions surfaced yet',
+      action: 'watch',
+      confidence: 1,
+      tone: 'ready',
+      signals: ['Full Atlas receipts will appear after the next run'],
+    }));
+  }
+  const seen = new Set<string>();
+  return items.filter((item) => {
+    if (seen.has(item.id)) return false;
+    seen.add(item.id);
+    return true;
+  }).slice(0, 6);
+}
+
+function stage8ReviewItem(item: Stage8ReviewItemView): Stage8ReviewItemView {
+  return {
+    ...item,
+    signals: item.signals.filter(Boolean).slice(0, 3),
+  };
 }
 
 function buildCompilerWorkbenchView(

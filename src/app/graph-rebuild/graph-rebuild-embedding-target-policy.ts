@@ -43,8 +43,8 @@ export function selectGraphRebuildEmbeddingTargetPlan(
 ): GraphRebuildEmbeddingTargetPlan & { targets: GraphRebuildEmbeddingTarget[] } {
     const annotated = targets.map(annotateTarget);
     const enabledLanes = enabledStageLanes(stagePolicy);
-    const eligible = annotated.filter((target) => enabledLanes.has(target.lane || 'unknown'));
-    const disabled = annotated.filter((target) => !enabledLanes.has(target.lane || 'unknown'));
+    const eligible = annotated.filter((target) => isStructureRoot(target) || enabledLanes.has(target.lane || 'unknown'));
+    const disabled = annotated.filter((target) => !isStructureRoot(target) && !enabledLanes.has(target.lane || 'unknown'));
     const selected = selectEmbeddingTargets(eligible, relationships, temporalEdges, causalEdges);
     const selectedIds = new Set(selected.map((target) => target.id));
     const admitted = selected.map((target) => ({
@@ -101,6 +101,8 @@ function selectEmbeddingTargets(
         for (const target of values.slice(0, budget)) addGroup([target]);
     };
 
+    const structureRoots = ranked(byKind.get('structureroot') || []);
+    addMany(structureRoots, structureRoots.length);
     addMany(ranked(byLane.get('document_spine') || []), NOTE_TARGET_BUDGET * 6);
     addMany(spreadSample(documentOrdered(byKind.get('chunk') || []), CHUNK_TARGET_BUDGET), CHUNK_TARGET_BUDGET);
     for (const target of ranked([...(byLane.get('temporal_fact') || []), ...(byLane.get('causal_fact') || [])]).slice(0, STORY_EDGE_TARGET_BUDGET)) {
@@ -143,9 +145,9 @@ function annotateTarget(target: GraphRebuildEmbeddingTarget): GraphRebuildEmbedd
     return {
         ...target,
         lane,
-        admissionTier: targetTier(lane),
-        structuralRole: targetStructuralRole(lane),
-        admissionReason: targetAdmissionReason(lane),
+        admissionTier: targetTier(target, lane),
+        structuralRole: targetStructuralRole(target, lane),
+        admissionReason: targetAdmissionReason(target, lane),
         parentIds: targetParentIds(target),
     };
 }
@@ -153,7 +155,7 @@ function annotateTarget(target: GraphRebuildEmbeddingTarget): GraphRebuildEmbedd
 function targetLane(target: GraphRebuildEmbeddingTarget): GraphRebuildSignalTargetLane {
     const kind = normalizeKind(target.kind);
     if (kind === 'note') return 'document_spine';
-    if (kind === 'structureroot') return 'document_spine';
+    if (kind === 'structureroot') return structureRootLane(target);
     if (kind === 'chunk') return 'chunk_spine';
     if (kind === 'entity') return 'entity_anchor';
     if (kind === 'anchor') return 'anchor_evidence';
@@ -168,7 +170,11 @@ function targetLane(target: GraphRebuildEmbeddingTarget): GraphRebuildSignalTarg
     return 'unknown';
 }
 
-function targetStructuralRole(lane: GraphRebuildSignalTargetLane): GraphRebuildEmbeddingTarget['structuralRole'] {
+function targetStructuralRole(
+    target: GraphRebuildEmbeddingTarget,
+    lane: GraphRebuildSignalTargetLane,
+): GraphRebuildEmbeddingTarget['structuralRole'] {
+    if (isStructureRoot(target)) return 'root';
     switch (lane) {
         case 'document_spine': return 'root';
         case 'chunk_spine': return 'spine';
@@ -187,7 +193,9 @@ function targetStructuralRole(lane: GraphRebuildSignalTargetLane): GraphRebuildE
     }
 }
 
-function targetAdmissionReason(lane: GraphRebuildSignalTargetLane): string {
+function targetAdmissionReason(target: GraphRebuildEmbeddingTarget, lane: GraphRebuildSignalTargetLane): string {
+    const rootKey = structureRootKey(target);
+    if (rootKey) return `mandatory_${rootKey}_root`;
     switch (lane) {
         case 'document_spine': return 'mandatory_document_spine';
         case 'chunk_spine': return 'mandatory_chunk_spine';
@@ -204,7 +212,8 @@ function targetAdmissionReason(lane: GraphRebuildSignalTargetLane): string {
     }
 }
 
-function targetTier(lane: GraphRebuildSignalTargetLane): number {
+function targetTier(target: GraphRebuildEmbeddingTarget, lane: GraphRebuildSignalTargetLane): number {
+    if (isStructureRoot(target)) return 0;
     if (lane === 'document_spine' || lane === 'chunk_spine') return 0;
     if (lane === 'entity_anchor') return 1;
     if (lane === 'anchor_evidence' || lane === 'cooccurrence_weak' || lane === 'entity_linker') return 3;
@@ -213,6 +222,7 @@ function targetTier(lane: GraphRebuildSignalTargetLane): number {
 }
 
 function targetDeferReason(target: GraphRebuildEmbeddingTarget): string {
+    if (isStructureRoot(target)) return 'structure_root_exceeded_embedding_budget';
     if (target.lane === 'cooccurrence_weak') return 'weak_cooccurrence_not_promoted';
     if (target.lane === 'entity_linker') return 'entity_linker_requires_final_linking';
     if (target.lane === 'anchor_evidence') return 'raw_anchor_evidence_not_promoted';
@@ -231,7 +241,7 @@ function buildLaneReceipts(targets: GraphRebuildEmbeddingTarget[]): GraphRebuild
             candidates: values.length,
             admitted: values.filter((target) => target.admissionStatus === 'admitted').length,
             deferred: values.filter((target) => target.admissionStatus === 'deferred').length,
-            tier: targetTier(lane),
+            tier: targetTier(values[0], lane),
         }))
         .sort((left, right) => left.tier - right.tier || left.lane.localeCompare(right.lane));
 }
@@ -365,7 +375,32 @@ function targetParentIds(target: GraphRebuildEmbeddingTarget): string[] {
 }
 
 function isPrimaryTarget(target: GraphRebuildEmbeddingTarget): boolean {
+    if (isStructureRoot(target)) return true;
     return target.lane !== 'anchor_evidence' && target.lane !== 'cooccurrence_weak';
+}
+
+function structureRootLane(target: GraphRebuildEmbeddingTarget): GraphRebuildSignalTargetLane {
+    switch (structureRootKey(target)) {
+        case 'identity': return 'entity_anchor';
+        case 'temporal': return 'temporal_fact';
+        case 'causal': return 'causal_fact';
+        case 'evidence': return 'anchor_evidence';
+        default: return 'document_spine';
+    }
+}
+
+function structureRootKey(target: GraphRebuildEmbeddingTarget): string {
+    if (!isStructureRoot(target)) return '';
+    const text = `${target.id} ${target.sourceId} ${target.label} ${target.text}`.toLowerCase();
+    if (/causal|cause/.test(text)) return 'causal';
+    if (/temporal|before|after|timeline/.test(text)) return 'temporal';
+    if (/identity|entity|alias/.test(text)) return 'identity';
+    if (/evidence|source|provenance/.test(text)) return 'evidence';
+    return 'document_structure';
+}
+
+function isStructureRoot(target: GraphRebuildEmbeddingTarget): boolean {
+    return normalizeKind(target.kind) === 'structureroot';
 }
 
 function numericSignal(text: string, key: string): number {

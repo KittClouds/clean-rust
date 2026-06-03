@@ -15,6 +15,7 @@ use crate::retrieval_causal::{
     retrieved_causal_explanation_impl, retrieved_causal_explanation_with_session_impl,
 };
 use crate::retrieval_history::{retrieved_history_impl, retrieved_history_with_session_impl};
+use crate::retrieval_receipts::GraphNativeRetrievalReceipt;
 use crate::retrieval_world::{retrieved_world_state_impl, retrieved_world_state_with_session_impl};
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -43,6 +44,8 @@ pub struct GraphRetrievedRegion {
     pub seed_vertex_ids: Vec<String>,
     #[serde(default)]
     pub included_vertex_ids: Vec<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub native_retrieval_receipt: Option<GraphNativeRetrievalReceipt>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]

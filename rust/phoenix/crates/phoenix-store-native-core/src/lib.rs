@@ -18,7 +18,7 @@ pub use schema::{
 };
 
 pub const SEMANTIC_VECTOR_DIM: usize = 384;
-pub const SEMANTIC_MODEL_ID: &str = "MongoDB/mdbr-leaf-ir";
+pub const SEMANTIC_MODEL_ID: &str = "MongoDB/mdbr-leaf-mt";
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]

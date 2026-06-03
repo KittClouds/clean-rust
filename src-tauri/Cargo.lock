@@ -3706,11 +3706,21 @@ dependencies = [
  "daachorse",
  "memchr",
  "phoenix-alex 0.1.0",
+ "phoenix-embed",
  "phoenix-types 0.1.0",
  "rustc-hash 1.1.0",
  "serde",
  "smallvec",
  "thiserror 1.0.69",
+]
+
+[[package]]
+name = "phoenix-embed"
+version = "0.1.1"
+dependencies = [
+ "ort",
+ "thiserror 1.0.69",
+ "tokenizers",
 ]
 
 [[package]]

@@ -197,6 +197,9 @@ export class GraphRebuildPipelineService {
             appendGraphTruthContractStage(stageReceipts, completedSnapshot);
             appendEntityLinkerPlanStage(stageReceipts, completedSnapshot, request.embeddingStagePolicy?.entityLinkerEnabled !== false);
             appendEdgeJudgmentPlanStage(stageReceipts, completedSnapshot);
+            appendSemanticRerankStage(stageReceipts, completedSnapshot);
+            appendSemanticAdjudicationStage(stageReceipts, completedSnapshot);
+            appendSemanticEvalLedgerStage(stageReceipts, completedSnapshot);
             appendSnapshotTimingStages(stageReceipts, completedSnapshot);
 
             const completedAt = Date.now();
@@ -335,6 +338,9 @@ export class GraphRebuildPipelineService {
                 appendGraphTruthContractStage(stageReceipts, snapshot);
                 appendEntityLinkerPlanStage(stageReceipts, snapshot, request.embeddingStagePolicy?.entityLinkerEnabled !== false);
                 appendEdgeJudgmentPlanStage(stageReceipts, snapshot);
+                appendSemanticRerankStage(stageReceipts, snapshot);
+                appendSemanticAdjudicationStage(stageReceipts, snapshot);
+                appendSemanticEvalLedgerStage(stageReceipts, snapshot);
                 appendSnapshotTimingStages(stageReceipts, snapshot);
             }
 
@@ -545,6 +551,7 @@ export class GraphRebuildPipelineService {
             appendGraphTruthContractStage(stageReceipts, completedSnapshot);
             appendEntityLinkerPlanStage(stageReceipts, completedSnapshot, request.embeddingStagePolicy?.entityLinkerEnabled !== false);
             appendEdgeJudgmentPlanStage(stageReceipts, completedSnapshot);
+            appendSemanticRerankStage(stageReceipts, completedSnapshot);
             appendSnapshotTimingStages(stageReceipts, completedSnapshot);
 
             for (const projection of PROJECTION_CAPABILITIES) {
@@ -1084,6 +1091,74 @@ function appendEdgeJudgmentPlanStage(stageReceipts: GraphIndexStageReceipt[], sn
         0,
         edgeJudgmentPlanCounters(plan),
         'GLiClass edge/type candidate plan ready; no graph mutation yet',
+    ));
+}
+
+function appendSemanticRerankStage(stageReceipts: GraphIndexStageReceipt[], snapshot: GraphRebuildSnapshot): void {
+    const summary = snapshot.semanticRerankSummary;
+    if (!summary) return;
+    stageReceipts.push(instrumentationStage(
+        'semanticRerankPlan',
+        'Semantic Rerank Plan',
+        0,
+        {
+            inputs: summary.counters.inputCount,
+            judgments: summary.counters.judgmentCount,
+            receipts: summary.counters.receiptCount,
+            plannedModelCalls: summary.counters.plannedModelCalls,
+            accepted: summary.counters.byDecision['accept'] || 0,
+            reviewed: summary.counters.byDecision['review'] || 0,
+            deferred: summary.counters.byDecision['defer'] || 0,
+            rejected: summary.counters.byDecision['reject'] || 0,
+            deterministicCalibration: summary.counters.byScoreSource['deterministic_calibration'] || 0,
+            modelScored: summary.counters.byScoreSource['gliclass_instruct'] || 0,
+        },
+        `${summary.modelId} query-label rerank plan ready; smoke uses calibration until model scores are attached`,
+    ));
+}
+
+function appendSemanticAdjudicationStage(stageReceipts: GraphIndexStageReceipt[], snapshot: GraphRebuildSnapshot): void {
+    const summary = snapshot.semanticAdjudicationSummary;
+    if (!summary) return;
+    stageReceipts.push(instrumentationStage(
+        'semanticAdjudicationDag',
+        'Semantic Adjudication DAG',
+        summary.counters.appliedMutationCount,
+        {
+            decisions: summary.counters.decisionCount,
+            mutations: summary.counters.mutationCount,
+            appliedMutations: summary.counters.appliedMutationCount,
+            receipts: summary.counters.receiptCount,
+            ledgerOnly: summary.counters.ledgerOnlyCount,
+            accepted: summary.counters.byState['accepted'] || 0,
+            supported: summary.counters.byState['supported'] || 0,
+            deferred: summary.counters.byState['deferred'] || 0,
+            rejected: summary.counters.byState['rejected'] || 0,
+            invalidated: summary.counters.byState['invalidated'] || 0,
+            superseded: summary.counters.byState['superseded'] || 0,
+        },
+        'Phase 5 reversible adjudication DAG committed accepted safe topology mutations; ledger-only rows did not poison the graph',
+    ));
+}
+
+function appendSemanticEvalLedgerStage(stageReceipts: GraphIndexStageReceipt[], snapshot: GraphRebuildSnapshot): void {
+    const summary = snapshot.semanticEvalLedgerSummary;
+    if (!summary) return;
+    stageReceipts.push(instrumentationStage(
+        'semanticEvalLedger',
+        'Semantic Eval Ledger',
+        summary.counters.rowCount,
+        {
+            rows: summary.counters.rowCount,
+            acceptedCandidates: summary.counters.acceptedCandidates,
+            rejectedCandidates: summary.counters.rejectedCandidates,
+            ambiguousCases: summary.counters.ambiguousCases,
+            userCorrections: summary.counters.userCorrections,
+            modelDisagreements: summary.counters.modelDisagreements,
+            manifoldDisagreements: summary.counters.manifoldDisagreements,
+            graphChangeRows: summary.counters.graphChangeRows,
+        },
+        'Phase 6 compact dataset export ready for classifier, reranker, router, and model-swap evals',
     ));
 }
 

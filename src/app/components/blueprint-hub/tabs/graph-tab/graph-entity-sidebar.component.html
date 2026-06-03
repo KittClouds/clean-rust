@@ -48,6 +48,35 @@
                 <span class="diagnostics-pill">{{ diagnostics.dimensionLabel }}</span>
             </div>
 
+            @if (stage8Diagnostics(); as quality) {
+            <div class="diagnostics-quality-strip">
+                <div class="diagnostics-quality-head">
+                    <span class="diagnostics-kicker">Stage 8</span>
+                    <strong>{{ quality.modelLabel }}</strong>
+                    <small>{{ quality.summary }}</small>
+                </div>
+                <div class="diagnostics-quality-grid">
+                    @for (lane of quality.lanes; track lane.id) {
+                    <div class="diagnostics-quality-lane" [class]="'diagnostics-quality-lane quality-tone-' + lane.tone">
+                        <span>{{ lane.label }}</span>
+                        <strong>{{ lane.value }}</strong>
+                        <small>{{ lane.detail }}</small>
+                    </div>
+                    }
+                </div>
+                @if (quality.receipts.length) {
+                <div class="diagnostics-receipt-strip">
+                    @for (receipt of quality.receipts; track receipt.id) {
+                    <div class="diagnostics-receipt-row" [class]="'diagnostics-receipt-row quality-tone-' + receipt.tone">
+                        <strong>{{ receipt.label }}</strong>
+                        <small>{{ receipt.detail }}</small>
+                    </div>
+                    }
+                </div>
+                }
+            </div>
+            }
+
             @if (diagnostics.selected; as target) {
             <div class="diagnostics-grid">
                 <div class="diagnostic-tile"><span>Region</span><strong>{{ target.region }}</strong></div>

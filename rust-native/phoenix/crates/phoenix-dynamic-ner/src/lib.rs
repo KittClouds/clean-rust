@@ -14,6 +14,8 @@ mod hints;
 mod identity_resolution;
 #[cfg(test)]
 mod identity_resolution_tests;
+#[cfg(all(feature = "jina-router", not(target_arch = "wasm32")))]
+mod jina_router;
 mod known_lane;
 mod label_catalog;
 #[cfg(test)]
@@ -40,6 +42,8 @@ pub use identity_resolution::{
     resolve_identity_dag, IdentityEdge, IdentityEdgeKind, IdentityLinkerCandidate, IdentityNode,
     IdentityNodeKind, IdentityResolutionDag, IdentityResolutionInput,
 };
+#[cfg(all(feature = "jina-router", not(target_arch = "wasm32")))]
+pub use jina_router::{JinaRouterOptions, JinaSemanticLabelRouter};
 pub use known_lane::KnownSurfaceLane;
 pub use label_catalog::{
     canonical_label, confusion_group, domain_pack, label_compatibility, label_description,

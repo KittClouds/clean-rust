@@ -10,6 +10,9 @@ mod graph;
 mod hints;
 #[path = "../../../../../rust-native/phoenix/crates/phoenix-dynamic-ner/src/identity_resolution.rs"]
 mod identity_resolution;
+#[cfg(all(feature = "jina-router", not(target_arch = "wasm32")))]
+#[path = "../../../../../rust-native/phoenix/crates/phoenix-dynamic-ner/src/jina_router.rs"]
+mod jina_router;
 #[path = "../../../../../rust-native/phoenix/crates/phoenix-dynamic-ner/src/known_lane.rs"]
 mod known_lane;
 #[path = "../../../../../rust-native/phoenix/crates/phoenix-dynamic-ner/src/label_catalog.rs"]
@@ -44,6 +47,8 @@ pub use identity_resolution::{
     resolve_identity_dag, IdentityEdge, IdentityEdgeKind, IdentityLinkerCandidate, IdentityNode,
     IdentityNodeKind, IdentityResolutionDag, IdentityResolutionInput,
 };
+#[cfg(all(feature = "jina-router", not(target_arch = "wasm32")))]
+pub use jina_router::{JinaRouterOptions, JinaSemanticLabelRouter};
 pub use known_lane::KnownSurfaceLane;
 pub use label_catalog::{
     canonical_label, confusion_group, domain_pack, label_compatibility, label_description,

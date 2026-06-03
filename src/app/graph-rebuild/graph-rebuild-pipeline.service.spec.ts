@@ -161,6 +161,14 @@ describe('GraphRebuildPipelineService', () => {
                     id: 'edgeTypeJudgmentPlan',
                     label: 'Edge Type Judgment Plan',
                 }),
+                expect.objectContaining({
+                    id: 'semanticAdjudicationDag',
+                    label: 'Semantic Adjudication DAG',
+                }),
+                expect.objectContaining({
+                    id: 'semanticEvalLedger',
+                    label: 'Semantic Eval Ledger',
+                }),
             ]),
         }));
     });
@@ -667,15 +675,14 @@ function request(): GraphIndexRunRequest {
         policy: 'delta',
         modelSelection: {
             dynamicNerId: 'dynamic_ner',
-            embeddingModelId: 'mongodb-leaf',
-            embeddingModelLabel: 'MDBR Leaf',
+            embeddingModelId: 'mongodb-leaf-mt',
+            embeddingModelLabel: 'MDBR Leaf MT',
             embeddingDimensionLabel: '384d',
             nliModelId: 'modernbert-nli',
         },
         entities: registryMock.entities,
     };
 }
-
 function createGraphRebuildMock() {
     return {
         buildAndPersistSnapshot: vi.fn(async () => ({
@@ -686,6 +693,47 @@ function createGraphRebuildMock() {
                 { id: 'embed:graph-fact:1', kind: 'graphFact', sourceId: 'rel-1', label: 'Kai supports Hazel', text: 'fact', evidenceIds: [] },
                 { id: 'embed:event:1', kind: 'event', sourceId: 'event-1', label: 'Event', text: 'event', evidenceIds: [] },
             ],
+            semanticAdjudicationSummary: {
+                schemaVersion: 'phoenix-semantic-adjudication-dag/v1',
+                generatedAt: 1,
+                sourceSnapshotId: 'snapshot-1',
+                states: ['proposed', 'supported', 'accepted', 'deferred', 'rejected', 'invalidated', 'superseded'],
+                dagEdges: [],
+                decisions: [],
+                mutations: [],
+                receipts: [],
+                counters: {
+                    byState: { deferred: 1 },
+                    byCandidateKind: {},
+                    decisionCount: 1,
+                    mutationCount: 0,
+                    appliedMutationCount: 0,
+                    ledgerOnlyCount: 1,
+                    receiptCount: 1,
+                    reversibleReceiptCount: 1,
+                    topologyCommitCount: 0,
+                },
+            },
+            semanticEvalLedgerSummary: {
+                schemaVersion: 'phoenix-semantic-eval-ledger/v1',
+                generatedAt: 1,
+                sourceSnapshotId: 'snapshot-1',
+                datasetPurpose: ['classifier_training', 'reranker_eval', 'router_tuning', 'model_swap_regression'],
+                entries: [],
+                compactExport: { scopeId: 'note:note-1', builtAt: 1, rowCount: 1, rows: [] },
+                counters: {
+                    rowCount: 1,
+                    byLabel: { ambiguous_case: 1 },
+                    byCandidateKind: {},
+                    acceptedCandidates: 0,
+                    rejectedCandidates: 0,
+                    ambiguousCases: 1,
+                    userCorrections: 0,
+                    modelDisagreements: 0,
+                    manifoldDisagreements: 0,
+                    graphChangeRows: 0,
+                },
+            },
             counters: {
                 nodes: 2,
                 edges: 1,
@@ -727,7 +775,6 @@ function createGraphRebuildMock() {
         restorePersistedSnapshot: vi.fn(async () => undefined),
     };
 }
-
 function createAtlasRuntimeMock() {
     return {
         capabilityState: vi.fn((capability: string) => ({

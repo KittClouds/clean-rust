@@ -1,26 +1,18 @@
 mod pipeline_parity_support;
 
-use std::collections::hash_map::DefaultHasher;
 use std::collections::BTreeMap;
 use std::collections::BTreeSet;
 use std::env;
 use std::fs;
-use std::hash::{Hash, Hasher};
 use std::path::{Path, PathBuf};
-use std::sync::Mutex;
 use std::time::Instant;
 
 use compact_str::CompactString;
 use phoenix_dynamic_ner::{
-    labels_for_domain, DiscoveredSpan, DomainProfile, DynamicNerModel, DynamicSchemaBuilder,
-    EntityLabel, LabelPack, LexicalSemanticLabelRouter, LocalMentionId, MentionVote,
-    ModelNerRequest, ModelNerWindow, NerModelError, PhoenixNerEngineBuilder, SemanticLabelRouter,
-    SemanticRouteHint, SemanticRouteInput, SurfaceNerInput, SurfaceNerMetrics, SurfaceRouter,
-    VerificationCase, ROUTABLE_LABELS,
-};
-use phoenix_embed::{
-    default_ort_dylib_path, workspace_root, OrtExecutionProviderPreference, OrtTextEmbedConfig,
-    OrtTextEmbedder, TextEmbeddingInputPrefix, TextEmbeddingPooling, TextEmbeddingProfile,
+    DiscoveredSpan, DynamicNerModel, DynamicSchemaBuilder, EntityLabel, LabelPack,
+    LexicalSemanticLabelRouter, LocalMentionId, MentionVote, ModelNerRequest, ModelNerWindow,
+    NerModelError, PhoenixNerEngineBuilder, SemanticLabelRouter, SurfaceNerInput,
+    SurfaceNerMetrics, SurfaceRouter, VerificationCase,
 };
 use phoenix_rel_post::{
     GlinerBiModel, GlinerBiOverlapPolicy, GlinerBiPredictOptions, GlinerXModel,
@@ -40,32 +32,6 @@ struct BiBackend {
 struct XBackend {
     model: GlinerXModel,
 }
-
-struct JinaSemanticLabelRouter {
-    embedder: Mutex<OrtTextEmbedder>,
-    document_domains: Mutex<BTreeMap<u64, (DomainProfile, f32)>>,
-    domain_queries: Vec<DomainPrototype>,
-    label_queries: Vec<LabelPrototype>,
-    min_confidence: f32,
-    min_label_score: f32,
-}
-
-struct DomainPrototype {
-    domain: DomainProfile,
-    query: &'static str,
-    vector: Vec<f32>,
-}
-
-struct LabelPrototype {
-    label: &'static str,
-    vector: Vec<f32>,
-}
-
-// The parity example runs the Jina embedder synchronously on one thread. ORT's
-// memory-info handle is not marked Send, so the adapter protects inference with
-// a mutex and keeps the unsafe boundary local to this smoke harness.
-unsafe impl Send for JinaSemanticLabelRouter {}
-unsafe impl Sync for JinaSemanticLabelRouter {}
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let docs = args_or_default();
@@ -219,15 +185,13 @@ fn load_semantic_label_router() -> Result<Option<Box<dyn SemanticLabelRouter + S
             Ok(Some(Box::new(LexicalSemanticLabelRouter::default())))
         }
         "jina" => {
-            let root = jina_model_root()
-                .ok_or_else(|| "Jina router requested but no model root was found".to_owned())?;
-            let router = JinaSemanticLabelRouter::load(root)?;
+            let router = phoenix_dynamic_ner::JinaSemanticLabelRouter::load_default()?;
             println!("LABEL_ROUTER\tmode=jina");
             Ok(Some(Box::new(router)))
         }
         "auto" | "" => {
-            if let Some(root) = jina_model_root() {
-                match JinaSemanticLabelRouter::load(root) {
+            if jina_model_root().is_some() {
+                match phoenix_dynamic_ner::JinaSemanticLabelRouter::load_default() {
                     Ok(router) => {
                         println!("LABEL_ROUTER\tmode=jina-auto");
                         Ok(Some(Box::new(router)))
@@ -264,334 +228,6 @@ fn jina_model_root() -> Option<PathBuf> {
     .into_iter()
     .map(PathBuf::from)
     .find(|path| path.is_dir())
-}
-
-impl JinaSemanticLabelRouter {
-    fn load(model_root: PathBuf) -> Result<Self, String> {
-        if env::var_os("ORT_DYLIB_PATH").is_none() {
-            if let Some(path) = default_ort_dylib_path(&workspace_root()) {
-                unsafe { env::set_var("ORT_DYLIB_PATH", path) };
-            }
-        }
-        let config = OrtTextEmbedConfig {
-            model_root: model_root.clone(),
-            batch_size: 16,
-            max_length: 1024,
-            profile: TextEmbeddingProfile::Native768,
-            prefix_passage: false,
-            pooling: TextEmbeddingPooling::LastToken,
-            input_prefix: TextEmbeddingInputPrefix::None,
-            execution_provider: OrtExecutionProviderPreference::from_env(),
-        };
-        let started = Instant::now();
-        let embedder =
-            OrtTextEmbedder::load(&config).map_err(|error| format!("Jina load: {error}"))?;
-        let mut query_texts = Vec::new();
-        query_texts.extend(
-            DOMAIN_PROTOTYPES
-                .iter()
-                .map(|(_, query)| format!("Query: {query}")),
-        );
-        query_texts.extend(
-            ROUTABLE_LABELS
-                .iter()
-                .map(|label| format!("Query: entity label {label}. {}", label_description(label))),
-        );
-        let vectors = embedder
-            .embed_texts(&query_texts)
-            .map_err(|error| format!("Jina prototype embed: {error}"))?;
-        let mut iter = vectors.into_iter();
-        let domain_queries = DOMAIN_PROTOTYPES
-            .iter()
-            .filter_map(|(domain, query)| {
-                iter.next().map(|vector| DomainPrototype {
-                    domain: *domain,
-                    query: *query,
-                    vector,
-                })
-            })
-            .collect::<Vec<_>>();
-        let label_queries = ROUTABLE_LABELS
-            .iter()
-            .filter_map(|label| {
-                iter.next().map(|vector| LabelPrototype {
-                    label: *label,
-                    vector,
-                })
-            })
-            .collect::<Vec<_>>();
-        println!(
-            "JINA_ROUTER_LOAD\tmodel={}\tload_ms={}\tdomains={}\tlabels={}",
-            clean(&model_root.display().to_string()),
-            started.elapsed().as_millis(),
-            domain_queries.len(),
-            label_queries.len()
-        );
-        Ok(Self {
-            embedder: Mutex::new(embedder),
-            document_domains: Mutex::new(BTreeMap::new()),
-            domain_queries,
-            label_queries,
-            min_confidence: env_f32("PHOENIX_DYN_NER_JINA_MIN_CONFIDENCE", 0.48),
-            min_label_score: env_f32("PHOENIX_DYN_NER_JINA_MIN_LABEL_SCORE", 0.16),
-        })
-    }
-}
-
-impl SemanticLabelRouter for JinaSemanticLabelRouter {
-    fn route_window(&self, input: &SemanticRouteInput<'_>) -> Option<SemanticRouteHint> {
-        let doc_domain = self.document_domain(input.document_text);
-        let text = format!("Document: {}", compact_window_text(input.window_text));
-        let embedding = self
-            .embedder
-            .lock()
-            .ok()?
-            .embed_texts(&[text])
-            .ok()?
-            .into_iter()
-            .next()?;
-        self.route_embedding(&embedding, doc_domain)
-    }
-}
-
-impl JinaSemanticLabelRouter {
-    fn route_embedding(
-        &self,
-        embedding: &[f32],
-        doc_domain: Option<(DomainProfile, f32)>,
-    ) -> Option<SemanticRouteHint> {
-        let domain_scores = self.score_domains(&embedding);
-        let (mut domain, mut query, top_score) = *domain_scores.first()?;
-        let runner_up = domain_scores
-            .get(1)
-            .map(|(_, _, score)| *score)
-            .unwrap_or(0.0);
-        let margin = (top_score - runner_up).max(0.0);
-        if let Some((doc_domain, doc_confidence)) = doc_domain {
-            if should_apply_document_domain_prior(doc_domain, domain, doc_confidence, margin) {
-                domain = doc_domain;
-                query = domain_query(doc_domain);
-            }
-        }
-        let confidence = (0.38 + top_score.max(0.0) * 1.35 + margin * 1.65).clamp(0.0, 0.94);
-        if confidence < self.min_confidence {
-            return None;
-        }
-
-        let mut labels = domain_labels(domain);
-        let mut scored_labels = self
-            .label_queries
-            .iter()
-            .map(|prototype| (prototype.label, cosine(&embedding, &prototype.vector)))
-            .collect::<Vec<_>>();
-        scored_labels.sort_by(|left, right| {
-            right
-                .1
-                .partial_cmp(&left.1)
-                .unwrap_or(std::cmp::Ordering::Equal)
-        });
-        for (label, score) in scored_labels {
-            if labels.len() >= 12 {
-                break;
-            }
-            if score >= self.min_label_score {
-                push_route_label(&mut labels, label);
-            }
-        }
-        Some(SemanticRouteHint::new(
-            domain,
-            confidence,
-            labels,
-            format!("jina-v5-router:{query}:score={top_score:.3}:margin={margin:.3}"),
-        ))
-    }
-}
-
-impl JinaSemanticLabelRouter {
-    fn document_domain(&self, document_text: &str) -> Option<(DomainProfile, f32)> {
-        let key = stable_text_hash(document_text);
-        if let Some(value) = self.document_domains.lock().ok()?.get(&key).copied() {
-            return Some(value);
-        }
-        let text = format!("Document: {}", compact_document_text(document_text));
-        let embedding = self
-            .embedder
-            .lock()
-            .ok()?
-            .embed_texts(&[text])
-            .ok()?
-            .into_iter()
-            .next()?;
-        let scores = self.score_domains(&embedding);
-        let (domain, _, top_score) = *scores.first()?;
-        let runner_up = scores.get(1).map(|(_, _, score)| *score).unwrap_or(0.0);
-        let confidence =
-            (0.38 + top_score.max(0.0) * 1.35 + (top_score - runner_up).max(0.0) * 1.65)
-                .clamp(0.0, 0.94);
-        let value = (domain, confidence);
-        self.document_domains.lock().ok()?.insert(key, value);
-        Some(value)
-    }
-
-    fn score_domains(&self, embedding: &[f32]) -> Vec<(DomainProfile, &'static str, f32)> {
-        let mut scores = self
-            .domain_queries
-            .iter()
-            .map(|prototype| {
-                (
-                    prototype.domain,
-                    prototype.query,
-                    cosine(embedding, &prototype.vector),
-                )
-            })
-            .collect::<Vec<_>>();
-        scores.sort_by(|left, right| {
-            right
-                .2
-                .partial_cmp(&left.2)
-                .unwrap_or(std::cmp::Ordering::Equal)
-        });
-        scores
-    }
-}
-
-fn domain_labels(domain: DomainProfile) -> smallvec::SmallVec<[EntityLabel; 16]> {
-    let mut labels = smallvec::SmallVec::<[EntityLabel; 16]>::new();
-    for label in labels_for_domain(domain) {
-        push_route_label(&mut labels, label);
-    }
-    labels
-}
-
-fn push_route_label(labels: &mut smallvec::SmallVec<[EntityLabel; 16]>, label: &str) {
-    if !labels
-        .iter()
-        .any(|existing| existing.as_str().eq_ignore_ascii_case(label))
-    {
-        labels.push(EntityLabel::new(label));
-    }
-}
-
-fn compact_window_text(text: &str) -> String {
-    let mut out = text.split_whitespace().collect::<Vec<_>>().join(" ");
-    if out.len() > 1800 {
-        out.truncate(1800);
-    }
-    out
-}
-
-fn compact_document_text(text: &str) -> String {
-    let mut out = text.split_whitespace().collect::<Vec<_>>().join(" ");
-    if out.len() > 4200 {
-        out.truncate(4200);
-    }
-    out
-}
-
-fn stable_text_hash(text: &str) -> u64 {
-    let mut hasher = DefaultHasher::new();
-    text.len().hash(&mut hasher);
-    text.get(..text.len().min(4096))
-        .unwrap_or(text)
-        .hash(&mut hasher);
-    hasher.finish()
-}
-
-fn should_apply_document_domain_prior(
-    document_domain: DomainProfile,
-    window_domain: DomainProfile,
-    document_confidence: f32,
-    window_margin: f32,
-) -> bool {
-    document_confidence >= 0.54
-        && is_story_like_domain(document_domain)
-        && !is_story_compatible_domain(window_domain)
-        && window_margin < 0.22
-}
-
-fn is_story_like_domain(domain: DomainProfile) -> bool {
-    matches!(
-        domain,
-        DomainProfile::Story | DomainProfile::Fantasy | DomainProfile::Memory
-    )
-}
-
-fn is_story_compatible_domain(domain: DomainProfile) -> bool {
-    matches!(
-        domain,
-        DomainProfile::Story
-            | DomainProfile::Fantasy
-            | DomainProfile::Memory
-            | DomainProfile::General
-    )
-}
-
-fn cosine(left: &[f32], right: &[f32]) -> f32 {
-    left.iter().zip(right.iter()).map(|(a, b)| a * b).sum()
-}
-
-const DOMAIN_PROTOTYPES: &[(DomainProfile, &str)] = &[
-    (
-        DomainProfile::Story,
-        "fiction story narrative with named characters, speakers, factions, places, items, relationships, and dialogue",
-    ),
-    (
-        DomainProfile::Fantasy,
-        "fantasy fiction with creatures, species, monsters, magic, spells, weapons, artifacts, ranks, and powers",
-    ),
-    (
-        DomainProfile::Corporate,
-        "business organization document with companies, departments, products, executives, metrics, initiatives, and risk",
-    ),
-    (
-        DomainProfile::Technical,
-        "software engineering technical document with modules, functions, libraries, embeddings, vectors, benchmarks, algorithms, and errors",
-    ),
-    (
-        DomainProfile::Legal,
-        "legal document with courts, statutes, rulings, parties, claims, and jurisdictions",
-    ),
-    (
-        DomainProfile::Academic,
-        "academic research document with papers, researchers, datasets, methods, institutions, and theories",
-    ),
-    (
-        DomainProfile::Memory,
-        "personal memory or state document with goals, emotions, relationships, remembered states, and intentions",
-    ),
-    (
-        DomainProfile::General,
-        "general prose with named entities, roles, objects, concepts, locations, organizations, and events",
-    ),
-];
-
-fn domain_query(domain: DomainProfile) -> &'static str {
-    DOMAIN_PROTOTYPES
-        .iter()
-        .find_map(|(candidate, query)| (*candidate == domain).then_some(*query))
-        .unwrap_or("general prose with named entities")
-}
-
-fn label_description(label: &str) -> &'static str {
-    match label {
-        "Character" | "Npc" => "A named individual actor, speaker, or person in the document.",
-        "Organization" | "Faction" => {
-            "A named group, institution, company, gang, faction, or alliance."
-        }
-        "Location" | "Region" | "Landmark" => "A named place, city, area, base, or landmark.",
-        "Event" => "A named happening, battle, meeting, incident, or process.",
-        "Artifact" | "Item" | "Object" | "Weapon" => {
-            "A named object, tool, weapon, document, machine, or created thing."
-        }
-        "Concept" | "Rank" | "Role" | "State" | "Goal" | "Relationship" => {
-            "An abstract idea, rank, role, state, relation, rule, or goal."
-        }
-        "Creature" | "Species" | "Monster" => {
-            "A nonhuman species, creature kind, monster, or denizen category."
-        }
-        "Ability" | "Spell" => "A named power, skill, spell, or capability.",
-        _ => "A named entity label candidate.",
-    }
 }
 
 impl DynamicNerModel for BiBackend {

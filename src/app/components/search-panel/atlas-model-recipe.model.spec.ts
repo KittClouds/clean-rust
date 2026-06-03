@@ -65,7 +65,7 @@ describe('atlas model recipe model', () => {
             coOccurrenceLoading: false,
             vectorStatus: 'loading',
             semanticReady: false,
-            semanticDetail: 'MDBR Leaf 384d',
+            semanticDetail: 'MDBR Leaf MT 384d',
             nliInitialized: false,
             nliProcessing: true,
             nliModelId: null,
@@ -97,3 +97,4 @@ describe('atlas model recipe model', () => {
         expect(laneListLabel([])).toBe('none');
     });
 });
+

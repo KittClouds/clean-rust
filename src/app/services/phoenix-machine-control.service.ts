@@ -15,7 +15,7 @@ import {
 
 export type PhoenixMachineVectorStatus = 'idle' | 'loading' | 'ready' | 'indexing' | 'error';
 export type PhoenixMachineGraphStatus = 'idle' | 'building' | 'ready' | 'searching' | 'error';
-export type PhoenixMachineModelId = 'mongodb-leaf' | 'bge-small-en' | 'jina-v5-nano-retrieval';
+export type PhoenixMachineModelId = 'mongodb-leaf-mt' | 'bge-small-en' | 'jina-v5-nano-retrieval';
 export type PhoenixMachineManifoldStatusMap = Record<AtlasManifoldMode, PhoenixMachineManifoldStatus>;
 export interface PhoenixMachineManifoldLoad {
     mode: AtlasManifoldMode;

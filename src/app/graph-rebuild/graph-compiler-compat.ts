@@ -16,7 +16,7 @@ import type {
     GraphRootReceipt,
 } from './graph-compiler-read-model';
 import { projectUiGraphFromCompilerOutput } from './graph-compiler-read-model';
-import type { GraphRebuildSnapshot } from './graph-rebuild-snapshot';
+import type { GraphRebuildCausalEdge, GraphRebuildSnapshot } from './graph-rebuild-snapshot';
 
 export function buildCompatibilityGraphCompilerSidecar(snapshot: GraphRebuildSnapshot): GraphCompilerDualWriteSidecar {
     const factGraph = buildCompatibilityGraphCompilerOutput(snapshot);
@@ -91,8 +91,8 @@ function buildCompatibilityGraphCompilerOutput(snapshot: GraphRebuildSnapshot): 
         provenanceByEdge.set(edgeKey, { factId: id });
         provenanceByEdge.set(legacyKey, { factId: id });
     }
-    for (const edge of snapshot.temporalEdges) pushStoryFact(edge.id, 'temporalFact', edge.relationType, edge.sourceId, edge.targetId, edge.evidenceIds, edge.confidence, 'source', 'target');
-    for (const edge of snapshot.causalEdges) pushStoryFact(edge.id, 'causalFact', edge.relationType, edge.sourceId, edge.targetId, edge.evidenceIds, edge.confidence, 'cause', 'effect');
+    for (const edge of snapshot.temporalEdges) pushStoryFact(edge.id, 'temporalFact', edge.relationType, edge.sourceId, edge.targetId, edge.evidenceIds, edge.confidence, 'accepted', 'source', 'target');
+    for (const edge of snapshot.causalEdges) pushStoryFact(edge.id, 'causalFact', edge.relationType, edge.sourceId, edge.targetId, edge.evidenceIds, edge.confidence, causalCompilerStatus(edge), 'cause', 'effect');
     for (const state of snapshot.memoryState) {
         const id = `fact:memory:${state.id}`;
         const evidenceIds = ensureAnchorEvidence(state.evidenceIds);
@@ -110,14 +110,20 @@ function buildCompatibilityGraphCompilerOutput(snapshot: GraphRebuildSnapshot): 
     output.receipts = computeReceipts(output);
     return output;
 
-    function pushStoryFact(idSource: string, lane: GraphCompilerFactLane, predicate: string, sourceId: string, targetId: string, evidenceSourceIds: string[], confidence: number, leftRole: string, rightRole: string): void {
+    function pushStoryFact(idSource: string, lane: GraphCompilerFactLane, predicate: string, sourceId: string, targetId: string, evidenceSourceIds: string[], confidence: number, status: string, leftRole: string, rightRole: string): void {
         const id = `fact:${lane}:${idSource}`;
         const evidenceIds = ensureAnchorEvidence(evidenceSourceIds);
-        facts.push(factLike(id, lane, predicate, idSource, 'accepted', evidenceIds, confidence));
+        facts.push(factLike(id, lane, predicate, idSource, status, evidenceIds, confidence));
         roles.push(role(id, leftRole, atomId('event', sourceId), confidence), role(id, rightRole, atomId('event', targetId), confidence));
         for (const evidenceId of evidenceIds) roles.push(role(id, 'evidence', evidenceId, confidence));
         projectedEdges.push(projection(`projection:${lane}:${idSource}`, atomId('event', sourceId), atomId('event', targetId), predicate, 'legacyBinary', confidence, id));
     }
+}
+
+function causalCompilerStatus(edge: GraphRebuildCausalEdge): string {
+    if (edge.status === 'accepted' || edge.status === 'supported') return 'accepted';
+    if (edge.status === 'rejected' || edge.status === 'invalidated' || edge.status === 'contradicted') return 'rejected';
+    return 'review';
 }
 
 function computeReceipts(output: GraphCompilerOutput): GraphCompileReceipts {

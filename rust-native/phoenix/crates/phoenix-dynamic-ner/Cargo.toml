@@ -5,6 +5,10 @@ edition.workspace = true
 license.workspace = true
 authors.workspace = true
 
+[features]
+default = []
+jina-router = ["dep:phoenix-embed"]
+
 [dependencies]
 compact_str.workspace = true
 daachorse.workspace = true
@@ -16,6 +20,9 @@ thiserror.workspace = true
 
 phoenix-alex = { path = "../phoenix-alex" }
 phoenix-types = { path = "../phoenix-types" }
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+phoenix-embed = { path = "../phoenix-embed", optional = true }
 
 [dev-dependencies]
 criterion = { version = "0.5", features = ["html_reports"] }

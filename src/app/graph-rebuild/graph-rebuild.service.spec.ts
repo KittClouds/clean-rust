@@ -190,8 +190,8 @@ describe('GraphRebuildService persistence helpers', () => {
             status: 'completed',
             modelSelection: {
                 dynamicNerId: 'dynamic_ner',
-                embeddingModelId: 'mongodb-leaf',
-                embeddingModelLabel: 'MDBR Leaf',
+                embeddingModelId: 'mongodb-leaf-mt',
+                embeddingModelLabel: 'MDBR Leaf MT',
                 embeddingDimensionLabel: '384d',
                 nliModelId: 'modernbert-nli',
             },
@@ -340,3 +340,4 @@ function occurrence(noteId: string, entityId: string, sourceStart: number, sourc
         updatedAt: 1,
     };
 }
+

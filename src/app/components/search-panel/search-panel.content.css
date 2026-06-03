@@ -260,13 +260,6 @@
 }
 
 /* ── ACTIONS ────────────────────────────────── */
-.dimension-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 5px;
-}
-
-.dimension-grid button,
 .secondary-action,
 .warning-action,
 .primary-action {
@@ -278,14 +271,12 @@
   font-weight: 900;
 }
 
-.dimension-active,
 .secondary-action:hover:not(:disabled) {
   border-color: rgba(var(--phthalo-rgb), 0.92);
   background: rgba(var(--phthalo-rgb), 0.44);
   color: var(--phthalo-ink);
 }
 
-.dimension-muted,
 .secondary-action {
   background: rgba(255, 255, 255, 0.04);
 }

@@ -181,7 +181,7 @@ function dimensionsFromLabel(label: string | undefined): number {
 function defaultNativeDimensions(modelId: string, modelLabel = ''): number {
     const text = `${modelId} ${modelLabel}`;
     if (/jina.*v5/i.test(text)) return 768;
-    if (/(mdbr|mongodb.*leaf|leaf).*mt|mt.*(mdbr|leaf)/i.test(text)) return 768;
+    if (/(mdbr|mongodb.*leaf|leaf).*mt|mt.*(mdbr|leaf)/i.test(text)) return 384;
     return 384;
 }
 

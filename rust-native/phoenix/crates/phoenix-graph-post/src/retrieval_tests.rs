@@ -1,6 +1,7 @@
 use phoenix_graph_kernel::{
     KernelBiTemporal, KernelEdge, KernelEdgeType, KernelGraphLayer, KernelGraphSnapshot,
-    KernelProvenance, KernelRelationClass, KernelVertex, KernelVertexClass, KernelVertexId,
+    KernelProvenance, KernelRegionProfile, KernelRelationClass, KernelVertex, KernelVertexClass,
+    KernelVertexId,
 };
 use serde_json::json;
 
@@ -10,11 +11,12 @@ use crate::retrieval::{
 };
 use crate::retrieval_causal::build_causal_region;
 use crate::retrieval_common::{
-    graph_local_entity_slot_seeds, graph_local_target_seeds, kernel_from_snapshot,
-    score_from_distance,
+    build_region_from_view_profile, graph_local_entity_slot_seeds, graph_local_target_seeds,
+    kernel_from_snapshot, score_from_distance,
 };
 use crate::retrieval_history::build_history_region;
 use crate::retrieval_history::history_seed_surface;
+use crate::retrieval_receipts::GraphNativeRetrievalStrategy;
 use crate::retrieval_world::build_world_state_region;
 use crate::retrieval_world::world_seed_surface;
 use phoenix_types::ScopeKey;
@@ -147,6 +149,70 @@ fn world_state_region_keeps_entity_slot_anchor_and_support_chain() {
         .included_vertex_ids
         .contains(&"graph::claim::2".to_owned()));
     assert!(!region.truncated);
+    let receipt = region
+        .native_retrieval_receipt
+        .as_ref()
+        .expect("simple region receipt");
+    assert_eq!(
+        receipt.strategy,
+        GraphNativeRetrievalStrategy::SimpleRegionExpansion
+    );
+    assert_eq!(receipt.region.vertex_count, region.vertex_count);
+}
+
+#[test]
+fn bounded_view_region_records_walk_and_pcst_receipt() {
+    let snapshot = KernelGraphSnapshot {
+        vertices: vec![
+            vertex("graph::entity::alice", "entity", Some("alice"), None),
+            vertex(
+                "graph::state::1",
+                "state",
+                Some("alice"),
+                Some("entity.employer"),
+            ),
+            vertex(
+                "graph::claim::1",
+                "claim",
+                Some("alice"),
+                Some("entity.employer"),
+            ),
+        ],
+        asserted_edges: vec![
+            edge("graph::state::1", "graph::entity::alice", "state_of"),
+            edge("graph::state::1", "graph::claim::1", "supported_by"),
+        ],
+        candidate_edges: Vec::new(),
+    };
+    let kernel = kernel_from_snapshot(&ScopeKey::default(), &snapshot).expect("region kernel");
+    let view = kernel.query_view(phoenix_graph_kernel::KernelViewRequest {
+        valid_at: None,
+        recorded_at: None,
+        include_candidate_graph: true,
+    });
+
+    let (_, region) = build_region_from_view_profile(
+        &view,
+        vec!["graph::entity::alice".to_owned()],
+        &[],
+        12,
+        2,
+        |_| true,
+        KernelRegionProfile::WorldState,
+    );
+
+    let receipt = region
+        .native_retrieval_receipt
+        .as_ref()
+        .expect("bounded walk receipt");
+    assert_eq!(
+        receipt.strategy,
+        GraphNativeRetrievalStrategy::BoundedWalkPcst
+    );
+    assert!(receipt
+        .walk
+        .as_ref()
+        .is_some_and(|walk| walk.pcst_compacted));
 }
 
 #[test]

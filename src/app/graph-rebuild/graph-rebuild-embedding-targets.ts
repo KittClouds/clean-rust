@@ -169,7 +169,7 @@ export function buildGraphRebuildEmbeddingTargets(
 
 function temporalTarget(
     input: BuildGraphRebuildSnapshotInput,
-    edge: GraphRebuildTemporalEdge,
+    edge: GraphRebuildTemporalEdge | GraphRebuildCausalEdge,
     kind: string,
     eventById: Map<string, GraphRebuildEvent>,
     anchorById: Map<string, GraphRebuildEntityAnchor>,
@@ -187,6 +187,7 @@ function temporalTarget(
         text: limitText([
             `${source?.label || edge.sourceId} ${edge.relationType} ${target?.label || edge.targetId}`,
             `confidence:${edge.confidence.toFixed(2)}`,
+            ...causalTextLines(edge, kind),
             ...evidenceContexts(input, edge.evidenceIds, anchorById, 4).map((context) => `evidence_context:${context}`),
         ].filter(Boolean).join('\n'), 1800),
         evidenceIds: edge.evidenceIds,
@@ -196,6 +197,26 @@ function temporalTarget(
             `embed:event:${edge.targetId}`,
         ]),
     };
+}
+
+function causalTextLines(edge: GraphRebuildTemporalEdge | GraphRebuildCausalEdge, kind: string): string[] {
+    if (kind !== 'causalFact') return [];
+    const causal = edge as GraphRebuildCausalEdge;
+    return [
+        `causal_status:${causal.status}`,
+        `causal_source:${causal.sourceKind}`,
+        `causal_relation_kind:${causal.relationKind || causal.relationType}`,
+        `causal_polarity:${causal.polarity}`,
+        `causal_modality:${causal.modality}`,
+        `causal_source_semantics:${causal.sourceSemantics}`,
+        `causal_evidence_class:${causal.evidenceClass}`,
+        causal.cue ? `causal_cue:${causal.cue}` : '',
+        typeof causal.temporalLegal === 'boolean' ? `temporal_legal:${causal.temporalLegal}` : '',
+        typeof causal.sentenceDistance === 'number' ? `sentence_distance:${causal.sentenceDistance}` : '',
+        typeof causal.graphSupportCount === 'number' ? `graph_support_count:${causal.graphSupportCount}` : '',
+        causal.supportIds.length ? `support_ids:${causal.supportIds.slice(0, 8).join(',')}` : '',
+        causal.rationale ? `rationale:${causal.rationale}` : '',
+    ].filter(Boolean);
 }
 
 function noteText(input: BuildGraphRebuildSnapshotInput, noteId: string): string {

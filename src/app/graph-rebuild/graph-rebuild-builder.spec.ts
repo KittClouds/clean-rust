@@ -12,6 +12,7 @@ import {
 import type { EntityOccurrence } from '../lib/dexie/db';
 import type { RegisteredEntity } from '../lib/registry';
 import type { GraphCompilerDualWriteSidecar } from './graph-compiler-read-model';
+import { buildGraphSemanticAdjudicationDAGSummary } from './graph-semantic-adjudication';
 
 describe('Phoenix graph rebuild builder', () => {
     it('resolves canonical Alex entities by label and alias', () => {
@@ -111,9 +112,12 @@ describe('Phoenix graph rebuild builder', () => {
             deferredCount: 3,
         });
         expect(snapshot.embeddingTargetPlan?.lanes).toEqual(expect.arrayContaining([
-            expect.objectContaining({ lane: 'document_spine', admitted: 6 }),
+            expect.objectContaining({ lane: 'document_spine', admitted: 2 }),
             expect.objectContaining({ lane: 'chunk_spine', admitted: 1 }),
-            expect.objectContaining({ lane: 'entity_anchor', admitted: 3 }),
+            expect.objectContaining({ lane: 'entity_anchor', admitted: 4 }),
+            expect.objectContaining({ lane: 'temporal_fact', admitted: 1, tier: 0 }),
+            expect.objectContaining({ lane: 'causal_fact', admitted: 1, tier: 0 }),
+            expect.objectContaining({ lane: 'anchor_evidence', admitted: 4, tier: 0 }),
             expect.objectContaining({ lane: 'relationship_fact', admitted: 2 }),
             expect.objectContaining({ lane: 'cooccurrence_weak', candidates: 3, admitted: 0, deferred: 3 }),
             expect.objectContaining({ lane: 'memory_state', admitted: 3 }),
@@ -144,11 +148,14 @@ describe('Phoenix graph rebuild builder', () => {
             embeddingTargets: 19,
             embeddingTargetCandidates: 22,
             embeddingTargetDeferred: 3,
-            embeddingDocumentSpine: 6,
+            embeddingDocumentSpine: 2,
             embeddingChunkSpine: 1,
-            embeddingEntityAnchors: 3,
+            embeddingEntityAnchors: 4,
             embeddingRelationshipFacts: 2,
+            embeddingTemporalFacts: 1,
+            embeddingCausalFacts: 1,
             embeddingMemoryStates: 3,
+            embeddingAnchorEvidence: 4,
             nodes: 3,
             edges: 5,
             structuralComponents: 1,
@@ -306,7 +313,9 @@ describe('Phoenix graph rebuild builder', () => {
             'structureRoot',
         ]);
         expect(snapshot.embeddingTargetPlan?.lanes).toEqual(expect.arrayContaining([
-            expect.objectContaining({ lane: 'anchor_evidence', candidates: 1, admitted: 0, deferred: 1 }),
+            expect.objectContaining({ lane: 'anchor_evidence', candidates: 2, admitted: 1, deferred: 1 }),
+            expect.objectContaining({ lane: 'causal_fact', candidates: 1, admitted: 1, deferred: 0 }),
+            expect.objectContaining({ lane: 'temporal_fact', candidates: 1, admitted: 1, deferred: 0 }),
         ]));
     });
 
@@ -425,7 +434,7 @@ describe('Phoenix graph rebuild builder', () => {
             dynamicNerId: 'dynamic_ner',
             embeddingModelId: 'mongodb-leaf-mt',
             embeddingModelLabel: 'MDBR Leaf MT',
-            embeddingDimensionLabel: '786d',
+            embeddingDimensionLabel: '384d',
             nliModelId: 'nli',
         });
         const jina = embeddingModelAdapterFromSelection({
@@ -437,8 +446,9 @@ describe('Phoenix graph rebuild builder', () => {
         });
 
         expect(leafMt).toMatchObject({
-            dimensionLabel: '786d',
-            selectedDimensions: 786,
+            dimensionLabel: '384d',
+            nativeDimensions: 384,
+            selectedDimensions: 384,
             modelFamily: 'mdbr-leaf-mt',
             taskProfile: 'multi_task',
             topologySupport: 'native',
@@ -552,6 +562,9 @@ describe('Phoenix graph rebuild builder', () => {
         expect(snapshot.events.map((event) => event.noteId)).toEqual(['note-1', 'note-1', 'note-2', 'note-2']);
         expect(snapshot.temporalEdges).toHaveLength(2);
         expect(snapshot.causalEdges).toHaveLength(2);
+        expect(snapshot.causalEdges.every((edge) => edge.status === 'candidate')).toBe(true);
+        expect(snapshot.causalEdges.every((edge) => edge.sourceKind === 'candidate_cue')).toBe(true);
+        expect(snapshot.causalEdges.every((edge) => edge.evidenceIds.every((id) => !id.startsWith('event:')))).toBe(true);
         expect(snapshot.temporalEdges.every((edge) => sameNoteEdge(edge, snapshot.events))).toBe(true);
         expect(snapshot.causalEdges.every((edge) => sameNoteEdge(edge, snapshot.events))).toBe(true);
         expect(snapshot.embeddingTargets.map((target) => target.kind)).toEqual(expect.arrayContaining([
@@ -559,6 +572,325 @@ describe('Phoenix graph rebuild builder', () => {
             'temporalFact',
             'causalFact',
         ]));
+    });
+
+    it('promotes causal sidecar edges with review metadata into causal graph facts', () => {
+        const text = 'Kai warned Hazel before the chamber destabilized. Hazel approved the packet after Kai kept the door open.';
+        const secondStart = text.indexOf('Hazel approved');
+        const snapshot = buildGraphRebuildSnapshot({
+            scopeKind: 'note',
+            scopeId: 'note:causal-sidecar',
+            noteIds: ['note-causal'],
+            entities: [
+                entity('e-kai', 'Kai', []),
+                entity('e-hazel', 'Hazel', []),
+            ],
+            chunks: [
+                { id: 'note-causal:chunk:0', noteId: 'note-causal', start: 0, end: secondStart - 1, ordinal: 0, source: 'dynamic-chunking' },
+                { id: 'note-causal:chunk:1', noteId: 'note-causal', start: secondStart, end: text.length, ordinal: 1, source: 'dynamic-chunking' },
+            ],
+            occurrences: [
+                occurrence('note-causal', 'e-kai', 'Kai', 0, 3),
+                occurrence('note-causal', 'e-hazel', 'Hazel', 11, 16),
+                occurrence('note-causal', 'e-hazel', 'Hazel', secondStart, secondStart + 5),
+                occurrence('note-causal', 'e-kai', 'Kai', text.lastIndexOf('Kai'), text.lastIndexOf('Kai') + 3),
+            ],
+            causalSidecar: {
+                edgeRecords: [{
+                    edgeId: 'native-edge-1',
+                    caseId: 'review-1',
+                    source: 'event:note-causal:0:warning_event',
+                    target: 'event:note-causal:1:approval_event',
+                    relationKind: 'directCause',
+                    status: 'supported',
+                    confidenceMillis: 860,
+                    cue: 'because',
+                    evidenceRefs: ['receipt:causal:1'],
+                }],
+            },
+            noteTexts: { 'note-causal': text },
+            builtAt: 19,
+        });
+        const edge = snapshot.causalEdges.find((row) => row.sourceKind === 'explicit_cue');
+        const target = snapshot.embeddingTargets.find((row) => row.kind === 'causalFact' && row.sourceId === edge?.id);
+
+        expect(edge).toMatchObject({
+            status: 'supported',
+            relationKind: 'direct_cause',
+            confidence: 0.86,
+            cue: 'because',
+            evidenceClass: 'world_support',
+        });
+        expect(edge?.supportIds).toEqual(expect.arrayContaining(['review-1']));
+        expect(target?.text).toContain('causal_status:supported');
+        expect(target?.text).toContain('causal_source:explicit_cue');
+        expect(target?.text).toContain('causal_relation_kind:direct_cause');
+        expect(snapshot.graphModelV2?.facts.find((fact) => fact.sourceRecordId === edge?.id)?.status).toBe('accepted');
+    });
+
+    it('stages phase-one semantic graph tasks with reversible no-mutation receipts', () => {
+        const text = 'Kai warned Hazel before Rift opened the door. Hazel watched Kai because Rift shifted again. The quiet omen hovered.';
+        const secondStart = text.indexOf('Hazel watched');
+        const thirdStart = text.indexOf('The quiet omen');
+        const snapshot = buildGraphRebuildSnapshot({
+            scopeKind: 'note',
+            scopeId: 'note:semantic-tasks',
+            noteIds: ['note-semantic'],
+            entities: [
+                entity('e-kai', 'Kai', []),
+                entity('e-hazel', 'Hazel', []),
+                entity('e-rift', 'Rift', []),
+            ],
+            chunks: [
+                { id: 'note-semantic:chunk:0', noteId: 'note-semantic', start: 0, end: secondStart - 1, ordinal: 0, source: 'dynamic-chunking' },
+                { id: 'note-semantic:chunk:1', noteId: 'note-semantic', start: secondStart, end: thirdStart - 1, ordinal: 1, source: 'dynamic-chunking' },
+                {
+                    id: 'note-semantic:chunk:2',
+                    noteId: 'note-semantic',
+                    start: thirdStart,
+                    end: text.length,
+                    ordinal: 2,
+                    source: 'dynamic-chunking',
+                    meaningFrame: {
+                        role: 'mixed',
+                        splitReason: 'test',
+                        breakPressure: 0,
+                        mergePressure: 0,
+                        entityPriors: [],
+                        eventCues: ['omen'],
+                        modalCues: [],
+                        temporalCues: [],
+                        authorityCues: [],
+                        evidenceCues: [],
+                        carryoverIn: [],
+                        carryoverOut: [],
+                    },
+                },
+            ],
+            occurrences: [
+                occurrence('note-semantic', 'e-kai', 'Kai', 0, 3),
+                occurrence('note-semantic', 'e-hazel', 'Hazel', 11, 16),
+                occurrence('note-semantic', 'e-rift', 'Rift', 25, 29),
+                occurrence('note-semantic', 'e-hazel', 'Hazel', secondStart, secondStart + 5),
+                occurrence('note-semantic', 'e-kai', 'Kai', text.indexOf('Kai', secondStart), text.indexOf('Kai', secondStart) + 3),
+                occurrence('note-semantic', 'e-rift', 'Rift', text.indexOf('Rift', secondStart), text.indexOf('Rift', secondStart) + 4),
+            ],
+            noteTexts: { 'note-semantic': text },
+            builtAt: 20,
+        });
+        const summary = snapshot.semanticTaskSummary!;
+
+        expect(summary.schemaVersion).toBe('phoenix-graph-semantic-tasks/v1');
+        expect(summary.sourceSnapshotId).toBe(snapshot.id);
+        expect(summary.tasks.length).toBe(snapshot.counters.semanticTasks);
+        expect(summary.receipts.length).toBe(snapshot.counters.semanticTaskReceipts);
+        expect(summary.counters.mutationAllowedCount).toBe(0);
+        expect(summary.tasks.every((task) => task.mutationAllowed === false)).toBe(true);
+        expect(summary.receipts.every((receipt) => receipt.mutationAllowed === false && receipt.reversible)).toBe(true);
+        expect(summary.receipts.every((receipt) => receipt.invariant === 'phase1_no_topology_mutation')).toBe(true);
+        expect(summary.counters.byTaskKind).toEqual(expect.objectContaining({
+            edge_classification: expect.any(Number),
+            node_classification: expect.any(Number),
+            path_reasoning: expect.any(Number),
+        }));
+        expect(summary.tasks.map((task) => task.proposalKind)).toEqual(expect.arrayContaining([
+            'relation_type',
+            'causal_type',
+            'entity_kind',
+            'causal_chain',
+        ]));
+        const candidates = snapshot.semanticCandidateSummary!;
+        expect(candidates.schemaVersion).toBe('phoenix-semantic-candidate-factory/v1');
+        expect(candidates.sourceSnapshotId).toBe(snapshot.id);
+        expect(candidates.candidates.length).toBe(snapshot.counters.semanticCandidates);
+        expect(candidates.receipts.length).toBe(snapshot.counters.semanticCandidateReceipts);
+        expect(candidates.counters.mutationAllowedCount).toBe(0);
+        expect(candidates.candidates.every((candidate) => candidate.mutationAllowed === false)).toBe(true);
+        expect(candidates.receipts.every((receipt) => receipt.mutationAllowed === false && receipt.reversible)).toBe(true);
+        expect(candidates.receipts.every((receipt) => receipt.invariant === 'phase2_no_topology_commit')).toBe(true);
+        expect(candidates.counters.byKind).toEqual(expect.objectContaining({
+            relation_link: expect.any(Number),
+            causal_bridge: expect.any(Number),
+            temporal_bridge: expect.any(Number),
+            missing_frame: expect.any(Number),
+        }));
+        expect(candidates.candidates.every((candidate) => candidate.rank >= 0 && candidate.rank <= 1)).toBe(true);
+        expect(candidates.candidates.every((candidate) => candidate.reversibleReceiptIds.length === 1)).toBe(true);
+        const manifolds = snapshot.manifoldSpecializationSummary!;
+        expect(manifolds.schemaVersion).toBe('phoenix-manifold-specialization/v1');
+        expect(manifolds.sourceSnapshotId).toBe(snapshot.id);
+        expect(manifolds.profiles.map((profile) => profile.manifold)).toEqual(expect.arrayContaining([
+            'hybrid',
+            'hopf',
+            'caps',
+            'product',
+            'siegel',
+            'lorentz',
+            'hyperbolic',
+        ]));
+        expect(manifolds.contributions.length).toBe(snapshot.counters.manifoldCandidateContributions);
+        expect(manifolds.receipts.length).toBe(snapshot.counters.manifoldContributionReceipts);
+        expect(manifolds.counters.mutationAllowedCount).toBe(0);
+        expect(manifolds.receipts.every((receipt) => receipt.invariant === 'phase3_no_topology_commit')).toBe(true);
+        expect(manifolds.contributions.every((contribution) =>
+            contribution.score >= 0
+            && contribution.score <= 1
+            && Boolean(contribution.scoreInterpretation)
+            && Boolean(contribution.rationale),
+        )).toBe(true);
+        expect(candidates.candidates.some((candidate) => candidate.manifoldContributionIds?.length)).toBe(true);
+        const rerank = snapshot.semanticRerankSummary!;
+        expect(rerank.schemaVersion).toBe('phoenix-semantic-rerank/v1');
+        expect(rerank.modelId).toBe('knowledgator/gliclass-instruct-base-v1.0');
+        expect(rerank.runner).toBe('gliclass-query-label-rerank');
+        expect(rerank.sourceSnapshotId).toBe(snapshot.id);
+        expect(rerank.inputs.length).toBe(snapshot.counters.semanticRerankInputs);
+        expect(rerank.judgments.length).toBe(snapshot.counters.semanticRerankJudgments);
+        expect(rerank.receipts.length).toBe(snapshot.counters.semanticRerankReceipts);
+        expect(rerank.counters.mutationAllowedCount).toBe(0);
+        expect(rerank.receipts.every((receipt) => receipt.invariant === 'phase4_no_topology_commit')).toBe(true);
+        expect(rerank.inputs.every((input) => input.queryLabels.length >= 3 && input.passage.length <= input.maxPassageChars)).toBe(true);
+        expect(rerank.judgments.every((judgment) =>
+            judgment.scores.every((score) => score.query.length > 20 && score.score >= 0 && score.score <= 1),
+        )).toBe(true);
+        expect(candidates.candidates.some((candidate) => candidate.semanticRerankJudgmentIds?.length)).toBe(true);
+        const adjudication = snapshot.semanticAdjudicationSummary!;
+        expect(adjudication.schemaVersion).toBe('phoenix-semantic-adjudication-dag/v1');
+        expect(adjudication.sourceSnapshotId).toBe(snapshot.id);
+        expect(adjudication.states).toEqual([
+            'proposed',
+            'supported',
+            'accepted',
+            'deferred',
+            'rejected',
+            'invalidated',
+            'superseded',
+        ]);
+        expect(adjudication.decisions.length).toBe(snapshot.counters.semanticAdjudicationDecisions);
+        expect(adjudication.mutations.length).toBe(snapshot.counters.semanticAdjudicationMutations);
+        expect(adjudication.receipts.length).toBe(snapshot.counters.semanticAdjudicationReceipts);
+        expect(adjudication.counters.topologyCommitCount).toBe(snapshot.counters.semanticAdjudicationTopologyCommits);
+        expect(adjudication.counters.ledgerOnlyCount).toBe(snapshot.counters.semanticAdjudicationLedgerOnly);
+        expect(adjudication.counters.topologyCommitCount).toBeGreaterThan(0);
+        expect(adjudication.receipts.every((receipt) => receipt.reversible)).toBe(true);
+        expect(adjudication.decisions.filter((decision) => decision.state === 'accepted').every((decision) =>
+            Boolean(decision.sourceHypothesis)
+            && decision.evidenceTargetIds.length > 0
+            && decision.scoringBundle.finalScore >= 0
+            && decision.rationale.length > 0
+            && Boolean(decision.undoReceiptId)
+            && decision.affectedGraphAtomIds.length >= 2
+            && decision.affectedGraphFactIds.length >= 1
+            && decision.ledgerOnly === false,
+        )).toBe(true);
+        expect(adjudication.mutations.every((mutation) =>
+            snapshot.edges.some((edge) => edge.id === mutation.createdEdgeId)
+            && mutation.reversiblePatch.undoOperation === 'remove_semantic_edge_and_fact',
+        )).toBe(true);
+        const evalLedger = snapshot.semanticEvalLedgerSummary!;
+        expect(evalLedger.schemaVersion).toBe('phoenix-semantic-eval-ledger/v1');
+        expect(evalLedger.sourceSnapshotId).toBe(snapshot.id);
+        expect(evalLedger.entries.length).toBe(snapshot.counters.semanticEvalLedgerRows);
+        expect(evalLedger.compactExport.rowCount).toBe(evalLedger.entries.length);
+        expect(evalLedger.datasetPurpose).toEqual([
+            'classifier_training',
+            'reranker_eval',
+            'router_tuning',
+            'model_swap_regression',
+        ]);
+        expect(evalLedger.counters.acceptedCandidates).toBeGreaterThan(0);
+        expect(evalLedger.counters.ambiguousCases).toBeGreaterThan(0);
+        expect(evalLedger.counters.graphChangeRows).toBe(adjudication.counters.topologyCommitCount);
+        expect(evalLedger.entries.every((entry) =>
+            Boolean(entry.sourceHypothesis)
+            && entry.evidenceTargetIds.length > 0
+            && entry.scoringBundle.scoreParts.length > 0,
+        )).toBe(true);
+    });
+
+    it('keeps rejected adjudication decisions in the ledger without mutating topology', () => {
+        const summary = buildGraphSemanticAdjudicationDAGSummary({
+            id: 'graph-rebuild:test:reject',
+            builtAt: 30,
+            scopeId: 'scope',
+            nodes: [
+                { id: 'e-kai', entityId: 'e-kai', label: 'Kai', kind: 'CHARACTER', aliases: [], anchorIds: ['a-kai'], noteIds: ['n1'], totalMentions: 1 },
+                { id: 'e-hazel', entityId: 'e-hazel', label: 'Hazel', kind: 'CHARACTER', aliases: [], anchorIds: ['a-hazel'], noteIds: ['n1'], totalMentions: 1 },
+            ],
+            entityAnchors: [
+                { id: 'a-kai', noteId: 'n1', surface: 'Kai', sourceStart: 0, sourceEnd: 3, source: 'dictionary_match', confidence: 1, entityId: 'e-kai', status: 'accepted', generation: 1 },
+                { id: 'a-hazel', noteId: 'n1', surface: 'Hazel', sourceStart: 10, sourceEnd: 15, source: 'dictionary_match', confidence: 1, entityId: 'e-hazel', status: 'accepted', generation: 1 },
+            ],
+            semanticCandidateSummary: {
+                schemaVersion: 'phoenix-semantic-candidate-factory/v1',
+                generatedAt: 30,
+                sourceSnapshotId: 'graph-rebuild:test:reject',
+                candidates: [{
+                    id: 'semantic-candidate:relation:test-reject',
+                    kind: 'relation_link',
+                    status: 'proposed',
+                    sourceTaskIds: ['task-1'],
+                    sourceTargetIds: ['a-kai', 'a-hazel'],
+                    targetIds: ['edge:test'],
+                    evidenceIds: ['a-kai', 'a-hazel'],
+                    sources: [{ kind: 'semantic_task', id: 'task-1', label: 'semantic_link' }],
+                    scores: [{ kind: 'semantic', score: 0.2, weight: 1, sourceId: 'task-1', rationale: 'weak support' }],
+                    confidence: 0.2,
+                    noiseScore: 0.9,
+                    rank: 0.22,
+                    rationale: ['weak support'],
+                    reversibleReceiptIds: ['receipt-1'],
+                    mutationAllowed: false,
+                    createdAt: 30,
+                }],
+                receipts: [],
+                counters: {} as any,
+            },
+            semanticRerankSummary: {
+                schemaVersion: 'phoenix-semantic-rerank/v1',
+                generatedAt: 30,
+                sourceSnapshotId: 'graph-rebuild:test:reject',
+                modelId: 'knowledgator/gliclass-instruct-base-v1.0',
+                runner: 'gliclass-query-label-rerank',
+                scoreSource: 'deterministic_calibration',
+                labels: [],
+                inputs: [],
+                judgments: [{
+                    id: 'judgment-reject',
+                    candidateId: 'semantic-candidate:relation:test-reject',
+                    candidateKind: 'relation_link',
+                    inputId: 'input-1',
+                    decision: 'reject',
+                    topLabelId: 'gliclass-label:reject_as_noise',
+                    topLabelKind: 'reject_as_noise',
+                    modelId: 'knowledgator/gliclass-instruct-base-v1.0',
+                    runner: 'gliclass-query-label-rerank',
+                    scoreSource: 'deterministic_calibration',
+                    relevanceScore: 0.7,
+                    calibratedScore: 0.61,
+                    scores: [],
+                    evidenceIds: ['a-kai', 'a-hazel'],
+                    manifoldContributionIds: [],
+                    rationale: ['reject_as_noise'],
+                    reversibleReceiptId: 'rerank-receipt-1',
+                }],
+                receipts: [],
+                counters: {} as any,
+            },
+        } as any, 30);
+
+        expect(summary.decisions).toHaveLength(1);
+        expect(summary.decisions[0]).toMatchObject({
+            state: 'rejected',
+            ledgerOnly: true,
+            affectedGraphAtomIds: [],
+            affectedGraphFactIds: [],
+        });
+        expect(summary.mutations).toHaveLength(0);
+        expect(summary.receipts[0]).toMatchObject({
+            mutationAllowed: false,
+            invariant: 'phase5_ledger_only_no_topology_commit',
+        });
     });
 
     it('does not promote broad chunk cues into every distant entity pair', () => {

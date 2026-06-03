@@ -45,6 +45,10 @@ const MODEL_FILES: Record<string, RustModelFiles> = {
         onnxUrl: 'https://huggingface.co/jinaai/jina-embeddings-v5-text-nano-retrieval/resolve/main/onnx/model.onnx',
         tokenizerUrl: 'https://huggingface.co/jinaai/jina-embeddings-v5-text-nano-retrieval/resolve/main/tokenizer.json',
     },
+    'mongodb-leaf-mt': {
+        onnxUrl: 'https://huggingface.co/MongoDB/mdbr-leaf-mt/resolve/main/onnx/model.onnx',
+        tokenizerUrl: 'https://huggingface.co/MongoDB/mdbr-leaf-mt/resolve/main/tokenizer.json',
+    },
 };
 
 /**
@@ -92,6 +96,18 @@ export class RustEmbeddingProvider implements IEmbeddingProvider {
                     quality: 'high',
                     costPer1kTokens: 0,
                     description: 'Jina v5 Nano embeddings through the native Rust runner.',
+                };
+            case 'mongodb-leaf-mt':
+                return {
+                    id: 'mongodb-leaf-mt',
+                    name: 'MDBR Leaf MT (384d)',
+                    provider: 'rust',
+                    dimensions: 384,
+                    maxTokens: 512,
+                    speed: 'fast',
+                    quality: 'high',
+                    costPer1kTokens: 0,
+                    description: 'MDBR Leaf MT multi-task embeddings through the native Rust runner.',
                 };
             default:
                 return {

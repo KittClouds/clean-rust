@@ -369,7 +369,7 @@ fn parse_config() -> Config {
             .join("transformers")
             .join(".cache")
             .join("MongoDB")
-            .join("mdbr-leaf-ir"),
+            .join("mdbr-leaf-mt"),
         max_leaf_chars: env_usize("MAX_LEAF_CHARS", 2200),
         max_entities: env_usize("MAX_ENTITIES", 70),
         entity_context_chars: env_usize("ENTITY_CONTEXT_CHARS", 950),

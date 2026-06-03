@@ -9,6 +9,11 @@ use phoenix_graph_post::eval::{
     default_ablation_cases, evaluate_causal_cases, evaluate_history_cases,
     evaluate_world_state_cases, GraphAblationCaseResult, GraphSoftFamily,
 };
+use phoenix_graph_post::retrieval_ablation::{
+    default_retrieval_ablation_cases, evaluate_causal_retrieval_ablation_cases,
+    evaluate_history_retrieval_ablation_cases, evaluate_world_state_retrieval_ablation_cases,
+    GraphRetrievalAblationCaseResult,
+};
 use phoenix_graph_post::semantic_graph::{
     derive_semantic_graph_review_batch_from_store, persist_semantic_graph_patch_sidecar,
     SemanticGraphConfig,
@@ -108,6 +113,12 @@ struct AblationReport {
     #[serde(default)]
     causal_explanation_diffusion: Vec<DiffusionCaseReport>,
     #[serde(default)]
+    world_state_retrieval_ablation: Vec<GraphRetrievalAblationCaseResult>,
+    #[serde(default)]
+    history_retrieval_ablation: Vec<GraphRetrievalAblationCaseResult>,
+    #[serde(default)]
+    causal_explanation_retrieval_ablation: Vec<GraphRetrievalAblationCaseResult>,
+    #[serde(default)]
     world_state: Vec<AblationCaseReport>,
     #[serde(default)]
     history: Vec<AblationCaseReport>,
@@ -159,6 +170,7 @@ fn run(config: SmokeConfig) -> Result<AblationReport, String> {
         });
     let cases = default_ablation_cases();
     let diffusion_cases = default_diffusion_cases();
+    let retrieval_cases = default_retrieval_ablation_cases();
     let world_anchor = config
         .world_anchor
         .clone()
@@ -207,6 +219,28 @@ fn run(config: SmokeConfig) -> Result<AblationReport, String> {
                 region_node_limit: config.region_node_limit,
             },
             &diffusion_cases,
+        )
+        .map_err(|error| error.to_string())?
+        .unwrap_or_default(),
+        None => Vec::new(),
+    };
+    let world_state_retrieval_ablation = match world_anchor.as_ref() {
+        Some(anchor) => evaluate_world_state_retrieval_ablation_cases(
+            &store,
+            &scope,
+            &phoenix_graph_post::api::GraphRetrievedWorldStateQueryRequest {
+                query_text: anchor.query_text.clone(),
+                entity_id: anchor.entity_id.clone(),
+                slot_key: anchor.slot_key.clone(),
+                valid_at: None,
+                recorded_at: None,
+                include_candidate_graph: true,
+                seed_limit: config.seed_limit,
+                oversample: config.oversample,
+                expansion_hops: config.expansion_hops,
+                region_node_limit: config.region_node_limit,
+            },
+            &retrieval_cases,
         )
         .map_err(|error| error.to_string())?
         .unwrap_or_default(),
@@ -262,6 +296,31 @@ fn run(config: SmokeConfig) -> Result<AblationReport, String> {
         .unwrap_or_default(),
         None => Vec::new(),
     };
+    let history_retrieval_ablation = match world_anchor.as_ref() {
+        Some(anchor) => evaluate_history_retrieval_ablation_cases(
+            &store,
+            &scope,
+            &phoenix_graph_post::api::GraphRetrievedHistoryQueryRequest {
+                query_text: format!("history of {} for {}", anchor.slot_key, anchor.entity_id),
+                entity_id: anchor.entity_id.clone(),
+                slot_key: Some(anchor.slot_key.clone()),
+                since_valid_at: 0,
+                until_valid_at: None,
+                recorded_at: None,
+                include_candidate_graph: true,
+                truth_plane: phoenix_graph_post::api::GraphTruthPlane::WorldState,
+                limit: Some(config.history_limit),
+                seed_limit: config.seed_limit,
+                oversample: config.oversample,
+                expansion_hops: config.expansion_hops,
+                region_node_limit: config.region_node_limit.max(128),
+            },
+            &retrieval_cases,
+        )
+        .map_err(|error| error.to_string())?
+        .unwrap_or_default(),
+        None => Vec::new(),
+    };
     let causal_explanation = match causal_target.as_ref() {
         Some(target) => evaluate_causal_cases(
             &store,
@@ -310,6 +369,30 @@ fn run(config: SmokeConfig) -> Result<AblationReport, String> {
         .unwrap_or_default(),
         None => Vec::new(),
     };
+    let causal_explanation_retrieval_ablation = match causal_target.as_ref() {
+        Some(target) => evaluate_causal_retrieval_ablation_cases(
+            &store,
+            &scope,
+            &phoenix_graph_post::api::GraphRetrievedCausalExplanationQueryRequest {
+                query_text: target.query_text.clone(),
+                target_vertex_id: target.vertex_id.clone(),
+                valid_at: None,
+                recorded_at: None,
+                include_candidate_graph: true,
+                max_depth: 3,
+                limit: Some(config.causal_limit),
+                truth_plane: phoenix_graph_post::api::GraphTruthPlane::WorldState,
+                seed_limit: config.seed_limit,
+                oversample: config.oversample,
+                expansion_hops: config.expansion_hops.max(3),
+                region_node_limit: config.region_node_limit.max(144),
+            },
+            &retrieval_cases,
+        )
+        .map_err(|error| error.to_string())?
+        .unwrap_or_default(),
+        None => Vec::new(),
+    };
 
     Ok(AblationReport {
         store_path: config.store_path.display().to_string(),
@@ -330,6 +413,9 @@ fn run(config: SmokeConfig) -> Result<AblationReport, String> {
         world_state_diffusion: decorate_diffusion_cases(world_state_diffusion),
         history_diffusion: decorate_diffusion_cases(history_diffusion),
         causal_explanation_diffusion: decorate_diffusion_cases(causal_explanation_diffusion),
+        world_state_retrieval_ablation,
+        history_retrieval_ablation,
+        causal_explanation_retrieval_ablation,
         world_state: decorate_cases(world_state),
         history: decorate_cases(history),
         causal_explanation: decorate_cases(causal_explanation),

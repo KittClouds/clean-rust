@@ -31,12 +31,36 @@ import type { NerSuggestion } from '../../../../services/ner.service';
 import { GraphRebuildService } from '../../../../graph-rebuild/graph-rebuild.service';
 import type { GraphRebuildSnapshot } from '../../../../graph-rebuild/graph-rebuild-snapshot';
 import type { GraphLensMode } from './graph-lens';
-import { buildProductDiagnosticsView } from './graph-product-diagnostics';
+import { buildProductDiagnosticsView, type ProductDiagnosticsView } from './graph-product-diagnostics';
 
 interface EntityGroup {
     kind: string;
     entities: RegisteredEntity[];
     expanded: boolean;
+}
+
+type DiagnosticsQualityTone = 'ready' | 'review' | 'danger' | 'quiet';
+
+interface DiagnosticsQualityLane {
+    id: string;
+    label: string;
+    value: number;
+    detail: string;
+    tone: DiagnosticsQualityTone;
+}
+
+interface DiagnosticsReceiptView {
+    id: string;
+    label: string;
+    detail: string;
+    tone: DiagnosticsQualityTone;
+}
+
+interface DiagnosticsQualityView {
+    modelLabel: string;
+    summary: string;
+    lanes: DiagnosticsQualityLane[];
+    receipts: DiagnosticsReceiptView[];
 }
 
 type EntitySidebarRow =
@@ -106,6 +130,9 @@ export class GraphEntitySidebarComponent implements OnChanges, OnDestroy {
     });
     readonly productDiagnostics = computed(() =>
         buildProductDiagnosticsView(this.diagnosticsSnapshot(), this.selectedDiagnosticsEntity()),
+    );
+    readonly stage8Diagnostics = computed(() =>
+        buildDiagnosticsQualityView(this.diagnosticsSnapshot(), this.productDiagnostics()),
     );
 
     readonly lensModes: { id: GraphLensMode; label: string }[] = [
@@ -327,4 +354,60 @@ export class GraphEntitySidebarComponent implements OnChanges, OnDestroy {
             this.diagnosticsLoading.set(false);
         }
     }
+}
+
+function buildDiagnosticsQualityView(
+    snapshot: GraphRebuildSnapshot | null,
+    diagnostics: ProductDiagnosticsView | null,
+): DiagnosticsQualityView | null {
+    if (!snapshot || !diagnostics) return null;
+    const counters = snapshot.counters;
+    const finalLog = snapshot.finalLinkPatchLog;
+    const receiptFailures = finalLog?.counters.failedReceipts || counters.finalLinkReceiptFailures || 0;
+    const reviewTotal = diagnostics.reviewClusters.length
+        + (snapshot.resolutionSuggestions?.length || 0)
+        + (finalLog?.counters.planned || 0);
+    const frameCount = (counters.meaningFrameChunks || 0)
+        + counters.relationships
+        + counters.events;
+    const evidenceCount = counters.anchorEvidence || snapshot.entityAnchors.length;
+    const temporalCount = counters.temporalEdges + counters.causalEdges + counters.memoryState;
+    const lanes: DiagnosticsQualityLane[] = [
+        qualityLane('identity', 'Identity', counters.entityLinking?.candidateLinks || counters.shadowLinkSuggestions || 0, `${counters.entityLinking?.sameEntity || 0} same / ${counters.entityLinking?.ambiguous || 0} ambiguous`, reviewTotal ? 'review' : 'quiet'),
+        qualityLane('frames', 'Frames', frameCount, `${counters.relationships} relations / ${counters.events} events`, frameCount ? 'ready' : 'quiet'),
+        qualityLane('evidence', 'Evidence', evidenceCount, `${counters.mentions} mentions / ${counters.acceptedAnchors} anchors`, evidenceCount ? 'ready' : 'quiet'),
+        qualityLane('temporal', 'Temporal', temporalCount, `${counters.temporalEdges} temporal / ${counters.memoryState} memory`, temporalCount ? 'ready' : 'quiet'),
+        qualityLane('review', 'Review', reviewTotal, `${diagnostics.reviewClusters.length} families / ${finalLog?.counters.planned || 0} patches`, receiptFailures ? 'danger' : reviewTotal ? 'review' : 'quiet'),
+        qualityLane('router', 'Router', counters.embeddingTargets, `${counters.embeddingTargets} targets / ${counters.embeddingVectors} vectors`, counters.embeddingVectors ? 'ready' : 'quiet'),
+    ];
+    const receipts: DiagnosticsReceiptView[] = [
+        ...(snapshot.graphCompileReceipts?.invariantFailures || []).map((failure, index) => ({
+            id: `compiler:${index}`,
+            label: 'Compiler invariant',
+            detail: failure,
+            tone: 'danger' as const,
+        })),
+        ...(finalLog?.receipts || []).map((receipt) => ({
+            id: receipt.id,
+            label: receipt.invariant,
+            detail: receipt.detail,
+            tone: receipt.status === 'failed' ? 'danger' as const : 'ready' as const,
+        })),
+    ].slice(0, 4);
+    return {
+        modelLabel: `${diagnostics.modelLabel} / ${diagnostics.dimensionLabel}`,
+        summary: `${diagnostics.summary.targetCount} targets / ${diagnostics.summary.clusterCount} clusters / ${reviewTotal} review`,
+        lanes,
+        receipts,
+    };
+}
+
+function qualityLane(
+    id: string,
+    label: string,
+    value: number,
+    detail: string,
+    tone: DiagnosticsQualityTone,
+): DiagnosticsQualityLane {
+    return { id, label, value, detail, tone };
 }

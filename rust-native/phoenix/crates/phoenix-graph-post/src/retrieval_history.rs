@@ -197,7 +197,7 @@ fn timeline_issues(
     issues
 }
 
-fn history_edge_allowed(edge: &KernelEdge) -> bool {
+pub(crate) fn history_edge_allowed(edge: &KernelEdge) -> bool {
     matches!(
         edge.edge_type.0.as_str(),
         "state_of" | "state_value" | "supported_by" | "about" | "under_view"

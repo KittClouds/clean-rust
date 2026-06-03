@@ -27,6 +27,15 @@ import {
     normalizeGraphRebuildCandidate,
     prepareGraphRebuildAnchors,
 } from './graph-rebuild-anchor-hygiene';
+import { buildGraphSemanticTaskSummary } from './graph-semantic-tasks';
+import { buildGraphSemanticCandidateSummary } from './graph-semantic-candidates';
+import { buildGraphManifoldSpecializationSummary } from './graph-manifold-specialization';
+import { buildGraphSemanticRerankSummary } from './graph-semantic-rerank';
+import {
+    applyGraphSemanticAdjudicationMutations,
+    buildGraphSemanticAdjudicationDAGSummary,
+} from './graph-semantic-adjudication';
+import { buildGraphSemanticEvalLedgerSummary } from './graph-semantic-eval-ledger';
 
 export { buildGraphRebuildAliasResolver, normalizeGraphRebuildCandidate };
 
@@ -52,7 +61,7 @@ export function buildGraphRebuildSnapshot(input: BuildGraphRebuildSnapshotInput)
 
     const nodes = buildNodes(entityAnchors, entitiesById);
     const cooccurrenceEdges = buildEdges(entityAnchors, drops);
-    const derived = deriveGraphRebuildFacts(chunks, entityAnchors, input.noteTexts || {});
+    const derived = deriveGraphRebuildFacts(chunks, entityAnchors, input.noteTexts || {}, input.causalSidecar);
     const edges = [...cooccurrenceEdges, ...derived.edges]
         .sort((left, right) => right.weight - left.weight || left.type.localeCompare(right.type) || left.id.localeCompare(right.id));
     const relationships = applyRelationshipHints([...cooccurrenceEdges.map(edgeToRelationship), ...derived.relationships], input.relationshipHints || []);
@@ -211,6 +220,49 @@ export function buildGraphRebuildSnapshot(input: BuildGraphRebuildSnapshotInput)
     snapshot.counters.shadowLinkSuggestions = shadowLinkSuggestions.length;
     snapshot.counters.finalLinkPatches = finalLinkPatchLog.counters.planned;
     snapshot.counters.finalLinkReceiptFailures = finalLinkPatchLog.counters.failedReceipts;
+    const semanticTaskSummary = buildGraphSemanticTaskSummary(snapshot, builtAt);
+    snapshot.semanticTaskSummary = semanticTaskSummary;
+    snapshot.counters.semanticTasks = semanticTaskSummary.tasks.length;
+    snapshot.counters.semanticTaskReceipts = semanticTaskSummary.receipts.length;
+    snapshot.counters.semanticTaskMutationAllowed = semanticTaskSummary.counters.mutationAllowedCount;
+    const semanticCandidateSummary = buildGraphSemanticCandidateSummary(snapshot, semanticTaskSummary, builtAt);
+    snapshot.semanticCandidateSummary = semanticCandidateSummary;
+    snapshot.counters.semanticCandidates = semanticCandidateSummary.candidates.length;
+    snapshot.counters.semanticCandidateReceipts = semanticCandidateSummary.receipts.length;
+    snapshot.counters.semanticCandidateMutationAllowed = semanticCandidateSummary.counters.mutationAllowedCount;
+    snapshot.counters.semanticCandidateDeferred = semanticCandidateSummary.counters.deferredCount;
+    const manifoldSpecializationSummary = buildGraphManifoldSpecializationSummary(snapshot, semanticCandidateSummary, builtAt);
+    snapshot.manifoldSpecializationSummary = manifoldSpecializationSummary;
+    snapshot.counters.manifoldSpecializations = manifoldSpecializationSummary.profiles.length;
+    snapshot.counters.manifoldCandidateContributions = manifoldSpecializationSummary.contributions.length;
+    snapshot.counters.manifoldContributionReceipts = manifoldSpecializationSummary.receipts.length;
+    snapshot.counters.manifoldCandidateExplained = manifoldSpecializationSummary.counters.explainedCandidateCount;
+    snapshot.counters.manifoldSpecializationMutationAllowed = manifoldSpecializationSummary.counters.mutationAllowedCount;
+    const semanticRerankSummary = buildGraphSemanticRerankSummary(snapshot, semanticCandidateSummary, manifoldSpecializationSummary, builtAt);
+    snapshot.semanticRerankSummary = semanticRerankSummary;
+    snapshot.counters.semanticRerankInputs = semanticRerankSummary.inputs.length;
+    snapshot.counters.semanticRerankJudgments = semanticRerankSummary.judgments.length;
+    snapshot.counters.semanticRerankReceipts = semanticRerankSummary.receipts.length;
+    snapshot.counters.semanticRerankPlannedModelCalls = semanticRerankSummary.counters.plannedModelCalls;
+    snapshot.counters.semanticRerankMutationAllowed = semanticRerankSummary.counters.mutationAllowedCount;
+    const semanticAdjudicationSummary = buildGraphSemanticAdjudicationDAGSummary(snapshot, builtAt);
+    snapshot.semanticAdjudicationSummary = semanticAdjudicationSummary;
+    applyGraphSemanticAdjudicationMutations(snapshot, semanticAdjudicationSummary);
+    snapshot.counters.edges = snapshot.edges.length;
+    snapshot.counters.semanticAdjudicationDecisions = semanticAdjudicationSummary.decisions.length;
+    snapshot.counters.semanticAdjudicationMutations = semanticAdjudicationSummary.mutations.length;
+    snapshot.counters.semanticAdjudicationReceipts = semanticAdjudicationSummary.receipts.length;
+    snapshot.counters.semanticAdjudicationTopologyCommits = semanticAdjudicationSummary.counters.topologyCommitCount;
+    snapshot.counters.semanticAdjudicationLedgerOnly = semanticAdjudicationSummary.counters.ledgerOnlyCount;
+    const semanticEvalLedgerSummary = buildGraphSemanticEvalLedgerSummary(snapshot, builtAt);
+    snapshot.semanticEvalLedgerSummary = semanticEvalLedgerSummary;
+    snapshot.counters.semanticEvalLedgerRows = semanticEvalLedgerSummary.entries.length;
+    snapshot.counters.semanticEvalAcceptedCandidates = semanticEvalLedgerSummary.counters.acceptedCandidates;
+    snapshot.counters.semanticEvalRejectedCandidates = semanticEvalLedgerSummary.counters.rejectedCandidates;
+    snapshot.counters.semanticEvalAmbiguousCases = semanticEvalLedgerSummary.counters.ambiguousCases;
+    snapshot.counters.semanticEvalModelDisagreements = semanticEvalLedgerSummary.counters.modelDisagreements;
+    snapshot.counters.semanticEvalManifoldDisagreements = semanticEvalLedgerSummary.counters.manifoldDisagreements;
+    snapshot.counters.semanticEvalGraphChangeRows = semanticEvalLedgerSummary.counters.graphChangeRows;
     return snapshot;
 }
 

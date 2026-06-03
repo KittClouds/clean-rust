@@ -29,30 +29,31 @@ impl TextEmbeddingProfile {
     }
 
     fn project_into(self, values: &[f32], out: &mut Vec<f32>) -> Result<(), OrtTextEmbedError> {
-        match self {
-            Self::Truncate256 => {
-                if values.len() < 256 {
-                    return Err(OrtTextEmbedError::EmbeddingDimension {
-                        expected: 256,
-                        actual: values.len(),
-                        profile: self.label(),
-                    });
-                }
-                normalize_embedding_into(&values[..256], out);
-                Ok(())
+        let target_dim = self.target_dim();
+        if matches!(
+            self,
+            Self::Truncate128 | Self::Truncate256 | Self::Truncate512
+        ) {
+            if values.len() < target_dim {
+                return Err(OrtTextEmbedError::EmbeddingDimension {
+                    expected: target_dim,
+                    actual: values.len(),
+                    profile: self.label(),
+                });
             }
-            _ => {
-                if values.len() != self.target_dim() {
-                    return Err(OrtTextEmbedError::EmbeddingDimension {
-                        expected: self.target_dim(),
-                        actual: values.len(),
-                        profile: self.label(),
-                    });
-                }
-                normalize_embedding_into(values, out);
-                Ok(())
-            }
+            normalize_embedding_into(&values[..target_dim], out);
+            return Ok(());
         }
+
+        if values.len() != target_dim {
+            return Err(OrtTextEmbedError::EmbeddingDimension {
+                expected: target_dim,
+                actual: values.len(),
+                profile: self.label(),
+            });
+        }
+        normalize_embedding_into(values, out);
+        Ok(())
     }
 }
 

@@ -423,13 +423,34 @@ function addTemporalFact(
 ): void {
     const id = `fact:${family}:${edge.id}`;
     const lane: GraphRebuildSignalTargetLane = family === 'causal' ? 'causal_fact' : 'temporal_fact';
-    facts.push({ id, family, relationType: edge.relationType, lane, status: 'accepted', confidence: edge.confidence, evidenceIds: edge.evidenceIds, sourceRecordId: edge.id });
+    const status = family === 'causal' ? causalGraphStatus(edge as GraphRebuildCausalEdge) : 'accepted';
+    facts.push({ id, family, relationType: edge.relationType, lane, status, confidence: edge.confidence, evidenceIds: edge.evidenceIds, sourceRecordId: edge.id });
     addLaneTarget(lane, id);
-    styleTags.push(styleTag(id, 'fact', 'relationFamily', family));
+    styleTags.push(styleTag(id, 'fact', 'relationFamily', family), styleTag(id, 'fact', 'stage', status));
+    if (family === 'causal') {
+        const causal = edge as GraphRebuildCausalEdge;
+        styleTags.push(
+            styleTag(id, 'fact', 'storySignal', `source:${causal.sourceKind}`),
+            styleTag(id, 'fact', 'storySignal', `evidence:${causal.evidenceClass}`),
+            styleTag(id, 'fact', 'storySignal', `modality:${causal.modality}`),
+            styleTag(id, 'fact', 'storySignal', `polarity:${causal.polarity}`),
+        );
+    }
     pushRole(roles, id, family === 'causal' ? 'cause' : 'source', atomId('event', edge.sourceId), edge.confidence);
     pushRole(roles, id, family === 'causal' ? 'effect' : 'target', atomId('event', edge.targetId), edge.confidence);
-    for (const evidenceId of edge.evidenceIds) pushRole(roles, id, 'evidence', atomId('evidence', evidenceId), edge.confidence);
+    for (const evidenceId of causalEvidenceRoleIds(edge, family)) pushRole(roles, id, 'evidence', atomId('evidence', evidenceId), edge.confidence);
     projectionEdges.push({ id: `projection:${family}:${edge.id}`, sourceId: atomId('event', edge.sourceId), targetId: atomId('event', edge.targetId), edgeType: edge.relationType, projectionKind: 'legacyBinary', sourceFactId: id, confidence: edge.confidence });
+}
+
+function causalGraphStatus(edge: GraphRebuildCausalEdge): GraphRebuildAdjudicationStatus {
+    if (edge.status === 'accepted' || edge.status === 'supported') return 'accepted';
+    if (edge.status === 'rejected' || edge.status === 'invalidated' || edge.status === 'contradicted') return 'rejected';
+    return 'review';
+}
+
+function causalEvidenceRoleIds(edge: GraphRebuildTemporalEdge | GraphRebuildCausalEdge, family: 'temporal' | 'causal'): string[] {
+    if (family === 'temporal') return edge.evidenceIds;
+    return edge.evidenceIds.filter((id) => !id.startsWith('event:'));
 }
 
 function addMemoryFact(

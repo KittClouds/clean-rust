@@ -178,7 +178,139 @@ export interface GraphRebuildTemporalEdge {
     confidence: number;
 }
 
-export interface GraphRebuildCausalEdge extends GraphRebuildTemporalEdge {}
+export type GraphRebuildCausalStatus =
+    | 'candidate'
+    | 'accepted'
+    | 'supported'
+    | 'contradicted'
+    | 'superseded'
+    | 'invalidated'
+    | 'deferred'
+    | 'rejected';
+
+export type GraphRebuildCausalPolarity = 'support' | 'contradict' | 'underspecify' | 'unknown';
+export type GraphRebuildCausalSourceKind =
+    | 'explicit_link'
+    | 'explicit_cue'
+    | 'candidate_cue'
+    | 'local_temporal_pair'
+    | 'graph_support'
+    | 'reverse_conflict'
+    | 'quote_attribution'
+    | 'counterfactual_competition'
+    | 'chain_bridge'
+    | 'sidecar_review';
+export type GraphRebuildCausalEvidenceClass =
+    | 'world_support'
+    | 'reported_support'
+    | 'attributed_support'
+    | 'graph_support'
+    | 'local_temporal_pair';
+export type GraphRebuildCausalSourceSemantics =
+    | 'world_assertion'
+    | 'reported_speech'
+    | 'attributed_claim'
+    | 'unknown';
+export type GraphRebuildCausalModality =
+    | 'asserted'
+    | 'conditional'
+    | 'planned'
+    | 'hypothetical'
+    | 'negated'
+    | 'unknown';
+
+export interface GraphRebuildCausalEdge extends GraphRebuildTemporalEdge {
+    relationKind?: string;
+    status: GraphRebuildCausalStatus;
+    sourceKind: GraphRebuildCausalSourceKind;
+    evidenceClass: GraphRebuildCausalEvidenceClass;
+    polarity: GraphRebuildCausalPolarity;
+    modality: GraphRebuildCausalModality;
+    sourceSemantics: GraphRebuildCausalSourceSemantics;
+    cue?: string;
+    attributedTo?: string;
+    supportIds: string[];
+    diagnosticCodes?: string[];
+    rationale?: string;
+    temporalLegal?: boolean;
+    sentenceDistance?: number;
+    graphSupportCount?: number;
+}
+
+export type GraphRebuildCausalSidecarNodeRef = string | {
+    id?: string;
+    nodeId?: string;
+    semanticNodeId?: string;
+    canonicalEventId?: string;
+    label?: string;
+    kind?: string;
+    [key: string]: unknown;
+};
+
+export interface GraphRebuildCausalSidecarEdge {
+    edgeId?: string;
+    caseId?: string;
+    documentId?: string;
+    source?: GraphRebuildCausalSidecarNodeRef;
+    target?: GraphRebuildCausalSidecarNodeRef;
+    canonicalCauseEventId?: string | null;
+    canonicalEffectEventId?: string | null;
+    kind?: string;
+    relationKind?: string;
+    status?: string;
+    confidenceMillis?: number;
+    cue?: string | null;
+    attributedTo?: string | null;
+    polarity?: string;
+    evidenceRefs?: string[];
+    claimAtomIds?: string[];
+    temporalCertaintyMillis?: number;
+}
+
+export interface GraphRebuildCausalSidecarReviewCase {
+    caseId?: string;
+    documentId?: string;
+    source?: GraphRebuildCausalSidecarNodeRef;
+    target?: GraphRebuildCausalSidecarNodeRef;
+    canonicalCauseEventId?: string | null;
+    canonicalEffectEventId?: string | null;
+    kind?: string;
+    relationKind?: string;
+    baseConfidenceMillis?: number;
+    baseStatus?: string;
+    cue?: string | null;
+    polarity?: string;
+    attributedTo?: string | null;
+    sentenceDistance?: number;
+    temporalLegal?: boolean;
+    quotedEvidence?: boolean;
+    attributedEvidence?: boolean;
+    quotedOrAttributed?: boolean;
+    sourceSemantics?: string;
+    modalitySemantics?: string;
+    sharedParticipantCount?: number;
+    graphSupportCount?: number;
+    evidenceRefs?: string[];
+    seedSource?: string;
+}
+
+export interface GraphRebuildCausalSidecarChain {
+    chainId?: string;
+    edgeIds?: string[];
+    canonicalEventIds?: string[];
+    weakestStatus?: string;
+    confidenceMillis?: number;
+    speculative?: boolean;
+    evidenceRefs?: string[];
+}
+
+export interface GraphRebuildCausalSidecarInput {
+    edgeRecords?: GraphRebuildCausalSidecarEdge[];
+    edgeAdditions?: GraphRebuildCausalSidecarEdge[];
+    reviewCases?: GraphRebuildCausalSidecarReviewCase[];
+    shadowLocalPairCases?: GraphRebuildCausalSidecarReviewCase[];
+    chains?: GraphRebuildCausalSidecarChain[];
+}
 
 export interface GraphRebuildMemoryState {
     id: string;
@@ -618,6 +750,597 @@ export interface GraphRebuildFinalLinkPatchLog {
     };
 }
 
+export type GraphSemanticTaskKind =
+    | 'link_prediction'
+    | 'edge_classification'
+    | 'node_classification'
+    | 'graph_completion'
+    | 'community_detection'
+    | 'anomaly_detection'
+    | 'path_reasoning';
+
+export type GraphSemanticProposalKind =
+    | 'semantic_link'
+    | 'identity_link'
+    | 'relation_type'
+    | 'causal_type'
+    | 'temporal_type'
+    | 'entity_kind'
+    | 'domain_vote'
+    | 'missing_entity'
+    | 'missing_edge'
+    | 'missing_frame'
+    | 'semantic_bundle'
+    | 'contradiction_review'
+    | 'duplicate_review'
+    | 'brittle_link'
+    | 'outlier_review'
+    | 'causal_chain'
+    | 'temporal_chain'
+    | 'belief_chain';
+
+export type GraphSemanticTaskStatus = 'prepared' | 'proposed' | 'deferred' | 'blocked';
+export type GraphSemanticTaskSourceKind =
+    | 'embedding_target'
+    | 'manifold'
+    | 'graph_postprocess'
+    | 'identity_linker'
+    | 'relationship_fact'
+    | 'temporal_fact'
+    | 'causal_fact'
+    | 'ontology_policy'
+    | 'evidence_ledger';
+
+export type GraphSemanticTaskScoreKind =
+    | 'semantic'
+    | 'manifold'
+    | 'structural'
+    | 'evidence'
+    | 'ontology'
+    | 'temporal'
+    | 'causal'
+    | 'identity'
+    | 'anomaly';
+
+export interface GraphSemanticTaskSource {
+    kind: GraphSemanticTaskSourceKind;
+    id: string;
+    label: string;
+    lane?: GraphRebuildSignalTargetLane;
+    modelId?: string;
+    manifold?: string;
+    targetKind?: string;
+}
+
+export interface GraphSemanticTaskScore {
+    kind: GraphSemanticTaskScoreKind;
+    score: number;
+    weight: number;
+    sourceId: string;
+    rationale: string;
+}
+
+export interface GraphSemanticTaskReceipt {
+    id: string;
+    taskId: string;
+    status: GraphSemanticTaskStatus;
+    reversible: true;
+    mutationAllowed: false;
+    invariant: string;
+    evidenceIds: string[];
+    undoHint: string;
+    detail: string;
+}
+
+export interface GraphSemanticTask {
+    id: string;
+    taskKind: GraphSemanticTaskKind;
+    proposalKind: GraphSemanticProposalKind;
+    status: GraphSemanticTaskStatus;
+    sourceTargetIds: string[];
+    targetIds: string[];
+    sources: GraphSemanticTaskSource[];
+    scores: GraphSemanticTaskScore[];
+    confidence: number;
+    rationale: string[];
+    evidenceIds: string[];
+    reversibleReceiptIds: string[];
+    mutationAllowed: false;
+    createdAt: number;
+}
+
+export interface GraphSemanticTaskCounters {
+    byTaskKind: Record<string, number>;
+    byProposalKind: Record<string, number>;
+    bySourceKind: Record<string, number>;
+    byStatus: Record<string, number>;
+    byManifold: Record<string, number>;
+    sourceTargetCount: number;
+    receiptCount: number;
+    reversibleReceiptCount: number;
+    mutationAllowedCount: number;
+}
+
+export interface GraphSemanticTaskSummary {
+    schemaVersion: 'phoenix-graph-semantic-tasks/v1';
+    generatedAt: number;
+    sourceSnapshotId: string;
+    tasks: GraphSemanticTask[];
+    receipts: GraphSemanticTaskReceipt[];
+    counters: GraphSemanticTaskCounters;
+}
+
+export type GraphSemanticCandidateKind =
+    | 'entity_link'
+    | 'relation_link'
+    | 'missing_frame'
+    | 'causal_bridge'
+    | 'temporal_bridge'
+    | 'contradiction_review'
+    | 'outlier_review';
+
+export type GraphSemanticCandidateStatus = 'proposed' | 'deferred' | 'blocked';
+export type GraphSemanticCandidateSourceKind =
+    | 'semantic_task'
+    | 'embedding_target'
+    | 'manifold'
+    | 'graph_postprocess'
+    | 'identity_linker'
+    | 'relationship_fact'
+    | 'temporal_fact'
+    | 'causal_fact'
+    | 'frame_gap'
+    | 'evidence_anchor';
+
+export interface GraphSemanticCandidateSource {
+    kind: GraphSemanticCandidateSourceKind;
+    id: string;
+    label: string;
+    taskId?: string;
+    taskKind?: GraphSemanticTaskKind;
+    proposalKind?: GraphSemanticProposalKind;
+    manifold?: string;
+}
+
+export interface GraphSemanticCandidate {
+    id: string;
+    kind: GraphSemanticCandidateKind;
+    status: GraphSemanticCandidateStatus;
+    sourceTaskIds: string[];
+    sourceTargetIds: string[];
+    targetIds: string[];
+    evidenceIds: string[];
+    sources: GraphSemanticCandidateSource[];
+    scores: GraphSemanticTaskScore[];
+    confidence: number;
+    noiseScore: number;
+    rank: number;
+    rationale: string[];
+    reversibleReceiptIds: string[];
+    manifoldContributionIds?: string[];
+    semanticRerankJudgmentIds?: string[];
+    mutationAllowed: false;
+    createdAt: number;
+}
+
+export interface GraphSemanticCandidateReceipt {
+    id: string;
+    candidateId: string;
+    status: GraphSemanticCandidateStatus;
+    reversible: true;
+    mutationAllowed: false;
+    invariant: string;
+    evidenceIds: string[];
+    undoHint: string;
+    detail: string;
+}
+
+export interface GraphSemanticCandidateCounters {
+    byKind: Record<string, number>;
+    byStatus: Record<string, number>;
+    bySourceKind: Record<string, number>;
+    sourceTaskCount: number;
+    sourceTargetCount: number;
+    receiptCount: number;
+    reversibleReceiptCount: number;
+    mutationAllowedCount: number;
+    proposedCount: number;
+    deferredCount: number;
+    blockedCount: number;
+    maxCandidates: number;
+    averageNoiseScore: number;
+}
+
+export interface GraphSemanticCandidateSummary {
+    schemaVersion: 'phoenix-semantic-candidate-factory/v1';
+    generatedAt: number;
+    sourceSnapshotId: string;
+    candidates: GraphSemanticCandidate[];
+    receipts: GraphSemanticCandidateReceipt[];
+    counters: GraphSemanticCandidateCounters;
+}
+
+export type GraphSemanticManifoldKind =
+    | 'hybrid'
+    | 'hopf'
+    | 'caps'
+    | 'product'
+    | 'siegel'
+    | 'lorentz'
+    | 'hyperbolic';
+
+export type GraphManifoldRole =
+    | 'semantic_neighborhood'
+    | 'recurrence_cycle'
+    | 'evidence_cap_hierarchy'
+    | 'cross_family_bridge'
+    | 'structured_route'
+    | 'hierarchy_compression'
+    | 'ancestry_depth';
+
+export interface GraphManifoldContributionRule {
+    id: string;
+    description: string;
+    candidateKinds: GraphSemanticCandidateKind[];
+    requiredSignals: string[];
+}
+
+export interface GraphManifoldRoleProfile {
+    manifold: GraphSemanticManifoldKind;
+    manifoldRole: GraphManifoldRole;
+    label: string;
+    scoreInterpretation: string;
+    candidateKinds: GraphSemanticCandidateKind[];
+    contributionRules: GraphManifoldContributionRule[];
+}
+
+export interface GraphManifoldCandidateContribution {
+    id: string;
+    candidateId: string;
+    candidateKind: GraphSemanticCandidateKind;
+    manifold: GraphSemanticManifoldKind;
+    manifoldRole: GraphManifoldRole;
+    ruleId: string;
+    score: number;
+    scoreInterpretation: string;
+    sourceTargetIds: string[];
+    evidenceIds: string[];
+    rationale: string;
+    reversibleReceiptId: string;
+}
+
+export interface GraphManifoldSpecializationReceipt {
+    id: string;
+    contributionId: string;
+    candidateId: string;
+    manifold: GraphSemanticManifoldKind;
+    reversible: true;
+    mutationAllowed: false;
+    invariant: string;
+    evidenceIds: string[];
+    undoHint: string;
+    detail: string;
+}
+
+export interface GraphManifoldSpecializationCounters {
+    byManifold: Record<string, number>;
+    byRole: Record<string, number>;
+    byCandidateKind: Record<string, number>;
+    contributionCount: number;
+    explainedCandidateCount: number;
+    unexplainedCandidateCount: number;
+    receiptCount: number;
+    reversibleReceiptCount: number;
+    mutationAllowedCount: number;
+    maxContributions: number;
+}
+
+export interface GraphManifoldSpecializationSummary {
+    schemaVersion: 'phoenix-manifold-specialization/v1';
+    generatedAt: number;
+    sourceSnapshotId: string;
+    profiles: GraphManifoldRoleProfile[];
+    contributions: GraphManifoldCandidateContribution[];
+    receipts: GraphManifoldSpecializationReceipt[];
+    counters: GraphManifoldSpecializationCounters;
+}
+
+export type GraphSemanticRerankLabelKind =
+    | 'strong_identity_alias'
+    | 'strong_relation_bridge'
+    | 'strong_missing_frame'
+    | 'strong_causal_bridge'
+    | 'strong_temporal_bridge'
+    | 'strong_contradiction_review'
+    | 'strong_outlier_review'
+    | 'defer_for_review'
+    | 'reject_as_noise';
+
+export type GraphSemanticRerankDecision = 'accept' | 'defer' | 'reject' | 'review';
+export type GraphSemanticRerankScoreSource = 'gliclass_instruct' | 'deterministic_calibration';
+
+export interface GraphSemanticRerankLabel {
+    id: string;
+    kind: GraphSemanticRerankLabelKind;
+    query: string;
+    threshold: number;
+    candidateKinds: GraphSemanticCandidateKind[];
+}
+
+export interface GraphSemanticRerankInput {
+    id: string;
+    candidateId: string;
+    candidateKind: GraphSemanticCandidateKind;
+    passage: string;
+    labelIds: string[];
+    queryLabels: string[];
+    manifoldContributionIds: string[];
+    evidenceIds: string[];
+    maxPassageChars: number;
+}
+
+export interface GraphSemanticRerankScore {
+    labelId: string;
+    labelKind: GraphSemanticRerankLabelKind;
+    query: string;
+    score: number;
+    source: GraphSemanticRerankScoreSource;
+    rationale: string;
+}
+
+export interface GraphSemanticRerankJudgment {
+    id: string;
+    candidateId: string;
+    candidateKind: GraphSemanticCandidateKind;
+    inputId: string;
+    decision: GraphSemanticRerankDecision;
+    topLabelId: string;
+    topLabelKind: GraphSemanticRerankLabelKind;
+    modelId: string;
+    runner: string;
+    scoreSource: GraphSemanticRerankScoreSource;
+    relevanceScore: number;
+    calibratedScore: number;
+    scores: GraphSemanticRerankScore[];
+    evidenceIds: string[];
+    manifoldContributionIds: string[];
+    rationale: string[];
+    reversibleReceiptId: string;
+}
+
+export interface GraphSemanticRerankReceipt {
+    id: string;
+    judgmentId: string;
+    candidateId: string;
+    reversible: true;
+    mutationAllowed: false;
+    invariant: string;
+    evidenceIds: string[];
+    undoHint: string;
+    detail: string;
+}
+
+export interface GraphSemanticRerankCounters {
+    byDecision: Record<string, number>;
+    byTopLabelKind: Record<string, number>;
+    byCandidateKind: Record<string, number>;
+    byScoreSource: Record<string, number>;
+    inputCount: number;
+    judgmentCount: number;
+    receiptCount: number;
+    plannedModelCalls: number;
+    reversibleReceiptCount: number;
+    mutationAllowedCount: number;
+    maxInputs: number;
+    averageCalibratedScore: number;
+}
+
+export interface GraphSemanticRerankSummary {
+    schemaVersion: 'phoenix-semantic-rerank/v1';
+    generatedAt: number;
+    sourceSnapshotId: string;
+    modelId: string;
+    runner: 'gliclass-query-label-rerank';
+    scoreSource: GraphSemanticRerankScoreSource;
+    labels: GraphSemanticRerankLabel[];
+    inputs: GraphSemanticRerankInput[];
+    judgments: GraphSemanticRerankJudgment[];
+    receipts: GraphSemanticRerankReceipt[];
+    counters: GraphSemanticRerankCounters;
+}
+
+export type GraphSemanticAdjudicationState =
+    | 'proposed'
+    | 'supported'
+    | 'accepted'
+    | 'deferred'
+    | 'rejected'
+    | 'invalidated'
+    | 'superseded';
+
+export interface GraphSemanticAdjudicationScorePart {
+    id: string;
+    score: number;
+    weight: number;
+}
+
+export interface GraphSemanticAdjudicationScoringBundle {
+    candidateRank: number;
+    candidateConfidence: number;
+    candidateNoise: number;
+    rerankRelevance: number;
+    rerankCalibrated: number;
+    rerankSource: GraphSemanticRerankScoreSource | 'missing_rerank';
+    topLabelKind?: GraphSemanticRerankLabelKind;
+    finalScore: number;
+    scoreParts: GraphSemanticAdjudicationScorePart[];
+}
+
+export interface GraphSemanticAdjudicationReceipt {
+    id: string;
+    candidateId: string;
+    judgmentId?: string;
+    state: GraphSemanticAdjudicationState;
+    reversible: true;
+    mutationAllowed: boolean;
+    invariant: string;
+    evidenceTargetIds: string[];
+    affectedGraphAtomIds: string[];
+    affectedGraphFactIds: string[];
+    undoHint: string;
+    detail: string;
+}
+
+export interface GraphSemanticAdjudicationMutation {
+    id: string;
+    decisionId: string;
+    candidateId: string;
+    operation: 'add_semantic_edge';
+    status: 'applied' | 'reverted';
+    createdEdgeId: string;
+    createdFactIds: string[];
+    affectedGraphAtomIds: string[];
+    affectedGraphFactIds: string[];
+    createdEdge?: GraphRebuildEdge;
+    undoReceiptId: string;
+    reversiblePatch: {
+        undoOperation: 'remove_semantic_edge_and_fact';
+        removeEdgeId: string;
+        removeFactIds: string[];
+    };
+    createdAt: number;
+}
+
+export interface GraphSemanticAdjudicationDecision {
+    id: string;
+    proposalNodeId: string;
+    supportedNodeId: string;
+    candidateId: string;
+    candidateKind: GraphSemanticCandidateKind;
+    judgmentId?: string;
+    state: GraphSemanticAdjudicationState;
+    sourceHypothesis: string;
+    evidenceTargetIds: string[];
+    scoringBundle: GraphSemanticAdjudicationScoringBundle;
+    rationale: string[];
+    undoReceiptId: string;
+    mutationId?: string;
+    affectedGraphAtomIds: string[];
+    affectedGraphFactIds: string[];
+    ledgerOnly: boolean;
+    createdAt: number;
+}
+
+export interface GraphSemanticAdjudicationCounters {
+    byState: Record<string, number>;
+    byCandidateKind: Record<string, number>;
+    decisionCount: number;
+    mutationCount: number;
+    appliedMutationCount: number;
+    ledgerOnlyCount: number;
+    receiptCount: number;
+    reversibleReceiptCount: number;
+    topologyCommitCount: number;
+}
+
+export interface GraphSemanticAdjudicationDAGSummary {
+    schemaVersion: 'phoenix-semantic-adjudication-dag/v1';
+    generatedAt: number;
+    sourceSnapshotId: string;
+    states: GraphSemanticAdjudicationState[];
+    dagEdges: Array<{ from: string; to: string; label: string }>;
+    decisions: GraphSemanticAdjudicationDecision[];
+    mutations: GraphSemanticAdjudicationMutation[];
+    receipts: GraphSemanticAdjudicationReceipt[];
+    counters: GraphSemanticAdjudicationCounters;
+}
+
+export type GraphSemanticEvalLedgerLabel =
+    | 'accepted_candidate'
+    | 'rejected_candidate'
+    | 'ambiguous_case'
+    | 'model_disagreement'
+    | 'manifold_disagreement';
+
+export interface GraphSemanticEvalLedgerEntry {
+    id: string;
+    candidateId: string;
+    decisionId: string;
+    label: GraphSemanticEvalLedgerLabel;
+    candidateKind: GraphSemanticCandidateKind;
+    adjudicationState: GraphSemanticAdjudicationState;
+    sourceHypothesis: string;
+    evidenceTargetIds: string[];
+    score: number;
+    scoringBundle: GraphSemanticAdjudicationScoringBundle;
+    rerank?: {
+        judgmentId: string;
+        decision: GraphSemanticRerankDecision;
+        scoreSource: GraphSemanticRerankScoreSource;
+        topLabelKind: GraphSemanticRerankLabelKind;
+        relevanceScore: number;
+        calibratedScore: number;
+    };
+    manifoldVotes: Array<{
+        id: string;
+        manifold: GraphSemanticManifoldKind;
+        role: GraphManifoldRole;
+        score: number;
+        ruleId: string;
+    }>;
+    flags: string[];
+    beforeGraph: {
+        edgeCount: number;
+        factIds: string[];
+        edgeIds: string[];
+    };
+    afterGraph: {
+        edgeCount: number;
+        factIds: string[];
+        edgeIds: string[];
+    };
+    userCorrectionIds: string[];
+    rationale: string[];
+}
+
+export interface GraphSemanticEvalLedgerCounters {
+    rowCount: number;
+    byLabel: Record<string, number>;
+    byCandidateKind: Record<string, number>;
+    acceptedCandidates: number;
+    rejectedCandidates: number;
+    ambiguousCases: number;
+    userCorrections: number;
+    modelDisagreements: number;
+    manifoldDisagreements: number;
+    graphChangeRows: number;
+}
+
+export interface GraphSemanticEvalLedgerSummary {
+    schemaVersion: 'phoenix-semantic-eval-ledger/v1';
+    generatedAt: number;
+    sourceSnapshotId: string;
+    datasetPurpose: Array<'classifier_training' | 'reranker_eval' | 'router_tuning' | 'model_swap_regression'>;
+    entries: GraphSemanticEvalLedgerEntry[];
+    compactExport: {
+        scopeId: string;
+        builtAt: number;
+        rowCount: number;
+        rows: Array<{
+            id: string;
+            label: GraphSemanticEvalLedgerLabel;
+            kind: GraphSemanticCandidateKind;
+            state: GraphSemanticAdjudicationState;
+            score: number;
+            flags: string[];
+            evidence: number;
+            changedEdges: number;
+            changedFacts: number;
+        }>;
+    };
+    counters: GraphSemanticEvalLedgerCounters;
+}
+
 export interface GraphRebuildEntityLinkCounters {
     candidateMentions: number;
     candidateLinks: number;
@@ -720,6 +1443,35 @@ export interface GraphRebuildCounters {
     shadowLinkSuggestions?: number;
     finalLinkPatches?: number;
     finalLinkReceiptFailures?: number;
+    semanticTasks?: number;
+    semanticTaskReceipts?: number;
+    semanticTaskMutationAllowed?: number;
+    semanticCandidates?: number;
+    semanticCandidateReceipts?: number;
+    semanticCandidateMutationAllowed?: number;
+    semanticCandidateDeferred?: number;
+    manifoldSpecializations?: number;
+    manifoldCandidateContributions?: number;
+    manifoldContributionReceipts?: number;
+    manifoldCandidateExplained?: number;
+    manifoldSpecializationMutationAllowed?: number;
+    semanticRerankInputs?: number;
+    semanticRerankJudgments?: number;
+    semanticRerankReceipts?: number;
+    semanticRerankPlannedModelCalls?: number;
+    semanticRerankMutationAllowed?: number;
+    semanticAdjudicationDecisions?: number;
+    semanticAdjudicationMutations?: number;
+    semanticAdjudicationReceipts?: number;
+    semanticAdjudicationTopologyCommits?: number;
+    semanticAdjudicationLedgerOnly?: number;
+    semanticEvalLedgerRows?: number;
+    semanticEvalAcceptedCandidates?: number;
+    semanticEvalRejectedCandidates?: number;
+    semanticEvalAmbiguousCases?: number;
+    semanticEvalModelDisagreements?: number;
+    semanticEvalManifoldDisagreements?: number;
+    semanticEvalGraphChangeRows?: number;
     entityLinking?: GraphRebuildEntityLinkCounters;
     meaningFrameChunks?: number;
     eventAspects?: number;
@@ -781,6 +1533,12 @@ export interface GraphRebuildSnapshot {
     entityLinkSuggestions?: GraphRebuildEntityLinkSuggestion[];
     shadowLinkSuggestions?: GraphRebuildShadowLink[];
     finalLinkPatchLog?: GraphRebuildFinalLinkPatchLog;
+    semanticTaskSummary?: GraphSemanticTaskSummary;
+    semanticCandidateSummary?: GraphSemanticCandidateSummary;
+    manifoldSpecializationSummary?: GraphManifoldSpecializationSummary;
+    semanticRerankSummary?: GraphSemanticRerankSummary;
+    semanticAdjudicationSummary?: GraphSemanticAdjudicationDAGSummary;
+    semanticEvalLedgerSummary?: GraphSemanticEvalLedgerSummary;
     counters: GraphRebuildCounters;
     buildTimings?: GraphRebuildBuildTimings;
     resolutionSuggestions?: GraphRebuildResolutionSuggestion[];
@@ -894,6 +1652,7 @@ export interface BuildGraphRebuildSnapshotInput {
     chunks?: GraphRebuildChunk[];
     relationshipHints?: GraphRebuildRelationshipHint[];
     noteTexts?: Record<string, string>;
+    causalSidecar?: GraphRebuildCausalSidecarInput;
     embeddingProfile?: Partial<GraphRebuildEmbeddingProfile>;
     postProcessMode?: GraphIndexPostProcessMode;
     embeddingStagePolicy?: GraphIndexEmbeddingStagePolicy;

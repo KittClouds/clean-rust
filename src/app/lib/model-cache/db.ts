@@ -17,7 +17,7 @@ import Dexie, { Table } from 'dexie';
 // =============================================================================
 
 export interface CachedModel {
-    id: string;                    // e.g., "tts:supertonic-2", "embed:mongodb-leaf", "voice:F1"
+    id: string;                    // e.g., "tts:supertonic-2", "embed:mongodb-leaf-mt", "voice:F1"
     type: 'tts' | 'embedding' | 'voice' | 'onnx';
     url: string;                   // Original source URL
     blob: Blob;                    // The actual model binary

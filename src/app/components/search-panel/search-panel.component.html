@@ -74,13 +74,6 @@
           optionLabel="label" optionValue="id" styleClass="scope-select">
         </p-select>
       </label>
-
-      <div class="dimension-grid">
-        <button *ngFor="let dim of truncateDims" type="button" (click)="truncateDim.set(dim)"
-          [ngClass]="truncateDim() === dim ? 'dimension-active' : 'dimension-muted'">
-          {{ dim === 'full' ? 'Full' : dim + 'd' }}
-        </button>
-      </div>
     </div>
 
     <div class="model-lane-grid full-atlas-model-grid">
@@ -92,6 +85,79 @@
         <strong>{{ model.status }}</strong>
         <small>{{ model.detail }}</small>
         <em>{{ model.optional ? (model.status === 'ready' ? 'staged' : 'click to stage') : (model.status === 'ready' ? 'warm' : 'required') }}</em>
+      </div>
+    </div>
+
+    <div class="stage8-workbench" *ngIf="stage8Workbench() as stage8">
+      <div class="stage8-head">
+        <div>
+          <span>Stage 8</span>
+          <strong>{{ stage8.label }}</strong>
+          <small>{{ stage8.detail }}</small>
+        </div>
+        <button type="button" class="stage8-icon-action" title="Open graph" (click)="openGraphLens()">
+          <ng-icon name="lucideLayers" class="h-3.5 w-3.5"></ng-icon>
+        </button>
+      </div>
+
+      <div class="stage8-router" [ngClass]="'stage8-tone-' + stage8.router.tone">
+        <span class="stage8-router-dot"></span>
+        <span class="stage8-router-main">
+          <strong>{{ stage8.router.model }}</strong>
+          <small>{{ stage8.router.dimension }} / {{ stage8.router.detail }}</small>
+        </span>
+        <span class="stage8-router-meta">
+          <em>{{ stage8.router.status }}</em>
+          <small>{{ stage8.router.timing }}</small>
+        </span>
+        <span class="stage8-router-chips">
+          <span class="stage8-router-chip">{{ stage8.router.gate }}</span>
+          <span class="stage8-router-chip">{{ stage8.router.budget }}</span>
+        </span>
+      </div>
+
+      <div class="stage8-lanes">
+        <button *ngFor="let lane of stage8.lanes" type="button" class="stage8-lane"
+          [ngClass]="'stage8-tone-' + lane.tone" [disabled]="!lane.queue"
+          [title]="lane.label + ': ' + lane.detail" (click)="lane.queue && setCompilerQueue(lane.queue)">
+          <span>{{ lane.label }}</span>
+          <strong>{{ lane.value | number:'1.0-0' }}</strong>
+          <small>{{ lane.detail }}</small>
+        </button>
+      </div>
+
+      <div class="stage8-review-queue">
+        <div class="stage8-section-head">
+          <span>Review queue</span>
+          <strong>{{ stage8.reviewItems.length | number:'1.0-0' }} items</strong>
+        </div>
+        <article *ngFor="let item of stage8.reviewItems" class="stage8-review-item"
+          [ngClass]="'stage8-tone-' + item.tone" [title]="item.label + ': ' + item.detail">
+          <span class="stage8-review-family">{{ item.family }}</span>
+          <span class="stage8-review-main">
+            <strong>{{ item.label }}</strong>
+            <small>{{ item.detail }}</small>
+            <em *ngIf="item.signals.length">{{ item.signals.join(' / ') }}</em>
+          </span>
+          <span class="stage8-review-score">{{ confidencePercent(item.confidence) }}%</span>
+          <button type="button" *ngIf="item.queue; else stage8PassiveAction" class="stage8-review-action"
+            (click)="setCompilerQueue(item.queue)">
+            {{ item.action }}
+          </button>
+          <ng-template #stage8PassiveAction>
+            <b class="stage8-review-action">{{ item.action }}</b>
+          </ng-template>
+        </article>
+      </div>
+
+      <div class="stage8-receipts" *ngIf="stage8.receipts.length">
+        <span>Receipts</span>
+        <div *ngFor="let row of stage8.receipts" class="stage8-receipt-row"
+          [ngClass]="'receipt-status-' + row.status">
+          <strong>{{ row.label }}</strong>
+          <small>{{ row.detail }}</small>
+          <em>{{ row.durationMs | number:'1.0-0' }} ms</em>
+        </div>
       </div>
     </div>
 

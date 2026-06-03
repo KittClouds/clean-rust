@@ -7,6 +7,7 @@ import type {
     GraphRebuildChunk,
     GraphRebuildScopeKind,
     GraphRebuildSnapshot,
+    GraphSemanticManifoldKind,
 } from './graph-rebuild-snapshot';
 import type { EntityOccurrence } from '../lib/dexie/db';
 import type { RegisteredEntity } from '../lib/registry';
@@ -187,6 +188,30 @@ describe('Phoenix graph rebuild parity smoke', () => {
         });
         const elapsedMs = performance.now() - started;
         const counts = kindCounts(snapshot.embeddingTargets.map((target) => target.kind));
+        console.info('graph-rebuild-smoke', JSON.stringify({
+            doc: 'shortrun',
+            chars: text.length,
+            chunks: chunks.length,
+            occurrences: occurrences.length,
+            events: snapshot.counters.events,
+            causalEdges: snapshot.counters.causalEdges,
+            targets: snapshot.counters.embeddingTargets,
+            semanticTasks: snapshot.counters.semanticTasks,
+            semanticCandidates: snapshot.counters.semanticCandidates,
+            manifoldContributions: snapshot.counters.manifoldCandidateContributions,
+            manifoldExplained: snapshot.counters.manifoldCandidateExplained,
+            manifoldByManifold: snapshot.manifoldSpecializationSummary?.counters.byManifold,
+            semanticRerankInputs: snapshot.counters.semanticRerankInputs,
+            semanticRerankCalls: snapshot.counters.semanticRerankPlannedModelCalls,
+            semanticRerankDecisions: snapshot.semanticRerankSummary?.counters.byDecision,
+            semanticAdjudicationDecisions: snapshot.counters.semanticAdjudicationDecisions,
+            semanticAdjudicationCommits: snapshot.counters.semanticAdjudicationTopologyCommits,
+            semanticAdjudicationLedgerOnly: snapshot.counters.semanticAdjudicationLedgerOnly,
+            semanticAdjudicationStates: snapshot.semanticAdjudicationSummary?.counters.byState,
+            semanticEvalLedger: compactEvalLedger(snapshot),
+            candidateNoise: snapshot.semanticCandidateSummary?.counters.averageNoiseScore,
+            elapsedMs: Math.round(elapsedMs),
+        }));
 
         expect(occurrences.length).toBeGreaterThan(900);
         expect(snapshot.counters.embeddingTargets).toBeLessThanOrEqual(960);
@@ -194,8 +219,10 @@ describe('Phoenix graph rebuild parity smoke', () => {
         expect(snapshot.embeddingTargetPlan?.candidateCount).toBeGreaterThanOrEqual(snapshot.counters.embeddingTargets);
         expect(snapshot.counters.embeddingDocumentSpine).toBeGreaterThan(0);
         expect(snapshot.counters.embeddingChunkSpine).toBeGreaterThan(0);
-        expect(snapshot.counters.embeddingEntityAnchors).toBe(entities.length);
+        expect(snapshot.counters.embeddingEntityAnchors).toBe(entities.length + 1);
         expect(snapshot.counters.embeddingRelationshipFacts).toBeGreaterThan(0);
+        expect(snapshot.counters.embeddingTemporalFacts).toBeGreaterThan(0);
+        expect(snapshot.counters.embeddingCausalFacts).toBeGreaterThan(0);
         expect(snapshot.embeddingGraphPostProcess?.targetCount).toBe(snapshot.counters.embeddingTargets);
         expect(snapshot.embeddingGraphPostProcess?.metrics.plannedPairCount).toBeLessThan(
             snapshot.embeddingGraphPostProcess?.metrics.theoreticalPairCount || 0,
@@ -208,18 +235,239 @@ describe('Phoenix graph rebuild parity smoke', () => {
         expect(counts.anchor).toBeLessThan(occurrences.length);
         expect(snapshot.embeddingTargetPlan?.lanes).toEqual(expect.arrayContaining([
             expect.objectContaining({ lane: 'cooccurrence_weak', admitted: 80, deferred: expect.any(Number) }),
-            expect.objectContaining({ lane: 'anchor_evidence', admitted: entities.length, deferred: expect.any(Number) }),
+            expect.objectContaining({ lane: 'anchor_evidence', admitted: entities.length + 1, deferred: expect.any(Number) }),
         ]));
         expect(snapshot.embeddingTargets.filter((target) => target.kind === 'entity').every((target) => /mentions:\d+/.test(target.text))).toBe(true);
         expect(snapshot.embeddingTargets.filter((target) => target.kind === 'graphFact').every((target) => target.text.includes('evidence_context:'))).toBe(true);
         expect(snapshot.embeddingTargets.filter((target) => target.kind === 'anchor').every((target) => target.text.includes('source:') && target.text.includes('evidence_context:'))).toBe(true);
+        expect(snapshot.semanticTaskSummary?.counters.mutationAllowedCount).toBe(0);
+        expect(snapshot.semanticTaskSummary?.receipts.length).toBe(snapshot.counters.semanticTaskReceipts);
+        expect(snapshot.semanticTaskSummary?.tasks.every((task) => task.mutationAllowed === false)).toBe(true);
+        expect(snapshot.semanticTaskSummary?.receipts.every((receipt) => receipt.invariant === 'phase1_no_topology_mutation')).toBe(true);
+        expect(snapshot.semanticTaskSummary?.counters.byTaskKind).toEqual(expect.objectContaining({
+            link_prediction: expect.any(Number),
+            edge_classification: expect.any(Number),
+            node_classification: expect.any(Number),
+            graph_completion: expect.any(Number),
+            community_detection: expect.any(Number),
+            anomaly_detection: expect.any(Number),
+            path_reasoning: expect.any(Number),
+        }));
+        expect(snapshot.semanticCandidateSummary?.schemaVersion).toBe('phoenix-semantic-candidate-factory/v1');
+        expect(snapshot.semanticCandidateSummary?.counters.mutationAllowedCount).toBe(0);
+        expect(snapshot.semanticCandidateSummary?.candidates.length).toBeLessThanOrEqual(240);
+        expect(snapshot.semanticCandidateSummary?.candidates.length).toBe(snapshot.counters.semanticCandidates);
+        expect(snapshot.semanticCandidateSummary?.receipts.length).toBe(snapshot.counters.semanticCandidateReceipts);
+        expect(snapshot.semanticCandidateSummary?.receipts.every((receipt) => receipt.invariant === 'phase2_no_topology_commit')).toBe(true);
+        expect(snapshot.semanticCandidateSummary?.counters.averageNoiseScore).toBeLessThan(0.62);
+        expect(snapshot.semanticCandidateSummary?.counters.byKind).toEqual(expect.objectContaining({
+            entity_link: expect.any(Number),
+            relation_link: expect.any(Number),
+            causal_bridge: expect.any(Number),
+            temporal_bridge: expect.any(Number),
+            outlier_review: expect.any(Number),
+        }));
+        expect(snapshot.manifoldSpecializationSummary?.schemaVersion).toBe('phoenix-manifold-specialization/v1');
+        expect(snapshot.manifoldSpecializationSummary?.contributions.length).toBeLessThanOrEqual(480);
+        expect(snapshot.manifoldSpecializationSummary?.contributions.length).toBe(snapshot.counters.manifoldCandidateContributions);
+        expect(snapshot.manifoldSpecializationSummary?.receipts.length).toBe(snapshot.counters.manifoldContributionReceipts);
+        expect(snapshot.manifoldSpecializationSummary?.receipts.every((receipt) => receipt.invariant === 'phase3_no_topology_commit')).toBe(true);
+        expect(snapshot.manifoldSpecializationSummary?.counters.mutationAllowedCount).toBe(0);
+        expect(snapshot.manifoldSpecializationSummary?.counters.byManifold['product']).toBeGreaterThan(0);
+        expect(snapshot.manifoldSpecializationSummary?.counters.byManifold['siegel']).toBeGreaterThan(0);
+        expect(snapshot.manifoldSpecializationSummary?.counters.byManifold['hopf']).toBeGreaterThan(0);
+        expect(manifoldContributions(snapshot, 'product').some((row) =>
+            row.ruleId.startsWith('product-') && /lanes|source-bridge|bridge/.test(row.rationale),
+        )).toBe(true);
+        expect(manifoldContributions(snapshot, 'siegel').some((row) =>
+            row.ruleId.startsWith('siegel-') && /route|branch/.test(row.rationale),
+        )).toBe(true);
+        expect(manifoldContributions(snapshot, 'hopf').some((row) =>
+            row.ruleId.startsWith('hopf-') && /identity|alias|recurrence/.test(row.rationale),
+        )).toBe(true);
+        expect(declaredRuleCoverage(snapshot)).toBe(true);
+        expect(snapshot.semanticCandidateSummary?.candidates.some((candidate) =>
+            (candidate.manifoldContributionIds || []).length > 0,
+        )).toBe(true);
+        expect(snapshot.semanticRerankSummary?.schemaVersion).toBe('phoenix-semantic-rerank/v1');
+        expect(snapshot.semanticRerankSummary?.modelId).toBe('knowledgator/gliclass-instruct-base-v1.0');
+        expect(snapshot.semanticRerankSummary?.runner).toBe('gliclass-query-label-rerank');
+        expect(snapshot.semanticRerankSummary?.inputs.length).toBe(snapshot.counters.semanticRerankInputs);
+        expect(snapshot.semanticRerankSummary?.judgments.length).toBe(snapshot.counters.semanticRerankJudgments);
+        expect(snapshot.semanticRerankSummary?.receipts.length).toBe(snapshot.counters.semanticRerankReceipts);
+        expect(snapshot.semanticRerankSummary?.counters.mutationAllowedCount).toBe(0);
+        expect(snapshot.semanticRerankSummary?.receipts.every((receipt) => receipt.invariant === 'phase4_no_topology_commit')).toBe(true);
+        expect(snapshot.semanticRerankSummary?.inputs.length).toBeLessThanOrEqual(192);
+        expect(snapshot.semanticRerankSummary?.inputs.every((input) =>
+            input.queryLabels.length >= 3 && input.queryLabels.every((query) => query.length > 20),
+        )).toBe(true);
+        expect(snapshot.semanticRerankSummary?.judgments.some((judgment) => judgment.decision === 'accept')).toBe(true);
+        expect(snapshot.semanticRerankSummary?.judgments.every((judgment) =>
+            judgment.modelId === 'knowledgator/gliclass-instruct-base-v1.0'
+            && judgment.runner === 'gliclass-query-label-rerank'
+            && judgment.scores.length >= 3,
+        )).toBe(true);
+        expect(snapshot.semanticAdjudicationSummary?.schemaVersion).toBe('phoenix-semantic-adjudication-dag/v1');
+        expect(snapshot.semanticAdjudicationSummary?.counters.topologyCommitCount).toBeGreaterThan(0);
+        expect(snapshot.semanticAdjudicationSummary?.mutations.every((mutation) =>
+            snapshot.edges.some((edge) => edge.id === mutation.createdEdgeId),
+        )).toBe(true);
+        expect(snapshot.semanticAdjudicationSummary?.decisions.filter((decision) => decision.state !== 'accepted').every((decision) =>
+            decision.ledgerOnly === true
+            && decision.affectedGraphAtomIds.length === 0
+            && decision.affectedGraphFactIds.length === 0,
+        )).toBe(true);
+        expect(snapshot.semanticEvalLedgerSummary?.compactExport.rowCount).toBe(snapshot.counters.semanticEvalLedgerRows);
+        expect(snapshot.semanticEvalLedgerSummary?.counters.acceptedCandidates).toBeGreaterThan(0);
+        expect(snapshot.semanticEvalLedgerSummary?.counters.ambiguousCases).toBeGreaterThan(0);
+        expect(snapshot.semanticEvalLedgerSummary?.counters.graphChangeRows).toBe(snapshot.counters.semanticAdjudicationTopologyCommits);
+        expect(snapshot.semanticEvalLedgerSummary?.compactExport.rows.every((row) =>
+            row.evidence > 0 && row.score >= 0 && row.score <= 1,
+        )).toBe(true);
         expect(elapsedMs).toBeLessThan(8000);
+    });
+
+    it('ramps causal target smoke over docs/midrun.md without exceeding the signal budget', () => {
+        const text = readFileSync(new URL('../../../docs/midrun.md', import.meta.url), 'utf8');
+        const chunks = dynamicChunksForNote({ id: 'midrun-dense', markdownContent: text, content: '' });
+        const surfaces = candidateSurfaces(text).slice(0, 72);
+        const entities = surfaces.map((surface, index) =>
+            registeredEntity(`mid-${index}:${normalizeId(surface)}`, surface, likelyKind(surface), []),
+        );
+        const occurrences = entities.flatMap((entity) =>
+            surfaceOccurrences(text, 'midrun-dense', entity.id, entity.label, entity.kind, 'dictionary_match', 48),
+        );
+        const started = performance.now();
+        const snapshot = buildGraphRebuildSnapshot({
+            scopeKind: 'note',
+            scopeId: 'note:midrun-dense',
+            noteIds: ['midrun-dense'],
+            entities,
+            chunks,
+            occurrences,
+            candidateCount: occurrences.length,
+            noteTexts: { 'midrun-dense': text },
+            builtAt: 23,
+        });
+        const elapsedMs = performance.now() - started;
+        const causalTargets = snapshot.embeddingTargets.filter((target) => target.kind === 'causalFact');
+        console.info('graph-rebuild-smoke', JSON.stringify({
+            doc: 'midrun',
+            chars: text.length,
+            chunks: chunks.length,
+            occurrences: occurrences.length,
+            events: snapshot.counters.events,
+            causalEdges: snapshot.counters.causalEdges,
+            targets: snapshot.counters.embeddingTargets,
+            semanticTasks: snapshot.counters.semanticTasks,
+            semanticCandidates: snapshot.counters.semanticCandidates,
+            manifoldContributions: snapshot.counters.manifoldCandidateContributions,
+            manifoldExplained: snapshot.counters.manifoldCandidateExplained,
+            manifoldByManifold: snapshot.manifoldSpecializationSummary?.counters.byManifold,
+            semanticRerankInputs: snapshot.counters.semanticRerankInputs,
+            semanticRerankCalls: snapshot.counters.semanticRerankPlannedModelCalls,
+            semanticRerankDecisions: snapshot.semanticRerankSummary?.counters.byDecision,
+            semanticAdjudicationDecisions: snapshot.counters.semanticAdjudicationDecisions,
+            semanticAdjudicationCommits: snapshot.counters.semanticAdjudicationTopologyCommits,
+            semanticAdjudicationLedgerOnly: snapshot.counters.semanticAdjudicationLedgerOnly,
+            semanticAdjudicationStates: snapshot.semanticAdjudicationSummary?.counters.byState,
+            semanticEvalLedger: compactEvalLedger(snapshot),
+            candidateNoise: snapshot.semanticCandidateSummary?.counters.averageNoiseScore,
+            elapsedMs: Math.round(elapsedMs),
+        }));
+
+        expect(text.length).toBeGreaterThan(400000);
+        expect(chunks.length).toBeGreaterThan(40);
+        expect(occurrences.length).toBeGreaterThan(900);
+        expect(snapshot.counters.embeddingTargets).toBeLessThanOrEqual(960);
+        expect(snapshot.embeddingTargetPlan?.admittedCount).toBe(snapshot.counters.embeddingTargets);
+        expect(snapshot.counters.events).toBeGreaterThan(40);
+        expect(snapshot.counters.temporalEdges).toBeGreaterThan(0);
+        expect(snapshot.counters.causalEdges).toBeGreaterThan(0);
+        expect(causalTargets.length).toBeGreaterThan(0);
+        expect(causalTargets.every((target) => target.text.includes('causal_status:'))).toBe(true);
+        expect(causalTargets.every((target) => target.text.includes('causal_source:'))).toBe(true);
+        expect(snapshot.semanticTaskSummary?.tasks.length).toBeGreaterThan(100);
+        expect(snapshot.semanticTaskSummary?.counters.mutationAllowedCount).toBe(0);
+        expect(snapshot.semanticTaskSummary?.counters.byTaskKind['path_reasoning']).toBeGreaterThan(0);
+        expect(snapshot.semanticTaskSummary?.counters.byTaskKind['community_detection']).toBeGreaterThan(0);
+        expect(snapshot.semanticCandidateSummary?.candidates.length).toBeGreaterThan(100);
+        expect(snapshot.semanticCandidateSummary?.candidates.length).toBeLessThanOrEqual(240);
+        expect(snapshot.semanticCandidateSummary?.counters.mutationAllowedCount).toBe(0);
+        expect(snapshot.semanticCandidateSummary?.counters.averageNoiseScore).toBeLessThan(0.66);
+        expect(snapshot.semanticCandidateSummary?.counters.byKind['causal_bridge']).toBeGreaterThan(0);
+        expect(snapshot.semanticCandidateSummary?.counters.byKind['temporal_bridge']).toBeGreaterThan(0);
+        expect(snapshot.manifoldSpecializationSummary?.contributions.length).toBeGreaterThan(40);
+        expect(snapshot.manifoldSpecializationSummary?.contributions.length).toBeLessThanOrEqual(480);
+        expect(snapshot.manifoldSpecializationSummary?.counters.byManifold['product']).toBeGreaterThan(0);
+        expect(snapshot.manifoldSpecializationSummary?.counters.byManifold['siegel']).toBeGreaterThan(0);
+        expect(snapshot.manifoldSpecializationSummary?.counters.byManifold['hopf']).toBeGreaterThan(0);
+        expect(declaredRuleCoverage(snapshot)).toBe(true);
+        expect(snapshot.manifoldSpecializationSummary?.contributions.every((contribution) =>
+            Boolean(contribution.scoreInterpretation)
+            && Boolean(contribution.rationale)
+            && contribution.score >= 0
+            && contribution.score <= 1,
+        )).toBe(true);
+        expect(snapshot.semanticRerankSummary?.inputs.length).toBeGreaterThan(100);
+        expect(snapshot.semanticRerankSummary?.inputs.length).toBeLessThanOrEqual(192);
+        expect(snapshot.semanticRerankSummary?.counters.plannedModelCalls).toBeGreaterThan(snapshot.semanticRerankSummary?.inputs.length || 0);
+        expect(snapshot.semanticRerankSummary?.counters.byScoreSource['deterministic_calibration']).toBe(snapshot.semanticRerankSummary?.judgments.length);
+        expect(snapshot.semanticRerankSummary?.judgments.every((judgment) =>
+            judgment.relevanceScore >= 0
+            && judgment.relevanceScore <= 1
+            && judgment.calibratedScore >= 0
+            && judgment.calibratedScore <= 1,
+        )).toBe(true);
+        expect(snapshot.semanticAdjudicationSummary?.decisions.length).toBe(snapshot.counters.semanticAdjudicationDecisions);
+        expect(snapshot.semanticAdjudicationSummary?.counters.topologyCommitCount).toBeGreaterThan(0);
+        expect(snapshot.semanticAdjudicationSummary?.counters.ledgerOnlyCount).toBeGreaterThan(0);
+        expect(snapshot.semanticAdjudicationSummary?.receipts.every((receipt) =>
+            receipt.reversible
+            && (receipt.mutationAllowed || receipt.affectedGraphAtomIds.length === 0)
+            && (receipt.mutationAllowed || receipt.affectedGraphFactIds.length === 0),
+        )).toBe(true);
+        expect(snapshot.semanticEvalLedgerSummary?.compactExport.rowCount).toBe(snapshot.counters.semanticEvalLedgerRows);
+        expect(snapshot.semanticEvalLedgerSummary?.counters.acceptedCandidates).toBeGreaterThan(0);
+        expect(snapshot.semanticEvalLedgerSummary?.counters.ambiguousCases).toBeGreaterThan(0);
+        expect(snapshot.semanticEvalLedgerSummary?.counters.graphChangeRows).toBe(snapshot.counters.semanticAdjudicationTopologyCommits);
+        expect(snapshot.semanticEvalLedgerSummary?.counters.manifoldDisagreements).toBeGreaterThan(0);
+        expect(snapshot.embeddingGraphPostProcess?.metrics.plannedPairCount).toBeLessThan(
+            snapshot.embeddingGraphPostProcess?.metrics.theoreticalPairCount || 0,
+        );
+        expect(elapsedMs).toBeLessThan(20000);
     });
 });
 
 function loadFixture(): ParityFixture {
     const raw = readFileSync(new URL('./fixtures/graph-rebuild-parity-smoke.json', import.meta.url), 'utf8');
     return JSON.parse(raw) as ParityFixture;
+}
+
+function manifoldContributions(snapshot: GraphRebuildSnapshot, manifold: GraphSemanticManifoldKind) {
+    return (snapshot.manifoldSpecializationSummary?.contributions || []).filter((row) => row.manifold === manifold);
+}
+
+function declaredRuleCoverage(snapshot: GraphRebuildSnapshot): boolean {
+    const summary = snapshot.manifoldSpecializationSummary;
+    if (!summary) return false;
+    const declared = new Set(summary.profiles.flatMap((profile) => profile.contributionRules.map((rule) => rule.id)));
+    return summary.contributions.every((contribution) => declared.has(contribution.ruleId));
+}
+
+function compactEvalLedger(snapshot: GraphRebuildSnapshot) {
+    const ledger = snapshot.semanticEvalLedgerSummary;
+    return ledger ? {
+        rows: ledger.compactExport.rowCount,
+        byLabel: ledger.counters.byLabel,
+        accepted: ledger.counters.acceptedCandidates,
+        rejected: ledger.counters.rejectedCandidates,
+        ambiguous: ledger.counters.ambiguousCases,
+        modelDisagreements: ledger.counters.modelDisagreements,
+        manifoldDisagreements: ledger.counters.manifoldDisagreements,
+        graphChanges: ledger.counters.graphChangeRows,
+        sample: ledger.compactExport.rows.slice(0, 3),
+    } : null;
 }
 
 function toRegisteredEntity(entity: FixtureEntity): RegisteredEntity {

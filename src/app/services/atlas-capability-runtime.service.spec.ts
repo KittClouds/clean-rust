@@ -184,8 +184,8 @@ describe('AtlasCapabilityRuntimeService', () => {
 
     it('builds one explicit contract for semantic graph handoff', () => {
         const contract = service.buildRecipeContract('semanticGraph', {
-            selectedModel: 'mongodb-leaf',
-            selectedModelLabel: 'MDBR Leaf',
+            selectedModel: 'mongodb-leaf-mt',
+            selectedModelLabel: 'MDBR Leaf MT',
             dimensionLabel: '384d',
             buildScope: { mode: 'folder', folderId: 'folder-1' },
             buildPolicy: 'force',
@@ -199,8 +199,8 @@ describe('AtlasCapabilityRuntimeService', () => {
             exportableMentionStatuses: ['AcceptedKnown', 'AcceptedNew', 'AliasCandidate'],
             modelLanes: ['dynamicNer', 'semanticEmbedding'],
             embeddingModel: {
-                id: 'mongodb-leaf',
-                label: 'MDBR Leaf',
+                id: 'mongodb-leaf-mt',
+                label: 'MDBR Leaf MT',
                 dimensionLabel: '384d',
             },
             requiredStages: expect.arrayContaining([
@@ -318,8 +318,8 @@ describe('AtlasCapabilityRuntimeService', () => {
 
     it('plans Semantic Graph with embedding warm and explicit folder scope', async () => {
         const options = {
-            selectedModel: 'mongodb-leaf' as const,
-            selectedModelLabel: 'MDBR Leaf',
+            selectedModel: 'mongodb-leaf-mt' as const,
+            selectedModelLabel: 'MDBR Leaf MT',
             dimensionLabel: '384d',
             buildScope: { mode: 'folder' as const, folderId: 'folder-1' },
             buildPolicy: 'force' as const,
@@ -334,7 +334,7 @@ describe('AtlasCapabilityRuntimeService', () => {
             noteTitle: 'Folder scope (3 notes)',
             plainText: expect.stringContaining('Branna crossed the bridge'),
         }));
-        expect(machine.loadSemanticModel).toHaveBeenCalledWith('mongodb-leaf', 'MDBR Leaf', '384d');
+        expect(machine.loadSemanticModel).toHaveBeenCalledWith('mongodb-leaf-mt', 'MDBR Leaf MT', '384d');
         expect(atlasScan.runRichEmbeddingScan).toHaveBeenCalledWith(expect.objectContaining({
             includeSemanticAtlas: true,
             policy: 'force',
@@ -350,8 +350,8 @@ describe('AtlasCapabilityRuntimeService', () => {
 
     it('plans Adjudicated Semantic Graph as semantic build followed by native NLI apply', async () => {
         await service.runRecipe('adjudicatedSemanticGraph', {
-            selectedModel: 'mongodb-leaf',
-            selectedModelLabel: 'MDBR Leaf',
+            selectedModel: 'mongodb-leaf-mt',
+            selectedModelLabel: 'MDBR Leaf MT',
             dimensionLabel: '384d',
             buildScope: { mode: 'note', noteId: 'note-1' },
         });
@@ -380,8 +380,8 @@ describe('AtlasCapabilityRuntimeService', () => {
 
     it('loads the selected embedding model inside the Semantic Graph contract', async () => {
         const options = {
-            selectedModel: 'mongodb-leaf' as const,
-            selectedModelLabel: 'MDBR Leaf',
+            selectedModel: 'mongodb-leaf-mt' as const,
+            selectedModelLabel: 'MDBR Leaf MT',
             dimensionLabel: '384d',
             buildScope: { mode: 'note' as const, noteId: 'note-1' },
         };
@@ -393,11 +393,11 @@ describe('AtlasCapabilityRuntimeService', () => {
         await service.runRecipe('semanticGraph', options);
 
         expect(ner.warmProvider).toHaveBeenCalledWith('dynamic_ner');
-        expect(machine.loadSemanticModel).toHaveBeenCalledWith('mongodb-leaf', 'MDBR Leaf', '384d');
+        expect(machine.loadSemanticModel).toHaveBeenCalledWith('mongodb-leaf-mt', 'MDBR Leaf MT', '384d');
         expect(atlasScan.runRichEmbeddingScan).toHaveBeenCalledWith(expect.objectContaining({
             includeSemanticAtlas: true,
-            modelId: 'mongodb-leaf',
-            modelLabel: 'MDBR Leaf',
+            modelId: 'mongodb-leaf-mt',
+            modelLabel: 'MDBR Leaf MT',
             dimensionLabel: '384d',
             policy: 'dirty-only',
         }));
@@ -411,8 +411,8 @@ describe('AtlasCapabilityRuntimeService', () => {
 
     it('runs Reasoning Graph only after entity, semantic, and NLI prerequisites', async () => {
         await service.runRecipe('reasoningGraph', {
-            selectedModel: 'mongodb-leaf',
-            selectedModelLabel: 'MDBR Leaf',
+            selectedModel: 'mongodb-leaf-mt',
+            selectedModelLabel: 'MDBR Leaf MT',
             dimensionLabel: '384d',
             buildScope: { mode: 'note', noteId: 'note-1' },
         });
@@ -421,7 +421,7 @@ describe('AtlasCapabilityRuntimeService', () => {
         expect(ner.runDynamicScan).toHaveBeenCalledWith(expect.objectContaining({
             noteId: 'note-1',
         }));
-        expect(machine.loadSemanticModel).toHaveBeenCalledWith('mongodb-leaf', 'MDBR Leaf', '384d');
+        expect(machine.loadSemanticModel).toHaveBeenCalledWith('mongodb-leaf-mt', 'MDBR Leaf MT', '384d');
         expect(nli.initialize).toHaveBeenCalledWith('onnx-community/ModernBERT-base-nli-ONNX');
         expect(atlasScan.runRichEmbeddingScan).toHaveBeenCalledWith(expect.objectContaining({
             includeSemanticAtlas: true,
@@ -859,3 +859,4 @@ function createPhoenixBackendMock() {
         }),
     };
 }
+

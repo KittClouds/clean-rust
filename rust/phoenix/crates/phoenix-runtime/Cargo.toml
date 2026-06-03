@@ -6,7 +6,8 @@ license.workspace = true
 authors.workspace = true
 
 [features]
-default = []
+default = ["jina-router"]
+jina-router = ["phoenix-dynamic-ner/jina-router"]
 legacy-cozo-graph = [
     "dep:phoenix-gldr",
     "dep:phoenix-graptor",

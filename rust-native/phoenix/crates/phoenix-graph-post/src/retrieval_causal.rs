@@ -186,7 +186,7 @@ pub(crate) fn build_causal_region_from_view(
     )
 }
 
-fn causal_edge_allowed(edge: &KernelEdge) -> bool {
+pub(crate) fn causal_edge_allowed(edge: &KernelEdge) -> bool {
     matches!(
         edge.edge_type.0.as_str(),
         "causal_link" | "supported_by" | "canonicalized_as" | "subject" | "object" | "under_view"

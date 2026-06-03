@@ -4,8 +4,9 @@ use std::path::{Path, PathBuf};
 use std::sync::{Arc, OnceLock};
 
 use phoenix_dynamic_ner::{
-    DiscoveredSpan, DynamicNerModel, EntityLabel, LabelPack, LocalMentionId, MentionVote,
-    ModelNerRequest, ModelNerWindow, NerModelError, VerificationCase,
+    DiscoveredSpan, DynamicNerModel, EntityLabel, LabelPack, LexicalSemanticLabelRouter,
+    LocalMentionId, MentionVote, ModelNerRequest, ModelNerWindow, NerModelError,
+    SemanticLabelRouter, VerificationCase,
 };
 use phoenix_rel_post::{
     GlinerBiModel, GlinerBiOverlapPolicy, GlinerBiPredictOptions, GlinerBiPrediction, GlinerXModel,
@@ -31,6 +32,33 @@ pub fn load_default_model() -> Result<Box<dyn DynamicNerModel + Send + Sync>, St
         })),
         LoadedGlinerModel::X(model) => Ok(Box::new(RuntimeGlinerXModel { model })),
     }
+}
+
+pub fn load_default_label_router(
+) -> Result<Option<Box<dyn SemanticLabelRouter + Send + Sync>>, String> {
+    let mode = env::var("PHOENIX_DYN_NER_LABEL_ROUTER").unwrap_or_else(|_| "auto".to_owned());
+    match mode.trim().to_ascii_lowercase().as_str() {
+        "off" | "none" | "0" => Ok(None),
+        "lexical" => Ok(Some(Box::new(LexicalSemanticLabelRouter::default()))),
+        "jina" => load_jina_label_router().map(Some),
+        "auto" | "" => match load_jina_label_router() {
+            Ok(router) => Ok(Some(router)),
+            Err(_) => Ok(Some(Box::new(LexicalSemanticLabelRouter::default()))),
+        },
+        other => Err(format!("unsupported PHOENIX_DYN_NER_LABEL_ROUTER={other}")),
+    }
+}
+
+#[cfg(all(feature = "jina-router", not(target_arch = "wasm32")))]
+fn load_jina_label_router() -> Result<Box<dyn SemanticLabelRouter + Send + Sync>, String> {
+    Ok(Box::new(
+        phoenix_dynamic_ner::JinaSemanticLabelRouter::load_default()?,
+    ))
+}
+
+#[cfg(any(not(feature = "jina-router"), target_arch = "wasm32"))]
+fn load_jina_label_router() -> Result<Box<dyn SemanticLabelRouter + Send + Sync>, String> {
+    Err("Jina semantic router is not enabled for this runtime target".to_owned())
 }
 
 struct RuntimeGlinerBiModel {

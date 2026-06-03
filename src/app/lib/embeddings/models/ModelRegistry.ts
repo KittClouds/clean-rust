@@ -35,10 +35,10 @@ export class EmbeddingModelRegistry {
     private static models: Map<string, EmbeddingModelDefinition> = new Map([
         // ===== NATIVE RUST RUNNER MODELS =====
         [
-            'mongodb-leaf',
+            'mongodb-leaf-mt',
             {
-                id: 'mongodb-leaf',
-                name: 'MDBR Leaf (384d)',
+                id: 'mongodb-leaf-mt',
+                name: 'MDBR Leaf MT (384d)',
                 provider: 'rust',
                 dimensions: 384,
                 maxTokens: 512,
@@ -46,11 +46,11 @@ export class EmbeddingModelRegistry {
                 quality: 'high',
                 costPer1kTokens: 0,
                 localModel: {
-                    modelId: 'MongoDB/mdbr-leaf-ir',
+                    modelId: 'MongoDB/mdbr-leaf-mt',
                     quantization: 'q8',
-                    memoryMB: 50,
+                    memoryMB: 90,
                 },
-                description: 'MDBR Leaf through the native Phoenix Rust semantic runner.',
+                description: 'MDBR Leaf MT through the native Phoenix Rust semantic runner for fast multi-task embeddings.',
             },
         ],
         [
