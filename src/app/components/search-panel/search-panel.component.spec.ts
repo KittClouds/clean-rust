@@ -46,6 +46,7 @@ import { AtlasCapabilityRuntimeService } from '../../services/atlas-capability-r
 import { GraphRebuildPipelineService } from '../../graph-rebuild/graph-rebuild-pipeline.service';
 import { PhoenixUiApiService } from '../../services/phoenix-ui-api.service';
 import { PhoenixBackendService } from '../../services/phoenix-backend.service';
+import { CalendarService } from '../../services/calendar.service';
 
 describe('SearchPanelComponent model recipe lifecycle', () => {
     let injector: EnvironmentInjector;
@@ -76,6 +77,7 @@ describe('SearchPanelComponent model recipe lifecycle', () => {
             { provide: PhoenixUiApiService, useValue: createPhoenixUiApiMock() },
             { provide: PhoenixBackendService, useValue: createPhoenixBackendMock() },
             { provide: GraphRebuildPipelineService, useValue: createFullAtlasPipelineMock() },
+            { provide: CalendarService, useValue: createCalendarMock() },
             AtlasCapabilityRuntimeService,
         ], parentInjector);
         component = runInInjectionContext(injector, () => new SearchPanelComponent());
@@ -414,6 +416,7 @@ describe('SearchPanelComponent model recipe lifecycle', () => {
         expect(pipeline.buildCoreGraph.mock.calls[0][0]).toEqual(expect.objectContaining({
             policy: 'delta',
             postProcessMode: 'core',
+            calendarRegistrySnapshot: expect.objectContaining({ id: 'calendar-registry:test' }),
             scope: expect.objectContaining({
                 kind: 'note',
                 scopeId: 'note:note-1',
@@ -435,6 +438,7 @@ describe('SearchPanelComponent model recipe lifecycle', () => {
         expect(pipeline.postProcessAtlas).toHaveBeenCalledTimes(1);
         expect(pipeline.postProcessAtlas.mock.calls[0][0]).toEqual(expect.objectContaining({
             postProcessMode: 'full',
+            calendarRegistrySnapshot: expect.objectContaining({ id: 'calendar-registry:test' }),
             scope: expect.objectContaining({ scopeId: 'note:note-1' }),
         }));
         expect(pipeline.buildCoreGraph).not.toHaveBeenCalled();
@@ -587,6 +591,40 @@ function createPhoenixUiApiMock() {
 function createPhoenixBackendMock() {
     return {
         storeCommand: vi.fn(async () => []),
+    };
+}
+
+function createCalendarMock() {
+    return {
+        calendarRegistrySnapshot: vi.fn(() => ({
+            schemaVersion: 'phoenix-calendar-registry/v1',
+            id: 'calendar-registry:test',
+            builtAt: 1,
+            calendar: {
+                id: 'calendar:test',
+                name: 'Test Calendar',
+                fingerprint: 'calendar:fingerprint:test',
+                mode: 'customOrdinal',
+                createdFrom: 'manual',
+                monthCount: 12,
+                weekdayCount: 7,
+                hasYearZero: false,
+            },
+            scope: { kind: 'note', scopeId: 'note:note-1', noteIds: ['note-1'] },
+            anchors: [],
+            diagnostics: {},
+            summary: {
+                anchorCount: 0,
+                sourceKindCounts: {},
+                eventAnchorCount: 0,
+                folderAnchorCount: 0,
+                periodAnchorCount: 0,
+                markerAnchorCount: 0,
+                realCompatibleAnchorCount: 0,
+                customOrdinalAnchorCount: 0,
+                diagnostics: {},
+            },
+        })),
     };
 }
 

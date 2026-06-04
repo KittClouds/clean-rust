@@ -17,8 +17,8 @@ use super::types::{
 };
 use super::verify::verify_graph_compile_output;
 use crate::types::{
-    GraphAnchor, GraphChunk, GraphEvent, GraphMemoryState, GraphMention, GraphNode, GraphScopeKind,
-    GraphTemporalEdge,
+    GraphAnchor, GraphCalendarRegistryBridgeSummary, GraphCalendarRegistryReceipt, GraphChunk,
+    GraphEvent, GraphMemoryState, GraphMention, GraphNode, GraphScopeKind, GraphTemporalEdge,
 };
 
 pub fn compile_graph_snapshot(input: GraphCompilerInput<'_>) -> GraphCompilerOutput {
@@ -51,6 +51,7 @@ pub fn compile_graph_snapshot(input: GraphCompilerInput<'_>) -> GraphCompilerOut
         "target",
     );
     build.story_edges(input.causal_edges, FactLane::CausalFact, "cause", "effect");
+    build.calendar_registry(input.calendar_registry);
     legacy_relationship_keys(&mut build.relation_by_edge, input.relationships);
     legacy_projections(
         &mut build.output,
@@ -315,6 +316,46 @@ impl CompilerBuild {
                 edge.confidence,
             );
         }
+    }
+
+    fn calendar_registry(&mut self, summary: Option<&GraphCalendarRegistryBridgeSummary>) {
+        let Some(summary) = summary else {
+            return;
+        };
+        for receipt in summary.receipts.iter().filter(|receipt| {
+            receipt.status == "accepted_temporal_receipt" && !receipt.mutation_allowed
+        }) {
+            self.calendar_time_anchor(receipt);
+        }
+    }
+
+    fn calendar_time_anchor(&mut self, receipt: &GraphCalendarRegistryReceipt) {
+        let evidence_id = format_compact!("evidence:calendar:{}", receipt.id);
+        let note_id = receipt.source_note_ids.first().cloned();
+        self.evidence(
+            evidence_id.clone(),
+            EvidenceKind::CalendarRegistry,
+            note_id.clone(),
+            None,
+            receipt.id.clone(),
+            None,
+            0.86,
+        );
+        let atom_id = receipt
+            .affected_graph_atoms
+            .first()
+            .cloned()
+            .unwrap_or_else(|| atom_id("timeAnchor", &receipt.calendar_anchor_id));
+        self.atom(
+            GraphAtomKind::TimeAnchor,
+            atom_id,
+            receipt.calendar_anchor_id.clone(),
+            receipt.display_date.clone(),
+            note_id,
+            None,
+            None,
+            vec![evidence_id],
+        );
     }
 
     fn ensure_evidence_ids(

@@ -203,6 +203,83 @@ pub struct GraphCounters {
     pub drop_reasons: GraphDropReasons,
 }
 
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct GraphCalendarRegistryBridgeCounters {
+    #[serde(default)]
+    pub anchor_count: usize,
+    #[serde(default)]
+    pub receipt_count: usize,
+    #[serde(default)]
+    pub accepted_temporal_receipts: usize,
+    #[serde(default)]
+    pub registry_only_receipts: usize,
+    #[serde(default)]
+    pub deferred_invalid_receipts: usize,
+    #[serde(default)]
+    pub custom_ordinal_receipts: usize,
+    #[serde(default)]
+    pub real_epoch_receipts: usize,
+    #[serde(default)]
+    pub event_receipts: usize,
+    #[serde(default)]
+    pub folder_receipts: usize,
+    #[serde(default)]
+    pub period_receipts: usize,
+    #[serde(default)]
+    pub marker_receipts: usize,
+    #[serde(default)]
+    pub mutation_allowed_count: usize,
+}
+
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct GraphCalendarRegistryReceipt {
+    pub id: CompactString,
+    pub calendar_anchor_id: CompactString,
+    pub source_kind: CompactString,
+    pub source_id: CompactString,
+    pub status: CompactString,
+    pub date_key: CompactString,
+    pub normalized_value: CompactString,
+    pub display_date: CompactString,
+    pub ordinal: i64,
+    pub end_ordinal: Option<i64>,
+    pub real_epoch_ms: Option<i64>,
+    pub real_interval_end_ms: Option<i64>,
+    #[serde(default)]
+    pub source_note_ids: Vec<CompactString>,
+    #[serde(default)]
+    pub evidence_refs: Vec<CompactString>,
+    #[serde(default)]
+    pub affected_graph_atoms: Vec<CompactString>,
+    #[serde(default)]
+    pub affected_graph_facts: Vec<CompactString>,
+    #[serde(default)]
+    pub reversible: bool,
+    #[serde(default)]
+    pub mutation_allowed: bool,
+    pub rationale: CompactString,
+}
+
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct GraphCalendarRegistryBridgeSummary {
+    pub schema_version: CompactString,
+    pub generated_at: u64,
+    pub source_snapshot_id: CompactString,
+    pub source_calendar_registry_id: CompactString,
+    pub calendar_id: CompactString,
+    pub calendar_fingerprint: CompactString,
+    pub calendar_mode: CompactString,
+    pub scope_kind: CompactString,
+    pub scope_id: CompactString,
+    #[serde(default)]
+    pub receipts: Vec<GraphCalendarRegistryReceipt>,
+    #[serde(default)]
+    pub counters: GraphCalendarRegistryBridgeCounters,
+}
+
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct GraphRebuildSnapshot {
@@ -227,5 +304,7 @@ pub struct GraphRebuildSnapshot {
     pub projection_refs: Vec<GraphProjectionRef>,
     pub nodes: Vec<GraphNode>,
     pub edges: Vec<GraphEdge>,
+    #[serde(default)]
+    pub calendar_registry_summary: Option<GraphCalendarRegistryBridgeSummary>,
     pub counters: GraphCounters,
 }

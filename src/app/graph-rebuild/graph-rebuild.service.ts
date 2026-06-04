@@ -31,6 +31,7 @@ import type {
     GraphRebuildSnapshot,
 } from './graph-rebuild-snapshot';
 import type { GraphCompilerDualWriteSidecar } from './graph-compiler-read-model';
+import type { CalendarRegistrySnapshot } from '../lib/fantasy-calendar/calendar-registry-snapshot';
 
 export const GRAPH_REBUILD_NAMESPACE = 'phoenix_graph_rebuild_v1';
 const SNAPSHOT_DOCUMENT_KEY = 'snapshot';
@@ -61,6 +62,7 @@ export interface GraphRebuildBuildRequest {
     postProcessMode?: GraphIndexPostProcessMode;
     embeddingStagePolicy?: GraphIndexEmbeddingStagePolicy;
     candidateCount?: number;
+    calendarRegistrySnapshot?: CalendarRegistrySnapshot;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -115,6 +117,7 @@ export class GraphRebuildService {
                 postProcessMode: request.postProcessMode,
                 embeddingStagePolicy: request.embeddingStagePolicy,
                 candidateCount: request.candidateCount,
+                calendarRegistrySnapshot: request.calendarRegistrySnapshot,
             }));
             await this.attachNativeGraphCompilerSidecar(snapshot);
             finalizeBuildTimings(timings, totalStarted);

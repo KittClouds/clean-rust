@@ -37,6 +37,7 @@ import { BlueprintHubService } from '../blueprint-hub/blueprint-hub.service';
 import { NliWorkerService } from '../../lib/services/nli-worker.service';
 import { AtlasCapabilityRuntimeService } from '../../services/atlas-capability-runtime.service';
 import { GraphRebuildPipelineService } from '../../graph-rebuild/graph-rebuild-pipeline.service';
+import { CalendarService } from '../../services/calendar.service';
 import type {
   GraphIndexProjectionReceipt,
   GraphIndexModelReadiness,
@@ -312,6 +313,7 @@ export class SearchPanelComponent implements OnInit {
   private readonly nli = inject(NliWorkerService);
   private readonly atlasRuntime = inject(AtlasCapabilityRuntimeService);
   private readonly fullAtlasPipeline = inject(GraphRebuildPipelineService);
+  private readonly calendar = inject(CalendarService);
 
   readonly query = this.machine.query;
   readonly indexScope = this.machine.scope;
@@ -653,6 +655,7 @@ export class SearchPanelComponent implements OnInit {
       enabledLanes: this.selectedEmbeddingStageLanes(),
       entityLinkerEnabled: this.entityLinkerStageEnabled(),
     },
+    calendarRegistrySnapshot: this.calendar.calendarRegistrySnapshot(),
     entities: smartGraphRegistry.getAllEntities(),
   }));
   readonly fullAtlasModelReadiness = computed(() => this.fullAtlasPipeline.modelReadiness(this.fullAtlasRequest()));

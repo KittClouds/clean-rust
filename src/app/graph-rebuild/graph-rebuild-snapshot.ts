@@ -1,4 +1,5 @@
 import type { EntityOccurrence } from '../lib/dexie/db';
+import type { CalendarRegistrySnapshot } from '../lib/fantasy-calendar/calendar-registry-snapshot';
 import type { RegisteredEntity } from '../lib/registry';
 import type {
     GraphCompileReceipts,
@@ -8,6 +9,7 @@ import type {
     GraphCompilerSource,
 } from './graph-compiler-read-model';
 import type { GraphModelV2Snapshot } from './graph-model-v2';
+import type { GraphCalendarRegistryBridgeSummary } from './graph-calendar-registry-bridge';
 
 export type GraphRebuildScopeKind = 'global' | 'folder' | 'narrative' | 'note' | 'multiNote';
 export type GraphRebuildAnchorSource = EntityOccurrence['source'] | 'accepted_suggestion';
@@ -1472,6 +1474,12 @@ export interface GraphRebuildCounters {
     semanticEvalModelDisagreements?: number;
     semanticEvalManifoldDisagreements?: number;
     semanticEvalGraphChangeRows?: number;
+    calendarRegistryAnchors?: number;
+    calendarRegistryReceipts?: number;
+    calendarRegistryAcceptedTemporalReceipts?: number;
+    calendarRegistryRealEpochReceipts?: number;
+    calendarRegistryCustomOrdinalReceipts?: number;
+    calendarRegistryMutationAllowed?: number;
     entityLinking?: GraphRebuildEntityLinkCounters;
     meaningFrameChunks?: number;
     eventAspects?: number;
@@ -1539,6 +1547,7 @@ export interface GraphRebuildSnapshot {
     semanticRerankSummary?: GraphSemanticRerankSummary;
     semanticAdjudicationSummary?: GraphSemanticAdjudicationDAGSummary;
     semanticEvalLedgerSummary?: GraphSemanticEvalLedgerSummary;
+    calendarRegistrySummary?: GraphCalendarRegistryBridgeSummary;
     counters: GraphRebuildCounters;
     buildTimings?: GraphRebuildBuildTimings;
     resolutionSuggestions?: GraphRebuildResolutionSuggestion[];
@@ -1576,6 +1585,7 @@ export interface GraphIndexRunRequest {
     postProcessMode?: GraphIndexPostProcessMode;
     modelSelection: GraphIndexModelSelection;
     embeddingStagePolicy?: GraphIndexEmbeddingStagePolicy;
+    calendarRegistrySnapshot?: CalendarRegistrySnapshot;
     entities: RegisteredEntity[];
 }
 
@@ -1659,6 +1669,7 @@ export interface BuildGraphRebuildSnapshotInput {
     candidateCount?: number;
     builtAt?: number;
     graphCompilerSidecar?: GraphCompilerDualWriteSidecar;
+    calendarRegistrySnapshot?: CalendarRegistrySnapshot;
 }
 
 export interface GraphRebuildNoteFolderContext {

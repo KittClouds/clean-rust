@@ -52,6 +52,7 @@ pub fn compile_legacy_snapshot(snapshot: &GraphRebuildSnapshot) -> GraphCompiler
         temporal_edges: &snapshot.temporal_edges,
         causal_edges: &snapshot.causal_edges,
         memory_state: &snapshot.memory_state,
+        calendar_registry: snapshot.calendar_registry_summary.as_ref(),
         legacy_edges: &snapshot.edges,
         bundle_compression: None,
         bundle_commitment: None,

@@ -10,9 +10,10 @@ use serde::Deserialize;
 use crate::{
     build_graph_rebuild_snapshot, compile_dual_write_snapshot, compile_graph_snapshot,
     compile_legacy_snapshot_strict, verify_graph_compile_output, EvidenceAnchor,
-    EvidenceBundleKind, EvidenceKind, FactLane, FactRole, GraphAtom, GraphAtomKind, GraphChunk,
-    GraphCompileReceipts, GraphCompilerInput, GraphCompilerOutput, GraphMention, GraphRebuildInput,
-    GraphScopeKind, RelationFact,
+    EvidenceBundleKind, EvidenceKind, FactLane, FactRole, GraphAtom, GraphAtomKind,
+    GraphCalendarRegistryBridgeCounters, GraphCalendarRegistryBridgeSummary,
+    GraphCalendarRegistryReceipt, GraphChunk, GraphCompileReceipts, GraphCompilerInput,
+    GraphCompilerOutput, GraphMention, GraphRebuildInput, GraphScopeKind, RelationFact,
 };
 
 const PARITY_FIXTURE: &str =
@@ -198,6 +199,37 @@ fn dual_write_projects_legacy_ui_graph_from_fact_graph() {
 }
 
 #[test]
+fn dual_write_preserves_calendar_registry_receipts_without_projecting_edges() {
+    let text = "Kai watched Hazel.";
+    let entities = vec![entry("e-kai", "Kai", &[]), entry("e-hazel", "Hazel", &[])];
+    let mut snapshot = build_graph_rebuild_snapshot(GraphRebuildInput {
+        scope_kind: GraphScopeKind::Note,
+        scope_id: "note:calendar",
+        note_id: "note-calendar",
+        text,
+        scope: ScopeKey::default(),
+        entities: &entities,
+        candidate_count: 2,
+        built_at: Some(45),
+    })
+    .expect("snapshot");
+    snapshot.edges.clear();
+    snapshot.calendar_registry_summary = Some(calendar_summary("note-calendar"));
+
+    let dual = compile_dual_write_snapshot(&snapshot);
+
+    assert!(dual.fact_graph.atoms.iter().any(|atom| {
+        atom.kind == GraphAtomKind::TimeAnchor && atom.source_id == "calendar-anchor:event-1"
+    }));
+    assert!(dual.fact_graph.evidence_anchors.iter().any(|evidence| {
+        evidence.kind == EvidenceKind::CalendarRegistry
+            && evidence.source_id == "calendar-registry-receipt:event-1"
+    }));
+    assert!(dual.projected_ui_graph.is_empty());
+    assert_eq!(dual.fact_graph.receipts.counters.invariant_failures, 0);
+}
+
+#[test]
 fn compiles_prepared_artifacts_without_legacy_rescan() {
     let note_ids = vec!["note-prepared".into()];
     let chunks = vec![GraphChunk {
@@ -295,6 +327,7 @@ fn compiles_prepared_artifacts_without_legacy_rescan() {
         temporal_edges: &[],
         causal_edges: &[],
         memory_state: &[],
+        calendar_registry: None,
         legacy_edges: &[],
         bundle_compression: None,
         bundle_commitment: None,
@@ -486,6 +519,49 @@ fn entry_from_fixture(entity: &FixtureEntity) -> LexiconEntry {
         kind: Some(parse_kind(&entity.kind)),
         scope: ScopeKey::default(),
         ..LexiconEntry::default()
+    }
+}
+
+fn calendar_summary(note_id: &str) -> GraphCalendarRegistryBridgeSummary {
+    GraphCalendarRegistryBridgeSummary {
+        schema_version: "phoenix-calendar-registry-bridge/v1".into(),
+        generated_at: 45,
+        source_snapshot_id: "snapshot:calendar".into(),
+        source_calendar_registry_id: "calendar-registry:test".into(),
+        calendar_id: "calendar:test".into(),
+        calendar_fingerprint: "calendar:fingerprint:test".into(),
+        calendar_mode: "customOrdinal".into(),
+        scope_kind: "note".into(),
+        scope_id: "note:calendar".into(),
+        receipts: vec![GraphCalendarRegistryReceipt {
+            id: "calendar-registry-receipt:event-1".into(),
+            calendar_anchor_id: "calendar-anchor:event-1".into(),
+            source_kind: "user_calendar_event".into(),
+            source_id: "event-1".into(),
+            status: "accepted_temporal_receipt".into(),
+            date_key: "cal:calendar:test|era:era-1|y:1|m:0|d:0".into(),
+            normalized_value: "CAL:calendar:test:cal:calendar:test|era:era-1|y:1|m:0|d:0".into(),
+            display_date: "Month 1 1, 1 CE".into(),
+            ordinal: 0,
+            end_ordinal: None,
+            real_epoch_ms: None,
+            real_interval_end_ms: None,
+            source_note_ids: vec![note_id.into()],
+            evidence_refs: vec!["calendar:event:event-1".into()],
+            affected_graph_atoms: vec!["calendar-atom:calendar-anchor:event-1".into()],
+            affected_graph_facts: Vec::new(),
+            reversible: true,
+            mutation_allowed: false,
+            rationale: "calendar receipt fixture".into(),
+        }],
+        counters: GraphCalendarRegistryBridgeCounters {
+            anchor_count: 1,
+            receipt_count: 1,
+            accepted_temporal_receipts: 1,
+            custom_ordinal_receipts: 1,
+            event_receipts: 1,
+            ..GraphCalendarRegistryBridgeCounters::default()
+        },
     }
 }
 

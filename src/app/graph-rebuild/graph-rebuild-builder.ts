@@ -36,6 +36,7 @@ import {
     buildGraphSemanticAdjudicationDAGSummary,
 } from './graph-semantic-adjudication';
 import { buildGraphSemanticEvalLedgerSummary } from './graph-semantic-eval-ledger';
+import { buildGraphCalendarRegistryBridgeSummary } from './graph-calendar-registry-bridge';
 
 export { buildGraphRebuildAliasResolver, normalizeGraphRebuildCandidate };
 
@@ -263,6 +264,23 @@ export function buildGraphRebuildSnapshot(input: BuildGraphRebuildSnapshotInput)
     snapshot.counters.semanticEvalModelDisagreements = semanticEvalLedgerSummary.counters.modelDisagreements;
     snapshot.counters.semanticEvalManifoldDisagreements = semanticEvalLedgerSummary.counters.manifoldDisagreements;
     snapshot.counters.semanticEvalGraphChangeRows = semanticEvalLedgerSummary.counters.graphChangeRows;
+    const calendarRegistrySummary = buildGraphCalendarRegistryBridgeSummary({
+        calendarRegistry: input.calendarRegistrySnapshot,
+        sourceSnapshotId: snapshot.id,
+        scopeKind: input.scopeKind,
+        scopeId: input.scopeId,
+        noteIds,
+        generatedAt: builtAt,
+    });
+    if (calendarRegistrySummary) {
+        snapshot.calendarRegistrySummary = calendarRegistrySummary;
+        snapshot.counters.calendarRegistryAnchors = calendarRegistrySummary.counters.anchorCount;
+        snapshot.counters.calendarRegistryReceipts = calendarRegistrySummary.counters.receiptCount;
+        snapshot.counters.calendarRegistryAcceptedTemporalReceipts = calendarRegistrySummary.counters.acceptedTemporalReceipts;
+        snapshot.counters.calendarRegistryRealEpochReceipts = calendarRegistrySummary.counters.realEpochReceipts;
+        snapshot.counters.calendarRegistryCustomOrdinalReceipts = calendarRegistrySummary.counters.customOrdinalReceipts;
+        snapshot.counters.calendarRegistryMutationAllowed = calendarRegistrySummary.counters.mutationAllowedCount;
+    }
     return snapshot;
 }
 

@@ -262,4 +262,66 @@ describe('CalendarService', () => {
             date: { year: 1, monthIndex: 0, dayIndex: 1 },
         }));
     });
+
+    it('exposes a scoped read-only calendar registry snapshot', () => {
+        foldersSubject.next([
+            makeFolder({ id: 'narr-1', name: 'Narrative Root', narrativeId: 'narr-1', isNarrativeRoot: true }),
+            makeFolder({ id: 'act-1', name: 'Act One', parentId: 'narr-1', narrativeId: 'narr-1' }),
+            makeFolder({
+                id: 'folder-dated',
+                name: 'Dated Act',
+                parentId: 'act-1',
+                narrativeId: 'narr-1',
+                metadata: { date: { year: 1, monthIndex: 0, dayIndex: 2 } },
+            }),
+        ]);
+        timelineStoreMock.events.set([{
+            id: 'event-1',
+            title: 'Coronation',
+            description: 'The crown changes hands.',
+            order: 1,
+            entityIds: [],
+            source: 'calendar',
+            linkedNoteId: 'note-1',
+            linkedNoteTitle: 'Chapter One',
+            calendarDate: { year: 1, monthIndex: 0, dayIndex: 1 },
+            status: 'todo',
+            createdAt: 1,
+            updatedAt: 1,
+        }]);
+        service.periods.set([{
+            id: 'period-1',
+            calendarId: service.calendar().id,
+            name: 'First Age',
+            startYear: 1,
+            periodType: 'age',
+            color: '#22c55e',
+        }]);
+
+        const snapshot = service.calendarRegistrySnapshot();
+
+        expect(snapshot.scope).toMatchObject({
+            kind: 'act',
+            scopeId: 'act-1',
+            narrativeId: 'narr-1',
+        });
+        expect(snapshot.summary).toMatchObject({
+            anchorCount: 3,
+            eventAnchorCount: 1,
+            folderAnchorCount: 1,
+            periodAnchorCount: 1,
+        });
+        expect(snapshot.anchors.filter(anchor => anchor.kind === 'user_calendar_event')).toHaveLength(1);
+        expect(snapshot.anchors.find(anchor => anchor.kind === 'user_calendar_event')).toMatchObject({
+            sourceId: 'event-1',
+            noteId: 'note-1',
+            calendarFingerprint: snapshot.calendar.fingerprint,
+            displayDate: '2 Month 1, 1 CE',
+        });
+        expect(snapshot.anchors.find(anchor => anchor.kind === 'user_calendar_folder')).toMatchObject({
+            sourceId: 'folder-dated',
+            folderId: 'folder-dated',
+            ordinal: 2,
+        });
+    });
 });

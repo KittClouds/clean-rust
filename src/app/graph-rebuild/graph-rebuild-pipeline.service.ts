@@ -161,6 +161,7 @@ export class GraphRebuildPipelineService {
                     postProcessMode: 'core',
                     embeddingStagePolicy: request.embeddingStagePolicy,
                     candidateCount: nerStage.counters['candidates'] || 0,
+                    calendarRegistrySnapshot: request.calendarRegistrySnapshot,
                 });
                 snapshotRef.value = snapshot;
                 return {
@@ -200,6 +201,7 @@ export class GraphRebuildPipelineService {
             appendSemanticRerankStage(stageReceipts, completedSnapshot);
             appendSemanticAdjudicationStage(stageReceipts, completedSnapshot);
             appendSemanticEvalLedgerStage(stageReceipts, completedSnapshot);
+            appendCalendarRegistryStage(stageReceipts, completedSnapshot);
             appendSnapshotTimingStages(stageReceipts, completedSnapshot);
 
             const completedAt = Date.now();
@@ -309,6 +311,7 @@ export class GraphRebuildPipelineService {
                     postProcessMode: 'full',
                     embeddingStagePolicy: request.embeddingStagePolicy,
                     candidateCount: nerStage.counters['candidates'] || 0,
+                    calendarRegistrySnapshot: request.calendarRegistrySnapshot,
                 });
                 return {
                     outputCount: snapshot.counters.nodes + snapshot.counters.edges,
@@ -341,6 +344,7 @@ export class GraphRebuildPipelineService {
                 appendSemanticRerankStage(stageReceipts, snapshot);
                 appendSemanticAdjudicationStage(stageReceipts, snapshot);
                 appendSemanticEvalLedgerStage(stageReceipts, snapshot);
+                appendCalendarRegistryStage(stageReceipts, snapshot);
                 appendSnapshotTimingStages(stageReceipts, snapshot);
             }
 
@@ -521,6 +525,7 @@ export class GraphRebuildPipelineService {
                     postProcessMode: 'full',
                     embeddingStagePolicy: request.embeddingStagePolicy,
                     candidateCount: cachedSnapshot?.counters.candidates || 0,
+                    calendarRegistrySnapshot: request.calendarRegistrySnapshot,
                 });
                 snapshotRef.value = snapshot;
                 return {
@@ -552,6 +557,7 @@ export class GraphRebuildPipelineService {
             appendEntityLinkerPlanStage(stageReceipts, completedSnapshot, request.embeddingStagePolicy?.entityLinkerEnabled !== false);
             appendEdgeJudgmentPlanStage(stageReceipts, completedSnapshot);
             appendSemanticRerankStage(stageReceipts, completedSnapshot);
+            appendCalendarRegistryStage(stageReceipts, completedSnapshot);
             appendSnapshotTimingStages(stageReceipts, completedSnapshot);
 
             for (const projection of PROJECTION_CAPABILITIES) {
@@ -1159,6 +1165,31 @@ function appendSemanticEvalLedgerStage(stageReceipts: GraphIndexStageReceipt[], 
             graphChangeRows: summary.counters.graphChangeRows,
         },
         'Phase 6 compact dataset export ready for classifier, reranker, router, and model-swap evals',
+    ));
+}
+
+function appendCalendarRegistryStage(stageReceipts: GraphIndexStageReceipt[], snapshot: GraphRebuildSnapshot): void {
+    const summary = snapshot.calendarRegistrySummary;
+    if (!summary) return;
+    stageReceipts.push(instrumentationStage(
+        'calendarRegistryBridge',
+        'Calendar Registry Bridge',
+        0,
+        {
+            anchors: summary.counters.anchorCount,
+            receipts: summary.counters.receiptCount,
+            acceptedTemporalReceipts: summary.counters.acceptedTemporalReceipts,
+            registryOnly: summary.counters.registryOnlyReceipts,
+            deferredInvalid: summary.counters.deferredInvalidReceipts,
+            realEpochReceipts: summary.counters.realEpochReceipts,
+            customOrdinalReceipts: summary.counters.customOrdinalReceipts,
+            eventReceipts: summary.counters.eventReceipts,
+            folderReceipts: summary.counters.folderReceipts,
+            periodReceipts: summary.counters.periodReceipts,
+            markerReceipts: summary.counters.markerReceipts,
+            mutationAllowed: summary.counters.mutationAllowedCount,
+        },
+        `${summary.calendarMode} calendar anchors bridged as temporal receipts; graph mutations remain adjudication-controlled`,
     ));
 }
 

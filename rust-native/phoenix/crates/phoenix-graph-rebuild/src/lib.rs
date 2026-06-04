@@ -29,7 +29,8 @@ pub use compiler::{
     GraphRootReceipt, ProjectedGraphEdge, RelationFact,
 };
 pub use types::{
-    GraphAnchor, GraphChunk, GraphCounters, GraphDropReasons, GraphEdge, GraphEmbeddingTarget,
-    GraphEpisode, GraphEvent, GraphMemoryState, GraphMention, GraphNode, GraphProjectionRef,
-    GraphRebuildSnapshot, GraphRelationship, GraphScopeKind, GraphTemporalEdge,
+    GraphAnchor, GraphCalendarRegistryBridgeCounters, GraphCalendarRegistryBridgeSummary,
+    GraphCalendarRegistryReceipt, GraphChunk, GraphCounters, GraphDropReasons, GraphEdge,
+    GraphEmbeddingTarget, GraphEpisode, GraphEvent, GraphMemoryState, GraphMention, GraphNode,
+    GraphProjectionRef, GraphRebuildSnapshot, GraphRelationship, GraphScopeKind, GraphTemporalEdge,
 };

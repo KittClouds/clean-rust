@@ -39,6 +39,8 @@ import { GraphRebuildService } from './graph-rebuild.service';
 import { AtlasCapabilityRuntimeService } from '../services/atlas-capability-runtime.service';
 import { NerService } from '../services/ner.service';
 import type { GraphIndexRunRequest } from './graph-rebuild-snapshot';
+import type { CalendarRegistrySnapshot } from '../lib/fantasy-calendar/calendar-registry-snapshot';
+import type { GraphCalendarRegistryBridgeSummary } from './graph-calendar-registry-bridge';
 
 describe('GraphRebuildPipelineService', () => {
     let injector: EnvironmentInjector;
@@ -277,6 +279,7 @@ describe('GraphRebuildPipelineService', () => {
             scopeId: 'note:note-1',
             noteIds: ['note-1'],
             candidateCount: 2,
+            calendarRegistrySnapshot: expect.objectContaining({ id: 'calendar-registry:test' }),
             relationshipHints: [expect.objectContaining({
                 sourceId: 'entity-kai',
                 targetId: 'entity-hazel',
@@ -318,6 +321,18 @@ describe('GraphRebuildPipelineService', () => {
                 'nativeResult.embeddingCounts.leafVectors': 7,
             }),
         }));
+        expect(receipt.stageReceipts).toEqual(expect.arrayContaining([
+            expect.objectContaining({
+                id: 'calendarRegistryBridge',
+                label: 'Calendar Registry Bridge',
+                counters: expect.objectContaining({
+                    anchors: 1,
+                    receipts: 1,
+                    acceptedTemporalReceipts: 1,
+                    mutationAllowed: 0,
+                }),
+            }),
+        ]));
         expect(service.lastSnapshot()?.id).toBe('snapshot-1');
     });
 
@@ -680,9 +695,92 @@ function request(): GraphIndexRunRequest {
             embeddingDimensionLabel: '384d',
             nliModelId: 'modernbert-nli',
         },
+        calendarRegistrySnapshot: calendarRegistrySnapshot(),
         entities: registryMock.entities,
     };
 }
+
+function calendarRegistrySnapshot(): CalendarRegistrySnapshot {
+    return {
+        schemaVersion: 'phoenix-calendar-registry/v1',
+        id: 'calendar-registry:test',
+        builtAt: 1,
+        calendar: {
+            id: 'calendar:test',
+            name: 'Pipeline Calendar',
+            fingerprint: 'calendar:fingerprint:test',
+            mode: 'customOrdinal',
+            createdFrom: 'manual',
+            monthCount: 12,
+            weekdayCount: 7,
+            hasYearZero: false,
+            defaultEraId: 'era-1',
+        },
+        scope: { kind: 'note', scopeId: 'note:note-1', noteIds: ['note-1'] },
+        anchors: [{
+            id: 'calendar-anchor:event-1',
+            kind: 'user_calendar_event',
+            sourceId: 'event-1',
+            sourceLabel: 'Festival',
+            calendarId: 'calendar:test',
+            calendarFingerprint: 'calendar:fingerprint:test',
+            dateKey: 'cal:calendar:test|era:era-1|y:1|m:0|d:0',
+            normalizedValue: 'CAL:calendar:test:cal:calendar:test|era:era-1|y:1|m:0|d:0',
+            displayDate: 'Month 1 1, 1 CE',
+            granularity: 'day',
+            date: { year: 1, monthIndex: 0, dayIndex: 0, eraId: 'era-1' },
+            ordinal: 0,
+            noteId: 'note-1',
+            confidence: 0.9,
+            evidenceRefs: ['calendar:event:event-1'],
+            attributes: {},
+        }],
+        summary: {
+            anchorCount: 1,
+            eventAnchorCount: 1,
+            folderAnchorCount: 0,
+            periodAnchorCount: 0,
+            markerAnchorCount: 0,
+            realCompatibleAnchorCount: 0,
+            customOrdinalAnchorCount: 1,
+            sourceKindCounts: { user_calendar_event: 1 },
+            diagnostics: {},
+            firstOrdinal: 0,
+            lastOrdinal: 0,
+        },
+    };
+}
+
+function calendarRegistryBridgeSummary(): GraphCalendarRegistryBridgeSummary {
+    return {
+        schemaVersion: 'phoenix-calendar-registry-bridge/v1',
+        generatedAt: 1,
+        sourceSnapshotId: 'snapshot-1',
+        sourceCalendarRegistryId: 'calendar-registry:test',
+        calendarId: 'calendar:test',
+        calendarFingerprint: 'calendar:fingerprint:test',
+        calendarMode: 'customOrdinal',
+        scopeKind: 'note',
+        scopeId: 'note:note-1',
+        receipts: [],
+        counters: {
+            anchorCount: 1,
+            receiptCount: 1,
+            acceptedTemporalReceipts: 1,
+            registryOnlyReceipts: 0,
+            deferredInvalidReceipts: 0,
+            customOrdinalReceipts: 1,
+            realEpochReceipts: 0,
+            eventReceipts: 1,
+            folderReceipts: 0,
+            periodReceipts: 0,
+            markerReceipts: 0,
+            mutationAllowedCount: 0,
+            diagnostics: {},
+        },
+    };
+}
+
 function createGraphRebuildMock() {
     return {
         buildAndPersistSnapshot: vi.fn(async () => ({
@@ -734,11 +832,15 @@ function createGraphRebuildMock() {
                     graphChangeRows: 0,
                 },
             },
+            calendarRegistrySummary: calendarRegistryBridgeSummary(),
             counters: {
                 nodes: 2,
                 edges: 1,
                 chunks: 1,
                 acceptedAnchors: 2,
+                calendarRegistryAnchors: 1,
+                calendarRegistryReceipts: 1,
+                calendarRegistryMutationAllowed: 0,
                 embeddingTargets: 3,
                 embeddingVectors: 3,
                 graphAwareLinkSuggestions: 2,

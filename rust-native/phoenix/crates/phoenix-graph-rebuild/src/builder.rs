@@ -218,6 +218,7 @@ pub fn build_graph_rebuild_snapshot(
         projection_refs: Vec::new(),
         nodes,
         edges,
+        calendar_registry_summary: None,
         counters,
     })
 }

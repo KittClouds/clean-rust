@@ -10,6 +10,9 @@ serde.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true
 rustc-hash.workspace = true
+hashbrown.workspace = true
+memchr.workspace = true
+memmap2.workspace = true
 phoenix-chunker = { path = "../phoenix-chunker" }
 phoenix-semantic-v2 = { path = "../phoenix-semantic-v2" }
 phoenix-scope-analysis = { path = "../phoenix-scope-analysis" }

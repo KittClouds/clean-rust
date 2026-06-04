@@ -57,6 +57,7 @@ export type GraphCompilerEvidenceKind =
     | 'modelVote'
     | 'adjudicationVote'
     | 'eventReference'
+    | 'calendarRegistry'
     | 'mentionGraphEdge';
 export type GraphCompilerEvidenceBundleKind =
     | 'span'

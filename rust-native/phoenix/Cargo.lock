@@ -3003,6 +3003,9 @@ dependencies = [
 name = "phoenix-temporal-post"
 version = "0.1.1"
 dependencies = [
+ "hashbrown 0.15.5",
+ "memchr",
+ "memmap2",
  "phoenix-chunker",
  "phoenix-scope-analysis",
  "phoenix-semantic-v2",
