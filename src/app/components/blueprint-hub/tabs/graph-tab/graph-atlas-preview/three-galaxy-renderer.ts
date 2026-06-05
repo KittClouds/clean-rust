@@ -10,6 +10,7 @@ import { makeAtomTexture, makeHaloTexture, makeLabelSprite, makeNodeTexture, typ
 import type { GraphRendererMode, GraphRendererPointer, GraphRendererPort } from './graph-renderer-port';
 
 const MAX_EDGE_SEGMENTS = 8;
+const TREE_FILAMENT_EDGE_SEGMENTS = 18;
 const MAX_EDGE_TUBE_SEGMENTS = 18;
 const HOPF_EDGE_SEGMENTS = 24;
 const HOPF_CROSS_EDGE_SEGMENTS = 32;
@@ -35,6 +36,7 @@ const CAPS_SHELL_RADII = [0.54, 0.98, 1.22, 1.34, 1.48, 1.68, 1.92];
 const HYBRID_SURFACE_EDGE_MIN_RADIUS = 2.32 * 0.92;
 const HYBRID_SURFACE_EDGE_MAX_RADIUS_DELTA = 0.42;
 const MAX_CAMERA_VIEW_SHIFT = 2.6;
+const TREE_FILAMENT_EDGE_LAYOUTS = new Set(['lorentzTree', 'productManifold', 'siegelFinsler']);
 type GuideSurface = 'default' | 'product';
 interface GuideAttachmentContract {
     liveLorentzGuides: boolean;
@@ -509,7 +511,8 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
         colorAttr.array.fill(0);
         let cursor = 0;
         const tubeMode = this.settings.edgeMode === 'tube';
-        const baseSteps = tubeMode ? MAX_EDGE_TUBE_SEGMENTS : this.settings.edgeMode === 'curved' ? MAX_EDGE_SEGMENTS : 1;
+        const treeFilaments = this.usesTreeFilamentEdges(data);
+        const baseSteps = tubeMode ? MAX_EDGE_TUBE_SEGMENTS : this.settings.edgeMode === 'curved' ? (treeFilaments ? TREE_FILAMENT_EDGE_SEGMENTS : MAX_EDGE_SEGMENTS) : 1;
         for (let edge = 0; edge < data.edgePairs.length / 2; edge++) {
             const interGalaxy = data.edgeKinds[edge] === 1;
             const source = data.edgePairs[edge * 2];
@@ -519,12 +522,14 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
             const surfaceEdge = this.capsSurfaceEdge(data, ax, ay, az, bx, by, bz);
             const hopfEdge = !surfaceEdge && !tubeMode && this.mode === '3d' && data.layoutMode === 'hopfProjection' && this.settings.edgeMode === 'curved';
             const hopfCrossBase = hopfEdge && this.isHopfCrossBaseEdge(data, source, target);
-            const steps = surfaceEdge ? MAX_EDGE_SEGMENTS : hopfEdge ? (hopfCrossBase ? HOPF_CROSS_EDGE_SEGMENTS : HOPF_EDGE_SEGMENTS) : baseSteps;
+            const steps = surfaceEdge ? (treeFilaments ? TREE_FILAMENT_EDGE_SEGMENTS : MAX_EDGE_SEGMENTS) : hopfEdge ? (hopfCrossBase ? HOPF_CROSS_EDGE_SEGMENTS : HOPF_EDGE_SEGMENTS) : baseSteps;
             const curveScale = THREE.MathUtils.clamp(this.settings.edgeCurveStrength, 0.25, 1.2) * (interGalaxy ? 0.92 : 0.58);
             const lift = tubeMode
                 ? this.edgeTubeLift(data, edge, source, target)
                 : this.settings.edgeMode === 'curved'
-                ? (0.08 + Math.abs(source - target) * 0.002) * curveScale + (interGalaxy ? 0.18 : 0) + (hopfCrossBase ? 0.1 : 0)
+                ? treeFilaments
+                    ? this.treeFilamentEdgeLift(data, edge, source, target, curveScale)
+                    : (0.08 + Math.abs(source - target) * 0.002) * curveScale + (interGalaxy ? 0.18 : 0) + (hopfCrossBase ? 0.1 : 0)
                 : 0;
             const dx = bx - ax;
             const dy = by - ay;
@@ -544,12 +549,18 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
                     if (surfaceEdge) {
                         cursor = this.writeCapsSurfaceEdgeVertex(positionAttr, colorAttr, cursor, data, focus, edge, ax, ay, az, bx, by, bz, ox, oy, t0, tone);
                         cursor = this.writeCapsSurfaceEdgeVertex(positionAttr, colorAttr, cursor, data, focus, edge, ax, ay, az, bx, by, bz, ox, oy, t1, tone);
+                    } else if (tubeMode && treeFilaments) {
+                        cursor = this.writeTreeTubeEdgeVertex(positionAttr, colorAttr, cursor, data, focus, edge, ax, ay, az, bx, by, bz, ox, oy, lift, t0, tone);
+                        cursor = this.writeTreeTubeEdgeVertex(positionAttr, colorAttr, cursor, data, focus, edge, ax, ay, az, bx, by, bz, ox, oy, lift, t1, tone);
                     } else if (tubeMode) {
                         cursor = this.writeTubeEdgeVertex(positionAttr, colorAttr, cursor, data, focus, edge, ax + ox, ay + oy, az, bx + ox, by + oy, bz, lift, t0, tone);
                         cursor = this.writeTubeEdgeVertex(positionAttr, colorAttr, cursor, data, focus, edge, ax + ox, ay + oy, az, bx + ox, by + oy, bz, lift, t1, tone);
                     } else if (hopfEdge) {
                         cursor = this.writeHopfEdgeVertex(positionAttr, colorAttr, cursor, data, focus, edge, ax + ox, ay + oy, az, bx + ox, by + oy, bz, lift, t0, tone, hopfCrossBase);
                         cursor = this.writeHopfEdgeVertex(positionAttr, colorAttr, cursor, data, focus, edge, ax + ox, ay + oy, az, bx + ox, by + oy, bz, lift, t1, tone, hopfCrossBase);
+                    } else if (treeFilaments) {
+                        cursor = this.writeTreeFilamentEdgeVertex(positionAttr, colorAttr, cursor, data, focus, edge, ax, ay, az, bx, by, bz, ox, oy, lift, t0, tone);
+                        cursor = this.writeTreeFilamentEdgeVertex(positionAttr, colorAttr, cursor, data, focus, edge, ax, ay, az, bx, by, bz, ox, oy, lift, t1, tone);
                     } else {
                         cursor = this.writeEdgeVertex(positionAttr, colorAttr, cursor, data, focus, edge, ax + ox, ay + oy, az, bx + ox, by + oy, bz, lift, t0, tone);
                         cursor = this.writeEdgeVertex(positionAttr, colorAttr, cursor, data, focus, edge, ax + ox, ay + oy, az, bx + ox, by + oy, bz, lift, t1, tone);
@@ -837,6 +848,9 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
     ): number {
         const sourceIndex = this.liveGuideNodeIndex(guide, data, indexById, 0);
         const targetIndex = this.liveGuideNodeIndex(guide, data, indexById, 1);
+        if (guide.guideKind === 'rootLane' && this.usesTreeFilamentEdges(data)) {
+            return this.writeSlantedRootLanePositions(output, cursor, guide);
+        }
         if (guide.guideKind !== 'membership' || sourceIndex < 0 || targetIndex < 0) {
             output.set(guide.positions3d, cursor);
             return cursor + guide.positions3d.length;
@@ -854,6 +868,7 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
             oldBx, oldBy, oldBz,
             positions[newA], positions[newA + 1], positions[newA + 2],
             positions[newB], positions[newB + 1], positions[newB + 2],
+            this.usesTreeFilamentEdges(data),
         );
     }
 
@@ -865,6 +880,7 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
         oldBx: number, oldBy: number, oldBz: number,
         newAx: number, newAy: number, newAz: number,
         newBx: number, newBy: number, newBz: number,
+        terminalTaper = false,
     ): number {
         const odx = oldBx - oldAx, ody = oldBy - oldAy, odz = oldBz - oldAz;
         const ndx = newBx - newAx, ndy = newBy - newAy, ndz = newBz - newAz;
@@ -874,9 +890,10 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
             const px = source[index], py = source[index + 1], pz = source[index + 2];
             const t = THREE.MathUtils.clamp(((px - oldAx) * odx + (py - oldAy) * ody + (pz - oldAz) * odz) / oldLenSq, 0, 1);
             const oldBaseX = oldAx + odx * t, oldBaseY = oldAy + ody * t, oldBaseZ = oldAz + odz * t;
-            output[cursor++] = newAx + ndx * t + (px - oldBaseX) * offsetScale;
-            output[cursor++] = newAy + ndy * t + (py - oldBaseY) * offsetScale;
-            output[cursor++] = newAz + ndz * t + (pz - oldBaseZ) * offsetScale;
+            const envelope = terminalTaper ? this.treeFilamentTerminalTaper(t) : 1;
+            output[cursor++] = newAx + ndx * t + (px - oldBaseX) * offsetScale * envelope;
+            output[cursor++] = newAy + ndy * t + (py - oldBaseY) * offsetScale * envelope;
+            output[cursor++] = newAz + ndz * t + (pz - oldBaseZ) * offsetScale * envelope;
         }
         output[cursor - source.length] = newAx;
         output[cursor - source.length + 1] = newAy;
@@ -885,6 +902,26 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
         output[cursor - 2] = newBy;
         output[cursor - 1] = newBz;
         return cursor;
+    }
+
+    private writeSlantedRootLanePositions(output: Float32Array, cursor: number, guide: Pick<GalaxyLorentzGuideView, 'id' | 'positions3d'>): number {
+        const seed = this.stableUnit(`root-lane-slant:${guide.id}`);
+        const slope = 0.1 + seed * 0.08;
+        const depthSlope = 0.025 + seed * 0.035;
+        const phase = (seed - 0.5) * 0.12;
+        for (let index = 0; index < guide.positions3d.length; index += 3) {
+            const x = guide.positions3d[index];
+            output[cursor++] = x;
+            output[cursor++] = guide.positions3d[index + 1] + x * slope + phase;
+            output[cursor++] = guide.positions3d[index + 2] + x * depthSlope;
+        }
+        return cursor;
+    }
+
+    private treeFilamentTerminalTaper(t: number): number {
+        const start = THREE.MathUtils.smoothstep(t, 0.02, 0.16);
+        const end = 1 - THREE.MathUtils.smoothstep(t, 0.58, 0.96);
+        return THREE.MathUtils.clamp(start * end, 0, 1);
     }
 
     private nodeIndexById(data: GalaxySceneV2): Map<string, number> {
@@ -971,6 +1008,10 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
         return Math.max(0.012, this.settings.edgeOpacity * (0.46 + glow * 0.18));
     }
 
+    private edgeMaterialBlending(data: GalaxySceneV2 | null = this.sceneData): THREE.Blending {
+        return THREE.NormalBlending;
+    }
+
     private edgeMaterialWidth(): number {
         const glow = THREE.MathUtils.clamp(this.settings.glow, 0, 1.8);
         if (this.settings.edgeMode === 'tube') {
@@ -981,6 +1022,12 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
 
     private edgeStrokeCount(data?: Pick<GalaxySceneV2, 'edgeAlpha' | 'edgeKinds'>, edge = 0): number {
         if (this.settings.edgeMode === 'hidden') return 1;
+        if (this.usesTreeFilamentEdges(data as GalaxySceneV2 | undefined)) {
+            const signal = this.normalizedEdgeSignal(data, edge);
+            const hierarchyBoost = data?.edgeKinds[edge] === 2 ? 1 : 0;
+            const bridgeBoost = data?.edgeKinds[edge] === 1 ? 1 : 0;
+            return THREE.MathUtils.clamp(3 + Math.round(signal * 1.8 + hierarchyBoost + bridgeBoost), 3, MAX_EDGE_STROKES);
+        }
         if (this.settings.edgeMode === 'tube') {
             const confidence = THREE.MathUtils.clamp(data?.edgeAlpha[edge] ?? 0.45, 0.12, 1);
             const bridgeBoost = data?.edgeKinds[edge] === 1 ? 1 : 0;
@@ -991,6 +1038,11 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
     }
 
     private edgeStrokeOffset(data?: Pick<GalaxySceneV2, 'edgeAlpha' | 'edgeKinds'>, edge = 0): number {
+        if (this.usesTreeFilamentEdges(data as GalaxySceneV2 | undefined)) {
+            const signal = this.normalizedEdgeSignal(data, edge);
+            const hierarchyBoost = data?.edgeKinds[edge] === 2 ? 1.22 : data?.edgeKinds[edge] === 1 ? 1.14 : 1;
+            return 0.0082 * hierarchyBoost * (0.72 + this.settings.edgeWidth * 0.42 + signal * 0.82);
+        }
         if (this.settings.edgeMode === 'tube') {
             const confidence = THREE.MathUtils.clamp(data?.edgeAlpha[edge] ?? 0.45, 0.12, 1);
             const bridgeBoost = data?.edgeKinds[edge] === 1 ? 1.18 : 1;
@@ -1000,10 +1052,33 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
     }
 
     private edgeStrokeTone(stroke: number, strokes: number): number {
+        if (this.usesTreeFilamentEdges()) {
+            if (stroke === 0) return 1.18;
+            const ring = Math.ceil(stroke / 2);
+            return THREE.MathUtils.clamp(0.78 - ring * 0.11 + strokes * 0.038, 0.44, 0.82);
+        }
         if (this.settings.edgeMode !== 'tube') return 1;
         if (stroke === 0) return 1.08;
         const ring = Math.ceil(stroke / 2);
         return THREE.MathUtils.clamp(0.86 - ring * 0.18 + strokes * 0.02, 0.42, 0.88);
+    }
+
+    private usesTreeFilamentEdges(data: Pick<GalaxySceneV2, 'layoutMode'> | null | undefined = this.sceneData): boolean {
+        return this.settings.edgeMode !== 'hidden' && Boolean(data && TREE_FILAMENT_EDGE_LAYOUTS.has(data.layoutMode));
+    }
+
+    private normalizedEdgeSignal(data?: Pick<GalaxySceneV2, 'edgeAlpha'>, edge = 0): number {
+        const alpha = data?.edgeAlpha[edge] ?? 0.18;
+        return THREE.MathUtils.clamp((alpha - 0.052) / 0.288, 0, 1);
+    }
+
+    private treeFilamentEdgeLift(data: Pick<GalaxySceneV2, 'edgeAlpha' | 'edgeKinds'>, edge: number, source: number, target: number, curveScale: number): number {
+        const signal = this.normalizedEdgeSignal(data, edge);
+        const span = Math.sqrt(Math.max(1, Math.abs(source - target)));
+        const spanLift = THREE.MathUtils.clamp(span * 0.022, 0.045, 0.42);
+        const kindBoost = data.edgeKinds[edge] === 1 ? 1.42 : data.edgeKinds[edge] === 2 ? 1.24 : 1;
+        const signalBoost = 0.82 + signal * 0.55;
+        return (0.11 + spanLift + signal * 0.14) * curveScale * kindBoost * signalBoost;
     }
 
     private rebuildNodeObjects(data: GalaxySceneV2): void {
@@ -2158,11 +2233,54 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
     }
 
     private edgeTubeLift(data: GalaxySceneV2, edge: number, source: number, target: number): number {
+        const curveScale = THREE.MathUtils.clamp(this.settings.edgeCurveStrength, 0.25, 1.2);
+        if (this.usesTreeFilamentEdges(data)) {
+            const kindScale = data.edgeKinds[edge] === 1 ? 0.74 : data.edgeKinds[edge] === 2 ? 0.68 : 0.62;
+            return this.treeFilamentEdgeLift(data, edge, source, target, curveScale * kindScale);
+        }
         const confidence = THREE.MathUtils.clamp(data.edgeAlpha[edge] ?? 0.45, 0.12, 1);
         const bridgeBoost = data.edgeKinds[edge] === 1 ? 1.38 : 1;
         const span = Math.sqrt(Math.max(1, Math.abs(source - target)));
-        const curveScale = THREE.MathUtils.clamp(this.settings.edgeCurveStrength, 0.25, 1.2);
         return (0.045 + confidence * 0.13 + span * 0.004) * bridgeBoost * curveScale;
+    }
+
+    private writeTreeTubeEdgeVertex(
+        positionAttr: THREE.BufferAttribute,
+        colorAttr: THREE.BufferAttribute,
+        cursor: number,
+        data: GalaxySceneV2,
+        focus: GalaxyFocusMask,
+        edge: number,
+        ax: number,
+        ay: number,
+        az: number,
+        bx: number,
+        by: number,
+        bz: number,
+        ox: number,
+        oy: number,
+        lift: number,
+        t: number,
+        tone = 1,
+    ): number {
+        const envelope = this.treeFilamentTerminalTaper(t);
+        return this.writeTubeEdgeVertex(
+            positionAttr,
+            colorAttr,
+            cursor,
+            data,
+            focus,
+            edge,
+            ax + ox * envelope,
+            ay + oy * envelope,
+            az,
+            bx + ox * envelope,
+            by + oy * envelope,
+            bz,
+            lift,
+            t,
+            tone,
+        );
     }
 
     private writeTubeEdgeVertex(
@@ -2201,11 +2319,11 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
     }
 
     private tubeEdgeTerminalFlourish(data: GalaxySceneV2, t: number, lift: number, sign: number): number {
-        if (data.layoutMode !== 'lorentzTree' && data.layoutMode !== 'siegelFinsler') return 0;
-        const width = 0.26;
-        const start = t < width ? Math.sin(Math.PI * t / width) : 0;
+        if (!TREE_FILAMENT_EDGE_LAYOUTS.has(data.layoutMode)) return 0;
+        const width = data.layoutMode === 'productManifold' ? 0.3 : 0.26;
         const end = t > 1 - width ? Math.sin(Math.PI * (1 - t) / width) : 0;
-        return lift * 0.2 * sign * (end - start * 0.42);
+        const style = data.layoutMode === 'siegelFinsler' ? 0.21 : data.layoutMode === 'lorentzTree' ? 0.18 : 0.16;
+        return lift * style * sign * end;
     }
 
     private writeHopfEdgeVertex(
@@ -2292,6 +2410,37 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
         return cursor + 1;
     }
 
+    private writeTreeFilamentEdgeVertex(
+        positionAttr: THREE.BufferAttribute,
+        colorAttr: THREE.BufferAttribute,
+        cursor: number,
+        data: GalaxySceneV2,
+        focus: GalaxyFocusMask,
+        edge: number,
+        ax: number,
+        ay: number,
+        az: number,
+        bx: number,
+        by: number,
+        bz: number,
+        ox: number,
+        oy: number,
+        lift: number,
+        t: number,
+        tone = 1,
+    ): number {
+        const envelope = this.treeFilamentTerminalTaper(t);
+        const curve = lift * Math.sin(Math.PI * t);
+        positionAttr.setXYZ(
+            cursor,
+            THREE.MathUtils.lerp(ax, bx, t) + ox * envelope,
+            THREE.MathUtils.lerp(ay, by, t) + oy * envelope + curve,
+            THREE.MathUtils.lerp(az, bz, t),
+        );
+        this.writeEdgeColor(colorAttr, cursor, data, focus, edge, t, tone);
+        return cursor + 1;
+    }
+
     private writeCapsSurfaceEdgeVertex(
         positionAttr: THREE.BufferAttribute,
         colorAttr: THREE.BufferAttribute,
@@ -2310,10 +2459,11 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
         t: number,
         tone = 1,
     ): number {
+        const envelope = this.usesTreeFilamentEdges(data) ? this.treeFilamentTerminalTaper(t) : 1;
         if (!this.capsSurfacePoint(this.edgeSurfacePoint, ax, ay, az, bx, by, bz, t)) {
-            return this.writeEdgeVertex(positionAttr, colorAttr, cursor, data, focus, edge, ax + ox, ay + oy, az, bx + ox, by + oy, bz, 0, t, tone);
+            return this.writeEdgeVertex(positionAttr, colorAttr, cursor, data, focus, edge, ax + ox * envelope, ay + oy * envelope, az, bx + ox * envelope, by + oy * envelope, bz, 0, t, tone);
         }
-        positionAttr.setXYZ(cursor, this.edgeSurfacePoint.x + ox, this.edgeSurfacePoint.y + oy, this.edgeSurfacePoint.z);
+        positionAttr.setXYZ(cursor, this.edgeSurfacePoint.x + ox * envelope, this.edgeSurfacePoint.y + oy * envelope, this.edgeSurfacePoint.z);
         this.writeEdgeColor(colorAttr, cursor, data, focus, edge, t, tone);
         return cursor + 1;
     }

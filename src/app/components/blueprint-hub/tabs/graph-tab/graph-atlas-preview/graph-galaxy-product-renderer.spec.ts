@@ -22,8 +22,14 @@ import { ThreeGalaxyRenderer } from './three-galaxy-renderer';
 type RendererProbe = {
     setSettings(settings: Record<string, unknown>): void;
     edgeMaterialOpacity(): number;
-    edgeStrokeCount(data?: { edgeAlpha: Float32Array; edgeKinds: Uint8Array }, edge?: number): number;
-    edgeStrokeOffset(data?: { edgeAlpha: Float32Array; edgeKinds: Uint8Array }, edge?: number): number;
+    edgeMaterialBlending(data?: { layoutMode: string } | null): THREE.Blending;
+    edgeColor(data: { layoutMode: string; edgeAlpha: Float32Array; edgeColors: Float32Array; edgeKinds: Uint8Array }, edge: number, t: number): THREE.Color;
+    edgeStrokeCount(data?: { layoutMode?: string; edgeAlpha: Float32Array; edgeKinds: Uint8Array }, edge?: number): number;
+    edgeStrokeOffset(data?: { layoutMode?: string; edgeAlpha: Float32Array; edgeKinds: Uint8Array }, edge?: number): number;
+    normalizedEdgeSignal(data?: { edgeAlpha: Float32Array }, edge?: number): number;
+    treeFilamentEdgeLift(data: { edgeAlpha: Float32Array; edgeKinds: Uint8Array }, edge: number, source: number, target: number, curveScale: number): number;
+    treeFilamentTerminalTaper(t: number): number;
+    edgeTubeLift(data: { layoutMode: string; edgeAlpha: Float32Array; edgeKinds: Uint8Array }, edge: number, source: number, target: number): number;
     hybridShellOpacity(): number;
     hopfGuideWeightForKind(kind: string, surface?: string): number;
     hopfLayerOpacity(layer: string, kind: string, weight?: number, surface?: string): number;
@@ -40,9 +46,10 @@ type RendererProbe = {
     tubeEdgeTerminalFlourish(data: { layoutMode: string }, t: number, lift: number, sign: number): number;
     capsSurfaceEdge(data: { layoutMode: string }, ax: number, ay: number, az: number, bx: number, by: number, bz: number): boolean;
     capsSurfacePoint(out: THREE.Vector3, ax: number, ay: number, az: number, bx: number, by: number, bz: number, t: number): boolean;
-    writeLorentzGuidePositions(output: Float32Array, cursor: number, guide: Record<string, unknown>, data: { ids: string[] }, positions: Float32Array, indexById: Map<string, number>): number;
+    writeLorentzGuidePositions(output: Float32Array, cursor: number, guide: Record<string, unknown>, data: { ids: string[]; layoutMode?: string }, positions: Float32Array, indexById: Map<string, number>): number;
     guideAttachmentContract(data: { layoutMode: string }): { liveLorentzGuides: boolean; localScale: number };
     guidePositionsForContract(positions: Float32Array, contract: { liveLorentzGuides: boolean; localScale: number }): Float32Array;
+    sceneData: unknown;
 };
 
 type CameraProbe = RendererProbe & {
@@ -165,12 +172,57 @@ describe('Product manifold guide styling', () => {
         expect(renderer.edgeStrokeOffset(data, 1)).toBeGreaterThan(renderer.edgeStrokeOffset(data, 0));
     });
 
-    it('adds a terminal curl only to Lorentz-style tube edges', () => {
+    it('keeps tree-space shape helpers without overriding edge colors', () => {
         const renderer = new ThreeGalaxyRenderer() as unknown as RendererProbe;
+        const data = {
+            layoutMode: 'lorentzTree',
+            edgeAlpha: new Float32Array([0.22, 0.34]),
+            edgeKinds: new Uint8Array([0, 2]),
+            edgeColors: new Float32Array([
+                1, 0, 0,
+                1, 0, 0,
+                0.8, 0.15, 0.9,
+                0.8, 0.15, 0.9,
+            ]),
+        };
+        renderer.sceneData = data;
 
+        expect(renderer.edgeMaterialBlending(data)).toBe(THREE.NormalBlending);
+        expect(renderer.edgeMaterialOpacity()).toBeLessThan(0.35);
+        expect(renderer.edgeStrokeCount(data, 0)).toBeGreaterThanOrEqual(3);
+        expect(renderer.edgeStrokeCount({ ...data, edgeAlpha: new Float32Array([0.06, 0.34]) }, 0)).toBe(3);
+        expect(renderer.edgeStrokeCount(data, 1)).toBeGreaterThan(renderer.edgeStrokeCount(data, 0));
+        expect(renderer.edgeStrokeOffset(data, 0)).toBeGreaterThan(0.008);
+        expect(renderer.normalizedEdgeSignal(data, 1)).toBeGreaterThan(renderer.normalizedEdgeSignal(data, 0));
+        expect(renderer.treeFilamentEdgeLift(data, 1, 0, 90, 0.58)).toBeGreaterThan(renderer.treeFilamentEdgeLift(data, 0, 0, 4, 0.58));
+        expect(renderer.treeFilamentTerminalTaper(0.5)).toBeCloseTo(1);
+        expect(renderer.treeFilamentTerminalTaper(0.9)).toBeLessThan(0.25);
+
+        const color = renderer.edgeColor(data, 0, 0.5);
+        expect(color.r).toBeGreaterThan(color.g);
+        expect(color.r).toBeGreaterThan(color.b);
+
+        expect(renderer.edgeMaterialBlending({ layoutMode: 'productManifold' })).toBe(THREE.NormalBlending);
+        expect(renderer.edgeMaterialBlending({ layoutMode: 'siegelFinsler' })).toBe(THREE.NormalBlending);
+        expect(renderer.edgeMaterialBlending({ layoutMode: 'single' })).toBe(THREE.NormalBlending);
+    });
+
+    it('carries target-side Lorentz styling into tree-space tube edges', () => {
+        const renderer = new ThreeGalaxyRenderer() as unknown as RendererProbe;
+        const data = {
+            layoutMode: 'productManifold',
+            edgeAlpha: new Float32Array([1]),
+            edgeKinds: new Uint8Array([0]),
+        };
+        const genericData = { ...data, layoutMode: 'single' };
+
+        expect(renderer.edgeTubeLift(data, 0, 0, 28)).toBeGreaterThan(renderer.edgeTubeLift(genericData, 0, 0, 28));
+        expect(renderer.tubeEdgeTerminalFlourish({ layoutMode: 'lorentzTree' }, 0.9, 0.3, 1)).toBeGreaterThan(0);
+        expect(renderer.tubeEdgeTerminalFlourish({ layoutMode: 'productManifold' }, 0.9, 0.3, 1)).toBeGreaterThan(0);
         expect(renderer.tubeEdgeTerminalFlourish({ layoutMode: 'siegelFinsler' }, 0.9, 0.3, 1)).toBeGreaterThan(0);
         expect(renderer.tubeEdgeTerminalFlourish({ layoutMode: 'siegelFinsler' }, 0.5, 0.3, 1)).toBe(0);
-        expect(renderer.tubeEdgeTerminalFlourish({ layoutMode: 'productManifold' }, 0.9, 0.3, 1)).toBe(0);
+        expect(renderer.tubeEdgeTerminalFlourish({ layoutMode: 'siegelFinsler' }, 0.1, 0.3, 1)).toBe(0);
+        expect(renderer.tubeEdgeTerminalFlourish({ layoutMode: 'single' }, 0.9, 0.3, 1)).toBe(0);
     });
 
     it('dims Lorentz guides by node focus without changing graph edge focus', () => {
@@ -334,6 +386,56 @@ describe('Product manifold guide styling', () => {
         expect(Array.from(output.slice(0, 3))).toEqual([2, 0, 0]);
         expect(Array.from(output.slice(output.length - 3))).toEqual([4, 0, 0]);
         expect(output[4]).toBeGreaterThan(0);
+    });
+
+    it('slants Caps root lanes so tree guides read as depth cues instead of flat rulers', () => {
+        const renderer = new ThreeGalaxyRenderer() as unknown as RendererProbe;
+        const guide = {
+            id: 'caps:root-lane:0',
+            guideKind: 'rootLane',
+            nodeIds: [],
+            positions3d: new Float32Array([
+                -2, 0, 0,
+                2, 0, 0,
+            ]),
+        };
+        const output = new Float32Array(guide.positions3d.length);
+
+        renderer.writeLorentzGuidePositions(output, 0, guide, { ids: [], layoutMode: 'lorentzTree' }, new Float32Array(), new Map());
+
+        expect(output[0]).toBe(-2);
+        expect(output[3]).toBe(2);
+        expect(Math.abs(output[4] - output[1])).toBeGreaterThan(0.3);
+        expect(Math.abs(output[5] - output[2])).toBeGreaterThan(0.08);
+    });
+
+    it('tapers live membership guide offsets before they attach to the next tree node', () => {
+        const renderer = new ThreeGalaxyRenderer() as unknown as RendererProbe;
+        const guide = {
+            id: 'caps:bridge:a-b',
+            guideKind: 'membership',
+            nodeIds: ['a', 'b'],
+            positions3d: new Float32Array([
+                0, 0, 0,
+                0.5, 0.6, 0,
+                0.9, 0.6, 0,
+                1, 0, 0,
+            ]),
+        };
+        const output = new Float32Array(guide.positions3d.length);
+
+        renderer.writeLorentzGuidePositions(
+            output,
+            0,
+            guide,
+            { ids: ['a', 'b'], layoutMode: 'lorentzTree' },
+            new Float32Array([0, 0, 0, 10, 0, 0]),
+            new Map([['a', 0], ['b', 1]]),
+        );
+
+        expect(output[4]).toBeGreaterThan(1);
+        expect(output[7]).toBeLessThan(0.4);
+        expect(Array.from(output.slice(output.length - 3))).toEqual([10, 0, 0]);
     });
 
     it('uses one live guide attachment contract for Product and Siegel spaces', () => {

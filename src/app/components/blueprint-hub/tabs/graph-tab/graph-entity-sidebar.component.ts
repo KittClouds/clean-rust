@@ -3,17 +3,22 @@ import { ScrollingModule } from '@angular/cdk/scrolling';
 import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges, computed, inject, signal } from '@angular/core';
 import {
     BookOpen,
+    BrainCircuit,
     Calendar,
     Check,
     ChevronDown,
     ChevronRight,
+    Copy,
+    Eye,
     Lightbulb,
     MapPin,
+    Network,
     Package,
     PanelLeft,
     PanelLeftClose,
     Pencil,
     Plus,
+    RefreshCw,
     Search,
     Shield,
     Sparkles,
@@ -31,6 +36,11 @@ import type { NerSuggestion } from '../../../../services/ner.service';
 import { GraphRebuildService } from '../../../../graph-rebuild/graph-rebuild.service';
 import type { GraphRebuildSnapshot } from '../../../../graph-rebuild/graph-rebuild-snapshot';
 import type { GraphLensMode } from './graph-lens';
+import {
+    buildGraphDiscourseAnalyticsView,
+    type GraphDiscourseTabId,
+    type GraphDiscourseTone,
+} from './graph-discourse-analytics';
 import { buildProductDiagnosticsView, type ProductDiagnosticsView } from './graph-product-diagnostics';
 
 interface EntityGroup {
@@ -40,6 +50,7 @@ interface EntityGroup {
 }
 
 type DiagnosticsQualityTone = 'ready' | 'review' | 'danger' | 'quiet';
+type GraphSidebarView = 'entities' | 'diagnostics' | 'discourse';
 
 interface DiagnosticsQualityLane {
     id: string;
@@ -84,7 +95,7 @@ const ENTITY_ICONS: Record<string, any> = {
     standalone: true,
     imports: [CommonModule, ScrollingModule, LucideAngularModule],
     templateUrl: './graph-entity-sidebar.component.html',
-    styleUrls: ['./graph-entity-sidebar.component.css', './graph-entity-sidebar.review-clusters.css'],
+    styleUrls: ['./graph-entity-sidebar.component.css', './graph-entity-sidebar.review-clusters.css', './graph-entity-sidebar.discourse.css'],
 })
 export class GraphEntitySidebarComponent implements OnChanges, OnDestroy {
     private readonly graphRebuild = inject(GraphRebuildService);
@@ -112,14 +123,18 @@ export class GraphEntitySidebarComponent implements OnChanges, OnDestroy {
     @Output() searchTextChange = new EventEmitter<string>();
 
     readonly isOpen = signal(true);
-    readonly controlsOpen = signal(false);
+    readonly sidebarView = signal<GraphSidebarView>('entities');
     readonly entitySearch = signal('');
     readonly expandedKinds = signal<Set<string>>(new Set());
     readonly diagnosticsSnapshot = signal<GraphRebuildSnapshot | null>(null);
     readonly diagnosticsLoading = signal(false);
     readonly diagnosticsError = signal<string | null>(null);
+    readonly selectedDiscourseTab = signal<GraphDiscourseTabId>('ideas');
+    readonly underlyingIdeasOpen = signal(false);
+    readonly discourseActionNotice = signal('');
     private readonly selectedDiagnosticsEntity = signal<RegisteredEntity | null>(null);
     private readonly dataRevision = signal(0);
+    private discourseNoticeTimer: ReturnType<typeof setTimeout> | undefined;
     private readonly unsubscribeColors = entityColorStore.subscribe(() => {
         this.dataRevision.update((revision) => revision + 1);
     });
@@ -134,6 +149,20 @@ export class GraphEntitySidebarComponent implements OnChanges, OnDestroy {
     readonly stage8Diagnostics = computed(() =>
         buildDiagnosticsQualityView(this.diagnosticsSnapshot(), this.productDiagnostics()),
     );
+    readonly discourseAnalytics = computed(() => {
+        this.dataRevision();
+        return buildGraphDiscourseAnalyticsView(
+            this.diagnosticsSnapshot(),
+            this.productDiagnostics(),
+            this.selectedDiagnosticsEntity(),
+            this.entities,
+        );
+    });
+    readonly activeDiscoursePanel = computed(() => {
+        const discourse = this.discourseAnalytics();
+        return discourse?.panels[this.selectedDiscourseTab()] ?? null;
+    });
+    readonly primaryDiscourseQuestion = computed(() => this.discourseAnalytics()?.questions[0] ?? null);
 
     readonly lensModes: { id: GraphLensMode; label: string }[] = [
         { id: 'global', label: 'Global' },
@@ -143,13 +172,18 @@ export class GraphEntitySidebarComponent implements OnChanges, OnDestroy {
     ];
 
     readonly BookIcon = BookOpen;
+    readonly BrainIcon = BrainCircuit;
     readonly CheckIcon = Check;
     readonly ChevronDownIcon = ChevronDown;
     readonly ChevronRightIcon = ChevronRight;
+    readonly CopyIcon = Copy;
+    readonly EyeIcon = Eye;
+    readonly NetworkIcon = Network;
     readonly PanelLeftIcon = PanelLeft;
     readonly PanelLeftCloseIcon = PanelLeftClose;
     readonly PencilIcon = Pencil;
     readonly PlusIcon = Plus;
+    readonly RefreshIcon = RefreshCw;
     readonly SearchIcon = Search;
     readonly SparklesIcon = Sparkles;
     readonly TrashIcon = Trash2;
@@ -190,6 +224,7 @@ export class GraphEntitySidebarComponent implements OnChanges, OnDestroy {
 
     ngOnDestroy(): void {
         this.unsubscribeColors();
+        if (this.discourseNoticeTimer) clearTimeout(this.discourseNoticeTimer);
         if (typeof window !== 'undefined') {
             window.removeEventListener('graph-rebuild-snapshot-updated', this.snapshotUpdated);
             window.removeEventListener('graph-index-run-completed', this.snapshotUpdated);
@@ -206,13 +241,57 @@ export class GraphEntitySidebarComponent implements OnChanges, OnDestroy {
         this.isOpen.update((open) => !open);
     }
 
+    setSidebarView(view: GraphSidebarView): void {
+        this.sidebarView.set(view);
+        if (view !== 'entities' && !this.diagnosticsSnapshot()) void this.refreshDiagnosticsSnapshot();
+    }
+
+    reloadGraphSidebarSnapshot(): void {
+        void this.refreshDiagnosticsSnapshot();
+    }
+
     toggleControls(): void {
-        this.controlsOpen.update((open) => !open);
-        if (!this.diagnosticsSnapshot()) void this.refreshDiagnosticsSnapshot();
+        this.setSidebarView(this.sidebarView() === 'diagnostics' ? 'entities' : 'diagnostics');
     }
 
     toggleActions(): void {
         this.toggleControls();
+    }
+
+    setDiscourseTab(tab: GraphDiscourseTabId): void {
+        this.selectedDiscourseTab.set(tab);
+    }
+
+    toggleUnderlyingIdeas(): void {
+        this.underlyingIdeasOpen.update((open) => !open);
+    }
+
+    toneClass(prefix: string, tone: GraphDiscourseTone | DiagnosticsQualityTone): string {
+        return `${prefix}-${tone}`;
+    }
+
+    async copyDiscourseSummary(): Promise<void> {
+        const discourse = this.discourseAnalytics();
+        const panel = this.activeDiscoursePanel();
+        if (!discourse || !panel) return;
+        const text = [
+            discourse.title,
+            discourse.summary,
+            '',
+            `${panel.title}: ${panel.summary}`,
+            ...panel.bullets.map((bullet) => `- ${bullet}`),
+            '',
+            ...discourse.questions.map((question) => `Question: ${question.prompt}`),
+        ].join('\n');
+        await navigator.clipboard?.writeText(text);
+        this.flashDiscourseNotice('Copied discourse read');
+    }
+
+    highlightDiscourseQuery(query: string): void {
+        if (!query.trim()) return;
+        this.updateEntitySearch(query);
+        this.sidebarView.set('entities');
+        this.flashDiscourseNotice('Filtered atlas by question');
     }
 
     toggleKind(kind: string): void {
@@ -287,6 +366,12 @@ export class GraphEntitySidebarComponent implements OnChanges, OnDestroy {
         if (source === 'lfm_local_experiment') return 'LFM';
         if (source === 'gliner_local') return 'GLiNER';
         return 'Phoenix';
+    }
+
+    private flashDiscourseNotice(message: string): void {
+        this.discourseActionNotice.set(message);
+        if (this.discourseNoticeTimer) clearTimeout(this.discourseNoticeTimer);
+        this.discourseNoticeTimer = setTimeout(() => this.discourseActionNotice.set(''), 2400);
     }
 
     private groupedEntities(): EntityGroup[] {

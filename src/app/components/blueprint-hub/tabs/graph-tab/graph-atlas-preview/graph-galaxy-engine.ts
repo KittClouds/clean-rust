@@ -96,6 +96,40 @@ export interface GalaxyHybridInteriorState {
     signature?: GalaxyBusemannSignature;
 }
 
+export interface GalaxyHybridPlacementPoint extends GalaxyVec3 {
+    radius: number;
+}
+
+export interface GalaxyHybridShellReceipt {
+    mode: 'hybridShell';
+    geometryVersion: 'hybrid_shell_anatomy_v1';
+    lane: string;
+    phase: number;
+    specificity: number;
+    ambiguity: number;
+    level: number;
+    strength: number;
+    baseRadius: number;
+    shellRadius: number;
+    laneStrength: number;
+    direction: GalaxyVec3;
+    point: GalaxyHybridPlacementPoint;
+    sourceSignals: string[];
+}
+
+export interface GalaxyHybridBusemannReceipt {
+    mode: 'busemannCommitment';
+    family: GalaxyPrototypeFamily;
+    topPrototypeId: string;
+    entropy: number;
+    margin: number;
+    confidence: number;
+    promotionReady: boolean;
+    radialStrength: number;
+    point: GalaxyHybridPlacementPoint;
+    source: 'backendPoint' | 'frontendCommitment';
+}
+
 export interface GalaxyBusemannHorosphereSpec {
     prototypeId: string;
     family: string;
@@ -216,6 +250,11 @@ export interface GalaxyNode extends Rgb {
     depth: number;
     galaxyOpacity: number;
     groupId?: string;
+    hybridShell?: GalaxyHybridShellReceipt;
+    hybridShellPoint?: GalaxyHybridPlacementPoint;
+    hybridCommitment?: GalaxyHybridBusemannReceipt;
+    hybridCommitmentPoint?: GalaxyHybridPlacementPoint;
+    hybridRenderPoint?: GalaxyHybridPlacementPoint;
 }
 
 export interface GalaxyEdge {
@@ -935,15 +974,43 @@ function applyHybridSpaceLayout(nodes: GalaxyNode[], links: GalaxyEdge[]): void 
     for (const node of nodes) {
         const hierarchy = hybridHierarchyInfo(node);
         const direction = hybridHierarchyDirection(node, hierarchy);
-        const radius = hybridHierarchyRadius(node, hybridRadius(node), hierarchy);
-        node.x = direction.x * radius * HYBRID_SHELL_RADIUS;
-        node.y = direction.y * radius * HYBRID_SHELL_RADIUS;
-        node.z = direction.z * radius * HYBRID_SHELL_RADIUS;
+        const baseRadius = hybridRadius(node);
+        const radius = hybridHierarchyRadius(node, baseRadius, hierarchy);
+        const point = hybridPlacementPoint(direction, radius);
+        node.x = point.x;
+        node.y = point.y;
+        node.z = point.z;
         node.baseX = node.x;
         node.baseY = node.y;
         node.baseZ = node.z;
         node.depth = radius;
         node.radius *= hybridNodeScale(node, radius);
+        const receipt: GalaxyHybridShellReceipt = {
+            mode: 'hybridShell',
+            geometryVersion: 'hybrid_shell_anatomy_v1',
+            lane: hierarchy.lane,
+            phase: hierarchy.phase,
+            specificity: hierarchy.specificity,
+            ambiguity: hierarchy.ambiguity,
+            level: hierarchy.level,
+            strength: hierarchy.strength,
+            baseRadius,
+            shellRadius: radius,
+            laneStrength: hybridLaneStrength(hierarchy),
+            direction,
+            point,
+            sourceSignals: hybridHierarchySourceSignals(node),
+        };
+        node.hybridShell = receipt;
+        node.hybridShellPoint = point;
+        node.hybridRenderPoint = point;
+        const metadata = node.entity.metadata ?? {};
+        node.entity.metadata = {
+            ...metadata,
+            hybridShell: receipt,
+            hybridShellPoint: point,
+            hybridRenderPoint: point,
+        };
     }
 
     for (const link of links) {
@@ -1028,17 +1095,32 @@ function hybridHierarchyInfo(node: GalaxyNode): HybridHierarchyInfo {
 function hybridHierarchyDirection(node: GalaxyNode, hierarchy: HybridHierarchyInfo): { x: number; y: number; z: number } {
     const base = normalizedDirection(node);
     const lane = hybridLaneDirection(hierarchy);
-    const laneStrength =
-        hierarchy.lane === 'temporal' ? hierarchy.strength * 1.08 :
-        hierarchy.lane === 'causal' ? hierarchy.strength * 1.02 :
-        hierarchy.lane === 'document' ? hierarchy.strength * 0.94 :
-        hierarchy.strength * 0.72;
+    const laneStrength = hybridLaneStrength(hierarchy);
     const mixed = {
         x: base.x * (1 - laneStrength) + lane.x * laneStrength,
         y: base.y * (1 - laneStrength) + lane.y * laneStrength,
         z: base.z * (1 - laneStrength) + lane.z * laneStrength,
     };
     return normalizeVector(mixed, base);
+}
+
+function hybridLaneStrength(hierarchy: HybridHierarchyInfo): number {
+    if (hierarchy.lane === 'temporal') return hierarchy.strength * 1.08;
+    if (hierarchy.lane === 'causal') return hierarchy.strength * 1.02;
+    if (hierarchy.lane === 'document') return hierarchy.strength * 0.94;
+    return hierarchy.strength * 0.72;
+}
+
+function hybridPlacementPoint(
+    direction: { x: number; y: number; z: number },
+    radius: number,
+): GalaxyHybridPlacementPoint {
+    return {
+        x: direction.x * radius * HYBRID_SHELL_RADIUS,
+        y: direction.y * radius * HYBRID_SHELL_RADIUS,
+        z: direction.z * radius * HYBRID_SHELL_RADIUS,
+        radius,
+    };
 }
 
 function hybridLaneDirection(hierarchy: HybridHierarchyInfo): { x: number; y: number; z: number } {
@@ -1133,6 +1215,31 @@ function normalizeHierarchyLane(value: string): string {
     if (/evidence|memory|state|source|provenance/.test(lane)) return 'evidence';
     if (/entity|character|location|concept|item|creature|npc|network/.test(lane)) return 'entity';
     return 'semantic';
+}
+
+function hybridHierarchySourceSignals(node: GalaxyNode): string[] {
+    const metadata = node.entity.metadata || {};
+    const product = recordValue(metadata['product']);
+    const region = recordValue(product['region']);
+    const lanes = recordValue(product['lanes']);
+    const lorentz = recordValue(metadata['lorentz']);
+    const signals: string[] = [];
+    appendSourceSignal(signals, 'productLaneKind', metadata['productLaneKind']);
+    appendSourceSignal(signals, 'product.region.laneKind', region['laneKind']);
+    appendSourceSignal(signals, 'product.dominantLane', product['dominantLane']);
+    appendSourceSignal(signals, 'product.lanes.dominantLane', lanes['dominantLane']);
+    appendSourceSignal(signals, 'lorentz.dominantLane', lorentz['dominantLane']);
+    appendSourceSignal(signals, 'lorentz.primaryTreeKind', lorentz['primaryTreeKind']);
+    appendSourceSignal(signals, 'graphRelationFamily', metadata['graphRelationFamily']);
+    appendSourceSignal(signals, 'graphKind', metadata['graphKind']);
+    appendSourceSignal(signals, 'sourceType', metadata['sourceType']);
+    appendSourceSignal(signals, 'kind', node.entity.kind);
+    return signals;
+}
+
+function appendSourceSignal(signals: string[], label: string, value: unknown): void {
+    if (typeof value !== 'string' || !value.trim()) return;
+    signals.push(`${label}=${value.trim()}`);
 }
 
 function recordValue(value: unknown): Record<string, unknown> {

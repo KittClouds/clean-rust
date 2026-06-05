@@ -144,7 +144,7 @@ function mutationFor(
         sourceId: pair[0],
         targetId: pair[1],
         type: edgeType,
-        weight: round(Math.max(candidate.rank, judgment.calibratedScore)),
+        weight: semanticEdgeWeight(candidate, judgment),
         confidence: judgment.calibratedScore,
         evidenceAnchorIds: candidate.evidenceIds.slice(0, 16),
         scopeKeys: [`semantic-adjudication:${snapshot.scopeId}`],
@@ -306,6 +306,13 @@ function edgeTypeFor(candidate: GraphSemanticCandidate): string {
 function mutationKey(mutation: GraphSemanticAdjudicationMutation): string {
     const edge = mutation.createdEdge;
     return edge ? `${edge.sourceId}|${edge.targetId}|${edge.type}` : mutation.id;
+}
+
+function semanticEdgeWeight(
+    candidate: GraphSemanticCandidate,
+    judgment: GraphSemanticRerankJudgment,
+): number {
+    return Math.max(1, Math.round(Math.max(candidate.rank, judgment.calibratedScore)));
 }
 
 function evidenceNoteIds(snapshot: GraphRebuildSnapshot, candidate: GraphSemanticCandidate): string[] {

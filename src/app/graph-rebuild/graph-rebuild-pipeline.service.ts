@@ -201,6 +201,7 @@ export class GraphRebuildPipelineService {
             appendSemanticRerankStage(stageReceipts, completedSnapshot);
             appendSemanticAdjudicationStage(stageReceipts, completedSnapshot);
             appendSemanticEvalLedgerStage(stageReceipts, completedSnapshot);
+            appendMemoryGraphRagBridgeStage(stageReceipts, completedSnapshot);
             appendCalendarRegistryStage(stageReceipts, completedSnapshot);
             appendSnapshotTimingStages(stageReceipts, completedSnapshot);
 
@@ -344,6 +345,7 @@ export class GraphRebuildPipelineService {
                 appendSemanticRerankStage(stageReceipts, snapshot);
                 appendSemanticAdjudicationStage(stageReceipts, snapshot);
                 appendSemanticEvalLedgerStage(stageReceipts, snapshot);
+                appendMemoryGraphRagBridgeStage(stageReceipts, snapshot);
                 appendCalendarRegistryStage(stageReceipts, snapshot);
                 appendSnapshotTimingStages(stageReceipts, snapshot);
             }
@@ -557,6 +559,7 @@ export class GraphRebuildPipelineService {
             appendEntityLinkerPlanStage(stageReceipts, completedSnapshot, request.embeddingStagePolicy?.entityLinkerEnabled !== false);
             appendEdgeJudgmentPlanStage(stageReceipts, completedSnapshot);
             appendSemanticRerankStage(stageReceipts, completedSnapshot);
+            appendMemoryGraphRagBridgeStage(stageReceipts, completedSnapshot);
             appendCalendarRegistryStage(stageReceipts, completedSnapshot);
             appendSnapshotTimingStages(stageReceipts, completedSnapshot);
 
@@ -1165,6 +1168,32 @@ function appendSemanticEvalLedgerStage(stageReceipts: GraphIndexStageReceipt[], 
             graphChangeRows: summary.counters.graphChangeRows,
         },
         'Phase 6 compact dataset export ready for classifier, reranker, router, and model-swap evals',
+    ));
+}
+
+function appendMemoryGraphRagBridgeStage(stageReceipts: GraphIndexStageReceipt[], snapshot: GraphRebuildSnapshot): void {
+    const summary = snapshot.memoryGraphRagBridgeSummary;
+    if (!summary) return;
+    stageReceipts.push(instrumentationStage(
+        'memoryGraphRagBridge',
+        'MemoryGraphRAG Bridge',
+        summary.counters.evalRowCount,
+        {
+            records: summary.counters.recordCount,
+            schemaRecords: summary.counters.schemaRecords,
+            factRecords: summary.counters.factRecords,
+            passageRecords: summary.counters.passageRecords,
+            evalRows: summary.counters.evalRowCount,
+            passedEvalRows: summary.counters.passedEvalRows,
+            failedEvalRows: summary.counters.failedEvalRows,
+            observerSeeds: summary.counters.observerSeedRecords,
+            reflectorSeeds: summary.counters.reflectorSeedRecords,
+            retrievalRecords: summary.counters.retrievalRecords,
+            conflictRecords: summary.counters.conflictRecords,
+            receipts: summary.counters.receiptCount,
+            mutationAllowed: summary.counters.mutationAllowedCount,
+        },
+        'MemGraphRAG-style schema/fact/passage bridge ready for OM observer, reflector, and retrieval evals',
     ));
 }
 

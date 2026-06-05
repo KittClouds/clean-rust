@@ -5,6 +5,8 @@ import {
     type GalaxyHopfRibbon,
     type GalaxyLayoutMode,
     type GalaxyLorentzGuide,
+    type GalaxyHybridBusemannReceipt,
+    type GalaxyHybridShellReceipt,
     type GalaxyNode,
     type GalaxyScene,
     type GalaxyBusemannHorosphereSpec,
@@ -60,6 +62,38 @@ export interface GalaxyBusemannHorosphereView {
     opacity: number;
 }
 
+export interface GalaxyHybridShellReceiptView {
+    lane: string;
+    phase: number;
+    specificity: number;
+    ambiguity: number;
+    level: number;
+    strength: number;
+    baseRadius: number;
+    shellRadius: number;
+    laneStrength: number;
+    sourceSignals: string[];
+}
+
+export interface GalaxyHybridCommitmentReceiptView {
+    family: string;
+    topPrototypeId: string;
+    entropy: number;
+    margin: number;
+    confidence: number;
+    promotionReady: boolean;
+    radialStrength: number;
+    source: GalaxyHybridBusemannReceipt['source'];
+    radius: number;
+}
+
+export interface GalaxyHybridNodeReceiptView {
+    nodeId: string;
+    shell?: GalaxyHybridShellReceiptView;
+    commitment?: GalaxyHybridCommitmentReceiptView;
+    renderRadius: number;
+}
+
 export interface GalaxySceneV2 {
     sourceMode: GalaxySceneSourceMode;
     layoutMode: GalaxyLayoutMode;
@@ -73,6 +107,9 @@ export interface GalaxySceneV2 {
     hopfRibbons: GalaxyHopfRibbonView[];
     lorentzGuides: GalaxyLorentzGuideView[];
     busemannHorospheres?: GalaxyBusemannHorosphereView[];
+    hybridShellPositions?: Float32Array;
+    hybridCommitmentPositions?: Float32Array;
+    hybridReceipts?: GalaxyHybridNodeReceiptView[];
     positions3d: Float32Array;
     positions2d: Float32Array;
     radii: Float32Array;
@@ -95,6 +132,11 @@ export function galaxySceneToV2(scene: GalaxyScene, sourceMode: GalaxySceneSourc
     const positions2d = new Float32Array(nodeCount * 3);
     const radii = new Float32Array(nodeCount);
     const colors = new Float32Array(nodeCount * 3);
+    const hasHybridShell = scene.nodes.some((node) => !!node.hybridShellPoint || !!node.hybridShell);
+    const hasHybridCommitment = scene.nodes.some((node) => !!node.hybridCommitmentPoint || !!node.hybridCommitment);
+    const hybridShellPositions = hasHybridShell ? new Float32Array(nodeCount * 3) : undefined;
+    const hybridCommitmentPositions = hasHybridCommitment ? new Float32Array(nodeCount * 3) : undefined;
+    const hybridReceipts: GalaxyHybridNodeReceiptView[] = [];
 
     for (let index = 0; index < nodeCount; index++) {
         const node = scene.nodes[index];
@@ -109,6 +151,18 @@ export function galaxySceneToV2(scene: GalaxyScene, sourceMode: GalaxySceneSourc
         writePosition(positions2d, index, node.x, node.y, 0);
         radii[index] = node.radius;
         writeColor(colors, index, node);
+        if (hybridShellPositions) {
+            const point = node.hybridShellPoint ?? node.hybridShell?.point ?? node;
+            writePosition(hybridShellPositions, index, point.x, point.y, point.z);
+        }
+        if (hybridCommitmentPositions) {
+            const point = node.hybridCommitmentPoint ?? node.hybridCommitment?.point ?? node;
+            writePosition(hybridCommitmentPositions, index, point.x, point.y, point.z);
+        }
+        const hybridReceipt = hybridNodeReceiptView(node);
+        if (hybridReceipt) {
+            hybridReceipts.push(hybridReceipt);
+        }
     }
 
     const edgePairs = new Uint32Array(scene.links.length * 2);
@@ -146,6 +200,9 @@ export function galaxySceneToV2(scene: GalaxyScene, sourceMode: GalaxySceneSourc
         hopfRibbons: (scene.hopfRibbons ?? []).map(hopfRibbonView),
         lorentzGuides: (scene.lorentzGuides ?? []).map(lorentzGuideView),
         busemannHorospheres: (scene.busemannHorospheres ?? []).map(busemannHorosphereView),
+        hybridShellPositions,
+        hybridCommitmentPositions,
+        hybridReceipts: hybridReceipts.length ? hybridReceipts : undefined,
         positions3d,
         positions2d,
         radii,
@@ -154,6 +211,49 @@ export function galaxySceneToV2(scene: GalaxyScene, sourceMode: GalaxySceneSourc
         edgeColors,
         edgeAlpha,
         edgeKinds,
+    };
+}
+
+function hybridNodeReceiptView(node: GalaxyNode): GalaxyHybridNodeReceiptView | null {
+    if (!node.hybridShell && !node.hybridCommitment && !node.hybridRenderPoint) {
+        return null;
+    }
+
+    const renderRadius = node.hybridRenderPoint?.radius ?? Math.hypot(node.x, node.y, node.z);
+    return {
+        nodeId: node.entity.id,
+        shell: node.hybridShell ? hybridShellReceiptView(node.hybridShell) : undefined,
+        commitment: node.hybridCommitment ? hybridCommitmentReceiptView(node.hybridCommitment) : undefined,
+        renderRadius,
+    };
+}
+
+function hybridShellReceiptView(receipt: GalaxyHybridShellReceipt): GalaxyHybridShellReceiptView {
+    return {
+        lane: receipt.lane,
+        phase: receipt.phase,
+        specificity: receipt.specificity,
+        ambiguity: receipt.ambiguity,
+        level: receipt.level,
+        strength: receipt.strength,
+        baseRadius: receipt.baseRadius,
+        shellRadius: receipt.shellRadius,
+        laneStrength: receipt.laneStrength,
+        sourceSignals: receipt.sourceSignals,
+    };
+}
+
+function hybridCommitmentReceiptView(receipt: GalaxyHybridBusemannReceipt): GalaxyHybridCommitmentReceiptView {
+    return {
+        family: receipt.family,
+        topPrototypeId: receipt.topPrototypeId,
+        entropy: receipt.entropy,
+        margin: receipt.margin,
+        confidence: receipt.confidence,
+        promotionReady: receipt.promotionReady,
+        radialStrength: receipt.radialStrength,
+        source: receipt.source,
+        radius: receipt.point.radius,
     };
 }
 

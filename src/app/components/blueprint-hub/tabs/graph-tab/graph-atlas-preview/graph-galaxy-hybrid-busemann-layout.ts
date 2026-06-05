@@ -1,8 +1,10 @@
 import type {
+    GalaxyHybridBusemannReceipt,
     GalaxyBusemannPrototype,
     GalaxyBusemannSignature,
     GalaxyHybridInteriorState,
     GalaxyNode,
+    GalaxyHybridPlacementPoint,
     GalaxyVec3,
 } from './graph-galaxy-engine';
 
@@ -24,6 +26,8 @@ type MutableGalaxyNode = GalaxyNode & {
         confidence: number;
         promotionReady: boolean;
         radialStrength: number;
+        point?: GalaxyHybridPlacementPoint;
+        source?: GalaxyHybridBusemannReceipt['source'];
     };
 };
 
@@ -96,6 +100,7 @@ export function applyHybridBusemannLayout(
         const radialStrength = clamp01(signature.radialStrength);
 
         let position: GalaxyVec3 | null = null;
+        let positionSource: GalaxyHybridBusemannReceipt['source'] = 'frontendCommitment';
 
         if (preferBackendPoint) {
             position = normalizeBackendInteriorPoint(
@@ -103,6 +108,9 @@ export function applyHybridBusemannLayout(
                 shellRadius,
                 maxR,
             );
+            if (position) {
+                positionSource = 'backendPoint';
+            }
         }
 
         if (!position) {
@@ -144,6 +152,20 @@ export function applyHybridBusemannLayout(
         node.y = position.y;
         node.z = position.z;
 
+        const point = placementPointFromPosition(position, shellRadius);
+        const receipt: GalaxyHybridBusemannReceipt = {
+            mode: 'busemannCommitment',
+            family: signature.family,
+            topPrototypeId,
+            entropy,
+            margin: finiteOr(signature.margin, 0),
+            confidence,
+            promotionReady: !!signature.promotionReady,
+            radialStrength,
+            point,
+            source: positionSource,
+        };
+
         node.__hybridInterior = {
             mode: 'busemannCommitment',
             family: signature.family,
@@ -153,6 +175,18 @@ export function applyHybridBusemannLayout(
             confidence,
             promotionReady: !!signature.promotionReady,
             radialStrength,
+            point,
+            source: positionSource,
+        };
+        node.hybridCommitment = receipt;
+        node.hybridCommitmentPoint = point;
+        node.hybridRenderPoint = point;
+        const metadata = node.entity.metadata ?? {};
+        node.entity.metadata = {
+            ...metadata,
+            hybridCommitment: receipt,
+            hybridCommitmentPoint: point,
+            hybridRenderPoint: point,
         };
     }
 
@@ -398,6 +432,15 @@ function normalizeBackendInteriorPoint(
     }
 
     return point;
+}
+
+function placementPointFromPosition(position: GalaxyVec3, shellRadius: number): GalaxyHybridPlacementPoint {
+    return {
+        x: position.x,
+        y: position.y,
+        z: position.z,
+        radius: clamp01(norm3(position) / Math.max(EPS, shellRadius)),
+    };
 }
 
 function normalizeNullable3(value: GalaxyVec3 | null | undefined): GalaxyVec3 | null {

@@ -37,6 +37,7 @@ import {
 } from './graph-semantic-adjudication';
 import { buildGraphSemanticEvalLedgerSummary } from './graph-semantic-eval-ledger';
 import { buildGraphCalendarRegistryBridgeSummary } from './graph-calendar-registry-bridge';
+import { buildGraphMemoryGraphRagBridgeSummary } from './graph-memory-graphrag-bridge';
 
 export { buildGraphRebuildAliasResolver, normalizeGraphRebuildCandidate };
 
@@ -264,6 +265,16 @@ export function buildGraphRebuildSnapshot(input: BuildGraphRebuildSnapshotInput)
     snapshot.counters.semanticEvalModelDisagreements = semanticEvalLedgerSummary.counters.modelDisagreements;
     snapshot.counters.semanticEvalManifoldDisagreements = semanticEvalLedgerSummary.counters.manifoldDisagreements;
     snapshot.counters.semanticEvalGraphChangeRows = semanticEvalLedgerSummary.counters.graphChangeRows;
+    const memoryGraphRagBridgeSummary = buildGraphMemoryGraphRagBridgeSummary(snapshot, builtAt);
+    snapshot.memoryGraphRagBridgeSummary = memoryGraphRagBridgeSummary;
+    snapshot.counters.memoryGraphRagRecords = memoryGraphRagBridgeSummary.counters.recordCount;
+    snapshot.counters.memoryGraphRagSchemaRecords = memoryGraphRagBridgeSummary.counters.schemaRecords;
+    snapshot.counters.memoryGraphRagFactRecords = memoryGraphRagBridgeSummary.counters.factRecords;
+    snapshot.counters.memoryGraphRagPassageRecords = memoryGraphRagBridgeSummary.counters.passageRecords;
+    snapshot.counters.memoryGraphRagEvalRows = memoryGraphRagBridgeSummary.counters.evalRowCount;
+    snapshot.counters.memoryGraphRagPassedEvalRows = memoryGraphRagBridgeSummary.counters.passedEvalRows;
+    snapshot.counters.memoryGraphRagReceipts = memoryGraphRagBridgeSummary.counters.receiptCount;
+    snapshot.counters.memoryGraphRagMutationAllowed = memoryGraphRagBridgeSummary.counters.mutationAllowedCount;
     const calendarRegistrySummary = buildGraphCalendarRegistryBridgeSummary({
         calendarRegistry: input.calendarRegistrySnapshot,
         sourceSnapshotId: snapshot.id,

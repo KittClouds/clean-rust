@@ -209,6 +209,7 @@ describe('Phoenix graph rebuild parity smoke', () => {
             semanticAdjudicationLedgerOnly: snapshot.counters.semanticAdjudicationLedgerOnly,
             semanticAdjudicationStates: snapshot.semanticAdjudicationSummary?.counters.byState,
             semanticEvalLedger: compactEvalLedger(snapshot),
+            memoryGraphRagBridge: compactMemoryGraphRagBridge(snapshot),
             candidateNoise: snapshot.semanticCandidateSummary?.counters.averageNoiseScore,
             elapsedMs: Math.round(elapsedMs),
         }));
@@ -372,6 +373,7 @@ describe('Phoenix graph rebuild parity smoke', () => {
             semanticAdjudicationLedgerOnly: snapshot.counters.semanticAdjudicationLedgerOnly,
             semanticAdjudicationStates: snapshot.semanticAdjudicationSummary?.counters.byState,
             semanticEvalLedger: compactEvalLedger(snapshot),
+            memoryGraphRagBridge: compactMemoryGraphRagBridge(snapshot),
             candidateNoise: snapshot.semanticCandidateSummary?.counters.averageNoiseScore,
             elapsedMs: Math.round(elapsedMs),
         }));
@@ -432,6 +434,23 @@ describe('Phoenix graph rebuild parity smoke', () => {
         expect(snapshot.semanticEvalLedgerSummary?.counters.ambiguousCases).toBeGreaterThan(0);
         expect(snapshot.semanticEvalLedgerSummary?.counters.graphChangeRows).toBe(snapshot.counters.semanticAdjudicationTopologyCommits);
         expect(snapshot.semanticEvalLedgerSummary?.counters.manifoldDisagreements).toBeGreaterThan(0);
+        expect(snapshot.memoryGraphRagBridgeSummary?.schemaVersion).toBe('phoenix-memory-graphrag-bridge/v1');
+        expect(snapshot.memoryGraphRagBridgeSummary?.paperShape.implementationMode).toBe('phoenix_bridge_contract');
+        expect(snapshot.memoryGraphRagBridgeSummary?.counters.schemaRecords).toBeGreaterThan(0);
+        expect(snapshot.memoryGraphRagBridgeSummary?.counters.factRecords).toBeGreaterThan(40);
+        expect(snapshot.memoryGraphRagBridgeSummary?.counters.passageRecords).toBeGreaterThan(20);
+        expect(snapshot.memoryGraphRagBridgeSummary?.counters.evalRowCount).toBeGreaterThan(20);
+        expect(snapshot.memoryGraphRagBridgeSummary?.counters.passedEvalRows).toBeGreaterThan(0);
+        expect(snapshot.memoryGraphRagBridgeSummary?.counters.mutationAllowedCount).toBe(0);
+        expect(snapshot.memoryGraphRagBridgeSummary?.evalRows.some((row) => row.kind === 'conflict_route')).toBe(true);
+        expect(snapshot.memoryGraphRagBridgeSummary?.evalRows.every((row) =>
+            row.retrievedRecordIds.length > 0 && row.score >= 0 && row.score <= 1,
+        )).toBe(true);
+        expect(snapshot.memoryGraphRagBridgeSummary?.receipts.every((receipt) =>
+            receipt.reversible
+            && receipt.mutationAllowed === false
+            && receipt.invariant === 'memorygraphrag_bridge_no_topology_commit',
+        )).toBe(true);
         expect(snapshot.embeddingGraphPostProcess?.metrics.plannedPairCount).toBeLessThan(
             snapshot.embeddingGraphPostProcess?.metrics.theoreticalPairCount || 0,
         );
@@ -467,6 +486,20 @@ function compactEvalLedger(snapshot: GraphRebuildSnapshot) {
         manifoldDisagreements: ledger.counters.manifoldDisagreements,
         graphChanges: ledger.counters.graphChangeRows,
         sample: ledger.compactExport.rows.slice(0, 3),
+    } : null;
+}
+
+function compactMemoryGraphRagBridge(snapshot: GraphRebuildSnapshot) {
+    const bridge = snapshot.memoryGraphRagBridgeSummary;
+    return bridge ? {
+        records: bridge.counters.recordCount,
+        byLayer: bridge.counters.byLayer,
+        byEvalKind: bridge.counters.byEvalKind,
+        evalRows: bridge.counters.evalRowCount,
+        passed: bridge.counters.passedEvalRows,
+        failed: bridge.counters.failedEvalRows,
+        mutationAllowed: bridge.counters.mutationAllowedCount,
+        sample: bridge.compactEvalLedger.rows.slice(0, 3),
     } : null;
 }
 

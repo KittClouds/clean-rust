@@ -7,7 +7,12 @@ vi.mock('../lib/model-cache', () => ({
 }));
 
 import { modelCache } from '../lib/model-cache';
-import { TtsService, TTS_VOICES } from './tts.service';
+import {
+    NATIVE_SUPERTONIC_MODEL_ROOT,
+    SUPERTONIC3_MODEL_ID,
+    TtsService,
+    TTS_VOICES,
+} from './tts.service';
 
 function createVoiceBlob(): Blob {
     return new Blob([new Float32Array([0.1, 0.2, 0.3, 0.4]).buffer], {
@@ -311,9 +316,27 @@ describe('TtsService', () => {
         expect(ttsSupertonicSpeak.mock.calls[0][0]).toMatchObject({
             text: 'Phoenix native Supertonic smoke.',
             voiceStyle: 'F1',
+            modelRoot: 'C:\\phoenix-tts\\supertonic-3',
             lang: 'en',
         });
         expect(worker.postMessage.mock.calls.some(([message]) => message.type === 'SPEAK')).toBe(false);
+    });
+
+    it('advertises Supertonic 3 native defaults and ten preset styles', () => {
+        expect(SUPERTONIC3_MODEL_ID).toBe('Supertone/supertonic-3');
+        expect(NATIVE_SUPERTONIC_MODEL_ROOT).toBe('C:\\phoenix-tts\\supertonic-3');
+        expect(TTS_VOICES.map((voice) => voice.id)).toEqual([
+            'F1',
+            'F2',
+            'F3',
+            'F4',
+            'F5',
+            'M1',
+            'M2',
+            'M3',
+            'M4',
+            'M5',
+        ]);
     });
 
     it('routes native Qwen voice clone through the 0.6B TauRPC path', async () => {

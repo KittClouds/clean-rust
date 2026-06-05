@@ -300,23 +300,22 @@ function directedCurve(source: GalaxyNode, target: GalaxyNode, sourceInfo: Siege
     const curlSign = stableUnit(`${link.id}:siegel-terminal`) > 0.5 ? 1 : -1;
     const curlAmount = bridge ? 0.1 : 0.064;
     for (let index = 0; index < steps; index++) {
-        writeVec(positions, index * 6, embellishedDirectedPoint(sourcePoint, mid, targetPoint, curlNormal, index / steps, curlAmount, curlSign));
-        writeVec(positions, index * 6 + 3, embellishedDirectedPoint(sourcePoint, mid, targetPoint, curlNormal, (index + 1) / steps, curlAmount, curlSign));
+        writeVec(positions, index * 6, targetBraidedDirectedPoint(sourcePoint, mid, targetPoint, curlNormal, index / steps, curlAmount, curlSign));
+        writeVec(positions, index * 6 + 3, targetBraidedDirectedPoint(sourcePoint, mid, targetPoint, curlNormal, (index + 1) / steps, curlAmount, curlSign));
     }
     return positions;
 }
 
-function embellishedDirectedPoint(a: Vec3, b: Vec3, c: Vec3, normal: Vec3, t: number, amount: number, sign: number): Vec3 {
+function targetBraidedDirectedPoint(a: Vec3, b: Vec3, c: Vec3, normal: Vec3, t: number, amount: number, sign: number): Vec3 {
     const point = quadraticPoint(a, b, c, t);
-    const curl = terminalFlourish(t, amount) * sign;
+    const curl = targetFlourish(t, amount) * sign;
     return add(point, scale(normal, curl));
 }
 
-function terminalFlourish(t: number, amount: number): number {
+function targetFlourish(t: number, amount: number): number {
     const width = 0.28;
-    const start = t < width ? Math.sin(Math.PI * t / width) : 0;
     const end = t > 1 - width ? Math.sin(Math.PI * (1 - t) / width) : 0;
-    return amount * (end - start * 0.45);
+    return amount * end * 0.78;
 }
 
 function fallbackDepth(node: GalaxyNode, lane: string): number {

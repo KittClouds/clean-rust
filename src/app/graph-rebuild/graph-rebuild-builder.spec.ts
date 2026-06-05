@@ -787,6 +787,14 @@ describe('Phoenix graph rebuild builder', () => {
             snapshot.edges.some((edge) => edge.id === mutation.createdEdgeId)
             && mutation.reversiblePatch.undoOperation === 'remove_semantic_edge_and_fact',
         )).toBe(true);
+        expect(adjudication.mutations.every((mutation) =>
+            mutation.createdEdge
+            && Number.isInteger(mutation.createdEdge.weight)
+            && mutation.createdEdge.weight >= 1
+            && mutation.createdEdge.confidence >= 0
+            && mutation.createdEdge.confidence <= 1,
+        )).toBe(true);
+        expect(snapshot.edges.every((edge) => Number.isInteger(edge.weight))).toBe(true);
         const evalLedger = snapshot.semanticEvalLedgerSummary!;
         expect(evalLedger.schemaVersion).toBe('phoenix-semantic-eval-ledger/v1');
         expect(evalLedger.sourceSnapshotId).toBe(snapshot.id);
@@ -806,6 +814,31 @@ describe('Phoenix graph rebuild builder', () => {
             && entry.evidenceTargetIds.length > 0
             && entry.scoringBundle.scoreParts.length > 0,
         )).toBe(true);
+        const memoryBridge = snapshot.memoryGraphRagBridgeSummary!;
+        expect(memoryBridge.schemaVersion).toBe('phoenix-memory-graphrag-bridge/v1');
+        expect(memoryBridge.sourceSnapshotId).toBe(snapshot.id);
+        expect(memoryBridge.paperShape.implementationMode).toBe('phoenix_bridge_contract');
+        expect(memoryBridge.paperShape.arxivId).toBe('2606.00610');
+        expect(memoryBridge.counters.schemaRecords).toBeGreaterThan(0);
+        expect(memoryBridge.counters.factRecords).toBeGreaterThan(0);
+        expect(memoryBridge.counters.passageRecords).toBeGreaterThan(0);
+        expect(memoryBridge.counters.evalRowCount).toBe(snapshot.counters.memoryGraphRagEvalRows);
+        expect(memoryBridge.counters.passedEvalRows).toBe(snapshot.counters.memoryGraphRagPassedEvalRows);
+        expect(memoryBridge.counters.mutationAllowedCount).toBe(0);
+        expect(memoryBridge.receipts.every((receipt) =>
+            receipt.reversible
+            && receipt.mutationAllowed === false
+            && receipt.invariant === 'memorygraphrag_bridge_no_topology_commit',
+        )).toBe(true);
+        expect(memoryBridge.agentContracts.map((contract) => contract.surface)).toEqual([
+            'observer_extraction',
+            'reflector_compression',
+            'retrieval_context',
+            'conflict_resolution',
+        ]);
+        expect(memoryBridge.compactEvalLedger.rowCount).toBe(memoryBridge.evalRows.length);
+        expect(memoryBridge.evalRows.some((row) => row.kind === 'hierarchical_retrieval')).toBe(true);
+        expect(memoryBridge.evalRows.some((row) => row.kind === 'reflection_seed')).toBe(true);
     });
 
     it('keeps rejected adjudication decisions in the ledger without mutating topology', () => {

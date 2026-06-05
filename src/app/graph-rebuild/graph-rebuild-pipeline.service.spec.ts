@@ -41,6 +41,7 @@ import { NerService } from '../services/ner.service';
 import type { GraphIndexRunRequest } from './graph-rebuild-snapshot';
 import type { CalendarRegistrySnapshot } from '../lib/fantasy-calendar/calendar-registry-snapshot';
 import type { GraphCalendarRegistryBridgeSummary } from './graph-calendar-registry-bridge';
+import type { GraphMemoryGraphRagBridgeSummary } from './graph-memory-graphrag-bridge';
 
 describe('GraphRebuildPipelineService', () => {
     let injector: EnvironmentInjector;
@@ -170,6 +171,10 @@ describe('GraphRebuildPipelineService', () => {
                 expect.objectContaining({
                     id: 'semanticEvalLedger',
                     label: 'Semantic Eval Ledger',
+                }),
+                expect.objectContaining({
+                    id: 'memoryGraphRagBridge',
+                    label: 'MemoryGraphRAG Bridge',
                 }),
             ]),
         }));
@@ -322,6 +327,15 @@ describe('GraphRebuildPipelineService', () => {
             }),
         }));
         expect(receipt.stageReceipts).toEqual(expect.arrayContaining([
+            expect.objectContaining({
+                id: 'memoryGraphRagBridge',
+                label: 'MemoryGraphRAG Bridge',
+                counters: expect.objectContaining({
+                    records: 3,
+                    evalRows: 2,
+                    mutationAllowed: 0,
+                }),
+            }),
             expect.objectContaining({
                 id: 'calendarRegistryBridge',
                 label: 'Calendar Registry Bridge',
@@ -781,6 +795,45 @@ function calendarRegistryBridgeSummary(): GraphCalendarRegistryBridgeSummary {
     };
 }
 
+function memoryGraphRagBridgeSummary(): GraphMemoryGraphRagBridgeSummary {
+    return {
+        schemaVersion: 'phoenix-memory-graphrag-bridge/v1',
+        generatedAt: 1,
+        sourceSnapshotId: 'snapshot-1',
+        paperShape: {
+            paperName: 'MemGraphRAG: Memory-based Multi-Agent System for Graph Retrieval-Augmented Generation',
+            arxivId: '2606.00610',
+            implementationMode: 'phoenix_bridge_contract',
+            mappedLayers: [],
+            skippedRuntimePieces: [],
+        },
+        agentContracts: [],
+        records: [],
+        evalRows: [],
+        receipts: [],
+        compactEvalLedger: { scopeId: 'note:note-1', builtAt: 1, rowCount: 2, rows: [] },
+        counters: {
+            byLayer: { schema: 1, fact: 1, passage: 1 },
+            bySurface: { retrieval_context: 3 },
+            byEvalKind: { hierarchical_retrieval: 1, reflection_seed: 1 },
+            recordCount: 3,
+            schemaRecords: 1,
+            factRecords: 1,
+            passageRecords: 1,
+            observerSeedRecords: 1,
+            reflectorSeedRecords: 1,
+            retrievalRecords: 3,
+            conflictRecords: 0,
+            evalRowCount: 2,
+            passedEvalRows: 2,
+            failedEvalRows: 0,
+            receiptCount: 5,
+            reversibleReceiptCount: 5,
+            mutationAllowedCount: 0,
+        },
+    };
+}
+
 function createGraphRebuildMock() {
     return {
         buildAndPersistSnapshot: vi.fn(async () => ({
@@ -832,12 +885,16 @@ function createGraphRebuildMock() {
                     graphChangeRows: 0,
                 },
             },
+            memoryGraphRagBridgeSummary: memoryGraphRagBridgeSummary(),
             calendarRegistrySummary: calendarRegistryBridgeSummary(),
             counters: {
                 nodes: 2,
                 edges: 1,
                 chunks: 1,
                 acceptedAnchors: 2,
+                memoryGraphRagRecords: 3,
+                memoryGraphRagEvalRows: 2,
+                memoryGraphRagMutationAllowed: 0,
                 calendarRegistryAnchors: 1,
                 calendarRegistryReceipts: 1,
                 calendarRegistryMutationAllowed: 0,

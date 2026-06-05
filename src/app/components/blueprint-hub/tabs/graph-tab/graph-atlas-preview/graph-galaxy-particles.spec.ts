@@ -72,6 +72,32 @@ describe('GraphGalaxyParticles', () => {
         particles.dispose();
     });
 
+    it('keeps tree-space tube particles on the target-styled edge path', () => {
+        const scene = particleScene();
+        const particles = new GraphGalaxyParticles();
+        const settings = { ...DEFAULT_GALAXY_SETTINGS, particleFlow: true, particleSpeed: 0, particleOpacity: 1, edgeMode: 'tube' as const };
+        const probe = particles as unknown as {
+            seeds: number[];
+            edgeTubeLift(data: GalaxySceneV2, settings: typeof settings, edge: number, source: number, target: number): number;
+            tubeEdgeTerminalFlourish(data: GalaxySceneV2, t: number, lift: number, sign: number): number;
+        };
+
+        const lift = probe.edgeTubeLift(scene, settings, 0, 0, 1);
+        expect(lift).toBeGreaterThan(probe.edgeTubeLift({ ...scene, layoutMode: 'single' }, settings, 0, 0, 1));
+        expect(probe.tubeEdgeTerminalFlourish(scene, 0.9, lift, 1)).toBeGreaterThan(0);
+        expect(probe.tubeEdgeTerminalFlourish(scene, 0.1, lift, 1)).toBe(0);
+
+        particles.bind(scene, settings);
+        probe.seeds[0] = 0.9;
+        particles.update(scene, scene.positions3d, settings, 0);
+
+        const position = particles.points.geometry.getAttribute('position') as THREE.BufferAttribute;
+        expect(position.getY(0)).toBeGreaterThan(0);
+        expect(Math.abs(position.getZ(0))).toBeGreaterThan(0.01);
+
+        particles.dispose();
+    });
+
     it('focuses Caps selection through structural ancestors instead of semantic hubs', () => {
         const scene = structuralCapsScene();
         const focus = buildGalaxyFocusMask(scene, 'kai', null);
@@ -176,6 +202,10 @@ describe('GraphGalaxyParticles', () => {
         product.positions3d = new Float32Array([2, 0, 0, 6, 0, 0]);
         particles.update(product, product.positions3d, settings, 0);
         expect(position.getX(0)).toBeCloseTo(3);
+
+        probe.seeds[0] = 0.95;
+        particles.update(product, product.positions3d, settings, 0);
+        expect(Math.abs(position.getY(0))).toBeLessThan(0.04);
 
         particles.bind(siegel, settings);
         probe.seeds[0] = 0.5;

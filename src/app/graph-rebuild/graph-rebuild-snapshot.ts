@@ -10,6 +10,7 @@ import type {
 } from './graph-compiler-read-model';
 import type { GraphModelV2Snapshot } from './graph-model-v2';
 import type { GraphCalendarRegistryBridgeSummary } from './graph-calendar-registry-bridge';
+import type { GraphMemoryGraphRagBridgeSummary } from './graph-memory-graphrag-bridge';
 
 export type GraphRebuildScopeKind = 'global' | 'folder' | 'narrative' | 'note' | 'multiNote';
 export type GraphRebuildAnchorSource = EntityOccurrence['source'] | 'accepted_suggestion';
@@ -1474,6 +1475,14 @@ export interface GraphRebuildCounters {
     semanticEvalModelDisagreements?: number;
     semanticEvalManifoldDisagreements?: number;
     semanticEvalGraphChangeRows?: number;
+    memoryGraphRagRecords?: number;
+    memoryGraphRagSchemaRecords?: number;
+    memoryGraphRagFactRecords?: number;
+    memoryGraphRagPassageRecords?: number;
+    memoryGraphRagEvalRows?: number;
+    memoryGraphRagPassedEvalRows?: number;
+    memoryGraphRagReceipts?: number;
+    memoryGraphRagMutationAllowed?: number;
     calendarRegistryAnchors?: number;
     calendarRegistryReceipts?: number;
     calendarRegistryAcceptedTemporalReceipts?: number;
@@ -1547,6 +1556,7 @@ export interface GraphRebuildSnapshot {
     semanticRerankSummary?: GraphSemanticRerankSummary;
     semanticAdjudicationSummary?: GraphSemanticAdjudicationDAGSummary;
     semanticEvalLedgerSummary?: GraphSemanticEvalLedgerSummary;
+    memoryGraphRagBridgeSummary?: GraphMemoryGraphRagBridgeSummary;
     calendarRegistrySummary?: GraphCalendarRegistryBridgeSummary;
     counters: GraphRebuildCounters;
     buildTimings?: GraphRebuildBuildTimings;

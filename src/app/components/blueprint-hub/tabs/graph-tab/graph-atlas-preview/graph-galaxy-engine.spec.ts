@@ -186,6 +186,17 @@ describe('Graph galaxy hybrid hierarchy', () => {
         expect(hybridRadiusOf(doc)).toBeLessThan(hybridRadiusOf(chunk) - 0.2);
         expect(hybridRadiusOf(chunk)).toBeGreaterThan(0.5);
         expect(hybridRadiusOf(chunk)).toBeLessThan(0.72);
+        expect(doc.hybridShell).toMatchObject({
+            mode: 'hybridShell',
+            geometryVersion: 'hybrid_shell_anatomy_v1',
+            lane: 'document',
+            level: 0,
+        });
+        expect(doc.hybridShellPoint?.radius).toBeCloseTo(hybridRadiusOf(doc), 5);
+        expect(chunk.hybridShellPoint?.radius).toBeCloseTo(hybridRadiusOf(chunk), 5);
+        expect(chunk.hybridRenderPoint).toEqual(chunk.hybridShellPoint);
+        expect(chunk.hybridShell?.sourceSignals).toContain('productLaneKind=document');
+        expect(chunk.entity.metadata?.['hybridShell']).toMatchObject({ lane: 'document' });
     });
 
     it('gives temporal and causal facts typed directions without leaving the Hybrid lane', () => {
@@ -247,8 +258,31 @@ describe('Graph galaxy hybrid hierarchy', () => {
             topPrototypeId: 'relation:approval',
             promotionReady: true,
         });
+        expect(bundle.hybridShell).toMatchObject({ lane: 'relationship' });
+        expect(bundle.hybridShellPoint).toBeDefined();
+        expect(bundle.hybridCommitment).toMatchObject({
+            mode: 'busemannCommitment',
+            topPrototypeId: 'relation:approval',
+            source: 'frontendCommitment',
+        });
+        expect(bundle.hybridCommitmentPoint?.radius).toBeCloseTo(hybridRadiusOf(bundle), 5);
+        expect(bundle.hybridRenderPoint).toEqual(bundle.hybridCommitmentPoint);
         expect(hybridRadiusOf(bundle)).toBeLessThan(0.95);
         expect(scene.busemannHorospheres?.some((spec) => spec.prototypeId === 'relation:approval')).toBe(true);
+        const v2 = galaxySceneToV2(scene, 'embeddings');
+        const receipt = v2.hybridReceipts?.find((item) => item.nodeId === 'bundle-approval');
+
+        expect(v2.hybridShellPositions?.length).toBe(3);
+        expect(v2.hybridCommitmentPositions?.length).toBe(3);
+        expect(v2.hybridCommitmentPositions?.[0]).toBeCloseTo(bundle.x, 5);
+        expect(receipt).toMatchObject({
+            nodeId: 'bundle-approval',
+            shell: { lane: 'relationship' },
+            commitment: {
+                topPrototypeId: 'relation:approval',
+                source: 'frontendCommitment',
+            },
+        });
     });
 
     it('keeps uncertain Busemann bundles near the interior instead of shell regions', () => {
@@ -285,6 +319,26 @@ describe('Graph galaxy Siegel-Finsler layout', () => {
         expect(scene.lorentzGuides?.some((guide) => guide.id.startsWith('siegel:lane:document'))).toBe(true);
         expect(scene.lorentzGuides?.some((guide) => guide.id === 'siegel:direction-axis')).toBe(true);
     });
+
+    it('keeps directed guides clean at the source and styled near the target', () => {
+        const scene = buildGalaxyScene([
+            siegelNode('chunk', 'Chunk 1', 'chunk', 'document', 2, []),
+            siegelNode('entity', 'Kai', 'entity', 'entity', 4, ['chunk']),
+        ], [
+            { id: 'chunk-entity', sourceId: 'chunk', targetId: 'entity', type: 'target-parent', confidence: 0.9 },
+        ], mergeGalaxySettings({ layoutMode: 'siegelFinsler' }));
+        const guide = scene.lorentzGuides?.find((item) => item.id === 'siegel:directed:chunk-entity');
+
+        expect(guide).toBeTruthy();
+        const sourceDeviation = chordDeviation(guide!.positions3d, 1);
+        const middleDeviation = chordDeviation(guide!.positions3d, Math.floor((guide!.positions3d.length / 3) * 0.5));
+        const terminalDeviation = chordDeviation(guide!.positions3d, guide!.positions3d.length / 3 - 2);
+
+        expect(sourceDeviation).toBeLessThan(terminalDeviation);
+        expect(terminalDeviation).toBeGreaterThan(0.015);
+        expect(terminalDeviation).toBeLessThan(0.075);
+        expect(terminalDeviation).toBeLessThan(middleDeviation * 0.55);
+    });
 });
 
 describe('Graph galaxy Product traversal manifold', () => {
@@ -317,6 +371,18 @@ function stable(index: number, salt: number): number {
 
 function hybridRadiusOf(node: { x: number; y: number; z: number }): number {
     return Math.hypot(node.x, node.y, node.z) / 2.32;
+}
+
+function chordDeviation(buffer: Float32Array, vertex: number): number {
+    const last = buffer.length - 3;
+    const ax = buffer[0], ay = buffer[1], az = buffer[2];
+    const bx = buffer[last], by = buffer[last + 1], bz = buffer[last + 2];
+    const px = buffer[vertex * 3], py = buffer[vertex * 3 + 1], pz = buffer[vertex * 3 + 2];
+    const dx = bx - ax, dy = by - ay, dz = bz - az;
+    const lengthSq = Math.max(0.000001, dx * dx + dy * dy + dz * dz);
+    const t = Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy + (pz - az) * dz) / lengthSq));
+    const qx = ax + dx * t, qy = ay + dy * t, qz = az + dz * t;
+    return Math.hypot(px - qx, py - qy, pz - qz);
 }
 
 function hybridNode(
