@@ -205,6 +205,8 @@ export class GraphRebuildPipelineService {
             appendDiscourseSpineStage(stageReceipts, completedSnapshot);
             appendDiscourseBridgeCandidateStage(stageReceipts, completedSnapshot);
             appendDiscourseBridgeAdjudicationStage(stageReceipts, completedSnapshot);
+            appendDiscourseEvalLedgerStage(stageReceipts, completedSnapshot);
+            appendDiscoursePromotionSurfaceStage(stageReceipts, completedSnapshot);
             appendCalendarRegistryStage(stageReceipts, completedSnapshot);
             appendSnapshotTimingStages(stageReceipts, completedSnapshot);
 
@@ -352,6 +354,8 @@ export class GraphRebuildPipelineService {
                 appendDiscourseSpineStage(stageReceipts, snapshot);
                 appendDiscourseBridgeCandidateStage(stageReceipts, snapshot);
                 appendDiscourseBridgeAdjudicationStage(stageReceipts, snapshot);
+                appendDiscourseEvalLedgerStage(stageReceipts, snapshot);
+                appendDiscoursePromotionSurfaceStage(stageReceipts, snapshot);
                 appendCalendarRegistryStage(stageReceipts, snapshot);
                 appendSnapshotTimingStages(stageReceipts, snapshot);
             }
@@ -569,6 +573,8 @@ export class GraphRebuildPipelineService {
             appendDiscourseSpineStage(stageReceipts, completedSnapshot);
             appendDiscourseBridgeCandidateStage(stageReceipts, completedSnapshot);
             appendDiscourseBridgeAdjudicationStage(stageReceipts, completedSnapshot);
+            appendDiscourseEvalLedgerStage(stageReceipts, completedSnapshot);
+            appendDiscoursePromotionSurfaceStage(stageReceipts, completedSnapshot);
             appendCalendarRegistryStage(stageReceipts, completedSnapshot);
             appendSnapshotTimingStages(stageReceipts, completedSnapshot);
 
@@ -1282,6 +1288,53 @@ function appendDiscourseBridgeAdjudicationStage(stageReceipts: GraphIndexStageRe
             mutationAllowed: summary.counters.mutationAllowedCount,
         },
         'Discourse bridge decisions are reversible ledger rows; accepted rows wait for a future promotion lane',
+    ));
+}
+
+function appendDiscourseEvalLedgerStage(stageReceipts: GraphIndexStageReceipt[], snapshot: GraphRebuildSnapshot): void {
+    const summary = snapshot.discourseEvalLedgerSummary;
+    if (!summary) return;
+    stageReceipts.push(instrumentationStage(
+        'discourseEvalLedger',
+        'Discourse Eval Ledger',
+        summary.counters.rowCount,
+        {
+            rows: summary.counters.rowCount,
+            acceptedCandidates: summary.counters.acceptedCandidates,
+            rejectedCandidates: summary.counters.rejectedCandidates,
+            ambiguousCases: summary.counters.ambiguousCases,
+            userCorrections: summary.counters.userCorrections,
+            modelDisagreements: summary.counters.modelDisagreements,
+            manifoldDisagreements: summary.counters.manifoldDisagreements,
+            evalDisagreements: summary.counters.evalDisagreements,
+            resonanceRows: summary.counters.resonanceRows,
+            resolutionRows: summary.counters.resolutionRows,
+            clusterReviewRows: summary.counters.clusterReviewRows,
+            graphChangeRows: summary.counters.graphChangeRows,
+        },
+        'Compact discourse dataset export ready for document classifiers, bridge rerankers, resolver evals, and model swaps',
+    ));
+}
+
+function appendDiscoursePromotionSurfaceStage(stageReceipts: GraphIndexStageReceipt[], snapshot: GraphRebuildSnapshot): void {
+    const summary = snapshot.discoursePromotionSurfaceSummary;
+    if (!summary) return;
+    stageReceipts.push(instrumentationStage(
+        'discoursePromotionSurface',
+        'Discourse Promotion Surface',
+        summary.counters.compilerHintCount,
+        {
+            chunkWormholes: summary.counters.chunkWormholeCount,
+            documentClusters: summary.counters.documentClusterCount,
+            resolverCandidates: summary.counters.resolverCandidateCount,
+            compilerHints: summary.counters.compilerHintCount,
+            acceptedRows: summary.counters.acceptedRows,
+            ambiguousRows: summary.counters.ambiguousRows,
+            receipts: summary.counters.receiptCount,
+            graphPatches: summary.counters.graphPatchCount,
+            mutationAllowed: summary.counters.mutationAllowedCount,
+        },
+        'Discourse wormholes, document clusters, and resolver hints are surfaced for UI/compiler consumers without graph patches',
     ));
 }
 

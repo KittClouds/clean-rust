@@ -14,6 +14,8 @@ import type { GraphMemoryGraphRagBridgeSummary } from './graph-memory-graphrag-b
 import type { GraphDiscourseSpineSummary } from './graph-discourse-spine';
 import type { GraphDiscourseBridgeCandidateSummary } from './graph-discourse-bridge-candidates';
 import type { GraphDiscourseBridgeAdjudicationSummary } from './graph-discourse-bridge-adjudication';
+import type { GraphDiscourseEvalLedgerSummary } from './graph-discourse-eval-ledger';
+import type { GraphDiscoursePromotionSurfaceSummary } from './graph-discourse-promotion-surface';
 
 export type GraphRebuildScopeKind = 'global' | 'folder' | 'narrative' | 'note' | 'multiNote';
 export type GraphRebuildAnchorSource = EntityOccurrence['source'] | 'accepted_suggestion';
@@ -1677,6 +1679,179 @@ export interface GraphDiscourseBridgeAdjudicationCounters {
     compactRowCount: number;
 }
 
+export type GraphDiscourseEvalLedgerLabel =
+    | 'accepted_candidate'
+    | 'rejected_candidate'
+    | 'ambiguous_case'
+    | 'model_disagreement'
+    | 'manifold_disagreement';
+
+export interface GraphDiscourseEvalLedgerEntry {
+    id: string;
+    candidateId: string;
+    decisionId: string;
+    label: GraphDiscourseEvalLedgerLabel;
+    candidateKind: GraphDiscourseBridgeCandidateKind;
+    adjudicationState: GraphDiscourseBridgeAdjudicationState;
+    sourceHypothesis: string;
+    evidenceTargetIds: string[];
+    score: number;
+    scoringBundle: GraphDiscourseBridgeAdjudicationScoringBundle;
+    rerank?: {
+        judgmentId: string;
+        decision: GraphSemanticRerankDecision;
+        scoreSource: GraphSemanticRerankScoreSource;
+        topLabelKind: GraphDiscourseBridgeRerankLabelKind;
+        relevanceScore: number;
+        calibratedScore: number;
+    };
+    candidateEval?: {
+        evalRowId: string;
+        kind: GraphDiscourseBridgeEvalKind;
+        expectedLabelKind: GraphDiscourseBridgeRerankLabelKind;
+        score: number;
+        passed: boolean;
+        failureModes: string[];
+    };
+    discourseReceipts: {
+        semanticScore: number;
+        labelAgreement: number;
+        entityOverlap: number;
+        distanceScore: number;
+        corefPressure: number;
+        finalScore: number;
+    };
+    flags: string[];
+    beforeGraph: {
+        edgeCount: number;
+        factIds: string[];
+        edgeIds: string[];
+    };
+    afterGraph: {
+        edgeCount: number;
+        factIds: string[];
+        edgeIds: string[];
+    };
+    userCorrectionIds: string[];
+    rationale: string[];
+}
+
+export interface GraphDiscourseEvalLedgerCounters {
+    rowCount: number;
+    byLabel: Record<string, number>;
+    byCandidateKind: Record<string, number>;
+    byState: Record<string, number>;
+    acceptedCandidates: number;
+    rejectedCandidates: number;
+    ambiguousCases: number;
+    userCorrections: number;
+    modelDisagreements: number;
+    manifoldDisagreements: number;
+    evalDisagreements: number;
+    graphChangeRows: number;
+    resonanceRows: number;
+    resolutionRows: number;
+    clusterReviewRows: number;
+}
+
+export type GraphDiscoursePromotionHintKind =
+    | 'chunk_wormhole'
+    | 'document_cluster'
+    | 'cross_doc_resolution';
+
+export interface GraphDiscoursePromotionCompilerHint {
+    id: string;
+    kind: GraphDiscoursePromotionHintKind;
+    sourceLedgerEntryId: string;
+    candidateId: string;
+    decisionId: string;
+    sourceTargetId: string;
+    targetTargetId?: string;
+    memberTargetIds: string[];
+    evidenceTargetIds: string[];
+    proposedEdgeType?: string;
+    confidence: number;
+    status: 'read_model_only';
+    mutationAllowed: false;
+    rationale: string[];
+}
+
+export interface GraphDiscourseChunkWormhole {
+    id: string;
+    sourceLedgerEntryId: string;
+    candidateId: string;
+    decisionId: string;
+    sourceTargetId: string;
+    targetTargetId: string;
+    score: number;
+    label: GraphDiscourseEvalLedgerLabel;
+    state: GraphDiscourseBridgeAdjudicationState;
+    evidenceTargetIds: string[];
+    flags: string[];
+    compilerHintId: string;
+    mutationAllowed: false;
+}
+
+export interface GraphDiscourseDocumentClusterView {
+    id: string;
+    sourceLedgerEntryId: string;
+    candidateId: string;
+    decisionId: string;
+    sourceClusterId?: string;
+    medoidTargetId: string;
+    memberTargetIds: string[];
+    score: number;
+    label: GraphDiscourseEvalLedgerLabel;
+    state: GraphDiscourseBridgeAdjudicationState;
+    flags: string[];
+    compilerHintId: string;
+    mutationAllowed: false;
+}
+
+export interface GraphDiscourseResolverCandidateView {
+    id: string;
+    sourceLedgerEntryId: string;
+    candidateId: string;
+    decisionId: string;
+    sourceTargetId: string;
+    targetTargetId: string;
+    sharedEntityIds: string[];
+    score: number;
+    label: GraphDiscourseEvalLedgerLabel;
+    state: GraphDiscourseBridgeAdjudicationState;
+    evidenceTargetIds: string[];
+    flags: string[];
+    compilerHintId: string;
+    mutationAllowed: false;
+}
+
+export interface GraphDiscoursePromotionReceipt {
+    id: string;
+    sourceLedgerEntryId: string;
+    compilerHintId: string;
+    reversible: true;
+    mutationAllowed: false;
+    invariant: 'discourse_promotion_surface_no_topology_commit';
+    evidenceTargetIds: string[];
+    undoHint: string;
+    detail: string;
+}
+
+export interface GraphDiscoursePromotionCounters {
+    byHintKind: Record<string, number>;
+    byLabel: Record<string, number>;
+    chunkWormholeCount: number;
+    documentClusterCount: number;
+    resolverCandidateCount: number;
+    compilerHintCount: number;
+    receiptCount: number;
+    reversibleReceiptCount: number;
+    graphPatchCount: number;
+    mutationAllowedCount: number;
+    acceptedRows: number;
+    ambiguousRows: number;
+}
+
 export interface GraphRebuildEntityLinkCounters {
     candidateMentions: number;
     candidateLinks: number;
@@ -1840,6 +2015,20 @@ export interface GraphRebuildCounters {
     discourseBridgeAdjudicationLedgerOnly?: number;
     discourseBridgeAdjudicationTopologyCommits?: number;
     discourseBridgeAdjudicationMutationAllowed?: number;
+    discourseEvalLedgerRows?: number;
+    discourseEvalAcceptedCandidates?: number;
+    discourseEvalRejectedCandidates?: number;
+    discourseEvalAmbiguousCases?: number;
+    discourseEvalModelDisagreements?: number;
+    discourseEvalManifoldDisagreements?: number;
+    discourseEvalGraphChangeRows?: number;
+    discoursePromotionChunkWormholes?: number;
+    discoursePromotionDocumentClusters?: number;
+    discoursePromotionResolverCandidates?: number;
+    discoursePromotionCompilerHints?: number;
+    discoursePromotionReceipts?: number;
+    discoursePromotionGraphPatches?: number;
+    discoursePromotionMutationAllowed?: number;
     calendarRegistryAnchors?: number;
     calendarRegistryReceipts?: number;
     calendarRegistryAcceptedTemporalReceipts?: number;
@@ -1917,6 +2106,8 @@ export interface GraphRebuildSnapshot {
     discourseSpineSummary?: GraphDiscourseSpineSummary;
     discourseBridgeCandidateSummary?: GraphDiscourseBridgeCandidateSummary;
     discourseBridgeAdjudicationSummary?: GraphDiscourseBridgeAdjudicationSummary;
+    discourseEvalLedgerSummary?: GraphDiscourseEvalLedgerSummary;
+    discoursePromotionSurfaceSummary?: GraphDiscoursePromotionSurfaceSummary;
     calendarRegistrySummary?: GraphCalendarRegistryBridgeSummary;
     counters: GraphRebuildCounters;
     buildTimings?: GraphRebuildBuildTimings;

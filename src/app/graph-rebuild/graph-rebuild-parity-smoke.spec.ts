@@ -213,6 +213,8 @@ describe('Phoenix graph rebuild parity smoke', () => {
             discourseSpine: compactDiscourseSpine(snapshot),
             discourseBridgeCandidates: compactDiscourseBridgeCandidates(snapshot),
             discourseBridgeAdjudication: compactDiscourseBridgeAdjudication(snapshot),
+            discourseEvalLedger: compactDiscourseEvalLedger(snapshot),
+            discoursePromotionSurface: compactDiscoursePromotionSurface(snapshot),
             candidateNoise: snapshot.semanticCandidateSummary?.counters.averageNoiseScore,
             elapsedMs: Math.round(elapsedMs),
         }));
@@ -366,6 +368,33 @@ describe('Phoenix graph rebuild parity smoke', () => {
             && receipt.mutationAllowed === false
             && receipt.invariant === 'discourse_bridge_adjudication_ledger_only',
         )).toBe(true);
+        expect(snapshot.discourseEvalLedgerSummary?.schemaVersion).toBe('phoenix-discourse-eval-ledger/v1');
+        expect(snapshot.discourseEvalLedgerSummary?.compactExport.rowCount).toBe(snapshot.counters.discourseEvalLedgerRows);
+        expect(snapshot.discourseEvalLedgerSummary?.counters.rowCount).toBe(snapshot.discourseBridgeAdjudicationSummary?.counters.decisionCount);
+        expect(snapshot.discourseEvalLedgerSummary?.counters.acceptedCandidates).toBeGreaterThan(0);
+        expect(snapshot.discourseEvalLedgerSummary?.counters.ambiguousCases).toBeGreaterThan(0);
+        expect(snapshot.discourseEvalLedgerSummary?.counters.graphChangeRows).toBe(0);
+        expect(snapshot.discourseEvalLedgerSummary?.compactExport.rows.every((row) =>
+            row.evidence > 0
+            && row.score >= 0
+            && row.score <= 1
+            && row.changedEdges === 0
+            && row.changedFacts === 0,
+        )).toBe(true);
+        expect(snapshot.discoursePromotionSurfaceSummary?.schemaVersion).toBe('phoenix-discourse-promotion-surface/v1');
+        expect(snapshot.discoursePromotionSurfaceSummary?.invariant).toBe('discourse_promotion_surface_no_topology_commit');
+        expect(snapshot.discoursePromotionSurfaceSummary?.counters.chunkWormholeCount).toBeGreaterThan(0);
+        expect(snapshot.discoursePromotionSurfaceSummary?.counters.documentClusterCount).toBeGreaterThan(0);
+        expect(snapshot.discoursePromotionSurfaceSummary?.counters.compilerHintCount).toBe(
+            (snapshot.discoursePromotionSurfaceSummary?.counters.chunkWormholeCount || 0)
+            + (snapshot.discoursePromotionSurfaceSummary?.counters.documentClusterCount || 0)
+            + (snapshot.discoursePromotionSurfaceSummary?.counters.resolverCandidateCount || 0),
+        );
+        expect(snapshot.discoursePromotionSurfaceSummary?.counters.graphPatchCount).toBe(0);
+        expect(snapshot.discoursePromotionSurfaceSummary?.counters.mutationAllowedCount).toBe(0);
+        expect(snapshot.discoursePromotionSurfaceSummary?.compilerHints.every((hint) =>
+            hint.status === 'read_model_only' && hint.mutationAllowed === false,
+        )).toBe(true);
         expect(elapsedMs).toBeLessThan(8000);
     });
 
@@ -418,6 +447,8 @@ describe('Phoenix graph rebuild parity smoke', () => {
             discourseSpine: compactDiscourseSpine(snapshot),
             discourseBridgeCandidates: compactDiscourseBridgeCandidates(snapshot),
             discourseBridgeAdjudication: compactDiscourseBridgeAdjudication(snapshot),
+            discourseEvalLedger: compactDiscourseEvalLedger(snapshot),
+            discoursePromotionSurface: compactDiscoursePromotionSurface(snapshot),
             candidateNoise: snapshot.semanticCandidateSummary?.counters.averageNoiseScore,
             elapsedMs: Math.round(elapsedMs),
         }));
@@ -518,6 +549,28 @@ describe('Phoenix graph rebuild parity smoke', () => {
             && decision.affectedGraphAtomIds.length === 0
             && decision.affectedGraphFactIds.length === 0,
         )).toBe(true);
+        expect(snapshot.discourseEvalLedgerSummary?.schemaVersion).toBe('phoenix-discourse-eval-ledger/v1');
+        expect(snapshot.discourseEvalLedgerSummary?.counters.rowCount).toBe(snapshot.discourseBridgeAdjudicationSummary?.counters.decisionCount);
+        expect(snapshot.discourseEvalLedgerSummary?.counters.acceptedCandidates).toBe(snapshot.discourseBridgeAdjudicationSummary?.counters.acceptedCount);
+        expect(snapshot.discourseEvalLedgerSummary?.counters.ambiguousCases).toBeGreaterThan(0);
+        expect(snapshot.discourseEvalLedgerSummary?.counters.manifoldDisagreements).toBeGreaterThan(0);
+        expect(snapshot.discourseEvalLedgerSummary?.counters.graphChangeRows).toBe(0);
+        expect(snapshot.discourseEvalLedgerSummary?.entries.every((entry) =>
+            entry.beforeGraph.edgeCount === entry.afterGraph.edgeCount
+            && entry.afterGraph.edgeIds.length === 0
+            && entry.afterGraph.factIds.length === 0,
+        )).toBe(true);
+        expect(snapshot.discoursePromotionSurfaceSummary?.schemaVersion).toBe('phoenix-discourse-promotion-surface/v1');
+        expect(snapshot.discoursePromotionSurfaceSummary?.counters.chunkWormholeCount).toBeGreaterThan(40);
+        expect(snapshot.discoursePromotionSurfaceSummary?.counters.documentClusterCount).toBeGreaterThan(0);
+        expect(snapshot.discoursePromotionSurfaceSummary?.counters.compilerHintCount).toBe(snapshot.discoursePromotionSurfaceSummary?.compactSurface.rowCount);
+        expect(snapshot.discoursePromotionSurfaceSummary?.counters.graphPatchCount).toBe(0);
+        expect(snapshot.discoursePromotionSurfaceSummary?.counters.mutationAllowedCount).toBe(0);
+        expect(snapshot.discoursePromotionSurfaceSummary?.receipts.every((receipt) =>
+            receipt.reversible
+            && receipt.mutationAllowed === false
+            && receipt.invariant === 'discourse_promotion_surface_no_topology_commit',
+        )).toBe(true);
         expect(snapshot.embeddingGraphPostProcess?.metrics.plannedPairCount).toBeLessThan(
             snapshot.embeddingGraphPostProcess?.metrics.theoreticalPairCount || 0,
         );
@@ -616,6 +669,39 @@ function compactDiscourseBridgeAdjudication(snapshot: GraphRebuildSnapshot) {
         topologyCommits: summary.counters.topologyCommitCount,
         mutationAllowed: summary.counters.mutationAllowedCount,
         sample: summary.compactDecisionLedger.rows.slice(0, 3),
+    } : null;
+}
+
+function compactDiscourseEvalLedger(snapshot: GraphRebuildSnapshot) {
+    const summary = snapshot.discourseEvalLedgerSummary;
+    return summary ? {
+        rows: summary.counters.rowCount,
+        byLabel: summary.counters.byLabel,
+        byState: summary.counters.byState,
+        accepted: summary.counters.acceptedCandidates,
+        rejected: summary.counters.rejectedCandidates,
+        ambiguous: summary.counters.ambiguousCases,
+        modelDisagreements: summary.counters.modelDisagreements,
+        manifoldDisagreements: summary.counters.manifoldDisagreements,
+        evalDisagreements: summary.counters.evalDisagreements,
+        graphChanges: summary.counters.graphChangeRows,
+        sample: summary.compactExport.rows.slice(0, 3),
+    } : null;
+}
+
+function compactDiscoursePromotionSurface(snapshot: GraphRebuildSnapshot) {
+    const summary = snapshot.discoursePromotionSurfaceSummary;
+    return summary ? {
+        wormholes: summary.counters.chunkWormholeCount,
+        clusters: summary.counters.documentClusterCount,
+        resolvers: summary.counters.resolverCandidateCount,
+        hints: summary.counters.compilerHintCount,
+        byHintKind: summary.counters.byHintKind,
+        acceptedRows: summary.counters.acceptedRows,
+        ambiguousRows: summary.counters.ambiguousRows,
+        graphPatches: summary.counters.graphPatchCount,
+        mutationAllowed: summary.counters.mutationAllowedCount,
+        sample: summary.compactSurface.rows.slice(0, 3),
     } : null;
 }
 

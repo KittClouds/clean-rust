@@ -41,6 +41,8 @@ import { buildGraphMemoryGraphRagBridgeSummary } from './graph-memory-graphrag-b
 import { buildGraphDiscourseSpineSummary } from './graph-discourse-spine';
 import { buildGraphDiscourseBridgeCandidateSummary } from './graph-discourse-bridge-candidates';
 import { buildGraphDiscourseBridgeAdjudicationSummary } from './graph-discourse-bridge-adjudication';
+import { buildGraphDiscourseEvalLedgerSummary } from './graph-discourse-eval-ledger';
+import { buildGraphDiscoursePromotionSurfaceSummary } from './graph-discourse-promotion-surface';
 
 export { buildGraphRebuildAliasResolver, normalizeGraphRebuildCandidate };
 
@@ -308,6 +310,24 @@ export function buildGraphRebuildSnapshot(input: BuildGraphRebuildSnapshotInput)
     snapshot.counters.discourseBridgeAdjudicationLedgerOnly = discourseBridgeAdjudicationSummary.counters.ledgerOnlyCount;
     snapshot.counters.discourseBridgeAdjudicationTopologyCommits = discourseBridgeAdjudicationSummary.counters.topologyCommitCount;
     snapshot.counters.discourseBridgeAdjudicationMutationAllowed = discourseBridgeAdjudicationSummary.counters.mutationAllowedCount;
+    const discourseEvalLedgerSummary = buildGraphDiscourseEvalLedgerSummary(snapshot, builtAt);
+    snapshot.discourseEvalLedgerSummary = discourseEvalLedgerSummary;
+    snapshot.counters.discourseEvalLedgerRows = discourseEvalLedgerSummary.counters.rowCount;
+    snapshot.counters.discourseEvalAcceptedCandidates = discourseEvalLedgerSummary.counters.acceptedCandidates;
+    snapshot.counters.discourseEvalRejectedCandidates = discourseEvalLedgerSummary.counters.rejectedCandidates;
+    snapshot.counters.discourseEvalAmbiguousCases = discourseEvalLedgerSummary.counters.ambiguousCases;
+    snapshot.counters.discourseEvalModelDisagreements = discourseEvalLedgerSummary.counters.modelDisagreements;
+    snapshot.counters.discourseEvalManifoldDisagreements = discourseEvalLedgerSummary.counters.manifoldDisagreements;
+    snapshot.counters.discourseEvalGraphChangeRows = discourseEvalLedgerSummary.counters.graphChangeRows;
+    const discoursePromotionSurfaceSummary = buildGraphDiscoursePromotionSurfaceSummary(snapshot, builtAt);
+    snapshot.discoursePromotionSurfaceSummary = discoursePromotionSurfaceSummary;
+    snapshot.counters.discoursePromotionChunkWormholes = discoursePromotionSurfaceSummary.counters.chunkWormholeCount;
+    snapshot.counters.discoursePromotionDocumentClusters = discoursePromotionSurfaceSummary.counters.documentClusterCount;
+    snapshot.counters.discoursePromotionResolverCandidates = discoursePromotionSurfaceSummary.counters.resolverCandidateCount;
+    snapshot.counters.discoursePromotionCompilerHints = discoursePromotionSurfaceSummary.counters.compilerHintCount;
+    snapshot.counters.discoursePromotionReceipts = discoursePromotionSurfaceSummary.counters.receiptCount;
+    snapshot.counters.discoursePromotionGraphPatches = discoursePromotionSurfaceSummary.counters.graphPatchCount;
+    snapshot.counters.discoursePromotionMutationAllowed = discoursePromotionSurfaceSummary.counters.mutationAllowedCount;
     const calendarRegistrySummary = buildGraphCalendarRegistryBridgeSummary({
         calendarRegistry: input.calendarRegistrySnapshot,
         sourceSnapshotId: snapshot.id,

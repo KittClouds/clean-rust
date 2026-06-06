@@ -45,6 +45,8 @@ import type { GraphMemoryGraphRagBridgeSummary } from './graph-memory-graphrag-b
 import type { GraphDiscourseSpineSummary } from './graph-discourse-spine';
 import type { GraphDiscourseBridgeCandidateSummary } from './graph-discourse-bridge-candidates';
 import type { GraphDiscourseBridgeAdjudicationSummary } from './graph-discourse-bridge-adjudication';
+import type { GraphDiscourseEvalLedgerSummary } from './graph-discourse-eval-ledger';
+import type { GraphDiscoursePromotionSurfaceSummary } from './graph-discourse-promotion-surface';
 
 describe('GraphRebuildPipelineService', () => {
     let injector: EnvironmentInjector;
@@ -364,6 +366,27 @@ describe('GraphRebuildPipelineService', () => {
                     decisions: 2,
                     ledgerOnly: 2,
                     topologyCommits: 0,
+                    mutationAllowed: 0,
+                }),
+            }),
+            expect.objectContaining({
+                id: 'discourseEvalLedger',
+                label: 'Discourse Eval Ledger',
+                counters: expect.objectContaining({
+                    rows: 2,
+                    acceptedCandidates: 1,
+                    ambiguousCases: 1,
+                    graphChangeRows: 0,
+                }),
+            }),
+            expect.objectContaining({
+                id: 'discoursePromotionSurface',
+                label: 'Discourse Promotion Surface',
+                counters: expect.objectContaining({
+                    chunkWormholes: 1,
+                    documentClusters: 1,
+                    compilerHints: 2,
+                    graphPatches: 0,
                     mutationAllowed: 0,
                 }),
             }),
@@ -977,6 +1000,72 @@ function discourseBridgeAdjudicationSummary(): GraphDiscourseBridgeAdjudicationS
     };
 }
 
+function discourseEvalLedgerSummary(): GraphDiscourseEvalLedgerSummary {
+    return {
+        schemaVersion: 'phoenix-discourse-eval-ledger/v1',
+        generatedAt: 1,
+        sourceSnapshotId: 'snapshot-1',
+        sourceAdjudicationSummaryId: 'snapshot-1:discourse-bridge-adjudication:1',
+        datasetPurpose: [
+            'classifier_training',
+            'reranker_eval',
+            'router_tuning',
+            'model_swap_regression',
+            'document_cluster_eval',
+            'cross_doc_resolver_training',
+        ],
+        entries: [],
+        compactExport: { scopeId: 'note:note-1', builtAt: 1, rowCount: 2, rows: [] },
+        counters: {
+            rowCount: 2,
+            byLabel: { accepted_candidate: 1, ambiguous_case: 1 },
+            byCandidateKind: { discourse_resonance: 1, cross_doc_resolution: 1 },
+            byState: { accepted: 1, supported: 1 },
+            acceptedCandidates: 1,
+            rejectedCandidates: 0,
+            ambiguousCases: 1,
+            userCorrections: 0,
+            modelDisagreements: 0,
+            manifoldDisagreements: 1,
+            evalDisagreements: 0,
+            graphChangeRows: 0,
+            resonanceRows: 1,
+            resolutionRows: 1,
+            clusterReviewRows: 0,
+        },
+    };
+}
+
+function discoursePromotionSurfaceSummary(): GraphDiscoursePromotionSurfaceSummary {
+    return {
+        schemaVersion: 'phoenix-discourse-promotion-surface/v1',
+        generatedAt: 1,
+        sourceSnapshotId: 'snapshot-1',
+        sourceEvalLedgerId: 'snapshot-1:discourse-eval-ledger:1',
+        invariant: 'discourse_promotion_surface_no_topology_commit',
+        chunkWormholes: [],
+        documentClusters: [],
+        resolverCandidates: [],
+        compilerHints: [],
+        receipts: [],
+        compactSurface: { scopeId: 'note:note-1', builtAt: 1, rowCount: 2, rows: [] },
+        counters: {
+            byHintKind: { chunk_wormhole: 1, document_cluster: 1 },
+            byLabel: { accepted_candidate: 1, ambiguous_case: 1 },
+            chunkWormholeCount: 1,
+            documentClusterCount: 1,
+            resolverCandidateCount: 0,
+            compilerHintCount: 2,
+            receiptCount: 2,
+            reversibleReceiptCount: 2,
+            graphPatchCount: 0,
+            mutationAllowedCount: 0,
+            acceptedRows: 1,
+            ambiguousRows: 1,
+        },
+    };
+}
+
 function createGraphRebuildMock() {
     return {
         buildAndPersistSnapshot: vi.fn(async () => ({
@@ -1032,6 +1121,8 @@ function createGraphRebuildMock() {
             discourseSpineSummary: discourseSpineSummary(),
             discourseBridgeCandidateSummary: discourseBridgeCandidateSummary(),
             discourseBridgeAdjudicationSummary: discourseBridgeAdjudicationSummary(),
+            discourseEvalLedgerSummary: discourseEvalLedgerSummary(),
+            discoursePromotionSurfaceSummary: discoursePromotionSurfaceSummary(),
             calendarRegistrySummary: calendarRegistryBridgeSummary(),
             counters: {
                 nodes: 2,
@@ -1051,6 +1142,15 @@ function createGraphRebuildMock() {
                 discourseBridgeAdjudicationLedgerOnly: 2,
                 discourseBridgeAdjudicationTopologyCommits: 0,
                 discourseBridgeAdjudicationMutationAllowed: 0,
+                discourseEvalLedgerRows: 2,
+                discourseEvalAcceptedCandidates: 1,
+                discourseEvalAmbiguousCases: 1,
+                discourseEvalGraphChangeRows: 0,
+                discoursePromotionChunkWormholes: 1,
+                discoursePromotionDocumentClusters: 1,
+                discoursePromotionCompilerHints: 2,
+                discoursePromotionGraphPatches: 0,
+                discoursePromotionMutationAllowed: 0,
                 calendarRegistryAnchors: 1,
                 calendarRegistryReceipts: 1,
                 calendarRegistryMutationAllowed: 0,
