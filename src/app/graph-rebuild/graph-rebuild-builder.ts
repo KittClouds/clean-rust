@@ -38,6 +38,9 @@ import {
 import { buildGraphSemanticEvalLedgerSummary } from './graph-semantic-eval-ledger';
 import { buildGraphCalendarRegistryBridgeSummary } from './graph-calendar-registry-bridge';
 import { buildGraphMemoryGraphRagBridgeSummary } from './graph-memory-graphrag-bridge';
+import { buildGraphDiscourseSpineSummary } from './graph-discourse-spine';
+import { buildGraphDiscourseBridgeCandidateSummary } from './graph-discourse-bridge-candidates';
+import { buildGraphDiscourseBridgeAdjudicationSummary } from './graph-discourse-bridge-adjudication';
 
 export { buildGraphRebuildAliasResolver, normalizeGraphRebuildCandidate };
 
@@ -275,6 +278,36 @@ export function buildGraphRebuildSnapshot(input: BuildGraphRebuildSnapshotInput)
     snapshot.counters.memoryGraphRagPassedEvalRows = memoryGraphRagBridgeSummary.counters.passedEvalRows;
     snapshot.counters.memoryGraphRagReceipts = memoryGraphRagBridgeSummary.counters.receiptCount;
     snapshot.counters.memoryGraphRagMutationAllowed = memoryGraphRagBridgeSummary.counters.mutationAllowedCount;
+    const discourseSpineSummary = buildGraphDiscourseSpineSummary(snapshot, builtAt);
+    snapshot.discourseSpineSummary = discourseSpineSummary;
+    snapshot.counters.discourseSpineTargets = discourseSpineSummary.counters.targetCount;
+    snapshot.counters.discourseSpineLabels = discourseSpineSummary.counters.labelCount;
+    snapshot.counters.discourseSpineClusters = discourseSpineSummary.counters.clusterCount;
+    snapshot.counters.discourseSpineBridges = discourseSpineSummary.counters.bridgeCount;
+    snapshot.counters.discourseSpineResonance = discourseSpineSummary.counters.resonanceCandidates;
+    snapshot.counters.discourseSpineResolution = discourseSpineSummary.counters.resolutionCandidates;
+    snapshot.counters.discourseSpineReceipts = discourseSpineSummary.counters.receiptCount;
+    snapshot.counters.discourseSpineMutationAllowed = discourseSpineSummary.counters.mutationAllowedCount;
+    const discourseBridgeCandidateSummary = buildGraphDiscourseBridgeCandidateSummary(snapshot, discourseSpineSummary, builtAt);
+    snapshot.discourseBridgeCandidateSummary = discourseBridgeCandidateSummary;
+    snapshot.counters.discourseBridgeCandidates = discourseBridgeCandidateSummary.counters.candidateCount;
+    snapshot.counters.discourseBridgeInputs = discourseBridgeCandidateSummary.counters.inputCount;
+    snapshot.counters.discourseBridgeJudgments = discourseBridgeCandidateSummary.counters.judgmentCount;
+    snapshot.counters.discourseBridgeEvalRows = discourseBridgeCandidateSummary.counters.evalRowCount;
+    snapshot.counters.discourseBridgeReceipts = discourseBridgeCandidateSummary.counters.receiptCount;
+    snapshot.counters.discourseBridgePlannedModelCalls = discourseBridgeCandidateSummary.counters.plannedModelCalls;
+    snapshot.counters.discourseBridgeMutationAllowed = discourseBridgeCandidateSummary.counters.mutationAllowedCount;
+    const discourseBridgeAdjudicationSummary = buildGraphDiscourseBridgeAdjudicationSummary(snapshot, discourseBridgeCandidateSummary, builtAt);
+    snapshot.discourseBridgeAdjudicationSummary = discourseBridgeAdjudicationSummary;
+    snapshot.counters.discourseBridgeAdjudicationDecisions = discourseBridgeAdjudicationSummary.counters.decisionCount;
+    snapshot.counters.discourseBridgeAdjudicationAccepted = discourseBridgeAdjudicationSummary.counters.acceptedCount;
+    snapshot.counters.discourseBridgeAdjudicationSupported = discourseBridgeAdjudicationSummary.counters.supportedCount;
+    snapshot.counters.discourseBridgeAdjudicationDeferred = discourseBridgeAdjudicationSummary.counters.deferredCount;
+    snapshot.counters.discourseBridgeAdjudicationRejected = discourseBridgeAdjudicationSummary.counters.rejectedCount;
+    snapshot.counters.discourseBridgeAdjudicationReceipts = discourseBridgeAdjudicationSummary.counters.receiptCount;
+    snapshot.counters.discourseBridgeAdjudicationLedgerOnly = discourseBridgeAdjudicationSummary.counters.ledgerOnlyCount;
+    snapshot.counters.discourseBridgeAdjudicationTopologyCommits = discourseBridgeAdjudicationSummary.counters.topologyCommitCount;
+    snapshot.counters.discourseBridgeAdjudicationMutationAllowed = discourseBridgeAdjudicationSummary.counters.mutationAllowedCount;
     const calendarRegistrySummary = buildGraphCalendarRegistryBridgeSummary({
         calendarRegistry: input.calendarRegistrySnapshot,
         sourceSnapshotId: snapshot.id,

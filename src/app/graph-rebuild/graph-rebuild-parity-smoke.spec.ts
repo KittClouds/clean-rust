@@ -210,6 +210,9 @@ describe('Phoenix graph rebuild parity smoke', () => {
             semanticAdjudicationStates: snapshot.semanticAdjudicationSummary?.counters.byState,
             semanticEvalLedger: compactEvalLedger(snapshot),
             memoryGraphRagBridge: compactMemoryGraphRagBridge(snapshot),
+            discourseSpine: compactDiscourseSpine(snapshot),
+            discourseBridgeCandidates: compactDiscourseBridgeCandidates(snapshot),
+            discourseBridgeAdjudication: compactDiscourseBridgeAdjudication(snapshot),
             candidateNoise: snapshot.semanticCandidateSummary?.counters.averageNoiseScore,
             elapsedMs: Math.round(elapsedMs),
         }));
@@ -325,6 +328,44 @@ describe('Phoenix graph rebuild parity smoke', () => {
         expect(snapshot.semanticEvalLedgerSummary?.compactExport.rows.every((row) =>
             row.evidence > 0 && row.score >= 0 && row.score <= 1,
         )).toBe(true);
+        expect(snapshot.discourseSpineSummary?.schemaVersion).toBe('phoenix-discourse-spine/v1');
+        expect(snapshot.discourseSpineSummary?.invariant).toBe('wormholes_are_proposals_not_edges');
+        expect(snapshot.discourseSpineSummary?.counters.documentRoots).toBeGreaterThan(0);
+        expect(snapshot.discourseSpineSummary?.counters.documents).toBeGreaterThan(0);
+        expect(snapshot.discourseSpineSummary?.counters.chunks).toBeGreaterThan(0);
+        expect(snapshot.discourseSpineSummary?.counters.labelCount).toBeGreaterThan(0);
+        expect(snapshot.discourseSpineSummary?.counters.bridgeCount).toBeGreaterThan(0);
+        expect(snapshot.discourseSpineSummary?.counters.mutationAllowedCount).toBe(0);
+        expect(snapshot.discourseSpineSummary?.receipts.every((receipt) =>
+            receipt.reversible
+            && receipt.mutationAllowed === false
+            && receipt.invariant === 'discourse_spine_no_topology_commit',
+        )).toBe(true);
+        expect(snapshot.discourseBridgeCandidateSummary?.schemaVersion).toBe('phoenix-discourse-bridge-candidates/v1');
+        expect(snapshot.discourseBridgeCandidateSummary?.modelId).toBe('knowledgator/gliclass-instruct-base-v1.0');
+        expect(snapshot.discourseBridgeCandidateSummary?.counters.candidateCount).toBeGreaterThan(0);
+        expect(snapshot.discourseBridgeCandidateSummary?.counters.evalRowCount).toBe(snapshot.discourseBridgeCandidateSummary?.counters.candidateCount);
+        expect(snapshot.discourseBridgeCandidateSummary?.counters.plannedModelCalls).toBeGreaterThan(snapshot.discourseBridgeCandidateSummary?.counters.inputCount || 0);
+        expect(snapshot.discourseBridgeCandidateSummary?.counters.mutationAllowedCount).toBe(0);
+        expect(snapshot.discourseBridgeCandidateSummary?.receipts.every((receipt) =>
+            receipt.reversible
+            && receipt.mutationAllowed === false
+            && receipt.invariant === 'discourse_bridge_candidates_no_topology_commit',
+        )).toBe(true);
+        expect(snapshot.discourseBridgeAdjudicationSummary?.schemaVersion).toBe('phoenix-discourse-bridge-adjudication/v1');
+        expect(snapshot.discourseBridgeAdjudicationSummary?.invariant).toBe('discourse_bridge_decisions_are_ledger_only');
+        expect(snapshot.discourseBridgeAdjudicationSummary?.counters.decisionCount).toBe(snapshot.discourseBridgeCandidateSummary?.counters.candidateCount);
+        expect(snapshot.discourseBridgeAdjudicationSummary?.counters.ledgerOnlyCount).toBe(snapshot.discourseBridgeAdjudicationSummary?.counters.decisionCount);
+        expect(snapshot.discourseBridgeAdjudicationSummary?.counters.topologyCommitCount).toBe(0);
+        expect(snapshot.discourseBridgeAdjudicationSummary?.counters.mutationAllowedCount).toBe(0);
+        expect(snapshot.discourseBridgeAdjudicationSummary?.compactDecisionLedger.rows.every((row) =>
+            row.changedAtoms === 0 && row.changedFacts === 0 && row.changedEdges === 0,
+        )).toBe(true);
+        expect(snapshot.discourseBridgeAdjudicationSummary?.receipts.every((receipt) =>
+            receipt.reversible
+            && receipt.mutationAllowed === false
+            && receipt.invariant === 'discourse_bridge_adjudication_ledger_only',
+        )).toBe(true);
         expect(elapsedMs).toBeLessThan(8000);
     });
 
@@ -374,6 +415,9 @@ describe('Phoenix graph rebuild parity smoke', () => {
             semanticAdjudicationStates: snapshot.semanticAdjudicationSummary?.counters.byState,
             semanticEvalLedger: compactEvalLedger(snapshot),
             memoryGraphRagBridge: compactMemoryGraphRagBridge(snapshot),
+            discourseSpine: compactDiscourseSpine(snapshot),
+            discourseBridgeCandidates: compactDiscourseBridgeCandidates(snapshot),
+            discourseBridgeAdjudication: compactDiscourseBridgeAdjudication(snapshot),
             candidateNoise: snapshot.semanticCandidateSummary?.counters.averageNoiseScore,
             elapsedMs: Math.round(elapsedMs),
         }));
@@ -451,6 +495,29 @@ describe('Phoenix graph rebuild parity smoke', () => {
             && receipt.mutationAllowed === false
             && receipt.invariant === 'memorygraphrag_bridge_no_topology_commit',
         )).toBe(true);
+        expect(snapshot.discourseSpineSummary?.schemaVersion).toBe('phoenix-discourse-spine/v1');
+        expect(snapshot.discourseSpineSummary?.counters.targetCount).toBeGreaterThan(40);
+        expect(snapshot.discourseSpineSummary?.counters.resonanceCandidates).toBeGreaterThan(0);
+        expect(snapshot.discourseSpineSummary?.counters.mutationAllowedCount).toBe(0);
+        expect(snapshot.discourseSpineSummary?.compactBridgeLedger.rowCount).toBe(snapshot.discourseSpineSummary?.bridges.length);
+        expect(snapshot.discourseBridgeCandidateSummary?.schemaVersion).toBe('phoenix-discourse-bridge-candidates/v1');
+        expect(snapshot.discourseBridgeCandidateSummary?.counters.candidateCount).toBeGreaterThan(40);
+        expect(snapshot.discourseBridgeCandidateSummary?.counters.evalRowCount).toBe(snapshot.discourseBridgeCandidateSummary?.counters.candidateCount);
+        expect(snapshot.discourseBridgeCandidateSummary?.counters.meaningOverlapWithoutEntity).toBeGreaterThan(0);
+        expect(snapshot.discourseBridgeCandidateSummary?.counters.mutationAllowedCount).toBe(0);
+        expect(snapshot.discourseBridgeAdjudicationSummary?.schemaVersion).toBe('phoenix-discourse-bridge-adjudication/v1');
+        expect(snapshot.discourseBridgeAdjudicationSummary?.counters.decisionCount).toBe(snapshot.discourseBridgeCandidateSummary?.counters.candidateCount);
+        expect(snapshot.discourseBridgeAdjudicationSummary?.counters.acceptedCount).toBeGreaterThan(0);
+        expect(snapshot.discourseBridgeAdjudicationSummary?.counters.ledgerOnlyCount).toBe(snapshot.discourseBridgeAdjudicationSummary?.counters.decisionCount);
+        expect(snapshot.discourseBridgeAdjudicationSummary?.counters.topologyCommitCount).toBe(0);
+        expect(snapshot.discourseBridgeAdjudicationSummary?.counters.mutationAllowedCount).toBe(0);
+        expect(snapshot.discourseBridgeAdjudicationSummary?.compactDecisionLedger.rowCount).toBe(snapshot.discourseBridgeAdjudicationSummary?.decisions.length);
+        expect(snapshot.discourseBridgeAdjudicationSummary?.decisions.every((decision) =>
+            decision.ledgerOnly
+            && decision.mutationAllowed === false
+            && decision.affectedGraphAtomIds.length === 0
+            && decision.affectedGraphFactIds.length === 0,
+        )).toBe(true);
         expect(snapshot.embeddingGraphPostProcess?.metrics.plannedPairCount).toBeLessThan(
             snapshot.embeddingGraphPostProcess?.metrics.theoreticalPairCount || 0,
         );
@@ -500,6 +567,55 @@ function compactMemoryGraphRagBridge(snapshot: GraphRebuildSnapshot) {
         failed: bridge.counters.failedEvalRows,
         mutationAllowed: bridge.counters.mutationAllowedCount,
         sample: bridge.compactEvalLedger.rows.slice(0, 3),
+    } : null;
+}
+
+function compactDiscourseSpine(snapshot: GraphRebuildSnapshot) {
+    const spine = snapshot.discourseSpineSummary;
+    return spine ? {
+        targets: spine.counters.targetCount,
+        documents: spine.counters.documents,
+        chunks: spine.counters.chunks,
+        labels: spine.counters.labelCount,
+        clusters: spine.counters.clusterCount,
+        bridges: spine.counters.bridgeCount,
+        resonance: spine.counters.resonanceCandidates,
+        resolution: spine.counters.resolutionCandidates,
+        mutationAllowed: spine.counters.mutationAllowedCount,
+        sample: spine.compactBridgeLedger.rows.slice(0, 3),
+    } : null;
+}
+
+function compactDiscourseBridgeCandidates(snapshot: GraphRebuildSnapshot) {
+    const summary = snapshot.discourseBridgeCandidateSummary;
+    return summary ? {
+        candidates: summary.counters.candidateCount,
+        inputs: summary.counters.inputCount,
+        judgments: summary.counters.judgmentCount,
+        evalRows: summary.counters.evalRowCount,
+        plannedCalls: summary.counters.plannedModelCalls,
+        byKind: summary.counters.byCandidateKind,
+        byDecision: summary.counters.byDecision,
+        byEvalKind: summary.counters.byEvalKind,
+        mutationAllowed: summary.counters.mutationAllowedCount,
+        sample: summary.compactEvalLedger.rows.slice(0, 3),
+    } : null;
+}
+
+function compactDiscourseBridgeAdjudication(snapshot: GraphRebuildSnapshot) {
+    const summary = snapshot.discourseBridgeAdjudicationSummary;
+    return summary ? {
+        decisions: summary.counters.decisionCount,
+        byState: summary.counters.byState,
+        accepted: summary.counters.acceptedCount,
+        supported: summary.counters.supportedCount,
+        deferred: summary.counters.deferredCount,
+        rejected: summary.counters.rejectedCount,
+        superseded: summary.counters.supersededCount,
+        ledgerOnly: summary.counters.ledgerOnlyCount,
+        topologyCommits: summary.counters.topologyCommitCount,
+        mutationAllowed: summary.counters.mutationAllowedCount,
+        sample: summary.compactDecisionLedger.rows.slice(0, 3),
     } : null;
 }
 

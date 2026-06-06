@@ -202,6 +202,9 @@ export class GraphRebuildPipelineService {
             appendSemanticAdjudicationStage(stageReceipts, completedSnapshot);
             appendSemanticEvalLedgerStage(stageReceipts, completedSnapshot);
             appendMemoryGraphRagBridgeStage(stageReceipts, completedSnapshot);
+            appendDiscourseSpineStage(stageReceipts, completedSnapshot);
+            appendDiscourseBridgeCandidateStage(stageReceipts, completedSnapshot);
+            appendDiscourseBridgeAdjudicationStage(stageReceipts, completedSnapshot);
             appendCalendarRegistryStage(stageReceipts, completedSnapshot);
             appendSnapshotTimingStages(stageReceipts, completedSnapshot);
 
@@ -346,6 +349,9 @@ export class GraphRebuildPipelineService {
                 appendSemanticAdjudicationStage(stageReceipts, snapshot);
                 appendSemanticEvalLedgerStage(stageReceipts, snapshot);
                 appendMemoryGraphRagBridgeStage(stageReceipts, snapshot);
+                appendDiscourseSpineStage(stageReceipts, snapshot);
+                appendDiscourseBridgeCandidateStage(stageReceipts, snapshot);
+                appendDiscourseBridgeAdjudicationStage(stageReceipts, snapshot);
                 appendCalendarRegistryStage(stageReceipts, snapshot);
                 appendSnapshotTimingStages(stageReceipts, snapshot);
             }
@@ -560,6 +566,9 @@ export class GraphRebuildPipelineService {
             appendEdgeJudgmentPlanStage(stageReceipts, completedSnapshot);
             appendSemanticRerankStage(stageReceipts, completedSnapshot);
             appendMemoryGraphRagBridgeStage(stageReceipts, completedSnapshot);
+            appendDiscourseSpineStage(stageReceipts, completedSnapshot);
+            appendDiscourseBridgeCandidateStage(stageReceipts, completedSnapshot);
+            appendDiscourseBridgeAdjudicationStage(stageReceipts, completedSnapshot);
             appendCalendarRegistryStage(stageReceipts, completedSnapshot);
             appendSnapshotTimingStages(stageReceipts, completedSnapshot);
 
@@ -1194,6 +1203,85 @@ function appendMemoryGraphRagBridgeStage(stageReceipts: GraphIndexStageReceipt[]
             mutationAllowed: summary.counters.mutationAllowedCount,
         },
         'MemGraphRAG-style schema/fact/passage bridge ready for OM observer, reflector, and retrieval evals',
+    ));
+}
+
+function appendDiscourseSpineStage(stageReceipts: GraphIndexStageReceipt[], snapshot: GraphRebuildSnapshot): void {
+    const summary = snapshot.discourseSpineSummary;
+    if (!summary) return;
+    stageReceipts.push(instrumentationStage(
+        'discourseSpine',
+        'Discourse Spine',
+        0,
+        {
+            targets: summary.counters.targetCount,
+            documentRoots: summary.counters.documentRoots,
+            documents: summary.counters.documents,
+            chunks: summary.counters.chunks,
+            labels: summary.counters.labelCount,
+            clusters: summary.counters.clusterCount,
+            bridges: summary.counters.bridgeCount,
+            resonance: summary.counters.resonanceCandidates,
+            resolution: summary.counters.resolutionCandidates,
+            proposedBridges: summary.counters.proposedBridges,
+            deferredBridges: summary.counters.deferredBridges,
+            receipts: summary.counters.receiptCount,
+            mutationAllowed: summary.counters.mutationAllowedCount,
+        },
+        'Document roots, documents, chunks, and wormhole proposals indexed as read-only discourse receipts',
+    ));
+}
+
+function appendDiscourseBridgeCandidateStage(stageReceipts: GraphIndexStageReceipt[], snapshot: GraphRebuildSnapshot): void {
+    const summary = snapshot.discourseBridgeCandidateSummary;
+    if (!summary) return;
+    stageReceipts.push(instrumentationStage(
+        'discourseBridgeCandidates',
+        'Discourse Bridge Candidates',
+        0,
+        {
+            candidates: summary.counters.candidateCount,
+            inputs: summary.counters.inputCount,
+            judgments: summary.counters.judgmentCount,
+            evalRows: summary.counters.evalRowCount,
+            plannedModelCalls: summary.counters.plannedModelCalls,
+            acceptedLookingResonance: summary.counters.acceptedLookingResonance,
+            weakResonance: summary.counters.weakResonance,
+            resolverPressure: summary.counters.crossDocResolverPressure,
+            entityOnlyOverlap: summary.counters.entityOverlapWithoutMeaning,
+            meaningOnlyOverlap: summary.counters.meaningOverlapWithoutEntity,
+            accepted: summary.counters.byDecision['accept'] || 0,
+            reviewed: summary.counters.byDecision['review'] || 0,
+            deferred: summary.counters.byDecision['defer'] || 0,
+            rejected: summary.counters.byDecision['reject'] || 0,
+            deterministicCalibration: summary.counters.byScoreSource['deterministic_calibration'] || 0,
+            mutationAllowed: summary.counters.mutationAllowedCount,
+        },
+        'Discourse wormholes packaged as GLiClass-shaped eval candidates; topology remains sealed',
+    ));
+}
+
+function appendDiscourseBridgeAdjudicationStage(stageReceipts: GraphIndexStageReceipt[], snapshot: GraphRebuildSnapshot): void {
+    const summary = snapshot.discourseBridgeAdjudicationSummary;
+    if (!summary) return;
+    stageReceipts.push(instrumentationStage(
+        'discourseBridgeAdjudication',
+        'Discourse Bridge Adjudication',
+        0,
+        {
+            decisions: summary.counters.decisionCount,
+            accepted: summary.counters.acceptedCount,
+            supported: summary.counters.supportedCount,
+            deferred: summary.counters.deferredCount,
+            rejected: summary.counters.rejectedCount,
+            invalidated: summary.counters.invalidatedCount,
+            superseded: summary.counters.supersededCount,
+            receipts: summary.counters.receiptCount,
+            ledgerOnly: summary.counters.ledgerOnlyCount,
+            topologyCommits: summary.counters.topologyCommitCount,
+            mutationAllowed: summary.counters.mutationAllowedCount,
+        },
+        'Discourse bridge decisions are reversible ledger rows; accepted rows wait for a future promotion lane',
     ));
 }
 

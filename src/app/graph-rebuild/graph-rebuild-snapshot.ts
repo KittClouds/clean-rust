@@ -11,6 +11,9 @@ import type {
 import type { GraphModelV2Snapshot } from './graph-model-v2';
 import type { GraphCalendarRegistryBridgeSummary } from './graph-calendar-registry-bridge';
 import type { GraphMemoryGraphRagBridgeSummary } from './graph-memory-graphrag-bridge';
+import type { GraphDiscourseSpineSummary } from './graph-discourse-spine';
+import type { GraphDiscourseBridgeCandidateSummary } from './graph-discourse-bridge-candidates';
+import type { GraphDiscourseBridgeAdjudicationSummary } from './graph-discourse-bridge-adjudication';
 
 export type GraphRebuildScopeKind = 'global' | 'folder' | 'narrative' | 'note' | 'multiNote';
 export type GraphRebuildAnchorSource = EntityOccurrence['source'] | 'accepted_suggestion';
@@ -1344,6 +1347,336 @@ export interface GraphSemanticEvalLedgerSummary {
     counters: GraphSemanticEvalLedgerCounters;
 }
 
+export type GraphDiscourseSpineTargetKind = 'document_root' | 'document' | 'chunk';
+export type GraphDiscourseSpineLabelKind =
+    | 'domain'
+    | 'story_aspect'
+    | 'narrative_function'
+    | 'evidence_role'
+    | 'temporal_scope'
+    | 'tone_mood'
+    | 'world_context';
+export type GraphDiscourseSpineClusterKind = 'domain_region' | 'aspect_region' | 'document_family';
+export type GraphDiscourseSpineBridgeKind = 'resonance' | 'resolution';
+export type GraphDiscourseSpineBridgeStatus = 'proposed' | 'deferred' | 'rejected';
+
+export interface GraphDiscourseSpineLabel {
+    id: string;
+    targetId: string;
+    targetKind: GraphDiscourseSpineTargetKind;
+    labelKind: GraphDiscourseSpineLabelKind;
+    value: string;
+    score: number;
+    cues: string[];
+    rationale: string;
+    receiptId: string;
+}
+
+export interface GraphDiscourseSpineCluster {
+    id: string;
+    kind: GraphDiscourseSpineClusterKind;
+    label: string;
+    targetIds: string[];
+    medoidTargetId: string;
+    score: number;
+    rationale: string[];
+    receiptId: string;
+}
+
+export interface GraphDiscourseSpineScorePart {
+    id: string;
+    score: number;
+    weight: number;
+}
+
+export interface GraphDiscourseSpineScoringBundle {
+    semanticScore: number;
+    labelAgreement: number;
+    entityOverlap: number;
+    distanceScore: number;
+    corefPressure: number;
+    finalScore: number;
+    scoreParts: GraphDiscourseSpineScorePart[];
+}
+
+export interface GraphDiscourseSpineBridge {
+    id: string;
+    kind: GraphDiscourseSpineBridgeKind;
+    status: GraphDiscourseSpineBridgeStatus;
+    sourceTargetId: string;
+    targetTargetId: string;
+    sourceKind: GraphDiscourseSpineTargetKind;
+    targetKind: GraphDiscourseSpineTargetKind;
+    label: string;
+    evidenceTargetIds: string[];
+    sharedLabelIds: string[];
+    sharedEntityIds: string[];
+    scoringBundle: GraphDiscourseSpineScoringBundle;
+    rationale: string[];
+    adjudicationState: 'proposed';
+    mutationAllowed: false;
+    receiptId: string;
+    createdAt: number;
+}
+
+export interface GraphDiscourseSpineReceipt {
+    id: string;
+    labelId?: string;
+    clusterId?: string;
+    bridgeId?: string;
+    reversible: true;
+    mutationAllowed: false;
+    invariant: 'discourse_spine_no_topology_commit';
+    evidenceTargetIds: string[];
+    undoHint: string;
+    detail: string;
+}
+
+export interface GraphDiscourseSpineCounters {
+    targetCount: number;
+    documentRoots: number;
+    documents: number;
+    chunks: number;
+    labelCount: number;
+    clusterCount: number;
+    bridgeCount: number;
+    resonanceCandidates: number;
+    resolutionCandidates: number;
+    proposedBridges: number;
+    deferredBridges: number;
+    rejectedBridges: number;
+    receiptCount: number;
+    reversibleReceiptCount: number;
+    mutationAllowedCount: number;
+    byLabelKind: Record<string, number>;
+    byClusterKind: Record<string, number>;
+    byBridgeKind: Record<string, number>;
+}
+
+export type GraphDiscourseBridgeCandidateKind =
+    | 'discourse_resonance'
+    | 'cross_doc_resolution'
+    | 'document_cluster_review';
+export type GraphDiscourseBridgeCandidateStatus = 'proposed' | 'deferred' | 'rejected';
+export type GraphDiscourseBridgeEvalKind =
+    | 'accepted_looking_resonance'
+    | 'weak_resonance'
+    | 'cross_doc_resolver_pressure'
+    | 'entity_overlap_without_meaning'
+    | 'meaning_overlap_without_entity';
+export type GraphDiscourseBridgeRerankLabelKind =
+    | 'meaningful_resonance'
+    | 'cross_doc_resolution'
+    | 'document_cluster_review'
+    | 'weak_resonance'
+    | 'entity_only_overlap'
+    | 'meaning_only_overlap'
+    | 'reject_noise';
+
+export interface GraphDiscourseBridgeRerankLabel {
+    id: string;
+    kind: GraphDiscourseBridgeRerankLabelKind;
+    query: string;
+    threshold: number;
+    candidateKinds: GraphDiscourseBridgeCandidateKind[];
+}
+
+export interface GraphDiscourseBridgeCandidate {
+    id: string;
+    kind: GraphDiscourseBridgeCandidateKind;
+    status: GraphDiscourseBridgeCandidateStatus;
+    sourceBridgeId?: string;
+    sourceClusterId?: string;
+    sourceTargetId: string;
+    targetTargetId: string;
+    evidenceTargetIds: string[];
+    sharedLabelIds: string[];
+    sharedEntityIds: string[];
+    score: number;
+    scoringBundle: GraphDiscourseSpineScoringBundle;
+    rationale: string[];
+    reversibleReceiptIds: string[];
+    mutationAllowed: false;
+    createdAt: number;
+}
+
+export interface GraphDiscourseBridgeRerankInput {
+    id: string;
+    candidateId: string;
+    candidateKind: GraphDiscourseBridgeCandidateKind;
+    passage: string;
+    labelIds: string[];
+    queryLabels: string[];
+    evidenceTargetIds: string[];
+    maxPassageChars: number;
+}
+
+export interface GraphDiscourseBridgeRerankScore {
+    labelId: string;
+    labelKind: GraphDiscourseBridgeRerankLabelKind;
+    query: string;
+    score: number;
+    source: GraphSemanticRerankScoreSource;
+    rationale: string;
+}
+
+export interface GraphDiscourseBridgeRerankJudgment {
+    id: string;
+    candidateId: string;
+    candidateKind: GraphDiscourseBridgeCandidateKind;
+    inputId: string;
+    decision: GraphSemanticRerankDecision;
+    topLabelId: string;
+    topLabelKind: GraphDiscourseBridgeRerankLabelKind;
+    modelId: string;
+    runner: 'gliclass-query-label-rerank';
+    scoreSource: GraphSemanticRerankScoreSource;
+    relevanceScore: number;
+    calibratedScore: number;
+    scores: GraphDiscourseBridgeRerankScore[];
+    evidenceTargetIds: string[];
+    rationale: string[];
+    reversibleReceiptId: string;
+}
+
+export interface GraphDiscourseBridgeEvalRow {
+    id: string;
+    kind: GraphDiscourseBridgeEvalKind;
+    candidateId: string;
+    judgmentId: string;
+    bridgeId?: string;
+    expectedLabelKind: GraphDiscourseBridgeRerankLabelKind;
+    score: number;
+    passed: boolean;
+    failureModes: string[];
+    evidenceTargetIds: string[];
+    flags: string[];
+    rationale: string[];
+}
+
+export interface GraphDiscourseBridgeCandidateReceipt {
+    id: string;
+    candidateId?: string;
+    judgmentId?: string;
+    evalRowId?: string;
+    reversible: true;
+    mutationAllowed: false;
+    invariant: 'discourse_bridge_candidates_no_topology_commit';
+    evidenceTargetIds: string[];
+    undoHint: string;
+    detail: string;
+}
+
+export interface GraphDiscourseBridgeCandidateCounters {
+    byCandidateKind: Record<string, number>;
+    byStatus: Record<string, number>;
+    byDecision: Record<string, number>;
+    byEvalKind: Record<string, number>;
+    byScoreSource: Record<string, number>;
+    candidateCount: number;
+    inputCount: number;
+    judgmentCount: number;
+    evalRowCount: number;
+    passedEvalRows: number;
+    failedEvalRows: number;
+    receiptCount: number;
+    reversibleReceiptCount: number;
+    mutationAllowedCount: number;
+    plannedModelCalls: number;
+    acceptedLookingResonance: number;
+    weakResonance: number;
+    crossDocResolverPressure: number;
+    entityOverlapWithoutMeaning: number;
+    meaningOverlapWithoutEntity: number;
+    maxCandidates: number;
+    maxPassageChars: number;
+}
+
+export type GraphDiscourseBridgeAdjudicationState =
+    | 'proposed'
+    | 'supported'
+    | 'accepted'
+    | 'deferred'
+    | 'rejected'
+    | 'invalidated'
+    | 'superseded';
+
+export interface GraphDiscourseBridgeAdjudicationScorePart {
+    id: string;
+    score: number;
+    weight: number;
+}
+
+export interface GraphDiscourseBridgeAdjudicationScoringBundle {
+    candidateScore: number;
+    spineFinalScore: number;
+    rerankRelevance: number;
+    rerankCalibrated: number;
+    rerankSource: GraphSemanticRerankScoreSource | 'missing_rerank';
+    topLabelKind?: GraphDiscourseBridgeRerankLabelKind;
+    evalScore: number;
+    evalPassed: boolean;
+    finalScore: number;
+    scoreParts: GraphDiscourseBridgeAdjudicationScorePart[];
+}
+
+export interface GraphDiscourseBridgeAdjudicationDecision {
+    id: string;
+    proposalNodeId: string;
+    supportedNodeId: string;
+    candidateId: string;
+    candidateKind: GraphDiscourseBridgeCandidateKind;
+    sourceBridgeId?: string;
+    sourceClusterId?: string;
+    judgmentId?: string;
+    evalRowId?: string;
+    state: GraphDiscourseBridgeAdjudicationState;
+    sourceHypothesis: string;
+    evidenceTargetIds: string[];
+    scoringBundle: GraphDiscourseBridgeAdjudicationScoringBundle;
+    rationale: string[];
+    undoReceiptId: string;
+    affectedGraphAtomIds: string[];
+    affectedGraphFactIds: string[];
+    ledgerOnly: true;
+    mutationAllowed: false;
+    createdAt: number;
+}
+
+export interface GraphDiscourseBridgeAdjudicationReceipt {
+    id: string;
+    candidateId: string;
+    judgmentId?: string;
+    evalRowId?: string;
+    state: GraphDiscourseBridgeAdjudicationState;
+    reversible: true;
+    mutationAllowed: false;
+    invariant: 'discourse_bridge_adjudication_ledger_only';
+    evidenceTargetIds: string[];
+    affectedGraphAtomIds: string[];
+    affectedGraphFactIds: string[];
+    undoHint: string;
+    detail: string;
+}
+
+export interface GraphDiscourseBridgeAdjudicationCounters {
+    byState: Record<string, number>;
+    byCandidateKind: Record<string, number>;
+    decisionCount: number;
+    acceptedCount: number;
+    supportedCount: number;
+    deferredCount: number;
+    rejectedCount: number;
+    invalidatedCount: number;
+    supersededCount: number;
+    receiptCount: number;
+    reversibleReceiptCount: number;
+    ledgerOnlyCount: number;
+    topologyCommitCount: number;
+    mutationAllowedCount: number;
+    compactRowCount: number;
+}
+
 export interface GraphRebuildEntityLinkCounters {
     candidateMentions: number;
     candidateLinks: number;
@@ -1483,6 +1816,30 @@ export interface GraphRebuildCounters {
     memoryGraphRagPassedEvalRows?: number;
     memoryGraphRagReceipts?: number;
     memoryGraphRagMutationAllowed?: number;
+    discourseSpineTargets?: number;
+    discourseSpineLabels?: number;
+    discourseSpineClusters?: number;
+    discourseSpineBridges?: number;
+    discourseSpineResonance?: number;
+    discourseSpineResolution?: number;
+    discourseSpineReceipts?: number;
+    discourseSpineMutationAllowed?: number;
+    discourseBridgeCandidates?: number;
+    discourseBridgeInputs?: number;
+    discourseBridgeJudgments?: number;
+    discourseBridgeEvalRows?: number;
+    discourseBridgeReceipts?: number;
+    discourseBridgePlannedModelCalls?: number;
+    discourseBridgeMutationAllowed?: number;
+    discourseBridgeAdjudicationDecisions?: number;
+    discourseBridgeAdjudicationAccepted?: number;
+    discourseBridgeAdjudicationSupported?: number;
+    discourseBridgeAdjudicationDeferred?: number;
+    discourseBridgeAdjudicationRejected?: number;
+    discourseBridgeAdjudicationReceipts?: number;
+    discourseBridgeAdjudicationLedgerOnly?: number;
+    discourseBridgeAdjudicationTopologyCommits?: number;
+    discourseBridgeAdjudicationMutationAllowed?: number;
     calendarRegistryAnchors?: number;
     calendarRegistryReceipts?: number;
     calendarRegistryAcceptedTemporalReceipts?: number;
@@ -1557,6 +1914,9 @@ export interface GraphRebuildSnapshot {
     semanticAdjudicationSummary?: GraphSemanticAdjudicationDAGSummary;
     semanticEvalLedgerSummary?: GraphSemanticEvalLedgerSummary;
     memoryGraphRagBridgeSummary?: GraphMemoryGraphRagBridgeSummary;
+    discourseSpineSummary?: GraphDiscourseSpineSummary;
+    discourseBridgeCandidateSummary?: GraphDiscourseBridgeCandidateSummary;
+    discourseBridgeAdjudicationSummary?: GraphDiscourseBridgeAdjudicationSummary;
     calendarRegistrySummary?: GraphCalendarRegistryBridgeSummary;
     counters: GraphRebuildCounters;
     buildTimings?: GraphRebuildBuildTimings;

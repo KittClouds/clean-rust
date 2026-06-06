@@ -42,6 +42,9 @@ import type { GraphIndexRunRequest } from './graph-rebuild-snapshot';
 import type { CalendarRegistrySnapshot } from '../lib/fantasy-calendar/calendar-registry-snapshot';
 import type { GraphCalendarRegistryBridgeSummary } from './graph-calendar-registry-bridge';
 import type { GraphMemoryGraphRagBridgeSummary } from './graph-memory-graphrag-bridge';
+import type { GraphDiscourseSpineSummary } from './graph-discourse-spine';
+import type { GraphDiscourseBridgeCandidateSummary } from './graph-discourse-bridge-candidates';
+import type { GraphDiscourseBridgeAdjudicationSummary } from './graph-discourse-bridge-adjudication';
 
 describe('GraphRebuildPipelineService', () => {
     let injector: EnvironmentInjector;
@@ -333,6 +336,34 @@ describe('GraphRebuildPipelineService', () => {
                 counters: expect.objectContaining({
                     records: 3,
                     evalRows: 2,
+                    mutationAllowed: 0,
+                }),
+            }),
+            expect.objectContaining({
+                id: 'discourseSpine',
+                label: 'Discourse Spine',
+                counters: expect.objectContaining({
+                    targets: 3,
+                    bridges: 2,
+                    mutationAllowed: 0,
+                }),
+            }),
+            expect.objectContaining({
+                id: 'discourseBridgeCandidates',
+                label: 'Discourse Bridge Candidates',
+                counters: expect.objectContaining({
+                    candidates: 2,
+                    evalRows: 2,
+                    mutationAllowed: 0,
+                }),
+            }),
+            expect.objectContaining({
+                id: 'discourseBridgeAdjudication',
+                label: 'Discourse Bridge Adjudication',
+                counters: expect.objectContaining({
+                    decisions: 2,
+                    ledgerOnly: 2,
+                    topologyCommits: 0,
                     mutationAllowed: 0,
                 }),
             }),
@@ -834,6 +865,118 @@ function memoryGraphRagBridgeSummary(): GraphMemoryGraphRagBridgeSummary {
     };
 }
 
+function discourseSpineSummary(): GraphDiscourseSpineSummary {
+    return {
+        schemaVersion: 'phoenix-discourse-spine/v1',
+        generatedAt: 1,
+        sourceSnapshotId: 'snapshot-1',
+        implementationMode: 'deterministic_registry',
+        invariant: 'wormholes_are_proposals_not_edges',
+        targets: [],
+        labels: [],
+        clusters: [],
+        bridges: [],
+        receipts: [],
+        compactBridgeLedger: { scopeId: 'note:note-1', builtAt: 1, rowCount: 2, rows: [] },
+        counters: {
+            targetCount: 3,
+            documentRoots: 1,
+            documents: 1,
+            chunks: 1,
+            labelCount: 21,
+            clusterCount: 2,
+            bridgeCount: 2,
+            resonanceCandidates: 1,
+            resolutionCandidates: 1,
+            proposedBridges: 1,
+            deferredBridges: 1,
+            rejectedBridges: 0,
+            receiptCount: 25,
+            reversibleReceiptCount: 25,
+            mutationAllowedCount: 0,
+            byLabelKind: { domain: 3 },
+            byClusterKind: { document_family: 1 },
+            byBridgeKind: { resonance: 1, resolution: 1 },
+        },
+    };
+}
+
+function discourseBridgeCandidateSummary(): GraphDiscourseBridgeCandidateSummary {
+    return {
+        schemaVersion: 'phoenix-discourse-bridge-candidates/v1',
+        generatedAt: 1,
+        sourceSnapshotId: 'snapshot-1',
+        sourceDiscourseSpineId: 'snapshot-1',
+        modelId: 'knowledgator/gliclass-instruct-base-v1.0',
+        runner: 'gliclass-query-label-rerank',
+        scoreSource: 'deterministic_calibration',
+        invariant: 'discourse_bridges_are_candidates_not_edges',
+        labels: [],
+        candidates: [],
+        inputs: [],
+        judgments: [],
+        evalRows: [],
+        receipts: [],
+        compactEvalLedger: { scopeId: 'note:note-1', builtAt: 1, rowCount: 2, rows: [] },
+        counters: {
+            byCandidateKind: { discourse_resonance: 1, cross_doc_resolution: 1 },
+            byStatus: { proposed: 2 },
+            byDecision: { accept: 1, review: 1 },
+            byEvalKind: { accepted_looking_resonance: 1, cross_doc_resolver_pressure: 1 },
+            byScoreSource: { deterministic_calibration: 2 },
+            candidateCount: 2,
+            inputCount: 2,
+            judgmentCount: 2,
+            evalRowCount: 2,
+            passedEvalRows: 2,
+            failedEvalRows: 0,
+            receiptCount: 6,
+            reversibleReceiptCount: 6,
+            mutationAllowedCount: 0,
+            plannedModelCalls: 8,
+            acceptedLookingResonance: 1,
+            weakResonance: 0,
+            crossDocResolverPressure: 1,
+            entityOverlapWithoutMeaning: 0,
+            meaningOverlapWithoutEntity: 0,
+            maxCandidates: 128,
+            maxPassageChars: 2200,
+        },
+    };
+}
+
+function discourseBridgeAdjudicationSummary(): GraphDiscourseBridgeAdjudicationSummary {
+    return {
+        schemaVersion: 'phoenix-discourse-bridge-adjudication/v1',
+        generatedAt: 1,
+        sourceSnapshotId: 'snapshot-1',
+        sourceCandidateSummaryId: 'snapshot-1:discourse-bridge-candidates:1',
+        invariant: 'discourse_bridge_decisions_are_ledger_only',
+        states: ['proposed', 'supported', 'accepted', 'deferred', 'rejected', 'invalidated', 'superseded'],
+        dagEdges: [],
+        decisions: [],
+        receipts: [],
+        compactDecisionLedger: { scopeId: 'note:note-1', builtAt: 1, rowCount: 2, rows: [] },
+        counters: {
+            byState: { accepted: 1, supported: 1 },
+            byCandidateKind: { discourse_resonance: 1, cross_doc_resolution: 1 },
+            decisionCount: 2,
+            acceptedCount: 1,
+            supportedCount: 1,
+            deferredCount: 0,
+            rejectedCount: 0,
+            invalidatedCount: 0,
+            supersededCount: 0,
+            receiptCount: 2,
+            reversibleReceiptCount: 2,
+            ledgerOnlyCount: 2,
+            topologyCommitCount: 0,
+            mutationAllowedCount: 0,
+            compactRowCount: 2,
+        },
+    };
+}
+
 function createGraphRebuildMock() {
     return {
         buildAndPersistSnapshot: vi.fn(async () => ({
@@ -886,6 +1029,9 @@ function createGraphRebuildMock() {
                 },
             },
             memoryGraphRagBridgeSummary: memoryGraphRagBridgeSummary(),
+            discourseSpineSummary: discourseSpineSummary(),
+            discourseBridgeCandidateSummary: discourseBridgeCandidateSummary(),
+            discourseBridgeAdjudicationSummary: discourseBridgeAdjudicationSummary(),
             calendarRegistrySummary: calendarRegistryBridgeSummary(),
             counters: {
                 nodes: 2,
@@ -895,6 +1041,16 @@ function createGraphRebuildMock() {
                 memoryGraphRagRecords: 3,
                 memoryGraphRagEvalRows: 2,
                 memoryGraphRagMutationAllowed: 0,
+                discourseSpineTargets: 3,
+                discourseSpineBridges: 2,
+                discourseSpineMutationAllowed: 0,
+                discourseBridgeCandidates: 2,
+                discourseBridgeEvalRows: 2,
+                discourseBridgeMutationAllowed: 0,
+                discourseBridgeAdjudicationDecisions: 2,
+                discourseBridgeAdjudicationLedgerOnly: 2,
+                discourseBridgeAdjudicationTopologyCommits: 0,
+                discourseBridgeAdjudicationMutationAllowed: 0,
                 calendarRegistryAnchors: 1,
                 calendarRegistryReceipts: 1,
                 calendarRegistryMutationAllowed: 0,
