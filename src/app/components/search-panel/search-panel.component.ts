@@ -2531,6 +2531,9 @@ function receiptRowDetail(
   counters: Record<string, number>,
   stageId = '',
 ): string {
+  if (stageId === 'receiptDbOps') {
+    return receiptDbOpsDetail(status, outputCount, counters);
+  }
   const entries = Object.entries(counters || {})
     .filter(([key, value]) => isVisibleReceiptCounter(key, value, stageId));
   const orderedEntries = prioritizeReceiptCounters(entries, receiptCounterPriority(stageId));
@@ -2541,6 +2544,40 @@ function receiptRowDetail(
     .join(' / ');
   const outputText = valueLabel(outputCount, 'output');
   return counterText ? `${status} / ${outputText} / ${counterText}` : `${status} / ${outputText}`;
+}
+
+function receiptDbOpsDetail(
+  status: string,
+  outputCount: number,
+  counters: Record<string, number>,
+): string {
+  const parts = [status, valueLabel(outputCount, 'output')];
+  const storeCountersPresent = Object.keys(counters || {}).some((key) => key.startsWith('receiptStore'));
+  const addMs = (label: string, key: string, includeZero = false): void => {
+    const value = counterValue(counters, key);
+    if (includeZero || value > 0) parts.push(`${label} ${formatDuration(value)}`);
+  };
+
+  addMs('persist', 'receiptPersistMs');
+  if (storeCountersPresent) {
+    addMs('store', 'receiptStoreTotalMs', true);
+    addMs('queue', 'receiptStoreQueueWaitMs', true);
+    addMs('append', 'receiptStoreAppendWalMs', true);
+    addMs('manifest', 'receiptStoreManifestMs', true);
+    addMs('native', 'receiptStoreNativeApplyMs', true);
+  }
+
+  const rpcCalls = counterValue(counters, 'receiptJsonRpcCalls');
+  if (rpcCalls > 0) parts.push(`rpc ${formatCount(rpcCalls)}`);
+  const walBytes = counterValue(counters, 'receiptApplyWalBatchRequestBytes');
+  if (walBytes > 0) {
+    parts.push(`wal ${formatBytes(walBytes)}`);
+  } else {
+    const payloadChars = counterValue(counters, 'receiptPayloadChars')
+      || counterValue(counters, 'receiptStorePayloadChars');
+    if (payloadChars > 0) parts.push(`payload ${formatCount(payloadChars)} chars`);
+  }
+  return parts.join(' / ');
 }
 
 function prioritizeReceiptCounters(
