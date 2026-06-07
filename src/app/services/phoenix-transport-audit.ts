@@ -146,16 +146,9 @@ class PhoenixTransportAudit {
 
     recordPayloadCounters(name: string, kind: PhoenixTransportKind, counters: Record<string, number>): void {
         if (!Object.keys(counters).length) return;
-        this.record({
-            name,
-            kind,
-            startedAt: Date.now(),
-            durationMs: 0,
-            requestBytes: 0,
-            responseBytes: 0,
-            ok: true,
-            counters,
-        });
+        const current = this.aggregateByKey.get(`${kind}:${name}`);
+        if (!current) return;
+        mergeCounters(current.counters, counters);
     }
 
     snapshot(): PhoenixTransportAuditSnapshot {

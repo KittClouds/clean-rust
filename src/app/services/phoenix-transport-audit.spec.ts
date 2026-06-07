@@ -47,4 +47,31 @@ describe('phoenixTransportAudit', () => {
             errors: 0,
         });
     });
+
+    it('attaches payload counters without recording a second transport call', async () => {
+        await phoenixTransportAudit.measureJsonRpc(
+            'phoenix.store_command:test',
+            '{"kind":"ApplyWalBatch"}',
+            async () => '{"success":true,"payload":{"replayed":2,"timings":{"totalMs":7}}}',
+            (raw) => JSON.parse(raw) as { success: boolean; payload: { replayed: number } },
+        );
+
+        phoenixTransportAudit.recordPayloadCounters('phoenix.store_command:test', 'taurpc-json', {
+            'payload.replayed': 2,
+            'payload.timings.totalMs': 7,
+        });
+
+        const snapshot = phoenixTransportAudit.snapshot();
+        expect(snapshot.totalCalls).toBe(1);
+        expect(snapshot.calls[0]).toMatchObject({
+            name: 'phoenix.store_command:test',
+            kind: 'taurpc-json',
+            count: 1,
+        });
+        expect(snapshot.calls[0]?.counters).toMatchObject({
+            'payload.replayed': 2,
+            'payload.timings.totalMs': 7,
+        });
+        expect(snapshot.recentCalls).toHaveLength(1);
+    });
 });
