@@ -7,6 +7,7 @@ import type { AtlasCapabilityId } from '../components/search-panel/atlas-capabil
 import type { AtlasBuildScope, AtlasRunOptions } from '../services/atlas-capability-runtime.model';
 import { AtlasCapabilityRuntimeService } from '../services/atlas-capability-runtime.service';
 import { NerService } from '../services/ner.service';
+import { phoenixTransportAudit, type PhoenixTransportAuditSnapshot } from '../services/phoenix-transport-audit';
 import { buildGraphRebuildDeltaPostProcessPlan, deltaPostProcessPlanCounters, type GraphRebuildDeltaPostProcessPlan } from './graph-rebuild-delta-postprocess-plan';
 import { buildGraphRebuildEdgeJudgmentPlan, edgeJudgmentPlanCounters } from './graph-rebuild-edge-type-judgment-plan';
 import { embeddingProfileFromModelSelection } from './graph-rebuild-embedding-signatures';
@@ -132,6 +133,7 @@ export class GraphRebuildPipelineService {
 
         this.runningState.set(true);
         const runStarted = Date.now();
+        const transportStarted = phoenixTransportAudit.snapshot();
         const stageReceipts: GraphIndexStageReceipt[] = [];
         const snapshotRef: { value?: GraphRebuildSnapshot } = {};
         try {
@@ -211,6 +213,7 @@ export class GraphRebuildPipelineService {
             appendDiscourseCompilerOverlayStage(stageReceipts, completedSnapshot);
             appendCalendarRegistryStage(stageReceipts, completedSnapshot);
             appendSnapshotTimingStages(stageReceipts, completedSnapshot);
+            appendTransportTimingStage(stageReceipts, transportStarted, phoenixTransportAudit.snapshot());
 
             const completedAt = Date.now();
             const receipt = this.buildRunReceipt({
@@ -229,7 +232,7 @@ export class GraphRebuildPipelineService {
                 message: `Clean graph built ${completedSnapshot.counters.nodes} nodes and ${completedSnapshot.counters.edges} edges.`,
             });
             await this.publishRunReceipt(receipt, completedSnapshot);
-            await this.graphRebuild.persistRunReceipt(receipt);
+            await this.persistRunReceiptWithTiming(receipt);
             return { receipt, snapshot: completedSnapshot };
         } catch (error) {
             const completedAt = Date.now();
@@ -269,6 +272,7 @@ export class GraphRebuildPipelineService {
 
         this.runningState.set(true);
         const runStarted = Date.now();
+        const transportStarted = phoenixTransportAudit.snapshot();
         const stageReceipts: GraphIndexStageReceipt[] = [];
         const projectionReceipts: GraphIndexProjectionReceipt[] = [];
         let snapshot: GraphRebuildSnapshot | null = null;
@@ -367,6 +371,7 @@ export class GraphRebuildPipelineService {
                 projectionReceipts.push(await this.runProjectionStage(projection.capability, projection.mode, options, snapshot));
             }
             projectionReceipts.push(await buildSiegelBackboneProjectionReceipt(snapshot));
+            appendTransportTimingStage(stageReceipts, transportStarted, phoenixTransportAudit.snapshot());
 
             const completedAt = Date.now();
             const completedSnapshot = snapshot as GraphRebuildSnapshot | null;
@@ -395,7 +400,7 @@ export class GraphRebuildPipelineService {
                     : 'Full Atlas Index completed without a graph snapshot.',
             };
             await this.publishRunReceipt(receipt, completedSnapshot);
-            await this.graphRebuild.persistRunReceipt(receipt);
+            await this.persistRunReceiptWithTiming(receipt);
             return { receipt, snapshot: completedSnapshot! };
         } catch (error) {
             const completedAt = Date.now();
@@ -440,6 +445,7 @@ export class GraphRebuildPipelineService {
 
         this.runningState.set(true);
         const runStarted = Date.now();
+        const transportStarted = phoenixTransportAudit.snapshot();
         const stageReceipts: GraphIndexStageReceipt[] = [];
         const projectionReceipts: GraphIndexProjectionReceipt[] = [];
         const snapshotRef: { value?: GraphRebuildSnapshot } = {};
@@ -479,6 +485,7 @@ export class GraphRebuildPipelineService {
                 projectionReceipts.push(await buildSiegelBackboneProjectionReceipt(cachedSnapshot));
                 const completedAt = Date.now();
                 const cacheStage = postProcessCacheStage(runStarted, completedAt, deltaPlan);
+                appendTransportTimingStage(stageReceipts, transportStarted, phoenixTransportAudit.snapshot());
                 const receipt = this.buildRunReceipt({
                     idPrefix: 'postprocess-atlas',
                     scope,
@@ -586,6 +593,7 @@ export class GraphRebuildPipelineService {
                 projectionReceipts.push(snapshotOwnedProjectionReceipt(projection.mode, completedSnapshot));
             }
             projectionReceipts.push(await buildSiegelBackboneProjectionReceipt(completedSnapshot));
+            appendTransportTimingStage(stageReceipts, transportStarted, phoenixTransportAudit.snapshot());
 
             const completedAt = Date.now();
             const receipt = this.buildRunReceipt({
@@ -716,6 +724,7 @@ export class GraphRebuildPipelineService {
     private async persistRunReceiptWithTiming(receipt: GraphIndexRunReceipt): Promise<void> {
         const startedAt = Date.now();
         const started = performance.now();
+        const receiptPayloadChars = jsonPayloadChars(receipt);
         await this.graphRebuild.persistRunReceipt(receipt);
         const durationMs = elapsedTimingMs(started);
         const completedAt = Date.now();
@@ -729,6 +738,7 @@ export class GraphRebuildPipelineService {
             outputCount: 0,
             counters: {
                 receiptPersistMs: durationMs,
+                receiptPayloadChars,
             },
             message: 'Run receipt persisted to scoped documents',
         });
@@ -993,6 +1003,89 @@ function appendSnapshotTimingStages(
         },
         'Graph rebuild CPU and service state timing',
     ));
+}
+
+function appendTransportTimingStage(
+    stageReceipts: GraphIndexStageReceipt[],
+    before: PhoenixTransportAuditSnapshot,
+    after: PhoenixTransportAuditSnapshot,
+): void {
+    const counters = transportDeltaCounters(before, after);
+    if (!counters['transportCalls'] && !counters['transportTotalMs']) return;
+    stageReceipts.push(instrumentationStage(
+        'transportOps',
+        'Transport Ops',
+        counters['transportTotalMs'],
+        counters,
+        'TauRPC transport calls and payload volume during this graph run',
+    ));
+}
+
+type TransportAggregate = PhoenixTransportAuditSnapshot['calls'][number];
+
+function transportDeltaCounters(
+    before: PhoenixTransportAuditSnapshot,
+    after: PhoenixTransportAuditSnapshot,
+): Record<string, number> {
+    const beforeByKey = new Map(before.calls.map((call) => [transportAggregateKey(call), call]));
+    const counters: Record<string, number> = {
+        transportCalls: 0,
+        transportErrors: 0,
+        transportTotalMs: 0,
+        transportMaxMs: 0,
+        transportRequestBytes: 0,
+        transportResponseBytes: 0,
+        jsonRpcCalls: 0,
+        typedRpcCalls: 0,
+        storeCommandCalls: 0,
+        applyWalBatchCalls: 0,
+        applyWalBatchRequestBytes: 0,
+        compileDualWriteCalls: 0,
+        compileDualWriteRequestBytes: 0,
+        compileGalaxySceneCalls: 0,
+        compileGalaxySceneRequestBytes: 0,
+    };
+    for (const call of after.calls) {
+        const previous = beforeByKey.get(transportAggregateKey(call));
+        const count = Math.max(0, call.count - (previous?.count || 0));
+        if (!count) continue;
+        const totalMs = Math.max(0, call.totalMs - (previous?.totalMs || 0));
+        const requestBytes = Math.max(0, call.totalRequestBytes - (previous?.totalRequestBytes || 0));
+        const responseBytes = Math.max(0, call.totalResponseBytes - (previous?.totalResponseBytes || 0));
+        const errors = Math.max(0, call.errors - (previous?.errors || 0));
+        const localMaxMs = call.maxMs > (previous?.maxMs || 0)
+            ? call.maxMs
+            : (count ? totalMs / count : 0);
+        counters['transportCalls'] += count;
+        counters['transportErrors'] += errors;
+        counters['transportTotalMs'] += totalMs;
+        counters['transportRequestBytes'] += requestBytes;
+        counters['transportResponseBytes'] += responseBytes;
+        counters['transportMaxMs'] = Math.max(counters['transportMaxMs'], localMaxMs);
+        if (call.kind === 'taurpc-json') counters['jsonRpcCalls'] += count;
+        if (call.kind === 'taurpc-typed') counters['typedRpcCalls'] += count;
+        if (call.name.startsWith('phoenix.store_command:')) counters['storeCommandCalls'] += count;
+        if (call.name === 'phoenix.store_command:persistence:applyWalBatch') {
+            counters['applyWalBatchCalls'] += count;
+            counters['applyWalBatchRequestBytes'] += requestBytes;
+        }
+        if (call.name === 'phoenix.store_command:graphRebuild:compileDualWrite') {
+            counters['compileDualWriteCalls'] += count;
+            counters['compileDualWriteRequestBytes'] += requestBytes;
+        }
+        if (call.name === 'phoenix.compile_galaxy_scene') {
+            counters['compileGalaxySceneCalls'] += count;
+            counters['compileGalaxySceneRequestBytes'] += requestBytes;
+        }
+    }
+    for (const key of Object.keys(counters)) {
+        counters[key] = Math.round(counters[key] || 0);
+    }
+    return counters;
+}
+
+function transportAggregateKey(call: TransportAggregate): string {
+    return `${call.kind}:${call.name}`;
 }
 
 function appendSignalCoverageStages(
@@ -1647,6 +1740,14 @@ function elapsedTimingMs(started: number): number {
     return Math.max(0, Math.round(performance.now() - started));
 }
 
+function jsonPayloadChars(value: unknown): number {
+    try {
+        return JSON.stringify(value ?? null).length;
+    } catch {
+        return 0;
+    }
+}
+
 function waitForUiFrame(): Promise<void> {
     if (typeof requestAnimationFrame !== 'function') return Promise.resolve();
     return new Promise((resolve) => requestAnimationFrame(() => resolve()));
@@ -1769,11 +1870,12 @@ function skippedPostProcessDiscoveryStage(startedAt: number, documentCount: numb
         status: 'skipped',
         startedAt: now,
         completedAt: now,
-        durationMs: Math.max(0, now - startedAt),
+        durationMs: 0,
         outputCount: 0,
         counters: {
             postprocessDiscoverySkipped: 1,
             documents: documentCount,
+            elapsedBeforeSkipMs: Math.max(0, now - startedAt),
             plannedModelCalls: 0,
         },
         message: 'Entity discovery is handled by Build Clean Graph; postprocess skips the deep NER pass.',

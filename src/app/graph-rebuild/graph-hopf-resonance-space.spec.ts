@@ -119,6 +119,74 @@ describe('Hopf resonance space contract', () => {
         expect(space.counters.droppedTargets).toBe(0);
         expect(space.counters.occupiedCellCount).toBeGreaterThan(1);
     });
+
+    it('anchors repeated before relations by their event context instead of the operator token', () => {
+        const targets = [
+            target('embed:note:n', 'note', 'n', 'Note N', 'storm archive mixed note'),
+            target('embed:structure-root:n:temporal', 'structureRoot', 'n', 'Temporal root', 'event order and before after root'),
+            target('embed:event:storm-a', 'event', 'n', 'Storm opens', 'lightning rain thunder roof collapse', { chunkId: 'storm' }),
+            target('embed:event:storm-b', 'event', 'n', 'Storm answers', 'rain window water shelter lantern', { chunkId: 'storm' }),
+            target('embed:event:archive-a', 'event', 'n', 'Archive opens', 'library parchment index theorem quiet', { chunkId: 'archive' }),
+            target('embed:event:archive-b', 'event', 'n', 'Archive answers', 'catalog shelf cipher lantern moon', { chunkId: 'archive' }),
+            target('embed:temporalFact:storm', 'temporalFact', 'n', 'before', 'Storm opens before Storm answers confidence:0.77', {
+                parentIds: ['embed:structure-root:n:temporal', 'embed:event:storm-a', 'embed:event:storm-b'],
+            }),
+            target('embed:temporalFact:archive', 'temporalFact', 'n', 'before', 'Archive opens before Archive answers confidence:0.77', {
+                parentIds: ['embed:structure-root:n:temporal', 'embed:event:archive-a', 'embed:event:archive-b'],
+            }),
+        ];
+
+        const space = buildHopfResonanceSpace(snapshot(targets, ['n']), { generatedAt: 15, cellResolution: 3 });
+        const storm = assignment(space, 'embed:temporalFact:storm');
+        const archive = assignment(space, 'embed:temporalFact:archive');
+
+        expect(storm.label).toBe('before');
+        expect(archive.label).toBe('before');
+        expect(storm.baseCellId).not.toBe(archive.baseCellId);
+        expect(storm.fiberKind).toBe('temporal_sample');
+        expect(archive.fiberKind).toBe('temporal_sample');
+    });
+
+    it('spreads overfull local fibers into deterministic strands', () => {
+        const targets = [
+            target('embed:note:fiber', 'note', 'fiber', 'Fiber Note', 'shared resonance note'),
+            ...Array.from({ length: 18 }, (_, index) =>
+                target(`embed:anchor:fiber:${index}`, 'anchor', 'fiber', 'Shared cue', 'same cue same evidence same local signature', {
+                    chunkId: 'same-chunk',
+                    evidenceIds: [`anchor:${index}`],
+                }),
+            ),
+        ];
+
+        const space = buildHopfResonanceSpace(snapshot(targets, ['fiber']), { generatedAt: 16, cellResolution: 2 });
+        const crowded = space.assignments
+            .filter((row) => row.fiberKind === 'evidence_sample' && row.strandCount > 8)
+            .sort((left, right) => right.strandCount - left.strandCount);
+        const phases = new Set(crowded.map((row) => row.phase));
+
+        expect(crowded.length).toBeGreaterThan(8);
+        expect(phases.size).toBeGreaterThan(6);
+        expect(crowded.every((row) => row.strandKey.includes(row.baseCellId))).toBe(true);
+        expect(space.counters.maxFiberSampleCount).toBeGreaterThan(8);
+    });
+
+    it('keeps structural roots in the document chart neighborhood', () => {
+        const roots = ['document-structure', 'identity', 'temporal', 'causal', 'evidence'];
+        const targets = [
+            target('embed:note:chapter', 'note', 'chapter', 'Chapter', 'chapter document storm archive sanctuary market'),
+            ...roots.map((root) => target(`embed:structure-root:chapter:${root}`, 'structureRoot', 'chapter', `${root} root`, `structure root ${root}`, {
+                parentIds: ['embed:note:chapter'],
+            })),
+        ];
+
+        const space = buildHopfResonanceSpace(snapshot(targets, ['chapter']), { generatedAt: 17, cellResolution: 3 });
+        const doc = assignment(space, 'embed:note:chapter');
+        const rootRows = roots.map((root) => assignment(space, `embed:structure-root:chapter:${root}`));
+        const docNeighborhood = new Set([doc.baseCellId, ...doc.secondaryCellIds]);
+
+        expect(rootRows.every((row) => docNeighborhood.has(row.baseCellId) || row.secondaryCellIds.includes(doc.baseCellId))).toBe(true);
+        expect(new Set(rootRows.map((row) => row.phase)).size).toBeGreaterThan(2);
+    });
 });
 
 function assignment(space: ReturnType<typeof buildHopfResonanceSpace>, id: string) {

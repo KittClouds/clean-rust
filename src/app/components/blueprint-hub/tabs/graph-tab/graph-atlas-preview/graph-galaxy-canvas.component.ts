@@ -3,7 +3,7 @@ import { AfterViewInit, Component, ElementRef, EventEmitter, inject, Input, OnCh
 import { PhoenixBackendService } from '../../../../../services/phoenix-backend.service';
 import { entityColorStore } from '../../../../../lib/store/entityColorStore';
 import { compileGalaxyScene } from './graph-galaxy-scene-compiler';
-import { graphGalaxyRuntimeMeter } from './graph-galaxy-runtime-meter';
+import { graphGalaxyRuntimeMeter, type GraphGalaxyCanvasTimings } from './graph-galaxy-runtime-meter';
 import { budgetGalaxySurface } from './graph-galaxy-surface-budget';
 import { galaxySceneToV2, type GalaxySceneSourceMode, type GalaxySceneV2 } from './graph-galaxy-scene-v2';
 import { mergeGalaxySettings, type GalaxyInputEdge, type GalaxyQueryFocus, type GalaxyRenderableNode, type GalaxyRenderSettings } from './graph-galaxy-engine';
@@ -116,7 +116,10 @@ export class GraphGalaxyCanvasComponent implements AfterViewInit, OnChanges, OnD
             if (this.viewReady) this.syncSurface();
         }
         if (changes['entities'] || changes['edges'] || changes['sourceMode']) this.markLayoutDirty();
-        if (changes['selectedEntityId'] && this.renderer.hasContext()) this.renderer.selectNode(this.selectedEntityId);
+        if (changes['selectedEntityId'] && this.renderer.hasContext()) {
+            this.renderer.selectNode(this.selectedEntityId);
+            this.recordRendererTimings();
+        }
         if (changes['viewMode'] && this.renderer.hasContext()) this.renderer.setMode(this.viewMode === 'map' ? '2d' : '3d');
         if (changes['surfaceActive'] && this.viewReady) this.syncSurface();
     }
@@ -312,14 +315,18 @@ export class GraphGalaxyCanvasComponent implements AfterViewInit, OnChanges, OnD
         this.renderer.setSettings(this.settings);
         this.renderer.setMode(this.viewMode === 'map' ? '2d' : '3d');
         if (this.scene) {
+            const setSceneStarted = performance.now();
             this.renderer.setScene(this.scene);
+            this.recordRendererTimings({ rendererSetSceneMs: performance.now() - setSceneStarted });
             this.renderer.selectNode(this.selectedEntityId);
+            this.recordRendererTimings();
         }
     }
 
     private draw(): void {
         if (!this.canHoldSurface()) return;
         this.renderer.render();
+        this.recordRendererTimings();
         const canvas = this.canvasRef.nativeElement;
         graphGalaxyRuntimeMeter.recordDraw(this.meterId, canvas.width / this.currentDpr, canvas.height / this.currentDpr, this.currentDpr, performance.now(), 0);
     }
@@ -334,15 +341,27 @@ export class GraphGalaxyCanvasComponent implements AfterViewInit, OnChanges, OnD
         if (this.destroyed || !this.needsLayout || this.sceneBuildPromise || !this.canHoldSurface()) return;
         this.needsLayout = false;
         const version = this.layoutVersion;
+        const buildStarted = performance.now();
         this.sceneBuildPromise = compileGalaxyScene(this.phoenix, this.entities, this.edges, mergeGalaxySettings(this.settings))
             .then((scene) => {
                 if (this.destroyed || this.layoutVersion !== version) return;
+                const sceneCompileMs = performance.now() - buildStarted;
+                const convertStarted = performance.now();
                 this.scene = galaxySceneToV2(scene, this.sourceMode);
+                const sceneConvertMs = performance.now() - convertStarted;
                 if (!this.renderer.hasContext()) this.ensureRendererMounted();
+                const setSceneStarted = performance.now();
                 this.renderer.setScene(this.scene);
+                const rendererSetSceneMs = performance.now() - setSceneStarted;
                 this.renderer.setSettings(this.settings);
                 this.renderer.setMode(this.viewMode === 'map' ? '2d' : '3d');
                 graphGalaxyRuntimeMeter.recordScene(this.meterId, scene.nodes.length, scene.links.length);
+                this.recordRendererTimings({
+                    sceneCompileMs,
+                    sceneConvertMs,
+                    rendererSetSceneMs,
+                    sceneBuildMs: performance.now() - buildStarted,
+                });
                 this.draw();
             })
             .catch((error) => console.error('[GraphGalaxyCanvas] Scene compile failed:', error))
@@ -360,13 +379,23 @@ export class GraphGalaxyCanvasComponent implements AfterViewInit, OnChanges, OnD
         if (this.hoverId === id) return;
         this.hoverId = id;
         this.renderer.hoverNode(id);
+        this.recordRendererTimings();
         this.draw();
         const entity = id ? this.entities.find((item) => item.id === id || item.metadata?.sourceEntityId === id) ?? null : null;
         this.entityHovered.emit(entity);
     }
 
     private pick(event: MouseEvent): string | null {
-        return this.renderer.pick(this.pointerFromEvent(event));
+        const id = this.renderer.pick(this.pointerFromEvent(event));
+        this.recordRendererTimings();
+        return id;
+    }
+
+    private recordRendererTimings(extra: Partial<GraphGalaxyCanvasTimings> = {}): void {
+        graphGalaxyRuntimeMeter.recordTimings(this.meterId, {
+            ...this.renderer.snapshotTimings(),
+            ...extra,
+        });
     }
 
     private pointerFromEvent(event: MouseEvent): { x: number; y: number; width: number; height: number } {

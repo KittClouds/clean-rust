@@ -8,6 +8,28 @@ import {
     sparseEmbeddingSignature,
     type SparseEmbeddingSignature,
 } from './graph-rebuild-embedding-signatures';
+import {
+    TAU,
+    add3,
+    clamp01,
+    clampInt,
+    dot3,
+    fallbackDirection,
+    fallbackTangent,
+    icosahedralCenters,
+    mix32,
+    norm3,
+    normalize3,
+    positiveRadians,
+    round,
+    roundVec,
+    scale3,
+    signedUnit,
+    stableUnit,
+    sub3,
+    tangentFrame,
+    type Vec3Tuple,
+} from './graph-hopf-resonance-geometry';
 
 export type HopfResonanceFiberKind =
     | 'document_chart'
@@ -56,6 +78,10 @@ export interface HopfResonanceAssignment {
     tangent: Vec3Tuple;
     phase: number;
     phaseRadians: number;
+    strandKey: string;
+    strandIndex: number;
+    strandCount: number;
+    phaseSpread: number;
     assignmentScore: number;
     residualScore: number;
     salience: number;
@@ -125,6 +151,8 @@ export interface HopfResonanceSpaceCounters {
     chunkTargets: number;
     entityTargets: number;
     structureRootTargets: number;
+    crowdedFiberCount: number;
+    maxFiberSampleCount: number;
     mutationAllowedCount: 0;
 }
 
@@ -150,8 +178,6 @@ export interface BuildHopfResonanceSpaceOptions {
     secondaryCellCount?: number;
 }
 
-type Vec3Tuple = [number, number, number];
-
 type MutableCell = HopfResonanceCell & {
     kindWeights: Map<HopfResonanceFiberKind, number>;
     assignments: HopfResonanceAssignment[];
@@ -169,8 +195,6 @@ type FiberAccumulator = {
 const DEFAULT_CELL_RESOLUTION = 3;
 const DEFAULT_NEIGHBOR_COUNT = 6;
 const DEFAULT_SECONDARY_CELL_COUNT = 3;
-const TAU = Math.PI * 2;
-
 export function buildHopfResonanceSpace(
     snapshot: GraphRebuildSnapshot,
     options: BuildHopfResonanceSpaceOptions = {},
@@ -181,9 +205,10 @@ export function buildHopfResonanceSpace(
     const neighborCount = clampInt(options.neighborCount ?? DEFAULT_NEIGHBOR_COUNT, 3, 12);
     const secondaryCellCount = clampInt(options.secondaryCellCount ?? DEFAULT_SECONDARY_CELL_COUNT, 1, 8);
     const cells = buildMutableCells(cellResolution, neighborCount);
-    const assignments = snapshot.embeddingTargets.map((target) =>
-        assignTargetToHopfCell(target, profile, cells, secondaryCellCount),
-    );
+    const directions = buildContextDirections(snapshot.embeddingTargets, profile);
+    const assignments = spreadFiberPhases(snapshot.embeddingTargets.map((target) =>
+        assignTargetToHopfCell(target, profile, cells, secondaryCellCount, directions.get(target.id)),
+    ));
 
     const cellById = new Map(cells.map((cell) => [cell.id, cell]));
     for (const assignment of assignments) {
@@ -230,6 +255,8 @@ export function buildHopfResonanceSpace(
             chunkTargets: assignments.filter((row) => row.fiberKind === 'chunk_sample').length,
             entityTargets: assignments.filter((row) => row.fiberKind === 'entity_sample').length,
             structureRootTargets: assignments.filter((row) => row.role === 'structure-root').length,
+            crowdedFiberCount: fibers.filter((row) => row.sampleCount >= 10).length,
+            maxFiberSampleCount: fibers.reduce((max, row) => Math.max(max, row.sampleCount), 0),
             mutationAllowedCount: 0,
         },
     };
@@ -269,9 +296,10 @@ function assignTargetToHopfCell(
     profile: GraphRebuildEmbeddingProfile,
     cells: MutableCell[],
     secondaryCellCount: number,
+    contextDirection?: Vec3Tuple,
 ): HopfResonanceAssignment {
     const signature = sparseEmbeddingSignature(target, profile.selectedDimensions);
-    const direction = signatureDirection(signature, target.id);
+    const direction = contextDirection || signatureDirection(signature, target.id);
     const ranked = rankCells(direction, cells, secondaryCellCount + 1);
     const primary = ranked[0] || cells[0];
     const frame = tangentFrame(primary.center);
@@ -299,6 +327,10 @@ function assignTargetToHopfCell(
         tangent: roundVec(tangent),
         phase: round(phaseRadians / TAU),
         phaseRadians: round(phaseRadians),
+        strandKey: `${primary.id}:${fiberKind}`,
+        strandIndex: 0,
+        strandCount: 1,
+        phaseSpread: 0,
         assignmentScore: round(clamp01((dot + 1) * 0.5)),
         residualScore: round(clamp01(residualNorm)),
         salience: targetSalience(target),
@@ -306,6 +338,88 @@ function assignTargetToHopfCell(
         parentIds: target.parentIds || [],
         receipt: 'hopf_space_assignment:no_topology_mutation',
     };
+}
+
+function buildContextDirections(
+    targets: GraphRebuildEmbeddingTarget[],
+    profile: GraphRebuildEmbeddingProfile,
+): Map<string, Vec3Tuple> {
+    const baseDirections = new Map<string, Vec3Tuple>();
+    for (const target of targets) {
+        baseDirections.set(target.id, signatureDirection(sparseEmbeddingSignature(target, profile.selectedDimensions), target.id));
+    }
+    const out = new Map<string, Vec3Tuple>();
+    for (const target of targets) {
+        out.set(target.id, contextDirectionForTarget(target, baseDirections));
+    }
+    return out;
+}
+
+function contextDirectionForTarget(
+    target: GraphRebuildEmbeddingTarget,
+    baseDirections: Map<string, Vec3Tuple>,
+): Vec3Tuple {
+    const own = baseDirections.get(target.id) || fallbackDirection(target.id);
+    const fiberKind = targetFiberKind(target);
+    const structuralRoot = fiberKind === 'structure_root';
+    const contextual = fiberKind === 'temporal_sample' || fiberKind === 'causal_sample';
+    let vector = scale3(own, structuralRoot ? 0.18 : contextual ? 0.34 : 0.72);
+    let weight = structuralRoot ? 0.18 : contextual ? 0.34 : 0.72;
+    for (const parentId of (target.parentIds || []).slice(0, 8)) {
+        const parent = baseDirections.get(parentId);
+        if (!parent) continue;
+        const parentWeight = parentId.includes(':structure-root:') || parentId.includes(':root:')
+            ? structuralRoot ? 0.04 : 0.08
+            : structuralRoot ? 0.42 : contextual ? 0.28 : 0.14;
+        vector = add3(vector, scale3(parent, parentWeight));
+        weight += parentWeight;
+    }
+    const note = target.noteId ? baseDirections.get(`embed:note:${target.noteId}`) : undefined;
+    if (note) {
+        const noteWeight = structuralRoot ? 0.7 : contextual ? 0.16 : 0.08;
+        vector = add3(vector, scale3(note, noteWeight));
+        weight += noteWeight;
+    }
+    const normalized = normalize3(scale3(vector, 1 / Math.max(0.0001, weight)));
+    return norm3(normalized) ? normalized : own;
+}
+
+function spreadFiberPhases(assignments: HopfResonanceAssignment[]): HopfResonanceAssignment[] {
+    const out = assignments.slice();
+    const groups = new Map<string, number[]>();
+    for (let index = 0; index < out.length; index += 1) {
+        const row = out[index];
+        const key = `${row.baseCellId}:${row.fiberKind}`;
+        const bucket = getOrInsert(groups, key, () => []);
+        bucket.push(index);
+    }
+    for (const [key, indexes] of groups) {
+        if (indexes.length < 4) {
+            for (let rank = 0; rank < indexes.length; rank += 1) {
+                const row = out[indexes[rank]];
+                out[indexes[rank]] = { ...row, strandKey: key, strandIndex: rank, strandCount: indexes.length };
+            }
+            continue;
+        }
+        const sorted = indexes.sort((left, right) => strandSortKey(out[left]).localeCompare(strandSortKey(out[right])));
+        const offset = stableUnit(`${key}:phase-offset`) / sorted.length;
+        for (let rank = 0; rank < sorted.length; rank += 1) {
+            const row = out[sorted[rank]];
+            const slot = positivePhase((rank + 0.5) / sorted.length + offset);
+            const blend = phaseSpreadWeight(row, sorted.length);
+            const phase = circularPhaseBlend(row.phase, slot, blend);
+            out[sorted[rank]] = {
+                ...row,
+                phase,
+                phaseRadians: round(phase * TAU),
+                strandKey: key,
+                strandIndex: rank,
+                strandCount: sorted.length,
+                phaseSpread: round(circularDistance(row.phase, phase)),
+            };
+        }
+    }
+    return out;
 }
 
 function buildMutableCells(resolution: number, neighborCount: number): MutableCell[] {
@@ -618,68 +732,6 @@ function targetSalience(target: GraphRebuildEmbeddingTarget): number {
     return round(base + evidence * 0.08 + textLength * 0.35);
 }
 
-function icosahedralCenters(resolution: number): Vec3Tuple[] {
-    const vertices = icosahedronVertices();
-    const faces = icosahedronFaces();
-    const byKey = new Map<string, Vec3Tuple>();
-    for (const [a, b, c] of faces) {
-        for (let i = 0; i <= resolution; i += 1) {
-            for (let j = 0; j <= resolution - i; j += 1) {
-                const k = resolution - i - j;
-                const point = normalize3([
-                    (vertices[a][0] * i + vertices[b][0] * j + vertices[c][0] * k) / resolution,
-                    (vertices[a][1] * i + vertices[b][1] * j + vertices[c][1] * k) / resolution,
-                    (vertices[a][2] * i + vertices[b][2] * j + vertices[c][2] * k) / resolution,
-                ]);
-                byKey.set(pointKey(point), point);
-            }
-        }
-    }
-    return [...byKey.values()].sort((left, right) =>
-        left[2] - right[2]
-        || left[1] - right[1]
-        || left[0] - right[0],
-    );
-}
-
-function icosahedronVertices(): Vec3Tuple[] {
-    const t = (1 + Math.sqrt(5)) / 2;
-    const vertices: Vec3Tuple[] = [
-        [-1, t, 0], [1, t, 0], [-1, -t, 0], [1, -t, 0],
-        [0, -1, t], [0, 1, t], [0, -1, -t], [0, 1, -t],
-        [t, 0, -1], [t, 0, 1], [-t, 0, -1], [-t, 0, 1],
-    ];
-    return vertices.map(normalize3);
-}
-
-function icosahedronFaces(): Array<[number, number, number]> {
-    return [
-        [0, 11, 5], [0, 5, 1], [0, 1, 7], [0, 7, 10], [0, 10, 11],
-        [1, 5, 9], [5, 11, 4], [11, 10, 2], [10, 7, 6], [7, 1, 8],
-        [3, 9, 4], [3, 4, 2], [3, 2, 6], [3, 6, 8], [3, 8, 9],
-        [4, 9, 5], [2, 4, 11], [6, 2, 10], [8, 6, 7], [9, 8, 1],
-    ];
-}
-
-function tangentFrame(center: Vec3Tuple): { u: Vec3Tuple; v: Vec3Tuple } {
-    const ref: Vec3Tuple = Math.abs(center[2]) < 0.86 ? [0, 0, 1] : [0, 1, 0];
-    const u = normalize3(cross3(ref, center));
-    const v = normalize3(cross3(center, u));
-    return { u, v };
-}
-
-function fallbackTangent(frame: { u: Vec3Tuple; v: Vec3Tuple }, seed: string): Vec3Tuple {
-    const angle = stableUnit(seed) * TAU;
-    return normalize3(add3(scale3(frame.u, Math.cos(angle)), scale3(frame.v, Math.sin(angle))));
-}
-
-function fallbackDirection(seed: string): Vec3Tuple {
-    const a = stableUnit(`${seed}:a`) * TAU;
-    const z = stableUnit(`${seed}:z`) * 2 - 1;
-    const r = Math.sqrt(Math.max(0, 1 - z * z));
-    return [Math.cos(a) * r, Math.sin(a) * r, z];
-}
-
 function coverageEntropy(rows: HopfDocumentCellWeight[], cellCount: number): number {
     const total = rows.reduce((sum, row) => sum + row.weight, 0);
     if (!total || cellCount <= 1) return 0;
@@ -696,6 +748,34 @@ function circularDistance(left: number, right: number): number {
     return Math.min(delta, 1 - delta) * 2;
 }
 
+function circularPhaseBlend(left: number, right: number, blend: number): number {
+    const delta = ((right - left + 1.5) % 1) - 0.5;
+    return round(positivePhase(left + delta * clamp01(blend)));
+}
+
+function phaseSpreadWeight(row: HopfResonanceAssignment, count: number): number {
+    const pressure = clamp01((count - 4) / 24);
+    if (row.fiberKind === 'temporal_sample' || row.fiberKind === 'causal_sample') return 0.48 + pressure * 0.34;
+    if (row.role === 'document-chart') return 0.12 + pressure * 0.08;
+    if (row.role === 'structure-root') return 0.22 + pressure * 0.14;
+    return 0.34 + pressure * 0.28;
+}
+
+function strandSortKey(row: HopfResonanceAssignment): string {
+    return [
+        row.noteId || '',
+        row.chunkId || '',
+        row.role,
+        row.targetKind,
+        row.label,
+        row.targetId,
+    ].join('\u0001');
+}
+
+function positivePhase(value: number): number {
+    return ((value % 1) + 1) % 1;
+}
+
 function normalizeKind(value: string | undefined): string {
     return String(value || '').toLowerCase().replace(/[^a-z0-9]+/g, '');
 }
@@ -709,90 +789,6 @@ function getOrInsert<K, V>(map: Map<K, V>, key: K, build: () => V): V {
     return value;
 }
 
-function pointKey(point: Vec3Tuple): string {
-    return `${Math.round(point[0] * 1_000_000)}:${Math.round(point[1] * 1_000_000)}:${Math.round(point[2] * 1_000_000)}`;
-}
-
 function safeId(value: string): string {
     return value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'x';
-}
-
-function stableUnit(value: string): number {
-    return mix32(hashString(value)) / 0xffffffff;
-}
-
-function hashString(value: string): number {
-    let out = 2166136261;
-    for (let index = 0; index < value.length; index += 1) {
-        out ^= value.charCodeAt(index);
-        out = Math.imul(out, 16777619);
-    }
-    return out >>> 0;
-}
-
-function mix32(value: number): number {
-    let out = value >>> 0;
-    out ^= out >>> 16;
-    out = Math.imul(out, 0x7feb352d);
-    out ^= out >>> 15;
-    out = Math.imul(out, 0x846ca68b);
-    out ^= out >>> 16;
-    return out >>> 0;
-}
-
-function signedUnit(seed: number): number {
-    return (mix32(seed) / 0x7fffffff) - 1;
-}
-
-function clampInt(value: number, min: number, max: number): number {
-    return Math.max(min, Math.min(max, Math.floor(value)));
-}
-
-function clamp01(value: number): number {
-    return Math.max(0, Math.min(1, Number.isFinite(value) ? value : 0));
-}
-
-function round(value: number): number {
-    return Number.isFinite(value) ? Math.round(value * 1000) / 1000 : 0;
-}
-
-function roundVec(vec: Vec3Tuple): Vec3Tuple {
-    return [round(vec[0]), round(vec[1]), round(vec[2])];
-}
-
-function positiveRadians(value: number): number {
-    return ((value % TAU) + TAU) % TAU;
-}
-
-function norm3(value: Vec3Tuple): number {
-    return Math.sqrt(dot3(value, value));
-}
-
-function normalize3(value: Vec3Tuple): Vec3Tuple {
-    const length = norm3(value);
-    return length ? [value[0] / length, value[1] / length, value[2] / length] : [0, 0, 0];
-}
-
-function dot3(left: Vec3Tuple, right: Vec3Tuple): number {
-    return left[0] * right[0] + left[1] * right[1] + left[2] * right[2];
-}
-
-function add3(left: Vec3Tuple, right: Vec3Tuple): Vec3Tuple {
-    return [left[0] + right[0], left[1] + right[1], left[2] + right[2]];
-}
-
-function sub3(left: Vec3Tuple, right: Vec3Tuple): Vec3Tuple {
-    return [left[0] - right[0], left[1] - right[1], left[2] - right[2]];
-}
-
-function scale3(value: Vec3Tuple, scale: number): Vec3Tuple {
-    return [value[0] * scale, value[1] * scale, value[2] * scale];
-}
-
-function cross3(left: Vec3Tuple, right: Vec3Tuple): Vec3Tuple {
-    return [
-        left[1] * right[2] - left[2] * right[1],
-        left[2] * right[0] - left[0] * right[2],
-        left[0] * right[1] - left[1] * right[0],
-    ];
 }

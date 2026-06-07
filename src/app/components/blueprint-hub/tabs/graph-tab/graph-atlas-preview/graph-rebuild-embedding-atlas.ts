@@ -57,6 +57,10 @@ type HopfBaseAssignment = {
     assignmentScore?: number;
     residualScore?: number;
     salience?: number;
+    strandKey?: string;
+    strandIndex?: number;
+    strandCount?: number;
+    phaseSpread?: number;
     direction?: readonly number[];
     tangent?: readonly number[];
     receipt?: string;
@@ -925,6 +929,10 @@ function graphRebuildHopfMetadata(
         assignmentScore: assignment.assignmentScore,
         residualScore: assignment.residualScore,
         salience: assignment.salience,
+        strandKey: assignment.strandKey,
+        strandIndex: assignment.strandIndex,
+        strandCount: assignment.strandCount,
+        phaseSpread: assignment.phaseSpread,
         direction: assignment.direction,
         tangent: assignment.tangent,
         receipt: assignment.receipt,
@@ -1054,6 +1062,10 @@ function hopfSnapshotAssignment(
         assignmentScore: clamp01(assignment.assignmentScore),
         residualScore: residual,
         salience: clamp01(assignment.salience),
+        strandKey: assignment.strandKey,
+        strandIndex: assignment.strandIndex,
+        strandCount: assignment.strandCount,
+        phaseSpread: assignment.phaseSpread,
         direction: assignment.direction,
         tangent: assignment.tangent,
         receipt: assignment.receipt,

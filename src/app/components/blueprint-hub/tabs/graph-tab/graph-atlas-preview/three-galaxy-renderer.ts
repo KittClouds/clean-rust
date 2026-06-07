@@ -43,6 +43,32 @@ interface GuideAttachmentContract {
     localScale: number;
 }
 
+export interface ThreeGalaxyRendererTimings {
+    rendererSetSceneMs: number;
+    applyModeMs: number;
+    liveGeometryMs: number;
+    focusMs: number;
+    instancesMs: number;
+    edgeGeometryMs: number;
+    labelsMs: number;
+    pickMs: number;
+    drawMs: number;
+}
+
+function emptyRendererTimings(): ThreeGalaxyRendererTimings {
+    return {
+        rendererSetSceneMs: 0,
+        applyModeMs: 0,
+        liveGeometryMs: 0,
+        focusMs: 0,
+        instancesMs: 0,
+        edgeGeometryMs: 0,
+        labelsMs: 0,
+        pickMs: 0,
+        drawMs: 0,
+    };
+}
+
 export class ThreeGalaxyRenderer implements GraphRendererPort {
     private renderer: THREE.WebGLRenderer | null = null;
     private readonly scene = new THREE.Scene();
@@ -96,6 +122,7 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
     private densityNodeBins = new Int32Array(0);
     private densityFactors = new Float32Array(0);
     private guidePositionBuffer = new Float32Array(0);
+    private readonly timings: ThreeGalaxyRendererTimings = emptyRendererTimings();
 
     mount(canvas: HTMLCanvasElement): boolean {
         if (this.renderer) return false;
@@ -121,6 +148,7 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
     }
 
     setScene(scene: GalaxySceneV2): void {
+        const started = this.now();
         this.sceneData = scene;
         this.clearObjects();
         this.nodeShape = this.settings.nodeShape;
@@ -137,6 +165,7 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
         if (this.glows) this.scene.add(this.glows);
         if (this.nodes) this.scene.add(this.nodes);
         this.applyModePositions();
+        this.recordTiming('rendererSetSceneMs', started);
         this.render();
     }
 
@@ -200,8 +229,10 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
     render(): void {
         const renderer = this.renderer;
         if (!renderer) return;
+        const started = this.now();
         this.particles.update(this.sceneData, this.positions(), this.settings, performance.now(), this.focusMask);
         renderer.render(this.scene, this.camera());
+        this.recordTiming('drawMs', started);
     }
 
     rotate(deltaX: number, deltaY: number): void {
@@ -340,16 +371,25 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
     }
 
     pick(pointer: GraphRendererPointer): string | null {
-        if (!this.sceneData) return null;
-        const screenHit = this.screenSpacePick(pointer);
-        if (screenHit >= 0) return this.sceneData.ids[screenHit] ?? null;
-        if (!this.nodes) return null;
-        this.pointer.x = (pointer.x / Math.max(1, pointer.width)) * 2 - 1;
-        this.pointer.y = -(pointer.y / Math.max(1, pointer.height)) * 2 + 1;
-        this.raycaster.setFromCamera(this.pointer, this.camera());
-        const hit = this.raycaster.intersectObjects(this.nodes.children, false)[0];
-        const index = Number(hit?.object.userData['index']);
-        return Number.isFinite(index) ? this.sceneData.ids[index] ?? null : null;
+        const started = this.now();
+        try {
+            if (!this.sceneData) return null;
+            const screenHit = this.screenSpacePick(pointer);
+            if (screenHit >= 0) return this.sceneData.ids[screenHit] ?? null;
+            if (!this.nodes) return null;
+            this.pointer.x = (pointer.x / Math.max(1, pointer.width)) * 2 - 1;
+            this.pointer.y = -(pointer.y / Math.max(1, pointer.height)) * 2 + 1;
+            this.raycaster.setFromCamera(this.pointer, this.camera());
+            const hit = this.raycaster.intersectObjects(this.nodes.children, false)[0];
+            const index = Number(hit?.object.userData['index']);
+            return Number.isFinite(index) ? this.sceneData.ids[index] ?? null : null;
+        } finally {
+            this.recordTiming('pickMs', started);
+        }
+    }
+
+    snapshotTimings(): ThreeGalaxyRendererTimings {
+        return { ...this.timings };
     }
 
     dispose(): void {
@@ -385,15 +425,25 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
     private applyModePositions(): void {
         const data = this.sceneData;
         if (!data) return;
+        const started = this.now();
         const positions = this.mode === '2d' ? data.positions2d : data.positions3d;
+        const focusStarted = this.now();
         const focus = buildGalaxyFocusMask(data, this.selectedId, this.hoverId);
+        this.recordTiming('focusMs', focusStarted);
         this.focusMask = focus;
         this.updateGroupShells(data);
         this.updateLorentzGuideGeometry(data, positions);
         this.updateGuideFocus(data, focus);
+        const instancesStarted = this.now();
         this.updateInstances(data, positions, focus);
+        this.recordTiming('instancesMs', instancesStarted);
+        const edgeStarted = this.now();
         this.updateEdgeGeometry(data, positions, focus);
+        this.recordTiming('edgeGeometryMs', edgeStarted);
+        const labelsStarted = this.now();
         this.rebuildLabels(data, positions);
+        this.recordTiming('labelsMs', labelsStarted);
+        this.recordTiming('applyModeMs', started);
     }
 
     private updateLiveGeometry(): void {
@@ -401,13 +451,21 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
         if (!data) return;
         const positions = this.positions();
         if (!positions) return;
+        const started = this.now();
+        const focusStarted = this.now();
         const focus = buildGalaxyFocusMask(data, this.selectedId, this.hoverId);
+        this.recordTiming('focusMs', focusStarted);
         this.focusMask = focus;
         this.updateGroupShells(data);
         this.updateLorentzGuideGeometry(data, positions);
         this.updateGuideFocus(data, focus);
+        const instancesStarted = this.now();
         this.updateInstances(data, positions, focus);
+        this.recordTiming('instancesMs', instancesStarted);
+        const edgeStarted = this.now();
         this.updateEdgeGeometry(data, positions, focus);
+        this.recordTiming('edgeGeometryMs', edgeStarted);
+        this.recordTiming('liveGeometryMs', started);
     }
 
     private updateInstances(data: GalaxySceneV2, positions: Float32Array, focus: GalaxyFocusMask): void {
@@ -2540,5 +2598,13 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
             label.material.dispose();
         }
         this.labels = [];
+    }
+
+    private recordTiming(key: keyof ThreeGalaxyRendererTimings, started: number): void {
+        this.timings[key] = Math.max(0, Math.round(this.now() - started));
+    }
+
+    private now(): number {
+        return typeof performance !== 'undefined' ? performance.now() : Date.now();
     }
 }
