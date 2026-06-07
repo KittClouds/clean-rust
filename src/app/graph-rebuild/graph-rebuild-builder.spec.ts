@@ -100,7 +100,7 @@ describe('Phoenix graph rebuild builder', () => {
             chunk: 1,
             entity: 3,
             event: 1,
-            graphFact: 2,
+            graphFact: 5,
             memoryState: 3,
             note: 1,
             structureRoot: 5,
@@ -108,8 +108,12 @@ describe('Phoenix graph rebuild builder', () => {
         expect(snapshot.embeddingTargetPlan).toMatchObject({
             schemaVersion: 'phoenix-signal-target-plan/v1',
             candidateCount: 22,
+            canonicalCount: 22,
             admittedCount: 19,
+            queuedCount: 19,
             deferredCount: 3,
+            schedulerDeferredCount: 3,
+            policyDeferredCount: 0,
         });
         expect(snapshot.embeddingTargetPlan?.lanes).toEqual(expect.arrayContaining([
             expect.objectContaining({ lane: 'document_spine', admitted: 2 }),
@@ -145,9 +149,12 @@ describe('Phoenix graph rebuild builder', () => {
             events: 1,
             episodes: 1,
             memoryState: 3,
-            embeddingTargets: 19,
+            embeddingTargets: 22,
             embeddingTargetCandidates: 22,
+            embeddingQueuedTargets: 19,
             embeddingTargetDeferred: 3,
+            embeddingSchedulerDeferredTargets: 3,
+            embeddingPolicyDeferredTargets: 0,
             embeddingDocumentSpine: 2,
             embeddingChunkSpine: 1,
             embeddingEntityAnchors: 4,
@@ -299,10 +306,14 @@ describe('Phoenix graph rebuild builder', () => {
 
         expect(snapshot.embeddingTargetPlan).toMatchObject({
             candidateCount: 9,
+            canonicalCount: 9,
             admittedCount: 8,
+            queuedCount: 8,
             deferredCount: 1,
+            policyDeferredCount: 1,
         });
         expect(snapshot.embeddingTargets.map((target) => target.kind).sort()).toEqual([
+            'anchor',
             'chunk',
             'entity',
             'note',
@@ -312,6 +323,11 @@ describe('Phoenix graph rebuild builder', () => {
             'structureRoot',
             'structureRoot',
         ]);
+        expect(snapshot.embeddingTargets.find((target) => target.kind === 'anchor')).toMatchObject({
+            admissionStatus: 'deferred',
+            workStatus: 'deferred_by_policy',
+            deferReason: 'lane_disabled_by_stage_policy',
+        });
         expect(snapshot.embeddingTargetPlan?.lanes).toEqual(expect.arrayContaining([
             expect.objectContaining({ lane: 'anchor_evidence', candidates: 2, admitted: 1, deferred: 1 }),
             expect.objectContaining({ lane: 'causal_fact', candidates: 1, admitted: 1, deferred: 0 }),

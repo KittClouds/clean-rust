@@ -349,6 +349,7 @@ export class SearchPanelComponent implements OnInit {
   readonly selectedBuildFolderId = signal('');
   readonly selectedBuildNoteIds = signal<string[]>([]);
   readonly buildNoteQuery = signal('');
+  readonly hydratedBuildScopeNotes = signal<SearchPanelNote[]>([]);
   readonly graphTargetQuery = signal('');
   readonly collapsedCapabilityGroups = signal<string[]>([]);
   readonly buildPolicy = signal<'dirty-only' | 'force'>('dirty-only');
@@ -443,6 +444,7 @@ export class SearchPanelComponent implements OnInit {
     const ids = new Set(noteIdsFromBuildScope(scope));
     return notes.filter((note) => ids.has(note.id));
   });
+  private buildScopeHydrationGeneration = 0;
   readonly buildScopeLabel = computed(() => {
     const scope = this.selectedBuildScope();
     if (scope.mode === 'global') return 'Global';
@@ -478,6 +480,10 @@ export class SearchPanelComponent implements OnInit {
     const labels = this.enabledLaneLabels();
     return labels.length ? labels.join(' + ') : 'Lexical retrieval';
   });
+  readonly buildScopeNotesForEstimate = computed(() => {
+    const hydrated = this.hydratedBuildScopeNotes();
+    return hydrated.length ? hydrated : this.scopedNotes();
+  });
   readonly vectorRouteLabel = computed(() =>
     this.embeddingsReady() ? 'Native Rust semantic runner ready' : 'Native Rust semantic runner idle'
   );
@@ -491,7 +497,7 @@ export class SearchPanelComponent implements OnInit {
   readonly commandStatus = computed(() => buildAtlasCommandStatus({
     scopeLabel: this.scopeLabel(),
     noteCount: this.scopedNotes().length,
-    estimatedChunks: estimateDynamicChunks(this.scopedNotes()),
+    estimatedChunks: estimateDynamicChunks(this.buildScopeNotesForEstimate()),
     audit: this.graphAudit(),
     stages: this.machineStages(),
     activeJob: this.activeJob(),
@@ -698,6 +704,7 @@ export class SearchPanelComponent implements OnInit {
           folderId: note.folderId || '',
           hasBody: !!note.hasBody,
         })));
+        this.queueBuildScopeHydration();
       });
 
     this.notesService.getAllFolders$()
@@ -762,6 +769,7 @@ export class SearchPanelComponent implements OnInit {
     if (mode === 'global') {
       this.machine.setScope('global');
       void this.machine.refreshAuditSafe();
+      this.queueBuildScopeHydration();
       return;
     }
     if (mode === 'folder') {
@@ -771,17 +779,20 @@ export class SearchPanelComponent implements OnInit {
         this.machine.setScope(folderId);
         void this.machine.refreshAuditSafe();
       }
+      this.queueBuildScopeHydration();
       return;
     }
     if (mode === 'note') {
       const noteId = this.noteStore.currentNote()?.id || this.notes()[0]?.id || '';
       if (noteId) this.selectedBuildNoteIds.set([noteId]);
+      this.queueBuildScopeHydration();
       return;
     }
     if (!this.selectedBuildNoteIds().length) {
       const noteId = this.noteStore.currentNote()?.id || this.notes()[0]?.id || '';
       if (noteId) this.selectedBuildNoteIds.set([noteId]);
     }
+    this.queueBuildScopeHydration();
   }
 
   onBuildFolderChange(folderId: string): void {
@@ -789,6 +800,7 @@ export class SearchPanelComponent implements OnInit {
     this.buildScopeMode.set('folder');
     this.machine.setScope(folderId || 'global');
     void this.machine.refreshAuditSafe();
+    this.queueBuildScopeHydration();
   }
 
   toggleBuildNote(noteId: string): void {
@@ -801,6 +813,7 @@ export class SearchPanelComponent implements OnInit {
     this.selectedBuildNoteIds.update((ids) =>
       ids.includes(noteId) ? ids.filter((id) => id !== noteId) : [...ids, noteId],
     );
+    this.queueBuildScopeHydration();
   }
 
   isBuildNoteSelected(noteId: string): boolean {
@@ -919,6 +932,21 @@ export class SearchPanelComponent implements OnInit {
     return this.fullAtlasModelsReady() ? 'Models Warm' : 'Load Models';
   }
 
+  async runEntitySuggestionStage(): Promise<void> {
+    if (this.isRunNerDisabled()) return;
+    await this.runAtlasRecipe('runNer', { preserveSelection: true });
+  }
+
+  isRunNerDisabled(): boolean {
+    return this.isRecipeDisabled('runNer');
+  }
+
+  nerSuggestionsButtonLabel(): string {
+    if (this.isRecipeBusy('runNer')) return 'Scanning NER';
+    if (!this.hasRunnableBuildScope()) return 'Pick Scope';
+    return 'Run NER';
+  }
+
   modelReadinessTone(status: string): string {
     if (status === 'ready') return 'ready';
     if (status === 'warming' || status === 'running') return 'running';
@@ -926,9 +954,13 @@ export class SearchPanelComponent implements OnInit {
     return 'idle';
   }
 
-  async runAtlasRecipe(recipeId: AtlasRecipeId): Promise<void> {
+  async runAtlasRecipe(recipeId: AtlasRecipeId, options: { preserveSelection?: boolean } = {}): Promise<void> {
     if (this.activeRecipe()) return;
-    this.applyRecipeSelection(recipeId);
+    if (options.preserveSelection) {
+      this.resetRecipeProgress();
+    } else {
+      this.applyRecipeSelection(recipeId);
+    }
     this.activeRecipe.set(recipeId);
     this.error.set(null);
     try {
@@ -1633,6 +1665,28 @@ export class SearchPanelComponent implements OnInit {
     return this.loadNotesByIds(this.scopedNotes().map((note) => note.id));
   }
 
+  private async hydrateBuildScopeNotes(notes: SearchPanelNote[]): Promise<void> {
+    const generation = ++this.buildScopeHydrationGeneration;
+    if (!notes.length) {
+      this.hydratedBuildScopeNotes.set([]);
+      return;
+    }
+    const ids = notes.map((note) => note.id).filter(Boolean);
+    const hydrated = await this.loadNotesByIds(ids);
+    if (generation !== this.buildScopeHydrationGeneration) return;
+    const hydratedById = new Map(hydrated.map((note) => [note.id, note]));
+    const merged: SearchPanelNote[] = [];
+    for (const id of ids) {
+      const note = hydratedById.get(id) || notes.find((candidate) => candidate.id === id);
+      if (note) merged.push(note);
+    }
+    this.hydratedBuildScopeNotes.set(merged);
+  }
+
+  private queueBuildScopeHydration(): void {
+    void this.hydrateBuildScopeNotes(this.scopedNotes());
+  }
+
   private async loadNoteMapByIds(ids: string[]): Promise<Map<string, SearchPanelNote>> {
     const notes = await this.loadNotesByIds(ids);
     return new Map(notes.map((note) => [note.id, note]));
@@ -1784,7 +1838,7 @@ function buildPostprocessStagingView(
     return {
       title: mode === 'budget' ? 'Lane Budget Matrix' : 'Lane Plan Matrix',
       mode,
-      targets: plan.admittedCount,
+      targets: plan.canonicalCount || plan.candidateCount,
       candidates: plan.candidateCount,
       deferred: plan.deferredCount,
       lanes,

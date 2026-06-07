@@ -1,5 +1,6 @@
 import type { RegisteredEntity } from '../../../../lib/registry';
 import type { GraphRebuildSnapshot } from '../../../../graph-rebuild/graph-rebuild-snapshot';
+import type { GraphDiscourseCompilerOverlayEdge } from '../../../../graph-rebuild/graph-discourse-compiler-overlay';
 import type { ProductDiagnosticsView } from './graph-product-diagnostics';
 
 export type GraphDiscourseTabId = 'insights' | 'ideas' | 'gaps' | 'relations' | 'stance' | 'stats';
@@ -50,6 +51,37 @@ export interface GraphDiscourseUnderlyingIdea {
     tone: GraphDiscourseTone;
 }
 
+export interface GraphDiscourseSpineSafetyItem {
+    id: string;
+    label: string;
+    value: string;
+    detail: string;
+    tone: GraphDiscourseTone;
+}
+
+export interface GraphDiscourseSpineRow {
+    id: string;
+    title: string;
+    routeLabel: string;
+    detail: string;
+    evidenceLabel: string;
+    scoreLabel: string;
+    query: string;
+    tone: GraphDiscourseTone;
+}
+
+export interface GraphDiscourseSpineSection {
+    id: 'wormholes' | 'clusters' | 'resolvers';
+    label: string;
+    detail: string;
+    rows: GraphDiscourseSpineRow[];
+}
+
+export interface GraphDiscourseSpineOverlayView {
+    safety: GraphDiscourseSpineSafetyItem[];
+    sections: GraphDiscourseSpineSection[];
+}
+
 export interface GraphDiscourseAnalyticsView {
     title: string;
     scopeLabel: string;
@@ -60,6 +92,7 @@ export interface GraphDiscourseAnalyticsView {
     panels: Record<GraphDiscourseTabId, GraphDiscoursePanel>;
     questions: GraphDiscourseQuestion[];
     underlyingIdeas: GraphDiscourseUnderlyingIdea[];
+    spineOverlay: GraphDiscourseSpineOverlayView;
 }
 
 const TABS: GraphDiscourseTab[] = [
@@ -83,17 +116,38 @@ export function buildGraphDiscourseAnalyticsView(
     const relationCounts = relationFamilies(snapshot);
     const stateCounts = topCountRecord(snapshot.semanticAdjudicationSummary?.counters.byState, 6);
     const candidateCounts = topCountRecord(snapshot.semanticCandidateSummary?.counters.byKind, 5);
-    const ledgerCounters = snapshot.semanticEvalLedgerSummary?.counters;
+    const semanticLedgerCounters = snapshot.semanticEvalLedgerSummary?.counters;
+    const discourseLedgerCounters = snapshot.discourseEvalLedgerSummary?.counters;
+    const promotionCounters = snapshot.discoursePromotionSurfaceSummary?.counters;
+    const overlayCounters = snapshot.discourseCompilerOverlaySummary?.counters;
     const bridgeCounters = snapshot.memoryGraphRagBridgeSummary?.counters;
     const reviewClusters = diagnostics?.reviewClusters ?? [];
     const topRegion = diagnostics?.summary.topRegions[0];
     const topKind = kindCounts[0];
-    const accepted = ledgerCounters?.acceptedCandidates ?? snapshot.counters.semanticEvalAcceptedCandidates ?? 0;
-    const rejected = ledgerCounters?.rejectedCandidates ?? snapshot.counters.semanticEvalRejectedCandidates ?? 0;
-    const ambiguous = ledgerCounters?.ambiguousCases ?? snapshot.counters.semanticEvalAmbiguousCases ?? 0;
-    const graphChanges = ledgerCounters?.graphChangeRows ?? snapshot.counters.semanticEvalGraphChangeRows ?? 0;
-    const modelDisagreements = ledgerCounters?.modelDisagreements ?? snapshot.counters.semanticEvalModelDisagreements ?? 0;
-    const manifoldDisagreements = ledgerCounters?.manifoldDisagreements ?? snapshot.counters.semanticEvalManifoldDisagreements ?? 0;
+    const accepted = discourseLedgerCounters?.acceptedCandidates
+        ?? semanticLedgerCounters?.acceptedCandidates
+        ?? snapshot.counters.semanticEvalAcceptedCandidates
+        ?? 0;
+    const rejected = discourseLedgerCounters?.rejectedCandidates
+        ?? semanticLedgerCounters?.rejectedCandidates
+        ?? snapshot.counters.semanticEvalRejectedCandidates
+        ?? 0;
+    const ambiguous = discourseLedgerCounters?.ambiguousCases
+        ?? semanticLedgerCounters?.ambiguousCases
+        ?? snapshot.counters.semanticEvalAmbiguousCases
+        ?? 0;
+    const graphChanges = discourseLedgerCounters?.graphChangeRows
+        ?? semanticLedgerCounters?.graphChangeRows
+        ?? snapshot.counters.semanticEvalGraphChangeRows
+        ?? 0;
+    const modelDisagreements = discourseLedgerCounters?.modelDisagreements
+        ?? semanticLedgerCounters?.modelDisagreements
+        ?? snapshot.counters.semanticEvalModelDisagreements
+        ?? 0;
+    const manifoldDisagreements = discourseLedgerCounters?.manifoldDisagreements
+        ?? semanticLedgerCounters?.manifoldDisagreements
+        ?? snapshot.counters.semanticEvalManifoldDisagreements
+        ?? 0;
     const reviewLoad = reviewClusters.length + ambiguous + modelDisagreements + manifoldDisagreements;
     const title = selectedEntity ? selectedEntity.label : scopeTitle(snapshot);
     const scopeLabel = `${snapshot.scopeKind} / ${snapshot.noteIds.length || 1} notes`;
@@ -103,6 +157,7 @@ export function buildGraphDiscourseAnalyticsView(
     const scoreLabel = `${accepted} accepted / ${rejected} rejected / ${ambiguous} ambiguous`;
     const ideaChips = ideaChipsFor(diagnostics, kindCounts, relationCounts);
     const gapChips = gapChipsFor(reviewClusters, candidateCounts, snapshot);
+    const overlayChips = discourseOverlayChipsFor(snapshot);
     const relationChips = relationCounts.slice(0, 6).map((row) => chip(
         `relation:${row.key}`,
         titleCase(row.key),
@@ -111,11 +166,14 @@ export function buildGraphDiscourseAnalyticsView(
         row.key,
     ));
     const stanceChips = stanceChipsFor(snapshot);
+    const spineOverlay = discourseSpineOverlayFor(snapshot);
     const metrics: GraphDiscourseMetric[] = [
         metric('ideas', 'Ideas', String(entities.length), topKind ? `${topKind.key} leads the entity surface` : 'no entity dominance yet', entities.length ? 'ready' : 'quiet'),
         metric('relations', 'Relations', String(snapshot.counters.relationships + (snapshot.graphAwareLinkSuggestions?.length || 0)), relationCounts[0] ? `${relationCounts[0].key} is the strongest relation family` : 'no relation family dominance', relationCounts.length ? 'ready' : 'quiet'),
         metric('gaps', 'Gaps', String(reviewLoad), `${reviewClusters.length} review clusters / ${modelDisagreements + manifoldDisagreements} disagreements`, reviewLoad ? 'review' : 'quiet'),
         metric('receipts', 'Receipts', String((bridgeCounters?.receiptCount || 0) + (snapshot.semanticAdjudicationSummary?.receipts.length || 0)), `${graphChanges} topology commits / ${snapshot.counters.semanticAdjudicationLedgerOnly || 0} ledger-only`, graphChanges ? 'ready' : 'quiet'),
+        metric('wormholes', 'Wormholes', String(promotionCounters?.chunkWormholeCount || 0), `${promotionCounters?.documentClusterCount || 0} doc clusters / ${promotionCounters?.resolverCandidateCount || 0} resolver hints`, promotionCounters?.compilerHintCount ? 'ready' : 'quiet'),
+        metric('overlay', 'Overlay', String(overlayCounters?.overlayEdgeCount || 0), `${overlayCounters?.graphPatchCount || 0} graph patches / ${overlayCounters?.mutationAllowedCount || 0} mutable`, overlayCounters?.overlayEdgeCount ? 'ready' : 'quiet'),
     ];
 
     return {
@@ -130,16 +188,18 @@ export function buildGraphDiscourseAnalyticsView(
                 `${scoreLabel} in the Phase 6 ledger.`,
                 `${graphChanges} accepted decisions changed graph topology; rejected or deferred decisions stayed ledger-only.`,
                 `${bridgeCounters?.evalRowCount || 0} memory bridge eval rows are available for retrieval sanity checks.`,
+                `${overlayCounters?.overlayEdgeCount || 0} discourse overlay edges are visible to compiler/atlas consumers without graph patches.`,
             ], [
                 chip('insight:score-source', snapshot.semanticRerankSummary?.scoreSource || 'no rerank', `${snapshot.semanticRerankSummary?.judgments.length || 0} judgments`, 'ready', 'rerank'),
                 chip('insight:commits', 'Topology commits', String(graphChanges), graphChanges ? 'ready' : 'quiet', 'accepted'),
                 chip('insight:ledger', 'Eval rows', String(snapshot.semanticEvalLedgerSummary?.entries.length || 0), snapshot.semanticEvalLedgerSummary?.entries.length ? 'ready' : 'quiet', 'eval'),
+                ...overlayChips.slice(0, 3),
             ]),
             ideas: panel('ideas', 'Main ideas summary', mainIdeaSummary(topKind, topRegion, relationCounts[0]), [
                 topKind ? `${topKind.key} is the largest entity family with ${topKind.count} registered nodes.` : 'No dominant entity family yet.',
                 topRegion ? `${topRegion.role}/${topRegion.lane} is the strongest product region.` : 'Product regions are not available yet.',
                 relationCounts[0] ? `${titleCase(relationCounts[0].key)} is the most repeated relation surface.` : 'Relation families are still sparse.',
-            ], ideaChips),
+            ], [...ideaChips, ...overlayChips].slice(0, 6)),
             gaps: panel('gaps', 'Content gaps', gapSummary(reviewLoad, ambiguous, modelDisagreements, manifoldDisagreements), [
                 `${reviewClusters.length} review families are waiting for a human or classifier decision.`,
                 `${ambiguous} ambiguous ledger rows need stronger evidence or identity resolution.`,
@@ -149,7 +209,7 @@ export function buildGraphDiscourseAnalyticsView(
                 `${snapshot.relationships.length} accepted or review relationship records are present.`,
                 `${snapshot.graphAwareLinkSuggestions?.length || 0} graph-aware relation suggestions are staged.`,
                 `${snapshot.causalEdges.length} causal and ${snapshot.temporalEdges.length} temporal edges are available for path questions.`,
-            ], relationChips),
+            ], [...overlayChips, ...relationChips].slice(0, 6)),
             stance: panel('stance', 'Stance and polarity', stanceSummary(snapshot), [
                 `${snapshot.causalEdges.filter((edge) => edge.polarity === 'support').length} causal edges carry support polarity.`,
                 `${snapshot.causalEdges.filter((edge) => edge.polarity === 'contradict').length} causal edges carry contradiction polarity.`,
@@ -163,10 +223,12 @@ export function buildGraphDiscourseAnalyticsView(
                 chip('stats:nodes', 'Nodes', String(snapshot.counters.nodes), snapshot.counters.nodes ? 'ready' : 'quiet', 'nodes'),
                 chip('stats:edges', 'Edges', String(snapshot.counters.edges), snapshot.counters.edges ? 'ready' : 'quiet', 'edges'),
                 chip('stats:vectors', 'Vectors', String(snapshot.counters.embeddingVectors), snapshot.counters.embeddingVectors ? 'ready' : 'quiet', 'vectors'),
+                chip('stats:overlay', 'Overlay', String(overlayCounters?.overlayEdgeCount || 0), overlayCounters?.overlayEdgeCount ? 'ready' : 'quiet', 'discourse overlay'),
             ]),
         },
         questions: questionsFor(selectedEntity, reviewClusters, relationCounts[0], topRegion, candidateCounts[0]),
         underlyingIdeas: underlyingIdeasFor(diagnostics, reviewClusters, snapshot, kindCounts, relationCounts),
+        spineOverlay,
     };
 }
 
@@ -385,7 +447,149 @@ function underlyingIdeasFor(
             tone: 'ready',
         });
     }
+    if (snapshot.discourseCompilerOverlaySummary) {
+        ideas.push({
+            id: 'discourse-overlay',
+            title: 'Discourse compiler overlay',
+            detail: `${snapshot.discourseCompilerOverlaySummary.counters.overlayEdgeCount} wormhole, cluster, or resolver hints are visible.`,
+            evidence: 'read-only compiler overlay',
+            tone: snapshot.discourseCompilerOverlaySummary.counters.overlayEdgeCount ? 'ready' : 'quiet',
+        });
+    }
     return ideas.slice(0, 8);
+}
+
+function discourseOverlayChipsFor(snapshot: GraphRebuildSnapshot): GraphDiscourseChip[] {
+    const promotion = snapshot.discoursePromotionSurfaceSummary?.counters;
+    const overlay = snapshot.discourseCompilerOverlaySummary?.counters;
+    return [
+        chip(
+            'discourse:wormholes',
+            'Chunk wormholes',
+            `${promotion?.chunkWormholeCount || 0} hints`,
+            promotion?.chunkWormholeCount ? 'ready' : 'quiet',
+            'chunk wormhole',
+        ),
+        chip(
+            'discourse:clusters',
+            'Doc clusters',
+            `${promotion?.documentClusterCount || 0} clusters`,
+            promotion?.documentClusterCount ? 'ready' : 'quiet',
+            'document cluster',
+        ),
+        chip(
+            'discourse:resolvers',
+            'Resolvers',
+            `${promotion?.resolverCandidateCount || 0} candidates`,
+            promotion?.resolverCandidateCount ? 'review' : 'quiet',
+            'cross doc resolver',
+        ),
+        chip(
+            'discourse:overlay',
+            'Overlay edges',
+            `${overlay?.overlayEdgeCount || 0} read-only`,
+            overlay?.overlayEdgeCount ? 'ready' : 'quiet',
+            'discourse overlay',
+        ),
+    ];
+}
+
+function discourseSpineOverlayFor(snapshot: GraphRebuildSnapshot): GraphDiscourseSpineOverlayView {
+    const summary = snapshot.discourseCompilerOverlaySummary;
+    const counters = summary?.counters;
+    const byTarget = new Map((snapshot.embeddingTargets || []).map((target) => [target.id, target]));
+    const rows = (summary?.overlayEdges || []).map((edge) => spineRowFor(edge, byTarget));
+
+    return {
+        safety: [
+            safetyItem('overlay', 'Overlay', String(counters?.overlayEdgeCount || 0), 'compiler-visible rows', counters?.overlayEdgeCount ? 'ready' : 'quiet'),
+            safetyItem('patches', 'Patches', String(counters?.graphPatchCount || 0), 'topology writes', counters?.graphPatchCount ? 'danger' : 'ready'),
+            safetyItem('mutable', 'Mutable', String(counters?.mutationAllowedCount || 0), 'mutation permission', counters?.mutationAllowedCount ? 'danger' : 'ready'),
+            safetyItem('receipts', 'Receipts', String(counters?.receiptCount || 0), 'undo rows', counters?.receiptCount ? 'ready' : 'quiet'),
+        ],
+        sections: [
+            {
+                id: 'wormholes',
+                label: 'Wormholes',
+                detail: `${counters?.chunkWormholeEdges || 0} meaning bridges`,
+                rows: rows.filter((row) => row.id.startsWith('chunk_wormhole:')).slice(0, 4),
+            },
+            {
+                id: 'clusters',
+                label: 'Document Clusters',
+                detail: `${counters?.documentClusterEdges || 0} cluster hints`,
+                rows: rows.filter((row) => row.id.startsWith('document_cluster:')).slice(0, 4),
+            },
+            {
+                id: 'resolvers',
+                label: 'Resolvers',
+                detail: `${counters?.resolverEdges || 0} cross-doc hints`,
+                rows: rows.filter((row) => row.id.startsWith('cross_doc_resolution:')).slice(0, 4),
+            },
+        ],
+    };
+}
+
+function spineRowFor(
+    edge: GraphDiscourseCompilerOverlayEdge,
+    byTarget: Map<string, { label: string; text: string; kind: string; noteId?: string; chunkId?: string }>,
+): GraphDiscourseSpineRow {
+    const source = targetLabel(edge.sourceTargetId, byTarget);
+    const target = edge.targetTargetId ? targetLabel(edge.targetTargetId, byTarget) : '';
+    const memberLabels = edge.memberTargetIds.map((id) => targetLabel(id, byTarget)).filter(Boolean);
+    const score = Math.round(edge.confidence * 100);
+    const kindLabel = titleCase(edge.kind);
+    const routeLabel = edge.kind === 'document_cluster'
+        ? `${source} + ${Math.max(0, edge.memberTargetIds.length - 1)} members`
+        : `${source} -> ${target || 'target pending'}`;
+    const detail = edge.kind === 'document_cluster'
+        ? compactMembers(memberLabels)
+        : edge.proposedEdgeType || kindLabel;
+    const queryParts = [
+        source,
+        target,
+        ...memberLabels.slice(0, 3),
+        edge.sourceTargetId,
+        edge.targetTargetId,
+        edge.proposedEdgeType,
+    ].filter(Boolean);
+
+    return {
+        id: `${edge.kind}:${edge.id}`,
+        title: kindLabel,
+        routeLabel,
+        detail,
+        evidenceLabel: `${edge.evidenceTargetIds.length} evidence`,
+        scoreLabel: `${score}%`,
+        query: queryParts.join(' '),
+        tone: edge.kind === 'cross_doc_resolution' ? 'review' : 'ready',
+    };
+}
+
+function targetLabel(
+    targetId: string,
+    byTarget: Map<string, { label: string; text: string; kind: string; noteId?: string; chunkId?: string }>,
+): string {
+    const target = byTarget.get(targetId);
+    if (target?.label?.trim()) return target.label.trim();
+    if (target?.text?.trim()) return target.text.trim().slice(0, 42);
+    return targetId.replace(/^embed:/, '').replace(/:/g, ' ').slice(0, 48);
+}
+
+function compactMembers(values: string[]): string {
+    const uniqueValues = [...new Set(values.filter(Boolean))];
+    if (!uniqueValues.length) return 'cluster members pending';
+    return uniqueValues.slice(0, 3).join(' / ') + (uniqueValues.length > 3 ? ` / +${uniqueValues.length - 3}` : '');
+}
+
+function safetyItem(
+    id: string,
+    label: string,
+    value: string,
+    detail: string,
+    tone: GraphDiscourseTone,
+): GraphDiscourseSpineSafetyItem {
+    return { id, label, value, detail, tone };
 }
 
 interface CountRow {

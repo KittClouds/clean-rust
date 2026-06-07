@@ -219,6 +219,16 @@
                 }
             </div>
 
+            <section class="discourse-spine-safety" aria-label="Discourse overlay safety receipts">
+                @for (item of discourse.spineOverlay.safety; track item.id) {
+                <div class="discourse-safety-cell" [ngClass]="toneClass('discourse-tone', item.tone)">
+                    <span>{{ item.label }}</span>
+                    <strong>{{ item.value }}</strong>
+                    <small>{{ item.detail }}</small>
+                </div>
+                }
+            </section>
+
             <div class="discourse-tab-grid" role="tablist" aria-label="Discourse analytic sections">
                 @for (tab of discourse.tabs; track tab.id) {
                 <button type="button" class="discourse-tab" [class.discourse-tab-active]="selectedDiscourseTab() === tab.id" (click)="setDiscourseTab(tab.id)">
@@ -254,6 +264,37 @@
                 </div>
             </article>
             }
+
+            <section class="discourse-spine-board">
+                <div class="diagnostic-section-head">
+                    <span class="diagnostics-kicker">Document Spine Overlay</span>
+                    <button type="button" class="discourse-icon-button" title="Reload discourse snapshot" (click)="reloadGraphSidebarSnapshot()">
+                        <lucide-icon [img]="RefreshIcon" class="h-3.5 w-3.5"></lucide-icon>
+                    </button>
+                </div>
+                @for (section of discourse.spineOverlay.sections; track section.id) {
+                <div class="discourse-spine-section">
+                    <header>
+                        <strong>{{ section.label }}</strong>
+                        <span>{{ section.detail }}</span>
+                    </header>
+                    <div class="discourse-spine-rows">
+                        @for (row of section.rows; track row.id) {
+                        <button type="button" class="discourse-spine-row" [ngClass]="toneClass('discourse-tone', row.tone)" (click)="highlightDiscourseQuery(row.query)">
+                            <span class="discourse-spine-row-top">
+                                <strong>{{ row.title }}</strong>
+                                <em>{{ row.scoreLabel }}</em>
+                            </span>
+                            <span class="discourse-route">{{ row.routeLabel }}</span>
+                            <small>{{ row.detail }} / {{ row.evidenceLabel }}</small>
+                        </button>
+                        } @empty {
+                        <div class="empty-row">No {{ section.label.toLowerCase() }} in this snapshot.</div>
+                        }
+                    </div>
+                </div>
+                }
+            </section>
 
             @if (primaryDiscourseQuestion(); as question) {
             <section class="discourse-question">

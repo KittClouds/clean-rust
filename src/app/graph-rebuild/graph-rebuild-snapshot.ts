@@ -16,6 +16,8 @@ import type { GraphDiscourseBridgeCandidateSummary } from './graph-discourse-bri
 import type { GraphDiscourseBridgeAdjudicationSummary } from './graph-discourse-bridge-adjudication';
 import type { GraphDiscourseEvalLedgerSummary } from './graph-discourse-eval-ledger';
 import type { GraphDiscoursePromotionSurfaceSummary } from './graph-discourse-promotion-surface';
+import type { GraphDiscourseCompilerOverlaySummary } from './graph-discourse-compiler-overlay';
+import type { HopfResonanceSpace } from './graph-hopf-resonance-space';
 
 export type GraphRebuildScopeKind = 'global' | 'folder' | 'narrative' | 'note' | 'multiNote';
 export type GraphRebuildAnchorSource = EntityOccurrence['source'] | 'accepted_suggestion';
@@ -348,6 +350,7 @@ export interface GraphRebuildEmbeddingTarget {
     structuralRole?: GraphRebuildSignalStructuralRole;
     admissionTier?: number;
     admissionStatus?: GraphRebuildSignalAdmissionStatus;
+    workStatus?: GraphRebuildSignalWorkStatus;
     admissionReason?: string;
     deferReason?: string;
     parentIds?: string[];
@@ -380,6 +383,11 @@ export type GraphRebuildSignalStructuralRole =
 
 export type GraphRebuildSignalAdmissionStatus = 'admitted' | 'deferred';
 
+export type GraphRebuildSignalWorkStatus =
+    | 'queued'
+    | 'deferred_by_scheduler'
+    | 'deferred_by_policy';
+
 export interface GraphRebuildSignalTargetLaneReceipt {
     lane: GraphRebuildSignalTargetLane;
     candidates: number;
@@ -394,6 +402,14 @@ export interface GraphRebuildEmbeddingTargetPlan {
     admittedCount: number;
     deferredCount: number;
     maxAdmitted: number;
+    canonicalCount: number;
+    queuedCount: number;
+    schedulerDeferredCount: number;
+    policyDeferredCount: number;
+    maxQueued: number;
+    queuedTargetIds: string[];
+    schedulerDeferredTargetIds: string[];
+    policyDeferredTargetIds: string[];
     lanes: GraphRebuildSignalTargetLaneReceipt[];
 }
 
@@ -1924,7 +1940,10 @@ export interface GraphRebuildCounters {
     memoryState: number;
     embeddingTargets: number;
     embeddingTargetCandidates?: number;
+    embeddingQueuedTargets?: number;
     embeddingTargetDeferred?: number;
+    embeddingSchedulerDeferredTargets?: number;
+    embeddingPolicyDeferredTargets?: number;
     embeddingDocumentSpine?: number;
     embeddingChunkSpine?: number;
     embeddingEntityAnchors?: number;
@@ -1983,6 +2002,13 @@ export interface GraphRebuildCounters {
     semanticEvalModelDisagreements?: number;
     semanticEvalManifoldDisagreements?: number;
     semanticEvalGraphChangeRows?: number;
+    hopfResonanceAssignments?: number;
+    hopfResonanceOccupiedCells?: number;
+    hopfResonanceFibers?: number;
+    hopfResonanceDocCharts?: number;
+    hopfResonanceBraids?: number;
+    hopfResonanceDroppedTargets?: number;
+    hopfResonanceMutationAllowed?: number;
     memoryGraphRagRecords?: number;
     memoryGraphRagSchemaRecords?: number;
     memoryGraphRagFactRecords?: number;
@@ -2029,6 +2055,13 @@ export interface GraphRebuildCounters {
     discoursePromotionReceipts?: number;
     discoursePromotionGraphPatches?: number;
     discoursePromotionMutationAllowed?: number;
+    discourseCompilerOverlayEdges?: number;
+    discourseCompilerOverlayChunkWormholes?: number;
+    discourseCompilerOverlayDocumentClusters?: number;
+    discourseCompilerOverlayResolvers?: number;
+    discourseCompilerOverlayReceipts?: number;
+    discourseCompilerOverlayGraphPatches?: number;
+    discourseCompilerOverlayMutationAllowed?: number;
     calendarRegistryAnchors?: number;
     calendarRegistryReceipts?: number;
     calendarRegistryAcceptedTemporalReceipts?: number;
@@ -2102,12 +2135,14 @@ export interface GraphRebuildSnapshot {
     semanticRerankSummary?: GraphSemanticRerankSummary;
     semanticAdjudicationSummary?: GraphSemanticAdjudicationDAGSummary;
     semanticEvalLedgerSummary?: GraphSemanticEvalLedgerSummary;
+    hopfResonanceSpace?: HopfResonanceSpace;
     memoryGraphRagBridgeSummary?: GraphMemoryGraphRagBridgeSummary;
     discourseSpineSummary?: GraphDiscourseSpineSummary;
     discourseBridgeCandidateSummary?: GraphDiscourseBridgeCandidateSummary;
     discourseBridgeAdjudicationSummary?: GraphDiscourseBridgeAdjudicationSummary;
     discourseEvalLedgerSummary?: GraphDiscourseEvalLedgerSummary;
     discoursePromotionSurfaceSummary?: GraphDiscoursePromotionSurfaceSummary;
+    discourseCompilerOverlaySummary?: GraphDiscourseCompilerOverlaySummary;
     calendarRegistrySummary?: GraphCalendarRegistryBridgeSummary;
     counters: GraphRebuildCounters;
     buildTimings?: GraphRebuildBuildTimings;

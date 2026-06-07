@@ -29,6 +29,14 @@ export interface Vec3 {
     z: number;
 }
 
+export interface HierarchyShellBand {
+    id: 'document' | 'documentRoot' | 'chunk' | 'entity' | 'event' | 'fact' | 'memory' | 'evidence';
+    rank: number;
+    radius: number;
+    min: number;
+    max: number;
+}
+
 interface BridgeInfo {
     capId: string;
     lane: string;
@@ -193,6 +201,63 @@ export function projectNodeToRadius(node: GalaxyNode, radius: number): void {
     node.z = direction.z * radius;
 }
 
+export function contractShellRadiusForNode(node: GalaxyNode, fallback: number): number {
+    const band = hierarchyShellBandForNode(node);
+    return band ? clamp(fallback || band.radius, band.min, band.max) : fallback;
+}
+
+export function enforceHierarchyShellContract(nodes: GalaxyNode[]): void {
+    for (const node of nodes) {
+        const band = hierarchyShellBandForNode(node);
+        if (!band) continue;
+        const radius = contractShellRadiusForNode(node, length(vectorOf(node)) || band.radius);
+        projectNodeToRadius(node, radius);
+        node.depth = clamp(radius / 2.18, 0, 1);
+    }
+}
+
+export function validateHierarchyShellContract(nodes: GalaxyNode[]): string[] {
+    const violations: string[] = [];
+    for (const node of nodes) {
+        const band = hierarchyShellBandForNode(node);
+        if (!band) continue;
+        const radius = length(vectorOf(node));
+        if (radius < band.min - 0.0001 || radius > band.max + 0.0001) {
+            violations.push(`${node.entity.id}:${band.id}:radius:${radius.toFixed(3)} not in ${band.min}-${band.max}`);
+        }
+    }
+    return violations;
+}
+
+export function hierarchyShellBandForNode(node: GalaxyNode): HierarchyShellBand | null {
+    const text = hierarchyKindText(node);
+    if (/embed:structure-root:|structure.?root|document.?root|lane.?root/.test(text)) {
+        return HIERARCHY_SHELL_BANDS.documentRoot;
+    }
+    if (/embed:note:|source:note|kind:note|document(?!_spine)|source:doc|kind:doc/.test(text)) {
+        return HIERARCHY_SHELL_BANDS.document;
+    }
+    if (/embed:chunk:|source:chunk|kind:chunk|chunk_spine/.test(text)) {
+        return HIERARCHY_SHELL_BANDS.chunk;
+    }
+    if (/embed:entity:|entity_anchor|source:entity|kind:entity|character|location|creature|concept/.test(text)) {
+        return HIERARCHY_SHELL_BANDS.entity;
+    }
+    if (/event_identity|source:event|kind:event|temporal_fact|causal_fact|temporal|causal/.test(text)) {
+        return HIERARCHY_SHELL_BANDS.event;
+    }
+    if (/relationship_fact|graph.?fact|relation.?fact|relationship|relation/.test(text)) {
+        return HIERARCHY_SHELL_BANDS.fact;
+    }
+    if (/memory_state|memory|state|context/.test(text)) {
+        return HIERARCHY_SHELL_BANDS.memory;
+    }
+    if (/embed:anchor:|anchor_evidence|source:anchor|kind:anchor|evidence|mention|provenance/.test(text)) {
+        return HIERARCHY_SHELL_BANDS.evidence;
+    }
+    return null;
+}
+
 export function vectorOf(node: GalaxyNode): Vec3 {
     return { x: node.x, y: node.y, z: node.z };
 }
@@ -264,6 +329,33 @@ export function clamp(value: number, min: number, max: number): number {
 export function finite(value: unknown): number {
     const number = Number(value);
     return Number.isFinite(number) ? number : 0;
+}
+
+const HIERARCHY_SHELL_BANDS: Record<HierarchyShellBand['id'], HierarchyShellBand> = {
+    document: { id: 'document', rank: 0, radius: 2.08, min: 2.02, max: 2.14 },
+    documentRoot: { id: 'documentRoot', rank: 1, radius: 1.92, min: 1.86, max: 1.98 },
+    chunk: { id: 'chunk', rank: 2, radius: 1.66, min: 1.58, max: 1.74 },
+    entity: { id: 'entity', rank: 3, radius: 1.42, min: 1.34, max: 1.52 },
+    event: { id: 'event', rank: 4, radius: 1.24, min: 1.14, max: 1.34 },
+    fact: { id: 'fact', rank: 5, radius: 1.14, min: 1.06, max: 1.24 },
+    memory: { id: 'memory', rank: 6, radius: 1.04, min: 0.96, max: 1.16 },
+    evidence: { id: 'evidence', rank: 7, radius: 0.92, min: 0.78, max: 1.0 },
+};
+
+function hierarchyKindText(node: GalaxyNode): string {
+    const metadata = node.entity.metadata || {};
+    const lorentz = record(metadata['lorentz']);
+    return [
+        node.entity.id,
+        `kind:${node.entity.kind || ''}`,
+        `source:${metadata['sourceType'] || ''}`,
+        metadata['signalLane'],
+        lorentz['signalLane'],
+        metadata['signalStructuralRole'],
+        lorentz['structuralRole'],
+        metadata['graphKind'],
+        metadata['graphColorKind'],
+    ].join(' ').toLowerCase();
 }
 
 function quadraticSegments(a: Vec3, b: Vec3, c: Vec3, steps: number): Float32Array {

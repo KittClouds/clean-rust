@@ -84,6 +84,18 @@ function overloadedHopfPost(targetId: string, medoidTargetId: string, phase: num
     };
 }
 
+function dot3(left: number[], right: number[]): number {
+    return left[0] * right[0] + left[1] * right[1] + left[2] * right[2];
+}
+
+function average3(left: number[], right: number[]): number[] {
+    const x = left[0] + right[0];
+    const y = left[1] + right[1];
+    const z = left[2] + right[2];
+    const norm = Math.max(0.000001, Math.hypot(x, y, z));
+    return [x / norm, y / norm, z / norm];
+}
+
 describe('embedding atlas projection', () => {
     it('places embedding nodes on a sphere shell instead of an axis-clamped box', () => {
         const atlas = buildLeafEmbeddingAtlas([
@@ -109,7 +121,7 @@ describe('embedding atlas projection', () => {
         expect(maxAxis).toBeLessThanOrEqual(1.08);
     });
 
-    it('renders graph-rebuild embedding targets for chunks, anchors, entities, and graph links', () => {
+    it('renders graph-rebuild embedding targets while compacting entity mention anchors', () => {
         const atlas = buildGraphRebuildEmbeddingAtlas({
             schemaVersion: 'phoenix-graph-rebuild/v1',
             id: 'snapshot-1',
@@ -161,19 +173,18 @@ describe('embedding atlas projection', () => {
 
         expect(atlas.nodes.map((node) => node.id)).toEqual(expect.arrayContaining([
             'embed:chunk:chunk-1',
-            'embed:anchor:anchor-1',
             'embed:entity:kai',
         ]));
         expect(atlas.edges.map((edge) => edge.type)).toEqual(expect.arrayContaining([
             'note-chunk',
-            'chunk-anchor',
             'chunk-entity',
-            'anchor-entity',
             'co_occurs_with',
         ]));
         const nodes = new Map(atlas.nodes.map((node) => [node.id, node]));
         const colors = new Map(atlas.nodes.map((node) => [node.id, node.colorHsl]));
         const styleLabDefaults = new Set(Object.values(DEFAULT_ENTITY_COLORS));
+        expect(nodes.has('embed:anchor:anchor-1')).toBe(false);
+        expect(nodes.has('embed:anchor:anchor-location')).toBe(false);
         expect(nodes.get('embed:entity:baton')?.kind).toBe('location');
         expect(nodes.get('embed:chunk:chunk-1')?.metadata).toEqual(expect.objectContaining({
             signalLane: 'chunk_spine',
@@ -184,12 +195,20 @@ describe('embedding atlas projection', () => {
             graphTruthStatus: 'accepted',
             graphTruthKind: 'target',
         }));
-        expect(nodes.get('embed:anchor:anchor-1')?.metadata?.graphTruthStatus).toBe('evidence');
+        expect(nodes.get('embed:entity:kai')?.metadata?.mentionCompaction).toMatchObject({
+            mode: 'entity_mention_compaction_v1',
+            anchorCount: 1,
+            anchorIds: ['anchor-1'],
+            chunkIds: ['chunk-1'],
+            expanded: false,
+        });
         expect(nodes.get('embed:entity:kai')?.metadata?.signalParentIds).toEqual(['embed:chunk:chunk-1', 'embed:note:note-1']);
-        expect(nodes.get('embed:anchor:anchor-location')?.kind).toBe('anchor');
+        expect(nodes.get('embed:entity:baton')?.metadata?.mentionCompaction).toMatchObject({
+            anchorCount: 1,
+            anchorIds: ['anchor-location'],
+        });
         expect(nodes.has('embed:graph-fact:co')).toBe(false);
         expect(colors.get('embed:entity:baton')).toBe(DEFAULT_ENTITY_COLORS.LOCATION);
-        expect(colors.get('embed:anchor:anchor-location')).toBe(DEFAULT_GRAPH_NODE_COLORS.anchor);
         expect(colors.get('embed:graph-fact:observe')).toBe(DEFAULT_GRAPH_NODE_COLORS.observation);
         expect(colors.get('embed:graph-fact:comment')).toBe(DEFAULT_GRAPH_NODE_COLORS.communication);
         expect(colors.get('embed:graph-fact:authority')).toBe(DEFAULT_GRAPH_NODE_COLORS.authority);
@@ -588,27 +607,31 @@ describe('embedding atlas projection', () => {
             },
         }, 'lorentz');
 
+        const nodesById = new Map(atlas.nodes.map((node) => [node.id, node]));
         const byId = new Map(atlas.nodes.map((node) => [node.id, node.metadata?.lorentz as Record<string, unknown>]));
         expect(byId.get('embed:note:note-1')).toMatchObject({ capId: 'document:note-1', signalLane: 'document_spine' });
         expect(byId.get('embed:structure-root:note-1:document-structure')).toMatchObject({
-            capId: 'document:note-1',
+            capId: 'document:note-1:root:document',
             signalLane: 'document_spine',
             parentNodeId: 'embed:note:note-1',
         });
         expect(byId.get('embed:chunk:chunk-1')).toMatchObject({
-            capId: 'document:note-1',
+            capId: 'document:note-1:chunks',
             signalLane: 'chunk_spine',
             parentNodeId: 'embed:structure-root:note-1:document-structure',
         });
-        expect(byId.get('embed:entity:kai')).toMatchObject({ capId: 'document:note-1', signalLane: 'entity_anchor' });
-        expect(byId.get('embed:anchor:a1')).toMatchObject({ capId: 'document:note-1', signalLane: 'anchor_evidence' });
+        expect(byId.get('embed:entity:kai')).toMatchObject({ capId: 'document:note-1:entities', signalLane: 'entity_anchor' });
+        expect(nodesById.has('embed:anchor:a1')).toBe(false);
+        expect(nodesById.get('embed:entity:kai')?.metadata?.mentionCompaction).toMatchObject({
+            anchorCount: 1,
+            anchorIds: ['a1'],
+        });
         expect(Number(byId.get('embed:note:note-1')?.['shellRadius'])).toBeGreaterThan(Number(byId.get('embed:chunk:chunk-1')?.['shellRadius']));
         expect(Number(byId.get('embed:structure-root:note-1:document-structure')?.['shellRadius'])).toBeGreaterThan(Number(byId.get('embed:chunk:chunk-1')?.['shellRadius']));
         expect(Number(byId.get('embed:chunk:chunk-1')?.['shellRadius'])).toBeGreaterThan(Number(byId.get('embed:entity:kai')?.['shellRadius']));
-        expect(Number(byId.get('embed:entity:kai')?.['shellRadius'])).toBeGreaterThan(Number(byId.get('embed:anchor:a1')?.['shellRadius']));
     });
 
-    it('uses folder territories as hierarchy cap regions for notes and descendants', () => {
+    it('keeps folder metadata without collapsing multi-doc hierarchy caps into one folder cap', () => {
         const folderFields = { folderId: 'folder-narrative', folderLabel: 'New Narrative', folderKind: 'NARRATIVE' };
         const targets = [
             { id: 'embed:note:note-1', kind: 'note', sourceId: 'note-1', noteId: 'note-1', ...folderFields, label: 'Untitled Note', text: 'chapter text', evidenceIds: [], lane: 'document_spine', structuralRole: 'root', admissionTier: 0 },
@@ -678,13 +701,121 @@ describe('embedding atlas projection', () => {
 
         for (const node of atlas.nodes) {
             expect(node.metadata?.folderId).toBe('folder-narrative');
-            expect(node.metadata?.lorentz).toMatchObject({ capId: 'folder:folder-narrative' });
         }
         const note = atlas.nodes.find((node) => node.id === 'embed:note:note-1')?.metadata?.lorentz as Record<string, unknown>;
+        const noteTwo = atlas.nodes.find((node) => node.id === 'embed:note:note-2')?.metadata?.lorentz as Record<string, unknown>;
         const chunk = atlas.nodes.find((node) => node.id === 'embed:chunk:chunk-1')?.metadata?.lorentz as Record<string, unknown>;
         const entity = atlas.nodes.find((node) => node.id === 'embed:entity:kai')?.metadata?.lorentz as Record<string, unknown>;
+        expect(note['capId']).toBe('document:note-1');
+        expect(noteTwo['capId']).toBe('document:note-2');
+        expect(chunk['capId']).toBe('document:note-1:chunks');
+        expect(entity['capId']).toBe('document:note-1:entities');
         expect(Number(note['shellRadius'])).toBeGreaterThan(Number(chunk['shellRadius']));
         expect(Number(chunk['shellRadius'])).toBeGreaterThan(Number(entity['shellRadius']));
+    });
+
+    it('averages multi-document entity caps between their supporting document spaces', () => {
+        const folderFields = { folderId: 'folder-narrative', folderLabel: 'New Narrative', folderKind: 'NARRATIVE' };
+        const targets = [
+            { id: 'embed:note:note-1', kind: 'note', sourceId: 'note-1', noteId: 'note-1', ...folderFields, label: 'Chapter 1', text: 'first chapter', evidenceIds: [], lane: 'document_spine', structuralRole: 'root', admissionTier: 0 },
+            { id: 'embed:note:note-2', kind: 'note', sourceId: 'note-2', noteId: 'note-2', ...folderFields, label: 'Chapter 2', text: 'second chapter', evidenceIds: [], lane: 'document_spine', structuralRole: 'root', admissionTier: 0 },
+            { id: 'embed:structure-root:note-1:identity', kind: 'structureRoot', sourceId: 'note-1:identity', noteId: 'note-1', ...folderFields, label: 'Identity root', text: 'structure_root:identity', evidenceIds: [], lane: 'entity_anchor', structuralRole: 'root', admissionTier: 0, parentIds: ['embed:note:note-1'] },
+            { id: 'embed:structure-root:note-2:identity', kind: 'structureRoot', sourceId: 'note-2:identity', noteId: 'note-2', ...folderFields, label: 'Identity root', text: 'structure_root:identity', evidenceIds: [], lane: 'entity_anchor', structuralRole: 'root', admissionTier: 0, parentIds: ['embed:note:note-2'] },
+            { id: 'embed:chunk:chunk-1', kind: 'chunk', sourceId: 'chunk-1', noteId: 'note-1', chunkId: 'chunk-1', ...folderFields, label: 'Chunk 1', text: 'Amara enters.', evidenceIds: [], lane: 'chunk_spine', structuralRole: 'spine', admissionTier: 0, parentIds: ['embed:structure-root:note-1:document-structure'] },
+            { id: 'embed:chunk:chunk-2', kind: 'chunk', sourceId: 'chunk-2', noteId: 'note-2', chunkId: 'chunk-2', ...folderFields, label: 'Chunk 2', text: 'Amara returns.', evidenceIds: [], lane: 'chunk_spine', structuralRole: 'spine', admissionTier: 0, parentIds: ['embed:structure-root:note-2:document-structure'] },
+            { id: 'embed:entity:amara', kind: 'entity', sourceId: 'amara', entityId: 'amara', entityKind: 'CHARACTER', ...folderFields, label: 'Amara', text: 'mentions:2 notes:2', evidenceIds: ['a1', 'a2'], lane: 'entity_anchor', structuralRole: 'child', admissionTier: 1, parentIds: ['embed:chunk:chunk-1', 'embed:chunk:chunk-2', 'embed:structure-root:note-1:identity', 'embed:structure-root:note-2:identity'] },
+            { id: 'embed:graph-fact:rel-1', kind: 'graphFact', sourceId: 'rel-1', noteId: 'note-1', ...folderFields, label: 'Amara remembers Arcadia', text: 'relationship fact', evidenceIds: ['a1'], lane: 'relationship_fact', structuralRole: 'fact', admissionTier: 2, parentIds: ['embed:entity:amara'] },
+        ] as const;
+        const posts = targets.map((target, index) => overloadedHopfPost(target.id, 'embed:note:note-1', index / targets.length, target.kind));
+        const atlas = buildGraphRebuildEmbeddingAtlas({
+            schemaVersion: 'phoenix-graph-rebuild/v1',
+            id: 'snapshot-multidoc-caps',
+            source: 'phoenix-graph-rebuild',
+            scopeKind: 'global',
+            scopeId: 'global',
+            noteIds: ['note-1', 'note-2'],
+            builtAt: 1,
+            chunks: [],
+            mentions: [],
+            entityAnchors: [{
+                id: 'a1',
+                noteId: 'note-1',
+                chunkId: 'chunk-1',
+                surface: 'Amara',
+                sourceStart: 0,
+                sourceEnd: 5,
+                source: 'dynamic-ner',
+                confidence: 0.92,
+                entityId: 'amara',
+                status: 'accepted',
+                generation: 1,
+            }, {
+                id: 'a2',
+                noteId: 'note-2',
+                chunkId: 'chunk-2',
+                surface: 'Amara',
+                sourceStart: 0,
+                sourceEnd: 5,
+                source: 'dynamic-ner',
+                confidence: 0.9,
+                entityId: 'amara',
+                status: 'accepted',
+                generation: 1,
+            }],
+            relationships: [],
+            events: [],
+            episodes: [],
+            temporalEdges: [],
+            causalEdges: [],
+            memoryState: [],
+            embeddingTargets: [...targets],
+            embeddingVectors: [],
+            projectionRefs: [],
+            nodes: [],
+            edges: [],
+            counters: null as any,
+            embeddingGraphPostProcess: {
+                schemaVersion: 'phoenix-embedding-graph-postprocess/v1',
+                targetCount: targets.length,
+                vectorDimensions: 384,
+                clusters: [],
+                productTopologyRegions: posts.map((post) => post.productTopologyRegion),
+                targets: posts,
+                backboneEdges: [],
+                bridgeEdges: [],
+                outlierTargetIds: [],
+                metrics: {
+                    clusterCount: 1,
+                    singletonCount: 0,
+                    largestClusterSize: targets.length,
+                    largestClusterRatio: 1,
+                    backboneEdgeCount: 0,
+                    bridgeEdgeCount: 0,
+                    outlierCount: 0,
+                    maxHubScore: 0.8,
+                    meanNeighborCount: 1,
+                },
+            },
+        }, 'lorentz');
+
+        const byId = new Map(atlas.nodes.map((node) => [node.id, node.metadata?.lorentz as Record<string, unknown>]));
+        const noteOne = byId.get('embed:note:note-1')!;
+        const noteTwo = byId.get('embed:note:note-2')!;
+        const rootOne = byId.get('embed:structure-root:note-1:identity')!;
+        const rootTwo = byId.get('embed:structure-root:note-2:identity')!;
+        const chunkOne = byId.get('embed:chunk:chunk-1')!;
+        const entity = byId.get('embed:entity:amara')!;
+        const fact = byId.get('embed:graph-fact:rel-1')!;
+
+        expect(rootOne['capId']).toBe('document:note-1:root:identity');
+        expect(rootTwo['capId']).toBe('document:note-2:root:identity');
+        expect(entity['capId']).toMatch(/^entity:amara:docs:/);
+        expect(entity['supportNoteIds']).toEqual(['note-1', 'note-2']);
+        expect(dot3(entity['capDirection'] as number[], average3(noteOne['capDirection'] as number[], noteTwo['capDirection'] as number[]))).toBeGreaterThan(0.82);
+        expect(Number(noteOne['shellRadius'])).toBeGreaterThan(Number(rootOne['shellRadius']));
+        expect(Number(rootOne['shellRadius'])).toBeGreaterThan(Number(chunkOne['shellRadius']));
+        expect(Number(chunkOne['shellRadius'])).toBeGreaterThan(Number(entity['shellRadius']));
+        expect(Number(entity['shellRadius'])).toBeGreaterThan(Number(fact['shellRadius']));
     });
 
     it('carries graph-rebuild targets into Siegel-Finsler metadata', () => {
@@ -796,6 +927,139 @@ describe('embedding atlas projection', () => {
             resonanceSource: 'point-formed',
         });
         expect(rowan.metadata?.hopf?.['phase']).not.toBe(0.8);
+    });
+
+    it('uses snapshot Hopf resonance cells when the backend universe is present', () => {
+        const atlas = buildGraphRebuildEmbeddingAtlas({
+            schemaVersion: 'phoenix-graph-rebuild/v1',
+            id: 'snapshot-hopf-contract',
+            source: 'phoenix-graph-rebuild',
+            scopeKind: 'global',
+            scopeId: 'global',
+            noteIds: ['note-1'],
+            builtAt: 1,
+            chunks: [],
+            mentions: [],
+            entityAnchors: [],
+            relationships: [],
+            events: [],
+            episodes: [],
+            temporalEdges: [],
+            causalEdges: [],
+            memoryState: [],
+            embeddingTargets: [
+                { id: 'embed:entity:kai', kind: 'entity', sourceId: 'kai', entityId: 'kai', label: 'Kai', text: 'Kai maps Red Mesa', evidenceIds: [] },
+                { id: 'embed:entity:rowan', kind: 'entity', sourceId: 'rowan', entityId: 'rowan', label: 'Rowan', text: 'Rowan reads authority lines', evidenceIds: [] },
+            ],
+            embeddingVectors: [],
+            projectionRefs: [],
+            nodes: [],
+            edges: [],
+            counters: null as any,
+            hopfResonanceSpace: {
+                schemaVersion: 'phoenix-hopf-resonance-space/v1',
+                generatedAt: 1,
+                sourceSnapshotId: 'snapshot-hopf-contract',
+                profile: null as any,
+                cellResolution: 3,
+                targetCount: 2,
+                assignments: [
+                    {
+                        targetId: 'embed:entity:kai',
+                        targetKind: 'entity',
+                        label: 'Kai',
+                        entityId: 'kai',
+                        role: 'fiber-sample',
+                        fiberKind: 'entity_sample',
+                        baseCellId: 'hopf:ico:r3:alpha',
+                        secondaryCellIds: ['hopf:ico:r3:beta'],
+                        direction: [1, 0, 0],
+                        tangent: [0, 1, 0],
+                        phase: 0.12,
+                        phaseRadians: Math.PI * 0.24,
+                        assignmentScore: 0.92,
+                        residualScore: 0.08,
+                        salience: 0.77,
+                        evidenceIds: [],
+                        parentIds: [],
+                        receipt: 'phase1b_no_topology_mutation:kai',
+                    },
+                    {
+                        targetId: 'embed:entity:rowan',
+                        targetKind: 'entity',
+                        label: 'Rowan',
+                        entityId: 'rowan',
+                        role: 'fiber-sample',
+                        fiberKind: 'entity_sample',
+                        baseCellId: 'hopf:ico:r3:alpha',
+                        secondaryCellIds: ['hopf:ico:r3:beta'],
+                        direction: [0.9, 0.1, 0],
+                        tangent: [0, 1, 0],
+                        phase: 0.35,
+                        phaseRadians: Math.PI * 0.7,
+                        assignmentScore: 0.88,
+                        residualScore: 0.12,
+                        salience: 0.7,
+                        evidenceIds: [],
+                        parentIds: [],
+                        receipt: 'phase1b_no_topology_mutation:rowan',
+                    },
+                ],
+                cells: [{
+                    id: 'hopf:ico:r3:alpha',
+                    ordinal: 0,
+                    resolution: 3,
+                    center: [1, 0, 0],
+                    neighborCellIds: ['hopf:ico:r3:beta'],
+                    targetCount: 2,
+                    sampleCount: 2,
+                    totalWeight: 1.8,
+                    dominantFiberKinds: ['entity_sample'],
+                    anchorTargetIds: ['embed:entity:kai'],
+                }],
+                fibers: [{
+                    id: 'hopf:fiber:hopf-ico-r3-alpha:entity_sample',
+                    cellId: 'hopf:ico:r3:alpha',
+                    fiberKind: 'entity_sample',
+                    targetIds: ['embed:entity:kai', 'embed:entity:rowan'],
+                    anchorTargetId: 'embed:entity:kai',
+                    sampleCount: 2,
+                    totalWeight: 1.8,
+                    meanPhase: 0.23,
+                    coherence: 0.81,
+                    frustration: 0.19,
+                }],
+                docCharts: [],
+                braids: [],
+                counters: null as any,
+            },
+        }, 'hopf');
+
+        const kai = atlas.nodes.find((node) => node.id === 'embed:entity:kai')!;
+        const rowan = atlas.nodes.find((node) => node.id === 'embed:entity:rowan')!;
+        expect(kai.metadata?.hopf).toMatchObject({
+            role: 'anchor',
+            baseId: 'hopf:ico:r3:alpha',
+            cellId: 'hopf:ico:r3:alpha',
+            fiberKind: 'entity_sample',
+            resonanceSource: 'snapshot-hopf-resonance-space',
+            resonanceAdmitted: true,
+            noTopologyMutation: true,
+            receipt: 'phase1b_no_topology_mutation:kai',
+            support: 0.92,
+            coherence: 0.81,
+            frustration: 0.19,
+        });
+        expect(rowan.metadata?.hopf).toMatchObject({
+            role: 'fiber',
+            baseId: 'hopf:ico:r3:alpha',
+            phase: 0.35,
+            assignmentScore: 0.88,
+            residualScore: 0.12,
+            salience: 0.7,
+            neighborCount: 1,
+            resonanceSource: 'snapshot-hopf-resonance-space',
+        });
     });
 
     it('splits overloaded graph-rebuild Hopf bases into semantic subfibers', () => {

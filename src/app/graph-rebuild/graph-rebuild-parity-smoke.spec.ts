@@ -188,6 +188,8 @@ describe('Phoenix graph rebuild parity smoke', () => {
         });
         const elapsedMs = performance.now() - started;
         const counts = kindCounts(snapshot.embeddingTargets.map((target) => target.kind));
+        const queuedTargets = snapshot.embeddingTargets.filter((target) => target.workStatus === 'queued' || target.admissionStatus === 'admitted');
+        const queuedCounts = kindCounts(queuedTargets.map((target) => target.kind));
         console.info('graph-rebuild-smoke', JSON.stringify({
             doc: 'shortrun',
             chars: text.length,
@@ -196,6 +198,7 @@ describe('Phoenix graph rebuild parity smoke', () => {
             events: snapshot.counters.events,
             causalEdges: snapshot.counters.causalEdges,
             targets: snapshot.counters.embeddingTargets,
+            queuedTargets: snapshot.counters.embeddingQueuedTargets,
             semanticTasks: snapshot.counters.semanticTasks,
             semanticCandidates: snapshot.counters.semanticCandidates,
             manifoldContributions: snapshot.counters.manifoldCandidateContributions,
@@ -215,21 +218,25 @@ describe('Phoenix graph rebuild parity smoke', () => {
             discourseBridgeAdjudication: compactDiscourseBridgeAdjudication(snapshot),
             discourseEvalLedger: compactDiscourseEvalLedger(snapshot),
             discoursePromotionSurface: compactDiscoursePromotionSurface(snapshot),
+            discourseCompilerOverlay: compactDiscourseCompilerOverlay(snapshot),
             candidateNoise: snapshot.semanticCandidateSummary?.counters.averageNoiseScore,
             elapsedMs: Math.round(elapsedMs),
         }));
 
         expect(occurrences.length).toBeGreaterThan(900);
-        expect(snapshot.counters.embeddingTargets).toBeLessThanOrEqual(960);
-        expect(snapshot.embeddingTargetPlan?.admittedCount).toBe(snapshot.counters.embeddingTargets);
-        expect(snapshot.embeddingTargetPlan?.candidateCount).toBeGreaterThanOrEqual(snapshot.counters.embeddingTargets);
+        expect(snapshot.counters.embeddingTargets).toBe(snapshot.embeddingTargetPlan?.canonicalCount);
+        expect(snapshot.counters.embeddingTargets).toBe(snapshot.embeddingTargetPlan?.candidateCount);
+        expect(snapshot.counters.embeddingTargets).toBeGreaterThan(snapshot.counters.embeddingQueuedTargets || 0);
+        expect(snapshot.counters.embeddingQueuedTargets).toBeLessThanOrEqual(snapshot.embeddingTargetPlan?.maxQueued || 0);
+        expect(snapshot.embeddingTargetPlan?.admittedCount).toBe(snapshot.counters.embeddingQueuedTargets);
+        expect(snapshot.embeddingTargetPlan?.queuedCount).toBe(snapshot.counters.embeddingQueuedTargets);
         expect(snapshot.counters.embeddingDocumentSpine).toBeGreaterThan(0);
         expect(snapshot.counters.embeddingChunkSpine).toBeGreaterThan(0);
-        expect(snapshot.counters.embeddingEntityAnchors).toBe(entities.length + 1);
+        expect(snapshot.counters.embeddingEntityAnchors).toBeGreaterThanOrEqual(entities.length + 1);
         expect(snapshot.counters.embeddingRelationshipFacts).toBeGreaterThan(0);
         expect(snapshot.counters.embeddingTemporalFacts).toBeGreaterThan(0);
         expect(snapshot.counters.embeddingCausalFacts).toBeGreaterThan(0);
-        expect(snapshot.embeddingGraphPostProcess?.targetCount).toBe(snapshot.counters.embeddingTargets);
+        expect(snapshot.embeddingGraphPostProcess?.targetCount).toBe(snapshot.counters.embeddingQueuedTargets);
         expect(snapshot.embeddingGraphPostProcess?.metrics.plannedPairCount).toBeLessThan(
             snapshot.embeddingGraphPostProcess?.metrics.theoreticalPairCount || 0,
         );
@@ -238,13 +245,14 @@ describe('Phoenix graph rebuild parity smoke', () => {
         expect(counts.chunk).toBeGreaterThan(0);
         expect(counts.entity).toBe(entities.length);
         expect(counts.graphFact).toBeGreaterThanOrEqual(100);
-        expect(counts.anchor).toBeLessThan(occurrences.length);
+        expect(counts.anchor).toBe(occurrences.length);
+        expect(queuedCounts.anchor).toBeLessThan(counts.anchor);
         expect(snapshot.embeddingTargetPlan?.lanes).toEqual(expect.arrayContaining([
             expect.objectContaining({ lane: 'cooccurrence_weak', admitted: 80, deferred: expect.any(Number) }),
             expect.objectContaining({ lane: 'anchor_evidence', admitted: entities.length + 1, deferred: expect.any(Number) }),
         ]));
         expect(snapshot.embeddingTargets.filter((target) => target.kind === 'entity').every((target) => /mentions:\d+/.test(target.text))).toBe(true);
-        expect(snapshot.embeddingTargets.filter((target) => target.kind === 'graphFact').every((target) => target.text.includes('evidence_context:'))).toBe(true);
+        expect(queuedTargets.filter((target) => target.kind === 'graphFact').every((target) => target.text.includes('evidence_context:'))).toBe(true);
         expect(snapshot.embeddingTargets.filter((target) => target.kind === 'anchor').every((target) => target.text.includes('source:') && target.text.includes('evidence_context:'))).toBe(true);
         expect(snapshot.semanticTaskSummary?.counters.mutationAllowedCount).toBe(0);
         expect(snapshot.semanticTaskSummary?.receipts.length).toBe(snapshot.counters.semanticTaskReceipts);
@@ -395,6 +403,20 @@ describe('Phoenix graph rebuild parity smoke', () => {
         expect(snapshot.discoursePromotionSurfaceSummary?.compilerHints.every((hint) =>
             hint.status === 'read_model_only' && hint.mutationAllowed === false,
         )).toBe(true);
+        expect(snapshot.discourseCompilerOverlaySummary?.schemaVersion).toBe('phoenix-discourse-compiler-overlay/v1');
+        expect(snapshot.discourseCompilerOverlaySummary?.invariant).toBe('discourse_compiler_overlay_no_topology_commit');
+        expect(snapshot.discourseCompilerOverlaySummary?.counters.overlayEdgeCount).toBe(snapshot.discoursePromotionSurfaceSummary?.counters.compilerHintCount);
+        expect(snapshot.discourseCompilerOverlaySummary?.counters.graphPatchCount).toBe(0);
+        expect(snapshot.discourseCompilerOverlaySummary?.counters.mutationAllowedCount).toBe(0);
+        expect(snapshot.discourseCompilerOverlaySummary?.compactOverlay.rows.every((row) =>
+            row.graphPatch === false && row.mutationAllowed === false,
+        )).toBe(true);
+        expect(snapshot.discourseCompilerOverlaySummary?.receipts.every((receipt) =>
+            receipt.reversible
+            && receipt.graphPatch === false
+            && receipt.mutationAllowed === false
+            && receipt.invariant === 'discourse_compiler_overlay_no_topology_commit',
+        )).toBe(true);
         expect(elapsedMs).toBeLessThan(8000);
     });
 
@@ -430,6 +452,7 @@ describe('Phoenix graph rebuild parity smoke', () => {
             events: snapshot.counters.events,
             causalEdges: snapshot.counters.causalEdges,
             targets: snapshot.counters.embeddingTargets,
+            queuedTargets: snapshot.counters.embeddingQueuedTargets,
             semanticTasks: snapshot.counters.semanticTasks,
             semanticCandidates: snapshot.counters.semanticCandidates,
             manifoldContributions: snapshot.counters.manifoldCandidateContributions,
@@ -449,6 +472,7 @@ describe('Phoenix graph rebuild parity smoke', () => {
             discourseBridgeAdjudication: compactDiscourseBridgeAdjudication(snapshot),
             discourseEvalLedger: compactDiscourseEvalLedger(snapshot),
             discoursePromotionSurface: compactDiscoursePromotionSurface(snapshot),
+            discourseCompilerOverlay: compactDiscourseCompilerOverlay(snapshot),
             candidateNoise: snapshot.semanticCandidateSummary?.counters.averageNoiseScore,
             elapsedMs: Math.round(elapsedMs),
         }));
@@ -456,8 +480,11 @@ describe('Phoenix graph rebuild parity smoke', () => {
         expect(text.length).toBeGreaterThan(400000);
         expect(chunks.length).toBeGreaterThan(40);
         expect(occurrences.length).toBeGreaterThan(900);
-        expect(snapshot.counters.embeddingTargets).toBeLessThanOrEqual(960);
-        expect(snapshot.embeddingTargetPlan?.admittedCount).toBe(snapshot.counters.embeddingTargets);
+        expect(snapshot.counters.embeddingTargets).toBe(snapshot.embeddingTargetPlan?.canonicalCount);
+        expect(snapshot.counters.embeddingTargets).toBe(snapshot.embeddingTargetPlan?.candidateCount);
+        expect(snapshot.counters.embeddingTargets).toBeGreaterThan(snapshot.counters.embeddingQueuedTargets || 0);
+        expect(snapshot.counters.embeddingQueuedTargets).toBeLessThanOrEqual(snapshot.embeddingTargetPlan?.maxQueued || 0);
+        expect(snapshot.embeddingTargetPlan?.admittedCount).toBe(snapshot.counters.embeddingQueuedTargets);
         expect(snapshot.counters.events).toBeGreaterThan(40);
         expect(snapshot.counters.temporalEdges).toBeGreaterThan(0);
         expect(snapshot.counters.causalEdges).toBeGreaterThan(0);
@@ -570,6 +597,22 @@ describe('Phoenix graph rebuild parity smoke', () => {
             receipt.reversible
             && receipt.mutationAllowed === false
             && receipt.invariant === 'discourse_promotion_surface_no_topology_commit',
+        )).toBe(true);
+        expect(snapshot.discourseCompilerOverlaySummary?.schemaVersion).toBe('phoenix-discourse-compiler-overlay/v1');
+        expect(snapshot.discourseCompilerOverlaySummary?.counters.overlayEdgeCount).toBe(snapshot.discoursePromotionSurfaceSummary?.counters.compilerHintCount);
+        expect(snapshot.discourseCompilerOverlaySummary?.counters.graphPatchCount).toBe(0);
+        expect(snapshot.discourseCompilerOverlaySummary?.counters.mutationAllowedCount).toBe(0);
+        expect(snapshot.discourseCompilerOverlaySummary?.overlayEdges.every((edge) =>
+            edge.status === 'overlay_only'
+            && edge.projectionKind === 'discourse_overlay'
+            && edge.graphPatch === false
+            && edge.mutationAllowed === false,
+        )).toBe(true);
+        expect(snapshot.discourseCompilerOverlaySummary?.receipts.every((receipt) =>
+            receipt.reversible
+            && receipt.graphPatch === false
+            && receipt.mutationAllowed === false
+            && receipt.invariant === 'discourse_compiler_overlay_no_topology_commit',
         )).toBe(true);
         expect(snapshot.embeddingGraphPostProcess?.metrics.plannedPairCount).toBeLessThan(
             snapshot.embeddingGraphPostProcess?.metrics.theoreticalPairCount || 0,
@@ -702,6 +745,21 @@ function compactDiscoursePromotionSurface(snapshot: GraphRebuildSnapshot) {
         graphPatches: summary.counters.graphPatchCount,
         mutationAllowed: summary.counters.mutationAllowedCount,
         sample: summary.compactSurface.rows.slice(0, 3),
+    } : null;
+}
+
+function compactDiscourseCompilerOverlay(snapshot: GraphRebuildSnapshot) {
+    const summary = snapshot.discourseCompilerOverlaySummary;
+    return summary ? {
+        overlayEdges: summary.counters.overlayEdgeCount,
+        byKind: summary.counters.byKind,
+        chunkWormholes: summary.counters.chunkWormholeEdges,
+        documentClusters: summary.counters.documentClusterEdges,
+        resolvers: summary.counters.resolverEdges,
+        receipts: summary.counters.receiptCount,
+        graphPatches: summary.counters.graphPatchCount,
+        mutationAllowed: summary.counters.mutationAllowedCount,
+        sample: summary.compactOverlay.rows.slice(0, 3),
     } : null;
 }
 

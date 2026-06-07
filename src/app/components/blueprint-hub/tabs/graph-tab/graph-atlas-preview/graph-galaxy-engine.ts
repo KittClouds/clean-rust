@@ -12,6 +12,11 @@ import {
 import { applyLorentzTreeLayout } from './graph-galaxy-lorentz-layout';
 import { applyProductConsensusLayout } from './graph-galaxy-product-layout';
 import { applySiegelFinslerLayout } from './graph-galaxy-siegel-layout';
+import {
+    buildHopfReceiptRibbons,
+    hopfDirectionFromMetadata,
+    type HopfReceiptBase,
+} from './graph-galaxy-hopf-receipts';
 
 export type GalaxyLabelMode = 'hover' | 'selected' | 'important' | 'always' | 'off';
 export type GalaxyEdgeMode = 'curved' | 'straight' | 'tube' | 'hidden';
@@ -371,7 +376,8 @@ export function buildGalaxyScene(
     edges: GalaxyInputEdge[],
     settings: GalaxyRenderSettings,
 ): GalaxyScene {
-    const entities = prioritizeEntities(entitiesInput);
+    const entities = orderEntitiesForStableRender(entitiesInput);
+    assertNoImplicitNodeDrop(entitiesInput.length, entities.length);
     const preserveAtlasLayout = shouldPreserveAtlasLayout(entities);
     const idToIndex = new Map<string, number>();
     const nodes = entities.map((entity, index) => {
@@ -473,14 +479,20 @@ export function clamp(value: number, min: number, max: number): number {
 function buildLinks(edges: GalaxyInputEdge[], idToIndex: Map<string, number>): GalaxyEdge[] {
     const seen = new Set<string>();
     const links: GalaxyEdge[] = [];
-    const maxLinks = Math.min(900, Math.max(180, idToIndex.size * 5));
-    for (const edge of edges) {
+    const orderedEdges = [...edges].sort((left, right) =>
+        galaxyEdgePriority(right) - galaxyEdgePriority(left)
+        || right.confidence - left.confidence
+        || left.id.localeCompare(right.id),
+    );
+    for (const edge of orderedEdges) {
         const source = idToIndex.get(edge.sourceId);
         const target = idToIndex.get(edge.targetId);
         if (source === undefined || target === undefined || source === target) {
             continue;
         }
-        const key = source < target ? `${source}:${target}` : `${target}:${source}`;
+        const key = source < target
+            ? `${source}:${target}:${edge.type}`
+            : `${target}:${source}:${edge.type}`;
         if (seen.has(key)) {
             continue;
         }
@@ -496,11 +508,22 @@ function buildLinks(edges: GalaxyInputEdge[], idToIndex: Map<string, number>): G
             flowOffset: stableUnit(`${edge.id}:flow`),
             metadata: edge.metadata,
         });
-        if (links.length >= maxLinks) {
-            break;
-        }
     }
     return links;
+}
+
+function galaxyEdgePriority(edge: GalaxyInputEdge): number {
+    if (isStructuralGalaxyInputEdge(edge)) return 100;
+    const type = String(edge.type || '').toLowerCase();
+    if (type === 'embedding-backbone') return 80;
+    if (type === 'embedding-bridge') return 70;
+    if (/temporal|causal|event/.test(type)) return 60;
+    if (/relationship|relation|fact/.test(type)) return 45;
+    return 20;
+}
+
+function isStructuralGalaxyInputEdge(edge: GalaxyInputEdge): boolean {
+    return /target-parent|note-chunk|chunk-anchor|chunk-entity|anchor-entity|event-chunk|event-entity|memory-entity/i.test(String(edge.type || ''));
 }
 
 function applyEmbeddingTopologyLens(
@@ -839,6 +862,9 @@ interface HopfBaseInfo extends Rgb {
     phases: number[];
     nodeIds: string[];
     fiberKinds: Set<string>;
+    secondaryCellIds: Set<string>;
+    backendReceiptCount: number;
+    documentChartCount: number;
     importance: number;
 }
 
@@ -1329,18 +1355,24 @@ function applyHopfProjectionLayout(nodes: GalaxyNode[], links: GalaxyEdge[]): Ga
         }
     }
 
-    return [...buildHopfRibbons(baseInfos), ...crossFiberBraids];
+    return [
+        ...buildHopfReceiptRibbons(hopfReceiptBases(baseInfos)),
+        ...buildHopfRibbons(baseInfos),
+        ...crossFiberBraids,
+    ];
 }
 
 function registerHopfBase(baseInfos: Map<string, HopfBaseInfo>, baseKey: string, node: GalaxyNode, anchor: boolean): void {
     const existing = baseInfos.get(baseKey);
-    const direction = normalizedDirection(node);
+    const metadata = hopfMetadata(node);
+    const direction = hopfDirectionFromMetadata(metadata?.['direction']) || normalizedDirection(node);
     const weight = anchor ? 1.35 : 1;
     if (existing) {
         existing.direction.x += direction.x * weight;
         existing.direction.y += direction.y * weight;
         existing.direction.z += direction.z * weight;
         existing.directionWeight += weight;
+        recordHopfReceiptMetadata(existing, node, metadata);
         if (anchor) {
             existing.r = node.r;
             existing.g = node.g;
@@ -1359,11 +1391,15 @@ function registerHopfBase(baseInfos: Map<string, HopfBaseInfo>, baseKey: string,
         phases: [],
         nodeIds: [],
         fiberKinds: new Set<string>(),
+        secondaryCellIds: new Set<string>(),
+        backendReceiptCount: 0,
+        documentChartCount: 0,
         importance: 0,
         r: node.r,
         g: node.g,
         b: node.b,
     });
+    recordHopfReceiptMetadata(baseInfos.get(baseKey)!, node, metadata);
 }
 
 function normalizeHopfBaseDirections(baseInfos: Map<string, HopfBaseInfo>): void {
@@ -1478,6 +1514,37 @@ function hopfBraidPoint(
         y: direction.y * radius,
         z: direction.z * radius,
     };
+}
+
+function recordHopfReceiptMetadata(info: HopfBaseInfo, node: GalaxyNode, metadata: Record<string, unknown> | null): void {
+    if (!metadata || metadata['resonanceSource'] !== 'snapshot-hopf-resonance-space') return;
+    info.backendReceiptCount += 1;
+    const secondaryCellIds = metadata['secondaryCellIds'];
+    if (Array.isArray(secondaryCellIds)) {
+        for (const cellId of secondaryCellIds) {
+            if (typeof cellId === 'string' && cellId) info.secondaryCellIds.add(cellId);
+        }
+    }
+    const fiberKind = String(metadata['fiberKind'] || '').toLowerCase();
+    const role = String(metadata['role'] || '').toLowerCase();
+    if (fiberKind === 'document_chart' || role === 'document-chart') {
+        info.documentChartCount += Math.max(1, Number(node.entity.totalMentions || 1));
+    }
+}
+
+function hopfReceiptBases(baseInfos: Map<string, HopfBaseInfo>): HopfReceiptBase[] {
+    return [...baseInfos.values()].map((info): HopfReceiptBase => ({
+        key: info.key,
+        direction: info.direction,
+        phases: info.phases,
+        nodeIds: info.nodeIds,
+        secondaryCellIds: [...info.secondaryCellIds],
+        fiberKinds: [...info.fiberKinds],
+        importance: info.importance,
+        backendReceiptCount: info.backendReceiptCount,
+        documentChartCount: info.documentChartCount,
+        color: { r: info.r, g: info.g, b: info.b },
+    }));
 }
 
 function hopfBraidNormal(
@@ -1712,14 +1779,15 @@ function groupColor(id: string, index: number): Rgb {
     return hslToRgb(`${hue} 76% 58%`);
 }
 
-function prioritizeEntities(entities: GalaxyRenderableNode[]): GalaxyRenderableNode[] {
-    const maxNodes =
-        entities.length > 1200 ? 180 :
-        entities.length > 640 ? 210 :
-        entities.length > 320 ? 240 : 260;
+function orderEntitiesForStableRender(entities: GalaxyRenderableNode[]): GalaxyRenderableNode[] {
+    // Scene assembly must not downsample graph atoms; explicit lenses must filter upstream with receipts.
     return [...entities]
-        .sort((left, right) => entityPriority(right) - entityPriority(left) || left.label.localeCompare(right.label))
-        .slice(0, maxNodes);
+        .sort((left, right) => entityPriority(right) - entityPriority(left) || left.label.localeCompare(right.label));
+}
+
+function assertNoImplicitNodeDrop(inputCount: number, outputCount: number): void {
+    if (inputCount === outputCount) return;
+    throw new Error(`[GraphGalaxy] Scene assembly dropped ${inputCount - outputCount} renderable nodes. Use an explicit atlas lens upstream instead.`);
 }
 
 function entityPriority(entity: GalaxyRenderableNode): number {

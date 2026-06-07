@@ -8,7 +8,7 @@ import type {
     GraphRebuildTemporalEdge,
 } from './graph-rebuild-snapshot';
 
-const MAX_EMBEDDING_TARGETS = 960;
+const MAX_EMBEDDING_WORK_TARGETS = 960;
 const NOTE_TARGET_BUDGET = 48;
 const CHUNK_TARGET_BUDGET = 220;
 const STORY_EDGE_TARGET_BUDGET = 160;
@@ -45,36 +45,48 @@ export function selectGraphRebuildEmbeddingTargetPlan(
     const enabledLanes = enabledStageLanes(stagePolicy);
     const eligible = annotated.filter((target) => isStructureRoot(target) || enabledLanes.has(target.lane || 'unknown'));
     const disabled = annotated.filter((target) => !isStructureRoot(target) && !enabledLanes.has(target.lane || 'unknown'));
-    const selected = selectEmbeddingTargets(eligible, relationships, temporalEdges, causalEdges);
-    const selectedIds = new Set(selected.map((target) => target.id));
-    const admitted = selected.map((target) => ({
+    const queued = selectEmbeddingTargets(eligible, relationships, temporalEdges, causalEdges);
+    const queuedIds = new Set(queued.map((target) => target.id));
+    const admitted = queued.map((target) => ({
         ...target,
         admissionStatus: 'admitted' as const,
+        workStatus: 'queued' as const,
         admissionReason: target.admissionReason || 'admitted_by_hierarchical_plan',
     }));
-    const deferredByBudget = eligible
-        .filter((target) => !selectedIds.has(target.id))
+    const deferredByScheduler = eligible
+        .filter((target) => !queuedIds.has(target.id))
         .map((target) => ({
             ...target,
             admissionStatus: 'deferred' as const,
+            workStatus: 'deferred_by_scheduler' as const,
             structuralRole: 'deferred' as const,
             deferReason: targetDeferReason(target),
         }));
     const deferredByPolicy = disabled.map((target) => ({
         ...target,
         admissionStatus: 'deferred' as const,
+        workStatus: 'deferred_by_policy' as const,
         structuralRole: 'deferred' as const,
         deferReason: 'lane_disabled_by_stage_policy',
     }));
-    const deferred = [...deferredByBudget, ...deferredByPolicy];
+    const deferred = [...deferredByScheduler, ...deferredByPolicy];
+    const canonicalTargets = canonicalTargetOrder([...admitted, ...deferred]);
     return {
         schemaVersion: 'phoenix-signal-target-plan/v1',
         candidateCount: annotated.length,
         admittedCount: admitted.length,
         deferredCount: deferred.length,
-        maxAdmitted: MAX_EMBEDDING_TARGETS,
-        lanes: buildLaneReceipts([...admitted, ...deferred]),
-        targets: admitted,
+        maxAdmitted: MAX_EMBEDDING_WORK_TARGETS,
+        canonicalCount: canonicalTargets.length,
+        queuedCount: admitted.length,
+        schedulerDeferredCount: deferredByScheduler.length,
+        policyDeferredCount: deferredByPolicy.length,
+        maxQueued: MAX_EMBEDDING_WORK_TARGETS,
+        queuedTargetIds: admitted.map((target) => target.id),
+        schedulerDeferredTargetIds: deferredByScheduler.map((target) => target.id),
+        policyDeferredTargetIds: deferredByPolicy.map((target) => target.id),
+        lanes: buildLaneReceipts(canonicalTargets),
+        targets: canonicalTargets,
     };
 }
 
@@ -93,7 +105,7 @@ function selectEmbeddingTargets(
     const storyEdgeById = new Map([...temporalEdges, ...causalEdges].map((edge) => [edge.id, edge]));
     const addGroup = (group: Array<GraphRebuildEmbeddingTarget | undefined>): boolean => {
         const missing = group.filter((target): target is GraphRebuildEmbeddingTarget => !!target && !selected.has(target.id));
-        if (selected.size + missing.length > MAX_EMBEDDING_TARGETS) return false;
+        if (selected.size + missing.length > MAX_EMBEDDING_WORK_TARGETS) return false;
         for (const target of missing) selected.set(target.id, target);
         return true;
     };
@@ -222,7 +234,7 @@ function targetTier(target: GraphRebuildEmbeddingTarget, lane: GraphRebuildSigna
 }
 
 function targetDeferReason(target: GraphRebuildEmbeddingTarget): string {
-    if (isStructureRoot(target)) return 'structure_root_exceeded_embedding_budget';
+    if (isStructureRoot(target)) return 'structure_root_deferred_by_scheduler';
     if (target.lane === 'cooccurrence_weak') return 'weak_cooccurrence_not_promoted';
     if (target.lane === 'entity_linker') return 'entity_linker_requires_final_linking';
     if (target.lane === 'anchor_evidence') return 'raw_anchor_evidence_not_promoted';
@@ -310,6 +322,15 @@ function spreadSample<T>(values: T[], limit: number): T[] {
 
 function coverageFillOrder(targets: GraphRebuildEmbeddingTarget[]): GraphRebuildEmbeddingTarget[] {
     return [...targets].sort((left, right) => coverageWeight(right) - coverageWeight(left) || targetOrder(left, right));
+}
+
+function canonicalTargetOrder(targets: GraphRebuildEmbeddingTarget[]): GraphRebuildEmbeddingTarget[] {
+    return [...targets].sort((left, right) =>
+        (left.admissionTier ?? 9) - (right.admissionTier ?? 9)
+        || String(left.noteId || '').localeCompare(String(right.noteId || ''))
+        || coverageWeight(right) - coverageWeight(left)
+        || left.id.localeCompare(right.id),
+    );
 }
 
 function coverageWeight(target: GraphRebuildEmbeddingTarget): number {

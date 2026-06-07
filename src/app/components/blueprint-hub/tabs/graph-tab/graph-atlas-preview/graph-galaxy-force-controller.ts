@@ -27,6 +27,7 @@ export class GraphGalaxyForceController {
     private hybridShellLocked = new Uint8Array(0);
     private hybridShellRadius3d = new Float32Array(0);
     private hybridShellRadius2d = new Float32Array(0);
+    private hierarchyShellRadii = new Float32Array(0);
     private hopfRailStrength = new Float32Array(0);
     private vx = new Float32Array(0);
     private vy = new Float32Array(0);
@@ -55,6 +56,7 @@ export class GraphGalaxyForceController {
         this.hybridShellLocked = new Uint8Array(scene.ids.length);
         this.hybridShellRadius3d = new Float32Array(scene.ids.length);
         this.hybridShellRadius2d = new Float32Array(scene.ids.length);
+        this.hierarchyShellRadii = scene.hierarchyShellRadii?.slice() ?? new Float32Array(scene.ids.length);
         this.hopfRailStrength = new Float32Array(scene.ids.length);
         this.vx = new Float32Array(scene.ids.length);
         this.vy = new Float32Array(scene.ids.length);
@@ -63,6 +65,7 @@ export class GraphGalaxyForceController {
         this.rebuildHybridConstraints(scene);
         this.rebuildHopfConstraints(scene);
         this.rebuildProductConstraints(scene);
+        this.constrainManifoldScene(scene);
         this.neighbors.length = scene.ids.length;
         for (let i = 0; i < scene.ids.length; i++) this.neighbors[i] = [];
         for (let i = 0; i < scene.edgePairs.length; i += 2) {
@@ -378,6 +381,13 @@ export class GraphGalaxyForceController {
 
         const shellCutoff = this.hybridBoundaryRadius3d * HYBRID_SHELL_LOCK_RATIO;
         for (let i = 0; i < scene.ids.length; i++) {
+            const contractRadius = this.hierarchyShellRadii[i] || 0;
+            if (scene.layoutMode === 'lorentzTree' && contractRadius > 0) {
+                this.hybridShellRadius3d[i] = contractRadius;
+                this.hybridShellRadius2d[i] = contractRadius;
+                this.hybridShellLocked[i] = 1;
+                continue;
+            }
             this.hybridShellLocked[i] = this.hybridShellRadius3d[i] >= shellCutoff ? 1 : 0;
         }
     }

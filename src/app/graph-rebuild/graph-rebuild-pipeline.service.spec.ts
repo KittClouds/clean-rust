@@ -4,7 +4,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const notesMock = vi.hoisted(() => ({
     rows: [] as any[],
-    bulkGet: vi.fn(async (ids: string[]) => ids.map((id) => notesMock.rows.find((row) => row.id === id))),
+    bodyRows: new Map<string, any>(),
+    bulkGet: vi.fn(async (ids: string[]) => ids.map((id) => notesMock.bodyRows.get(id) || notesMock.rows.find((row) => row.id === id))),
     toArray: vi.fn(async () => notesMock.rows),
 }));
 
@@ -47,6 +48,7 @@ import type { GraphDiscourseBridgeCandidateSummary } from './graph-discourse-bri
 import type { GraphDiscourseBridgeAdjudicationSummary } from './graph-discourse-bridge-adjudication';
 import type { GraphDiscourseEvalLedgerSummary } from './graph-discourse-eval-ledger';
 import type { GraphDiscoursePromotionSurfaceSummary } from './graph-discourse-promotion-surface';
+import type { GraphDiscourseCompilerOverlaySummary } from './graph-discourse-compiler-overlay';
 
 describe('GraphRebuildPipelineService', () => {
     let injector: EnvironmentInjector;
@@ -56,6 +58,7 @@ describe('GraphRebuildPipelineService', () => {
     let service: GraphRebuildPipelineService;
 
     beforeEach(() => {
+        notesMock.bodyRows.clear();
         notesMock.rows = [{
             id: 'note-1',
             title: 'Short Run',
@@ -276,6 +279,62 @@ describe('GraphRebuildPipelineService', () => {
         }));
     });
 
+    it('hydrates unopened selected notes before graph rebuild stages', async () => {
+        notesMock.rows = [
+            {
+                id: 'note-1',
+                title: 'First',
+                markdownContent: '',
+                content: '',
+                folderId: '',
+                updatedAt: 10,
+                version: 2,
+                hasBody: false,
+            },
+            {
+                id: 'note-2',
+                title: 'Second',
+                markdownContent: '',
+                content: '',
+                folderId: '',
+                updatedAt: 11,
+                version: 3,
+                hasBody: false,
+            },
+        ];
+        notesMock.bodyRows.set('note-1', {
+            ...notesMock.rows[0],
+            markdownContent: 'Kai mapped Red Mesa. '.repeat(120),
+            hasBody: true,
+        });
+        notesMock.bodyRows.set('note-2', {
+            ...notesMock.rows[1],
+            markdownContent: 'Rowan watched Boundary Keep. '.repeat(120),
+            hasBody: true,
+        });
+
+        await service.buildCoreGraph({
+            ...request(),
+            scope: {
+                kind: 'multiNote',
+                scopeId: 'multi:note-1|note-2',
+                label: '2 notes',
+                noteIds: ['note-1', 'note-2'],
+            },
+            policy: 'force',
+        });
+
+        expect(notesMock.bulkGet).toHaveBeenCalledWith(['note-1', 'note-2']);
+        expect(ner.runDynamicScan).toHaveBeenCalledWith(expect.objectContaining({
+            noteId: 'note-1',
+            plainText: expect.stringContaining('Kai mapped Red Mesa. Kai mapped Red Mesa.'),
+        }));
+        expect(ner.runDynamicScan).toHaveBeenCalledWith(expect.objectContaining({
+            noteId: 'note-2',
+            plainText: expect.stringContaining('Rowan watched Boundary Keep. Rowan watched Boundary Keep.'),
+        }));
+    });
+
     it('runs full atlas stages, then builds the final snapshot from NLI hints', async () => {
         await service.buildFullAtlas(request());
 
@@ -386,6 +445,17 @@ describe('GraphRebuildPipelineService', () => {
                     chunkWormholes: 1,
                     documentClusters: 1,
                     compilerHints: 2,
+                    graphPatches: 0,
+                    mutationAllowed: 0,
+                }),
+            }),
+            expect.objectContaining({
+                id: 'discourseCompilerOverlay',
+                label: 'Discourse Compiler Overlay',
+                counters: expect.objectContaining({
+                    overlayEdges: 2,
+                    chunkWormholes: 1,
+                    documentClusters: 1,
                     graphPatches: 0,
                     mutationAllowed: 0,
                 }),
@@ -1066,6 +1136,30 @@ function discoursePromotionSurfaceSummary(): GraphDiscoursePromotionSurfaceSumma
     };
 }
 
+function discourseCompilerOverlaySummary(): GraphDiscourseCompilerOverlaySummary {
+    return {
+        schemaVersion: 'phoenix-discourse-compiler-overlay/v1',
+        generatedAt: 1,
+        sourceSnapshotId: 'snapshot-1',
+        sourcePromotionSurfaceId: 'snapshot-1:discourse-promotion-surface:1',
+        invariant: 'discourse_compiler_overlay_no_topology_commit',
+        overlayEdges: [],
+        receipts: [],
+        compactOverlay: { scopeId: 'note:note-1', builtAt: 1, rowCount: 2, rows: [] },
+        counters: {
+            byKind: { chunk_wormhole: 1, document_cluster: 1 },
+            overlayEdgeCount: 2,
+            chunkWormholeEdges: 1,
+            documentClusterEdges: 1,
+            resolverEdges: 0,
+            receiptCount: 2,
+            reversibleReceiptCount: 2,
+            graphPatchCount: 0,
+            mutationAllowedCount: 0,
+        },
+    };
+}
+
 function createGraphRebuildMock() {
     return {
         buildAndPersistSnapshot: vi.fn(async () => ({
@@ -1123,6 +1217,7 @@ function createGraphRebuildMock() {
             discourseBridgeAdjudicationSummary: discourseBridgeAdjudicationSummary(),
             discourseEvalLedgerSummary: discourseEvalLedgerSummary(),
             discoursePromotionSurfaceSummary: discoursePromotionSurfaceSummary(),
+            discourseCompilerOverlaySummary: discourseCompilerOverlaySummary(),
             calendarRegistrySummary: calendarRegistryBridgeSummary(),
             counters: {
                 nodes: 2,
@@ -1151,6 +1246,11 @@ function createGraphRebuildMock() {
                 discoursePromotionCompilerHints: 2,
                 discoursePromotionGraphPatches: 0,
                 discoursePromotionMutationAllowed: 0,
+                discourseCompilerOverlayEdges: 2,
+                discourseCompilerOverlayChunkWormholes: 1,
+                discourseCompilerOverlayDocumentClusters: 1,
+                discourseCompilerOverlayGraphPatches: 0,
+                discourseCompilerOverlayMutationAllowed: 0,
                 calendarRegistryAnchors: 1,
                 calendarRegistryReceipts: 1,
                 calendarRegistryMutationAllowed: 0,

@@ -17,6 +17,11 @@ import type { GraphRebuildCounters, GraphRebuildSnapshot } from '../../../../../
 import { type EmbeddingAtlasData, type EmbeddingQueryTrace, type EmbeddingSourcePreview } from './graph-embedding-atlas';
 import { manifoldAdapter } from './graph-manifold-atlas';
 import { buildGraphRebuildEmbeddingAtlas } from './graph-rebuild-embedding-atlas';
+import {
+    registryEntityKindOrder,
+    registryEntityProjectionPoint,
+    REGISTRY_ENTITY_PROJECTION_SPACE,
+} from './graph-registry-entity-projection';
 import { GraphGalaxyCanvasComponent } from './graph-galaxy-canvas.component';
 import {
     mergeGalaxySettings,
@@ -61,6 +66,13 @@ interface PersistedAtlasViewState {
     settings: Partial<GalaxyRenderSettings>;
     graphKindFilter: string;
     controlsCollapsed: boolean;
+}
+
+interface HopfReceiptSummary {
+    assignments: number;
+    occupiedCells: number;
+    docCharts: number;
+    braids: number;
 }
 
 const GRAPH_ATLAS_VIEW_STATE_KEY = 'graph.atlas.viewState.v1';
@@ -135,6 +147,9 @@ function readPersistedAtlasViewState(): PersistedAtlasViewState {
                         }
                         @if (atlasMode === 'embeddings') {
                         <span class="rounded-full border border-cyan-400/15 bg-cyan-500/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-cyan-100">Input graph: {{ semanticGraphAvailabilityLabel() }}</span>
+                        }
+                        @if (hopfReceiptSummary(); as hopf) {
+                        <span class="rounded-full border border-sky-300/15 bg-sky-500/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-sky-100">Hopf receipts {{ hopf.assignments }} / {{ hopf.occupiedCells }} cells / {{ hopf.docCharts }} charts / {{ hopf.braids }} braids</span>
                         }
                         <div class="flex rounded-xl border border-white/10 bg-black/40 p-1">
                             <button type="button" class="rounded-lg px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] transition"
@@ -990,6 +1005,18 @@ export class GraphAtlasPreviewComponent implements OnInit {
         return `${this.graphKindTotal('leaf', 'chunk')} leaves / ${this.graphKindTotal('document')} documents / ${this.graphKindTotal('entity')} entities`;
     }
 
+    hopfReceiptSummary(): HopfReceiptSummary | null {
+        if (this.atlasMode !== 'embeddings' || this.manifoldMode() !== 'hopf') return null;
+        const space = this.graphSnapshotSignal()?.hopfResonanceSpace;
+        if (!space) return null;
+        return {
+            assignments: space.counters?.assignmentCount ?? space.assignments.length,
+            occupiedCells: space.counters?.occupiedCellCount ?? space.cells.filter((cell) => cell.targetCount > 0).length,
+            docCharts: space.counters?.docChartCount ?? space.docCharts.length,
+            braids: space.counters?.braidCount ?? space.braids.length,
+        };
+    }
+
     runSemanticAtlasAction(): void {
         if (this.canRefreshCurrentProjection()) {
             void this.refreshCurrentProjectionView(this.currentReadContext());
@@ -1413,7 +1440,13 @@ export class GraphAtlasPreviewComponent implements OnInit {
         }
 
         if (this.atlasMode === 'entities') {
-            const nodes = this.entities.map((entity) => this.entityNodeWithSource(entity));
+            const kindOrder = registryEntityKindOrder(this.entities);
+            const nodes = this.entities.map((entity, index) => this.registryEntityProjectionNode(
+                entity,
+                index,
+                this.entities.length,
+                kindOrder,
+            ));
             this.activeGraphCache = {
                 mode: this.atlasMode,
                 entities: this.entities,
@@ -1498,6 +1531,35 @@ export class GraphAtlasPreviewComponent implements OnInit {
             } satisfies GalaxyRenderableNode;
         });
         return [...atlas.nodes, ...anchors];
+    }
+
+    private registryEntityProjectionNode(
+        entity: GalaxyRenderableNode,
+        index: number,
+        total: number,
+        kindOrder: Map<string, number>,
+    ): GalaxyRenderableNode {
+        const sourceNode = this.entityNodeWithSource(entity);
+        const normalizedKind = String(sourceNode.kind || 'entity').trim().toLowerCase() || 'entity';
+        const point = registryEntityProjectionPoint(
+            sourceNode,
+            index,
+            total,
+            kindOrder.get(normalizedKind),
+            kindOrder.size,
+        );
+        return {
+            ...sourceNode,
+            atlasX: point.x,
+            atlasY: point.y,
+            atlasZ: point.z,
+            metadata: {
+                ...sourceNode.metadata,
+                projectionSpace: REGISTRY_ENTITY_PROJECTION_SPACE,
+                projectionPhase: point.phase,
+                projectionBand: point.band,
+            },
+        };
     }
 
     private entityNodeWithSource(entity: GalaxyRenderableNode): GalaxyRenderableNode {

@@ -1,6 +1,7 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 
 import { db, type Note } from '../lib/dexie/db';
+import * as ops from '../lib/operations';
 import { smartGraphRegistry } from '../lib/registry';
 import type { AtlasCapabilityId } from '../components/search-panel/atlas-capability.model';
 import type { AtlasBuildScope, AtlasRunOptions } from '../services/atlas-capability-runtime.model';
@@ -207,6 +208,7 @@ export class GraphRebuildPipelineService {
             appendDiscourseBridgeAdjudicationStage(stageReceipts, completedSnapshot);
             appendDiscourseEvalLedgerStage(stageReceipts, completedSnapshot);
             appendDiscoursePromotionSurfaceStage(stageReceipts, completedSnapshot);
+            appendDiscourseCompilerOverlayStage(stageReceipts, completedSnapshot);
             appendCalendarRegistryStage(stageReceipts, completedSnapshot);
             appendSnapshotTimingStages(stageReceipts, completedSnapshot);
 
@@ -356,6 +358,7 @@ export class GraphRebuildPipelineService {
                 appendDiscourseBridgeAdjudicationStage(stageReceipts, snapshot);
                 appendDiscourseEvalLedgerStage(stageReceipts, snapshot);
                 appendDiscoursePromotionSurfaceStage(stageReceipts, snapshot);
+                appendDiscourseCompilerOverlayStage(stageReceipts, snapshot);
                 appendCalendarRegistryStage(stageReceipts, snapshot);
                 appendSnapshotTimingStages(stageReceipts, snapshot);
             }
@@ -575,6 +578,7 @@ export class GraphRebuildPipelineService {
             appendDiscourseBridgeAdjudicationStage(stageReceipts, completedSnapshot);
             appendDiscourseEvalLedgerStage(stageReceipts, completedSnapshot);
             appendDiscoursePromotionSurfaceStage(stageReceipts, completedSnapshot);
+            appendDiscourseCompilerOverlayStage(stageReceipts, completedSnapshot);
             appendCalendarRegistryStage(stageReceipts, completedSnapshot);
             appendSnapshotTimingStages(stageReceipts, completedSnapshot);
 
@@ -879,9 +883,7 @@ export class GraphRebuildPipelineService {
     }
 
     private async loadScopedDocuments(noteIds: string[]): Promise<ScopedDocument[]> {
-        const rows = noteIds.length
-            ? (await db.notes.bulkGet(noteIds)).filter((note): note is Note => !!note)
-            : await db.notes.toArray();
+        const rows = await this.loadScopedNotesWithBodies(noteIds);
         return rows.map((note) => ({
             id: note.id,
             title: note.title || 'Untitled Note',
@@ -890,6 +892,17 @@ export class GraphRebuildPipelineService {
             version: note.version,
             updatedAt: note.updatedAt,
         }));
+    }
+
+    private async loadScopedNotesWithBodies(noteIds: string[]): Promise<Note[]> {
+        if (noteIds.length) {
+            return (await ops.getNotesByIds(noteIds)) as unknown as Note[];
+        }
+        const cached = await db.notes.toArray();
+        const ids = cached.map((note) => note.id).filter(Boolean);
+        if (!ids.length) return cached;
+        const hydrated = await ops.getNotesByIds(ids) as unknown as Note[];
+        return hydrated.length ? hydrated : cached;
     }
 
     private atlasOptions(request: GraphIndexRunRequest): AtlasRunOptions {
@@ -1335,6 +1348,26 @@ function appendDiscoursePromotionSurfaceStage(stageReceipts: GraphIndexStageRece
             mutationAllowed: summary.counters.mutationAllowedCount,
         },
         'Discourse wormholes, document clusters, and resolver hints are surfaced for UI/compiler consumers without graph patches',
+    ));
+}
+
+function appendDiscourseCompilerOverlayStage(stageReceipts: GraphIndexStageReceipt[], snapshot: GraphRebuildSnapshot): void {
+    const summary = snapshot.discourseCompilerOverlaySummary;
+    if (!summary) return;
+    stageReceipts.push(instrumentationStage(
+        'discourseCompilerOverlay',
+        'Discourse Compiler Overlay',
+        summary.counters.overlayEdgeCount,
+        {
+            overlayEdges: summary.counters.overlayEdgeCount,
+            chunkWormholes: summary.counters.chunkWormholeEdges,
+            documentClusters: summary.counters.documentClusterEdges,
+            resolvers: summary.counters.resolverEdges,
+            receipts: summary.counters.receiptCount,
+            graphPatches: summary.counters.graphPatchCount,
+            mutationAllowed: summary.counters.mutationAllowedCount,
+        },
+        'Promotion hints are exposed as read-only compiler overlay edges for atlas consumers without topology writes',
     ));
 }
 

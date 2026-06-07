@@ -190,9 +190,12 @@
           [class.animate-spin]="fullAtlasBusy()"></ng-icon>
         {{ postProcessButtonLabel() }}
       </button>
-      <button type="button" class="secondary-action" (click)="openGraphLens()">
-        <ng-icon name="lucideLayers" class="h-3.5 w-3.5"></ng-icon>
-        Open Graph
+      <button type="button" class="secondary-action ner-suggestions-action"
+        title="Run Dynamic NER and populate entity suggestions without rebuilding the graph"
+        (click)="runEntitySuggestionStage()" [disabled]="isRunNerDisabled()">
+        <ng-icon [name]="isRecipeBusy('runNer') ? 'lucideLoader2' : 'lucideCpu'" class="h-3.5 w-3.5"
+          [class.animate-spin]="isRecipeBusy('runNer')"></ng-icon>
+        {{ nerSuggestionsButtonLabel() }}
       </button>
     </div>
 

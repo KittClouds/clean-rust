@@ -129,6 +129,22 @@ describe('SearchPanelComponent model recipe lifecycle', () => {
         }));
     });
 
+    it('runs the NER suggestion stage without opening or rebuilding the graph', async () => {
+        component.selectRecipe('semanticGraph');
+
+        await component.runEntitySuggestionStage();
+
+        expect(component.selectedRecipe()).toBe('semanticGraph');
+        expect(ner.warmProvider).toHaveBeenCalledWith('dynamic_ner');
+        expect(ner.runDynamicScan).toHaveBeenCalledWith(expect.objectContaining({
+            noteId: 'note-1',
+            noteTitle: 'Runtime Note',
+            plainText: expect.stringContaining('Aella'),
+        }));
+        expect(atlasScan.runRichEmbeddingScan).not.toHaveBeenCalled();
+        expect(machine.requestGraphFocus).not.toHaveBeenCalled();
+    });
+
     it('stops the run when required model warming fails', async () => {
         machine.loadSemanticModel.mockRejectedValueOnce(new Error('semantic load failed'));
 
@@ -398,6 +414,38 @@ describe('SearchPanelComponent model recipe lifecycle', () => {
             noteIds: ['note-a', 'note-b'],
             buildScope: { mode: 'multiNote', noteIds: ['note-a', 'note-b'] },
         }));
+    });
+
+    it('hydrates unopened build-scope note bodies before estimating chunks', async () => {
+        const longA = 'Kai mapped Red Mesa before Hazel answered. '.repeat(160);
+        const longB = 'Rowan watched Boundary Keep while Brynwyn listened. '.repeat(160);
+        dbNotesMock.rows.set('note-a', {
+            id: 'note-a',
+            title: 'A',
+            content: longA,
+            markdownContent: longA,
+            folderId: '',
+            hasBody: true,
+        });
+        dbNotesMock.rows.set('note-b', {
+            id: 'note-b',
+            title: 'B',
+            content: longB,
+            markdownContent: longB,
+            folderId: '',
+            hasBody: true,
+        });
+        component.notes.set([
+            { id: 'note-a', title: 'A', content: '', narrativeId: '', folderId: '', hasBody: false },
+            { id: 'note-b', title: 'B', content: '', narrativeId: '', folderId: '', hasBody: false },
+        ]);
+        component.setBuildScopeMode('multiNote');
+        component.selectedBuildNoteIds.set(['note-a', 'note-b']);
+
+        await (component as any).hydrateBuildScopeNotes(component.scopedNotes());
+
+        expect(component.hydratedBuildScopeNotes().map((note) => note.content.length)).toEqual([longA.length, longB.length]);
+        expect(component.chunkingStatus().estimatedChunks).toBeGreaterThan(2);
     });
 
     it('runs the unified Full Atlas Index only from the explicit button path', async () => {

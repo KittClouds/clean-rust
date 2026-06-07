@@ -43,6 +43,8 @@ import { buildGraphDiscourseBridgeCandidateSummary } from './graph-discourse-bri
 import { buildGraphDiscourseBridgeAdjudicationSummary } from './graph-discourse-bridge-adjudication';
 import { buildGraphDiscourseEvalLedgerSummary } from './graph-discourse-eval-ledger';
 import { buildGraphDiscoursePromotionSurfaceSummary } from './graph-discourse-promotion-surface';
+import { buildGraphDiscourseCompilerOverlaySummary } from './graph-discourse-compiler-overlay';
+import { buildHopfResonanceSpace } from './graph-hopf-resonance-space';
 
 export { buildGraphRebuildAliasResolver, normalizeGraphRebuildCandidate };
 
@@ -88,10 +90,14 @@ export function buildGraphRebuildSnapshot(input: BuildGraphRebuildSnapshotInput)
         derived.memoryState,
     );
     const embeddingTargets = embeddingTargetPlan.targets;
+    const queuedTargetIds = new Set(embeddingTargetPlan.queuedTargetIds || []);
+    const embeddingWorkTargets = embeddingTargets.filter((target) =>
+        queuedTargetIds.size ? queuedTargetIds.has(target.id) : target.admissionStatus === 'admitted',
+    );
     const postProcessMode = input.postProcessMode || 'full';
     const embeddingGraphPostProcess = postProcessMode === 'full'
         ? buildGraphRebuildEmbeddingGraphPostProcess(
-            embeddingTargets,
+            embeddingWorkTargets,
             input.embeddingProfile,
         )
         : undefined;
@@ -176,16 +182,19 @@ export function buildGraphRebuildSnapshot(input: BuildGraphRebuildSnapshotInput)
             memoryState: derived.memoryState.length,
             embeddingTargets: embeddingTargets.length,
             embeddingTargetCandidates: embeddingTargetPlan.candidateCount,
+            embeddingQueuedTargets: embeddingWorkTargets.length,
             embeddingTargetDeferred: embeddingTargetPlan.deferredCount,
-            embeddingDocumentSpine: planLaneAdmitted(embeddingTargetPlan, 'document_spine'),
-            embeddingChunkSpine: planLaneAdmitted(embeddingTargetPlan, 'chunk_spine'),
-            embeddingEntityAnchors: planLaneAdmitted(embeddingTargetPlan, 'entity_anchor'),
-            embeddingRelationshipFacts: planLaneAdmitted(embeddingTargetPlan, 'relationship_fact'),
-            embeddingTemporalFacts: planLaneAdmitted(embeddingTargetPlan, 'temporal_fact'),
-            embeddingCausalFacts: planLaneAdmitted(embeddingTargetPlan, 'causal_fact'),
-            embeddingMemoryStates: planLaneAdmitted(embeddingTargetPlan, 'memory_state'),
-            embeddingEventIdentities: planLaneAdmitted(embeddingTargetPlan, 'event_identity'),
-            embeddingAnchorEvidence: planLaneAdmitted(embeddingTargetPlan, 'anchor_evidence'),
+            embeddingSchedulerDeferredTargets: embeddingTargetPlan.schedulerDeferredCount,
+            embeddingPolicyDeferredTargets: embeddingTargetPlan.policyDeferredCount,
+            embeddingDocumentSpine: planLaneCandidates(embeddingTargetPlan, 'document_spine'),
+            embeddingChunkSpine: planLaneCandidates(embeddingTargetPlan, 'chunk_spine'),
+            embeddingEntityAnchors: planLaneCandidates(embeddingTargetPlan, 'entity_anchor'),
+            embeddingRelationshipFacts: planLaneCandidates(embeddingTargetPlan, 'relationship_fact'),
+            embeddingTemporalFacts: planLaneCandidates(embeddingTargetPlan, 'temporal_fact'),
+            embeddingCausalFacts: planLaneCandidates(embeddingTargetPlan, 'causal_fact'),
+            embeddingMemoryStates: planLaneCandidates(embeddingTargetPlan, 'memory_state'),
+            embeddingEventIdentities: planLaneCandidates(embeddingTargetPlan, 'event_identity'),
+            embeddingAnchorEvidence: planLaneCandidates(embeddingTargetPlan, 'anchor_evidence'),
             embeddingVectors: 0,
             projectionRefs: 0,
             nodes: nodes.length,
@@ -211,6 +220,20 @@ export function buildGraphRebuildSnapshot(input: BuildGraphRebuildSnapshotInput)
         },
         resolutionSuggestions: hygiene.suggestions,
     };
+    const hopfResonanceSpace = buildHopfResonanceSpace(snapshot, { generatedAt: builtAt });
+    if (hopfResonanceSpace.assignments.length !== snapshot.embeddingTargets.length) {
+        throw new Error(
+            `Hopf resonance space contract failed: ${hopfResonanceSpace.assignments.length} assignments for ${snapshot.embeddingTargets.length} embedding targets`,
+        );
+    }
+    snapshot.hopfResonanceSpace = hopfResonanceSpace;
+    snapshot.counters.hopfResonanceAssignments = hopfResonanceSpace.assignments.length;
+    snapshot.counters.hopfResonanceOccupiedCells = hopfResonanceSpace.counters.occupiedCellCount;
+    snapshot.counters.hopfResonanceFibers = hopfResonanceSpace.fibers.length;
+    snapshot.counters.hopfResonanceDocCharts = hopfResonanceSpace.docCharts.length;
+    snapshot.counters.hopfResonanceBraids = hopfResonanceSpace.braids.length;
+    snapshot.counters.hopfResonanceDroppedTargets = hopfResonanceSpace.counters.droppedTargets;
+    snapshot.counters.hopfResonanceMutationAllowed = hopfResonanceSpace.counters.mutationAllowedCount;
     attachGraphCompilerReadModels(
         snapshot,
         input.graphCompilerSidecar || buildCompatibilityGraphCompilerSidecar(snapshot),
@@ -328,6 +351,15 @@ export function buildGraphRebuildSnapshot(input: BuildGraphRebuildSnapshotInput)
     snapshot.counters.discoursePromotionReceipts = discoursePromotionSurfaceSummary.counters.receiptCount;
     snapshot.counters.discoursePromotionGraphPatches = discoursePromotionSurfaceSummary.counters.graphPatchCount;
     snapshot.counters.discoursePromotionMutationAllowed = discoursePromotionSurfaceSummary.counters.mutationAllowedCount;
+    const discourseCompilerOverlaySummary = buildGraphDiscourseCompilerOverlaySummary(snapshot, builtAt);
+    snapshot.discourseCompilerOverlaySummary = discourseCompilerOverlaySummary;
+    snapshot.counters.discourseCompilerOverlayEdges = discourseCompilerOverlaySummary.counters.overlayEdgeCount;
+    snapshot.counters.discourseCompilerOverlayChunkWormholes = discourseCompilerOverlaySummary.counters.chunkWormholeEdges;
+    snapshot.counters.discourseCompilerOverlayDocumentClusters = discourseCompilerOverlaySummary.counters.documentClusterEdges;
+    snapshot.counters.discourseCompilerOverlayResolvers = discourseCompilerOverlaySummary.counters.resolverEdges;
+    snapshot.counters.discourseCompilerOverlayReceipts = discourseCompilerOverlaySummary.counters.receiptCount;
+    snapshot.counters.discourseCompilerOverlayGraphPatches = discourseCompilerOverlaySummary.counters.graphPatchCount;
+    snapshot.counters.discourseCompilerOverlayMutationAllowed = discourseCompilerOverlaySummary.counters.mutationAllowedCount;
     const calendarRegistrySummary = buildGraphCalendarRegistryBridgeSummary({
         calendarRegistry: input.calendarRegistrySnapshot,
         sourceSnapshotId: snapshot.id,
@@ -348,11 +380,11 @@ export function buildGraphRebuildSnapshot(input: BuildGraphRebuildSnapshotInput)
     return snapshot;
 }
 
-function planLaneAdmitted(
-    plan: { lanes: Array<{ lane: GraphRebuildSignalTargetLane; admitted: number }> },
+function planLaneCandidates(
+    plan: { lanes: Array<{ lane: GraphRebuildSignalTargetLane; candidates: number }> },
     lane: GraphRebuildSignalTargetLane,
 ): number {
-    return plan.lanes.find((row) => row.lane === lane)?.admitted || 0;
+    return plan.lanes.find((row) => row.lane === lane)?.candidates || 0;
 }
 
 function buildNodes(anchors: GraphRebuildEntityAnchor[], entitiesById: Map<string, RegisteredEntity>): GraphRebuildNode[] {

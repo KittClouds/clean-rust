@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
 import { mergeGalaxySettings } from './graph-galaxy-engine';
-import { galaxySettingsNeedSceneRebuild } from './graph-galaxy-canvas.component';
+import {
+    canGraphGalaxyCanvasHoldSurface,
+    galaxySettingsNeedSceneRebuild,
+} from './graph-galaxy-canvas.component';
 
 describe('GraphGalaxyCanvasComponent settings rebuild routing', () => {
     it('rebuilds the compiled scene when topology lens changes', () => {
@@ -16,5 +19,25 @@ describe('GraphGalaxyCanvasComponent settings rebuild routing', () => {
         const current = mergeGalaxySettings({ labelMode: 'always' });
 
         expect(galaxySettingsNeedSceneRebuild(previous, current)).toBe(false);
+    });
+});
+
+describe('GraphGalaxyCanvasComponent surface lifecycle gate', () => {
+    const active = {
+        destroyed: false,
+        documentVisible: true,
+        isVisible: true,
+        surfaceActive: true,
+    };
+
+    it('allows a WebGL surface only when the document, viewport, and graph panel are active', () => {
+        expect(canGraphGalaxyCanvasHoldSurface(active)).toBe(true);
+    });
+
+    it('releases hidden or inactive graph surfaces instead of keeping GPU work alive', () => {
+        expect(canGraphGalaxyCanvasHoldSurface({ ...active, isVisible: false })).toBe(false);
+        expect(canGraphGalaxyCanvasHoldSurface({ ...active, surfaceActive: false })).toBe(false);
+        expect(canGraphGalaxyCanvasHoldSurface({ ...active, documentVisible: false })).toBe(false);
+        expect(canGraphGalaxyCanvasHoldSurface({ ...active, destroyed: true })).toBe(false);
     });
 });

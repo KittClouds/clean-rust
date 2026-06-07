@@ -9,6 +9,17 @@ import { galaxySceneToV2, type GalaxySceneSourceMode, type GalaxySceneV2 } from 
 import { mergeGalaxySettings, type GalaxyInputEdge, type GalaxyQueryFocus, type GalaxyRenderableNode, type GalaxyRenderSettings } from './graph-galaxy-engine';
 import { ThreeGalaxyRenderer } from './three-galaxy-renderer';
 
+export interface GraphGalaxySurfaceGate {
+    destroyed: boolean;
+    documentVisible: boolean;
+    isVisible: boolean;
+    surfaceActive: boolean;
+}
+
+export function canGraphGalaxyCanvasHoldSurface(state: GraphGalaxySurfaceGate): boolean {
+    return !state.destroyed && state.documentVisible && state.isVisible && state.surfaceActive;
+}
+
 @Component({
     selector: 'app-graph-galaxy-canvas',
     standalone: true,
@@ -61,7 +72,7 @@ export class GraphGalaxyCanvasComponent implements AfterViewInit, OnChanges, OnD
     private lastPointerY = 0;
     private hoverId: string | null = null;
     private needsLayout = true;
-    private isVisible = true;
+    private isVisible = false;
     private documentVisible = typeof document === 'undefined' ? true : !document.hidden;
     private animationActive = false;
     private currentDpr = 1;
@@ -268,7 +279,12 @@ export class GraphGalaxyCanvasComponent implements AfterViewInit, OnChanges, OnD
     }
 
     private canHoldSurface(): boolean {
-        return !this.destroyed && this.documentVisible;
+        return canGraphGalaxyCanvasHoldSurface({
+            destroyed: this.destroyed,
+            documentVisible: this.documentVisible,
+            isVisible: this.isVisible,
+            surfaceActive: this.surfaceActive,
+        });
     }
 
     private resizeCanvas(): void {

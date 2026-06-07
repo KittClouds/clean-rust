@@ -8,6 +8,7 @@ import {
     type NoteBlockProjection,
 } from '../lib/dexie/db';
 import { parseContentToPlainText } from '../lib/analytics';
+import * as ops from '../lib/operations';
 import type { RegisteredEntity } from '../lib/registry';
 import { PhoenixBackendService } from '../services/phoenix-backend.service';
 import { PhoenixStoreService, type StoreScopedDocument } from '../services/phoenix-store.service';
@@ -243,7 +244,7 @@ export class GraphRebuildService {
     private async loadNoteTexts(noteIds: string[], occurrences: EntityOccurrence[]): Promise<Record<string, string>> {
         if (!canUseNotesTable()) return {};
         const scopedNoteIds = noteIds.length ? noteIds : [...new Set(occurrences.map((row) => row.noteId))];
-        const notes = (await Promise.all(scopedNoteIds.map((noteId) => db.notes.get(noteId)))).filter((note): note is Note => !!note);
+        const notes = await loadNotesWithBodies(scopedNoteIds);
         return Object.fromEntries(notes.map((note) => [note.id, notePlainText(note)]));
     }
 
@@ -254,7 +255,7 @@ export class GraphRebuildService {
         if (!canUseNotesTable()) return {};
         const scopedNoteIds = noteIds.length ? noteIds : [...new Set(occurrences.map((row) => row.noteId))];
         if (!scopedNoteIds.length) return {};
-        const notes = (await Promise.all(scopedNoteIds.map((noteId) => db.notes.get(noteId)))).filter((note): note is Note => !!note);
+        const notes = await loadNotesWithBodies(scopedNoteIds);
         const folderIds = [...new Set(notes.map((note) => note.folderId || '').filter(Boolean))];
         const folders = await Promise.all(folderIds.map((folderId) => db.folders.get(folderId)));
         const folderById = new Map(folders.filter((folder): folder is Folder => !!folder).map((folder) => [folder.id, folder]));
@@ -623,7 +624,7 @@ function elapsedMs(started: number): number {
 
 async function loadDynamicNoteChunks(noteIds: string[]): Promise<GraphRebuildChunk[]> {
     if (!canUseNotesTable() || !noteIds.length) return [];
-    const notes = (await Promise.all(noteIds.map((noteId) => db.notes.get(noteId)))).filter((note): note is Note => !!note);
+    const notes = await loadNotesWithBodies(noteIds);
     return notes.flatMap((note) => dynamicChunksForNote(note));
 }
 
@@ -642,7 +643,7 @@ async function loadBlockChunks(noteIds: string[]): Promise<GraphRebuildChunk[]> 
 
 async function loadFallbackNoteChunks(noteIds: string[]): Promise<GraphRebuildChunk[]> {
     if (!canUseNotesTable() || !noteIds.length) return [];
-    const notes = (await Promise.all(noteIds.map((noteId) => db.notes.get(noteId)))).filter((note): note is Note => !!note);
+    const notes = await loadNotesWithBodies(noteIds);
     return notes.map((note, ordinal) => ({
         id: `${note.id}:note-fallback:0`,
         noteId: note.id,
@@ -652,6 +653,13 @@ async function loadFallbackNoteChunks(noteIds: string[]): Promise<GraphRebuildCh
         source: 'note-fallback',
         textHash: simpleHash(note.markdownContent || ''),
     }));
+}
+
+async function loadNotesWithBodies(noteIds: string[]): Promise<Note[]> {
+    if (!noteIds.length) return [];
+    const hydrated = await ops.getNotesByIds(noteIds) as unknown as Note[];
+    if (hydrated.length) return hydrated;
+    return (await Promise.all(noteIds.map((noteId) => db.notes.get(noteId)))).filter((note): note is Note => !!note);
 }
 
 function notePlainText(note: Pick<Note, 'markdownContent' | 'content'>): string {

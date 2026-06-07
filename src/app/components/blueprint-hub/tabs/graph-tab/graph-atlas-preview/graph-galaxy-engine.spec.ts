@@ -49,6 +49,38 @@ describe('Graph galaxy scene prioritization', () => {
         expect(scene.nodes.filter((node) => String(node.entity.kind).toLowerCase() === 'character')).toHaveLength(21);
         expect(scene.links.map((link) => link.id)).toContain('rel-0-1');
     });
+
+    it('pins structural hierarchy edges when noisy relation edges fill the render queue first', () => {
+        const nodes = Array.from({ length: 220 }, (_, index) => ({
+            id: index === 0 ? 'embed:note:root' : `embed:chunk:${index}`,
+            label: index === 0 ? 'Document root' : `Chunk ${index}`,
+            kind: index === 0 ? 'note' : 'chunk',
+            totalMentions: 1,
+            atlasX: stable(index, 0),
+            atlasY: stable(index, 1),
+            atlasZ: stable(index, 2),
+            metadata: { sourceType: index === 0 ? 'note' : 'chunk', graphKind: index === 0 ? 'note' : 'chunk' },
+        } satisfies GalaxyRenderableNode));
+        const noisyEdges: GalaxyInputEdge[] = [];
+        for (let left = 1; left < 80; left += 1) {
+            for (let right = left + 1; right < 96; right += 1) {
+                noisyEdges.push({ id: `noise:${left}:${right}`, sourceId: nodes[left].id, targetId: nodes[right].id, type: 'cooccurrence', confidence: 0.22 });
+            }
+        }
+        const structuralEdges: GalaxyInputEdge[] = nodes.slice(1).map((node, index) => ({
+            id: `spine:${index + 1}`,
+            sourceId: nodes[0].id,
+            targetId: node.id,
+            type: 'note-chunk',
+            confidence: 0.9,
+        }));
+
+        const scene = buildGalaxyScene(nodes, [...noisyEdges, ...structuralEdges], mergeGalaxySettings({ layoutMode: 'single' }));
+        const renderedIds = new Set(scene.links.map((link) => link.id));
+
+        expect(noisyEdges.length).toBeGreaterThan(900);
+        expect(structuralEdges.every((edge) => renderedIds.has(edge.id))).toBe(true);
+    });
 });
 
 describe('Graph galaxy canonical colors', () => {

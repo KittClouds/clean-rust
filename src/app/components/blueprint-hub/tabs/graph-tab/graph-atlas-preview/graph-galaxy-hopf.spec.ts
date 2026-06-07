@@ -91,6 +91,27 @@ describe('Hopf galaxy visualization data', () => {
         expect(polylineLength(braid!.positions3d)).toBeGreaterThan(directSegmentLength(braid!.positions3d) * 1.05);
     });
 
+    it('emits Hopf receipt guides from backend cell assignments', () => {
+        const nodes: GalaxyRenderableNode[] = [
+            hopfReceiptTarget('embed:note:one', 'Chapter One', 'cell:a', 0.02, [1, 0, 0], ['cell:b'], 'document_chart'),
+            hopfReceiptTarget('embed:chunk:one', 'Chunk One', 'cell:a', 0.32, [1, 0, 0], ['cell:b'], 'chunk_sample'),
+            hopfReceiptTarget('embed:note:two', 'Chapter Two', 'cell:b', 0.12, [0, 1, 0], ['cell:a'], 'document_chart'),
+            hopfReceiptTarget('embed:chunk:two', 'Chunk Two', 'cell:b', 0.58, [0, 1, 0], ['cell:a'], 'chunk_sample'),
+        ];
+        const scene = buildGalaxyScene(nodes, [], mergeGalaxySettings({ layoutMode: 'hopfProjection' }));
+        const kinds = new Set(scene.hopfRibbons?.map((ribbon) => ribbon.guideKind));
+        const cellRing = scene.hopfRibbons?.find((ribbon) => ribbon.id === 'hopf:cell-ring:cell:a');
+        const docBand = scene.hopfRibbons?.find((ribbon) => ribbon.id === 'hopf:doc-chart:cell:a');
+        const receiptBraid = scene.hopfRibbons?.find((ribbon) => ribbon.id.startsWith('hopf:receipt-braid:'));
+
+        expect(kinds.has('spaceFiber')).toBe(true);
+        expect(kinds.has('torusBand')).toBe(true);
+        expect(kinds.has('crossFiberBraid')).toBe(true);
+        expect(cellRing?.nodeIds).toEqual(expect.arrayContaining(['embed:note:one', 'embed:chunk:one']));
+        expect(docBand?.nodeIds).toContain('embed:note:one');
+        expect(receiptBraid?.nodeIds).toEqual(expect.arrayContaining(['embed:note:one', 'embed:note:two']));
+    });
+
     it('keeps low-count semantic fibers visible when high-importance fibers fill the guide budget', () => {
         const crowded = Array.from({ length: 64 }, (_, index) =>
             hopfTarget(`embed:entity:busy-${index}`, `Busy ${index}`, 'anchor', `embed:entity:busy-${index}`, index / 64),
@@ -137,6 +158,40 @@ function hopfTarget(
         atlasZ: 0.42,
         totalMentions: 4,
         metadata: { sourceType: role, hopf: { role, baseId, fiberKind: 'identity', phase } },
+    };
+}
+
+function hopfReceiptTarget(
+    id: string,
+    label: string,
+    baseId: string,
+    phase: number,
+    direction: [number, number, number],
+    secondaryCellIds: string[],
+    fiberKind: string,
+): GalaxyRenderableNode {
+    return {
+        id,
+        label,
+        kind: fiberKind === 'document_chart' ? 'note' : 'chunk',
+        atlasX: direction[0],
+        atlasY: direction[1],
+        atlasZ: direction[2],
+        totalMentions: fiberKind === 'document_chart' ? 12 : 5,
+        metadata: {
+            sourceType: fiberKind === 'document_chart' ? 'note' : 'chunk',
+            hopf: {
+                role: fiberKind === 'document_chart' ? 'anchor' : 'fiber',
+                baseId,
+                cellId: baseId,
+                fiberKind,
+                phase,
+                direction,
+                secondaryCellIds,
+                resonanceSource: 'snapshot-hopf-resonance-space',
+                noTopologyMutation: true,
+            },
+        },
     };
 }
 

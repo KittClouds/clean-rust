@@ -68,6 +68,20 @@ describe('GraphGalaxyForceController Hybrid constraints', () => {
         expect(radius3d(scene.positions3d, 1)).toBeLessThanOrEqual(2.18);
     });
 
+    it('repairs explicit Caps hierarchy shells before rendering', () => {
+        const scene = capsScene([
+            [0.82, 0, 0],
+            [2.04, 0, 0],
+        ], new Float32Array([2.08, 1.42]));
+        const controller = new GraphGalaxyForceController();
+
+        controller.bind(scene);
+        controller.setMode('3d');
+
+        expect(radius3d(scene.positions3d, 0)).toBeCloseTo(2.08, 3);
+        expect(radius3d(scene.positions3d, 1)).toBeCloseTo(1.42, 3);
+    });
+
     it('pulls Hopf fiber nodes back toward their rail during stretched interactions', () => {
         const scene = hopfScene([
             [1.2, 0.1, 0.05],
@@ -134,14 +148,15 @@ function productScene(points: Array<[number, number, number]>): GalaxySceneV2 {
     return projectedScene('productManifold', points);
 }
 
-function capsScene(points: Array<[number, number, number]>): GalaxySceneV2 {
-    return projectedScene('lorentzTree', points);
+function capsScene(points: Array<[number, number, number]>, hierarchyShellRadii?: Float32Array): GalaxySceneV2 {
+    return projectedScene('lorentzTree', points, undefined, hierarchyShellRadii);
 }
 
 function projectedScene(
     layoutMode: GalaxySceneV2['layoutMode'],
     points: Array<[number, number, number]>,
     hopfRoles?: Uint8Array,
+    hierarchyShellRadii?: Float32Array,
 ): GalaxySceneV2 {
     const positions3d = new Float32Array(points.length * 3);
     const positions2d = new Float32Array(points.length * 3);
@@ -162,6 +177,7 @@ function projectedScene(
         kinds: ['leaf', 'entity'],
         groupIds: ['', ''],
         hopfRoles,
+        hierarchyShellRadii,
         groups: [],
         hopfRibbons: [],
         lorentzGuides: [],

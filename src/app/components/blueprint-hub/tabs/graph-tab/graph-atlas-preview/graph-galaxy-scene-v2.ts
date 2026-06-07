@@ -11,6 +11,7 @@ import {
     type GalaxyScene,
     type GalaxyBusemannHorosphereSpec,
 } from './graph-galaxy-engine';
+import { hierarchyShellBandForNode } from './graph-galaxy-hierarchy-caps';
 import { relationFamilyFromText } from './graph-relation-visual-style';
 
 export type GalaxySceneSourceMode = 'entities' | 'graph' | 'embeddings';
@@ -110,6 +111,8 @@ export interface GalaxySceneV2 {
     hybridShellPositions?: Float32Array;
     hybridCommitmentPositions?: Float32Array;
     hybridReceipts?: GalaxyHybridNodeReceiptView[];
+    hierarchyShellRadii?: Float32Array;
+    hierarchyShellRanks?: Uint8Array;
     positions3d: Float32Array;
     positions2d: Float32Array;
     radii: Float32Array;
@@ -134,8 +137,11 @@ export function galaxySceneToV2(scene: GalaxyScene, sourceMode: GalaxySceneSourc
     const colors = new Float32Array(nodeCount * 3);
     const hasHybridShell = scene.nodes.some((node) => !!node.hybridShellPoint || !!node.hybridShell);
     const hasHybridCommitment = scene.nodes.some((node) => !!node.hybridCommitmentPoint || !!node.hybridCommitment);
+    const hasHierarchyShells = scene.nodes.some((node) => hierarchyShellBandForNode(node));
     const hybridShellPositions = hasHybridShell ? new Float32Array(nodeCount * 3) : undefined;
     const hybridCommitmentPositions = hasHybridCommitment ? new Float32Array(nodeCount * 3) : undefined;
+    const hierarchyShellRadii = hasHierarchyShells ? new Float32Array(nodeCount) : undefined;
+    const hierarchyShellRanks = hasHierarchyShells ? new Uint8Array(nodeCount) : undefined;
     const hybridReceipts: GalaxyHybridNodeReceiptView[] = [];
 
     for (let index = 0; index < nodeCount; index++) {
@@ -162,6 +168,13 @@ export function galaxySceneToV2(scene: GalaxyScene, sourceMode: GalaxySceneSourc
         const hybridReceipt = hybridNodeReceiptView(node);
         if (hybridReceipt) {
             hybridReceipts.push(hybridReceipt);
+        }
+        if (hierarchyShellRadii && hierarchyShellRanks) {
+            const band = hierarchyShellBandForNode(node);
+            if (band) {
+                hierarchyShellRadii[index] = band.radius;
+                hierarchyShellRanks[index] = band.rank + 1;
+            }
         }
     }
 
@@ -203,6 +216,8 @@ export function galaxySceneToV2(scene: GalaxyScene, sourceMode: GalaxySceneSourc
         hybridShellPositions,
         hybridCommitmentPositions,
         hybridReceipts: hybridReceipts.length ? hybridReceipts : undefined,
+        hierarchyShellRadii,
+        hierarchyShellRanks,
         positions3d,
         positions2d,
         radii,

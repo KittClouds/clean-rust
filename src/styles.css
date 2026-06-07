@@ -206,6 +206,13 @@
     pointer-events: none !important;
 }
 
+/* Keep Omnedia gradient text static; its package default animates forever. */
+om-gradient-text .om-gradient-text {
+    animation: none !important;
+    background-position: 0 0 !important;
+    background-size: 100% 100% !important;
+}
+
 /* --- View Transitions API (Circular Reveal) --- */
 ::view-transition-old(root),
 ::view-transition-new(root) {

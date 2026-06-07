@@ -313,7 +313,9 @@ export async function getNotesByIds(ids: string[]): Promise<Note[]> {
         return cached.filter(Boolean).map((note) => note as unknown as Note);
     }
     const notes = await store.getNotesByIds(ids);
-    const byId = new Map<string, Note>(notes.map((note) => [note.id, { ...storeNoteToNote(note), hasBody: true }]));
+    const fullNotes = notes.map((note) => ({ ...storeNoteToNote(note), hasBody: true }));
+    for (const note of fullNotes) warmDexieNote(note);
+    const byId = new Map<string, Note>(fullNotes.map((note) => [note.id, note]));
     const missingIds = ids.filter((id) => !byId.has(id));
     if (missingIds.length) {
         const cached = await db.notes.bulkGet(missingIds);

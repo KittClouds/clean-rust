@@ -21,6 +21,11 @@ import {
     sparseEmbeddingSignature,
     sparseToDenseVector,
 } from '../../../../../graph-rebuild/graph-rebuild-embedding-signatures';
+import type {
+    HopfResonanceAssignment,
+    HopfResonanceFiber,
+    HopfResonanceSpace,
+} from '../../../../../graph-rebuild/graph-hopf-resonance-space';
 import type { GraphModelV2FactBundleCommitment } from '../../../../../graph-rebuild/graph-model-v2';
 import { createGraphModelV2ReadModel } from '../../../../../graph-rebuild/graph-model-v2-read-model';
 import { buildGraphSignalTruthIndex, type GraphSignalTruthRecord } from '../../../../../graph-rebuild/graph-rebuild-signal-truth';
@@ -29,16 +34,11 @@ import type { EmbeddingAtlasData, EmbeddingAtlasSearchItem } from './graph-embed
 import { relationFamilyFromText, relationHslFromText } from './graph-relation-visual-style';
 import { entityColorStore } from '../../../../../lib/store/entityColorStore';
 
-const VISIBLE_TARGET_LIMIT = 960;
-const STORY_TARGET_BUDGET = 120;
-const RELATION_TARGET_BUDGET = 96;
-const CO_OCCURRENCE_TARGET_BUDGET = 48;
 const HOPF_RESONANCE_DIMS = 96;
 const HOPF_RESONANCE_NEIGHBORS = 8;
 const HOPF_RESONANCE_FIBER_MEMBER_LIMIT = HOPF_RESONANCE_NEIGHBORS + 1;
 const HOPF_RESONANCE_THRESHOLD = 0.56;
 const HOPF_RESONANCE_EDGE_FLOOR = 0.44;
-const STORY_TARGET_KINDS = new Set(['causalFact', 'temporalFact', 'event', 'memoryState']);
 
 type HopfBaseAssignment = {
     role: 'anchor' | 'fiber' | 'loose';
@@ -52,15 +52,46 @@ type HopfBaseAssignment = {
     coherence: number;
     frustration: number;
     neighborCount: number;
+    cellId?: string;
+    secondaryCellIds?: string[];
+    assignmentScore?: number;
+    residualScore?: number;
+    salience?: number;
+    direction?: readonly number[];
+    tangent?: readonly number[];
+    receipt?: string;
+    resonanceSource?: 'point-formed' | 'snapshot-hopf-resonance-space';
+    noTopologyMutation?: boolean;
 };
 
 type TargetHierarchyContext = {
     noteId?: string;
     chunkId?: string;
+    supportNoteIds?: string[];
+    supportChunkIds?: string[];
     folderId?: string;
     folderLabel?: string;
     folderKind?: string;
     folderParentId?: string;
+};
+
+type CapsVec3 = { x: number; y: number; z: number };
+
+type MentionCompactionReceipt = {
+    mode: 'entity_mention_compaction_v1';
+    source: 'atlas_view_compaction';
+    expanded: false;
+    anchorCount: number;
+    anchorIds: string[];
+    noteIds: string[];
+    chunkIds: string[];
+    surfaces: string[];
+    maxConfidence: number;
+};
+
+type MentionCompactionSelection = {
+    targets: GraphRebuildEmbeddingTarget[];
+    receiptsByEntityTargetId: Map<string, MentionCompactionReceipt>;
 };
 
 type ProductTraversalBuild = {
@@ -79,15 +110,17 @@ export function buildGraphRebuildEmbeddingAtlas(
     const entityKindById = new Map(snapshot.nodes.map((node) => [node.entityId, node.kind]));
     const profile = normalizeEmbeddingProfile(snapshot.embeddingProfile);
     const postByTarget = new Map((snapshot.embeddingGraphPostProcess?.targets || []).map((row) => [row.targetId, row]));
-    const selected = selectEmbeddingTargets(snapshot)
+    const mentionCompaction = compactEntityMentionTargets(snapshot, selectEmbeddingTargets(snapshot));
+    const selected = mentionCompaction.targets
         .map((target) => hydrateTargetEntityKind(target, entityKindById));
     const hierarchyByTarget = buildTargetHierarchyContext(snapshot);
     const truthByTarget = buildGraphSignalTruthIndex(snapshot);
     const commitmentBySourceId = buildBundleCommitmentIndex(snapshot);
     const vectors = selected.map((target) => textVector(target, profile.selectedDimensions));
-    const hopfBasePlan = manifold === 'hopf' ? buildHopfResonancePlan(selected, vectors, postByTarget) : undefined;
+    const capsDocumentDirections = buildCapsDocumentDirections(selected, vectors, manifold);
+    const hopfBasePlan = manifold === 'hopf' ? buildHopfAtlasAssignmentPlan(snapshot, selected, vectors, postByTarget) : undefined;
     const rawNodes = selected.map((target, index) =>
-        targetNode(target, vectors[index], index, selected.length, manifold, postByTarget.get(target.id), hopfBasePlan?.get(target.id), hierarchyByTarget.get(target.id), truthByTarget.get(target.id), commitmentBySourceId.get(target.sourceId) || commitmentBySourceId.get(target.id)),
+        targetNode(target, vectors[index], index, selected.length, manifold, postByTarget.get(target.id), hopfBasePlan?.get(target.id), hierarchyByTarget.get(target.id), truthByTarget.get(target.id), commitmentBySourceId.get(target.sourceId) || commitmentBySourceId.get(target.id), mentionCompaction.receiptsByEntityTargetId.get(target.id), capsDocumentDirections),
     );
     const nodeIds = new Set(rawNodes.map((node) => node.id));
     const rawEdges = buildTargetEdges(snapshot).filter((edge) => nodeIds.has(edge.sourceId) && nodeIds.has(edge.targetId));
@@ -144,74 +177,85 @@ export function buildGraphRebuildEmbeddingAtlas(
 
 function selectEmbeddingTargets(snapshot: GraphRebuildSnapshot): GraphRebuildEmbeddingTarget[] {
     const candidates = snapshot.embeddingTargets.filter((target) => target.text.trim() || target.label.trim());
-    if (candidates.length <= VISIBLE_TARGET_LIMIT) return candidates.filter(isVisibleAtlasTarget);
+    return coverageOrderedTargets(candidates.filter(isVisibleAtlasTarget));
+}
 
-    const selected = new Map<string, GraphRebuildEmbeddingTarget>();
-    const byId = new Map(candidates.map((target) => [target.id, target]));
-    const temporalById = new Map([...snapshot.temporalEdges, ...snapshot.causalEdges].map((edge) => [edge.id, edge]));
-    const relationshipById = new Map(snapshot.relationships.map((relationship) => [relationship.id, relationship]));
-    const selectedRelationIds = new Set<string>();
-    const add = (target?: GraphRebuildEmbeddingTarget) => {
-        if (target && selected.size < VISIBLE_TARGET_LIMIT) selected.set(target.id, target);
-    };
-    const addGroup = (targets: Array<GraphRebuildEmbeddingTarget | undefined>) => {
-        const missing = targets.filter((target): target is GraphRebuildEmbeddingTarget => !!target && !selected.has(target.id));
-        if (selected.size + missing.length > VISIBLE_TARGET_LIMIT) return false;
-        for (const target of missing) selected.set(target.id, target);
-        return true;
-    };
-    const addLinkedEvents = (target: GraphRebuildEmbeddingTarget) => {
-        if (target.kind !== 'temporalFact' && target.kind !== 'causalFact') return;
-        const edge = temporalById.get(target.sourceId);
-        if (!edge) return;
-        add(byId.get(`embed:event:${edge.sourceId}`));
-        add(byId.get(`embed:event:${edge.targetId}`));
-    };
-    const addLinkedRelationshipEndpoints = (target: GraphRebuildEmbeddingTarget) => {
-        const relationship = relationshipById.get(target.sourceId);
-        if (!relationship) return;
-        addGroup([
-            byId.get(`embed:entity:${relationship.sourceEntityId}`),
-            byId.get(`embed:entity:${relationship.targetEntityId}`),
-        ]);
-    };
-    const addLinkedRelationship = (target?: GraphRebuildEmbeddingTarget) => {
-        if (!target || selectedRelationIds.has(target.id)) return;
-        if (!isVisibleAtlasTarget(target)) {
-            addLinkedRelationshipEndpoints(target);
-            selectedRelationIds.add(target.id);
-            return;
-        }
-        if (displayKind(target.kind) !== 'graph-fact') {
-            if (addGroup([target])) selectedRelationIds.add(target.id);
-            return;
-        }
-        const relationship = relationshipById.get(target.sourceId);
-        const group = relationship ? [
-            target,
-            byId.get(`embed:entity:${relationship.sourceEntityId}`),
-            byId.get(`embed:entity:${relationship.targetEntityId}`),
-        ] : [target];
-        if (addGroup(group)) selectedRelationIds.add(target.id);
+function compactEntityMentionTargets(
+    snapshot: GraphRebuildSnapshot,
+    selected: GraphRebuildEmbeddingTarget[],
+): MentionCompactionSelection {
+    const allTargetsById = new Map(snapshot.embeddingTargets.map((target) => [target.id, target]));
+    const selectedById = new Map(selected.map((target) => [target.id, target]));
+    const receiptDrafts = new Map<string, {
+        anchorIds: string[];
+        noteIds: Set<string>;
+        chunkIds: Set<string>;
+        surfaces: Set<string>;
+        maxConfidence: number;
+    }>();
+    const recordAnchor = (
+        entityId: string | undefined,
+        anchorId: string,
+        noteId: string | undefined,
+        chunkId: string | undefined,
+        surface: string | undefined,
+        confidence: number,
+    ) => {
+        if (!entityId || !anchorId) return;
+        const entityTargetId = `embed:entity:${entityId}`;
+        const entityTarget = selectedById.get(entityTargetId) || allTargetsById.get(entityTargetId);
+        if (!entityTarget) return;
+        selectedById.set(entityTargetId, entityTarget);
+        const draft = receiptDrafts.get(entityTargetId) || {
+            anchorIds: [],
+            noteIds: new Set<string>(),
+            chunkIds: new Set<string>(),
+            surfaces: new Set<string>(),
+            maxConfidence: 0,
+        };
+        if (!draft.anchorIds.includes(anchorId)) draft.anchorIds.push(anchorId);
+        if (noteId) draft.noteIds.add(noteId);
+        if (chunkId) draft.chunkIds.add(chunkId);
+        if (surface) draft.surfaces.add(surface);
+        draft.maxConfidence = Math.max(draft.maxConfidence, confidence || 0);
+        receiptDrafts.set(entityTargetId, draft);
     };
 
-    const relationTargets = candidates.filter((candidate) => displayKind(candidate.kind) === 'graph-fact');
-    const cooccurrenceTargets = relationTargets.filter((target) =>
-        relationFamilyFromText(target.label, target.text, target.sourceId) === 'cooccurrence',
-    );
-    for (const target of evenSample(cooccurrenceTargets, CO_OCCURRENCE_TARGET_BUDGET)) {
-        addLinkedRelationship(target);
+    for (const anchor of snapshot.entityAnchors || []) {
+        recordAnchor(anchor.entityId, anchor.id, anchor.noteId, anchor.chunkId, anchor.surface, anchor.confidence);
     }
-    for (const target of evenSample(candidates.filter((candidate) => STORY_TARGET_KINDS.has(candidate.kind)), STORY_TARGET_BUDGET)) {
-        add(target);
-        addLinkedEvents(target);
+    for (const target of selected) {
+        if (target.kind !== 'anchor' || !target.entityId) continue;
+        recordAnchor(target.entityId, target.sourceId || target.id.replace(/^embed:anchor:/, ''), target.noteId, target.chunkId, target.label, targetConfidence(target));
     }
-    const relationBudgetLeft = Math.max(0, RELATION_TARGET_BUDGET - selectedRelationIds.size);
-    for (const target of evenSample(relationTargets.filter((target) => isVisibleAtlasTarget(target) && !selectedRelationIds.has(target.id)), relationBudgetLeft)) {
-        addLinkedRelationship(target);
+
+    for (const target of selected) {
+        if (target.kind !== 'anchor' || !target.entityId) continue;
+        const entityTargetId = `embed:entity:${target.entityId}`;
+        if (!selectedById.has(entityTargetId)) continue;
+        selectedById.delete(target.id);
     }
-    for (const target of coverageOrderedTargets(candidates).filter(isVisibleAtlasTarget)) add(target);
-    return [...selected.values()];
+
+    const receiptsByEntityTargetId = new Map<string, MentionCompactionReceipt>();
+    for (const [entityTargetId, draft] of receiptDrafts) {
+        if (!selectedById.has(entityTargetId) || draft.anchorIds.length === 0) continue;
+        receiptsByEntityTargetId.set(entityTargetId, {
+            mode: 'entity_mention_compaction_v1',
+            source: 'atlas_view_compaction',
+            expanded: false,
+            anchorCount: draft.anchorIds.length,
+            anchorIds: draft.anchorIds.slice(0, 96),
+            noteIds: [...draft.noteIds].sort(),
+            chunkIds: [...draft.chunkIds].sort(),
+            surfaces: [...draft.surfaces].sort().slice(0, 24),
+            maxConfidence: clamp01(draft.maxConfidence),
+        });
+    }
+
+    return {
+        targets: [...selectedById.values()],
+        receiptsByEntityTargetId,
+    };
 }
 
 function isVisibleAtlasTarget(target: GraphRebuildEmbeddingTarget): boolean {
@@ -228,6 +272,7 @@ function coverageOrderedTargets(targets: GraphRebuildEmbeddingTarget[]): GraphRe
     const weight = (target: GraphRebuildEmbeddingTarget) => {
         switch (displayKind(target.kind)) {
             case 'note': return 900;
+            case 'structure-root': return 890;
             case 'chunk': return 880;
             case 'causal-fact': return 860;
             case 'temporal-fact': return 850;
@@ -254,15 +299,6 @@ function targetEvidenceScore(target: GraphRebuildEmbeddingTarget): number {
     if (/causal|cause|because|before|after|temporal|memory_key|chunk_role|meaning_cues/.test(text)) score += 24;
     if (/evidence_context:/.test(text)) score += 16;
     return score;
-}
-
-function evenSample<T>(values: T[], limit: number): T[] {
-    if (values.length <= limit) return values;
-    if (limit <= 0) return [];
-    const step = (values.length - 1) / Math.max(1, limit - 1);
-    const out: T[] = [];
-    for (let index = 0; index < limit; index += 1) out.push(values[Math.round(index * step)]);
-    return out;
 }
 
 const PRODUCT_CONE_TRAVERSAL_GEOMETRY = 'graph_rebuild_product_cone_traversal_v1';
@@ -601,19 +637,35 @@ function buildTargetHierarchyContext(snapshot: GraphRebuildSnapshot): Map<string
         const fallback = contexts.get(`embed:note:${chunk.noteId}`) || { noteId: chunk.noteId };
         contexts.set(`embed:chunk:${chunk.id}`, targetHierarchyBase(targetById.get(`embed:chunk:${chunk.id}`), { ...fallback, chunkId: chunk.id }));
     }
-    const entityContexts = new Map<string, { confidence: number; context: TargetHierarchyContext }>();
+    const entityContexts = new Map<string, {
+        confidence: number;
+        context: TargetHierarchyContext;
+        supportNoteIds: Set<string>;
+        supportChunkIds: Set<string>;
+    }>();
     for (const anchor of snapshot.entityAnchors || []) {
         const fallback = contexts.get(`embed:chunk:${anchor.chunkId}`) || contexts.get(`embed:note:${anchor.noteId}`) || { noteId: anchor.noteId };
         const context = targetHierarchyBase(targetById.get(`embed:anchor:${anchor.id}`), { ...fallback, noteId: anchor.noteId, chunkId: anchor.chunkId });
         contexts.set(`embed:anchor:${anchor.id}`, context);
         if (!anchor.entityId) continue;
         const existing = entityContexts.get(anchor.entityId);
+        const supportNoteIds = existing?.supportNoteIds || new Set<string>();
+        const supportChunkIds = existing?.supportChunkIds || new Set<string>();
+        if (anchor.noteId) supportNoteIds.add(anchor.noteId);
+        if (anchor.chunkId) supportChunkIds.add(anchor.chunkId);
         if (!existing || anchor.confidence > existing.confidence) {
-            entityContexts.set(anchor.entityId, { confidence: anchor.confidence, context });
+            entityContexts.set(anchor.entityId, { confidence: anchor.confidence, context, supportNoteIds, supportChunkIds });
+        } else {
+            existing.supportNoteIds = supportNoteIds;
+            existing.supportChunkIds = supportChunkIds;
         }
     }
     for (const [entityId, value] of entityContexts) {
-        contexts.set(`embed:entity:${entityId}`, value.context);
+        contexts.set(`embed:entity:${entityId}`, {
+            ...value.context,
+            supportNoteIds: [...value.supportNoteIds].sort(),
+            supportChunkIds: [...value.supportChunkIds].sort(),
+        });
     }
     return contexts;
 }
@@ -626,11 +678,42 @@ function targetHierarchyBase(
         ...fallback,
         noteId: target?.noteId || fallback.noteId,
         chunkId: target?.chunkId || fallback.chunkId,
+        supportNoteIds: targetSupportNoteIds(target, fallback),
+        supportChunkIds: targetSupportChunkIds(target, fallback),
         folderId: target?.folderId || fallback.folderId,
         folderLabel: target?.folderLabel || fallback.folderLabel,
         folderKind: target?.folderKind || fallback.folderKind,
         folderParentId: target?.folderParentId || fallback.folderParentId,
     };
+}
+
+function targetSupportNoteIds(
+    target: GraphRebuildEmbeddingTarget | undefined,
+    fallback: TargetHierarchyContext,
+): string[] | undefined {
+    const ids = new Set<string>(fallback.supportNoteIds || []);
+    if (fallback.noteId) ids.add(fallback.noteId);
+    if (target?.noteId) ids.add(target.noteId);
+    for (const parentId of target?.parentIds || []) {
+        const note = parentId.match(/^embed:note:(.+)$/)?.[1]
+            || parentId.match(/^embed:structure-root:([^:]+):/)?.[1];
+        if (note) ids.add(note);
+    }
+    return ids.size ? [...ids].sort() : undefined;
+}
+
+function targetSupportChunkIds(
+    target: GraphRebuildEmbeddingTarget | undefined,
+    fallback: TargetHierarchyContext,
+): string[] | undefined {
+    const ids = new Set<string>(fallback.supportChunkIds || []);
+    if (fallback.chunkId) ids.add(fallback.chunkId);
+    if (target?.chunkId) ids.add(target.chunkId);
+    for (const parentId of target?.parentIds || []) {
+        const chunk = parentId.match(/^embed:chunk:(.+)$/)?.[1];
+        if (chunk) ids.add(chunk);
+    }
+    return ids.size ? [...ids].sort() : undefined;
 }
 
 function targetNode(
@@ -644,17 +727,20 @@ function targetNode(
     hierarchyContext?: TargetHierarchyContext,
     graphTruth?: GraphSignalTruthRecord,
     commitment?: GraphModelV2FactBundleCommitment,
+    mentionCompaction?: MentionCompactionReceipt,
+    capsDocumentDirections?: Map<string, CapsVec3>,
 ): GalaxyRenderableNode {
     const point = projectVector(vector, target.id, index, total, manifold);
     const busemannSignature = graphModelBusemannSignature(commitment);
     const relationFamily = displayKind(target.kind) === 'graph-fact'
         ? relationFamilyFromText(target.label, target.text, target.sourceId)
         : null;
+    const totalMentions = mentionCompaction?.anchorCount ?? target.evidenceIds.length;
     return {
         id: target.id,
         label: target.label || target.id,
         kind: targetRenderKind(target),
-        totalMentions: Math.max(1, target.evidenceIds.length),
+        totalMentions: Math.max(1, totalMentions),
         atlasX: point.x,
         atlasY: point.y,
         atlasZ: point.z,
@@ -675,6 +761,10 @@ function targetNode(
             graphTruthStatus: graphTruth?.status,
             graphTruthReason: graphTruth?.reason,
             graphTruthKind: graphTruth?.kind,
+            mentionCompaction,
+            compactedMentionCount: mentionCompaction?.anchorCount,
+            compactedAnchorIds: mentionCompaction?.anchorIds,
+            compactedChunkIds: mentionCompaction?.chunkIds,
             commitmentTopPrototypeId: commitment?.topPrototypeId,
             commitmentTopLabel: commitment?.topLabel,
             commitmentConfidence: commitment?.classificationConfidence,
@@ -711,7 +801,7 @@ function targetNode(
                 lanes: post.productLaneFeatures,
             } : undefined,
             siegel: manifold === 'siegel' ? graphRebuildSiegelMetadata(target, post, hierarchyContext) : undefined,
-            lorentz: post ? productLorentzMetadata(target, point, post, hierarchyContext) : undefined,
+            lorentz: post ? productLorentzMetadata(target, point, post, hierarchyContext, capsDocumentDirections) : undefined,
             hopf: manifold === 'hopf'
                 ? graphRebuildHopfMetadata(target, post, manifold, hopfBase)
                 : post ? graphRebuildHopfMetadata(target, post, manifold) : undefined,
@@ -818,7 +908,7 @@ function graphRebuildHopfMetadata(
         };
     }
 
-    const role = target.id === assignment.anchorTargetId ? 'anchor' : 'fiber';
+    const role = assignment.role === 'anchor' || target.id === assignment.anchorTargetId ? 'anchor' : 'fiber';
     return {
         role,
         baseId: assignment.baseId,
@@ -830,8 +920,17 @@ function graphRebuildHopfMetadata(
         laneKind: post?.productTopologyRegion.laneKind,
         rootBaseId: assignment.rootBaseId,
         splitKey: assignment.splitKey,
-        resonanceSource: 'point-formed',
+        cellId: assignment.cellId,
+        secondaryCellIds: assignment.secondaryCellIds,
+        assignmentScore: assignment.assignmentScore,
+        residualScore: assignment.residualScore,
+        salience: assignment.salience,
+        direction: assignment.direction,
+        tangent: assignment.tangent,
+        receipt: assignment.receipt,
+        resonanceSource: assignment.resonanceSource || 'point-formed',
         resonanceAdmitted: true,
+        noTopologyMutation: assignment.noTopologyMutation,
         support: assignment.support,
         coherence: assignment.coherence,
         frustration: assignment.frustration,
@@ -879,6 +978,89 @@ type HopfResonanceEdge = {
     other: number;
     weight: number;
 };
+
+function buildHopfAtlasAssignmentPlan(
+    snapshot: GraphRebuildSnapshot,
+    targets: GraphRebuildEmbeddingTarget[],
+    vectors: Float32Array[],
+    postByTarget: Map<string, GraphRebuildEmbeddingTargetPostProcess>,
+): Map<string, HopfBaseAssignment> {
+    const plan = buildHopfSnapshotAssignmentPlan(snapshot.hopfResonanceSpace, targets);
+    if (plan.size === targets.length) return plan;
+
+    const fallback = buildHopfResonancePlan(targets, vectors, postByTarget);
+    if (!plan.size) return fallback;
+    for (const target of targets) {
+        if (!plan.has(target.id)) {
+            const assignment = fallback.get(target.id);
+            if (assignment) plan.set(target.id, assignment);
+        }
+    }
+    return plan;
+}
+
+function buildHopfSnapshotAssignmentPlan(
+    space: HopfResonanceSpace | undefined,
+    targets: GraphRebuildEmbeddingTarget[],
+): Map<string, HopfBaseAssignment> {
+    const plan = new Map<string, HopfBaseAssignment>();
+    if (!space?.assignments?.length || !targets.length) return plan;
+
+    const visibleTargetIds = new Set(targets.map((target) => target.id));
+    const anchorByCell = new Map<string, string>();
+    for (const cell of space.cells || []) {
+        const anchorId = cell.anchorTargetIds.find((targetId) => visibleTargetIds.has(targetId)) || cell.anchorTargetIds[0];
+        if (anchorId) anchorByCell.set(cell.id, anchorId);
+    }
+
+    const fiberByTargetId = new Map<string, HopfResonanceFiber>();
+    for (const fiber of space.fibers || []) {
+        for (const targetId of fiber.targetIds) {
+            if (!fiberByTargetId.has(targetId)) fiberByTargetId.set(targetId, fiber);
+        }
+    }
+
+    for (const assignment of space.assignments) {
+        if (!visibleTargetIds.has(assignment.targetId)) continue;
+        plan.set(assignment.targetId, hopfSnapshotAssignment(assignment, anchorByCell, fiberByTargetId));
+    }
+    return plan;
+}
+
+function hopfSnapshotAssignment(
+    assignment: HopfResonanceAssignment,
+    anchorByCell: Map<string, string>,
+    fiberByTargetId: Map<string, HopfResonanceFiber>,
+): HopfBaseAssignment {
+    const fiber = fiberByTargetId.get(assignment.targetId);
+    const anchorTargetId = anchorByCell.get(assignment.baseCellId) || fiber?.anchorTargetId || assignment.targetId;
+    const structuralAnchor = assignment.role === 'document-chart' || assignment.role === 'structure-root';
+    const role: HopfBaseAssignment['role'] = structuralAnchor || assignment.targetId === anchorTargetId ? 'anchor' : 'fiber';
+    const residual = clamp01(assignment.residualScore);
+    return {
+        role,
+        rootBaseId: assignment.baseCellId,
+        baseId: assignment.baseCellId,
+        anchorTargetId,
+        splitKey: `${assignment.baseCellId}:${assignment.fiberKind}`,
+        fiberKind: assignment.fiberKind,
+        phase: clamp01(assignment.phase),
+        support: clamp01(assignment.assignmentScore),
+        coherence: fiber?.coherence ?? clamp01(1 - residual),
+        frustration: fiber?.frustration ?? residual,
+        neighborCount: assignment.secondaryCellIds.length,
+        cellId: assignment.baseCellId,
+        secondaryCellIds: assignment.secondaryCellIds.slice(0, 6),
+        assignmentScore: clamp01(assignment.assignmentScore),
+        residualScore: residual,
+        salience: clamp01(assignment.salience),
+        direction: assignment.direction,
+        tangent: assignment.tangent,
+        receipt: assignment.receipt,
+        resonanceSource: 'snapshot-hopf-resonance-space',
+        noTopologyMutation: true,
+    };
+}
 
 function buildHopfResonancePlan(
     targets: GraphRebuildEmbeddingTarget[],
@@ -1240,6 +1422,7 @@ function productLorentzMetadata(
     point: { x: number; y: number; z: number },
     post: GraphRebuildEmbeddingTargetPostProcess,
     hierarchyContext?: TargetHierarchyContext,
+    capsDocumentDirections?: Map<string, CapsVec3>,
 ): Record<string, unknown> {
     const lane = post.productLaneFeatures;
     const region = post.productTopologyRegion;
@@ -1248,11 +1431,14 @@ function productLorentzMetadata(
     const scale = 0.22 + depth * 0.66;
     const treeKind = productFiberKind(post.clusterRole, region.laneKind);
     const parentNodeId = post.medoidTargetId && post.medoidTargetId !== target.id ? post.medoidTargetId : null;
-    const capId = productCapId(target, region.id, hierarchyContext);
+    const supportNoteIds = capsSupportNoteIds(target, hierarchyContext);
+    const supportChunkIds = capsSupportChunkIds(target, hierarchyContext);
+    const capId = productCapId(target, region.id, hierarchyContext, supportNoteIds);
     const parentId = productCapParentId(target, parentNodeId, hierarchyContext);
     const level = productRegionLevel(target, post);
     const specificity = productHierarchySpecificity(target, post);
     const ambiguity = productHierarchyAmbiguity(post);
+    const capDirection = capsDirectionForTarget(target, point, hierarchyContext, supportNoteIds, capsDocumentDirections);
     return {
         geometry: 'hierarchy_caps_v1',
         klein: [
@@ -1262,12 +1448,14 @@ function productLorentzMetadata(
             lane.fiberPhase,
         ],
         capId,
-        capDirection: [point.x / radius, point.y / radius, point.z / radius],
+        capDirection: [capDirection.x, capDirection.y, capDirection.z],
         capPhase: lane.fiberPhase,
         shellRadius: productCapShellRadius(target, specificity, ambiguity),
         parentNodeId: parentId,
         signalLane: target.lane,
         structuralRole: target.structuralRole,
+        supportNoteIds,
+        supportChunkIds,
         specificity,
         ambiguity,
         level,
@@ -1292,12 +1480,165 @@ function productLorentzMetadata(
     };
 }
 
-function productCapId(target: GraphRebuildEmbeddingTarget, fallback: string, hierarchyContext?: TargetHierarchyContext): string {
-    const folderId = target.folderId || hierarchyContext?.folderId;
-    if (folderId) return `folder:${folderId}`;
-    const noteId = target.noteId || hierarchyContext?.noteId;
-    if (noteId) return `document:${noteId}`;
+function productCapId(
+    target: GraphRebuildEmbeddingTarget,
+    fallback: string,
+    hierarchyContext: TargetHierarchyContext | undefined,
+    supportNoteIds: string[],
+): string {
+    const kind = displayKind(target.kind);
+    const noteId = target.noteId || hierarchyContext?.noteId || supportNoteIds[0];
+    if (kind === 'note' && noteId) return `document:${noteId}`;
+    if (kind === 'structure-root' && noteId) return `document:${noteId}:root:${capsStructureRootKey(target)}`;
+    if (kind === 'chunk' && noteId) return `document:${noteId}:chunks`;
+    if (kind === 'entity') {
+        const entityId = target.entityId || target.sourceId;
+        return supportNoteIds.length > 1
+            ? `entity:${entityId}:docs:${capsStableToken(supportNoteIds.join('|'))}`
+            : noteId ? `document:${noteId}:entities` : `entity:${entityId}`;
+    }
+    if (kind === 'event' && noteId) return `document:${noteId}:events`;
+    if ((kind === 'temporal-fact' || kind === 'causal-fact') && noteId) return `document:${noteId}:${kind}`;
+    if ((kind === 'graph-fact' || kind === 'memory-state') && noteId) return `document:${noteId}:facts`;
+    if (noteId) return `document:${noteId}:signals`;
     return fallback;
+}
+
+function buildCapsDocumentDirections(
+    targets: GraphRebuildEmbeddingTarget[],
+    vectors: Float32Array[],
+    manifold: AtlasManifoldMode,
+): Map<string, CapsVec3> {
+    const directions = new Map<string, CapsVec3>();
+    for (let index = 0; index < targets.length; index += 1) {
+        const target = targets[index];
+        if (displayKind(target.kind) !== 'note' || !target.noteId) continue;
+        directions.set(target.noteId, capsNormalize(projectVector(vectors[index], target.id, index, targets.length, manifold), capsStableVector(`document:${target.noteId}`)));
+    }
+    return directions;
+}
+
+function capsDirectionForTarget(
+    target: GraphRebuildEmbeddingTarget,
+    point: { x: number; y: number; z: number },
+    hierarchyContext: TargetHierarchyContext | undefined,
+    supportNoteIds: string[],
+    documentDirections?: Map<string, CapsVec3>,
+): CapsVec3 {
+    const kind = displayKind(target.kind);
+    const noteId = target.noteId || hierarchyContext?.noteId || supportNoteIds[0];
+    const fallback = capsNormalize(point, capsStableVector(target.id));
+    const docDirection = capsAverageDocumentDirections(supportNoteIds.length ? supportNoteIds : noteId ? [noteId] : [], documentDirections, fallback);
+    if (kind === 'note') return fallback;
+    if (kind === 'structure-root') {
+        const rootLane = capsStructureRootKey(target);
+        return capsNormalize(capsWeighted([
+            [docDirection, 0.78],
+            [capsLaneDirection(rootLane), 0.18],
+            [capsStableVector(`${target.id}:root`), 0.08],
+        ]), docDirection);
+    }
+    if (kind === 'chunk') {
+        return capsNormalize(capsWeighted([
+            [docDirection, 0.68],
+            [capsStableVector(target.chunkId || target.sourceId), 0.22],
+            [fallback, 0.1],
+        ]), docDirection);
+    }
+    if (kind === 'entity') {
+        return capsNormalize(capsWeighted([
+            [docDirection, supportNoteIds.length > 1 ? 0.7 : 0.58],
+            [capsLaneDirection('identity'), 0.18],
+            [fallback, supportNoteIds.length > 1 ? 0.12 : 0.24],
+            [capsStableVector(target.entityId || target.sourceId), 0.08],
+        ]), docDirection);
+    }
+    return capsNormalize(capsWeighted([
+        [docDirection, 0.52],
+        [capsLaneDirection(target.lane || kind), 0.24],
+        [fallback, 0.24],
+    ]), fallback);
+}
+
+function capsAverageDocumentDirections(
+    noteIds: string[],
+    documentDirections: Map<string, CapsVec3> | undefined,
+    fallback: CapsVec3,
+): CapsVec3 {
+    const uniqueNoteIds = [...new Set(noteIds)].filter(Boolean);
+    if (!uniqueNoteIds.length) return fallback;
+    const weighted = uniqueNoteIds.map((noteId): [CapsVec3, number] => [
+        documentDirections?.get(noteId) || capsStableVector(`document:${noteId}`),
+        1,
+    ]);
+    return capsNormalize(capsWeighted(weighted), fallback);
+}
+
+function capsSupportNoteIds(target: GraphRebuildEmbeddingTarget, context?: TargetHierarchyContext): string[] {
+    const out = new Set<string>(context?.supportNoteIds || []);
+    if (context?.noteId) out.add(context.noteId);
+    if (target.noteId) out.add(target.noteId);
+    for (const parentId of target.parentIds || []) {
+        const noteId = parentId.match(/^embed:note:(.+)$/)?.[1]
+            || parentId.match(/^embed:structure-root:([^:]+):/)?.[1];
+        if (noteId) out.add(noteId);
+    }
+    return [...out].sort();
+}
+
+function capsSupportChunkIds(target: GraphRebuildEmbeddingTarget, context?: TargetHierarchyContext): string[] {
+    const out = new Set<string>(context?.supportChunkIds || []);
+    if (context?.chunkId) out.add(context.chunkId);
+    if (target.chunkId) out.add(target.chunkId);
+    for (const parentId of target.parentIds || []) {
+        const chunkId = parentId.match(/^embed:chunk:(.+)$/)?.[1];
+        if (chunkId) out.add(chunkId);
+    }
+    return [...out].sort();
+}
+
+function capsStructureRootKey(target: GraphRebuildEmbeddingTarget): string {
+    const text = `${target.id} ${target.sourceId} ${target.label} ${target.text}`.toLowerCase();
+    if (/identity|entity|alias/.test(text)) return 'identity';
+    if (/temporal|timeline|before|after/.test(text)) return 'temporal';
+    if (/causal|cause|effect/.test(text)) return 'causal';
+    if (/evidence|source|provenance/.test(text)) return 'evidence';
+    return 'document';
+}
+
+function capsLaneDirection(lane: string): CapsVec3 {
+    const value = lane.toLowerCase();
+    if (/identity|entity/.test(value)) return capsNormalize({ x: -0.62, y: 0.58, z: 0.22 }, { x: -1, y: 1, z: 0 });
+    if (/temporal/.test(value)) return capsNormalize({ x: 0.2, y: 0.88, z: -0.28 }, { x: 0, y: 1, z: 0 });
+    if (/causal/.test(value)) return capsNormalize({ x: 0.86, y: -0.24, z: 0.34 }, { x: 1, y: 0, z: 0 });
+    if (/evidence|anchor/.test(value)) return capsNormalize({ x: -0.58, y: -0.1, z: 0.8 }, { x: -1, y: 0, z: 0 });
+    if (/event/.test(value)) return capsNormalize({ x: 0.54, y: 0.36, z: -0.76 }, { x: 0, y: 0, z: -1 });
+    if (/relationship|fact|cooccurrence/.test(value)) return capsNormalize({ x: 0.56, y: -0.62, z: -0.2 }, { x: 1, y: -1, z: 0 });
+    return capsNormalize({ x: -0.3, y: 0.18, z: 0.94 }, { x: 0, y: 0, z: 1 });
+}
+
+function capsWeighted(values: Array<[CapsVec3, number]>): CapsVec3 {
+    return values.reduce((sum, [value, weight]) => ({
+        x: sum.x + value.x * weight,
+        y: sum.y + value.y * weight,
+        z: sum.z + value.z * weight,
+    }), { x: 0, y: 0, z: 0 });
+}
+
+function capsNormalize(value: CapsVec3, fallback: CapsVec3): CapsVec3 {
+    const norm = Math.hypot(value.x, value.y, value.z);
+    return norm > 0.0001 ? { x: value.x / norm, y: value.y / norm, z: value.z / norm } : fallback;
+}
+
+function capsStableVector(id: string): CapsVec3 {
+    const a = unitHash(`${id}:caps:a`) * Math.PI * 2;
+    const y = unitHash(`${id}:caps:y`) * 2 - 1;
+    const radial = Math.sqrt(Math.max(0, 1 - y * y));
+    return { x: Math.cos(a) * radial, y, z: Math.sin(a) * radial };
+}
+
+function capsStableToken(value: string): string {
+    return Math.round(unitHash(value) * 0xffffff).toString(36);
 }
 
 function productCapParentId(
@@ -1327,14 +1668,16 @@ function productCapShellRadius(
     const lane = target.lane || 'unknown';
     const kind = displayKind(target.kind);
     let radius = 1.28;
-    if (lane === 'document_spine') radius = kind === 'note' ? 2.08 : kind === 'structure-root' ? 1.92 : 1.72;
-    else if (lane === 'chunk_spine') radius = 1.66;
-    else if (lane === 'entity_anchor') radius = 1.42;
-    else if (lane === 'event_identity' || lane === 'temporal_fact' || lane === 'causal_fact') radius = 1.34;
-    else if (lane === 'relationship_fact') radius = 1.3;
-    else if (lane === 'memory_state') radius = 1.16;
-    else if (lane === 'cooccurrence_weak') radius = 1.08;
-    else if (lane === 'anchor_evidence') radius = 0.96;
+    if (kind === 'note') radius = 2.08;
+    else if (kind === 'structure-root') radius = 1.92;
+    else if (kind === 'chunk' || lane === 'chunk_spine') radius = 1.66;
+    else if (kind === 'entity' || lane === 'entity_anchor') radius = 1.42;
+    else if (lane === 'document_spine') radius = 1.72;
+    else if (lane === 'event_identity' || lane === 'temporal_fact' || lane === 'causal_fact') radius = 1.24;
+    else if (lane === 'relationship_fact') radius = 1.16;
+    else if (lane === 'memory_state') radius = 1.08;
+    else if (lane === 'cooccurrence_weak') radius = 1.02;
+    else if (lane === 'anchor_evidence') radius = 0.92;
     const confidence = targetConfidence(target);
     const confidenceDrop = lane === 'document_spine' ? 0.08 : 0.24;
     radius -= (1 - confidence) * confidenceDrop;
@@ -1347,15 +1690,15 @@ function productCapShellRadius(
 function productCapShellBand(target: GraphRebuildEmbeddingTarget): [number, number] {
     const lane = target.lane || 'unknown';
     const kind = displayKind(target.kind);
-    if (lane === 'document_spine' && kind === 'note') return [2.02, 2.12];
-    if (lane === 'document_spine' && kind === 'structure-root') return [1.86, 1.98];
-    if (lane === 'document_spine' || lane === 'chunk_spine') return [1.56, 1.74];
-    if (lane === 'entity_anchor') return [1.34, 1.52];
-    if (lane === 'event_identity' || lane === 'temporal_fact' || lane === 'causal_fact') return [1.22, 1.48];
-    if (lane === 'relationship_fact') return [1.18, 1.42];
-    if (lane === 'memory_state') return [1.04, 1.28];
-    if (lane === 'cooccurrence_weak') return [0.96, 1.2];
-    if (lane === 'anchor_evidence') return [0.84, 1.08];
+    if (kind === 'note') return [2.02, 2.12];
+    if (kind === 'structure-root') return [1.86, 1.98];
+    if (kind === 'chunk' || lane === 'document_spine' || lane === 'chunk_spine') return [1.56, 1.74];
+    if (kind === 'entity' || lane === 'entity_anchor') return [1.34, 1.52];
+    if (lane === 'event_identity' || lane === 'temporal_fact' || lane === 'causal_fact') return [1.14, 1.34];
+    if (lane === 'relationship_fact') return [1.08, 1.26];
+    if (lane === 'memory_state') return [0.98, 1.18];
+    if (lane === 'cooccurrence_weak') return [0.92, 1.12];
+    if (lane === 'anchor_evidence') return [0.78, 1.0];
     return [0.54, 2.12];
 }
 

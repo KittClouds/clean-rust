@@ -10,6 +10,7 @@
     "build": "ng build",
     "desktop:build": "npm run build && cargo build --release --manifest-path src-tauri/Cargo.toml",
     "watch": "ng build --watch --configuration development",
+    "hopf:space": "node scripts/hopf-resonance-space-smoke.mjs",
     "test": "vitest run",
     "test:watch": "vitest"
   },

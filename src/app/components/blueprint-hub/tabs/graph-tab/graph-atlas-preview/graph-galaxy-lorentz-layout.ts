@@ -7,9 +7,11 @@ import {
     capRingSegments,
     causalConeDirection,
     clamp,
+    contractShellRadiusForNode,
     derivedRole,
     documentTreeDirection,
     dominantLane,
+    enforceHierarchyShellContract,
     fallbackLane,
     finite,
     firstNumber,
@@ -88,11 +90,15 @@ export function applyLorentzTreeLayout(nodes: GalaxyNode[], links: GalaxyEdge[],
     for (let index = 0; index < nodes.length; index++) {
         projectNodeToRadius(nodes[index], infos[index].targetRadius);
         nodes[index].depth = clamp(length(vectorOf(nodes[index])) / CAP_SCENE_RADIUS, 0, 1);
-        nodes[index].baseX = nodes[index].x;
-        nodes[index].baseY = nodes[index].y;
-        nodes[index].baseZ = nodes[index].z;
     }
     tuneCapLinks(nodes, links, infos);
+    enforceHierarchyShellContract(nodes);
+    for (const node of nodes) {
+        node.depth = clamp(length(vectorOf(node)) / CAP_SCENE_RADIUS, 0, 1);
+        node.baseX = node.x;
+        node.baseY = node.y;
+        node.baseZ = node.z;
+    }
 
     return [
         ...buildCapBoundaryGuides(caps),
@@ -165,9 +171,10 @@ function buildCaps(nodes: GalaxyNode[], infos: HierarchyInfo[]): CapInfo[] {
             byId.set(info.capId, cap);
         }
         const lane = laneDirection(info.lane);
-        cap.center.x += info.direction.x * 0.74 + lane.x * 0.26;
-        cap.center.y += info.direction.y * 0.74 + lane.y * 0.26;
-        cap.center.z += info.direction.z * 0.74 + lane.z * 0.26;
+        const concentration = clamp(0.86 + info.confidence * 0.28 + info.specificity * 0.18 - info.ambiguity * 0.14, 0.62, 1.28);
+        cap.center.x += (info.direction.x * 0.82 + lane.x * 0.18) * concentration;
+        cap.center.y += (info.direction.y * 0.82 + lane.y * 0.18) * concentration;
+        cap.center.z += (info.direction.z * 0.82 + lane.z * 0.18) * concentration;
         cap.indexes.push(index);
         cap.radiusSum += info.targetRadius;
         cap.ambiguitySum += info.ambiguity;
@@ -331,9 +338,11 @@ function buildMembershipGuides(nodes: GalaxyNode[], links: GalaxyEdge[], infos: 
 function buildLevelShellGuides(): GalaxyLorentzGuide[] {
     const shells = [
         { level: 0, radius: 2.08, kind: 'documentStructure', weight: 0.52 },
-        { level: 1, radius: 1.72, kind: 'semantic', weight: 0.44 },
-        { level: 2, radius: 1.42, kind: 'identity', weight: 0.38 },
-        { level: 3, radius: 1.04, kind: 'evidence', weight: 0.32 },
+        { level: 1, radius: 1.92, kind: 'semantic', weight: 0.46 },
+        { level: 2, radius: 1.66, kind: 'document', weight: 0.42 },
+        { level: 3, radius: 1.42, kind: 'identity', weight: 0.38 },
+        { level: 4, radius: 1.18, kind: 'relationship', weight: 0.34 },
+        { level: 5, radius: 0.92, kind: 'evidence', weight: 0.3 },
     ];
     return shells.map((shell) => ({
         id: `caps:shell:${shell.level}`,
@@ -419,7 +428,7 @@ function hierarchyRadius(
 ): number {
     const lorentz = record(node.entity.metadata?.['lorentz']);
     const explicitRadius = Number(lorentz['shellRadius']);
-    if (Number.isFinite(explicitRadius)) return clamp(explicitRadius, 0.38, CAP_SCENE_RADIUS * 0.985);
+    if (Number.isFinite(explicitRadius)) return contractShellRadiusForNode(node, clamp(explicitRadius, 0.38, CAP_SCENE_RADIUS * 0.985));
     const sourceType = String(node.entity.metadata?.sourceType || node.entity.kind || '').toLowerCase();
     const kind = String(node.entity.kind || '').toLowerCase();
     let radius = hierarchyShellRadius(sourceType, kind, lane);
@@ -434,7 +443,7 @@ function hierarchyRadius(
         radius = clamp(radius, 1.28, 1.58);
     }
     if (lane === 'temporal') radius = clamp(radius, 1.08, 1.72);
-    return clamp(radius, 0.38, CAP_SCENE_RADIUS * 0.985);
+    return contractShellRadiusForNode(node, clamp(radius, 0.38, CAP_SCENE_RADIUS * 0.985));
 }
 
 function hierarchyShellRadius(sourceType: string, kind: string, lane: string): number {

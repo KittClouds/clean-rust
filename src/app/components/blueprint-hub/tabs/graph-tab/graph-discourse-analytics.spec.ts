@@ -14,6 +14,11 @@ describe('buildGraphDiscourseAnalyticsView', () => {
         expect(view?.panels.gaps.summary).toContain('ambiguous');
         expect(view?.panels.relations.chips.some((chip) => chip.label === 'Trusts')).toBe(true);
         expect(view?.underlyingIdeas.some((idea) => idea.id === 'memory-bridge')).toBe(true);
+        expect(view?.spineOverlay.safety.find((item) => item.id === 'patches')?.value).toBe('0');
+        expect(view?.spineOverlay.sections.find((section) => section.id === 'wormholes')?.rows[0]).toMatchObject({
+            routeLabel: 'Chunk 1 -> Chunk 2',
+            scoreLabel: '91%',
+        });
         expect(view?.questions[0].prompt).toContain('resolve');
     });
 
@@ -116,6 +121,11 @@ function snapshot(): GraphRebuildSnapshot {
                 evidenceIds: ['a1'],
             },
         ],
+        embeddingTargets: [
+            { id: 'embed:chunk:chunk-1', kind: 'chunk', sourceId: 'chunk-1', label: 'Chunk 1', text: 'Kai trusts Hazel.', evidenceIds: [] },
+            { id: 'embed:chunk:chunk-2', kind: 'chunk', sourceId: 'chunk-2', label: 'Chunk 2', text: 'Hazel answers Kai.', evidenceIds: [] },
+            { id: 'embed:note:note-1', kind: 'note', sourceId: 'note-1', label: 'Red Mesa', text: 'chapter text', evidenceIds: [] },
+        ],
         edges: [{ id: 'e1', sourceId: 'kai', targetId: 'hazel', type: 'trusts', weight: 1, confidence: 0.9, evidenceAnchorIds: ['a1'], scopeKeys: [], noteIds: [] }],
         causalEdges: [{
             id: 'c1',
@@ -158,6 +168,64 @@ function snapshot(): GraphRebuildSnapshot {
                 evalRowCount: 3,
                 receiptCount: 2,
             },
+        },
+        discoursePromotionSurfaceSummary: {
+            counters: {
+                chunkWormholeCount: 1,
+                documentClusterCount: 1,
+                resolverCandidateCount: 0,
+                compilerHintCount: 2,
+            },
+        },
+        discourseCompilerOverlaySummary: {
+            counters: {
+                overlayEdgeCount: 2,
+                chunkWormholeEdges: 1,
+                documentClusterEdges: 1,
+                resolverEdges: 0,
+                graphPatchCount: 0,
+                mutationAllowedCount: 0,
+                receiptCount: 2,
+            },
+            overlayEdges: [
+                {
+                    id: 'overlay-1',
+                    kind: 'chunk_wormhole',
+                    sourceHintId: 'hint-1',
+                    sourceLedgerEntryId: 'ledger-1',
+                    candidateId: 'candidate-1',
+                    decisionId: 'decision-1',
+                    sourceTargetId: 'embed:chunk:chunk-1',
+                    targetTargetId: 'embed:chunk:chunk-2',
+                    memberTargetIds: [],
+                    evidenceTargetIds: ['a1'],
+                    proposedEdgeType: 'chunk-resonates-with',
+                    confidence: 0.91,
+                    projectionKind: 'discourse_overlay',
+                    status: 'overlay_only',
+                    graphPatch: false,
+                    mutationAllowed: false,
+                    rationale: [],
+                },
+                {
+                    id: 'overlay-2',
+                    kind: 'document_cluster',
+                    sourceHintId: 'hint-2',
+                    sourceLedgerEntryId: 'ledger-2',
+                    candidateId: 'candidate-2',
+                    decisionId: 'decision-2',
+                    sourceTargetId: 'embed:note:note-1',
+                    memberTargetIds: ['embed:note:note-1', 'embed:chunk:chunk-1'],
+                    evidenceTargetIds: [],
+                    proposedEdgeType: 'document-cluster-member',
+                    confidence: 0.82,
+                    projectionKind: 'discourse_overlay',
+                    status: 'overlay_only',
+                    graphPatch: false,
+                    mutationAllowed: false,
+                    rationale: [],
+                },
+            ],
         },
         embeddingGraphPostProcess: {
             metrics: { outlierCount: 1 },
