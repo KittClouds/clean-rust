@@ -5591,6 +5591,7 @@ impl PhoenixRuntime {
         &self,
         records: &[PersistenceWalRecord],
     ) -> Result<(), StoreError> {
+        let mut lex_dirty = false;
         for record in records {
             if record.seq == 0 {
                 return Err(StoreError::Query("invalid WAL seq: 0".to_owned()));
@@ -5607,16 +5608,19 @@ impl PhoenixRuntime {
                 "note:upsert" => {
                     let row = require_payload_value(&record.payload, "row")?;
                     self.upsert_note_row(row)?;
+                    lex_dirty = true;
                 }
                 "note:delete" => {
                     let id = require_payload_str(&record.payload, "id")?;
                     self.delete_note_rows(id)?;
+                    lex_dirty = true;
                 }
                 "relation:upsert" => {
                     let relation = require_payload_str(&record.payload, "relation")?;
                     ensure_allowed_content_relation(relation)?;
                     let row = require_payload_value(&record.payload, "row")?;
                     self.put_relation_row(relation, row.clone())?;
+                    lex_dirty |= relation_touches_lex_index(relation);
                 }
                 "relation:delete" => {
                     let relation = require_payload_str(&record.payload, "relation")?;
@@ -5628,6 +5632,7 @@ impl PhoenixRuntime {
                         .filter(|row| row_matches_filter(row, filter))
                         .collect::<Vec<_>>();
                     let _ = self.delete_relation_rows(relation, &matched)?;
+                    lex_dirty |= relation_touches_lex_index(relation);
                 }
                 "entityCards:upsertBatch" => {
                     let cards: Vec<EntityCard> = serde_json::from_value(
@@ -5666,7 +5671,9 @@ impl PhoenixRuntime {
             }
         }
 
-        self.rebuild_lex_index()?;
+        if lex_dirty {
+            self.rebuild_lex_index()?;
+        }
         Ok(())
     }
 
@@ -12416,6 +12423,10 @@ fn ensure_allowed_content_relation(relation: &str) -> Result<(), StoreError> {
     )))
 }
 
+fn relation_touches_lex_index(relation: &str) -> bool {
+    relation == "notes"
+}
+
 fn row_matches_filter(row: &Value, filter: Option<&serde_json::Map<String, Value>>) -> bool {
     let Some(filter) = filter else {
         return true;
@@ -14977,6 +14988,50 @@ mod tests {
             Some("Alpha".to_owned())
         );
         assert!(entity.is_some());
+        assert!(runtime.lex.borrow().is_some());
+    }
+
+    #[test]
+    fn scoped_document_wal_replay_does_not_rebuild_lex_index() {
+        let runtime = native_test_runtime();
+        runtime.init().expect("init");
+        assert!(runtime.lex.borrow().is_none());
+
+        let result = runtime
+            .store_command(StoreCommandRequest {
+                command: "persistence:applyWalBatch".to_owned(),
+                payload: json!({
+                    "records": [
+                        {
+                            "seq": 1,
+                            "command": "relation:upsert",
+                            "partition": "content",
+                            "writtenAt": 100,
+                            "payload": {
+                                "relation": "scoped_documents",
+                                "row": {
+                                    "id": "phoenix.graph.rebuild:scope:latest",
+                                    "scope_folder_id": "scope",
+                                    "narrative_id": "",
+                                    "namespace": "phoenix.graph.rebuild",
+                                    "document_key": "latest",
+                                    "payload": "{\"ok\":true}",
+                                    "created_at": 100,
+                                    "updated_at": 100
+                                }
+                            }
+                        }
+                    ]
+                }),
+            })
+            .expect("scoped document wal batch");
+
+        assert!(result.success);
+        assert!(runtime.lex.borrow().is_none());
+        let rows = runtime
+            .fetch_relation_rows("scoped_documents")
+            .expect("scoped documents");
+        assert_eq!(rows.len(), 1);
     }
 
     #[test]
