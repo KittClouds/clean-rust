@@ -700,7 +700,15 @@ describe('GraphRebuildPipelineService', () => {
             expect.objectContaining({ id: 'snapshotDbOps', label: 'DB Ops' }),
             expect.objectContaining({ id: 'snapshotCpu', label: 'Snapshot CPU' }),
             expect.objectContaining({ id: 'uiCommit', label: 'UI Commit' }),
-            expect.objectContaining({ id: 'receiptDbOps', label: 'Receipt DB Ops' }),
+            expect.objectContaining({
+                id: 'receiptDbOps',
+                label: 'Receipt DB Ops',
+                counters: expect.objectContaining({
+                    receiptStoreRecords: 1,
+                    receiptStorePayloadChars: 4096,
+                    receiptStoreNativeApplyMs: 4,
+                }),
+            }),
         ]));
         expect(result.receipt.projectionReceipts).toEqual(expect.arrayContaining([
             expect.objectContaining({
@@ -1285,7 +1293,22 @@ function createGraphRebuildMock() {
         loadPersistedSnapshot: vi.fn(async () => null),
         loadPersistedRunReceipt: vi.fn(async () => null),
         loadPostProcessCache: vi.fn(async () => null),
-        persistRunReceipt: vi.fn(async () => undefined),
+        persistRunReceipt: vi.fn(async () => ({
+            records: 1,
+            noteMutations: 0,
+            relationUpserts: 1,
+            relationDeletes: 0,
+            scopedDocumentUpserts: 1,
+            payloadChars: 4096,
+            serializedWaitMs: 2,
+            appendWalMs: 3,
+            manifestCommitMs: 1,
+            runtimeApplyMs: 4,
+            runtimeReloadMs: 0,
+            totalMs: 10,
+            checkpointScheduled: 1,
+            runtimeReloaded: 0,
+        })),
         persistPostProcessCache: vi.fn(async () => undefined),
         restorePersistedSnapshot: vi.fn(async () => undefined),
     };

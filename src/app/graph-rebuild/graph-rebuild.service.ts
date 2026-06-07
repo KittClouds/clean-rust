@@ -11,7 +11,11 @@ import { parseContentToPlainText } from '../lib/analytics';
 import * as ops from '../lib/operations';
 import type { RegisteredEntity } from '../lib/registry';
 import { PhoenixBackendService } from '../services/phoenix-backend.service';
-import { PhoenixStoreService, type StoreScopedDocument } from '../services/phoenix-store.service';
+import {
+    PhoenixStoreService,
+    type PhoenixContentMutationTiming,
+    type StoreScopedDocument,
+} from '../services/phoenix-store.service';
 import { attachGraphCompilerReadModels } from './graph-compiler-read-model';
 import { buildGraphRebuildSnapshot } from './graph-rebuild-builder';
 import { buildAdaptiveGraphRebuildChunks } from './graph-rebuild-meaning-frames';
@@ -165,13 +169,14 @@ export class GraphRebuildService {
         return document ? scopedDocumentToGraphModelV2OverGraphExport(document) : null;
     }
 
-    async persistRunReceipt(receipt: GraphIndexRunReceipt): Promise<void> {
-        await this.store.upsertScopedDocument(graphIndexReceiptToScopedDocument(receipt));
+    async persistRunReceipt(receipt: GraphIndexRunReceipt): Promise<PhoenixContentMutationTiming> {
+        const timing = await this.store.upsertScopedDocument(graphIndexReceiptToScopedDocument(receipt));
         dispatchGraphRebuildEvent('graph-index-run-completed', {
             scopeId: receipt.scope.scopeId,
             receiptId: receipt.id,
             snapshotId: receipt.snapshotId,
         });
+        return timing;
     }
 
     async loadPersistedRunReceipt(scopeId: string): Promise<GraphIndexRunReceipt | null> {

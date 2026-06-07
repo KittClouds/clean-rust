@@ -8,6 +8,7 @@ import type { AtlasBuildScope, AtlasRunOptions } from '../services/atlas-capabil
 import { AtlasCapabilityRuntimeService } from '../services/atlas-capability-runtime.service';
 import { NerService } from '../services/ner.service';
 import { phoenixTransportAudit, type PhoenixTransportAuditSnapshot } from '../services/phoenix-transport-audit';
+import type { PhoenixContentMutationTiming } from '../services/phoenix-store.service';
 import { buildGraphRebuildDeltaPostProcessPlan, deltaPostProcessPlanCounters, type GraphRebuildDeltaPostProcessPlan } from './graph-rebuild-delta-postprocess-plan';
 import { buildGraphRebuildEdgeJudgmentPlan, edgeJudgmentPlanCounters } from './graph-rebuild-edge-type-judgment-plan';
 import { embeddingProfileFromModelSelection } from './graph-rebuild-embedding-signatures';
@@ -726,7 +727,7 @@ export class GraphRebuildPipelineService {
         const started = performance.now();
         const receiptPayloadChars = jsonPayloadChars(receipt);
         const transportStarted = phoenixTransportAudit.snapshot();
-        await this.graphRebuild.persistRunReceipt(receipt);
+        const storeTiming = await this.graphRebuild.persistRunReceipt(receipt);
         const transportCounters = prefixedCounters(
             transportDeltaCounters(transportStarted, phoenixTransportAudit.snapshot()),
             'receipt',
@@ -744,6 +745,7 @@ export class GraphRebuildPipelineService {
             counters: {
                 receiptPersistMs: durationMs,
                 receiptPayloadChars,
+                ...contentMutationTimingCounters(storeTiming, 'receiptStore'),
                 ...transportCounters,
             },
             message: 'Run receipt persisted to scoped documents',
@@ -1028,6 +1030,26 @@ function appendTransportTimingStage(
 }
 
 type TransportAggregate = PhoenixTransportAuditSnapshot['calls'][number];
+
+function contentMutationTimingCounters(
+    timing: PhoenixContentMutationTiming | undefined,
+    prefix: string,
+): Record<string, number> {
+    if (!timing) return {};
+    return {
+        [`${prefix}Records`]: timing.records,
+        [`${prefix}PayloadChars`]: timing.payloadChars,
+        [`${prefix}ScopedDocuments`]: timing.scopedDocumentUpserts,
+        [`${prefix}QueueWaitMs`]: timing.serializedWaitMs,
+        [`${prefix}AppendWalMs`]: timing.appendWalMs,
+        [`${prefix}ManifestMs`]: timing.manifestCommitMs,
+        [`${prefix}NativeApplyMs`]: timing.runtimeApplyMs,
+        [`${prefix}ReloadMs`]: timing.runtimeReloadMs,
+        [`${prefix}TotalMs`]: timing.totalMs,
+        [`${prefix}CheckpointScheduled`]: timing.checkpointScheduled,
+        [`${prefix}RuntimeReloaded`]: timing.runtimeReloaded,
+    };
+}
 
 function transportDeltaCounters(
     before: PhoenixTransportAuditSnapshot,
