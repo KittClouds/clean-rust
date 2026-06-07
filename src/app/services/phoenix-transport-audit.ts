@@ -8,6 +8,7 @@ export interface PhoenixTransportCallSample {
     requestBytes: number;
     responseBytes: number;
     ok: boolean;
+    counters?: Record<string, number>;
 }
 
 export interface PhoenixTransportAggregate {
@@ -20,6 +21,7 @@ export interface PhoenixTransportAggregate {
     maxMs: number;
     totalRequestBytes: number;
     totalResponseBytes: number;
+    counters: Record<string, number>;
 }
 
 export interface PhoenixTransportAuditSnapshot {
@@ -142,6 +144,20 @@ class PhoenixTransportAudit {
         }
     }
 
+    recordPayloadCounters(name: string, kind: PhoenixTransportKind, counters: Record<string, number>): void {
+        if (!Object.keys(counters).length) return;
+        this.record({
+            name,
+            kind,
+            startedAt: Date.now(),
+            durationMs: 0,
+            requestBytes: 0,
+            responseBytes: 0,
+            ok: true,
+            counters,
+        });
+    }
+
     snapshot(): PhoenixTransportAuditSnapshot {
         const calls = Array.from(this.aggregateByKey.values())
             .map((aggregate) => ({
@@ -187,6 +203,7 @@ class PhoenixTransportAudit {
             current.maxMs = Math.max(current.maxMs, sample.durationMs);
             current.totalRequestBytes += sample.requestBytes;
             current.totalResponseBytes += sample.responseBytes;
+            mergeCounters(current.counters, sample.counters);
             return;
         }
         this.aggregateByKey.set(key, {
@@ -199,6 +216,7 @@ class PhoenixTransportAudit {
             maxMs: sample.durationMs,
             totalRequestBytes: sample.requestBytes,
             totalResponseBytes: sample.responseBytes,
+            counters: { ...(sample.counters || {}) },
         });
     }
 
@@ -208,6 +226,15 @@ class PhoenixTransportAudit {
         }
         window.kittPhoenixTransportAudit = () => this.snapshot();
         window.kittResetPhoenixTransportAudit = () => this.reset();
+    }
+}
+
+function mergeCounters(target: Record<string, number>, source: Record<string, number> | undefined): void {
+    if (!source) return;
+    for (const [key, value] of Object.entries(source)) {
+        if (typeof value === 'number' && Number.isFinite(value)) {
+            target[key] = (target[key] || 0) + value;
+        }
     }
 }
 

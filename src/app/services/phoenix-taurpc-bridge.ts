@@ -225,6 +225,11 @@ class PhoenixTaurpcBridge implements PhoenixNativeBridge {
         if (!result?.success) {
             throw new Error(result?.error || `Phoenix store command failed: ${command}`);
         }
+        phoenixTransportAudit.recordPayloadCounters(
+            `phoenix.store_command:${command}`,
+            'taurpc-json',
+            flattenNumericCounters(result.payload, 'payload'),
+        );
         return result.payload ?? null;
     }
 
@@ -528,6 +533,21 @@ class PhoenixTaurpcBridge implements PhoenixNativeBridge {
 
 function parseJson<T = any>(value: string): T {
     return value.trim() ? JSON.parse(value) as T : null as T;
+}
+
+function flattenNumericCounters(value: unknown, prefix: string, out: Record<string, number> = {}): Record<string, number> {
+    if (!value || typeof value !== 'object') return out;
+    for (const [key, raw] of Object.entries(value as Record<string, unknown>)) {
+        const name = `${prefix}.${key}`;
+        if (typeof raw === 'number' && Number.isFinite(raw)) {
+            out[name] = raw;
+        } else if (typeof raw === 'boolean') {
+            out[name] = raw ? 1 : 0;
+        } else if (raw && typeof raw === 'object' && !Array.isArray(raw)) {
+            flattenNumericCounters(raw, name, out);
+        }
+    }
+    return out;
 }
 
 function isMissingTaurpcProcedure(error: unknown, procedure: string): boolean {

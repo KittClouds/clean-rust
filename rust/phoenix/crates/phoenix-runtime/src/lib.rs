@@ -198,6 +198,23 @@ struct PersistenceWalRecord {
     written_at: Option<u64>,
 }
 
+#[derive(Clone, Debug, Default, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct PersistenceWalApplyReport {
+    records: usize,
+    note_upserts: usize,
+    note_deletes: usize,
+    relation_upserts: usize,
+    relation_deletes: usize,
+    scoped_document_upserts: usize,
+    lex_rebuilt: bool,
+    parse_ms: u64,
+    note_ms: u64,
+    relation_ms: u64,
+    lex_ms: u64,
+    total_ms: u64,
+}
+
 #[derive(Clone, Debug)]
 struct NativeScopeLexCacheEntry {
     generation: u64,
@@ -5590,7 +5607,12 @@ impl PhoenixRuntime {
     fn apply_persistence_wal_batch(
         &self,
         records: &[PersistenceWalRecord],
-    ) -> Result<(), StoreError> {
+    ) -> Result<PersistenceWalApplyReport, StoreError> {
+        let total_started = Instant::now();
+        let mut report = PersistenceWalApplyReport {
+            records: records.len(),
+            ..PersistenceWalApplyReport::default()
+        };
         let mut lex_dirty = false;
         for record in records {
             if record.seq == 0 {
@@ -5606,23 +5628,36 @@ impl PhoenixRuntime {
 
             match record.command.as_str() {
                 "note:upsert" => {
+                    let started = Instant::now();
                     let row = require_payload_value(&record.payload, "row")?;
                     self.upsert_note_row(row)?;
+                    report.note_upserts += 1;
+                    report.note_ms += elapsed_millis(started);
                     lex_dirty = true;
                 }
                 "note:delete" => {
+                    let started = Instant::now();
                     let id = require_payload_str(&record.payload, "id")?;
                     self.delete_note_rows(id)?;
+                    report.note_deletes += 1;
+                    report.note_ms += elapsed_millis(started);
                     lex_dirty = true;
                 }
                 "relation:upsert" => {
+                    let started = Instant::now();
                     let relation = require_payload_str(&record.payload, "relation")?;
                     ensure_allowed_content_relation(relation)?;
                     let row = require_payload_value(&record.payload, "row")?;
                     self.put_relation_row(relation, row.clone())?;
+                    report.relation_upserts += 1;
+                    if relation == "scoped_documents" {
+                        report.scoped_document_upserts += 1;
+                    }
+                    report.relation_ms += elapsed_millis(started);
                     lex_dirty |= relation_touches_lex_index(relation);
                 }
                 "relation:delete" => {
+                    let started = Instant::now();
                     let relation = require_payload_str(&record.payload, "relation")?;
                     ensure_allowed_content_relation(relation)?;
                     let filter = payload_object(record.payload.get("filter"));
@@ -5632,6 +5667,8 @@ impl PhoenixRuntime {
                         .filter(|row| row_matches_filter(row, filter))
                         .collect::<Vec<_>>();
                     let _ = self.delete_relation_rows(relation, &matched)?;
+                    report.relation_deletes += 1;
+                    report.relation_ms += elapsed_millis(started);
                     lex_dirty |= relation_touches_lex_index(relation);
                 }
                 "entityCards:upsertBatch" => {
@@ -5672,9 +5709,13 @@ impl PhoenixRuntime {
         }
 
         if lex_dirty {
+            let started = Instant::now();
             self.rebuild_lex_index()?;
+            report.lex_rebuilt = true;
+            report.lex_ms = elapsed_millis(started);
         }
-        Ok(())
+        report.total_ms = elapsed_millis(total_started);
+        Ok(report)
     }
 
     pub fn boot_snapshot_rows(&self) -> Result<PhoenixBootSnapshotRows, StoreError> {
@@ -5959,12 +6000,18 @@ impl PhoenixRuntime {
                 })
             }
             "persistence:applyWalBatch" => {
+                let parse_started = Instant::now();
                 let batch: PersistenceWalBatchRequest = serde_json::from_value(request.payload)
                     .map_err(|error| StoreError::Query(error.to_string()))?;
-                self.apply_persistence_wal_batch(&batch.records)?;
+                let parse_ms = elapsed_millis(parse_started);
+                let mut report = self.apply_persistence_wal_batch(&batch.records)?;
+                report.parse_ms = parse_ms;
                 Ok(StoreCommandResult {
                     success: true,
-                    payload: Some(serde_json::json!({ "replayed": batch.records.len() })),
+                    payload: Some(serde_json::json!({
+                        "replayed": batch.records.len(),
+                        "timings": report,
+                    })),
                     error: None,
                 })
             }
@@ -12425,6 +12472,10 @@ fn ensure_allowed_content_relation(relation: &str) -> Result<(), StoreError> {
 
 fn relation_touches_lex_index(relation: &str) -> bool {
     relation == "notes"
+}
+
+fn elapsed_millis(started: Instant) -> u64 {
+    started.elapsed().as_millis().min(u128::from(u64::MAX)) as u64
 }
 
 fn row_matches_filter(row: &Value, filter: Option<&serde_json::Map<String, Value>>) -> bool {

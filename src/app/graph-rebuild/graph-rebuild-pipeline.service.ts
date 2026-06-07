@@ -725,7 +725,12 @@ export class GraphRebuildPipelineService {
         const startedAt = Date.now();
         const started = performance.now();
         const receiptPayloadChars = jsonPayloadChars(receipt);
+        const transportStarted = phoenixTransportAudit.snapshot();
         await this.graphRebuild.persistRunReceipt(receipt);
+        const transportCounters = prefixedCounters(
+            transportDeltaCounters(transportStarted, phoenixTransportAudit.snapshot()),
+            'receipt',
+        );
         const durationMs = elapsedTimingMs(started);
         const completedAt = Date.now();
         receipt.stageReceipts.push({
@@ -739,6 +744,7 @@ export class GraphRebuildPipelineService {
             counters: {
                 receiptPersistMs: durationMs,
                 receiptPayloadChars,
+                ...transportCounters,
             },
             message: 'Run receipt persisted to scoped documents',
         });
@@ -1044,6 +1050,12 @@ function transportDeltaCounters(
         compileDualWriteRequestBytes: 0,
         compileGalaxySceneCalls: 0,
         compileGalaxySceneRequestBytes: 0,
+        applyWalBatchNativeParseMs: 0,
+        applyWalBatchNativeApplyMs: 0,
+        applyWalBatchNativeRelationMs: 0,
+        applyWalBatchNativeLexMs: 0,
+        applyWalBatchNativeLexRebuilt: 0,
+        applyWalBatchNativeScopedDocumentUpserts: 0,
     };
     for (const call of after.calls) {
         const previous = beforeByKey.get(transportAggregateKey(call));
@@ -1068,6 +1080,13 @@ function transportDeltaCounters(
         if (call.name === 'phoenix.store_command:persistence:applyWalBatch') {
             counters['applyWalBatchCalls'] += count;
             counters['applyWalBatchRequestBytes'] += requestBytes;
+            const payloadCounters = transportPayloadCounterDelta(call, previous);
+            counters['applyWalBatchNativeParseMs'] += payloadCounters['payload.timings.parseMs'] || 0;
+            counters['applyWalBatchNativeApplyMs'] += payloadCounters['payload.timings.totalMs'] || 0;
+            counters['applyWalBatchNativeRelationMs'] += payloadCounters['payload.timings.relationMs'] || 0;
+            counters['applyWalBatchNativeLexMs'] += payloadCounters['payload.timings.lexMs'] || 0;
+            counters['applyWalBatchNativeLexRebuilt'] += payloadCounters['payload.timings.lexRebuilt'] || 0;
+            counters['applyWalBatchNativeScopedDocumentUpserts'] += payloadCounters['payload.timings.scopedDocumentUpserts'] || 0;
         }
         if (call.name === 'phoenix.store_command:graphRebuild:compileDualWrite') {
             counters['compileDualWriteCalls'] += count;
@@ -1086,6 +1105,27 @@ function transportDeltaCounters(
 
 function transportAggregateKey(call: TransportAggregate): string {
     return `${call.kind}:${call.name}`;
+}
+
+function transportPayloadCounterDelta(
+    call: TransportAggregate,
+    previous: TransportAggregate | undefined,
+): Record<string, number> {
+    const out: Record<string, number> = {};
+    const current = call.counters || {};
+    const before = previous?.counters || {};
+    for (const [key, value] of Object.entries(current)) {
+        out[key] = Math.max(0, value - (before[key] || 0));
+    }
+    return out;
+}
+
+function prefixedCounters(counters: Record<string, number>, prefix: string): Record<string, number> {
+    const out: Record<string, number> = {};
+    for (const [key, value] of Object.entries(counters)) {
+        out[`${prefix}${key.slice(0, 1).toUpperCase()}${key.slice(1)}`] = value;
+    }
+    return out;
 }
 
 function appendSignalCoverageStages(
