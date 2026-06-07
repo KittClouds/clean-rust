@@ -304,6 +304,7 @@ export class PhoenixStoreService {
     private contentCheckpointTimeout: ReturnType<typeof setTimeout> | null = null;
     private derivedCheckpointTimeout: ReturnType<typeof setTimeout> | null = null;
     private snapshotsPaused = false;
+    private snapshotPauseDepth = 0;
     private manifest: PersistenceManifest | null = null;
     private manifestMeta: LoadedPhoenixManifestState | null = null;
     private derivedDirty = false;
@@ -355,11 +356,18 @@ export class PhoenixStoreService {
     }
 
     pauseSnapshots(): void {
+        this.snapshotPauseDepth += 1;
         this.snapshotsPaused = true;
         this.clearCheckpointTimers();
     }
 
     resumeSnapshots(): void {
+        if (this.snapshotPauseDepth > 0) {
+            this.snapshotPauseDepth -= 1;
+        }
+        if (this.snapshotPauseDepth > 0 || !this.snapshotsPaused) {
+            return;
+        }
         this.snapshotsPaused = false;
         if (this.initialized) {
             this.scheduleContentCheckpoint();
@@ -1186,14 +1194,14 @@ export class PhoenixStoreService {
         }
     }
 
-    private scheduleContentCheckpoint(delayMs = PHOENIX_WAL_IDLE_CHECKPOINT_MS): void {
+    private scheduleContentCheckpoint(delayMs = PHOENIX_WAL_IDLE_CHECKPOINT_MS): boolean {
         const manifest = this.manifest;
         if (!manifest || this.snapshotsPaused) {
-            return;
+            return false;
         }
         const lastSeq = manifest.content.nextSeq - 1;
         if (lastSeq <= manifest.content.lastCheckpointSeq && !shouldCheckpointContent(manifest)) {
-            return;
+            return false;
         }
         if (shouldCheckpointContent(manifest)) {
             delayMs = 0;
@@ -1210,6 +1218,7 @@ export class PhoenixStoreService {
                 }
             });
         }, delayMs);
+        return true;
     }
 
     private scheduleDerivedCheckpoint(delayMs = PHOENIX_DERIVED_CHECKPOINT_MS): void {
@@ -1346,8 +1355,7 @@ export class PhoenixStoreService {
                 await this.reloadRuntimeFromPersistence();
                 timing.runtimeReloadMs = elapsedPhoenixStoreMs(stepStarted);
                 timing.runtimeReloaded = 1;
-                this.scheduleContentCheckpoint();
-                timing.checkpointScheduled = 1;
+                timing.checkpointScheduled = this.scheduleContentCheckpoint() ? 1 : 0;
                 timing.totalMs = elapsedPhoenixStoreMs(totalStarted);
                 return timing;
             }
@@ -1363,8 +1371,7 @@ export class PhoenixStoreService {
                 lastRecoveredSeq: batch.records[batch.records.length - 1]?.seq || this.recoveryState.lastRecoveredSeq,
                 manifestGeneration: nextManifest.generation,
             };
-            this.scheduleContentCheckpoint();
-            timing.checkpointScheduled = 1;
+            timing.checkpointScheduled = this.scheduleContentCheckpoint() ? 1 : 0;
             timing.totalMs = elapsedPhoenixStoreMs(totalStarted);
             return timing;
         });

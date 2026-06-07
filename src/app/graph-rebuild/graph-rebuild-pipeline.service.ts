@@ -8,7 +8,7 @@ import type { AtlasBuildScope, AtlasRunOptions } from '../services/atlas-capabil
 import { AtlasCapabilityRuntimeService } from '../services/atlas-capability-runtime.service';
 import { NerService } from '../services/ner.service';
 import { phoenixTransportAudit, type PhoenixTransportAuditSnapshot } from '../services/phoenix-transport-audit';
-import type { PhoenixContentMutationTiming } from '../services/phoenix-store.service';
+import { PhoenixStoreService, type PhoenixContentMutationTiming } from '../services/phoenix-store.service';
 import { buildGraphRebuildDeltaPostProcessPlan, deltaPostProcessPlanCounters, type GraphRebuildDeltaPostProcessPlan } from './graph-rebuild-delta-postprocess-plan';
 import { buildGraphRebuildEdgeJudgmentPlan, edgeJudgmentPlanCounters } from './graph-rebuild-edge-type-judgment-plan';
 import { embeddingProfileFromModelSelection } from './graph-rebuild-embedding-signatures';
@@ -78,6 +78,7 @@ export class GraphRebuildPipelineService {
     private readonly graphRebuild = inject(GraphRebuildService);
     private readonly atlasRuntime = inject(AtlasCapabilityRuntimeService);
     private readonly ner = inject(NerService);
+    private readonly store = inject(PhoenixStoreService);
     private readonly runningState = signal(false);
     private readonly entityLinkerWarmState = signal(false);
     private readonly lastReceiptState = signal<GraphIndexRunReceipt | null>(null);
@@ -137,6 +138,7 @@ export class GraphRebuildPipelineService {
         const transportStarted = phoenixTransportAudit.snapshot();
         const stageReceipts: GraphIndexStageReceipt[] = [];
         const snapshotRef: { value?: GraphRebuildSnapshot } = {};
+        let resumeContentCheckpoints: (() => void) | null = null;
         try {
             const docs = await this.loadScopedDocuments(request.scope.noteIds);
             const scope = expandScopeNoteIds(request.scope, docs);
@@ -155,6 +157,7 @@ export class GraphRebuildPipelineService {
                 ? smartGraphRegistry.getAllEntities()
                 : request.entities;
             const fingerprint = postProcessFingerprint(scope, docs, entities, request.modelSelection, request.embeddingStagePolicy);
+            resumeContentCheckpoints = this.deferContentCheckpoints();
             const graphStage = await this.runStage('coreGraphSnapshot', 'Clean Graph Snapshot', async () => {
                 const snapshot = await this.graphRebuild.buildAndPersistSnapshot({
                     scopeKind: scope.kind,
@@ -234,6 +237,7 @@ export class GraphRebuildPipelineService {
             });
             await this.publishRunReceipt(receipt, completedSnapshot);
             await this.persistRunReceiptWithTiming(receipt);
+            resumeContentCheckpoints?.();
             return { receipt, snapshot: completedSnapshot };
         } catch (error) {
             const completedAt = Date.now();
@@ -257,6 +261,7 @@ export class GraphRebuildPipelineService {
             this.lastReceiptState.set(failedReceipt);
             throw error;
         } finally {
+            resumeContentCheckpoints?.();
             this.runningState.set(false);
         }
     }
@@ -278,6 +283,7 @@ export class GraphRebuildPipelineService {
         const projectionReceipts: GraphIndexProjectionReceipt[] = [];
         let snapshot: GraphRebuildSnapshot | null = null;
         let relationshipHints: GraphRebuildRelationshipHint[] = [];
+        let resumeContentCheckpoints: (() => void) | null = null;
 
         try {
             const docs = await this.loadScopedDocuments(request.scope.noteIds);
@@ -313,6 +319,7 @@ export class GraphRebuildPipelineService {
                 }
             }
 
+            resumeContentCheckpoints = this.deferContentCheckpoints();
             const graphStage = await this.runStage('graphSnapshot', 'Graph Rebuild Snapshot', async () => {
                 snapshot = await this.graphRebuild.buildAndPersistSnapshot({
                     scopeKind: scope.kind,
@@ -402,6 +409,7 @@ export class GraphRebuildPipelineService {
             };
             await this.publishRunReceipt(receipt, completedSnapshot);
             await this.persistRunReceiptWithTiming(receipt);
+            resumeContentCheckpoints();
             return { receipt, snapshot: completedSnapshot! };
         } catch (error) {
             const completedAt = Date.now();
@@ -430,6 +438,7 @@ export class GraphRebuildPipelineService {
             this.lastReceiptState.set(failedReceipt);
             throw error;
         } finally {
+            resumeContentCheckpoints?.();
             this.runningState.set(false);
         }
     }
@@ -451,6 +460,7 @@ export class GraphRebuildPipelineService {
         const projectionReceipts: GraphIndexProjectionReceipt[] = [];
         const snapshotRef: { value?: GraphRebuildSnapshot } = {};
         let postProcessFingerprintValue: string | undefined;
+        let resumeContentCheckpoints: (() => void) | null = null;
         try {
             const docs = await this.loadScopedDocuments(request.scope.noteIds);
             const scope = expandScopeNoteIds(request.scope, docs);
@@ -503,9 +513,11 @@ export class GraphRebuildPipelineService {
                     snapshot: cachedSnapshot,
                     message: 'Postprocess reused the graph snapshot and refreshed projections for this scope.',
                 });
+                resumeContentCheckpoints = this.deferContentCheckpoints();
                 await this.publishRunReceipt(receipt, cachedSnapshot);
                 await this.graphRebuild.restorePersistedSnapshot(cachedSnapshot);
                 await this.persistRunReceiptWithTiming(receipt);
+                resumeContentCheckpoints();
                 return { receipt, snapshot: cachedSnapshot };
             }
 
@@ -536,6 +548,7 @@ export class GraphRebuildPipelineService {
                 }
             }
 
+            resumeContentCheckpoints = this.deferContentCheckpoints();
             const graphStage = await this.runStage('postProcessSnapshot', 'Postprocess Snapshot', async () => {
                 const snapshot = await this.graphRebuild.buildAndPersistSnapshot({
                     scopeKind: scope.kind,
@@ -615,6 +628,7 @@ export class GraphRebuildPipelineService {
             });
             await this.publishRunReceipt(receipt, completedSnapshot);
             await this.persistRunReceiptWithTiming(receipt);
+            resumeContentCheckpoints();
             return { receipt, snapshot: completedSnapshot };
         } catch (error) {
             const completedAt = Date.now();
@@ -639,6 +653,7 @@ export class GraphRebuildPipelineService {
             this.lastReceiptState.set(failedReceipt);
             throw error;
         } finally {
+            resumeContentCheckpoints?.();
             this.runningState.set(false);
         }
     }
@@ -720,6 +735,16 @@ export class GraphRebuildPipelineService {
         receipt.completedAt = Math.max(receipt.completedAt, completedAt);
         receipt.durationMs = receipt.completedAt - receipt.startedAt;
         this.lastReceiptState.set({ ...receipt, stageReceipts: [...receipt.stageReceipts] });
+    }
+
+    private deferContentCheckpoints(): () => void {
+        let resumed = false;
+        this.store.pauseSnapshots();
+        return () => {
+            if (resumed) return;
+            resumed = true;
+            this.store.resumeSnapshots();
+        };
     }
 
     private async persistRunReceiptWithTiming(receipt: GraphIndexRunReceipt): Promise<void> {

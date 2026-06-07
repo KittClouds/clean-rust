@@ -39,6 +39,7 @@ import { GraphRebuildPipelineService } from './graph-rebuild-pipeline.service';
 import { GraphRebuildService } from './graph-rebuild.service';
 import { AtlasCapabilityRuntimeService } from '../services/atlas-capability-runtime.service';
 import { NerService } from '../services/ner.service';
+import { PhoenixStoreService } from '../services/phoenix-store.service';
 import type { GraphIndexRunRequest } from './graph-rebuild-snapshot';
 import type { CalendarRegistrySnapshot } from '../lib/fantasy-calendar/calendar-registry-snapshot';
 import type { GraphCalendarRegistryBridgeSummary } from './graph-calendar-registry-bridge';
@@ -55,6 +56,7 @@ describe('GraphRebuildPipelineService', () => {
     let graphRebuild: ReturnType<typeof createGraphRebuildMock>;
     let atlasRuntime: ReturnType<typeof createAtlasRuntimeMock>;
     let ner: ReturnType<typeof createNerMock>;
+    let store: ReturnType<typeof createPhoenixStoreMock>;
     let service: GraphRebuildPipelineService;
 
     beforeEach(() => {
@@ -79,10 +81,12 @@ describe('GraphRebuildPipelineService', () => {
         graphRebuild = createGraphRebuildMock();
         atlasRuntime = createAtlasRuntimeMock();
         ner = createNerMock();
+        store = createPhoenixStoreMock();
         injector = createEnvironmentInjector([
             { provide: GraphRebuildService, useValue: graphRebuild },
             { provide: AtlasCapabilityRuntimeService, useValue: atlasRuntime },
             { provide: NerService, useValue: ner },
+            { provide: PhoenixStoreService, useValue: store },
         ], Injector.create({ providers: [] }) as unknown as EnvironmentInjector);
         service = runInInjectionContext(injector, () => new GraphRebuildPipelineService());
     });
@@ -474,6 +478,28 @@ describe('GraphRebuildPipelineService', () => {
         expect(service.lastSnapshot()?.id).toBe('snapshot-1');
     });
 
+    it('defers content checkpoints until the clean graph receipt is persisted', async () => {
+        await service.buildCoreGraph(request());
+
+        expect(store.pauseSnapshots).toHaveBeenCalledTimes(1);
+        expect(store.resumeSnapshots).toHaveBeenCalledTimes(1);
+        expect(store.pauseSnapshots.mock.invocationCallOrder[0])
+            .toBeLessThan(graphRebuild.buildAndPersistSnapshot.mock.invocationCallOrder[0]);
+        expect(graphRebuild.buildAndPersistSnapshot.mock.invocationCallOrder[0])
+            .toBeLessThan(graphRebuild.persistRunReceipt.mock.invocationCallOrder[0]);
+        expect(graphRebuild.persistRunReceipt.mock.invocationCallOrder[0])
+            .toBeLessThan(store.resumeSnapshots.mock.invocationCallOrder[0]);
+    });
+
+    it('resumes deferred content checkpoints after graph snapshot failures', async () => {
+        graphRebuild.buildAndPersistSnapshot.mockRejectedValueOnce(new Error('snapshot boom'));
+
+        await expect(service.buildCoreGraph(request())).rejects.toThrow('snapshot boom');
+
+        expect(store.pauseSnapshots).toHaveBeenCalledTimes(1);
+        expect(store.resumeSnapshots).toHaveBeenCalledTimes(1);
+    });
+
     it('uses projection-only orchestration when the scope and adapter fingerprint match', async () => {
         const first = await service.postProcessAtlas(request());
         expect(graphRebuild.persistPostProcessCache).not.toHaveBeenCalled();
@@ -481,6 +507,8 @@ describe('GraphRebuildPipelineService', () => {
         graphRebuild.loadPersistedRunReceipt.mockResolvedValue(first.receipt);
         graphRebuild.loadPersistedSnapshot.mockResolvedValue(first.snapshot);
         atlasRuntime.runCapability.mockClear();
+        store.pauseSnapshots.mockClear();
+        store.resumeSnapshots.mockClear();
 
         const second = await service.postProcessAtlas(request());
 
@@ -492,6 +520,13 @@ describe('GraphRebuildPipelineService', () => {
         expect(atlasRuntime.runCapability).not.toHaveBeenCalledWith('nliAdjudication', expect.anything());
         expect(graphRebuild.buildAndPersistSnapshot).toHaveBeenCalledTimes(1);
         expect(graphRebuild.restorePersistedSnapshot).toHaveBeenCalledWith(first.snapshot);
+        expect(store.pauseSnapshots).toHaveBeenCalledTimes(1);
+        expect(store.resumeSnapshots).toHaveBeenCalledTimes(1);
+        expect(store.pauseSnapshots.mock.invocationCallOrder[0])
+            .toBeLessThan(graphRebuild.restorePersistedSnapshot.mock.invocationCallOrder[0]);
+        const receiptCallOrder = graphRebuild.persistRunReceipt.mock.invocationCallOrder;
+        expect(receiptCallOrder[receiptCallOrder.length - 1])
+            .toBeLessThan(store.resumeSnapshots.mock.invocationCallOrder[0]);
         expect(second.receipt.postProcessCacheHit).toBe(true);
         expect(second.receipt.stageReceipts).toEqual(expect.arrayContaining([
             expect.objectContaining({
@@ -1313,6 +1348,14 @@ function createGraphRebuildMock() {
         restorePersistedSnapshot: vi.fn(async () => undefined),
     };
 }
+
+function createPhoenixStoreMock() {
+    return {
+        pauseSnapshots: vi.fn(),
+        resumeSnapshots: vi.fn(),
+    };
+}
+
 function createAtlasRuntimeMock() {
     return {
         capabilityState: vi.fn((capability: string) => ({
