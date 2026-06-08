@@ -597,6 +597,7 @@ export function graphRebuildSnapshotPersistenceView(snapshot: GraphRebuildSnapsh
         };
         persisted.embeddingTargetPlan = plan;
     }
+    delete persisted.semanticTaskSummary;
     return persisted;
 }
 

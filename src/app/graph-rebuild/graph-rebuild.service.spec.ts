@@ -436,6 +436,34 @@ describe('GraphRebuildService persistence helpers', () => {
         expect(persisted?.embeddingTargets).toEqual(snapshot.embeddingTargets);
     });
 
+    it('keeps semantic task plans in memory without making them durable reload payload', () => {
+        const snapshot = buildGraphRebuildSnapshot({
+            scopeKind: 'global',
+            scopeId: 'global',
+            noteIds: ['note-1'],
+            entities: [entity('entity-kai', 'Kai', []), entity('entity-hazel', 'Hazel', [])],
+            chunks: [{ id: 'note-1:chunk:0', noteId: 'note-1', start: 0, end: 30, ordinal: 0, source: 'dynamic-chunking' }],
+            occurrences: [
+                occurrence('note-1', 'entity-kai', 0, 3),
+                occurrence('note-1', 'entity-hazel', 12, 17),
+            ],
+            noteTexts: { 'note-1': 'Kai approved Hazel.' },
+            builtAt: 42,
+        });
+
+        expect(snapshot.semanticTaskSummary?.tasks.length).toBeGreaterThan(0);
+
+        const persistedView = graphRebuildSnapshotPersistenceView(snapshot);
+        const document = graphRebuildSnapshotToScopedDocument(snapshot);
+        const persisted = scopedDocumentToGraphRebuildSnapshot(document);
+
+        expect(persistedView.semanticTaskSummary).toBeUndefined();
+        expect(persisted?.semanticTaskSummary).toBeUndefined();
+        expect(persisted?.semanticCandidateSummary).toEqual(snapshot.semanticCandidateSummary);
+        expect(persisted?.semanticRerankSummary).toEqual(snapshot.semanticRerankSummary);
+        expect(persisted?.semanticEvalLedgerSummary).toEqual(snapshot.semanticEvalLedgerSummary);
+    });
+
     it('persists graph compiler as a derived in-memory sidecar, not primary snapshot payload', () => {
         const snapshot = buildGraphRebuildSnapshot({
             scopeKind: 'global',
