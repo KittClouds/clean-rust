@@ -44,6 +44,7 @@ const SNAPSHOT_DOCUMENT_KEY = 'snapshot';
 const RECEIPT_DOCUMENT_KEY = 'receipt';
 export const GRAPH_MODEL_V2_OVERGRAPH_DOCUMENT_KEY = 'graph-model-v2-overgraph';
 const POST_PROCESS_CACHE_PREFIX = 'postprocess-cache';
+const COMPRESSED_JSON_SCHEMA_VERSION = 'phoenix-graph-rebuild-json-payload/gzip-base64/v1';
 const COMPRESSED_SNAPSHOT_SCHEMA_VERSION = 'phoenix-graph-rebuild-payload/gzip-base64/v1';
 const SNAPSHOT_COMPRESSION_MIN_CHARS = 64 * 1024;
 const BASE64_CHUNK_SIZE = 0x8000;
@@ -58,6 +59,15 @@ export interface GraphRebuildPostProcessCache {
     receipt?: GraphIndexRunReceipt;
     receiptId?: string;
     updatedAt: number;
+}
+
+interface CompressedGraphRebuildJsonPayload {
+    schemaVersion: typeof COMPRESSED_JSON_SCHEMA_VERSION;
+    sourceSchemaVersion: string;
+    encoding: 'gzip+base64';
+    rawChars: number;
+    compressedBytes: number;
+    payload: string;
 }
 
 interface CompressedGraphRebuildSnapshotPayload {
@@ -244,6 +254,9 @@ export class GraphRebuildService {
         const document = graphRebuildSnapshotToScopedDocument(snapshot);
         const documentPayloadStats = graphRebuildSnapshotDocumentPayloadStats(document.payload);
         const overGraphDocument = graphModelV2OverGraphExportToScopedDocument(snapshot);
+        const overGraphDocumentPayloadStats = overGraphDocument
+            ? graphRebuildSnapshotDocumentPayloadStats(overGraphDocument.payload)
+            : undefined;
         if (timings) {
             const profileStarted = performance.now();
             timings.snapshotPayloadBreakdown = graphRebuildSnapshotPayloadCounters(
@@ -251,6 +264,7 @@ export class GraphRebuildService {
                 document.payload.length,
                 overGraphDocument?.payload.length || 0,
                 documentPayloadStats,
+                overGraphDocumentPayloadStats,
             );
             timings.snapshotPayloadProfileMs = elapsedMs(profileStarted);
             timings.snapshotSerializeMs = elapsedMs(serializeStarted);
@@ -260,6 +274,10 @@ export class GraphRebuildService {
             timings.snapshotCompressionSavedChars = documentPayloadStats.savedChars;
             timings.snapshotCompressionRatioPct = documentPayloadStats.ratioPct;
             timings.snapshotOverGraphPayloadChars = overGraphDocument?.payload.length || 0;
+            timings.snapshotOverGraphRawPayloadChars = overGraphDocumentPayloadStats?.rawChars || 0;
+            timings.snapshotOverGraphCompressedBytes = overGraphDocumentPayloadStats?.compressedBytes || 0;
+            timings.snapshotOverGraphCompressionSavedChars = overGraphDocumentPayloadStats?.savedChars || 0;
+            timings.snapshotOverGraphCompressionRatioPct = overGraphDocumentPayloadStats?.ratioPct || 0;
             timings.snapshotTotalPayloadChars = document.payload.length + (overGraphDocument?.payload.length || 0);
         }
         const storeStarted = performance.now();
@@ -508,14 +526,18 @@ export function graphRebuildSnapshotToScopedDocument(snapshot: GraphRebuildSnaps
 }
 
 function encodeGraphRebuildSnapshotPayload(snapshot: GraphRebuildSnapshot): string {
-    const raw = JSON.stringify(snapshot);
+    return encodeGraphRebuildJsonPayload(snapshot, snapshot.schemaVersion);
+}
+
+function encodeGraphRebuildJsonPayload(value: unknown, sourceSchemaVersion: string): string {
+    const raw = JSON.stringify(value);
     if (raw.length < SNAPSHOT_COMPRESSION_MIN_CHARS) return raw;
     try {
         const compressed = gzipSync(strToU8(raw), { level: 1 });
         const payload = bytesToBase64(compressed);
-        const envelope: CompressedGraphRebuildSnapshotPayload = {
-            schemaVersion: COMPRESSED_SNAPSHOT_SCHEMA_VERSION,
-            sourceSchemaVersion: snapshot.schemaVersion,
+        const envelope: CompressedGraphRebuildJsonPayload = {
+            schemaVersion: COMPRESSED_JSON_SCHEMA_VERSION,
+            sourceSchemaVersion,
             encoding: 'gzip+base64',
             rawChars: raw.length,
             compressedBytes: compressed.byteLength,
@@ -529,10 +551,23 @@ function encodeGraphRebuildSnapshotPayload(snapshot: GraphRebuildSnapshot): stri
 }
 
 function decodeGraphRebuildSnapshotPayload(payload: string): GraphRebuildSnapshot | null {
-    const parsed = JSON.parse(payload) as GraphRebuildSnapshot | CompressedGraphRebuildSnapshotPayload;
-    if (!isCompressedGraphRebuildSnapshotPayload(parsed)) return parsed as GraphRebuildSnapshot;
+    return decodeGraphRebuildJsonPayload<GraphRebuildSnapshot>(payload);
+}
+
+function decodeGraphRebuildJsonPayload<T>(payload: string): T {
+    const parsed = JSON.parse(payload) as T | CompressedGraphRebuildJsonPayload | CompressedGraphRebuildSnapshotPayload;
+    if (!isCompressedGraphRebuildJsonPayload(parsed) && !isCompressedGraphRebuildSnapshotPayload(parsed)) {
+        return parsed as T;
+    }
     const bytes = base64ToBytes(parsed.payload);
-    return JSON.parse(strFromU8(gunzipSync(bytes))) as GraphRebuildSnapshot;
+    return JSON.parse(strFromU8(gunzipSync(bytes))) as T;
+}
+
+function isCompressedGraphRebuildJsonPayload(value: unknown): value is CompressedGraphRebuildJsonPayload {
+    const record = value && typeof value === 'object' ? value as Partial<CompressedGraphRebuildJsonPayload> : null;
+    return record?.schemaVersion === COMPRESSED_JSON_SCHEMA_VERSION
+        && record.encoding === 'gzip+base64'
+        && typeof record.payload === 'string';
 }
 
 function isCompressedGraphRebuildSnapshotPayload(value: unknown): value is CompressedGraphRebuildSnapshotPayload {
@@ -545,7 +580,7 @@ function isCompressedGraphRebuildSnapshotPayload(value: unknown): value is Compr
 export function graphRebuildSnapshotDocumentPayloadStats(payload: string): GraphRebuildSnapshotDocumentPayloadStats {
     try {
         const parsed = JSON.parse(payload) as unknown;
-        if (isCompressedGraphRebuildSnapshotPayload(parsed)) {
+        if (isCompressedGraphRebuildJsonPayload(parsed) || isCompressedGraphRebuildSnapshotPayload(parsed)) {
             const rawChars = Math.max(0, Math.round(parsed.rawChars || 0));
             const compressedBytes = Math.max(0, Math.round(parsed.compressedBytes || 0));
             const savedChars = Math.max(0, rawChars - payload.length);
@@ -588,7 +623,10 @@ export function graphModelV2OverGraphExportToScopedDocument(snapshot: GraphRebui
         narrativeId: snapshot.scopeKind === 'narrative' ? snapshot.scopeId : '',
         namespace: GRAPH_REBUILD_NAMESPACE,
         documentKey: GRAPH_MODEL_V2_OVERGRAPH_DOCUMENT_KEY,
-        payload: JSON.stringify(buildGraphModelV2OverGraphExport(snapshot)),
+        payload: encodeGraphRebuildJsonPayload(
+            buildGraphModelV2OverGraphExport(snapshot),
+            'phoenix-graph-model-v2-overgraph/v1',
+        ),
         createdAt: snapshot.builtAt || now,
         updatedAt: now,
     };
@@ -599,8 +637,10 @@ export function graphRebuildSnapshotPayloadCounters(
     primaryPayloadChars: number,
     overGraphPayloadChars = 0,
     primaryPayloadStats?: GraphRebuildSnapshotDocumentPayloadStats,
+    overGraphPayloadStats?: GraphRebuildSnapshotDocumentPayloadStats,
 ): Record<string, number> {
     const primaryRawPayloadChars = primaryPayloadStats?.rawChars || primaryPayloadChars;
+    const overGraphRawPayloadChars = overGraphPayloadStats?.rawChars || overGraphPayloadChars;
     const counters: Record<string, number> = {
         snapshotPrimaryPayloadChars: primaryPayloadChars,
         snapshotPrimaryRawPayloadChars: primaryRawPayloadChars,
@@ -608,7 +648,12 @@ export function graphRebuildSnapshotPayloadCounters(
         snapshotCompressionSavedChars: primaryPayloadStats?.savedChars || 0,
         snapshotCompressionRatioPct: primaryPayloadStats?.ratioPct || 100,
         snapshotOverGraphPayloadChars: overGraphPayloadChars,
+        snapshotOverGraphRawPayloadChars: overGraphRawPayloadChars,
+        snapshotOverGraphCompressedBytes: overGraphPayloadStats?.compressedBytes || overGraphPayloadChars,
+        snapshotOverGraphCompressionSavedChars: overGraphPayloadStats?.savedChars || 0,
+        snapshotOverGraphCompressionRatioPct: overGraphPayloadStats?.ratioPct || 100,
         snapshotTotalScopedPayloadChars: primaryPayloadChars + overGraphPayloadChars,
+        snapshotTotalScopedRawPayloadChars: primaryRawPayloadChars + overGraphRawPayloadChars,
     };
     for (const [counterKey, snapshotKey] of SNAPSHOT_PAYLOAD_PROFILE_FIELDS) {
         const chars = jsonPayloadChars((snapshot as unknown as Record<string, unknown>)[snapshotKey]);
@@ -628,7 +673,7 @@ export function scopedDocumentToGraphRebuildSnapshot(document: StoreScopedDocume
 
 export function scopedDocumentToGraphModelV2OverGraphExport(document: StoreScopedDocument): GraphModelV2OverGraphExport | null {
     try {
-        const parsed = JSON.parse(document.payload) as GraphModelV2OverGraphExport;
+        const parsed = decodeGraphRebuildJsonPayload<GraphModelV2OverGraphExport>(document.payload);
         return parsed?.schemaVersion === 'phoenix-graph-model-v2-overgraph/v1' ? parsed : null;
     } catch {
         return null;
@@ -705,6 +750,10 @@ function emptyBuildTimings(): GraphRebuildBuildTimings {
         snapshotCompressionSavedChars: 0,
         snapshotCompressionRatioPct: 100,
         snapshotOverGraphPayloadChars: 0,
+        snapshotOverGraphRawPayloadChars: 0,
+        snapshotOverGraphCompressedBytes: 0,
+        snapshotOverGraphCompressionSavedChars: 0,
+        snapshotOverGraphCompressionRatioPct: 100,
         snapshotTotalPayloadChars: 0,
         snapshotPayloadProfileMs: 0,
         snapshotPayloadBreakdown: {},

@@ -2094,6 +2094,10 @@ export interface GraphRebuildBuildTimings {
     snapshotCompressionSavedChars?: number;
     snapshotCompressionRatioPct?: number;
     snapshotOverGraphPayloadChars?: number;
+    snapshotOverGraphRawPayloadChars?: number;
+    snapshotOverGraphCompressedBytes?: number;
+    snapshotOverGraphCompressionSavedChars?: number;
+    snapshotOverGraphCompressionRatioPct?: number;
     snapshotTotalPayloadChars?: number;
     snapshotPayloadProfileMs?: number;
     snapshotPayloadBreakdown?: Record<string, number>;

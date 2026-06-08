@@ -2597,12 +2597,15 @@ function snapshotPayloadProfileDetail(
     ['saved', 'snapshotCompressionSavedChars'],
     ['ratio', 'snapshotCompressionRatioPct'],
     ['overgraph', 'snapshotOverGraphPayloadChars'],
+    ['overgraph raw', 'snapshotOverGraphRawPayloadChars'],
+    ['overgraph saved', 'snapshotOverGraphCompressionSavedChars'],
+    ['overgraph ratio', 'snapshotOverGraphCompressionRatioPct'],
     ['total', 'snapshotTotalScopedPayloadChars'],
   ];
   for (const [label, key] of aggregateCounters) {
     const value = counterValue(counters, key);
     if (value <= 0) continue;
-    if (key === 'snapshotCompressionRatioPct') {
+    if (key === 'snapshotCompressionRatioPct' || key === 'snapshotOverGraphCompressionRatioPct') {
       parts.push(`${label} ${formatCount(value)}%`);
     } else {
       parts.push(`${label} ${formatCount(value)} chars`);
@@ -2658,7 +2661,7 @@ function receiptCounterPriority(stageId: string): string[] {
     return ['embeddingTargets', 'embeddingPlannedPairs', 'embeddingPrunedPairs', 'embeddingBackboneEdges', 'embeddingClusters', 'linkSuggestions', 'entityLinks'];
   }
   if (stageId === 'snapshotDbOps') {
-    return ['dbLoadMs', 'snapshotPersistMs', 'snapshotStoreMs', 'snapshotSerializeMs', 'snapshotPayloadProfileMs', 'snapshotPayloadChars', 'snapshotPrimaryRawPayloadChars', 'snapshotCompressionSavedChars', 'snapshotCompressionRatioPct', 'snapshotOverGraphPayloadChars', 'snapshotTotalPayloadChars'];
+    return ['dbLoadMs', 'snapshotPersistMs', 'snapshotStoreMs', 'snapshotSerializeMs', 'snapshotPayloadProfileMs', 'snapshotPayloadChars', 'snapshotPrimaryRawPayloadChars', 'snapshotCompressionSavedChars', 'snapshotCompressionRatioPct', 'snapshotOverGraphPayloadChars', 'snapshotOverGraphRawPayloadChars', 'snapshotOverGraphCompressionSavedChars', 'snapshotOverGraphCompressionRatioPct', 'snapshotTotalPayloadChars'];
   }
   if (stageId === 'snapshotPayloadProfile') {
     return [
@@ -2667,7 +2670,11 @@ function receiptCounterPriority(stageId: string): string[] {
       'snapshotCompressionSavedChars',
       'snapshotCompressionRatioPct',
       'snapshotOverGraphPayloadChars',
+      'snapshotOverGraphRawPayloadChars',
+      'snapshotOverGraphCompressionSavedChars',
+      'snapshotOverGraphCompressionRatioPct',
       'snapshotTotalScopedPayloadChars',
+      'snapshotTotalScopedRawPayloadChars',
       'payloadEmbeddingTargetsChars',
       'payloadEmbeddingTargetPlanChars',
       'payloadEmbeddingGraphPostProcessChars',

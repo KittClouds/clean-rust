@@ -265,12 +265,26 @@ describe('GraphRebuildService persistence helpers', () => {
             noteTexts: { 'note-1': 'Kai approved Hazel.' },
             builtAt: 42,
         });
+        if (!snapshot.graphModelV2?.atoms.length) throw new Error('Expected graph model atoms.');
+        const styleTargetId = snapshot.graphModelV2.atoms[0].id;
+        for (let index = 0; index < 1024; index += 1) {
+            snapshot.graphModelV2.styleTags.push({
+                targetId: styleTargetId,
+                targetType: 'atom',
+                tagKind: 'storySignal',
+                value: `overgraph-compression-receipt-${index}:`
+                    + 'Kai and Hazel repeat a deliberately large sidecar payload. '.repeat(2),
+            });
+        }
 
         const document = graphModelV2OverGraphExportToScopedDocument(snapshot);
         const roundtripped = document ? scopedDocumentToGraphModelV2OverGraphExport(document) : null;
+        const stats = document ? graphRebuildSnapshotDocumentPayloadStats(document.payload) : null;
 
         expect(document?.namespace).toBe(GRAPH_REBUILD_NAMESPACE);
         expect(document?.documentKey).toBe(GRAPH_MODEL_V2_OVERGRAPH_DOCUMENT_KEY);
+        expect(stats?.savedChars).toBeGreaterThan(0);
+        expect(stats?.ratioPct).toBeLessThan(100);
         expect(roundtripped?.schemaVersion).toBe('phoenix-graph-model-v2-overgraph/v1');
         const expectedVertices = (snapshot.graphModelV2?.counters.atoms || 0)
             + (snapshot.graphModelV2?.counters.facts || 0);
@@ -300,10 +314,15 @@ describe('GraphRebuildService persistence helpers', () => {
             snapshot,
             document.payload.length,
             overGraphDocument?.payload.length || 0,
+            graphRebuildSnapshotDocumentPayloadStats(document.payload),
+            overGraphDocument ? graphRebuildSnapshotDocumentPayloadStats(overGraphDocument.payload) : undefined,
         );
 
         expect(counters['snapshotPrimaryPayloadChars']).toBe(document.payload.length);
         expect(counters['snapshotOverGraphPayloadChars']).toBe(overGraphDocument?.payload.length || 0);
+        expect(counters['snapshotOverGraphRawPayloadChars']).toBeGreaterThanOrEqual(
+            counters['snapshotOverGraphPayloadChars'],
+        );
         expect(counters['snapshotTotalScopedPayloadChars']).toBe(
             document.payload.length + (overGraphDocument?.payload.length || 0),
         );
