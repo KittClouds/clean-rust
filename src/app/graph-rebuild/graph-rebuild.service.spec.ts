@@ -7,6 +7,7 @@ import {
     graphIndexReceiptToScopedDocument,
     graphRebuildSnapshotDocumentPayloadStats,
     graphRebuildSnapshotPayloadCounters,
+    graphRebuildSnapshotToNativeCompilerPayload,
     graphRebuildSnapshotToScopedDocument,
     mergeGraphRebuildOccurrences,
     postProcessCacheToScopedDocument,
@@ -291,6 +292,42 @@ describe('GraphRebuildService persistence helpers', () => {
         expect(roundtripped?.graphBatch.vertices.length).toBe(expectedVertices);
         expect(roundtripped?.summary.bundleReceipts).toBe(snapshot.graphModelV2?.counters.bundles || 0);
         expect(roundtripped?.graphBatch.edges.some((edge) => edge.edgeType === 'role:source')).toBe(true);
+    });
+
+    it('sends only compiler-owned structural fields to the native graph compiler', () => {
+        const snapshot = buildGraphRebuildSnapshot({
+            scopeKind: 'global',
+            scopeId: 'global',
+            noteIds: ['note-1'],
+            entities: [entity('entity-kai', 'Kai', []), entity('entity-hazel', 'Hazel', [])],
+            chunks: [{ id: 'note-1:chunk:0', noteId: 'note-1', start: 0, end: 30, ordinal: 0, source: 'dynamic-chunking' }],
+            occurrences: [
+                occurrence('note-1', 'entity-kai', 0, 3),
+                occurrence('note-1', 'entity-hazel', 12, 17),
+            ],
+            noteTexts: { 'note-1': 'Kai approved Hazel.' },
+            builtAt: 42,
+        });
+        (snapshot as GraphRebuildSnapshot & { semanticCandidateSummary: unknown }).semanticCandidateSummary = {
+            rows: Array.from({ length: 256 }, (_, index) => ({
+                id: `candidate:${index}`,
+                text: 'This payload belongs to browser receipts, not the Rust compiler call. '.repeat(12),
+            })),
+        };
+
+        const payload = graphRebuildSnapshotToNativeCompilerPayload(snapshot);
+
+        expect(payload.chunks).toBe(snapshot.chunks);
+        expect(payload.mentions).toBe(snapshot.mentions);
+        expect(payload.entityAnchors).toBe(snapshot.entityAnchors);
+        expect(payload.nodes).toBe(snapshot.nodes);
+        expect(payload.edges).toBe(snapshot.edges);
+        expect(payload.embeddingTargets).toEqual([]);
+        expect(payload.embeddingVectors).toEqual([]);
+        expect(payload.projectionRefs).toEqual([]);
+        expect(payload.graphModelV2).toBeUndefined();
+        expect(payload.semanticCandidateSummary).toBeUndefined();
+        expect(JSON.stringify(payload).length).toBeLessThan(JSON.stringify(snapshot).length / 2);
     });
 
     it('profiles snapshot payload sections without changing the scoped document contract', () => {

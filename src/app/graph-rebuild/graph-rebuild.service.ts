@@ -185,7 +185,9 @@ export class GraphRebuildService {
 
     private async attachNativeGraphCompilerSidecar(snapshot: GraphRebuildSnapshot): Promise<void> {
         try {
-            const sidecar = await this.phoenix.storeCommand('graphRebuild:compileDualWrite', { snapshot }) as GraphCompilerDualWriteSidecar | null;
+            const sidecar = await this.phoenix.storeCommand('graphRebuild:compileDualWrite', {
+                snapshot: graphRebuildSnapshotToNativeCompilerPayload(snapshot),
+            }) as GraphCompilerDualWriteSidecar | null;
             if (!sidecar?.factGraph) return;
             attachGraphCompilerReadModels(snapshot, sidecar, 'rust');
         } catch (error) {
@@ -399,6 +401,34 @@ export function snapshotAnchorsToGraphRebuildOccurrences(
                 updatedAt: now,
             };
         });
+}
+
+export function graphRebuildSnapshotToNativeCompilerPayload(snapshot: GraphRebuildSnapshot): GraphRebuildSnapshot {
+    return {
+        schemaVersion: snapshot.schemaVersion,
+        id: snapshot.id,
+        source: snapshot.source,
+        scopeKind: snapshot.scopeKind,
+        scopeId: snapshot.scopeId,
+        noteIds: snapshot.noteIds,
+        builtAt: snapshot.builtAt,
+        chunks: snapshot.chunks,
+        mentions: snapshot.mentions,
+        entityAnchors: snapshot.entityAnchors,
+        relationships: snapshot.relationships,
+        events: snapshot.events,
+        episodes: [],
+        temporalEdges: snapshot.temporalEdges,
+        causalEdges: snapshot.causalEdges,
+        memoryState: snapshot.memoryState,
+        embeddingTargets: [],
+        embeddingVectors: [],
+        projectionRefs: [],
+        nodes: snapshot.nodes,
+        edges: snapshot.edges,
+        calendarRegistrySummary: snapshot.calendarRegistrySummary,
+        counters: snapshot.counters,
+    };
 }
 
 function anchorSpanStillMatches(
