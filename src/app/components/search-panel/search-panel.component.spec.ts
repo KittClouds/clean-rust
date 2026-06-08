@@ -525,7 +525,7 @@ describe('SearchPanelComponent model recipe lifecycle', () => {
                 kind: 'stage',
                 label: 'Snapshot Payload',
                 durationMs: 2,
-                detail: 'completed / 0 outputs / primary 1,200 chars / overgraph 400 chars / total 1,600 chars / graph model v2 700 chars / embedding graph post process 500 chars / chunks 300 chars',
+                detail: 'completed / 0 outputs / primary 1,200 chars / raw 1,400 chars / saved 200 chars / ratio 86% / overgraph 400 chars / total 1,600 chars / graph model v2 700 chars / embedding graph post process 500 chars / chunks 300 chars',
             }),
             expect.objectContaining({
                 kind: 'stage',
@@ -778,6 +778,9 @@ function createFullAtlasPipelineMock() {
                         outputCount: 0,
                         counters: {
                             snapshotPrimaryPayloadChars: 1200,
+                            snapshotPrimaryRawPayloadChars: 1400,
+                            snapshotCompressionSavedChars: 200,
+                            snapshotCompressionRatioPct: 86,
                             snapshotOverGraphPayloadChars: 400,
                             snapshotTotalScopedPayloadChars: 1600,
                             payloadChunksChars: 300,

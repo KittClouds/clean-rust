@@ -5,6 +5,7 @@ import {
     GRAPH_REBUILD_NAMESPACE,
     graphModelV2OverGraphExportToScopedDocument,
     graphIndexReceiptToScopedDocument,
+    graphRebuildSnapshotDocumentPayloadStats,
     graphRebuildSnapshotPayloadCounters,
     graphRebuildSnapshotToScopedDocument,
     mergeGraphRebuildOccurrences,
@@ -308,6 +309,41 @@ describe('GraphRebuildService persistence helpers', () => {
         );
         expect(counters['payloadEmbeddingTargetsChars']).toBeGreaterThan(0);
         expect(counters['payloadGraphModelV2Chars']).toBeGreaterThan(0);
+    });
+
+    it('compresses large persisted graph rebuild snapshots and round-trips them', () => {
+        const snapshot = buildGraphRebuildSnapshot({
+            scopeKind: 'global',
+            scopeId: 'global',
+            noteIds: ['note-1'],
+            entities: [entity('entity-kai', 'Kai', []), entity('entity-hazel', 'Hazel', [])],
+            chunks: [{ id: 'note-1:chunk:0', noteId: 'note-1', start: 0, end: 30, ordinal: 0, source: 'dynamic-chunking' }],
+            occurrences: [
+                occurrence('note-1', 'entity-kai', 0, 3),
+                occurrence('note-1', 'entity-hazel', 12, 17),
+            ],
+            noteTexts: { 'note-1': 'Kai approved Hazel.' },
+            builtAt: 42,
+        });
+        (snapshot as GraphRebuildSnapshot & { semanticCandidateSummary: unknown }).semanticCandidateSummary = {
+            rows: Array.from({ length: 256 }, (_, index) => ({
+                id: `candidate:${index}`,
+                text: 'Kai and Hazel carry a deliberately repeated persistence payload. '.repeat(12),
+            })),
+        };
+
+        const rawChars = JSON.stringify(snapshot).length;
+        const document = graphRebuildSnapshotToScopedDocument(snapshot);
+        const persisted = scopedDocumentToGraphRebuildSnapshot(document);
+        const jsonPersistedSnapshot = JSON.parse(JSON.stringify(snapshot));
+        const stats = graphRebuildSnapshotDocumentPayloadStats(document.payload);
+        const counters = graphRebuildSnapshotPayloadCounters(snapshot, document.payload.length, 0, stats);
+
+        expect(document.payload.length).toBeLessThan(rawChars);
+        expect(persisted).toEqual(jsonPersistedSnapshot);
+        expect(counters['snapshotPrimaryRawPayloadChars']).toBe(rawChars);
+        expect(counters['snapshotCompressionSavedChars']).toBeGreaterThan(0);
+        expect(counters['snapshotCompressionRatioPct']).toBeLessThan(100);
     });
 
     it('keeps postprocess cache documents as lightweight snapshot references', () => {

@@ -2593,12 +2593,20 @@ function snapshotPayloadProfileDetail(
   const parts = [status, valueLabel(outputCount, 'output')];
   const aggregateCounters: Array<[string, string]> = [
     ['primary', 'snapshotPrimaryPayloadChars'],
+    ['raw', 'snapshotPrimaryRawPayloadChars'],
+    ['saved', 'snapshotCompressionSavedChars'],
+    ['ratio', 'snapshotCompressionRatioPct'],
     ['overgraph', 'snapshotOverGraphPayloadChars'],
     ['total', 'snapshotTotalScopedPayloadChars'],
   ];
   for (const [label, key] of aggregateCounters) {
     const value = counterValue(counters, key);
-    if (value > 0) parts.push(`${label} ${formatCount(value)} chars`);
+    if (value <= 0) continue;
+    if (key === 'snapshotCompressionRatioPct') {
+      parts.push(`${label} ${formatCount(value)}%`);
+    } else {
+      parts.push(`${label} ${formatCount(value)} chars`);
+    }
   }
   const sectionEntries = Object.entries(counters || {})
     .filter(([key, value]) => isSnapshotPayloadSectionCounter(key, value))
@@ -2650,11 +2658,14 @@ function receiptCounterPriority(stageId: string): string[] {
     return ['embeddingTargets', 'embeddingPlannedPairs', 'embeddingPrunedPairs', 'embeddingBackboneEdges', 'embeddingClusters', 'linkSuggestions', 'entityLinks'];
   }
   if (stageId === 'snapshotDbOps') {
-    return ['dbLoadMs', 'snapshotPersistMs', 'snapshotStoreMs', 'snapshotSerializeMs', 'snapshotPayloadProfileMs', 'snapshotPayloadChars', 'snapshotOverGraphPayloadChars', 'snapshotTotalPayloadChars'];
+    return ['dbLoadMs', 'snapshotPersistMs', 'snapshotStoreMs', 'snapshotSerializeMs', 'snapshotPayloadProfileMs', 'snapshotPayloadChars', 'snapshotPrimaryRawPayloadChars', 'snapshotCompressionSavedChars', 'snapshotCompressionRatioPct', 'snapshotOverGraphPayloadChars', 'snapshotTotalPayloadChars'];
   }
   if (stageId === 'snapshotPayloadProfile') {
     return [
       'snapshotPrimaryPayloadChars',
+      'snapshotPrimaryRawPayloadChars',
+      'snapshotCompressionSavedChars',
+      'snapshotCompressionRatioPct',
       'snapshotOverGraphPayloadChars',
       'snapshotTotalScopedPayloadChars',
       'payloadEmbeddingTargetsChars',

@@ -1,4 +1,5 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
+import { gzipSync, gunzipSync, strFromU8, strToU8 } from 'fflate';
 
 import {
     db,
@@ -43,6 +44,9 @@ const SNAPSHOT_DOCUMENT_KEY = 'snapshot';
 const RECEIPT_DOCUMENT_KEY = 'receipt';
 export const GRAPH_MODEL_V2_OVERGRAPH_DOCUMENT_KEY = 'graph-model-v2-overgraph';
 const POST_PROCESS_CACHE_PREFIX = 'postprocess-cache';
+const COMPRESSED_SNAPSHOT_SCHEMA_VERSION = 'phoenix-graph-rebuild-payload/gzip-base64/v1';
+const SNAPSHOT_COMPRESSION_MIN_CHARS = 64 * 1024;
+const BASE64_CHUNK_SIZE = 0x8000;
 
 export interface GraphRebuildPostProcessCache {
     schemaVersion: 'phoenix-graph-postprocess-cache/v1';
@@ -54,6 +58,22 @@ export interface GraphRebuildPostProcessCache {
     receipt?: GraphIndexRunReceipt;
     receiptId?: string;
     updatedAt: number;
+}
+
+interface CompressedGraphRebuildSnapshotPayload {
+    schemaVersion: typeof COMPRESSED_SNAPSHOT_SCHEMA_VERSION;
+    sourceSchemaVersion: GraphRebuildSnapshot['schemaVersion'];
+    encoding: 'gzip+base64';
+    rawChars: number;
+    compressedBytes: number;
+    payload: string;
+}
+
+export interface GraphRebuildSnapshotDocumentPayloadStats {
+    rawChars: number;
+    compressedBytes: number;
+    savedChars: number;
+    ratioPct: number;
 }
 
 export interface GraphRebuildBuildRequest {
@@ -222,6 +242,7 @@ export class GraphRebuildService {
     ): Promise<void> {
         const serializeStarted = performance.now();
         const document = graphRebuildSnapshotToScopedDocument(snapshot);
+        const documentPayloadStats = graphRebuildSnapshotDocumentPayloadStats(document.payload);
         const overGraphDocument = graphModelV2OverGraphExportToScopedDocument(snapshot);
         if (timings) {
             const profileStarted = performance.now();
@@ -229,10 +250,15 @@ export class GraphRebuildService {
                 snapshot,
                 document.payload.length,
                 overGraphDocument?.payload.length || 0,
+                documentPayloadStats,
             );
             timings.snapshotPayloadProfileMs = elapsedMs(profileStarted);
             timings.snapshotSerializeMs = elapsedMs(serializeStarted);
             timings.snapshotPayloadChars = document.payload.length;
+            timings.snapshotPrimaryRawPayloadChars = documentPayloadStats.rawChars;
+            timings.snapshotPrimaryCompressedBytes = documentPayloadStats.compressedBytes;
+            timings.snapshotCompressionSavedChars = documentPayloadStats.savedChars;
+            timings.snapshotCompressionRatioPct = documentPayloadStats.ratioPct;
             timings.snapshotOverGraphPayloadChars = overGraphDocument?.payload.length || 0;
             timings.snapshotTotalPayloadChars = document.payload.length + (overGraphDocument?.payload.length || 0);
         }
@@ -475,10 +501,82 @@ export function graphRebuildSnapshotToScopedDocument(snapshot: GraphRebuildSnaps
         narrativeId: snapshot.scopeKind === 'narrative' ? snapshot.scopeId : '',
         namespace: GRAPH_REBUILD_NAMESPACE,
         documentKey: SNAPSHOT_DOCUMENT_KEY,
-        payload: JSON.stringify(snapshot),
+        payload: encodeGraphRebuildSnapshotPayload(snapshot),
         createdAt: snapshot.builtAt || now,
         updatedAt: now,
     };
+}
+
+function encodeGraphRebuildSnapshotPayload(snapshot: GraphRebuildSnapshot): string {
+    const raw = JSON.stringify(snapshot);
+    if (raw.length < SNAPSHOT_COMPRESSION_MIN_CHARS) return raw;
+    try {
+        const compressed = gzipSync(strToU8(raw), { level: 1 });
+        const payload = bytesToBase64(compressed);
+        const envelope: CompressedGraphRebuildSnapshotPayload = {
+            schemaVersion: COMPRESSED_SNAPSHOT_SCHEMA_VERSION,
+            sourceSchemaVersion: snapshot.schemaVersion,
+            encoding: 'gzip+base64',
+            rawChars: raw.length,
+            compressedBytes: compressed.byteLength,
+            payload,
+        };
+        const encoded = JSON.stringify(envelope);
+        return encoded.length < raw.length ? encoded : raw;
+    } catch {
+        return raw;
+    }
+}
+
+function decodeGraphRebuildSnapshotPayload(payload: string): GraphRebuildSnapshot | null {
+    const parsed = JSON.parse(payload) as GraphRebuildSnapshot | CompressedGraphRebuildSnapshotPayload;
+    if (!isCompressedGraphRebuildSnapshotPayload(parsed)) return parsed as GraphRebuildSnapshot;
+    const bytes = base64ToBytes(parsed.payload);
+    return JSON.parse(strFromU8(gunzipSync(bytes))) as GraphRebuildSnapshot;
+}
+
+function isCompressedGraphRebuildSnapshotPayload(value: unknown): value is CompressedGraphRebuildSnapshotPayload {
+    const record = value && typeof value === 'object' ? value as Partial<CompressedGraphRebuildSnapshotPayload> : null;
+    return record?.schemaVersion === COMPRESSED_SNAPSHOT_SCHEMA_VERSION
+        && record.encoding === 'gzip+base64'
+        && typeof record.payload === 'string';
+}
+
+export function graphRebuildSnapshotDocumentPayloadStats(payload: string): GraphRebuildSnapshotDocumentPayloadStats {
+    try {
+        const parsed = JSON.parse(payload) as unknown;
+        if (isCompressedGraphRebuildSnapshotPayload(parsed)) {
+            const rawChars = Math.max(0, Math.round(parsed.rawChars || 0));
+            const compressedBytes = Math.max(0, Math.round(parsed.compressedBytes || 0));
+            const savedChars = Math.max(0, rawChars - payload.length);
+            return {
+                rawChars,
+                compressedBytes,
+                savedChars,
+                ratioPct: rawChars > 0 ? Math.round((payload.length / rawChars) * 100) : 100,
+            };
+        }
+    } catch {
+        // Fall through to raw payload stats.
+    }
+    return {
+        rawChars: payload.length,
+        compressedBytes: payload.length,
+        savedChars: 0,
+        ratioPct: 100,
+    };
+}
+
+function bytesToBase64(bytes: Uint8Array): string {
+    let binary = '';
+    for (let offset = 0; offset < bytes.length; offset += BASE64_CHUNK_SIZE) {
+        binary += strFromU8(bytes.subarray(offset, offset + BASE64_CHUNK_SIZE), true);
+    }
+    return btoa(binary);
+}
+
+function base64ToBytes(encoded: string): Uint8Array {
+    return strToU8(atob(encoded), true);
 }
 
 export function graphModelV2OverGraphExportToScopedDocument(snapshot: GraphRebuildSnapshot): StoreScopedDocument | null {
@@ -500,9 +598,15 @@ export function graphRebuildSnapshotPayloadCounters(
     snapshot: GraphRebuildSnapshot,
     primaryPayloadChars: number,
     overGraphPayloadChars = 0,
+    primaryPayloadStats?: GraphRebuildSnapshotDocumentPayloadStats,
 ): Record<string, number> {
+    const primaryRawPayloadChars = primaryPayloadStats?.rawChars || primaryPayloadChars;
     const counters: Record<string, number> = {
         snapshotPrimaryPayloadChars: primaryPayloadChars,
+        snapshotPrimaryRawPayloadChars: primaryRawPayloadChars,
+        snapshotPrimaryCompressedBytes: primaryPayloadStats?.compressedBytes || primaryPayloadChars,
+        snapshotCompressionSavedChars: primaryPayloadStats?.savedChars || 0,
+        snapshotCompressionRatioPct: primaryPayloadStats?.ratioPct || 100,
         snapshotOverGraphPayloadChars: overGraphPayloadChars,
         snapshotTotalScopedPayloadChars: primaryPayloadChars + overGraphPayloadChars,
     };
@@ -515,7 +619,7 @@ export function graphRebuildSnapshotPayloadCounters(
 
 export function scopedDocumentToGraphRebuildSnapshot(document: StoreScopedDocument): GraphRebuildSnapshot | null {
     try {
-        const parsed = JSON.parse(document.payload) as GraphRebuildSnapshot;
+        const parsed = decodeGraphRebuildSnapshotPayload(document.payload);
         return parsed?.schemaVersion === 'phoenix-graph-rebuild/v1' ? parsed : null;
     } catch {
         return null;
@@ -596,6 +700,10 @@ function emptyBuildTimings(): GraphRebuildBuildTimings {
         snapshotStoreMs: 0,
         snapshotEventMs: 0,
         snapshotPayloadChars: 0,
+        snapshotPrimaryRawPayloadChars: 0,
+        snapshotPrimaryCompressedBytes: 0,
+        snapshotCompressionSavedChars: 0,
+        snapshotCompressionRatioPct: 100,
         snapshotOverGraphPayloadChars: 0,
         snapshotTotalPayloadChars: 0,
         snapshotPayloadProfileMs: 0,
