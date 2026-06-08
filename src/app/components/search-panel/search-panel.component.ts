@@ -2537,6 +2537,9 @@ function receiptRowDetail(
   if (stageId === 'snapshotPayloadProfile') {
     return snapshotPayloadProfileDetail(status, outputCount, counters);
   }
+  if (stageId === 'transportOps') {
+    return transportOpsDetail(status, outputCount, counters);
+  }
   const entries = Object.entries(counters || {})
     .filter(([key, value]) => isVisibleReceiptCounter(key, value, stageId));
   const orderedEntries = prioritizeReceiptCounters(entries, receiptCounterPriority(stageId));
@@ -2618,6 +2621,39 @@ function snapshotPayloadProfileDetail(
   for (const [key, value] of sectionEntries) {
     parts.push(`${snapshotPayloadSectionLabel(key)} ${formatCount(value)} chars`);
   }
+  return parts.join(' / ');
+}
+
+function transportOpsDetail(
+  status: string,
+  outputCount: number,
+  counters: Record<string, number>,
+): string {
+  const parts = [status, valueLabel(outputCount, 'output')];
+  const addCount = (label: string, key: string): void => {
+    const value = counterValue(counters, key);
+    if (value > 0) parts.push(`${label} ${formatCount(value)}`);
+  };
+  const addDuration = (label: string, key: string): void => {
+    const value = counterValue(counters, key);
+    if (value > 0) parts.push(`${label} ${formatDuration(value)}`);
+  };
+  const addBytes = (label: string, key: string): void => {
+    const value = counterValue(counters, key);
+    if (value > 0) parts.push(`${label} ${formatBytes(value)}`);
+  };
+
+  addCount('calls', 'transportCalls');
+  addDuration('total', 'transportTotalMs');
+  addDuration('max', 'transportMaxMs');
+  addBytes('request', 'transportRequestBytes');
+  addBytes('response', 'transportResponseBytes');
+  addCount('store', 'storeCommandCalls');
+  addCount('wal calls', 'applyWalBatchCalls');
+  addBytes('wal request', 'applyWalBatchRequestBytes');
+  addCount('compile calls', 'compileDualWriteCalls');
+  addBytes('compile request', 'compileDualWriteRequestBytes');
+  addBytes('galaxy request', 'compileGalaxySceneRequestBytes');
   return parts.join(' / ');
 }
 
@@ -2773,6 +2809,7 @@ function valueLabel(value: number, singular: string): string {
 }
 
 function formatReceiptCounterValue(key: string, value: number): string {
+  if (/bytes$/i.test(key)) return formatBytes(value);
   return /ms$/i.test(key) ? formatDuration(value) : formatCount(value);
 }
 
