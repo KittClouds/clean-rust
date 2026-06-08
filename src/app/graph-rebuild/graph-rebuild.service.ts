@@ -79,6 +79,19 @@ interface CompressedGraphRebuildSnapshotPayload {
     payload: string;
 }
 
+interface CompressedGraphCompilerFactGraphPayload {
+    schemaVersion: 'phoenix-graph-compiler-payload/gzip-base64/v1';
+    sourceSchemaVersion: string;
+    encoding: 'gzip+base64';
+    rawBytes: number;
+    compressedBytes: number;
+    payload: string;
+}
+
+export type NativeGraphCompilerSidecar = Partial<GraphCompilerDualWriteSidecar> & {
+    factGraphPayload?: CompressedGraphCompilerFactGraphPayload;
+};
+
 export interface GraphRebuildSnapshotDocumentPayloadStats {
     rawChars: number;
     compressedBytes: number;
@@ -185,9 +198,10 @@ export class GraphRebuildService {
 
     private async attachNativeGraphCompilerSidecar(snapshot: GraphRebuildSnapshot): Promise<void> {
         try {
-            const sidecar = await this.phoenix.storeCommand('graphRebuild:compileDualWrite', {
+            const rawSidecar = await this.phoenix.storeCommand('graphRebuild:compileDualWrite', {
                 snapshot: graphRebuildSnapshotToNativeCompilerPayload(snapshot),
-            }) as GraphCompilerDualWriteSidecar | null;
+            }) as NativeGraphCompilerSidecar | null;
+            const sidecar = decodeNativeGraphCompilerSidecar(rawSidecar);
             if (!sidecar?.factGraph) return;
             attachGraphCompilerReadModels(snapshot, sidecar, 'rust');
         } catch (error) {
@@ -593,6 +607,20 @@ function decodeGraphRebuildJsonPayload<T>(payload: string): T {
     return JSON.parse(strFromU8(gunzipSync(bytes))) as T;
 }
 
+export function decodeNativeGraphCompilerSidecar(
+    sidecar: NativeGraphCompilerSidecar | null | undefined,
+): GraphCompilerDualWriteSidecar | null {
+    if (!sidecar) return null;
+    if (sidecar.factGraph) return sidecar as GraphCompilerDualWriteSidecar;
+    const compressed = sidecar.factGraphPayload;
+    if (!isCompressedGraphCompilerFactGraphPayload(compressed)) return null;
+    const factGraph = JSON.parse(strFromU8(gunzipSync(base64ToBytes(compressed.payload))));
+    return {
+        ...sidecar,
+        factGraph,
+    } as GraphCompilerDualWriteSidecar;
+}
+
 function isCompressedGraphRebuildJsonPayload(value: unknown): value is CompressedGraphRebuildJsonPayload {
     const record = value && typeof value === 'object' ? value as Partial<CompressedGraphRebuildJsonPayload> : null;
     return record?.schemaVersion === COMPRESSED_JSON_SCHEMA_VERSION
@@ -603,6 +631,13 @@ function isCompressedGraphRebuildJsonPayload(value: unknown): value is Compresse
 function isCompressedGraphRebuildSnapshotPayload(value: unknown): value is CompressedGraphRebuildSnapshotPayload {
     const record = value && typeof value === 'object' ? value as Partial<CompressedGraphRebuildSnapshotPayload> : null;
     return record?.schemaVersion === COMPRESSED_SNAPSHOT_SCHEMA_VERSION
+        && record.encoding === 'gzip+base64'
+        && typeof record.payload === 'string';
+}
+
+function isCompressedGraphCompilerFactGraphPayload(value: unknown): value is CompressedGraphCompilerFactGraphPayload {
+    const record = value && typeof value === 'object' ? value as Partial<CompressedGraphCompilerFactGraphPayload> : null;
+    return record?.schemaVersion === 'phoenix-graph-compiler-payload/gzip-base64/v1'
         && record.encoding === 'gzip+base64'
         && typeof record.payload === 'string';
 }

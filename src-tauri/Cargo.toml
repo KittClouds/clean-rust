@@ -13,6 +13,8 @@ tauri-build = { version = "2", features = [] }
 
 [dependencies]
 hashbrown = "0.15"
+base64 = "0.22"
+flate2 = "1"
 phoenix-native = { path = "../rust/phoenix/crates/phoenix-native" }
 phoenix-graph-rebuild = { path = "../rust-native/phoenix/crates/phoenix-graph-rebuild" }
 phoenix-hyperbolic = { path = "../rust/phoenix/crates/phoenix-hyperbolic" }

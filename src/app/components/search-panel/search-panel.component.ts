@@ -2655,6 +2655,8 @@ function transportOpsDetail(
   addCount('compile calls', 'compileDualWriteCalls');
   addBytes('compile request', 'compileDualWriteRequestBytes');
   addBytes('compile response', 'compileDualWriteResponseBytes');
+  addBytes('compile raw', 'compileDualWriteRawBytes');
+  addBytes('compile zipped', 'compileDualWriteCompressedBytes');
   addBytes('galaxy request', 'compileGalaxySceneRequestBytes');
   addBytes('galaxy response', 'compileGalaxySceneResponseBytes');
   return parts.join(' / ');

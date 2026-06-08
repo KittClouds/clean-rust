@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest';
+import { gzipSync, strFromU8, strToU8 } from 'fflate';
 
 import {
     GRAPH_MODEL_V2_OVERGRAPH_DOCUMENT_KEY,
     GRAPH_REBUILD_NAMESPACE,
+    decodeNativeGraphCompilerSidecar,
     graphModelV2OverGraphExportToScopedDocument,
     graphIndexReceiptToScopedDocument,
     graphRebuildSnapshotDocumentPayloadStats,
@@ -328,6 +330,39 @@ describe('GraphRebuildService persistence helpers', () => {
         expect(payload.graphModelV2).toBeUndefined();
         expect(payload.semanticCandidateSummary).toBeUndefined();
         expect(JSON.stringify(payload).length).toBeLessThan(JSON.stringify(snapshot).length / 2);
+    });
+
+    it('decodes compressed native graph compiler sidecars without changing the compiler contract', () => {
+        const snapshot = buildGraphRebuildSnapshot({
+            scopeKind: 'global',
+            scopeId: 'global',
+            noteIds: ['note-1'],
+            entities: [entity('entity-kai', 'Kai', []), entity('entity-hazel', 'Hazel', [])],
+            chunks: [{ id: 'note-1:chunk:0', noteId: 'note-1', start: 0, end: 30, ordinal: 0, source: 'dynamic-chunking' }],
+            occurrences: [
+                occurrence('note-1', 'entity-kai', 0, 3),
+                occurrence('note-1', 'entity-hazel', 12, 17),
+            ],
+            noteTexts: { 'note-1': 'Kai approved Hazel.' },
+            builtAt: 42,
+        });
+        const factGraph = snapshot.graphCompiler;
+        if (!factGraph) throw new Error('Expected graph compiler output.');
+        const raw = JSON.stringify(factGraph);
+        const compressed = gzipSync(strToU8(raw), { level: 1 });
+        const sidecar = decodeNativeGraphCompilerSidecar({
+            factGraphPayload: {
+                schemaVersion: 'phoenix-graph-compiler-payload/gzip-base64/v1',
+                sourceSchemaVersion: factGraph.schemaVersion,
+                encoding: 'gzip+base64',
+                rawBytes: raw.length,
+                compressedBytes: compressed.byteLength,
+                payload: btoa(strFromU8(compressed, true)),
+            },
+        });
+
+        expect(sidecar?.factGraph).toEqual(factGraph);
+        expect(sidecar?.projectedUiGraph).toBeUndefined();
     });
 
     it('profiles snapshot payload sections without changing the scoped document contract', () => {

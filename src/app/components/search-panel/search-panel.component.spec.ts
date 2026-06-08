@@ -531,7 +531,7 @@ describe('SearchPanelComponent model recipe lifecycle', () => {
                 kind: 'stage',
                 label: 'Transport Ops',
                 durationMs: 30,
-                detail: 'completed / 0 outputs / calls 3 / total 30 ms / max 15 ms / request 4.5 KiB / response 1.0 KiB / store 2 / wal calls 1 / wal request 2.0 KiB / wal response 256 B / compile calls 1 / compile request 2.5 KiB / compile response 768 B',
+                detail: 'completed / 0 outputs / calls 3 / total 30 ms / max 15 ms / request 4.5 KiB / response 1.0 KiB / store 2 / wal calls 1 / wal request 2.0 KiB / wal response 256 B / compile calls 1 / compile request 2.5 KiB / compile response 768 B / compile raw 4.0 KiB / compile zipped 512 B',
             }),
             expect.objectContaining({
                 kind: 'stage',
@@ -814,6 +814,8 @@ function createFullAtlasPipelineMock() {
                             compileDualWriteCalls: 1,
                             compileDualWriteRequestBytes: 2560,
                             compileDualWriteResponseBytes: 768,
+                            compileDualWriteRawBytes: 4096,
+                            compileDualWriteCompressedBytes: 512,
                         },
                         message: 'TauRPC transport calls and payload volume during this graph run',
                     },

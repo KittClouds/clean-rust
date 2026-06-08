@@ -1,5 +1,6 @@
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet, VecDeque};
 use std::hash::{Hash, Hasher};
+use std::io::Write;
 use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
 
@@ -8,6 +9,8 @@ use crate::tts::{
     NativeQwenSpeakRequest, NativeSupertonicSpeakRequest, NativeTtsLoadRequest, NativeTtsService,
     NativeTtsSpeakRequest, NativeTtsStatus, NativeTtsSynthResult,
 };
+use base64::{engine::general_purpose::STANDARD as BASE64_STANDARD, Engine as _};
+use flate2::{write::GzEncoder, Compression};
 use phoenix_graph_rebuild::{compile_legacy_snapshot, GraphRebuildSnapshot};
 use phoenix_hyperbolic::lorentz_tree::{
     HyperboloidPoint, LorentzForest, LorentzForestIndex, LorentzNode, LorentzQueryMode,
@@ -793,10 +796,15 @@ impl PhoenixApi for PhoenixApiImpl {
             let snapshot = serde_json::from_value::<GraphRebuildSnapshot>(snapshot_value)
                 .map_err(|error| format!("invalid graph rebuild snapshot: {error}"))?;
             let fact_graph = compile_legacy_snapshot(&snapshot);
+            let fact_graph_payload = compressed_json_payload(
+                &fact_graph,
+                "phoenix-graph-compiler-payload/gzip-base64/v1",
+                fact_graph.schema_version.as_str(),
+            )?;
             return serialize_json(&json!({
                 "success": true,
                 "payload": {
-                    "factGraph": fact_graph,
+                    "factGraphPayload": fact_graph_payload,
                 },
                 "error": null,
             }));
@@ -3487,6 +3495,30 @@ fn parse_json<T: DeserializeOwned>(json: &str) -> Result<T, String> {
 fn serialize_json<T: Serialize>(value: &T) -> Result<String, String> {
     serde_json::to_string(value)
         .map_err(|error| format!("failed to serialize Phoenix result: {error}"))
+}
+
+fn compressed_json_payload<T: Serialize>(
+    value: &T,
+    schema_version: &str,
+    source_schema_version: &str,
+) -> Result<Value, String> {
+    let raw = serde_json::to_vec(value)
+        .map_err(|error| format!("failed to serialize compressed Phoenix payload: {error}"))?;
+    let mut encoder = GzEncoder::new(Vec::with_capacity(raw.len() / 4), Compression::fast());
+    encoder
+        .write_all(&raw)
+        .map_err(|error| format!("failed to compress Phoenix payload: {error}"))?;
+    let compressed = encoder
+        .finish()
+        .map_err(|error| format!("failed to finish Phoenix payload compression: {error}"))?;
+    Ok(json!({
+        "schemaVersion": schema_version,
+        "sourceSchemaVersion": source_schema_version,
+        "encoding": "gzip+base64",
+        "rawBytes": raw.len(),
+        "compressedBytes": compressed.len(),
+        "payload": BASE64_STANDARD.encode(compressed),
+    }))
 }
 
 #[cfg(test)]

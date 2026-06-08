@@ -1117,6 +1117,8 @@ function transportDeltaCounters(
         compileDualWriteCalls: 0,
         compileDualWriteRequestBytes: 0,
         compileDualWriteResponseBytes: 0,
+        compileDualWriteRawBytes: 0,
+        compileDualWriteCompressedBytes: 0,
         compileGalaxySceneCalls: 0,
         compileGalaxySceneRequestBytes: 0,
         compileGalaxySceneResponseBytes: 0,
@@ -1163,6 +1165,9 @@ function transportDeltaCounters(
             counters['compileDualWriteCalls'] += count;
             counters['compileDualWriteRequestBytes'] += requestBytes;
             counters['compileDualWriteResponseBytes'] += responseBytes;
+            const payloadCounters = transportPayloadCounterDelta(call, previous);
+            counters['compileDualWriteRawBytes'] += payloadCounters['payload.factGraphPayload.rawBytes'] || 0;
+            counters['compileDualWriteCompressedBytes'] += payloadCounters['payload.factGraphPayload.compressedBytes'] || 0;
         }
         if (call.name === 'phoenix.compile_galaxy_scene') {
             counters['compileGalaxySceneCalls'] += count;
