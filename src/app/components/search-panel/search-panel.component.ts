@@ -2534,6 +2534,9 @@ function receiptRowDetail(
   if (stageId === 'receiptDbOps') {
     return receiptDbOpsDetail(status, outputCount, counters);
   }
+  if (stageId === 'snapshotPayloadProfile') {
+    return snapshotPayloadProfileDetail(status, outputCount, counters);
+  }
   const entries = Object.entries(counters || {})
     .filter(([key, value]) => isVisibleReceiptCounter(key, value, stageId));
   const orderedEntries = prioritizeReceiptCounters(entries, receiptCounterPriority(stageId));
@@ -2578,6 +2581,44 @@ function receiptDbOpsDetail(
     if (payloadChars > 0) parts.push(`payload ${formatCount(payloadChars)} chars`);
   }
   return parts.join(' / ');
+}
+
+const SNAPSHOT_PAYLOAD_SECTION_LIMIT = 8;
+
+function snapshotPayloadProfileDetail(
+  status: string,
+  outputCount: number,
+  counters: Record<string, number>,
+): string {
+  const parts = [status, valueLabel(outputCount, 'output')];
+  const aggregateCounters: Array<[string, string]> = [
+    ['primary', 'snapshotPrimaryPayloadChars'],
+    ['overgraph', 'snapshotOverGraphPayloadChars'],
+    ['total', 'snapshotTotalScopedPayloadChars'],
+  ];
+  for (const [label, key] of aggregateCounters) {
+    const value = counterValue(counters, key);
+    if (value > 0) parts.push(`${label} ${formatCount(value)} chars`);
+  }
+  const sectionEntries = Object.entries(counters || {})
+    .filter(([key, value]) => isSnapshotPayloadSectionCounter(key, value))
+    .sort((left, right) => right[1] - left[1] || left[0].localeCompare(right[0]))
+    .slice(0, SNAPSHOT_PAYLOAD_SECTION_LIMIT);
+  for (const [key, value] of sectionEntries) {
+    parts.push(`${snapshotPayloadSectionLabel(key)} ${formatCount(value)} chars`);
+  }
+  return parts.join(' / ');
+}
+
+function isSnapshotPayloadSectionCounter(key: string, value: number): boolean {
+  return key.startsWith('payload')
+    && key.endsWith('Chars')
+    && Number.isFinite(value)
+    && value > 0;
+}
+
+function snapshotPayloadSectionLabel(key: string): string {
+  return labelFromKey(key.replace(/^payload/, '').replace(/Chars$/i, ''));
 }
 
 function prioritizeReceiptCounters(

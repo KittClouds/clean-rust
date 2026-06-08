@@ -523,6 +523,12 @@ describe('SearchPanelComponent model recipe lifecycle', () => {
             }),
             expect.objectContaining({
                 kind: 'stage',
+                label: 'Snapshot Payload',
+                durationMs: 2,
+                detail: 'completed / 0 outputs / primary 1,200 chars / overgraph 400 chars / total 1,600 chars / graph model v2 700 chars / embedding graph post process 500 chars / chunks 300 chars',
+            }),
+            expect.objectContaining({
+                kind: 'stage',
                 label: 'Receipt DB Ops',
                 durationMs: 15,
                 detail: 'completed / 0 outputs / persist 15 ms / store 10 ms / queue 2 ms / append 3 ms / manifest 1 ms / native 4 ms / rpc 1 / wal 2.0 KiB',
@@ -763,6 +769,22 @@ function createFullAtlasPipelineMock() {
                             snapshotPayloadChars: 1200,
                         },
                         message: 'Snapshot DB reads and persist timing',
+                    },
+                    {
+                        id: 'snapshotPayloadProfile',
+                        label: 'Snapshot Payload',
+                        status: 'completed',
+                        durationMs: 2,
+                        outputCount: 0,
+                        counters: {
+                            snapshotPrimaryPayloadChars: 1200,
+                            snapshotOverGraphPayloadChars: 400,
+                            snapshotTotalScopedPayloadChars: 1600,
+                            payloadChunksChars: 300,
+                            payloadGraphModelV2Chars: 700,
+                            payloadEmbeddingGraphPostProcessChars: 500,
+                        },
+                        message: 'Top-level snapshot JSON payload section sizes',
                     },
                     {
                         id: 'receiptDbOps',
