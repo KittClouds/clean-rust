@@ -2084,9 +2084,14 @@ export interface GraphRebuildBuildTimings {
     occurrenceRecoverMs: number;
     snapshotBuildMs: number;
     stateCommitMs: number;
+    nativeCompilerMs?: number;
     snapshotPersistMs: number;
     snapshotSerializeMs: number;
+    snapshotPrimaryEncodeMs?: number;
+    snapshotOverGraphEncodeMs?: number;
     snapshotStoreMs: number;
+    snapshotPrimaryStoreMs?: number;
+    snapshotOverGraphStoreMs?: number;
     snapshotEventMs: number;
     snapshotPayloadChars: number;
     snapshotPrimaryRawPayloadChars?: number;

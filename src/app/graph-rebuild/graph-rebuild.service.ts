@@ -171,7 +171,7 @@ export class GraphRebuildService {
                 candidateCount: request.candidateCount,
                 calendarRegistrySnapshot: request.calendarRegistrySnapshot,
             }));
-            await this.attachNativeGraphCompilerSidecar(snapshot);
+            await this.attachNativeGraphCompilerSidecar(snapshot, timings);
             finalizeBuildTimings(timings, totalStarted);
             snapshot.buildTimings = timings;
             const stateStarted = performance.now();
@@ -196,7 +196,11 @@ export class GraphRebuildService {
         }
     }
 
-    private async attachNativeGraphCompilerSidecar(snapshot: GraphRebuildSnapshot): Promise<void> {
+    private async attachNativeGraphCompilerSidecar(
+        snapshot: GraphRebuildSnapshot,
+        timings?: GraphRebuildBuildTimings,
+    ): Promise<void> {
+        const started = performance.now();
         try {
             const rawSidecar = await this.phoenix.storeCommand('graphRebuild:compileDualWrite', {
                 snapshot: graphRebuildSnapshotToNativeCompilerPayload(snapshot),
@@ -206,6 +210,8 @@ export class GraphRebuildService {
             attachGraphCompilerReadModels(snapshot, sidecar, 'rust');
         } catch (error) {
             console.warn('[GraphRebuild] Native graph compiler sidecar unavailable; using compatibility sidecar', error);
+        } finally {
+            if (timings) timings.nativeCompilerMs = elapsedMs(started);
         }
     }
 
@@ -267,9 +273,13 @@ export class GraphRebuildService {
         emitEvent = true,
     ): Promise<void> {
         const serializeStarted = performance.now();
+        const primaryEncodeStarted = performance.now();
         const document = graphRebuildSnapshotToScopedDocument(snapshot);
+        if (timings) timings.snapshotPrimaryEncodeMs = elapsedMs(primaryEncodeStarted);
         const documentPayloadStats = graphRebuildSnapshotDocumentPayloadStats(document.payload);
+        const overGraphEncodeStarted = performance.now();
         const overGraphDocument = graphModelV2OverGraphExportToScopedDocument(snapshot);
+        if (timings) timings.snapshotOverGraphEncodeMs = elapsedMs(overGraphEncodeStarted);
         const overGraphDocumentPayloadStats = overGraphDocument
             ? graphRebuildSnapshotDocumentPayloadStats(overGraphDocument.payload)
             : undefined;
@@ -297,8 +307,14 @@ export class GraphRebuildService {
             timings.snapshotTotalPayloadChars = document.payload.length + (overGraphDocument?.payload.length || 0);
         }
         const storeStarted = performance.now();
+        const primaryStoreStarted = performance.now();
         await this.store.upsertScopedDocument(document);
-        if (overGraphDocument) await this.store.upsertScopedDocument(overGraphDocument);
+        if (timings) timings.snapshotPrimaryStoreMs = elapsedMs(primaryStoreStarted);
+        if (overGraphDocument) {
+            const overGraphStoreStarted = performance.now();
+            await this.store.upsertScopedDocument(overGraphDocument);
+            if (timings) timings.snapshotOverGraphStoreMs = elapsedMs(overGraphStoreStarted);
+        }
         if (timings) timings.snapshotStoreMs = elapsedMs(storeStarted);
         if (emitEvent) {
             const eventStarted = performance.now();
@@ -805,9 +821,14 @@ function emptyBuildTimings(): GraphRebuildBuildTimings {
         occurrenceRecoverMs: 0,
         snapshotBuildMs: 0,
         stateCommitMs: 0,
+        nativeCompilerMs: 0,
         snapshotPersistMs: 0,
         snapshotSerializeMs: 0,
+        snapshotPrimaryEncodeMs: 0,
+        snapshotOverGraphEncodeMs: 0,
         snapshotStoreMs: 0,
+        snapshotPrimaryStoreMs: 0,
+        snapshotOverGraphStoreMs: 0,
         snapshotEventMs: 0,
         snapshotPayloadChars: 0,
         snapshotPrimaryRawPayloadChars: 0,
