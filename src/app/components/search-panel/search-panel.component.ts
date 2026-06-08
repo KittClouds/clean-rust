@@ -2648,6 +2648,10 @@ function transportOpsDetail(
   addDuration('max', 'transportMaxMs');
   addBytes('request', 'transportRequestBytes');
   addBytes('response', 'transportResponseBytes');
+  addBytes('json response', 'jsonRpcResponseBytes');
+  addBytes('typed response', 'typedRpcResponseBytes');
+  addBytes('boot snapshot response', 'bootSnapshotJsonResponseBytes');
+  addBytes('init response', 'initRuntimeResponseBytes');
   addCount('store', 'storeCommandCalls');
   addBytes('store request', 'storeCommandRequestBytes');
   addBytes('store response', 'storeCommandResponseBytes');

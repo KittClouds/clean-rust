@@ -1109,7 +1109,17 @@ function transportDeltaCounters(
         transportRequestBytes: 0,
         transportResponseBytes: 0,
         jsonRpcCalls: 0,
+        jsonRpcRequestBytes: 0,
+        jsonRpcResponseBytes: 0,
         typedRpcCalls: 0,
+        typedRpcRequestBytes: 0,
+        typedRpcResponseBytes: 0,
+        bootSnapshotJsonCalls: 0,
+        bootSnapshotJsonRequestBytes: 0,
+        bootSnapshotJsonResponseBytes: 0,
+        initRuntimeCalls: 0,
+        initRuntimeRequestBytes: 0,
+        initRuntimeResponseBytes: 0,
         storeCommandCalls: 0,
         storeCommandTotalMs: 0,
         storeCommandRequestBytes: 0,
@@ -1149,8 +1159,18 @@ function transportDeltaCounters(
         counters['transportRequestBytes'] += requestBytes;
         counters['transportResponseBytes'] += responseBytes;
         counters['transportMaxMs'] = Math.max(counters['transportMaxMs'], localMaxMs);
-        if (call.kind === 'taurpc-json') counters['jsonRpcCalls'] += count;
-        if (call.kind === 'taurpc-typed') counters['typedRpcCalls'] += count;
+        if (call.kind === 'taurpc-json') {
+            addTransportFamilyCounters(counters, 'jsonRpc', count, totalMs, requestBytes, responseBytes);
+        }
+        if (call.kind === 'taurpc-typed') {
+            addTransportFamilyCounters(counters, 'typedRpc', count, totalMs, requestBytes, responseBytes);
+        }
+        if (call.name === 'phoenix.boot_snapshot_json') {
+            addTransportFamilyCounters(counters, 'bootSnapshotJson', count, totalMs, requestBytes, responseBytes);
+        }
+        if (call.name === 'phoenix.init_runtime') {
+            addTransportFamilyCounters(counters, 'initRuntime', count, totalMs, requestBytes, responseBytes);
+        }
         if (call.name.startsWith('phoenix.store_command:')) {
             addTransportFamilyCounters(counters, 'storeCommand', count, totalMs, requestBytes, responseBytes);
         }

@@ -531,7 +531,7 @@ describe('SearchPanelComponent model recipe lifecycle', () => {
                 kind: 'stage',
                 label: 'Transport Ops',
                 durationMs: 30,
-                detail: 'completed / 0 outputs / calls 4 / total 30 ms / max 15 ms / request 5.5 KiB / response 1.6 KiB / store 3 / store request 5.5 KiB / store response 1.6 KiB / scoped reads 1 / scoped read response 640 B / snapshot read response 640 B / wal calls 1 / wal request 2.0 KiB / wal response 256 B / compile calls 1 / compile request 2.5 KiB / compile response 768 B / compile raw 4.0 KiB / compile zipped 512 B',
+                detail: 'completed / 0 outputs / calls 4 / total 30 ms / max 15 ms / request 5.5 KiB / response 1.6 KiB / json response 1.6 KiB / store 3 / store request 5.5 KiB / store response 1.6 KiB / scoped reads 1 / scoped read response 640 B / snapshot read response 640 B / wal calls 1 / wal request 2.0 KiB / wal response 256 B / compile calls 1 / compile request 2.5 KiB / compile response 768 B / compile raw 4.0 KiB / compile zipped 512 B',
             }),
             expect.objectContaining({
                 kind: 'stage',
@@ -807,6 +807,9 @@ function createFullAtlasPipelineMock() {
                             transportMaxMs: 15,
                             transportRequestBytes: 5632,
                             transportResponseBytes: 1664,
+                            jsonRpcCalls: 4,
+                            jsonRpcRequestBytes: 5632,
+                            jsonRpcResponseBytes: 1664,
                             storeCommandCalls: 3,
                             storeCommandRequestBytes: 5632,
                             storeCommandResponseBytes: 1664,

@@ -56,7 +56,7 @@ function storeCommandAuditName(command: string, payload: Record<string, unknown>
 function scopedDocumentAuditKey(filter: Record<string, unknown> | null): string {
     if (!filter) return '';
     const namespace = stringValue(filter['namespace']);
-    const documentKey = stringValue(filter['documentKey']);
+    const documentKey = stringValue(filter['documentKey']) || stringValue(filter['document_key']);
     if (!documentKey) return '';
     if (namespace === GRAPH_REBUILD_NAMESPACE_AUDIT) {
         if (documentKey === 'snapshot') return 'snapshot';
