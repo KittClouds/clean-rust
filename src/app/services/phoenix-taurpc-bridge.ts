@@ -20,6 +20,9 @@ import {
 
 type PhoenixRpc = ReturnType<typeof createTauRPCProxy>;
 type ReadyCallback = () => void;
+const GRAPH_REBUILD_NAMESPACE_AUDIT = 'phoenix_graph_rebuild_v1';
+const GRAPH_REBUILD_OVERGRAPH_DOCUMENT_KEY = 'graph-model-v2-overgraph';
+const GRAPH_REBUILD_POSTPROCESS_CACHE_PREFIX = 'postprocess-cache';
 
 export function registerPhoenixTaurpcBackendIfAvailable(): boolean {
     if (typeof window === 'undefined' || !window.__TAURI_INTERNALS__) {
@@ -30,6 +33,59 @@ export function registerPhoenixTaurpcBackendIfAvailable(): boolean {
     }
     registerPhoenixNativeBackend(new PhoenixTaurpcBridge(createTauRPCProxy()));
     return true;
+}
+
+function storeCommandAuditName(command: string, payload: Record<string, unknown> = {}): string {
+    const base = `phoenix.store_command:${command}`;
+    if (command === 'relation:getFirst' || command === 'relation:list') {
+        const relation = auditToken(payload['relation']);
+        if (!relation) return base;
+        const filter = objectRecord(payload['filter']);
+        if (relation === 'scoped_documents') {
+            const documentKey = scopedDocumentAuditKey(filter);
+            return documentKey ? `${base}:${relation}:${documentKey}` : `${base}:${relation}`;
+        }
+        return `${base}:${relation}`;
+    }
+    if (command === 'note:list' || command === 'note:listByIds' || command === 'note:get') {
+        return `${base}:${payload['includeBody'] === true ? 'body' : 'meta'}`;
+    }
+    return base;
+}
+
+function scopedDocumentAuditKey(filter: Record<string, unknown> | null): string {
+    if (!filter) return '';
+    const namespace = stringValue(filter['namespace']);
+    const documentKey = stringValue(filter['documentKey']);
+    if (!documentKey) return '';
+    if (namespace === GRAPH_REBUILD_NAMESPACE_AUDIT) {
+        if (documentKey === 'snapshot') return 'snapshot';
+        if (documentKey === 'receipt') return 'receipt';
+        if (documentKey === GRAPH_REBUILD_OVERGRAPH_DOCUMENT_KEY) return 'overgraph';
+        if (documentKey.startsWith(`${GRAPH_REBUILD_POSTPROCESS_CACHE_PREFIX}:`)) return 'postprocess-cache';
+    }
+    return auditToken(documentKey);
+}
+
+function objectRecord(value: unknown): Record<string, unknown> | null {
+    return value && typeof value === 'object' && !Array.isArray(value)
+        ? value as Record<string, unknown>
+        : null;
+}
+
+function stringValue(value: unknown): string {
+    return typeof value === 'string' ? value : '';
+}
+
+function auditToken(value: unknown): string {
+    if (typeof value !== 'string') return '';
+    return value
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9_-]+/g, '-')
+        .replace(/-+/g, '-')
+        .replace(/^-|-$/g, '')
+        .slice(0, 64);
 }
 
 class PhoenixTaurpcBridge implements PhoenixNativeBridge {
@@ -216,8 +272,9 @@ class PhoenixTaurpcBridge implements PhoenixNativeBridge {
     async storeCommand(command: string, payload: Record<string, unknown> = {}): Promise<any> {
         await this.loadRuntime();
         const payloadJson = JSON.stringify(payload ?? {});
+        const auditName = storeCommandAuditName(command, payload);
         const result = await phoenixTransportAudit.measureJsonRpc(
-            `phoenix.store_command:${command}`,
+            auditName,
             payloadJson,
             () => this.rpc.phoenix.store_command(command, payloadJson),
             (raw) => parseJson<{ success?: boolean; payload?: unknown; error?: string }>(raw),
@@ -226,7 +283,7 @@ class PhoenixTaurpcBridge implements PhoenixNativeBridge {
             throw new Error(result?.error || `Phoenix store command failed: ${command}`);
         }
         phoenixTransportAudit.recordPayloadCounters(
-            `phoenix.store_command:${command}`,
+            auditName,
             'taurpc-json',
             flattenNumericCounters(result.payload, 'payload'),
         );

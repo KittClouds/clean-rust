@@ -1111,6 +1111,9 @@ function transportDeltaCounters(
         jsonRpcCalls: 0,
         typedRpcCalls: 0,
         storeCommandCalls: 0,
+        storeCommandTotalMs: 0,
+        storeCommandRequestBytes: 0,
+        storeCommandResponseBytes: 0,
         applyWalBatchCalls: 0,
         applyWalBatchRequestBytes: 0,
         applyWalBatchResponseBytes: 0,
@@ -1148,7 +1151,33 @@ function transportDeltaCounters(
         counters['transportMaxMs'] = Math.max(counters['transportMaxMs'], localMaxMs);
         if (call.kind === 'taurpc-json') counters['jsonRpcCalls'] += count;
         if (call.kind === 'taurpc-typed') counters['typedRpcCalls'] += count;
-        if (call.name.startsWith('phoenix.store_command:')) counters['storeCommandCalls'] += count;
+        if (call.name.startsWith('phoenix.store_command:')) {
+            addTransportFamilyCounters(counters, 'storeCommand', count, totalMs, requestBytes, responseBytes);
+        }
+        if (call.name.startsWith('phoenix.store_command:relation:list:')) {
+            addTransportFamilyCounters(counters, 'relationList', count, totalMs, requestBytes, responseBytes);
+        }
+        if (call.name.startsWith('phoenix.store_command:relation:getFirst:')) {
+            addTransportFamilyCounters(counters, 'relationGetFirst', count, totalMs, requestBytes, responseBytes);
+        }
+        if (call.name.startsWith('phoenix.store_command:relation:getFirst:scoped_documents')) {
+            addTransportFamilyCounters(counters, 'scopedDocumentRead', count, totalMs, requestBytes, responseBytes);
+            if (call.name.endsWith(':snapshot')) {
+                addTransportFamilyCounters(counters, 'snapshotDocumentRead', count, totalMs, requestBytes, responseBytes);
+            } else if (call.name.endsWith(':receipt')) {
+                addTransportFamilyCounters(counters, 'receiptDocumentRead', count, totalMs, requestBytes, responseBytes);
+            } else if (call.name.endsWith(':postprocess-cache')) {
+                addTransportFamilyCounters(counters, 'postprocessCacheRead', count, totalMs, requestBytes, responseBytes);
+            } else if (call.name.endsWith(':overgraph')) {
+                addTransportFamilyCounters(counters, 'overGraphDocumentRead', count, totalMs, requestBytes, responseBytes);
+            }
+        }
+        if (call.name.startsWith('phoenix.store_command:note:')) {
+            addTransportFamilyCounters(counters, 'noteCommand', count, totalMs, requestBytes, responseBytes);
+            if (call.name.endsWith(':body')) {
+                addTransportFamilyCounters(counters, 'noteBodyRead', count, totalMs, requestBytes, responseBytes);
+            }
+        }
         if (call.name === 'phoenix.store_command:persistence:applyWalBatch') {
             counters['applyWalBatchCalls'] += count;
             counters['applyWalBatchRequestBytes'] += requestBytes;
@@ -1179,6 +1208,20 @@ function transportDeltaCounters(
         counters[key] = Math.round(counters[key] || 0);
     }
     return counters;
+}
+
+function addTransportFamilyCounters(
+    counters: Record<string, number>,
+    prefix: string,
+    count: number,
+    totalMs: number,
+    requestBytes: number,
+    responseBytes: number,
+): void {
+    counters[`${prefix}Calls`] = (counters[`${prefix}Calls`] || 0) + count;
+    counters[`${prefix}TotalMs`] = (counters[`${prefix}TotalMs`] || 0) + totalMs;
+    counters[`${prefix}RequestBytes`] = (counters[`${prefix}RequestBytes`] || 0) + requestBytes;
+    counters[`${prefix}ResponseBytes`] = (counters[`${prefix}ResponseBytes`] || 0) + responseBytes;
 }
 
 function transportAggregateKey(call: TransportAggregate): string {

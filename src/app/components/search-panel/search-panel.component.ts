@@ -2649,6 +2649,16 @@ function transportOpsDetail(
   addBytes('request', 'transportRequestBytes');
   addBytes('response', 'transportResponseBytes');
   addCount('store', 'storeCommandCalls');
+  addBytes('store request', 'storeCommandRequestBytes');
+  addBytes('store response', 'storeCommandResponseBytes');
+  addBytes('relation list response', 'relationListResponseBytes');
+  addCount('scoped reads', 'scopedDocumentReadCalls');
+  addBytes('scoped read response', 'scopedDocumentReadResponseBytes');
+  addBytes('snapshot read response', 'snapshotDocumentReadResponseBytes');
+  addBytes('receipt read response', 'receiptDocumentReadResponseBytes');
+  addBytes('cache read response', 'postprocessCacheReadResponseBytes');
+  addBytes('overgraph read response', 'overGraphDocumentReadResponseBytes');
+  addBytes('note body response', 'noteBodyReadResponseBytes');
   addCount('wal calls', 'applyWalBatchCalls');
   addBytes('wal request', 'applyWalBatchRequestBytes');
   addBytes('wal response', 'applyWalBatchResponseBytes');
