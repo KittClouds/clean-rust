@@ -285,6 +285,29 @@ describe('Phoenix graph rebuild builder', () => {
                 relatedBundleIds: ['bundle:rust:co-duplicate', 'bundle:rust:co'],
             }),
         ]));
+
+        const compactSidecar = {
+            factGraph: graphCompilerSidecar.factGraph,
+            receipts,
+        } satisfies GraphCompilerDualWriteSidecar;
+        const compactSnapshot = buildGraphRebuildSnapshot({
+            scopeKind: 'note',
+            scopeId: 'note:rust',
+            noteIds: ['note-1'],
+            entities: [entity('kai', 'Kai', []), entity('hazel', 'Hazel', [])],
+            chunks: [{ id: 'chunk-1', noteId: 'note-1', start: 0, end: 18, ordinal: 0, source: 'note-block' }],
+            occurrences: [occurrence('note-1', 'kai', 'Kai', 0, 3), occurrence('note-1', 'hazel', 'Hazel', 8, 13)],
+            graphCompilerSidecar: compactSidecar,
+            builtAt: 77,
+        });
+        expect(compactSnapshot.projectedUiGraph).toEqual([
+            expect.objectContaining({
+                sourceId: 'kai',
+                targetId: 'hazel',
+                edgeType: 'co_occurs_with',
+                evidenceAnchorIds: ['bundle:rust:co'],
+            }),
+        ]);
     });
 
     it('defers disabled embedding lanes without hiding their candidates', () => {

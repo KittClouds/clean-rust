@@ -8,7 +8,7 @@ use crate::tts::{
     NativeQwenSpeakRequest, NativeSupertonicSpeakRequest, NativeTtsLoadRequest, NativeTtsService,
     NativeTtsSpeakRequest, NativeTtsStatus, NativeTtsSynthResult,
 };
-use phoenix_graph_rebuild::{compile_dual_write_snapshot, GraphRebuildSnapshot};
+use phoenix_graph_rebuild::{compile_legacy_snapshot, GraphRebuildSnapshot};
 use phoenix_hyperbolic::lorentz_tree::{
     HyperboloidPoint, LorentzForest, LorentzForestIndex, LorentzNode, LorentzQueryMode,
     LorentzScoreConfig, LorentzTree, LorentzTreeKind, LorentzTreeMembership, LorentzTreeQuery,
@@ -792,13 +792,11 @@ impl PhoenixApi for PhoenixApiImpl {
             let snapshot_value = payload.get("snapshot").cloned().unwrap_or(payload);
             let snapshot = serde_json::from_value::<GraphRebuildSnapshot>(snapshot_value)
                 .map_err(|error| format!("invalid graph rebuild snapshot: {error}"))?;
-            let dual = compile_dual_write_snapshot(&snapshot);
+            let fact_graph = compile_legacy_snapshot(&snapshot);
             return serialize_json(&json!({
                 "success": true,
                 "payload": {
-                    "factGraph": dual.fact_graph,
-                    "projectedUiGraph": dual.projected_ui_graph,
-                    "receipts": dual.receipts,
+                    "factGraph": fact_graph,
                 },
                 "error": null,
             }));

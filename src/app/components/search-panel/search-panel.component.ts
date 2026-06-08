@@ -2651,9 +2651,12 @@ function transportOpsDetail(
   addCount('store', 'storeCommandCalls');
   addCount('wal calls', 'applyWalBatchCalls');
   addBytes('wal request', 'applyWalBatchRequestBytes');
+  addBytes('wal response', 'applyWalBatchResponseBytes');
   addCount('compile calls', 'compileDualWriteCalls');
   addBytes('compile request', 'compileDualWriteRequestBytes');
+  addBytes('compile response', 'compileDualWriteResponseBytes');
   addBytes('galaxy request', 'compileGalaxySceneRequestBytes');
+  addBytes('galaxy response', 'compileGalaxySceneResponseBytes');
   return parts.join(' / ');
 }
 

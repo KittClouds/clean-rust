@@ -1113,10 +1113,13 @@ function transportDeltaCounters(
         storeCommandCalls: 0,
         applyWalBatchCalls: 0,
         applyWalBatchRequestBytes: 0,
+        applyWalBatchResponseBytes: 0,
         compileDualWriteCalls: 0,
         compileDualWriteRequestBytes: 0,
+        compileDualWriteResponseBytes: 0,
         compileGalaxySceneCalls: 0,
         compileGalaxySceneRequestBytes: 0,
+        compileGalaxySceneResponseBytes: 0,
         applyWalBatchNativeParseMs: 0,
         applyWalBatchNativeApplyMs: 0,
         applyWalBatchNativeRelationMs: 0,
@@ -1147,6 +1150,7 @@ function transportDeltaCounters(
         if (call.name === 'phoenix.store_command:persistence:applyWalBatch') {
             counters['applyWalBatchCalls'] += count;
             counters['applyWalBatchRequestBytes'] += requestBytes;
+            counters['applyWalBatchResponseBytes'] += responseBytes;
             const payloadCounters = transportPayloadCounterDelta(call, previous);
             counters['applyWalBatchNativeParseMs'] += payloadCounters['payload.timings.parseMs'] || 0;
             counters['applyWalBatchNativeApplyMs'] += payloadCounters['payload.timings.totalMs'] || 0;
@@ -1158,10 +1162,12 @@ function transportDeltaCounters(
         if (call.name === 'phoenix.store_command:graphRebuild:compileDualWrite') {
             counters['compileDualWriteCalls'] += count;
             counters['compileDualWriteRequestBytes'] += requestBytes;
+            counters['compileDualWriteResponseBytes'] += responseBytes;
         }
         if (call.name === 'phoenix.compile_galaxy_scene') {
             counters['compileGalaxySceneCalls'] += count;
             counters['compileGalaxySceneRequestBytes'] += requestBytes;
+            counters['compileGalaxySceneResponseBytes'] += responseBytes;
         }
     }
     for (const key of Object.keys(counters)) {

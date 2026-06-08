@@ -210,7 +210,7 @@ export interface GraphCompilerProjectedUiEdge extends Omit<GraphRebuildEdge, 'ty
 
 export interface GraphCompilerDualWriteSidecar {
     factGraph: GraphCompilerOutput;
-    projectedUiGraph: GraphCompilerProjectedUiEdge[];
+    projectedUiGraph?: GraphCompilerProjectedUiEdge[];
     receipts?: GraphCompileReceipts;
 }
 
@@ -236,7 +236,7 @@ export function attachGraphCompilerReadModels(
     snapshot.graphCompiler = sidecar.factGraph;
     snapshot.graphCompileReceipts = sidecar.receipts || sidecar.factGraph.receipts;
     snapshot.graphCompilerSource = source;
-    snapshot.projectedUiGraph = sidecar.projectedUiGraph;
+    snapshot.projectedUiGraph = sidecar.projectedUiGraph || projectUiGraphFromCompilerOutput(sidecar.factGraph);
     snapshot.graphModelV2 = buildGraphModelV2FromCompilerOutput(snapshot.id, sidecar.factGraph);
     return snapshot;
 }
