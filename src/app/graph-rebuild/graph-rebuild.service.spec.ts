@@ -5,6 +5,7 @@ import {
     GRAPH_REBUILD_NAMESPACE,
     graphModelV2OverGraphExportToScopedDocument,
     graphIndexReceiptToScopedDocument,
+    graphRebuildSnapshotPayloadCounters,
     graphRebuildSnapshotToScopedDocument,
     mergeGraphRebuildOccurrences,
     postProcessCacheToScopedDocument,
@@ -275,6 +276,38 @@ describe('GraphRebuildService persistence helpers', () => {
         expect(roundtripped?.graphBatch.vertices.length).toBe(expectedVertices);
         expect(roundtripped?.summary.bundleReceipts).toBe(snapshot.graphModelV2?.counters.bundles || 0);
         expect(roundtripped?.graphBatch.edges.some((edge) => edge.edgeType === 'role:source')).toBe(true);
+    });
+
+    it('profiles snapshot payload sections without changing the scoped document contract', () => {
+        const snapshot = buildGraphRebuildSnapshot({
+            scopeKind: 'global',
+            scopeId: 'global',
+            noteIds: ['note-1'],
+            entities: [entity('entity-kai', 'Kai', []), entity('entity-hazel', 'Hazel', [])],
+            chunks: [{ id: 'note-1:chunk:0', noteId: 'note-1', start: 0, end: 30, ordinal: 0, source: 'dynamic-chunking' }],
+            occurrences: [
+                occurrence('note-1', 'entity-kai', 0, 3),
+                occurrence('note-1', 'entity-hazel', 12, 17),
+            ],
+            noteTexts: { 'note-1': 'Kai approved Hazel.' },
+            builtAt: 42,
+        });
+        const document = graphRebuildSnapshotToScopedDocument(snapshot);
+        const overGraphDocument = graphModelV2OverGraphExportToScopedDocument(snapshot);
+
+        const counters = graphRebuildSnapshotPayloadCounters(
+            snapshot,
+            document.payload.length,
+            overGraphDocument?.payload.length || 0,
+        );
+
+        expect(counters['snapshotPrimaryPayloadChars']).toBe(document.payload.length);
+        expect(counters['snapshotOverGraphPayloadChars']).toBe(overGraphDocument?.payload.length || 0);
+        expect(counters['snapshotTotalScopedPayloadChars']).toBe(
+            document.payload.length + (overGraphDocument?.payload.length || 0),
+        );
+        expect(counters['payloadEmbeddingTargetsChars']).toBeGreaterThan(0);
+        expect(counters['payloadGraphModelV2Chars']).toBeGreaterThan(0);
     });
 
     it('keeps postprocess cache documents as lightweight snapshot references', () => {

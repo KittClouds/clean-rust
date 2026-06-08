@@ -2609,7 +2609,44 @@ function receiptCounterPriority(stageId: string): string[] {
     return ['embeddingTargets', 'embeddingPlannedPairs', 'embeddingPrunedPairs', 'embeddingBackboneEdges', 'embeddingClusters', 'linkSuggestions', 'entityLinks'];
   }
   if (stageId === 'snapshotDbOps') {
-    return ['dbLoadMs', 'snapshotPersistMs', 'snapshotStoreMs', 'snapshotSerializeMs', 'snapshotPayloadChars'];
+    return ['dbLoadMs', 'snapshotPersistMs', 'snapshotStoreMs', 'snapshotSerializeMs', 'snapshotPayloadProfileMs', 'snapshotPayloadChars', 'snapshotOverGraphPayloadChars', 'snapshotTotalPayloadChars'];
+  }
+  if (stageId === 'snapshotPayloadProfile') {
+    return [
+      'snapshotPrimaryPayloadChars',
+      'snapshotOverGraphPayloadChars',
+      'snapshotTotalScopedPayloadChars',
+      'payloadEmbeddingTargetsChars',
+      'payloadEmbeddingTargetPlanChars',
+      'payloadEmbeddingGraphPostProcessChars',
+      'payloadHopfResonanceSpaceChars',
+      'payloadGraphModelV2Chars',
+      'payloadGraphCompilerChars',
+      'payloadProjectedUiGraphChars',
+      'payloadSemanticRerankSummaryChars',
+      'payloadSemanticAdjudicationSummaryChars',
+      'payloadSemanticEvalLedgerSummaryChars',
+      'payloadMemoryGraphRagBridgeSummaryChars',
+      'payloadDiscourseSpineSummaryChars',
+      'payloadDiscourseBridgeCandidateSummaryChars',
+      'payloadDiscourseBridgeAdjudicationSummaryChars',
+      'payloadDiscourseEvalLedgerSummaryChars',
+      'payloadDiscoursePromotionSurfaceSummaryChars',
+      'payloadDiscourseCompilerOverlaySummaryChars',
+      'payloadGraphAwareLinkSuggestionsChars',
+      'payloadEntityLinkSuggestionsChars',
+      'payloadShadowLinkSuggestionsChars',
+      'payloadChunksChars',
+      'payloadMentionsChars',
+      'payloadEntityAnchorsChars',
+      'payloadRelationshipsChars',
+      'payloadEventsChars',
+      'payloadTemporalEdgesChars',
+      'payloadCausalEdgesChars',
+      'payloadMemoryStateChars',
+      'payloadNodesChars',
+      'payloadEdgesChars',
+    ];
   }
   if (stageId === 'signalCandidatePlan') {
     return ['documents', 'documentChars', 'entities', 'discoverySkipped', 'discoveryCandidates', 'exportableMentions', 'discoveryCacheHit', 'priorTargets', 'plannedModelCalls'];

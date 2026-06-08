@@ -2089,6 +2089,10 @@ export interface GraphRebuildBuildTimings {
     snapshotStoreMs: number;
     snapshotEventMs: number;
     snapshotPayloadChars: number;
+    snapshotOverGraphPayloadChars?: number;
+    snapshotTotalPayloadChars?: number;
+    snapshotPayloadProfileMs?: number;
+    snapshotPayloadBreakdown?: Record<string, number>;
     dbOpsMs: number;
     totalMs: number;
 }

@@ -70,6 +70,10 @@ export interface GraphRebuildBuildRequest {
     calendarRegistrySnapshot?: CalendarRegistrySnapshot;
 }
 
+type GraphRebuildBuildTimingNumberKey = {
+    [Key in keyof GraphRebuildBuildTimings]-?: NonNullable<GraphRebuildBuildTimings[Key]> extends number ? Key : never;
+}[keyof GraphRebuildBuildTimings];
+
 @Injectable({ providedIn: 'root' })
 export class GraphRebuildService {
     private readonly store = inject(PhoenixStoreService);
@@ -218,13 +222,22 @@ export class GraphRebuildService {
     ): Promise<void> {
         const serializeStarted = performance.now();
         const document = graphRebuildSnapshotToScopedDocument(snapshot);
+        const overGraphDocument = graphModelV2OverGraphExportToScopedDocument(snapshot);
         if (timings) {
+            const profileStarted = performance.now();
+            timings.snapshotPayloadBreakdown = graphRebuildSnapshotPayloadCounters(
+                snapshot,
+                document.payload.length,
+                overGraphDocument?.payload.length || 0,
+            );
+            timings.snapshotPayloadProfileMs = elapsedMs(profileStarted);
             timings.snapshotSerializeMs = elapsedMs(serializeStarted);
             timings.snapshotPayloadChars = document.payload.length;
+            timings.snapshotOverGraphPayloadChars = overGraphDocument?.payload.length || 0;
+            timings.snapshotTotalPayloadChars = document.payload.length + (overGraphDocument?.payload.length || 0);
         }
         const storeStarted = performance.now();
         await this.store.upsertScopedDocument(document);
-        const overGraphDocument = graphModelV2OverGraphExportToScopedDocument(snapshot);
         if (overGraphDocument) await this.store.upsertScopedDocument(overGraphDocument);
         if (timings) timings.snapshotStoreMs = elapsedMs(storeStarted);
         if (emitEvent) {
@@ -483,6 +496,23 @@ export function graphModelV2OverGraphExportToScopedDocument(snapshot: GraphRebui
     };
 }
 
+export function graphRebuildSnapshotPayloadCounters(
+    snapshot: GraphRebuildSnapshot,
+    primaryPayloadChars: number,
+    overGraphPayloadChars = 0,
+): Record<string, number> {
+    const counters: Record<string, number> = {
+        snapshotPrimaryPayloadChars: primaryPayloadChars,
+        snapshotOverGraphPayloadChars: overGraphPayloadChars,
+        snapshotTotalScopedPayloadChars: primaryPayloadChars + overGraphPayloadChars,
+    };
+    for (const [counterKey, snapshotKey] of SNAPSHOT_PAYLOAD_PROFILE_FIELDS) {
+        const chars = jsonPayloadChars((snapshot as unknown as Record<string, unknown>)[snapshotKey]);
+        if (chars > 0) counters[counterKey] = chars;
+    }
+    return counters;
+}
+
 export function scopedDocumentToGraphRebuildSnapshot(document: StoreScopedDocument): GraphRebuildSnapshot | null {
     try {
         const parsed = JSON.parse(document.payload) as GraphRebuildSnapshot;
@@ -566,14 +596,60 @@ function emptyBuildTimings(): GraphRebuildBuildTimings {
         snapshotStoreMs: 0,
         snapshotEventMs: 0,
         snapshotPayloadChars: 0,
+        snapshotOverGraphPayloadChars: 0,
+        snapshotTotalPayloadChars: 0,
+        snapshotPayloadProfileMs: 0,
+        snapshotPayloadBreakdown: {},
         dbOpsMs: 0,
         totalMs: 0,
     };
 }
 
+const SNAPSHOT_PAYLOAD_PROFILE_FIELDS: Array<[string, keyof GraphRebuildSnapshot]> = [
+    ['payloadChunksChars', 'chunks'],
+    ['payloadMentionsChars', 'mentions'],
+    ['payloadEntityAnchorsChars', 'entityAnchors'],
+    ['payloadRelationshipsChars', 'relationships'],
+    ['payloadEventsChars', 'events'],
+    ['payloadTemporalEdgesChars', 'temporalEdges'],
+    ['payloadCausalEdgesChars', 'causalEdges'],
+    ['payloadMemoryStateChars', 'memoryState'],
+    ['payloadEmbeddingTargetsChars', 'embeddingTargets'],
+    ['payloadEmbeddingTargetPlanChars', 'embeddingTargetPlan'],
+    ['payloadEmbeddingGraphPostProcessChars', 'embeddingGraphPostProcess'],
+    ['payloadNodesChars', 'nodes'],
+    ['payloadEdgesChars', 'edges'],
+    ['payloadGraphCompilerChars', 'graphCompiler'],
+    ['payloadProjectedUiGraphChars', 'projectedUiGraph'],
+    ['payloadGraphModelV2Chars', 'graphModelV2'],
+    ['payloadGraphAwareLinkSuggestionsChars', 'graphAwareLinkSuggestions'],
+    ['payloadEntityLinkSuggestionsChars', 'entityLinkSuggestions'],
+    ['payloadShadowLinkSuggestionsChars', 'shadowLinkSuggestions'],
+    ['payloadSemanticTaskSummaryChars', 'semanticTaskSummary'],
+    ['payloadSemanticCandidateSummaryChars', 'semanticCandidateSummary'],
+    ['payloadManifoldSpecializationSummaryChars', 'manifoldSpecializationSummary'],
+    ['payloadSemanticRerankSummaryChars', 'semanticRerankSummary'],
+    ['payloadSemanticAdjudicationSummaryChars', 'semanticAdjudicationSummary'],
+    ['payloadSemanticEvalLedgerSummaryChars', 'semanticEvalLedgerSummary'],
+    ['payloadHopfResonanceSpaceChars', 'hopfResonanceSpace'],
+    ['payloadMemoryGraphRagBridgeSummaryChars', 'memoryGraphRagBridgeSummary'],
+    ['payloadDiscourseSpineSummaryChars', 'discourseSpineSummary'],
+    ['payloadDiscourseBridgeCandidateSummaryChars', 'discourseBridgeCandidateSummary'],
+    ['payloadDiscourseBridgeAdjudicationSummaryChars', 'discourseBridgeAdjudicationSummary'],
+    ['payloadDiscourseEvalLedgerSummaryChars', 'discourseEvalLedgerSummary'],
+    ['payloadDiscoursePromotionSurfaceSummaryChars', 'discoursePromotionSurfaceSummary'],
+    ['payloadDiscourseCompilerOverlaySummaryChars', 'discourseCompilerOverlaySummary'],
+    ['payloadCalendarRegistrySummaryChars', 'calendarRegistrySummary'],
+];
+
+function jsonPayloadChars(value: unknown): number {
+    if (value === undefined) return 0;
+    return JSON.stringify(value).length;
+}
+
 async function timedAsync<T>(
     timings: GraphRebuildBuildTimings,
-    key: keyof GraphRebuildBuildTimings,
+    key: GraphRebuildBuildTimingNumberKey,
     action: () => Promise<T>,
 ): Promise<T> {
     const started = performance.now();
@@ -586,7 +662,7 @@ async function timedAsync<T>(
 
 function timedSync<T>(
     timings: GraphRebuildBuildTimings,
-    key: keyof GraphRebuildBuildTimings,
+    key: GraphRebuildBuildTimingNumberKey,
     action: () => T,
 ): T {
     const started = performance.now();

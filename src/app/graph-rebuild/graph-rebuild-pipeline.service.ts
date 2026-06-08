@@ -1017,13 +1017,26 @@ function appendSnapshotTimingStages(
             snapshotPersistMs: timings.snapshotPersistMs,
             snapshotStoreMs: timings.snapshotStoreMs || 0,
             snapshotSerializeMs: timings.snapshotSerializeMs || 0,
+            snapshotPayloadProfileMs: timings.snapshotPayloadProfileMs || 0,
             snapshotPayloadChars: timings.snapshotPayloadChars || 0,
+            snapshotOverGraphPayloadChars: timings.snapshotOverGraphPayloadChars || 0,
+            snapshotTotalPayloadChars: timings.snapshotTotalPayloadChars || 0,
             occurrenceLoadMs: timings.occurrenceLoadMs,
             chunkLoadMs: timings.chunkLoadMs,
             noteTextLoadMs: timings.noteTextLoadMs,
         },
         'Snapshot DB reads and persist timing',
     ));
+    const payloadBreakdown = timings.snapshotPayloadBreakdown || {};
+    if (Object.keys(payloadBreakdown).length) {
+        stageReceipts.push(instrumentationStage(
+            'snapshotPayloadProfile',
+            'Snapshot Payload',
+            Math.round(timings.snapshotPayloadProfileMs || 0),
+            payloadBreakdown,
+            'Top-level snapshot JSON payload section sizes',
+        ));
+    }
     stageReceipts.push(instrumentationStage(
         'snapshotCpu',
         'Snapshot CPU',
