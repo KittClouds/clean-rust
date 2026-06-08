@@ -9,6 +9,7 @@ import {
     graphIndexReceiptToScopedDocument,
     graphRebuildSnapshotDocumentPayloadStats,
     graphRebuildSnapshotPayloadCounters,
+    graphRebuildSnapshotPersistenceView,
     graphRebuildSnapshotToNativeCompilerPayload,
     graphRebuildSnapshotToScopedDocument,
     mergeGraphRebuildOccurrences,
@@ -382,8 +383,9 @@ describe('GraphRebuildService persistence helpers', () => {
         const document = graphRebuildSnapshotToScopedDocument(snapshot);
         const overGraphDocument = graphModelV2OverGraphExportToScopedDocument(snapshot);
 
+        const persistedSnapshot = graphRebuildSnapshotPersistenceView(snapshot);
         const counters = graphRebuildSnapshotPayloadCounters(
-            snapshot,
+            persistedSnapshot,
             document.payload.length,
             overGraphDocument?.payload.length || 0,
             graphRebuildSnapshotDocumentPayloadStats(document.payload),
@@ -400,6 +402,34 @@ describe('GraphRebuildService persistence helpers', () => {
         );
         expect(counters['payloadEmbeddingTargetsChars']).toBeGreaterThan(0);
         expect(counters['payloadGraphModelV2Chars']).toBeGreaterThan(0);
+        expect(counters['payloadGraphCompilerChars'] || 0).toBe(0);
+    });
+
+    it('persists graph compiler as a derived in-memory sidecar, not primary snapshot payload', () => {
+        const snapshot = buildGraphRebuildSnapshot({
+            scopeKind: 'global',
+            scopeId: 'global',
+            noteIds: ['note-1'],
+            entities: [entity('entity-kai', 'Kai', []), entity('entity-hazel', 'Hazel', [])],
+            chunks: [{ id: 'note-1:chunk:0', noteId: 'note-1', start: 0, end: 30, ordinal: 0, source: 'dynamic-chunking' }],
+            occurrences: [
+                occurrence('note-1', 'entity-kai', 0, 3),
+                occurrence('note-1', 'entity-hazel', 12, 17),
+            ],
+            noteTexts: { 'note-1': 'Kai approved Hazel.' },
+            builtAt: 42,
+        });
+
+        expect(snapshot.graphCompiler).toBeTruthy();
+        expect(snapshot.graphModelV2).toBeTruthy();
+
+        const document = graphRebuildSnapshotToScopedDocument(snapshot);
+        const persisted = scopedDocumentToGraphRebuildSnapshot(document);
+
+        expect(persisted?.graphCompiler).toBeUndefined();
+        expect(persisted?.graphModelV2).toEqual(snapshot.graphModelV2);
+        expect(persisted?.graphCompileReceipts).toEqual(snapshot.graphCompileReceipts);
+        expect(snapshot.graphCompiler).toBeTruthy();
     });
 
     it('compresses large persisted graph rebuild snapshots and round-trips them', () => {
@@ -424,15 +454,18 @@ describe('GraphRebuildService persistence helpers', () => {
         };
 
         const rawChars = JSON.stringify(snapshot).length;
+        const persistedView = graphRebuildSnapshotPersistenceView(snapshot);
+        const persistedRawChars = JSON.stringify(persistedView).length;
         const document = graphRebuildSnapshotToScopedDocument(snapshot);
         const persisted = scopedDocumentToGraphRebuildSnapshot(document);
-        const jsonPersistedSnapshot = JSON.parse(JSON.stringify(snapshot));
+        const jsonPersistedSnapshot = JSON.parse(JSON.stringify(persistedView));
         const stats = graphRebuildSnapshotDocumentPayloadStats(document.payload);
-        const counters = graphRebuildSnapshotPayloadCounters(snapshot, document.payload.length, 0, stats);
+        const counters = graphRebuildSnapshotPayloadCounters(persistedView, document.payload.length, 0, stats);
 
         expect(document.payload.length).toBeLessThan(rawChars);
+        expect(document.payload.length).toBeLessThan(persistedRawChars);
         expect(persisted).toEqual(jsonPersistedSnapshot);
-        expect(counters['snapshotPrimaryRawPayloadChars']).toBe(rawChars);
+        expect(counters['snapshotPrimaryRawPayloadChars']).toBe(persistedRawChars);
         expect(counters['snapshotCompressionSavedChars']).toBeGreaterThan(0);
         expect(counters['snapshotCompressionRatioPct']).toBeLessThan(100);
     });

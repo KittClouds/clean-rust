@@ -273,8 +273,9 @@ export class GraphRebuildService {
         emitEvent = true,
     ): Promise<void> {
         const serializeStarted = performance.now();
+        const persistedSnapshot = graphRebuildSnapshotPersistenceView(snapshot);
         const primaryEncodeStarted = performance.now();
-        const document = graphRebuildSnapshotToScopedDocument(snapshot);
+        const document = graphRebuildSnapshotToScopedDocument(persistedSnapshot);
         if (timings) timings.snapshotPrimaryEncodeMs = elapsedMs(primaryEncodeStarted);
         const documentPayloadStats = graphRebuildSnapshotDocumentPayloadStats(document.payload);
         const overGraphEncodeStarted = performance.now();
@@ -286,7 +287,7 @@ export class GraphRebuildService {
         if (timings) {
             const profileStarted = performance.now();
             timings.snapshotPayloadBreakdown = graphRebuildSnapshotPayloadCounters(
-                snapshot,
+                persistedSnapshot,
                 document.payload.length,
                 overGraphDocument?.payload.length || 0,
                 documentPayloadStats,
@@ -579,10 +580,17 @@ export function graphRebuildSnapshotToScopedDocument(snapshot: GraphRebuildSnaps
         narrativeId: snapshot.scopeKind === 'narrative' ? snapshot.scopeId : '',
         namespace: GRAPH_REBUILD_NAMESPACE,
         documentKey: SNAPSHOT_DOCUMENT_KEY,
-        payload: encodeGraphRebuildSnapshotPayload(snapshot),
+        payload: encodeGraphRebuildSnapshotPayload(graphRebuildSnapshotPersistenceView(snapshot)),
         createdAt: snapshot.builtAt || now,
         updatedAt: now,
     };
+}
+
+export function graphRebuildSnapshotPersistenceView(snapshot: GraphRebuildSnapshot): GraphRebuildSnapshot {
+    if (!snapshot.graphCompiler || !snapshot.graphModelV2) return snapshot;
+    const persisted = { ...snapshot };
+    delete persisted.graphCompiler;
+    return persisted;
 }
 
 function encodeGraphRebuildSnapshotPayload(snapshot: GraphRebuildSnapshot): string {
