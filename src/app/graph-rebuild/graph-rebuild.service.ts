@@ -587,9 +587,16 @@ export function graphRebuildSnapshotToScopedDocument(snapshot: GraphRebuildSnaps
 }
 
 export function graphRebuildSnapshotPersistenceView(snapshot: GraphRebuildSnapshot): GraphRebuildSnapshot {
-    if (!snapshot.graphCompiler || !snapshot.graphModelV2) return snapshot;
     const persisted = { ...snapshot };
-    delete persisted.graphCompiler;
+    if (snapshot.graphCompiler && snapshot.graphModelV2) {
+        delete persisted.graphCompiler;
+    }
+    if (snapshot.embeddingTargetPlan) {
+        const { targets: _targets, ...plan } = snapshot.embeddingTargetPlan as GraphRebuildSnapshot['embeddingTargetPlan'] & {
+            targets?: unknown;
+        };
+        persisted.embeddingTargetPlan = plan;
+    }
     return persisted;
 }
 

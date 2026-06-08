@@ -405,6 +405,37 @@ describe('GraphRebuildService persistence helpers', () => {
         expect(counters['payloadGraphCompilerChars'] || 0).toBe(0);
     });
 
+    it('persists the embedding target plan as lane/count receipts, not duplicate target rows', () => {
+        const snapshot = buildGraphRebuildSnapshot({
+            scopeKind: 'global',
+            scopeId: 'global',
+            noteIds: ['note-1'],
+            entities: [entity('entity-kai', 'Kai', []), entity('entity-hazel', 'Hazel', [])],
+            chunks: [{ id: 'note-1:chunk:0', noteId: 'note-1', start: 0, end: 30, ordinal: 0, source: 'dynamic-chunking' }],
+            occurrences: [
+                occurrence('note-1', 'entity-kai', 0, 3),
+                occurrence('note-1', 'entity-hazel', 12, 17),
+            ],
+            noteTexts: { 'note-1': 'Kai approved Hazel.' },
+            builtAt: 42,
+        });
+
+        expect((snapshot.embeddingTargetPlan as GraphRebuildSnapshot['embeddingTargetPlan'] & { targets?: unknown[] })?.targets?.length)
+            .toBe(snapshot.embeddingTargets.length);
+
+        const persistedView = graphRebuildSnapshotPersistenceView(snapshot);
+        const document = graphRebuildSnapshotToScopedDocument(snapshot);
+        const persisted = scopedDocumentToGraphRebuildSnapshot(document);
+
+        expect((persistedView.embeddingTargetPlan as GraphRebuildSnapshot['embeddingTargetPlan'] & { targets?: unknown[] })?.targets)
+            .toBeUndefined();
+        expect((persisted?.embeddingTargetPlan as GraphRebuildSnapshot['embeddingTargetPlan'] & { targets?: unknown[] })?.targets)
+            .toBeUndefined();
+        expect(persisted?.embeddingTargetPlan?.lanes).toEqual(snapshot.embeddingTargetPlan?.lanes);
+        expect(persisted?.embeddingTargetPlan?.candidateCount).toBe(snapshot.embeddingTargetPlan?.candidateCount);
+        expect(persisted?.embeddingTargets).toEqual(snapshot.embeddingTargets);
+    });
+
     it('persists graph compiler as a derived in-memory sidecar, not primary snapshot payload', () => {
         const snapshot = buildGraphRebuildSnapshot({
             scopeKind: 'global',
