@@ -1055,7 +1055,7 @@ function appendSnapshotTimingStages(
     stageReceipts.push(instrumentationStage(
         'snapshotCpu',
         'Snapshot CPU',
-        Math.round(timings.occurrenceRecoverMs + timings.snapshotBuildMs),
+        Math.round((timings.nativeCompilerMs || 0) + timings.occurrenceRecoverMs + timings.snapshotBuildMs),
         {
             occurrenceRecoverMs: timings.occurrenceRecoverMs,
             snapshotBuildMs: timings.snapshotBuildMs,

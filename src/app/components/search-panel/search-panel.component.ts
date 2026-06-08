@@ -2534,6 +2534,9 @@ function receiptRowDetail(
   if (stageId === 'receiptDbOps') {
     return receiptDbOpsDetail(status, outputCount, counters);
   }
+  if (stageId === 'snapshotDbOps') {
+    return snapshotDbOpsDetail(status, outputCount, counters);
+  }
   if (stageId === 'snapshotPayloadProfile') {
     return snapshotPayloadProfileDetail(status, outputCount, counters);
   }
@@ -2583,6 +2586,34 @@ function receiptDbOpsDetail(
       || counterValue(counters, 'receiptStorePayloadChars');
     if (payloadChars > 0) parts.push(`payload ${formatCount(payloadChars)} chars`);
   }
+  return parts.join(' / ');
+}
+
+function snapshotDbOpsDetail(
+  status: string,
+  outputCount: number,
+  counters: Record<string, number>,
+): string {
+  const parts = [status, valueLabel(outputCount, 'output')];
+  const addMs = (label: string, key: string): void => {
+    const value = counterValue(counters, key);
+    if (value > 0) parts.push(`${label} ${formatDuration(value)}`);
+  };
+  const addChars = (label: string, key: string): void => {
+    const value = counterValue(counters, key);
+    if (value > 0) parts.push(`${label} ${formatCount(value)} chars`);
+  };
+
+  addMs('db load', 'dbLoadMs');
+  addMs('snapshot persist', 'snapshotPersistMs');
+  addMs('snapshot serialize', 'snapshotSerializeMs');
+  addMs('primary encode', 'snapshotPrimaryEncodeMs');
+  addMs('overgraph encode', 'snapshotOverGraphEncodeMs');
+  addMs('payload profile', 'snapshotPayloadProfileMs');
+  addMs('snapshot store', 'snapshotStoreMs');
+  addMs('primary store', 'snapshotPrimaryStoreMs');
+  addMs('overgraph store', 'snapshotOverGraphStoreMs');
+  addChars('payload', 'snapshotPayloadChars');
   return parts.join(' / ');
 }
 
