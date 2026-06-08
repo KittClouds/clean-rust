@@ -2651,6 +2651,9 @@ function transportOpsDetail(
   addBytes('json response', 'jsonRpcResponseBytes');
   addBytes('typed response', 'typedRpcResponseBytes');
   addBytes('boot snapshot response', 'bootSnapshotJsonResponseBytes');
+  addBytes('scan response', 'scanJsonResponseBytes');
+  addBytes('atlas scan response', 'atlasRichScanJsonResponseBytes');
+  addBytes('graph delta response', 'graphDeltaJsonResponseBytes');
   addBytes('init response', 'initRuntimeResponseBytes');
   addCount('store', 'storeCommandCalls');
   addBytes('store request', 'storeCommandRequestBytes');

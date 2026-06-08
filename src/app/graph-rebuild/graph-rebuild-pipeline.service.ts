@@ -781,6 +781,10 @@ export class GraphRebuildPipelineService {
     }
 
     private async safeLoadSnapshot(scopeId: string): Promise<GraphRebuildSnapshot | null> {
+        const inMemorySnapshot = this.lastSnapshotState();
+        if (inMemorySnapshot?.scopeId === scopeId) {
+            return inMemorySnapshot;
+        }
         try {
             return await this.graphRebuild.loadPersistedSnapshot(scopeId);
         } catch {
@@ -1117,6 +1121,15 @@ function transportDeltaCounters(
         bootSnapshotJsonCalls: 0,
         bootSnapshotJsonRequestBytes: 0,
         bootSnapshotJsonResponseBytes: 0,
+        scanJsonCalls: 0,
+        scanJsonRequestBytes: 0,
+        scanJsonResponseBytes: 0,
+        atlasRichScanJsonCalls: 0,
+        atlasRichScanJsonRequestBytes: 0,
+        atlasRichScanJsonResponseBytes: 0,
+        graphDeltaJsonCalls: 0,
+        graphDeltaJsonRequestBytes: 0,
+        graphDeltaJsonResponseBytes: 0,
         initRuntimeCalls: 0,
         initRuntimeRequestBytes: 0,
         initRuntimeResponseBytes: 0,
@@ -1167,6 +1180,15 @@ function transportDeltaCounters(
         }
         if (call.name === 'phoenix.boot_snapshot_json') {
             addTransportFamilyCounters(counters, 'bootSnapshotJson', count, totalMs, requestBytes, responseBytes);
+        }
+        if (call.name === 'phoenix.scan_json') {
+            addTransportFamilyCounters(counters, 'scanJson', count, totalMs, requestBytes, responseBytes);
+        }
+        if (call.name === 'phoenix.atlas_rich_scan_json') {
+            addTransportFamilyCounters(counters, 'atlasRichScanJson', count, totalMs, requestBytes, responseBytes);
+        }
+        if (call.name === 'phoenix.graph_delta_json') {
+            addTransportFamilyCounters(counters, 'graphDeltaJson', count, totalMs, requestBytes, responseBytes);
         }
         if (call.name === 'phoenix.init_runtime') {
             addTransportFamilyCounters(counters, 'initRuntime', count, totalMs, requestBytes, responseBytes);

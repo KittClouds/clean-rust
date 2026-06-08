@@ -506,6 +506,7 @@ describe('GraphRebuildPipelineService', () => {
         graphRebuild.loadPostProcessCache.mockResolvedValue(null);
         graphRebuild.loadPersistedRunReceipt.mockResolvedValue(first.receipt);
         graphRebuild.loadPersistedSnapshot.mockResolvedValue(first.snapshot);
+        graphRebuild.loadPersistedSnapshot.mockClear();
         atlasRuntime.runCapability.mockClear();
         store.pauseSnapshots.mockClear();
         store.resumeSnapshots.mockClear();
@@ -518,6 +519,7 @@ describe('GraphRebuildPipelineService', () => {
         expect(atlasRuntime.runCapability).toHaveBeenCalledWith('lorentzForest', expect.objectContaining({ skipModelWarm: true }));
         expect(atlasRuntime.runCapability).toHaveBeenCalledWith('productManifold', expect.objectContaining({ skipModelWarm: true }));
         expect(atlasRuntime.runCapability).not.toHaveBeenCalledWith('nliAdjudication', expect.anything());
+        expect(graphRebuild.loadPersistedSnapshot).not.toHaveBeenCalled();
         expect(graphRebuild.buildAndPersistSnapshot).toHaveBeenCalledTimes(1);
         expect(graphRebuild.restorePersistedSnapshot).toHaveBeenCalledWith(first.snapshot);
         expect(store.pauseSnapshots).toHaveBeenCalledTimes(1);
@@ -1207,6 +1209,8 @@ function createGraphRebuildMock() {
     return {
         buildAndPersistSnapshot: vi.fn(async () => ({
             id: 'snapshot-1',
+            scopeId: 'note:note-1',
+            scopeKind: 'note',
             embeddingGraphPostProcess: { schemaVersion: 'phoenix-embedding-graph-postprocess/v1' },
             embeddingTargets: [
                 { id: 'embed:entity:entity-kai', kind: 'entity', sourceId: 'entity-kai', label: 'Kai', text: 'Kai', evidenceIds: [] },
