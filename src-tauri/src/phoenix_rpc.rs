@@ -5,6 +5,10 @@ use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
 
 use crate::graph_galaxy::{compile_scene, DesktopGalaxyScene, DesktopGalaxySceneRequest};
+use crate::graph_scene_packet::{
+    compile_packet, GraphScenePacket, GraphScenePacketEdgeInput, GraphScenePacketInput,
+    GraphScenePacketNodeInput, GraphScenePacketRequest,
+};
 use crate::tts::{
     NativeQwenSpeakRequest, NativeSupertonicSpeakRequest, NativeTtsLoadRequest, NativeTtsService,
     NativeTtsSpeakRequest, NativeTtsStatus, NativeTtsSynthResult,
@@ -576,6 +580,7 @@ pub trait PhoenixApi {
     async fn scan_json(request_json: String) -> Result<String, String>;
     async fn atlas_rich_scan_json(request_json: String) -> Result<String, String>;
     async fn manifold_snapshot_json(request_json: String) -> Result<String, String>;
+    async fn graph_scene_packet_json(request_json: String) -> Result<String, String>;
     async fn lorentz_forest_cache_json(request_json: String) -> Result<String, String>;
     async fn lorentz_forest_build_json(request_json: String) -> Result<String, String>;
     async fn lorentz_forest_query_json(request_json: String) -> Result<String, String>;
@@ -699,6 +704,13 @@ impl PhoenixApi for PhoenixApiImpl {
         let guard = self.lock_state()?;
         let snapshot = build_manifold_snapshot(&guard.host, request)?;
         serialize_json(&snapshot)
+    }
+
+    async fn graph_scene_packet_json(self, request_json: String) -> Result<String, String> {
+        let request = parse_json::<GraphScenePacketRequest>(&request_json)?;
+        let guard = self.lock_state()?;
+        let packet = build_graph_scene_packet(&guard.host, request)?;
+        serialize_json(&packet)
     }
 
     async fn lorentz_forest_cache_json(self, request_json: String) -> Result<String, String> {
@@ -1103,6 +1115,107 @@ fn build_manifold_snapshot(
         },
         payload,
     })
+}
+
+fn build_graph_scene_packet(
+    host: &PhoenixNativeHost,
+    request: GraphScenePacketRequest,
+) -> Result<GraphScenePacket, String> {
+    let manifold = request.manifold.clone().unwrap_or_else(|| "hybrid".to_owned());
+    let layout_mode = request
+        .layout_mode
+        .clone()
+        .unwrap_or_else(|| layout_mode_for_manifold(&manifold).to_owned());
+    let source_mode = request
+        .source_mode
+        .clone()
+        .unwrap_or_else(|| "embeddings".to_owned());
+    let limit = request.limit.unwrap_or(4096).max(1);
+    let settings = request.settings.unwrap_or_default();
+
+    if let Some(nodes) = request.nodes {
+        let edges = request.edges.unwrap_or_default();
+        return Ok(compile_packet(GraphScenePacketInput {
+            source: request.source.unwrap_or_else(|| "inline".to_owned()),
+            manifold,
+            layout_mode,
+            source_mode,
+            source_label: "inline graph scene packet".to_owned(),
+            limit,
+            settings,
+            nodes,
+            edges,
+        }));
+    }
+
+    let snapshot = build_manifold_snapshot(
+        host,
+        DesktopManifoldSnapshotRequest {
+            manifold: Some(manifold.clone()),
+            scope: request.scope,
+            limit: Some(limit),
+        },
+    )?;
+    let nodes = snapshot
+        .payload
+        .nodes
+        .iter()
+        .map(scene_packet_node_from_desktop)
+        .collect::<Vec<_>>();
+    let edges = snapshot
+        .payload
+        .edges
+        .iter()
+        .map(scene_packet_edge_from_desktop)
+        .collect::<Vec<_>>();
+
+    Ok(compile_packet(GraphScenePacketInput {
+        source: request
+            .source
+            .unwrap_or_else(|| "manifoldSnapshot".to_owned()),
+        manifold: snapshot.manifold.to_owned(),
+        layout_mode,
+        source_mode,
+        source_label: snapshot.source_label.to_owned(),
+        limit,
+        settings,
+        nodes,
+        edges,
+    }))
+}
+
+fn layout_mode_for_manifold(manifold: &str) -> &'static str {
+    match manifold {
+        "hopf" => "hopfProjection",
+        "lorentz" => "lorentzTree",
+        "product" => "productManifold",
+        "siegel" => "siegelFinsler",
+        _ => "hybridSpace",
+    }
+}
+
+fn scene_packet_node_from_desktop(node: &DesktopManifoldNode) -> GraphScenePacketNodeInput {
+    GraphScenePacketNodeInput {
+        id: node.id.clone(),
+        label: node.label.clone(),
+        kind: node.kind.clone(),
+        source_type: node.source_type.clone(),
+        vector: node.vector.iter().map(|value| *value as f32).collect(),
+        base_vector: node
+            .base_vector
+            .map(|value| [value[0] as f32, value[1] as f32, value[2] as f32]),
+        total_mentions: None,
+    }
+}
+
+fn scene_packet_edge_from_desktop(edge: &DesktopManifoldEdge) -> GraphScenePacketEdgeInput {
+    GraphScenePacketEdgeInput {
+        id: edge.id.clone(),
+        source_id: edge.source_id.clone(),
+        target_id: edge.target_id.clone(),
+        edge_type: edge.edge_type.clone(),
+        confidence: edge.confidence as f32,
+    }
 }
 
 fn store_relation_rows(host: &PhoenixNativeHost, relation: &str) -> Result<Vec<Value>, String> {

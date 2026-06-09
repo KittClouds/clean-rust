@@ -2,6 +2,10 @@ import { createTauRPCProxy, type Router as PhoenixTaurpcRouter } from '../genera
 import { registerPhoenixNativeBackend, type PhoenixNativeBridge } from './phoenix-backend.service';
 import type { PhoenixBootSnapshotRows } from './phoenix-boot-snapshot.model';
 import type { PhoenixGalaxyScene, PhoenixGalaxySceneRequest } from './phoenix-galaxy-scene.model';
+import type {
+    PhoenixGraphScenePacket,
+    PhoenixGraphScenePacketRequest,
+} from './phoenix-graph-scene-packet.model';
 import { phoenixTransportAudit } from './phoenix-transport-audit';
 import type { PhoenixSnapshotPartition } from './phoenix-wasm.service';
 import {
@@ -162,6 +166,10 @@ class PhoenixTaurpcBridge implements PhoenixNativeBridge {
 
     async manifoldSnapshot(request: Record<string, unknown>): Promise<any> {
         return this.callJson('manifold_snapshot_json', request);
+    }
+
+    async graphScenePacket(request: PhoenixGraphScenePacketRequest): Promise<PhoenixGraphScenePacket> {
+        return this.callJson('graph_scene_packet_json', request);
     }
 
     async lorentzForestCache(request: Record<string, unknown>): Promise<any> {

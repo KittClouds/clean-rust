@@ -16,6 +16,10 @@ import {
 } from './phoenix-wasm.service';
 import type { PhoenixBootSnapshotRows as PhoenixBootSnapshotPayload } from './phoenix-boot-snapshot.model';
 import type { PhoenixGalaxyScene, PhoenixGalaxySceneRequest } from './phoenix-galaxy-scene.model';
+import type {
+    PhoenixGraphScenePacket,
+    PhoenixGraphScenePacketRequest,
+} from './phoenix-graph-scene-packet.model';
 
 type PhoenixTransportMethodName =
     | 'onReady'
@@ -81,6 +85,7 @@ export type PhoenixNativeBridge = Pick<PhoenixWasmService, 'isReady' | PhoenixNa
     loadRuntime(): Promise<void>;
     bootSnapshot(): Promise<PhoenixBootSnapshotPayload>;
     compileGalaxyScene(request: PhoenixGalaxySceneRequest): Promise<PhoenixGalaxyScene>;
+    graphScenePacket?(request: PhoenixGraphScenePacketRequest): Promise<PhoenixGraphScenePacket>;
     siegelFinslerReceipt?(request: Record<string, unknown>): Promise<any>;
 };
 
@@ -313,6 +318,17 @@ export class PhoenixBackendService {
             throw new Error('Phoenix galaxy scene compilation is only available on native desktop.');
         }
         return this.requireNativeBridge().compileGalaxyScene(request);
+    }
+
+    async graphScenePacket(request: PhoenixGraphScenePacketRequest): Promise<PhoenixGraphScenePacket> {
+        if (this.target !== 'native') {
+            throw new Error('Phoenix graph scene packets are only available on native desktop.');
+        }
+        const bridge = this.requireNativeBridge();
+        if (!bridge.graphScenePacket) {
+            throw new Error('Phoenix native graph scene packet compiler is unavailable.');
+        }
+        return bridge.graphScenePacket(request);
     }
 
     async storeCommand(command: string, payload: Record<string, unknown> = {}): Promise<any> {

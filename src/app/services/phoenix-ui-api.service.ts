@@ -31,6 +31,10 @@ import {
     type ManifoldProjectionSource,
     type ManifoldTopologyPayload,
 } from './manifold-atlas.types';
+import type {
+    PhoenixGraphScenePacket,
+    PhoenixGraphScenePacketRequest,
+} from './phoenix-graph-scene-packet.model';
 import type { PhoenixGraphDeltaBinaryResult } from './phoenix-wasm.service';
 
 export interface ProvenanceContext {
@@ -1011,6 +1015,16 @@ export class PhoenixUiApiService {
                 source: 'fallback',
             },
         };
+    }
+
+    async loadStagedGraphScenePacket(request: PhoenixGraphScenePacketRequest): Promise<PhoenixGraphScenePacket | null> {
+        await this.loadRuntime();
+        try {
+            return await this.phoenix.graphScenePacket(request);
+        } catch (error) {
+            console.warn('[PhoenixUiApi] Native graph scene packet unavailable.', error);
+            return null;
+        }
     }
 
     async lorentzForestCacheStatus(
