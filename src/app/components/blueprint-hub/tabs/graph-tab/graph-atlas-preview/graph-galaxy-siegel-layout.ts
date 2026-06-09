@@ -358,10 +358,10 @@ function targetFlourish(t: number, amount: number): number {
 
 function fallbackDepth(node: GalaxyNode, lane: string): number {
     const meta = node.entity.metadata || {};
-    const sourceType = String(meta.sourceType || '').toLowerCase();
+    const sourceType = String(meta['sourceType'] || '').toLowerCase();
     const kind = String(node.entity.kind || '').toLowerCase();
-    const graphKind = String(meta.graphKind || '').toLowerCase();
-    const signalLane = String(meta.signalLane || '').toLowerCase();
+    const graphKind = String(meta['graphKind'] || '').toLowerCase();
+    const signalLane = String(meta['signalLane'] || '').toLowerCase();
     const text = `${sourceType} ${kind} ${graphKind} ${signalLane}`;
     if (/\b(note|doc|document)\b/.test(text)) return 0;
     if (/structure[-_]?root|document[-_]?root|\broot\b/.test(text)) return 1;
