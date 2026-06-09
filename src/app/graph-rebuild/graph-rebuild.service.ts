@@ -18,6 +18,11 @@ import {
     type StoreScopedDocument,
 } from '../services/phoenix-store.service';
 import { attachGraphCompilerReadModels } from './graph-compiler-read-model';
+import { buildGraphDiscourseBridgeAdjudicationSummary } from './graph-discourse-bridge-adjudication';
+import { buildGraphDiscourseBridgeCandidateSummary } from './graph-discourse-bridge-candidates';
+import { buildGraphDiscourseCompilerOverlaySummary } from './graph-discourse-compiler-overlay';
+import { buildGraphDiscourseEvalLedgerSummary } from './graph-discourse-eval-ledger';
+import { buildGraphDiscoursePromotionSurfaceSummary } from './graph-discourse-promotion-surface';
 import { buildGraphRebuildSnapshot } from './graph-rebuild-builder';
 import { buildGraphDiscourseSpineSummary } from './graph-discourse-spine';
 import { buildHopfResonanceSpace } from './graph-hopf-resonance-space';
@@ -604,6 +609,11 @@ export function graphRebuildSnapshotPersistenceView(snapshot: GraphRebuildSnapsh
     delete persisted.hopfResonanceSpace;
     delete persisted.memoryGraphRagBridgeSummary;
     delete persisted.discourseSpineSummary;
+    delete persisted.discourseBridgeCandidateSummary;
+    delete persisted.discourseBridgeAdjudicationSummary;
+    delete persisted.discourseEvalLedgerSummary;
+    delete persisted.discoursePromotionSurfaceSummary;
+    delete persisted.discourseCompilerOverlaySummary;
     delete persisted.semanticTaskSummary;
     return persisted;
 }
@@ -653,6 +663,76 @@ export function hydrateGraphRebuildSnapshotDerivedViews(snapshot: GraphRebuildSn
         hydrated.counters.discourseSpineResolution = discourseSpineSummary.counters.resolutionCandidates;
         hydrated.counters.discourseSpineReceipts = discourseSpineSummary.counters.receiptCount;
         hydrated.counters.discourseSpineMutationAllowed = discourseSpineSummary.counters.mutationAllowedCount;
+    }
+    if (!hydrated.discourseBridgeCandidateSummary) {
+        hydrated = cloneGraphRebuildSnapshotForHydration(hydrated);
+        const discourseBridgeCandidateSummary = buildGraphDiscourseBridgeCandidateSummary(
+            hydrated,
+            hydrated.discourseSpineSummary,
+            hydrated.builtAt,
+        );
+        hydrated.discourseBridgeCandidateSummary = discourseBridgeCandidateSummary;
+        hydrated.counters.discourseBridgeCandidates = discourseBridgeCandidateSummary.counters.candidateCount;
+        hydrated.counters.discourseBridgeInputs = discourseBridgeCandidateSummary.counters.inputCount;
+        hydrated.counters.discourseBridgeJudgments = discourseBridgeCandidateSummary.counters.judgmentCount;
+        hydrated.counters.discourseBridgeEvalRows = discourseBridgeCandidateSummary.counters.evalRowCount;
+        hydrated.counters.discourseBridgeReceipts = discourseBridgeCandidateSummary.counters.receiptCount;
+        hydrated.counters.discourseBridgePlannedModelCalls = discourseBridgeCandidateSummary.counters.plannedModelCalls;
+        hydrated.counters.discourseBridgeMutationAllowed = discourseBridgeCandidateSummary.counters.mutationAllowedCount;
+    }
+    if (!hydrated.discourseBridgeAdjudicationSummary) {
+        hydrated = cloneGraphRebuildSnapshotForHydration(hydrated);
+        const discourseBridgeAdjudicationSummary = buildGraphDiscourseBridgeAdjudicationSummary(
+            hydrated,
+            hydrated.discourseBridgeCandidateSummary,
+            hydrated.builtAt,
+        );
+        hydrated.discourseBridgeAdjudicationSummary = discourseBridgeAdjudicationSummary;
+        hydrated.counters.discourseBridgeAdjudicationDecisions = discourseBridgeAdjudicationSummary.counters.decisionCount;
+        hydrated.counters.discourseBridgeAdjudicationAccepted = discourseBridgeAdjudicationSummary.counters.acceptedCount;
+        hydrated.counters.discourseBridgeAdjudicationSupported = discourseBridgeAdjudicationSummary.counters.supportedCount;
+        hydrated.counters.discourseBridgeAdjudicationDeferred = discourseBridgeAdjudicationSummary.counters.deferredCount;
+        hydrated.counters.discourseBridgeAdjudicationRejected = discourseBridgeAdjudicationSummary.counters.rejectedCount;
+        hydrated.counters.discourseBridgeAdjudicationReceipts = discourseBridgeAdjudicationSummary.counters.receiptCount;
+        hydrated.counters.discourseBridgeAdjudicationLedgerOnly = discourseBridgeAdjudicationSummary.counters.ledgerOnlyCount;
+        hydrated.counters.discourseBridgeAdjudicationTopologyCommits = discourseBridgeAdjudicationSummary.counters.topologyCommitCount;
+        hydrated.counters.discourseBridgeAdjudicationMutationAllowed = discourseBridgeAdjudicationSummary.counters.mutationAllowedCount;
+    }
+    if (!hydrated.discourseEvalLedgerSummary) {
+        hydrated = cloneGraphRebuildSnapshotForHydration(hydrated);
+        const discourseEvalLedgerSummary = buildGraphDiscourseEvalLedgerSummary(hydrated, hydrated.builtAt);
+        hydrated.discourseEvalLedgerSummary = discourseEvalLedgerSummary;
+        hydrated.counters.discourseEvalLedgerRows = discourseEvalLedgerSummary.counters.rowCount;
+        hydrated.counters.discourseEvalAcceptedCandidates = discourseEvalLedgerSummary.counters.acceptedCandidates;
+        hydrated.counters.discourseEvalRejectedCandidates = discourseEvalLedgerSummary.counters.rejectedCandidates;
+        hydrated.counters.discourseEvalAmbiguousCases = discourseEvalLedgerSummary.counters.ambiguousCases;
+        hydrated.counters.discourseEvalModelDisagreements = discourseEvalLedgerSummary.counters.modelDisagreements;
+        hydrated.counters.discourseEvalManifoldDisagreements = discourseEvalLedgerSummary.counters.manifoldDisagreements;
+        hydrated.counters.discourseEvalGraphChangeRows = discourseEvalLedgerSummary.counters.graphChangeRows;
+    }
+    if (!hydrated.discoursePromotionSurfaceSummary) {
+        hydrated = cloneGraphRebuildSnapshotForHydration(hydrated);
+        const discoursePromotionSurfaceSummary = buildGraphDiscoursePromotionSurfaceSummary(hydrated, hydrated.builtAt);
+        hydrated.discoursePromotionSurfaceSummary = discoursePromotionSurfaceSummary;
+        hydrated.counters.discoursePromotionChunkWormholes = discoursePromotionSurfaceSummary.counters.chunkWormholeCount;
+        hydrated.counters.discoursePromotionDocumentClusters = discoursePromotionSurfaceSummary.counters.documentClusterCount;
+        hydrated.counters.discoursePromotionResolverCandidates = discoursePromotionSurfaceSummary.counters.resolverCandidateCount;
+        hydrated.counters.discoursePromotionCompilerHints = discoursePromotionSurfaceSummary.counters.compilerHintCount;
+        hydrated.counters.discoursePromotionReceipts = discoursePromotionSurfaceSummary.counters.receiptCount;
+        hydrated.counters.discoursePromotionGraphPatches = discoursePromotionSurfaceSummary.counters.graphPatchCount;
+        hydrated.counters.discoursePromotionMutationAllowed = discoursePromotionSurfaceSummary.counters.mutationAllowedCount;
+    }
+    if (!hydrated.discourseCompilerOverlaySummary) {
+        hydrated = cloneGraphRebuildSnapshotForHydration(hydrated);
+        const discourseCompilerOverlaySummary = buildGraphDiscourseCompilerOverlaySummary(hydrated, hydrated.builtAt);
+        hydrated.discourseCompilerOverlaySummary = discourseCompilerOverlaySummary;
+        hydrated.counters.discourseCompilerOverlayEdges = discourseCompilerOverlaySummary.counters.overlayEdgeCount;
+        hydrated.counters.discourseCompilerOverlayChunkWormholes = discourseCompilerOverlaySummary.counters.chunkWormholeEdges;
+        hydrated.counters.discourseCompilerOverlayDocumentClusters = discourseCompilerOverlaySummary.counters.documentClusterEdges;
+        hydrated.counters.discourseCompilerOverlayResolvers = discourseCompilerOverlaySummary.counters.resolverEdges;
+        hydrated.counters.discourseCompilerOverlayReceipts = discourseCompilerOverlaySummary.counters.receiptCount;
+        hydrated.counters.discourseCompilerOverlayGraphPatches = discourseCompilerOverlaySummary.counters.graphPatchCount;
+        hydrated.counters.discourseCompilerOverlayMutationAllowed = discourseCompilerOverlaySummary.counters.mutationAllowedCount;
     }
     return hydrated;
 }

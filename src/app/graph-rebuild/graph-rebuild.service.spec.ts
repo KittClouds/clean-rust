@@ -518,10 +518,25 @@ describe('GraphRebuildService persistence helpers', () => {
         const hydrated = persisted ? hydrateGraphRebuildSnapshotDerivedViews(persisted) : null;
 
         expect(persistedView.discourseSpineSummary).toBeUndefined();
+        expect(persistedView.discourseBridgeCandidateSummary).toBeUndefined();
+        expect(persistedView.discourseBridgeAdjudicationSummary).toBeUndefined();
+        expect(persistedView.discourseEvalLedgerSummary).toBeUndefined();
+        expect(persistedView.discoursePromotionSurfaceSummary).toBeUndefined();
+        expect(persistedView.discourseCompilerOverlaySummary).toBeUndefined();
         expect(persisted?.discourseSpineSummary).toBeUndefined();
+        expect(persisted?.discourseBridgeCandidateSummary).toBeUndefined();
+        expect(persisted?.discourseBridgeAdjudicationSummary).toBeUndefined();
+        expect(persisted?.discourseEvalLedgerSummary).toBeUndefined();
+        expect(persisted?.discoursePromotionSurfaceSummary).toBeUndefined();
+        expect(persisted?.discourseCompilerOverlaySummary).toBeUndefined();
         expect(hydrated?.discourseSpineSummary).toEqual(snapshot.discourseSpineSummary);
         expect(hydrated?.counters.discourseSpineTargets).toBe(snapshot.counters.discourseSpineTargets);
         expect(hydrated?.discourseBridgeCandidateSummary).toEqual(snapshot.discourseBridgeCandidateSummary);
+        expect(hydrated?.discourseBridgeAdjudicationSummary).toEqual(snapshot.discourseBridgeAdjudicationSummary);
+        expect(hydrated?.discourseEvalLedgerSummary).toEqual(snapshot.discourseEvalLedgerSummary);
+        expect(hydrated?.discoursePromotionSurfaceSummary).toEqual(snapshot.discoursePromotionSurfaceSummary);
+        expect(hydrated?.discourseCompilerOverlaySummary).toEqual(snapshot.discourseCompilerOverlaySummary);
+        expect(hydrated?.counters.discourseCompilerOverlayEdges).toBe(snapshot.counters.discourseCompilerOverlayEdges);
     });
 
     it('hydrates MemoryGraphRAG bridge as a derived reload view instead of durable payload bulk', () => {
