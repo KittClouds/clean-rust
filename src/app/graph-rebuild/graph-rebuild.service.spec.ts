@@ -459,10 +459,19 @@ describe('GraphRebuildService persistence helpers', () => {
         const persisted = scopedDocumentToGraphRebuildSnapshot(document);
 
         expect(persistedView.semanticTaskSummary).toBeUndefined();
+        expect(persistedView.semanticRerankSummary).toBeUndefined();
+        expect(persistedView.semanticAdjudicationSummary).toBeUndefined();
+        expect(persistedView.semanticEvalLedgerSummary).toBeUndefined();
         expect(persisted?.semanticTaskSummary).toBeUndefined();
+        expect(persisted?.semanticRerankSummary).toBeUndefined();
+        expect(persisted?.semanticAdjudicationSummary).toBeUndefined();
+        expect(persisted?.semanticEvalLedgerSummary).toBeUndefined();
         expect(persisted?.semanticCandidateSummary).toEqual(snapshot.semanticCandidateSummary);
-        expect(persisted?.semanticRerankSummary).toEqual(snapshot.semanticRerankSummary);
-        expect(persisted?.semanticEvalLedgerSummary).toEqual(snapshot.semanticEvalLedgerSummary);
+        const hydrated = persisted ? hydrateGraphRebuildSnapshotDerivedViews(persisted) : null;
+        expect(hydrated?.semanticRerankSummary).toEqual(snapshot.semanticRerankSummary);
+        expect(hydrated?.semanticAdjudicationSummary).toEqual(snapshot.semanticAdjudicationSummary);
+        expect(hydrated?.semanticEvalLedgerSummary).toEqual(snapshot.semanticEvalLedgerSummary);
+        expect(hydrated?.counters.semanticAdjudicationTopologyCommits).toBe(snapshot.counters.semanticAdjudicationTopologyCommits);
     });
 
     it('hydrates Hopf resonance as a derived reload view instead of durable payload bulk', () => {

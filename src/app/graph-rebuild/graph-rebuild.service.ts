@@ -27,6 +27,9 @@ import { buildGraphRebuildSnapshot } from './graph-rebuild-builder';
 import { buildGraphDiscourseSpineSummary } from './graph-discourse-spine';
 import { buildHopfResonanceSpace } from './graph-hopf-resonance-space';
 import { buildGraphMemoryGraphRagBridgeSummary } from './graph-memory-graphrag-bridge';
+import { buildGraphSemanticAdjudicationDAGSummary } from './graph-semantic-adjudication';
+import { buildGraphSemanticEvalLedgerSummary } from './graph-semantic-eval-ledger';
+import { buildGraphSemanticRerankSummary } from './graph-semantic-rerank';
 import { buildAdaptiveGraphRebuildChunks } from './graph-rebuild-meaning-frames';
 import {
     buildGraphModelV2OverGraphExport,
@@ -615,6 +618,9 @@ export function graphRebuildSnapshotPersistenceView(snapshot: GraphRebuildSnapsh
     delete persisted.discoursePromotionSurfaceSummary;
     delete persisted.discourseCompilerOverlaySummary;
     delete persisted.semanticTaskSummary;
+    delete persisted.semanticRerankSummary;
+    delete persisted.semanticAdjudicationSummary;
+    delete persisted.semanticEvalLedgerSummary;
     return persisted;
 }
 
@@ -637,6 +643,48 @@ export function hydrateGraphRebuildSnapshotDerivedViews(snapshot: GraphRebuildSn
         hydrated.counters.hopfResonanceBraids = hopfResonanceSpace.braids.length;
         hydrated.counters.hopfResonanceDroppedTargets = hopfResonanceSpace.counters.droppedTargets;
         hydrated.counters.hopfResonanceMutationAllowed = hopfResonanceSpace.counters.mutationAllowedCount;
+    }
+    if (!hydrated.semanticRerankSummary && hydrated.semanticCandidateSummary) {
+        hydrated = cloneGraphRebuildSnapshotForHydration(hydrated);
+        const semanticRerankSummary = buildGraphSemanticRerankSummary(
+            hydrated,
+            hydrated.semanticCandidateSummary,
+            hydrated.manifoldSpecializationSummary,
+            hydrated.builtAt,
+        );
+        hydrated.semanticRerankSummary = semanticRerankSummary;
+        hydrated.counters.semanticRerankInputs = semanticRerankSummary.inputs.length;
+        hydrated.counters.semanticRerankJudgments = semanticRerankSummary.judgments.length;
+        hydrated.counters.semanticRerankReceipts = semanticRerankSummary.receipts.length;
+        hydrated.counters.semanticRerankPlannedModelCalls = semanticRerankSummary.counters.plannedModelCalls;
+        hydrated.counters.semanticRerankMutationAllowed = semanticRerankSummary.counters.mutationAllowedCount;
+    }
+    if (!hydrated.semanticAdjudicationSummary && hydrated.semanticCandidateSummary && hydrated.semanticRerankSummary) {
+        hydrated = cloneGraphRebuildSnapshotForHydration(hydrated);
+        const semanticAdjudicationSummary = buildGraphSemanticAdjudicationDAGSummary(hydrated, hydrated.builtAt);
+        hydrated.semanticAdjudicationSummary = semanticAdjudicationSummary;
+        hydrated.counters.semanticAdjudicationDecisions = semanticAdjudicationSummary.decisions.length;
+        hydrated.counters.semanticAdjudicationMutations = semanticAdjudicationSummary.mutations.length;
+        hydrated.counters.semanticAdjudicationReceipts = semanticAdjudicationSummary.receipts.length;
+        hydrated.counters.semanticAdjudicationTopologyCommits = semanticAdjudicationSummary.counters.topologyCommitCount;
+        hydrated.counters.semanticAdjudicationLedgerOnly = semanticAdjudicationSummary.counters.ledgerOnlyCount;
+    }
+    if (
+        !hydrated.semanticEvalLedgerSummary
+        && hydrated.semanticCandidateSummary
+        && hydrated.semanticRerankSummary
+        && hydrated.semanticAdjudicationSummary
+    ) {
+        hydrated = cloneGraphRebuildSnapshotForHydration(hydrated);
+        const semanticEvalLedgerSummary = buildGraphSemanticEvalLedgerSummary(hydrated, hydrated.builtAt);
+        hydrated.semanticEvalLedgerSummary = semanticEvalLedgerSummary;
+        hydrated.counters.semanticEvalLedgerRows = semanticEvalLedgerSummary.entries.length;
+        hydrated.counters.semanticEvalAcceptedCandidates = semanticEvalLedgerSummary.counters.acceptedCandidates;
+        hydrated.counters.semanticEvalRejectedCandidates = semanticEvalLedgerSummary.counters.rejectedCandidates;
+        hydrated.counters.semanticEvalAmbiguousCases = semanticEvalLedgerSummary.counters.ambiguousCases;
+        hydrated.counters.semanticEvalModelDisagreements = semanticEvalLedgerSummary.counters.modelDisagreements;
+        hydrated.counters.semanticEvalManifoldDisagreements = semanticEvalLedgerSummary.counters.manifoldDisagreements;
+        hydrated.counters.semanticEvalGraphChangeRows = semanticEvalLedgerSummary.counters.graphChangeRows;
     }
     if (!hydrated.memoryGraphRagBridgeSummary) {
         hydrated = cloneGraphRebuildSnapshotForHydration(hydrated);
