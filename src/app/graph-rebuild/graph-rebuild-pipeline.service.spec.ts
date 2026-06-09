@@ -40,6 +40,7 @@ import { GraphRebuildService } from './graph-rebuild.service';
 import { AtlasCapabilityRuntimeService } from '../services/atlas-capability-runtime.service';
 import { NerService } from '../services/ner.service';
 import { PhoenixStoreService } from '../services/phoenix-store.service';
+import { PhoenixUiApiService } from '../services/phoenix-ui-api.service';
 import type { GraphIndexRunRequest } from './graph-rebuild-snapshot';
 import type { CalendarRegistrySnapshot } from '../lib/fantasy-calendar/calendar-registry-snapshot';
 import type { GraphCalendarRegistryBridgeSummary } from './graph-calendar-registry-bridge';
@@ -57,6 +58,7 @@ describe('GraphRebuildPipelineService', () => {
     let atlasRuntime: ReturnType<typeof createAtlasRuntimeMock>;
     let ner: ReturnType<typeof createNerMock>;
     let store: ReturnType<typeof createPhoenixStoreMock>;
+    let phoenixUiApi: ReturnType<typeof createPhoenixUiApiMock>;
     let service: GraphRebuildPipelineService;
 
     beforeEach(() => {
@@ -82,11 +84,13 @@ describe('GraphRebuildPipelineService', () => {
         atlasRuntime = createAtlasRuntimeMock();
         ner = createNerMock();
         store = createPhoenixStoreMock();
+        phoenixUiApi = createPhoenixUiApiMock();
         injector = createEnvironmentInjector([
             { provide: GraphRebuildService, useValue: graphRebuild },
             { provide: AtlasCapabilityRuntimeService, useValue: atlasRuntime },
             { provide: NerService, useValue: ner },
             { provide: PhoenixStoreService, useValue: store },
+            { provide: PhoenixUiApiService, useValue: phoenixUiApi },
         ], Injector.create({ providers: [] }) as unknown as EnvironmentInjector);
         service = runInInjectionContext(injector, () => new GraphRebuildPipelineService());
     });
@@ -188,7 +192,21 @@ describe('GraphRebuildPipelineService', () => {
                     id: 'memoryGraphRagBridge',
                     label: 'MemoryGraphRAG Bridge',
                 }),
+                expect.objectContaining({
+                    id: 'stagedNativeScenePacket',
+                    label: 'Staged Native Scene Packet',
+                    counters: expect.objectContaining({
+                        scenePacketAvailable: 1,
+                        rendererWired: 0,
+                        nodeParityOk: 1,
+                    }),
+                }),
             ]),
+        }));
+        expect(phoenixUiApi.loadStagedGraphScenePacket).toHaveBeenCalledWith(expect.objectContaining({
+            source: 'manifoldSnapshot',
+            manifold: 'siegel',
+            limit: 4096,
         }));
     });
 
@@ -1358,6 +1376,68 @@ function createPhoenixStoreMock() {
         pauseSnapshots: vi.fn(),
         resumeSnapshots: vi.fn(),
     };
+}
+
+function createPhoenixUiApiMock() {
+    return {
+        loadStagedGraphScenePacket: vi.fn(async () => ({
+            version: 'graph-scene-packet/v1' as const,
+            source: 'manifoldSnapshot',
+            sourceLabel: 'Spec packet',
+            manifold: 'siegel',
+            layoutMode: 'siegelFinsler' as const,
+            sourceMode: 'embeddings' as const,
+            counters: {
+                inputNodes: 3,
+                inputEdges: 0,
+                renderedNodes: 3,
+                renderedEdges: 0,
+                droppedEdges: 0,
+                bufferBytes: 132,
+            },
+            ids: ['embed:entity:entity-kai', 'embed:graph-fact:1', 'embed:event:1'],
+            labels: ['Kai', 'Kai supports Hazel', 'Event'],
+            kinds: ['entity', 'graphFact', 'event'],
+            groupIds: ['entity', 'graphFact', 'event'],
+            positions3d: encodeF32([0, 0, 0, 1, 1, 1, 2, 2, 2]),
+            positions2d: encodeF32([0, 0, 0, 1, 1, 0, 2, 2, 0]),
+            radii: encodeF32([1, 0.8, 0.6]),
+            colors: encodeF32([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]),
+            edgeIds: [],
+            edgePairs: encodeU32([]),
+            edgeColors: encodeF32([]),
+            edgeAlpha: encodeF32([]),
+            edgeKinds: encodeU8([]),
+            hierarchyShellRadii: encodeF32([3, 2, 1]),
+            hierarchyShellRanks: encodeU8([0, 1, 2]),
+        })),
+    };
+}
+
+function encodeF32(values: number[]): string {
+    const bytes = new Uint8Array(values.length * 4);
+    const view = new DataView(bytes.buffer);
+    values.forEach((value, index) => view.setFloat32(index * 4, value, true));
+    return encodeBytes(bytes);
+}
+
+function encodeU32(values: number[]): string {
+    const bytes = new Uint8Array(values.length * 4);
+    const view = new DataView(bytes.buffer);
+    values.forEach((value, index) => view.setUint32(index * 4, value, true));
+    return encodeBytes(bytes);
+}
+
+function encodeU8(values: number[]): string {
+    return encodeBytes(Uint8Array.from(values));
+}
+
+function encodeBytes(bytes: Uint8Array): string {
+    let binary = '';
+    for (const byte of bytes) {
+        binary += String.fromCharCode(byte);
+    }
+    return btoa(binary);
 }
 
 function createAtlasRuntimeMock() {

@@ -7,8 +7,10 @@ import type { AtlasCapabilityId } from '../components/search-panel/atlas-capabil
 import type { AtlasBuildScope, AtlasRunOptions } from '../services/atlas-capability-runtime.model';
 import { AtlasCapabilityRuntimeService } from '../services/atlas-capability-runtime.service';
 import { NerService } from '../services/ner.service';
+import { decodeGraphScenePacketBuffers, graphScenePacketEncodedChars } from '../services/phoenix-graph-scene-packet.decode';
 import { phoenixTransportAudit, type PhoenixTransportAuditSnapshot } from '../services/phoenix-transport-audit';
 import { PhoenixStoreService, type PhoenixContentMutationTiming } from '../services/phoenix-store.service';
+import { PhoenixUiApiService } from '../services/phoenix-ui-api.service';
 import { buildGraphRebuildDeltaPostProcessPlan, deltaPostProcessPlanCounters, type GraphRebuildDeltaPostProcessPlan } from './graph-rebuild-delta-postprocess-plan';
 import { buildGraphRebuildEdgeJudgmentPlan, edgeJudgmentPlanCounters } from './graph-rebuild-edge-type-judgment-plan';
 import { embeddingProfileFromModelSelection } from './graph-rebuild-embedding-signatures';
@@ -79,6 +81,7 @@ export class GraphRebuildPipelineService {
     private readonly atlasRuntime = inject(AtlasCapabilityRuntimeService);
     private readonly ner = inject(NerService);
     private readonly store = inject(PhoenixStoreService);
+    private readonly phoenixUiApi = inject(PhoenixUiApiService);
     private readonly runningState = signal(false);
     private readonly entityLinkerWarmState = signal(false);
     private readonly lastReceiptState = signal<GraphIndexRunReceipt | null>(null);
@@ -217,6 +220,7 @@ export class GraphRebuildPipelineService {
             appendDiscourseCompilerOverlayStage(stageReceipts, completedSnapshot);
             appendCalendarRegistryStage(stageReceipts, completedSnapshot);
             appendSnapshotTimingStages(stageReceipts, completedSnapshot);
+            await this.appendStagedNativeScenePacketStage(stageReceipts, completedSnapshot, scope);
             appendTransportTimingStage(stageReceipts, transportStarted, phoenixTransportAudit.snapshot());
 
             const completedAt = Date.now();
@@ -373,6 +377,7 @@ export class GraphRebuildPipelineService {
                 appendDiscourseCompilerOverlayStage(stageReceipts, snapshot);
                 appendCalendarRegistryStage(stageReceipts, snapshot);
                 appendSnapshotTimingStages(stageReceipts, snapshot);
+                await this.appendStagedNativeScenePacketStage(stageReceipts, snapshot, scope);
             }
 
             for (const projection of PROJECTION_CAPABILITIES) {
@@ -496,6 +501,7 @@ export class GraphRebuildPipelineService {
                 projectionReceipts.push(await buildSiegelBackboneProjectionReceipt(cachedSnapshot));
                 const completedAt = Date.now();
                 const cacheStage = postProcessCacheStage(runStarted, completedAt, deltaPlan);
+                await this.appendStagedNativeScenePacketStage(stageReceipts, cachedSnapshot, scope);
                 appendTransportTimingStage(stageReceipts, transportStarted, phoenixTransportAudit.snapshot());
                 const receipt = this.buildRunReceipt({
                     idPrefix: 'postprocess-atlas',
@@ -602,6 +608,7 @@ export class GraphRebuildPipelineService {
             appendDiscourseCompilerOverlayStage(stageReceipts, completedSnapshot);
             appendCalendarRegistryStage(stageReceipts, completedSnapshot);
             appendSnapshotTimingStages(stageReceipts, completedSnapshot);
+            await this.appendStagedNativeScenePacketStage(stageReceipts, completedSnapshot, scope);
 
             for (const projection of PROJECTION_CAPABILITIES) {
                 projectionReceipts.push(snapshotOwnedProjectionReceipt(projection.mode, completedSnapshot));
@@ -778,6 +785,74 @@ export class GraphRebuildPipelineService {
         receipt.completedAt = Math.max(receipt.completedAt, completedAt);
         receipt.durationMs = receipt.completedAt - receipt.startedAt;
         this.lastReceiptState.set({ ...receipt, stageReceipts: [...receipt.stageReceipts] });
+    }
+
+    private async appendStagedNativeScenePacketStage(
+        stageReceipts: GraphIndexStageReceipt[],
+        snapshot: GraphRebuildSnapshot | null,
+        scope: GraphIndexRunScope,
+    ): Promise<void> {
+        if (!snapshot?.counters.embeddingTargets) return;
+        const limit = Math.max(4096, snapshot.counters.embeddingTargets);
+        const started = performance.now();
+        const packet = await this.phoenixUiApi.loadStagedGraphScenePacket({
+            source: 'manifoldSnapshot',
+            manifold: 'siegel',
+            sourceMode: 'embeddings',
+            scope: graphScenePacketScope(scope),
+            limit,
+        });
+        const loadMs = elapsedTimingMs(started);
+        if (!packet) {
+            stageReceipts.push(instrumentationStage(
+                'stagedNativeScenePacket',
+                'Staged Native Scene Packet',
+                loadMs,
+                {
+                    scenePacketAvailable: 0,
+                    rendererWired: 0,
+                },
+                'Staged native scene packet benchmark unavailable; live renderer left untouched',
+            ));
+            return;
+        }
+        const decodeStarted = performance.now();
+        const buffers = decodeGraphScenePacketBuffers(packet);
+        const decodeMs = elapsedTimingMs(decodeStarted);
+        const expectedNodes = snapshot.embeddingTargets?.length || snapshot.counters.embeddingTargets || 0;
+        const nodeDelta = Math.abs(packet.counters.renderedNodes - expectedNodes);
+        const stage = instrumentationStage(
+            'stagedNativeScenePacket',
+            'Staged Native Scene Packet',
+            loadMs + decodeMs,
+            {
+                scenePacketAvailable: 1,
+                rendererWired: 0,
+                manifoldSiegel: 1,
+                packetNodes: packet.counters.renderedNodes,
+                packetEdges: packet.counters.renderedEdges,
+                expectedNodes,
+                nodeDelta,
+                nodeParityOk: nodeDelta === 0 ? 1 : 0,
+                embeddingBackboneEdges: snapshot.counters.embeddingBackboneEdges || 0,
+                cleanGraphEdges: snapshot.counters.edges || 0,
+                packetBufferBytes: packet.counters.bufferBytes,
+                packetEncodedChars: graphScenePacketEncodedChars(packet),
+                packetLoadMs: loadMs,
+                packetDecodeMs: decodeMs,
+                hierarchyShellRanks: buffers.hierarchyShellRanks?.length === packet.ids.length ? 1 : 0,
+                decodedFloat32Values: buffers.positions3d.length
+                    + buffers.positions2d.length
+                    + buffers.radii.length
+                    + buffers.colors.length
+                    + buffers.edgeColors.length
+                    + buffers.edgeAlpha.length
+                    + (buffers.hierarchyShellRadii?.length || 0),
+            },
+            'Staged only; Siegel native scene packet decoded for benchmark shape without switching the live renderer',
+        );
+        stage.outputCount = packet.counters.renderedNodes + packet.counters.renderedEdges;
+        stageReceipts.push(stage);
     }
 
     private async safeLoadSnapshot(scopeId: string): Promise<GraphRebuildSnapshot | null> {
@@ -1153,6 +1228,9 @@ function transportDeltaCounters(
         compileGalaxySceneCalls: 0,
         compileGalaxySceneRequestBytes: 0,
         compileGalaxySceneResponseBytes: 0,
+        graphScenePacketCalls: 0,
+        graphScenePacketRequestBytes: 0,
+        graphScenePacketResponseBytes: 0,
         applyWalBatchNativeParseMs: 0,
         applyWalBatchNativeApplyMs: 0,
         applyWalBatchNativeRelationMs: 0,
@@ -1249,6 +1327,11 @@ function transportDeltaCounters(
             counters['compileGalaxySceneCalls'] += count;
             counters['compileGalaxySceneRequestBytes'] += requestBytes;
             counters['compileGalaxySceneResponseBytes'] += responseBytes;
+        }
+        if (call.name === 'phoenix.graph_scene_packet_json') {
+            counters['graphScenePacketCalls'] += count;
+            counters['graphScenePacketRequestBytes'] += requestBytes;
+            counters['graphScenePacketResponseBytes'] += responseBytes;
         }
     }
     for (const key of Object.keys(counters)) {
@@ -1863,6 +1946,15 @@ function atlasScopeFromGraphScope(scope: GraphIndexRunScope): AtlasBuildScope {
     if (scope.kind === 'folder') return { mode: 'folder', folderId: scope.scopeId.replace(/^folder:/, '') };
     if (scope.kind === 'narrative') return { mode: 'folder', folderId: scope.scopeId };
     return { mode: 'global' };
+}
+
+function graphScenePacketScope(scope: GraphIndexRunScope): Record<string, unknown> {
+    return {
+        kind: scope.kind,
+        scopeId: scope.scopeId,
+        label: scope.label,
+        noteIds: scope.noteIds,
+    };
 }
 
 function capabilityLabel(id: AtlasCapabilityId): string {
