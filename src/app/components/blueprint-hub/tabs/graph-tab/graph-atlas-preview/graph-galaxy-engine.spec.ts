@@ -352,6 +352,48 @@ describe('Graph galaxy Siegel-Finsler layout', () => {
         expect(scene.lorentzGuides?.some((guide) => guide.id === 'siegel:direction-axis')).toBe(true);
     });
 
+    it('keeps graph rebuild hierarchy bands authoritative when Siegel metadata is stale', () => {
+        const scene = buildGalaxyScene([
+            siegelNode('doc', 'Document', 'note', 'document', 4, []),
+            siegelNode('root', 'Identity root', 'structureRoot', 'document', 5, ['doc']),
+            siegelNode('chunk', 'Chunk 1', 'chunk', 'document', 5, ['root']),
+            siegelNode('entity', 'Kai', 'CHARACTER', 'entity', 5, ['chunk']),
+            siegelNode('fact', 'Kai causes signal', 'graphFact', 'causal', 1, ['entity']),
+            siegelNode('anchor', 'Kai mention', 'anchor', 'evidence', 1, ['chunk']),
+        ], [
+            { id: 'doc-root', sourceId: 'doc', targetId: 'root', type: 'target-parent', confidence: 0.9 },
+            { id: 'root-chunk', sourceId: 'root', targetId: 'chunk', type: 'target-parent', confidence: 0.9 },
+            { id: 'chunk-entity', sourceId: 'chunk', targetId: 'entity', type: 'chunk-entity', confidence: 0.9 },
+            { id: 'entity-fact', sourceId: 'entity', targetId: 'fact', type: 'causal', confidence: 0.86 },
+            { id: 'chunk-anchor', sourceId: 'chunk', targetId: 'anchor', type: 'chunk-anchor', confidence: 0.84 },
+        ], mergeGalaxySettings({ layoutMode: 'siegelFinsler' }));
+        const byId = new Map(scene.nodes.map((node) => [node.entity.id, node]));
+
+        expect(byId.get('root')!.x).toBeGreaterThan(byId.get('doc')!.x);
+        expect(byId.get('chunk')!.x).toBeGreaterThan(byId.get('root')!.x);
+        expect(byId.get('entity')!.x).toBeGreaterThan(byId.get('chunk')!.x);
+        expect(byId.get('fact')!.x).toBeGreaterThan(byId.get('entity')!.x);
+        expect(byId.get('anchor')!.x).toBeGreaterThan(byId.get('fact')!.x);
+        expect(byId.get('chunk')!.x - byId.get('root')!.x).toBeLessThan(0.62);
+        expect(byId.get('entity')!.x - byId.get('chunk')!.x).toBeLessThan(0.62);
+    });
+
+    it('keeps entity and fact bands thick on the z axis', () => {
+        const scene = buildGalaxyScene([
+            siegelNode('entity-a', 'Kai', 'entity', 'entity', 3, [], { phase: 0 }),
+            siegelNode('entity-b', 'Hazel', 'entity', 'entity', 3, [], { phase: 0.25 }),
+            siegelNode('entity-c', 'Rowan', 'entity', 'entity', 3, [], { phase: 0.5 }),
+            siegelNode('entity-d', 'Cael', 'entity', 'entity', 3, [], { phase: 0.75 }),
+            siegelNode('fact-a', 'causes_or_explains', 'graphFact', 'causal', 4, [], { phase: 0.1 }),
+            siegelNode('fact-b', 'causes_or_explains', 'graphFact', 'causal', 4, [], { phase: 0.35 }),
+            siegelNode('fact-c', 'causes_or_explains', 'graphFact', 'causal', 4, [], { phase: 0.6 }),
+            siegelNode('fact-d', 'causes_or_explains', 'graphFact', 'causal', 4, [], { phase: 0.85 }),
+        ], [], mergeGalaxySettings({ layoutMode: 'siegelFinsler' }));
+
+        expect(zRange(scene.nodes.filter((node) => node.entity.id.startsWith('entity-')))).toBeGreaterThan(0.3);
+        expect(zRange(scene.nodes.filter((node) => node.entity.id.startsWith('fact-')))).toBeGreaterThan(0.3);
+    });
+
     it('keeps directed guides clean at the source and styled near the target', () => {
         const scene = buildGalaxyScene([
             siegelNode('chunk', 'Chunk 1', 'chunk', 'document', 2, []),
@@ -415,6 +457,11 @@ function chordDeviation(buffer: Float32Array, vertex: number): number {
     const t = Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy + (pz - az) * dz) / lengthSq));
     const qx = ax + dx * t, qy = ay + dy * t, qz = az + dz * t;
     return Math.hypot(px - qx, py - qy, pz - qz);
+}
+
+function zRange(nodes: Array<{ z: number }>): number {
+    const zs = nodes.map((node) => node.z);
+    return Math.max(...zs) - Math.min(...zs);
 }
 
 function hybridNode(
@@ -499,6 +546,7 @@ function siegelNode(
     lane: string,
     depth: number,
     parentIds: string[],
+    options: { phase?: number; matrixCells?: number[] } = {},
 ): GalaxyRenderableNode {
     return {
         id,
@@ -514,7 +562,8 @@ function siegelNode(
                 role: depth <= 1 ? 'root' : 'child',
                 depth,
                 confidence: 0.9,
-                matrixCells: [0.5, 0.5, 0.5, 0.4, 0.6, 0.5],
+                phase: options.phase,
+                matrixCells: options.matrixCells || [0.5, 0.5, 0.5, 0.4, 0.6, 0.5],
                 parentIds,
             },
         },
