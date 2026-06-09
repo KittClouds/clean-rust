@@ -83,6 +83,31 @@ describe('graph galaxy hierarchy contract', () => {
         }
     });
 
+    it('uses structural forest ownership instead of flat type caps', () => {
+        const snapshot = contractSnapshot();
+        snapshot.embeddingTargets.push(
+            target('embed:event:event-a', 'event', 'event-a', 'Warning event', 'event_identity', 'note-a', 'note-a:chunk-1', ['embed:chunk:note-a:chunk-1']),
+            target('embed:event:event-b', 'event', 'event-b', 'Outcome event', 'event_identity', 'note-a', 'note-a:chunk-1', ['embed:chunk:note-a:chunk-1']),
+            target('embed:causalFact:cause-1', 'causalFact', 'cause-1', 'causes_or_explains', 'causal_fact', 'note-a', undefined, [
+                'embed:structure-root:note-a:causal',
+                'embed:event:event-a',
+                'embed:event:event-b',
+            ]),
+        );
+        attachPostProcess(snapshot);
+
+        const atlas = buildGraphRebuildEmbeddingAtlas(snapshot, 'lorentz');
+        const byId = new Map(atlas.nodes.map((node) => [node.id, node]));
+        const entityLorentz = byId.get('embed:entity:kai')?.metadata?.lorentz as Record<string, unknown>;
+        const causalLorentz = byId.get('embed:causalFact:cause-1')?.metadata?.lorentz as Record<string, unknown>;
+
+        expect(entityLorentz?.['capId']).toBe('identity:kai');
+        expect(entityLorentz?.['parentNodeId']).toBe('embed:structure-root:note-a:identity');
+        expect(causalLorentz?.['capId']).toBe('event:event-b:causal');
+        expect(causalLorentz?.['parentNodeId']).toBe('embed:event:event-b');
+        expect(causalLorentz?.['supportChunkIds']).toEqual(['note-a:chunk-1']);
+    });
+
     it('does not silently downsample large scene nodes or unique edges', () => {
         const nodes = Array.from({ length: 1300 }, (_, index) =>
             contractNode(`embed:chunk:bulk-${index}`, `Chunk ${index}`, 'chunk', 'chunk_spine', 1.66),
@@ -124,6 +149,71 @@ function contractNode(
                 signalLane,
                 primaryTreeKind: 'documentStructure',
             },
+        },
+    };
+}
+
+function attachPostProcess(snapshot: GraphRebuildSnapshot): void {
+    snapshot.embeddingGraphPostProcess = {
+        schemaVersion: 'phoenix-embedding-graph-postprocess/v1',
+        profile: { id: 'test', selectedDimensions: 8 } as never,
+        adapter: 'deterministic-local' as never,
+        targetCount: snapshot.embeddingTargets.length,
+        vectorDimensions: 8,
+        clusters: [],
+        productTopologyRegions: [],
+        targets: snapshot.embeddingTargets.map((item, index) => ({
+            targetId: item.id,
+            clusterId: `cluster:${index}`,
+            clusterRole: item.kind === 'entity' ? 'entity_region' : item.kind === 'event' ? 'event_region' : item.kind === 'causalFact' ? 'fact_region' : 'document_region',
+            medoidTargetId: item.id,
+            outlierScore: 0.05,
+            hubScore: 0.1,
+            neighborCount: 2,
+            productLaneFeatures: {
+                semanticDepth: 0.4,
+                documentDepth: 0.7,
+                relationDepth: 0.3,
+                clusterRadius: 0.2,
+                fiberPhase: index / Math.max(1, snapshot.embeddingTargets.length),
+                confidence: 0.9,
+                dominantLane: item.lane === 'causal_fact' ? 'causal' : item.lane === 'entity_anchor' ? 'entity' : item.lane === 'event_identity' ? 'temporal' : 'document',
+                laneWeights: {
+                    semantic: 0.1,
+                    document: item.lane === 'document_spine' || item.lane === 'chunk_spine' ? 0.9 : 0.2,
+                    relation: item.lane === 'relationship_fact' ? 0.9 : 0.1,
+                    temporal: item.lane === 'event_identity' ? 0.8 : 0.1,
+                    causal: item.lane === 'causal_fact' ? 0.9 : 0.1,
+                    evidence: item.lane === 'anchor_evidence' ? 0.9 : 0.1,
+                    entity: item.lane === 'entity_anchor' ? 0.9 : 0.1,
+                },
+            },
+            productTopologyRegion: {
+                id: `region:${index}`,
+                role: 'core',
+                laneKind: item.lane === 'causal_fact' ? 'causal' : item.lane === 'entity_anchor' ? 'entity' : item.lane === 'event_identity' ? 'temporal' : 'document',
+                clusterId: `cluster:${index}`,
+                medoidTargetId: item.id,
+                memberCount: 1,
+                density: 1,
+                confidence: 0.9,
+                bridgeTargetIds: [],
+                backboneTargetIds: [item.id],
+            },
+        })),
+        backboneEdges: [],
+        bridgeEdges: [],
+        outlierTargetIds: [],
+        metrics: {
+            clusterCount: snapshot.embeddingTargets.length,
+            singletonCount: snapshot.embeddingTargets.length,
+            largestClusterSize: 1,
+            largestClusterRatio: 0,
+            backboneEdgeCount: 0,
+            bridgeEdgeCount: 0,
+            outlierCount: 0,
+            maxHubScore: 0,
+            meanNeighborCount: 0,
         },
     };
 }

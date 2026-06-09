@@ -616,11 +616,11 @@ describe('embedding atlas projection', () => {
             parentNodeId: 'embed:note:note-1',
         });
         expect(byId.get('embed:chunk:chunk-1')).toMatchObject({
-            capId: 'document:note-1:chunks',
+            capId: 'document:note-1:chunk:chunk-1',
             signalLane: 'chunk_spine',
             parentNodeId: 'embed:structure-root:note-1:document-structure',
         });
-        expect(byId.get('embed:entity:kai')).toMatchObject({ capId: 'document:note-1:entities', signalLane: 'entity_anchor' });
+        expect(byId.get('embed:entity:kai')).toMatchObject({ capId: 'identity:kai', signalLane: 'entity_anchor' });
         expect(nodesById.has('embed:anchor:a1')).toBe(false);
         expect(nodesById.get('embed:entity:kai')?.metadata?.mentionCompaction).toMatchObject({
             anchorCount: 1,
@@ -708,8 +708,8 @@ describe('embedding atlas projection', () => {
         const entity = atlas.nodes.find((node) => node.id === 'embed:entity:kai')?.metadata?.lorentz as Record<string, unknown>;
         expect(note['capId']).toBe('document:note-1');
         expect(noteTwo['capId']).toBe('document:note-2');
-        expect(chunk['capId']).toBe('document:note-1:chunks');
-        expect(entity['capId']).toBe('document:note-1:entities');
+        expect(chunk['capId']).toBe('document:note-1:chunk:chunk-1');
+        expect(entity['capId']).toBe('identity:kai');
         expect(Number(note['shellRadius'])).toBeGreaterThan(Number(chunk['shellRadius']));
         expect(Number(chunk['shellRadius'])).toBeGreaterThan(Number(entity['shellRadius']));
     });
@@ -809,7 +809,7 @@ describe('embedding atlas projection', () => {
 
         expect(rootOne['capId']).toBe('document:note-1:root:identity');
         expect(rootTwo['capId']).toBe('document:note-2:root:identity');
-        expect(entity['capId']).toMatch(/^entity:amara:docs:/);
+        expect(entity['capId']).toBe('identity:amara');
         expect(entity['supportNoteIds']).toEqual(['note-1', 'note-2']);
         expect(dot3(entity['capDirection'] as number[], average3(noteOne['capDirection'] as number[], noteTwo['capDirection'] as number[]))).toBeGreaterThan(0.82);
         expect(Number(noteOne['shellRadius'])).toBeGreaterThan(Number(rootOne['shellRadius']));

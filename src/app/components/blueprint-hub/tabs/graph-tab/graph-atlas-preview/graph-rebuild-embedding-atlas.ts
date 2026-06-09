@@ -671,7 +671,53 @@ function buildTargetHierarchyContext(snapshot: GraphRebuildSnapshot): Map<string
             supportChunkIds: [...value.supportChunkIds].sort(),
         });
     }
+    for (const target of snapshot.embeddingTargets) {
+        if (contexts.has(target.id)) continue;
+        contexts.set(target.id, targetHierarchyBase(target, {
+            noteId: target.noteId,
+            chunkId: target.chunkId,
+        }));
+    }
+    for (let pass = 0; pass < 4; pass += 1) {
+        for (const target of snapshot.embeddingTargets) {
+            const parentContexts = (target.parentIds || [])
+                .map((parentId) => contexts.get(parentId))
+                .filter((context): context is TargetHierarchyContext => !!context);
+            if (!parentContexts.length) continue;
+            contexts.set(target.id, mergeTargetHierarchyContext(
+                targetHierarchyBase(target, contexts.get(target.id) || {}),
+                parentContexts,
+            ));
+        }
+    }
     return contexts;
+}
+
+function mergeTargetHierarchyContext(
+    base: TargetHierarchyContext,
+    parents: TargetHierarchyContext[],
+): TargetHierarchyContext {
+    const noteIds = new Set(base.supportNoteIds || []);
+    const chunkIds = new Set(base.supportChunkIds || []);
+    if (base.noteId) noteIds.add(base.noteId);
+    if (base.chunkId) chunkIds.add(base.chunkId);
+    let noteId = base.noteId;
+    let chunkId = base.chunkId;
+    for (const parent of parents) {
+        if (!noteId && parent.noteId) noteId = parent.noteId;
+        if (!chunkId && parent.chunkId) chunkId = parent.chunkId;
+        if (parent.noteId) noteIds.add(parent.noteId);
+        if (parent.chunkId) chunkIds.add(parent.chunkId);
+        for (const id of parent.supportNoteIds || []) noteIds.add(id);
+        for (const id of parent.supportChunkIds || []) chunkIds.add(id);
+    }
+    return {
+        ...base,
+        noteId,
+        chunkId,
+        supportNoteIds: noteIds.size ? [...noteIds].sort() : undefined,
+        supportChunkIds: chunkIds.size ? [...chunkIds].sort() : undefined,
+    };
 }
 
 function targetHierarchyBase(
@@ -1501,19 +1547,41 @@ function productCapId(
     supportNoteIds: string[],
 ): string {
     const kind = displayKind(target.kind);
+    const parents = target.parentIds || [];
     const noteId = target.noteId || hierarchyContext?.noteId || supportNoteIds[0];
+    const supportChunkIds = capsSupportChunkIds(target, hierarchyContext);
+    const chunkId = target.chunkId || hierarchyContext?.chunkId || supportChunkIds[0];
     if (kind === 'note' && noteId) return `document:${noteId}`;
     if (kind === 'structure-root' && noteId) return `document:${noteId}:root:${capsStructureRootKey(target)}`;
-    if (kind === 'chunk' && noteId) return `document:${noteId}:chunks`;
+    if (kind === 'chunk' && noteId) return `document:${noteId}:chunk:${target.chunkId || target.sourceId}`;
     if (kind === 'entity') {
         const entityId = target.entityId || target.sourceId;
-        return supportNoteIds.length > 1
-            ? `entity:${entityId}:docs:${capsStableToken(supportNoteIds.join('|'))}`
-            : noteId ? `document:${noteId}:entities` : `entity:${entityId}`;
+        return `identity:${entityId}`;
     }
-    if (kind === 'event' && noteId) return `document:${noteId}:events`;
-    if ((kind === 'temporal-fact' || kind === 'causal-fact') && noteId) return `document:${noteId}:${kind}`;
-    if ((kind === 'graph-fact' || kind === 'memory-state') && noteId) return `document:${noteId}:facts`;
+    if (kind === 'anchor' && noteId && chunkId) return `document:${noteId}:chunk:${chunkId}:evidence`;
+    if (kind === 'event') return `event:${target.sourceId}`;
+    if (kind === 'causal-fact') {
+        const outcomeId = lastParentWithPrefix(parents, 'embed:event:');
+        if (outcomeId) return `${capsNodeCapToken(outcomeId)}:causal`;
+        if (noteId && chunkId) return `document:${noteId}:chunk:${chunkId}:causal`;
+    }
+    if (kind === 'temporal-fact') {
+        const eventId = firstParentWithPrefix(parents, 'embed:event:');
+        if (eventId) return `${capsNodeCapToken(eventId)}:temporal`;
+        if (noteId && chunkId) return `document:${noteId}:chunk:${chunkId}:temporal`;
+    }
+    if (kind === 'graph-fact') {
+        const family = relationFamilyFromText(target.label, target.text, target.sourceId) || 'relationship';
+        if (noteId && chunkId) return `document:${noteId}:chunk:${chunkId}:facts:${family}`;
+        const entityParent = firstParentWithPrefix(parents, 'embed:entity:');
+        if (entityParent) return `${capsNodeCapToken(entityParent)}:facts:${family}`;
+        if (noteId) return `document:${noteId}:facts:${family}`;
+    }
+    if (kind === 'memory-state') {
+        const entityParent = firstParentWithPrefix(parents, 'embed:entity:') || (target.entityId ? `embed:entity:${target.entityId}` : null);
+        if (entityParent) return `${capsNodeCapToken(entityParent)}:memory`;
+        if (noteId) return `document:${noteId}:memory`;
+    }
     if (noteId) return `document:${noteId}:signals`;
     return fallback;
 }
@@ -1651,10 +1719,6 @@ function capsStableVector(id: string): CapsVec3 {
     return { x: Math.cos(a) * radial, y, z: Math.sin(a) * radial };
 }
 
-function capsStableToken(value: string): string {
-    return Math.round(unitHash(value) * 0xffffff).toString(36);
-}
-
 function productCapParentId(
     target: GraphRebuildEmbeddingTarget,
     fallback: string | null,
@@ -1666,10 +1730,14 @@ function productCapParentId(
     const kind = displayKind(target.kind);
     if (kind === 'structure-root' && noteId) return `embed:note:${noteId}`;
     if (target.kind === 'chunk' && noteId) return firstParentWithPrefix(parents, `embed:structure-root:${noteId}:document-structure`) || `embed:note:${noteId}`;
-    if (target.kind === 'entity' && chunkId) return `embed:chunk:${chunkId}`;
-    if (target.kind === 'entity' && noteId) return firstParentWithPrefix(parents, `embed:structure-root:${noteId}:identity`) || `embed:note:${noteId}`;
-    if (target.kind === 'anchor' && target.entityId) return `embed:entity:${target.entityId}`;
+    if (target.kind === 'entity' && noteId) return firstParentWithPrefix(parents, `embed:structure-root:${noteId}:identity`) || `embed:structure-root:${noteId}:identity`;
     if (target.kind === 'anchor' && chunkId) return `embed:chunk:${chunkId}`;
+    if (target.kind === 'anchor' && target.entityId) return `embed:entity:${target.entityId}`;
+    if (kind === 'event' && chunkId) return `embed:chunk:${chunkId}`;
+    if (kind === 'causal-fact') return lastParentWithPrefix(parents, 'embed:event:') || firstParentWithPrefix(parents, `embed:structure-root:${noteId || ''}:causal`) || fallback;
+    if (kind === 'temporal-fact') return firstParentWithPrefix(parents, 'embed:event:') || firstParentWithPrefix(parents, `embed:structure-root:${noteId || ''}:temporal`) || fallback;
+    if (kind === 'graph-fact') return chunkId ? `embed:chunk:${chunkId}` : firstParentWithPrefix(parents, 'embed:entity:') || fallback;
+    if (kind === 'memory-state' && target.entityId) return `embed:entity:${target.entityId}`;
     if (parents.length) return parents[0];
     return fallback;
 }
@@ -2027,6 +2095,21 @@ function graphRebuildCapabilities(manifold: AtlasManifoldMode): ManifoldCapabili
 
 function firstParentWithPrefix(parentIds: string[], prefix: string): string | null {
     return parentIds.find((parentId) => parentId.startsWith(prefix)) || null;
+}
+
+function lastParentWithPrefix(parentIds: string[], prefix: string): string | null {
+    for (let index = parentIds.length - 1; index >= 0; index -= 1) {
+        if (parentIds[index].startsWith(prefix)) return parentIds[index];
+    }
+    return null;
+}
+
+function capsNodeCapToken(nodeId: string): string {
+    if (nodeId.startsWith('embed:event:')) return `event:${nodeId.slice('embed:event:'.length)}`;
+    if (nodeId.startsWith('embed:entity:')) return `identity:${nodeId.slice('embed:entity:'.length)}`;
+    if (nodeId.startsWith('embed:chunk:')) return `chunk:${nodeId.slice('embed:chunk:'.length)}`;
+    if (nodeId.startsWith('embed:note:')) return `document:${nodeId.slice('embed:note:'.length)}`;
+    return normalizeHopfToken(nodeId);
 }
 
 function unitHash(value: string): number {
