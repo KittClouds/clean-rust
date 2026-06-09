@@ -12,6 +12,7 @@ import {
     graphRebuildSnapshotPersistenceView,
     graphRebuildSnapshotToNativeCompilerPayload,
     graphRebuildSnapshotToScopedDocument,
+    hydrateGraphRebuildSnapshotDerivedViews,
     mergeGraphRebuildOccurrences,
     postProcessCacheToScopedDocument,
     recoverGraphRebuildOccurrences,
@@ -462,6 +463,35 @@ describe('GraphRebuildService persistence helpers', () => {
         expect(persisted?.semanticCandidateSummary).toEqual(snapshot.semanticCandidateSummary);
         expect(persisted?.semanticRerankSummary).toEqual(snapshot.semanticRerankSummary);
         expect(persisted?.semanticEvalLedgerSummary).toEqual(snapshot.semanticEvalLedgerSummary);
+    });
+
+    it('hydrates Hopf resonance as a derived reload view instead of durable payload bulk', () => {
+        const snapshot = buildGraphRebuildSnapshot({
+            scopeKind: 'global',
+            scopeId: 'global',
+            noteIds: ['note-1'],
+            entities: [entity('entity-kai', 'Kai', []), entity('entity-hazel', 'Hazel', [])],
+            chunks: [{ id: 'note-1:chunk:0', noteId: 'note-1', start: 0, end: 30, ordinal: 0, source: 'dynamic-chunking' }],
+            occurrences: [
+                occurrence('note-1', 'entity-kai', 0, 3),
+                occurrence('note-1', 'entity-hazel', 12, 17),
+            ],
+            noteTexts: { 'note-1': 'Kai approved Hazel.' },
+            builtAt: 42,
+        });
+
+        expect(snapshot.hopfResonanceSpace?.assignments.length).toBe(snapshot.embeddingTargets.length);
+
+        const persistedView = graphRebuildSnapshotPersistenceView(snapshot);
+        const document = graphRebuildSnapshotToScopedDocument(snapshot);
+        const persisted = scopedDocumentToGraphRebuildSnapshot(document);
+        const hydrated = persisted ? hydrateGraphRebuildSnapshotDerivedViews(persisted) : null;
+
+        expect(persistedView.hopfResonanceSpace).toBeUndefined();
+        expect(persisted?.hopfResonanceSpace).toBeUndefined();
+        expect(hydrated?.hopfResonanceSpace).toEqual(snapshot.hopfResonanceSpace);
+        expect(hydrated?.counters.hopfResonanceAssignments).toBe(snapshot.counters.hopfResonanceAssignments);
+        expect(hydrated?.embeddingTargets).toEqual(snapshot.embeddingTargets);
     });
 
     it('persists graph compiler as a derived in-memory sidecar, not primary snapshot payload', () => {

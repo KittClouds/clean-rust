@@ -19,6 +19,7 @@ import {
 } from '../services/phoenix-store.service';
 import { attachGraphCompilerReadModels } from './graph-compiler-read-model';
 import { buildGraphRebuildSnapshot } from './graph-rebuild-builder';
+import { buildHopfResonanceSpace } from './graph-hopf-resonance-space';
 import { buildAdaptiveGraphRebuildChunks } from './graph-rebuild-meaning-frames';
 import {
     buildGraphModelV2OverGraphExport,
@@ -217,7 +218,8 @@ export class GraphRebuildService {
 
     async loadPersistedSnapshot(scopeId: string): Promise<GraphRebuildSnapshot | null> {
         const document = await this.store.getScopedDocument(scopeId, GRAPH_REBUILD_NAMESPACE, SNAPSHOT_DOCUMENT_KEY);
-        return document ? scopedDocumentToGraphRebuildSnapshot(document) : null;
+        const snapshot = document ? scopedDocumentToGraphRebuildSnapshot(document) : null;
+        return snapshot ? hydrateGraphRebuildSnapshotDerivedViews(snapshot) : null;
     }
 
     async loadPersistedGraphModelV2OverGraph(scopeId: string): Promise<GraphModelV2OverGraphExport | null> {
@@ -597,8 +599,32 @@ export function graphRebuildSnapshotPersistenceView(snapshot: GraphRebuildSnapsh
         };
         persisted.embeddingTargetPlan = plan;
     }
+    delete persisted.hopfResonanceSpace;
     delete persisted.semanticTaskSummary;
     return persisted;
+}
+
+export function hydrateGraphRebuildSnapshotDerivedViews(snapshot: GraphRebuildSnapshot): GraphRebuildSnapshot {
+    if (snapshot.hopfResonanceSpace || !snapshot.embeddingTargets.length) return snapshot;
+    const hydrated: GraphRebuildSnapshot = {
+        ...snapshot,
+        counters: { ...snapshot.counters },
+    };
+    const hopfResonanceSpace = buildHopfResonanceSpace(hydrated, { generatedAt: hydrated.builtAt });
+    if (hopfResonanceSpace.assignments.length !== hydrated.embeddingTargets.length) {
+        throw new Error(
+            `Hopf resonance hydration contract failed: ${hopfResonanceSpace.assignments.length} assignments for ${hydrated.embeddingTargets.length} embedding targets`,
+        );
+    }
+    hydrated.hopfResonanceSpace = hopfResonanceSpace;
+    hydrated.counters.hopfResonanceAssignments = hopfResonanceSpace.assignments.length;
+    hydrated.counters.hopfResonanceOccupiedCells = hopfResonanceSpace.counters.occupiedCellCount;
+    hydrated.counters.hopfResonanceFibers = hopfResonanceSpace.fibers.length;
+    hydrated.counters.hopfResonanceDocCharts = hopfResonanceSpace.docCharts.length;
+    hydrated.counters.hopfResonanceBraids = hopfResonanceSpace.braids.length;
+    hydrated.counters.hopfResonanceDroppedTargets = hopfResonanceSpace.counters.droppedTargets;
+    hydrated.counters.hopfResonanceMutationAllowed = hopfResonanceSpace.counters.mutationAllowedCount;
+    return hydrated;
 }
 
 function encodeGraphRebuildSnapshotPayload(snapshot: GraphRebuildSnapshot): string {
