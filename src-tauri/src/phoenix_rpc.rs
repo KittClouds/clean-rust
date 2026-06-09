@@ -1,20 +1,20 @@
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet, VecDeque};
 use std::hash::{Hash, Hasher};
-use std::io::Write;
+use std::io::{Read, Write};
 use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
 
 use crate::graph_galaxy::{compile_scene, DesktopGalaxyScene, DesktopGalaxySceneRequest};
 use crate::graph_scene_packet::{
     compile_packet, GraphScenePacket, GraphScenePacketEdgeInput, GraphScenePacketInput,
-    GraphScenePacketNodeInput, GraphScenePacketRequest,
+    GraphScenePacketNodeInput, GraphScenePacketRequest, GraphScenePacketSettings,
 };
 use crate::tts::{
     NativeQwenSpeakRequest, NativeSupertonicSpeakRequest, NativeTtsLoadRequest, NativeTtsService,
     NativeTtsSpeakRequest, NativeTtsStatus, NativeTtsSynthResult,
 };
 use base64::{engine::general_purpose::STANDARD as BASE64_STANDARD, Engine as _};
-use flate2::{write::GzEncoder, Compression};
+use flate2::{read::GzDecoder, write::GzEncoder, Compression};
 use phoenix_graph_rebuild::{compile_legacy_snapshot, GraphRebuildSnapshot};
 use phoenix_hyperbolic::lorentz_tree::{
     HyperboloidPoint, LorentzForest, LorentzForestIndex, LorentzNode, LorentzQueryMode,
@@ -508,6 +508,12 @@ const HOPF_GEOMETRY_VERSION: &str = "hopf_ico_r5_v1";
 const HOPF_PROJECTION_VERSION: &str = "hopf_stereographic_v1";
 const LORENTZ_GEOMETRY_VERSION: &str = "lorentz_h4_forest_v1";
 const PRODUCT_GEOMETRY_VERSION: &str = "product_lorentz_hopf_v1";
+const GRAPH_REBUILD_NAMESPACE: &str = "phoenix_graph_rebuild_v1";
+const GRAPH_REBUILD_SNAPSHOT_DOCUMENT_KEY: &str = "snapshot";
+const GRAPH_REBUILD_COMPRESSED_JSON_SCHEMA: &str =
+    "phoenix-graph-rebuild-json-payload/gzip-base64/v1";
+const GRAPH_REBUILD_COMPRESSED_SNAPSHOT_SCHEMA: &str =
+    "phoenix-graph-rebuild-payload/gzip-base64/v1";
 const HOPF_ICO_RESOLUTION: u32 = 5;
 const HOPF_CHART_RESOLUTION: u32 = 3;
 const HOPF_CONE_APERTURE_COS: f64 = 0.573_576_436_351_046;
@@ -1121,7 +1127,10 @@ fn build_graph_scene_packet(
     host: &PhoenixNativeHost,
     request: GraphScenePacketRequest,
 ) -> Result<GraphScenePacket, String> {
-    let manifold = request.manifold.clone().unwrap_or_else(|| "hybrid".to_owned());
+    let manifold = request
+        .manifold
+        .clone()
+        .unwrap_or_else(|| "hybrid".to_owned());
     let layout_mode = request
         .layout_mode
         .clone()
@@ -1132,6 +1141,22 @@ fn build_graph_scene_packet(
         .unwrap_or_else(|| "embeddings".to_owned());
     let limit = request.limit.unwrap_or(4096).max(1);
     let settings = request.settings.unwrap_or_default();
+    let requested_source = request.source.clone();
+
+    if is_scoped_snapshot_packet_source(requested_source.as_deref()) {
+        return Ok(compile_packet(
+            graph_scene_packet_input_from_scoped_snapshot(
+                host,
+                request.scope.as_ref(),
+                requested_source.unwrap_or_else(|| "scopedSnapshot".to_owned()),
+                manifold,
+                layout_mode,
+                source_mode,
+                limit,
+                settings,
+            )?,
+        ));
+    }
 
     if let Some(nodes) = request.nodes {
         let edges = request.edges.unwrap_or_default();
@@ -1216,6 +1241,284 @@ fn scene_packet_edge_from_desktop(edge: &DesktopManifoldEdge) -> GraphScenePacke
         edge_type: edge.edge_type.clone(),
         confidence: edge.confidence as f32,
     }
+}
+
+fn is_scoped_snapshot_packet_source(source: Option<&str>) -> bool {
+    matches!(
+        source,
+        Some("scopedSnapshot") | Some("graphRebuildSnapshot") | Some("scopedGraphRebuildSnapshot")
+    )
+}
+
+fn graph_scene_packet_input_from_scoped_snapshot(
+    host: &PhoenixNativeHost,
+    scope: Option<&Value>,
+    source: String,
+    manifold: String,
+    layout_mode: String,
+    source_mode: String,
+    limit: usize,
+    settings: GraphScenePacketSettings,
+) -> Result<GraphScenePacketInput, String> {
+    let scope_id = scope
+        .map(|value| str_field(value, "scope_id", "scopeId"))
+        .filter(|value| !value.is_empty())
+        .ok_or_else(|| "graph scene packet scoped snapshot requires scope.scopeId".to_owned())?;
+    let row = store_relation_first(
+        host,
+        "scoped_documents",
+        json!({
+            "scope_folder_id": scope_id,
+            "namespace": GRAPH_REBUILD_NAMESPACE,
+            "document_key": GRAPH_REBUILD_SNAPSHOT_DOCUMENT_KEY,
+        }),
+    )?
+    .ok_or_else(|| format!("graph rebuild snapshot document missing for scope {scope_id}"))?;
+    let payload = row
+        .get("payload")
+        .and_then(Value::as_str)
+        .map(str::to_owned)
+        .unwrap_or_else(|| row.get("payload").map(Value::to_string).unwrap_or_default());
+    if payload.is_empty() {
+        return Err(format!(
+            "graph rebuild snapshot document for scope {scope_id} had no payload"
+        ));
+    }
+    let snapshot = decode_graph_rebuild_scoped_payload(&payload)?;
+    graph_scene_packet_input_from_rebuild_snapshot_value(
+        &snapshot,
+        source,
+        manifold,
+        layout_mode,
+        source_mode,
+        limit,
+        settings,
+    )
+}
+
+fn graph_scene_packet_input_from_rebuild_snapshot_value(
+    snapshot: &Value,
+    source: String,
+    manifold: String,
+    layout_mode: String,
+    source_mode: String,
+    limit: usize,
+    settings: GraphScenePacketSettings,
+) -> Result<GraphScenePacketInput, String> {
+    let nodes_value = snapshot
+        .get("embeddingTargets")
+        .and_then(Value::as_array)
+        .ok_or_else(|| "graph rebuild snapshot payload missing embeddingTargets".to_owned())?;
+    let mut target_ids = HashSet::with_capacity(nodes_value.len());
+    let mut nodes = Vec::with_capacity(nodes_value.len());
+    for (index, target) in nodes_value.iter().enumerate() {
+        let id = str_field(target, "id", "id");
+        if id.is_empty() {
+            continue;
+        }
+        target_ids.insert(id.to_owned());
+        let vector = stable_packet_vector(id, index);
+        let kind = str_field(target, "kind", "kind");
+        nodes.push(GraphScenePacketNodeInput {
+            id: id.to_owned(),
+            label: {
+                let label = str_field(target, "label", "label");
+                if label.is_empty() {
+                    kind.to_owned()
+                } else {
+                    label.to_owned()
+                }
+            },
+            kind: kind.to_owned(),
+            source_type: graph_rebuild_packet_source_type(target).to_owned(),
+            vector: vector.to_vec(),
+            base_vector: Some(vector),
+            total_mentions: Some(target_total_mentions(target)),
+        });
+    }
+
+    let mut edges = Vec::new();
+    if let Some(post_process) = snapshot.get("embeddingGraphPostProcess") {
+        push_graph_rebuild_packet_edges(
+            post_process.get("backboneEdges").and_then(Value::as_array),
+            &target_ids,
+            &mut edges,
+        );
+        push_graph_rebuild_packet_edges(
+            post_process.get("bridgeEdges").and_then(Value::as_array),
+            &target_ids,
+            &mut edges,
+        );
+    }
+
+    Ok(GraphScenePacketInput {
+        source,
+        manifold,
+        layout_mode,
+        source_mode,
+        source_label: "scoped graph-rebuild snapshot".to_owned(),
+        limit,
+        settings,
+        nodes,
+        edges,
+    })
+}
+
+fn push_graph_rebuild_packet_edges(
+    rows: Option<&Vec<Value>>,
+    target_ids: &HashSet<String>,
+    out: &mut Vec<GraphScenePacketEdgeInput>,
+) {
+    let Some(rows) = rows else { return };
+    out.reserve(rows.len());
+    for row in rows {
+        let source_id = str_field(row, "source_target_id", "sourceTargetId");
+        let target_id = str_field(row, "target_target_id", "targetTargetId");
+        if source_id.is_empty()
+            || target_id.is_empty()
+            || !target_ids.contains(source_id)
+            || !target_ids.contains(target_id)
+        {
+            continue;
+        }
+        let id = str_field(row, "id", "id");
+        let edge_type = str_field(row, "role", "role");
+        out.push(GraphScenePacketEdgeInput {
+            id: if id.is_empty() {
+                format!("{source_id}:semantic-neighbor:{target_id}")
+            } else {
+                id.to_owned()
+            },
+            source_id: source_id.to_owned(),
+            target_id: target_id.to_owned(),
+            edge_type: if edge_type.is_empty() {
+                "semantic-neighbor".to_owned()
+            } else {
+                edge_type.to_owned()
+            },
+            confidence: f32_field(row, "score").unwrap_or(0.5),
+        });
+    }
+}
+
+fn graph_rebuild_packet_source_type(target: &Value) -> &'static str {
+    let lane = str_field(target, "lane", "lane");
+    let role = str_field(target, "structural_role", "structuralRole");
+    if role == "root" || lane == "document_spine" {
+        "root"
+    } else if lane == "chunk_spine" {
+        "chunk"
+    } else if lane == "entity_anchor" {
+        "entity"
+    } else if lane == "anchor_evidence" {
+        "evidence"
+    } else if lane == "event_identity" {
+        "event"
+    } else if lane == "temporal_fact" {
+        "temporal"
+    } else if lane == "causal_fact" {
+        "causal"
+    } else if lane == "memory_state" {
+        "memory"
+    } else if !role.is_empty() {
+        "graph"
+    } else {
+        "target"
+    }
+}
+
+fn target_total_mentions(target: &Value) -> u32 {
+    let evidence = target
+        .get("evidenceIds")
+        .or_else(|| target.get("evidence_ids"))
+        .and_then(Value::as_array)
+        .map(Vec::len)
+        .unwrap_or(0);
+    let parents = target
+        .get("parentIds")
+        .or_else(|| target.get("parent_ids"))
+        .and_then(Value::as_array)
+        .map(Vec::len)
+        .unwrap_or(0);
+    count_for_wire(evidence.max(parents).max(1))
+}
+
+fn stable_packet_vector(id: &str, index: usize) -> [f32; 3] {
+    let mut hash = 2_166_136_261_u32 ^ index as u32;
+    for byte in id.bytes() {
+        hash ^= byte as u32;
+        hash = hash.wrapping_mul(16_777_619);
+    }
+    let x = ((hash & 0xff) as f32 / 127.5) - 1.0;
+    let y = (((hash >> 8) & 0xff) as f32 / 127.5) - 1.0;
+    let z = (((hash >> 16) & 0xff) as f32 / 127.5) - 1.0;
+    let norm = (x * x + y * y + z * z).sqrt().max(1e-6);
+    [x / norm, y / norm, z / norm]
+}
+
+fn decode_graph_rebuild_scoped_payload(payload: &str) -> Result<Value, String> {
+    let parsed = serde_json::from_str::<Value>(payload)
+        .map_err(|error| format!("invalid graph rebuild snapshot payload JSON: {error}"))?;
+    let schema = parsed
+        .get("schemaVersion")
+        .and_then(Value::as_str)
+        .unwrap_or_default();
+    if schema != GRAPH_REBUILD_COMPRESSED_JSON_SCHEMA
+        && schema != GRAPH_REBUILD_COMPRESSED_SNAPSHOT_SCHEMA
+    {
+        return Ok(parsed);
+    }
+    let encoded = parsed
+        .get("payload")
+        .and_then(Value::as_str)
+        .ok_or_else(|| "compressed graph rebuild snapshot payload missing payload".to_owned())?;
+    let compressed = BASE64_STANDARD
+        .decode(encoded)
+        .map_err(|error| format!("invalid compressed graph rebuild snapshot base64: {error}"))?;
+    let mut decoder = GzDecoder::new(compressed.as_slice());
+    let mut decoded = String::new();
+    decoder
+        .read_to_string(&mut decoded)
+        .map_err(|error| format!("failed to decompress graph rebuild snapshot payload: {error}"))?;
+    serde_json::from_str::<Value>(&decoded)
+        .map_err(|error| format!("invalid decompressed graph rebuild snapshot JSON: {error}"))
+}
+
+fn store_relation_first(
+    host: &PhoenixNativeHost,
+    relation: &str,
+    filter: Value,
+) -> Result<Option<Value>, String> {
+    let result = host
+        .store_command(StoreCommandRequest {
+            command: "relation:getFirst".to_owned(),
+            payload: json!({ "relation": relation, "filter": filter }),
+        })
+        .map_err(|error| error.to_string())?;
+    let value = serde_json::to_value(result)
+        .map_err(|error| format!("failed to encode relation row: {error}"))?;
+    let success = value
+        .get("success")
+        .and_then(Value::as_bool)
+        .unwrap_or(false);
+    if !success {
+        let error = value
+            .get("error")
+            .and_then(Value::as_str)
+            .unwrap_or("store command failed");
+        return Err(format!("failed to load relation {relation}: {error}"));
+    }
+    Ok(value
+        .get("payload")
+        .cloned()
+        .filter(|payload| !payload.is_null()))
+}
+
+fn f32_field(row: &Value, key: &str) -> Option<f32> {
+    row.get(key)
+        .and_then(Value::as_f64)
+        .filter(|value| value.is_finite())
+        .map(|value| value as f32)
 }
 
 fn store_relation_rows(host: &PhoenixNativeHost, relation: &str) -> Result<Vec<Value>, String> {
@@ -3686,5 +3989,90 @@ mod tests {
                 assert!(neighbor.neighbor_cell_ids.contains(&cell.cell_id));
             }
         }
+    }
+
+    #[test]
+    fn graph_rebuild_scoped_snapshot_payload_decodes_compressed_json() {
+        let raw = json!({
+            "schemaVersion": "phoenix-graph-rebuild/v1",
+            "embeddingTargets": [],
+        });
+        let raw_json = serde_json::to_vec(&raw).unwrap();
+        let mut encoder = GzEncoder::new(Vec::new(), Compression::fast());
+        encoder.write_all(&raw_json).unwrap();
+        let compressed = encoder.finish().unwrap();
+        let envelope = json!({
+            "schemaVersion": GRAPH_REBUILD_COMPRESSED_JSON_SCHEMA,
+            "sourceSchemaVersion": "phoenix-graph-rebuild/v1",
+            "encoding": "gzip+base64",
+            "rawChars": raw_json.len(),
+            "compressedBytes": compressed.len(),
+            "payload": BASE64_STANDARD.encode(compressed),
+        });
+
+        let decoded = decode_graph_rebuild_scoped_payload(&envelope.to_string()).unwrap();
+
+        assert_eq!(
+            decoded.get("schemaVersion").and_then(Value::as_str),
+            Some("phoenix-graph-rebuild/v1")
+        );
+    }
+
+    #[test]
+    fn graph_rebuild_scoped_snapshot_value_builds_packet_input() {
+        let snapshot = json!({
+            "schemaVersion": "phoenix-graph-rebuild/v1",
+            "embeddingTargets": [
+                {
+                    "id": "embed:document:note-1",
+                    "kind": "document",
+                    "label": "Note 1",
+                    "lane": "document_spine",
+                    "evidenceIds": []
+                },
+                {
+                    "id": "embed:chunk:note-1:0",
+                    "kind": "chunk",
+                    "label": "Chunk 1",
+                    "lane": "chunk_spine",
+                    "parentIds": ["embed:document:note-1"]
+                }
+            ],
+            "embeddingGraphPostProcess": {
+                "backboneEdges": [
+                    {
+                        "id": "edge:1",
+                        "sourceTargetId": "embed:document:note-1",
+                        "targetTargetId": "embed:chunk:note-1:0",
+                        "role": "hierarchy",
+                        "score": 0.91
+                    },
+                    {
+                        "id": "edge:dropped",
+                        "sourceTargetId": "missing",
+                        "targetTargetId": "embed:chunk:note-1:0",
+                        "role": "hierarchy",
+                        "score": 0.91
+                    }
+                ],
+                "bridgeEdges": []
+            }
+        });
+
+        let input = graph_scene_packet_input_from_rebuild_snapshot_value(
+            &snapshot,
+            "scopedSnapshot".to_owned(),
+            "siegel".to_owned(),
+            "siegelFinsler".to_owned(),
+            "embeddings".to_owned(),
+            4096,
+            GraphScenePacketSettings::default(),
+        )
+        .unwrap();
+
+        assert_eq!(input.nodes.len(), 2);
+        assert_eq!(input.edges.len(), 1);
+        assert_eq!(input.nodes[0].source_type, "root");
+        assert_eq!(input.nodes[1].source_type, "chunk");
     }
 }

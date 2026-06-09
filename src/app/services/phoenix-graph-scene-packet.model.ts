@@ -35,7 +35,7 @@ export interface PhoenixGraphScenePacketEdgeInput {
 }
 
 export interface PhoenixGraphScenePacketRequest {
-    source?: 'inline' | 'manifoldSnapshot';
+    source?: 'inline' | 'manifoldSnapshot' | 'scopedSnapshot';
     manifold?: AtlasManifoldMode;
     layoutMode?: PhoenixGraphSceneLayoutMode;
     sourceMode?: PhoenixGraphSceneSourceMode;

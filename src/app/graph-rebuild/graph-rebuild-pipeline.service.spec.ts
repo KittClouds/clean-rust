@@ -204,13 +204,12 @@ describe('GraphRebuildPipelineService', () => {
             ]),
         }));
         expect(phoenixUiApi.loadStagedGraphScenePacket).toHaveBeenCalledWith(expect.objectContaining({
-            source: 'inline',
+            source: 'scopedSnapshot',
             manifold: 'siegel',
             limit: 4096,
-            nodes: expect.arrayContaining([
-                expect.objectContaining({ id: 'embed:entity:entity-kai' }),
-            ]),
         }));
+        expect(phoenixUiApi.loadStagedGraphScenePacket.mock.calls[0][0].nodes).toBeUndefined();
+        expect(phoenixUiApi.loadStagedGraphScenePacket.mock.calls[0][0].edges).toBeUndefined();
     });
 
     it('expands global graph rebuilds to loaded note ids for deterministic chunking', async () => {

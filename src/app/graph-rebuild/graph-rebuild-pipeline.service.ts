@@ -8,7 +8,6 @@ import type { AtlasBuildScope, AtlasRunOptions } from '../services/atlas-capabil
 import { AtlasCapabilityRuntimeService } from '../services/atlas-capability-runtime.service';
 import { NerService } from '../services/ner.service';
 import { decodeGraphScenePacketBuffers, graphScenePacketEncodedChars } from '../services/phoenix-graph-scene-packet.decode';
-import type { PhoenixGraphScenePacketEdgeInput, PhoenixGraphScenePacketNodeInput } from '../services/phoenix-graph-scene-packet.model';
 import { phoenixTransportAudit, type PhoenixTransportAuditSnapshot } from '../services/phoenix-transport-audit';
 import { PhoenixStoreService, type PhoenixContentMutationTiming } from '../services/phoenix-store.service';
 import { PhoenixUiApiService } from '../services/phoenix-ui-api.service';
@@ -795,16 +794,13 @@ export class GraphRebuildPipelineService {
     ): Promise<void> {
         if (!snapshot?.counters.embeddingTargets) return;
         const limit = Math.max(4096, snapshot.counters.embeddingTargets);
-        const inline = graphScenePacketInlineSnapshot(snapshot);
         const started = performance.now();
         const packet = await this.phoenixUiApi.loadStagedGraphScenePacket({
-            source: 'inline',
+            source: 'scopedSnapshot',
             manifold: 'siegel',
             sourceMode: 'embeddings',
             scope: graphScenePacketScope(scope),
             limit,
-            nodes: inline.nodes,
-            edges: inline.edges,
         });
         const loadMs = elapsedTimingMs(started);
         if (!packet) {
@@ -832,10 +828,8 @@ export class GraphRebuildPipelineService {
                 {
                     scenePacketAvailable: 1,
                     rendererWired: 0,
-                    sourceInlineSnapshot: 1,
+                    sourceScopedSnapshot: 1,
                     manifoldSiegel: 1,
-                    inlineNodes: inline.nodes.length,
-                    inlineEdges: inline.edges.length,
                     packetNodes: packet.counters.renderedNodes,
                     packetEdges: packet.counters.renderedEdges,
                     expectedNodes,
@@ -856,7 +850,7 @@ export class GraphRebuildPipelineService {
                     + buffers.edgeAlpha.length
                     + (buffers.hierarchyShellRadii?.length || 0),
             },
-            'Staged only; inline graph-rebuild snapshot decoded through native packet without switching the live renderer',
+            'Staged only; scoped graph-rebuild snapshot decoded through native packet without switching the live renderer',
         );
         stage.outputCount = packet.counters.renderedNodes + packet.counters.renderedEdges;
         stageReceipts.push(stage);
@@ -1962,66 +1956,6 @@ function graphScenePacketScope(scope: GraphIndexRunScope): Record<string, unknow
         label: scope.label,
         noteIds: scope.noteIds,
     };
-}
-
-function graphScenePacketInlineSnapshot(snapshot: GraphRebuildSnapshot): {
-    nodes: PhoenixGraphScenePacketNodeInput[];
-    edges: PhoenixGraphScenePacketEdgeInput[];
-} {
-    const assignmentByTarget = new Map((snapshot.hopfResonanceSpace?.assignments || [])
-        .map((assignment) => [assignment.targetId, assignment]));
-    const targetIds = new Set(snapshot.embeddingTargets.map((target) => target.id));
-    const nodes = snapshot.embeddingTargets.map((target, index): PhoenixGraphScenePacketNodeInput => {
-        const assignment = assignmentByTarget.get(target.id);
-        const vector = assignment?.direction || stablePacketVector(target.id, index);
-        return {
-            id: target.id,
-            label: target.label || target.kind,
-            kind: target.kind,
-            sourceType: graphScenePacketSourceType(target),
-            vector,
-            baseVector: vector,
-            totalMentions: Math.max(1, target.evidenceIds?.length || target.parentIds?.length || 1),
-        };
-    });
-    const edges = [
-        ...(snapshot.embeddingGraphPostProcess?.backboneEdges || []),
-        ...(snapshot.embeddingGraphPostProcess?.bridgeEdges || []),
-    ]
-        .filter((edge) => targetIds.has(edge.sourceTargetId) && targetIds.has(edge.targetTargetId))
-        .map((edge): PhoenixGraphScenePacketEdgeInput => ({
-            id: edge.id,
-            sourceId: edge.sourceTargetId,
-            targetId: edge.targetTargetId,
-            edgeType: edge.role || 'semantic-neighbor',
-            confidence: edge.score,
-        }));
-    return { nodes, edges };
-}
-
-function graphScenePacketSourceType(target: GraphRebuildSnapshot['embeddingTargets'][number]): string {
-    if (target.structuralRole === 'root' || target.lane === 'document_spine') return 'root';
-    if (target.lane === 'chunk_spine') return 'chunk';
-    if (target.lane === 'entity_anchor') return 'entity';
-    if (target.lane === 'anchor_evidence') return 'evidence';
-    if (target.lane === 'event_identity') return 'event';
-    if (target.lane === 'temporal_fact') return 'temporal';
-    if (target.lane === 'causal_fact') return 'causal';
-    if (target.lane === 'memory_state') return 'memory';
-    return target.structuralRole || target.lane || target.kind || 'target';
-}
-
-function stablePacketVector(id: string, index: number): [number, number, number] {
-    let hash = 2166136261 ^ index;
-    for (let offset = 0; offset < id.length; offset++) {
-        hash ^= id.charCodeAt(offset);
-        hash = Math.imul(hash, 16777619);
-    }
-    const x = (((hash >>> 0) & 0xff) / 127.5) - 1;
-    const y = (((hash >>> 8) & 0xff) / 127.5) - 1;
-    const z = (((hash >>> 16) & 0xff) / 127.5) - 1;
-    const norm = Math.hypot(x, y, z) || 1;
-    return [x / norm, y / norm, z / norm];
 }
 
 function capabilityLabel(id: AtlasCapabilityId): string {
