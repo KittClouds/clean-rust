@@ -2543,6 +2543,9 @@ function receiptRowDetail(
   if (stageId === 'transportOps') {
     return transportOpsDetail(status, outputCount, counters);
   }
+  if (stageId === 'stagedNativeScenePacket') {
+    return stagedNativeScenePacketDetail(status, outputCount, counters);
+  }
   const entries = Object.entries(counters || {})
     .filter(([key, value]) => isVisibleReceiptCounter(key, value, stageId));
   const orderedEntries = prioritizeReceiptCounters(entries, receiptCounterPriority(stageId));
@@ -2705,8 +2708,42 @@ function transportOpsDetail(
   addBytes('compile response', 'compileDualWriteResponseBytes');
   addBytes('compile raw', 'compileDualWriteRawBytes');
   addBytes('compile zipped', 'compileDualWriteCompressedBytes');
+  addCount('scene packet calls', 'graphScenePacketCalls');
+  addBytes('scene packet request', 'graphScenePacketRequestBytes');
+  addBytes('scene packet response', 'graphScenePacketResponseBytes');
   addBytes('galaxy request', 'compileGalaxySceneRequestBytes');
   addBytes('galaxy response', 'compileGalaxySceneResponseBytes');
+  return parts.join(' / ');
+}
+
+function stagedNativeScenePacketDetail(
+  status: string,
+  outputCount: number,
+  counters: Record<string, number>,
+): string {
+  const parts = [status];
+  const packetNodes = counterValue(counters, 'packetNodes');
+  const packetEdges = counterValue(counters, 'packetEdges');
+  const expectedNodes = counterValue(counters, 'expectedNodes');
+  const nodeDelta = counterValue(counters, 'nodeDelta');
+  const loadMs = counterValue(counters, 'packetLoadMs');
+  const decodeMs = counterValue(counters, 'packetDecodeMs');
+  const packetOutputs = outputCount || packetNodes + packetEdges;
+
+  parts.push(valueLabel(packetOutputs, 'output'));
+  if (packetNodes > 0 || packetEdges > 0) {
+    parts.push(`packet ${formatCount(packetNodes)}n/${formatCount(packetEdges)}e`);
+  }
+  if (expectedNodes > 0) parts.push(`expected ${formatCount(expectedNodes)} nodes`);
+  parts.push(nodeDelta === 0 ? 'node parity ok' : `node delta ${formatCount(nodeDelta)}`);
+  if (loadMs > 0) parts.push(`load ${formatDuration(loadMs)}`);
+  if (decodeMs > 0) parts.push(`decode ${formatDuration(decodeMs)}`);
+  const bufferBytes = counterValue(counters, 'packetBufferBytes');
+  if (bufferBytes > 0) parts.push(`buffers ${formatBytes(bufferBytes)}`);
+  const encodedChars = counterValue(counters, 'packetEncodedChars');
+  if (encodedChars > 0) parts.push(`encoded ${formatCount(encodedChars)} chars`);
+  if (counterValue(counters, 'hierarchyShellRanks') > 0) parts.push('hierarchy shells');
+  if (counterValue(counters, 'rendererWired') === 0) parts.push('renderer staged');
   return parts.join(' / ');
 }
 
