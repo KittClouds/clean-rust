@@ -24,8 +24,8 @@ type RendererProbe = {
     edgeMaterialOpacity(): number;
     edgeMaterialBlending(data?: { layoutMode: string } | null): THREE.Blending;
     edgeColor(data: { layoutMode: string; edgeAlpha: Float32Array; edgeColors: Float32Array; edgeKinds: Uint8Array }, edge: number, t: number): THREE.Color;
-    edgeStrokeCount(data?: { layoutMode?: string; edgeAlpha: Float32Array; edgeKinds: Uint8Array }, edge?: number): number;
-    edgeStrokeOffset(data?: { layoutMode?: string; edgeAlpha: Float32Array; edgeKinds: Uint8Array }, edge?: number): number;
+    edgeStrokeCount(data?: { layoutMode?: string; edgePairs?: Uint32Array; edgeAlpha: Float32Array; edgeKinds: Uint8Array }, edge?: number): number;
+    edgeStrokeOffset(data?: { layoutMode?: string; edgePairs?: Uint32Array; edgeAlpha: Float32Array; edgeKinds: Uint8Array }, edge?: number): number;
     normalizedEdgeSignal(data?: { edgeAlpha: Float32Array }, edge?: number): number;
     treeFilamentEdgeLift(data: { edgeAlpha: Float32Array; edgeKinds: Uint8Array }, edge: number, source: number, target: number, curveScale: number): number;
     treeFilamentTerminalTaper(t: number): number;
@@ -158,7 +158,7 @@ describe('Product manifold guide styling', () => {
         expect(renderer.hybridShellOpacity()).toBeLessThan(lowShell * 1.5);
     });
 
-    it('adds a tube edge mode with confidence-weighted thickness', () => {
+    it('keeps tube edge mode on the lightweight hybrid stroke contract', () => {
         const renderer = new ThreeGalaxyRenderer() as unknown as RendererProbe;
         const data = {
             edgeAlpha: new Float32Array([0.18, 1]),
@@ -168,8 +168,26 @@ describe('Product manifold guide styling', () => {
         renderer.setSettings({ edgeMode: 'tube', edgeWidth: 1.1, edgeOpacity: 0.7, glow: 1.8 });
 
         expect(renderer.edgeMaterialOpacity()).toBeLessThan(0.35);
-        expect(renderer.edgeStrokeCount(data, 1)).toBeGreaterThan(renderer.edgeStrokeCount(data, 0));
-        expect(renderer.edgeStrokeOffset(data, 1)).toBeGreaterThan(renderer.edgeStrokeOffset(data, 0));
+        expect(renderer.edgeStrokeCount(data, 0)).toBeLessThanOrEqual(2);
+        expect(renderer.edgeStrokeCount(data, 1)).toBe(renderer.edgeStrokeCount(data, 0));
+        expect(renderer.edgeStrokeOffset(data, 1)).toBe(renderer.edgeStrokeOffset(data, 0));
+    });
+
+    it('collapses dense manifold scenes to the hybrid stroke budget without changing tree routing helpers', () => {
+        const renderer = new ThreeGalaxyRenderer() as unknown as RendererProbe;
+        const denseTree = {
+            layoutMode: 'siegelFinsler',
+            edgePairs: new Uint32Array(1300 * 2),
+            edgeAlpha: new Float32Array([0.18, 1]),
+            edgeKinds: new Uint8Array([0, 2]),
+        };
+        const smallTree = { ...denseTree, edgePairs: new Uint32Array(16) };
+
+        renderer.setSettings({ edgeMode: 'curved', edgeWidth: 1.1, glow: 1.8 });
+
+        expect(renderer.edgeStrokeCount(denseTree, 1)).toBeLessThanOrEqual(2);
+        expect(renderer.edgeStrokeCount(smallTree, 1)).toBeGreaterThan(renderer.edgeStrokeCount(denseTree, 1));
+        expect(renderer.edgeStrokeOffset(denseTree, 1)).toBeLessThan(renderer.edgeStrokeOffset(smallTree, 1));
     });
 
     it('keeps tree-space shape helpers without overriding edge colors', () => {

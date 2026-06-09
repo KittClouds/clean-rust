@@ -15,6 +15,10 @@ const MAX_EDGE_TUBE_SEGMENTS = 18;
 const HOPF_EDGE_SEGMENTS = 24;
 const HOPF_CROSS_EDGE_SEGMENTS = 32;
 const MAX_EDGE_STROKES = 5;
+const LEAN_EDGE_STYLE_THRESHOLD = 1200;
+const LEAN_EDGE_STROKES = 2;
+const LEAN_HOPF_EDGE_SEGMENTS = 12;
+const LEAN_HOPF_CROSS_EDGE_SEGMENTS = 16;
 const MAX_HOPF_RIBBON_GUIDES = 128;
 const MAX_HOPF_DATA_TUBES = 20;
 const MAX_HOPF_TORUS_TUBES = 12;
@@ -38,6 +42,7 @@ const HYBRID_SURFACE_EDGE_MAX_RADIUS_DELTA = 0.42;
 const MAX_CAMERA_VIEW_SHIFT = 2.6;
 const TREE_FILAMENT_EDGE_LAYOUTS = new Set(['lorentzTree', 'productManifold', 'siegelFinsler']);
 type GuideSurface = 'default' | 'product';
+type EdgeStyleData = Pick<GalaxySceneV2, 'edgeAlpha' | 'edgeKinds'> & Partial<Pick<GalaxySceneV2, 'edgePairs' | 'layoutMode'>>;
 interface GuideAttachmentContract {
     liveLorentzGuides: boolean;
     localScale: number;
@@ -407,8 +412,12 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
         if (!scene.edgePairs.length) return null;
         const geometry = new THREE.BufferGeometry();
         const edgeCount = scene.edgePairs.length / 2;
-        const maxEdgeSegments = Math.max(MAX_EDGE_TUBE_SEGMENTS, HOPF_CROSS_EDGE_SEGMENTS);
-        const vertexCapacity = edgeCount * maxEdgeSegments * 2 * MAX_EDGE_STROKES;
+        const denseEdges = this.isDenseEdgeScene(scene);
+        const maxEdgeSegments = denseEdges
+            ? Math.max(MAX_EDGE_SEGMENTS, LEAN_HOPF_CROSS_EDGE_SEGMENTS)
+            : Math.max(MAX_EDGE_TUBE_SEGMENTS, HOPF_CROSS_EDGE_SEGMENTS);
+        const maxEdgeStrokes = denseEdges ? LEAN_EDGE_STROKES : MAX_EDGE_STROKES;
+        const vertexCapacity = edgeCount * maxEdgeSegments * 2 * maxEdgeStrokes;
         geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(vertexCapacity * 3), 3));
         geometry.setAttribute('color', new THREE.BufferAttribute(new Float32Array(vertexCapacity * 3), 3));
         const material = new THREE.LineBasicMaterial({
@@ -570,7 +579,12 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
         let cursor = 0;
         const tubeMode = this.settings.edgeMode === 'tube';
         const treeFilaments = this.usesTreeFilamentEdges(data);
-        const baseSteps = tubeMode ? MAX_EDGE_TUBE_SEGMENTS : this.settings.edgeMode === 'curved' ? (treeFilaments ? TREE_FILAMENT_EDGE_SEGMENTS : MAX_EDGE_SEGMENTS) : 1;
+        const leanEdges = this.usesLeanEdgeContract(data);
+        const baseSteps = tubeMode
+            ? MAX_EDGE_SEGMENTS
+            : this.settings.edgeMode === 'curved'
+            ? (treeFilaments && !leanEdges ? TREE_FILAMENT_EDGE_SEGMENTS : MAX_EDGE_SEGMENTS)
+            : 1;
         for (let edge = 0; edge < data.edgePairs.length / 2; edge++) {
             const interGalaxy = data.edgeKinds[edge] === 1;
             const source = data.edgePairs[edge * 2];
@@ -580,7 +594,11 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
             const surfaceEdge = this.capsSurfaceEdge(data, ax, ay, az, bx, by, bz);
             const hopfEdge = !surfaceEdge && !tubeMode && this.mode === '3d' && data.layoutMode === 'hopfProjection' && this.settings.edgeMode === 'curved';
             const hopfCrossBase = hopfEdge && this.isHopfCrossBaseEdge(data, source, target);
-            const steps = surfaceEdge ? (treeFilaments ? TREE_FILAMENT_EDGE_SEGMENTS : MAX_EDGE_SEGMENTS) : hopfEdge ? (hopfCrossBase ? HOPF_CROSS_EDGE_SEGMENTS : HOPF_EDGE_SEGMENTS) : baseSteps;
+            const steps = surfaceEdge
+                ? (treeFilaments && !leanEdges ? TREE_FILAMENT_EDGE_SEGMENTS : MAX_EDGE_SEGMENTS)
+                : hopfEdge
+                ? (hopfCrossBase ? (leanEdges ? LEAN_HOPF_CROSS_EDGE_SEGMENTS : HOPF_CROSS_EDGE_SEGMENTS) : (leanEdges ? LEAN_HOPF_EDGE_SEGMENTS : HOPF_EDGE_SEGMENTS))
+                : baseSteps;
             const curveScale = THREE.MathUtils.clamp(this.settings.edgeCurveStrength, 0.25, 1.2) * (interGalaxy ? 0.92 : 0.58);
             const lift = tubeMode
                 ? this.edgeTubeLift(data, edge, source, target)
@@ -1060,10 +1078,7 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
 
     private edgeMaterialOpacity(): number {
         const glow = THREE.MathUtils.clamp(this.settings.glow, 0, 1.8);
-        if (this.settings.edgeMode === 'tube') {
-            return Math.max(0.01, this.settings.edgeOpacity * (0.3 + glow * 0.075));
-        }
-        return Math.max(0.012, this.settings.edgeOpacity * (0.46 + glow * 0.18));
+        return Math.max(0.008, this.settings.edgeOpacity * (0.22 + glow * 0.085));
     }
 
     private edgeMaterialBlending(data: GalaxySceneV2 | null = this.sceneData): THREE.Blending {
@@ -1072,14 +1087,12 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
 
     private edgeMaterialWidth(): number {
         const glow = THREE.MathUtils.clamp(this.settings.glow, 0, 1.8);
-        if (this.settings.edgeMode === 'tube') {
-            return Math.max(1, this.settings.edgeWidth * (0.8 + glow * 0.08));
-        }
-        return Math.max(1, this.settings.edgeWidth * (0.66 + glow * 0.08));
+        return Math.max(1, this.settings.edgeWidth * (0.58 + glow * 0.045));
     }
 
-    private edgeStrokeCount(data?: Pick<GalaxySceneV2, 'edgeAlpha' | 'edgeKinds'>, edge = 0): number {
+    private edgeStrokeCount(data?: EdgeStyleData, edge = 0): number {
         if (this.settings.edgeMode === 'hidden') return 1;
+        if (this.usesLeanEdgeContract(data)) return this.leanEdgeStrokeCount();
         if (this.usesTreeFilamentEdges(data as GalaxySceneV2 | undefined)) {
             const signal = this.normalizedEdgeSignal(data, edge);
             const hierarchyBoost = data?.edgeKinds[edge] === 2 ? 1 : 0;
@@ -1095,7 +1108,8 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
         return THREE.MathUtils.clamp(1 + Math.round(width * 1.4), 1, MAX_EDGE_STROKES);
     }
 
-    private edgeStrokeOffset(data?: Pick<GalaxySceneV2, 'edgeAlpha' | 'edgeKinds'>, edge = 0): number {
+    private edgeStrokeOffset(data?: EdgeStyleData, edge = 0): number {
+        if (this.usesLeanEdgeContract(data)) return 0.0032 * Math.max(0, this.settings.edgeWidth - 0.55);
         if (this.usesTreeFilamentEdges(data as GalaxySceneV2 | undefined)) {
             const signal = this.normalizedEdgeSignal(data, edge);
             const hierarchyBoost = data?.edgeKinds[edge] === 2 ? 1.22 : data?.edgeKinds[edge] === 1 ? 1.14 : 1;
@@ -1110,6 +1124,7 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
     }
 
     private edgeStrokeTone(stroke: number, strokes: number): number {
+        if (this.usesLeanEdgeContract()) return stroke === 0 ? 1 : 0.66;
         if (this.usesTreeFilamentEdges()) {
             if (stroke === 0) return 1.18;
             const ring = Math.ceil(stroke / 2);
@@ -1119,6 +1134,20 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
         if (stroke === 0) return 1.08;
         const ring = Math.ceil(stroke / 2);
         return THREE.MathUtils.clamp(0.86 - ring * 0.18 + strokes * 0.02, 0.42, 0.88);
+    }
+
+    private leanEdgeStrokeCount(): number {
+        const width = Math.max(0, this.settings.edgeWidth - 0.55);
+        return THREE.MathUtils.clamp(1 + Math.round(width * 1.4), 1, LEAN_EDGE_STROKES);
+    }
+
+    private usesLeanEdgeContract(data: Partial<Pick<GalaxySceneV2, 'edgePairs'>> | null | undefined = this.sceneData): boolean {
+        return this.settings.edgeMode === 'tube' || this.isDenseEdgeScene(data);
+    }
+
+    private isDenseEdgeScene(data: Partial<Pick<GalaxySceneV2, 'edgePairs'>> | null | undefined): boolean {
+        const edgeCount = data?.edgePairs?.length ? data.edgePairs.length / 2 : 0;
+        return edgeCount >= LEAN_EDGE_STYLE_THRESHOLD;
     }
 
     private usesTreeFilamentEdges(data: Pick<GalaxySceneV2, 'layoutMode'> | null | undefined = this.sceneData): boolean {
@@ -2528,10 +2557,11 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
 
     private writeEdgeColor(colorAttr: THREE.BufferAttribute, cursor: number, data: GalaxySceneV2, focus: GalaxyFocusMask, edge: number, t: number, tone = 1): void {
         const color = this.edgeColor(data, edge, t);
-        const bridgeBoost = data.edgeKinds[edge] === 1 ? 1.18 : 1;
-        const glowBoost = 0.82 + THREE.MathUtils.clamp(this.settings.glow, 0, 1.8) * 0.2;
-        const boost = (focus.hasFocus ? (focus.edgeLevels[edge] ? 1.04 : 0.1) : 0.76) * bridgeBoost * glowBoost * tone;
-        colorAttr.setXYZ(cursor, Math.min(0.78, color.r * boost), Math.min(0.86, color.g * boost), Math.min(0.88, color.b * boost));
+        const bridgeBoost = data.edgeKinds[edge] === 1 ? 1.1 : 1;
+        const glowBoost = 0.58 + THREE.MathUtils.clamp(this.settings.glow, 0, 1.8) * 0.12;
+        const focusBoost = focus.hasFocus ? (focus.edgeLevels[edge] ? 1 : 0.08) : 0.72;
+        const boost = focusBoost * bridgeBoost * glowBoost * tone;
+        colorAttr.setXYZ(cursor, Math.min(0.62, color.r * boost), Math.min(0.68, color.g * boost), Math.min(0.7, color.b * boost));
     }
 
     private edgeColor(data: GalaxySceneV2, edge: number, t: number): THREE.Color {
