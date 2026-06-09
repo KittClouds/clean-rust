@@ -19,6 +19,7 @@ import {
 } from '../services/phoenix-store.service';
 import { attachGraphCompilerReadModels } from './graph-compiler-read-model';
 import { buildGraphRebuildSnapshot } from './graph-rebuild-builder';
+import { buildGraphDiscourseSpineSummary } from './graph-discourse-spine';
 import { buildHopfResonanceSpace } from './graph-hopf-resonance-space';
 import { buildAdaptiveGraphRebuildChunks } from './graph-rebuild-meaning-frames';
 import {
@@ -600,31 +601,49 @@ export function graphRebuildSnapshotPersistenceView(snapshot: GraphRebuildSnapsh
         persisted.embeddingTargetPlan = plan;
     }
     delete persisted.hopfResonanceSpace;
+    delete persisted.discourseSpineSummary;
     delete persisted.semanticTaskSummary;
     return persisted;
 }
 
 export function hydrateGraphRebuildSnapshotDerivedViews(snapshot: GraphRebuildSnapshot): GraphRebuildSnapshot {
-    if (snapshot.hopfResonanceSpace || !snapshot.embeddingTargets.length) return snapshot;
-    const hydrated: GraphRebuildSnapshot = {
-        ...snapshot,
-        counters: { ...snapshot.counters },
-    };
-    const hopfResonanceSpace = buildHopfResonanceSpace(hydrated, { generatedAt: hydrated.builtAt });
-    if (hopfResonanceSpace.assignments.length !== hydrated.embeddingTargets.length) {
-        throw new Error(
-            `Hopf resonance hydration contract failed: ${hopfResonanceSpace.assignments.length} assignments for ${hydrated.embeddingTargets.length} embedding targets`,
-        );
+    if (!snapshot.embeddingTargets.length) return snapshot;
+    let hydrated = snapshot;
+    if (!hydrated.hopfResonanceSpace) {
+        hydrated = cloneGraphRebuildSnapshotForHydration(hydrated);
+        const hopfResonanceSpace = buildHopfResonanceSpace(hydrated, { generatedAt: hydrated.builtAt });
+        if (hopfResonanceSpace.assignments.length !== hydrated.embeddingTargets.length) {
+            throw new Error(
+                `Hopf resonance hydration contract failed: ${hopfResonanceSpace.assignments.length} assignments for ${hydrated.embeddingTargets.length} embedding targets`,
+            );
+        }
+        hydrated.hopfResonanceSpace = hopfResonanceSpace;
+        hydrated.counters.hopfResonanceAssignments = hopfResonanceSpace.assignments.length;
+        hydrated.counters.hopfResonanceOccupiedCells = hopfResonanceSpace.counters.occupiedCellCount;
+        hydrated.counters.hopfResonanceFibers = hopfResonanceSpace.fibers.length;
+        hydrated.counters.hopfResonanceDocCharts = hopfResonanceSpace.docCharts.length;
+        hydrated.counters.hopfResonanceBraids = hopfResonanceSpace.braids.length;
+        hydrated.counters.hopfResonanceDroppedTargets = hopfResonanceSpace.counters.droppedTargets;
+        hydrated.counters.hopfResonanceMutationAllowed = hopfResonanceSpace.counters.mutationAllowedCount;
     }
-    hydrated.hopfResonanceSpace = hopfResonanceSpace;
-    hydrated.counters.hopfResonanceAssignments = hopfResonanceSpace.assignments.length;
-    hydrated.counters.hopfResonanceOccupiedCells = hopfResonanceSpace.counters.occupiedCellCount;
-    hydrated.counters.hopfResonanceFibers = hopfResonanceSpace.fibers.length;
-    hydrated.counters.hopfResonanceDocCharts = hopfResonanceSpace.docCharts.length;
-    hydrated.counters.hopfResonanceBraids = hopfResonanceSpace.braids.length;
-    hydrated.counters.hopfResonanceDroppedTargets = hopfResonanceSpace.counters.droppedTargets;
-    hydrated.counters.hopfResonanceMutationAllowed = hopfResonanceSpace.counters.mutationAllowedCount;
+    if (!hydrated.discourseSpineSummary) {
+        hydrated = cloneGraphRebuildSnapshotForHydration(hydrated);
+        const discourseSpineSummary = buildGraphDiscourseSpineSummary(hydrated, hydrated.builtAt);
+        hydrated.discourseSpineSummary = discourseSpineSummary;
+        hydrated.counters.discourseSpineTargets = discourseSpineSummary.counters.targetCount;
+        hydrated.counters.discourseSpineLabels = discourseSpineSummary.counters.labelCount;
+        hydrated.counters.discourseSpineClusters = discourseSpineSummary.counters.clusterCount;
+        hydrated.counters.discourseSpineBridges = discourseSpineSummary.counters.bridgeCount;
+        hydrated.counters.discourseSpineResonance = discourseSpineSummary.counters.resonanceCandidates;
+        hydrated.counters.discourseSpineResolution = discourseSpineSummary.counters.resolutionCandidates;
+        hydrated.counters.discourseSpineReceipts = discourseSpineSummary.counters.receiptCount;
+        hydrated.counters.discourseSpineMutationAllowed = discourseSpineSummary.counters.mutationAllowedCount;
+    }
     return hydrated;
+}
+
+function cloneGraphRebuildSnapshotForHydration(snapshot: GraphRebuildSnapshot): GraphRebuildSnapshot {
+    return { ...snapshot, counters: { ...snapshot.counters } };
 }
 
 function encodeGraphRebuildSnapshotPayload(snapshot: GraphRebuildSnapshot): string {
