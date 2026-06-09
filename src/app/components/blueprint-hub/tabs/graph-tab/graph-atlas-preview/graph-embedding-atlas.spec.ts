@@ -838,7 +838,8 @@ describe('embedding atlas projection', () => {
             memoryState: [],
             embeddingTargets: [
                 { id: 'embed:note:note-1', kind: 'note', sourceId: 'note-1', noteId: 'note-1', label: 'Red Mesa', text: 'chapter text', evidenceIds: [], lane: 'document_spine', structuralRole: 'root', admissionStatus: 'admitted' },
-                { id: 'embed:chunk:chunk-1', kind: 'chunk', sourceId: 'chunk-1', noteId: 'note-1', chunkId: 'chunk-1', label: 'Chunk 1', text: 'sharp chunk', evidenceIds: [], lane: 'chunk_spine', structuralRole: 'spine', admissionStatus: 'admitted', parentIds: ['embed:note:note-1'] },
+                { id: 'embed:structure-root:note-1:identity', kind: 'structureRoot', sourceId: 'note-1:identity', noteId: 'note-1', label: 'Identity root', text: 'identity structure', evidenceIds: [], lane: 'document_spine', structuralRole: 'root', admissionStatus: 'admitted', parentIds: ['embed:note:note-1'] },
+                { id: 'embed:chunk:chunk-1', kind: 'chunk', sourceId: 'chunk-1', noteId: 'note-1', chunkId: 'chunk-1', label: 'Chunk 1', text: 'sharp chunk', evidenceIds: [], lane: 'chunk_spine', structuralRole: 'spine', admissionStatus: 'admitted', parentIds: ['embed:structure-root:note-1:identity'] },
                 { id: 'embed:entity:kai', kind: 'entity', sourceId: 'kai', entityId: 'kai', entityKind: 'CHARACTER', label: 'Kai', text: 'mentions:3 evidence_context:Kai', evidenceIds: ['a1'], lane: 'entity_anchor', structuralRole: 'child', admissionStatus: 'admitted', parentIds: ['embed:chunk:chunk-1'] },
             ],
             embeddingVectors: [],
@@ -849,6 +850,10 @@ describe('embedding atlas projection', () => {
         }, 'siegel');
 
         const kai = atlas.nodes.find((node) => node.id === 'embed:entity:kai')!;
+        const note = atlas.nodes.find((node) => node.id === 'embed:note:note-1')!;
+        const root = atlas.nodes.find((node) => node.id === 'embed:structure-root:note-1:identity')!;
+        const chunk = atlas.nodes.find((node) => node.id === 'embed:chunk:chunk-1')!;
+        const zValues = atlas.nodes.map((node) => Number(node.atlasZ));
         expect(atlas.manifold).toMatchObject({
             mode: 'siegel',
             geometryVersion: 'graph_rebuild_siegel_finsler_v1',
@@ -861,6 +866,10 @@ describe('embedding atlas projection', () => {
             directed: true,
         });
         expect(kai.metadata?.siegel?.['matrixCells']).toHaveLength(6);
+        expect(Number(note.atlasY)).toBeGreaterThan(Number(root.atlasY));
+        expect(Number(root.atlasY)).toBeGreaterThan(Number(chunk.atlasY));
+        expect(Number(chunk.atlasY)).toBeGreaterThan(Number(kai.atlasY));
+        expect(Math.max(...zValues) - Math.min(...zValues)).toBeGreaterThan(0.45);
         expect(atlas.edges.map((edge) => edge.type)).toContain('target-parent');
     });
 

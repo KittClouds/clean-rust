@@ -734,7 +734,9 @@ function targetNode(
     mentionCompaction?: MentionCompactionReceipt,
     capsDocumentDirections?: Map<string, CapsVec3>,
 ): GalaxyRenderableNode {
-    const point = projectVector(vector, target.id, index, total, manifold);
+    const point = manifold === 'siegel'
+        ? projectSiegelVector(vector, target, index, total, hierarchyContext)
+        : projectVector(vector, target.id, index, total, manifold);
     const busemannSignature = graphModelBusemannSignature(commitment);
     const relationFamily = displayKind(target.kind) === 'graph-fact'
         ? relationFamilyFromText(target.label, target.text, target.sourceId)
@@ -1908,6 +1910,55 @@ function projectVector(
         y: (vector[1] * 0.7 + y * 0.64) * scale,
         z: (vector[2] * 0.9 + Math.sin(spiral) * radial) * scale,
     };
+}
+
+function projectSiegelVector(
+    vector: Float32Array,
+    target: GraphRebuildEmbeddingTarget,
+    index: number,
+    total: number,
+    hierarchyContext?: TargetHierarchyContext,
+): { x: number; y: number; z: number } {
+    const depth = siegelDepth(target, hierarchyContext);
+    const lane = normalizeSiegelLane(target.lane, target.kind);
+    const phase = unitHash(`${target.id}:siegel-projection`);
+    const angle = phase * Math.PI * 2;
+    const semantic = targetSemanticSpread(vector, index, total);
+    const layer = siegelDepthLayer(depth);
+    const laneShift = siegelLaneShift(lane);
+    const radius = (0.58 + semantic.radial * 0.3 + phase * 0.08) * (1 + depth * 0.025);
+    return {
+        x: (Math.cos(angle) * radius + vector[0] * 0.22 + laneShift.x) * 1.12,
+        y: layer + vector[1] * 0.1 + laneShift.y,
+        z: (Math.sin(angle) * radius + vector[2] * 0.3 + laneShift.z + semantic.z * 0.18) * 1.28,
+    };
+}
+
+function targetSemanticSpread(vector: Float32Array, index: number, total: number): { radial: number; z: number } {
+    const ordinal = total > 1 ? index / (total - 1) : 0.5;
+    return {
+        radial: clampRange(Math.abs(vector[3] ?? 0) + Math.abs(vector[4] ?? 0) + ordinal * 0.35, 0, 1.4),
+        z: (vector[5] ?? 0) + (0.5 - ordinal) * 0.4,
+    };
+}
+
+function siegelDepthLayer(depth: number): number {
+    return 1.04 - clampHierarchyDepth(depth) * 0.34;
+}
+
+function clampHierarchyDepth(depth: number): number {
+    return Math.max(0, Math.min(5, depth));
+}
+
+function siegelLaneShift(lane: string): { x: number; y: number; z: number } {
+    if (lane === 'document') return { x: -0.32, y: 0.02, z: -0.14 };
+    if (lane === 'entity') return { x: 0.18, y: -0.03, z: 0.28 };
+    if (lane === 'relationship') return { x: 0.34, y: -0.04, z: -0.06 };
+    if (lane === 'temporal') return { x: 0.08, y: -0.06, z: 0.36 };
+    if (lane === 'causal') return { x: 0.42, y: -0.06, z: 0.2 };
+    if (lane === 'event') return { x: 0.22, y: -0.08, z: -0.32 };
+    if (lane === 'evidence') return { x: -0.08, y: -0.1, z: 0.44 };
+    return { x: 0, y: -0.04, z: 0 };
 }
 
 function displayKind(kind: string): string {
