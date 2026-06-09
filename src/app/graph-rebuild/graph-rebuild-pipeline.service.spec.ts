@@ -204,9 +204,12 @@ describe('GraphRebuildPipelineService', () => {
             ]),
         }));
         expect(phoenixUiApi.loadStagedGraphScenePacket).toHaveBeenCalledWith(expect.objectContaining({
-            source: 'manifoldSnapshot',
+            source: 'inline',
             manifold: 'siegel',
             limit: 4096,
+            nodes: expect.arrayContaining([
+                expect.objectContaining({ id: 'embed:entity:entity-kai' }),
+            ]),
         }));
     });
 

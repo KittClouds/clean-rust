@@ -2734,6 +2734,7 @@ function stagedNativeScenePacketDetail(
   if (packetNodes > 0 || packetEdges > 0) {
     parts.push(`packet ${formatCount(packetNodes)}n/${formatCount(packetEdges)}e`);
   }
+  if (counterValue(counters, 'sourceInlineSnapshot') > 0) parts.push('inline snapshot');
   if (expectedNodes > 0) parts.push(`expected ${formatCount(expectedNodes)} nodes`);
   parts.push(nodeDelta === 0 ? 'node parity ok' : `node delta ${formatCount(nodeDelta)}`);
   if (loadMs > 0) parts.push(`load ${formatDuration(loadMs)}`);
