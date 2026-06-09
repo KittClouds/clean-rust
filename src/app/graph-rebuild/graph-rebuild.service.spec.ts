@@ -524,6 +524,36 @@ describe('GraphRebuildService persistence helpers', () => {
         expect(hydrated?.discourseBridgeCandidateSummary).toEqual(snapshot.discourseBridgeCandidateSummary);
     });
 
+    it('hydrates MemoryGraphRAG bridge as a derived reload view instead of durable payload bulk', () => {
+        const snapshot = buildGraphRebuildSnapshot({
+            scopeKind: 'global',
+            scopeId: 'global',
+            noteIds: ['note-1'],
+            entities: [entity('entity-kai', 'Kai', []), entity('entity-hazel', 'Hazel', [])],
+            chunks: [{ id: 'note-1:chunk:0', noteId: 'note-1', start: 0, end: 30, ordinal: 0, source: 'dynamic-chunking' }],
+            occurrences: [
+                occurrence('note-1', 'entity-kai', 0, 3),
+                occurrence('note-1', 'entity-hazel', 12, 17),
+            ],
+            noteTexts: { 'note-1': 'Kai approved Hazel.' },
+            builtAt: 42,
+        });
+
+        expect(snapshot.memoryGraphRagBridgeSummary?.schemaVersion).toBe('phoenix-memory-graphrag-bridge/v1');
+        expect(snapshot.memoryGraphRagBridgeSummary?.records.length).toBeGreaterThan(0);
+
+        const persistedView = graphRebuildSnapshotPersistenceView(snapshot);
+        const document = graphRebuildSnapshotToScopedDocument(snapshot);
+        const persisted = scopedDocumentToGraphRebuildSnapshot(document);
+        const hydrated = persisted ? hydrateGraphRebuildSnapshotDerivedViews(persisted) : null;
+
+        expect(persistedView.memoryGraphRagBridgeSummary).toBeUndefined();
+        expect(persisted?.memoryGraphRagBridgeSummary).toBeUndefined();
+        expect(hydrated?.memoryGraphRagBridgeSummary).toEqual(snapshot.memoryGraphRagBridgeSummary);
+        expect(hydrated?.counters.memoryGraphRagRecords).toBe(snapshot.counters.memoryGraphRagRecords);
+        expect(hydrated?.semanticEvalLedgerSummary).toEqual(snapshot.semanticEvalLedgerSummary);
+    });
+
     it('persists graph compiler as a derived in-memory sidecar, not primary snapshot payload', () => {
         const snapshot = buildGraphRebuildSnapshot({
             scopeKind: 'global',

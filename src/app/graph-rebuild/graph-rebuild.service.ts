@@ -21,6 +21,7 @@ import { attachGraphCompilerReadModels } from './graph-compiler-read-model';
 import { buildGraphRebuildSnapshot } from './graph-rebuild-builder';
 import { buildGraphDiscourseSpineSummary } from './graph-discourse-spine';
 import { buildHopfResonanceSpace } from './graph-hopf-resonance-space';
+import { buildGraphMemoryGraphRagBridgeSummary } from './graph-memory-graphrag-bridge';
 import { buildAdaptiveGraphRebuildChunks } from './graph-rebuild-meaning-frames';
 import {
     buildGraphModelV2OverGraphExport,
@@ -601,6 +602,7 @@ export function graphRebuildSnapshotPersistenceView(snapshot: GraphRebuildSnapsh
         persisted.embeddingTargetPlan = plan;
     }
     delete persisted.hopfResonanceSpace;
+    delete persisted.memoryGraphRagBridgeSummary;
     delete persisted.discourseSpineSummary;
     delete persisted.semanticTaskSummary;
     return persisted;
@@ -625,6 +627,19 @@ export function hydrateGraphRebuildSnapshotDerivedViews(snapshot: GraphRebuildSn
         hydrated.counters.hopfResonanceBraids = hopfResonanceSpace.braids.length;
         hydrated.counters.hopfResonanceDroppedTargets = hopfResonanceSpace.counters.droppedTargets;
         hydrated.counters.hopfResonanceMutationAllowed = hopfResonanceSpace.counters.mutationAllowedCount;
+    }
+    if (!hydrated.memoryGraphRagBridgeSummary) {
+        hydrated = cloneGraphRebuildSnapshotForHydration(hydrated);
+        const memoryGraphRagBridgeSummary = buildGraphMemoryGraphRagBridgeSummary(hydrated, hydrated.builtAt);
+        hydrated.memoryGraphRagBridgeSummary = memoryGraphRagBridgeSummary;
+        hydrated.counters.memoryGraphRagRecords = memoryGraphRagBridgeSummary.counters.recordCount;
+        hydrated.counters.memoryGraphRagSchemaRecords = memoryGraphRagBridgeSummary.counters.schemaRecords;
+        hydrated.counters.memoryGraphRagFactRecords = memoryGraphRagBridgeSummary.counters.factRecords;
+        hydrated.counters.memoryGraphRagPassageRecords = memoryGraphRagBridgeSummary.counters.passageRecords;
+        hydrated.counters.memoryGraphRagEvalRows = memoryGraphRagBridgeSummary.counters.evalRowCount;
+        hydrated.counters.memoryGraphRagPassedEvalRows = memoryGraphRagBridgeSummary.counters.passedEvalRows;
+        hydrated.counters.memoryGraphRagReceipts = memoryGraphRagBridgeSummary.counters.receiptCount;
+        hydrated.counters.memoryGraphRagMutationAllowed = memoryGraphRagBridgeSummary.counters.mutationAllowedCount;
     }
     if (!hydrated.discourseSpineSummary) {
         hydrated = cloneGraphRebuildSnapshotForHydration(hydrated);
