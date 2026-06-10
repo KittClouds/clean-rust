@@ -147,6 +147,24 @@ describe('Product manifold galaxy visualization data', () => {
         expect(backboneEdge.alpha).toBeGreaterThan(bridgeEdge.alpha * 0.7);
     });
 
+    it('lets hierarchy caps own Product basins before embedding clusters', () => {
+        const nodes: GalaxyRenderableNode[] = [
+            hierarchyProductNode('embed:note:1', 'Doc', 'note', 'document:1', 0),
+            hierarchyProductNode('embed:root:1', 'Identity root', 'structure-root', 'document:1:root:identity', 1, 'embed:note:1'),
+            hierarchyProductNode('embed:chunk:1', 'Scene chunk', 'chunk', 'document:1:chunk:1', 2, 'embed:root:1'),
+            hierarchyProductNode('embed:entity:kai', 'Kai', 'entity', 'identity:kai', 3, 'embed:chunk:1'),
+            hierarchyProductNode('embed:fact:cause', 'causes_or_explains', 'causal-fact', 'event:1:causal', 5, 'embed:entity:kai'),
+        ];
+
+        const scene = buildGalaxyScene(nodes, [], mergeGalaxySettings({ layoutMode: 'productManifold' }));
+        const byId = new Map(scene.nodes.map((node) => [node.entity.id, node]));
+
+        expect(byId.get('embed:note:1')!.x).toBeLessThan(byId.get('embed:root:1')!.x);
+        expect(byId.get('embed:root:1')!.x).toBeLessThan(byId.get('embed:chunk:1')!.x);
+        expect(byId.get('embed:chunk:1')!.x).toBeLessThan(byId.get('embed:entity:kai')!.x);
+        expect(byId.get('embed:entity:kai')!.x).toBeLessThan(byId.get('embed:fact:cause')!.x);
+    });
+
     it('keeps Product topology pressure separate from the Lorentz skeleton', () => {
         const nodes: GalaxyRenderableNode[] = [
             topologyNode('embed:entity:kai', 'Kai', 'embedding-cluster:0', 'embed:entity:kai', 0.1, 0.9),
@@ -357,6 +375,28 @@ function topologyNode(
                         entity: id.includes('rook') ? 0.2 : 0.8,
                     },
                 },
+            },
+        },
+    };
+}
+
+function hierarchyProductNode(id: string, label: string, sourceType: string, capId: string, level: number, parentNodeId = ''): GalaxyRenderableNode {
+    return {
+        id,
+        label,
+        kind: sourceType,
+        totalMentions: 2,
+        metadata: {
+            sourceType,
+            embeddingClusterId: 'embedding-cluster:flat-type-island',
+            productLaneKind: 'document',
+            productTraversal: { routeStage: 6, lane: 'causal' },
+            lorentz: {
+                geometry: 'hierarchy_caps_v1',
+                capId,
+                level,
+                parentNodeId,
+                primaryTreeKind: 'document',
             },
         },
     };

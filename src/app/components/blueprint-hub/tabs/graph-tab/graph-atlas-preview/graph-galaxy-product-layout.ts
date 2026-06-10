@@ -82,6 +82,8 @@ interface ProductInfo {
     traversalSupport: number;
     traversalObstruction: number;
     obstructionKind: string;
+    hierarchyCapId: string;
+    hierarchyLevel: number;
 }
 
 interface ProductBasin {
@@ -426,6 +428,12 @@ function productInfo(node: GalaxyNode): ProductInfo {
     const fiber = record(product['fiber']);
     const hopf = record(metadata['hopf']);
     const traversal = record(metadata['productTraversal']);
+    const lorentz = record(metadata['lorentz']);
+    const memberships = lorentz['memberships'];
+    const primaryMembership = Array.isArray(memberships) ? record(memberships[0]) : {};
+    const hasHierarchyCaps = firstText(lorentz['geometry']) === 'hierarchy_caps_v1' || !!firstRawText(lorentz['capId']);
+    const hierarchyCapId = hasHierarchyCaps ? firstRawText(lorentz['capId'], primaryMembership['treeId']) : '';
+    const hierarchyLevel = hierarchyCapId ? finite(lorentz['level'] ?? primaryMembership['level']) : 0;
     const laneWeights = numberRecord(lanes['laneWeights']);
     const lane = firstText(
         traversal['lane'],
@@ -442,7 +450,7 @@ function productInfo(node: GalaxyNode): ProductInfo {
     const directRole = firstText(metadata['productRegionRole'], region['role']);
     const role = directRole || derivedRole(node, outlierScore, hubScore);
     const medoidId = firstText(metadata['embeddingMedoidTargetId'], region['medoidTargetId']);
-    const clusterId = firstText(metadata['embeddingClusterId'], region['clusterId'], medoidId && `medoid:${medoidId}`, `lane:${lane}`);
+    const clusterId = hierarchyCapId || firstText(metadata['embeddingClusterId'], region['clusterId'], medoidId && `medoid:${medoidId}`, `lane:${lane}`);
     return {
         clusterId,
         lane,
@@ -457,6 +465,8 @@ function productInfo(node: GalaxyNode): ProductInfo {
         traversalSupport: finite(traversal['supportScore']),
         traversalObstruction: finite(traversal['obstructionScore']),
         obstructionKind: firstText(traversal['obstructionKind']),
+        hierarchyCapId,
+        hierarchyLevel,
     };
 }
 
@@ -603,6 +613,7 @@ function canonicalRouteLane(lane: string): string {
 
 function routeStageFor(node: GalaxyNode, info: ProductInfo, activity: ProductTraversalActivity): number {
     const lane = canonicalRouteLane(info.lane || productNodeKind(node));
+    if (info.hierarchyCapId) return clamp(Math.round(info.hierarchyLevel), 0, 6);
     if (Number.isFinite(info.routeStage) && info.routeStage > 0) return clamp(Math.round(info.routeStage), 0, 6);
     if (activity.obstruction > 0.58 || info.role === 'outlier') return 6;
     if (lane === 'evidence') return 0;
@@ -697,6 +708,13 @@ function numberRecord(value: unknown): Record<string, number> {
 function firstText(...values: unknown[]): string {
     for (const value of values) {
         const text = String(value || '').trim().toLowerCase(); if (text) return text;
+    }
+    return '';
+}
+
+function firstRawText(...values: unknown[]): string {
+    for (const value of values) {
+        const text = String(value || '').trim(); if (text) return text;
     }
     return '';
 }
