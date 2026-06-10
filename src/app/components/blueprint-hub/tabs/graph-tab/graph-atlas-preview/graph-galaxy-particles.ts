@@ -122,6 +122,7 @@ export class GraphGalaxyParticles {
         const baseAlpha = settings.particleOpacity * (focus?.hasFocus ? 0.72 : 0.42);
         const flowSize = 0.62 + settings.particleSize * 0.1;
         const curved = settings.edgeMode === 'curved' || settings.edgeMode === 'tube';
+        const hopfCurves = data.layoutMode === 'hopfProjection' && settings.edgeMode === 'curved' && positions === data.positions3d;
         for (let i = 0; i < this.flowSources.length; i++) {
             const flowSource = this.flowSources[i];
             const t = (this.seeds[i] + time * 0.001 * this.speeds[i] * settings.particleSpeed) % 1;
@@ -129,11 +130,14 @@ export class GraphGalaxyParticles {
                 const edge = flowSource.index;
                 const source = data.edgePairs[edge * 2];
                 const target = data.edgePairs[edge * 2 + 1];
+                const hopfCrossBase = hopfCurves && this.isHopfCrossBaseEdge(data, source, target);
                 const lift = settings.edgeMode === 'tube'
                     ? this.edgeTubeLift(data, settings, edge, source, target)
-                    : curved ? this.edgeLift(data, settings, edge, source, target) : 0;
+                    : curved ? this.edgeLift(data, settings, edge, source, target, hopfCrossBase) : 0;
                 if (settings.edgeMode === 'tube') {
                     this.writeTubeEdgePosition(positionAttr, i, data, positions, edge, source, target, lift, t);
+                } else if (hopfCurves) {
+                    this.writeHopfEdgePosition(positionAttr, i, positions, edge, source, target, lift, t, settings.edgeCurveStrength, hopfCrossBase);
                 } else {
                     this.writeEdgePosition(positionAttr, i, data, positions, source, target, lift, t);
                 }
@@ -180,13 +184,13 @@ export class GraphGalaxyParticles {
         return data.layoutMode === 'lorentzTree' || data.layoutMode === 'productManifold' || data.layoutMode === 'siegelFinsler';
     }
 
-    private edgeLift(data: GalaxySceneV2, settings: GalaxyRenderSettings, edge: number, source: number, target: number): number {
+    private edgeLift(data: GalaxySceneV2, settings: GalaxyRenderSettings, edge: number, source: number, target: number, hopfCrossBase = false): number {
         const interGalaxy = data.edgeKinds[edge] === 1;
         const curveScale = THREE.MathUtils.clamp(settings.edgeCurveStrength, 0.25, 1.2) * (interGalaxy ? 0.92 : 0.58);
         if (this.usesTreeFilamentFlow(data)) {
             return this.treeFilamentEdgeLift(data, edge, source, target, curveScale);
         }
-        return (0.08 + Math.abs(source - target) * 0.002) * curveScale + (interGalaxy ? 0.18 : 0);
+        return (0.08 + Math.abs(source - target) * 0.002) * curveScale + (interGalaxy ? 0.18 : 0) + (hopfCrossBase ? 0.1 : 0);
     }
 
     private edgeTubeLift(data: GalaxySceneV2, settings: GalaxyRenderSettings, edge: number, source: number, target: number): number {
@@ -219,6 +223,65 @@ export class GraphGalaxyParticles {
             }
         }
         positionAttr.setXYZ(particle, this.edgeX(positions, source, target, t), this.edgeY(positions, source, target, lift, t), this.edgeZ(positions, source, target, t));
+    }
+
+    private writeHopfEdgePosition(
+        positionAttr: THREE.BufferAttribute,
+        particle: number,
+        positions: Float32Array,
+        edge: number,
+        source: number,
+        target: number,
+        lift: number,
+        t: number,
+        edgeCurveStrength: number,
+        crossBase: boolean,
+    ): void {
+        const sourceOffset = source * 3;
+        const targetOffset = target * 3;
+        const ax = positions[sourceOffset], ay = positions[sourceOffset + 1], az = positions[sourceOffset + 2];
+        const bx = positions[targetOffset], by = positions[targetOffset + 1], bz = positions[targetOffset + 2];
+        const ar = Math.max(0.0001, Math.hypot(ax, ay, az));
+        const br = Math.max(0.0001, Math.hypot(bx, by, bz));
+        const aux = ax / ar, auy = ay / ar, auz = az / ar;
+        const bux = bx / br, buy = by / br, buz = bz / br;
+        let nx = auy * buz - auz * buy;
+        let ny = auz * bux - aux * buz;
+        let nz = aux * buy - auy * bux;
+        const seed = this.stableUnit(`hopf-edge:${edge}`);
+        const sign = seed < 0.5 ? -1 : 1;
+        let normalLength = Math.hypot(nx, ny, nz);
+        if (normalLength < 0.0001) {
+            nx = auy * sign - auz * 0.38;
+            ny = auz + 0.22;
+            nz = -aux + auy * 0.38;
+            normalLength = Math.hypot(nx, ny, nz) || 1;
+        }
+        nx /= normalLength;
+        ny /= normalLength;
+        nz /= normalLength;
+
+        const sweep = Math.sin(Math.PI * t);
+        const curveScale = THREE.MathUtils.clamp(edgeCurveStrength, 0.25, 1.2);
+        const bend = (crossBase ? 0.36 : 0.18) * curveScale * sweep * sign;
+        const baseX = aux * (1 - t) + bux * t;
+        const baseY = auy * (1 - t) + buy * t;
+        const baseZ = auz * (1 - t) + buz * t;
+        const sideX = ny * baseZ - nz * baseY;
+        const sideY = nz * baseX - nx * baseZ;
+        const sideZ = nx * baseY - ny * baseX;
+        const sideLength = Math.hypot(sideX, sideY, sideZ) || 1;
+        const spin = Math.sin(Math.PI * 2 * t + seed * Math.PI * 2) * (crossBase ? 0.075 : 0.034) * sweep;
+        let dx = baseX + nx * bend + (sideX / sideLength) * spin;
+        let dy = baseY + ny * bend + (sideY / sideLength) * spin;
+        let dz = baseZ + nz * bend + (sideZ / sideLength) * spin;
+        const directionLength = Math.hypot(dx, dy, dz) || 1;
+        dx /= directionLength;
+        dy /= directionLength;
+        dz /= directionLength;
+
+        const radius = THREE.MathUtils.lerp(ar, br, t) + lift * (crossBase ? 0.72 : 0.38) * sweep;
+        positionAttr.setXYZ(particle, dx * radius, dy * radius, dz * radius);
     }
 
     private writeTubeEdgePosition(
@@ -435,6 +498,12 @@ export class GraphGalaxyParticles {
 
     private edgeZ(positions: Float32Array, source: number, target: number, t: number): number {
         return THREE.MathUtils.lerp(positions[source * 3 + 2], positions[target * 3 + 2], t);
+    }
+
+    private isHopfCrossBaseEdge(data: GalaxySceneV2, source: number, target: number): boolean {
+        const sourceBase = data.hopfBaseIds?.[source] || '';
+        const targetBase = data.hopfBaseIds?.[target] || '';
+        return Boolean(sourceBase && targetBase && sourceBase !== targetBase);
     }
 
     private writeTargetColor(colorAttr: THREE.BufferAttribute, data: GalaxySceneV2, edge: number, particle: number): void {
