@@ -53,8 +53,9 @@ export function applyProductStoryRegions(nodes: GalaxyNode[], links: GalaxyEdge[
     for (let index = 0; index < infos.length; index++) {
         const info = infos[index];
         const story = stories[index];
+        const compiledRegionId = story.regionId;
         if (!story.ownerEntityId) story.ownerEntityId = ownerIdFromRegion(info.ownerRegionId);
-        story.regionId = storyRegionId(nodes[index], info, story);
+        story.regionId = compiledRegionId || storyRegionId(nodes[index], info, story);
         story.pathKey = storyPathKey(story);
         info.story = story;
         if (story.regionId) info.clusterId = story.regionId;
@@ -83,6 +84,7 @@ export function productStoryBasinCenter(regionId: string, fallbackLane: string, 
         + (ownerId ? (stableUnit(`${ownerId}:owner-y`) - 0.5) * 0.34 : 0);
     const z = (stableUnit(`${docId}:doc-z`) - 0.5) * 0.44
         + (chunkId ? (stableUnit(`${docId}:${chunkId}:chunk-z`) - 0.5) * 0.72 : 0)
+        + (chunkId ? chunkOrdinalBand(chunkId) * 0.14 : 0)
         + (ownerId ? (stableUnit(`${ownerId}:owner-z`) - 0.5) * 0.12 : 0)
         + ((index / Math.max(1, total)) - 0.5) * 0.08;
     return { x, y, z };
@@ -90,6 +92,8 @@ export function productStoryBasinCenter(regionId: string, fallbackLane: string, 
 
 function productStoryInfo(node: GalaxyNode, info: ProductStoryLayoutInfo): ProductStoryInfo {
     const metadata = record(node.entity.metadata);
+    const ownership = productOwnershipStory(metadata);
+    if (ownership) return ownership;
     const lorentz = record(metadata['lorentz']);
     const membership = firstMembership(lorentz['memberships']);
     const capId = text(lorentz['capId'], membership['treeId'], info.hierarchyCapId);
@@ -103,6 +107,25 @@ function productStoryInfo(node: GalaxyNode, info: ProductStoryLayoutInfo): Produ
         parentNodeId: text(lorentz['parentNodeId'], membership['parentNodeId']),
         depth: depthFor(sourceType, capId, info.hierarchyLevel),
         localRank: rankFor(metadata, capId, node.entity.id),
+    };
+    return story;
+}
+
+function productOwnershipStory(metadata: Record<string, unknown>): ProductStoryInfo | null {
+    const ownership = record(metadata['productOwnership']);
+    const regionId = text(ownership['regionId']);
+    if (!regionId) return null;
+    const story: ProductStoryInfo = {
+        ...EMPTY_PRODUCT_STORY,
+        regionId,
+        documentId: normalizeId(firstArrayText(ownership['noteIds'])),
+        rootKind: text(ownership['lane'], ownership['role']),
+        chunkId: normalizeId(firstArrayText(ownership['chunkIds'])),
+        ownerEntityId: normalizeEntityId(text(ownership['ownerEntityId'])),
+        parentNodeId: text(ownership['primaryParentId']),
+        depth: finite(ownership['depth']),
+        localRank: finite(ownership['localRank']),
+        pathKey: text(ownership['pathKey']),
     };
     return story;
 }
@@ -187,6 +210,12 @@ function rootBand(rootKind: string): number {
     return 0;
 }
 
+function chunkOrdinalBand(chunkId: string): number {
+    const match = chunkId.match(/(\d+)$/);
+    if (!match) return stableUnit(`${chunkId}:chunk-ordinal`) - 0.5;
+    return ((Number(match[1]) % 9) - 4) / 4;
+}
+
 function documentFromCap(capId: string): string { return matchOne(capId, /^document:([^:]+)/i); }
 function chunkFromCap(capId: string): string { return matchOne(capId, /:chunk:([^:]+)/i); }
 function entityFromCap(capId: string): string { return matchOne(capId, /^identity:([^:]+)/i); }
@@ -230,6 +259,11 @@ function text(...values: unknown[]): string {
 
 function record(value: unknown): Record<string, unknown> {
     return value && typeof value === 'object' ? value as Record<string, unknown> : {};
+}
+
+function finite(value: unknown): number {
+    const number = Number(value);
+    return Number.isFinite(number) ? number : 0;
 }
 
 function stableUnit(value: string): number {

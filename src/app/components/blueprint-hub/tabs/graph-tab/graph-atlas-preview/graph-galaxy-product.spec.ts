@@ -216,6 +216,29 @@ describe('Product manifold galaxy visualization data', () => {
         expect(Math.abs(kaiFactOne.z - kaiFactTwo.z)).toBeGreaterThan(0.08);
     });
 
+    it('uses target parents instead of fact-family colors for Product ownership', () => {
+        const nodes: GalaxyRenderableNode[] = [
+            parentedProductNode('embed:note:1', 'Doc', 'note', [], { noteId: '1', productLaneKind: 'document' }),
+            parentedProductNode('embed:chunk:1', 'Scene chunk', 'chunk', ['embed:note:1'], { noteId: '1', chunkId: '1', productLaneKind: 'document' }),
+            parentedProductNode('embed:entity:kai', 'Kai', 'entity', ['embed:chunk:1'], { noteId: '1', chunkId: '1', productLaneKind: 'entity' }),
+            parentedProductNode('embed:entity:rowan', 'Rowan', 'entity', ['embed:chunk:1'], { noteId: '1', chunkId: '1', productLaneKind: 'entity' }),
+            parentedProductNode('embed:event:kai', 'Kai event', 'event', ['embed:chunk:1', 'embed:entity:kai'], { noteId: '1', chunkId: '1', productLaneKind: 'event' }),
+            parentedProductNode('embed:causalFact:kai', 'Kai causes route shift', 'causal-fact', ['embed:event:kai'], { noteId: '1', productLaneKind: 'causal' }),
+            parentedProductNode('embed:temporalFact:kai', 'Kai before route shift', 'temporal-fact', ['embed:event:kai'], { noteId: '1', productLaneKind: 'temporal' }),
+            parentedProductNode('embed:graph-fact:kai', 'Kai trusts Rowan', 'graph-fact', ['embed:entity:kai', 'embed:chunk:1'], { noteId: '1', chunkId: '1', productLaneKind: 'relationship' }),
+            parentedProductNode('embed:memory:kai', 'Kai remains cautious', 'memory-state', ['embed:entity:kai'], { noteId: '1', productLaneKind: 'memory' }),
+            parentedProductNode('embed:graph-fact:weak', 'Kai co_occurs_with Rowan', 'graph-fact', ['embed:entity:kai', 'embed:chunk:1'], { noteId: '1', chunkId: '1', signalLane: 'cooccurrence_weak', productLaneKind: 'relationship' }),
+            parentedProductNode('embed:causalFact:rowan', 'Rowan causes route shift', 'causal-fact', ['embed:entity:rowan', 'embed:chunk:1'], { noteId: '1', chunkId: '1', productLaneKind: 'causal' }),
+        ];
+
+        const scene = buildGalaxyScene(nodes, [], mergeGalaxySettings({ layoutMode: 'productManifold' }));
+
+        for (const id of ['embed:causalFact:kai', 'embed:temporalFact:kai', 'embed:graph-fact:kai', 'embed:memory:kai', 'embed:graph-fact:weak']) {
+            expect(sceneDistance(scene, 'embed:entity:kai', id)).toBeLessThan(sceneDistance(scene, 'embed:entity:rowan', id));
+        }
+        expect(sceneDistance(scene, 'embed:causalFact:kai', 'embed:graph-fact:kai')).toBeLessThan(sceneDistance(scene, 'embed:causalFact:kai', 'embed:causalFact:rowan'));
+    });
+
     it('keeps Product topology pressure separate from the Lorentz skeleton', () => {
         const nodes: GalaxyRenderableNode[] = [
             topologyNode('embed:entity:kai', 'Kai', 'embedding-cluster:0', 'embed:entity:kai', 0.1, 0.9),
@@ -472,6 +495,21 @@ function ownedProductNode(id: string, label: string, sourceType: string, capId: 
                 level,
                 primaryTreeKind: lane,
             },
+        },
+    };
+}
+
+function parentedProductNode(id: string, label: string, sourceType: string, parentIds: string[], metadata: Record<string, unknown>): GalaxyRenderableNode {
+    return {
+        id,
+        label,
+        kind: sourceType,
+        totalMentions: 2,
+        metadata: {
+            sourceType,
+            signalParentIds: parentIds,
+            embeddingClusterId: 'embedding-cluster:flat-family-island',
+            ...metadata,
         },
     };
 }
