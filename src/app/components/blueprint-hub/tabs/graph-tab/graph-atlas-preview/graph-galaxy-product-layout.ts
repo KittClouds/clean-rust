@@ -1,6 +1,7 @@
 import type { GalaxyEdge, GalaxyLorentzGuide, GalaxyNode, Rgb } from './graph-galaxy-engine';
 import { normalizeProductHopfPhase, productHopfAgreement, productHopfBraidDirection, productHopfTension } from './graph-galaxy-product-hopf';
 import { applyProductOwnerRegions } from './graph-galaxy-product-ownership';
+import { applyProductStoryRegions, EMPTY_PRODUCT_STORY, productStoryBasinCenter, type ProductStoryInfo } from './graph-galaxy-product-story';
 import { GRAPH_RELATION_FAMILY_HSL, relationFamilyFromText } from './graph-relation-visual-style';
 import { entityColorStore, normalizeGraphNodeColorKind } from '../../../../../lib/store/entityColorStore';
 
@@ -30,6 +31,7 @@ const KIND_HSL: Record<string, string> = {
 };
 
 const ROUTE_STAGE_X = [-1.38, -0.86, -0.32, 0.24, 0.78, 1.18, 1.5] as const;
+const STORY_STAGE_X = [-1.46, -1.02, -0.48, 0.12, 0.58, 0.94, 1.22] as const;
 const ROUTE_LANE_Y: Record<string, number> = {
     evidence: 0.74,
     identity: 0.44,
@@ -86,6 +88,7 @@ interface ProductInfo {
     hierarchyCapId: string;
     hierarchyLevel: number;
     ownerRegionId: string;
+    story: ProductStoryInfo;
 }
 
 interface ProductBasin {
@@ -113,6 +116,7 @@ export function applyProductConsensusLayout(nodes: GalaxyNode[], links: GalaxyEd
     if (!nodes.length) return [];
     const infos = nodes.map(productInfo);
     applyProductOwnerRegions(nodes, links, infos);
+    applyProductStoryRegions(nodes, links, infos);
     const activity = buildTraversalActivity(nodes, links, infos);
     const basins = buildBasins(nodes, infos);
     placeBasinCenters(basins);
@@ -169,6 +173,11 @@ function placeBasinCenters(basins: ProductBasin[]): void {
     const total = Math.max(1, basins.length);
     for (let index = 0; index < basins.length; index++) {
         const basin = basins[index];
+        const storyCenter = productStoryBasinCenter(basin.id, basin.lane, index, total);
+        if (storyCenter) {
+            basin.center = storyCenter;
+            continue;
+        }
         const lane = laneDirection(basin.lane);
         const angle = (index / total) * TAU + stableUnit(`${basin.id}:basin`) * 0.7;
         const ring = { x: Math.cos(angle), y: Math.sin(angle) * 0.42, z: Math.sin(angle) };
@@ -224,19 +233,22 @@ function productTraversalTarget(
     const phaseY = Math.sin(info.phase) * 0.055;
     const phaseZ = Math.cos(info.phase) * 0.08;
     const routeX = ROUTE_STAGE_X[stage] + (stableUnit(`${node.entity.id}:route:x`) - 0.5) * 0.14 + lorentz.x * 0.16;
+    const storyPull = info.story.regionId && !owned ? 0.46 : 0;
     const ownerX = basin.center.x * 1.42 + local.x * 0.34 + lorentz.x * 0.06;
-    const x = owned ? routeX * 0.16 + ownerX * 0.84 : routeX;
+    const x = owned ? routeX * 0.16 + ownerX * 0.84 : routeX * (1 - storyPull) + basin.center.x * storyPull;
     const laneY = routeLaneBand(lane);
     const y = owned
         ? basin.center.y * 1.2 + ownerY * 0.58 + local.y * 0.62 + phaseY
-        : laneY * (1 - ownerPull) + basin.center.y * ownerPull + ownerY + local.y * 0.42 + phaseY + (stableUnit(`${node.entity.id}:route:y`) - 0.5) * 0.055;
+        : laneY * (1 - ownerPull - storyPull * 0.7) + basin.center.y * (ownerPull + storyPull * 0.7) + ownerY + local.y * 0.42 + phaseY + (stableUnit(`${node.entity.id}:route:y`) - 0.5) * 0.055;
     const z = owned
         ? basin.center.z * 1.18 + ownerZ * 0.62 + local.z * 0.58 + phaseZ + obstruction * 0.12
-        : -0.2 + routeLoad * 0.38 + phaseZ + ownerZ + local.z * 0.32 + basinDrift.z + lorentz.z * 0.18 + obstruction * 0.22;
+        : -0.2 + routeLoad * 0.38 + phaseZ + ownerZ + local.z * 0.32 + basinDrift.z + basin.center.z * storyPull * 0.48 + lorentz.z * 0.18 + obstruction * 0.22;
     const target = { x, y, z: z + (index % 7 - 3) * 0.012 };
     const radius = length(target);
     if (owned && info.role === 'outlier' && radius < 1.16) return scale(target, 1.16 / Math.max(0.001, radius));
-    return scaleToRadius(target, obstruction > 0.55 ? 1.74 : 1.52);
+    const placed = scaleToRadius(target, obstruction > 0.55 ? 1.74 : 1.52);
+    if (info.story.depth >= 0) placed.x = placed.x * 0.45 + STORY_STAGE_X[stage] * 0.55;
+    return placed;
 }
 
 function relaxConsensus(
@@ -485,6 +497,7 @@ function productInfo(node: GalaxyNode): ProductInfo {
         hierarchyCapId,
         hierarchyLevel,
         ownerRegionId: '',
+        story: EMPTY_PRODUCT_STORY,
     };
 }
 
@@ -631,6 +644,7 @@ function canonicalRouteLane(lane: string): string {
 
 function routeStageFor(node: GalaxyNode, info: ProductInfo, activity: ProductTraversalActivity): number {
     const lane = canonicalRouteLane(info.lane || productNodeKind(node));
+    if (info.story.depth >= 0) return clamp(Math.round(info.story.depth), 0, 6);
     if (info.hierarchyCapId) return clamp(Math.round(info.hierarchyLevel), 0, 6);
     if (Number.isFinite(info.routeStage) && info.routeStage > 0) return clamp(Math.round(info.routeStage), 0, 6);
     if (activity.obstruction > 0.58 || info.role === 'outlier') return 6;

@@ -192,6 +192,30 @@ describe('Product manifold galaxy visualization data', () => {
         expect(sceneDistance(scene, 'embed:fact:kai', 'embed:fact:kai-causal')).toBeLessThan(sceneDistance(scene, 'embed:fact:kai-causal', 'embed:fact:rowan-causal'));
     });
 
+    it('uses story chunks before flat fact lanes in Product regions', () => {
+        const nodes: GalaxyRenderableNode[] = [
+            ownedProductNode('embed:note:1', 'Doc', 'note', 'document:1', 0, '', 'document'),
+            ownedProductNode('embed:chunk:1', 'Scene chunk one', 'chunk', 'document:1:chunk:1', 2, '', 'document'),
+            ownedProductNode('embed:chunk:2', 'Scene chunk two', 'chunk', 'document:1:chunk:2', 2, '', 'document'),
+            ownedProductNode('embed:entity:kai', 'Kai', 'entity', 'identity:kai', 3, 'kai', 'entity'),
+            ownedProductNode('embed:fact:kai-causal-1', 'Kai causes scene one shift', 'causal-fact', 'document:1:chunk:1:facts:causal', 4, 'kai', 'causal'),
+            ownedProductNode('embed:fact:kai-causal-2', 'Kai causes scene two shift', 'causal-fact', 'document:1:chunk:2:facts:causal', 4, 'kai', 'causal'),
+        ];
+        const edges: GalaxyInputEdge[] = [
+            { id: 'fact-source:kai-causal-1', sourceId: 'embed:fact:kai-causal-1', targetId: 'embed:entity:kai', type: 'causal', confidence: 0.84 },
+            { id: 'fact-source:kai-causal-2', sourceId: 'embed:fact:kai-causal-2', targetId: 'embed:entity:kai', type: 'causal', confidence: 0.84 },
+        ];
+
+        const scene = buildGalaxyScene(nodes, edges, mergeGalaxySettings({ layoutMode: 'productManifold' }));
+        const byId = new Map(scene.nodes.map((node) => [node.entity.id, node]));
+        const kaiFactOne = byId.get('embed:fact:kai-causal-1')!;
+        const kaiFactTwo = byId.get('embed:fact:kai-causal-2')!;
+
+        expect(byId.get('embed:chunk:1')!.x).toBeLessThan(kaiFactOne.x);
+        expect(byId.get('embed:chunk:2')!.x).toBeLessThan(kaiFactTwo.x);
+        expect(Math.abs(kaiFactOne.z - kaiFactTwo.z)).toBeGreaterThan(0.08);
+    });
+
     it('keeps Product topology pressure separate from the Lorentz skeleton', () => {
         const nodes: GalaxyRenderableNode[] = [
             topologyNode('embed:entity:kai', 'Kai', 'embedding-cluster:0', 'embed:entity:kai', 0.1, 0.9),
