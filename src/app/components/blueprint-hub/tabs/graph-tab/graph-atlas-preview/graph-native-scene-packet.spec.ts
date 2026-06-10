@@ -35,6 +35,31 @@ describe('graphScenePacketToV2', () => {
             edgeKinds: encodeU8([2]),
             hierarchyShellRadii: encodeF32([4, 1]),
             hierarchyShellRanks: encodeU8([1, 4]),
+            hierarchyHints: [
+                {
+                    nodeId: 'entity:kai',
+                    primaryTreeId: 'identity:kai',
+                    capId: 'identity:kai',
+                    parentNodeId: 'embed:structure-root:note-1:identity',
+                    shellRadius: 1.42,
+                    hierarchyLevel: 3,
+                    role: 'canonicalEntity',
+                    confidence: 0.94,
+                    memberships: [
+                        {
+                            treeId: 'identity:kai',
+                            nodeId: 'entity:kai',
+                            parentNodeId: 'embed:structure-root:note-1:identity',
+                            depth: 3,
+                            localRank: 1,
+                            pathKey: 'identity:kai/embed:structure-root:note-1:identity/entity:kai',
+                            role: 'canonicalEntity',
+                            confidence: 0.94,
+                            primary: true,
+                        },
+                    ],
+                },
+            ],
         };
 
         const scene = graphScenePacketToV2(packet);
@@ -44,6 +69,11 @@ describe('graphScenePacketToV2', () => {
         expect(Array.from(scene.edgePairs)).toEqual([0, 1]);
         expect(Array.from(scene.edgeKinds)).toEqual([2]);
         expect(Array.from(scene.hierarchyShellRanks ?? [])).toEqual([1, 4]);
+        expect(scene.hierarchyHints?.[0]).toMatchObject({
+            nodeId: 'entity:kai',
+            capId: 'identity:kai',
+            parentNodeId: 'embed:structure-root:note-1:identity',
+        });
     });
 });
 

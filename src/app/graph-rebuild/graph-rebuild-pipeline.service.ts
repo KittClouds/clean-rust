@@ -842,6 +842,7 @@ export class GraphRebuildPipelineService {
                 packetLoadMs: loadMs,
                 packetDecodeMs: decodeMs,
                 hierarchyShellRanks: buffers.hierarchyShellRanks?.length === packet.ids.length ? 1 : 0,
+                hierarchyHints: packet.hierarchyHints?.length === packet.ids.length ? 1 : 0,
                 decodedFloat32Values: buffers.positions3d.length
                     + buffers.positions2d.length
                     + buffers.radii.length

@@ -199,6 +199,7 @@ describe('GraphRebuildPipelineService', () => {
                         scenePacketAvailable: 1,
                         rendererWired: 0,
                         nodeParityOk: 1,
+                        hierarchyHints: 1,
                     }),
                 }),
             ]),
@@ -1412,7 +1413,38 @@ function createPhoenixUiApiMock() {
             edgeKinds: encodeU8([]),
             hierarchyShellRadii: encodeF32([3, 2, 1]),
             hierarchyShellRanks: encodeU8([0, 1, 2]),
+            hierarchyHints: [
+                hierarchyHint('embed:entity:entity-kai', 'identity:entity-kai', 'embed:structure-root:note-1:identity', 3),
+                hierarchyHint('embed:graph-fact:1', 'document:note-1:chunk:note-1:0:facts:relationship', 'embed:chunk:note-1:0', 5),
+                hierarchyHint('embed:event:1', 'event:1', 'embed:chunk:note-1:0', 4),
+            ],
         })),
+    };
+}
+
+function hierarchyHint(nodeId: string, capId: string, parentNodeId: string, level: number) {
+    return {
+        nodeId,
+        primaryTreeId: capId.split(':').slice(0, 2).join(':'),
+        capId,
+        parentNodeId,
+        shellRadius: 1,
+        hierarchyLevel: level,
+        role: 'test',
+        confidence: 0.94,
+        memberships: [
+            {
+                treeId: capId.split(':').slice(0, 2).join(':'),
+                nodeId,
+                parentNodeId,
+                depth: level,
+                localRank: level,
+                pathKey: `${capId}/${parentNodeId}/${nodeId}`,
+                role: 'test',
+                confidence: 0.94,
+                primary: true,
+            },
+        ],
     };
 }
 

@@ -1,4 +1,5 @@
 mod graph_galaxy;
+mod graph_scene_hierarchy;
 mod graph_scene_packet;
 mod phoenix_rpc;
 mod tts;

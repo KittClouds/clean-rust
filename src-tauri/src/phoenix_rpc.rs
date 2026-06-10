@@ -5,6 +5,7 @@ use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
 
 use crate::graph_galaxy::{compile_scene, DesktopGalaxyScene, DesktopGalaxySceneRequest};
+use crate::graph_scene_hierarchy::graph_rebuild_hierarchy_hint;
 use crate::graph_scene_packet::{
     compile_packet, GraphScenePacket, GraphScenePacketEdgeInput, GraphScenePacketInput,
     GraphScenePacketNodeInput, GraphScenePacketRequest, GraphScenePacketSettings,
@@ -1230,6 +1231,7 @@ fn scene_packet_node_from_desktop(node: &DesktopManifoldNode) -> GraphScenePacke
             .base_vector
             .map(|value| [value[0] as f32, value[1] as f32, value[2] as f32]),
         total_mentions: None,
+        hierarchy_hint: None,
     }
 }
 
@@ -1334,6 +1336,7 @@ fn graph_scene_packet_input_from_rebuild_snapshot_value(
             vector: vector.to_vec(),
             base_vector: Some(vector),
             total_mentions: Some(target_total_mentions(target)),
+            hierarchy_hint: graph_rebuild_hierarchy_hint(target, index),
         });
     }
 
@@ -4036,6 +4039,39 @@ mod tests {
                     "label": "Chunk 1",
                     "lane": "chunk_spine",
                     "parentIds": ["embed:document:note-1"]
+                },
+                {
+                    "id": "embed:event:event-a",
+                    "kind": "event",
+                    "sourceId": "event-a",
+                    "label": "Cause event",
+                    "lane": "event_identity",
+                    "noteId": "note-1",
+                    "chunkId": "note-1:0",
+                    "parentIds": ["embed:chunk:note-1:0"]
+                },
+                {
+                    "id": "embed:event:event-b",
+                    "kind": "event",
+                    "sourceId": "event-b",
+                    "label": "Outcome event",
+                    "lane": "event_identity",
+                    "noteId": "note-1",
+                    "chunkId": "note-1:0",
+                    "parentIds": ["embed:chunk:note-1:0"]
+                },
+                {
+                    "id": "embed:causalFact:cause-1",
+                    "kind": "causalFact",
+                    "sourceId": "cause-1",
+                    "label": "causes_or_explains",
+                    "lane": "causal_fact",
+                    "noteId": "note-1",
+                    "parentIds": [
+                        "embed:structure-root:note-1:causal",
+                        "embed:event:event-a",
+                        "embed:event:event-b"
+                    ]
                 }
             ],
             "embeddingGraphPostProcess": {
@@ -4070,9 +4106,19 @@ mod tests {
         )
         .unwrap();
 
-        assert_eq!(input.nodes.len(), 2);
+        assert_eq!(input.nodes.len(), 5);
         assert_eq!(input.edges.len(), 1);
         assert_eq!(input.nodes[0].source_type, "root");
         assert_eq!(input.nodes[1].source_type, "chunk");
+        let causal_hint = input.nodes[4]
+            .hierarchy_hint
+            .as_ref()
+            .expect("causal hierarchy hint");
+        assert_eq!(causal_hint.cap_id, "event:event-b:causal");
+        assert_eq!(
+            causal_hint.parent_node_id.as_deref(),
+            Some("embed:event:event-b")
+        );
+        assert_eq!(causal_hint.shell_radius, 1.14);
     }
 }

@@ -42,7 +42,19 @@ export function graphScenePacketEncodedChars(packet: PhoenixGraphScenePacket): n
         + packet.edgeAlpha.length
         + packet.edgeKinds.length
         + (packet.hierarchyShellRadii?.length || 0)
-        + (packet.hierarchyShellRanks?.length || 0);
+        + (packet.hierarchyShellRanks?.length || 0)
+        + (packet.hierarchyHints?.reduce((sum, hint) => sum
+            + hint.nodeId.length
+            + hint.primaryTreeId.length
+            + hint.capId.length
+            + (hint.parentNodeId?.length || 0)
+            + hint.role.length
+            + hint.memberships.reduce((inner, membership) => inner
+                + membership.treeId.length
+                + membership.nodeId.length
+                + (membership.parentNodeId?.length || 0)
+                + membership.pathKey.length
+                + membership.role.length, 0), 0) || 0);
 }
 
 function decodeF32(encoded: string, expected: number): Float32Array {

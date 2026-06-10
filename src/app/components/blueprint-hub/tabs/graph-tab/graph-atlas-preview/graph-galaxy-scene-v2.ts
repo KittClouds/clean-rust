@@ -13,6 +13,7 @@ import {
 } from './graph-galaxy-engine';
 import { hierarchyShellBandForNode } from './graph-galaxy-hierarchy-caps';
 import { relationFamilyFromText } from './graph-relation-visual-style';
+import type { PhoenixGraphScenePacketHierarchyHint } from '../../../../../services/phoenix-graph-scene-packet.model';
 
 export type GalaxySceneSourceMode = 'entities' | 'graph' | 'embeddings';
 
@@ -113,6 +114,7 @@ export interface GalaxySceneV2 {
     hybridReceipts?: GalaxyHybridNodeReceiptView[];
     hierarchyShellRadii?: Float32Array;
     hierarchyShellRanks?: Uint8Array;
+    hierarchyHints?: PhoenixGraphScenePacketHierarchyHint[];
     positions3d: Float32Array;
     positions2d: Float32Array;
     radii: Float32Array;

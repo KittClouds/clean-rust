@@ -24,5 +24,6 @@ export function graphScenePacketToV2(packet: PhoenixGraphScenePacket): GalaxySce
         edgeKinds: buffers.edgeKinds,
         hierarchyShellRadii: buffers.hierarchyShellRadii,
         hierarchyShellRanks: buffers.hierarchyShellRanks,
+        hierarchyHints: packet.hierarchyHints?.slice(),
     };
 }

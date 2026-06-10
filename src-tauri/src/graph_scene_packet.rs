@@ -46,6 +46,7 @@ pub struct GraphScenePacketNodeInput {
     pub vector: Vec<f32>,
     pub base_vector: Option<[f32; 3]>,
     pub total_mentions: Option<u32>,
+    pub hierarchy_hint: Option<GraphScenePacketHierarchyHint>,
 }
 
 #[derive(Clone, Debug, Deserialize)]
@@ -56,6 +57,34 @@ pub struct GraphScenePacketEdgeInput {
     pub target_id: String,
     pub edge_type: String,
     pub confidence: f32,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct GraphScenePacketHierarchyHint {
+    pub node_id: String,
+    pub primary_tree_id: String,
+    pub cap_id: String,
+    pub parent_node_id: Option<String>,
+    pub shell_radius: f32,
+    pub hierarchy_level: u16,
+    pub role: String,
+    pub confidence: f32,
+    pub memberships: Vec<GraphScenePacketHierarchyMembership>,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct GraphScenePacketHierarchyMembership {
+    pub tree_id: String,
+    pub node_id: String,
+    pub parent_node_id: Option<String>,
+    pub depth: u16,
+    pub local_rank: u32,
+    pub path_key: String,
+    pub role: String,
+    pub confidence: f32,
+    pub primary: bool,
 }
 
 #[derive(Debug)]
@@ -98,6 +127,8 @@ pub struct GraphScenePacket {
     pub hierarchy_shell_radii: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub hierarchy_shell_ranks: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub hierarchy_hints: Option<Vec<GraphScenePacketHierarchyHint>>,
 }
 
 #[derive(Debug, Serialize)]
@@ -157,6 +188,7 @@ pub fn compile_packet(input: GraphScenePacketInput) -> GraphScenePacket {
     let mut colors = Vec::<f32>::with_capacity(nodes.len() * 3);
     let mut shell_radii = Vec::<f32>::with_capacity(nodes.len());
     let mut shell_ranks = Vec::<u8>::with_capacity(nodes.len());
+    let mut hierarchy_hints = Vec::new();
 
     for node in &nodes {
         ids.push(node.input.id.clone());
@@ -164,11 +196,20 @@ pub fn compile_packet(input: GraphScenePacketInput) -> GraphScenePacket {
         kinds.push(node.input.kind.clone());
         group_ids.push(String::new());
         push_point(&mut positions3d, node.point);
-        push_point(&mut positions2d, Point3 { z: 0.0, ..node.point });
+        push_point(
+            &mut positions2d,
+            Point3 {
+                z: 0.0,
+                ..node.point
+            },
+        );
         radii.push(node.radius);
         colors.extend_from_slice(&node.color);
         shell_radii.push(shell_radius(node.shell_rank));
         shell_ranks.push(node.shell_rank);
+        if let Some(hint) = &node.input.hierarchy_hint {
+            hierarchy_hints.push(hint.clone());
+        }
     }
 
     let mut edge_pairs = Vec::<u32>::with_capacity(edges.len() * 2);
@@ -182,11 +223,16 @@ pub fn compile_packet(input: GraphScenePacketInput) -> GraphScenePacket {
         edge_pairs.push(edge.target);
         let source = &nodes[edge.source as usize];
         let target = &nodes[edge.target as usize];
-        let color = relation_color(&edge.edge_type).unwrap_or_else(|| mix_color(source.color, target.color));
+        let color = relation_color(&edge.edge_type)
+            .unwrap_or_else(|| mix_color(source.color, target.color));
         edge_colors.extend_from_slice(&color);
         edge_colors.extend_from_slice(&color);
         edge_alpha.push((0.055 + edge.confidence.max(0.0) * 0.052).min(0.32));
-        edge_kinds.push(if is_hierarchy_edge(&edge.edge_type) { 2 } else { 0 });
+        edge_kinds.push(if is_hierarchy_edge(&edge.edge_type) {
+            2
+        } else {
+            0
+        });
     }
 
     let buffer_bytes = bytes_len_f32(&positions3d)
@@ -230,6 +276,7 @@ pub fn compile_packet(input: GraphScenePacketInput) -> GraphScenePacket {
         edge_kinds: STANDARD.encode(edge_kinds),
         hierarchy_shell_radii: Some(encode_f32(&shell_radii)),
         hierarchy_shell_ranks: Some(STANDARD.encode(shell_ranks)),
+        hierarchy_hints: (!hierarchy_hints.is_empty()).then_some(hierarchy_hints),
     }
 }
 
@@ -242,7 +289,11 @@ fn select_nodes(nodes: Vec<GraphScenePacketNodeInput>, limit: usize) -> Vec<Node
             let shell_rank = hierarchy_rank(&input);
             let point = input
                 .base_vector
-                .map(|v| Point3 { x: v[0], y: v[1], z: v[2] })
+                .map(|v| Point3 {
+                    x: v[0],
+                    y: v[1],
+                    z: v[2],
+                })
                 .unwrap_or_else(|| project_vector(&input.vector, &input.id, index, limit));
             let mentions = input.total_mentions.unwrap_or(1).max(1) as f32;
             NodeView {
@@ -263,8 +314,12 @@ fn select_edges(
     let mut seen = HashSet::<u64>::with_capacity(edges.len());
     let mut out = Vec::with_capacity(edges.len());
     for edge in edges {
-        let Some(&source) = id_to_index.get(&edge.source_id) else { continue };
-        let Some(&target) = id_to_index.get(&edge.target_id) else { continue };
+        let Some(&source) = id_to_index.get(&edge.source_id) else {
+            continue;
+        };
+        let Some(&target) = id_to_index.get(&edge.target_id) else {
+            continue;
+        };
         if source == target {
             continue;
         }
@@ -314,7 +369,11 @@ fn apply_hierarchy_bands(nodes: &mut [NodeView], layout_mode: &str) {
         let rank = node.shell_rank.max(1) as f32;
         let lane = index as f32 / len as f32;
         let arc = (lane - 0.5) * 2.6;
-        let z_scale = if layout_mode == "siegelFinsler" { 0.38 } else { 0.26 };
+        let z_scale = if layout_mode == "siegelFinsler" {
+            0.38
+        } else {
+            0.26
+        };
         node.point.x = -2.2 + rank * 0.72 + arc.sin() * 0.18;
         node.point.y = (lane - 0.5) * 1.9 + stable_signed(&node.input.id) * 0.08;
         node.point.z = arc.cos() * z_scale + stable_signed(&format!("{}:z", node.input.id)) * 0.16;
@@ -346,7 +405,9 @@ fn apply_product_shell(nodes: &mut [NodeView]) {
 fn apply_hybrid_shell(nodes: &mut [NodeView]) {
     for node in nodes {
         let rank = node.shell_rank.max(1) as f32;
-        let norm = (node.point.x * node.point.x + node.point.y * node.point.y + node.point.z * node.point.z)
+        let norm = (node.point.x * node.point.x
+            + node.point.y * node.point.y
+            + node.point.z * node.point.z)
             .sqrt()
             .max(1.0e-4);
         let radius = 0.78 + rank * 0.18;
@@ -357,7 +418,13 @@ fn apply_hybrid_shell(nodes: &mut [NodeView]) {
 }
 
 fn relax(nodes: &mut [NodeView], edges: &[EdgeView], settings: GraphScenePacketSettings) {
-    let ticks = if nodes.len() > 900 { 8 } else if nodes.len() > 400 { 14 } else { 22 };
+    let ticks = if nodes.len() > 900 {
+        8
+    } else if nodes.len() > 400 {
+        14
+    } else {
+        22
+    };
     let mut vx = vec![0.0_f32; nodes.len()];
     let mut vy = vec![0.0_f32; nodes.len()];
     let mut vz = vec![0.0_f32; nodes.len()];
@@ -398,7 +465,11 @@ fn relax(nodes: &mut [NodeView], edges: &[EdgeView], settings: GraphScenePacketS
 fn project_vector(vector: &[f32], id: &str, index: usize, total: usize) -> Point3 {
     let seed = stable_hash(id);
     let phase = seed as f32 / u32::MAX as f32;
-    let mut point = Point3 { x: 0.0, y: 0.0, z: 0.0 };
+    let mut point = Point3 {
+        x: 0.0,
+        y: 0.0,
+        z: 0.0,
+    };
     for (dim, value) in vector.iter().enumerate() {
         let n = dim as f32 + 1.0;
         point.x += value * (n * 12.9898 + phase * std::f32::consts::TAU).sin();
@@ -434,20 +505,34 @@ fn hierarchy_rank(node: &GraphScenePacketNodeInput) -> u8 {
         node.kind.to_ascii_lowercase(),
         node.source_type.to_ascii_lowercase()
     );
-    if text.contains("doc") || text.contains("document") { 1 }
-    else if text.contains("root") || text.contains("identity") || text.contains("context") { 2 }
-    else if text.contains("chunk") || text.contains("leaf") { 3 }
-    else if text.contains("entity") || text.contains("character") { 4 }
-    else { 5 }
+    if text.contains("doc") || text.contains("document") {
+        1
+    } else if text.contains("root") || text.contains("identity") || text.contains("context") {
+        2
+    } else if text.contains("chunk") || text.contains("leaf") {
+        3
+    } else if text.contains("entity") || text.contains("character") {
+        4
+    } else {
+        5
+    }
 }
 
 fn color_for_node(node: &GraphScenePacketNodeInput, index: usize) -> [f32; 3] {
-    let text = format!("{} {}", node.kind.to_ascii_lowercase(), node.source_type.to_ascii_lowercase());
-    if text.contains("doc") || text.contains("leaf") { [0.10, 0.77, 0.95] }
-    else if text.contains("entity") || text.contains("character") { [0.78, 0.26, 0.96] }
-    else if text.contains("causal") { [0.98, 0.67, 0.02] }
-    else if text.contains("temporal") { [0.20, 0.88, 0.66] }
-    else {
+    let text = format!(
+        "{} {}",
+        node.kind.to_ascii_lowercase(),
+        node.source_type.to_ascii_lowercase()
+    );
+    if text.contains("doc") || text.contains("leaf") {
+        [0.10, 0.77, 0.95]
+    } else if text.contains("entity") || text.contains("character") {
+        [0.78, 0.26, 0.96]
+    } else if text.contains("causal") {
+        [0.98, 0.67, 0.02]
+    } else if text.contains("temporal") {
+        [0.20, 0.88, 0.66]
+    } else {
         const PALETTE: [[f32; 3]; 4] = [
             [0.18, 0.88, 0.78],
             [0.15, 0.72, 0.95],
@@ -573,7 +658,9 @@ mod tests {
             edges: vec![],
         });
         assert_eq!(packet.counters.rendered_nodes, 4);
-        let ranks = STANDARD.decode(packet.hierarchy_shell_ranks.unwrap()).unwrap();
+        let ranks = STANDARD
+            .decode(packet.hierarchy_shell_ranks.unwrap())
+            .unwrap();
         assert_eq!(ranks, vec![1, 2, 3, 4]);
     }
 
@@ -599,6 +686,51 @@ mod tests {
         assert_eq!(packet.counters.dropped_edges, 2);
     }
 
+    #[test]
+    fn packet_preserves_native_hierarchy_hints() {
+        let mut child = node("embed:causalFact:cause-1", "causes_or_explains", "causal");
+        child.hierarchy_hint = Some(GraphScenePacketHierarchyHint {
+            node_id: child.id.clone(),
+            primary_tree_id: "event:event-b".into(),
+            cap_id: "event:event-b:causal".into(),
+            parent_node_id: Some("embed:event:event-b".into()),
+            shell_radius: 1.14,
+            hierarchy_level: 5,
+            role: "causalFact".into(),
+            confidence: 0.94,
+            memberships: vec![GraphScenePacketHierarchyMembership {
+                tree_id: "event:event-b".into(),
+                node_id: child.id.clone(),
+                parent_node_id: Some("embed:event:event-b".into()),
+                depth: 5,
+                local_rank: 1,
+                path_key: "event:event-b/embed:event:event-b/embed:causalFact:cause-1".into(),
+                role: "causalFact".into(),
+                confidence: 0.94,
+                primary: true,
+            }],
+        });
+        let packet = compile_packet(GraphScenePacketInput {
+            source: "inline".into(),
+            manifold: "siegel".into(),
+            layout_mode: "siegelFinsler".into(),
+            source_mode: "embeddings".into(),
+            source_label: "test".into(),
+            limit: 16,
+            settings: GraphScenePacketSettings::default(),
+            nodes: vec![node("embed:event:event-b", "Event", "event"), child],
+            edges: vec![],
+        });
+
+        let hints = packet.hierarchy_hints.expect("native hierarchy hints");
+        assert_eq!(hints.len(), 1);
+        assert_eq!(hints[0].cap_id, "event:event-b:causal");
+        assert_eq!(
+            hints[0].parent_node_id.as_deref(),
+            Some("embed:event:event-b")
+        );
+    }
+
     fn node(id: &str, label: &str, source_type: &str) -> GraphScenePacketNodeInput {
         GraphScenePacketNodeInput {
             id: id.into(),
@@ -608,6 +740,7 @@ mod tests {
             vector: vec![0.1, 0.3, 0.5, 0.7],
             base_vector: None,
             total_mentions: Some(1),
+            hierarchy_hint: None,
         }
     }
 

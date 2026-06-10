@@ -24,6 +24,7 @@ export interface PhoenixGraphScenePacketNodeInput {
     vector: number[];
     baseVector?: [number, number, number] | null;
     totalMentions?: number | null;
+    hierarchyHint?: PhoenixGraphScenePacketHierarchyHint | null;
 }
 
 export interface PhoenixGraphScenePacketEdgeInput {
@@ -32,6 +33,30 @@ export interface PhoenixGraphScenePacketEdgeInput {
     targetId: string;
     edgeType: string;
     confidence: number;
+}
+
+export interface PhoenixGraphScenePacketHierarchyMembership {
+    treeId: string;
+    nodeId: string;
+    parentNodeId?: string | null;
+    depth: number;
+    localRank: number;
+    pathKey: string;
+    role: string;
+    confidence: number;
+    primary: boolean;
+}
+
+export interface PhoenixGraphScenePacketHierarchyHint {
+    nodeId: string;
+    primaryTreeId: string;
+    capId: string;
+    parentNodeId?: string | null;
+    shellRadius: number;
+    hierarchyLevel: number;
+    role: string;
+    confidence: number;
+    memberships: PhoenixGraphScenePacketHierarchyMembership[];
 }
 
 export interface PhoenixGraphScenePacketRequest {
@@ -78,4 +103,5 @@ export interface PhoenixGraphScenePacket {
     edgeKinds: string;
     hierarchyShellRadii?: string;
     hierarchyShellRanks?: string;
+    hierarchyHints?: PhoenixGraphScenePacketHierarchyHint[];
 }
