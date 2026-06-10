@@ -394,11 +394,66 @@ fn apply_hopf_shell(nodes: &mut [NodeView]) {
 
 fn apply_product_shell(nodes: &mut [NodeView]) {
     for node in nodes {
+        if let Some(hint) = &node.input.hierarchy_hint {
+            let stage = product_hierarchy_stage(hint.hierarchy_level);
+            let lane = product_hierarchy_lane(&hint.role, &hint.cap_id);
+            let phase_key = format!("{}:{}", hint.cap_id, node.input.id);
+            let phase = stable_unit(&phase_key) * std::f32::consts::TAU;
+            let shell_depth = (2.08 - hint.shell_radius.clamp(0.84, 2.08)) * 0.18;
+            node.point.x = product_stage_x(stage)
+                + stable_signed(&format!("{}:product:x", node.input.id)) * 0.055;
+            node.point.y = product_lane_y(lane)
+                + stable_signed(&format!("{}:product:y", node.input.id)) * 0.045;
+            node.point.z = phase.sin() * 0.28
+                + stable_signed(&format!("{}:product:cap", hint.cap_id)) * 0.16
+                + stable_signed(&format!("{}:product:z", node.input.id)) * 0.05
+                + shell_depth;
+            continue;
+        }
         let rank = node.shell_rank.max(1) as f32;
         let phase = stable_unit(&node.input.id) * std::f32::consts::TAU;
         node.point.x = phase.cos() * (0.72 + rank * 0.18);
         node.point.y = (rank - 3.0) * 0.28 + stable_signed(&node.input.kind) * 0.12;
         node.point.z = phase.sin() * (0.72 + rank * 0.12);
+    }
+}
+
+fn product_hierarchy_stage(level: u16) -> usize {
+    usize::from(level.min(6))
+}
+
+fn product_stage_x(stage: usize) -> f32 {
+    const X: [f32; 7] = [-1.38, -0.86, -0.32, 0.24, 0.78, 1.18, 1.50];
+    X[stage.min(X.len() - 1)]
+}
+
+fn product_hierarchy_lane(role: &str, cap_id: &str) -> &'static str {
+    let role = role.to_ascii_lowercase();
+    let cap = cap_id.to_ascii_lowercase();
+    if role.contains("entity") || role.contains("memory") || cap.starts_with("identity:") {
+        "identity"
+    } else if role.contains("temporal") {
+        "temporal"
+    } else if role.contains("causal") {
+        "causal"
+    } else if role.contains("event") || cap.starts_with("event:") {
+        "event"
+    } else if role.contains("fact") {
+        "relationship"
+    } else {
+        "evidence"
+    }
+}
+
+fn product_lane_y(lane: &str) -> f32 {
+    match lane {
+        "evidence" => 0.74,
+        "identity" => 0.44,
+        "relationship" => 0.16,
+        "event" => -0.10,
+        "temporal" => -0.36,
+        "causal" => -0.62,
+        _ => 0.02,
     }
 }
 
@@ -636,121 +691,5 @@ fn encode_u32(values: &[u32]) -> String {
 }
 
 #[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn hierarchy_packet_keeps_document_chunk_entity_order() {
-        let packet = compile_packet(GraphScenePacketInput {
-            source: "inline".into(),
-            manifold: "siegel".into(),
-            layout_mode: "siegelFinsler".into(),
-            source_mode: "embeddings".into(),
-            source_label: "test".into(),
-            limit: 16,
-            settings: GraphScenePacketSettings::default(),
-            nodes: vec![
-                node("doc-1", "Document", "document"),
-                node("root-1", "Identity Root", "identity_root"),
-                node("chunk-1", "Chunk", "chunk"),
-                node("entity-1", "Entity", "entity"),
-            ],
-            edges: vec![],
-        });
-        assert_eq!(packet.counters.rendered_nodes, 4);
-        let ranks = STANDARD
-            .decode(packet.hierarchy_shell_ranks.unwrap())
-            .unwrap();
-        assert_eq!(ranks, vec![1, 2, 3, 4]);
-    }
-
-    #[test]
-    fn invalid_edges_do_not_cross_packet_boundary() {
-        let packet = compile_packet(GraphScenePacketInput {
-            source: "inline".into(),
-            manifold: "hybrid".into(),
-            layout_mode: "hybridSpace".into(),
-            source_mode: "embeddings".into(),
-            source_label: "test".into(),
-            limit: 16,
-            settings: GraphScenePacketSettings::default(),
-            nodes: vec![node("a", "A", "entity"), node("b", "B", "entity")],
-            edges: vec![
-                edge("ab", "a", "b"),
-                edge("missing", "a", "c"),
-                edge("dupe", "b", "a"),
-            ],
-        });
-        assert_eq!(packet.counters.input_edges, 3);
-        assert_eq!(packet.counters.rendered_edges, 1);
-        assert_eq!(packet.counters.dropped_edges, 2);
-    }
-
-    #[test]
-    fn packet_preserves_native_hierarchy_hints() {
-        let mut child = node("embed:causalFact:cause-1", "causes_or_explains", "causal");
-        child.hierarchy_hint = Some(GraphScenePacketHierarchyHint {
-            node_id: child.id.clone(),
-            primary_tree_id: "event:event-b".into(),
-            cap_id: "event:event-b:causal".into(),
-            parent_node_id: Some("embed:event:event-b".into()),
-            shell_radius: 1.14,
-            hierarchy_level: 5,
-            role: "causalFact".into(),
-            confidence: 0.94,
-            memberships: vec![GraphScenePacketHierarchyMembership {
-                tree_id: "event:event-b".into(),
-                node_id: child.id.clone(),
-                parent_node_id: Some("embed:event:event-b".into()),
-                depth: 5,
-                local_rank: 1,
-                path_key: "event:event-b/embed:event:event-b/embed:causalFact:cause-1".into(),
-                role: "causalFact".into(),
-                confidence: 0.94,
-                primary: true,
-            }],
-        });
-        let packet = compile_packet(GraphScenePacketInput {
-            source: "inline".into(),
-            manifold: "siegel".into(),
-            layout_mode: "siegelFinsler".into(),
-            source_mode: "embeddings".into(),
-            source_label: "test".into(),
-            limit: 16,
-            settings: GraphScenePacketSettings::default(),
-            nodes: vec![node("embed:event:event-b", "Event", "event"), child],
-            edges: vec![],
-        });
-
-        let hints = packet.hierarchy_hints.expect("native hierarchy hints");
-        assert_eq!(hints.len(), 1);
-        assert_eq!(hints[0].cap_id, "event:event-b:causal");
-        assert_eq!(
-            hints[0].parent_node_id.as_deref(),
-            Some("embed:event:event-b")
-        );
-    }
-
-    fn node(id: &str, label: &str, source_type: &str) -> GraphScenePacketNodeInput {
-        GraphScenePacketNodeInput {
-            id: id.into(),
-            label: label.into(),
-            kind: label.into(),
-            source_type: source_type.into(),
-            vector: vec![0.1, 0.3, 0.5, 0.7],
-            base_vector: None,
-            total_mentions: Some(1),
-            hierarchy_hint: None,
-        }
-    }
-
-    fn edge(id: &str, source_id: &str, target_id: &str) -> GraphScenePacketEdgeInput {
-        GraphScenePacketEdgeInput {
-            id: id.into(),
-            source_id: source_id.into(),
-            target_id: target_id.into(),
-            edge_type: "semantic-neighbor".into(),
-            confidence: 0.5,
-        }
-    }
-}
+#[path = "graph_scene_packet_tests.rs"]
+mod tests;
