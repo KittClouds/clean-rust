@@ -79,6 +79,7 @@ export function compileProductOwnership(nodes: GalaxyNode[], links: GalaxyEdge[]
 
 function seedState(node: GalaxyNode): OwnershipState {
     const metadata = node.entity.metadata || {};
+    const lorentz = record(metadata['lorentz']);
     const sourceType = kindKey(text(metadata['sourceType'], node.entity.kind));
     const lane = laneKey(text(metadata['signalLane'], metadata['productLaneKind'], sourceType));
     const role = roleKey(text(metadata['signalStructuralRole']), sourceType, lane);
@@ -104,7 +105,8 @@ function seedState(node: GalaxyNode): OwnershipState {
         parents: [],
     };
     applyIdContext(state, node.entity.id);
-    applyCapContext(state, text(record(metadata['lorentz'])['capId']));
+    applyCapContext(state, text(lorentz['capId']));
+    addParent(state, text(lorentz['parentNodeId']), 'lorentz-parent', 0.66);
     addContext(state.noteIds, text(metadata['noteId']));
     addContext(state.chunkIds, text(metadata['chunkId']));
     addContext(state.entityIds, text(metadata['sourceEntityId'], metadata['entityId'], metadata['canonicalEntityId']));
@@ -255,9 +257,7 @@ function productRegionId(state: OwnershipState): string {
     if (state.sourceType === 'note') return `product:story:${note}:document`;
     if (state.sourceType === 'structure-root') return `product:story:${note}:root:${rootKindFor(state)}`;
     if (state.sourceType === 'chunk' && chunk) return `product:story:${note}:chunk:${chunk}`;
-    if (state.ownerEntityId && chunk) return `product:story:${note}:chunk:${chunk}:owner:${state.ownerEntityId}`;
-    if (state.ownerEntityId) return `product:story:${note}:owner:${state.ownerEntityId}`;
-    if (chunk) return `product:story:${note}:chunk:${chunk}:lane:${state.lane || state.role || 'signals'}`;
+    if (chunk) return `product:story:${note}:chunk:${chunk}`;
     return `product:story:${note}:signals:${state.lane || state.role || 'semantic'}`;
 }
 

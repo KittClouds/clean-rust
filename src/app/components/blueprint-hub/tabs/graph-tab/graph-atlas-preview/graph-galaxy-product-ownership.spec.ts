@@ -23,7 +23,7 @@ describe('Product graph ownership compiler', () => {
             node('embed:graph-fact:weak1', 'graph-fact', ['embed:entity:kai', 'embed:chunk:c1'], { noteId: 'n1', chunkId: 'c1', signalLane: 'cooccurrence_weak' }),
         ];
         const records = byId(compileProductOwnership(nodes, []));
-        const entityRegion = records.get('embed:entity:kai')!.regionId;
+        const chunkRegion = 'product:story:n1:chunk:c1';
         const ownedIds = [
             'embed:causalFact:cf1',
             'embed:temporalFact:tf1',
@@ -33,11 +33,12 @@ describe('Product graph ownership compiler', () => {
             'embed:graph-fact:weak1',
         ];
 
-        expect(records.get('embed:chunk:c1')!.regionId).toBe('product:story:n1:chunk:c1');
-        expect(records.get('embed:event:e1')!.regionId).toBe(entityRegion);
+        expect(records.get('embed:chunk:c1')!.regionId).toBe(chunkRegion);
+        expect(records.get('embed:entity:kai')!.regionId).toBe(chunkRegion);
+        expect(records.get('embed:event:e1')!.regionId).toBe(chunkRegion);
         for (const id of ownedIds) {
             const record = records.get(id)!;
-            expect(record.regionId).toBe(entityRegion);
+            expect(record.regionId).toBe(chunkRegion);
             expect(record.ownerEntityId).toBe('kai');
             expect(record.noteIds).toContain('n1');
             expect(record.chunkIds).toContain('c1');

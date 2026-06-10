@@ -161,8 +161,10 @@ describe('Product manifold galaxy visualization data', () => {
 
         expect(byId.get('embed:note:1')!.x).toBeLessThan(byId.get('embed:root:1')!.x);
         expect(byId.get('embed:root:1')!.x).toBeLessThan(byId.get('embed:chunk:1')!.x);
-        expect(byId.get('embed:chunk:1')!.x).toBeLessThan(byId.get('embed:entity:kai')!.x);
-        expect(byId.get('embed:entity:kai')!.x).toBeLessThan(byId.get('embed:fact:cause')!.x);
+        expect(ownershipRegion(scene, 'embed:chunk:1')).toBe('product:story:1:chunk:1');
+        expect(ownershipRegion(scene, 'embed:entity:kai')).toBe('product:story:1:chunk:1');
+        expect(ownershipRegion(scene, 'embed:fact:cause')).toBe('product:story:1:chunk:1');
+        expect(ownershipOwner(scene, 'embed:fact:cause')).toBe('kai');
     });
 
     it('clusters Product children in their owning entity regions', () => {
@@ -187,8 +189,12 @@ describe('Product manifold galaxy visualization data', () => {
 
         expect(sceneDistance(scene, 'embed:entity:kai', 'embed:anchor:kai')).toBeLessThan(sceneDistance(scene, 'embed:entity:rowan', 'embed:anchor:kai'));
         expect(sceneDistance(scene, 'embed:entity:rowan', 'embed:anchor:rowan')).toBeLessThan(sceneDistance(scene, 'embed:entity:kai', 'embed:anchor:rowan'));
-        expect(sceneDistance(scene, 'embed:entity:kai', 'embed:fact:kai')).toBeLessThan(sceneDistance(scene, 'embed:entity:rowan', 'embed:fact:kai'));
-        expect(sceneDistance(scene, 'embed:entity:kai', 'embed:fact:kai-causal')).toBeLessThan(sceneDistance(scene, 'embed:entity:rowan', 'embed:fact:kai-causal'));
+        expect(ownershipRegion(scene, 'embed:fact:kai')).toBe('product:story:1:chunk:1');
+        expect(ownershipRegion(scene, 'embed:fact:kai-causal')).toBe('product:story:1:chunk:1');
+        expect(ownershipRegion(scene, 'embed:fact:rowan-causal')).toBe('product:story:1:chunk:1');
+        expect(ownershipOwner(scene, 'embed:fact:kai')).toBe('kai');
+        expect(ownershipOwner(scene, 'embed:fact:kai-causal')).toBe('kai');
+        expect(ownershipOwner(scene, 'embed:fact:rowan-causal')).toBe('rowan');
         expect(sceneDistance(scene, 'embed:fact:kai', 'embed:fact:kai-causal')).toBeLessThan(sceneDistance(scene, 'embed:fact:kai-causal', 'embed:fact:rowan-causal'));
     });
 
@@ -234,8 +240,10 @@ describe('Product manifold galaxy visualization data', () => {
         const scene = buildGalaxyScene(nodes, [], mergeGalaxySettings({ layoutMode: 'productManifold' }));
 
         for (const id of ['embed:causalFact:kai', 'embed:temporalFact:kai', 'embed:graph-fact:kai', 'embed:memory:kai', 'embed:graph-fact:weak']) {
-            expect(sceneDistance(scene, 'embed:entity:kai', id)).toBeLessThan(sceneDistance(scene, 'embed:entity:rowan', id));
+            expect(ownershipRegion(scene, id)).toBe('product:story:1:chunk:1');
+            expect(ownershipOwner(scene, id)).toBe('kai');
         }
+        expect(ownershipOwner(scene, 'embed:causalFact:rowan')).toBe('rowan');
         expect(sceneDistance(scene, 'embed:causalFact:kai', 'embed:graph-fact:kai')).toBeLessThan(sceneDistance(scene, 'embed:causalFact:kai', 'embed:causalFact:rowan'));
     });
 
@@ -304,6 +312,16 @@ function sceneDistance(scene: ReturnType<typeof buildGalaxyScene>, leftId: strin
     const left = scene.nodes.find((node) => node.entity.id === leftId)!;
     const right = scene.nodes.find((node) => node.entity.id === rightId)!;
     return Math.hypot(left.x - right.x, left.y - right.y, left.z - right.z);
+}
+
+function ownershipRegion(scene: ReturnType<typeof buildGalaxyScene>, id: string): string {
+    const ownership = scene.nodes.find((node) => node.entity.id === id)?.entity.metadata?.['productOwnership'] as Record<string, unknown> | undefined;
+    return String(ownership?.['regionId'] || '');
+}
+
+function ownershipOwner(scene: ReturnType<typeof buildGalaxyScene>, id: string): string {
+    const ownership = scene.nodes.find((node) => node.entity.id === id)?.entity.metadata?.['productOwnership'] as Record<string, unknown> | undefined;
+    return String(ownership?.['ownerEntityId'] || '');
 }
 
 function routeEnvelopeDeviation(positions: Float32Array): number {

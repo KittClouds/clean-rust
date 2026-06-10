@@ -512,10 +512,10 @@ function derivedRole(node: GalaxyNode, outlierScore: number, hubScore: number): 
 }
 
 function localOffset(id: string, lane: Vec3, info: ProductInfo): Vec3 {
-    const seed = stableVector(`${id}:product:${info.clusterId}:${info.lane}`);
+    const ownerKey = info.ownerRegionId || id, seed = stableVector(`${ownerKey}:product:${info.clusterId}`);
     const tangentA = normalize(cross(lane, Math.abs(lane.y) > 0.72 ? { x: 1, y: 0, z: 0 } : { x: 0, y: 1, z: 0 }));
     const tangentB = normalize(cross(lane, tangentA));
-    const phase = info.phase + (stableUnit(`${id}:phase`) - 0.5) * 0.52;
+    const phase = info.phase + (stableUnit(`${ownerKey}:phase`) - 0.5) * 0.52 + (stableUnit(`${id}:local-phase`) - 0.5) * 0.16;
     const orbit = add(scale(tangentA, Math.cos(phase)), scale(tangentB, Math.sin(phase)));
     const radius = roleLocalRadius(info.role, info.outlierScore);
     const laneWeight = clamp(info.laneWeights[info.lane] ?? 0.36, 0, 1);
