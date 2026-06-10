@@ -165,6 +165,27 @@ describe('Product manifold galaxy visualization data', () => {
         expect(byId.get('embed:entity:kai')!.x).toBeLessThan(byId.get('embed:fact:cause')!.x);
     });
 
+    it('clusters Product children in their owning entity regions', () => {
+        const nodes: GalaxyRenderableNode[] = [
+            ownedProductNode('embed:note:1', 'Doc', 'note', 'document:1', 0, '', 'document'),
+            ownedProductNode('embed:chunk:1', 'Scene chunk', 'chunk', 'document:1:chunk:1', 2, '', 'document'),
+            ownedProductNode('embed:entity:kai', 'Kai', 'entity', 'identity:kai', 3, 'kai', 'entity'),
+            ownedProductNode('embed:entity:rowan', 'Rowan', 'entity', 'identity:rowan', 3, 'rowan', 'entity'),
+            ownedProductNode('embed:anchor:kai', 'Kai mention', 'anchor', 'document:1:chunk:1:evidence', 4, 'kai', 'evidence'),
+            ownedProductNode('embed:anchor:rowan', 'Rowan mention', 'anchor', 'document:1:chunk:1:evidence', 4, 'rowan', 'evidence'),
+            ownedProductNode('embed:fact:kai', 'Kai trusts Rowan', 'graph-fact', 'document:1:chunk:1:facts:relationship', 4, '', 'relationship'),
+        ];
+        const edges: GalaxyInputEdge[] = [
+            { id: 'fact-source:kai', sourceId: 'embed:fact:kai', targetId: 'embed:entity:kai', type: 'fact-source', confidence: 0.88 },
+        ];
+
+        const scene = buildGalaxyScene(nodes, edges, mergeGalaxySettings({ layoutMode: 'productManifold' }));
+
+        expect(sceneDistance(scene, 'embed:entity:kai', 'embed:anchor:kai')).toBeLessThan(sceneDistance(scene, 'embed:entity:rowan', 'embed:anchor:kai'));
+        expect(sceneDistance(scene, 'embed:entity:rowan', 'embed:anchor:rowan')).toBeLessThan(sceneDistance(scene, 'embed:entity:kai', 'embed:anchor:rowan'));
+        expect(sceneDistance(scene, 'embed:entity:kai', 'embed:fact:kai')).toBeLessThan(sceneDistance(scene, 'embed:entity:rowan', 'embed:fact:kai'));
+    });
+
     it('keeps Product topology pressure separate from the Lorentz skeleton', () => {
         const nodes: GalaxyRenderableNode[] = [
             topologyNode('embed:entity:kai', 'Kai', 'embedding-cluster:0', 'embed:entity:kai', 0.1, 0.9),
@@ -397,6 +418,29 @@ function hierarchyProductNode(id: string, label: string, sourceType: string, cap
                 level,
                 parentNodeId,
                 primaryTreeKind: 'document',
+            },
+        },
+    };
+}
+
+function ownedProductNode(id: string, label: string, sourceType: string, capId: string, level: number, sourceEntityId: string, lane: string): GalaxyRenderableNode {
+    return {
+        id,
+        label,
+        kind: sourceType,
+        totalMentions: 2,
+        metadata: {
+            sourceType,
+            sourceId: id.replace(/^embed:[^:]+:/, ''),
+            sourceEntityId,
+            embeddingClusterId: 'embedding-cluster:flat-owner-test',
+            productLaneKind: lane,
+            productTraversal: { routeStage: 6 },
+            lorentz: {
+                geometry: 'hierarchy_caps_v1',
+                capId,
+                level,
+                primaryTreeKind: lane,
             },
         },
     };

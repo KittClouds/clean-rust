@@ -1,5 +1,6 @@
 import type { GalaxyEdge, GalaxyLorentzGuide, GalaxyNode, Rgb } from './graph-galaxy-engine';
 import { normalizeProductHopfPhase, productHopfAgreement, productHopfBraidDirection, productHopfTension } from './graph-galaxy-product-hopf';
+import { applyProductOwnerRegions } from './graph-galaxy-product-ownership';
 import { GRAPH_RELATION_FAMILY_HSL, relationFamilyFromText } from './graph-relation-visual-style';
 import { entityColorStore, normalizeGraphNodeColorKind } from '../../../../../lib/store/entityColorStore';
 
@@ -84,6 +85,7 @@ interface ProductInfo {
     obstructionKind: string;
     hierarchyCapId: string;
     hierarchyLevel: number;
+    ownerRegionId: string;
 }
 
 interface ProductBasin {
@@ -110,6 +112,7 @@ interface Vec3 {
 export function applyProductConsensusLayout(nodes: GalaxyNode[], links: GalaxyEdge[]): GalaxyLorentzGuide[] {
     if (!nodes.length) return [];
     const infos = nodes.map(productInfo);
+    applyProductOwnerRegions(nodes, links, infos);
     const activity = buildTraversalActivity(nodes, links, infos);
     const basins = buildBasins(nodes, infos);
     placeBasinCenters(basins);
@@ -210,14 +213,19 @@ function productTraversalTarget(
     const stage = routeStageFor(node, info, activity);
     const local = localOffset(node.entity.id, laneDirection(lane), info);
     const lorentz = scale(info.lorentz, 0.08);
-    const basinDrift = scale(normalize(basin.center), 0.08 + Math.min(0.09, basin.indexes.length * 0.006));
+    const ownerPull = info.ownerRegionId ? 0.58 : 0.08;
+    const basinDrift = scale(normalize(basin.center), ownerPull + Math.min(0.1, basin.indexes.length * 0.006));
     const routeLoad = Math.min(1, (activity.incoming + activity.outgoing) / 5);
     const obstruction = clamp(Math.max(activity.obstruction, info.outlierScore * 0.78), 0, 1);
+    const ownerAngle = info.ownerRegionId ? stableUnit(`${info.ownerRegionId}:owner-region`) * TAU : 0;
+    const ownerY = info.ownerRegionId ? Math.cos(ownerAngle) * 0.28 : 0;
+    const ownerZ = info.ownerRegionId ? Math.sin(ownerAngle) * 0.34 : 0;
     const phaseY = Math.sin(info.phase) * 0.055;
     const phaseZ = Math.cos(info.phase) * 0.08;
     const x = ROUTE_STAGE_X[stage] + (stableUnit(`${node.entity.id}:route:x`) - 0.5) * 0.14 + lorentz.x * 0.16;
-    const y = routeLaneBand(lane) + local.y * 0.42 + phaseY + (stableUnit(`${node.entity.id}:route:y`) - 0.5) * 0.055;
-    const z = -0.2 + routeLoad * 0.38 + phaseZ + local.z * 0.32 + basinDrift.z + lorentz.z * 0.18 + obstruction * 0.22;
+    const laneY = routeLaneBand(lane);
+    const y = laneY * (1 - ownerPull) + basin.center.y * ownerPull + ownerY + local.y * 0.42 + phaseY + (stableUnit(`${node.entity.id}:route:y`) - 0.5) * 0.055;
+    const z = -0.2 + routeLoad * 0.38 + phaseZ + ownerZ + local.z * 0.32 + basinDrift.z + lorentz.z * 0.18 + obstruction * 0.22;
     const target = { x, y, z: z + (index % 7 - 3) * 0.012 };
     return scaleToRadius(target, obstruction > 0.55 ? 1.74 : 1.52);
 }
@@ -467,6 +475,7 @@ function productInfo(node: GalaxyNode): ProductInfo {
         obstructionKind: firstText(traversal['obstructionKind']),
         hierarchyCapId,
         hierarchyLevel,
+        ownerRegionId: '',
     };
 }
 
