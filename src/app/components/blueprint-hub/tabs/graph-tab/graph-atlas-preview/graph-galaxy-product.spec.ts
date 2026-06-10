@@ -174,9 +174,13 @@ describe('Product manifold galaxy visualization data', () => {
             ownedProductNode('embed:anchor:kai', 'Kai mention', 'anchor', 'document:1:chunk:1:evidence', 4, 'kai', 'evidence'),
             ownedProductNode('embed:anchor:rowan', 'Rowan mention', 'anchor', 'document:1:chunk:1:evidence', 4, 'rowan', 'evidence'),
             ownedProductNode('embed:fact:kai', 'Kai trusts Rowan', 'graph-fact', 'document:1:chunk:1:facts:relationship', 4, '', 'relationship'),
+            ownedProductNode('embed:fact:kai-causal', 'Kai causes route shift', 'causal-fact', 'document:1:chunk:1:facts:causal', 4, '', 'causal'),
+            ownedProductNode('embed:fact:rowan-causal', 'Rowan causes route shift', 'causal-fact', 'document:1:chunk:1:facts:causal', 4, '', 'causal'),
         ];
         const edges: GalaxyInputEdge[] = [
             { id: 'fact-source:kai', sourceId: 'embed:fact:kai', targetId: 'embed:entity:kai', type: 'fact-source', confidence: 0.88 },
+            { id: 'fact-source:kai-causal', sourceId: 'embed:fact:kai-causal', targetId: 'embed:entity:kai', type: 'causal', confidence: 0.84 },
+            { id: 'fact-source:rowan-causal', sourceId: 'embed:fact:rowan-causal', targetId: 'embed:entity:rowan', type: 'causal', confidence: 0.84 },
         ];
 
         const scene = buildGalaxyScene(nodes, edges, mergeGalaxySettings({ layoutMode: 'productManifold' }));
@@ -184,6 +188,8 @@ describe('Product manifold galaxy visualization data', () => {
         expect(sceneDistance(scene, 'embed:entity:kai', 'embed:anchor:kai')).toBeLessThan(sceneDistance(scene, 'embed:entity:rowan', 'embed:anchor:kai'));
         expect(sceneDistance(scene, 'embed:entity:rowan', 'embed:anchor:rowan')).toBeLessThan(sceneDistance(scene, 'embed:entity:kai', 'embed:anchor:rowan'));
         expect(sceneDistance(scene, 'embed:entity:kai', 'embed:fact:kai')).toBeLessThan(sceneDistance(scene, 'embed:entity:rowan', 'embed:fact:kai'));
+        expect(sceneDistance(scene, 'embed:entity:kai', 'embed:fact:kai-causal')).toBeLessThan(sceneDistance(scene, 'embed:entity:rowan', 'embed:fact:kai-causal'));
+        expect(sceneDistance(scene, 'embed:fact:kai', 'embed:fact:kai-causal')).toBeLessThan(sceneDistance(scene, 'embed:fact:kai-causal', 'embed:fact:rowan-causal'));
     });
 
     it('keeps Product topology pressure separate from the Lorentz skeleton', () => {

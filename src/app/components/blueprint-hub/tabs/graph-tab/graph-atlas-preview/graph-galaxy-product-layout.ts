@@ -213,7 +213,8 @@ function productTraversalTarget(
     const stage = routeStageFor(node, info, activity);
     const local = localOffset(node.entity.id, laneDirection(lane), info);
     const lorentz = scale(info.lorentz, 0.08);
-    const ownerPull = info.ownerRegionId ? 0.58 : 0.08;
+    const owned = Boolean(info.ownerRegionId);
+    const ownerPull = owned ? 0.88 : 0.08;
     const basinDrift = scale(normalize(basin.center), ownerPull + Math.min(0.1, basin.indexes.length * 0.006));
     const routeLoad = Math.min(1, (activity.incoming + activity.outgoing) / 5);
     const obstruction = clamp(Math.max(activity.obstruction, info.outlierScore * 0.78), 0, 1);
@@ -222,11 +223,19 @@ function productTraversalTarget(
     const ownerZ = info.ownerRegionId ? Math.sin(ownerAngle) * 0.34 : 0;
     const phaseY = Math.sin(info.phase) * 0.055;
     const phaseZ = Math.cos(info.phase) * 0.08;
-    const x = ROUTE_STAGE_X[stage] + (stableUnit(`${node.entity.id}:route:x`) - 0.5) * 0.14 + lorentz.x * 0.16;
+    const routeX = ROUTE_STAGE_X[stage] + (stableUnit(`${node.entity.id}:route:x`) - 0.5) * 0.14 + lorentz.x * 0.16;
+    const ownerX = basin.center.x * 1.42 + local.x * 0.34 + lorentz.x * 0.06;
+    const x = owned ? routeX * 0.16 + ownerX * 0.84 : routeX;
     const laneY = routeLaneBand(lane);
-    const y = laneY * (1 - ownerPull) + basin.center.y * ownerPull + ownerY + local.y * 0.42 + phaseY + (stableUnit(`${node.entity.id}:route:y`) - 0.5) * 0.055;
-    const z = -0.2 + routeLoad * 0.38 + phaseZ + ownerZ + local.z * 0.32 + basinDrift.z + lorentz.z * 0.18 + obstruction * 0.22;
+    const y = owned
+        ? basin.center.y * 1.2 + ownerY * 0.58 + local.y * 0.62 + phaseY
+        : laneY * (1 - ownerPull) + basin.center.y * ownerPull + ownerY + local.y * 0.42 + phaseY + (stableUnit(`${node.entity.id}:route:y`) - 0.5) * 0.055;
+    const z = owned
+        ? basin.center.z * 1.18 + ownerZ * 0.62 + local.z * 0.58 + phaseZ + obstruction * 0.12
+        : -0.2 + routeLoad * 0.38 + phaseZ + ownerZ + local.z * 0.32 + basinDrift.z + lorentz.z * 0.18 + obstruction * 0.22;
     const target = { x, y, z: z + (index % 7 - 3) * 0.012 };
+    const radius = length(target);
+    if (owned && info.role === 'outlier' && radius < 1.16) return scale(target, 1.16 / Math.max(0.001, radius));
     return scaleToRadius(target, obstruction > 0.55 ? 1.74 : 1.52);
 }
 
@@ -258,7 +267,7 @@ function relaxConsensus(
         for (let index = 0; index < nodes.length; index++) {
             const node = nodes[index];
             const stageX = ROUTE_STAGE_X[routeStageFor(node, infos[index], activity[index])];
-            node.x += (stageX - node.x) * 0.2;
+            node.x += (stageX - node.x) * (infos[index].ownerRegionId ? 0.045 : 0.2);
         }
     }
 }
