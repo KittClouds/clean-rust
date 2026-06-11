@@ -20,6 +20,7 @@ const KIND_HSL: Record<string, string> = {
     chunk: '178 66% 58%',
     character: '286 74% 66%',
     entityOther: '184 62% 58%',
+    stateContext: '146 72% 56%',
     semantic: '176 72% 58%',
     abstraction: '228 66% 66%',
     bridge: '302 76% 66%',
@@ -128,6 +129,8 @@ export function laneDirection(lane: string): Vec3 {
             return normalize({ x: 0.36, y: 0.34, z: -0.86 }, { x: 0, y: 0, z: -1 });
         case 'relationship':
             return normalize({ x: 0.56, y: -0.62, z: -0.2 }, { x: 1, y: -1, z: 0 });
+        case 'stateContext':
+            return normalize({ x: 0.52, y: -0.18, z: -0.84 }, { x: 1, y: 0, z: -1 });
         case 'entity':
         case 'entityOther':
             return normalize({ x: -0.62, y: 0.58, z: 0.22 }, { x: -1, y: 1, z: 0 });
@@ -157,6 +160,7 @@ export function fallbackLane(node: GalaxyNode): string {
     if (/causal|cause|effect/.test(text)) return 'causal';
     if (/temporal|timeline|time/.test(text)) return 'temporal';
     if (/event|scene/.test(text)) return 'event';
+    if (/decision|rank|service|affiliation|affiliate|family-context|memory|state/.test(text)) return 'stateContext';
     if (/memory|evidence|source|provenance/.test(text)) return 'evidence';
     if (/relationship|relation|graph-fact|graphfact|fact/.test(text)) return 'relationship';
     if (/chunk|anchor|note|document|doc/.test(text)) return 'document';

@@ -231,6 +231,45 @@ describe('Graph galaxy canonical colors', () => {
         }
     });
 
+    it('keeps named state/context colors distinct from the entity they describe', () => {
+        entityColorStore.setColor('CHARACTER', '0 100% 50%');
+        entityColorStore.setGraphNodeColor('decisionState', '88 100% 50%');
+        entityColorStore.setGraphNodeColor('rankStatus', '246 100% 50%');
+        try {
+            const decision: GalaxyRenderableNode = {
+                id: 'embed:memory:m1',
+                label: 'decision_state',
+                kind: 'decision-state',
+                metadata: {
+                    sourceType: 'memoryState',
+                    entityKind: 'CHARACTER',
+                    graphKind: 'decision-state',
+                    graphColorKind: 'decision-state',
+                    graphMemoryStateKind: 'decisionState',
+                    graphRebuildEmbeddingTarget: true,
+                },
+            };
+            const rank: GalaxyRenderableNode = {
+                id: 'embed:memory:m2',
+                label: 'rank_or_status',
+                kind: 'rank-status',
+                metadata: {
+                    sourceType: 'memoryState',
+                    entityKind: 'CHARACTER',
+                    graphKind: 'rank-status',
+                    graphColorKind: 'rank-or-status',
+                    graphMemoryStateKind: 'rankStatus',
+                    graphRebuildEmbeddingTarget: true,
+                },
+            };
+
+            expect(resolveGalaxyNodeColorHsl(decision)).toBe('88 100% 50%');
+            expect(resolveGalaxyNodeColorHsl(rank)).toBe('246 100% 50%');
+        } finally {
+            entityColorStore.reset();
+        }
+    });
+
     it('uses relation-family styles for co-occurrence edges without requiring co-occurrence nodes', () => {
         entityColorStore.setColor('CHARACTER', '0 100% 50%');
         entityColorStore.setGraphNodeColor('cooccurrence', '240 100% 50%');
@@ -407,6 +446,13 @@ describe('Graph galaxy Siegel-Finsler layout', () => {
             siegelNode('location', 'Tempest', 'LOCATION', 'entity', 1, ['chunk']),
             siegelNode('character', 'Kai', 'CHARACTER', 'entity', 5, ['chunk']),
             siegelNode('item', 'Ledger', 'ITEM', 'entity', 2, ['chunk']),
+            siegelNode('state', 'decision_state', 'memoryState', 'memory_state', 5, ['character'], {
+                metadata: {
+                    entityKind: 'CHARACTER',
+                    graphKind: 'decision-state',
+                    graphColorKind: 'decision-state',
+                },
+            }),
             siegelNode('anchor', 'Kai mention', 'anchor', 'evidence', 1, ['chunk']),
         ], [
             { id: 'doc-root', sourceId: 'doc', targetId: 'root', type: 'target-parent', confidence: 0.9 },
@@ -415,6 +461,7 @@ describe('Graph galaxy Siegel-Finsler layout', () => {
             { id: 'chunk-location', sourceId: 'chunk', targetId: 'location', type: 'chunk-entity', confidence: 0.9 },
             { id: 'chunk-character', sourceId: 'chunk', targetId: 'character', type: 'chunk-entity', confidence: 0.9 },
             { id: 'chunk-item', sourceId: 'chunk', targetId: 'item', type: 'chunk-entity', confidence: 0.9 },
+            { id: 'character-state', sourceId: 'character', targetId: 'state', type: 'memory-entity', confidence: 0.9 },
             { id: 'chunk-anchor', sourceId: 'chunk', targetId: 'anchor', type: 'chunk-anchor', confidence: 0.84 },
         ], mergeGalaxySettings({ layoutMode: 'siegelFinsler' }));
         const byId = new Map(scene.nodes.map((node) => [node.entity.id, node]));
@@ -425,26 +472,30 @@ describe('Graph galaxy Siegel-Finsler layout', () => {
         expect(byId.get('location')!.x).toBeGreaterThan(byId.get('event')!.x);
         expect(byId.get('character')!.x).toBeGreaterThan(byId.get('location')!.x);
         expect(byId.get('item')!.x).toBeGreaterThan(byId.get('character')!.x);
-        expect(byId.get('anchor')!.x).toBeGreaterThan(byId.get('item')!.x);
+        expect(byId.get('state')!.x).toBeGreaterThan(byId.get('item')!.x);
+        expect(byId.get('anchor')!.x).toBeGreaterThan(byId.get('state')!.x);
         expect(byId.get('chunk')!.x - byId.get('root')!.x).toBeLessThan(0.62);
         expect(byId.get('event')!.x - byId.get('chunk')!.x).toBeLessThan(0.62);
         expect(scene.lorentzGuides?.some((guide) => guide.id === 'siegel:lane:event')).toBe(true);
         expect(scene.lorentzGuides?.some((guide) => guide.id === 'siegel:lane:location')).toBe(true);
         expect(scene.lorentzGuides?.some((guide) => guide.id === 'siegel:lane:character')).toBe(true);
+        expect(scene.lorentzGuides?.some((guide) => guide.id === 'siegel:lane:stateContext')).toBe(true);
     });
 
-    it('keeps entity and event bands thick on the z axis', () => {
+    it('keeps entity and event bands thick on the y and z axes', () => {
         const scene = buildGalaxyScene([
-            siegelNode('entity-a', 'Kai', 'entity', 'entity', 3, [], { phase: 0 }),
-            siegelNode('entity-b', 'Hazel', 'entity', 'entity', 3, [], { phase: 0.25 }),
-            siegelNode('entity-c', 'Rowan', 'entity', 'entity', 3, [], { phase: 0.5 }),
-            siegelNode('entity-d', 'Cael', 'entity', 'entity', 3, [], { phase: 0.75 }),
-            siegelNode('event-a', 'causal event', 'event', 'causal', 4, [], { phase: 0.1 }),
-            siegelNode('event-b', 'causal event', 'event', 'causal', 4, [], { phase: 0.35 }),
-            siegelNode('event-c', 'causal event', 'event', 'causal', 4, [], { phase: 0.6 }),
-            siegelNode('event-d', 'causal event', 'event', 'causal', 4, [], { phase: 0.85 }),
+            siegelNode('entity-a', 'Kai', 'entity', 'entity', 3, [], { phase: 0, matrixCells: [0.5, 0.08, 0.08, 0.4, 0.6, 0.5] }),
+            siegelNode('entity-b', 'Hazel', 'entity', 'entity', 3, [], { phase: 0.25, matrixCells: [0.5, 0.34, 0.34, 0.4, 0.6, 0.5] }),
+            siegelNode('entity-c', 'Rowan', 'entity', 'entity', 3, [], { phase: 0.5, matrixCells: [0.5, 0.66, 0.66, 0.4, 0.6, 0.5] }),
+            siegelNode('entity-d', 'Cael', 'entity', 'entity', 3, [], { phase: 0.75, matrixCells: [0.5, 0.92, 0.92, 0.4, 0.6, 0.5] }),
+            siegelNode('event-a', 'causal event', 'event', 'causal', 4, [], { phase: 0.1, matrixCells: [0.5, 0.1, 0.1, 0.4, 0.6, 0.5] }),
+            siegelNode('event-b', 'causal event', 'event', 'causal', 4, [], { phase: 0.35, matrixCells: [0.5, 0.35, 0.35, 0.4, 0.6, 0.5] }),
+            siegelNode('event-c', 'causal event', 'event', 'causal', 4, [], { phase: 0.6, matrixCells: [0.5, 0.65, 0.65, 0.4, 0.6, 0.5] }),
+            siegelNode('event-d', 'causal event', 'event', 'causal', 4, [], { phase: 0.85, matrixCells: [0.5, 0.9, 0.9, 0.4, 0.6, 0.5] }),
         ], [], mergeGalaxySettings({ layoutMode: 'siegelFinsler' }));
 
+        expect(yRange(scene.nodes.filter((node) => node.entity.id.startsWith('entity-')))).toBeGreaterThan(0.13);
+        expect(yRange(scene.nodes.filter((node) => node.entity.id.startsWith('event-')))).toBeGreaterThan(0.13);
         expect(zRange(scene.nodes.filter((node) => node.entity.id.startsWith('entity-')))).toBeGreaterThan(0.3);
         expect(zRange(scene.nodes.filter((node) => node.entity.id.startsWith('event-')))).toBeGreaterThan(0.3);
     });
@@ -532,6 +583,11 @@ function zRange(nodes: Array<{ z: number }>): number {
     return Math.max(...zs) - Math.min(...zs);
 }
 
+function yRange(nodes: Array<{ y: number }>): number {
+    const ys = nodes.map((node) => node.y);
+    return Math.max(...ys) - Math.min(...ys);
+}
+
 function hybridNode(
     id: string,
     label: string,
@@ -615,7 +671,7 @@ function siegelNode(
     lane: string,
     depth: number,
     parentIds: string[],
-    options: { phase?: number; matrixCells?: number[] } = {},
+    options: { phase?: number; matrixCells?: number[]; metadata?: Record<string, unknown> } = {},
 ): GalaxyRenderableNode {
     return {
         id,
@@ -626,6 +682,7 @@ function siegelNode(
             sourceType: kind,
             graphKind: kind,
             signalParentIds: parentIds,
+            ...options.metadata,
             siegel: {
                 lane,
                 role: depth <= 1 ? 'root' : 'child',

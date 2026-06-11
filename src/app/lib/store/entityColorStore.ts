@@ -25,7 +25,12 @@ export type GraphNodeColorKind =
     | 'eventNode'
     | 'temporalFact'
     | 'causalFact'
-    | 'memoryState';
+    | 'memoryState'
+    | 'decisionState'
+    | 'rankStatus'
+    | 'serviceContext'
+    | 'affiliationContext'
+    | 'familyContext';
 
 // ============================================
 // DEFAULT COLORS (HSL VALUES)
@@ -102,6 +107,11 @@ export const DEFAULT_GRAPH_NODE_COLORS: Record<GraphNodeColorKind, string> = {
     temporalFact: '199 80% 58%',
     causalFact: '345 82% 61%',
     memoryState: '145 70% 50%',
+    decisionState: '88 84% 56%',
+    rankStatus: '246 82% 58%',
+    serviceContext: '32 88% 58%',
+    affiliationContext: '176 70% 48%',
+    familyContext: '326 76% 62%',
 };
 
 export function normalizeEntityKind(kind: EntityKind | string | null | undefined): EntityKind | null {
@@ -134,6 +144,28 @@ const GRAPH_NODE_KIND_ALIASES: Record<string, GraphNodeColorKind> = {
     causal_fact: 'causalFact',
     causalfact: 'causalFact',
     state: 'memoryState',
+    decision: 'decisionState',
+    decision_state: 'decisionState',
+    decisionstate: 'decisionState',
+    rank: 'rankStatus',
+    rank_status: 'rankStatus',
+    rankstatus: 'rankStatus',
+    rank_or_status: 'rankStatus',
+    rankorstatus: 'rankStatus',
+    service: 'serviceContext',
+    service_context: 'serviceContext',
+    servicecontext: 'serviceContext',
+    service_rank: 'serviceContext',
+    servicerank: 'serviceContext',
+    affiliation: 'affiliationContext',
+    affiliate_context: 'affiliationContext',
+    affiliatecontext: 'affiliationContext',
+    affiliant_context: 'affiliationContext',
+    affiliantcontext: 'affiliationContext',
+    affiliation_context: 'affiliationContext',
+    affiliationcontext: 'affiliationContext',
+    family_context: 'familyContext',
+    familycontext: 'familyContext',
     temporal: 'temporal',
     temporal_fact: 'temporalFact',
     temporalfact: 'temporalFact',

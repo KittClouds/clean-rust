@@ -21,9 +21,11 @@ import {
 
 const SIEGEL_MAX_GUIDES = 260;
 const SIEGEL_FLOW_X_MIN = -1.54;
-const SIEGEL_FLOW_X_STEP = 0.29;
+const SIEGEL_FLOW_X_STEP = 0.26;
 const SIEGEL_FLOW_Y_TOP = 0.72;
 const SIEGEL_FLOW_Y_STEP = 0.16;
+const SIEGEL_FLOW_Y_CELL_SPREAD = 0.2;
+const SIEGEL_FLOW_Y_ROW_SPREAD = 0.1;
 const SIEGEL_FLOW_Z = 0.74;
 const SIEGEL_BAND_HALF_WIDTH = 0.13;
 
@@ -35,6 +37,7 @@ type SiegelBandId =
     | 'location'
     | 'character'
     | 'entityOther'
+    | 'stateContext'
     | 'relationship'
     | 'evidence'
     | 'semantic';
@@ -47,9 +50,10 @@ const SIEGEL_BAND_ORDER: Record<SiegelBandId, number> = {
     location: 4,
     character: 5,
     entityOther: 6,
-    relationship: 7,
-    evidence: 8,
-    semantic: 9,
+    stateContext: 7,
+    relationship: 8,
+    evidence: 9,
+    semantic: 10,
 };
 
 const SIEGEL_BANDS = Object.keys(SIEGEL_BAND_ORDER) as SiegelBandId[];
@@ -167,8 +171,8 @@ function siegelBandPoint(info: SiegelInfo, lane: LaneRow): Vec3 {
     const y = SIEGEL_FLOW_Y_TOP
         - info.depth * SIEGEL_FLOW_Y_STEP
         + lane.y * 0.18
-        + (cells[1] - 0.5) * 0.12
-        + (info.row - 0.5) * 0.055;
+        + (cells[1] - 0.5) * SIEGEL_FLOW_Y_CELL_SPREAD
+        + (info.row - 0.5) * SIEGEL_FLOW_Y_ROW_SPREAD;
     const z = lane.y * 0.24
         + (cells[2] - 0.5) * SIEGEL_FLOW_Z
         + (cells[3] - 0.5) * 0.32
@@ -403,10 +407,11 @@ function siegelBandForNode(node: GalaxyNode, lane: SiegelBandId, role: string): 
     }
     if (hasAny(terms, ['anchor', 'evidenceanchor', 'mention', 'evidence'])) return 'evidence';
     if (hasAny(terms, ['event', 'eventatom', 'timeline'])) return 'event';
+    if (hasAny(terms, SIEGEL_STATE_CONTEXT_TERMS)) return 'stateContext';
     if (hasAny(terms, ['location', 'place', 'site'])) return 'location';
     if (hasAny(terms, ['character', 'npc', 'creature'])) return 'character';
     if (hasAny(terms, ['entity', 'identity', 'network', 'item', 'concept', 'object', 'group'])) return 'entityOther';
-    if (hasAny(terms, ['graphfact', 'relationshipfact', 'temporalfact', 'causalfact', 'memorystate', 'fact', 'factvertex', 'relation', 'relationship'])
+    if (hasAny(terms, ['graphfact', 'relationshipfact', 'temporalfact', 'causalfact', 'fact', 'factvertex', 'relation', 'relationship'])
         || ['relationship', 'temporal', 'causal'].includes(lane)) {
         return 'relationship';
     }
@@ -421,11 +426,12 @@ function normalizeSiegelLane(value: string): SiegelBandId {
     if (laneHas(lane, ['document', 'doc'])) return 'document';
     if (laneHas(lane, ['chunk', 'leaf', 'chapter', 'scene', 'beat', 'act', 'arc', 'narrative', 'structure'])) return 'chunk';
     if (laneHas(lane, ['event', 'timeline'])) return 'event';
+    if (laneHas(lane, SIEGEL_STATE_CONTEXT_TERMS)) return 'stateContext';
     if (laneHas(lane, ['location', 'place', 'site'])) return 'location';
     if (laneHas(lane, ['character', 'creature', 'npc'])) return 'character';
     if (laneHas(lane, ['entity', 'identity', 'concept', 'item', 'network', 'group', 'object'])) return 'entityOther';
     if (laneHas(lane, ['relation', 'relationship', 'cooccurrence', 'communication', 'authority', 'approval', 'family', 'intimacy', 'transfer'])) return 'relationship';
-    if (laneHas(lane, ['temporal', 'causal', 'cause', 'effect', 'time', 'memory', 'state', 'fact'])) return 'relationship';
+    if (laneHas(lane, ['temporal', 'causal', 'cause', 'effect', 'time', 'fact'])) return 'relationship';
     if (laneHas(lane, ['evidence', 'source', 'provenance', 'anchor', 'mention'])) return 'evidence';
     return 'semantic';
 }
@@ -441,6 +447,21 @@ function bandRank(band: SiegelBandId): number {
 function compactToken(value: unknown): string {
     return String(value || '').toLowerCase().replace(/[^a-z0-9]+/g, '');
 }
+
+const SIEGEL_STATE_CONTEXT_TERMS = [
+    'memorystate',
+    'memory',
+    'state',
+    'decisionstate',
+    'rankstatus',
+    'rankorstatus',
+    'servicecontext',
+    'servicerank',
+    'affiliationcontext',
+    'affiliatecontext',
+    'affiliantcontext',
+    'familycontext',
+];
 
 function hasAny(terms: string[], tokens: string[]): boolean {
     return terms.some((term) => tokens.includes(term));

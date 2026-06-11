@@ -803,6 +803,7 @@ function targetNode(
             entityKind: target.entityKind,
             graphColorKind: relationFamily || targetRenderKind(target),
             graphRelationFamily: relationFamily || undefined,
+            graphMemoryStateKind: displayKind(target.kind) === 'memory-state' ? memoryStateGraphColorKind(target) : undefined,
             signalLane: target.lane,
             signalStructuralRole: target.structuralRole,
             signalAdmissionTier: target.admissionTier,
@@ -917,6 +918,7 @@ type SiegelBandId =
     | 'location'
     | 'character'
     | 'entityOther'
+    | 'stateContext'
     | 'relationship'
     | 'evidence'
     | 'semantic';
@@ -929,9 +931,10 @@ const SIEGEL_BAND_ORDER: Record<SiegelBandId, number> = {
     location: 4,
     character: 5,
     entityOther: 6,
-    relationship: 7,
-    evidence: 8,
-    semantic: 9,
+    stateContext: 7,
+    relationship: 8,
+    evidence: 9,
+    semantic: 10,
 };
 
 function graphRebuildSiegelMetadata(
@@ -1027,6 +1030,7 @@ function normalizeSiegelLane(lane: string | undefined, kind: string, entityKind?
         return 'chunk';
     }
     if (hasSiegelTerm(raw, ['event', 'eventatom', 'timeline'])) return 'event';
+    if (hasSiegelTerm(raw, SIEGEL_STATE_CONTEXT_TERMS)) return 'stateContext';
     if (hasSiegelTerm(raw, ['location', 'place', 'site'])) return 'location';
     if (hasSiegelTerm(raw, ['character', 'npc', 'creature'])) return 'character';
     if (hasSiegelTerm(raw, ['entity', 'identity', 'network', 'item', 'concept', 'object', 'group'])) return 'entityOther';
@@ -1036,7 +1040,6 @@ function normalizeSiegelLane(lane: string | undefined, kind: string, entityKind?
         'graphfact',
         'temporalfact',
         'causalfact',
-        'memorystate',
         'fact',
         'factvertex',
         'relation',
@@ -1073,6 +1076,9 @@ function siegelBandForTarget(
     if (['anchor', 'evidenceanchor', 'mention', 'evidence'].includes(kind)) return 'evidence';
     if (['chapter', 'scene', 'beat', 'act', 'arc', 'narrative'].includes(entityKind)) return 'chunk';
     if (['event', 'eventatom', 'timeline'].includes(kind) || ['event', 'timeline'].includes(entityKind)) return 'event';
+    if (isSiegelStateContextKind(kind) || isSiegelStateContextKind(target.label) || isSiegelStateContextKind(target.text)) {
+        return 'stateContext';
+    }
     if (['location', 'place', 'site'].includes(entityKind)) return 'location';
     if (['character', 'npc', 'creature'].includes(entityKind)) return 'character';
     if (kind === 'entity' || ['identity', 'network', 'item', 'concept', 'object', 'group'].includes(entityKind)) return 'entityOther';
@@ -1101,6 +1107,26 @@ function siegelMatrixCells(target: GraphRebuildEmbeddingTarget, lane: string, de
 
 function compactSiegelToken(value: unknown): string {
     return String(value || '').toLowerCase().replace(/[^a-z0-9]+/g, '');
+}
+
+const SIEGEL_STATE_CONTEXT_TERMS = [
+    'memorystate',
+    'memory',
+    'state',
+    'decisionstate',
+    'rankstatus',
+    'rankorstatus',
+    'servicecontext',
+    'servicerank',
+    'affiliationcontext',
+    'affiliatecontext',
+    'affiliantcontext',
+    'familycontext',
+];
+
+function isSiegelStateContextKind(value: unknown): boolean {
+    const token = compactSiegelToken(value);
+    return SIEGEL_STATE_CONTEXT_TERMS.some((term) => token === term || (term.length > 3 && token.includes(term)));
 }
 
 function hasSiegelTerm(raw: string, terms: string[]): boolean {
@@ -2111,8 +2137,9 @@ function siegelLaneShift(lane: string): { x: number; y: number; z: number } {
     if (lane === 'location') return { x: 0.12, y: -0.03, z: 0.34 };
     if (lane === 'character') return { x: 0.26, y: -0.04, z: 0.16 };
     if (lane === 'entityOther') return { x: 0.38, y: -0.04, z: 0.02 };
-    if (lane === 'relationship') return { x: 0.5, y: -0.05, z: -0.12 };
-    if (lane === 'evidence') return { x: 0.58, y: -0.06, z: 0.26 };
+    if (lane === 'stateContext') return { x: 0.48, y: -0.05, z: -0.22 };
+    if (lane === 'relationship') return { x: 0.56, y: -0.05, z: -0.12 };
+    if (lane === 'evidence') return { x: 0.64, y: -0.06, z: 0.26 };
     return { x: 0.66, y: -0.06, z: 0 };
 }
 
@@ -2125,6 +2152,9 @@ function normalizeHopfToken(value: string): string {
 }
 
 function targetRenderKind(target: GraphRebuildEmbeddingTarget): string {
+    if (displayKind(target.kind) === 'memory-state') {
+        return displayKind(memoryStateGraphColorKind(target));
+    }
     if (displayKind(target.kind) === 'entity' && target.entityKind) {
         return displayKind(target.entityKind);
     }
@@ -2139,7 +2169,22 @@ function targetColorHsl(target: GraphRebuildEmbeddingTarget): string {
     if (kind === 'entity' && target.entityKind) {
         return entityColorStore.getRawHsl(target.entityKind.toUpperCase() as any);
     }
+    if (kind === 'memory-state') {
+        return entityColorStore.getRawGraphNodeHsl(memoryStateGraphColorKind(target));
+    }
     return kindHsl(kind);
+}
+
+function memoryStateGraphColorKind(target: GraphRebuildEmbeddingTarget): string {
+    const token = compactSiegelToken(`${target.label || ''} ${target.text || ''} ${target.sourceId || ''}`);
+    if (token.includes('decisionstate') || token.includes('approved') || token.includes('accepted')) return 'decisionState';
+    if (token.includes('rankorstatus') || token.includes('rankstatus') || token.includes('rank')) return 'rankStatus';
+    if (token.includes('servicecontext') || token.includes('servicerank') || token.includes('service')) return 'serviceContext';
+    if (token.includes('affiliationcontext') || token.includes('affiliatecontext') || token.includes('affiliantcontext') || token.includes('affiliation')) {
+        return 'affiliationContext';
+    }
+    if (token.includes('familycontext') || token.includes('family')) return 'familyContext';
+    return 'memoryState';
 }
 
 function kindHsl(kind: string): string {

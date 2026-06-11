@@ -132,6 +132,7 @@ export class GraphEntitySidebarComponent implements OnChanges, OnDestroy {
     readonly selectedDiscourseTab = signal<GraphDiscourseTabId>('ideas');
     readonly underlyingIdeasOpen = signal(false);
     readonly discourseActionNotice = signal('');
+    readonly focusedDiscourseQuery = signal('');
     private readonly selectedDiagnosticsEntity = signal<RegisteredEntity | null>(null);
     private readonly dataRevision = signal(0);
     private discourseNoticeTimer: ReturnType<typeof setTimeout> | undefined;
@@ -288,10 +289,16 @@ export class GraphEntitySidebarComponent implements OnChanges, OnDestroy {
     }
 
     highlightDiscourseQuery(query: string): void {
-        if (!query.trim()) return;
-        this.updateEntitySearch(query);
-        this.sidebarView.set('entities');
-        this.flashDiscourseNotice('Filtered atlas by question');
+        const focus = query.trim();
+        if (!focus) return;
+        this.focusedDiscourseQuery.set(focus);
+        this.sidebarView.set('discourse');
+        this.flashDiscourseNotice('Discourse focus updated');
+    }
+
+    isFocusedDiscourseQuery(query: string): boolean {
+        const focus = this.focusedDiscourseQuery().trim().toLowerCase();
+        return !!focus && query.trim().toLowerCase() === focus;
     }
 
     toggleKind(kind: string): void {

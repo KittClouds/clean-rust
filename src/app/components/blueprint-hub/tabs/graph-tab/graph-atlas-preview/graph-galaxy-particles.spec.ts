@@ -146,6 +146,21 @@ describe('GraphGalaxyParticles', () => {
         expect(leafFocus.nodeLevels[2]).toBeGreaterThan(0);
     });
 
+    it('focuses Siegel graph walks by Finsler hierarchy instead of dense incident edges', () => {
+        const scene = siegelFocusScene();
+        const focus = buildGalaxyFocusMask(scene, null, 'kai');
+
+        expect(focus.nodeLevels[0]).toBeGreaterThan(0);
+        expect(focus.nodeLevels[1]).toBeGreaterThan(0);
+        expect(focus.nodeLevels[2]).toBeGreaterThan(0);
+        expect(focus.nodeLevels[3]).toBe(3);
+        expect(focus.nodeLevels[4]).toBeGreaterThan(0);
+        expect(focus.nodeLevels[5]).toBeGreaterThan(0);
+        expect(focus.nodeLevels[6]).toBe(0);
+        expect(focus.nodeLevels[7]).toBe(0);
+        expect([...focus.edgeLevels]).toEqual([2, 2, 2, 2, 2, 0, 0]);
+    });
+
     it('keeps Caps particles on spherical shell edges without affecting map paths', () => {
         const scene = capsParticleScene();
         const particles = new GraphGalaxyParticles();
@@ -397,6 +412,51 @@ function structuralCapsScene(): GalaxySceneV2 {
         edgeColors: new Float32Array(4 * 6),
         edgeAlpha: new Float32Array([1, 1, 1, 1]),
         edgeKinds: new Uint8Array([2, 2, 2, 0]),
+    };
+}
+
+function siegelFocusScene(): GalaxySceneV2 {
+    return {
+        ...particleScene(),
+        layoutMode: 'siegelFinsler',
+        ids: ['doc', 'root', 'chunk', 'kai', 'event', 'anchor', 'dense-a', 'dense-b'],
+        labels: ['Document', 'Root', 'Chunk', 'Kai', 'Event', 'Anchor', 'Dense A', 'Dense B'],
+        kinds: ['note', 'structureRoot', 'chunk', 'character', 'event', 'anchor', 'character', 'location'],
+        groupIds: ['', '', '', '', '', '', '', ''],
+        positions3d: new Float32Array([
+            -1.4, 0, 0,
+            -1.1, 0, 0,
+            -0.8, 0, 0,
+            -0.2, 0, 0,
+            0.2, 0, 0,
+            0.5, 0, 0,
+            -0.2, 0.7, 0,
+            0.4, 0.7, 0,
+        ]),
+        positions2d: new Float32Array([
+            -1.4, 0, 0,
+            -1.1, 0, 0,
+            -0.8, 0, 0,
+            -0.2, 0, 0,
+            0.2, 0, 0,
+            0.5, 0, 0,
+            -0.2, 0.7, 0,
+            0.4, 0.7, 0,
+        ]),
+        radii: new Float32Array(8).fill(0.08),
+        colors: new Float32Array(8 * 3).fill(0.5),
+        edgePairs: new Uint32Array([
+            0, 1,
+            1, 2,
+            2, 3,
+            4, 3,
+            5, 3,
+            3, 6,
+            6, 7,
+        ]),
+        edgeColors: new Float32Array(7 * 6),
+        edgeAlpha: new Float32Array(7).fill(1),
+        edgeKinds: new Uint8Array([2, 2, 2, 2, 2, 0, 0]),
     };
 }
 

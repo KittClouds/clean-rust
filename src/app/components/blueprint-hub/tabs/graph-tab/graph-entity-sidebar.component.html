@@ -254,7 +254,7 @@
                 </div>
                 <div class="discourse-chip-grid">
                     @for (chip of panel.chips; track chip.id) {
-                    <button type="button" class="discourse-chip" [ngClass]="toneClass('discourse-tone', chip.tone)" (click)="highlightDiscourseQuery(chip.query)">
+                    <button type="button" class="discourse-chip" [class.discourse-focus-active]="isFocusedDiscourseQuery(chip.query)" [ngClass]="toneClass('discourse-tone', chip.tone)" (click)="highlightDiscourseQuery(chip.query)">
                         <strong>{{ chip.label }}</strong>
                         <small>{{ chip.detail }}</small>
                     </button>
@@ -280,7 +280,7 @@
                     </header>
                     <div class="discourse-spine-rows">
                         @for (row of section.rows; track row.id) {
-                        <button type="button" class="discourse-spine-row" [ngClass]="toneClass('discourse-tone', row.tone)" (click)="highlightDiscourseQuery(row.query)">
+                        <button type="button" class="discourse-spine-row" [class.discourse-focus-active]="isFocusedDiscourseQuery(row.query)" [ngClass]="toneClass('discourse-tone', row.tone)" (click)="highlightDiscourseQuery(row.query)">
                             <span class="discourse-spine-row-top">
                                 <strong>{{ row.title }}</strong>
                                 <em>{{ row.scoreLabel }}</em>
@@ -304,9 +304,9 @@
                     <small>{{ question.reason }}</small>
                 </div>
                 <div class="discourse-action-row">
-                    <button type="button" class="discourse-action-button" (click)="highlightDiscourseQuery(question.query)">
+                    <button type="button" class="discourse-action-button" [class.discourse-focus-active]="isFocusedDiscourseQuery(question.query)" (click)="highlightDiscourseQuery(question.query)">
                         <lucide-icon [img]="SearchIcon" class="h-3.5 w-3.5"></lucide-icon>
-                        Highlight
+                        Focus
                     </button>
                     <button type="button" class="discourse-action-button" (click)="copyDiscourseSummary()">
                         <lucide-icon [img]="CopyIcon" class="h-3.5 w-3.5"></lucide-icon>

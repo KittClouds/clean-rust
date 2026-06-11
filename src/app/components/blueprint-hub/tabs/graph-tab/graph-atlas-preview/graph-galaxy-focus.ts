@@ -22,7 +22,6 @@ export function buildGalaxyFocusMask(data: GalaxySceneV2, selectedId: string | n
     }
 
     if (data.layoutMode === 'siegelFinsler' && focusDirectedHierarchy(data, focusIndex, nodeLevels, edgeLevels)) {
-        includeIncidentConnections(data, focusIndex, nodeLevels, edgeLevels);
         return { hasFocus: true, focusIndex, selectedIndex, hoverIndex, nodeLevels, edgeLevels };
     }
 
@@ -50,14 +49,27 @@ function focusDirectedHierarchy(
     nodeLevels: Uint8Array,
     edgeLevels: Uint8Array,
 ): boolean {
-    const edgeCount = edgeLevels.length;
     nodeLevels[focusIndex] = 3;
     let found = false;
+    found = walkSiegelDirection(data, focusIndex, nodeLevels, edgeLevels, 'ancestor') || found;
+    found = walkSiegelDirection(data, focusIndex, nodeLevels, edgeLevels, 'descendant') || found;
+    return found;
+}
+
+function walkSiegelDirection(
+    data: GalaxySceneV2,
+    focusIndex: number,
+    nodeLevels: Uint8Array,
+    edgeLevels: Uint8Array,
+    direction: 'ancestor' | 'descendant',
+): boolean {
+    const edgeCount = edgeLevels.length;
     const seen = new Uint8Array(data.ids.length);
     const queue = new Uint32Array(data.ids.length);
     const depths = new Uint8Array(data.ids.length);
     let head = 0;
     let tail = 0;
+    let found = false;
     queue[tail++] = focusIndex;
     seen[focusIndex] = 1;
     while (head < tail) {
@@ -68,28 +80,29 @@ function focusDirectedHierarchy(
             if (data.edgeKinds[edge] !== 2) continue;
             const source = data.edgePairs[edge * 2];
             const target = data.edgePairs[edge * 2 + 1];
-            if (target !== current) continue;
+            if (source !== current && target !== current) continue;
+            const parent = siegelFlowParent(data, source, target);
+            const child = parent === source ? target : source;
+            const nextNode = direction === 'ancestor' ? parent : child;
+            if ((direction === 'ancestor' && child !== current) || (direction === 'descendant' && parent !== current)) continue;
             found = true;
             edgeLevels[edge] = 2;
-            nodeLevels[source] = Math.max(nodeLevels[source], depth <= 1 ? 2 : 1);
-            if (!seen[source]) {
-                seen[source] = 1;
-                depths[source] = depth + 1;
-                queue[tail++] = source;
+            nodeLevels[nextNode] = Math.max(nodeLevels[nextNode], depth <= 1 ? 2 : 1);
+            if (!seen[nextNode]) {
+                seen[nextNode] = 1;
+                depths[nextNode] = depth + 1;
+                queue[tail++] = nextNode;
             }
         }
     }
-
-    for (let edge = 0; edge < edgeCount; edge += 1) {
-        if (data.edgeKinds[edge] !== 2) continue;
-        const source = data.edgePairs[edge * 2];
-        const target = data.edgePairs[edge * 2 + 1];
-        if (source !== focusIndex) continue;
-        found = true;
-        edgeLevels[edge] = 2;
-        nodeLevels[target] = Math.max(nodeLevels[target], 2);
-    }
     return found;
+}
+
+function siegelFlowParent(data: GalaxySceneV2, source: number, target: number): number {
+    const sx = data.positions3d[source * 3];
+    const tx = data.positions3d[target * 3];
+    if (Math.abs(sx - tx) > 0.0001) return sx <= tx ? source : target;
+    return structuralParent(data, source, target);
 }
 
 function focusStructuralHierarchy(

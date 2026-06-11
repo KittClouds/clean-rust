@@ -43,4 +43,30 @@ describe('entityColorStore', () => {
         expect(entityColorStore.getRawHsl('NETWORK')).toBe('190 88% 44%');
         expect(entityColorStore.getRawHsl('FACTION')).toBe('190 88% 44%');
     });
+
+    it('normalizes state and context graph colors as distinct persisted roles', async () => {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({
+            graphNodeColors: {
+                decisionState: '88 80% 51%',
+                rankStatus: '246 81% 52%',
+                serviceContext: '32 82% 53%',
+                affiliationContext: '176 83% 54%',
+                familyContext: '326 84% 55%',
+            },
+        }));
+
+        const { entityColorStore, normalizeGraphNodeColorKind } = await import('./entityColorStore');
+        entityColorStore.initialize();
+
+        expect(normalizeGraphNodeColorKind('decision_state')).toBe('decisionState');
+        expect(normalizeGraphNodeColorKind('rank_or_status')).toBe('rankStatus');
+        expect(normalizeGraphNodeColorKind('service_context')).toBe('serviceContext');
+        expect(normalizeGraphNodeColorKind('affiliant_context')).toBe('affiliationContext');
+        expect(normalizeGraphNodeColorKind('family_context')).toBe('familyContext');
+        expect(entityColorStore.getRawGraphNodeHsl('decision-state')).toBe('88 80% 51%');
+        expect(entityColorStore.getRawGraphNodeHsl('rank_or_status')).toBe('246 81% 52%');
+        expect(entityColorStore.getRawGraphNodeHsl('serviceContext')).toBe('32 82% 53%');
+        expect(entityColorStore.getRawGraphNodeHsl('affiliation_context')).toBe('176 83% 54%');
+        expect(entityColorStore.getRawGraphNodeHsl('familyContext')).toBe('326 84% 55%');
+    });
 });

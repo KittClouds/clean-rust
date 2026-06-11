@@ -38,7 +38,8 @@ const ENTITY_CATEGORIES: EntityCategory[] = [
 const GRAPH_NODE_COLOR_CATEGORIES: GraphNodeColorCategory[] = [
     { name: 'Relationship colors', kinds: ['cooccurrence', 'observation', 'communication', 'authority', 'approval', 'relationship'] },
     { name: 'Story relationships', kinds: ['family', 'intimacy', 'transfer', 'causal', 'temporal', 'scenePresence'] },
-    { name: 'Story structure', kinds: ['document', 'chunk', 'anchor', 'graphFact', 'eventNode', 'temporalFact', 'causalFact', 'memoryState'] },
+    { name: 'Story structure', kinds: ['document', 'chunk', 'anchor', 'graphFact', 'eventNode', 'temporalFact', 'causalFact'] },
+    { name: 'State and context', kinds: ['memoryState', 'decisionState', 'rankStatus', 'serviceContext', 'affiliationContext', 'familyContext'] },
 ];
 
 const GRAPH_NODE_COLOR_LABELS: Record<GraphNodeColorKind, string> = {
@@ -62,6 +63,11 @@ const GRAPH_NODE_COLOR_LABELS: Record<GraphNodeColorKind, string> = {
     temporalFact: 'Timeline midpoint',
     causalFact: 'Cause midpoint',
     memoryState: 'Memory state',
+    decisionState: 'Decision state',
+    rankStatus: 'Rank/status',
+    serviceContext: 'Service context',
+    affiliationContext: 'Affiliation context',
+    familyContext: 'Family context',
 };
 
 const MODE_ORDER: HighlightMode[] = ['vivid', 'gradient', 'subtle', 'clean', 'focus', 'off'];

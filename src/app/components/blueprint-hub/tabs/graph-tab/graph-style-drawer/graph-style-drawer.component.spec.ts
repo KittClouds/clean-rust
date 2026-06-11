@@ -12,7 +12,10 @@ describe('GraphStyleDrawerComponent model language', () => {
         expect(text).toContain('Relationship colors');
         expect(text).toContain('Story relationships');
         expect(text).toContain('Story structure');
+        expect(text).toContain('State and context');
         expect(text).toContain('Weak co-occurrence');
+        expect(text).toContain('Decision state');
+        expect(text).toContain('Rank/status');
         expect(text).toContain('Document');
         expect(text).toContain('Relationship midpoint');
         expect(text).not.toContain('Graph node types');

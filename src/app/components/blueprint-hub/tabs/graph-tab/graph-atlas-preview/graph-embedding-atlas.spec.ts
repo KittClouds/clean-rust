@@ -841,6 +841,7 @@ describe('embedding atlas projection', () => {
                 { id: 'embed:structure-root:note-1:identity', kind: 'structureRoot', sourceId: 'note-1:identity', noteId: 'note-1', label: 'Identity root', text: 'identity structure', evidenceIds: [], lane: 'document_spine', structuralRole: 'root', admissionStatus: 'admitted', parentIds: ['embed:note:note-1'] },
                 { id: 'embed:chunk:chunk-1', kind: 'chunk', sourceId: 'chunk-1', noteId: 'note-1', chunkId: 'chunk-1', label: 'Chunk 1', text: 'sharp chunk', evidenceIds: [], lane: 'chunk_spine', structuralRole: 'spine', admissionStatus: 'admitted', parentIds: ['embed:structure-root:note-1:identity'] },
                 { id: 'embed:entity:kai', kind: 'entity', sourceId: 'kai', entityId: 'kai', entityKind: 'CHARACTER', label: 'Kai', text: 'mentions:3 evidence_context:Kai', evidenceIds: ['a1'], lane: 'entity_anchor', structuralRole: 'child', admissionStatus: 'admitted', parentIds: ['embed:chunk:chunk-1'] },
+                { id: 'embed:memory:m1', kind: 'memoryState', sourceId: 'm1', entityId: 'kai', entityKind: 'CHARACTER', noteId: 'note-1', label: 'rank_or_status', text: 'rank_or_status for Kai', evidenceIds: ['a1'], lane: 'memory_state', structuralRole: 'child', admissionStatus: 'admitted', parentIds: ['embed:entity:kai'] },
             ],
             embeddingVectors: [],
             projectionRefs: [],
@@ -853,6 +854,7 @@ describe('embedding atlas projection', () => {
         const note = atlas.nodes.find((node) => node.id === 'embed:note:note-1')!;
         const root = atlas.nodes.find((node) => node.id === 'embed:structure-root:note-1:identity')!;
         const chunk = atlas.nodes.find((node) => node.id === 'embed:chunk:chunk-1')!;
+        const status = atlas.nodes.find((node) => node.id === 'embed:memory:m1')!;
         const zValues = atlas.nodes.map((node) => Number(node.atlasZ));
         expect(atlas.manifold).toMatchObject({
             mode: 'siegel',
@@ -860,9 +862,20 @@ describe('embedding atlas projection', () => {
         });
         expect(atlas.sourceLabel).toContain('siegel-finsler');
         expect(kai.metadata?.siegel).toMatchObject({
-            lane: 'entity',
-            depth: 3,
+            lane: 'character',
+            depth: 5,
             parentIds: ['embed:chunk:chunk-1'],
+            directed: true,
+        });
+        expect(status).toMatchObject({ kind: 'rank-status' });
+        expect(status.metadata).toMatchObject({
+            graphColorKind: 'rank-status',
+            graphMemoryStateKind: 'rankStatus',
+        });
+        expect(status.metadata?.siegel).toMatchObject({
+            lane: 'stateContext',
+            depth: 7,
+            parentIds: ['embed:entity:kai'],
             directed: true,
         });
         expect(kai.metadata?.siegel?.['matrixCells']).toHaveLength(6);

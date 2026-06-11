@@ -1691,7 +1691,7 @@ function graphInventoryFromDelta(delta: PhoenixGraphDeltaBinaryResult): GraphInv
         const id = node.nodeId;
         if (!id || idSet.has(id)) continue;
         idSet.add(id);
-        const kind = normalizeGraphKind(node.kind || 'generic');
+        const kind = graphStateContextKind(normalizeGraphKind(node.kind || 'generic'), node.label || id);
         nodes.push({
             id,
             label: node.label || id,
@@ -1769,7 +1769,7 @@ function normalizeGraphKind(kind: string): string {
 }
 
 function graphKindHsl(kind: string): string {
-    switch (normalizeGraphKind(kind)) {
+    switch (graphStateContextKind(normalizeGraphKind(kind))) {
         case 'document': return entityColorStore.getRawGraphNodeHsl('document');
         case 'chunk':
         case 'leaf': return entityColorStore.getRawGraphNodeHsl('chunk');
@@ -1777,13 +1777,37 @@ function graphKindHsl(kind: string): string {
         case 'mention': return entityColorStore.getRawGraphNodeHsl('anchor');
         case 'alias': return '315 72% 58%';
         case 'event': return entityColorStore.getRawGraphNodeHsl('eventNode');
-        case 'state': return entityColorStore.getRawGraphNodeHsl('memoryState');
-        case 'memory': return entityColorStore.getRawGraphNodeHsl('memoryState');
+        case 'state':
+        case 'memory':
+        case 'memory-state': return entityColorStore.getRawGraphNodeHsl('memoryState');
+        case 'decision-state': return entityColorStore.getRawGraphNodeHsl('decisionState');
+        case 'rank-status':
+        case 'rank-or-status': return entityColorStore.getRawGraphNodeHsl('rankStatus');
+        case 'service-context':
+        case 'service-rank': return entityColorStore.getRawGraphNodeHsl('serviceContext');
+        case 'affiliation-context':
+        case 'affiliate-context':
+        case 'affiliant-context': return entityColorStore.getRawGraphNodeHsl('affiliationContext');
+        case 'family-context': return entityColorStore.getRawGraphNodeHsl('familyContext');
         case 'timeanchor':
         case 'time-anchor': return entityColorStore.getRawGraphNodeHsl('temporal');
         case 'candidate': return '260 28% 58%';
         default: return '220 10% 54%';
     }
+}
+
+function graphStateContextKind(kind: string, label = ''): string {
+    const token = `${kind} ${label}`.toLowerCase().replace(/[^a-z0-9]+/g, '');
+    const stateish = /state|memory|decision|rank|service|affiliation|affiliate|affiliant|family/.test(token);
+    if (!stateish) return kind;
+    if (token.includes('decisionstate') || token.includes('decision')) return 'decision-state';
+    if (token.includes('rankorstatus') || token.includes('rankstatus') || token.includes('rank')) return 'rank-status';
+    if (token.includes('servicecontext') || token.includes('servicerank') || token.includes('service')) return 'service-context';
+    if (token.includes('affiliationcontext') || token.includes('affiliatecontext') || token.includes('affiliantcontext') || token.includes('affiliation')) {
+        return 'affiliation-context';
+    }
+    if (token.includes('familycontext')) return 'family-context';
+    return kind === 'state' || kind === 'memory' ? 'memory-state' : kind;
 }
 
 function stableAtlasPoint(id: string, index: number): { atlasX: number; atlasY: number; atlasZ: number } {
