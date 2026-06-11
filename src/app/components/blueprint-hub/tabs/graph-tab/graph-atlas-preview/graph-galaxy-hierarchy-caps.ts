@@ -15,7 +15,11 @@ const KIND_HSL: Record<string, string> = {
     causal: '24 82% 62%',
     evidence: '136 70% 62%',
     document: '214 78% 62%',
+    documentRoot: '214 72% 58%',
     documentStructure: '214 78% 62%',
+    chunk: '178 66% 58%',
+    character: '286 74% 66%',
+    entityOther: '184 62% 58%',
     semantic: '176 72% 58%',
     abstraction: '228 66% 66%',
     bridge: '302 76% 66%',
@@ -105,8 +109,11 @@ export function rawDirection(node: GalaxyNode, lorentz: Record<string, unknown>)
 export function laneDirection(lane: string): Vec3 {
     switch (normalizeLane(lane)) {
         case 'document':
+        case 'documentRoot':
         case 'documentStructure':
             return normalize({ x: -0.3, y: 0.18, z: 0.94 }, { x: 0, y: 0, z: 1 });
+        case 'chunk':
+            return normalize({ x: -0.24, y: 0.62, z: 0.74 }, { x: 0, y: 1, z: 0 });
         case 'temporal':
             return normalize({ x: 0.2, y: 0.88, z: -0.28 }, { x: 0, y: 1, z: 0 });
         case 'causal':
@@ -115,9 +122,14 @@ export function laneDirection(lane: string): Vec3 {
             return normalize({ x: 0.54, y: 0.36, z: -0.76 }, { x: 0, y: 0, z: -1 });
         case 'evidence':
             return normalize({ x: -0.58, y: -0.1, z: 0.8 }, { x: -1, y: 0, z: 0 });
+        case 'location':
+            return normalize({ x: 0.14, y: 0.74, z: 0.66 }, { x: 0, y: 1, z: 0 });
+        case 'character':
+            return normalize({ x: 0.36, y: 0.34, z: -0.86 }, { x: 0, y: 0, z: -1 });
         case 'relationship':
             return normalize({ x: 0.56, y: -0.62, z: -0.2 }, { x: 1, y: -1, z: 0 });
         case 'entity':
+        case 'entityOther':
             return normalize({ x: -0.62, y: 0.58, z: 0.22 }, { x: -1, y: 1, z: 0 });
         default:
             return normalize({ x: 0.18, y: 0.48, z: 0.86 }, { x: 0, y: 0, z: 1 });

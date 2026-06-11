@@ -403,25 +403,34 @@ describe('Graph galaxy Siegel-Finsler layout', () => {
             siegelNode('doc', 'Document', 'note', 'document', 4, []),
             siegelNode('root', 'Identity root', 'structureRoot', 'document', 5, ['doc']),
             siegelNode('chunk', 'Chunk 1', 'chunk', 'document', 5, ['root']),
-            siegelNode('entity', 'Kai', 'CHARACTER', 'entity', 5, ['chunk']),
-            siegelNode('event', 'Kai causes signal', 'event', 'causal', 1, ['entity']),
+            siegelNode('event', 'Kai causes signal', 'event', 'causal', 1, ['chunk']),
+            siegelNode('location', 'Tempest', 'LOCATION', 'entity', 1, ['chunk']),
+            siegelNode('character', 'Kai', 'CHARACTER', 'entity', 5, ['chunk']),
+            siegelNode('item', 'Ledger', 'ITEM', 'entity', 2, ['chunk']),
             siegelNode('anchor', 'Kai mention', 'anchor', 'evidence', 1, ['chunk']),
         ], [
             { id: 'doc-root', sourceId: 'doc', targetId: 'root', type: 'target-parent', confidence: 0.9 },
             { id: 'root-chunk', sourceId: 'root', targetId: 'chunk', type: 'target-parent', confidence: 0.9 },
-            { id: 'chunk-entity', sourceId: 'chunk', targetId: 'entity', type: 'chunk-entity', confidence: 0.9 },
-            { id: 'entity-event', sourceId: 'entity', targetId: 'event', type: 'event-entity', confidence: 0.86 },
+            { id: 'chunk-event', sourceId: 'chunk', targetId: 'event', type: 'event-chunk', confidence: 0.9 },
+            { id: 'chunk-location', sourceId: 'chunk', targetId: 'location', type: 'chunk-entity', confidence: 0.9 },
+            { id: 'chunk-character', sourceId: 'chunk', targetId: 'character', type: 'chunk-entity', confidence: 0.9 },
+            { id: 'chunk-item', sourceId: 'chunk', targetId: 'item', type: 'chunk-entity', confidence: 0.9 },
             { id: 'chunk-anchor', sourceId: 'chunk', targetId: 'anchor', type: 'chunk-anchor', confidence: 0.84 },
         ], mergeGalaxySettings({ layoutMode: 'siegelFinsler' }));
         const byId = new Map(scene.nodes.map((node) => [node.entity.id, node]));
 
         expect(byId.get('root')!.x).toBeGreaterThan(byId.get('doc')!.x);
         expect(byId.get('chunk')!.x).toBeGreaterThan(byId.get('root')!.x);
-        expect(byId.get('entity')!.x).toBeGreaterThan(byId.get('chunk')!.x);
-        expect(byId.get('event')!.x).toBeGreaterThan(byId.get('entity')!.x);
-        expect(byId.get('anchor')!.x).toBeGreaterThan(byId.get('event')!.x);
+        expect(byId.get('event')!.x).toBeGreaterThan(byId.get('chunk')!.x);
+        expect(byId.get('location')!.x).toBeGreaterThan(byId.get('event')!.x);
+        expect(byId.get('character')!.x).toBeGreaterThan(byId.get('location')!.x);
+        expect(byId.get('item')!.x).toBeGreaterThan(byId.get('character')!.x);
+        expect(byId.get('anchor')!.x).toBeGreaterThan(byId.get('item')!.x);
         expect(byId.get('chunk')!.x - byId.get('root')!.x).toBeLessThan(0.62);
-        expect(byId.get('entity')!.x - byId.get('chunk')!.x).toBeLessThan(0.62);
+        expect(byId.get('event')!.x - byId.get('chunk')!.x).toBeLessThan(0.62);
+        expect(scene.lorentzGuides?.some((guide) => guide.id === 'siegel:lane:event')).toBe(true);
+        expect(scene.lorentzGuides?.some((guide) => guide.id === 'siegel:lane:location')).toBe(true);
+        expect(scene.lorentzGuides?.some((guide) => guide.id === 'siegel:lane:character')).toBe(true);
     });
 
     it('keeps entity and event bands thick on the z axis', () => {

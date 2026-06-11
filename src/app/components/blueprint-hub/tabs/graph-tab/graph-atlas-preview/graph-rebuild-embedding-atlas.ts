@@ -909,12 +909,37 @@ function targetConfidence(target: GraphRebuildEmbeddingTarget): number {
     return 0.62;
 }
 
+type SiegelBandId =
+    | 'document'
+    | 'documentRoot'
+    | 'chunk'
+    | 'event'
+    | 'location'
+    | 'character'
+    | 'entityOther'
+    | 'relationship'
+    | 'evidence'
+    | 'semantic';
+
+const SIEGEL_BAND_ORDER: Record<SiegelBandId, number> = {
+    document: 0,
+    documentRoot: 1,
+    chunk: 2,
+    event: 3,
+    location: 4,
+    character: 5,
+    entityOther: 6,
+    relationship: 7,
+    evidence: 8,
+    semantic: 9,
+};
+
 function graphRebuildSiegelMetadata(
     target: GraphRebuildEmbeddingTarget,
     post?: GraphRebuildEmbeddingTargetPostProcess,
     hierarchyContext?: TargetHierarchyContext,
 ): Record<string, unknown> {
-    const lane = normalizeSiegelLane(target.lane, target.kind);
+    const lane = siegelBandForTarget(target, hierarchyContext);
     const confidence = targetConfidence(target);
     const depth = siegelDepth(target, hierarchyContext);
     return {
@@ -994,32 +1019,92 @@ function graphRebuildHopfMetadata(
     };
 }
 
-function normalizeSiegelLane(lane: string | undefined, kind: string): string {
-    const raw = String(lane || kind || '').toLowerCase();
-    if (/document|chunk|spine|structure/.test(raw)) return 'document';
-    if (/entity|anchor/.test(raw)) return 'entity';
-    if (/relationship|cooccurrence/.test(raw)) return 'relationship';
-    if (/temporal/.test(raw)) return 'temporal';
-    if (/causal/.test(raw)) return 'causal';
-    if (/memory|evidence/.test(raw)) return 'evidence';
-    if (/event|story/.test(raw)) return 'event';
+function normalizeSiegelLane(lane: string | undefined, kind: string, entityKind?: string): SiegelBandId {
+    const raw = [lane, kind, entityKind].map(compactSiegelToken).join(' ');
+    if (hasSiegelTerm(raw, ['documentroot', 'structureroot', 'root'])) return 'documentRoot';
+    if (hasSiegelTerm(raw, ['document', 'documentatom', 'note', 'doc'])) return 'document';
+    if (hasSiegelTerm(raw, ['chunk', 'chunkatom', 'leaf', 'chapter', 'scene', 'beat', 'act', 'arc', 'narrative', 'spine', 'structure'])) {
+        return 'chunk';
+    }
+    if (hasSiegelTerm(raw, ['event', 'eventatom', 'timeline'])) return 'event';
+    if (hasSiegelTerm(raw, ['location', 'place', 'site'])) return 'location';
+    if (hasSiegelTerm(raw, ['character', 'npc', 'creature'])) return 'character';
+    if (hasSiegelTerm(raw, ['entity', 'identity', 'network', 'item', 'concept', 'object', 'group'])) return 'entityOther';
+    if (hasSiegelTerm(raw, [
+        'relationship',
+        'relationshipfact',
+        'graphfact',
+        'temporalfact',
+        'causalfact',
+        'memorystate',
+        'fact',
+        'factvertex',
+        'relation',
+        'cooccurrence',
+        'communication',
+        'authority',
+        'approval',
+        'family',
+        'intimacy',
+        'transfer',
+        'temporal',
+        'causal',
+    ])) {
+        return 'relationship';
+    }
+    if (hasSiegelTerm(raw, ['evidence', 'evidenceanchor', 'anchor', 'mention', 'source', 'provenance'])) return 'evidence';
     return 'semantic';
 }
 
 function siegelDepth(target: GraphRebuildEmbeddingTarget, hierarchyContext?: TargetHierarchyContext): number {
-    const kind = displayKind(target.kind);
-    if (kind === 'note') return 0;
-    if (kind === 'structure-root') return 1;
-    if (kind === 'chunk') return 2;
-    if (kind === 'entity') return 3;
-    if (kind === 'anchor') return 4;
-    if (hierarchyContext?.chunkId) return 4;
-    return target.structuralRole === 'root' ? 1 : target.structuralRole === 'spine' ? 2 : 4;
+    return SIEGEL_BAND_ORDER[siegelBandForTarget(target, hierarchyContext)];
+}
+
+function siegelBandForTarget(
+    target: GraphRebuildEmbeddingTarget,
+    hierarchyContext?: TargetHierarchyContext,
+): SiegelBandId {
+    const kind = compactSiegelToken(target.kind);
+    const entityKind = compactSiegelToken(target.entityKind);
+    const lane = normalizeSiegelLane(target.lane, target.kind, target.entityKind);
+    if (['note', 'doc', 'document', 'documentatom'].includes(kind)) return 'document';
+    if (['structureroot', 'documentroot', 'root'].includes(kind)) return 'documentRoot';
+    if (['chunk', 'chunkatom', 'leaf'].includes(kind)) return 'chunk';
+    if (['anchor', 'evidenceanchor', 'mention', 'evidence'].includes(kind)) return 'evidence';
+    if (['chapter', 'scene', 'beat', 'act', 'arc', 'narrative'].includes(entityKind)) return 'chunk';
+    if (['event', 'eventatom', 'timeline'].includes(kind) || ['event', 'timeline'].includes(entityKind)) return 'event';
+    if (['location', 'place', 'site'].includes(entityKind)) return 'location';
+    if (['character', 'npc', 'creature'].includes(entityKind)) return 'character';
+    if (kind === 'entity' || ['identity', 'network', 'item', 'concept', 'object', 'group'].includes(entityKind)) return 'entityOther';
+    if ([
+        'graphfact',
+        'relationshipfact',
+        'temporalfact',
+        'causalfact',
+        'memorystate',
+        'fact',
+        'factvertex',
+        'relation',
+        'relationship',
+    ].includes(kind) || hierarchyContext?.chunkId) {
+        return 'relationship';
+    }
+    if (target.structuralRole === 'root') return 'documentRoot';
+    if (target.structuralRole === 'spine') return 'chunk';
+    return lane;
 }
 
 function siegelMatrixCells(target: GraphRebuildEmbeddingTarget, lane: string, depth: number): number[] {
     const source = `${target.id}:${lane}:${depth}:${target.parentIds?.join('|') || ''}`;
     return Array.from({ length: 6 }, (_, index) => unitHash(`${source}:${index}`));
+}
+
+function compactSiegelToken(value: unknown): string {
+    return String(value || '').toLowerCase().replace(/[^a-z0-9]+/g, '');
+}
+
+function hasSiegelTerm(raw: string, terms: string[]): boolean {
+    return raw.split(' ').some((term) => terms.some((needle) => term === needle || (needle.length > 3 && term.includes(needle))));
 }
 
 type HopfResonanceEntry = {
@@ -1988,7 +2073,7 @@ function projectSiegelVector(
     hierarchyContext?: TargetHierarchyContext,
 ): { x: number; y: number; z: number } {
     const depth = siegelDepth(target, hierarchyContext);
-    const lane = normalizeSiegelLane(target.lane, target.kind);
+    const lane = siegelBandForTarget(target, hierarchyContext);
     const phase = unitHash(`${target.id}:siegel-projection`);
     const angle = phase * Math.PI * 2;
     const semantic = targetSemanticSpread(vector, index, total);
@@ -2011,22 +2096,24 @@ function targetSemanticSpread(vector: Float32Array, index: number, total: number
 }
 
 function siegelDepthLayer(depth: number): number {
-    return 1.04 - clampHierarchyDepth(depth) * 0.34;
+    return 1.08 - clampHierarchyDepth(depth) * 0.21;
 }
 
 function clampHierarchyDepth(depth: number): number {
-    return Math.max(0, Math.min(5, depth));
+    return Math.max(0, Math.min(SIEGEL_BAND_ORDER.semantic, depth));
 }
 
 function siegelLaneShift(lane: string): { x: number; y: number; z: number } {
-    if (lane === 'document') return { x: -0.32, y: 0.02, z: -0.14 };
-    if (lane === 'entity') return { x: 0.18, y: -0.03, z: 0.28 };
-    if (lane === 'relationship') return { x: 0.34, y: -0.04, z: -0.06 };
-    if (lane === 'temporal') return { x: 0.08, y: -0.06, z: 0.36 };
-    if (lane === 'causal') return { x: 0.42, y: -0.06, z: 0.2 };
-    if (lane === 'event') return { x: 0.22, y: -0.08, z: -0.32 };
-    if (lane === 'evidence') return { x: -0.08, y: -0.1, z: 0.44 };
-    return { x: 0, y: -0.04, z: 0 };
+    if (lane === 'document') return { x: -0.42, y: 0.04, z: -0.18 };
+    if (lane === 'documentRoot') return { x: -0.34, y: 0.02, z: -0.08 };
+    if (lane === 'chunk') return { x: -0.22, y: 0, z: 0.02 };
+    if (lane === 'event') return { x: -0.06, y: -0.02, z: -0.32 };
+    if (lane === 'location') return { x: 0.12, y: -0.03, z: 0.34 };
+    if (lane === 'character') return { x: 0.26, y: -0.04, z: 0.16 };
+    if (lane === 'entityOther') return { x: 0.38, y: -0.04, z: 0.02 };
+    if (lane === 'relationship') return { x: 0.5, y: -0.05, z: -0.12 };
+    if (lane === 'evidence') return { x: 0.58, y: -0.06, z: 0.26 };
+    return { x: 0.66, y: -0.06, z: 0 };
 }
 
 function displayKind(kind: string): string {

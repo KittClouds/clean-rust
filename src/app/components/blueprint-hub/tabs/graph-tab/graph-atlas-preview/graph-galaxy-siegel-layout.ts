@@ -21,14 +21,42 @@ import {
 
 const SIEGEL_MAX_GUIDES = 260;
 const SIEGEL_FLOW_X_MIN = -1.54;
-const SIEGEL_FLOW_X_STEP = 0.38;
+const SIEGEL_FLOW_X_STEP = 0.29;
 const SIEGEL_FLOW_Y_TOP = 0.72;
 const SIEGEL_FLOW_Y_STEP = 0.16;
 const SIEGEL_FLOW_Z = 0.74;
 const SIEGEL_BAND_HALF_WIDTH = 0.13;
 
+type SiegelBandId =
+    | 'document'
+    | 'documentRoot'
+    | 'chunk'
+    | 'event'
+    | 'location'
+    | 'character'
+    | 'entityOther'
+    | 'relationship'
+    | 'evidence'
+    | 'semantic';
+
+const SIEGEL_BAND_ORDER: Record<SiegelBandId, number> = {
+    document: 0,
+    documentRoot: 1,
+    chunk: 2,
+    event: 3,
+    location: 4,
+    character: 5,
+    entityOther: 6,
+    relationship: 7,
+    evidence: 8,
+    semantic: 9,
+};
+
+const SIEGEL_BANDS = Object.keys(SIEGEL_BAND_ORDER) as SiegelBandId[];
+
 interface SiegelInfo {
-    lane: string;
+    lane: SiegelBandId;
+    band: SiegelBandId;
     role: string;
     depth: number;
     row: number;
@@ -59,7 +87,7 @@ export function applySiegelFinslerLayout(nodes: GalaxyNode[], links: GalaxyEdge[
         node.x = point.x;
         node.y = point.y;
         node.z = point.z;
-        node.depth = clamp((info.depth + info.ambiguity) / 5, 0, 1);
+        node.depth = clamp((info.depth + info.ambiguity) / (SIEGEL_BANDS.length - 1), 0, 1);
         node.radius *= siegelNodeScale(info);
     }
 
@@ -83,7 +111,7 @@ function siegelInfo(node: GalaxyNode): SiegelInfo {
     const region = record(product['region']);
     const lorentz = record(meta['lorentz']);
     const graphTruth = record(meta['graphTruth']);
-    const lane = normalizeSiegelLane(firstText(
+    const sourceLane = normalizeSiegelLane(firstText(
         siegel['lane'],
         meta['signalLane'],
         meta['productLaneKind'],
@@ -96,7 +124,9 @@ function siegelInfo(node: GalaxyNode): SiegelInfo {
     ));
     const role = firstText(siegel['role'], meta['signalStructuralRole'], meta['graphTruthStatus'], graphTruth['status'], region['role']);
     const parentIds = new Set((Array.isArray(meta['signalParentIds']) ? meta['signalParentIds'] : []).map(String));
-    const depth = fallbackDepth(node, lane);
+    const band = siegelBandForNode(node, sourceLane, role);
+    const lane = band;
+    const depth = bandRank(band);
     const confidence = clamp(firstNumber(siegel['confidence'], meta['targetConfidence'], meta['productRegionConfidence'], region['confidence'], 0.62), 0, 1);
     const ambiguity = clamp(firstNumber(siegel['ambiguity'], lorentz['ambiguity'], meta['embeddingOutlierScore'], 0) * 0.72, 0, 1);
     const cells = Array.isArray(siegel['matrixCells'])
@@ -105,6 +135,7 @@ function siegelInfo(node: GalaxyNode): SiegelInfo {
     while (cells.length < 6) cells.push(stableUnit(`${node.entity.id}:siegel:${cells.length}`));
     return {
         lane,
+        band,
         role,
         depth,
         row: stableUnit(`${node.entity.id}:siegel-row`),
@@ -117,11 +148,11 @@ function siegelInfo(node: GalaxyNode): SiegelInfo {
 }
 
 function buildLaneRows(infos: SiegelInfo[]): LaneRow[] {
-    const counts = new Map<string, number>();
+    const counts = new Map<SiegelBandId, number>();
     for (const info of infos) counts.set(info.lane, (counts.get(info.lane) || 0) + 1);
     const ordered = [...counts.entries()]
         .sort((left, right) => laneRank(left[0]) - laneRank(right[0]) || right[1] - left[1] || left[0].localeCompare(right[0]))
-        .slice(0, 9);
+        .slice(0, SIEGEL_BANDS.length);
     const total = Math.max(1, ordered.length - 1);
     return ordered.map(([lane, count], index) => ({
         lane,
@@ -147,7 +178,7 @@ function siegelBandPoint(info: SiegelInfo, lane: LaneRow): Vec3 {
 }
 
 function siegelBandX(info: SiegelInfo): number {
-    return SIEGEL_FLOW_X_MIN + info.depth * SIEGEL_FLOW_X_STEP;
+    return SIEGEL_FLOW_X_MIN + bandRank(info.band) * SIEGEL_FLOW_X_STEP;
 }
 
 function relaxDirectedPairs(
@@ -356,37 +387,67 @@ function targetFlourish(t: number, amount: number): number {
     return amount * end * 0.78;
 }
 
-function fallbackDepth(node: GalaxyNode, lane: string): number {
+function siegelBandForNode(node: GalaxyNode, lane: SiegelBandId, role: string): SiegelBandId {
     const meta = node.entity.metadata || {};
-    const sourceType = String(meta['sourceType'] || '').toLowerCase();
-    const kind = String(node.entity.kind || '').toLowerCase();
-    const graphKind = String(meta['graphKind'] || '').toLowerCase();
-    const signalLane = String(meta['signalLane'] || '').toLowerCase();
-    const text = `${sourceType} ${kind} ${graphKind} ${signalLane}`;
-    if (/\b(note|doc|document)\b/.test(text)) return 0;
-    if (/structure[-_]?root|document[-_]?root|\broot\b/.test(text)) return 1;
-    if (/chunk|leaf/.test(text)) return 2;
-    if (/entity|character|location|network|item|concept|creature|npc|identity/.test(text) || lane === 'entity') return 3;
-    if (/anchor|mention|evidence/.test(text)) return 5;
-    if (/graph[-_]?fact|relationship|relation|temporal|causal|event|memory|state|context|fact/.test(text)) return 4;
-    return lane === 'document' ? 2 : lane === 'entity' ? 3 : 4;
+    const sourceType = compactToken(meta['sourceType']);
+    const kind = compactToken(node.entity.kind);
+    const graphKind = compactToken(meta['graphKind']);
+    const entityKind = compactToken(firstText(meta['entityKind'], meta['graphEntityKind']));
+    const structuralRole = compactToken(firstText(meta['signalStructuralRole'], role));
+    const terms = [sourceType, kind, graphKind, entityKind].filter(Boolean);
+
+    if (hasAny(terms, ['note', 'doc', 'document', 'documentatom'])) return 'document';
+    if (hasAny(terms, ['structureroot', 'documentroot', 'root'])) return 'documentRoot';
+    if (hasAny(terms, ['chunk', 'chunkatom', 'leaf', 'chapter', 'scene', 'beat', 'act', 'arc', 'narrative'])) {
+        return 'chunk';
+    }
+    if (hasAny(terms, ['anchor', 'evidenceanchor', 'mention', 'evidence'])) return 'evidence';
+    if (hasAny(terms, ['event', 'eventatom', 'timeline'])) return 'event';
+    if (hasAny(terms, ['location', 'place', 'site'])) return 'location';
+    if (hasAny(terms, ['character', 'npc', 'creature'])) return 'character';
+    if (hasAny(terms, ['entity', 'identity', 'network', 'item', 'concept', 'object', 'group'])) return 'entityOther';
+    if (hasAny(terms, ['graphfact', 'relationshipfact', 'temporalfact', 'causalfact', 'memorystate', 'fact', 'factvertex', 'relation', 'relationship'])
+        || ['relationship', 'temporal', 'causal'].includes(lane)) {
+        return 'relationship';
+    }
+    if (structuralRole === 'root') return 'documentRoot';
+    if (structuralRole === 'spine') return 'chunk';
+    return lane;
 }
 
-function normalizeSiegelLane(value: string): string {
+function normalizeSiegelLane(value: string): SiegelBandId {
     const lane = normalizeLane(value).toLowerCase().replace(/[_\s-]+/g, '');
-    if (/document|doc|chunk|leaf|structure/.test(lane)) return 'document';
-    if (/temporal|timeline|time/.test(lane)) return 'temporal';
-    if (/causal|cause|effect/.test(lane)) return 'causal';
-    if (/event|scene|beat|chapter/.test(lane)) return 'event';
-    if (/relation|relationship|cooccurrence|communication|authority|approval|family|intimacy|transfer/.test(lane)) return 'relationship';
-    if (/evidence|memory|state|source|provenance|anchor|mention/.test(lane)) return 'evidence';
-    if (/entity|identity|character|location|concept|item|creature|npc|network/.test(lane)) return 'entity';
+    if (laneHas(lane, ['documentroot', 'structureroot', 'root'])) return 'documentRoot';
+    if (laneHas(lane, ['document', 'doc'])) return 'document';
+    if (laneHas(lane, ['chunk', 'leaf', 'chapter', 'scene', 'beat', 'act', 'arc', 'narrative', 'structure'])) return 'chunk';
+    if (laneHas(lane, ['event', 'timeline'])) return 'event';
+    if (laneHas(lane, ['location', 'place', 'site'])) return 'location';
+    if (laneHas(lane, ['character', 'creature', 'npc'])) return 'character';
+    if (laneHas(lane, ['entity', 'identity', 'concept', 'item', 'network', 'group', 'object'])) return 'entityOther';
+    if (laneHas(lane, ['relation', 'relationship', 'cooccurrence', 'communication', 'authority', 'approval', 'family', 'intimacy', 'transfer'])) return 'relationship';
+    if (laneHas(lane, ['temporal', 'causal', 'cause', 'effect', 'time', 'memory', 'state', 'fact'])) return 'relationship';
+    if (laneHas(lane, ['evidence', 'source', 'provenance', 'anchor', 'mention'])) return 'evidence';
     return 'semantic';
 }
 
-function laneRank(lane: string): number {
-    const index = ['document', 'entity', 'relationship', 'event', 'temporal', 'causal', 'evidence', 'semantic'].indexOf(lane);
-    return index >= 0 ? index : 99;
+function laneRank(lane: SiegelBandId): number {
+    return bandRank(lane);
+}
+
+function bandRank(band: SiegelBandId): number {
+    return SIEGEL_BAND_ORDER[band] ?? SIEGEL_BAND_ORDER.semantic;
+}
+
+function compactToken(value: unknown): string {
+    return String(value || '').toLowerCase().replace(/[^a-z0-9]+/g, '');
+}
+
+function hasAny(terms: string[], tokens: string[]): boolean {
+    return terms.some((term) => tokens.includes(term));
+}
+
+function laneHas(lane: string, tokens: string[]): boolean {
+    return tokens.some((token) => lane === token || (token.length > 3 && lane.includes(token)));
 }
 
 function isStructuralLink(link: GalaxyEdge, possibleParent: GalaxyNode, possibleChild: SiegelInfo): boolean {
