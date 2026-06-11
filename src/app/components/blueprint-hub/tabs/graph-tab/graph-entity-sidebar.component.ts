@@ -20,7 +20,6 @@ import {
     Plus,
     RefreshCw,
     Search,
-    Shield,
     Sparkles,
     Trash2,
     User,
@@ -31,7 +30,7 @@ import { LucideAngularModule } from 'lucide-angular';
 
 import { entitySourceLabel, type RegisteredEntity } from '../../../../lib/registry';
 import type { EntitySuggestionProviderId } from '../../../../lib/entity-suggestions/entity-suggestion.types';
-import { entityColorStore } from '../../../../lib/store/entityColorStore';
+import { entityColorStore, normalizeEntityKind } from '../../../../lib/store/entityColorStore';
 import type { NerSuggestion } from '../../../../services/ner.service';
 import { GraphRebuildService } from '../../../../graph-rebuild/graph-rebuild.service';
 import type { GraphRebuildSnapshot } from '../../../../graph-rebuild/graph-rebuild-snapshot';
@@ -85,7 +84,8 @@ const ENTITY_ICONS: Record<string, any> = {
     LOCATION: MapPin,
     NPC: Users,
     ITEM: Package,
-    FACTION: Shield,
+    FACTION: Network,
+    NETWORK: Network,
     EVENT: Calendar,
     CONCEPT: Lightbulb,
 };
@@ -203,7 +203,7 @@ export class GraphEntitySidebarComponent implements OnChanges, OnDestroy {
 
     ngOnChanges(changes: SimpleChanges): void {
         if (changes['entities']) {
-            const nextKinds = new Set(this.entities.map((entity) => entity.kind));
+            const nextKinds = new Set(this.entities.map((entity) => this.canonicalKind(entity.kind)));
             this.expandedKinds.update((current) => new Set([...current, ...nextKinds]));
             this.dataRevision.update((value) => value + 1);
         }
@@ -303,23 +303,27 @@ export class GraphEntitySidebarComponent implements OnChanges, OnDestroy {
     }
 
     getIcon(kind: string): any {
-        return ENTITY_ICONS[kind] || Sparkles;
+        return ENTITY_ICONS[this.canonicalKind(kind)] || Sparkles;
     }
 
     getColor(kind: string): string {
-        return entityColorStore.getEntityColor(kind);
+        return entityColorStore.getEntityColor(this.canonicalKind(kind));
     }
 
     getEntityBadgeColor(entity: RegisteredEntity): string {
-        return entityColorStore.getEntityColor(entity.kind);
+        return entityColorStore.getEntityColor(this.canonicalKind(entity.kind));
     }
 
     getEntityBadgeBgColor(entity: RegisteredEntity): string {
-        return entityColorStore.getEntityBgColor(entity.kind, 0.13);
+        return entityColorStore.getEntityBgColor(this.canonicalKind(entity.kind), 0.13);
     }
 
     getEntityBadgeBorderColor(entity: RegisteredEntity): string {
-        return entityColorStore.getEntityBgColor(entity.kind, 0.34);
+        return entityColorStore.getEntityBgColor(this.canonicalKind(entity.kind), 0.34);
+    }
+
+    displayKind(kind: string): string {
+        return this.canonicalKind(kind);
     }
 
     getEntitySourceLabel(entity: RegisteredEntity): string {
@@ -379,9 +383,10 @@ export class GraphEntitySidebarComponent implements OnChanges, OnDestroy {
         const groups = new Map<string, RegisteredEntity[]>();
         for (const entity of this.entities) {
             if (query && !this.matchesQuery(entity, query)) continue;
-            const list = groups.get(entity.kind) ?? [];
+            const kind = this.canonicalKind(entity.kind);
+            const list = groups.get(kind) ?? [];
             list.push(entity);
-            groups.set(entity.kind, list);
+            groups.set(kind, list);
         }
         const expanded = this.expandedKinds();
         return [...groups.entries()]
@@ -415,15 +420,21 @@ export class GraphEntitySidebarComponent implements OnChanges, OnDestroy {
     }
 
     private matchesQuery(entity: RegisteredEntity, query: string): boolean {
+        const kind = this.canonicalKind(entity.kind);
         return entity.label.toLowerCase().includes(query)
-            || entity.kind.toLowerCase().includes(query)
+            || kind.toLowerCase().includes(query)
             || entity.aliases.some((alias) => alias.toLowerCase().includes(query));
     }
 
     private matchesSuggestionQuery(suggestion: NerSuggestion, query: string): boolean {
+        const kind = this.canonicalKind(suggestion.kind);
         return suggestion.label.toLowerCase().includes(query)
-            || suggestion.kind.toLowerCase().includes(query)
+            || kind.toLowerCase().includes(query)
             || this.sourceLabel(suggestion.source).toLowerCase().includes(query);
+    }
+
+    private canonicalKind(kind: string): string {
+        return normalizeEntityKind(kind) || kind;
     }
 
     private async refreshDiagnosticsSnapshot(): Promise<void> {

@@ -370,7 +370,7 @@
                     <span class="suggestion-dot"></span>
                     <span class="min-w-0 flex-1">
                         <span class="block truncate text-sm font-medium text-amber-100">{{ row.suggestion.label }}</span>
-                        <span class="block truncate text-[11px] text-amber-100/45">{{ sourceLabel(row.suggestion.source) }} - {{ row.suggestion.kind }} - {{ confidencePercent(row.suggestion.confidence) }}%</span>
+                        <span class="block truncate text-[11px] text-amber-100/45">{{ sourceLabel(row.suggestion.source) }} - {{ displayKind(row.suggestion.kind) }} - {{ confidencePercent(row.suggestion.confidence) }}%</span>
                     </span>
                     <button type="button" class="row-icon-button text-emerald-300" title="Accept suggestion" (click)="acceptSuggestionClicked(row.suggestion.id, $event)">
                         <lucide-icon [img]="CheckIcon" class="h-3.5 w-3.5"></lucide-icon>
@@ -383,7 +383,7 @@
                 <button type="button" class="atlas-group-row" (click)="toggleKind(row.kind)">
                     <lucide-icon [img]="row.expanded ? ChevronDownIcon : ChevronRightIcon" class="h-4 w-4 text-zinc-500"></lucide-icon>
                     <lucide-icon [img]="getIcon(row.kind)" class="h-4 w-4" [style.color]="getColor(row.kind)"></lucide-icon>
-                    <span [style.color]="getColor(row.kind)">{{ row.kind }}</span>
+                    <span [style.color]="getColor(row.kind)">{{ displayKind(row.kind) }}</span>
                     <strong>{{ row.count }}</strong>
                 </button>
                 } @else {

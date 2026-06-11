@@ -106,6 +106,7 @@ export const DEFAULT_GRAPH_NODE_COLORS: Record<GraphNodeColorKind, string> = {
 
 export function normalizeEntityKind(kind: EntityKind | string | null | undefined): EntityKind | null {
     const normalized = String(kind || '').trim().toUpperCase().replace(/[-\s]+/g, '_') as EntityKind;
+    if (normalized === 'FACTION') return 'NETWORK' as EntityKind;
     return Object.prototype.hasOwnProperty.call(DEFAULT_ENTITY_COLORS, normalized) ? normalized : null;
 }
 
@@ -162,9 +163,17 @@ export function normalizeGraphNodeColorKind(kind: GraphNodeColorKind | string | 
 }
 
 // ============================================
-// STORE CLASS - PURE RUNTIME REGISTRY
-// No localStorage persistence - CSS variables are the source of truth
+// STORE CLASS - PERSISTED RUNTIME REGISTRY
+// CSS variables are the live source of truth; localStorage restores user choices.
 // ============================================
+
+const STORAGE_KEY = 'graph-style-lab:entity-colors:v1';
+
+interface PersistedEntityColors {
+    colors?: Partial<Record<EntityKind, string>>;
+    textColors?: Partial<Record<EntityKind, string>>;
+    graphNodeColors?: Partial<Record<GraphNodeColorKind, string>>;
+}
 
 class EntityColorStore {
     private colors: Record<EntityKind, string>;
@@ -185,17 +194,16 @@ class EntityColorStore {
     }
 
     /**
-     * Initialize store - must be called after DOM is ready
-     * Always uses DEFAULT colors and syncs to CSS variables
-     * NO localStorage loading - pure runtime defaults
+     * Initialize store - must be called after DOM is ready.
+     * Defaults are overlaid with any persisted Style Lab choices.
      */
     initialize(): void {
         if (this.initialized) return;
 
-        // Always start with defaults - no stale state
         this.colors = { ...DEFAULT_ENTITY_COLORS };
         this.textColors = { ...DEFAULT_ENTITY_TEXT_COLORS };
         this.graphNodeColors = { ...DEFAULT_GRAPH_NODE_COLORS };
+        this.loadPersistedColors();
         this.snapshot = { ...this.colors };
         this.textSnapshot = { ...this.textColors };
 
@@ -310,25 +318,25 @@ class EntityColorStore {
 
     /**
      * Set pill color for a kind - updates CSS variable immediately
-     * Changes are session-only, NOT persisted to localStorage
      */
     setColor(kind: EntityKind | string, hslValue: string): void {
         const normalized = normalizeEntityKind(kind);
         if (!normalized) return;
         this.colors[normalized] = hslValue;
         this.setCssVar(normalized, hslValue);
+        this.persist();
         this.notify();
     }
 
     /**
      * Set text color for a kind - updates CSS variable immediately
-     * Changes are session-only, NOT persisted to localStorage
      */
     setTextColor(kind: EntityKind | string, hslValue: string): void {
         const normalized = normalizeEntityKind(kind);
         if (!normalized) return;
         this.textColors[normalized] = hslValue;
         this.setTextCssVar(normalized, hslValue);
+        this.persist();
         this.notify();
     }
 
@@ -337,6 +345,7 @@ class EntityColorStore {
         if (!normalized) return;
         this.graphNodeColors[normalized] = hslValue;
         this.setGraphNodeCssVar(normalized, hslValue);
+        this.persist();
         this.notify();
     }
 
@@ -345,11 +354,12 @@ class EntityColorStore {
      */
     setColors(colors: Partial<Record<EntityKind, string>>): void {
         for (const [kind, hsl] of Object.entries(colors)) {
-            if (hsl) {
-                this.colors[kind as EntityKind] = hsl;
-                this.setCssVar(kind as EntityKind, hsl);
-            }
+            const normalized = normalizeEntityKind(kind);
+            if (!normalized || !hsl) continue;
+            this.colors[normalized] = hsl;
+            this.setCssVar(normalized, hsl);
         }
+        this.persist();
         this.notify();
     }
 
@@ -358,11 +368,12 @@ class EntityColorStore {
      */
     setTextColors(colors: Partial<Record<EntityKind, string>>): void {
         for (const [kind, hsl] of Object.entries(colors)) {
-            if (hsl) {
-                this.textColors[kind as EntityKind] = hsl;
-                this.setTextCssVar(kind as EntityKind, hsl);
-            }
+            const normalized = normalizeEntityKind(kind);
+            if (!normalized || !hsl) continue;
+            this.textColors[normalized] = hsl;
+            this.setTextCssVar(normalized, hsl);
         }
+        this.persist();
         this.notify();
     }
 
@@ -374,7 +385,69 @@ class EntityColorStore {
         this.textColors = { ...DEFAULT_ENTITY_TEXT_COLORS };
         this.graphNodeColors = { ...DEFAULT_GRAPH_NODE_COLORS };
         this.syncAllToCssVars();
+        this.persist();
         this.notify();
+    }
+
+    private loadPersistedColors(): void {
+        const persisted = this.readPersistedColors();
+        if (!persisted) return;
+        this.applyPersistedEntityColors(this.colors, persisted.colors);
+        this.applyPersistedEntityColors(this.textColors, persisted.textColors);
+        this.applyPersistedGraphNodeColors(persisted.graphNodeColors);
+    }
+
+    private readPersistedColors(): PersistedEntityColors | null {
+        if (typeof localStorage === 'undefined') return null;
+        try {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (!raw) return null;
+            const parsed = JSON.parse(raw) as PersistedEntityColors;
+            return parsed && typeof parsed === 'object' ? parsed : null;
+        } catch {
+            return null;
+        }
+    }
+
+    private applyPersistedEntityColors(
+        target: Record<EntityKind, string>,
+        colors: Partial<Record<EntityKind, string>> | undefined,
+    ): void {
+        if (!colors) return;
+        for (const [kind, hsl] of Object.entries(colors)) {
+            const normalized = normalizeEntityKind(kind);
+            if (!normalized || !this.isValidHsl(hsl)) continue;
+            target[normalized] = hsl;
+        }
+    }
+
+    private applyPersistedGraphNodeColors(
+        colors: Partial<Record<GraphNodeColorKind, string>> | undefined,
+    ): void {
+        if (!colors) return;
+        for (const [kind, hsl] of Object.entries(colors)) {
+            const normalized = normalizeGraphNodeColorKind(kind);
+            if (!normalized || !this.isValidHsl(hsl)) continue;
+            this.graphNodeColors[normalized] = hsl;
+        }
+    }
+
+    private persist(): void {
+        if (typeof localStorage === 'undefined') return;
+        try {
+            const payload: PersistedEntityColors = {
+                colors: this.colors,
+                textColors: this.textColors,
+                graphNodeColors: this.graphNodeColors,
+            };
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+        } catch {
+            // Color choices are non-critical; keep live CSS updates even if storage is unavailable.
+        }
+    }
+
+    private isValidHsl(value: unknown): value is string {
+        return typeof value === 'string' && /^\d{1,3}(?:\.\d+)?\s+\d{1,3}(?:\.\d+)?%\s+\d{1,3}(?:\.\d+)?%$/.test(value.trim());
     }
 
     // ============================================

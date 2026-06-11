@@ -6,13 +6,13 @@ import { entitySourceLabel, entitySourceSystem, smartGraphRegistry } from '../..
 import type { Edge, RegisteredEntity } from '../../../../../lib/registry';
 import { ConnectionGroup, ConnectionGroupComponent } from './connection-group/connection-group.component';
 import { EntityKind } from '../../../../../lib/Scanner/types';
-import { entityColorStore } from '../../../../../lib/store/entityColorStore';
+import { entityColorStore, normalizeEntityKind } from '../../../../../lib/store/entityColorStore';
 
 const ENTITY_ICONS: Record<string, any> = {
     CHARACTER: User,
     NPC: Users,
     CREATURE: Users,
-    FACTION: Users,
+    FACTION: Globe,
     ORGANIZATION: Shield,
     NETWORK: Globe,
     LOCATION: MapPin,
@@ -49,7 +49,7 @@ const ENTITY_ICONS: Record<string, any> = {
                                 [style.color]="getColor(entity.kind)"
                             >
                                 <lucide-icon [img]="getIcon(entity.kind)" class="h-3.5 w-3.5"></lucide-icon>
-                                {{ entity.kind }}
+                                {{ displayKind(entity.kind) }}
                             </span>
                             <span class="rounded-full border border-cyan-300/15 bg-cyan-300/5 px-3 py-1 text-[11px] uppercase tracking-[0.18em] text-cyan-100/80">
                                 {{ sourceLabel() }}
@@ -325,7 +325,7 @@ const ENTITY_ICONS: Record<string, any> = {
                                 >
                                     <option value="">Choose target...</option>
                                     <option *ngFor="let target of relationshipTargets()" [value]="target.id">
-                                        {{ target.label }} · {{ target.kind }}
+                                        {{ target.label }} · {{ displayKind(target.kind) }}
                                     </option>
                                 </select>
                             </label>
@@ -633,7 +633,11 @@ export class GraphDetailComponent implements OnChanges {
     }
 
     readableKind(kind: string): string {
-        return String(kind || 'unknown').replace(/_/g, ' ').toLowerCase();
+        return this.displayKind(kind).replace(/_/g, ' ').toLowerCase();
+    }
+
+    displayKind(kind: string): string {
+        return normalizeEntityKind(kind) || String(kind || 'UNKNOWN').toUpperCase();
     }
 
     readableRelation(type: string): string {
