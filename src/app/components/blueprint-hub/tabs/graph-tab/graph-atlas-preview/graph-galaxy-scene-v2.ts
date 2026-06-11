@@ -8,6 +8,7 @@ import {
     type GalaxyHybridBusemannReceipt,
     type GalaxyHybridShellReceipt,
     type GalaxyNode,
+    type GalaxyRelationControl,
     type GalaxyScene,
     type GalaxyBusemannHorosphereSpec,
 } from './graph-galaxy-engine';
@@ -64,6 +65,27 @@ export interface GalaxyBusemannHorosphereView {
     opacity: number;
 }
 
+export interface GalaxyRelationControlView {
+    id: string;
+    label: string;
+    kind: string;
+    family: string;
+    noteIds: string[];
+    chunkIds: string[];
+    entityIds: string[];
+    eventIds: string[];
+    ownerEntityId: string;
+    regionId: string;
+    sourceNodeIds: string[];
+    targetNodeIds: string[];
+    evidenceNodeIds: string[];
+    participantNodeIds: string[];
+    edgeIds: string[];
+    position3d: [number, number, number];
+    color: { r: number; g: number; b: number };
+    confidence: number;
+}
+
 export interface GalaxyHybridShellReceiptView {
     lane: string;
     phase: number;
@@ -108,6 +130,7 @@ export interface GalaxySceneV2 {
     groups: GalaxySceneGroupView[];
     hopfRibbons: GalaxyHopfRibbonView[];
     lorentzGuides: GalaxyLorentzGuideView[];
+    relationControls?: GalaxyRelationControlView[];
     busemannHorospheres?: GalaxyBusemannHorosphereView[];
     hybridShellPositions?: Float32Array;
     hybridCommitmentPositions?: Float32Array;
@@ -214,6 +237,7 @@ export function galaxySceneToV2(scene: GalaxyScene, sourceMode: GalaxySceneSourc
         groups: scene.groups.map(groupView),
         hopfRibbons: (scene.hopfRibbons ?? []).map(hopfRibbonView),
         lorentzGuides: (scene.lorentzGuides ?? []).map(lorentzGuideView),
+        relationControls: scene.relationControls?.map(relationControlView),
         busemannHorospheres: (scene.busemannHorospheres ?? []).map(busemannHorosphereView),
         hybridShellPositions,
         hybridCommitmentPositions,
@@ -228,6 +252,29 @@ export function galaxySceneToV2(scene: GalaxyScene, sourceMode: GalaxySceneSourc
         edgeColors,
         edgeAlpha,
         edgeKinds,
+    };
+}
+
+function relationControlView(control: GalaxyRelationControl): GalaxyRelationControlView {
+    return {
+        id: control.id,
+        label: control.label,
+        kind: control.kind,
+        family: control.family,
+        noteIds: control.noteIds,
+        chunkIds: control.chunkIds,
+        entityIds: control.entityIds,
+        eventIds: control.eventIds,
+        ownerEntityId: control.ownerEntityId,
+        regionId: control.regionId,
+        sourceNodeIds: control.sourceNodeIds,
+        targetNodeIds: control.targetNodeIds,
+        evidenceNodeIds: control.evidenceNodeIds,
+        participantNodeIds: control.participantNodeIds,
+        edgeIds: control.edgeIds,
+        position3d: [control.x, control.y, control.z],
+        color: { r: control.r / 255, g: control.g / 255, b: control.b / 255 },
+        confidence: control.confidence,
     };
 }
 

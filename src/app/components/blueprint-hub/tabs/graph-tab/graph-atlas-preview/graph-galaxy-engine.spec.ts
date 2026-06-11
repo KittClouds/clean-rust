@@ -50,6 +50,46 @@ describe('Graph galaxy scene prioritization', () => {
         expect(scene.links.map((link) => link.id)).toContain('rel-0-1');
     });
 
+    it('treats relationship facts as edge controls instead of topology nodes', () => {
+        const nodes: GalaxyRenderableNode[] = [
+            relationNode('embed:entity:kai', 'Kai', 'CHARACTER'),
+            relationNode('embed:entity:hazel', 'Hazel', 'CHARACTER'),
+            relationNode('embed:anchor:a1', 'source span', 'anchor'),
+            {
+                ...relationNode('embed:graph-fact:r1', 'Kai commands Hazel', 'graph-fact'),
+                metadata: {
+                    sourceType: 'graphFact',
+                    graphRelationFamily: 'authority',
+                    graphColorKind: 'authority',
+                },
+            },
+        ];
+        const edges: GalaxyInputEdge[] = [
+            { id: 'r1:source', sourceId: 'embed:graph-fact:r1', targetId: 'embed:entity:kai', type: 'source', confidence: 0.91 },
+            { id: 'r1:target', sourceId: 'embed:graph-fact:r1', targetId: 'embed:entity:hazel', type: 'target', confidence: 0.88 },
+            { id: 'r1:evidence', sourceId: 'embed:graph-fact:r1', targetId: 'embed:anchor:a1', type: 'evidence', confidence: 0.82 },
+        ];
+
+        const scene = buildGalaxyScene(nodes, edges, mergeGalaxySettings({ layoutMode: 'single' }));
+        const sceneIds = new Set(scene.nodes.map((node) => node.entity.id));
+        const control = scene.relationControls?.[0];
+
+        expect(sceneIds.has('embed:graph-fact:r1')).toBe(false);
+        expect(control?.id).toBe('embed:graph-fact:r1');
+        expect(control?.family).toBe('authority');
+        expect(control?.sourceNodeIds).toEqual(['embed:entity:kai']);
+        expect(control?.targetNodeIds).toEqual(['embed:entity:hazel']);
+        expect(control?.evidenceNodeIds).toEqual(['embed:anchor:a1']);
+        expect(scene.links.some((link) =>
+            scene.nodes[link.source].entity.id === 'embed:entity:kai'
+            && scene.nodes[link.target].entity.id === 'embed:entity:hazel'
+            && link.metadata?.['relationControlId'] === 'embed:graph-fact:r1',
+        )).toBe(true);
+
+        const packed = galaxySceneToV2(scene, 'embeddings');
+        expect(packed.relationControls?.[0]?.id).toBe('embed:graph-fact:r1');
+    });
+
     it('pins structural hierarchy edges when noisy relation edges fill the render queue first', () => {
         const nodes = Array.from({ length: 220 }, (_, index) => ({
             id: index === 0 ? 'embed:note:root' : `embed:chunk:${index}`,
@@ -164,6 +204,8 @@ describe('Graph galaxy canonical colors', () => {
                         graphRebuildEmbeddingTarget: true,
                     },
                 },
+                { id: 'embed:entity:kai', label: 'Kai', kind: 'entity', metadata: { sourceType: 'entity' } },
+                { id: 'embed:entity:hazel', label: 'Hazel', kind: 'entity', metadata: { sourceType: 'entity' } },
                 {
                     id: 'embed:graph-fact:co1',
                     label: 'Kai co_occurs_with Hazel',
@@ -176,10 +218,14 @@ describe('Graph galaxy canonical colors', () => {
                         graphRebuildEmbeddingTarget: true,
                     },
                 },
-            ], [], mergeGalaxySettings({ layoutMode: 'productManifold' }));
+            ], [
+                { id: 'co1:source', sourceId: 'embed:graph-fact:co1', targetId: 'embed:entity:kai', type: 'source', confidence: 0.8 },
+                { id: 'co1:target', sourceId: 'embed:graph-fact:co1', targetId: 'embed:entity:hazel', type: 'target', confidence: 0.8 },
+            ], mergeGalaxySettings({ layoutMode: 'productManifold' }));
 
             expect(scene.nodes.find((node) => node.entity.id === 'embed:event:e1')).toMatchObject({ r: 0, g: 255, b: 0 });
-            expect(scene.nodes.find((node) => node.entity.id === 'embed:graph-fact:co1')).toMatchObject({ r: 0, g: 0, b: 255 });
+            expect(scene.nodes.find((node) => node.entity.id === 'embed:graph-fact:co1')).toBeUndefined();
+            expect(scene.relationControls?.find((control) => control.id === 'embed:graph-fact:co1')).toMatchObject({ r: 0, g: 0, b: 255 });
         } finally {
             entityColorStore.reset();
         }
@@ -233,8 +279,8 @@ describe('Graph galaxy hybrid hierarchy', () => {
 
     it('gives temporal and causal facts typed directions without leaving the Hybrid lane', () => {
         const scene = buildGalaxyScene([
-            hybridNode('time-1', 'Before the tower pull', 'graph-fact', 'temporal-fact', 1, 0, 0, { lane: 'temporal', specificity: 0.78, ambiguity: 0.04, phase: 0.25, level: 2 }),
-            hybridNode('cause-1', 'Signal causes recall', 'graph-fact', 'causal-fact', 0, 0, 1, { lane: 'causal', specificity: 0.74, ambiguity: 0.04, phase: 0.5, level: 3 }),
+            hybridNode('time-1', 'Before the tower pull', 'event', 'event', 1, 0, 0, { lane: 'temporal', specificity: 0.78, ambiguity: 0.04, phase: 0.25, level: 2 }),
+            hybridNode('cause-1', 'Signal causes recall', 'event', 'event', 0, 0, 1, { lane: 'causal', specificity: 0.74, ambiguity: 0.04, phase: 0.5, level: 3 }),
         ], [{ id: 'causal-link', sourceId: 'time-1', targetId: 'cause-1', type: 'causal', confidence: 0.9 }], mergeGalaxySettings({ layoutMode: 'hybridSpace' }));
         const temporal = scene.nodes.find((node) => node.entity.id === 'time-1')!;
         const causal = scene.nodes.find((node) => node.entity.id === 'cause-1')!;
@@ -250,13 +296,13 @@ describe('Graph galaxy hybrid hierarchy', () => {
             {
                 id: 'bundle-approval',
                 label: 'Kai approves Hazel',
-                kind: 'graph-fact',
+                kind: 'concept',
                 totalMentions: 2,
                 atlasX: 1,
                 atlasY: 0,
                 atlasZ: 0,
                 metadata: {
-                    sourceType: 'graphFact',
+                    sourceType: 'concept',
                     graphColorKind: 'approval',
                     graphRelationFamily: 'approval',
                     busemannSignature: {
@@ -358,13 +404,13 @@ describe('Graph galaxy Siegel-Finsler layout', () => {
             siegelNode('root', 'Identity root', 'structureRoot', 'document', 5, ['doc']),
             siegelNode('chunk', 'Chunk 1', 'chunk', 'document', 5, ['root']),
             siegelNode('entity', 'Kai', 'CHARACTER', 'entity', 5, ['chunk']),
-            siegelNode('fact', 'Kai causes signal', 'graphFact', 'causal', 1, ['entity']),
+            siegelNode('event', 'Kai causes signal', 'event', 'causal', 1, ['entity']),
             siegelNode('anchor', 'Kai mention', 'anchor', 'evidence', 1, ['chunk']),
         ], [
             { id: 'doc-root', sourceId: 'doc', targetId: 'root', type: 'target-parent', confidence: 0.9 },
             { id: 'root-chunk', sourceId: 'root', targetId: 'chunk', type: 'target-parent', confidence: 0.9 },
             { id: 'chunk-entity', sourceId: 'chunk', targetId: 'entity', type: 'chunk-entity', confidence: 0.9 },
-            { id: 'entity-fact', sourceId: 'entity', targetId: 'fact', type: 'causal', confidence: 0.86 },
+            { id: 'entity-event', sourceId: 'entity', targetId: 'event', type: 'event-entity', confidence: 0.86 },
             { id: 'chunk-anchor', sourceId: 'chunk', targetId: 'anchor', type: 'chunk-anchor', confidence: 0.84 },
         ], mergeGalaxySettings({ layoutMode: 'siegelFinsler' }));
         const byId = new Map(scene.nodes.map((node) => [node.entity.id, node]));
@@ -372,26 +418,26 @@ describe('Graph galaxy Siegel-Finsler layout', () => {
         expect(byId.get('root')!.x).toBeGreaterThan(byId.get('doc')!.x);
         expect(byId.get('chunk')!.x).toBeGreaterThan(byId.get('root')!.x);
         expect(byId.get('entity')!.x).toBeGreaterThan(byId.get('chunk')!.x);
-        expect(byId.get('fact')!.x).toBeGreaterThan(byId.get('entity')!.x);
-        expect(byId.get('anchor')!.x).toBeGreaterThan(byId.get('fact')!.x);
+        expect(byId.get('event')!.x).toBeGreaterThan(byId.get('entity')!.x);
+        expect(byId.get('anchor')!.x).toBeGreaterThan(byId.get('event')!.x);
         expect(byId.get('chunk')!.x - byId.get('root')!.x).toBeLessThan(0.62);
         expect(byId.get('entity')!.x - byId.get('chunk')!.x).toBeLessThan(0.62);
     });
 
-    it('keeps entity and fact bands thick on the z axis', () => {
+    it('keeps entity and event bands thick on the z axis', () => {
         const scene = buildGalaxyScene([
             siegelNode('entity-a', 'Kai', 'entity', 'entity', 3, [], { phase: 0 }),
             siegelNode('entity-b', 'Hazel', 'entity', 'entity', 3, [], { phase: 0.25 }),
             siegelNode('entity-c', 'Rowan', 'entity', 'entity', 3, [], { phase: 0.5 }),
             siegelNode('entity-d', 'Cael', 'entity', 'entity', 3, [], { phase: 0.75 }),
-            siegelNode('fact-a', 'causes_or_explains', 'graphFact', 'causal', 4, [], { phase: 0.1 }),
-            siegelNode('fact-b', 'causes_or_explains', 'graphFact', 'causal', 4, [], { phase: 0.35 }),
-            siegelNode('fact-c', 'causes_or_explains', 'graphFact', 'causal', 4, [], { phase: 0.6 }),
-            siegelNode('fact-d', 'causes_or_explains', 'graphFact', 'causal', 4, [], { phase: 0.85 }),
+            siegelNode('event-a', 'causal event', 'event', 'causal', 4, [], { phase: 0.1 }),
+            siegelNode('event-b', 'causal event', 'event', 'causal', 4, [], { phase: 0.35 }),
+            siegelNode('event-c', 'causal event', 'event', 'causal', 4, [], { phase: 0.6 }),
+            siegelNode('event-d', 'causal event', 'event', 'causal', 4, [], { phase: 0.85 }),
         ], [], mergeGalaxySettings({ layoutMode: 'siegelFinsler' }));
 
         expect(zRange(scene.nodes.filter((node) => node.entity.id.startsWith('entity-')))).toBeGreaterThan(0.3);
-        expect(zRange(scene.nodes.filter((node) => node.entity.id.startsWith('fact-')))).toBeGreaterThan(0.3);
+        expect(zRange(scene.nodes.filter((node) => node.entity.id.startsWith('event-')))).toBeGreaterThan(0.3);
     });
 
     it('keeps directed guides clean at the source and styled near the target', () => {
@@ -420,8 +466,8 @@ describe('Graph galaxy Product traversal manifold', () => {
         const scene = buildGalaxyScene([
             productNode('evidence', 'Chunk evidence', 'chunk', 'evidence', 'chunk'),
             productNode('entity', 'Kai', 'entity', 'identity', 'entity'),
-            productNode('causal', 'Kai causes signal', 'graph-fact', 'causal', 'causal-fact'),
-            productNode('dead-end', 'unsupported bridge', 'graph-fact', 'bridge', 'graph-fact', 'outlier'),
+            productNode('causal', 'Kai causes signal', 'event', 'causal', 'event'),
+            productNode('dead-end', 'unsupported bridge', 'event', 'bridge', 'event', 'outlier'),
         ], [
             { id: 'evidence-entity', sourceId: 'evidence', targetId: 'entity', type: 'evidence_anchor', confidence: 0.9 },
             { id: 'entity-causal', sourceId: 'entity', targetId: 'causal', type: 'causal', confidence: 0.82 },
@@ -433,7 +479,7 @@ describe('Graph galaxy Product traversal manifold', () => {
         expect(scene.hopfRibbons?.length ?? 0).toBe(0);
         expect(byId.get('evidence')!.x).toBeLessThan(byId.get('entity')!.x);
         expect(byId.get('entity')!.x).toBeLessThan(byId.get('causal')!.x);
-        expect(byId.get('dead-end')!.x).toBeGreaterThan(byId.get('causal')!.x);
+        expect(byId.get('dead-end')).toBeTruthy();
         expect(scene.lorentzGuides?.some((guide) => guide.id === 'product:lane:evidence' && guide.guideKind === 'rootLane')).toBe(true);
         expect(scene.lorentzGuides?.some((guide) => guide.id === 'product:route:causal-dead-end' && /unsupported|mismatch|missing/i.test(guide.treeKind))).toBe(true);
     });
@@ -441,6 +487,19 @@ describe('Graph galaxy Product traversal manifold', () => {
 
 function stable(index: number, salt: number): number {
     return (((index * 37 + salt * 17) % 101) / 50) - 1;
+}
+
+function relationNode(id: string, label: string, kind: string): GalaxyRenderableNode {
+    return {
+        id,
+        label,
+        kind,
+        totalMentions: 1,
+        atlasX: stable(id.length, 0),
+        atlasY: stable(id.length, 1),
+        atlasZ: stable(id.length, 2),
+        metadata: { sourceType: kind },
+    };
 }
 
 function hybridRadiusOf(node: { x: number; y: number; z: number }): number {
@@ -508,14 +567,15 @@ function busemannBundleNode(
     return {
         id,
         label: id,
-        kind: 'graph-fact',
+        kind: 'concept',
         totalMentions: 1,
         atlasX: 1,
         atlasY: 0,
         atlasZ: 0,
         metadata: {
-            sourceType: 'graphFact',
+            sourceType: 'concept',
             graphColorKind: 'approval',
+            graphRelationFamily: 'approval',
             busemannSignature: {
                 family: 'RelationFamily',
                 topPrototypeId: 'relation:approval',

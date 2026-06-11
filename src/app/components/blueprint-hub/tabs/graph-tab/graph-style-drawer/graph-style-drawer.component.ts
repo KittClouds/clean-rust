@@ -36,9 +36,9 @@ const ENTITY_CATEGORIES: EntityCategory[] = [
 ];
 
 const GRAPH_NODE_COLOR_CATEGORIES: GraphNodeColorCategory[] = [
-    { name: 'Fact families', kinds: ['cooccurrence', 'observation', 'communication', 'authority', 'approval', 'relationship'] },
-    { name: 'Narrative facts', kinds: ['family', 'intimacy', 'transfer', 'causal', 'temporal', 'scenePresence'] },
-    { name: 'Projection structure', kinds: ['document', 'chunk', 'anchor', 'graphFact', 'eventNode', 'temporalFact', 'causalFact', 'memoryState'] },
+    { name: 'Relationship colors', kinds: ['cooccurrence', 'observation', 'communication', 'authority', 'approval', 'relationship'] },
+    { name: 'Story relationships', kinds: ['family', 'intimacy', 'transfer', 'causal', 'temporal', 'scenePresence'] },
+    { name: 'Story structure', kinds: ['document', 'chunk', 'anchor', 'graphFact', 'eventNode', 'temporalFact', 'causalFact', 'memoryState'] },
 ];
 
 const GRAPH_NODE_COLOR_LABELS: Record<GraphNodeColorKind, string> = {
@@ -54,14 +54,14 @@ const GRAPH_NODE_COLOR_LABELS: Record<GraphNodeColorKind, string> = {
     causal: 'Causal',
     temporal: 'Temporal',
     relationship: 'Relationship',
-    document: 'Document atom',
-    chunk: 'Chunk atom',
-    anchor: 'Evidence anchor',
-    graphFact: 'Fact vertex',
-    eventNode: 'Event atom',
-    temporalFact: 'Temporal fact vertex',
-    causalFact: 'Causal fact vertex',
-    memoryState: 'Memory state atom',
+    document: 'Document',
+    chunk: 'Chunk',
+    anchor: 'Evidence',
+    graphFact: 'Relationship midpoint',
+    eventNode: 'Event',
+    temporalFact: 'Timeline midpoint',
+    causalFact: 'Cause midpoint',
+    memoryState: 'Memory state',
 };
 
 const MODE_ORDER: HighlightMode[] = ['vivid', 'gradient', 'subtle', 'clean', 'focus', 'off'];

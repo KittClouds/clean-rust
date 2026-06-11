@@ -17,6 +17,7 @@ import {
     hopfDirectionFromMetadata,
     type HopfReceiptBase,
 } from './graph-galaxy-hopf-receipts';
+import { relationFamilyFromText } from './graph-relation-visual-style';
 
 export type GalaxyLabelMode = 'hover' | 'selected' | 'important' | 'always' | 'off';
 export type GalaxyEdgeMode = 'curved' | 'straight' | 'tube' | 'hidden';
@@ -275,6 +276,28 @@ export interface GalaxyEdge {
     metadata?: Record<string, unknown>;
 }
 
+export interface GalaxyRelationControl extends Rgb {
+    id: string;
+    label: string;
+    kind: string;
+    family: string;
+    noteIds: string[];
+    chunkIds: string[];
+    entityIds: string[];
+    eventIds: string[];
+    ownerEntityId: string;
+    regionId: string;
+    sourceNodeIds: string[];
+    targetNodeIds: string[];
+    evidenceNodeIds: string[];
+    participantNodeIds: string[];
+    edgeIds: string[];
+    x: number;
+    y: number;
+    z: number;
+    confidence: number;
+}
+
 export interface GalaxyGroup extends Rgb {
     id: string;
     label: string;
@@ -311,6 +334,7 @@ export interface GalaxyScene {
     links: GalaxyEdge[];
     layoutMode: GalaxyLayoutMode;
     groups: GalaxyGroup[];
+    relationControls?: GalaxyRelationControl[];
     hopfRibbons?: GalaxyHopfRibbon[];
     lorentzGuides?: GalaxyLorentzGuide[];
     busemannHorospheres?: GalaxyBusemannHorosphereSpec[];
@@ -376,8 +400,9 @@ export function buildGalaxyScene(
     edges: GalaxyInputEdge[],
     settings: GalaxyRenderSettings,
 ): GalaxyScene {
-    const entities = orderEntitiesForStableRender(entitiesInput);
-    assertNoImplicitNodeDrop(entitiesInput.length, entities.length);
+    const relationPlan = compileRelationControlPlan(entitiesInput, edges);
+    const entities = orderEntitiesForStableRender(relationPlan.nodes);
+    assertNoImplicitNodeDrop(relationPlan.nodes.length, entities.length);
     const preserveAtlasLayout = shouldPreserveAtlasLayout(entities);
     const idToIndex = new Map<string, number>();
     const nodes = entities.map((entity, index) => {
@@ -408,51 +433,51 @@ export function buildGalaxyScene(
         };
     });
 
-    const links = buildLinks(edges, idToIndex);
+    const links = buildLinks(relationPlan.edges, idToIndex);
     applyEmbeddingTopologyLens(nodes, links, settings);
     if (settings.layoutMode === 'hybridSpace') {
         applyGalaxyMetadata(nodes);
         applyHybridSpaceLayout(nodes, links);
         const busemannHorospheres = applyBusemannCommitmentOverlay(nodes, settings);
-        return { nodes, links, layoutMode: 'hybridSpace', groups: [], busemannHorospheres };
+        return attachRelationControls({ nodes, links, layoutMode: 'hybridSpace', groups: [], busemannHorospheres }, relationPlan.controls);
     }
 
     if (settings.layoutMode === 'hopfProjection') {
         applyGalaxyMetadata(nodes);
         const hopfRibbons = applyHopfProjectionLayout(nodes, links);
-        return { nodes, links, layoutMode: 'hopfProjection', groups: [], hopfRibbons };
+        return attachRelationControls({ nodes, links, layoutMode: 'hopfProjection', groups: [], hopfRibbons }, relationPlan.controls);
     }
 
     if (settings.layoutMode === 'lorentzTree') {
         applyGalaxyMetadata(nodes);
         const lorentzGuides = applyLorentzTreeLayout(nodes, links);
-        return { nodes, links, layoutMode: 'lorentzTree', groups: [], lorentzGuides };
+        return attachRelationControls({ nodes, links, layoutMode: 'lorentzTree', groups: [], lorentzGuides }, relationPlan.controls);
     }
 
     if (settings.layoutMode === 'productManifold') {
         applyGalaxyMetadata(nodes);
         const lorentzGuides = applyProductConsensusLayout(nodes, links);
-        return { nodes, links, layoutMode: 'productManifold', groups: [], lorentzGuides };
+        return attachRelationControls({ nodes, links, layoutMode: 'productManifold', groups: [], lorentzGuides }, relationPlan.controls);
     }
 
     if (settings.layoutMode === 'siegelFinsler') {
         applyGalaxyMetadata(nodes);
         const lorentzGuides = applySiegelFinslerLayout(nodes, links);
-        return { nodes, links, layoutMode: 'siegelFinsler', groups: [], lorentzGuides };
+        return attachRelationControls({ nodes, links, layoutMode: 'siegelFinsler', groups: [], lorentzGuides }, relationPlan.controls);
     }
 
     const groupPlan = settings.layoutMode === 'multiGalaxy' ? buildGroupPlan(nodes) : [];
     if (groupPlan.length > 1) {
         applyGalaxyMetadata(nodes);
         const groups = applyMultiGalaxyLayout(nodes, links, groupPlan);
-        return { nodes, links, layoutMode: 'multiGalaxy', groups };
+        return attachRelationControls({ nodes, links, layoutMode: 'multiGalaxy', groups }, relationPlan.controls);
     }
 
     if (!preserveAtlasLayout) {
         relaxNodes(nodes, links, settings);
     }
     applyGalaxyMetadata(nodes);
-    return { nodes, links, layoutMode: 'single', groups: [] };
+    return attachRelationControls({ nodes, links, layoutMode: 'single', groups: [] }, relationPlan.controls);
 }
 
 function hasAtlasSeed(entity: GalaxyRenderableNode): boolean {
@@ -461,6 +486,305 @@ function hasAtlasSeed(entity: GalaxyRenderableNode): boolean {
 
 function shouldPreserveAtlasLayout(entities: GalaxyRenderableNode[]): boolean {
     return entities.length > 0 && entities.every(hasAtlasSeed);
+}
+
+interface RelationControlDraft {
+    id: string;
+    label: string;
+    kind: string;
+    family: string;
+    noteIds: string[];
+    chunkIds: string[];
+    entityIds: string[];
+    eventIds: string[];
+    ownerEntityId: string;
+    sourceNodeIds: string[];
+    targetNodeIds: string[];
+    evidenceNodeIds: string[];
+    participantNodeIds: string[];
+    edgeIds: string[];
+    confidence: number;
+}
+
+interface RelationControlPlan {
+    nodes: GalaxyRenderableNode[];
+    edges: GalaxyInputEdge[];
+    controls: RelationControlDraft[];
+}
+
+export function hasRelationControlNodes(entities: GalaxyRenderableNode[]): boolean {
+    return entities.some(isRelationControlNode);
+}
+
+function compileRelationControlPlan(entities: GalaxyRenderableNode[], edges: GalaxyInputEdge[]): RelationControlPlan {
+    const factNodes = new Map(entities.filter(isRelationControlNode).map((node) => [node.id, node]));
+    if (!factNodes.size) return { nodes: entities, edges, controls: [] };
+    const controls = new Map<string, RelationControlDraft>();
+    for (const fact of factNodes.values()) controls.set(fact.id, relationControlDraft(fact));
+    const topologyEdges: GalaxyInputEdge[] = [];
+    for (const edge of edges) {
+        const sourceFact = factNodes.has(edge.sourceId);
+        const targetFact = factNodes.has(edge.targetId);
+        if (!sourceFact && !targetFact) {
+            topologyEdges.push(edge);
+            continue;
+        }
+        if (sourceFact && !targetFact) addRelationRole(controls.get(edge.sourceId), edge, edge.targetId, edge.type);
+        if (targetFact && !sourceFact) addRelationRole(controls.get(edge.targetId), edge, edge.sourceId, edge.type);
+    }
+    const activeControls = [...controls.values()].filter((control) => uniqueControlIds(control.participantNodeIds).length > 1);
+    for (const control of activeControls) {
+        for (const [sourceId, targetId] of relationEndpointPairs(control)) {
+            topologyEdges.push({
+                id: `relation-control:${control.id}:${sourceId}:${targetId}`,
+                sourceId,
+                targetId,
+                type: control.family || control.label || 'relationship',
+                confidence: control.confidence,
+                metadata: {
+                    relationControl: true,
+                    relationControlId: control.id,
+                    relationFamily: control.family,
+                    relationLabel: control.label,
+                    noteIds: control.noteIds,
+                    chunkIds: control.chunkIds,
+                    entityIds: control.entityIds,
+                    eventIds: control.eventIds,
+                    ownerEntityId: control.ownerEntityId,
+                    sourceNodeIds: control.sourceNodeIds,
+                    targetNodeIds: control.targetNodeIds,
+                    evidenceNodeIds: control.evidenceNodeIds,
+                },
+            });
+        }
+    }
+    return {
+        nodes: entities.filter((node) => !factNodes.has(node.id)),
+        edges: topologyEdges,
+        controls: activeControls,
+    };
+}
+
+function isRelationControlNode(entity: GalaxyRenderableNode): boolean {
+    const rawSourceType = stringValue(entity.metadata?.['sourceType']);
+    const sourceType = relationKindKey(rawSourceType || stringValue(entity.kind));
+    if (sourceType === 'graph-fact' || sourceType === 'temporal-fact' || sourceType === 'causal-fact') return true;
+    return !rawSourceType && /^embed:(graph-fact|temporalFact|causalFact):/.test(entity.id);
+}
+
+function relationControlDraft(fact: GalaxyRenderableNode): RelationControlDraft {
+    const metadata = fact.metadata || {};
+    const family = firstGraphNodeColorKind(
+        stringValue(metadata['graphRelationFamily']),
+        stringValue(metadata['graphColorKind']),
+        stringValue(metadata['signalLane']),
+        stringValue(metadata['productLaneKind']),
+        relationFamilyFromText(fact.label, metadata['preview']) || undefined,
+        fact.kind,
+    ) || 'graphFact';
+    const draft: RelationControlDraft = {
+        id: fact.id,
+        label: fact.label || fact.id,
+        kind: relationKindKey(stringValue(metadata['sourceType'] || fact.kind)),
+        family,
+        noteIds: uniqueControlIds([stringValue(metadata['noteId']), ...arrayStringValues(metadata['supportNoteIds'])]),
+        chunkIds: uniqueControlIds([stringValue(metadata['chunkId']), ...arrayStringValues(metadata['supportChunkIds'])]),
+        entityIds: uniqueControlIds([stringValue(metadata['sourceEntityId']), stringValue(metadata['entityId']), stringValue(metadata['canonicalEntityId'])]),
+        eventIds: uniqueControlIds([stringValue(metadata['eventId']), stringValue(metadata['sourceEventId']), stringValue(metadata['targetEventId'])]),
+        ownerEntityId: stringValue(metadata['sourceEntityId'] || metadata['entityId'] || metadata['canonicalEntityId']),
+        sourceNodeIds: [],
+        targetNodeIds: [],
+        evidenceNodeIds: [],
+        participantNodeIds: [],
+        edgeIds: [],
+        confidence: 0,
+    };
+    for (const parentId of relationParentIds(fact)) {
+        addControlId(draft.participantNodeIds, parentId);
+        addControlContext(draft, parentId);
+        if (/^embed:(entity|event):/.test(parentId)) addControlId(draft.sourceNodeIds, parentId);
+        if (/^embed:(chunk|anchor):/.test(parentId)) addControlId(draft.evidenceNodeIds, parentId);
+    }
+    return draft;
+}
+
+function relationParentIds(fact: GalaxyRenderableNode): string[] {
+    const metadata = fact.metadata || {};
+    const lorentz = (metadata['lorentz'] || {}) as Record<string, unknown>;
+    return uniqueControlIds([
+        ...arrayStringValues(metadata['signalParentIds']),
+        ...arrayStringValues(metadata['parentIds']),
+        stringValue(lorentz['parentNodeId']),
+    ]);
+}
+
+function addRelationRole(control: RelationControlDraft | undefined, edge: GalaxyInputEdge, nodeId: string, roleValue: string): void {
+    if (!control || isRelationControlId(nodeId)) return;
+    const role = relationRole(roleValue);
+    addControlId(control.participantNodeIds, nodeId);
+    addControlId(control.edgeIds, edge.id);
+    addControlContext(control, nodeId);
+    control.confidence = Math.max(control.confidence, edge.confidence || 0.55);
+    if (role === 'source') addControlId(control.sourceNodeIds, nodeId);
+    else if (role === 'target') addControlId(control.targetNodeIds, nodeId);
+    else if (role === 'evidence') addControlId(control.evidenceNodeIds, nodeId);
+}
+
+function relationRole(value: string): 'source' | 'target' | 'evidence' | 'other' {
+    const role = String(value || '').toLowerCase();
+    if (/evidence|anchor|support/.test(role)) return 'evidence';
+    if (/target|effect|listener|object|state|location|time/.test(role)) return 'target';
+    if (/source|cause|subject|actor|speaker|left/.test(role)) return 'source';
+    return 'other';
+}
+
+function relationEndpointPairs(control: RelationControlDraft): Array<[string, string]> {
+    const sources = uniqueControlIds(control.sourceNodeIds.length ? control.sourceNodeIds : control.participantNodeIds);
+    const targets = uniqueControlIds(control.targetNodeIds);
+    const pairs: Array<[string, string]> = [];
+    if (sources.length && targets.length) {
+        for (const source of sources) {
+            for (const target of targets) {
+                if (source !== target) pairs.push([source, target]);
+                if (pairs.length >= 16) return pairs;
+            }
+        }
+        return pairs;
+    }
+    const participants = uniqueControlIds(control.participantNodeIds);
+    for (let left = 0; left < participants.length; left++) {
+        for (let right = left + 1; right < participants.length; right++) {
+            pairs.push([participants[left], participants[right]]);
+            if (pairs.length >= 16) return pairs;
+        }
+    }
+    return pairs;
+}
+
+function attachRelationControls(scene: GalaxyScene, drafts: RelationControlDraft[]): GalaxyScene {
+    if (!drafts.length) return scene;
+    const byId = new Map(scene.nodes.map((node) => [node.entity.id, node]));
+    const controls = drafts
+        .map((draft) => materializeRelationControl(draft, byId))
+        .filter((control): control is GalaxyRelationControl => !!control);
+    return controls.length ? { ...scene, relationControls: controls } : scene;
+}
+
+function materializeRelationControl(draft: RelationControlDraft, byId: Map<string, GalaxyNode>): GalaxyRelationControl | null {
+    const participantIds = uniqueControlIds(draft.participantNodeIds).filter((id) => byId.has(id));
+    if (participantIds.length < 2) return null;
+    const anchors = uniqueControlIds([...draft.sourceNodeIds, ...draft.targetNodeIds]).filter((id) => byId.has(id));
+    const positionIds = anchors.length >= 2 ? anchors : participantIds;
+    const point = averageNodePosition(positionIds, byId);
+    const color = hslToRgb(entityColorStore.getRawGraphNodeHsl(draft.family));
+    const context = materializeRelationContext(draft, participantIds, byId);
+    return {
+        ...color,
+        ...draft,
+        ...context,
+        sourceNodeIds: draft.sourceNodeIds.filter((id) => byId.has(id)),
+        targetNodeIds: draft.targetNodeIds.filter((id) => byId.has(id)),
+        evidenceNodeIds: draft.evidenceNodeIds.filter((id) => byId.has(id)),
+        participantNodeIds: participantIds,
+        x: point.x,
+        y: point.y,
+        z: point.z,
+        confidence: draft.confidence || 0.55,
+    };
+}
+
+function addControlContext(control: RelationControlDraft, nodeId: string): void {
+    addControlId(control.noteIds, nodeId.match(/^embed:note:(.+)$/)?.[1] || nodeId.match(/^embed:structure-root:([^:]+)/)?.[1] || '');
+    addControlId(control.chunkIds, nodeId.match(/^embed:chunk:(.+)$/)?.[1] || '');
+    addControlId(control.entityIds, entityIdFromNodeId(nodeId));
+    addControlId(control.eventIds, nodeId.match(/^embed:event:(.+)$/)?.[1] || '');
+}
+
+function materializeRelationContext(
+    draft: RelationControlDraft,
+    participantIds: string[],
+    byId: Map<string, GalaxyNode>,
+): Pick<GalaxyRelationControl, 'noteIds' | 'chunkIds' | 'entityIds' | 'eventIds' | 'ownerEntityId' | 'regionId'> {
+    const noteIds = [...draft.noteIds];
+    const chunkIds = [...draft.chunkIds];
+    const entityIds = [...draft.entityIds];
+    const eventIds = [...draft.eventIds];
+    let ownerEntityId = draft.ownerEntityId;
+    for (const id of participantIds) {
+        const node = byId.get(id);
+        const ownership = (node?.entity.metadata?.['productOwnership'] || {}) as Record<string, unknown>;
+        mergeControlContext(noteIds, arrayStringValues(ownership['noteIds']));
+        mergeControlContext(chunkIds, arrayStringValues(ownership['chunkIds']));
+        mergeControlContext(entityIds, arrayStringValues(ownership['entityIds']));
+        mergeControlContext(eventIds, arrayStringValues(ownership['eventIds']));
+        addControlId(noteIds, stringValue(node?.entity.metadata?.['noteId']));
+        addControlId(chunkIds, stringValue(node?.entity.metadata?.['chunkId']));
+        addControlId(entityIds, stringValue(node?.entity.metadata?.['sourceEntityId'] || node?.entity.metadata?.['entityId'] || node?.entity.metadata?.['canonicalEntityId']));
+        addControlId(entityIds, entityIdFromNodeId(id));
+        addControlId(eventIds, id.match(/^embed:event:(.+)$/)?.[1] || '');
+        if (!ownerEntityId) ownerEntityId = stringValue(ownership['ownerEntityId']) || entityIdFromNodeId(id);
+    }
+    const note = uniqueControlIds(noteIds)[0] || 'global';
+    const chunk = uniqueControlIds(chunkIds)[0] || '';
+    const owner = ownerEntityId || uniqueControlIds(entityIds)[0] || '';
+    const regionId = chunk
+        ? `product:story:${note}:chunk:${chunk}${owner ? `:owner:${owner}` : ''}`
+        : owner
+            ? `product:story:${note}:owner:${owner}`
+            : `product:story:${note}:signals:${draft.family || draft.kind || 'relationship'}`;
+    return {
+        noteIds: uniqueControlIds(noteIds),
+        chunkIds: uniqueControlIds(chunkIds),
+        entityIds: uniqueControlIds(entityIds),
+        eventIds: uniqueControlIds(eventIds),
+        ownerEntityId: owner,
+        regionId,
+    };
+}
+
+function mergeControlContext(target: string[], source: string[]): void {
+    for (const item of source) addControlId(target, item);
+}
+
+function entityIdFromNodeId(id: string): string {
+    return id.match(/^embed:entity:(.+)$/)?.[1] || '';
+}
+
+function averageNodePosition(ids: string[], byId: Map<string, GalaxyNode>): { x: number; y: number; z: number } {
+    let x = 0, y = 0, z = 0, count = 0;
+    for (const id of ids) {
+        const node = byId.get(id);
+        if (!node) continue;
+        x += node.x;
+        y += node.y;
+        z += node.z;
+        count += 1;
+    }
+    return count ? { x: x / count, y: y / count, z: z / count } : { x: 0, y: 0, z: 0 };
+}
+
+function addControlId(ids: string[], id: string): void {
+    if (id && !ids.includes(id)) ids.push(id);
+}
+
+function uniqueControlIds(ids: string[]): string[] {
+    return [...new Set(ids.filter(Boolean))].sort();
+}
+
+function arrayStringValues(value: unknown): string[] {
+    return Array.isArray(value) ? value.map((item) => stringValue(item)).filter(Boolean) : [];
+}
+
+function isRelationControlId(id: string): boolean {
+    return /^embed:(graph-fact|temporalFact|causalFact):/.test(id);
+}
+
+function relationKindKey(value: string): string {
+    const key = String(value || '').replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+    if (/graph[-_]?fact|relationship/.test(key)) return 'graph-fact';
+    if (/temporal[-_]?fact/.test(key)) return 'temporal-fact';
+    if (/causal[-_]?fact/.test(key)) return 'causal-fact';
+    return key.replace(/_/g, '-');
 }
 
 export function stableUnit(value: string): number {

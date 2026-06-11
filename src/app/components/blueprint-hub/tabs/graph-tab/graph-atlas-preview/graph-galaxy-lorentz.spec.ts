@@ -49,7 +49,7 @@ describe('Lorentz tree galaxy visualization data', () => {
         const scene = buildGalaxyScene([
             capNode('doc', 'Document', 'note', 0.18, 0.66, 'documentStructure', [0.05, 0.1, 1]),
             capNode('chunk', 'Sharp chunk', 'chunk', 0.93, 0.18, 'documentStructure', [0.12, 0.18, 1]),
-            capNode('cause', 'Cause bridge', 'causalFact', 0.76, 0.34, 'causal', [1, -0.2, 0.22]),
+            capNode('cause', 'Cause bridge', 'event', 0.76, 0.34, 'causal', [1, -0.2, 0.22]),
         ], [
             { id: 'doc-chunk', sourceId: 'doc', targetId: 'chunk', type: 'note-chunk', confidence: 0.9 },
             { id: 'chunk-cause', sourceId: 'chunk', targetId: 'cause', type: 'causal', confidence: 0.84 },
@@ -63,19 +63,19 @@ describe('Lorentz tree galaxy visualization data', () => {
         expect(scene.lorentzGuides?.some((guide) => guide.treeKind === 'causal')).toBe(true);
     });
 
-    it('keeps canon entities outside derived facts and context in hierarchy caps', () => {
+    it('keeps canon entities outside derived signals and context in hierarchy caps', () => {
         const scene = buildGalaxyScene([
             capNode('kai', 'Kai', 'entity', 0.86, 0.08, 'entity', [0.2, 0.1, 1], 0.94, 'CHARACTER'),
-            capNode('fact', 'Kai trusts Hazel', 'graphFact', 0.68, 0.24, 'relationship', [0.2, 0.1, 1], 0.72),
+            capNode('signal', 'Kai trusts Hazel', 'event', 0.68, 0.24, 'relationship', [0.2, 0.1, 1], 0.72),
             capNode('context', 'Unresolved memory', 'memoryState', 0.48, 0.58, 'evidence', [0.2, 0.1, 1], 0.44),
         ], [
-            { id: 'entity-fact', sourceId: 'kai', targetId: 'fact', type: 'supports', confidence: 0.82 },
-            { id: 'fact-context', sourceId: 'fact', targetId: 'context', type: 'memory', confidence: 0.62 },
+            { id: 'entity-signal', sourceId: 'kai', targetId: 'signal', type: 'supports', confidence: 0.82 },
+            { id: 'signal-context', sourceId: 'signal', targetId: 'context', type: 'memory', confidence: 0.62 },
         ], mergeGalaxySettings({ layoutMode: 'lorentzTree' }));
         const byId = new Map(scene.nodes.map((node) => [node.entity.id, node]));
 
-        expect(byId.get('kai')!.depth).toBeGreaterThan(byId.get('fact')!.depth);
-        expect(byId.get('fact')!.depth).toBeGreaterThan(byId.get('context')!.depth);
+        expect(byId.get('kai')!.depth).toBeGreaterThan(byId.get('signal')!.depth);
+        expect(byId.get('signal')!.depth).toBeGreaterThan(byId.get('context')!.depth);
     });
 
     it('honors explicit graph-rebuild cap shell radii without changing fallback Lorentz fixtures', () => {

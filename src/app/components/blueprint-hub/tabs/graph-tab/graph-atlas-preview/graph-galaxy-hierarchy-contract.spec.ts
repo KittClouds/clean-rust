@@ -13,13 +13,13 @@ describe('graph galaxy hierarchy contract', () => {
             contractNode('embed:structure-root:note-1:identity', 'Identity root', 'structureRoot', 'document_spine', 0.8),
             contractNode('embed:chunk:chunk-1', 'Chunk', 'chunk', 'chunk_spine', 2.12),
             contractNode('embed:entity:kai', 'Kai', 'entity', 'entity_anchor', 2.08),
-            contractNode('embed:graph-fact:trust', 'Kai trusts Hazel', 'graphFact', 'relationship_fact', 1.92),
+            contractNode('embed:event:trust', 'Kai trusts Hazel', 'event', 'event_identity', 1.92),
             contractNode('embed:anchor:mention-1', 'Kai mention', 'anchor', 'anchor_evidence', 1.72),
         ], [
             edge('doc-root', 'embed:note:note-1', 'embed:structure-root:note-1:identity', 'target-parent'),
             edge('root-chunk', 'embed:structure-root:note-1:identity', 'embed:chunk:chunk-1', 'target-parent'),
             edge('chunk-entity', 'embed:chunk:chunk-1', 'embed:entity:kai', 'chunk-entity'),
-            edge('entity-fact', 'embed:entity:kai', 'embed:graph-fact:trust', 'relationship'),
+            edge('entity-event', 'embed:entity:kai', 'embed:event:trust', 'event-entity'),
             edge('entity-anchor', 'embed:entity:kai', 'embed:anchor:mention-1', 'anchor-entity'),
         ], mergeGalaxySettings({ layoutMode: 'lorentzTree' }));
         const byId = new Map(scene.nodes.map((node) => [node.entity.id, radius(node)]));
@@ -28,8 +28,8 @@ describe('graph galaxy hierarchy contract', () => {
         expect(byId.get('embed:note:note-1')!).toBeGreaterThan(byId.get('embed:structure-root:note-1:identity')!);
         expect(byId.get('embed:structure-root:note-1:identity')!).toBeGreaterThan(byId.get('embed:chunk:chunk-1')!);
         expect(byId.get('embed:chunk:chunk-1')!).toBeGreaterThan(byId.get('embed:entity:kai')!);
-        expect(byId.get('embed:entity:kai')!).toBeGreaterThan(byId.get('embed:graph-fact:trust')!);
-        expect(byId.get('embed:graph-fact:trust')!).toBeGreaterThan(byId.get('embed:anchor:mention-1')!);
+        expect(byId.get('embed:entity:kai')!).toBeGreaterThan(byId.get('embed:event:trust')!);
+        expect(byId.get('embed:event:trust')!).toBeGreaterThan(byId.get('embed:anchor:mention-1')!);
     });
 
     it('preserves document-root-chunk-entity order for graph rebuild Caps snapshots', () => {
@@ -43,7 +43,7 @@ describe('graph galaxy hierarchy contract', () => {
             expect(byId.get(`embed:structure-root:${noteId}:identity`)!).toBeGreaterThan(byId.get(`embed:chunk:${noteId}:chunk-1`)!);
         }
         expect(byId.get('embed:chunk:note-a:chunk-1')!).toBeGreaterThan(byId.get('embed:entity:kai')!);
-        expect(byId.get('embed:entity:kai')!).toBeGreaterThan(byId.get('embed:graph-fact:echo')!);
+        expect(scene.nodes.some((node) => node.entity.id === 'embed:graph-fact:echo')).toBe(false);
     });
 
     it('carries hierarchy shells into the runtime scene contract', () => {
@@ -69,7 +69,8 @@ describe('graph galaxy hierarchy contract', () => {
         const sceneIds = new Set(scene.nodes.map((node) => node.entity.id));
 
         expect(atlas.nodes.length).toBeGreaterThan(960);
-        expect(scene.nodes.length).toBe(atlas.nodes.length);
+        expect(scene.nodes.length).toBeLessThan(atlas.nodes.length);
+        expect(sceneIds.has('embed:graph-fact:signal-0')).toBe(false);
         for (const id of [
             'embed:note:note-a',
             'embed:note:note-b',

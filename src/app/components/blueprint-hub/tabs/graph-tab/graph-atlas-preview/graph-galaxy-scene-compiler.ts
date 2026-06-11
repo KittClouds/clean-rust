@@ -2,6 +2,7 @@ import type { PhoenixBackendService } from '../../../../../services/phoenix-back
 import type { PhoenixGalaxySceneRequest } from '../../../../../services/phoenix-galaxy-scene.model';
 import {
     buildGalaxyScene,
+    hasRelationControlNodes,
     hslToRgb,
     resolveGalaxyNodeColorHsl,
     type GalaxyInputEdge,
@@ -23,7 +24,8 @@ export async function compileGalaxyScene(
     const hasAtlasLayout = entities.some((entity) =>
         Number.isFinite(entity.atlasX) && Number.isFinite(entity.atlasY) && Number.isFinite(entity.atlasZ),
     );
-    if (backend.target !== 'native' || hasGalaxyMetadata || hasAtlasLayout || settings.layoutMode !== 'single') {
+    const hasRelationControls = hasRelationControlNodes(entities);
+    if (backend.target !== 'native' || hasGalaxyMetadata || hasAtlasLayout || hasRelationControls || settings.layoutMode !== 'single') {
         graphGalaxyRuntimeMeter.recordCompilerSource('local');
         return buildGalaxyScene(entities, edges, settings);
     }
