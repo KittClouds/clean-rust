@@ -265,6 +265,130 @@
             </article>
             }
 
+            @if (discourseWorkbench(); as workbench) {
+            <section class="discourse-workbench">
+                <div class="diagnostic-section-head">
+                    <span class="diagnostics-kicker">Review Workbench</span>
+                    <strong>{{ activeDiscourseRecords().length }} rows / {{ workbench.openReviewCount }} open</strong>
+                </div>
+                <div class="discourse-record-list">
+                    @for (record of activeDiscourseRecords(); track record.id) {
+                    <button type="button" class="discourse-record-row" [class.discourse-record-selected]="isDiscourseRecordSelected(record)" [ngClass]="toneClass('discourse-tone', record.tone)" (click)="selectDiscourseRecord(record.id, $event)">
+                        <span class="discourse-spine-row-top">
+                            <strong>{{ record.title }}</strong>
+                            <em>{{ record.scoreLabel }}</em>
+                        </span>
+                        <span class="discourse-route">{{ record.subtitle }}</span>
+                        <small>{{ record.detail }}</small>
+                        <span class="discourse-record-tags">
+                            @for (tag of record.tags.slice(0, 3); track tag) {
+                            <b>{{ tag }}</b>
+                            }
+                            @if (stagedDiscourseDecision(record)) {
+                            <b class="discourse-stage-badge">{{ stagedDiscourseDecision(record) }}</b>
+                            }
+                        </span>
+                    </button>
+                    } @empty {
+                    <div class="empty-row">No inspectable rows for this section yet.</div>
+                    }
+                </div>
+
+                @if (selectedDiscourseRecord(); as record) {
+                <article class="discourse-inspector" [ngClass]="toneClass('discourse-tone', record.tone)">
+                    <header>
+                        <div>
+                            <span class="diagnostics-kicker">{{ record.kind }}</span>
+                            <h4>{{ record.title }}</h4>
+                            <small>{{ record.status }} / {{ record.scoreLabel }}</small>
+                        </div>
+                        @if (stagedDiscourseDecision(record)) {
+                        <span class="discourse-stage-badge">{{ stagedDiscourseDecision(record) }}</span>
+                        }
+                    </header>
+                    <p>{{ record.detail }}</p>
+                    <div class="discourse-action-row">
+                        <button type="button" class="discourse-action-button" (click)="focusDiscourseRecord(record, $event)">
+                            <lucide-icon [img]="SearchIcon" class="h-3.5 w-3.5"></lucide-icon>
+                            Focus Atlas
+                        </button>
+                        <button type="button" class="discourse-action-button" (click)="copyDiscourseRecord(record, $event)">
+                            <lucide-icon [img]="CopyIcon" class="h-3.5 w-3.5"></lucide-icon>
+                            Copy
+                        </button>
+                        @if (!record.actionKinds.length || hasDiscourseAction(record, 'accept_fact')) {
+                        <button type="button" class="discourse-action-button" (click)="stageDiscourseRecordDecision(record, 'accepted', $event)">
+                            <lucide-icon [img]="CheckIcon" class="h-3.5 w-3.5"></lucide-icon>
+                            Accept
+                        </button>
+                        }
+                        @if (hasDiscourseAction(record, 'promote_sidecar_to_anchor')) {
+                        <button type="button" class="discourse-action-button" (click)="stageDiscourseRecordDecision(record, 'promoted_to_anchor', $event)">
+                            <lucide-icon [img]="PlusIcon" class="h-3.5 w-3.5"></lucide-icon>
+                            Promote
+                        </button>
+                        }
+                        @if (hasDiscourseAction(record, 'demote_graph_fact_to_sidecar')) {
+                        <button type="button" class="discourse-action-button" (click)="stageDiscourseRecordDecision(record, 'ledger_only', $event)">
+                            <lucide-icon [img]="ChevronDownIcon" class="h-3.5 w-3.5"></lucide-icon>
+                            Demote
+                        </button>
+                        }
+                        @if (hasDiscourseAction(record, 'compile_to_graph')) {
+                        <button type="button" class="discourse-action-button" (click)="stageDiscourseRecordDecision(record, 'compiled_to_graph', $event)">
+                            <lucide-icon [img]="NetworkIcon" class="h-3.5 w-3.5"></lucide-icon>
+                            Compile
+                        </button>
+                        }
+                        @if (hasDiscourseAction(record, 'mute_detector_pattern')) {
+                        <button type="button" class="discourse-action-button" (click)="stageDiscourseRecordDecision(record, 'muted', $event)">
+                            <lucide-icon [img]="EyeIcon" class="h-3.5 w-3.5"></lucide-icon>
+                            Mute
+                        </button>
+                        }
+                        @if (!record.actionKinds.length || hasDiscourseAction(record, 'reject_fact')) {
+                        <button type="button" class="discourse-action-button" (click)="stageDiscourseRecordDecision(record, 'rejected', $event)">
+                            <lucide-icon [img]="XIcon" class="h-3.5 w-3.5"></lucide-icon>
+                            Reject
+                        </button>
+                        }
+                    </div>
+                    <div class="discourse-id-grid">
+                        @if (record.candidateId) {
+                        <span><b>Candidate</b>{{ record.candidateId }}</span>
+                        }
+                        @if (record.decisionId) {
+                        <span><b>Decision</b>{{ record.decisionId }}</span>
+                        }
+                        @if (record.sourceIds.length) {
+                        <span><b>Sources</b>{{ record.sourceIds.slice(0, 4).join(' / ') }}</span>
+                        }
+                        @if (record.targetIds.length) {
+                        <span><b>Targets</b>{{ record.targetIds.slice(0, 4).join(' / ') }}</span>
+                        }
+                        @if (record.evidenceIds.length) {
+                        <span><b>Evidence</b>{{ record.evidenceIds.slice(0, 6).join(' / ') }}</span>
+                        }
+                    </div>
+                    @if (record.facts.length) {
+                    <div class="discourse-fact-grid">
+                        @for (fact of record.facts.slice(0, 6); track fact.label) {
+                        <span><b>{{ fact.label }}</b>{{ fact.value }}</span>
+                        }
+                    </div>
+                    }
+                    @if (record.rationale.length) {
+                    <div class="discourse-rationale">
+                        @for (line of record.rationale.slice(0, 4); track line) {
+                        <span>{{ line }}</span>
+                        }
+                    </div>
+                    }
+                </article>
+                }
+            </section>
+            }
+
             <section class="discourse-spine-board">
                 <div class="diagnostic-section-head">
                     <span class="diagnostics-kicker">Document Spine Overlay</span>

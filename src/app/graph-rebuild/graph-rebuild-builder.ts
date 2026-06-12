@@ -45,6 +45,9 @@ import { buildGraphDiscourseEvalLedgerSummary } from './graph-discourse-eval-led
 import { buildGraphDiscoursePromotionSurfaceSummary } from './graph-discourse-promotion-surface';
 import { buildGraphDiscourseCompilerOverlaySummary } from './graph-discourse-compiler-overlay';
 import { buildHopfResonanceSpace } from './graph-hopf-resonance-space';
+import { buildGraphDocumentSidecar } from './graph-document-sidecar';
+import { buildGraphDocumentReviewSummary } from './graph-document-review';
+import { buildGraphDocumentCompilerSummary } from './graph-document-compiler';
 
 export { buildGraphRebuildAliasResolver, normalizeGraphRebuildCandidate };
 
@@ -126,6 +129,27 @@ export function buildGraphRebuildSnapshot(input: BuildGraphRebuildSnapshotInput)
         ...chunks.map((chunk) => chunk.noteId),
         ...entityAnchors.map((anchor) => anchor.noteId),
     ]);
+    const documentSidecarSummary = buildGraphDocumentSidecar({
+        noteIds,
+        noteTexts: input.noteTexts || {},
+        chunks,
+        builtAt,
+    });
+    const documentReviewSummary = buildGraphDocumentReviewSummary(documentSidecarSummary, builtAt);
+    const documentCompilerSummary = buildGraphDocumentCompilerSummary({
+        sidecar: documentSidecarSummary,
+        review: documentReviewSummary,
+        builtAt,
+        baseline: {
+            atomCount: nodes.length,
+            factCount: relationships.length
+                + derived.events.length
+                + derived.temporalEdges.length
+                + derived.causalEdges.length
+                + derived.memoryState.length,
+            edgeCount: edges.length,
+        },
+    });
 
     const snapshot: GraphRebuildSnapshot = {
         schemaVersion: 'phoenix-graph-rebuild/v1',
@@ -156,6 +180,9 @@ export function buildGraphRebuildSnapshot(input: BuildGraphRebuildSnapshotInput)
         structuralPostProcess,
         graphAwareLinkSuggestions,
         entityLinkSuggestions: entityLinking.suggestions,
+        documentSidecarSummary,
+        documentReviewSummary,
+        documentCompilerSummary,
         counters: {
             entities: input.entities.length,
             aliases: resolver.aliasCount,
@@ -214,6 +241,47 @@ export function buildGraphRebuildSnapshot(input: BuildGraphRebuildSnapshotInput)
             entityLinkSuggestions: entityLinking.suggestions.length,
             entityLinking: entityLinking.counters,
             meaningFrameChunks: chunks.filter((chunk) => Boolean(chunk.meaningFrame)).length,
+            documentSidecarUnits: documentSidecarSummary.counters.units,
+            documentSidecarSections: documentSidecarSummary.counters.sections,
+            documentSidecarRegions: documentSidecarSummary.counters.regions,
+            documentSidecarRhetoricalUnits: documentSidecarSummary.counters.rhetoricalUnits,
+            documentSidecarRetrievalUnits: documentSidecarSummary.counters.retrievalUnits,
+            documentSidecarGraphFacts: documentSidecarSummary.counters.graphFactCandidates,
+            documentSidecarEvidenceSpans: documentSidecarSummary.counters.evidenceSpans,
+            documentSidecarAnchorPromotions: documentSidecarSummary.counters.userAnchorPromotions,
+            documentReviewRows: documentReviewSummary.counters.rows,
+            documentReviewActionableRows: documentReviewSummary.counters.actionableRows,
+            documentReviewStateRecords: documentReviewSummary.counters.stateRecords,
+            documentReviewActions: documentReviewSummary.counters.actions,
+            documentReviewReceipts: documentReviewSummary.counters.receipts,
+            documentReviewReversibleReceipts: documentReviewSummary.counters.reversibleReceipts,
+            documentReviewProposedRows: documentReviewSummary.counters.proposedRows,
+            documentReviewAcceptedRows: documentReviewSummary.counters.acceptedRows,
+            documentReviewRejectedRows: documentReviewSummary.counters.rejectedRows,
+            documentReviewMutedRows: documentReviewSummary.counters.mutedRows,
+            documentReviewPromotedToAnchorRows: documentReviewSummary.counters.promotedToAnchorRows,
+            documentReviewCompiledToGraphRows: documentReviewSummary.counters.compiledToGraphRows,
+            documentReviewLedgerOnlyRows: documentReviewSummary.counters.ledgerOnlyRows,
+            documentCompilerEntityMentions: documentCompilerSummary.counters.entityMentions,
+            documentCompilerRelationCandidates: documentCompilerSummary.counters.relationCandidates,
+            documentCompilerHyperedges: documentCompilerSummary.counters.hyperedges,
+            documentCompilerNaryHyperedges: documentCompilerSummary.counters.naryHyperedges,
+            documentCompilerEvidenceEdges: documentCompilerSummary.counters.evidenceBackedEdges,
+            documentCompilerCrossDocBridges: documentCompilerSummary.counters.crossDocBridges,
+            documentCompilerStructureEdges: documentCompilerSummary.counters.documentStructureEdges,
+            documentCompilerRetrievalOverlays: documentCompilerSummary.counters.retrievalOverlays,
+            documentCompilerTopologyDiffs: documentCompilerSummary.counters.topologyDiffs,
+            documentCompilerTopologyCommits: documentCompilerSummary.counters.topologyCommits,
+            documentCompilerLedgerOnly: documentCompilerSummary.counters.ledgerOnly,
+            documentCompilerOverlayOnly: documentCompilerSummary.counters.overlayOnly,
+            documentCompilerReviewable: documentCompilerSummary.counters.reviewable,
+            documentCompilerBlocked: documentCompilerSummary.counters.blocked,
+            documentCompilerReceipts: documentCompilerSummary.counters.receipts,
+            documentCompilerReversibleReceipts: documentCompilerSummary.counters.reversibleReceipts,
+            documentCompilerMutationAllowed: documentCompilerSummary.counters.mutationAllowed,
+            documentCompilerHighConfidenceFacts: documentCompilerSummary.counters.highConfidenceFacts,
+            documentCompilerReviewedFacts: documentCompilerSummary.counters.reviewedFacts,
+            documentCompilerAmbiguousFacts: documentCompilerSummary.counters.ambiguousFacts,
             eventAspects: derived.events.filter((event) => Boolean(event.aspect)).length,
             dropReasons: drops,
             resolution: hygiene.resolution,

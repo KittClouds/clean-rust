@@ -64,6 +64,32 @@ describe('GraphEntitySidebarComponent discourse focus', () => {
         expect(component.entitySearch()).toBe('Kai');
         expect(emittedSearches).toEqual(['Kai']);
     });
+
+    it('selects discourse workbench rows without mutating atlas search', () => {
+        component.sidebarView.set('discourse');
+        const emittedSearches: string[] = [];
+        component.searchTextChange.subscribe((value) => emittedSearches.push(value));
+
+        component.selectDiscourseRecord('gaps:row-1');
+
+        expect(component.selectedDiscourseRecordId()).toBe('gaps:row-1');
+        expect(component.entitySearch()).toBe('');
+        expect(emittedSearches).toEqual([]);
+    });
+
+    it('uses the explicit discourse focus action to update atlas search', () => {
+        component.sidebarView.set('discourse');
+        const emittedSearches: string[] = [];
+        component.searchTextChange.subscribe((value) => emittedSearches.push(value));
+
+        component.focusDiscourseRecord({
+            id: 'gaps:row-1',
+            focusQuery: 'Kai Hazel bridge',
+        } as any);
+
+        expect(component.focusedDiscourseQuery()).toBe('Kai Hazel bridge');
+        expect(emittedSearches).toEqual(['Kai Hazel bridge']);
+    });
 });
 
 function entities(): RegisteredEntity[] {

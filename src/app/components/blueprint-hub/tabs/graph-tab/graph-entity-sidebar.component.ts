@@ -40,6 +40,11 @@ import {
     type GraphDiscourseTabId,
     type GraphDiscourseTone,
 } from './graph-discourse-analytics';
+import {
+    buildGraphDiscourseWorkbenchView,
+    type GraphDiscourseWorkbenchDecision,
+    type GraphDiscourseWorkbenchRecord,
+} from './graph-discourse-workbench';
 import { buildProductDiagnosticsView, type ProductDiagnosticsView } from './graph-product-diagnostics';
 
 interface EntityGroup {
@@ -130,6 +135,8 @@ export class GraphEntitySidebarComponent implements OnChanges, OnDestroy {
     readonly diagnosticsLoading = signal(false);
     readonly diagnosticsError = signal<string | null>(null);
     readonly selectedDiscourseTab = signal<GraphDiscourseTabId>('ideas');
+    readonly selectedDiscourseRecordId = signal('');
+    readonly discourseRecordDecisions = signal<Record<string, GraphDiscourseWorkbenchDecision>>({});
     readonly underlyingIdeasOpen = signal(false);
     readonly discourseActionNotice = signal('');
     readonly focusedDiscourseQuery = signal('');
@@ -162,6 +169,19 @@ export class GraphEntitySidebarComponent implements OnChanges, OnDestroy {
     readonly activeDiscoursePanel = computed(() => {
         const discourse = this.discourseAnalytics();
         return discourse?.panels[this.selectedDiscourseTab()] ?? null;
+    });
+    readonly discourseWorkbench = computed(() => {
+        this.dataRevision();
+        return buildGraphDiscourseWorkbenchView(this.diagnosticsSnapshot(), this.entities);
+    });
+    readonly activeDiscourseRecords = computed(() => {
+        const workbench = this.discourseWorkbench();
+        return workbench?.recordsByTab[this.selectedDiscourseTab()] ?? [];
+    });
+    readonly selectedDiscourseRecord = computed(() => {
+        const records = this.activeDiscourseRecords();
+        const selectedId = this.selectedDiscourseRecordId();
+        return records.find((record) => record.id === selectedId) ?? records[0] ?? null;
     });
     readonly primaryDiscourseQuestion = computed(() => this.discourseAnalytics()?.questions[0] ?? null);
 
@@ -261,6 +281,7 @@ export class GraphEntitySidebarComponent implements OnChanges, OnDestroy {
 
     setDiscourseTab(tab: GraphDiscourseTabId): void {
         this.selectedDiscourseTab.set(tab);
+        this.selectedDiscourseRecordId.set(this.discourseWorkbench()?.recordsByTab[tab]?.[0]?.id || '');
     }
 
     toggleUnderlyingIdeas(): void {
@@ -286,6 +307,49 @@ export class GraphEntitySidebarComponent implements OnChanges, OnDestroy {
         ].join('\n');
         await navigator.clipboard?.writeText(text);
         this.flashDiscourseNotice('Copied discourse read');
+    }
+
+    selectDiscourseRecord(recordId: string, event?: Event): void {
+        event?.stopPropagation();
+        this.selectedDiscourseRecordId.set(recordId);
+    }
+
+    focusDiscourseRecord(record: GraphDiscourseWorkbenchRecord, event?: Event): void {
+        event?.stopPropagation();
+        const focus = record.focusQuery.trim();
+        if (!focus) return;
+        this.focusedDiscourseQuery.set(focus);
+        this.searchTextChange.emit(focus);
+        this.flashDiscourseNotice('Atlas focus updated');
+    }
+
+    async copyDiscourseRecord(record: GraphDiscourseWorkbenchRecord, event?: Event): Promise<void> {
+        event?.stopPropagation();
+        await navigator.clipboard?.writeText(this.discourseRecordText(record));
+        this.flashDiscourseNotice('Copied discourse record');
+    }
+
+    stageDiscourseRecordDecision(
+        record: GraphDiscourseWorkbenchRecord,
+        decision: GraphDiscourseWorkbenchDecision,
+        event?: Event,
+    ): void {
+        event?.stopPropagation();
+        this.discourseRecordDecisions.update((current) => ({ ...current, [record.id]: decision }));
+        this.selectedDiscourseRecordId.set(record.id);
+        this.flashDiscourseNotice(`Staged ${decision}`);
+    }
+
+    stagedDiscourseDecision(record: GraphDiscourseWorkbenchRecord): GraphDiscourseWorkbenchDecision | '' {
+        return this.discourseRecordDecisions()[record.id] || '';
+    }
+
+    isDiscourseRecordSelected(record: GraphDiscourseWorkbenchRecord): boolean {
+        return this.selectedDiscourseRecord()?.id === record.id;
+    }
+
+    hasDiscourseAction(record: GraphDiscourseWorkbenchRecord, actionKind: string): boolean {
+        return record.actionKinds.includes(actionKind);
     }
 
     highlightDiscourseQuery(query: string): void {
@@ -383,6 +447,27 @@ export class GraphEntitySidebarComponent implements OnChanges, OnDestroy {
         this.discourseActionNotice.set(message);
         if (this.discourseNoticeTimer) clearTimeout(this.discourseNoticeTimer);
         this.discourseNoticeTimer = setTimeout(() => this.discourseActionNotice.set(''), 2400);
+    }
+
+    private discourseRecordText(record: GraphDiscourseWorkbenchRecord): string {
+        return [
+            record.title,
+            record.subtitle,
+            record.detail,
+            '',
+            `Kind: ${record.kind}`,
+            `Status: ${record.status}`,
+            `Score: ${record.scoreLabel}`,
+            record.candidateId ? `Candidate: ${record.candidateId}` : '',
+            record.decisionId ? `Decision: ${record.decisionId}` : '',
+            record.sourceIds.length ? `Sources: ${record.sourceIds.join(', ')}` : '',
+            record.targetIds.length ? `Targets: ${record.targetIds.join(', ')}` : '',
+            record.evidenceIds.length ? `Evidence: ${record.evidenceIds.join(', ')}` : '',
+            '',
+            ...record.facts.map((fact) => `${fact.label}: ${fact.value}`),
+            '',
+            ...record.rationale.map((line) => `- ${line}`),
+        ].filter(Boolean).join('\n');
     }
 
     private groupedEntities(): EntityGroup[] {

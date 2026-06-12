@@ -339,6 +339,141 @@
     padding: 9px;
 }
 
+.discourse-workbench {
+    display: grid;
+    gap: 8px;
+    border: 1px solid rgba(45, 212, 191, 0.16);
+    border-radius: 8px;
+    background: linear-gradient(180deg, rgba(20, 184, 166, 0.08), rgba(0, 0, 0, 0.24));
+    padding: 9px;
+}
+
+.discourse-record-list {
+    display: grid;
+    gap: 5px;
+    max-height: 310px;
+    overflow-y: auto;
+    padding-right: 2px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.16) transparent;
+}
+
+.discourse-record-row {
+    display: grid;
+    width: 100%;
+    min-width: 0;
+    gap: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 7px;
+    background: rgba(0, 0, 0, 0.24);
+    padding: 7px 8px;
+    text-align: left;
+}
+
+.discourse-record-row:hover,
+.discourse-record-selected {
+    border-color: rgba(45, 212, 191, 0.48);
+    background: rgba(20, 184, 166, 0.1);
+}
+
+.discourse-record-tags {
+    display: flex;
+    min-width: 0;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+.discourse-record-tags b,
+.discourse-stage-badge {
+    max-width: 100%;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.035);
+    padding: 2px 6px;
+    color: rgb(161 161 170);
+    font-size: 8px;
+    font-weight: 900;
+    letter-spacing: 0.06em;
+    text-overflow: ellipsis;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.discourse-stage-badge {
+    border-color: rgba(45, 212, 191, 0.3);
+    background: rgba(20, 184, 166, 0.12);
+    color: rgb(153 246 228);
+}
+
+.discourse-inspector {
+    display: grid;
+    gap: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.32);
+    padding: 9px;
+}
+
+.discourse-inspector header {
+    display: flex;
+    min-width: 0;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.discourse-inspector h4 {
+    margin: 2px 0 0;
+    overflow: hidden;
+    color: white;
+    font-size: 13px;
+    font-weight: 950;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.discourse-inspector header small,
+.discourse-inspector p {
+    color: rgb(161 161 170);
+    font-size: 10px;
+    line-height: 1.45;
+}
+
+.discourse-id-grid,
+.discourse-fact-grid {
+    display: grid;
+    gap: 5px;
+}
+
+.discourse-id-grid span,
+.discourse-fact-grid span,
+.discourse-rationale span {
+    display: grid;
+    min-width: 0;
+    gap: 2px;
+    border-left: 2px solid rgba(45, 212, 191, 0.32);
+    padding-left: 6px;
+    color: rgb(212 212 216);
+    font-size: 10px;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+}
+
+.discourse-id-grid b,
+.discourse-fact-grid b {
+    color: rgb(113 113 122);
+    font-size: 8px;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.discourse-rationale {
+    display: grid;
+    gap: 5px;
+}
+
 .discourse-spine-section {
     display: grid;
     gap: 6px;
