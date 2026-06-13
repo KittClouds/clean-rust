@@ -39,6 +39,8 @@ describe('buildGraphEvaluationDashboard', () => {
             'document-adaptation',
             'evidence-density',
             'entity-prior-noise',
+            'proposition-substrate',
+            'predicate-precision',
             'review-ratio',
             'graph-mutations',
             'retrieval-quality',

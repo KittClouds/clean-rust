@@ -51,7 +51,7 @@ export interface GraphDocumentCompiledEntityMention {
     surface: string;
     normalizedSurface: string;
     resolvedEntityId?: string;
-    role: 'subject' | 'object';
+    role: string;
     noteId: string;
     sourceStart: number;
     sourceEnd: number;
@@ -454,10 +454,12 @@ function mentionRowsFor(
     status: GraphDocumentCompileStatus,
     provenance: GraphDocumentCompilerProvenance,
 ): GraphDocumentCompiledEntityMention[] {
-    const surfaces = [
-        ...fact.subjectSurfaces.map((surface) => ({ role: 'subject' as const, surface })),
-        ...fact.objectSurfaces.map((surface) => ({ role: 'object' as const, surface })),
-    ].slice(0, 8);
+    const surfaces = (fact.roles?.length
+        ? fact.roles.flatMap((role) => role.surfaces.map((surface) => ({ role: role.role, surface })))
+        : [
+            ...fact.subjectSurfaces.map((surface) => ({ role: 'subject', surface })),
+            ...fact.objectSurfaces.map((surface) => ({ role: 'object', surface })),
+        ]).slice(0, 8);
     const mentions: GraphDocumentCompiledEntityMention[] = [];
     for (const [index, item] of surfaces.entries()) {
         if (context.entityMentions.length >= MAX_ENTITY_MENTIONS) break;
@@ -493,13 +495,13 @@ function relationFor(
     provenance: GraphDocumentCompilerProvenance,
 ): GraphDocumentRelationCandidate | null {
     const subjectMentionIds = mentions.filter((mention) => mention.role === 'subject').map((mention) => mention.id);
-    const objectMentionIds = mentions.filter((mention) => mention.role === 'object').map((mention) => mention.id);
+    const objectMentionIds = mentions.filter((mention) => mention.role !== 'subject').map((mention) => mention.id);
     const subjectEntityIds = unique(mentions.filter((mention) => mention.role === 'subject').map((mention) => mention.resolvedEntityId || ''));
-    const objectEntityIds = unique(mentions.filter((mention) => mention.role === 'object').map((mention) => mention.resolvedEntityId || ''));
+    const objectEntityIds = unique(mentions.filter((mention) => mention.role !== 'subject').map((mention) => mention.resolvedEntityId || ''));
     if (!subjectMentionIds.length || !objectMentionIds.length) return null;
     return {
         id: `document-relation:${slug(fact.id)}`,
-        predicate: predicateFor(fact.kind),
+        predicate: fact.predicate || predicateFor(fact.kind),
         subjectMentionIds,
         objectMentionIds,
         subjectEntityIds,
@@ -545,7 +547,7 @@ function hyperedgeFor(
     }
     return {
         id: `document-hyperedge:${slug(fact.id)}`,
-        predicate: predicateFor(fact.kind),
+        predicate: fact.predicate || predicateFor(fact.kind),
         sourceKind: fact.kind,
         roles,
         evidenceSpanIds: fact.evidenceSpanIds,
@@ -643,7 +645,10 @@ function statusForFact(
 }
 
 function resolvedEntitiesForFact(context: CompilerContext, fact: GraphFactCandidate): string[] {
-    return unique([...fact.subjectSurfaces, ...fact.objectSurfaces]
+    const surfaces = fact.roles?.length
+        ? fact.roles.flatMap((role) => role.surfaces)
+        : [...fact.subjectSurfaces, ...fact.objectSurfaces];
+    return unique(surfaces
         .map((surface) => context.entityBySurface.get(normalizeSurface(surface)) || ''));
 }
 

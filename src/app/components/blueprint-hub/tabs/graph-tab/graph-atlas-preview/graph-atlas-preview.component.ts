@@ -231,43 +231,43 @@ function readPersistedAtlasViewState(): PersistedAtlasViewState {
                     </div>
                     }
                     @if (atlasMode === 'embeddings') {
-                    <div class="canvas-projection-rail pointer-events-auto absolute left-4 top-16 z-30 flex flex-wrap items-center gap-1 overflow-x-auto border border-white/10 bg-black/65 p-1 shadow-xl backdrop-blur"
+                    <div class="canvas-projection-rail pointer-events-auto absolute left-4 top-16 z-30 flex flex-wrap items-center gap-0.5 overflow-x-auto border border-white/10 bg-black/65 p-0.5 shadow-xl backdrop-blur"
                         [class.canvas-projection-rail-top]="controlsCollapsed" aria-label="Embedding manifold projection">
                         <div class="flex border-r border-white/10 pr-1">
-                            <button type="button" class="px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] transition"
+                            <button type="button" class="px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.1em] transition"
                                 [class.bg-violet-500/20]="manifoldMode() === 'hybrid'" [class.text-violet-100]="manifoldMode() === 'hybrid'"
                                 [class.text-zinc-500]="manifoldMode() !== 'hybrid'" (click)="setManifoldMode('hybrid')">Hybrid</button>
-                            <button type="button" class="px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] transition"
+                            <button type="button" class="px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.1em] transition"
                                 [class.bg-violet-500/20]="manifoldMode() === 'hopf'" [class.text-violet-100]="manifoldMode() === 'hopf'"
                                 [class.text-zinc-500]="manifoldMode() !== 'hopf'" (click)="setManifoldMode('hopf')">Hopf</button>
-                            <button type="button" class="px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] transition"
+                            <button type="button" class="px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.1em] transition"
                                 [class.bg-violet-500/20]="manifoldMode() === 'lorentz'" [class.text-violet-100]="manifoldMode() === 'lorentz'"
                                 [class.text-zinc-500]="manifoldMode() !== 'lorentz'" (click)="setManifoldMode('lorentz')">Caps</button>
-                            <button type="button" class="px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] transition"
+                            <button type="button" class="px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.1em] transition"
                                 [class.bg-violet-500/20]="manifoldMode() === 'product'" [class.text-violet-100]="manifoldMode() === 'product'"
                                 [class.text-zinc-500]="manifoldMode() !== 'product'" (click)="setManifoldMode('product')">Product</button>
-                            <button type="button" class="px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] transition"
+                            <button type="button" class="px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.1em] transition"
                                 [class.bg-violet-500/20]="manifoldMode() === 'siegel'" [class.text-violet-100]="manifoldMode() === 'siegel'"
                                 [class.text-zinc-500]="manifoldMode() !== 'siegel'" (click)="setManifoldMode('siegel')">Siegel</button>
                         </div>
                         @if (manifoldMode() === 'hybrid') {
-                        <button type="button" class="px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] transition"
+                        <button type="button" class="px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.1em] transition"
                             [class.bg-cyan-500/15]="settings.layoutMode === 'hybridSpace'" [class.text-cyan-100]="settings.layoutMode === 'hybridSpace'"
                             [class.text-zinc-500]="settings.layoutMode !== 'hybridSpace'" (click)="setLayoutMode('hybridSpace')">Shell</button>
-                        <button type="button" class="px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] transition"
+                        <button type="button" class="px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.1em] transition"
                             [class.bg-cyan-500/15]="settings.layoutMode === 'multiGalaxy'" [class.text-cyan-100]="settings.layoutMode === 'multiGalaxy'"
                             [class.text-zinc-500]="settings.layoutMode !== 'multiGalaxy'" (click)="setLayoutMode('multiGalaxy')">Multi</button>
                         } @else if (manifoldMode() === 'hopf') {
-                        <button type="button" class="bg-cyan-500/15 px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-cyan-100 transition"
+                        <button type="button" class="bg-cyan-500/15 px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.1em] text-cyan-100 transition"
                             (click)="setLayoutMode('hopfProjection')">Projection</button>
                         } @else if (manifoldMode() === 'lorentz') {
-                        <button type="button" class="bg-cyan-500/15 px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-cyan-100 transition"
+                        <button type="button" class="bg-cyan-500/15 px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.1em] text-cyan-100 transition"
                             (click)="setLayoutMode('lorentzTree')">Caps</button>
                         } @else if (manifoldMode() === 'siegel') {
-                        <button type="button" class="bg-cyan-500/15 px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-cyan-100 transition"
+                        <button type="button" class="bg-cyan-500/15 px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.1em] text-cyan-100 transition"
                             (click)="setLayoutMode('siegelFinsler')">Finsler</button>
                         } @else {
-                        <button type="button" class="bg-cyan-500/15 px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-cyan-100 transition"
+                        <button type="button" class="bg-cyan-500/15 px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.1em] text-cyan-100 transition"
                             (click)="setLayoutMode('productManifold')">Transit</button>
                         }
                     </div>
@@ -551,11 +551,11 @@ function readPersistedAtlasViewState(): PersistedAtlasViewState {
         .canvas-lens-rail { max-width: calc(100% - 32px); }
         .canvas-projection-rail { max-width: calc(100% - 32px); scrollbar-width: none; }
         .canvas-projection-rail-top {
-            left: 50%;
+            left: 82px;
             top: 12px;
-            max-width: calc(100% - 220px);
+            max-width: calc(100% - 260px);
             flex-wrap: nowrap;
-            transform: translateX(-50%);
+            transform: none;
         }
         .canvas-projection-rail::-webkit-scrollbar { display: none; }
         @container (max-width: 820px) {

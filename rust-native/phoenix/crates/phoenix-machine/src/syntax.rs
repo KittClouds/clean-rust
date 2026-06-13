@@ -109,8 +109,11 @@ pub(crate) fn retag_with_context(text: &str, tokens: &mut [TokenSpan]) {
         if matches!(previous, PosTag::Determiner | PosTag::Adjective) && is_verbal(&current) {
             tokens[index].pos = Some(PosTag::Noun);
         }
-        if previous == PosTag::Modal && is_nominal(&current) {
-            tokens[index].pos = Some(PosTag::Verb);
+        if previous == PosTag::Modal && current == PosTag::Noun {
+            let surface = super::slice_or_empty(text, tokens[index].range);
+            if !surface.starts_with(|ch: char| ch.is_ascii_digit()) {
+                tokens[index].pos = Some(PosTag::Verb);
+            }
         }
         if current == PosTag::Noun
             && previous == PosTag::Determiner
@@ -286,6 +289,22 @@ mod tests {
         assert_eq!(tags[1], PosTag::Adjective);
         assert_eq!(tags[3], PosTag::Modal);
         assert_eq!(tags[5], PosTag::Preposition);
+    }
+
+    #[test]
+    fn modal_context_does_not_turn_pronouns_or_ordinals_into_verbs() {
+        let tokenized = tokenize("Will he leave? May 8th return again.");
+        let surfaces = tokenized
+            .tokens
+            .iter()
+            .map(|token| {
+                &"Will he leave? May 8th return again."
+                    [token.range.start as usize..token.range.end as usize]
+            })
+            .zip(tokenized.tokens.iter().map(|token| token.pos.clone()))
+            .collect::<Vec<_>>();
+        assert!(surfaces.contains(&("he", Some(PosTag::Pronoun))));
+        assert!(surfaces.contains(&("8th", Some(PosTag::Noun))));
     }
 
     #[test]

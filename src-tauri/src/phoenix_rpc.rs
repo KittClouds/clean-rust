@@ -17,8 +17,9 @@ use crate::tts::{
 use base64::{engine::general_purpose::STANDARD as BASE64_STANDARD, Engine as _};
 use flate2::{read::GzDecoder, write::GzEncoder, Compression};
 use phoenix_graph_rebuild::{
-    build_chunks, classify_document_profiles, compile_legacy_snapshot, Chunk, ChunkerConfig,
-    DocumentProfileRequest, GraphRebuildSnapshot,
+    build_chunks, build_document_semantic_summary, classify_document_profiles,
+    compile_legacy_snapshot, Chunk, ChunkerConfig, DocumentProfileRequest, DocumentSemanticRequest,
+    GraphRebuildSnapshot,
 };
 use phoenix_hyperbolic::lorentz_tree::{
     HyperboloidPoint, LorentzForest, LorentzForestIndex, LorentzNode, LorentzQueryMode,
@@ -934,6 +935,16 @@ impl PhoenixApi for PhoenixApiImpl {
                     "source": "native_rust",
                     "documents": documents,
                 },
+                "error": null,
+            }));
+        }
+        if command == "documentSemantic:build" {
+            let request = serde_json::from_value::<DocumentSemanticRequest>(payload)
+                .map_err(|error| format!("invalid document semantic request: {error}"))?;
+            let summary = build_document_semantic_summary(&request);
+            return serialize_json(&json!({
+                "success": true,
+                "payload": summary,
                 "error": null,
             }));
         }

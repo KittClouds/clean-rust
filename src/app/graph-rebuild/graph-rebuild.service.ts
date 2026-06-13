@@ -28,6 +28,14 @@ import {
     normalizeDocumentProfileSummary,
     type GraphDocumentProfileSummary,
 } from './graph-document-profile';
+import {
+    isGraphDocumentSemanticSummary,
+    type GraphDocumentSemanticSummary,
+} from './graph-document-semantic';
+import {
+    isGraphOperatorMutationJournal,
+    type GraphOperatorMutationJournal,
+} from './graph-operator-mutation-journal';
 import { buildGraphRebuildSnapshot } from './graph-rebuild-builder';
 import { buildGraphDiscourseSpineSummary } from './graph-discourse-spine';
 import { buildHopfResonanceSpace } from './graph-hopf-resonance-space';
@@ -72,6 +80,7 @@ import type { CalendarRegistrySnapshot } from '../lib/fantasy-calendar/calendar-
 export const GRAPH_REBUILD_NAMESPACE = 'phoenix_graph_rebuild_v1';
 const SNAPSHOT_DOCUMENT_KEY = 'snapshot';
 const RECEIPT_DOCUMENT_KEY = 'receipt';
+const OPERATOR_MUTATION_JOURNAL_DOCUMENT_KEY = 'operator-mutation-journal';
 export const GRAPH_MODEL_V2_OVERGRAPH_DOCUMENT_KEY = 'graph-model-v2-overgraph';
 const POST_PROCESS_CACHE_PREFIX = 'postprocess-cache';
 const COMPRESSED_JSON_SCHEMA_VERSION = 'phoenix-graph-rebuild-json-payload/gzip-base64/v1';
@@ -193,6 +202,10 @@ export class GraphRebuildService {
             const documentProfileSummary = await timedAsync(timings, 'documentProfileMs', () =>
                 this.classifyDocumentProfiles(noteTexts, builtAt)
             );
+            const documentSemanticSummary = await timedAsync(timings, 'documentSemanticMs', () =>
+                this.buildDocumentSemanticSummary(noteTexts, request.entities)
+            );
+            const operatorMutationJournal = await this.loadOperatorMutationJournal(request.scopeId);
             const recoverStarted = performance.now();
             const fallbackOccurrences = request.fallbackOccurrences || [];
             const occurrences = mergeGraphRebuildOccurrences(
@@ -216,6 +229,8 @@ export class GraphRebuildService {
                 candidateCount: request.candidateCount,
                 calendarRegistrySnapshot: request.calendarRegistrySnapshot,
                 documentProfileSummary,
+                documentSemanticSummary,
+                operatorMutationJournal: operatorMutationJournal || undefined,
                 builtAt,
             }));
             await this.attachNativeGraphCompilerSidecar(snapshot, timings);
@@ -283,6 +298,28 @@ export class GraphRebuildService {
         }
     }
 
+    private async buildDocumentSemanticSummary(
+        noteTexts: Record<string, string>,
+        entities: RegisteredEntity[],
+    ): Promise<GraphDocumentSemanticSummary | undefined> {
+        if (this.phoenix.target !== 'native') return undefined;
+        try {
+            const native = await this.phoenix.storeCommand('documentSemantic:build', {
+                documents: Object.entries(noteTexts).map(([noteId, text]) => ({ noteId, text })),
+                entities: entities.map((entity) => ({
+                    id: entity.id,
+                    label: entity.label,
+                    aliases: entity.aliases || [],
+                    kind: entity.kind,
+                })),
+            });
+            return isGraphDocumentSemanticSummary(native) ? native : undefined;
+        } catch (error) {
+            console.warn('[GraphRebuild] Native document semantics unavailable; retaining compatibility facts', error);
+            return undefined;
+        }
+    }
+
     async loadPersistedSnapshot(scopeId: string): Promise<GraphRebuildSnapshot | null> {
         const document = await this.store.getScopedDocument(scopeId, GRAPH_REBUILD_NAMESPACE, SNAPSHOT_DOCUMENT_KEY);
         const snapshot = document ? scopedDocumentToGraphRebuildSnapshot(document) : null;
@@ -334,7 +371,14 @@ export class GraphRebuildService {
     async restorePersistedSnapshot(snapshot: GraphRebuildSnapshot): Promise<void> {
         const reconciled = await this.reconcileDocumentGraphMutations(snapshot);
         this.snapshotState.set(reconciled);
+        if (reconciled.operatorMutationJournal) {
+            await this.persistOperatorMutationJournal(reconciled.operatorMutationJournal, reconciled.scopeKind);
+        }
         await this.persistSnapshot(reconciled);
+    }
+
+    async loadPersistedOperatorMutationJournal(scopeId: string): Promise<GraphOperatorMutationJournal | null> {
+        return this.loadOperatorMutationJournal(scopeId);
     }
 
     private async reconcileDocumentGraphMutations(
@@ -387,6 +431,34 @@ export class GraphRebuildService {
         return document
             ? scopedDocumentToGraphRebuildSnapshot(document)?.documentGraphMutationLedger
             : undefined;
+    }
+
+    private async loadOperatorMutationJournal(scopeId: string): Promise<GraphOperatorMutationJournal | null> {
+        const current = this.snapshotState();
+        if (current?.scopeId === scopeId && current.operatorMutationJournal) {
+            return current.operatorMutationJournal;
+        }
+        const journalDocument = await this.store.getScopedDocument(
+            scopeId,
+            GRAPH_REBUILD_NAMESPACE,
+            OPERATOR_MUTATION_JOURNAL_DOCUMENT_KEY,
+        );
+        if (journalDocument) return scopedDocumentToGraphOperatorMutationJournal(journalDocument);
+        const snapshotDocument = await this.store.getScopedDocument(
+            scopeId,
+            GRAPH_REBUILD_NAMESPACE,
+            SNAPSHOT_DOCUMENT_KEY,
+        );
+        return snapshotDocument
+            ? scopedDocumentToGraphRebuildSnapshot(snapshotDocument)?.operatorMutationJournal || null
+            : null;
+    }
+
+    private async persistOperatorMutationJournal(
+        journal: GraphOperatorMutationJournal,
+        scopeKind: GraphRebuildScopeKind,
+    ): Promise<void> {
+        await this.store.upsertScopedDocument(graphOperatorMutationJournalToScopedDocument(journal, scopeKind));
     }
 
     private async persistSnapshot(
@@ -1131,6 +1203,34 @@ export function scopedDocumentToGraphIndexReceipt(document: StoreScopedDocument)
     }
 }
 
+export function graphOperatorMutationJournalToScopedDocument(
+    journal: GraphOperatorMutationJournal,
+    scopeKind: GraphRebuildScopeKind,
+): StoreScopedDocument {
+    const now = Date.now();
+    return {
+        id: `${GRAPH_REBUILD_NAMESPACE}:${journal.scopeId}:${OPERATOR_MUTATION_JOURNAL_DOCUMENT_KEY}`,
+        scopeFolderId: journal.scopeId,
+        narrativeId: scopeKind === 'narrative' ? journal.scopeId : '',
+        namespace: GRAPH_REBUILD_NAMESPACE,
+        documentKey: OPERATOR_MUTATION_JOURNAL_DOCUMENT_KEY,
+        payload: encodeGraphRebuildJsonPayload(journal, journal.schemaVersion),
+        createdAt: journal.updatedAt || now,
+        updatedAt: now,
+    };
+}
+
+export function scopedDocumentToGraphOperatorMutationJournal(
+    document: StoreScopedDocument,
+): GraphOperatorMutationJournal | null {
+    try {
+        const parsed = decodeGraphRebuildJsonPayload<GraphOperatorMutationJournal>(document.payload);
+        return isGraphOperatorMutationJournal(parsed) ? parsed : null;
+    } catch {
+        return null;
+    }
+}
+
 function postProcessCacheDocumentKey(fingerprint: string): string {
     return `${POST_PROCESS_CACHE_PREFIX}:${fingerprint}`;
 }
@@ -1167,6 +1267,7 @@ function emptyBuildTimings(): GraphRebuildBuildTimings {
         dbLoadMs: 0,
         occurrenceRecoverMs: 0,
         documentProfileMs: 0,
+        documentSemanticMs: 0,
         snapshotBuildMs: 0,
         stateCommitMs: 0,
         nativeCompilerMs: 0,

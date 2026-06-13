@@ -12,8 +12,14 @@ memchr.workspace = true
 phoenix-alex = { path = "../phoenix-alex" }
 phoenix-chunker = { path = "../phoenix-chunker" }
 phoenix-hyperbolic = { path = "../phoenix-hyperbolic" }
+phoenix-machine = { path = "../phoenix-machine" }
+phoenix-proposition = { path = "../phoenix-proposition" }
 phoenix-types = { path = "../phoenix-types" }
 serde.workspace = true
 serde_json.workspace = true
 smallvec.workspace = true
 thiserror.workspace = true
+
+[[example]]
+name = "semantic_audit"
+path = "examples/semantic_audit.rs"

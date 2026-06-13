@@ -135,6 +135,21 @@ function buildMetrics(snapshot: GraphRebuildSnapshot, receipt: GraphIndexRunRece
     const priorNoise = priorCount ? unresolvedPriors.length / priorCount : 0;
     const review = snapshot.documentReviewSummary?.counters;
     const semantic = snapshot.semanticEvalLedgerSummary?.counters;
+    const propositionSemantics = snapshot.documentSemanticSummary;
+    const propositionCount = propositionSemantics?.counters.propositions || 0;
+    const scopeCount = propositionSemantics
+        ? propositionSemantics.counters.negated
+            + propositionSemantics.counters.modal
+            + propositionSemantics.counters.conditional
+            + propositionSemantics.counters.attributed
+            + propositionSemantics.counters.questions
+            + propositionSemantics.counters.directives
+        : 0;
+    const reviewablePropositions = propositionSemantics?.counters.reviewable || 0;
+    const ledgerOnlyPropositions = propositionSemantics?.counters.ledgerOnly || 0;
+    const modifierPropositions = propositionSemantics?.counters.predicateModifiers || 0;
+    const scopeRate = propositionCount ? Math.min(1, scopeCount / propositionCount) : 0;
+    const predicatePrecisionRate = propositionCount ? reviewablePropositions / propositionCount : 0;
     const discourse = snapshot.discourseEvalLedgerSummary?.counters;
     const accepted = (review?.acceptedRows || 0) + (semantic?.acceptedCandidates || 0) + (discourse?.acceptedCandidates || 0);
     const rejected = (review?.rejectedRows || 0) + (semantic?.rejectedCandidates || 0) + (discourse?.rejectedCandidates || 0);
@@ -189,6 +204,34 @@ function buildMetrics(snapshot: GraphRebuildSnapshot, receipt: GraphIndexRunRece
         metric('entity-prior-noise', 'semantic', 'Entity-prior noise', percent(priorNoise), clampScore(100 - priorNoise * 130),
             priorCount ? `${unresolvedPriors.length} of ${priorCount} entity priors lack a matching mention in their chunk.` : 'No entity priors were emitted.',
             ['Lower is better. A noisy prior can bias relation and event extraction before linking.'], unresolvedPriors),
+        metric('proposition-substrate', 'semantic', 'Proposition substrate', propositionCount
+            ? `${formatNumber(reviewablePropositions)} / ${formatNumber(propositionCount)} reviewable`
+            : 'Not attached', propositionCount ? clampScore(72 + scopeRate * 28) : 35,
+            propositionCount
+                ? `${formatNumber(propositionSemantics?.counters.arguments || 0)} typed arguments feed reviewable facts, temporal axes, and causal analysis.`
+                : 'The native proposition substrate did not run for this snapshot.',
+            propositionSemantics
+                ? [
+                    `${formatNumber(propositionSemantics.counters.resolvedArguments)} arguments resolve directly to registered entities.`,
+                    `${formatNumber(scopeCount)} scope readings capture negation, modality, conditionals, attribution, questions, or directives.`,
+                    `${formatNumber(propositionSemantics.counters.nAry)} propositions preserve three or more semantic roles.`,
+                    `${formatNumber(ledgerOnlyPropositions)} predicate readings stay ledger-only; ${formatNumber(modifierPropositions)} are modifier or nominal-event readings.`,
+                ]
+                : ['Run Full Atlas in the desktop app to attach native document semantics.'],
+            semanticPropositionRecords(snapshot)),
+        metric('predicate-precision', 'semantic', 'Predicate precision gate', propositionCount
+            ? percent(predicatePrecisionRate)
+            : 'Not attached', propositionCount ? clampScore(58 + predicatePrecisionRate * 34 - (modifierPropositions / Math.max(1, propositionCount)) * 18) : 35,
+            propositionCount
+                ? `${formatNumber(reviewablePropositions)} propositions can enter review; ${formatNumber(ledgerOnlyPropositions)} remain inspectable ledger rows.`
+                : 'No predicate admission ledger is attached.',
+            propositionSemantics
+                ? [
+                    `${formatNumber(modifierPropositions)} participle modifiers or nominal events were prevented from competing for graph-fact slots.`,
+                    `${formatNumber(propositionSemantics.counters.predicateNoise || 0)} predicate readings were classified as noise.`,
+                ]
+                : ['Run native document semantics to classify predicate admission.'],
+            semanticPropositionRecords(snapshot).filter((row) => row.tone === 'quiet').slice(0, 80)),
         metric('review-ratio', 'semantic', 'Accepted / rejected ratio', reviewedTotal ? `${accepted} / ${rejected}` : 'No decisions', reviewedTotal ? clampScore(acceptedRate * 115) : null,
             reviewedTotal ? `${percent(acceptedRate)} accepted across ${reviewedTotal} evaluated objects.` : 'The review ledger has not accumulated decisions yet.',
             [`${ambiguous} objects remain proposed or ambiguous.`], decisionRecords(snapshot)),
@@ -272,6 +315,18 @@ function deepestUnitRecords(units: NonNullable<GraphRebuildSnapshot['documentSid
 
 function evidenceRecords(spans: NonNullable<GraphRebuildSnapshot['documentSidecarSummary']>['evidenceSpans']): GraphEvaluationRecord[] {
     return spans.slice(0, 80).map((span) => ({ id: span.id, title: span.preview || span.id, detail: span.confidence.reasons.join(', '), meta: `${span.noteId} / ${percent(span.confidence.score)}`, tone: span.confidence.score < 0.55 ? 'suspicious' : 'quiet' }));
+}
+
+function semanticPropositionRecords(snapshot: GraphRebuildSnapshot): GraphEvaluationRecord[] {
+    return (snapshot.documentSemanticSummary?.documents || []).flatMap((document) =>
+        document.propositions.map((proposition) => ({
+            id: proposition.id,
+            title: proposition.predicate || proposition.relationType,
+            detail: proposition.preview,
+            meta: `${proposition.predicateQuality || 'predicate'} / ${proposition.arguments.length} roles / ${Math.round(proposition.confidenceMillis / 10)}% confidence`,
+            tone: proposition.reviewState === 'proposed' ? 'suspicious' as const : 'quiet' as const,
+        })),
+    );
 }
 
 function profileRecords(snapshot: GraphRebuildSnapshot): GraphEvaluationRecord[] {

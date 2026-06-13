@@ -32,7 +32,10 @@ describe('graph document review snapshot actions', () => {
 
 function baseSnapshot(sidecar: ReturnType<typeof buildGraphDocumentSidecar>, review: ReturnType<typeof buildGraphDocumentReviewSummary>): GraphRebuildSnapshot {
     return {
-        id: 'snapshot:1', builtAt: 10, nodes: [], edges: [], relationships: [], events: [], temporalEdges: [],
+        schemaVersion: 'phoenix-graph-rebuild/v1', source: 'phoenix-graph-rebuild', scopeKind: 'note',
+        scopeId: 'review-snapshot-note', noteIds: sidecar.noteIds, id: 'snapshot:1', builtAt: 10,
+        chunks: [], mentions: [], entityAnchors: [], embeddingTargets: [], embeddingVectors: [],
+        projectionRefs: [], nodes: [], edges: [], relationships: [], events: [], episodes: [], temporalEdges: [],
         causalEdges: [], memoryState: [], documentSidecarSummary: sidecar, documentReviewSummary: review, counters: {},
     } as unknown as GraphRebuildSnapshot;
 }

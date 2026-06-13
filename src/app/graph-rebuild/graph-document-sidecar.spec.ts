@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 import { buildGraphDocumentSidecar } from './graph-document-sidecar';
+import type { GraphDocumentSemanticSummary } from './graph-document-semantic';
 import { buildFallbackDocumentProfileSummary } from './graph-document-profile';
 import { buildAdaptiveGraphRebuildChunks } from './graph-rebuild-meaning-frames';
 import { buildGraphRebuildSnapshot } from './graph-rebuild-builder';
@@ -130,4 +131,167 @@ describe('graph document sidecar', () => {
         expect(snapshot.counters.documentSidecarUnits).toBe(snapshot.documentSidecarSummary?.counters.units);
         expect(snapshot.counters.documentSidecarGraphFacts).toBeGreaterThan(0);
     });
+
+    it('uses native semantic propositions as role-aware facts instead of heuristic paragraph facts', () => {
+        const text = 'Kai gave Hazel the key in New Rome.';
+        const semantics: GraphDocumentSemanticSummary = {
+            schemaVersion: 'phoenix-document-semantics/v1',
+            source: 'native_rust',
+            documents: [{
+                noteId: 'semantic-note',
+                textChars: text.length,
+                propositions: [{
+                    id: 'semantic-note:prop:0',
+                    noteId: 'semantic-note',
+                    sentenceIndex: 0,
+                    start: 0,
+                    end: text.length,
+                    preview: text,
+                    predicate: 'give',
+                    relationType: 'gives',
+                    predicateQuality: 'finite_verb',
+                    predicateAdmission: 'review',
+                    qualityReasons: ['finite_subject_frame'],
+                    triggerStart: 4,
+                    triggerEnd: 8,
+                    arguments: [
+                        { role: 'subject', surface: 'Kai', entityId: 'entity-kai', start: 0, end: 3 },
+                        { role: 'recipient', surface: 'Hazel', entityId: 'entity-hazel', start: 9, end: 14 },
+                        { role: 'object', surface: 'the key', start: 15, end: 22 },
+                        { role: 'location', surface: 'New Rome', entityId: 'entity-rome', start: 26, end: 34 },
+                    ],
+                    scope: [{ kind: 'assertion' }],
+                    evidence: [{ label: text, kind: 'sentence', start: 0, end: text.length }],
+                    confidenceMillis: 910,
+                    reviewState: 'proposed',
+                }],
+                counters: semanticCounters(1),
+            }],
+            counters: semanticCounters(1),
+        };
+        const sidecar = buildGraphDocumentSidecar({
+            noteIds: ['semantic-note'],
+            noteTexts: { 'semantic-note': text },
+            chunks: buildAdaptiveGraphRebuildChunks('semantic-note', text),
+            builtAt: 20,
+            documentSemanticSummary: semantics,
+        });
+
+        expect(sidecar.graphFactCandidates).toHaveLength(1);
+        expect(sidecar.graphFactCandidates[0]).toEqual(expect.objectContaining({
+            kind: 'n_ary_claim',
+            predicate: 'give',
+            semanticPropositionId: 'semantic-note:prop:0',
+        }));
+        expect(sidecar.graphFactCandidates[0].roles?.map((role) => role.role)).toEqual([
+            'subject',
+            'recipient',
+            'object',
+            'location',
+        ]);
+    });
+
+    it('keeps modifier-like native predicates in the ledger instead of graph fact review', () => {
+        const text = 'Kai found sponsored heroes. Kai warned Hazel.';
+        const semantics: GraphDocumentSemanticSummary = {
+            schemaVersion: 'phoenix-document-semantics/v1',
+            source: 'native_rust',
+            documents: [{
+                noteId: 'predicate-note',
+                textChars: text.length,
+                propositions: [
+                    {
+                        id: 'predicate-note:prop:modifier',
+                        noteId: 'predicate-note',
+                        sentenceIndex: 0,
+                        start: 10,
+                        end: 26,
+                        preview: 'sponsored heroes',
+                        predicate: 'sponsored',
+                        relationType: 'relates_to',
+                        predicateQuality: 'participle_modifier',
+                        predicateAdmission: 'ledger_only',
+                        qualityReasons: ['participle_before_nominal'],
+                        triggerStart: 10,
+                        triggerEnd: 19,
+                        arguments: [
+                            { role: 'object', surface: 'heroes', start: 20, end: 26 },
+                        ],
+                        scope: [{ kind: 'assertion' }],
+                        evidence: [{ label: 'sponsored heroes', kind: 'sentence', start: 10, end: 26 }],
+                        confidenceMillis: 360,
+                        reviewState: 'ledger_only',
+                    },
+                    {
+                        id: 'predicate-note:prop:warned',
+                        noteId: 'predicate-note',
+                        sentenceIndex: 1,
+                        start: 28,
+                        end: text.length,
+                        preview: 'Kai warned Hazel.',
+                        predicate: 'warned',
+                        relationType: 'communication',
+                        predicateQuality: 'relation_cue',
+                        predicateAdmission: 'review',
+                        qualityReasons: ['typed_relation_cue'],
+                        triggerStart: 32,
+                        triggerEnd: 38,
+                        arguments: [
+                            { role: 'subject', surface: 'Kai', entityId: 'entity-kai', start: 28, end: 31 },
+                            { role: 'object', surface: 'Hazel', entityId: 'entity-hazel', start: 39, end: 44 },
+                        ],
+                        scope: [{ kind: 'assertion' }],
+                        evidence: [{ label: 'Kai warned Hazel', kind: 'sentence', start: 28, end: text.length }],
+                        confidenceMillis: 900,
+                        reviewState: 'proposed',
+                    },
+                ],
+                counters: {
+                    ...semanticCounters(2),
+                    reviewable: 1,
+                    ledgerOnly: 1,
+                    predicateModifiers: 1,
+                },
+            }],
+            counters: {
+                ...semanticCounters(2),
+                reviewable: 1,
+                ledgerOnly: 1,
+                predicateModifiers: 1,
+            },
+        };
+        const sidecar = buildGraphDocumentSidecar({
+            noteIds: ['predicate-note'],
+            noteTexts: { 'predicate-note': text },
+            chunks: buildAdaptiveGraphRebuildChunks('predicate-note', text),
+            builtAt: 21,
+            documentSemanticSummary: semantics,
+        });
+
+        expect(sidecar.graphFactCandidates).toHaveLength(1);
+        expect(sidecar.graphFactCandidates[0].predicate).toBe('warned');
+        expect(sidecar.graphFactCandidates.some((candidate) => candidate.predicate === 'sponsored')).toBe(false);
+    });
 });
+
+function semanticCounters(propositions: number) {
+    return {
+        documents: 1,
+        sentences: 1,
+        propositions,
+        arguments: 4,
+        resolvedArguments: 3,
+        negated: 0,
+        modal: 0,
+        conditional: 0,
+        attributed: 0,
+        quoted: 0,
+        questions: 0,
+        directives: 0,
+        nAry: propositions,
+        reviewable: propositions,
+        ledgerOnly: 0,
+        predicateModifiers: 0,
+        predicateNoise: 0,
+    };
+}

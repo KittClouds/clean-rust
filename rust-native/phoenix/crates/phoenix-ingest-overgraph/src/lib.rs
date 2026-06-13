@@ -8673,9 +8673,11 @@ impl PhoenixInvarantV3 {
             resolution_bundle.discovery_count,
             mention_count,
         );
-        let causal_substrate = build_document_causal_substrate(document, &scan_bundle, created_at);
+        let semantic_substrate =
+            build_document_semantic_substrate(document, &scan_bundle, created_at);
+        let causal_substrate = build_document_causal_substrate(document, &semantic_substrate);
         let temporal_substrate =
-            build_document_temporal_substrate(document, &scan_bundle, created_at);
+            build_document_temporal_substrate(document, &semantic_substrate, created_at);
         let event_identity_substrate = build_document_event_identity_substrate(
             document,
             manifest.revision,
@@ -8934,9 +8936,11 @@ impl PhoenixInvarantV3 {
             resolution_bundle.discovery_count,
             mention_count,
         );
-        let causal_substrate = build_document_causal_substrate(document, &scan_bundle, created_at);
+        let semantic_substrate =
+            build_document_semantic_substrate(document, &scan_bundle, created_at);
+        let causal_substrate = build_document_causal_substrate(document, &semantic_substrate);
         let temporal_substrate =
-            build_document_temporal_substrate(document, &scan_bundle, created_at);
+            build_document_temporal_substrate(document, &semantic_substrate, created_at);
         let event_identity_substrate = build_document_event_identity_substrate(
             document,
             manifest.revision,
@@ -8992,11 +8996,18 @@ impl PhoenixInvarantV3 {
     }
 }
 
-fn build_document_causal_substrate(
+struct SharedDocumentSemanticSubstrate {
+    artifacts: SurfaceCompileArtifacts,
+    propositions: Vec<phoenix_types::Proposition>,
+    semantics: phoenix_causality::SemanticBundle,
+    temporal_bindings: Vec<phoenix_time::TemporalBinding>,
+}
+
+fn build_document_semantic_substrate(
     document: &IngestDocument,
     scan_bundle: &NativeScanBundle,
     created_at: i64,
-) -> DocumentCausalSubstrate {
+) -> SharedDocumentSemanticSubstrate {
     let chunk_spans = scan_bundle
         .chunks
         .iter()
@@ -9026,15 +9037,15 @@ fn build_document_causal_substrate(
             resolver_links: scan_bundle.scan.resolver_links.clone(),
             narrative_hits: scan_bundle.scan.narrative_hits.clone(),
             diagnostics: vec![Diagnostic {
-                code: "PX_CAUSAL_SUBSTRATE_SCAN".to_owned(),
-                message: "Rebuilt compact scan artifact for causal substrate compilation."
+                code: "PX_SEMANTIC_SUBSTRATE_SCAN".to_owned(),
+                message: "Rebuilt compact scan artifact for shared semantic substrate compilation."
                     .to_owned(),
             }],
         },
         structure: build_causal_structure_artifact(document, scan_bundle),
         surface: phoenix_types::SurfaceDocument::default(),
     };
-    let propositions = PropositionLowerer::lower(&artifacts);
+    let propositions = PropositionLowerer::lower_with_text(&document.text, &artifacts);
     let semantics = SemanticLowerer::lower(&propositions);
     let temporal_bindings = propositions
         .iter()
@@ -9042,24 +9053,37 @@ fn build_document_causal_substrate(
             TimeKernel::bind_label(proposition.predicate.predicate.as_str(), Some(created_at))
         })
         .collect::<Vec<_>>();
+    SharedDocumentSemanticSubstrate {
+        artifacts,
+        propositions,
+        semantics,
+        temporal_bindings,
+    }
+}
+
+fn build_document_causal_substrate(
+    document: &IngestDocument,
+    substrate: &SharedDocumentSemanticSubstrate,
+) -> DocumentCausalSubstrate {
     let causality = CausalityLowerer::lower(CausalityRequest {
         text: &document.text,
-        artifacts: &artifacts,
-        propositions: &propositions,
-        semantics: &semantics,
-        temporal_bindings: &temporal_bindings,
+        artifacts: &substrate.artifacts,
+        propositions: &substrate.propositions,
+        semantics: &substrate.semantics,
+        temporal_bindings: &substrate.temporal_bindings,
     });
     DocumentCausalSubstrate {
-        propositions,
-        semantic_events: semantics.events,
-        semantic_states: semantics.states,
-        semantic_claims: semantics.claims,
-        semantic_relations: semantics.relations,
-        temporal_bindings: temporal_bindings
-            .into_iter()
+        propositions: substrate.propositions.clone(),
+        semantic_events: substrate.semantics.events.clone(),
+        semantic_states: substrate.semantics.states.clone(),
+        semantic_claims: substrate.semantics.claims.clone(),
+        semantic_relations: substrate.semantics.relations.clone(),
+        temporal_bindings: substrate
+            .temporal_bindings
+            .iter()
             .map(|binding| RecordedTemporalBinding {
-                anchor: binding.anchor,
-                recorded_window: binding.recorded_window,
+                anchor: binding.anchor.clone(),
+                recorded_window: binding.recorded_window.clone(),
             })
             .collect(),
         causal_candidates: causality.candidates,
@@ -9118,48 +9142,11 @@ fn build_native_relation_candidates(
 
 fn build_document_temporal_substrate(
     document: &IngestDocument,
-    scan_bundle: &NativeScanBundle,
+    substrate: &SharedDocumentSemanticSubstrate,
     created_at: i64,
 ) -> DocumentTemporalSubstrate {
-    let chunk_spans = scan_bundle
-        .chunks
-        .iter()
-        .map(|chunk| ChunkSpan {
-            kind: None,
-            range: chunk.range,
-            head: chunk.range,
-            modifiers: Vec::new(),
-            sentence_index: scan_bundle
-                .scan
-                .sentences
-                .iter()
-                .position(|sentence| {
-                    sentence.range.start <= chunk.range.start
-                        && sentence.range.end >= chunk.range.end
-                })
-                .unwrap_or_default(),
-        })
-        .collect::<Vec<_>>();
-    let artifacts = SurfaceCompileArtifacts {
-        scan: ScanArtifact {
-            sentences: scan_bundle.scan.sentences.clone(),
-            tokens: Vec::new(),
-            mentions: scan_bundle.scan.mentions.clone(),
-            sentence_syntax: Vec::new(),
-            chunks: chunk_spans,
-            resolver_links: scan_bundle.scan.resolver_links.clone(),
-            narrative_hits: scan_bundle.scan.narrative_hits.clone(),
-            diagnostics: vec![Diagnostic {
-                code: "PX_TEMPORAL_SUBSTRATE_SCAN".to_owned(),
-                message: "Rebuilt compact scan artifact for temporal substrate compilation."
-                    .to_owned(),
-            }],
-        },
-        structure: build_causal_structure_artifact(document, scan_bundle),
-        surface: phoenix_types::SurfaceDocument::default(),
-    };
-    let propositions = PropositionLowerer::lower(&artifacts);
-    let semantics = SemanticLowerer::lower(&propositions);
+    let propositions = &substrate.propositions;
+    let semantics = &substrate.semantics;
     let document_id = document.document_id.0.clone();
     let dct_axis_id = TemporalAxisId("axis:world".to_owned());
     let mut axis_records = vec![TemporalAxisRecord {
@@ -9456,10 +9443,10 @@ fn build_document_temporal_substrate(
     }
 
     DocumentTemporalSubstrate {
-        propositions,
-        semantic_events: semantics.events,
-        semantic_states: semantics.states,
-        semantic_claims: semantics.claims,
+        propositions: propositions.clone(),
+        semantic_events: semantics.events.clone(),
+        semantic_states: semantics.states.clone(),
+        semantic_claims: semantics.claims.clone(),
         surface_temporal_cues,
         timex_records,
         anchor_candidates,

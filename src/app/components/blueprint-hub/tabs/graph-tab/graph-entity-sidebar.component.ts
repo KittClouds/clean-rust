@@ -39,11 +39,7 @@ import {
 import type { NerSuggestion } from '../../../../services/ner.service';
 import { GraphRebuildService } from '../../../../graph-rebuild/graph-rebuild.service';
 import type { GraphRebuildSnapshot } from '../../../../graph-rebuild/graph-rebuild-snapshot';
-import { buildGraphDocumentCompilerSummary } from '../../../../graph-rebuild/graph-document-compiler';
-import {
-    applyGraphDocumentReviewAction,
-    type GraphDocumentReviewActionKind,
-} from '../../../../graph-rebuild/graph-document-review';
+import { applyGraphDocumentReviewDecisionToSnapshot } from '../../../../graph-rebuild/graph-document-review-snapshot';
 import type { GraphLensMode } from './graph-lens';
 import {
     buildGraphDiscourseAnalyticsView,
@@ -648,85 +644,8 @@ function applyRecordDecision(
     record: GraphDiscourseWorkbenchRecord,
     decision: GraphDiscourseWorkbenchDecision,
 ): GraphRebuildSnapshot | null {
-    const review = snapshot?.documentReviewSummary;
-    const sidecar = snapshot?.documentSidecarSummary;
-    const actionKind = reviewActionKind(decision);
-    if (!snapshot || !review || !sidecar || !actionKind || !record.kind.startsWith('document-review:')) return null;
-    const row = review.rows.find((candidate) => candidate.objectId === record.sourceIds[0]);
-    if (!row?.availableActions.some((action) => action.kind === actionKind)) return null;
-    const builtAt = Date.now();
-    const nextReview = {
-        ...applyGraphDocumentReviewAction(review, { rowId: row.id, actionKind, createdAt: builtAt }),
-        builtAt,
-    };
-    const nextCompiler = buildGraphDocumentCompilerSummary({
-        sidecar,
-        review: nextReview,
-        builtAt,
-        entities: snapshot.nodes.map((node) => ({ id: node.entityId, label: node.label, aliases: node.aliases })),
-        baseline: {
-            atomCount: snapshot.nodes.length,
-            factCount: snapshot.relationships.length
-                + snapshot.events.length
-                + snapshot.temporalEdges.length
-                + snapshot.causalEdges.length
-                + snapshot.memoryState.length,
-            edgeCount: snapshot.edges.length,
-        },
-    });
-    return {
-        ...snapshot,
-        documentReviewSummary: nextReview,
-        documentCompilerSummary: nextCompiler,
-        counters: {
-            ...snapshot.counters,
-            documentReviewRows: nextReview.counters.rows,
-            documentReviewActionableRows: nextReview.counters.actionableRows,
-            documentReviewStateRecords: nextReview.counters.stateRecords,
-            documentReviewActions: nextReview.counters.actions,
-            documentReviewReceipts: nextReview.counters.receipts,
-            documentReviewReversibleReceipts: nextReview.counters.reversibleReceipts,
-            documentReviewProposedRows: nextReview.counters.proposedRows,
-            documentReviewAcceptedRows: nextReview.counters.acceptedRows,
-            documentReviewRejectedRows: nextReview.counters.rejectedRows,
-            documentReviewMutedRows: nextReview.counters.mutedRows,
-            documentReviewPromotedToAnchorRows: nextReview.counters.promotedToAnchorRows,
-            documentReviewCompiledToGraphRows: nextReview.counters.compiledToGraphRows,
-            documentReviewLedgerOnlyRows: nextReview.counters.ledgerOnlyRows,
-            documentCompilerEntityMentions: nextCompiler.counters.entityMentions,
-            documentCompilerRelationCandidates: nextCompiler.counters.relationCandidates,
-            documentCompilerHyperedges: nextCompiler.counters.hyperedges,
-            documentCompilerNaryHyperedges: nextCompiler.counters.naryHyperedges,
-            documentCompilerEvidenceEdges: nextCompiler.counters.evidenceBackedEdges,
-            documentCompilerCrossDocBridges: nextCompiler.counters.crossDocBridges,
-            documentCompilerStructureEdges: nextCompiler.counters.documentStructureEdges,
-            documentCompilerRetrievalOverlays: nextCompiler.counters.retrievalOverlays,
-            documentCompilerTopologyDiffs: nextCompiler.counters.topologyDiffs,
-            documentCompilerTopologyCommits: nextCompiler.counters.topologyCommits,
-            documentCompilerLedgerOnly: nextCompiler.counters.ledgerOnly,
-            documentCompilerOverlayOnly: nextCompiler.counters.overlayOnly,
-            documentCompilerReviewable: nextCompiler.counters.reviewable,
-            documentCompilerBlocked: nextCompiler.counters.blocked,
-            documentCompilerReceipts: nextCompiler.counters.receipts,
-            documentCompilerReversibleReceipts: nextCompiler.counters.reversibleReceipts,
-            documentCompilerMutationAllowed: nextCompiler.counters.mutationAllowed,
-            documentCompilerHighConfidenceFacts: nextCompiler.counters.highConfidenceFacts,
-            documentCompilerReviewedFacts: nextCompiler.counters.reviewedFacts,
-            documentCompilerAmbiguousFacts: nextCompiler.counters.ambiguousFacts,
-        },
-    };
-}
-
-function reviewActionKind(
-    decision: GraphDiscourseWorkbenchDecision,
-): GraphDocumentReviewActionKind | null {
-    if (decision === 'accepted') return 'accept_fact';
-    if (decision === 'rejected') return 'reject_fact';
-    if (decision === 'muted') return 'mute_detector_pattern';
-    if (decision === 'promoted_to_anchor') return 'promote_sidecar_to_anchor';
-    if (decision === 'compiled_to_graph') return 'compile_to_graph';
-    if (decision === 'ledger_only') return 'demote_graph_fact_to_sidecar';
-    return null;
+    if (!record.kind.startsWith('document-review:')) return null;
+    return applyGraphDocumentReviewDecisionToSnapshot(snapshot, [record.sourceIds[0]], decision);
 }
 
 function buildDiagnosticsQualityView(

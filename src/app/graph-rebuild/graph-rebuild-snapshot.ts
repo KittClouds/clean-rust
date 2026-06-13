@@ -20,9 +20,11 @@ import type { GraphDiscourseCompilerOverlaySummary } from './graph-discourse-com
 import type { HopfResonanceSpace } from './graph-hopf-resonance-space';
 import type { GraphDocumentSidecarSummary } from './graph-document-sidecar';
 import type { GraphDocumentProfileSummary } from './graph-document-profile';
+import type { GraphDocumentSemanticSummary } from './graph-document-semantic';
 import type { GraphDocumentReviewSummary } from './graph-document-review';
 import type { GraphDocumentCompilerSummary } from './graph-document-compiler';
 import type { GraphDocumentGraphMutationLedger } from './graph-document-durable-commit';
+import type { GraphOperatorMutationJournal } from './graph-operator-mutation-journal';
 
 export type GraphRebuildScopeKind = 'global' | 'folder' | 'narrative' | 'note' | 'multiNote';
 export type GraphRebuildAnchorSource = EntityOccurrence['source'] | 'accepted_suggestion';
@@ -2083,6 +2085,21 @@ export interface GraphRebuildCounters {
     documentSidecarGraphFacts?: number;
     documentSidecarEvidenceSpans?: number;
     documentSidecarAnchorPromotions?: number;
+    documentSemanticPropositions?: number;
+    documentSemanticArguments?: number;
+    documentSemanticResolvedArguments?: number;
+    documentSemanticNegated?: number;
+    documentSemanticModal?: number;
+    documentSemanticConditional?: number;
+    documentSemanticAttributed?: number;
+    documentSemanticQuoted?: number;
+    documentSemanticQuestions?: number;
+    documentSemanticDirectives?: number;
+    documentSemanticNary?: number;
+    documentSemanticReviewable?: number;
+    documentSemanticLedgerOnly?: number;
+    documentSemanticPredicateModifiers?: number;
+    documentSemanticPredicateNoise?: number;
     documentReviewRows?: number;
     documentReviewActionableRows?: number;
     documentReviewStateRecords?: number;
@@ -2096,6 +2113,12 @@ export interface GraphRebuildCounters {
     documentReviewPromotedToAnchorRows?: number;
     documentReviewCompiledToGraphRows?: number;
     documentReviewLedgerOnlyRows?: number;
+    operatorMutationIntents?: number;
+    operatorMutationActive?: number;
+    operatorMutationApplied?: number;
+    operatorMutationConflicted?: number;
+    operatorMutationUndone?: number;
+    operatorMutationReceipts?: number;
     documentCompilerEntityMentions?: number;
     documentCompilerRelationCandidates?: number;
     documentCompilerHyperedges?: number;
@@ -2129,6 +2152,7 @@ export interface GraphRebuildBuildTimings {
     dbLoadMs: number;
     occurrenceRecoverMs: number;
     documentProfileMs?: number;
+    documentSemanticMs?: number;
     snapshotBuildMs: number;
     stateCommitMs: number;
     nativeCompilerMs?: number;
@@ -2208,9 +2232,11 @@ export interface GraphRebuildSnapshot {
     discoursePromotionSurfaceSummary?: GraphDiscoursePromotionSurfaceSummary;
     discourseCompilerOverlaySummary?: GraphDiscourseCompilerOverlaySummary;
     documentSidecarSummary?: GraphDocumentSidecarSummary;
+    documentSemanticSummary?: GraphDocumentSemanticSummary;
     documentReviewSummary?: GraphDocumentReviewSummary;
     documentCompilerSummary?: GraphDocumentCompilerSummary;
     documentGraphMutationLedger?: GraphDocumentGraphMutationLedger;
+    operatorMutationJournal?: GraphOperatorMutationJournal;
     calendarRegistrySummary?: GraphCalendarRegistryBridgeSummary;
     counters: GraphRebuildCounters;
     buildTimings?: GraphRebuildBuildTimings;
@@ -2335,6 +2361,8 @@ export interface BuildGraphRebuildSnapshotInput {
     graphCompilerSidecar?: GraphCompilerDualWriteSidecar;
     calendarRegistrySnapshot?: CalendarRegistrySnapshot;
     documentProfileSummary?: GraphDocumentProfileSummary;
+    documentSemanticSummary?: GraphDocumentSemanticSummary;
+    operatorMutationJournal?: GraphOperatorMutationJournal;
 }
 
 export interface GraphRebuildNoteFolderContext {

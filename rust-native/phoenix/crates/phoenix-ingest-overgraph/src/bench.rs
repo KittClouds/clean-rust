@@ -34,6 +34,7 @@ pub struct IngestBenchmarkReport {
     pub scan_bundle_us: u64,
     pub resolve_us: u64,
     pub post_resolve_total_us: u64,
+    pub semantic_substrate_us: u64,
     pub causal_substrate_us: u64,
     pub temporal_substrate_us: u64,
     pub event_identity_substrate_us: u64,
@@ -79,12 +80,17 @@ impl PhoenixInvarantV3 {
         );
 
         let started = Instant::now();
-        let causal_substrate = build_document_causal_substrate(document, &scan_bundle, created_at);
+        let semantic_substrate =
+            build_document_semantic_substrate(document, &scan_bundle, created_at);
+        let semantic_substrate_us = elapsed_us(started);
+
+        let started = Instant::now();
+        let causal_substrate = build_document_causal_substrate(document, &semantic_substrate);
         let causal_substrate_us = elapsed_us(started);
 
         let started = Instant::now();
         let temporal_substrate =
-            build_document_temporal_substrate(document, &scan_bundle, created_at);
+            build_document_temporal_substrate(document, &semantic_substrate, created_at);
         let temporal_substrate_us = elapsed_us(started);
 
         let started = Instant::now();
@@ -203,6 +209,7 @@ impl PhoenixInvarantV3 {
             scan_bundle_us,
             resolve_us,
             post_resolve_total_us: elapsed_us(post_resolve_started),
+            semantic_substrate_us,
             causal_substrate_us,
             temporal_substrate_us,
             event_identity_substrate_us,

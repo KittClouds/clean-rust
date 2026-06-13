@@ -9,6 +9,7 @@ mod builder;
 mod compiler;
 mod embedding;
 mod facts;
+mod semantic;
 #[cfg(test)]
 mod tests;
 mod types;
@@ -31,6 +32,12 @@ pub use compiler::{
 pub use phoenix_chunker_native::{
     build_chunks, classify_document_profiles, Chunk, ChunkerConfig, DocumentProfileRequest,
     DocumentProfileSummary,
+};
+pub use semantic::{
+    build_document_semantic_summary, DocumentSemanticArgument, DocumentSemanticCounters,
+    DocumentSemanticDocument, DocumentSemanticEntity, DocumentSemanticInput,
+    DocumentSemanticProposition, DocumentSemanticRequest, DocumentSemanticScope,
+    DocumentSemanticSummary,
 };
 pub use types::{
     GraphAnchor, GraphCalendarRegistryBridgeCounters, GraphCalendarRegistryBridgeSummary,

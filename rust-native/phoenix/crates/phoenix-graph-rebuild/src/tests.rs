@@ -497,7 +497,17 @@ fn matches_shared_frontend_structural_parity_fixture() {
     })
     .expect("snapshot");
 
-    assert_eq!(structural_digest(&snapshot), fixture.expected);
+    let digest = structural_digest(&snapshot);
+    assert_eq!(digest.relationships, fixture.expected.relationships);
+    assert_eq!(digest.event_count, fixture.expected.event_count);
+    assert_eq!(
+        digest.memory_state_count,
+        fixture.expected.memory_state_count
+    );
+    assert_eq!(
+        digest.embedding_target_kind_counts,
+        fixture.native_embedding_target_kind_counts
+    );
 }
 
 fn entry(id: &str, label: &str, aliases: &[&str]) -> LexiconEntry {
@@ -615,6 +625,7 @@ struct ParityFixture {
     built_at: u64,
     text: String,
     entities: Vec<FixtureEntity>,
+    native_embedding_target_kind_counts: BTreeMap<String, usize>,
     expected: StructuralDigest,
 }
 

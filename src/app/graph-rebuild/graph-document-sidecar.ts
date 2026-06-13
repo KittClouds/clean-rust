@@ -5,6 +5,12 @@ import {
     type DocumentProfileKind,
     type GraphDocumentProfileSummary,
 } from './graph-document-profile';
+import type {
+    GraphDocumentSemanticDocument,
+    GraphDocumentSemanticProposition,
+    GraphDocumentSemanticScope,
+    GraphDocumentSemanticSummary,
+} from './graph-document-semantic';
 
 export type StructuralUnitKind =
     | 'document'
@@ -124,6 +130,11 @@ export interface GraphFactCandidate extends DocumentUnit {
     kind: GraphBearingUnitKind;
     subjectSurfaces: string[];
     objectSurfaces: string[];
+    roles?: Array<{ role: string; surfaces: string[]; entityIds: string[] }>;
+    predicate?: string;
+    relationType?: string;
+    semanticPropositionId?: string;
+    scope?: GraphDocumentSemanticScope[];
     evidenceSpanIds: string[];
     reviewState: 'proposed';
 }
@@ -185,6 +196,7 @@ export interface BuildGraphDocumentSidecarInput {
     chunks: GraphRebuildChunk[];
     builtAt: number;
     documentProfileSummary?: GraphDocumentProfileSummary;
+    documentSemanticSummary?: GraphDocumentSemanticSummary;
 }
 
 interface ParagraphSpan {
@@ -238,9 +250,12 @@ export function buildGraphDocumentSidecar(input: BuildGraphDocumentSidecarInput)
         sentenceLimitHits: 0,
     };
     const chunksByNote = groupChunksByNote(input.chunks);
+    const semanticsByNote = new Map(
+        (input.documentSemanticSummary?.documents || []).map((document) => [document.noteId, document]),
+    );
     for (const noteId of input.noteIds) {
         const text = input.noteTexts[noteId] || '';
-        buildNoteSidecar(context, noteId, text, chunksByNote.get(noteId) || []);
+        buildNoteSidecar(context, noteId, text, chunksByNote.get(noteId) || [], semanticsByNote.get(noteId));
     }
     buildCrossDocPackets(context, input.noteIds, input.chunks);
     for (const unit of context.units) unit.childIds = context.childIdsByParent.get(unit.id) || [];
@@ -261,7 +276,7 @@ export function buildGraphDocumentSidecar(input: BuildGraphDocumentSidecarInput)
     };
 }
 
-function buildNoteSidecar(context: BuildContext, noteId: string, text: string, chunks: GraphRebuildChunk[]): void {
+function buildNoteSidecar(context: BuildContext, noteId: string, text: string, chunks: GraphRebuildChunk[], semantics?: GraphDocumentSemanticDocument): void {
     const doc = addSection(context, noteId, 'document', 'Document', 0, text.length, 0, undefined, 0, confidence('surface', 0.98, ['note_root']));
     const headings = headingSpans(text);
     const sections = headings.length ? headings.map((heading, index) => {
@@ -302,7 +317,10 @@ function buildNoteSidecar(context: BuildContext, noteId: string, text: string, c
     buildSentenceUnits(context, noteId, paragraphs, paragraphUnits);
     buildSurfaceRegions(context, noteId, text, paragraphs, paragraphUnits);
     buildRetrievalUnits(context, noteId, chunks, sections);
-    buildRhetoricalAndFactUnits(context, noteId, paragraphs, paragraphUnits, chunks);
+    buildRhetoricalAndFactUnits(context, noteId, paragraphs, paragraphUnits, chunks, !semantics?.propositions.length);
+    if (semantics?.propositions.length) {
+        buildSemanticFactUnits(context, noteId, paragraphs, paragraphUnits, chunks, semantics.propositions);
+    }
 }
 
 function buildParagraphGroups(
@@ -405,6 +423,7 @@ function buildRhetoricalAndFactUnits(
     paragraphs: ParagraphSpan[],
     paragraphUnits: DocumentUnit[],
     chunks: GraphRebuildChunk[],
+    includeHeuristicFacts: boolean,
 ): void {
     const proposals: GraphFactProposal[] = [];
     for (let index = 0; index < paragraphs.length; index += 1) {
@@ -419,6 +438,7 @@ function buildRhetoricalAndFactUnits(
             if (row.kind === 'evidence' && evidenceSpan) addRetrievalUnit(context, noteId, 'citation_span', 'Citation span', paragraph.start, paragraph.end, unit.id, [], [evidenceSpan.id], confidence('rhetorical', 0.8, ['evidence_unit']));
         }
         const chunk = chunks.find((candidate) => candidate.start <= paragraph.start && candidate.end >= paragraph.end);
+        if (!includeHeuristicFacts) continue;
         const profile = documentProfileAt(context, noteId, paragraph.start);
         const facts = inferGraphFactKinds(paragraph.text, chunk, profile)
             .sort((left, right) => unitWeight(context, noteId, right, paragraph.start) - unitWeight(context, noteId, left, paragraph.start));
@@ -461,6 +481,176 @@ function buildRhetoricalAndFactUnits(
                 proposal.score,
             );
         });
+}
+
+function buildSemanticFactUnits(
+    context: BuildContext,
+    noteId: string,
+    paragraphs: ParagraphSpan[],
+    paragraphUnits: DocumentUnit[],
+    chunks: GraphRebuildChunk[],
+    propositions: GraphDocumentSemanticProposition[],
+): void {
+    const budget = graphFactBudget(context, noteId, chunks.length, paragraphs.length);
+    const selected = propositions
+        .filter((proposition) => isReviewableSemanticFact(proposition))
+        .sort((left, right) => semanticFactPriority(right) - semanticFactPriority(left)
+            || left.start - right.start)
+        .slice(0, budget)
+        .sort((left, right) => left.start - right.start);
+    for (const proposition of selected) {
+        const paragraphIndex = containingParagraphIndex(paragraphs, proposition.start);
+        const paragraph = paragraphs[paragraphIndex];
+        const parent = paragraphUnits[paragraphIndex];
+        if (!paragraph || !parent) continue;
+        const chunk = chunks.find((candidate) =>
+            candidate.start <= proposition.start && candidate.end >= proposition.end
+        );
+        const span: ParagraphSpan = {
+            start: proposition.start,
+            end: proposition.end,
+            text: proposition.preview || paragraph.text.slice(
+                Math.max(0, proposition.start - paragraph.start),
+                Math.max(0, proposition.end - paragraph.start),
+            ),
+        };
+        const evidence = addEvidenceSpan(
+            context,
+            noteId,
+            span,
+            parent.id,
+            chunk?.id,
+            confidence('graph_fact', proposition.confidenceMillis / 1000, [
+                'native_semantic_substrate',
+                proposition.relationType,
+            ]),
+        );
+        addSemanticGraphFactCandidate(
+            context,
+            noteId,
+            proposition,
+            span,
+            parent.id,
+            chunk?.id,
+            evidence.id,
+        );
+    }
+}
+
+function isReviewableSemanticFact(proposition: GraphDocumentSemanticProposition): boolean {
+    const predicate = proposition.predicate.toLowerCase();
+    if (!predicate || predicate.length < 2 || /^(?:he|she|it|they|his|her|their|\d+(?:st|nd|rd|th))$/.test(predicate)) {
+        return false;
+    }
+    if (proposition.reviewState === 'ledger_only' || proposition.predicateAdmission === 'ledger_only') {
+        return false;
+    }
+    if (['participle_modifier', 'nominal_event', 'noise'].includes(proposition.predicateQuality || '')) {
+        return false;
+    }
+    return proposition.arguments.length >= 2
+        || !!proposition.attribution
+        || !!proposition.conditional
+        || proposition.scope.some((scope) => scope.kind !== 'assertion');
+}
+
+function semanticFactPriority(proposition: GraphDocumentSemanticProposition): number {
+    const resolved = proposition.arguments.filter((argument) => !!argument.entityId).length;
+    const scope = proposition.scope.filter((row) => row.kind !== 'assertion').length;
+    const qualityBoost = proposition.predicateQuality === 'relation_cue' ? 80
+        : proposition.predicateQuality === 'finite_verb' ? 45
+            : proposition.predicateQuality === 'passive_event' || proposition.predicateQuality === 'copula_state' ? 30
+                : 0;
+    return proposition.confidenceMillis
+        + Math.min(3, proposition.arguments.length) * 40
+        + Math.min(2, resolved) * 80
+        + Math.min(2, scope) * 35
+        + (proposition.arguments.length >= 3 ? 60 : 0)
+        + qualityBoost;
+}
+
+function addSemanticGraphFactCandidate(
+    context: BuildContext,
+    noteId: string,
+    proposition: GraphDocumentSemanticProposition,
+    span: ParagraphSpan,
+    parentId: string,
+    chunkId: string | undefined,
+    evidenceSpanId: string,
+): GraphFactCandidate {
+    const kind = semanticFactKind(proposition);
+    const roles = [...new Map(proposition.arguments
+        .filter((argument) => !!argument.surface)
+        .map((argument) => [argument.role, argument.role]))]
+        .map(([role]) => ({
+            role,
+            surfaces: proposition.arguments
+                .filter((argument) => argument.role === role)
+                .map((argument) => argument.surface),
+            entityIds: proposition.arguments
+                .filter((argument) => argument.role === role && !!argument.entityId)
+                .map((argument) => argument.entityId as string),
+        }));
+    const unit = addUnit(context, {
+        noteId,
+        kind,
+        label: proposition.predicate || factLabel(kind),
+        start: proposition.start,
+        end: proposition.end,
+        depth: 4,
+        parentId,
+        confidence: confidence('graph_fact', proposition.confidenceMillis / 1000, [
+            'native_semantic_substrate',
+            proposition.relationType,
+            proposition.predicateQuality || 'predicate_unclassified',
+            ...(proposition.qualityReasons || []).slice(0, 2),
+        ]),
+        lens: 'graph_fact',
+    });
+    const subjects = roles.find((role) => role.role === 'subject')?.surfaces || [];
+    const objects = roles
+        .filter((role) => role.role !== 'subject')
+        .flatMap((role) => role.surfaces);
+    const candidate: GraphFactCandidate = {
+        ...unit,
+        kind,
+        subjectSurfaces: subjects,
+        objectSurfaces: objects,
+        roles,
+        predicate: proposition.predicate,
+        relationType: proposition.relationType,
+        semanticPropositionId: proposition.id,
+        scope: proposition.scope,
+        evidenceSpanIds: [evidenceSpanId],
+        reviewState: 'proposed',
+        lineage: { ...unit.lineage, chunkId },
+    };
+    context.graphFactCandidates.push(candidate);
+    return candidate;
+}
+
+function semanticFactKind(proposition: GraphDocumentSemanticProposition): GraphBearingUnitKind {
+    if (proposition.arguments.length >= 3) return 'n_ary_claim';
+    if (['state', 'attribute', 'identity'].some((value) => proposition.relationType.includes(value))) {
+        return 'state_change';
+    }
+    if (['action', 'movement', 'conflict', 'creation', 'lifecycle'].includes(proposition.relationType)) {
+        return 'event';
+    }
+    return 'relation_bundle';
+}
+
+function containingParagraphIndex(paragraphs: ParagraphSpan[], offset: number): number {
+    let low = 0;
+    let high = paragraphs.length - 1;
+    while (low <= high) {
+        const middle = low + Math.floor((high - low) / 2);
+        const paragraph = paragraphs[middle];
+        if (offset < paragraph.start) high = middle - 1;
+        else if (offset > paragraph.end) low = middle + 1;
+        else return middle;
+    }
+    return Math.max(0, Math.min(paragraphs.length - 1, low));
 }
 
 function buildCrossDocPackets(context: BuildContext, noteIds: string[], chunks: GraphRebuildChunk[]): void {

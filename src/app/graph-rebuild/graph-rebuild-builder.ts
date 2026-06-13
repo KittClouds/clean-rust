@@ -48,6 +48,7 @@ import { buildHopfResonanceSpace } from './graph-hopf-resonance-space';
 import { buildGraphDocumentSidecar } from './graph-document-sidecar';
 import { buildGraphDocumentReviewSummary } from './graph-document-review';
 import { buildGraphDocumentCompilerSummary } from './graph-document-compiler';
+import { replayGraphOperatorMutationJournal } from './graph-operator-mutation-journal';
 
 export { buildGraphRebuildAliasResolver, normalizeGraphRebuildCandidate };
 
@@ -135,6 +136,7 @@ export function buildGraphRebuildSnapshot(input: BuildGraphRebuildSnapshotInput)
         chunks,
         builtAt,
         documentProfileSummary: input.documentProfileSummary,
+        documentSemanticSummary: input.documentSemanticSummary,
     });
     const documentReviewSummary = buildGraphDocumentReviewSummary(documentSidecarSummary, builtAt);
     const documentCompilerSummary = buildGraphDocumentCompilerSummary({
@@ -153,7 +155,7 @@ export function buildGraphRebuildSnapshot(input: BuildGraphRebuildSnapshotInput)
         },
     });
 
-    const snapshot: GraphRebuildSnapshot = {
+    let snapshot: GraphRebuildSnapshot = {
         schemaVersion: 'phoenix-graph-rebuild/v1',
         id: `graph-rebuild:${input.scopeKind}:${input.scopeId}:${builtAt}`,
         source: 'phoenix-graph-rebuild',
@@ -183,6 +185,7 @@ export function buildGraphRebuildSnapshot(input: BuildGraphRebuildSnapshotInput)
         graphAwareLinkSuggestions,
         entityLinkSuggestions: entityLinking.suggestions,
         documentSidecarSummary,
+        documentSemanticSummary: input.documentSemanticSummary,
         documentReviewSummary,
         documentCompilerSummary,
         counters: {
@@ -251,6 +254,21 @@ export function buildGraphRebuildSnapshot(input: BuildGraphRebuildSnapshotInput)
             documentSidecarGraphFacts: documentSidecarSummary.counters.graphFactCandidates,
             documentSidecarEvidenceSpans: documentSidecarSummary.counters.evidenceSpans,
             documentSidecarAnchorPromotions: documentSidecarSummary.counters.userAnchorPromotions,
+            documentSemanticPropositions: input.documentSemanticSummary?.counters.propositions || 0,
+            documentSemanticArguments: input.documentSemanticSummary?.counters.arguments || 0,
+            documentSemanticResolvedArguments: input.documentSemanticSummary?.counters.resolvedArguments || 0,
+            documentSemanticNegated: input.documentSemanticSummary?.counters.negated || 0,
+            documentSemanticModal: input.documentSemanticSummary?.counters.modal || 0,
+            documentSemanticConditional: input.documentSemanticSummary?.counters.conditional || 0,
+            documentSemanticAttributed: input.documentSemanticSummary?.counters.attributed || 0,
+            documentSemanticQuoted: input.documentSemanticSummary?.counters.quoted || 0,
+            documentSemanticQuestions: input.documentSemanticSummary?.counters.questions || 0,
+            documentSemanticDirectives: input.documentSemanticSummary?.counters.directives || 0,
+            documentSemanticNary: input.documentSemanticSummary?.counters.nAry || 0,
+            documentSemanticReviewable: input.documentSemanticSummary?.counters.reviewable || 0,
+            documentSemanticLedgerOnly: input.documentSemanticSummary?.counters.ledgerOnly || 0,
+            documentSemanticPredicateModifiers: input.documentSemanticSummary?.counters.predicateModifiers || 0,
+            documentSemanticPredicateNoise: input.documentSemanticSummary?.counters.predicateNoise || 0,
             documentReviewRows: documentReviewSummary.counters.rows,
             documentReviewActionableRows: documentReviewSummary.counters.actionableRows,
             documentReviewStateRecords: documentReviewSummary.counters.stateRecords,
@@ -290,6 +308,9 @@ export function buildGraphRebuildSnapshot(input: BuildGraphRebuildSnapshotInput)
         },
         resolutionSuggestions: hygiene.suggestions,
     };
+    if (input.operatorMutationJournal) {
+        snapshot = replayGraphOperatorMutationJournal(snapshot, input.operatorMutationJournal, builtAt).snapshot;
+    }
     const hopfResonanceSpace = buildHopfResonanceSpace(snapshot, { generatedAt: builtAt });
     if (hopfResonanceSpace.assignments.length !== snapshot.embeddingTargets.length) {
         throw new Error(
