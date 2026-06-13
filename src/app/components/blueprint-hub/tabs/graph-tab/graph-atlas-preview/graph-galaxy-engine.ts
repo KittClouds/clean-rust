@@ -25,6 +25,7 @@ export type GalaxyEdgeColorMode = 'aqua' | 'orchid' | 'gold' | 'entityBlend' | '
 export type GalaxyBackgroundMode = 'nebula' | 'grid' | 'quiet' | 'void';
 export type GalaxyNodeDragMode = 'stretch' | 'force' | 'pin' | 'camera';
 export type GalaxyNodeShapeMode = 'atom' | 'halo' | 'sphere';
+export type GalaxySphereSurfaceMode = 'solid' | 'glass';
 export type GalaxyLayoutMode = 'single' | 'multiGalaxy' | 'hybridSpace' | 'hopfProjection' | 'lorentzTree' | 'productManifold' | 'siegelFinsler';
 export type GalaxyEmbeddingTopologyMode = 'off' | 'clusters' | 'regions' | 'lanes' | 'medoids' | 'outliers' | 'backbone' | 'bridges';
 
@@ -158,6 +159,7 @@ export interface GalaxyRenderSettings {
     edgeCurveStrength: number;
     nodeDistance: number;
     particleFlow: boolean;
+    particleFlowMode?: GalaxyParticleFlowMode;
     particleSize: number;
     particleSpeed: number;
     particleOpacity: number;
@@ -165,6 +167,7 @@ export interface GalaxyRenderSettings {
     backgroundMode: GalaxyBackgroundMode;
     nodeDragMode: GalaxyNodeDragMode;
     nodeShape: GalaxyNodeShapeMode;
+    sphereSurface?: GalaxySphereSurfaceMode;
     clickFocus: boolean;
     labelLimit: number;
     selectedPulse: boolean;
@@ -263,6 +266,8 @@ export interface GalaxyNode extends Rgb {
     hybridRenderPoint?: GalaxyHybridPlacementPoint;
 }
 
+export type GalaxyParticleFlowMode = 'swarm' | 'walk';
+
 export interface GalaxyEdge {
     id: string;
     source: number;
@@ -351,6 +356,7 @@ export const DEFAULT_GALAXY_SETTINGS: GalaxyRenderSettings = {
     edgeCurveStrength: 0.55,
     nodeDistance: 1,
     particleFlow: false,
+    particleFlowMode: 'swarm',
     particleSize: 1,
     particleSpeed: 1,
     particleOpacity: 0.72,
@@ -358,6 +364,7 @@ export const DEFAULT_GALAXY_SETTINGS: GalaxyRenderSettings = {
     backgroundMode: 'nebula',
     nodeDragMode: 'stretch',
     nodeShape: 'atom',
+    sphereSurface: 'solid',
     clickFocus: false,
     labelLimit: 14,
     selectedPulse: true,
@@ -383,6 +390,8 @@ export const DEFAULT_GALAXY_SETTINGS: GalaxyRenderSettings = {
 
 export function mergeGalaxySettings(settings?: Partial<GalaxyRenderSettings> | null): GalaxyRenderSettings {
     const merged = { ...DEFAULT_GALAXY_SETTINGS, ...settings };
+    if (merged.particleFlowMode !== 'walk') merged.particleFlowMode = 'swarm';
+    if (merged.sphereSurface !== 'glass') merged.sphereSurface = 'solid';
     if (merged.edgeColorMode === 'cyan') merged.edgeColorMode = 'aqua';
     merged.edgeCurveStrength = Math.min(1.2, Math.max(0.25, merged.edgeCurveStrength));
     merged.edgeWidth = Math.min(1.1, Math.max(0.15, merged.edgeWidth));
@@ -1094,6 +1103,15 @@ function groupInfoForNode(entity: GalaxyRenderableNode): Pick<GalaxyGroupPlan, '
     const sourceType = String(metadata.sourceType || '').toLowerCase();
     if (sourceType === 'query') {
         return { id: 'group:query', label: 'Query Trace', kind: 'query' };
+    }
+
+    const galaxyId = stringValue(metadata.galaxyId);
+    if (galaxyId) {
+        return {
+            id: galaxyId,
+            label: stringValue(metadata['galaxyLabel']) || sourceTitleFromLabel(entity.label) || titleCase(entity.kind),
+            kind: sourceType === 'entity' ? 'entity-cluster' : 'semantic-cluster',
+        };
     }
 
     const noteId = stringValue(metadata.noteId) || (sourceType === 'doc' ? stringValue(metadata.sourceId) : '');

@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild, computed, effect, inject, signal, untracked } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Plus, Search, SlidersHorizontal, Zap } from 'lucide-angular';
+import { Plus, ScanSearch, Search, Settings2, SlidersHorizontal, Zap } from 'lucide-angular';
 import { LucideAngularModule } from 'lucide-angular';
 
 import { entitySourceSystem, type RegisteredEntity } from '../../../../../lib/registry';
@@ -23,6 +23,17 @@ import {
     REGISTRY_ENTITY_PROJECTION_SPACE,
 } from './graph-registry-entity-projection';
 import { GraphGalaxyCanvasComponent } from './graph-galaxy-canvas.component';
+import { GraphCanvasInspectorComponent } from './graph-canvas-inspector.component';
+import {
+    buildCanvasSearchFocus,
+    filterGraphForCanvasLens,
+    graphCanvasBatchRecords,
+    graphCanvasInspectorRecord,
+    type GraphCanvasHit,
+    type GraphCanvasLens,
+    type GraphCanvasReviewRequest,
+    type GraphCanvasSourceRequest,
+} from './graph-canvas-interaction';
 import {
     mergeGalaxySettings,
     type GalaxyBackgroundMode,
@@ -52,6 +63,7 @@ interface ActiveAtlasGraph {
     trace: EmbeddingQueryTrace | null;
     graphInventory: GraphInventory;
     graphKindFilter: string;
+    canvasLens: GraphCanvasLens;
     nodes: GalaxyRenderableNode[];
     graphEdges: AtlasPreviewEdge[];
 }
@@ -65,6 +77,7 @@ interface PersistedAtlasViewState {
     manifoldMode: AtlasManifoldMode;
     settings: Partial<GalaxyRenderSettings>;
     graphKindFilter: string;
+    canvasLens: GraphCanvasLens;
     controlsCollapsed: boolean;
 }
 
@@ -79,6 +92,7 @@ const GRAPH_ATLAS_VIEW_STATE_KEY = 'graph.atlas.viewState.v1';
 const ATLAS_MODES = new Set<AtlasMode>(['entities', 'graph', 'embeddings']);
 const ATLAS_VIEW_MODES = new Set<AtlasViewMode>(['3d', 'map']);
 const ATLAS_MANIFOLD_MODES = new Set<AtlasManifoldMode>(['hybrid', 'hopf', 'lorentz', 'product', 'siegel']);
+const CANVAS_LENSES = new Set<GraphCanvasLens>(['entities', 'structure', 'facts', 'discourse', 'accepted', 'proposed']);
 
 export interface GraphInventory {
     nodes: GalaxyRenderableNode[];
@@ -102,6 +116,7 @@ function readPersistedAtlasViewState(): PersistedAtlasViewState {
         manifoldMode,
         settings: stored.settings && typeof stored.settings === 'object' ? stored.settings : {},
         graphKindFilter: typeof stored.graphKindFilter === 'string' && stored.graphKindFilter ? stored.graphKindFilter : 'all',
+        canvasLens: CANVAS_LENSES.has(stored.canvasLens as GraphCanvasLens) ? stored.canvasLens as GraphCanvasLens : 'entities',
         controlsCollapsed: stored.controlsCollapsed === true,
     };
 }
@@ -109,12 +124,12 @@ function readPersistedAtlasViewState(): PersistedAtlasViewState {
 @Component({
     selector: 'app-graph-atlas-preview',
     standalone: true,
-    imports: [CommonModule, FormsModule, LucideAngularModule, GraphGalaxyCanvasComponent],
+    imports: [CommonModule, FormsModule, LucideAngularModule, GraphGalaxyCanvasComponent, GraphCanvasInspectorComponent],
     template: `
         <section class="atlas-preview-surface relative h-full min-h-[520px] overflow-hidden rounded-none border border-white/5 bg-[#02040a] shadow-[0_24px_80px_rgba(0,0,0,0.24)]" [attr.data-backdrop]="settings.backgroundMode">
             <div class="relative z-10 flex h-full min-h-[520px] flex-col p-px">
-                <div class="pointer-events-none absolute left-5 right-5 top-5 z-30 flex items-start justify-between gap-3">
-                    <div class="flex min-w-0 items-start gap-2">
+                <div class="pointer-events-none absolute left-3 right-3 top-3 z-30 flex items-start justify-between gap-2">
+                    <div class="canvas-control-zone flex min-w-0 items-start gap-2 overflow-hidden">
                         <button type="button"
                             class="canvas-chrome-toggle"
                             [class.canvas-chrome-toggle-active]="controlsCollapsed"
@@ -123,17 +138,17 @@ function readPersistedAtlasViewState(): PersistedAtlasViewState {
                             <lucide-icon [img]="SlidersIcon" class="h-4 w-4"></lucide-icon>
                         </button>
                     @if (!controlsCollapsed) {
-                    <div class="canvas-control-rail flex min-w-0 flex-wrap items-center gap-2 rounded-2xl px-2 py-1.5">
+                    <div class="canvas-control-rail flex min-w-0 flex-nowrap items-center gap-2 overflow-x-auto rounded-2xl px-2 py-1.5">
                         <div class="flex rounded-xl border border-white/10 bg-black/40 p-1">
-                            <button type="button" class="rounded-lg px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] transition"
+                            <button type="button" class="rounded-lg px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.1em] transition"
                                 [class.bg-cyan-500/15]="atlasMode === 'entities'" [class.text-cyan-100]="atlasMode === 'entities'"
                                 [class.text-zinc-500]="atlasMode !== 'entities'" (click)="setAtlasMode('entities')">Entities</button>
-                            <button type="button" class="rounded-lg px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] transition"
+                            <button type="button" class="rounded-lg px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.1em] transition"
                                 [class.bg-cyan-500/15]="atlasMode === 'graph'" [class.text-cyan-100]="atlasMode === 'graph'"
                                 [class.text-zinc-500]="atlasMode !== 'graph'" (click)="setAtlasMode('graph')">Graph</button>
-                            <button type="button" class="rounded-lg px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] transition"
+                            <button type="button" class="rounded-lg px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.1em] transition"
                                 [class.bg-cyan-500/15]="atlasMode === 'embeddings'" [class.text-cyan-100]="atlasMode === 'embeddings'"
-                                [class.text-zinc-500]="atlasMode !== 'embeddings'" (click)="setAtlasMode('embeddings')">Embeddings</button>
+                                [class.text-zinc-500]="atlasMode !== 'embeddings'" (click)="setAtlasMode('embeddings')">Embed</button>
                         </div>
                         <span class="rounded-full border border-cyan-400/15 bg-cyan-500/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-cyan-100">{{ primaryCountLabel() }} {{ activeNodeCount() }}</span>
                         <span class="rounded-full border border-violet-400/15 bg-violet-500/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-violet-100">{{ secondaryCountLabel() }} {{ activeEdgeCount() }}</span>
@@ -152,62 +167,13 @@ function readPersistedAtlasViewState(): PersistedAtlasViewState {
                         <span class="rounded-full border border-sky-300/15 bg-sky-500/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-sky-100">Hopf receipts {{ hopf.assignments }} / {{ hopf.occupiedCells }} cells / {{ hopf.docCharts }} charts / {{ hopf.braids }} braids</span>
                         }
                         <div class="flex rounded-xl border border-white/10 bg-black/40 p-1">
-                            <button type="button" class="rounded-lg px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] transition"
+                            <button type="button" class="rounded-lg px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.1em] transition"
                                 [class.bg-cyan-500/15]="viewMode === '3d'" [class.text-cyan-100]="viewMode === '3d'"
                                 [class.text-zinc-500]="viewMode !== '3d'" (click)="setViewMode('3d')">3D</button>
-                            <button type="button" class="rounded-lg px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] transition"
+                            <button type="button" class="rounded-lg px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.1em] transition"
                                 [class.bg-cyan-500/15]="viewMode === 'map'" [class.text-cyan-100]="viewMode === 'map'"
                                 [class.text-zinc-500]="viewMode !== 'map'" (click)="setViewMode('map')">Map</button>
                         </div>
-                        @if (atlasMode === 'embeddings') {
-                        <div class="flex rounded-xl border border-white/10 bg-black/40 p-1">
-                            <button type="button" class="rounded-lg px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] transition"
-                                [class.bg-violet-500/20]="manifoldMode() === 'hybrid'" [class.text-violet-100]="manifoldMode() === 'hybrid'"
-                                [class.text-zinc-500]="manifoldMode() !== 'hybrid'" (click)="setManifoldMode('hybrid')">Hybrid</button>
-                            <button type="button" class="rounded-lg px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] transition"
-                                [class.bg-violet-500/20]="manifoldMode() === 'hopf'" [class.text-violet-100]="manifoldMode() === 'hopf'"
-                                [class.text-zinc-500]="manifoldMode() !== 'hopf'" (click)="setManifoldMode('hopf')">Hopf</button>
-                            <button type="button" class="rounded-lg px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] transition"
-                                [class.bg-violet-500/20]="manifoldMode() === 'lorentz'" [class.text-violet-100]="manifoldMode() === 'lorentz'"
-                                [class.text-zinc-500]="manifoldMode() !== 'lorentz'" (click)="setManifoldMode('lorentz')">Caps</button>
-                            <button type="button" class="rounded-lg px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] transition"
-                                [class.bg-violet-500/20]="manifoldMode() === 'product'" [class.text-violet-100]="manifoldMode() === 'product'"
-                                [class.text-zinc-500]="manifoldMode() !== 'product'" (click)="setManifoldMode('product')">Product</button>
-                            <button type="button" class="rounded-lg px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] transition"
-                                [class.bg-violet-500/20]="manifoldMode() === 'siegel'" [class.text-violet-100]="manifoldMode() === 'siegel'"
-                                [class.text-zinc-500]="manifoldMode() !== 'siegel'" (click)="setManifoldMode('siegel')">Siegel</button>
-                        </div>
-                        @if (manifoldMode() === 'hybrid') {
-                        <div class="flex rounded-xl border border-white/10 bg-black/40 p-1">
-                            <button type="button" class="rounded-lg px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] transition"
-                                [class.bg-cyan-500/15]="settings.layoutMode === 'hybridSpace'" [class.text-cyan-100]="settings.layoutMode === 'hybridSpace'"
-                                [class.text-zinc-500]="settings.layoutMode !== 'hybridSpace'" (click)="setLayoutMode('hybridSpace')">Shell</button>
-                            <button type="button" class="rounded-lg px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] transition"
-                                [class.bg-cyan-500/15]="settings.layoutMode === 'multiGalaxy'" [class.text-cyan-100]="settings.layoutMode === 'multiGalaxy'"
-                                [class.text-zinc-500]="settings.layoutMode !== 'multiGalaxy'" (click)="setLayoutMode('multiGalaxy')">Multi</button>
-                        </div>
-                        } @else if (manifoldMode() === 'hopf') {
-                        <div class="flex rounded-xl border border-white/10 bg-black/40 p-1">
-                            <button type="button" class="rounded-lg bg-cyan-500/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-cyan-100 transition"
-                                (click)="setLayoutMode('hopfProjection')">Projection</button>
-                        </div>
-                        } @else if (manifoldMode() === 'lorentz') {
-                        <div class="flex rounded-xl border border-white/10 bg-black/40 p-1">
-                            <button type="button" class="rounded-lg bg-cyan-500/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-cyan-100 transition"
-                                (click)="setLayoutMode('lorentzTree')">Caps</button>
-                        </div>
-                        } @else if (manifoldMode() === 'siegel') {
-                        <div class="flex rounded-xl border border-white/10 bg-black/40 p-1">
-                            <button type="button" class="rounded-lg bg-cyan-500/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-cyan-100 transition"
-                                (click)="setLayoutMode('siegelFinsler')">Finsler</button>
-                        </div>
-                        } @else {
-                        <div class="flex rounded-xl border border-white/10 bg-black/40 p-1">
-                            <button type="button" class="rounded-lg bg-cyan-500/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-cyan-100 transition"
-                                (click)="setLayoutMode('productManifold')">Transit</button>
-                        </div>
-                        }
-                        }
                         <div class="flex shrink-0 items-center gap-2">
                             <button type="button" class="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs font-semibold text-zinc-200 transition hover:border-cyan-400/20 hover:bg-cyan-500/10"
                                 (click)="resetCamera()">Reset</button>
@@ -218,12 +184,13 @@ function readPersistedAtlasViewState(): PersistedAtlasViewState {
                     }
                     </div>
 
-                    <div class="flex shrink-0 items-start gap-2">
+                    <div class="flex shrink-0 items-start gap-1.5">
                         <div class="relative">
                             <button type="button"
-                                class="canvas-glass-button rounded-xl px-3 py-1.5 text-xs font-semibold"
+                                class="canvas-glass-button rounded-xl px-2 py-1.5 text-[10px] font-semibold"
+                                [attr.title]="lensLabel() + ' lens'"
                                 (click)="toggleLensMenu()">
-                                {{ lensLabel() }} Lens
+                                {{ lensLabel() }}
                             </button>
                             @if (lensMenuOpen) {
                             <div class="pointer-events-auto absolute right-0 top-10 w-44 rounded-2xl border border-white/10 bg-black/55 p-2 text-xs shadow-2xl backdrop-blur">
@@ -237,14 +204,74 @@ function readPersistedAtlasViewState(): PersistedAtlasViewState {
                             }
                         </div>
                         <button type="button"
-                            class="canvas-glass-button rounded-xl px-3 py-1.5 text-xs font-semibold"
+                            class="canvas-glass-button inline-flex h-[34px] w-[34px] items-center justify-center rounded-xl"
+                            aria-label="Open atlas settings" title="Settings"
                             (click)="toggleSettings()">
-                            Settings
+                            <lucide-icon [img]="SettingsIcon" class="h-4 w-4"></lucide-icon>
                         </button>
                     </div>
                 </div>
 
                 <div class="atlas-canvas-surface relative min-h-0 flex-1 overflow-hidden rounded-none border border-white/5 bg-[#02040a] p-px">
+                    @if (atlasMode === 'graph') {
+                    <div class="canvas-lens-rail pointer-events-auto absolute left-4 top-16 z-30 flex flex-wrap items-center gap-1 border border-white/10 bg-black/65 p-1 shadow-xl backdrop-blur" aria-label="Graph object lens">
+                        @for (lens of canvasLenses; track lens.id) {
+                        <button type="button" class="px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] transition"
+                            [class.bg-teal-500/15]="canvasLens() === lens.id"
+                            [class.text-teal-100]="canvasLens() === lens.id"
+                            [class.text-zinc-500]="canvasLens() !== lens.id"
+                            (click)="setCanvasLens(lens.id)">{{ lens.label }}</button>
+                        }
+                        <button type="button" class="canvas-chrome-toggle"
+                            [class.canvas-chrome-toggle-active]="lassoEnabled()"
+                            title="Lasso select" aria-label="Toggle lasso selection"
+                            (click)="toggleLasso()">
+                            <lucide-icon [img]="LassoIcon" class="h-4 w-4"></lucide-icon>
+                        </button>
+                    </div>
+                    }
+                    @if (atlasMode === 'embeddings') {
+                    <div class="canvas-projection-rail pointer-events-auto absolute left-4 top-16 z-30 flex flex-wrap items-center gap-1 overflow-x-auto border border-white/10 bg-black/65 p-1 shadow-xl backdrop-blur"
+                        [class.canvas-projection-rail-top]="controlsCollapsed" aria-label="Embedding manifold projection">
+                        <div class="flex border-r border-white/10 pr-1">
+                            <button type="button" class="px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] transition"
+                                [class.bg-violet-500/20]="manifoldMode() === 'hybrid'" [class.text-violet-100]="manifoldMode() === 'hybrid'"
+                                [class.text-zinc-500]="manifoldMode() !== 'hybrid'" (click)="setManifoldMode('hybrid')">Hybrid</button>
+                            <button type="button" class="px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] transition"
+                                [class.bg-violet-500/20]="manifoldMode() === 'hopf'" [class.text-violet-100]="manifoldMode() === 'hopf'"
+                                [class.text-zinc-500]="manifoldMode() !== 'hopf'" (click)="setManifoldMode('hopf')">Hopf</button>
+                            <button type="button" class="px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] transition"
+                                [class.bg-violet-500/20]="manifoldMode() === 'lorentz'" [class.text-violet-100]="manifoldMode() === 'lorentz'"
+                                [class.text-zinc-500]="manifoldMode() !== 'lorentz'" (click)="setManifoldMode('lorentz')">Caps</button>
+                            <button type="button" class="px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] transition"
+                                [class.bg-violet-500/20]="manifoldMode() === 'product'" [class.text-violet-100]="manifoldMode() === 'product'"
+                                [class.text-zinc-500]="manifoldMode() !== 'product'" (click)="setManifoldMode('product')">Product</button>
+                            <button type="button" class="px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] transition"
+                                [class.bg-violet-500/20]="manifoldMode() === 'siegel'" [class.text-violet-100]="manifoldMode() === 'siegel'"
+                                [class.text-zinc-500]="manifoldMode() !== 'siegel'" (click)="setManifoldMode('siegel')">Siegel</button>
+                        </div>
+                        @if (manifoldMode() === 'hybrid') {
+                        <button type="button" class="px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] transition"
+                            [class.bg-cyan-500/15]="settings.layoutMode === 'hybridSpace'" [class.text-cyan-100]="settings.layoutMode === 'hybridSpace'"
+                            [class.text-zinc-500]="settings.layoutMode !== 'hybridSpace'" (click)="setLayoutMode('hybridSpace')">Shell</button>
+                        <button type="button" class="px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] transition"
+                            [class.bg-cyan-500/15]="settings.layoutMode === 'multiGalaxy'" [class.text-cyan-100]="settings.layoutMode === 'multiGalaxy'"
+                            [class.text-zinc-500]="settings.layoutMode !== 'multiGalaxy'" (click)="setLayoutMode('multiGalaxy')">Multi</button>
+                        } @else if (manifoldMode() === 'hopf') {
+                        <button type="button" class="bg-cyan-500/15 px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-cyan-100 transition"
+                            (click)="setLayoutMode('hopfProjection')">Projection</button>
+                        } @else if (manifoldMode() === 'lorentz') {
+                        <button type="button" class="bg-cyan-500/15 px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-cyan-100 transition"
+                            (click)="setLayoutMode('lorentzTree')">Caps</button>
+                        } @else if (manifoldMode() === 'siegel') {
+                        <button type="button" class="bg-cyan-500/15 px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-cyan-100 transition"
+                            (click)="setLayoutMode('siegelFinsler')">Finsler</button>
+                        } @else {
+                        <button type="button" class="bg-cyan-500/15 px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-cyan-100 transition"
+                            (click)="setLayoutMode('productManifold')">Transit</button>
+                        }
+                    </div>
+                    }
                     @if (activeNodeCount() === 0) {
                     <div class="flex h-full min-h-[430px] items-center justify-center rounded-none border border-dashed border-white/10 text-center">
                         <div>
@@ -256,7 +283,28 @@ function readPersistedAtlasViewState(): PersistedAtlasViewState {
                     <app-graph-galaxy-canvas #galaxyCanvas class="block h-full min-h-0 w-full"
                         [entities]="activeNodes()" [edges]="activeEdges()" [settings]="settings" [selectedEntityId]="selectedEntityId"
                         [queryFocus]="canvasQueryFocus()" [viewMode]="viewMode" [sourceMode]="atlasMode" [surfaceActive]="isAtlasSurfaceActive()"
-                        (entitySelected)="onCanvasEntitySelected($event)" (entityHovered)="hoveredEntity = $event"></app-graph-galaxy-canvas>
+                        [lassoEnabled]="lassoEnabled()"
+                        (entitySelected)="onCanvasEntitySelected($event)" (entityHovered)="hoveredEntity = $event"
+                        (objectSelected)="onCanvasObjectSelected($event)" (objectHovered)="hoveredCanvasHit.set($event)"
+                        (batchSelected)="onCanvasBatchSelected($event)"></app-graph-galaxy-canvas>
+                    <app-graph-canvas-inspector
+                        [record]="canvasInspectorRecord()"
+                        [batchRecords]="canvasBatchRecords()"
+                        [busy]="canvasReviewBusy"
+                        (close)="closeCanvasInspector()"
+                        (focusRequested)="focusCanvasNodes($event)"
+                        (sourceRequested)="sourceRequested.emit($event)"
+                        (reviewRequested)="reviewRequested.emit($event)">
+                    </app-graph-canvas-inspector>
+                    @if (!canvasInspectorRecord() && canvasBatchRecords().length === 0 && canvasHoverRecord(); as hover) {
+                    <div class="pointer-events-none absolute bottom-20 left-4 z-30 max-w-[320px] border border-teal-300/20 bg-black/75 px-3 py-2 text-xs shadow-2xl backdrop-blur">
+                        <div class="flex items-center justify-between gap-3">
+                            <strong class="truncate text-zinc-100">{{ hover.title }}</strong>
+                            @if (hover.confidence !== null) { <span class="text-teal-200">{{ hover.confidence | percent:'1.0-0' }}</span> }
+                        </div>
+                        <p class="mt-1 line-clamp-2 text-zinc-400">{{ hover.sourceSnippet || hover.subtitle }}</p>
+                    </div>
+                    }
                     @if (atlasMode === 'graph') {
                     <div class="absolute bottom-4 right-4 z-30 flex max-w-[calc(100%-32px)] flex-col items-end gap-2">
                         <!-- Filter buttons (the 4 important buttons) -->
@@ -341,13 +389,16 @@ function readPersistedAtlasViewState(): PersistedAtlasViewState {
                             <button type="button" class="galaxy-control-button" (click)="cycleLabelMode()">Labels<span>{{ settings.labelMode }}</span></button>
                             <button type="button" class="galaxy-control-button" (click)="cycleEdgeMode()">Edges<span>{{ settings.edgeMode }}</span></button>
                             <button type="button" class="galaxy-control-button" (click)="cycleEdgeColorMode()">Palette<span>{{ edgeColorLabel() }}</span></button>
-                            <button type="button" class="galaxy-control-button" (click)="toggleParticles()">Flow<span>{{ settings.particleFlow ? 'on' : 'off' }}</span></button>
+                            <button type="button" class="galaxy-control-button" (click)="cycleParticleFlow()">Flow<span>{{ particleFlowLabel() }}</span></button>
                             @if (atlasMode === 'embeddings') {
                             <button type="button" class="galaxy-control-button" (click)="cycleEmbeddingTopologyMode()">Topology<span>{{ embeddingTopologyLabel() }}</span></button>
                             }
                             <button type="button" class="galaxy-control-button" (click)="cycleNodeDragMode()">Drag<span>{{ settings.nodeDragMode }}</span></button>
                             <button type="button" class="galaxy-control-button" (click)="toggleClickFocus()">Dbl Focus<span>{{ settings.clickFocus ? 'on' : 'off' }}</span></button>
                             <button type="button" class="galaxy-control-button" (click)="cycleNodeShape()">Shape<span>{{ settings.nodeShape }}</span></button>
+                            @if (settings.nodeShape === 'sphere') {
+                            <button type="button" class="galaxy-control-button" (click)="toggleSphereSurface()">Marble<span>{{ settings.sphereSurface === 'glass' ? 'B · glass' : 'A · solid' }}</span></button>
+                            }
                             <button type="button" class="galaxy-control-button" (click)="toggleAutoRotate()">Rotate<span>{{ settings.autoRotate ? 'on' : 'off' }}</span></button>
                             <button type="button" class="galaxy-control-button" (click)="cycleBackgroundMode()">Backdrop<span>{{ backgroundLabel() }}</span></button>
                             @if (settings.layoutMode === 'hybridSpace' || settings.layoutMode === 'productManifold') {
@@ -494,7 +545,30 @@ function readPersistedAtlasViewState(): PersistedAtlasViewState {
             padding: 2px 1px 0;
         }
 
-        .canvas-control-rail { pointer-events: none; background: transparent; box-shadow: none; }
+        .canvas-control-rail { pointer-events: auto; background: transparent; box-shadow: none; scrollbar-width: none; }
+        .canvas-control-zone { max-width: calc(100% - 102px); }
+        .atlas-canvas-surface { container-type: inline-size; }
+        .canvas-lens-rail { max-width: calc(100% - 32px); }
+        .canvas-projection-rail { max-width: calc(100% - 32px); scrollbar-width: none; }
+        .canvas-projection-rail-top {
+            left: 50%;
+            top: 12px;
+            max-width: calc(100% - 220px);
+            flex-wrap: nowrap;
+            transform: translateX(-50%);
+        }
+        .canvas-projection-rail::-webkit-scrollbar { display: none; }
+        @container (max-width: 820px) {
+            .canvas-projection-rail-top {
+                left: 16px;
+                top: 64px;
+                max-width: calc(100% - 32px);
+                flex-wrap: wrap;
+                transform: none;
+            }
+        }
+        .canvas-control-rail::-webkit-scrollbar { display: none; }
+        .canvas-control-rail > * { flex: 0 0 auto; }
         .canvas-control-rail button, .canvas-chrome-toggle, .canvas-glass-button, .settings-float button, .settings-float input, .atlas-bottom-shelf, .atlas-bottom-shelf * { pointer-events: auto; }
 
         .canvas-chrome-toggle {
@@ -785,6 +859,7 @@ export class GraphAtlasPreviewComponent implements OnInit {
     }
     @Input() atlasSearch = '';
     @Input() isScanning = false;
+    @Input() canvasReviewBusy = false;
     @Input() activeProvider: EntitySuggestionProviderId | null = null;
     @Output() entitySelected = new EventEmitter<RegisteredEntity>();
     @Output() addEntityRequested = new EventEmitter<void>();
@@ -793,6 +868,8 @@ export class GraphAtlasPreviewComponent implements OnInit {
     @Output() atlasModeChange = new EventEmitter<AtlasMode>();
     @Output() lensModeChange = new EventEmitter<GraphLensMode>();
     @Output() atlasSearchChange = new EventEmitter<string>();
+    @Output() reviewRequested = new EventEmitter<GraphCanvasReviewRequest>();
+    @Output() sourceRequested = new EventEmitter<GraphCanvasSourceRequest>();
     @ViewChild('galaxyCanvas') private galaxyCanvas?: GraphGalaxyCanvasComponent;
 
     private readonly persistedViewState = readPersistedAtlasViewState();
@@ -805,6 +882,11 @@ export class GraphAtlasPreviewComponent implements OnInit {
     isRefreshingProjection = false;
     selectedEntityId: string | null = null;
     hoveredEntity: GalaxyRenderableNode | null = null;
+    readonly canvasLens = signal<GraphCanvasLens>(this.persistedViewState.canvasLens);
+    readonly lassoEnabled = signal(false);
+    readonly selectedCanvasHit = signal<GraphCanvasHit | null>(null);
+    readonly hoveredCanvasHit = signal<GraphCanvasHit | null>(null);
+    readonly batchSelectedNodeIds = signal<string[]>([]);
     queryText = signal('');
     queryTrace = signal<EmbeddingQueryTrace | null>(null);
     readonly manifoldMode = this.machine.manifoldMode;
@@ -837,13 +919,23 @@ export class GraphAtlasPreviewComponent implements OnInit {
     }));
     readonly PlusIcon = Plus;
     readonly SearchIcon = Search;
+    readonly SettingsIcon = Settings2;
     readonly SlidersIcon = SlidersHorizontal;
+    readonly LassoIcon = ScanSearch;
     readonly ZapIcon = Zap;
     readonly lensModes: { id: GraphLensMode; label: string }[] = [
         { id: 'global', label: 'Global' },
         { id: 'narrative', label: 'Narrative' },
         { id: 'note', label: 'Note' },
         { id: 'multiNote', label: 'Compare' },
+    ];
+    readonly canvasLenses: { id: GraphCanvasLens; label: string }[] = [
+        { id: 'entities', label: 'Entities' },
+        { id: 'structure', label: 'Structure' },
+        { id: 'facts', label: 'Facts' },
+        { id: 'discourse', label: 'Discourse' },
+        { id: 'accepted', label: 'Accepted' },
+        { id: 'proposed', label: 'Proposed' },
     ];
 
     constructor() {
@@ -873,6 +965,9 @@ export class GraphAtlasPreviewComponent implements OnInit {
     }
 
     ngOnInit(): void {
+        if (this.atlasMode === 'graph' && this.settings.layoutMode === 'single') {
+            this.settings = mergeGalaxySettings({ ...this.settings, layoutMode: 'multiGalaxy' });
+        }
         this.atlasModeChange.emit(this.atlasMode);
     }
 
@@ -887,8 +982,11 @@ export class GraphAtlasPreviewComponent implements OnInit {
         if (changed) this.atlasModeChange.emit(mode);
         this.selectedEntityId = null;
         this.hoveredEntity = null;
-        if (mode !== 'embeddings' && this.settings.layoutMode !== 'single') {
+        this.closeCanvasInspector();
+        if (mode === 'entities' && this.settings.layoutMode !== 'single') {
             this.updateSettings({ layoutMode: 'single' });
+        } else if (mode === 'graph' && this.settings.layoutMode !== 'multiGalaxy') {
+            this.updateSettings({ layoutMode: 'multiGalaxy' });
         } else if (mode === 'embeddings') {
             const layoutMode = this.layoutForManifold(this.manifoldMode());
             if (this.settings.layoutMode === 'single' || this.settings.layoutMode !== layoutMode && this.manifoldMode() !== 'hybrid') {
@@ -908,8 +1006,21 @@ export class GraphAtlasPreviewComponent implements OnInit {
         this.persistViewState();
     }
 
+    setCanvasLens(lens: GraphCanvasLens): void {
+        if (this.canvasLens() === lens) return;
+        this.canvasLens.set(lens);
+        this.graphKindFilter.set('all');
+        this.activeGraphCache = null;
+        this.closeCanvasInspector();
+        this.persistViewState();
+    }
+
+    toggleLasso(): void {
+        this.lassoEnabled.update((value) => !value);
+    }
+
     setLayoutMode(mode: GalaxyLayoutMode): void {
-        if (mode !== 'single' && this.atlasMode !== 'embeddings') return;
+        if (mode !== 'single' && mode !== 'multiGalaxy' && this.atlasMode !== 'embeddings') return;
         if ((mode === 'hybridSpace' || mode === 'multiGalaxy') && this.manifoldMode() !== 'hybrid') {
             this.machine.setManifoldMode('hybrid');
         } else if (mode === 'hopfProjection' && this.manifoldMode() !== 'hopf') {
@@ -1048,6 +1159,43 @@ export class GraphAtlasPreviewComponent implements OnInit {
         this.selectedEntityId = this.selectedEntityId === node.id ? null : node.id;
     }
 
+    onCanvasObjectSelected(hit: GraphCanvasHit): void {
+        this.selectedCanvasHit.set(hit);
+        this.batchSelectedNodeIds.set([]);
+        if (hit.kind === 'node') this.selectedEntityId = hit.id;
+    }
+
+    onCanvasBatchSelected(ids: string[]): void {
+        this.batchSelectedNodeIds.set(ids);
+        this.selectedCanvasHit.set(null);
+        this.selectedEntityId = ids.length === 1 ? ids[0] : null;
+    }
+
+    closeCanvasInspector(): void {
+        this.selectedCanvasHit.set(null);
+        this.batchSelectedNodeIds.set([]);
+        this.selectedEntityId = null;
+    }
+
+    focusCanvasNodes(ids: string[]): void {
+        const id = ids.find((candidate) => this.activeNodes().some((node) => node.id === candidate));
+        if (!id) return;
+        this.selectedEntityId = id;
+        this.galaxyCanvas?.focusEntity(id);
+    }
+
+    canvasInspectorRecord() {
+        return graphCanvasInspectorRecord(this.selectedCanvasHit(), this.activeNodes(), this.activeEdges());
+    }
+
+    canvasHoverRecord() {
+        return graphCanvasInspectorRecord(this.hoveredCanvasHit(), this.activeNodes(), this.activeEdges());
+    }
+
+    canvasBatchRecords() {
+        return graphCanvasBatchRecords(this.batchSelectedNodeIds(), this.activeNodes());
+    }
+
     runAtlasQuery(): void {
         this.atlasMode = 'embeddings';
         this.persistViewState();
@@ -1117,8 +1265,21 @@ export class GraphAtlasPreviewComponent implements OnInit {
         return labels[this.settings.embeddingTopologyMode || 'off'];
     }
 
-    toggleParticles(): void {
-        this.updateSettings({ particleFlow: !this.settings.particleFlow });
+    cycleParticleFlow(): void {
+        if (!this.settings.particleFlow) {
+            this.updateSettings({ particleFlow: true, particleFlowMode: 'swarm' });
+            return;
+        }
+        if (this.settings.particleFlowMode !== 'walk') {
+            this.updateSettings({ particleFlow: true, particleFlowMode: 'walk' });
+            return;
+        }
+        this.updateSettings({ particleFlow: false });
+    }
+
+    particleFlowLabel(): string {
+        if (!this.settings.particleFlow) return 'off';
+        return this.settings.particleFlowMode === 'walk' ? 'walk' : 'swarm';
     }
 
     cycleNodeDragMode(): void {
@@ -1318,12 +1479,13 @@ export class GraphAtlasPreviewComponent implements OnInit {
 
     canvasQueryFocus() {
         const trace = this.queryTrace();
-        return trace ? {
+        if (trace) return {
             queryNodeId: trace.queryNode.id,
             primaryNodeIds: trace.primaryIds,
             secondaryNodeIds: trace.secondaryIds,
             edgeIds: trace.edgeIds,
-        } : null;
+        };
+        return buildCanvasSearchFocus(this.atlasSearch, this.activeNodes(), this.activeEdges());
     }
 
     activePreview(): EmbeddingSourcePreview | null {
@@ -1349,6 +1511,7 @@ export class GraphAtlasPreviewComponent implements OnInit {
             manifoldMode: this.manifoldMode(),
             settings: this.settings,
             graphKindFilter: this.graphKindFilter(),
+            canvasLens: this.canvasLens(),
             controlsCollapsed: this.controlsCollapsed,
         });
     }
@@ -1425,6 +1588,7 @@ export class GraphAtlasPreviewComponent implements OnInit {
         const trace = this.queryTrace();
         const graphInventory = this.graphInventory();
         const graphKindFilter = this.graphKindFilter();
+        const canvasLens = this.canvasLens();
         const cached = this.activeGraphCache;
         if (
             cached &&
@@ -1434,7 +1598,8 @@ export class GraphAtlasPreviewComponent implements OnInit {
             cached.atlas === atlas &&
             cached.trace === trace &&
             cached.graphInventory === graphInventory &&
-            cached.graphKindFilter === graphKindFilter
+            cached.graphKindFilter === graphKindFilter &&
+            cached.canvasLens === canvasLens
         ) {
             return cached;
         }
@@ -1455,6 +1620,7 @@ export class GraphAtlasPreviewComponent implements OnInit {
                 trace,
                 graphInventory,
                 graphKindFilter,
+                canvasLens,
                 nodes,
                 graphEdges: this.edges,
             };
@@ -1462,13 +1628,14 @@ export class GraphAtlasPreviewComponent implements OnInit {
         }
 
         if (this.atlasMode === 'graph') {
+            const lensSlice = filterGraphForCanvasLens(graphInventory.nodes, graphInventory.edges, canvasLens);
             const allowed = graphKindFilter === 'all' ? null : new Set(
-                graphInventory.nodes.filter((node) => normalizeGraphKind(node.kind) === graphKindFilter).map((node) => node.id),
+                lensSlice.nodes.filter((node) => normalizeGraphKind(node.kind) === graphKindFilter).map((node) => node.id),
             );
-            const nodes = allowed ? graphInventory.nodes.filter((node) => allowed.has(node.id)) : graphInventory.nodes;
+            const nodes = allowed ? lensSlice.nodes.filter((node) => allowed.has(node.id)) : lensSlice.nodes;
             const graphEdges = allowed
-                ? graphInventory.edges.filter((edge) => allowed.has(edge.sourceId) && allowed.has(edge.targetId))
-                : graphInventory.edges;
+                ? lensSlice.edges.filter((edge) => allowed.has(edge.sourceId) && allowed.has(edge.targetId))
+                : lensSlice.edges;
             this.activeGraphCache = {
                 mode: this.atlasMode,
                 entities: this.entities,
@@ -1477,6 +1644,7 @@ export class GraphAtlasPreviewComponent implements OnInit {
                 trace,
                 graphInventory,
                 graphKindFilter,
+                canvasLens,
                 nodes,
                 graphEdges,
             };
@@ -1493,6 +1661,7 @@ export class GraphAtlasPreviewComponent implements OnInit {
             trace,
             graphInventory,
             graphKindFilter,
+            canvasLens,
             nodes: trace ? [trace.queryNode, ...embeddingNodes] : embeddingNodes,
             graphEdges: trace ? [...trace.edges, ...embeddingEdges] : embeddingEdges,
         };
@@ -1531,6 +1700,10 @@ export class GraphAtlasPreviewComponent implements OnInit {
             } satisfies GalaxyRenderableNode;
         });
         return [...atlas.nodes, ...anchors];
+    }
+
+    toggleSphereSurface(): void {
+        this.updateSettings({ sphereSurface: this.settings.sphereSurface === 'glass' ? 'solid' : 'glass' });
     }
 
     private registryEntityProjectionNode(

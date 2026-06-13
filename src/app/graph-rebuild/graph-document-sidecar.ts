@@ -1,4 +1,10 @@
 import type { GraphRebuildChunk } from './graph-rebuild-snapshot';
+import {
+    buildFallbackDocumentProfileSummary,
+    documentUnitWeight,
+    type DocumentProfileKind,
+    type GraphDocumentProfileSummary,
+} from './graph-document-profile';
 
 export type StructuralUnitKind =
     | 'document'
@@ -169,6 +175,7 @@ export interface GraphDocumentSidecarSummary {
     retrievalUnits: RetrievalUnit[];
     graphFactCandidates: GraphFactCandidate[];
     evidenceSpans: EvidenceSpan[];
+    documentProfileSummary?: GraphDocumentProfileSummary;
     counters: GraphDocumentSidecarCounters;
 }
 
@@ -177,12 +184,23 @@ export interface BuildGraphDocumentSidecarInput {
     noteTexts: Record<string, string>;
     chunks: GraphRebuildChunk[];
     builtAt: number;
+    documentProfileSummary?: GraphDocumentProfileSummary;
 }
 
 interface ParagraphSpan {
     start: number;
     end: number;
     text: string;
+}
+
+interface GraphFactProposal {
+    kind: GraphBearingUnitKind;
+    paragraph: ParagraphSpan;
+    parentId: string;
+    chunkId?: string;
+    evidenceSpanId?: string;
+    score: number;
+    priority: number;
 }
 
 interface BuildContext {
@@ -194,6 +212,7 @@ interface BuildContext {
     retrievalUnits: RetrievalUnit[];
     graphFactCandidates: GraphFactCandidate[];
     evidenceSpans: EvidenceSpan[];
+    documentProfileSummary: GraphDocumentProfileSummary;
     childIdsByParent: Map<string, string[]>;
     sentenceLimitHits: number;
 }
@@ -203,6 +222,8 @@ const MAX_SENTENCE_UNITS_PER_NOTE = 2400;
 const PREVIEW_CHARS = 180;
 
 export function buildGraphDocumentSidecar(input: BuildGraphDocumentSidecarInput): GraphDocumentSidecarSummary {
+    const documentProfileSummary = input.documentProfileSummary
+        || buildFallbackDocumentProfileSummary(input.noteTexts, input.builtAt);
     const context: BuildContext = {
         builtAt: input.builtAt,
         units: [],
@@ -212,6 +233,7 @@ export function buildGraphDocumentSidecar(input: BuildGraphDocumentSidecarInput)
         retrievalUnits: [],
         graphFactCandidates: [],
         evidenceSpans: [],
+        documentProfileSummary,
         childIdsByParent: new Map(),
         sentenceLimitHits: 0,
     };
@@ -234,6 +256,7 @@ export function buildGraphDocumentSidecar(input: BuildGraphDocumentSidecarInput)
         retrievalUnits: context.retrievalUnits,
         graphFactCandidates: context.graphFactCandidates,
         evidenceSpans: context.evidenceSpans,
+        documentProfileSummary,
         counters: buildCounters(context),
     };
 }
@@ -357,13 +380,14 @@ function buildSurfaceRegions(
         const lower = paragraph.text.toLowerCase();
         const parentId = paragraphUnits[index].id;
         if (isDialogue(paragraph.text)) {
-            addRegion(context, regionInput(noteId, 'dialogue_block', 'Dialogue block', paragraph, parentId, 'prose', 'surface', 0.84, ['quote_or_speech_cue']));
+            addRegion(context, regionInput(noteId, 'dialogue_block', 'Dialogue block', paragraph, parentId, 'prose', 'surface', adaptedScore(context, noteId, 'dialogue_block', paragraph.start, 0.84), ['quote_or_speech_cue', 'document_profile_weighted']));
         } else if (EVENT_CUES.some((cue) => lower.includes(cue))) {
-            addRegion(context, regionInput(noteId, 'action_block', 'Action block', paragraph, parentId, 'prose', 'surface', 0.7, ['event_cue']));
+            addRegion(context, regionInput(noteId, 'action_block', 'Action block', paragraph, parentId, 'prose', 'surface', adaptedScore(context, noteId, 'action_block', paragraph.start, 0.7), ['event_cue', 'document_profile_weighted']));
         }
         const explicit = paragraph.text.match(/^\s*(chapter|scene)\s+([^\n]+)/i);
         if (explicit) {
-            addSection(context, noteId, explicit[1].toLowerCase() as 'chapter' | 'scene', explicit[0].trim(), paragraph.start, paragraph.end, 1, parentId, index, confidence('surface', 0.9, ['explicit_prose_marker']), explicit[0].trim());
+            const kind = explicit[1].toLowerCase() as 'chapter' | 'scene';
+            addSection(context, noteId, kind, explicit[0].trim(), paragraph.start, paragraph.end, 1, parentId, index, confidence('surface', adaptedScore(context, noteId, kind, paragraph.start, 0.9), ['explicit_prose_marker', 'document_profile_weighted']), explicit[0].trim());
         }
     }
 }
@@ -382,21 +406,61 @@ function buildRhetoricalAndFactUnits(
     paragraphUnits: DocumentUnit[],
     chunks: GraphRebuildChunk[],
 ): void {
+    const proposals: GraphFactProposal[] = [];
     for (let index = 0; index < paragraphs.length; index += 1) {
         const paragraph = paragraphs[index];
         const parentId = paragraphUnits[index].id;
-        const rhetorical = inferRhetoricalKinds(paragraph.text);
-        const evidenceSpan = rhetorical.length ? addEvidenceSpan(context, noteId, paragraph, parentId, undefined, confidence('rhetorical', 0.72, ['paragraph_rhetorical_cue'])) : undefined;
-        for (const row of rhetorical.slice(0, 2)) {
-            const unit = addRhetoricalUnit(context, noteId, row.kind, row.kind, paragraph, parentId, row.cue, evidenceSpan ? [evidenceSpan.id] : []);
+        const rhetorical = inferRhetoricalKinds(paragraph.text)
+            .slice(0, 2)
+            .sort((left, right) => unitWeight(context, noteId, right.kind, paragraph.start) - unitWeight(context, noteId, left.kind, paragraph.start));
+        const evidenceSpan = rhetorical.length ? addEvidenceSpan(context, noteId, paragraph, parentId, undefined, confidence('rhetorical', adaptedScore(context, noteId, 'evidence', paragraph.start, 0.72), ['paragraph_rhetorical_cue', 'document_profile_weighted'])) : undefined;
+        for (const row of rhetorical) {
+            const unit = addRhetoricalUnit(context, noteId, row.kind, row.kind, paragraph, parentId, row.cue, evidenceSpan ? [evidenceSpan.id] : [], adaptedScore(context, noteId, row.kind, paragraph.start, 0.72));
             if (row.kind === 'evidence' && evidenceSpan) addRetrievalUnit(context, noteId, 'citation_span', 'Citation span', paragraph.start, paragraph.end, unit.id, [], [evidenceSpan.id], confidence('rhetorical', 0.8, ['evidence_unit']));
         }
         const chunk = chunks.find((candidate) => candidate.start <= paragraph.start && candidate.end >= paragraph.end);
-        for (const fact of inferGraphFactKinds(paragraph.text, chunk).slice(0, 2)) {
-            const span = evidenceSpan || addEvidenceSpan(context, noteId, paragraph, parentId, chunk?.id, confidence('graph_fact', 0.68, ['graph_fact_cue']));
-            addGraphFactCandidate(context, noteId, fact, paragraph, parentId, chunk?.id, [span.id]);
+        const profile = documentProfileAt(context, noteId, paragraph.start);
+        const facts = inferGraphFactKinds(paragraph.text, chunk, profile)
+            .sort((left, right) => unitWeight(context, noteId, right, paragraph.start) - unitWeight(context, noteId, left, paragraph.start));
+        const fact = facts[0];
+        if (fact) {
+            const score = adaptedScore(context, noteId, fact, paragraph.start, 0.66);
+            proposals.push({
+                kind: fact,
+                paragraph,
+                parentId,
+                chunkId: chunk?.id,
+                evidenceSpanId: evidenceSpan?.id,
+                score,
+                priority: score + graphFactSpecificity(fact, paragraph.text, chunk) * 0.12,
+            });
         }
     }
+    const budget = graphFactBudget(context, noteId, chunks.length, paragraphs.length);
+    proposals
+        .sort((left, right) => right.priority - left.priority || left.paragraph.start - right.paragraph.start)
+        .slice(0, budget)
+        .sort((left, right) => left.paragraph.start - right.paragraph.start)
+        .forEach((proposal) => {
+            const spanId = proposal.evidenceSpanId || addEvidenceSpan(
+                context,
+                noteId,
+                proposal.paragraph,
+                proposal.parentId,
+                proposal.chunkId,
+                confidence('graph_fact', adaptedScore(context, noteId, proposal.kind, proposal.paragraph.start, 0.68), ['graph_fact_cue', 'document_profile_weighted']),
+            ).id;
+            addGraphFactCandidate(
+                context,
+                noteId,
+                proposal.kind,
+                proposal.paragraph,
+                proposal.parentId,
+                proposal.chunkId,
+                [spanId],
+                proposal.score,
+            );
+        });
 }
 
 function buildCrossDocPackets(context: BuildContext, noteIds: string[], chunks: GraphRebuildChunk[]): void {
@@ -441,7 +505,7 @@ function addLineRegions(context: BuildContext, noteId: string, text: string, kin
         if ((!match || index === lines.length) && runStart >= 0) {
             const first = lines[runStart];
             const last = lines[index - 1];
-            addRegion(context, regionInput(noteId, kind, kind === 'list' ? 'List' : 'Code block', { start: first.start, end: last.end, text: text.slice(first.start, last.end) }, undefined, 'layout', 'surface', 0.9, [`${kind}_lines`]));
+            addRegion(context, regionInput(noteId, kind, kind === 'list' ? 'List' : 'Code block', { start: first.start, end: last.end, text: text.slice(first.start, last.end) }, undefined, 'layout', 'surface', adaptedScore(context, noteId, kind, first.start, 0.9), [`${kind}_lines`, 'document_profile_weighted']));
             runStart = -1;
         }
     }
@@ -491,8 +555,8 @@ function addRegion(context: BuildContext, input: Omit<DocumentRegion, 'id' | 'ch
     return region;
 }
 
-function addRhetoricalUnit(context: BuildContext, noteId: string, kind: RhetoricalUnitKind, label: string, paragraph: ParagraphSpan, parentId: string, cue: string, evidenceSpanIds: string[]): RhetoricalUnit {
-    const unit = addUnit(context, { noteId, kind, label, start: paragraph.start, end: paragraph.end, depth: 3, parentId, confidence: confidence('rhetorical', 0.72, [cue]), lens: 'rhetorical' });
+function addRhetoricalUnit(context: BuildContext, noteId: string, kind: RhetoricalUnitKind, label: string, paragraph: ParagraphSpan, parentId: string, cue: string, evidenceSpanIds: string[], score: number): RhetoricalUnit {
+    const unit = addUnit(context, { noteId, kind, label, start: paragraph.start, end: paragraph.end, depth: 3, parentId, confidence: confidence('rhetorical', score, [cue, 'document_profile_weighted']), lens: 'rhetorical' });
     const rhetorical: RhetoricalUnit = { ...unit, kind, cue, evidenceSpanIds };
     context.rhetoricalUnits.push(rhetorical);
     return rhetorical;
@@ -505,9 +569,9 @@ function addRetrievalUnit(context: BuildContext, noteId: string, kind: Retrieval
     return retrieval;
 }
 
-function addGraphFactCandidate(context: BuildContext, noteId: string, kind: GraphBearingUnitKind, paragraph: ParagraphSpan, parentId: string, chunkId: string | undefined, evidenceSpanIds: string[]): GraphFactCandidate {
+function addGraphFactCandidate(context: BuildContext, noteId: string, kind: GraphBearingUnitKind, paragraph: ParagraphSpan, parentId: string, chunkId: string | undefined, evidenceSpanIds: string[], score: number): GraphFactCandidate {
     const surfaces = namedSurfaces(paragraph.text).slice(0, 6);
-    const unit = addUnit(context, { noteId, kind, label: factLabel(kind), start: paragraph.start, end: paragraph.end, depth: 4, parentId, confidence: confidence('graph_fact', 0.66, [kind]), lens: 'graph_fact' });
+    const unit = addUnit(context, { noteId, kind, label: factLabel(kind), start: paragraph.start, end: paragraph.end, depth: 4, parentId, confidence: confidence('graph_fact', score, [kind, 'document_profile_weighted']), lens: 'graph_fact' });
     const candidate: GraphFactCandidate = {
         ...unit,
         kind,
@@ -671,15 +735,55 @@ function inferRhetoricalKinds(text: string): Array<{ kind: RhetoricalUnitKind; c
     return out;
 }
 
-function inferGraphFactKinds(text: string, chunk: GraphRebuildChunk | undefined): GraphBearingUnitKind[] {
+function inferGraphFactKinds(
+    text: string,
+    chunk: GraphRebuildChunk | undefined,
+    profile: DocumentProfileKind,
+): GraphBearingUnitKind[] {
     const lower = text.toLowerCase();
     const out = new Set<GraphBearingUnitKind>();
-    if (/\b(because|therefore|claim|shows|evidence|according to)\b/.test(lower)) out.add('n_ary_claim');
-    if (EVENT_CUES.some((cue) => lower.includes(cue))) out.add('event');
-    if (/\b(became|changed|shifted|turned|moved from|converted)\b/.test(lower)) out.add('state_change');
-    if (/\b(step|run|use|apply|must|should|then)\b/.test(lower)) out.add('procedure_step');
-    if (namedSurfaces(text).length >= 2 || (chunk?.meaningFrame?.entityPriors.length || 0) >= 2) out.add('relation_bundle');
+    const surfaces = namedSurfaces(text);
+    const priorCount = chunk?.meaningFrame?.entityPriors.length || 0;
+    const claimCue = /\b(because|therefore|claim|shows|evidence|according to|demonstrates|indicates)\b/.test(lower);
+    const stateCue = /\b(became|changed|shifted|turned|moved from|converted|increased|decreased)\b/.test(lower);
+    const procedureCue = /^\s*(?:[-*+]\s+|\d+[.)]\s+)?(?:run|use|apply|install|configure|select|open|create|remove|must|should)\b/i.test(text);
+    const relationCue = /\b(with|between|against|supports|contains|causes|depends on|belongs to|located in|connected to)\b/.test(lower);
+    if (claimCue && (surfaces.length > 0 || ['research_paper', 'reference_article', 'legal_policy'].includes(profile))) out.add('n_ary_claim');
+    if (stateCue && (surfaces.length > 0 || profile === 'prose_fiction')) out.add('state_change');
+    if (EVENT_CUES.some((cue) => lower.includes(cue)) && (surfaces.length > 0 || profile === 'prose_fiction')) out.add('event');
+    if (procedureCue && ['technical_docs', 'legal_policy', 'meeting_notes', 'code_heavy_notes', 'trading_system_specs'].includes(profile)) out.add('procedure_step');
+    if (surfaces.length >= 2 && (relationCue || priorCount >= 2)) out.add('relation_bundle');
     return [...out];
+}
+
+function graphFactSpecificity(
+    kind: GraphBearingUnitKind,
+    text: string,
+    chunk: GraphRebuildChunk | undefined,
+): number {
+    const surfaces = namedSurfaces(text).length;
+    const priors = chunk?.meaningFrame?.entityPriors.length || 0;
+    const kindBoost = kind === 'relation_bundle' || kind === 'n_ary_claim' ? 2 : kind === 'state_change' ? 1.5 : 1;
+    return Math.min(4, kindBoost + Math.min(2, surfaces) + Math.min(1, priors / 2));
+}
+
+function graphFactBudget(
+    context: BuildContext,
+    noteId: string,
+    chunkCount: number,
+    paragraphCount: number,
+): number {
+    const profile = documentProfileAt(context, noteId, 0);
+    const multiplier = profile === 'prose_fiction' ? 1.15
+        : profile === 'research_paper' || profile === 'reference_article' ? 1.4
+            : 1.6;
+    return Math.min(paragraphCount, 320, Math.max(16, Math.ceil(chunkCount * multiplier)));
+}
+
+function documentProfileAt(context: BuildContext, noteId: string, sourceStart: number): DocumentProfileKind {
+    const profile = context.documentProfileSummary.profiles.find((row) => row.noteId === noteId);
+    const region = profile?.regions.find((row) => row.start <= sourceStart && row.end >= sourceStart);
+    return region?.dominantProfile || profile?.dominantProfile || 'mixed_notebook';
 }
 
 function namedSurfaces(text: string): string[] {
@@ -690,6 +794,14 @@ function namedSurfaces(text: string): string[] {
 
 function isDialogue(text: string): boolean {
     return /["]/.test(text) || /\b(said|asked|answered|replied|murmured)\b/i.test(text);
+}
+
+function unitWeight(context: BuildContext, noteId: string, kind: string, sourceStart: number): number {
+    return documentUnitWeight(context.documentProfileSummary, noteId, kind, sourceStart);
+}
+
+function adaptedScore(context: BuildContext, noteId: string, kind: string, sourceStart: number, base: number): number {
+    return Math.max(0.05, Math.min(0.99, base + (unitWeight(context, noteId, kind, sourceStart) - 1) * 0.18));
 }
 
 function confidence(source: DocumentSidecarLens, score: number, reasons: string[]): StructureConfidence {

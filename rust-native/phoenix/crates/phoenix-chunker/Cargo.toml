@@ -6,6 +6,7 @@ license.workspace = true
 authors.workspace = true
 
 [lib]
+name = "phoenix_chunker_native"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]

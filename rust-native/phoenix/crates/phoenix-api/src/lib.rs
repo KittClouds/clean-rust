@@ -410,15 +410,15 @@ pub struct ChunkerStageApi;
 
 impl ChunkerStageApi {
     pub fn sentence_ranges(&self, text: &str) -> Vec<(usize, usize)> {
-        phoenix_chunker::api::sentence_ranges(text)
+        phoenix_chunker_native::api::sentence_ranges(text)
     }
 
     pub fn build_chunks(
         &self,
         text: &str,
-        config: &phoenix_chunker::ChunkerConfig,
-    ) -> Vec<phoenix_chunker::Chunk> {
-        phoenix_chunker::api::chunk_ranges(text, config)
+        config: &phoenix_chunker_native::ChunkerConfig,
+    ) -> Vec<phoenix_chunker_native::Chunk> {
+        phoenix_chunker_native::api::chunk_ranges(text, config)
     }
 }
 

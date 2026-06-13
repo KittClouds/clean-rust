@@ -3,7 +3,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use compact_str::{format_compact, CompactString};
 use hashbrown::{HashMap, HashSet};
 use phoenix_alex::api as alex;
-use phoenix_chunker::api::default_chunk_ranges;
+use phoenix_chunker_native::api::default_chunk_ranges;
 use phoenix_types::{EntityId, KnownMatch, LexiconEntry, ScopeKey};
 use smallvec::SmallVec;
 use thiserror::Error;
@@ -227,7 +227,7 @@ fn build_chunks(note_id: &str, text: &str) -> Vec<GraphChunk> {
     let sentence_like = memchr::memchr_iter(b'.', text.as_bytes()).count();
     let mut chunks = default_chunk_ranges(text);
     if chunks.is_empty() && !text.trim().is_empty() {
-        chunks.push(phoenix_chunker::Chunk {
+        chunks.push(phoenix_chunker_native::Chunk {
             start: 0,
             end: text.len(),
         });

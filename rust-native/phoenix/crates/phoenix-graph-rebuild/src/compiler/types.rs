@@ -1,6 +1,6 @@
 use compact_str::CompactString;
 use phoenix_alex::SurfaceHit;
-use phoenix_chunker::{LensChunk, LensMentionGraph};
+use phoenix_chunker_native::{LensChunk, LensMentionGraph};
 use phoenix_types::{EntityId, TextRange};
 use serde::{Deserialize, Serialize};
 

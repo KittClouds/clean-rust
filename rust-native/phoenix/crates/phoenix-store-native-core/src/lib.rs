@@ -1,4 +1,4 @@
-pub use phoenix_chunker::ChunkLens;
+pub use phoenix_chunker_native::ChunkLens;
 use phoenix_graph::{GraphMutationBatch, GraptorGraph};
 use phoenix_graph_kernel::{
     KernelCheckpointData, KernelGraphSnapshot, KernelJournalEntry, KernelMutationBatch,

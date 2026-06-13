@@ -6,9 +6,16 @@ import type { RegisteredEntity } from '../../../../lib/registry';
 import { db } from '../../../../lib/dexie/db';
 import { PhoenixProjectionService } from '../../../../services/phoenix-projection.service';
 import { GraphRebuildService } from '../../../../graph-rebuild/graph-rebuild.service';
-import type { GraphRebuildSnapshot } from '../../../../graph-rebuild/graph-rebuild-snapshot';
-import { entityColorStore } from '../../../../lib/store/entityColorStore';
-import { GraphAtlasPreviewComponent, EMPTY_GRAPH_INVENTORY, type AtlasMode, type AtlasPreviewEdge, type GraphInventory } from './graph-atlas-preview/graph-atlas-preview.component';
+import type { GraphIndexRunReceipt, GraphRebuildSnapshot } from '../../../../graph-rebuild/graph-rebuild-snapshot';
+import { applyGraphDocumentReviewDecisionToSnapshot } from '../../../../graph-rebuild/graph-document-review-snapshot';
+import { NoteEditorStore } from '../../../../lib/store/note-editor.store';
+import { EditorService } from '../../../../services/editor.service';
+import { BlueprintHubService } from '../../blueprint-hub.service';
+import { GraphAtlasPreviewComponent, type AtlasMode, type AtlasPreviewEdge } from './graph-atlas-preview/graph-atlas-preview.component';
+import { buildGraphCanvasInventory } from './graph-atlas-preview/graph-canvas-inventory';
+import type { GraphCanvasReviewRequest, GraphCanvasSourceRequest } from './graph-atlas-preview/graph-canvas-interaction';
+import { GraphEvaluationDashboardComponent } from './graph-evaluation-dashboard.component';
+import type { GraphOperatingRoomId } from './graph-operating-room';
 import type { EntitySuggestionProviderId } from '../../../../lib/entity-suggestions/entity-suggestion.types';
 import { getSetting, setSetting } from '../../../../lib/dexie/settings.service';
 import {
@@ -40,7 +47,7 @@ function readPersistedGraphLensState(): GraphLensState {
 @Component({
     selector: 'app-graph-lens-workspace',
     standalone: true,
-    imports: [CommonModule, FormsModule, GraphAtlasPreviewComponent],
+    imports: [CommonModule, FormsModule, GraphAtlasPreviewComponent, GraphEvaluationDashboardComponent],
     template: `
         <div class="flex h-full min-h-[560px] flex-col gap-0">
             @if (usesNotes()) {
@@ -78,12 +85,19 @@ function readPersistedGraphLensState(): GraphLensState {
             </section>
             }
 
-            @if (graphSnapshotStale()) {
+            @if (graphSnapshotStale() && operatingRoom !== 'metrics') {
             <section class="shrink-0 rounded-xl border border-amber-400/15 bg-amber-500/5 px-3 py-2 text-xs font-semibold text-amber-100">
                 Latest anchors changed. The atlas view is stale until Build Full Atlas runs again.
             </section>
             }
 
+            @if (operatingRoom === 'metrics') {
+            <app-graph-evaluation-dashboard class="block min-h-0 flex-1"
+                [snapshot]="graphRebuildSnapshot()"
+                [receipt]="graphIndexReceipt()"
+                [stale]="graphSnapshotStale()">
+            </app-graph-evaluation-dashboard>
+            } @else {
             <app-graph-atlas-preview class="block min-h-0 flex-1"
                 [entities]="lensedGraph().entities"
                 [edges]="lensedGraph().edges"
@@ -97,29 +111,38 @@ function readPersistedGraphLensState(): GraphLensState {
                 [atlasSearch]="atlasSearch"
                 [isScanning]="isScanning"
                 [activeProvider]="activeProvider"
+                [canvasReviewBusy]="canvasReviewBusy()"
                 (entitySelected)="entitySelected.emit($event)"
                 (addEntityRequested)="addEntityRequested.emit()"
                 (scanRequested)="scanRequested.emit(lens())"
                 (styleRequested)="styleRequested.emit()"
                 (atlasModeChange)="atlasModeChange.emit($event)"
                 (atlasSearchChange)="atlasSearchChange.emit($event)"
+                (reviewRequested)="handleCanvasReview($event)"
+                (sourceRequested)="jumpToCanvasSource($event)"
                 (lensModeChange)="setLensMode($event)">
             </app-graph-atlas-preview>
+            }
         </div>
     `,
 })
 export class GraphLensWorkspaceComponent implements OnDestroy {
     private readonly projection = inject(PhoenixProjectionService);
     private readonly graphRebuild = inject(GraphRebuildService);
+    private readonly noteEditor = inject(NoteEditorStore);
+    private readonly editor = inject(EditorService);
+    private readonly hub = inject(BlueprintHubService);
     private readonly narrativeEntitiesSignal = signal<RegisteredEntity[]>([]);
     private readonly narrativeEdgesSignal = signal<AtlasPreviewEdge[]>([]);
     private readonly graphRebuildSnapshotSignal = signal<GraphRebuildSnapshot | null>(null);
+    private readonly graphIndexReceiptSignal = signal<GraphIndexRunReceipt | null>(null);
     private readonly graphSnapshotStaleSignal = signal(false);
     private readonly memberships = signal<GraphLensMembership[]>([]);
     private membershipToken = 0;
     private noteToken = 0;
     private graphSnapshotLoadToken = 0;
     private removeAnchorListeners: (() => void) | null = null;
+    readonly canvasReviewBusy = signal(false);
 
     @Input() set narrativeEntities(value: RegisteredEntity[] | null | undefined) {
         this.narrativeEntitiesSignal.set(value ?? []);
@@ -136,6 +159,7 @@ export class GraphLensWorkspaceComponent implements OnDestroy {
     }
 
     @Input() atlasSearch = '';
+    @Input() operatingRoom: GraphOperatingRoomId = 'entities';
     @Input() isScanning = false;
     @Input() activeProvider: EntitySuggestionProviderId | null = null;
     @Input() set candidateCount(value: number | null | undefined) {
@@ -178,9 +202,10 @@ export class GraphLensWorkspaceComponent implements OnDestroy {
         narrativeEdges: this.narrativeEdgesSignal(),
         memberships: this.memberships(),
     }));
-    readonly graphRebuildInventory = computed(() => graphInventoryFromSnapshot(this.graphRebuildSnapshotSignal()));
+    readonly graphRebuildInventory = computed(() => buildGraphCanvasInventory(this.graphRebuildSnapshotSignal()));
     readonly graphRebuildCounters = computed(() => this.graphRebuildSnapshotSignal()?.counters ?? null);
     readonly graphRebuildSnapshot = computed(() => this.graphRebuildSnapshotSignal());
+    readonly graphIndexReceipt = computed(() => this.graphIndexReceiptSignal());
     readonly graphSnapshotStale = computed(() => this.graphSnapshotStaleSignal());
     readonly filteredNotes = computed(() => {
         const query = this.noteQuery().trim().toLowerCase();
@@ -257,6 +282,31 @@ export class GraphLensWorkspaceComponent implements OnDestroy {
         this.persistLensState();
     }
 
+    async handleCanvasReview(request: GraphCanvasReviewRequest): Promise<void> {
+        if (this.canvasReviewBusy()) return;
+        const next = applyGraphDocumentReviewDecisionToSnapshot(
+            this.graphRebuildSnapshotSignal(),
+            request.objectIds,
+            request.decision,
+        );
+        if (!next) return;
+        this.canvasReviewBusy.set(true);
+        try {
+            await this.graphRebuild.restorePersistedSnapshot(next);
+            this.graphRebuildSnapshotSignal.set(next);
+        } finally {
+            this.canvasReviewBusy.set(false);
+        }
+    }
+
+    async jumpToCanvasSource(request: GraphCanvasSourceRequest): Promise<void> {
+        await this.noteEditor.openNote(request.noteId);
+        this.hub.close();
+        await nextAnimationFrame();
+        await nextAnimationFrame();
+        this.editor.selectProjectedRange(request.sourceStart, request.sourceEnd);
+    }
+
     private persistLensState(): void {
         setSetting<GraphLensState>(GRAPH_LENS_STATE_KEY, this.lens());
     }
@@ -293,9 +343,16 @@ export class GraphLensWorkspaceComponent implements OnDestroy {
         const token = ++this.graphSnapshotLoadToken;
         const normalized = normalizeGraphLensForBuild(lens);
         try {
-            const snapshot = await this.graphRebuild.loadPersistedSnapshot(normalized.scopeId);
+            const receiptPromise = typeof this.graphRebuild.loadPersistedRunReceipt === 'function'
+                ? this.graphRebuild.loadPersistedRunReceipt(normalized.scopeId)
+                : Promise.resolve(null);
+            const [snapshot, receipt] = await Promise.all([
+                this.graphRebuild.loadPersistedSnapshot(normalized.scopeId),
+                receiptPromise,
+            ]);
             if (token === this.graphSnapshotLoadToken) {
                 this.graphRebuildSnapshotSignal.set(snapshot);
+                this.graphIndexReceiptSignal.set(receipt);
                 this.graphSnapshotStaleSignal.set(false);
             }
         } catch (error) {
@@ -339,113 +396,6 @@ function normalizeGraphLensForBuild(lens: GraphLensState): {
     return { scopeKind: 'global', scopeId: 'global', noteIds: [] };
 }
 
-function graphInventoryFromSnapshot(snapshot: GraphRebuildSnapshot | null): GraphInventory {
-    if (!snapshot) return EMPTY_GRAPH_INVENTORY;
-    const nodes = snapshot.nodes.map((node, index) => ({
-        id: node.id,
-        label: node.label,
-        kind: node.kind,
-        aliases: node.aliases,
-        totalMentions: node.totalMentions,
-        ...stablePoint(node.id, index),
-        colorHsl: entityColorStore.getRawHsl(node.kind as any),
-        metadata: {
-            sourceType: 'graph-rebuild',
-            sourceEntityId: node.entityId,
-            graphKind: 'entity',
-            anchorIds: node.anchorIds,
-            noteIds: node.noteIds,
-        },
-    }));
-    const chunkMentionCounts = new Map<string, number>();
-    for (const anchor of snapshot.entityAnchors) {
-        if (!anchor.chunkId) continue;
-        chunkMentionCounts.set(anchor.chunkId, (chunkMentionCounts.get(anchor.chunkId) || 0) + 1);
-    }
-    const chunkNodes = snapshot.chunks.map((chunk, index) => ({
-        id: chunkNodeId(chunk.id),
-        label: `Chunk ${chunk.ordinal + 1}`,
-        kind: 'chunk',
-        totalMentions: Math.max(1, chunkMentionCounts.get(chunk.id) || 0),
-        ...stablePoint(chunk.id, nodes.length + index),
-        colorHsl: graphKindHsl('chunk'),
-        metadata: {
-            sourceType: 'graph-rebuild',
-            graphKind: 'chunk',
-            chunkId: chunk.id,
-            noteId: chunk.noteId,
-            start: chunk.start,
-            end: chunk.end,
-            source: chunk.source,
-        },
-    }));
-    const inventoryNodes = [...nodes, ...chunkNodes];
-    const entityIds = new Set(snapshot.nodes.map((node) => node.id));
-    const chunkIds = new Set(snapshot.chunks.map((chunk) => chunk.id));
-    const anchorEdges = snapshot.entityAnchors
-        .filter((anchor) => anchor.chunkId && entityIds.has(anchor.entityId) && chunkIds.has(anchor.chunkId))
-        .map((anchor) => ({
-            id: `anchor:${anchor.id}`,
-            sourceId: chunkNodeId(anchor.chunkId!),
-            targetId: anchor.entityId,
-            type: 'entity_anchor',
-            confidence: Math.max(0.25, Math.min(1.2, anchor.confidence)),
-        }));
-    return {
-        nodes: inventoryNodes,
-        edges: [
-            ...snapshot.edges.map((edge) => ({
-                id: edge.id,
-                sourceId: edge.sourceId,
-                targetId: edge.targetId,
-                type: edge.type,
-                confidence: Math.max(0.25, Math.min(1.8, edge.confidence + edge.weight * 0.08)),
-            })),
-            ...anchorEdges,
-        ],
-        kindCounts: graphKindCounts(inventoryNodes),
-        sourceLabel: 'graph rebuild snapshot',
-    };
-}
-
-function graphKindCounts(nodes: GraphInventory['nodes']): Array<{ kind: string; count: number }> {
-    const counts = new Map<string, number>();
-    for (const node of nodes) {
-        const kind = String(node.kind || 'unknown').toLowerCase();
-        counts.set(kind, (counts.get(kind) || 0) + 1);
-    }
-    return [...counts.entries()].map(([kind, count]) => ({ kind, count }));
-}
-
-function stablePoint(id: string, index: number): { atlasX: number; atlasY: number; atlasZ: number } {
-    const angle = index * 2.399963229728653 + hashUnit(id);
-    const y = 1 - ((index % 89) / 88) * 2;
-    const radius = Math.sqrt(Math.max(0, 1 - y * y)) * 0.92;
-    return {
-        atlasX: Math.cos(angle) * radius,
-        atlasY: y * 0.7,
-        atlasZ: Math.sin(angle) * radius,
-    };
-}
-
-function chunkNodeId(chunkId: string): string {
-    return `chunk:${chunkId}`;
-}
-
-function graphKindHsl(kind: string): string {
-    switch (String(kind || '').toLowerCase()) {
-        case 'chunk': return entityColorStore.getRawGraphNodeHsl('chunk');
-        case 'event': return entityColorStore.getRawGraphNodeHsl('eventNode');
-        case 'memory': return entityColorStore.getRawGraphNodeHsl('memoryState');
-        default: return '220 10% 54%';
-    }
-}
-
-function hashUnit(value: string): number {
-    let hash = 2166136261;
-    for (let index = 0; index < value.length; index += 1) {
-        hash ^= value.charCodeAt(index);
-        hash = Math.imul(hash, 16777619);
-    }
-    return (hash >>> 0) / 4294967295;
+function nextAnimationFrame(): Promise<void> {
+    return new Promise((resolve) => requestAnimationFrame(() => resolve()));
 }

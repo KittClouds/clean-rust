@@ -22,6 +22,7 @@ import type { AtlasMode } from './graph-atlas-preview/graph-atlas-preview.compon
 import type { GraphLensState } from './graph-lens';
 import { buildGraphAtlasReadContext } from './graph-atlas-preview/graph-atlas-read-context';
 import { clearRejectedSuggestionFeedback } from '../../../../lib/entity-learning/entity-feedback';
+import type { GraphOperatingRoomId } from './graph-operating-room';
 
 @Component({
     selector: 'app-graph-tab',
@@ -56,6 +57,7 @@ export class GraphTabComponent {
     isStyleDrawerOpen = signal(false);
     atlasSearch = signal('');
     atlasMode = signal<AtlasMode>('graph');
+    operatingRoom = signal<GraphOperatingRoomId>('entities');
 
     // Scope state — driven by ScopeService
     scopeLabel = this.scopeService.scopeLabel;
@@ -121,6 +123,11 @@ export class GraphTabComponent {
 
     showAtlas() {
         this.selectedEntity.set(null);
+    }
+
+    setOperatingRoom(room: GraphOperatingRoomId): void {
+        this.operatingRoom.set(room);
+        if (room === 'metrics') this.showAtlas();
     }
 
     toggleStyleDrawer() {

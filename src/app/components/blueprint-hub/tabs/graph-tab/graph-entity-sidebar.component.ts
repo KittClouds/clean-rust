@@ -30,10 +30,20 @@ import { LucideAngularModule } from 'lucide-angular';
 
 import { entitySourceLabel, type RegisteredEntity } from '../../../../lib/registry';
 import type { EntitySuggestionProviderId } from '../../../../lib/entity-suggestions/entity-suggestion.types';
-import { entityColorStore, normalizeEntityKind } from '../../../../lib/store/entityColorStore';
+import {
+    entityColorStore,
+    hexColorToHsl,
+    hslColorToHex,
+    normalizeEntityKind,
+} from '../../../../lib/store/entityColorStore';
 import type { NerSuggestion } from '../../../../services/ner.service';
 import { GraphRebuildService } from '../../../../graph-rebuild/graph-rebuild.service';
 import type { GraphRebuildSnapshot } from '../../../../graph-rebuild/graph-rebuild-snapshot';
+import { buildGraphDocumentCompilerSummary } from '../../../../graph-rebuild/graph-document-compiler';
+import {
+    applyGraphDocumentReviewAction,
+    type GraphDocumentReviewActionKind,
+} from '../../../../graph-rebuild/graph-document-review';
 import type { GraphLensMode } from './graph-lens';
 import {
     buildGraphDiscourseAnalyticsView,
@@ -45,6 +55,15 @@ import {
     type GraphDiscourseWorkbenchDecision,
     type GraphDiscourseWorkbenchRecord,
 } from './graph-discourse-workbench';
+import {
+    buildGraphOperatingRoomView,
+    type GraphOperatingRoomCount,
+    type GraphOperatingRoomId,
+} from './graph-operating-room';
+import {
+    buildGraphEvaluationDashboard,
+    type GraphEvaluationTone,
+} from './graph-evaluation-dashboard';
 import { buildProductDiagnosticsView, type ProductDiagnosticsView } from './graph-product-diagnostics';
 
 interface EntityGroup {
@@ -54,7 +73,7 @@ interface EntityGroup {
 }
 
 type DiagnosticsQualityTone = 'ready' | 'review' | 'danger' | 'quiet';
-type GraphSidebarView = 'entities' | 'diagnostics' | 'discourse';
+type GraphSidebarView = GraphOperatingRoomId;
 
 interface DiagnosticsQualityLane {
     id: string;
@@ -100,7 +119,12 @@ const ENTITY_ICONS: Record<string, any> = {
     standalone: true,
     imports: [CommonModule, ScrollingModule, LucideAngularModule],
     templateUrl: './graph-entity-sidebar.component.html',
-    styleUrls: ['./graph-entity-sidebar.component.css', './graph-entity-sidebar.review-clusters.css', './graph-entity-sidebar.discourse.css'],
+    styleUrls: [
+        './graph-entity-sidebar.component.css',
+        './graph-entity-sidebar.review-clusters.css',
+        './graph-entity-sidebar.discourse.css',
+        './graph-entity-sidebar.operating-room.css',
+    ],
 })
 export class GraphEntitySidebarComponent implements OnChanges, OnDestroy {
     private readonly graphRebuild = inject(GraphRebuildService);
@@ -126,6 +150,7 @@ export class GraphEntitySidebarComponent implements OnChanges, OnDestroy {
     @Output() scanRequested = new EventEmitter<void>();
     @Output() lensModeChange = new EventEmitter<GraphLensMode>();
     @Output() searchTextChange = new EventEmitter<string>();
+    @Output() operatingRoomChange = new EventEmitter<GraphOperatingRoomId>();
 
     readonly isOpen = signal(true);
     readonly sidebarView = signal<GraphSidebarView>('entities');
@@ -136,6 +161,7 @@ export class GraphEntitySidebarComponent implements OnChanges, OnDestroy {
     readonly diagnosticsError = signal<string | null>(null);
     readonly selectedDiscourseTab = signal<GraphDiscourseTabId>('ideas');
     readonly selectedDiscourseRecordId = signal('');
+    readonly selectedOperatingCountId = signal('');
     readonly discourseRecordDecisions = signal<Record<string, GraphDiscourseWorkbenchDecision>>({});
     readonly underlyingIdeasOpen = signal(false);
     readonly discourseActionNotice = signal('');
@@ -173,6 +199,36 @@ export class GraphEntitySidebarComponent implements OnChanges, OnDestroy {
     readonly discourseWorkbench = computed(() => {
         this.dataRevision();
         return buildGraphDiscourseWorkbenchView(this.diagnosticsSnapshot(), this.entities);
+    });
+    readonly operatingRoom = computed(() => {
+        this.dataRevision();
+        return buildGraphOperatingRoomView(this.discourseWorkbench(), this.diagnosticsSnapshot(), this.entities);
+    });
+    readonly evaluationDashboard = computed(() =>
+        buildGraphEvaluationDashboard(this.diagnosticsSnapshot(), null),
+    );
+    readonly operatingRoomTabs = computed(() => this.operatingRoom().tabs);
+    readonly activeOperatingRoom = computed(() =>
+        this.operatingRoom().tabs.find((room) => room.id === this.sidebarView()) ?? this.operatingRoom().tabs[0],
+    );
+    readonly activeOperatingCounts = computed(() =>
+        this.operatingRoom().counts.filter((count) => count.roomId === this.sidebarView()),
+    );
+    readonly selectedOperatingCount = computed(() => {
+        const selectedId = this.selectedOperatingCountId();
+        const count = this.operatingRoom().countsById[selectedId];
+        return count?.roomId === this.sidebarView() ? count : null;
+    });
+    readonly activeOperatingRecords = computed(() => {
+        const room = this.sidebarView();
+        const selected = this.selectedOperatingCount();
+        if (selected) return selected.recordIds.map((id) => this.operatingRoom().recordsById[id]).filter(Boolean);
+        return this.operatingRoom().recordsByRoom[room] ?? [];
+    });
+    readonly selectedOperatingRecord = computed(() => {
+        const records = this.activeOperatingRecords();
+        const selectedId = this.selectedDiscourseRecordId();
+        return records.find((record) => record.id === selectedId) ?? records[0] ?? null;
     });
     readonly activeDiscourseRecords = computed(() => {
         const workbench = this.discourseWorkbench();
@@ -264,6 +320,8 @@ export class GraphEntitySidebarComponent implements OnChanges, OnDestroy {
 
     setSidebarView(view: GraphSidebarView): void {
         this.sidebarView.set(view);
+        this.selectedOperatingCountId.set('');
+        this.operatingRoomChange.emit(view);
         if (view !== 'entities' && !this.diagnosticsSnapshot()) void this.refreshDiagnosticsSnapshot();
     }
 
@@ -272,7 +330,7 @@ export class GraphEntitySidebarComponent implements OnChanges, OnDestroy {
     }
 
     toggleControls(): void {
-        this.setSidebarView(this.sidebarView() === 'diagnostics' ? 'entities' : 'diagnostics');
+        this.setSidebarView(this.sidebarView() === 'metrics' ? 'entities' : 'metrics');
     }
 
     toggleActions(): void {
@@ -290,6 +348,10 @@ export class GraphEntitySidebarComponent implements OnChanges, OnDestroy {
 
     toneClass(prefix: string, tone: GraphDiscourseTone | DiagnosticsQualityTone): string {
         return `${prefix}-${tone}`;
+    }
+
+    evaluationToneClass(tone: GraphEvaluationTone): string {
+        return `evaluation-tone-${tone}`;
     }
 
     async copyDiscourseSummary(): Promise<void> {
@@ -314,6 +376,19 @@ export class GraphEntitySidebarComponent implements OnChanges, OnDestroy {
         this.selectedDiscourseRecordId.set(recordId);
     }
 
+    selectOperatingCount(count: GraphOperatingRoomCount, event?: Event): void {
+        event?.stopPropagation();
+        if (this.sidebarView() !== count.roomId) this.setSidebarView(count.roomId);
+        this.selectedOperatingCountId.set(count.id);
+        this.selectedDiscourseRecordId.set(count.recordIds[0] || '');
+    }
+
+    clearOperatingCount(event?: Event): void {
+        event?.stopPropagation();
+        this.selectedOperatingCountId.set('');
+        this.selectedDiscourseRecordId.set(this.activeOperatingRecords()[0]?.id || '');
+    }
+
     focusDiscourseRecord(record: GraphDiscourseWorkbenchRecord, event?: Event): void {
         event?.stopPropagation();
         const focus = record.focusQuery.trim();
@@ -329,15 +404,29 @@ export class GraphEntitySidebarComponent implements OnChanges, OnDestroy {
         this.flashDiscourseNotice('Copied discourse record');
     }
 
-    stageDiscourseRecordDecision(
+    async stageDiscourseRecordDecision(
         record: GraphDiscourseWorkbenchRecord,
         decision: GraphDiscourseWorkbenchDecision,
         event?: Event,
-    ): void {
+    ): Promise<void> {
         event?.stopPropagation();
-        this.discourseRecordDecisions.update((current) => ({ ...current, [record.id]: decision }));
         this.selectedDiscourseRecordId.set(record.id);
-        this.flashDiscourseNotice(`Staged ${decision}`);
+        const nextSnapshot = applyRecordDecision(this.diagnosticsSnapshot(), record, decision);
+        if (!nextSnapshot) {
+            this.discourseRecordDecisions.update((current) => ({ ...current, [record.id]: decision }));
+            this.flashDiscourseNotice(`Staged ${decision}`);
+            return;
+        }
+        try {
+            await this.graphRebuild.restorePersistedSnapshot(nextSnapshot);
+            this.diagnosticsSnapshot.set(nextSnapshot);
+            this.discourseRecordDecisions.update((current) => ({ ...current, [record.id]: decision }));
+            this.dataRevision.update((value) => value + 1);
+            this.flashDiscourseNotice(`Saved ${decision} with reversible receipt`);
+        } catch (error) {
+            this.diagnosticsError.set(error instanceof Error ? error.message : String(error));
+            this.flashDiscourseNotice(`Could not save ${decision}`);
+        }
     }
 
     stagedDiscourseDecision(record: GraphDiscourseWorkbenchRecord): GraphDiscourseWorkbenchDecision | '' {
@@ -379,6 +468,16 @@ export class GraphEntitySidebarComponent implements OnChanges, OnDestroy {
 
     getColor(kind: string): string {
         return entityColorStore.getEntityColor(this.canonicalKind(kind));
+    }
+
+    getHexColor(kind: string): string {
+        this.dataRevision();
+        return hslColorToHex(entityColorStore.getRawHsl(this.canonicalKind(kind)));
+    }
+
+    updateKindColor(kind: string, hexColor: string, event: Event): void {
+        event.stopPropagation();
+        entityColorStore.setColor(this.canonicalKind(kind), hexColorToHsl(hexColor));
     }
 
     getEntityBadgeColor(entity: RegisteredEntity): string {
@@ -542,6 +641,92 @@ export class GraphEntitySidebarComponent implements OnChanges, OnDestroy {
             this.diagnosticsLoading.set(false);
         }
     }
+}
+
+function applyRecordDecision(
+    snapshot: GraphRebuildSnapshot | null,
+    record: GraphDiscourseWorkbenchRecord,
+    decision: GraphDiscourseWorkbenchDecision,
+): GraphRebuildSnapshot | null {
+    const review = snapshot?.documentReviewSummary;
+    const sidecar = snapshot?.documentSidecarSummary;
+    const actionKind = reviewActionKind(decision);
+    if (!snapshot || !review || !sidecar || !actionKind || !record.kind.startsWith('document-review:')) return null;
+    const row = review.rows.find((candidate) => candidate.objectId === record.sourceIds[0]);
+    if (!row?.availableActions.some((action) => action.kind === actionKind)) return null;
+    const builtAt = Date.now();
+    const nextReview = {
+        ...applyGraphDocumentReviewAction(review, { rowId: row.id, actionKind, createdAt: builtAt }),
+        builtAt,
+    };
+    const nextCompiler = buildGraphDocumentCompilerSummary({
+        sidecar,
+        review: nextReview,
+        builtAt,
+        entities: snapshot.nodes.map((node) => ({ id: node.entityId, label: node.label, aliases: node.aliases })),
+        baseline: {
+            atomCount: snapshot.nodes.length,
+            factCount: snapshot.relationships.length
+                + snapshot.events.length
+                + snapshot.temporalEdges.length
+                + snapshot.causalEdges.length
+                + snapshot.memoryState.length,
+            edgeCount: snapshot.edges.length,
+        },
+    });
+    return {
+        ...snapshot,
+        documentReviewSummary: nextReview,
+        documentCompilerSummary: nextCompiler,
+        counters: {
+            ...snapshot.counters,
+            documentReviewRows: nextReview.counters.rows,
+            documentReviewActionableRows: nextReview.counters.actionableRows,
+            documentReviewStateRecords: nextReview.counters.stateRecords,
+            documentReviewActions: nextReview.counters.actions,
+            documentReviewReceipts: nextReview.counters.receipts,
+            documentReviewReversibleReceipts: nextReview.counters.reversibleReceipts,
+            documentReviewProposedRows: nextReview.counters.proposedRows,
+            documentReviewAcceptedRows: nextReview.counters.acceptedRows,
+            documentReviewRejectedRows: nextReview.counters.rejectedRows,
+            documentReviewMutedRows: nextReview.counters.mutedRows,
+            documentReviewPromotedToAnchorRows: nextReview.counters.promotedToAnchorRows,
+            documentReviewCompiledToGraphRows: nextReview.counters.compiledToGraphRows,
+            documentReviewLedgerOnlyRows: nextReview.counters.ledgerOnlyRows,
+            documentCompilerEntityMentions: nextCompiler.counters.entityMentions,
+            documentCompilerRelationCandidates: nextCompiler.counters.relationCandidates,
+            documentCompilerHyperedges: nextCompiler.counters.hyperedges,
+            documentCompilerNaryHyperedges: nextCompiler.counters.naryHyperedges,
+            documentCompilerEvidenceEdges: nextCompiler.counters.evidenceBackedEdges,
+            documentCompilerCrossDocBridges: nextCompiler.counters.crossDocBridges,
+            documentCompilerStructureEdges: nextCompiler.counters.documentStructureEdges,
+            documentCompilerRetrievalOverlays: nextCompiler.counters.retrievalOverlays,
+            documentCompilerTopologyDiffs: nextCompiler.counters.topologyDiffs,
+            documentCompilerTopologyCommits: nextCompiler.counters.topologyCommits,
+            documentCompilerLedgerOnly: nextCompiler.counters.ledgerOnly,
+            documentCompilerOverlayOnly: nextCompiler.counters.overlayOnly,
+            documentCompilerReviewable: nextCompiler.counters.reviewable,
+            documentCompilerBlocked: nextCompiler.counters.blocked,
+            documentCompilerReceipts: nextCompiler.counters.receipts,
+            documentCompilerReversibleReceipts: nextCompiler.counters.reversibleReceipts,
+            documentCompilerMutationAllowed: nextCompiler.counters.mutationAllowed,
+            documentCompilerHighConfidenceFacts: nextCompiler.counters.highConfidenceFacts,
+            documentCompilerReviewedFacts: nextCompiler.counters.reviewedFacts,
+            documentCompilerAmbiguousFacts: nextCompiler.counters.ambiguousFacts,
+        },
+    };
+}
+
+function reviewActionKind(
+    decision: GraphDiscourseWorkbenchDecision,
+): GraphDocumentReviewActionKind | null {
+    if (decision === 'accepted') return 'accept_fact';
+    if (decision === 'rejected') return 'reject_fact';
+    if (decision === 'muted') return 'mute_detector_pattern';
+    if (decision === 'promoted_to_anchor') return 'promote_sidecar_to_anchor';
+    if (decision === 'compiled_to_graph') return 'compile_to_graph';
+    if (decision === 'ledger_only') return 'demote_graph_fact_to_sidecar';
+    return null;
 }
 
 function buildDiagnosticsQualityView(

@@ -44,6 +44,9 @@ vi.mock('../../../../lib/dexie/settings.service', () => ({
 import { GraphLensWorkspaceComponent } from './graph-lens-workspace.component';
 import { GraphRebuildService } from '../../../../graph-rebuild/graph-rebuild.service';
 import { PhoenixProjectionService } from '../../../../services/phoenix-projection.service';
+import { NoteEditorStore } from '../../../../lib/store/note-editor.store';
+import { EditorService } from '../../../../services/editor.service';
+import { BlueprintHubService } from '../../blueprint-hub.service';
 
 let latestEffectScheduler: ReturnType<typeof createImmediateEffectScheduler> | null = null;
 
@@ -53,16 +56,19 @@ describe('GraphLensWorkspaceComponent read-only snapshot loading', () => {
     let component: GraphLensWorkspaceComponent;
     let effectScheduler: ReturnType<typeof createImmediateEffectScheduler>;
     let snapshotToLoad: any;
+    let receiptToLoad: any;
 
     beforeEach(() => {
         settingsMock.store.clear();
         snapshotToLoad = null;
+        receiptToLoad = null;
         graphRebuild = createGraphRebuildMock();
         effectScheduler = createImmediateEffectScheduler();
         latestEffectScheduler = effectScheduler;
         injector = createEnvironmentInjector([
             { provide: GraphRebuildService, useValue: graphRebuild },
             { provide: PhoenixProjectionService, useValue: createProjectionMock() },
+            ...sourceNavigationProviders(),
             { provide: ChangeDetectionScheduler, useValue: { notify: vi.fn(), runningTick: false } },
             { provide: EffectScheduler, useValue: effectScheduler },
         ], Injector.create({ providers: [] }) as unknown as EnvironmentInjector);
@@ -114,7 +120,17 @@ describe('GraphLensWorkspaceComponent read-only snapshot loading', () => {
         expect(inventory.edges.map((edge) => edge.id)).toEqual(expect.arrayContaining([
             'anchor:a-kai',
         ]));
-        expect(inventory.kindCounts).toContainEqual({ kind: 'chunk', count: 1 });
+        expect(inventory.kindCounts).toContainEqual({ kind: 'leaf_chunk', count: 1 });
+    });
+
+    it('hydrates the evaluation dashboard receipt with the persisted snapshot', async () => {
+        snapshotToLoad = sampleSnapshot();
+        receiptToLoad = { id: 'run-1', durationMs: 1800 };
+
+        await flushAsync();
+
+        expect(graphRebuild.loadPersistedRunReceipt).toHaveBeenCalledWith('global');
+        expect(component.graphIndexReceipt()).toEqual(receiptToLoad);
     });
 
     it('hydrates the lens from Dexie settings and persists later scope changes', async () => {
@@ -131,6 +147,7 @@ describe('GraphLensWorkspaceComponent read-only snapshot loading', () => {
         injector = createEnvironmentInjector([
             { provide: GraphRebuildService, useValue: graphRebuild },
             { provide: PhoenixProjectionService, useValue: createProjectionMock() },
+            ...sourceNavigationProviders(),
             { provide: ChangeDetectionScheduler, useValue: { notify: vi.fn(), runningTick: false } },
             { provide: EffectScheduler, useValue: effectScheduler },
         ], Injector.create({ providers: [] }) as unknown as EnvironmentInjector);
@@ -150,6 +167,7 @@ describe('GraphLensWorkspaceComponent read-only snapshot loading', () => {
     function createGraphRebuildMock() {
         return {
             loadPersistedSnapshot: vi.fn(async () => snapshotToLoad),
+            loadPersistedRunReceipt: vi.fn(async () => receiptToLoad),
             buildAndPersistSnapshot: vi.fn(async () => null),
         };
     }
@@ -160,6 +178,14 @@ function createProjectionMock() {
         entities: signal([]),
         getEdgesForEntity: vi.fn(() => []),
     };
+}
+
+function sourceNavigationProviders() {
+    return [
+        { provide: NoteEditorStore, useValue: { openNote: vi.fn(async () => undefined) } },
+        { provide: EditorService, useValue: { selectProjectedRange: vi.fn() } },
+        { provide: BlueprintHubService, useValue: { close: vi.fn() } },
+    ];
 }
 
 function createImmediateEffectScheduler() {

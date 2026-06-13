@@ -24,6 +24,7 @@ describe('graph document compiler', () => {
         const summary = buildGraphDocumentCompilerSummary({
             sidecar,
             review: compiledReview,
+            entities: COMPILER_ENTITIES,
             builtAt: 22,
             baseline: { atomCount: 3, factCount: 2, edgeCount: 1 },
         });
@@ -61,6 +62,7 @@ describe('graph document compiler', () => {
         const summary = buildGraphDocumentCompilerSummary({
             sidecar,
             review,
+            entities: COMPILER_ENTITIES,
             builtAt: 31,
             baseline: { atomCount: 1, factCount: 1, edgeCount: 1 },
         });
@@ -83,7 +85,12 @@ describe('graph document compiler', () => {
     it('allows high-confidence facts to compile while bounding disposable sidecar overlays', () => {
         const sidecar = highConfidenceSidecar(sidecarFixture());
         const review = buildGraphDocumentReviewSummary(sidecar, 40);
-        const summary = buildGraphDocumentCompilerSummary({ sidecar, review, builtAt: 41 });
+        const summary = buildGraphDocumentCompilerSummary({
+            sidecar,
+            review,
+            entities: COMPILER_ENTITIES,
+            builtAt: 41,
+        });
 
         expect(summary.counters.highConfidenceFacts).toBe(1);
         expect(summary.counters.topologyCommits).toBe(1);
@@ -96,7 +103,12 @@ describe('graph document compiler', () => {
     it('projects pending document hyperedges into the graph compiler read model', () => {
         const sidecar = highConfidenceSidecar(sidecarFixture());
         const review = buildGraphDocumentReviewSummary(sidecar, 45);
-        const summary = buildGraphDocumentCompilerSummary({ sidecar, review, builtAt: 46 });
+        const summary = buildGraphDocumentCompilerSummary({
+            sidecar,
+            review,
+            entities: COMPILER_ENTITIES,
+            builtAt: 46,
+        });
         const sidecarOutput = buildCompatibilityGraphCompilerSidecar(snapshotWithCompiler(sidecar, summary));
         const documentFact = sidecarOutput.factGraph.facts.find((fact) => fact.id.startsWith('fact:document-hyperedge:'));
         const roleCount = sidecarOutput.factGraph.roles.filter((role) => role.factId === documentFact?.id).length;
@@ -141,7 +153,7 @@ function requireFactRow(review: ReturnType<typeof buildGraphDocumentReviewSummar
 }
 
 function highConfidenceSidecar(sidecar: ReturnType<typeof buildGraphDocumentSidecar>) {
-    const firstFact = sidecar.graphFactCandidates[0];
+    const firstFact = sidecar.graphFactCandidates.find((fact) => fact.kind === 'relation_bundle');
     expect(firstFact).toBeTruthy();
     const upgraded = {
         ...firstFact!,
@@ -152,6 +164,16 @@ function highConfidenceSidecar(sidecar: ReturnType<typeof buildGraphDocumentSide
         graphFactCandidates: [upgraded, ...sidecar.graphFactCandidates.slice(1)],
     };
 }
+
+const COMPILER_ENTITIES = [
+    { id: 'entity:amara', label: 'Amara', aliases: [] },
+    { id: 'entity:red-mesa', label: 'Red Mesa', aliases: [] },
+    { id: 'entity:halcyon', label: 'Halcyon', aliases: [] },
+    { id: 'entity:captain-ilya', label: 'Captain Ilya', aliases: [] },
+    { id: 'entity:morgan', label: 'Morgan', aliases: [] },
+    { id: 'entity:kai', label: 'Kai', aliases: [] },
+    { id: 'entity:hazel', label: 'Hazel', aliases: [] },
+];
 
 function snapshotWithCompiler(
     sidecar: ReturnType<typeof buildGraphDocumentSidecar>,

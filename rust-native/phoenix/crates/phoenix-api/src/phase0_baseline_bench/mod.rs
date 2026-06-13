@@ -5,7 +5,7 @@ use std::time::Instant;
 
 use phoenix_alex::Lexicon;
 use phoenix_api::{PhoenixPipelineApi, SidecarContinuityRunReport};
-use phoenix_chunker::ChunkerConfig;
+use phoenix_chunker_native::ChunkerConfig;
 use phoenix_dynamic_ner::{MentionStatus, PhoenixNerEngineBuilder, SurfaceNerInput};
 use phoenix_graph_kernel::KernelGraphSnapshot;
 use phoenix_ingest_overgraph::{InvarantV3Config, PhoenixInvarantV3};
@@ -239,7 +239,7 @@ fn run_once(
     let total_started = Instant::now();
 
     let started = Instant::now();
-    let base_chunks = phoenix_chunker::api::default_chunk_ranges(&input.text);
+    let base_chunks = phoenix_chunker_native::api::default_chunk_ranges(&input.text);
     let lens_chunk_count_by_lens = lens_chunk_counts(&input.text);
     let chunker_us = elapsed_us(started);
 
@@ -453,7 +453,7 @@ fn lens_chunk_counts(text: &str) -> BTreeMap<String, usize> {
     .map(|(name, config)| {
         (
             name.to_owned(),
-            phoenix_chunker::api::chunk_ranges(text, &config).len(),
+            phoenix_chunker_native::api::chunk_ranges(text, &config).len(),
         )
     })
     .collect()
@@ -682,7 +682,7 @@ fn tokenize_for_ner(text: &str) -> (Vec<TokenSpan>, Vec<SentenceSpan>) {
         tokens.push(token_span(text, s, text.len()));
     }
 
-    let sentences = phoenix_chunker::api::sentence_ranges(text)
+    let sentences = phoenix_chunker_native::api::sentence_ranges(text)
         .into_iter()
         .enumerate()
         .map(|(index, (start, end))| SentenceSpan {

@@ -8,6 +8,7 @@ import { budgetGalaxySurface } from './graph-galaxy-surface-budget';
 import { galaxySceneToV2, type GalaxySceneSourceMode, type GalaxySceneV2 } from './graph-galaxy-scene-v2';
 import { mergeGalaxySettings, type GalaxyInputEdge, type GalaxyQueryFocus, type GalaxyRenderableNode, type GalaxyRenderSettings } from './graph-galaxy-engine';
 import { ThreeGalaxyRenderer } from './three-galaxy-renderer';
+import type { GraphCanvasHit } from './graph-canvas-interaction';
 
 export interface GraphGalaxySurfaceGate {
     destroyed: boolean;
@@ -24,18 +25,28 @@ export function canGraphGalaxyCanvasHoldSurface(state: GraphGalaxySurfaceGate): 
     selector: 'app-graph-galaxy-canvas',
     standalone: true,
     template: `
-        <canvas
-            #canvas
-            class="block h-full min-h-[360px] w-full touch-none select-none rounded-none bg-[#02040a] cursor-grab active:cursor-grabbing"
-            (pointerdown)="onPointerDown($event)"
-            (pointermove)="onPointerMove($event)"
-            (pointerup)="onPointerUp()"
-            (pointerleave)="onPointerLeave()"
-            (wheel)="onWheel($event)"
-            (contextmenu)="$event.preventDefault()"
-            (dblclick)="onDoubleClick($event)"
-            (click)="onClick($event)"
-        ></canvas>
+        <div class="canvas-shell">
+            <canvas
+                #canvas
+                class="block h-full min-h-[360px] w-full touch-none select-none rounded-none bg-[#02040a] cursor-grab active:cursor-grabbing"
+                [class.cursor-crosshair]="lassoEnabled || lassoSelecting"
+                (pointerdown)="onPointerDown($event)"
+                (pointermove)="onPointerMove($event)"
+                (pointerup)="onPointerUp()"
+                (pointerleave)="onPointerLeave()"
+                (wheel)="onWheel($event)"
+                (contextmenu)="$event.preventDefault()"
+                (dblclick)="onDoubleClick($event)"
+                (click)="onClick($event)"
+            ></canvas>
+            @if (lassoRect) {
+            <div class="lasso-rect"
+                [style.left.px]="lassoRect.left"
+                [style.top.px]="lassoRect.top"
+                [style.width.px]="lassoRect.right - lassoRect.left"
+                [style.height.px]="lassoRect.bottom - lassoRect.top"></div>
+            }
+        </div>
     `,
     styles: [`
         :host {
@@ -43,6 +54,8 @@ export function canGraphGalaxyCanvasHoldSurface(state: GraphGalaxySurfaceGate): 
             height: 100%;
             background: #02040a;
         }
+        .canvas-shell { position: relative; height: 100%; }
+        .lasso-rect { position: absolute; z-index: 8; pointer-events: none; border: 1px solid rgba(94,234,212,.95); background: rgba(20,184,166,.12); box-shadow: 0 0 24px rgba(45,212,191,.18) inset; }
     `],
 })
 export class GraphGalaxyCanvasComponent implements AfterViewInit, OnChanges, OnDestroy {
@@ -55,8 +68,12 @@ export class GraphGalaxyCanvasComponent implements AfterViewInit, OnChanges, OnD
     @Input() viewMode: '3d' | 'map' = '3d';
     @Input() sourceMode: GalaxySceneSourceMode = 'entities';
     @Input() surfaceActive = true;
+    @Input() lassoEnabled = false;
     @Output() entitySelected = new EventEmitter<GalaxyRenderableNode>();
     @Output() entityHovered = new EventEmitter<GalaxyRenderableNode | null>();
+    @Output() objectSelected = new EventEmitter<GraphCanvasHit>();
+    @Output() objectHovered = new EventEmitter<GraphCanvasHit | null>();
+    @Output() batchSelected = new EventEmitter<string[]>();
     @ViewChild('canvas', { static: true }) private canvasRef!: ElementRef<HTMLCanvasElement>;
 
     private readonly renderer = new ThreeGalaxyRenderer();
@@ -70,7 +87,10 @@ export class GraphGalaxyCanvasComponent implements AfterViewInit, OnChanges, OnD
     private pointerMoved = false;
     private lastPointerX = 0;
     private lastPointerY = 0;
-    private hoverId: string | null = null;
+    private hoverKey: string | null = null;
+    lassoSelecting = false;
+    lassoRect: { left: number; top: number; right: number; bottom: number; width: number; height: number } | null = null;
+    private lassoStart: { x: number; y: number } | null = null;
     private needsLayout = true;
     private isVisible = false;
     private documentVisible = typeof document === 'undefined' ? true : !document.hidden;
@@ -164,17 +184,29 @@ export class GraphGalaxyCanvasComponent implements AfterViewInit, OnChanges, OnD
     onPointerDown(event: PointerEvent): void {
         event.preventDefault();
         const settings = mergeGalaxySettings(this.settings);
-        const picked = this.pick(event);
+        const pointer = this.pointerFromEvent(event);
+        const useLasso = event.button === 0 && (this.lassoEnabled || event.shiftKey);
+        const picked = useLasso ? null : this.pick(event);
         this.dragging = true;
+        this.lassoSelecting = useLasso;
+        this.lassoStart = useLasso ? { x: pointer.x, y: pointer.y } : null;
+        this.lassoRect = useLasso ? {
+            left: pointer.x,
+            top: pointer.y,
+            right: pointer.x,
+            bottom: pointer.y,
+            width: pointer.width,
+            height: pointer.height,
+        } : null;
         this.nodeDragging = Boolean(
-            picked && settings.nodeDragMode !== 'camera' && !event.shiftKey && event.button === 0 &&
-            this.renderer.beginNodeDrag(picked, this.pointerFromEvent(event)),
+            picked && settings.nodeDragMode !== 'camera' && event.button === 0 &&
+            this.renderer.beginNodeDrag(picked, pointer),
         );
-        this.panning = !this.nodeDragging && (event.shiftKey || event.button === 1 || event.button === 2);
+        this.panning = !this.lassoSelecting && !this.nodeDragging && (event.altKey || event.button === 1 || event.button === 2);
         this.pointerMoved = false;
         this.lastPointerX = event.clientX;
         this.lastPointerY = event.clientY;
-        if (picked) this.setHover(picked);
+        if (picked) this.setHover({ kind: 'node', id: picked });
         this.canvasRef.nativeElement.setPointerCapture(event.pointerId);
         this.syncSurface();
     }
@@ -189,16 +221,33 @@ export class GraphGalaxyCanvasComponent implements AfterViewInit, OnChanges, OnD
         this.lastPointerX = event.clientX;
         this.lastPointerY = event.clientY;
         this.pointerMoved ||= Math.abs(dx) + Math.abs(dy) > 3;
-        if (this.nodeDragging) this.renderer.dragNode(this.pointerFromEvent(event));
+        if (this.lassoSelecting) {
+            const pointer = this.pointerFromEvent(event);
+            const start = this.lassoStart || pointer;
+            this.lassoRect = {
+                left: Math.min(start.x, pointer.x),
+                top: Math.min(start.y, pointer.y),
+                right: Math.max(start.x, pointer.x),
+                bottom: Math.max(start.y, pointer.y),
+                width: pointer.width,
+                height: pointer.height,
+            };
+        } else if (this.nodeDragging) this.renderer.dragNode(this.pointerFromEvent(event));
         else this.panning ? this.renderer.pan(dx, dy) : this.renderer.rotate(dx, dy);
-        this.draw();
+        if (!this.lassoSelecting) this.draw();
     }
 
     onPointerUp(): void {
+        if (this.lassoSelecting && this.lassoRect) {
+            this.batchSelected.emit(this.renderer.nodesInRect(this.lassoRect));
+        }
         const relax = this.nodeDragging && this.renderer.endNodeDrag();
         this.dragging = false;
         this.nodeDragging = false;
         this.panning = false;
+        this.lassoSelecting = false;
+        this.lassoStart = null;
+        this.lassoRect = null;
         if (relax) this.start();
         this.syncSurface();
     }
@@ -216,23 +265,27 @@ export class GraphGalaxyCanvasComponent implements AfterViewInit, OnChanges, OnD
 
     onClick(event: MouseEvent): void {
         if (this.pointerMoved) return;
-        const id = this.pick(event);
-        const entity = id ? this.entities.find((item) => item.id === id || item.metadata?.sourceEntityId === id) : null;
+        const hit = this.pickObject(event);
+        if (!hit) return;
+        const entity = hit.kind === 'node'
+            ? this.entities.find((item) => item.id === hit.id || item.metadata?.sourceEntityId === hit.id)
+            : null;
         if (entity) {
             const nextId = entity.id === this.selectedEntityId ? null : entity.id;
             this.renderer.selectNode(nextId);
             this.draw();
             this.entitySelected.emit(entity);
         }
+        this.objectSelected.emit(hit);
     }
 
     onDoubleClick(event: MouseEvent): void {
-        const id = this.pick(event);
-        if (!id) {
+        const hit = this.pickObject(event);
+        if (!hit) {
             this.fitToGraph();
             return;
         }
-        if (mergeGalaxySettings(this.settings).clickFocus) this.focusEntity(id);
+        if (hit.kind === 'node' && mergeGalaxySettings(this.settings).clickFocus) this.focusEntity(hit.id);
     }
 
     private start(): void {
@@ -372,23 +425,32 @@ export class GraphGalaxyCanvasComponent implements AfterViewInit, OnChanges, OnD
     }
 
     private updateHover(event: MouseEvent): void {
-        this.setHover(this.pick(event));
+        this.setHover(this.pickObject(event));
     }
 
-    private setHover(id: string | null): void {
-        if (this.hoverId === id) return;
-        this.hoverId = id;
-        this.renderer.hoverNode(id);
+    private setHover(hit: GraphCanvasHit | null): void {
+        const key = hit ? `${hit.kind}:${hit.id}` : null;
+        if (this.hoverKey === key) return;
+        this.hoverKey = key;
+        const nodeId = hit?.kind === 'node' ? hit.id : null;
+        this.renderer.hoverNode(nodeId);
         this.recordRendererTimings();
         this.draw();
-        const entity = id ? this.entities.find((item) => item.id === id || item.metadata?.sourceEntityId === id) ?? null : null;
+        const entity = nodeId ? this.entities.find((item) => item.id === nodeId || item.metadata?.sourceEntityId === nodeId) ?? null : null;
         this.entityHovered.emit(entity);
+        this.objectHovered.emit(hit);
     }
 
     private pick(event: MouseEvent): string | null {
         const id = this.renderer.pick(this.pointerFromEvent(event));
         this.recordRendererTimings();
         return id;
+    }
+
+    private pickObject(event: MouseEvent): GraphCanvasHit | null {
+        const hit = this.renderer.pickObject(this.pointerFromEvent(event));
+        this.recordRendererTimings();
+        return hit;
     }
 
     private recordRendererTimings(extra: Partial<GraphGalaxyCanvasTimings> = {}): void {

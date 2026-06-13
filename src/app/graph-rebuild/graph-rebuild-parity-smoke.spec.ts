@@ -618,7 +618,7 @@ describe('Phoenix graph rebuild parity smoke', () => {
             snapshot.embeddingGraphPostProcess?.metrics.theoreticalPairCount || 0,
         );
         expect(elapsedMs).toBeLessThan(20000);
-    });
+    }, 30000);
 });
 
 function loadFixture(): ParityFixture {

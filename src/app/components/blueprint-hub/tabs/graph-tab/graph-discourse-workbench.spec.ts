@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import type { RegisteredEntity } from '../../../../lib/registry';
 import type { GraphRebuildSnapshot } from '../../../../graph-rebuild/graph-rebuild-snapshot';
 import { buildGraphDiscourseWorkbenchView } from './graph-discourse-workbench';
+import { buildGraphOperatingRoomView } from './graph-operating-room';
 
 describe('buildGraphDiscourseWorkbenchView', () => {
     it('keeps discourse ledger rows inspectable with candidate, decision, and evidence ids', () => {
@@ -54,6 +55,30 @@ describe('buildGraphDiscourseWorkbenchView', () => {
         expect(row?.facts.some((fact) => fact.label === 'Before graph' && fact.value.includes('2 atoms'))).toBe(true);
         expect(row?.facts.some((fact) => fact.label === 'Undo' && fact.value.includes('remove_document_compiler_outputs'))).toBe(true);
         expect(view?.recordsByTab.stats.some((record) => record.id === 'stats:document-compiler-diffs')).toBe(true);
+    });
+
+    it('builds operating-room rooms where count cards open their underlying rows', () => {
+        const snap = snapshot();
+        const workbench = buildGraphDiscourseWorkbenchView(snap, entities());
+        const room = buildGraphOperatingRoomView(workbench, snap, entities());
+        const relations = room.countsById['facts-relations'];
+        const receipts = room.countsById['metrics-receipts'];
+
+        expect(room.tabs.map((tab) => tab.id)).toEqual(['entities', 'structure', 'facts', 'review', 'discourse', 'metrics']);
+        expect(relations.value).toBe(relations.recordIds.length);
+        expect(relations.recordIds.some((id) => room.recordsById[id]?.kind.includes('document-compiler'))).toBe(true);
+        expect(receipts.value).toBe(receipts.recordIds.length);
+        expect(receipts.recordIds.some((id) => room.recordsById[id]?.receiptIds.includes('compiler-receipt-1'))).toBe(true);
+    });
+
+    it('adds operating-room inspection facts to document rows', () => {
+        const view = buildGraphDiscourseWorkbenchView(snapshot(), entities());
+        const row = view?.recordsByTab.relations.find((record) => record.id.includes('document-review'));
+
+        expect(row?.facts.some((fact) => fact.label === 'Source text' && fact.value.includes('Kai trusts Hazel'))).toBe(true);
+        expect(row?.facts.some((fact) => fact.label === 'Lineage' && fact.value.includes('unit-1'))).toBe(true);
+        expect(row?.facts.some((fact) => fact.label === 'Detector' && fact.value.includes('graph_fact'))).toBe(true);
+        expect(row?.facts.some((fact) => fact.label === 'Graph impact' && fact.value.includes('candidate'))).toBe(true);
     });
 });
 

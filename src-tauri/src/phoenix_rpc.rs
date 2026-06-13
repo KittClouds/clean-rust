@@ -16,7 +16,10 @@ use crate::tts::{
 };
 use base64::{engine::general_purpose::STANDARD as BASE64_STANDARD, Engine as _};
 use flate2::{read::GzDecoder, write::GzEncoder, Compression};
-use phoenix_graph_rebuild::{compile_legacy_snapshot, GraphRebuildSnapshot};
+use phoenix_graph_rebuild::{
+    build_chunks, classify_document_profiles, compile_legacy_snapshot, Chunk, ChunkerConfig,
+    DocumentProfileRequest, GraphRebuildSnapshot,
+};
 use phoenix_hyperbolic::lorentz_tree::{
     HyperboloidPoint, LorentzForest, LorentzForestIndex, LorentzNode, LorentzQueryMode,
     LorentzScoreConfig, LorentzTree, LorentzTreeKind, LorentzTreeMembership, LorentzTreeQuery,
@@ -33,6 +36,65 @@ use phoenix_types::{
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct DocumentChunkRequest {
+    documents: Vec<DocumentChunkInput>,
+    #[serde(default = "default_document_chunk_size")]
+    chunk_size: usize,
+    #[serde(default = "default_document_chunk_overlap")]
+    overlap: usize,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct DocumentChunkInput {
+    note_id: String,
+    text: String,
+}
+
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct DocumentChunkOutput {
+    note_id: String,
+    chunks: Vec<DocumentChunkRange>,
+}
+
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct DocumentChunkRange {
+    start: usize,
+    end: usize,
+    ordinal: usize,
+}
+
+fn default_document_chunk_size() -> usize {
+    1_840
+}
+
+fn default_document_chunk_overlap() -> usize {
+    256
+}
+
+fn utf16_offsets_for_chunks(text: &str, chunks: &[Chunk]) -> HashMap<usize, usize> {
+    let endpoints = chunks
+        .iter()
+        .flat_map(|chunk| [chunk.start, chunk.end])
+        .collect::<HashSet<_>>();
+    let mut offsets = HashMap::with_capacity(endpoints.len());
+    let mut utf16_offset = 0usize;
+    for (byte_offset, character) in text.char_indices() {
+        if endpoints.contains(&byte_offset) {
+            offsets.insert(byte_offset, utf16_offset);
+        }
+        utf16_offset += character.len_utf16();
+    }
+    if endpoints.contains(&text.len()) {
+        offsets.insert(text.len(), utf16_offset);
+    }
+    offsets
+}
 
 #[derive(Default)]
 struct PhoenixDesktopState {
@@ -824,6 +886,53 @@ impl PhoenixApi for PhoenixApiImpl {
                 "success": true,
                 "payload": {
                     "factGraphPayload": fact_graph_payload,
+                },
+                "error": null,
+            }));
+        }
+        if command == "documentProfile:classify" {
+            let request = serde_json::from_value::<DocumentProfileRequest>(payload)
+                .map_err(|error| format!("invalid document profile request: {error}"))?;
+            let summary = classify_document_profiles(&request);
+            return serialize_json(&json!({
+                "success": true,
+                "payload": summary,
+                "error": null,
+            }));
+        }
+        if command == "documentChunk:build" {
+            let request = serde_json::from_value::<DocumentChunkRequest>(payload)
+                .map_err(|error| format!("invalid document chunk request: {error}"))?;
+            let config = ChunkerConfig {
+                chunk_size: request.chunk_size.max(256),
+                overlap: request.overlap.min(request.chunk_size.saturating_sub(1)),
+            };
+            let documents = request
+                .documents
+                .into_iter()
+                .map(|document| {
+                    let chunks = build_chunks(&document.text, &config);
+                    let offsets = utf16_offsets_for_chunks(&document.text, &chunks);
+                    DocumentChunkOutput {
+                        note_id: document.note_id,
+                        chunks: chunks
+                            .iter()
+                            .enumerate()
+                            .map(|(ordinal, chunk)| DocumentChunkRange {
+                                start: offsets.get(&chunk.start).copied().unwrap_or_default(),
+                                end: offsets.get(&chunk.end).copied().unwrap_or_default(),
+                                ordinal,
+                            })
+                            .collect(),
+                    }
+                })
+                .collect::<Vec<_>>();
+            return serialize_json(&json!({
+                "success": true,
+                "payload": {
+                    "schemaVersion": "phoenix-document-chunks/v1",
+                    "source": "native_rust",
+                    "documents": documents,
                 },
                 "error": null,
             }));
@@ -3967,6 +4076,19 @@ mod tests {
         assert_eq!(info.storage, "nativeLocal");
         assert!(!info.feature_flags.graptor);
         assert!(!info.feature_flags.gldr);
+    }
+
+    #[test]
+    fn native_chunk_offsets_are_utf16_safe_for_frontend_ranges() {
+        let text = "A😀B. Café follows.";
+        let chunks = vec![Chunk {
+            start: "A😀".len(),
+            end: text.len(),
+        }];
+        let offsets = utf16_offsets_for_chunks(text, &chunks);
+
+        assert_eq!(offsets.get(&chunks[0].start), Some(&3));
+        assert_eq!(offsets.get(&chunks[0].end), Some(&19));
     }
 
     #[test]

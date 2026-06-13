@@ -148,6 +148,21 @@ describe('GraphRebuildService persistence helpers', () => {
             projectionRefs: [],
             nodes: [],
             edges: [],
+            documentGraphMutationLedger: {
+                schemaVersion: 'phoenix-document-graph-mutation-ledger/v1',
+                records: [{
+                    id: 'document-graph-mutation:commit-1',
+                    commitId: 'commit-1',
+                    topologyDiffId: 'diff-1',
+                    sourceObjectId: 'fact-1',
+                    receiptId: 'receipt-1',
+                    status: 'committed',
+                    vertexIds: ['fact-vertex-1'],
+                    edgeKeys: ['fact-vertex-1\u0000entity-1'],
+                    committedAt: 99,
+                }],
+                counters: { commits: 1, active: 1, undone: 0, vertices: 1, edges: 1 },
+            },
             counters: {
                 entities: 2,
                 aliases: 1,

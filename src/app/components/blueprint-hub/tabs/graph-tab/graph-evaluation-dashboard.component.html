@@ -1,0 +1,147 @@
+<section class="evaluation-shell" [class.evaluation-inspecting]="selectedMetric()">
+    <header class="evaluation-verdict" [ngClass]="toneClass(dashboard().tone)">
+        <div class="evaluation-score-ring">
+            @if (dashboard().tone === 'healthy') {
+            <lucide-icon [img]="CheckIcon" class="h-5 w-5"></lucide-icon>
+            } @else {
+            <lucide-icon [img]="AlertIcon" class="h-5 w-5"></lucide-icon>
+            }
+            <strong>{{ scoreLabel(dashboard().score) }}</strong>
+        </div>
+        <div class="evaluation-verdict-copy">
+            <span class="evaluation-kicker">Index health / {{ dashboard().scopeLabel }}</span>
+            <h2>{{ dashboard().verdict }}</h2>
+            <p>{{ dashboard().headline }}</p>
+        </div>
+        <div class="evaluation-reasons">
+            @for (reason of dashboard().reasons; track reason) {
+            <span>{{ reason }}</span>
+            }
+        </div>
+        <div class="evaluation-run-meta">
+            <span><b>{{ dashboard().runStatus }}</b> run status</span>
+            <span><b>{{ durationLabel() }}</b> elapsed</span>
+            <span><b>{{ dashboard().noteIds.length }}</b> documents</span>
+            @if (dashboard().builtAt) {
+            <span><b>{{ dashboard().builtAt | date:'shortTime' }}</b> latest snapshot</span>
+            }
+        </div>
+    </header>
+
+    @if (stale) {
+    <div class="evaluation-stale">
+        <lucide-icon [img]="AlertIcon" class="h-4 w-4"></lucide-icon>
+        Anchors changed after this snapshot. Health results describe the previous index run.
+    </div>
+    }
+
+    <nav class="evaluation-category-tabs" role="tablist" aria-label="Evaluation metric categories">
+        <button type="button" [class.evaluation-category-active]="category() === 'all'" (click)="selectCategory('all')">
+            <lucide-icon [img]="GaugeIcon" class="h-4 w-4"></lucide-icon>
+            All metrics
+            <em>{{ dashboard().metrics.length }}</em>
+        </button>
+        @for (group of dashboard().categories; track group.id) {
+        <button type="button" [ngClass]="toneClass(group.tone)" [class.evaluation-category-active]="category() === group.id" (click)="selectCategory(group.id)">
+            <span>{{ group.label }}</span>
+            <strong>{{ scoreLabel(group.score) }}</strong>
+        </button>
+        }
+    </nav>
+
+    <div class="evaluation-body">
+        <main class="evaluation-main">
+            @if (dashboard().metrics.length === 0) {
+            <div class="evaluation-empty">
+                <lucide-icon [img]="DatabaseIcon" class="h-6 w-6"></lucide-icon>
+                <strong>No evaluation snapshot</strong>
+                <span>Run Full Atlas for this scope to populate chunk, graph, retrieval, and performance health.</span>
+            </div>
+            } @else {
+            <div class="evaluation-metric-grid">
+                @for (metric of visibleMetrics(); track metric.id) {
+                <button type="button" class="evaluation-metric" [ngClass]="toneClass(metric.tone)" [class.evaluation-metric-selected]="selectedMetricId() === metric.id" (click)="inspect(metric)">
+                    <span class="evaluation-metric-head">
+                        <span>{{ metric.label }}</span>
+                        <em>{{ scoreLabel(metric.score) }}</em>
+                    </span>
+                    <strong>{{ metric.value }}</strong>
+                    <p>{{ metric.summary }}</p>
+                    @if (metric.distribution?.length) {
+                    <span class="evaluation-distribution" aria-label="Chunk size distribution">
+                        @for (bucket of metric.distribution; track bucket.label) {
+                        <i [style.height.%]="distributionWidth(metric, bucket.value)" [title]="bucket.label + ': ' + bucket.value"></i>
+                        }
+                    </span>
+                    }
+                    <span class="evaluation-open-label">
+                        <lucide-icon [img]="SearchIcon" class="h-3.5 w-3.5"></lucide-icon>
+                        {{ metric.records.length }} inspectable rows
+                    </span>
+                </button>
+                }
+            </div>
+
+            <section class="evaluation-stages">
+                <header>
+                    <span>
+                        <lucide-icon [img]="ClockIcon" class="h-4 w-4"></lucide-icon>
+                        Pipeline timing
+                    </span>
+                    <strong>{{ dashboard().stageRows.length }} stages</strong>
+                </header>
+                <div class="evaluation-stage-list">
+                    @for (stage of dashboard().stageRows; track stage.id) {
+                    <div [ngClass]="toneClass(stage.tone)">
+                        <span>{{ stage.title }}</span>
+                        <strong>{{ stage.meta }}</strong>
+                        <small>{{ stage.detail }}</small>
+                    </div>
+                    } @empty {
+                    <span class="evaluation-stage-empty">No stage timing ledger is attached.</span>
+                    }
+                </div>
+            </section>
+            }
+        </main>
+
+        @if (selectedMetric(); as metric) {
+        <aside class="evaluation-inspector" [ngClass]="toneClass(metric.tone)">
+            <header>
+                <div>
+                    <span class="evaluation-kicker">{{ metric.categoryId }} / score {{ scoreLabel(metric.score) }}</span>
+                    <h3>{{ metric.label }}</h3>
+                    <strong>{{ metric.value }}</strong>
+                </div>
+                <button type="button" title="Close metric inspector" aria-label="Close metric inspector" (click)="closeInspector()">
+                    <lucide-icon [img]="XIcon" class="h-4 w-4"></lucide-icon>
+                </button>
+            </header>
+            <p>{{ metric.summary }}</p>
+            <section class="evaluation-why">
+                <span class="evaluation-kicker">Why this was scored</span>
+                @for (reason of metric.why; track reason) {
+                <div>{{ reason }}</div>
+                }
+            </section>
+            <section class="evaluation-records">
+                <header>
+                    <span class="evaluation-kicker">Underlying data</span>
+                    <strong>{{ metric.records.length }} rows</strong>
+                </header>
+                <div>
+                    @for (record of metric.records; track record.id) {
+                    <article [ngClass]="toneClass(record.tone)">
+                        <strong>{{ record.title }}</strong>
+                        <p>{{ record.detail }}</p>
+                        <span>{{ record.meta }}</span>
+                    </article>
+                    } @empty {
+                    <div class="evaluation-record-empty">No suspicious rows. The score comes from aggregate counters.</div>
+                    }
+                </div>
+            </section>
+        </aside>
+        }
+    </div>
+</section>

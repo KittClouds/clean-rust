@@ -19,8 +19,10 @@ import type { GraphDiscoursePromotionSurfaceSummary } from './graph-discourse-pr
 import type { GraphDiscourseCompilerOverlaySummary } from './graph-discourse-compiler-overlay';
 import type { HopfResonanceSpace } from './graph-hopf-resonance-space';
 import type { GraphDocumentSidecarSummary } from './graph-document-sidecar';
+import type { GraphDocumentProfileSummary } from './graph-document-profile';
 import type { GraphDocumentReviewSummary } from './graph-document-review';
 import type { GraphDocumentCompilerSummary } from './graph-document-compiler';
+import type { GraphDocumentGraphMutationLedger } from './graph-document-durable-commit';
 
 export type GraphRebuildScopeKind = 'global' | 'folder' | 'narrative' | 'note' | 'multiNote';
 export type GraphRebuildAnchorSource = EntityOccurrence['source'] | 'accepted_suggestion';
@@ -2126,6 +2128,7 @@ export interface GraphRebuildBuildTimings {
     noteFolderLoadMs: number;
     dbLoadMs: number;
     occurrenceRecoverMs: number;
+    documentProfileMs?: number;
     snapshotBuildMs: number;
     stateCommitMs: number;
     nativeCompilerMs?: number;
@@ -2207,6 +2210,7 @@ export interface GraphRebuildSnapshot {
     documentSidecarSummary?: GraphDocumentSidecarSummary;
     documentReviewSummary?: GraphDocumentReviewSummary;
     documentCompilerSummary?: GraphDocumentCompilerSummary;
+    documentGraphMutationLedger?: GraphDocumentGraphMutationLedger;
     calendarRegistrySummary?: GraphCalendarRegistryBridgeSummary;
     counters: GraphRebuildCounters;
     buildTimings?: GraphRebuildBuildTimings;
@@ -2330,6 +2334,7 @@ export interface BuildGraphRebuildSnapshotInput {
     builtAt?: number;
     graphCompilerSidecar?: GraphCompilerDualWriteSidecar;
     calendarRegistrySnapshot?: CalendarRegistrySnapshot;
+    documentProfileSummary?: GraphDocumentProfileSummary;
 }
 
 export interface GraphRebuildNoteFolderContext {

@@ -23,14 +23,33 @@ import { buildGraphDiscourseBridgeCandidateSummary } from './graph-discourse-bri
 import { buildGraphDiscourseCompilerOverlaySummary } from './graph-discourse-compiler-overlay';
 import { buildGraphDiscourseEvalLedgerSummary } from './graph-discourse-eval-ledger';
 import { buildGraphDiscoursePromotionSurfaceSummary } from './graph-discourse-promotion-surface';
+import {
+    buildFallbackDocumentProfileSummary,
+    normalizeDocumentProfileSummary,
+    type GraphDocumentProfileSummary,
+} from './graph-document-profile';
 import { buildGraphRebuildSnapshot } from './graph-rebuild-builder';
 import { buildGraphDiscourseSpineSummary } from './graph-discourse-spine';
 import { buildHopfResonanceSpace } from './graph-hopf-resonance-space';
 import { buildGraphMemoryGraphRagBridgeSummary } from './graph-memory-graphrag-bridge';
+import {
+    buildGraphDocumentDurableCommitRequests,
+    emptyGraphDocumentGraphMutationLedger,
+    planGraphDocumentMutationReconciliation,
+    recordGraphDocumentCommit,
+    recordGraphDocumentUndo,
+    type GraphDocumentDurableCommitResult,
+    type GraphDocumentDurableUndoResult,
+    type GraphDocumentGraphMutationLedger,
+} from './graph-document-durable-commit';
 import { buildGraphSemanticAdjudicationDAGSummary } from './graph-semantic-adjudication';
 import { buildGraphSemanticEvalLedgerSummary } from './graph-semantic-eval-ledger';
 import { buildGraphSemanticRerankSummary } from './graph-semantic-rerank';
-import { buildAdaptiveGraphRebuildChunks } from './graph-rebuild-meaning-frames';
+import {
+    buildAdaptiveGraphRebuildChunks,
+    buildGraphRebuildChunksFromRanges,
+    type GraphRebuildChunkRange,
+} from './graph-rebuild-meaning-frames';
 import {
     buildGraphModelV2OverGraphExport,
     type GraphModelV2OverGraphExport,
@@ -70,6 +89,17 @@ export interface GraphRebuildPostProcessCache {
     receipt?: GraphIndexRunReceipt;
     receiptId?: string;
     updatedAt: number;
+}
+
+interface NativeDocumentChunkOutput {
+    noteId: string;
+    chunks: GraphRebuildChunkRange[];
+}
+
+interface NativeDocumentChunkSummary {
+    schemaVersion: 'phoenix-document-chunks/v1';
+    source: 'native_rust';
+    documents: NativeDocumentChunkOutput[];
 }
 
 interface CompressedGraphRebuildJsonPayload {
@@ -145,19 +175,23 @@ export class GraphRebuildService {
     async buildAndPersistSnapshot(request: GraphRebuildBuildRequest): Promise<GraphRebuildSnapshot> {
         this.buildingState.set(true);
         const totalStarted = performance.now();
+        const builtAt = Date.now();
         const timings = emptyBuildTimings();
         try {
             const persistedOccurrences = await timedAsync(timings, 'occurrenceLoadMs', () =>
                 this.loadOccurrences(request.noteIds, request.entities)
             );
-            const chunks = await timedAsync(timings, 'chunkLoadMs', () =>
-                this.loadChunks(request.noteIds, persistedOccurrences)
-            );
             const noteTexts = await timedAsync(timings, 'noteTextLoadMs', () =>
                 this.loadNoteTexts(request.noteIds, persistedOccurrences)
             );
+            const chunks = await timedAsync(timings, 'chunkLoadMs', () =>
+                this.loadChunks(request.noteIds, persistedOccurrences, noteTexts)
+            );
             const noteFolders = await timedAsync(timings, 'noteFolderLoadMs', () =>
                 this.loadNoteFolderContexts(request.noteIds, persistedOccurrences)
+            );
+            const documentProfileSummary = await timedAsync(timings, 'documentProfileMs', () =>
+                this.classifyDocumentProfiles(noteTexts, builtAt)
             );
             const recoverStarted = performance.now();
             const fallbackOccurrences = request.fallbackOccurrences || [];
@@ -166,7 +200,7 @@ export class GraphRebuildService {
                 recoverGraphRebuildOccurrences(noteTexts, request.entities),
             );
             timings.occurrenceRecoverMs = elapsedMs(recoverStarted);
-            const snapshot = timedSync(timings, 'snapshotBuildMs', () => buildGraphRebuildSnapshot({
+            let snapshot = timedSync(timings, 'snapshotBuildMs', () => buildGraphRebuildSnapshot({
                 scopeKind: request.scopeKind,
                 scopeId: request.scopeId,
                 noteIds: request.noteIds,
@@ -181,8 +215,11 @@ export class GraphRebuildService {
                 embeddingStagePolicy: request.embeddingStagePolicy,
                 candidateCount: request.candidateCount,
                 calendarRegistrySnapshot: request.calendarRegistrySnapshot,
+                documentProfileSummary,
+                builtAt,
             }));
             await this.attachNativeGraphCompilerSidecar(snapshot, timings);
+            snapshot = await this.reconcileDocumentGraphMutations(snapshot);
             finalizeBuildTimings(timings, totalStarted);
             snapshot.buildTimings = timings;
             const stateStarted = performance.now();
@@ -223,6 +260,26 @@ export class GraphRebuildService {
             console.warn('[GraphRebuild] Native graph compiler sidecar unavailable; using compatibility sidecar', error);
         } finally {
             if (timings) timings.nativeCompilerMs = elapsedMs(started);
+        }
+    }
+
+    private async classifyDocumentProfiles(
+        noteTexts: Record<string, string>,
+        builtAt: number,
+    ): Promise<GraphDocumentProfileSummary> {
+        if (this.phoenix.target !== 'native') {
+            return buildFallbackDocumentProfileSummary(noteTexts, builtAt);
+        }
+        try {
+            const native = await this.phoenix.storeCommand('documentProfile:classify', {
+                builtAt,
+                documents: Object.entries(noteTexts).map(([noteId, text]) => ({ noteId, text })),
+            });
+            return normalizeDocumentProfileSummary(native)
+                || buildFallbackDocumentProfileSummary(noteTexts, builtAt);
+        } catch (error) {
+            console.warn('[GraphRebuild] Native document profile unavailable; using compatibility classifier', error);
+            return buildFallbackDocumentProfileSummary(noteTexts, builtAt);
         }
     }
 
@@ -275,8 +332,61 @@ export class GraphRebuildService {
     }
 
     async restorePersistedSnapshot(snapshot: GraphRebuildSnapshot): Promise<void> {
-        this.snapshotState.set(snapshot);
-        await this.persistSnapshot(snapshot);
+        const reconciled = await this.reconcileDocumentGraphMutations(snapshot);
+        this.snapshotState.set(reconciled);
+        await this.persistSnapshot(reconciled);
+    }
+
+    private async reconcileDocumentGraphMutations(
+        snapshot: GraphRebuildSnapshot,
+    ): Promise<GraphRebuildSnapshot> {
+        const previousLedger = await this.loadDocumentGraphMutationLedger(snapshot.scopeId);
+        if (this.phoenix.target !== 'native') {
+            snapshot.documentGraphMutationLedger = previousLedger
+                || emptyGraphDocumentGraphMutationLedger();
+            return snapshot;
+        }
+        const desired = buildGraphDocumentDurableCommitRequests({
+            scopeId: snapshot.scopeId,
+            compiler: snapshot.documentCompilerSummary,
+            sidecar: snapshot.documentSidecarSummary,
+        });
+        const now = Date.now();
+        const plan = planGraphDocumentMutationReconciliation(desired, previousLedger, now);
+        let ledger = previousLedger || emptyGraphDocumentGraphMutationLedger();
+        for (const request of plan.undos) {
+            const result = await this.phoenix.storeCommand(
+                'documentGraph:undo',
+                request as unknown as Record<string, unknown>,
+            ) as GraphDocumentDurableUndoResult;
+            requireDocumentGraphMutationResult(result?.commitId, request.commitId, 'undo');
+            ledger = recordGraphDocumentUndo(ledger, request);
+        }
+        for (const request of plan.commits) {
+            const result = await this.phoenix.storeCommand(
+                'documentGraph:commit',
+                request as unknown as Record<string, unknown>,
+            ) as GraphDocumentDurableCommitResult;
+            requireDocumentGraphMutationResult(result?.commitId, request.commitId, 'commit');
+            ledger = recordGraphDocumentCommit(ledger, request, result, now);
+        }
+        snapshot.documentGraphMutationLedger = ledger;
+        return snapshot;
+    }
+
+    private async loadDocumentGraphMutationLedger(
+        scopeId: string,
+    ): Promise<GraphDocumentGraphMutationLedger | undefined> {
+        const current = this.snapshotState();
+        if (current?.scopeId === scopeId) return current.documentGraphMutationLedger;
+        const document = await this.store.getScopedDocument(
+            scopeId,
+            GRAPH_REBUILD_NAMESPACE,
+            SNAPSHOT_DOCUMENT_KEY,
+        );
+        return document
+            ? scopedDocumentToGraphRebuildSnapshot(document)?.documentGraphMutationLedger
+            : undefined;
     }
 
     private async persistSnapshot(
@@ -374,14 +484,47 @@ export class GraphRebuildService {
         return out;
     }
 
-    private async loadChunks(noteIds: string[], occurrences: EntityOccurrence[]): Promise<GraphRebuildChunk[]> {
+    private async loadChunks(
+        noteIds: string[],
+        occurrences: EntityOccurrence[],
+        noteTexts: Record<string, string>,
+    ): Promise<GraphRebuildChunk[]> {
         const scopedNoteIds = noteIds.length ? noteIds : [...new Set(occurrences.map((row) => row.noteId))];
+        if (this.phoenix.target === 'native') {
+            try {
+                const native = await this.phoenix.storeCommand('documentChunk:build', {
+                    chunkSize: 1_840,
+                    overlap: 256,
+                    documents: scopedNoteIds.map((noteId) => ({ noteId, text: noteTexts[noteId] || '' })),
+                }) as NativeDocumentChunkSummary | null;
+                if (native?.schemaVersion === 'phoenix-document-chunks/v1') {
+                    const byNote = new Map(native.documents.map((document) => [document.noteId, document.chunks]));
+                    const chunks = scopedNoteIds.flatMap((noteId) =>
+                        buildGraphRebuildChunksFromRanges(noteId, noteTexts[noteId] || '', byNote.get(noteId) || []),
+                    );
+                    if (chunks.length) return chunks;
+                }
+            } catch (error) {
+                console.warn('[GraphRebuild] Native document chunker unavailable; using adaptive compatibility chunker', error);
+            }
+        }
         const dynamicChunks = await loadDynamicNoteChunks(scopedNoteIds);
         if (dynamicChunks.length) return dynamicChunks;
         const blockChunks = await loadBlockChunks(scopedNoteIds);
         if (blockChunks.length) return blockChunks;
         return loadFallbackNoteChunks(scopedNoteIds);
     }
+}
+
+function requireDocumentGraphMutationResult(
+    actualCommitId: string | undefined,
+    expectedCommitId: string,
+    operation: 'commit' | 'undo',
+): void {
+    if (actualCommitId === expectedCommitId) return;
+    throw new Error(
+        `Document graph ${operation} returned ${actualCommitId || 'no commit id'} for ${expectedCommitId}`,
+    );
 }
 
 export function recoverGraphRebuildOccurrences(
@@ -1023,6 +1166,7 @@ function emptyBuildTimings(): GraphRebuildBuildTimings {
         noteFolderLoadMs: 0,
         dbLoadMs: 0,
         occurrenceRecoverMs: 0,
+        documentProfileMs: 0,
         snapshotBuildMs: 0,
         stateCommitMs: 0,
         nativeCompilerMs: 0,

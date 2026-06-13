@@ -120,6 +120,54 @@ export function normalizeEntityKind(kind: EntityKind | string | null | undefined
     return Object.prototype.hasOwnProperty.call(DEFAULT_ENTITY_COLORS, normalized) ? normalized : null;
 }
 
+export function hslColorToHex(hslString: string): string {
+    const [hueValue, saturationValue, lightnessValue] = hslString.split(' ');
+    const hue = Number.parseFloat(hueValue);
+    const saturation = Number.parseFloat(saturationValue?.replace('%', '')) / 100;
+    const lightness = Number.parseFloat(lightnessValue?.replace('%', '')) / 100;
+    if (![hue, saturation, lightness].every(Number.isFinite)) return '#888888';
+
+    const chroma = (1 - Math.abs(2 * lightness - 1)) * saturation;
+    const secondary = chroma * (1 - Math.abs((hue / 60) % 2 - 1));
+    const match = lightness - chroma / 2;
+    let red = 0;
+    let green = 0;
+    let blue = 0;
+    if (hue < 60) { red = chroma; green = secondary; }
+    else if (hue < 120) { red = secondary; green = chroma; }
+    else if (hue < 180) { green = chroma; blue = secondary; }
+    else if (hue < 240) { green = secondary; blue = chroma; }
+    else if (hue < 300) { red = secondary; blue = chroma; }
+    else { red = chroma; blue = secondary; }
+
+    const toHex = (value: number) => Math.round((value + match) * 255).toString(16).padStart(2, '0');
+    return `#${toHex(red)}${toHex(green)}${toHex(blue)}`;
+}
+
+export function hexColorToHsl(hex: string): string {
+    const match = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    if (!match) return '220 10% 50%';
+
+    const red = Number.parseInt(match[1], 16) / 255;
+    const green = Number.parseInt(match[2], 16) / 255;
+    const blue = Number.parseInt(match[3], 16) / 255;
+    const max = Math.max(red, green, blue);
+    const min = Math.min(red, green, blue);
+    const delta = max - min;
+    const lightness = (max + min) / 2;
+    let hue = 0;
+    let saturation = 0;
+
+    if (delta !== 0) {
+        saturation = lightness > 0.5 ? delta / (2 - max - min) : delta / (max + min);
+        if (max === red) hue = ((green - blue) / delta + (green < blue ? 6 : 0)) * 60;
+        else if (max === green) hue = ((blue - red) / delta + 2) * 60;
+        else hue = ((red - green) / delta + 4) * 60;
+    }
+
+    return `${hue.toFixed(3)} ${(saturation * 100).toFixed(3)}% ${(lightness * 100).toFixed(3)}%`;
+}
+
 const GRAPH_NODE_KIND_ALIASES: Record<string, GraphNodeColorKind> = {
     co_occurrence: 'cooccurrence',
     co_occurs: 'cooccurrence',

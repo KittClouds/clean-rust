@@ -21,7 +21,8 @@
         (rejectSuggestionRequested)="rejectSuggestion($event)"
         (styleRequested)="toggleStyleDrawer()"
         (searchTextChange)="atlasSearch.set($event)"
-        (lensModeChange)="graphLensMode.set($event)">
+        (lensModeChange)="graphLensMode.set($event)"
+        (operatingRoomChange)="setOperatingRoom($event)">
     </app-graph-entity-sidebar>
 
     <main class="relative z-10 flex min-w-0 flex-1 flex-col">
@@ -54,6 +55,7 @@
             <div class="h-full min-h-[560px] w-full">
                 <app-graph-lens-workspace class="block h-full min-h-[560px]" [narrativeEntities]="entities()" [narrativeEdges]="atlasEdges()"
                     [lensMode]="graphLensMode()"
+                    [operatingRoom]="operatingRoom()"
                     [atlasSearch]="atlasSearch()"
                     [isScanning]="isScanningSuggestions()"
                     [activeProvider]="activeSuggestionProvider()"

@@ -7,7 +7,7 @@ use std::path::PathBuf;
 use lz4_flex::{compress_prepend_size, decompress_size_prepended};
 use phoenix_alex::Lexicon;
 use phoenix_causality::{CausalityLowerer, CausalityRequest, SemanticLowerer};
-use phoenix_chunker::{build_chunks, ChunkerConfig};
+use phoenix_chunker_native::{build_chunks, ChunkerConfig};
 use phoenix_kernel::{
     entity_sidecar_from_snapshot, KernelEdge, KernelEdgeType, KernelEntityFacet,
     KernelEntitySidecar, KernelGraphLayer, KernelGraphSnapshot, KernelMutationBatch,
@@ -1482,7 +1482,7 @@ fn build_resolver_links_native(
 fn build_chunk_records(
     document: &IngestDocument,
     boundaries: &[BoundaryRecord],
-    chunk_ranges: &[phoenix_chunker::Chunk],
+    chunk_ranges: &[phoenix_chunker_native::Chunk],
 ) -> (Vec<ChunkRecord>, Vec<IndexedSpan>) {
     let mut chunks = Vec::with_capacity(chunk_ranges.len());
     let mut indexed_spans = Vec::with_capacity(chunk_ranges.len());

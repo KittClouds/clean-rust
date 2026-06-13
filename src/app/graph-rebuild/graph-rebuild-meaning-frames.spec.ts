@@ -2,7 +2,10 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 import { dynamicChunksForNote } from './graph-rebuild.service';
-import { summarizeMeaningFrame } from './graph-rebuild-meaning-frames';
+import {
+    buildGraphRebuildChunksFromRanges,
+    summarizeMeaningFrame,
+} from './graph-rebuild-meaning-frames';
 
 const KAI_ROWAN_SMOKE = `
 Kai looked at Cael first. "This one is official continuity work. The chain exists, even cracked.
@@ -17,6 +20,22 @@ Operator Office attached the packet before Red Mesa opened in the center.
 `;
 
 describe('graph rebuild meaning-frame chunking', () => {
+    it('enriches native ranges without changing their source offsets', () => {
+        const text = 'Amara entered the archive.\n\nThe report shows the bridge failed because the cable moved.';
+        const split = text.indexOf('The report');
+        const chunks = buildGraphRebuildChunksFromRanges('native-ranges', text, [
+            { start: 0, end: split - 2, ordinal: 0 },
+            { start: split, end: text.length, ordinal: 1 },
+        ]);
+
+        expect(chunks.map((chunk) => [chunk.start, chunk.end])).toEqual([
+            [0, split - 2],
+            [split, text.length],
+        ]);
+        expect(chunks.every((chunk) => chunk.splitReason === 'native-sentence-window')).toBe(true);
+        expect(chunks[1].meaningFrame?.evidenceCues.length).toBeGreaterThan(0);
+    });
+
     it('keeps note-sized chunks carrying role, cue, and entity-prior frames', () => {
         const chunks = dynamicChunksForNote({ id: 'kai-rowan', markdownContent: KAI_ROWAN_SMOKE, content: '' });
         const priors = chunks.flatMap((chunk) => chunk.meaningFrame?.entityPriors || []);

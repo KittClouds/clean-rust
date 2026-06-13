@@ -1,4 +1,4 @@
-use phoenix_chunker::split_sentence_ranges;
+use phoenix_chunker_native::split_sentence_ranges;
 use phoenix_types::{PosTag, SentenceSpan, TokenClass, TokenSpan};
 
 #[cfg(test)]

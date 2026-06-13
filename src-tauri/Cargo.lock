@@ -3971,6 +3971,7 @@ dependencies = [
 name = "phoenix-runtime"
 version = "0.1.0"
 dependencies = [
+ "hashbrown 0.15.5",
  "js-sys",
  "overgraph",
  "phoenix-alex 0.1.0",

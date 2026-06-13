@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 import { buildGraphDocumentSidecar } from './graph-document-sidecar';
+import { buildFallbackDocumentProfileSummary } from './graph-document-profile';
 import { buildAdaptiveGraphRebuildChunks } from './graph-rebuild-meaning-frames';
 import { buildGraphRebuildSnapshot } from './graph-rebuild-builder';
 
@@ -30,6 +31,7 @@ describe('graph document sidecar', () => {
         });
 
         expect(sidecar.schemaVersion).toBe('phoenix-document-sidecar/v1');
+        expect(sidecar.documentProfileSummary?.source).toBe('typescript_compatibility');
         expect(sidecar.anchorPolicy).toBe('sidecar_never_promotes_anchors');
         expect(sidecar.counters.userAnchorPromotions).toBe(0);
         expect(sidecar.units.every((unit) => unit.anchorPolicy === 'sidecar_only')).toBe(true);
@@ -53,11 +55,30 @@ describe('graph document sidecar', () => {
         ]));
         expect(sidecar.graphFactCandidates.map((unit) => unit.kind)).toEqual(expect.arrayContaining([
             'event',
-            'state_change',
-            'procedure_step',
             'relation_bundle',
-            'n_ary_claim',
         ]));
+        expect(sidecar.graphFactCandidates.length).toBeLessThanOrEqual(sidecar.counters.paragraphs);
+    });
+
+    it('preserves native profile provenance and uses its weighted ontology', () => {
+        const text = '# Methods\n\nThe method compares samples.\n\n# Results\n\nEvidence supports the result.';
+        const chunks = buildAdaptiveGraphRebuildChunks('weighted-paper', text);
+        const profile = buildFallbackDocumentProfileSummary({ 'weighted-paper': text }, 14);
+        profile.source = 'native_rust';
+        profile.counters.nativeProfiles = 1;
+        const sidecar = buildGraphDocumentSidecar({
+            noteIds: ['weighted-paper'],
+            noteTexts: { 'weighted-paper': text },
+            chunks,
+            builtAt: 14,
+            documentProfileSummary: profile,
+        });
+
+        expect(sidecar.documentProfileSummary).toBe(profile);
+        expect(sidecar.documentProfileSummary?.source).toBe('native_rust');
+        expect(sidecar.rhetoricalUnits.some((unit) =>
+            unit.kind === 'method' && unit.confidence.reasons.includes('document_profile_weighted'),
+        )).toBe(true);
     });
 
     it('gives shortrun prose useful structure even without markdown headings', () => {

@@ -16,26 +16,237 @@
 
     @if (isOpen()) {
     <div class="atlas-control-stack">
-        <div class="atlas-view-switcher" role="tablist" aria-label="Graph sidebar views">
-            <button type="button" class="atlas-view-tab" [class.atlas-view-tab-active]="sidebarView() === 'entities'" (click)="setSidebarView('entities')">
+        <div class="atlas-view-switcher atlas-operating-switcher" role="tablist" aria-label="Blueprint operating rooms">
+            @for (room of operatingRoomTabs(); track room.id) {
+            <button type="button" class="atlas-view-tab" [class.atlas-view-tab-active]="sidebarView() === room.id" (click)="setSidebarView(room.id)">
+                @if (room.id === 'entities') {
                 <lucide-icon [img]="BookIcon" class="h-3.5 w-3.5"></lucide-icon>
-                Entities
-            </button>
-            <button type="button" class="atlas-view-tab" [class.atlas-view-tab-active]="sidebarView() === 'diagnostics'" (click)="setSidebarView('diagnostics')">
-                <lucide-icon [img]="SparklesIcon" class="h-3.5 w-3.5"></lucide-icon>
-                Product
-            </button>
-            <button type="button" class="atlas-view-tab" [class.atlas-view-tab-active]="sidebarView() === 'discourse'" (click)="setSidebarView('discourse')">
+                } @else if (room.id === 'structure') {
+                <lucide-icon [img]="PanelLeftIcon" class="h-3.5 w-3.5"></lucide-icon>
+                } @else if (room.id === 'facts') {
+                <lucide-icon [img]="NetworkIcon" class="h-3.5 w-3.5"></lucide-icon>
+                } @else if (room.id === 'review') {
+                <lucide-icon [img]="CheckIcon" class="h-3.5 w-3.5"></lucide-icon>
+                } @else if (room.id === 'discourse') {
                 <lucide-icon [img]="BrainIcon" class="h-3.5 w-3.5"></lucide-icon>
-                Discourse
+                } @else {
+                <lucide-icon [img]="SparklesIcon" class="h-3.5 w-3.5"></lucide-icon>
+                }
+                <span>{{ room.label }}</span>
+                <em>{{ room.count }}</em>
             </button>
+            }
         </div>
         @if (scanError) {
         <p class="atlas-error">{{ scanError }}</p>
         }
     </div>
 
-    @if (sidebarView() === 'diagnostics') {
+    @if (sidebarView() !== 'entities') {
+    <div class="atlas-controls-shell discourse-shell">
+        @if (diagnosticsLoading()) {
+        <div class="atlas-empty atlas-control-empty">
+            <lucide-icon [img]="SparklesIcon" class="h-5 w-5"></lucide-icon>
+            <p>Loading atlas room</p>
+            <span>Reading the latest graph rebuild snapshot.</span>
+        </div>
+        } @else if (diagnosticsError()) {
+        <p class="atlas-error">{{ diagnosticsError() }}</p>
+        } @else if (sidebarView() === 'metrics') {
+        <section class="metrics-sidebar-panel" [ngClass]="evaluationToneClass(evaluationDashboard().tone)">
+            <header>
+                <div>
+                    <span class="diagnostics-kicker">Index Health</span>
+                    <h3>{{ evaluationDashboard().verdict }}</h3>
+                    <p>{{ evaluationDashboard().headline }}</p>
+                </div>
+                <strong>{{ evaluationDashboard().score === null ? '--' : evaluationDashboard().score }}</strong>
+                <button type="button" class="discourse-icon-button" title="Reload graph snapshot" (click)="reloadGraphSidebarSnapshot()">
+                    <lucide-icon [img]="RefreshIcon" class="h-3.5 w-3.5"></lucide-icon>
+                </button>
+            </header>
+
+            <div class="metrics-sidebar-categories">
+                @for (group of evaluationDashboard().categories; track group.id) {
+                <div [ngClass]="evaluationToneClass(group.tone)">
+                    <span>{{ group.label }}</span>
+                    <strong>{{ group.score === null ? '--' : group.score }}</strong>
+                </div>
+                }
+            </div>
+
+            <div class="metrics-sidebar-reasons">
+                <span class="diagnostics-kicker">Run diagnosis</span>
+                @for (reason of evaluationDashboard().reasons; track reason) {
+                <p>{{ reason }}</p>
+                }
+            </div>
+
+            <footer>
+                <span>{{ evaluationDashboard().metrics.length }} metrics</span>
+                <span>{{ evaluationDashboard().noteIds.length }} documents</span>
+                <span>Open a metric on the workspace to inspect its rows.</span>
+            </footer>
+        </section>
+        } @else {
+        <section class="discourse-panel operating-room-panel">
+            <header class="discourse-hero operating-room-hero">
+                <div class="discourse-orbit">
+                    @if (activeOperatingRoom().id === 'facts') {
+                    <lucide-icon [img]="NetworkIcon" class="h-4 w-4"></lucide-icon>
+                    } @else if (activeOperatingRoom().id === 'discourse') {
+                    <lucide-icon [img]="BrainIcon" class="h-4 w-4"></lucide-icon>
+                    } @else {
+                    <lucide-icon [img]="SparklesIcon" class="h-4 w-4"></lucide-icon>
+                    }
+                </div>
+                <div class="min-w-0">
+                    <span class="diagnostics-kicker">Blueprint Operating Room</span>
+                    <h3>{{ activeOperatingRoom().label }}</h3>
+                    <p>{{ activeOperatingRoom().count }} inspectable rows / {{ activeOperatingRoom().detail }}</p>
+                </div>
+                <button type="button" class="discourse-icon-button" title="Reload graph snapshot" (click)="reloadGraphSidebarSnapshot()">
+                    <lucide-icon [img]="RefreshIcon" class="h-3.5 w-3.5"></lucide-icon>
+                </button>
+            </header>
+
+            <div class="operating-count-grid">
+                @for (count of activeOperatingCounts(); track count.id) {
+                <button type="button" class="operating-count-card" [class.operating-count-active]="selectedOperatingCount()?.id === count.id" [ngClass]="toneClass('discourse-tone', count.tone)" (click)="selectOperatingCount(count, $event)">
+                    <span>{{ count.label }}</span>
+                    <strong>{{ count.value }}</strong>
+                    <small>{{ count.detail }}</small>
+                </button>
+                } @empty {
+                <div class="empty-row">No count queues for this room yet.</div>
+                }
+            </div>
+
+            <section class="discourse-workbench operating-queue">
+                <div class="diagnostic-section-head">
+                    <span class="diagnostics-kicker">{{ selectedOperatingCount()?.label || activeOperatingRoom().label }} Queue</span>
+                    <strong>{{ activeOperatingRecords().length }} rows</strong>
+                    @if (selectedOperatingCount()) {
+                    <button type="button" class="discourse-icon-button" title="Show full room queue" (click)="clearOperatingCount($event)">
+                        <lucide-icon [img]="XIcon" class="h-3.5 w-3.5"></lucide-icon>
+                    </button>
+                    }
+                </div>
+                <div class="discourse-record-list operating-record-list">
+                    @for (record of activeOperatingRecords(); track record.id) {
+                    <button type="button" class="discourse-record-row" [class.discourse-record-selected]="selectedOperatingRecord().id === record.id" [ngClass]="toneClass('discourse-tone', record.tone)" (click)="selectDiscourseRecord(record.id, $event)">
+                        <span class="discourse-spine-row-top">
+                            <strong>{{ record.title }}</strong>
+                            <em>{{ record.scoreLabel }}</em>
+                        </span>
+                        <span class="discourse-route">{{ record.subtitle }}</span>
+                        <small>{{ record.detail }}</small>
+                        <span class="discourse-record-tags">
+                            @for (tag of record.tags.slice(0, 3); track tag) {
+                            <b>{{ tag }}</b>
+                            }
+                            @if (stagedDiscourseDecision(record)) {
+                            <b class="discourse-stage-badge">{{ stagedDiscourseDecision(record) }}</b>
+                            }
+                        </span>
+                    </button>
+                    } @empty {
+                    <div class="empty-row">No inspectable rows for this room yet.</div>
+                    }
+                </div>
+
+                @if (selectedOperatingRecord(); as record) {
+                <article class="discourse-inspector operating-inspector" [ngClass]="toneClass('discourse-tone', record.tone)">
+                    <header>
+                        <div>
+                            <span class="diagnostics-kicker">{{ record.kind }}</span>
+                            <h4>{{ record.title }}</h4>
+                            <small>{{ record.status }} / {{ record.scoreLabel }}</small>
+                        </div>
+                        @if (stagedDiscourseDecision(record)) {
+                        <span class="discourse-stage-badge">{{ stagedDiscourseDecision(record) }}</span>
+                        }
+                    </header>
+                    <p>{{ record.detail }}</p>
+                    <div class="discourse-action-row">
+                        <button type="button" class="discourse-action-button" (click)="focusDiscourseRecord(record, $event)">
+                            <lucide-icon [img]="SearchIcon" class="h-3.5 w-3.5"></lucide-icon>
+                            Inspect
+                        </button>
+                        <button type="button" class="discourse-action-button" (click)="copyDiscourseRecord(record, $event)">
+                            <lucide-icon [img]="CopyIcon" class="h-3.5 w-3.5"></lucide-icon>
+                            Copy
+                        </button>
+                        @if (hasDiscourseAction(record, 'accept_fact')) {
+                        <button type="button" class="discourse-action-button" (click)="stageDiscourseRecordDecision(record, 'accepted', $event)">
+                            <lucide-icon [img]="CheckIcon" class="h-3.5 w-3.5"></lucide-icon>
+                            Accept
+                        </button>
+                        }
+                        @if (hasDiscourseAction(record, 'promote_sidecar_to_anchor')) {
+                        <button type="button" class="discourse-action-button" (click)="stageDiscourseRecordDecision(record, 'promoted_to_anchor', $event)">
+                            <lucide-icon [img]="PlusIcon" class="h-3.5 w-3.5"></lucide-icon>
+                            Promote
+                        </button>
+                        }
+                        @if (hasDiscourseAction(record, 'compile_to_graph')) {
+                        <button type="button" class="discourse-action-button" (click)="stageDiscourseRecordDecision(record, 'compiled_to_graph', $event)">
+                            <lucide-icon [img]="NetworkIcon" class="h-3.5 w-3.5"></lucide-icon>
+                            Compile
+                        </button>
+                        }
+                        @if (hasDiscourseAction(record, 'mute_detector_pattern')) {
+                        <button type="button" class="discourse-action-button" (click)="stageDiscourseRecordDecision(record, 'muted', $event)">
+                            <lucide-icon [img]="EyeIcon" class="h-3.5 w-3.5"></lucide-icon>
+                            Mute
+                        </button>
+                        }
+                        @if (hasDiscourseAction(record, 'reject_fact')) {
+                        <button type="button" class="discourse-action-button" (click)="stageDiscourseRecordDecision(record, 'rejected', $event)">
+                            <lucide-icon [img]="XIcon" class="h-3.5 w-3.5"></lucide-icon>
+                            Reject
+                        </button>
+                        }
+                    </div>
+                    <div class="discourse-id-grid">
+                        @if (record.sourceIds.length) {
+                        <span><b>Lineage</b>{{ record.sourceIds.slice(0, 5).join(' / ') }}</span>
+                        }
+                        @if (record.targetIds.length) {
+                        <span><b>Graph impact</b>{{ record.targetIds.slice(0, 5).join(' / ') }}</span>
+                        }
+                        @if (record.evidenceIds.length) {
+                        <span><b>Evidence</b>{{ record.evidenceIds.slice(0, 6).join(' / ') }}</span>
+                        }
+                        @if (record.entityIds.length) {
+                        <span><b>Related entities</b>{{ record.entityIds.slice(0, 6).join(' / ') }}</span>
+                        }
+                        @if (record.receiptIds.length) {
+                        <span><b>Receipts</b>{{ record.receiptIds.slice(0, 4).join(' / ') }}</span>
+                        }
+                    </div>
+                    @if (record.facts.length) {
+                    <div class="discourse-fact-grid">
+                        @for (fact of record.facts.slice(0, 9); track fact.label) {
+                        <span><b>{{ fact.label }}</b>{{ fact.value }}</span>
+                        }
+                    </div>
+                    }
+                    @if (record.rationale.length) {
+                    <div class="discourse-rationale">
+                        @for (line of record.rationale.slice(0, 5); track line) {
+                        <span>{{ line }}</span>
+                        }
+                    </div>
+                    }
+                </article>
+                }
+            </section>
+        </section>
+        }
+    </div>
+    <!-- Legacy Product and Discourse panels are retained for reference while V2 settles.
+    @if (false) {
     <div class="atlas-controls-shell">
         @if (diagnosticsLoading()) {
         <div class="atlas-empty atlas-control-empty">
@@ -178,6 +389,7 @@
         </div>
         }
     </div>
+    }
     } @else if (sidebarView() === 'discourse') {
     <div class="atlas-controls-shell discourse-shell">
         @if (diagnosticsLoading()) {
@@ -472,6 +684,7 @@
         </div>
         }
     </div>
+    -->
     } @else {
     <div class="atlas-list-shell">
         @if (rows().length === 0) {
@@ -504,12 +717,21 @@
                     </button>
                 </div>
                 } @else if (row.type === 'group') {
-                <button type="button" class="atlas-group-row" (click)="toggleKind(row.kind)">
-                    <lucide-icon [img]="row.expanded ? ChevronDownIcon : ChevronRightIcon" class="h-4 w-4 text-zinc-500"></lucide-icon>
-                    <lucide-icon [img]="getIcon(row.kind)" class="h-4 w-4" [style.color]="getColor(row.kind)"></lucide-icon>
-                    <span [style.color]="getColor(row.kind)">{{ displayKind(row.kind) }}</span>
-                    <strong>{{ row.count }}</strong>
-                </button>
+                <div class="atlas-group-row">
+                    <button type="button" class="atlas-group-toggle" (click)="toggleKind(row.kind)">
+                        <lucide-icon [img]="row.expanded ? ChevronDownIcon : ChevronRightIcon" class="h-4 w-4 text-zinc-500"></lucide-icon>
+                        <lucide-icon [img]="getIcon(row.kind)" class="h-4 w-4" [style.color]="getColor(row.kind)"></lucide-icon>
+                        <span [style.color]="getColor(row.kind)">{{ displayKind(row.kind) }}</span>
+                        <strong>{{ row.count }}</strong>
+                    </button>
+                    <label class="atlas-group-color" [style.backgroundColor]="getColor(row.kind)"
+                        [title]="'Change ' + displayKind(row.kind) + ' node color'"
+                        (click)="$event.stopPropagation()">
+                        <input type="color" [value]="getHexColor(row.kind)"
+                            [attr.aria-label]="'Change ' + displayKind(row.kind) + ' node color'"
+                            (input)="updateKindColor(row.kind, $any($event.target).value, $event)" />
+                    </label>
+                </div>
                 } @else {
                 <button type="button" class="atlas-entity-row" [class.atlas-entity-selected]="selectedEntity?.id === row.entity.id" (click)="entitySelected.emit(row.entity)">
                     <span class="entity-dot entity-source-ring" [style.backgroundColor]="getColor(row.entity.kind)" [style.borderColor]="getEntityBadgeColor(row.entity)"></span>

@@ -175,9 +175,6 @@ export function buildGraphDiscourseWorkbenchView(
     for (const row of records.sort(sortRecords)) {
         recordsByTab[row.tab].push(row);
     }
-    for (const tab of TABS) {
-        recordsByTab[tab] = recordsByTab[tab].slice(0, 24);
-    }
     const visible = TABS.flatMap((tab) => recordsByTab[tab]);
     return {
         records: visible,
@@ -411,6 +408,13 @@ function documentReviewRecord(
         ],
         rationale: row.why,
         facts: [
+            fact('Source text', labelsFor(row.evidenceSpanIds, labels)),
+            fact('Lineage', row.parentUnitIds.join(' / ')),
+            fact('Confidence', percent(row.confidence)),
+            fact('Detector', row.detector),
+            fact('Reason', row.why.join(' / ')),
+            fact('Graph impact', row.objectKind === 'graph_fact_candidate' ? 'reviewable fact candidate' : 'sidecar object only'),
+            fact('Related entities', row.relatedObjectIds.join(' / ')),
             fact('Object', row.objectId),
             fact('State', row.state),
             fact('Span', span(row.sourceStart, row.sourceEnd)),
@@ -469,6 +473,12 @@ function documentCompilerRecord(
         ],
         rationale: diff.rationale,
         facts: [
+            fact('Source text', labelsFor(diff.evidenceSpanIds, labels)),
+            fact('Lineage', diff.createdAtomIds.join(' / ')),
+            fact('Confidence', compilerScore(diff, summary) === null ? 'data' : percent(compilerScore(diff, summary) || 0)),
+            fact('Detector', 'document compiler'),
+            fact('Reason', diff.rationale.join(' / ')),
+            fact('Graph impact', compilerGraphCounts(diff.afterGraph)),
             fact('Output', diff.outputId),
             fact('Operation', diff.operation),
             fact('Before graph', compilerGraphCounts(diff.beforeGraph)),

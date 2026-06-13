@@ -134,12 +134,14 @@ export function buildGraphRebuildSnapshot(input: BuildGraphRebuildSnapshotInput)
         noteTexts: input.noteTexts || {},
         chunks,
         builtAt,
+        documentProfileSummary: input.documentProfileSummary,
     });
     const documentReviewSummary = buildGraphDocumentReviewSummary(documentSidecarSummary, builtAt);
     const documentCompilerSummary = buildGraphDocumentCompilerSummary({
         sidecar: documentSidecarSummary,
         review: documentReviewSummary,
         builtAt,
+        entities: nodes.map((node) => ({ id: node.entityId, label: node.label, aliases: node.aliases })),
         baseline: {
             atomCount: nodes.length,
             factCount: relationships.length

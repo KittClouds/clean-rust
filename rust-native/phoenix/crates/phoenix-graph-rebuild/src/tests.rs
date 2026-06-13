@@ -1,7 +1,7 @@
 use std::collections::BTreeMap;
 
 use phoenix_alex::{AlexSnapshotId, PatternId, SurfaceHit, SurfaceHitKind};
-use phoenix_chunker::{
+use phoenix_chunker_native::{
     LensChunk, LensKind, LensMentionEdge, LensMentionEdgeKind, LensMentionGraph,
 };
 use phoenix_types::{EntityId, EntityKind, LexiconEntry, ScopeKey, TextRange};

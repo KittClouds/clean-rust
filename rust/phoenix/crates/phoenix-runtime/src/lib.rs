@@ -13,6 +13,7 @@ mod binary;
 mod dynamic_gliclass;
 #[cfg(not(target_arch = "wasm32"))]
 mod dynamic_gliner;
+mod document_graph_commit;
 mod evidence_ledger;
 mod frame_extraction;
 #[cfg(not(target_arch = "wasm32"))]
@@ -164,6 +165,8 @@ const RUNTIME_CAPABILITIES: &[&str] = &[
     "graph:repairLiveTopology",
     "graph:upsertNode",
     "graph:upsertEdge",
+    "documentGraph:commit",
+    "documentGraph:undo",
     "note:list",
     "note:get",
     "note:listByIds",
@@ -5759,6 +5762,8 @@ impl PhoenixRuntime {
             });
         }
         match request.command.as_str() {
+            "documentGraph:commit" => document_graph_commit::commit(self, &request.payload),
+            "documentGraph:undo" => document_graph_commit::undo(self, &request.payload),
             "relation:upsert" => {
                 let relation = require_payload_str(&request.payload, "relation")?;
                 let row = require_payload_value(&request.payload, "row")?;
@@ -13347,6 +13352,109 @@ mod tests {
                 capability
             );
         }
+    }
+
+    #[test]
+    fn document_graph_commit_is_idempotent_and_undo_preserves_entities() {
+        let runtime = native_test_runtime();
+        runtime.init().expect("init");
+        let commit_id = "document-graph-commit:test-diff";
+        let payload = json!({
+            "schemaVersion": "phoenix-document-graph-commit/v1",
+            "commitId": commit_id,
+            "scopeId": "note:test",
+            "topologyDiffId": "test-diff",
+            "sourceObjectId": "fact-candidate:test",
+            "receiptId": "receipt:test",
+            "builtAt": 10,
+            "vertices": [
+                {
+                    "id": "entity:amara",
+                    "kind": "entity",
+                    "label": "Amara",
+                    "removeOnUndo": false,
+                    "attributes": { "registeredEntityReference": true }
+                },
+                {
+                    "id": "document-fact:test",
+                    "kind": "document_fact",
+                    "label": "relation_bundle",
+                    "removeOnUndo": true,
+                    "attributes": { "confidence": 0.94 }
+                },
+                {
+                    "id": "document-evidence:test",
+                    "kind": "evidence_span",
+                    "label": "Amara reached Halcyon.",
+                    "removeOnUndo": true,
+                    "attributes": { "noteId": "test" }
+                }
+            ],
+            "edges": [
+                {
+                    "source": "document-fact:test",
+                    "target": "entity:amara",
+                    "edgeType": "document_fact_role",
+                    "weight": 940,
+                    "attributes": { "roles": ["subject"] }
+                },
+                {
+                    "source": "document-fact:test",
+                    "target": "document-evidence:test",
+                    "edgeType": "supported_by_evidence_span",
+                    "weight": 940,
+                    "attributes": {}
+                }
+            ]
+        });
+
+        let first = runtime
+            .store_command(StoreCommandRequest {
+                command: "documentGraph:commit".to_owned(),
+                payload: payload.clone(),
+            })
+            .expect("commit");
+        assert!(first.success);
+        assert_eq!(
+            first.payload.as_ref().and_then(|value| value.get("idempotent")),
+            Some(&Value::Bool(false))
+        );
+        let second = runtime
+            .store_command(StoreCommandRequest {
+                command: "documentGraph:commit".to_owned(),
+                payload,
+            })
+            .expect("idempotent commit");
+        assert_eq!(
+            second.payload.as_ref().and_then(|value| value.get("idempotent")),
+            Some(&Value::Bool(true))
+        );
+
+        let undo = runtime
+            .store_command(StoreCommandRequest {
+                command: "documentGraph:undo".to_owned(),
+                payload: json!({
+                    "schemaVersion": "phoenix-document-graph-undo/v1",
+                    "commitId": commit_id,
+                    "undoneAt": 11
+                }),
+            })
+            .expect("undo");
+        assert!(undo.success);
+        let vertices = runtime
+            .fetch_relation_rows("graph_vertices")
+            .expect("vertices");
+        assert!(vertices.iter().any(|row| row.get("id") == Some(&json!("entity:amara"))));
+        assert!(!vertices
+            .iter()
+            .any(|row| row.get("id") == Some(&json!("document-fact:test"))));
+        assert!(!vertices
+            .iter()
+            .any(|row| row.get("id") == Some(&json!("document-evidence:test"))));
+        assert!(runtime
+            .fetch_relation_rows("graph_edges")
+            .expect("edges")
+            .is_empty());
     }
 
     #[test]

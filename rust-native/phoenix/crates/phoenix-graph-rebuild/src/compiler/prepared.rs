@@ -1,7 +1,7 @@
 use compact_str::{format_compact, CompactString};
 use hashbrown::HashSet;
 use phoenix_alex::{SurfaceHit, SurfaceHitKind};
-use phoenix_chunker::{LensChunk, LensKind, LensMentionEdgeKind, LensMentionGraph};
+use phoenix_chunker_native::{LensChunk, LensKind, LensMentionEdgeKind, LensMentionGraph};
 use phoenix_types::TextRange;
 
 use super::ids::mention_evidence_id;

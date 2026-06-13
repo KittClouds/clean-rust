@@ -39,23 +39,6 @@
                 }
             </div>
 
-            @if (mode() === 'focus') {
-            <div class="mt-4 border-t border-zinc-800 pt-4">
-                <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-zinc-500">Focus kinds</p>
-                <div class="mt-3 flex flex-wrap gap-2">
-                    @for (category of categories; track category.name) {
-                    @for (kind of category.kinds; track kind) {
-                    <button type="button"
-                        class="rounded-full border px-3 py-1.5 text-xs transition"
-                        [ngClass]="isFocusKindSelected(kind) ? 'border-emerald-400/40 bg-emerald-500/10 text-emerald-100' : 'border-zinc-800 bg-zinc-950 text-zinc-400 hover:border-zinc-700 hover:text-zinc-200'"
-                        (click)="toggleFocusKind(kind)">
-                        {{ formatKindName(kind) }}
-                    </button>
-                    }
-                    }
-                </div>
-            </div>
-            }
         </section>
 
         <section class="mt-5 rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4">

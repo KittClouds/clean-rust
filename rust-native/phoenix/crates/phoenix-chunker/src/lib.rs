@@ -3,6 +3,7 @@ pub mod api;
 #[cfg(not(target_arch = "wasm32"))]
 mod lens;
 mod normalize;
+mod profile;
 mod sentence;
 mod structural;
 
@@ -17,6 +18,11 @@ pub use lens::{
     LensMentionGraph, LensMentionKind, LensSurfaceHit, LensSurfaceHitKind, LensVoteReason,
 };
 pub use normalize::{is_sentence_guard, normalize_raw};
+pub use profile::{
+    classify_document_profiles, DocumentProfile, DocumentProfileCounters, DocumentProfileInput,
+    DocumentProfileKind, DocumentProfileRequest, DocumentProfileSignal, DocumentProfileSummary,
+    DocumentProfileWeight, DocumentRegionProfile, DocumentUnitWeight,
+};
 pub use sentence::split_sentence_ranges;
 pub use structural::{
     build_structural_substrate, BaseChunk, ChapterSpan, DialogueBoundaryHint, ParagraphSpan,

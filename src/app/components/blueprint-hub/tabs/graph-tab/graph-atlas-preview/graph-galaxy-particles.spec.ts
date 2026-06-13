@@ -251,6 +251,39 @@ describe('GraphGalaxyParticles', () => {
 
         particles.dispose();
     });
+
+    it('fans walk particles from documents and splits them at structural forks', () => {
+        const scene = walkParticleScene();
+        const particles = new GraphGalaxyParticles();
+        const settings = {
+            ...DEFAULT_GALAXY_SETTINGS,
+            particleFlow: true,
+            particleFlowMode: 'walk' as const,
+            particleSpeed: 1,
+            particleOpacity: 1,
+            edgeMode: 'straight' as const,
+        };
+
+        particles.bind(scene, settings);
+        particles.update(scene, scene.positions3d, settings, 100);
+        particles.update(scene, scene.positions3d, settings, 300);
+
+        const position = particles.points.geometry.getAttribute('position') as THREE.BufferAttribute;
+        const alpha = particles.points.geometry.getAttribute('alpha') as THREE.BufferAttribute;
+        expect(position.count).toBe(6);
+        expect([position.getX(0), position.getX(1)].sort((a, b) => a - b)).toEqual([-3, 1]);
+        expect(activeParticleIndexes(alpha)).toEqual([0, 1]);
+
+        particles.update(scene, scene.positions3d, settings, 2960);
+        expect(activeParticleIndexes(alpha)).toEqual([2, 3]);
+
+        particles.update(scene, scene.positions3d, settings, 4460);
+        expect(activeParticleIndexes(alpha)).toEqual(expect.arrayContaining([4, 5]));
+        expect(position.getX(4)).toBeGreaterThan(-1);
+        expect(position.getY(4)).toBeGreaterThan(0);
+
+        particles.dispose();
+    });
 });
 
 function particleScene(): GalaxySceneV2 {
@@ -295,6 +328,40 @@ function capsParticleScene(radius = 2.08): GalaxySceneV2 {
         edgeAlpha: new Float32Array([1]),
         edgeKinds: new Uint8Array([0]),
     };
+}
+
+function walkParticleScene(): GalaxySceneV2 {
+    return {
+        ...particleScene(),
+        layoutMode: 'single',
+        ids: ['doc-a', 'root-a', 'chunk-a', 'entity-a', 'doc-b', 'root-b', 'chunk-b', 'fact-a'],
+        labels: ['Doc A', 'Root A', 'Chunk A', 'Entity A', 'Doc B', 'Root B', 'Chunk B', 'Fact A'],
+        kinds: ['note', 'structureRoot', 'leaf_chunk', 'concept', 'document', 'section', 'leaf_chunk', 'claim'],
+        groupIds: ['', '', '', '', '', '', '', ''],
+        positions3d: new Float32Array([
+            -3, 0, 0, -2, 0, 0, -1, 0, 0, 0, 0, 0,
+            1, 0, 0, 2, 0, 0, 3, 0, 0, 0, 1, 0,
+        ]),
+        positions2d: new Float32Array([
+            -3, 0, 0, -2, 0, 0, -1, 0, 0, 0, 0, 0,
+            1, 0, 0, 2, 0, 0, 3, 0, 0, 0, 1, 0,
+        ]),
+        radii: new Float32Array(8).fill(0.08),
+        colors: new Float32Array([
+            0.1, 0.8, 1, 0.2, 0.7, 1, 0.3, 0.6, 1, 0.4, 0.5, 1,
+            1, 0.4, 0.2, 1, 0.5, 0.2, 1, 0.6, 0.2, 0.9, 0.2, 0.7,
+        ]),
+        edgePairs: new Uint32Array([0, 1, 1, 2, 2, 3, 4, 5, 5, 6, 2, 7]),
+        edgeIds: ['a-root', 'a-chunk', 'a-entity', 'b-root', 'b-chunk', 'a-fact'],
+        edgeTypes: ['target-parent', 'target-parent', 'chunk-entity', 'target-parent', 'target-parent', 'chunk-anchor'],
+        edgeColors: new Float32Array(6 * 6),
+        edgeAlpha: new Float32Array(6).fill(1),
+        edgeKinds: new Uint8Array(6).fill(2),
+    };
+}
+
+function activeParticleIndexes(alpha: THREE.BufferAttribute): number[] {
+    return Array.from({ length: alpha.count }, (_, index) => index).filter((index) => alpha.getX(index) > 0.05);
 }
 
 function hopfParticleScene(): GalaxySceneV2 {

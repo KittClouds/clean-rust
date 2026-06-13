@@ -1,7 +1,7 @@
 use std::collections::{BTreeMap, BTreeSet};
 
 use phoenix_alex::{api as alex_api, AlexError, Lexicon};
-use phoenix_chunker::split_sentence_ranges;
+use phoenix_chunker_native::split_sentence_ranges;
 use phoenix_scope_analysis::{ScopeAnalysisContext, ScopeEntityProfile};
 use phoenix_semantic_v2::{
     scope_storage_key, DirtyScopeRecord, DocumentArchive, DocumentRevisionRef, ErScopePatchSidecar,

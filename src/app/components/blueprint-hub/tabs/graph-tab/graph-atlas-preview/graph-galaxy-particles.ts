@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import type { GalaxyRenderSettings } from './graph-galaxy-engine';
 import type { GalaxyFocusMask } from './graph-galaxy-focus';
 import type { GalaxyLorentzGuideView, GalaxySceneV2 } from './graph-galaxy-scene-v2';
+import { buildGalaxyWalkBranches, type GalaxyWalkBranch } from './graph-galaxy-walk-flow';
 
 const MAX_FLOW_PARTICLES = 1800;
 const EMPTY_VEC3 = new Float32Array(0);
@@ -58,8 +59,11 @@ export class GraphGalaxyParticles {
         `,
     });
     private readonly flowSources: FlowSource[] = [];
+    private readonly walkBranches: GalaxyWalkBranch[] = [];
     private readonly seeds: number[] = [];
     private readonly speeds: number[] = [];
+    private walkStartedAt: number | null = null;
+    private walkTreeDepth = 0;
 
     constructor() {
         this.points = new THREE.Points(this.geometry, this.material);
@@ -68,8 +72,18 @@ export class GraphGalaxyParticles {
 
     bind(data: GalaxySceneV2, settings: GalaxyRenderSettings): void {
         this.flowSources.length = 0;
+        this.walkBranches.length = 0;
         this.seeds.length = 0;
         this.speeds.length = 0;
+        this.walkStartedAt = null;
+        this.walkTreeDepth = 0;
+        if (settings.particleFlow && settings.particleFlowMode === 'walk') {
+            this.walkBranches.push(...buildGalaxyWalkBranches(data, MAX_FLOW_PARTICLES));
+            this.walkTreeDepth = this.walkBranches.reduce((max, branch) => Math.max(max, branch.treeDepth), 0);
+            this.allocateParticles(this.walkBranches.length);
+            this.updateSettings(settings);
+            return;
+        }
         const edgeCount = data.edgePairs.length / 2;
         const guideIndexes = this.guideFlowIndexes(data);
         const sourceCount = edgeCount + guideIndexes.length;
@@ -93,18 +107,14 @@ export class GraphGalaxyParticles {
             this.speeds.push(0.23 + this.stableUnit(seedKey * 31 + 11) * 0.32);
         }
 
-        const count = this.flowSources.length;
-        this.geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(count * 3), 3));
-        this.geometry.setAttribute('color', new THREE.BufferAttribute(new Float32Array(count * 3), 3));
-        this.geometry.setAttribute('alpha', new THREE.BufferAttribute(new Float32Array(count), 1));
-        this.geometry.setAttribute('flowSize', new THREE.BufferAttribute(new Float32Array(count), 1));
+        this.allocateParticles(this.flowSources.length);
         this.updateSettings(settings);
         this.points.visible = true;
     }
 
     updateSettings(settings: GalaxyRenderSettings): void {
         this.material.uniforms['uBaseSize'].value = 3.35 + settings.particleSize * 0.95;
-        this.points.visible = settings.particleFlow && this.flowSources.length > 0;
+        this.points.visible = settings.particleFlow && (this.flowSources.length > 0 || this.walkBranches.length > 0);
     }
 
     update(
@@ -119,6 +129,10 @@ export class GraphGalaxyParticles {
         const colorAttr = this.geometry.getAttribute('color') as THREE.BufferAttribute;
         const alphaAttr = this.geometry.getAttribute('alpha') as THREE.BufferAttribute;
         const sizeAttr = this.geometry.getAttribute('flowSize') as THREE.BufferAttribute;
+        if (settings.particleFlowMode === 'walk') {
+            this.updateWalk(data, positions, settings, time, positionAttr, colorAttr, alphaAttr, sizeAttr, focus);
+            return;
+        }
         const baseAlpha = settings.particleOpacity * (focus?.hasFocus ? 0.72 : 0.42);
         const flowSize = 0.62 + settings.particleSize * 0.1;
         const curved = settings.edgeMode === 'curved' || settings.edgeMode === 'tube';
@@ -168,6 +182,120 @@ export class GraphGalaxyParticles {
         this.geometry.setAttribute('color', new THREE.BufferAttribute(EMPTY_VEC3, 3));
         this.geometry.setAttribute('alpha', new THREE.BufferAttribute(EMPTY_SCALAR, 1));
         this.geometry.setAttribute('flowSize', new THREE.BufferAttribute(EMPTY_SCALAR, 1));
+    }
+
+    private allocateParticles(count: number): void {
+        if (count === 0) {
+            this.setEmptyAttributes();
+            this.points.visible = false;
+            return;
+        }
+        this.geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(count * 3), 3));
+        this.geometry.setAttribute('color', new THREE.BufferAttribute(new Float32Array(count * 3), 3));
+        this.geometry.setAttribute('alpha', new THREE.BufferAttribute(new Float32Array(count), 1));
+        this.geometry.setAttribute('flowSize', new THREE.BufferAttribute(new Float32Array(count), 1));
+    }
+
+    private updateWalk(
+        data: GalaxySceneV2,
+        positions: Float32Array,
+        settings: GalaxyRenderSettings,
+        time: number,
+        positionAttr: THREE.BufferAttribute,
+        colorAttr: THREE.BufferAttribute,
+        alphaAttr: THREE.BufferAttribute,
+        sizeAttr: THREE.BufferAttribute,
+        focus?: GalaxyFocusMask | null,
+    ): void {
+        if (this.walkBranches.length === 0) return;
+        this.walkStartedAt ??= time;
+        const elapsed = Math.max(0, time - this.walkStartedAt) * 0.001 * Math.max(0.05, settings.particleSpeed);
+        const baseAlpha = settings.particleOpacity * (focus?.hasFocus ? 0.78 : 0.88);
+        const flowSize = 0.76 + settings.particleSize * 0.12;
+        const launchHold = 0.72;
+        const travelDuration = 1.28;
+        const nodeHold = 0.22;
+        const hopDuration = travelDuration + nodeHold;
+        const arrivalHold = 1.15;
+        const cycleDuration = launchHold + this.walkTreeDepth * hopDuration + arrivalHold;
+        const phase = elapsed % cycleDuration;
+
+        for (let particle = 0; particle < this.walkBranches.length; particle++) {
+            const branch = this.walkBranches[particle];
+            const localPhase = phase - launchHold - branch.depth * hopDuration;
+            let edgeT = 0;
+            let visibility = 0;
+
+            if (phase < launchHold && branch.depth === 0) {
+                visibility = THREE.MathUtils.smoothstep(phase, 0, 0.16);
+            } else if (localPhase >= 0 && localPhase <= travelDuration) {
+                edgeT = THREE.MathUtils.smoothstep(localPhase / travelDuration, 0.06, 0.94);
+                visibility = 1;
+            } else if (localPhase > travelDuration && localPhase <= hopDuration) {
+                edgeT = 1;
+                visibility = 1 - THREE.MathUtils.smoothstep(localPhase, travelDuration + nodeHold * 0.35, hopDuration);
+            } else if (branch.depth === branch.treeDepth - 1 && phase > launchHold + branch.treeDepth * hopDuration) {
+                edgeT = 1;
+                visibility = 1 - THREE.MathUtils.smoothstep(
+                    phase,
+                    launchHold + branch.treeDepth * hopDuration,
+                    cycleDuration,
+                );
+            }
+
+            this.writeWalkEdgePosition(positionAttr, particle, data, positions, settings, branch, edgeT);
+            this.writeNodeBlendColor(colorAttr, data, branch.source, branch.target, edgeT, particle);
+            const focusAlpha = focus?.hasFocus && focus.edgeLevels[branch.edge] === 0 ? 0.08 : 1;
+            alphaAttr.setX(particle, baseAlpha * visibility * focusAlpha);
+            sizeAttr.setX(particle, flowSize * (settings.edgeMode === 'tube' ? 1.08 : 1));
+        }
+
+        positionAttr.needsUpdate = true;
+        colorAttr.needsUpdate = true;
+        alphaAttr.needsUpdate = true;
+        sizeAttr.needsUpdate = true;
+    }
+
+    private writeWalkEdgePosition(
+        positionAttr: THREE.BufferAttribute,
+        particle: number,
+        data: GalaxySceneV2,
+        positions: Float32Array,
+        settings: GalaxyRenderSettings,
+        step: { edge: number; source: number; target: number },
+        t: number,
+    ): void {
+        const hopfCurves = data.layoutMode === 'hopfProjection' && settings.edgeMode === 'curved' && positions === data.positions3d;
+        const hopfCrossBase = hopfCurves && this.isHopfCrossBaseEdge(data, step.source, step.target);
+        const curved = settings.edgeMode === 'curved' || settings.edgeMode === 'tube';
+        const lift = settings.edgeMode === 'tube'
+            ? this.edgeTubeLift(data, settings, step.edge, step.source, step.target)
+            : curved ? this.edgeLift(data, settings, step.edge, step.source, step.target, hopfCrossBase) : 0;
+        if (settings.edgeMode === 'tube') {
+            this.writeTubeEdgePosition(positionAttr, particle, data, positions, step.edge, step.source, step.target, lift, t);
+        } else if (hopfCurves) {
+            this.writeHopfEdgePosition(positionAttr, particle, positions, step.edge, step.source, step.target, lift, t, settings.edgeCurveStrength, hopfCrossBase);
+        } else {
+            this.writeEdgePosition(positionAttr, particle, data, positions, step.source, step.target, lift, t);
+        }
+    }
+
+    private writeNodeBlendColor(
+        colorAttr: THREE.BufferAttribute,
+        data: GalaxySceneV2,
+        source: number,
+        target: number,
+        t: number,
+        particle: number,
+    ): void {
+        const sourceOffset = source * 3;
+        const targetOffset = target * 3;
+        colorAttr.setXYZ(
+            particle,
+            THREE.MathUtils.lerp(data.colors[sourceOffset], data.colors[targetOffset], t),
+            THREE.MathUtils.lerp(data.colors[sourceOffset + 1], data.colors[targetOffset + 1], t),
+            THREE.MathUtils.lerp(data.colors[sourceOffset + 2], data.colors[targetOffset + 2], t),
+        );
     }
 
     private guideFlowIndexes(data: GalaxySceneV2): number[] {

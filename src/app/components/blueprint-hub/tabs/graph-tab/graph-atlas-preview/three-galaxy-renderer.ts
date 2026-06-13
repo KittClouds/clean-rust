@@ -4,10 +4,18 @@ import type { GalaxyBusemannHorosphereView, GalaxyHopfRibbonView, GalaxyLorentzG
 import { buildGalaxyFocusMask, type GalaxyFocusMask } from './graph-galaxy-focus';
 import { mergeGalaxySettings, type GalaxyRenderSettings } from './graph-galaxy-engine';
 import { GraphGalaxyForceController, productManifoldExpansionScale } from './graph-galaxy-force-controller';
-import { buildGalaxyGlows, buildGalaxyNodes, type GalaxyNodeObject } from './graph-galaxy-objects';
+import {
+    buildGalaxyGlows,
+    buildGalaxyNodes,
+    galaxyNodePickShapeBoost,
+    galaxyNodeShapeScale,
+    type GalaxyNodeMaterial,
+    type GalaxyNodeObject,
+} from './graph-galaxy-objects';
 import { GraphGalaxyParticles } from './graph-galaxy-particles';
 import { makeAtomTexture, makeHaloTexture, makeLabelSprite, makeNodeTexture, type LabelSprite } from './graph-galaxy-textures';
 import type { GraphRendererMode, GraphRendererPointer, GraphRendererPort } from './graph-renderer-port';
+import type { GraphCanvasHit } from './graph-canvas-interaction';
 
 const MAX_EDGE_SEGMENTS = 8;
 const TREE_FILAMENT_EDGE_SEGMENTS = 18;
@@ -46,6 +54,17 @@ type EdgeStyleData = Pick<GalaxySceneV2, 'edgeAlpha' | 'edgeKinds'> & Partial<Pi
 interface GuideAttachmentContract {
     liveLorentzGuides: boolean;
     localScale: number;
+}
+
+function pointSegmentDistanceSquared(px: number, py: number, ax: number, ay: number, bx: number, by: number): number {
+    const dx = bx - ax;
+    const dy = by - ay;
+    const lengthSquared = dx * dx + dy * dy;
+    if (lengthSquared <= 0.000001) return (px - ax) ** 2 + (py - ay) ** 2;
+    const t = THREE.MathUtils.clamp(((px - ax) * dx + (py - ay) * dy) / lengthSquared, 0, 1);
+    const x = ax + t * dx;
+    const y = ay + t * dy;
+    return (px - x) ** 2 + (py - y) ** 2;
 }
 
 export interface ThreeGalaxyRendererTimings {
@@ -89,6 +108,7 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
     private readonly zoomNormal = new THREE.Vector3();
     private readonly zoomProjected = new THREE.Vector3();
     private readonly pickVector = new THREE.Vector3();
+    private readonly pickVectorB = new THREE.Vector3();
     private readonly cameraTarget = new THREE.Vector3();
     private readonly perspective = new THREE.PerspectiveCamera(48, 1, 0.01, 100);
     private readonly ortho = new THREE.OrthographicCamera(-4, 4, 3, -3, 0.01, 100);
@@ -128,6 +148,15 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
     private densityFactors = new Float32Array(0);
     private guidePositionBuffer = new Float32Array(0);
     private readonly timings: ThreeGalaxyRendererTimings = emptyRendererTimings();
+
+    constructor() {
+        const skyLight = new THREE.HemisphereLight(0xc9f5ff, 0x160b24, 1.35);
+        const keyLight = new THREE.DirectionalLight(0xffffff, 2.1);
+        const rimLight = new THREE.DirectionalLight(0x67e8f9, 1.15);
+        keyLight.position.set(-3.5, 5.2, 4.4);
+        rimLight.position.set(4.8, -1.6, -3.2);
+        this.scene.add(skyLight, keyLight, rimLight);
+    }
 
     mount(canvas: HTMLCanvasElement): boolean {
         if (this.renderer) return false;
@@ -176,6 +205,7 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
 
     setSettings(settings: Partial<GalaxyRenderSettings> | null): void {
         const previousShape = this.settings.nodeShape;
+        const previousSphereSurface = this.settings.sphereSurface;
         const previousHybridField = `${this.settings.hybridHorospheresVisible}:${this.settings.hybridPrototypeRaysVisible}`;
         this.settings = mergeGalaxySettings(settings);
         this.force.setSettings(this.settings);
@@ -184,7 +214,8 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
         if (this.sceneData?.layoutMode === 'hybridSpace' && previousHybridField !== nextHybridField) {
             this.rebuildShellObjects(this.sceneData);
         }
-        if (this.sceneData && previousShape !== this.settings.nodeShape) {
+        if (this.sceneData && (previousShape !== this.settings.nodeShape
+            || previousSphereSurface !== this.settings.sphereSurface)) {
             this.nodeShape = this.settings.nodeShape;
             this.rebuildNodeObjects(this.sceneData);
             this.applyModePositions();
@@ -376,21 +407,56 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
     }
 
     pick(pointer: GraphRendererPointer): string | null {
+        const hit = this.pickObject(pointer);
+        return hit?.kind === 'node' ? hit.id : null;
+    }
+
+    pickObject(pointer: GraphRendererPointer): GraphCanvasHit | null {
         const started = this.now();
         try {
             if (!this.sceneData) return null;
             const screenHit = this.screenSpacePick(pointer);
-            if (screenHit >= 0) return this.sceneData.ids[screenHit] ?? null;
-            if (!this.nodes) return null;
-            this.pointer.x = (pointer.x / Math.max(1, pointer.width)) * 2 - 1;
-            this.pointer.y = -(pointer.y / Math.max(1, pointer.height)) * 2 + 1;
-            this.raycaster.setFromCamera(this.pointer, this.camera());
-            const hit = this.raycaster.intersectObjects(this.nodes.children, false)[0];
-            const index = Number(hit?.object.userData['index']);
-            return Number.isFinite(index) ? this.sceneData.ids[index] ?? null : null;
+            if (screenHit >= 0) return { kind: 'node', id: this.sceneData.ids[screenHit] };
+            if (this.nodes) {
+                this.pointer.x = (pointer.x / Math.max(1, pointer.width)) * 2 - 1;
+                this.pointer.y = -(pointer.y / Math.max(1, pointer.height)) * 2 + 1;
+                this.raycaster.setFromCamera(this.pointer, this.camera());
+                const hit = this.raycaster.intersectObjects(this.nodes.children, false)[0];
+                const index = Number(hit?.object.userData['index']);
+                if (Number.isFinite(index)) return { kind: 'node', id: this.sceneData.ids[index] };
+            }
+            const edgeIndex = this.screenSpaceEdgePick(pointer);
+            if (edgeIndex >= 0) {
+                const sourceIndex = this.sceneData.edgePairs[edgeIndex * 2];
+                const targetIndex = this.sceneData.edgePairs[edgeIndex * 2 + 1];
+                return {
+                    kind: 'edge',
+                    id: this.sceneData.edgeIds[edgeIndex],
+                    sourceId: this.sceneData.ids[sourceIndex],
+                    targetId: this.sceneData.ids[targetIndex],
+                };
+            }
+            return this.screenSpaceGroupPick(pointer);
         } finally {
             this.recordTiming('pickMs', started);
         }
+    }
+
+    nodesInRect(rect: { left: number; top: number; right: number; bottom: number; width: number; height: number }): string[] {
+        const data = this.sceneData;
+        const positions = this.positions();
+        if (!data || !positions || rect.width <= 0 || rect.height <= 0) return [];
+        const camera = this.camera();
+        const ids: string[] = [];
+        for (let index = 0; index < data.ids.length; index++) {
+            const offset = index * 3;
+            this.pickVector.set(positions[offset], positions[offset + 1], positions[offset + 2]).project(camera);
+            if (this.pickVector.z < -1 || this.pickVector.z > 1) continue;
+            const x = (this.pickVector.x * 0.5 + 0.5) * rect.width;
+            const y = (-this.pickVector.y * 0.5 + 0.5) * rect.height;
+            if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) ids.push(data.ids[index]);
+        }
+        return ids;
     }
 
     snapshotTimings(): ThreeGalaxyRendererTimings {
@@ -499,17 +565,26 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
                     ? (hovered ? 1.94 : active ? 2.12 : neighbor ? 1.28 : dimmed ? 0.52 : 0.94)
                     : (hovered ? 4.9 : active ? 5.05 : neighbor ? 3.1 : dimmed ? 1.15 : 2.45));
             node.position.set(positions[i * 3], positions[i * 3 + 1], positions[i * 3 + 2]);
-            node.scale.setScalar(core * (atom
-                ? (hovered || active ? 2.38 : neighbor ? 1.84 : dimmed ? 1.15 : 1.6) * (productAtom ? 0.93 : 1)
-                : sphere
-                    ? (hovered || active ? 0.89 : neighbor ? 0.72 : dimmed ? 0.52 : 0.6)
-                    : (hovered || active ? 2.65 : neighbor ? 2.02 : dimmed ? 1.34 : 1.72)));
+            node.scale.setScalar(core * galaxyNodeShapeScale(this.nodeShape, {
+                active,
+                hovered,
+                neighbor,
+                dimmed,
+                productAtom,
+            }));
             this.nodeColor(data, i, active, hovered, neighbor, dimmed);
-            const material = node.material as THREE.SpriteMaterial | THREE.MeshBasicMaterial;
+            const material = node.material as GalaxyNodeMaterial;
             material.color.copy(this.color);
-            material.opacity = productAtom
+            const baseOpacity = productAtom
                 ? (dimmed ? 0.16 : neighbor ? 0.86 : hovered || active ? 1 : 0.98)
                 : (dimmed ? 0.18 : neighbor ? 0.82 : hovered || active ? 1 : 0.94);
+            material.opacity = material instanceof THREE.MeshPhysicalMaterial
+                ? baseOpacity * (hovered || active ? 0.88 : neighbor ? 0.8 : 0.76)
+                : baseOpacity;
+            if (material instanceof THREE.MeshPhysicalMaterial) {
+                material.emissive.copy(this.color);
+                material.emissiveIntensity = dimmed ? 0.06 : hovered || active ? 0.34 : neighbor ? 0.22 : 0.16;
+            }
             glow.position.copy(node.position);
             glow.scale.setScalar(halo * (0.82 + densityFactor * 0.18));
             this.glowColor(data, i, active, hovered, dimmed);
@@ -2232,7 +2307,7 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
         let best = -1;
         let bestScore = Number.POSITIVE_INFINITY;
         const glowBoost = this.settings.glow * 4;
-        const shapeBoost = this.settings.nodeShape === 'sphere' ? 4 : this.settings.nodeShape === 'atom' ? 1 : 2;
+        const shapeBoost = galaxyNodePickShapeBoost(this.settings.nodeShape);
         const densityPenalty = data.ids.length > 160 ? 4 : 0;
 
         for (let i = 0; i < data.ids.length; i++) {
@@ -2252,6 +2327,56 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
         }
 
         return best;
+    }
+
+    private screenSpaceEdgePick(pointer: GraphRendererPointer): number {
+        const data = this.sceneData;
+        const positions = this.positions();
+        if (!data || !positions || pointer.width <= 0 || pointer.height <= 0) return -1;
+        const camera = this.camera();
+        let best = -1;
+        let bestDistance = 9 * 9;
+        for (let index = 0; index < data.edgeIds.length; index++) {
+            const sourceOffset = data.edgePairs[index * 2] * 3;
+            const targetOffset = data.edgePairs[index * 2 + 1] * 3;
+            this.pickVector.set(positions[sourceOffset], positions[sourceOffset + 1], positions[sourceOffset + 2]).project(camera);
+            this.pickVectorB.set(positions[targetOffset], positions[targetOffset + 1], positions[targetOffset + 2]).project(camera);
+            if (this.pickVector.z < -1 || this.pickVector.z > 1 || this.pickVectorB.z < -1 || this.pickVectorB.z > 1) continue;
+            const ax = (this.pickVector.x * 0.5 + 0.5) * pointer.width;
+            const ay = (-this.pickVector.y * 0.5 + 0.5) * pointer.height;
+            const bx = (this.pickVectorB.x * 0.5 + 0.5) * pointer.width;
+            const by = (-this.pickVectorB.y * 0.5 + 0.5) * pointer.height;
+            const distance = pointSegmentDistanceSquared(pointer.x, pointer.y, ax, ay, bx, by);
+            if (distance < bestDistance) {
+                best = index;
+                bestDistance = distance;
+            }
+        }
+        return best;
+    }
+
+    private screenSpaceGroupPick(pointer: GraphRendererPointer): GraphCanvasHit | null {
+        const data = this.sceneData;
+        if (!data || pointer.width <= 0 || pointer.height <= 0) return null;
+        const camera = this.camera();
+        let best: GalaxySceneGroupView | null = null;
+        let bestScore = Number.POSITIVE_INFINITY;
+        for (const group of data.groups) {
+            const center = this.groupCenterForMode(group);
+            this.pickVector.set(center.x, center.y, center.z).project(camera);
+            this.pickVectorB.set(center.x + group.radius, center.y, center.z).project(camera);
+            if (this.pickVector.z < -1 || this.pickVector.z > 1) continue;
+            const x = (this.pickVector.x * 0.5 + 0.5) * pointer.width;
+            const y = (-this.pickVector.y * 0.5 + 0.5) * pointer.height;
+            const radius = Math.max(18, Math.abs(this.pickVectorB.x - this.pickVector.x) * pointer.width * 0.5);
+            const distance = Math.hypot(pointer.x - x, pointer.y - y);
+            const score = distance / radius;
+            if (score <= 1 && score < bestScore) {
+                best = group;
+                bestScore = score;
+            }
+        }
+        return best ? { kind: 'cluster', id: best.id, label: best.label, nodeIds: best.nodeIds } : null;
     }
 
     private capsSurfaceEdge(data: GalaxySceneV2, ax: number, ay: number, az: number, bx: number, by: number, bz: number): boolean {

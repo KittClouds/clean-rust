@@ -143,6 +143,8 @@ export interface GalaxySceneV2 {
     radii: Float32Array;
     colors: Float32Array;
     edgePairs: Uint32Array;
+    edgeIds: string[];
+    edgeTypes: string[];
     edgeColors: Float32Array;
     edgeAlpha: Float32Array;
     edgeKinds: Uint8Array;
@@ -204,6 +206,8 @@ export function galaxySceneToV2(scene: GalaxyScene, sourceMode: GalaxySceneSourc
     }
 
     const edgePairs = new Uint32Array(scene.links.length * 2);
+    const edgeIds = new Array<string>(scene.links.length);
+    const edgeTypes = new Array<string>(scene.links.length);
     const edgeColors = new Float32Array(scene.links.length * 6);
     const edgeAlpha = new Float32Array(scene.links.length);
     const edgeKinds = new Uint8Array(scene.links.length);
@@ -213,6 +217,8 @@ export function galaxySceneToV2(scene: GalaxyScene, sourceMode: GalaxySceneSourc
         const target = scene.nodes[edge.target];
         edgePairs[index * 2] = edge.source;
         edgePairs[index * 2 + 1] = edge.target;
+        edgeIds[index] = edge.id;
+        edgeTypes[index] = edge.type;
         const relationColor = relationEdgeColor(edge.type, source, target);
         if (relationColor) {
             writeRgbColor(edgeColors, index * 2, relationColor);
@@ -249,6 +255,8 @@ export function galaxySceneToV2(scene: GalaxyScene, sourceMode: GalaxySceneSourc
         radii,
         colors,
         edgePairs,
+        edgeIds,
+        edgeTypes,
         edgeColors,
         edgeAlpha,
         edgeKinds,

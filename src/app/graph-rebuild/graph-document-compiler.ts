@@ -50,6 +50,7 @@ export interface GraphDocumentCompiledEntityMention {
     id: string;
     surface: string;
     normalizedSurface: string;
+    resolvedEntityId?: string;
     role: 'subject' | 'object';
     noteId: string;
     sourceStart: number;
@@ -66,6 +67,8 @@ export interface GraphDocumentRelationCandidate {
     predicate: string;
     subjectMentionIds: string[];
     objectMentionIds: string[];
+    subjectEntityIds: string[];
+    objectEntityIds: string[];
     evidenceSpanIds: string[];
     confidence: number;
     status: GraphDocumentCompileStatus;
@@ -76,7 +79,7 @@ export interface GraphDocumentHyperedgeRole {
     id: string;
     role: string;
     targetId: string;
-    targetKind: 'entity_mention' | 'evidence_span' | 'document_unit' | 'retrieval_unit';
+    targetKind: 'entity' | 'entity_mention' | 'evidence_span' | 'document_unit' | 'retrieval_unit';
     surface?: string;
     confidence: number;
 }
@@ -232,6 +235,7 @@ export interface BuildGraphDocumentCompilerInput {
     builtAt: number;
     baseline?: Partial<GraphDocumentCompilerBaseline>;
     highConfidenceThreshold?: number;
+    entities?: Array<{ id: string; label: string; aliases?: string[] }>;
 }
 
 interface CompilerContext {
@@ -239,6 +243,7 @@ interface CompilerContext {
     baseline: GraphDocumentCompilerBaseline;
     reviewByObjectId: Map<string, GraphDocumentReviewRow>;
     evidenceById: Map<string, EvidenceSpan>;
+    entityBySurface: Map<string, string>;
     entityMentions: GraphDocumentCompiledEntityMention[];
     relationCandidates: GraphDocumentRelationCandidate[];
     hyperedges: GraphDocumentHyperedge[];
@@ -271,6 +276,7 @@ export function buildGraphDocumentCompilerSummary(
         },
         reviewByObjectId: new Map(input.review.rows.map((row) => [row.objectId, row])),
         evidenceById: new Map(input.sidecar.evidenceSpans.map((span) => [span.id, span])),
+        entityBySurface: entitySurfaceIndex(input.entities || []),
         entityMentions: [],
         relationCandidates: [],
         hyperedges: [],
@@ -312,7 +318,13 @@ export function buildGraphDocumentCompilerSummary(
 function compileGraphFacts(context: CompilerContext): void {
     for (const fact of context.input.sidecar.graphFactCandidates.slice(0, MAX_FACTS)) {
         const row = context.reviewByObjectId.get(fact.id);
-        const status = statusForFact(fact, row, context.input.highConfidenceThreshold || DEFAULT_HIGH_CONFIDENCE);
+        const resolvedEntityIds = resolvedEntitiesForFact(context, fact);
+        const status = statusForFact(
+            fact,
+            row,
+            context.input.highConfidenceThreshold || DEFAULT_HIGH_CONFIDENCE,
+            resolvedEntityIds.length,
+        );
         if (status === 'pending_commit') {
             if (row?.state === 'accepted' || row?.state === 'compiled_to_graph') context.reviewedFacts += 1;
             else context.highConfidenceFacts += 1;
@@ -454,6 +466,7 @@ function mentionRowsFor(
             id,
             surface: item.surface,
             normalizedSurface: normalizeSurface(item.surface),
+            resolvedEntityId: context.entityBySurface.get(normalizeSurface(item.surface)),
             role: item.role,
             noteId: fact.noteId,
             sourceStart: fact.start,
@@ -481,12 +494,16 @@ function relationFor(
 ): GraphDocumentRelationCandidate | null {
     const subjectMentionIds = mentions.filter((mention) => mention.role === 'subject').map((mention) => mention.id);
     const objectMentionIds = mentions.filter((mention) => mention.role === 'object').map((mention) => mention.id);
+    const subjectEntityIds = unique(mentions.filter((mention) => mention.role === 'subject').map((mention) => mention.resolvedEntityId || ''));
+    const objectEntityIds = unique(mentions.filter((mention) => mention.role === 'object').map((mention) => mention.resolvedEntityId || ''));
     if (!subjectMentionIds.length || !objectMentionIds.length) return null;
     return {
         id: `document-relation:${slug(fact.id)}`,
         predicate: predicateFor(fact.kind),
         subjectMentionIds,
         objectMentionIds,
+        subjectEntityIds,
+        objectEntityIds,
         evidenceSpanIds: fact.evidenceSpanIds,
         confidence: fact.confidence.score,
         status,
@@ -503,8 +520,8 @@ function hyperedgeFor(
     const roles: GraphDocumentHyperedgeRole[] = mentions.map((mention, index) => ({
         id: `document-hyperedge-role:${slug(`${fact.id}:${mention.role}:${index}`)}`,
         role: mention.role,
-        targetId: mention.id,
-        targetKind: 'entity_mention',
+        targetId: mention.resolvedEntityId || mention.id,
+        targetKind: mention.resolvedEntityId ? 'entity' : 'entity_mention',
         surface: mention.surface,
         confidence: mention.confidence,
     }));
@@ -614,12 +631,31 @@ function statusForFact(
     fact: GraphFactCandidate,
     row: GraphDocumentReviewRow | undefined,
     threshold: number,
+    resolvedEntityCount: number,
 ): GraphDocumentCompileStatus {
     if (row?.state === 'rejected' || row?.state === 'muted') return 'blocked';
-    if (row?.state === 'accepted' || row?.state === 'compiled_to_graph') return 'pending_commit';
-    if (fact.confidence.score >= threshold) return 'pending_commit';
+    if (row?.state === 'accepted' || row?.state === 'compiled_to_graph') {
+        return resolvedEntityCount > 0 ? 'pending_commit' : 'reviewable';
+    }
+    if (fact.kind === 'relation_bundle' && resolvedEntityCount >= 2 && fact.confidence.score >= threshold) return 'pending_commit';
     if (row?.state === 'ledger_only') return 'ledger_only';
     return 'reviewable';
+}
+
+function resolvedEntitiesForFact(context: CompilerContext, fact: GraphFactCandidate): string[] {
+    return unique([...fact.subjectSurfaces, ...fact.objectSurfaces]
+        .map((surface) => context.entityBySurface.get(normalizeSurface(surface)) || ''));
+}
+
+function entitySurfaceIndex(entities: Array<{ id: string; label: string; aliases?: string[] }>): Map<string, string> {
+    const index = new Map<string, string>();
+    for (const entity of entities) {
+        for (const surface of [entity.label, ...(entity.aliases || [])]) {
+            const normalized = normalizeSurface(surface);
+            if (normalized && !index.has(normalized)) index.set(normalized, entity.id);
+        }
+    }
+    return index;
 }
 
 function provenanceFor(
@@ -683,6 +719,10 @@ function predicateFor(kind: GraphFactCandidate['kind']): string {
 
 function normalizeSurface(value: string): string {
     return value.toLowerCase().replace(/\s+/g, ' ').trim();
+}
+
+function unique(values: string[]): string[] {
+    return [...new Set(values.filter(Boolean))];
 }
 
 function countBy(values: string[]): Record<string, number> {

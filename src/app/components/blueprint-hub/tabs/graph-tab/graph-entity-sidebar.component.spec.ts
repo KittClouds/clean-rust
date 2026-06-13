@@ -10,19 +10,25 @@ import {
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { RegisteredEntity } from '../../../../lib/registry';
+import { entityColorStore } from '../../../../lib/store/entityColorStore';
+import { buildGraphRebuildSnapshot } from '../../../../graph-rebuild/graph-rebuild-builder';
+import { buildAdaptiveGraphRebuildChunks } from '../../../../graph-rebuild/graph-rebuild-meaning-frames';
 import { GraphRebuildService } from '../../../../graph-rebuild/graph-rebuild.service';
 import { GraphEntitySidebarComponent } from './graph-entity-sidebar.component';
 
 describe('GraphEntitySidebarComponent discourse focus', () => {
     let injector: EnvironmentInjector;
     let component: GraphEntitySidebarComponent;
+    let restorePersistedSnapshot: ReturnType<typeof vi.fn>;
 
     beforeEach(() => {
+        restorePersistedSnapshot = vi.fn(async () => undefined);
         injector = createEnvironmentInjector([
             {
                 provide: GraphRebuildService,
                 useValue: {
                     loadPersistedSnapshot: vi.fn(async () => null),
+                    restorePersistedSnapshot,
                 },
             },
         ], Injector.create({ providers: [] }) as unknown as EnvironmentInjector);
@@ -65,6 +71,18 @@ describe('GraphEntitySidebarComponent discourse focus', () => {
         expect(emittedSearches).toEqual(['Kai']);
     });
 
+    it('updates an entity family color directly from its header control', () => {
+        const original = entityColorStore.getRawHsl('CHARACTER');
+        const stopPropagation = vi.fn();
+
+        component.updateKindColor('CHARACTER', '#12b8a6', { stopPropagation } as unknown as Event);
+
+        expect(stopPropagation).toHaveBeenCalledOnce();
+        expect(component.getHexColor('CHARACTER')).toBe('#12b8a6');
+
+        entityColorStore.setColor('CHARACTER', original);
+    });
+
     it('selects discourse workbench rows without mutating atlas search', () => {
         component.sidebarView.set('discourse');
         const emittedSearches: string[] = [];
@@ -89,6 +107,99 @@ describe('GraphEntitySidebarComponent discourse focus', () => {
 
         expect(component.focusedDiscourseQuery()).toBe('Kai Hazel bridge');
         expect(emittedSearches).toEqual(['Kai Hazel bridge']);
+    });
+
+    it('exposes the Phase 5 operating-room tabs and count filters', () => {
+        const tabIds = component.operatingRoomTabs().map((tab) => tab.id);
+        const entityCount = component.operatingRoom().countsById['entities-total'];
+
+        expect(tabIds).toEqual(['entities', 'structure', 'facts', 'review', 'discourse', 'metrics']);
+        expect(entityCount.value).toBe(3);
+
+        component.selectOperatingCount(entityCount);
+
+        expect(component.sidebarView()).toBe('entities');
+        expect(component.selectedOperatingCount()?.id).toBe('entities-total');
+        expect(component.activeOperatingRecords().length).toBe(3);
+        expect(component.selectedOperatingRecord()?.facts.some((fact) => fact.label === 'Lineage')).toBe(true);
+    });
+
+    it('opens the evaluation workspace when Metrics is selected', () => {
+        const rooms: string[] = [];
+        component.operatingRoomChange.subscribe((room) => rooms.push(room));
+
+        component.setSidebarView('metrics');
+
+        expect(component.sidebarView()).toBe('metrics');
+        expect(rooms).toEqual(['metrics']);
+        expect(component.evaluationDashboard()).toMatchObject({ verdict: 'No data', score: null });
+    });
+
+    it('surfaces weighted document profiles as inspectable Structure records', () => {
+        const text = '# Methods\n\nThe method compares samples.\n\n# Results\n\nEvidence supports the result.';
+        const snapshot = buildGraphRebuildSnapshot({
+            scopeKind: 'note',
+            scopeId: 'profile-note',
+            noteIds: ['profile-note'],
+            entities: [],
+            occurrences: [],
+            chunks: buildAdaptiveGraphRebuildChunks('profile-note', text),
+            noteTexts: { 'profile-note': text },
+            builtAt: 30,
+            postProcessMode: 'core',
+            embeddingStagePolicy: { entityLinkerEnabled: false },
+        });
+        component.diagnosticsSnapshot.set(snapshot);
+        const profileCount = component.operatingRoom().countsById['structure-profiles'];
+
+        component.selectOperatingCount(profileCount);
+
+        expect(profileCount.value).toBe(1);
+        expect(component.sidebarView()).toBe('structure');
+        expect(component.selectedOperatingRecord()?.kind).toBe('document-profile:weighted');
+        expect(component.selectedOperatingRecord()?.facts.some((fact) => fact.label === 'Ontology policy')).toBe(true);
+    });
+
+    it('persists document review actions with a reversible receipt', async () => {
+        const text = [
+            '# Review Note',
+            'Policy means Amara moved from Red Mesa to Halcyon because the report changed the plan.',
+            '- Use the recovered record as evidence.',
+            '"Should this become an anchor?" Amara asked.',
+        ].join('\n\n');
+        const snapshot = buildGraphRebuildSnapshot({
+            scopeKind: 'note',
+            scopeId: 'review-note',
+            noteIds: ['review-note'],
+            entities: [],
+            occurrences: [],
+            chunks: buildAdaptiveGraphRebuildChunks('review-note', text),
+            noteTexts: { 'review-note': text },
+            builtAt: 40,
+            postProcessMode: 'core',
+            embeddingStagePolicy: { entityLinkerEnabled: false },
+        });
+        component.diagnosticsSnapshot.set(snapshot);
+        const record = component.discourseWorkbench()?.records.find((candidate) =>
+            candidate.kind === 'document-review:graph_fact_candidate'
+            && candidate.actionKinds.includes('accept_fact')
+        );
+        expect(record).toBeTruthy();
+
+        await component.stageDiscourseRecordDecision(record!, 'accepted');
+
+        expect(restorePersistedSnapshot).toHaveBeenCalledOnce();
+        const persisted = restorePersistedSnapshot.mock.calls[0][0];
+        const persistedRow = persisted.documentReviewSummary.rows.find(
+            (candidate: any) => candidate.objectId === record!.sourceIds[0],
+        );
+        expect(persistedRow.state).toBe('accepted');
+        expect(persisted.documentReviewSummary.receipts.at(-1)).toMatchObject({
+            actionKind: 'accept_fact',
+            reversible: true,
+            mutationAllowed: false,
+        });
+        expect(persisted.documentCompilerSummary.sourceReviewBuiltAt).toBeGreaterThan(40);
     });
 });
 

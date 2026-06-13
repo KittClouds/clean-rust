@@ -28,6 +28,10 @@ pub use compiler::{
     GraphCompilerError, GraphCompilerInput, GraphCompilerOutput, GraphPrototypeFamily,
     GraphRootReceipt, ProjectedGraphEdge, RelationFact,
 };
+pub use phoenix_chunker_native::{
+    build_chunks, classify_document_profiles, Chunk, ChunkerConfig, DocumentProfileRequest,
+    DocumentProfileSummary,
+};
 pub use types::{
     GraphAnchor, GraphCalendarRegistryBridgeCounters, GraphCalendarRegistryBridgeSummary,
     GraphCalendarRegistryReceipt, GraphChunk, GraphCounters, GraphDropReasons, GraphEdge,

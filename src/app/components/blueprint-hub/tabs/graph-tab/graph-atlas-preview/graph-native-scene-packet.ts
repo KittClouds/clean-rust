@@ -19,6 +19,8 @@ export function graphScenePacketToV2(packet: PhoenixGraphScenePacket): GalaxySce
         radii: buffers.radii,
         colors: buffers.colors,
         edgePairs: buffers.edgePairs,
+        edgeIds: packet.edgeIds.slice(),
+        edgeTypes: packet.edgeIds.map(() => 'native_edge'),
         edgeColors: buffers.edgeColors,
         edgeAlpha: buffers.edgeAlpha,
         edgeKinds: buffers.edgeKinds,
