@@ -1,4 +1,4 @@
-import { buildGraphDocumentCompilerSummary } from './graph-document-compiler';
+import { buildGraphDocumentCompilePlanSummary } from './graph-document-compiler';
 import {
     applyGraphDocumentReviewAction,
     type GraphDocumentReviewActionKind,
@@ -328,7 +328,7 @@ function withReviewCompiler(
     builtAt: number,
     journal: GraphOperatorMutationJournal,
 ): GraphRebuildSnapshot {
-    const nextCompiler = buildGraphDocumentCompilerSummary({
+    const nextCompiler = buildGraphDocumentCompilePlanSummary({
         sidecar: snapshot.documentSidecarSummary!,
         review: nextReview,
         builtAt,
@@ -372,6 +372,7 @@ function withReviewCompiler(
             documentCompilerRetrievalOverlays: nextCompiler.counters.retrievalOverlays,
             documentCompilerTopologyDiffs: nextCompiler.counters.topologyDiffs,
             documentCompilerTopologyCommits: nextCompiler.counters.topologyCommits,
+            documentCompilerNativeCompileCandidates: nextCompiler.counters.nativeCompileCandidates || 0,
             documentCompilerLedgerOnly: nextCompiler.counters.ledgerOnly,
             documentCompilerOverlayOnly: nextCompiler.counters.overlayOnly,
             documentCompilerReviewable: nextCompiler.counters.reviewable,

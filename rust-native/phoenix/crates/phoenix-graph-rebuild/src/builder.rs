@@ -219,6 +219,8 @@ pub fn build_graph_rebuild_snapshot(
         nodes,
         edges,
         calendar_registry_summary: None,
+        document_sidecar_summary: None,
+        document_compiler_summary: None,
         counters,
     })
 }

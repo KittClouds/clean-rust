@@ -280,6 +280,91 @@ pub struct GraphCalendarRegistryBridgeSummary {
     pub counters: GraphCalendarRegistryBridgeCounters,
 }
 
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct GraphDocumentConfidence {
+    #[serde(default)]
+    pub score: f32,
+}
+
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct GraphDocumentEvidenceSpan {
+    pub id: CompactString,
+    pub note_id: CompactString,
+    #[serde(default)]
+    pub chunk_id: Option<CompactString>,
+    pub start: u32,
+    pub end: u32,
+    #[serde(default)]
+    pub confidence: GraphDocumentConfidence,
+}
+
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct GraphDocumentSidecarSummary {
+    #[serde(default)]
+    pub evidence_spans: Vec<GraphDocumentEvidenceSpan>,
+}
+
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct GraphDocumentCompilerHyperedgeRole {
+    pub id: CompactString,
+    pub role: CompactString,
+    #[serde(default)]
+    pub semantic_role: Option<CompactString>,
+    #[serde(default)]
+    pub slot_type: Option<CompactString>,
+    pub target_id: CompactString,
+    pub target_kind: CompactString,
+    #[serde(default)]
+    pub surface: Option<CompactString>,
+    #[serde(default)]
+    pub confidence: f32,
+    #[serde(default)]
+    pub required: Option<bool>,
+    #[serde(default)]
+    pub resolved: Option<bool>,
+}
+
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct GraphDocumentCompilerHyperedge {
+    pub id: CompactString,
+    pub predicate: CompactString,
+    #[serde(default)]
+    pub trigger_predicate: Option<CompactString>,
+    #[serde(default)]
+    pub frame: Option<CompactString>,
+    #[serde(default)]
+    pub factuality: Option<CompactString>,
+    #[serde(default)]
+    pub semantic_situation_id: Option<CompactString>,
+    #[serde(default)]
+    pub state_interval_ids: Vec<CompactString>,
+    #[serde(default)]
+    pub event_ordering_ids: Vec<CompactString>,
+    #[serde(default)]
+    pub temporal_conflict_ids: Vec<CompactString>,
+    #[serde(default)]
+    pub compilation_basis: Option<CompactString>,
+    #[serde(default)]
+    pub roles: Vec<GraphDocumentCompilerHyperedgeRole>,
+    #[serde(default)]
+    pub evidence_span_ids: Vec<CompactString>,
+    #[serde(default)]
+    pub confidence: f32,
+    pub status: CompactString,
+}
+
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct GraphDocumentCompilerSummary {
+    #[serde(default)]
+    pub hyperedges: Vec<GraphDocumentCompilerHyperedge>,
+}
+
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct GraphRebuildSnapshot {
@@ -306,5 +391,9 @@ pub struct GraphRebuildSnapshot {
     pub edges: Vec<GraphEdge>,
     #[serde(default)]
     pub calendar_registry_summary: Option<GraphCalendarRegistryBridgeSummary>,
+    #[serde(default)]
+    pub document_sidecar_summary: Option<GraphDocumentSidecarSummary>,
+    #[serde(default)]
+    pub document_compiler_summary: Option<GraphDocumentCompilerSummary>,
     pub counters: GraphCounters,
 }

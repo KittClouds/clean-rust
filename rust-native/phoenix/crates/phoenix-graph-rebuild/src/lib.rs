@@ -34,14 +34,19 @@ pub use phoenix_chunker_native::{
     DocumentProfileSummary,
 };
 pub use semantic::{
-    build_document_semantic_summary, DocumentSemanticArgument, DocumentSemanticCounters,
-    DocumentSemanticDocument, DocumentSemanticEntity, DocumentSemanticInput,
-    DocumentSemanticProposition, DocumentSemanticRequest, DocumentSemanticScope,
-    DocumentSemanticSummary,
+    build_document_semantic_summary, DocumentSemanticArgument, DocumentSemanticAttributionFrame,
+    DocumentSemanticConditionalFrame, DocumentSemanticCounters, DocumentSemanticDocument,
+    DocumentSemanticEntity, DocumentSemanticEventOrdering, DocumentSemanticFactualityEnvelope,
+    DocumentSemanticFrame, DocumentSemanticInput, DocumentSemanticProposition,
+    DocumentSemanticRecoveredArgument, DocumentSemanticRequest, DocumentSemanticScope,
+    DocumentSemanticSituationInstance, DocumentSemanticSpeechOrBeliefFrame,
+    DocumentSemanticStateInterval, DocumentSemanticSummary, DocumentSemanticTemporalConflict,
 };
 pub use types::{
     GraphAnchor, GraphCalendarRegistryBridgeCounters, GraphCalendarRegistryBridgeSummary,
-    GraphCalendarRegistryReceipt, GraphChunk, GraphCounters, GraphDropReasons, GraphEdge,
+    GraphCalendarRegistryReceipt, GraphChunk, GraphCounters, GraphDocumentCompilerHyperedge,
+    GraphDocumentCompilerHyperedgeRole, GraphDocumentCompilerSummary, GraphDocumentConfidence,
+    GraphDocumentEvidenceSpan, GraphDocumentSidecarSummary, GraphDropReasons, GraphEdge,
     GraphEmbeddingTarget, GraphEpisode, GraphEvent, GraphMemoryState, GraphMention, GraphNode,
     GraphProjectionRef, GraphRebuildSnapshot, GraphRelationship, GraphScopeKind, GraphTemporalEdge,
 };

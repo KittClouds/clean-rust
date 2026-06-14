@@ -1,10 +1,26 @@
 use phoenix_machine::{MachineConfig, MachineExtractionConfig, SurfaceCompiler};
 use phoenix_proposition::PropositionLowerer;
 use phoenix_types::{
-    EntityId, EntityKind, PosTag, Proposition, ResolverEntitySeed, ScopeKey, SourceRange,
-    TextRange, TokenSpan,
+    EntityId, EntityKind, Proposition, ResolverEntitySeed, ScopeKey, SourceRange, TokenSpan,
 };
 use serde::{Deserialize, Serialize};
+
+mod factuality;
+mod frame;
+mod precision;
+mod recovery;
+mod temporal;
+pub use factuality::{
+    DocumentSemanticAttributionFrame, DocumentSemanticConditionalFrame,
+    DocumentSemanticFactualityEnvelope, DocumentSemanticSpeechOrBeliefFrame,
+};
+pub use frame::DocumentSemanticFrame;
+use precision::{predicate_quality, proposition_confidence, role_precision_for};
+pub use recovery::DocumentSemanticRecoveredArgument;
+pub use temporal::{
+    DocumentSemanticEventOrdering, DocumentSemanticSituationInstance,
+    DocumentSemanticStateInterval, DocumentSemanticTemporalConflict,
+};
 
 const PREVIEW_CHARS: usize = 320;
 
@@ -43,6 +59,40 @@ pub struct DocumentSemanticCounters {
     pub propositions: usize,
     pub arguments: usize,
     pub resolved_arguments: usize,
+    pub role_annotations: usize,
+    pub unresolved_role_surfaces: usize,
+    pub role_failure_reasons: usize,
+    pub frame_annotations: usize,
+    pub lexical_frame_matches: usize,
+    pub fallback_frame_matches: usize,
+    pub low_confidence_frames: usize,
+    pub frame_failure_reasons: usize,
+    pub factuality_annotations: usize,
+    pub scoped_factuality: usize,
+    pub attributed_factuality: usize,
+    pub quoted_factuality: usize,
+    pub conditional_factuality: usize,
+    pub speech_or_belief_frames: usize,
+    pub low_confidence_factuality: usize,
+    pub factuality_failure_reasons: usize,
+    pub document_argument_recoveries: usize,
+    pub local_coreference_recoveries: usize,
+    pub alias_continuity_recoveries: usize,
+    pub omitted_subject_recoveries: usize,
+    pub quote_speaker_recoveries: usize,
+    pub repeated_event_links: usize,
+    pub window_argument_completions: usize,
+    pub low_confidence_recoveries: usize,
+    pub recovery_failure_reasons: usize,
+    pub situation_instances: usize,
+    pub state_intervals: usize,
+    pub event_orderings: usize,
+    pub explicit_event_orderings: usize,
+    pub recurrence_orderings: usize,
+    pub persistent_state_intervals: usize,
+    pub terminated_state_intervals: usize,
+    pub temporal_conflicts: usize,
+    pub world_state_ineligible_situations: usize,
     pub negated: usize,
     pub modal: usize,
     pub conditional: usize,
@@ -72,6 +122,10 @@ pub struct DocumentSemanticDocument {
     pub note_id: String,
     pub text_chars: usize,
     pub propositions: Vec<DocumentSemanticProposition>,
+    pub situations: Vec<DocumentSemanticSituationInstance>,
+    pub state_intervals: Vec<DocumentSemanticStateInterval>,
+    pub event_orderings: Vec<DocumentSemanticEventOrdering>,
+    pub temporal_conflicts: Vec<DocumentSemanticTemporalConflict>,
     pub counters: DocumentSemanticCounters,
 }
 
@@ -91,7 +145,13 @@ pub struct DocumentSemanticProposition {
     pub quality_reasons: Vec<String>,
     pub trigger_start: usize,
     pub trigger_end: usize,
+    pub frame: DocumentSemanticFrame,
+    pub factuality: DocumentSemanticFactualityEnvelope,
+    pub attribution_frame: Option<DocumentSemanticAttributionFrame>,
+    pub conditional_frame: Option<DocumentSemanticConditionalFrame>,
+    pub speech_or_belief_frame: Option<DocumentSemanticSpeechOrBeliefFrame>,
     pub arguments: Vec<DocumentSemanticArgument>,
+    pub document_argument_recoveries: Vec<DocumentSemanticRecoveredArgument>,
     pub scope: Vec<DocumentSemanticScope>,
     pub attribution: Option<DocumentSemanticAttribution>,
     pub conditional: Option<DocumentSemanticConditional>,
@@ -105,10 +165,14 @@ pub struct DocumentSemanticProposition {
 #[serde(rename_all = "camelCase")]
 pub struct DocumentSemanticArgument {
     pub role: String,
+    pub syntactic_role: String,
+    pub semantic_role: String,
     pub surface: String,
     pub entity_id: Option<String>,
     pub start: Option<usize>,
     pub end: Option<usize>,
+    pub role_confidence_millis: u16,
+    pub role_failure_reasons: Vec<String>,
 }
 
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
@@ -171,18 +235,53 @@ pub fn build_document_semantic_summary(
         let artifacts = compiler.compile(&document.text, &ScopeKey::default(), &seeds);
         let propositions = PropositionLowerer::lower_with_text(&document.text, &artifacts);
         let utf16 = Utf16Index::new(&document.text);
-        let rows = propositions
+        let mut rows = propositions
             .iter()
             .map(|proposition| {
                 map_proposition(document, proposition, &artifacts.scan.tokens, &utf16)
             })
             .collect::<Vec<_>>();
-        let document_counters = counters_for(artifacts.scan.sentences.len(), &rows);
+        recovery::recover_document_arguments(document, &mut rows);
+        let continuity = temporal::build_temporal_continuity(document, &rows);
+        let mut document_counters = counters_for(artifacts.scan.sentences.len(), &rows);
+        document_counters.situation_instances = continuity.situations.len();
+        document_counters.state_intervals = continuity.state_intervals.len();
+        document_counters.event_orderings = continuity.event_orderings.len();
+        document_counters.explicit_event_orderings = continuity
+            .event_orderings
+            .iter()
+            .filter(|row| row.source == "explicit_cue")
+            .count();
+        document_counters.recurrence_orderings = continuity
+            .event_orderings
+            .iter()
+            .filter(|row| row.relation == "recurs_after")
+            .count();
+        document_counters.persistent_state_intervals = continuity
+            .state_intervals
+            .iter()
+            .filter(|row| row.persists)
+            .count();
+        document_counters.terminated_state_intervals = continuity
+            .state_intervals
+            .iter()
+            .filter(|row| row.status == "terminated" || row.status == "superseded")
+            .count();
+        document_counters.temporal_conflicts = continuity.temporal_conflicts.len();
+        document_counters.world_state_ineligible_situations = continuity
+            .situations
+            .iter()
+            .filter(|row| !row.world_state_eligible)
+            .count();
         add_counters(&mut counters, &document_counters);
         documents.push(DocumentSemanticDocument {
             note_id: document.note_id.clone(),
             text_chars: document.text.encode_utf16().count(),
             propositions: rows,
+            situations: continuity.situations,
+            state_intervals: continuity.state_intervals,
+            event_orderings: continuity.event_orderings,
+            temporal_conflicts: continuity.temporal_conflicts,
             counters: document_counters,
         });
     }
@@ -246,17 +345,41 @@ fn map_proposition(
         .iter()
         .map(|argument| {
             let range = argument.range;
+            let surface = range
+                .map(|value| slice(&document.text, value).trim().to_owned())
+                .unwrap_or_default();
+            let syntactic_role = argument.role.to_string();
+            let precision = role_precision_for(
+                syntactic_role.as_str(),
+                proposition.predicate.relation_type.as_str(),
+                surface.as_str(),
+                argument.entity_id.is_some(),
+                range.is_some(),
+            );
             DocumentSemanticArgument {
-                role: argument.role.to_string(),
-                surface: range
-                    .map(|value| slice(&document.text, value).trim().to_owned())
-                    .unwrap_or_default(),
+                role: syntactic_role.clone(),
+                syntactic_role,
+                semantic_role: precision.semantic_role.to_owned(),
+                surface,
                 entity_id: argument.entity_id.as_ref().map(|id| id.0.clone()),
                 start: range.map(|value| utf16.offset(value.start)),
                 end: range.map(|value| utf16.offset(value.end)),
+                role_confidence_millis: precision.confidence_millis,
+                role_failure_reasons: precision.failure_reasons,
             }
         })
         .collect::<Vec<_>>();
+    let frame = frame::classify_frame(
+        proposition.predicate.predicate.as_str(),
+        proposition.predicate.relation_type.as_str(),
+        &arguments,
+    );
+    let factuality::FactualityBundle {
+        envelope: factuality,
+        attribution_frame,
+        conditional_frame,
+        speech_or_belief_frame,
+    } = factuality::build_factuality_bundle(proposition, &frame, |offset| utf16.offset(offset));
     let quality = predicate_quality(&document.text, proposition, &arguments, tokens);
     let confidence_millis = proposition_confidence(proposition, &arguments, &quality);
     DocumentSemanticProposition {
@@ -273,7 +396,13 @@ fn map_proposition(
         quality_reasons: quality.reasons.clone(),
         trigger_start: utf16.offset(proposition.predicate.trigger_range.start),
         trigger_end: utf16.offset(proposition.predicate.trigger_range.end),
+        frame,
+        factuality,
+        attribution_frame,
+        conditional_frame,
+        speech_or_belief_frame,
         arguments,
+        document_argument_recoveries: Vec::new(),
         scope: proposition
             .scope_ops
             .iter()
@@ -336,229 +465,6 @@ fn map_proposition(
     }
 }
 
-fn proposition_confidence(
-    proposition: &Proposition,
-    arguments: &[DocumentSemanticArgument],
-    quality: &PredicateQuality,
-) -> u16 {
-    let resolved = arguments
-        .iter()
-        .filter(|argument| argument.entity_id.is_some())
-        .count();
-    let mut score = 560i32 + arguments.len().min(3) as i32 * 70 + resolved.min(2) as i32 * 75;
-    if proposition.quote.is_some() || proposition.conditional.is_some() {
-        score += 35;
-    }
-    score += quality.score_delta;
-    score.clamp(160, 960) as u16
-}
-
-#[derive(Clone, Debug)]
-struct PredicateQuality {
-    quality: &'static str,
-    admission: &'static str,
-    score_delta: i32,
-    reasons: Vec<String>,
-}
-
-fn predicate_quality(
-    text: &str,
-    proposition: &Proposition,
-    arguments: &[DocumentSemanticArgument],
-    tokens: &[TokenSpan],
-) -> PredicateQuality {
-    let predicate = proposition.predicate.predicate.to_ascii_lowercase();
-    let trigger = proposition.predicate.trigger_range;
-    let index = token_index_for_range(tokens, trigger);
-    let previous = index.and_then(|value| previous_token_in_sentence(tokens, value, trigger));
-    let next = index.and_then(|value| next_token_in_sentence(tokens, value, trigger));
-    let previous_pos = previous
-        .and_then(|value| tokens.get(value))
-        .and_then(|token| token.pos.as_ref());
-    let next_pos = next
-        .and_then(|value| tokens.get(value))
-        .and_then(|token| token.pos.as_ref());
-    let previous_surface = previous
-        .and_then(|value| tokens.get(value))
-        .map(|token| slice_range(text, token.range).to_ascii_lowercase())
-        .unwrap_or_default();
-    let has_subject = arguments.iter().any(|argument| argument.role == "subject");
-    let resolved = arguments
-        .iter()
-        .filter(|argument| argument.entity_id.is_some())
-        .count();
-    let has_core_argument = arguments.iter().any(|argument| {
-        matches!(
-            argument.role.as_str(),
-            "object" | "recipient" | "cause" | "destination" | "source" | "location"
-        )
-    });
-    let scoped = proposition
-        .scope_ops
-        .iter()
-        .any(|scope| scope.kind != "assertion");
-    let relation_type = proposition.predicate.relation_type.as_str();
-    let ing = predicate.ends_with("ing");
-    let ed = predicate.ends_with("ed");
-    let next_nominal = next_pos.is_some_and(is_nominal);
-    let recent_perfect_auxiliary = index.is_some_and(|value| {
-        has_recent_perfect_auxiliary_before_predicate(text, tokens, value, trigger)
-    });
-    let previous_predicate_context = previous_pos
-        .is_some_and(|pos| matches!(pos, PosTag::Verb | PosTag::Auxiliary | PosTag::Modal));
-    let previous_modifier = previous_pos.is_some_and(|pos| {
-        matches!(
-            pos,
-            PosTag::Determiner | PosTag::Adjective | PosTag::Preposition | PosTag::Conjunction
-        )
-    }) || matches!(
-        previous_surface.as_str(),
-        "his" | "her" | "their" | "my" | "our" | "your" | "its" | "perfect" | "different"
-    );
-    let strong_frame =
-        (has_subject && (has_core_argument || resolved > 0 || scoped)) || arguments.len() >= 3;
-
-    let mut reasons = Vec::with_capacity(4);
-    if is_noise_predicate(&predicate) {
-        reasons.push("predicate_stop_or_ordinal".to_owned());
-        return PredicateQuality {
-            quality: "noise",
-            admission: "ledger_only",
-            score_delta: -320,
-            reasons,
-        };
-    }
-
-    if ed && recent_perfect_auxiliary {
-        reasons.push("perfect_auxiliary_context".to_owned());
-    }
-
-    if (ed || ing)
-        && next_nominal
-        && !recent_perfect_auxiliary
-        && (!has_subject
-            || previous_modifier
-            || previous_predicate_context
-            || relation_type == "relates_to"
-            || !has_core_argument)
-    {
-        reasons.push("participle_before_nominal".to_owned());
-        reasons.push("attribute_descriptor_not_event".to_owned());
-        return PredicateQuality {
-            quality: "participle_modifier",
-            admission: "ledger_only",
-            score_delta: -220,
-            reasons,
-        };
-    }
-
-    if ing && !has_subject {
-        reasons.push("gerund_without_actor".to_owned());
-        let quality = if previous_modifier || !has_core_argument {
-            "nominal_event"
-        } else {
-            "gerund_action"
-        };
-        return PredicateQuality {
-            quality,
-            admission: if arguments.len() >= 3 && scoped {
-                "review"
-            } else {
-                "ledger_only"
-            },
-            score_delta: if arguments.len() >= 3 && scoped {
-                -20
-            } else {
-                -150
-            },
-            reasons,
-        };
-    }
-
-    if matches!(
-        predicate.as_str(),
-        "be" | "is" | "are" | "was" | "were" | "been" | "being"
-    ) || relation_type.contains("state")
-        || relation_type.contains("identity")
-        || relation_type.contains("attribute")
-    {
-        reasons.push("copula_or_state_relation".to_owned());
-        return PredicateQuality {
-            quality: "copula_state",
-            admission: if strong_frame {
-                "review"
-            } else {
-                "ledger_only"
-            },
-            score_delta: if strong_frame { 45 } else { -80 },
-            reasons,
-        };
-    }
-
-    if ed && previous_surface_matches_be(&previous_surface) {
-        reasons.push("passive_auxiliary_context".to_owned());
-        return PredicateQuality {
-            quality: "passive_event",
-            admission: if has_core_argument || resolved > 0 {
-                "review"
-            } else {
-                "ledger_only"
-            },
-            score_delta: if has_core_argument || resolved > 0 {
-                35
-            } else {
-                -80
-            },
-            reasons,
-        };
-    }
-
-    if relation_type != "action" && relation_type != "relates_to" {
-        reasons.push("typed_relation_cue".to_owned());
-        return PredicateQuality {
-            quality: "relation_cue",
-            admission: if strong_frame
-                || proposition.conditional.is_some()
-                || proposition.quote.is_some()
-            {
-                "review"
-            } else {
-                "ledger_only"
-            },
-            score_delta: if strong_frame { 60 } else { -40 },
-            reasons,
-        };
-    }
-
-    reasons.push(
-        if has_subject {
-            "finite_subject_frame"
-        } else {
-            "weak_action_context"
-        }
-        .to_owned(),
-    );
-    PredicateQuality {
-        quality: if has_subject {
-            "finite_verb"
-        } else if ing {
-            "gerund_action"
-        } else {
-            "action_context"
-        },
-        admission: if strong_frame
-            || proposition.attribution.is_some()
-            || proposition.conditional.is_some()
-        {
-            "review"
-        } else {
-            "ledger_only"
-        },
-        score_delta: if strong_frame { 45 } else { -110 },
-        reasons,
-    }
-}
-
 fn counters_for(
     sentences: usize,
     propositions: &[DocumentSemanticProposition],
@@ -589,6 +495,94 @@ fn counters_for(
             .iter()
             .filter(|argument| argument.entity_id.is_some())
             .count();
+        counters.role_annotations += proposition.arguments.len();
+        counters.unresolved_role_surfaces += proposition
+            .arguments
+            .iter()
+            .filter(|argument| {
+                argument.entity_id.is_none()
+                    && !argument.surface.is_empty()
+                    && argument
+                        .role_failure_reasons
+                        .iter()
+                        .any(|reason| reason == "unresolved_entity")
+            })
+            .count();
+        counters.role_failure_reasons += proposition
+            .arguments
+            .iter()
+            .map(|argument| argument.role_failure_reasons.len())
+            .sum::<usize>();
+        counters.document_argument_recoveries += proposition.document_argument_recoveries.len();
+        counters.local_coreference_recoveries += proposition
+            .document_argument_recoveries
+            .iter()
+            .filter(|argument| argument.kind == "local_coreference")
+            .count();
+        counters.alias_continuity_recoveries += proposition
+            .document_argument_recoveries
+            .iter()
+            .filter(|argument| argument.kind == "alias_continuity")
+            .count();
+        counters.omitted_subject_recoveries += proposition
+            .document_argument_recoveries
+            .iter()
+            .filter(|argument| argument.kind == "omitted_subject")
+            .count();
+        counters.quote_speaker_recoveries += proposition
+            .document_argument_recoveries
+            .iter()
+            .filter(|argument| argument.kind == "quote_speaker_carryover")
+            .count();
+        counters.repeated_event_links += proposition
+            .document_argument_recoveries
+            .iter()
+            .filter(|argument| argument.kind == "repeated_event_entity_link")
+            .count();
+        counters.window_argument_completions += proposition
+            .document_argument_recoveries
+            .iter()
+            .filter(|argument| argument.kind == "window_argument_completion")
+            .count();
+        counters.low_confidence_recoveries += proposition
+            .document_argument_recoveries
+            .iter()
+            .filter(|argument| argument.confidence_millis < 600)
+            .count();
+        counters.recovery_failure_reasons += proposition
+            .document_argument_recoveries
+            .iter()
+            .map(|argument| argument.failure_reasons.len())
+            .sum::<usize>();
+        counters.frame_annotations += 1;
+        counters.lexical_frame_matches += (proposition.frame.source == "lexical_table") as usize;
+        counters.fallback_frame_matches += matches!(
+            proposition.frame.source.as_str(),
+            "relation_type_rule" | "role_pattern_rule"
+        ) as usize;
+        counters.low_confidence_frames += (proposition.frame.confidence_millis < 600) as usize;
+        counters.frame_failure_reasons += proposition.frame.failure_reasons.len();
+        counters.factuality_annotations += 1;
+        counters.scoped_factuality += (proposition.factuality.factuality != "asserted") as usize;
+        counters.attributed_factuality += proposition.factuality.reported as usize;
+        counters.quoted_factuality += proposition.factuality.quoted as usize;
+        counters.conditional_factuality += proposition.factuality.conditional as usize;
+        counters.speech_or_belief_frames += proposition.speech_or_belief_frame.is_some() as usize;
+        counters.low_confidence_factuality +=
+            (proposition.factuality.confidence_millis < 600) as usize;
+        counters.factuality_failure_reasons += proposition.factuality.failure_reasons.len()
+            + proposition
+                .attribution_frame
+                .as_ref()
+                .map_or(0, |frame| frame.failure_reasons.len())
+            + proposition
+                .conditional_frame
+                .as_ref()
+                .map_or(0, |frame| frame.failure_reasons.len())
+            + proposition
+                .speech_or_belief_frame
+                .as_ref()
+                .map_or(0, |frame| frame.failure_reasons.len());
         counters.negated += proposition
             .scope
             .iter()
@@ -619,6 +613,40 @@ fn add_counters(total: &mut DocumentSemanticCounters, value: &DocumentSemanticCo
     total.propositions += value.propositions;
     total.arguments += value.arguments;
     total.resolved_arguments += value.resolved_arguments;
+    total.role_annotations += value.role_annotations;
+    total.unresolved_role_surfaces += value.unresolved_role_surfaces;
+    total.role_failure_reasons += value.role_failure_reasons;
+    total.frame_annotations += value.frame_annotations;
+    total.lexical_frame_matches += value.lexical_frame_matches;
+    total.fallback_frame_matches += value.fallback_frame_matches;
+    total.low_confidence_frames += value.low_confidence_frames;
+    total.frame_failure_reasons += value.frame_failure_reasons;
+    total.factuality_annotations += value.factuality_annotations;
+    total.scoped_factuality += value.scoped_factuality;
+    total.attributed_factuality += value.attributed_factuality;
+    total.quoted_factuality += value.quoted_factuality;
+    total.conditional_factuality += value.conditional_factuality;
+    total.speech_or_belief_frames += value.speech_or_belief_frames;
+    total.low_confidence_factuality += value.low_confidence_factuality;
+    total.factuality_failure_reasons += value.factuality_failure_reasons;
+    total.document_argument_recoveries += value.document_argument_recoveries;
+    total.local_coreference_recoveries += value.local_coreference_recoveries;
+    total.alias_continuity_recoveries += value.alias_continuity_recoveries;
+    total.omitted_subject_recoveries += value.omitted_subject_recoveries;
+    total.quote_speaker_recoveries += value.quote_speaker_recoveries;
+    total.repeated_event_links += value.repeated_event_links;
+    total.window_argument_completions += value.window_argument_completions;
+    total.low_confidence_recoveries += value.low_confidence_recoveries;
+    total.recovery_failure_reasons += value.recovery_failure_reasons;
+    total.situation_instances += value.situation_instances;
+    total.state_intervals += value.state_intervals;
+    total.event_orderings += value.event_orderings;
+    total.explicit_event_orderings += value.explicit_event_orderings;
+    total.recurrence_orderings += value.recurrence_orderings;
+    total.persistent_state_intervals += value.persistent_state_intervals;
+    total.terminated_state_intervals += value.terminated_state_intervals;
+    total.temporal_conflicts += value.temporal_conflicts;
+    total.world_state_ineligible_situations += value.world_state_ineligible_situations;
     total.negated += value.negated;
     total.modal += value.modal;
     total.conditional += value.conditional;
@@ -636,131 +664,6 @@ fn add_counters(total: &mut DocumentSemanticCounters, value: &DocumentSemanticCo
 fn slice(text: &str, range: SourceRange) -> &str {
     text.get(range.start as usize..range.end as usize)
         .unwrap_or_default()
-}
-
-fn slice_range(text: &str, range: TextRange) -> &str {
-    text.get(range.start as usize..range.end as usize)
-        .unwrap_or_default()
-}
-
-fn token_index_for_range(tokens: &[TokenSpan], range: SourceRange) -> Option<usize> {
-    tokens
-        .iter()
-        .position(|token| token.range.start <= range.start && token.range.end >= range.end)
-        .or_else(|| {
-            tokens
-                .iter()
-                .position(|token| token.range.start < range.end && token.range.end > range.start)
-        })
-}
-
-fn previous_token_in_sentence(
-    tokens: &[TokenSpan],
-    index: usize,
-    trigger: SourceRange,
-) -> Option<usize> {
-    index.checked_sub(1).filter(|previous| {
-        tokens
-            .get(*previous)
-            .is_some_and(|token| trigger.start.saturating_sub(token.range.end) <= 64)
-    })
-}
-
-fn next_token_in_sentence(
-    tokens: &[TokenSpan],
-    index: usize,
-    trigger: SourceRange,
-) -> Option<usize> {
-    let next = index + 1;
-    (next < tokens.len()
-        && tokens
-            .get(next)
-            .is_some_and(|token| token.range.start.saturating_sub(trigger.end) <= 64))
-    .then_some(next)
-}
-
-fn is_nominal(pos: &PosTag) -> bool {
-    matches!(pos, PosTag::Noun | PosTag::Pronoun | PosTag::ProperNoun)
-}
-
-fn has_recent_perfect_auxiliary_before_predicate(
-    text: &str,
-    tokens: &[TokenSpan],
-    index: usize,
-    trigger: SourceRange,
-) -> bool {
-    let mut cursor = index;
-    let mut skipped = 0usize;
-    while let Some(previous) = cursor.checked_sub(1) {
-        let Some(token) = tokens.get(previous) else {
-            return false;
-        };
-        if trigger.start.saturating_sub(token.range.end) > 96 {
-            return false;
-        }
-        let surface = slice_range(text, token.range).trim();
-        if surface_matches_perfect_auxiliary(surface) {
-            return true;
-        }
-        let skippable = token
-            .pos
-            .as_ref()
-            .is_some_and(|pos| matches!(pos, PosTag::Adverb))
-            || surface_matches_auxiliary_adverb(surface);
-        if !skippable || skipped >= 3 {
-            return false;
-        }
-        skipped += 1;
-        cursor = previous;
-    }
-    false
-}
-
-fn surface_matches_perfect_auxiliary(value: &str) -> bool {
-    value.eq_ignore_ascii_case("had")
-        || value.eq_ignore_ascii_case("has")
-        || value.eq_ignore_ascii_case("have")
-        || value.eq_ignore_ascii_case("having")
-}
-
-fn surface_matches_auxiliary_adverb(value: &str) -> bool {
-    value.eq_ignore_ascii_case("not")
-        || value.eq_ignore_ascii_case("n't")
-        || value.eq_ignore_ascii_case("already")
-        || value.eq_ignore_ascii_case("just")
-        || value.eq_ignore_ascii_case("never")
-        || value.eq_ignore_ascii_case("still")
-        || value.eq_ignore_ascii_case("also")
-        || value.eq_ignore_ascii_case("then")
-        || value.eq_ignore_ascii_case("ever")
-        || value.eq_ignore_ascii_case("almost")
-}
-
-fn previous_surface_matches_be(value: &str) -> bool {
-    matches!(
-        value,
-        "is" | "are" | "was" | "were" | "be" | "been" | "being"
-    )
-}
-
-fn is_noise_predicate(value: &str) -> bool {
-    value.is_empty()
-        || value.len() < 2
-        || matches!(
-            value,
-            "he" | "she"
-                | "it"
-                | "they"
-                | "his"
-                | "her"
-                | "their"
-                | "this"
-                | "that"
-                | "these"
-                | "those"
-        )
-        || value.chars().next().is_some_and(|ch| ch.is_ascii_digit())
-        || matches!(value, "and" | "or" | "but")
 }
 
 struct Utf16Index {

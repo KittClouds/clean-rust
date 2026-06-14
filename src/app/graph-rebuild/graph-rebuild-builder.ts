@@ -47,7 +47,7 @@ import { buildGraphDiscourseCompilerOverlaySummary } from './graph-discourse-com
 import { buildHopfResonanceSpace } from './graph-hopf-resonance-space';
 import { buildGraphDocumentSidecar } from './graph-document-sidecar';
 import { buildGraphDocumentReviewSummary } from './graph-document-review';
-import { buildGraphDocumentCompilerSummary } from './graph-document-compiler';
+import { buildGraphDocumentCompilePlanSummary } from './graph-document-compiler';
 import { replayGraphOperatorMutationJournal } from './graph-operator-mutation-journal';
 
 export { buildGraphRebuildAliasResolver, normalizeGraphRebuildCandidate };
@@ -139,7 +139,7 @@ export function buildGraphRebuildSnapshot(input: BuildGraphRebuildSnapshotInput)
         documentSemanticSummary: input.documentSemanticSummary,
     });
     const documentReviewSummary = buildGraphDocumentReviewSummary(documentSidecarSummary, builtAt);
-    const documentCompilerSummary = buildGraphDocumentCompilerSummary({
+    const documentCompilerSummary = buildGraphDocumentCompilePlanSummary({
         sidecar: documentSidecarSummary,
         review: documentReviewSummary,
         builtAt,
@@ -252,11 +252,49 @@ export function buildGraphRebuildSnapshot(input: BuildGraphRebuildSnapshotInput)
             documentSidecarRhetoricalUnits: documentSidecarSummary.counters.rhetoricalUnits,
             documentSidecarRetrievalUnits: documentSidecarSummary.counters.retrievalUnits,
             documentSidecarGraphFacts: documentSidecarSummary.counters.graphFactCandidates,
+            documentSidecarSituationInstances: documentSidecarSummary.counters.situationInstances,
+            documentSidecarStateIntervals: documentSidecarSummary.counters.stateIntervals,
+            documentSidecarEventOrderings: documentSidecarSummary.counters.eventOrderings,
+            documentSidecarTemporalConflicts: documentSidecarSummary.counters.temporalConflicts,
             documentSidecarEvidenceSpans: documentSidecarSummary.counters.evidenceSpans,
             documentSidecarAnchorPromotions: documentSidecarSummary.counters.userAnchorPromotions,
             documentSemanticPropositions: input.documentSemanticSummary?.counters.propositions || 0,
             documentSemanticArguments: input.documentSemanticSummary?.counters.arguments || 0,
             documentSemanticResolvedArguments: input.documentSemanticSummary?.counters.resolvedArguments || 0,
+            documentSemanticRoleAnnotations: input.documentSemanticSummary?.counters.roleAnnotations || 0,
+            documentSemanticUnresolvedRoleSurfaces: input.documentSemanticSummary?.counters.unresolvedRoleSurfaces || 0,
+            documentSemanticRoleFailureReasons: input.documentSemanticSummary?.counters.roleFailureReasons || 0,
+            documentSemanticFrameAnnotations: input.documentSemanticSummary?.counters.frameAnnotations || 0,
+            documentSemanticLexicalFrames: input.documentSemanticSummary?.counters.lexicalFrameMatches || 0,
+            documentSemanticFallbackFrames: input.documentSemanticSummary?.counters.fallbackFrameMatches || 0,
+            documentSemanticLowConfidenceFrames: input.documentSemanticSummary?.counters.lowConfidenceFrames || 0,
+            documentSemanticFrameFailureReasons: input.documentSemanticSummary?.counters.frameFailureReasons || 0,
+            documentSemanticFactualityAnnotations: input.documentSemanticSummary?.counters.factualityAnnotations || 0,
+            documentSemanticScopedFactuality: input.documentSemanticSummary?.counters.scopedFactuality || 0,
+            documentSemanticAttributedFactuality: input.documentSemanticSummary?.counters.attributedFactuality || 0,
+            documentSemanticQuotedFactuality: input.documentSemanticSummary?.counters.quotedFactuality || 0,
+            documentSemanticConditionalFactuality: input.documentSemanticSummary?.counters.conditionalFactuality || 0,
+            documentSemanticSpeechOrBeliefFrames: input.documentSemanticSummary?.counters.speechOrBeliefFrames || 0,
+            documentSemanticLowConfidenceFactuality: input.documentSemanticSummary?.counters.lowConfidenceFactuality || 0,
+            documentSemanticFactualityFailureReasons: input.documentSemanticSummary?.counters.factualityFailureReasons || 0,
+            documentSemanticArgumentRecoveries: input.documentSemanticSummary?.counters.documentArgumentRecoveries || 0,
+            documentSemanticLocalCoreferenceRecoveries: input.documentSemanticSummary?.counters.localCoreferenceRecoveries || 0,
+            documentSemanticAliasContinuityRecoveries: input.documentSemanticSummary?.counters.aliasContinuityRecoveries || 0,
+            documentSemanticOmittedSubjectRecoveries: input.documentSemanticSummary?.counters.omittedSubjectRecoveries || 0,
+            documentSemanticQuoteSpeakerRecoveries: input.documentSemanticSummary?.counters.quoteSpeakerRecoveries || 0,
+            documentSemanticRepeatedEventLinks: input.documentSemanticSummary?.counters.repeatedEventLinks || 0,
+            documentSemanticWindowArgumentCompletions: input.documentSemanticSummary?.counters.windowArgumentCompletions || 0,
+            documentSemanticLowConfidenceRecoveries: input.documentSemanticSummary?.counters.lowConfidenceRecoveries || 0,
+            documentSemanticRecoveryFailureReasons: input.documentSemanticSummary?.counters.recoveryFailureReasons || 0,
+            documentSemanticSituationInstances: input.documentSemanticSummary?.counters.situationInstances || 0,
+            documentSemanticStateIntervals: input.documentSemanticSummary?.counters.stateIntervals || 0,
+            documentSemanticEventOrderings: input.documentSemanticSummary?.counters.eventOrderings || 0,
+            documentSemanticExplicitEventOrderings: input.documentSemanticSummary?.counters.explicitEventOrderings || 0,
+            documentSemanticRecurrenceOrderings: input.documentSemanticSummary?.counters.recurrenceOrderings || 0,
+            documentSemanticPersistentStateIntervals: input.documentSemanticSummary?.counters.persistentStateIntervals || 0,
+            documentSemanticTerminatedStateIntervals: input.documentSemanticSummary?.counters.terminatedStateIntervals || 0,
+            documentSemanticTemporalConflicts: input.documentSemanticSummary?.counters.temporalConflicts || 0,
+            documentSemanticWorldStateIneligibleSituations: input.documentSemanticSummary?.counters.worldStateIneligibleSituations || 0,
             documentSemanticNegated: input.documentSemanticSummary?.counters.negated || 0,
             documentSemanticModal: input.documentSemanticSummary?.counters.modal || 0,
             documentSemanticConditional: input.documentSemanticSummary?.counters.conditional || 0,
@@ -292,6 +330,7 @@ export function buildGraphRebuildSnapshot(input: BuildGraphRebuildSnapshotInput)
             documentCompilerRetrievalOverlays: documentCompilerSummary.counters.retrievalOverlays,
             documentCompilerTopologyDiffs: documentCompilerSummary.counters.topologyDiffs,
             documentCompilerTopologyCommits: documentCompilerSummary.counters.topologyCommits,
+            documentCompilerNativeCompileCandidates: documentCompilerSummary.counters.nativeCompileCandidates || 0,
             documentCompilerLedgerOnly: documentCompilerSummary.counters.ledgerOnly,
             documentCompilerOverlayOnly: documentCompilerSummary.counters.overlayOnly,
             documentCompilerReviewable: documentCompilerSummary.counters.reviewable,

@@ -13,7 +13,9 @@ use crate::{
     EvidenceBundleKind, EvidenceKind, FactLane, FactRole, GraphAtom, GraphAtomKind,
     GraphCalendarRegistryBridgeCounters, GraphCalendarRegistryBridgeSummary,
     GraphCalendarRegistryReceipt, GraphChunk, GraphCompileReceipts, GraphCompilerInput,
-    GraphCompilerOutput, GraphMention, GraphRebuildInput, GraphScopeKind, RelationFact,
+    GraphCompilerOutput, GraphDocumentCompilerHyperedge, GraphDocumentCompilerHyperedgeRole,
+    GraphDocumentCompilerSummary, GraphDocumentConfidence, GraphDocumentEvidenceSpan,
+    GraphDocumentSidecarSummary, GraphMention, GraphRebuildInput, GraphScopeKind, RelationFact,
 };
 
 const PARITY_FIXTURE: &str =
@@ -230,6 +232,73 @@ fn dual_write_preserves_calendar_registry_receipts_without_projecting_edges() {
 }
 
 #[test]
+fn dual_write_compiles_only_reviewed_document_situations_to_hyperedges() {
+    let text = "Kai gave Hazel the key.";
+    let entities = vec![entry("e-kai", "Kai", &[]), entry("e-hazel", "Hazel", &[])];
+    let mut snapshot = build_graph_rebuild_snapshot(GraphRebuildInput {
+        scope_kind: GraphScopeKind::Note,
+        scope_id: "note:document-situation",
+        note_id: "note-situation",
+        text,
+        scope: ScopeKey::default(),
+        entities: &entities,
+        candidate_count: 2,
+        built_at: Some(46),
+    })
+    .expect("snapshot");
+    snapshot.document_sidecar_summary = Some(GraphDocumentSidecarSummary {
+        evidence_spans: vec![GraphDocumentEvidenceSpan {
+            id: "evidence:situation:1".into(),
+            note_id: "note-situation".into(),
+            chunk_id: Some("note-situation:chunk:0".into()),
+            start: 0,
+            end: text.len() as u32,
+            confidence: GraphDocumentConfidence { score: 0.91 },
+        }],
+    });
+    snapshot.document_compiler_summary = Some(GraphDocumentCompilerSummary {
+        hyperedges: vec![
+            situation_hyperedge("h-good", "situation:good", Vec::new()),
+            situation_hyperedge(
+                "h-conflict",
+                "situation:conflict",
+                vec!["conflict:1".into()],
+            ),
+        ],
+    });
+
+    let dual = compile_dual_write_snapshot(&snapshot);
+    let fact = dual
+        .fact_graph
+        .facts
+        .iter()
+        .find(|fact| fact.semantic_situation_id.as_deref() == Some("situation:good"))
+        .expect("compiled semantic situation fact");
+
+    assert_eq!(fact.predicate, "transfer_possession");
+    assert_eq!(fact.semantic_frame.as_deref(), Some("transfer_possession"));
+    assert_eq!(fact.factuality.as_deref(), Some("asserted"));
+    assert!(dual
+        .fact_graph
+        .roles
+        .iter()
+        .any(|role| role.fact_id == fact.id
+            && role.semantic_role.as_deref() == Some("actor")
+            && role.slot_type.as_deref() == Some("participant")
+            && role.resolved == Some(true)));
+    assert!(!dual
+        .fact_graph
+        .facts
+        .iter()
+        .any(|fact| fact.semantic_situation_id.as_deref() == Some("situation:conflict")));
+    assert_eq!(
+        dual.fact_graph.receipts.counters.invariant_failures, 0,
+        "{:?}",
+        dual.fact_graph.receipts.invariant_failures
+    );
+}
+
+#[test]
 fn compiles_prepared_artifacts_without_legacy_rescan() {
     let note_ids = vec!["note-prepared".into()];
     let chunks = vec![GraphChunk {
@@ -328,6 +397,8 @@ fn compiles_prepared_artifacts_without_legacy_rescan() {
         causal_edges: &[],
         memory_state: &[],
         calendar_registry: None,
+        document_sidecar: None,
+        document_compiler: None,
         legacy_edges: &[],
         bundle_compression: None,
         bundle_commitment: None,
@@ -424,6 +495,12 @@ fn rejects_roles_that_target_the_wrong_layer() {
             status: "accepted".into(),
             evidence_ids: vec!["evidence:anchor:kai".into()],
             confidence: 0.8,
+            semantic_situation_id: None,
+            semantic_frame: None,
+            factuality: None,
+            state_interval_ids: Vec::new(),
+            event_ordering_ids: Vec::new(),
+            temporal_conflict_ids: Vec::new(),
         }],
         roles: vec![
             FactRole {
@@ -431,18 +508,30 @@ fn rejects_roles_that_target_the_wrong_layer() {
                 role: "source".into(),
                 atom_id: "atom:entity:e-kai".into(),
                 confidence: 0.8,
+                semantic_role: None,
+                slot_type: None,
+                required: None,
+                resolved: None,
             },
             FactRole {
                 fact_id: "fact:bad-role".into(),
                 role: "target".into(),
                 atom_id: "atom:entity:e-kai".into(),
                 confidence: 0.8,
+                semantic_role: None,
+                slot_type: None,
+                required: None,
+                resolved: None,
             },
             FactRole {
                 fact_id: "fact:bad-role".into(),
                 role: "evidence".into(),
                 atom_id: "atom:entity:e-kai".into(),
                 confidence: 0.8,
+                semantic_role: None,
+                slot_type: None,
+                required: None,
+                resolved: None,
             },
         ],
         projected_edges: Vec::new(),
@@ -572,6 +661,68 @@ fn calendar_summary(note_id: &str) -> GraphCalendarRegistryBridgeSummary {
             event_receipts: 1,
             ..GraphCalendarRegistryBridgeCounters::default()
         },
+    }
+}
+
+fn situation_hyperedge(
+    id: &str,
+    situation_id: &str,
+    temporal_conflict_ids: Vec<compact_str::CompactString>,
+) -> GraphDocumentCompilerHyperedge {
+    GraphDocumentCompilerHyperedge {
+        id: id.into(),
+        predicate: "transfer_possession".into(),
+        trigger_predicate: Some("gave".into()),
+        frame: Some("transfer_possession".into()),
+        factuality: Some("asserted".into()),
+        semantic_situation_id: Some(situation_id.into()),
+        state_interval_ids: Vec::new(),
+        event_ordering_ids: Vec::new(),
+        temporal_conflict_ids,
+        compilation_basis: Some("semantic_situation_frame".into()),
+        roles: vec![
+            document_hyperedge_role("role-actor", "actor", "e-kai", "entity", "Kai"),
+            document_hyperedge_role("role-recipient", "recipient", "e-hazel", "entity", "Hazel"),
+            document_hyperedge_role("role-theme", "theme", "key", "entity_mention", "the key"),
+            document_hyperedge_role(
+                "role-evidence",
+                "evidence",
+                "evidence:situation:1",
+                "evidence_span",
+                "evidence",
+            ),
+        ],
+        evidence_span_ids: vec!["evidence:situation:1".into()],
+        confidence: 0.91,
+        status: "pending_commit".into(),
+    }
+}
+
+fn document_hyperedge_role(
+    id: &str,
+    role: &str,
+    target_id: &str,
+    target_kind: &str,
+    surface: &str,
+) -> GraphDocumentCompilerHyperedgeRole {
+    GraphDocumentCompilerHyperedgeRole {
+        id: id.into(),
+        role: role.into(),
+        semantic_role: Some(role.into()),
+        slot_type: Some(
+            if role == "evidence" {
+                "evidence"
+            } else {
+                "participant"
+            }
+            .into(),
+        ),
+        target_id: target_id.into(),
+        target_kind: target_kind.into(),
+        surface: Some(surface.into()),
+        confidence: 0.9,
+        required: Some(true),
+        resolved: Some(target_kind == "entity" || target_kind == "evidence_span"),
     }
 }
 

@@ -154,20 +154,95 @@ describe('graph document sidecar', () => {
                     qualityReasons: ['finite_subject_frame'],
                     triggerStart: 4,
                     triggerEnd: 8,
+                    frame: {
+                        frame: 'transfer_possession',
+                        family: 'transfer',
+                        target: 'gave',
+                        lexicalUnit: 'give.v',
+                        definition: 'An actor transfers or receives a theme across a possession boundary.',
+                        source: 'lexical_table',
+                        confidenceMillis: 900,
+                        expectedRoles: ['actor', 'theme', 'recipient'],
+                        matchedRoles: ['actor', 'theme', 'recipient'],
+                        missingRoles: [],
+                        reasons: ['lexical_unit_match'],
+                        failureReasons: [],
+                    },
+                    factuality: assertedFactuality(),
                     arguments: [
-                        { role: 'subject', surface: 'Kai', entityId: 'entity-kai', start: 0, end: 3 },
-                        { role: 'recipient', surface: 'Hazel', entityId: 'entity-hazel', start: 9, end: 14 },
-                        { role: 'object', surface: 'the key', start: 15, end: 22 },
-                        { role: 'location', surface: 'New Rome', entityId: 'entity-rome', start: 26, end: 34 },
+                        { role: 'subject', syntacticRole: 'subject', semanticRole: 'actor', surface: 'Kai', entityId: 'entity-kai', start: 0, end: 3, roleConfidenceMillis: 900, roleFailureReasons: [] },
+                        { role: 'recipient', syntacticRole: 'recipient', semanticRole: 'recipient', surface: 'Hazel', entityId: 'entity-hazel', start: 9, end: 14, roleConfidenceMillis: 890, roleFailureReasons: [] },
+                        { role: 'object', syntacticRole: 'object', semanticRole: 'theme', surface: 'the key', start: 15, end: 22, roleConfidenceMillis: 725, roleFailureReasons: ['unresolved_entity'] },
+                        { role: 'location', syntacticRole: 'location', semanticRole: 'location', surface: 'New Rome', entityId: 'entity-rome', start: 26, end: 34, roleConfidenceMillis: 830, roleFailureReasons: [] },
                     ],
+                    documentArgumentRecoveries: [recoveredActor()],
                     scope: [{ kind: 'assertion' }],
                     evidence: [{ label: text, kind: 'sentence', start: 0, end: text.length }],
                     confidenceMillis: 910,
                     reviewState: 'proposed',
                 }],
-                counters: semanticCounters(1),
+                situations: [{
+                    id: 'semantic-note:situation:0',
+                    propositionId: 'semantic-note:prop:0',
+                    noteId: 'semantic-note',
+                    sentenceIndex: 0,
+                    start: 0,
+                    end: text.length,
+                    predicate: 'give',
+                    frame: 'transfer_possession',
+                    situationKind: 'event',
+                    participantEntityIds: ['entity-kai', 'entity-hazel'],
+                    participantSurfaces: ['Kai', 'Hazel', 'the key'],
+                    factuality: 'asserted',
+                    worldStateEligible: true,
+                    recurrenceIndex: 0,
+                    confidenceMillis: 900,
+                    detectorReasons: ['native_proposition_situation'],
+                    failureReasons: [],
+                }],
+                stateIntervals: [{
+                    id: 'semantic-note:state:0',
+                    noteId: 'semantic-note',
+                    stateKey: 'entity-kai:possession:key',
+                    subjectKey: 'entity-kai',
+                    predicate: 'possess',
+                    value: 'the key',
+                    polarity: 'positive',
+                    status: 'open',
+                    startSituationId: 'semantic-note:situation:0',
+                    mentionSituationIds: ['semantic-note:situation:0'],
+                    start: 0,
+                    persists: false,
+                    confidenceMillis: 820,
+                    detectorReasons: ['state_frame_interval'],
+                    failureReasons: [],
+                }],
+                eventOrderings: [{
+                    id: 'semantic-note:ordering:0',
+                    noteId: 'semantic-note',
+                    sourceSituationId: 'semantic-note:situation:0',
+                    targetSituationId: 'semantic-note:situation:1',
+                    relation: 'before',
+                    source: 'explicit_cue',
+                    confidenceMillis: 840,
+                    detectorReasons: ['explicit_cue:before'],
+                    failureReasons: [],
+                }],
+                temporalConflicts: [{
+                    id: 'semantic-note:conflict:0',
+                    noteId: 'semantic-note',
+                    kind: 'unresolved_state_transition',
+                    stateKey: 'entity-kai:possession:key',
+                    situationIds: ['semantic-note:situation:0'],
+                    stateIntervalIds: ['semantic-note:state:0'],
+                    severity: 'medium',
+                    confidenceMillis: 700,
+                    detectorReasons: ['opposing_state_polarity_without_transition_cue'],
+                    failureReasons: ['state_transition_requires_review'],
+                }],
+                counters: semanticCounters(1, 1, 1),
             }],
-            counters: semanticCounters(1),
+            counters: semanticCounters(1, 1, 1),
         };
         const sidecar = buildGraphDocumentSidecar({
             noteIds: ['semantic-note'],
@@ -182,13 +257,45 @@ describe('graph document sidecar', () => {
             kind: 'n_ary_claim',
             predicate: 'give',
             semanticPropositionId: 'semantic-note:prop:0',
+            frameFamily: 'transfer',
+            frameConfidence: 0.9,
+        }));
+        expect(sidecar.graphFactCandidates[0].frame?.frame).toBe('transfer_possession');
+        expect(sidecar.graphFactCandidates[0].confidence.reasons).toEqual(expect.arrayContaining([
+            'frame:transfer_possession',
+            'frame_source:lexical_table',
+            'factuality:asserted',
+            'speech_act:assertion',
+            'doc_recovery:omitted_subject',
+        ]));
+        expect(sidecar.graphFactCandidates[0].factuality?.factuality).toBe('asserted');
+        expect(sidecar.graphFactCandidates[0].documentArgumentRecoveries?.[0].kind).toBe('omitted_subject');
+        expect(sidecar.graphFactCandidates[0]).toEqual(expect.objectContaining({
+            semanticSituationId: 'semantic-note:situation:0',
+            stateIntervalIds: ['semantic-note:state:0'],
+            eventOrderingIds: ['semantic-note:ordering:0'],
+            temporalConflictIds: ['semantic-note:conflict:0'],
+        }));
+        expect(sidecar.counters).toEqual(expect.objectContaining({
+            situationInstances: 1,
+            stateIntervals: 1,
+            eventOrderings: 1,
+            temporalConflicts: 1,
         }));
         expect(sidecar.graphFactCandidates[0].roles?.map((role) => role.role)).toEqual([
-            'subject',
+            'actor',
             'recipient',
-            'object',
+            'theme',
             'location',
         ]);
+        expect(sidecar.graphFactCandidates[0].subjectSurfaces).toEqual(['Kai']);
+        expect(sidecar.graphFactCandidates[0].roles?.find((role) => role.role === 'actor')?.recoveryKinds).toEqual(['omitted_subject']);
+        expect(sidecar.graphFactCandidates[0].objectSurfaces).toEqual(['Hazel', 'the key', 'New Rome']);
+        expect(sidecar.graphFactCandidates[0].roles?.find((role) => role.role === 'theme')).toEqual(expect.objectContaining({
+            surfaces: ['the key'],
+            entityIds: [],
+            failureReasons: ['unresolved_entity'],
+        }));
     });
 
     it('keeps modifier-like native predicates in the ledger instead of graph fact review', () => {
@@ -274,13 +381,38 @@ describe('graph document sidecar', () => {
     });
 });
 
-function semanticCounters(propositions: number) {
+function semanticCounters(propositions: number, frames = 0, recoveries = 0) {
     return {
         documents: 1,
         sentences: 1,
         propositions,
         arguments: 4,
         resolvedArguments: 3,
+        roleAnnotations: 4,
+        unresolvedRoleSurfaces: 1,
+        roleFailureReasons: 1,
+        frameAnnotations: frames,
+        lexicalFrameMatches: frames,
+        fallbackFrameMatches: 0,
+        lowConfidenceFrames: 0,
+        frameFailureReasons: 0,
+        factualityAnnotations: propositions,
+        scopedFactuality: 0,
+        attributedFactuality: 0,
+        quotedFactuality: 0,
+        conditionalFactuality: 0,
+        speechOrBeliefFrames: 0,
+        lowConfidenceFactuality: 0,
+        factualityFailureReasons: 0,
+        documentArgumentRecoveries: recoveries,
+        localCoreferenceRecoveries: 0,
+        aliasContinuityRecoveries: 0,
+        omittedSubjectRecoveries: recoveries,
+        quoteSpeakerRecoveries: 0,
+        repeatedEventLinks: 0,
+        windowArgumentCompletions: 0,
+        lowConfidenceRecoveries: 0,
+        recoveryFailureReasons: 0,
         negated: 0,
         modal: 0,
         conditional: 0,
@@ -293,5 +425,45 @@ function semanticCounters(propositions: number) {
         ledgerOnly: 0,
         predicateModifiers: 0,
         predicateNoise: 0,
+    };
+}
+
+function recoveredActor() {
+    return {
+        kind: 'omitted_subject',
+        role: 'actor',
+        syntacticRole: 'subject',
+        semanticRole: 'actor',
+        surface: 'Kai',
+        entityId: 'entity-kai',
+        start: 0,
+        end: 3,
+        sourcePropositionId: 'semantic-note:prop:prior',
+        sourceSentenceIndex: 0,
+        confidenceMillis: 690,
+        detectorReasons: ['document_window_actor_carryover'],
+        failureReasons: [],
+    };
+}
+
+function assertedFactuality() {
+    return {
+        factuality: 'asserted',
+        polarity: 'positive',
+        speechAct: 'assertion',
+        asserted: true,
+        negated: false,
+        modal: false,
+        hypothetical: false,
+        conditional: false,
+        quoted: false,
+        reported: false,
+        believed: false,
+        questioned: false,
+        commanded: false,
+        confidenceMillis: 724,
+        scopeKinds: ['assertion'],
+        detectorReasons: ['native_scope_substrate'],
+        failureReasons: [],
     };
 }

@@ -6,10 +6,21 @@ import {
     type GraphDocumentProfileSummary,
 } from './graph-document-profile';
 import type {
+    GraphDocumentSemanticArgument,
+    GraphDocumentSemanticAttributionFrame,
+    GraphDocumentSemanticConditionalFrame,
     GraphDocumentSemanticDocument,
+    GraphDocumentSemanticFactualityEnvelope,
+    GraphDocumentSemanticFrame,
+    GraphDocumentSemanticEventOrdering,
     GraphDocumentSemanticProposition,
+    GraphDocumentSemanticRecoveredArgument,
     GraphDocumentSemanticScope,
+    GraphDocumentSemanticSituationInstance,
+    GraphDocumentSemanticSpeechOrBeliefFrame,
+    GraphDocumentSemanticStateInterval,
     GraphDocumentSemanticSummary,
+    GraphDocumentSemanticTemporalConflict,
 } from './graph-document-semantic';
 
 export type StructuralUnitKind =
@@ -130,13 +141,36 @@ export interface GraphFactCandidate extends DocumentUnit {
     kind: GraphBearingUnitKind;
     subjectSurfaces: string[];
     objectSurfaces: string[];
-    roles?: Array<{ role: string; surfaces: string[]; entityIds: string[] }>;
+    roles?: GraphFactCandidateRole[];
     predicate?: string;
     relationType?: string;
+    frame?: GraphDocumentSemanticFrame;
+    frameFamily?: string;
+    frameConfidence?: number;
+    factuality?: GraphDocumentSemanticFactualityEnvelope;
+    attributionFrame?: GraphDocumentSemanticAttributionFrame;
+    conditionalFrame?: GraphDocumentSemanticConditionalFrame;
+    speechOrBeliefFrame?: GraphDocumentSemanticSpeechOrBeliefFrame;
+    documentArgumentRecoveries?: GraphDocumentSemanticRecoveredArgument[];
+    semanticSituationId?: string;
+    stateIntervalIds?: string[];
+    eventOrderingIds?: string[];
+    temporalConflictIds?: string[];
     semanticPropositionId?: string;
     scope?: GraphDocumentSemanticScope[];
     evidenceSpanIds: string[];
     reviewState: 'proposed';
+}
+
+export interface GraphFactCandidateRole {
+    role: string;
+    syntacticRoles?: string[];
+    surfaces: string[];
+    entityIds: string[];
+    confidence: number;
+    failureReasons: string[];
+    recoveryKinds?: string[];
+    detectorReasons?: string[];
 }
 
 export interface EvidenceSpan {
@@ -161,6 +195,10 @@ export interface GraphDocumentSidecarCounters {
     rhetoricalUnits: number;
     retrievalUnits: number;
     graphFactCandidates: number;
+    situationInstances?: number;
+    stateIntervals?: number;
+    eventOrderings?: number;
+    temporalConflicts?: number;
     evidenceSpans: number;
     paragraphGroups: number;
     paragraphs: number;
@@ -185,6 +223,10 @@ export interface GraphDocumentSidecarSummary {
     rhetoricalUnits: RhetoricalUnit[];
     retrievalUnits: RetrievalUnit[];
     graphFactCandidates: GraphFactCandidate[];
+    situationInstances?: GraphDocumentSemanticSituationInstance[];
+    stateIntervals?: GraphDocumentSemanticStateInterval[];
+    eventOrderings?: GraphDocumentSemanticEventOrdering[];
+    temporalConflicts?: GraphDocumentSemanticTemporalConflict[];
     evidenceSpans: EvidenceSpan[];
     documentProfileSummary?: GraphDocumentProfileSummary;
     counters: GraphDocumentSidecarCounters;
@@ -223,8 +265,16 @@ interface BuildContext {
     rhetoricalUnits: RhetoricalUnit[];
     retrievalUnits: RetrievalUnit[];
     graphFactCandidates: GraphFactCandidate[];
+    situationInstances: GraphDocumentSemanticSituationInstance[];
+    stateIntervals: GraphDocumentSemanticStateInterval[];
+    eventOrderings: GraphDocumentSemanticEventOrdering[];
+    temporalConflicts: GraphDocumentSemanticTemporalConflict[];
     evidenceSpans: EvidenceSpan[];
     documentProfileSummary: GraphDocumentProfileSummary;
+    situationByPropositionId: Map<string, GraphDocumentSemanticSituationInstance>;
+    stateIntervalIdsBySituationId: Map<string, string[]>;
+    eventOrderingIdsBySituationId: Map<string, string[]>;
+    temporalConflictIdsBySituationId: Map<string, string[]>;
     childIdsByParent: Map<string, string[]>;
     sentenceLimitHits: number;
 }
@@ -244,8 +294,16 @@ export function buildGraphDocumentSidecar(input: BuildGraphDocumentSidecarInput)
         rhetoricalUnits: [],
         retrievalUnits: [],
         graphFactCandidates: [],
+        situationInstances: [],
+        stateIntervals: [],
+        eventOrderings: [],
+        temporalConflicts: [],
         evidenceSpans: [],
         documentProfileSummary,
+        situationByPropositionId: new Map(),
+        stateIntervalIdsBySituationId: new Map(),
+        eventOrderingIdsBySituationId: new Map(),
+        temporalConflictIdsBySituationId: new Map(),
         childIdsByParent: new Map(),
         sentenceLimitHits: 0,
     };
@@ -270,6 +328,10 @@ export function buildGraphDocumentSidecar(input: BuildGraphDocumentSidecarInput)
         rhetoricalUnits: context.rhetoricalUnits,
         retrievalUnits: context.retrievalUnits,
         graphFactCandidates: context.graphFactCandidates,
+        situationInstances: context.situationInstances,
+        stateIntervals: context.stateIntervals,
+        eventOrderings: context.eventOrderings,
+        temporalConflicts: context.temporalConflicts,
         evidenceSpans: context.evidenceSpans,
         documentProfileSummary,
         counters: buildCounters(context),
@@ -319,8 +381,39 @@ function buildNoteSidecar(context: BuildContext, noteId: string, text: string, c
     buildRetrievalUnits(context, noteId, chunks, sections);
     buildRhetoricalAndFactUnits(context, noteId, paragraphs, paragraphUnits, chunks, !semantics?.propositions.length);
     if (semantics?.propositions.length) {
+        appendSemanticContinuity(context, semantics);
         buildSemanticFactUnits(context, noteId, paragraphs, paragraphUnits, chunks, semantics.propositions);
     }
+}
+
+function appendSemanticContinuity(context: BuildContext, semantics: GraphDocumentSemanticDocument): void {
+    for (const situation of semantics.situations || []) {
+        context.situationInstances.push(situation);
+        context.situationByPropositionId.set(situation.propositionId, situation);
+    }
+    for (const interval of semantics.stateIntervals || []) {
+        context.stateIntervals.push(interval);
+        for (const situationId of interval.mentionSituationIds) {
+            appendMapValue(context.stateIntervalIdsBySituationId, situationId, interval.id);
+        }
+    }
+    for (const ordering of semantics.eventOrderings || []) {
+        context.eventOrderings.push(ordering);
+        appendMapValue(context.eventOrderingIdsBySituationId, ordering.sourceSituationId, ordering.id);
+        appendMapValue(context.eventOrderingIdsBySituationId, ordering.targetSituationId, ordering.id);
+    }
+    for (const conflict of semantics.temporalConflicts || []) {
+        context.temporalConflicts.push(conflict);
+        for (const situationId of conflict.situationIds) {
+            appendMapValue(context.temporalConflictIdsBySituationId, situationId, conflict.id);
+        }
+    }
+}
+
+function appendMapValue(map: Map<string, string[]>, key: string, value: string): void {
+    const values = map.get(key) || [];
+    if (!values.includes(value)) values.push(value);
+    map.set(key, values);
 }
 
 function buildParagraphGroups(
@@ -579,18 +672,10 @@ function addSemanticGraphFactCandidate(
     evidenceSpanId: string,
 ): GraphFactCandidate {
     const kind = semanticFactKind(proposition);
-    const roles = [...new Map(proposition.arguments
-        .filter((argument) => !!argument.surface)
-        .map((argument) => [argument.role, argument.role]))]
-        .map(([role]) => ({
-            role,
-            surfaces: proposition.arguments
-                .filter((argument) => argument.role === role)
-                .map((argument) => argument.surface),
-            entityIds: proposition.arguments
-                .filter((argument) => argument.role === role && !!argument.entityId)
-                .map((argument) => argument.entityId as string),
-        }));
+    const recoveredArguments = proposition.documentArgumentRecoveries || [];
+    const roleRecoveries = usableRecoveredArguments(proposition);
+    const roles = semanticRolesFor([...proposition.arguments, ...roleRecoveries]);
+    const situation = context.situationByPropositionId.get(proposition.id);
     const unit = addUnit(context, {
         noteId,
         kind,
@@ -602,14 +687,23 @@ function addSemanticGraphFactCandidate(
         confidence: confidence('graph_fact', proposition.confidenceMillis / 1000, [
             'native_semantic_substrate',
             proposition.relationType,
+            ...(proposition.frame ? [
+                `frame:${proposition.frame.frame}`,
+                `frame_source:${proposition.frame.source}`,
+            ] : []),
+            ...(proposition.factuality ? [
+                `factuality:${proposition.factuality.factuality}`,
+                `speech_act:${proposition.factuality.speechAct}`,
+            ] : []),
+            ...roleRecoveries.slice(0, 3).map((argument) => `doc_recovery:${argument.kind}`),
             proposition.predicateQuality || 'predicate_unclassified',
             ...(proposition.qualityReasons || []).slice(0, 2),
         ]),
         lens: 'graph_fact',
     });
-    const subjects = roles.find((role) => role.role === 'subject')?.surfaces || [];
+    const subjects = roles.filter((role) => isSubjectLikeRole(role.role)).flatMap((role) => role.surfaces);
     const objects = roles
-        .filter((role) => role.role !== 'subject')
+        .filter((role) => !isSubjectLikeRole(role.role))
         .flatMap((role) => role.surfaces);
     const candidate: GraphFactCandidate = {
         ...unit,
@@ -619,6 +713,18 @@ function addSemanticGraphFactCandidate(
         roles,
         predicate: proposition.predicate,
         relationType: proposition.relationType,
+        frame: proposition.frame,
+        frameFamily: proposition.frame?.family,
+        frameConfidence: proposition.frame ? proposition.frame.confidenceMillis / 1000 : undefined,
+        factuality: proposition.factuality,
+        attributionFrame: proposition.attributionFrame,
+        conditionalFrame: proposition.conditionalFrame,
+        speechOrBeliefFrame: proposition.speechOrBeliefFrame,
+        documentArgumentRecoveries: recoveredArguments,
+        semanticSituationId: situation?.id,
+        stateIntervalIds: situation ? context.stateIntervalIdsBySituationId.get(situation.id) || [] : [],
+        eventOrderingIds: situation ? context.eventOrderingIdsBySituationId.get(situation.id) || [] : [],
+        temporalConflictIds: situation ? context.temporalConflictIdsBySituationId.get(situation.id) || [] : [],
         semanticPropositionId: proposition.id,
         scope: proposition.scope,
         evidenceSpanIds: [evidenceSpanId],
@@ -629,8 +735,73 @@ function addSemanticGraphFactCandidate(
     return candidate;
 }
 
+type SemanticRoleInput = GraphDocumentSemanticArgument | GraphDocumentSemanticRecoveredArgument;
+
+function semanticRolesFor(arguments_: SemanticRoleInput[]): GraphFactCandidateRole[] {
+    const byRole = new Map<string, GraphFactCandidateRole>();
+    for (const argument of arguments_) {
+        if (!argument.surface) continue;
+        const role = argument.semanticRole || argument.role;
+        const syntacticRole = argument.syntacticRole || argument.role;
+        const row = byRole.get(role) || {
+            role,
+            syntacticRoles: [],
+            surfaces: [],
+            entityIds: [],
+            confidence: 0,
+            failureReasons: [],
+        };
+        row.syntacticRoles = unique([...(row.syntacticRoles || []), syntacticRole]);
+        row.surfaces = unique([...row.surfaces, argument.surface]);
+        row.entityIds = unique([
+            ...row.entityIds,
+            ...(argument.entityId ? [argument.entityId] : []),
+        ]);
+        row.failureReasons = unique([
+            ...row.failureReasons,
+            ...failureReasonsForRole(argument),
+        ]);
+        row.recoveryKinds = unique([
+            ...(row.recoveryKinds || []),
+            ...('kind' in argument ? [argument.kind] : []),
+        ]);
+        row.detectorReasons = unique([
+            ...(row.detectorReasons || []),
+            ...('detectorReasons' in argument ? argument.detectorReasons : []),
+        ]);
+        const roleConfidence = isRecoveredArgument(argument)
+            ? argument.confidenceMillis
+            : argument.roleConfidenceMillis ?? 620;
+        row.confidence = Math.max(row.confidence, Math.max(0, Math.min(1, (roleConfidence ?? 620) / 1000)));
+        byRole.set(role, row);
+    }
+    return [...byRole.values()];
+}
+
+function failureReasonsForRole(argument: SemanticRoleInput): string[] {
+    if (isRecoveredArgument(argument)) return argument.failureReasons || [];
+    return argument.roleFailureReasons || [];
+}
+
+function usableRecoveredArguments(proposition: GraphDocumentSemanticProposition): GraphDocumentSemanticRecoveredArgument[] {
+    return (proposition.documentArgumentRecoveries || []).filter((argument) =>
+        argument.confidenceMillis >= 600,
+    );
+}
+
+function isRecoveredArgument(argument: SemanticRoleInput): argument is GraphDocumentSemanticRecoveredArgument {
+    return 'confidenceMillis' in argument;
+}
+
+function isSubjectLikeRole(role: string): boolean {
+    return ['subject', 'actor', 'agent', 'bearer', 'experiencer', 'topic'].includes(role);
+}
+
 function semanticFactKind(proposition: GraphDocumentSemanticProposition): GraphBearingUnitKind {
-    if (proposition.arguments.length >= 3) return 'n_ary_claim';
+    if (proposition.arguments.length + usableRecoveredArguments(proposition).length >= 3) return 'n_ary_claim';
+    if (['motion', 'communication', 'causation', 'creation', 'conflict', 'decision', 'transfer'].includes(proposition.frame?.family || '')) {
+        return 'event';
+    }
     if (['state', 'attribute', 'identity'].some((value) => proposition.relationType.includes(value))) {
         return 'state_change';
     }
@@ -834,6 +1005,10 @@ function buildCounters(context: BuildContext): GraphDocumentSidecarCounters {
         rhetoricalUnits: context.rhetoricalUnits.length,
         retrievalUnits: context.retrievalUnits.length,
         graphFactCandidates: context.graphFactCandidates.length,
+        situationInstances: context.situationInstances.length,
+        stateIntervals: context.stateIntervals.length,
+        eventOrderings: context.eventOrderings.length,
+        temporalConflicts: context.temporalConflicts.length,
         evidenceSpans: context.evidenceSpans.length,
         paragraphGroups: byKind['paragraph_group'] || 0,
         paragraphs: byKind['paragraph'] || 0,

@@ -148,6 +148,16 @@ function buildMetrics(snapshot: GraphRebuildSnapshot, receipt: GraphIndexRunRece
     const reviewablePropositions = propositionSemantics?.counters.reviewable || 0;
     const ledgerOnlyPropositions = propositionSemantics?.counters.ledgerOnly || 0;
     const modifierPropositions = propositionSemantics?.counters.predicateModifiers || 0;
+    const factualityCount = propositionSemantics?.counters.factualityAnnotations || 0;
+    const recoveryCount = propositionSemantics?.counters.documentArgumentRecoveries || 0;
+    const situationCount = propositionSemantics?.counters.situationInstances || 0;
+    const stateIntervalCount = propositionSemantics?.counters.stateIntervals || 0;
+    const eventOrderingCount = propositionSemantics?.counters.eventOrderings || 0;
+    const explicitOrderingCount = propositionSemantics?.counters.explicitEventOrderings || 0;
+    const temporalConflictCount = propositionSemantics?.counters.temporalConflicts || 0;
+    const continuityScore = situationCount
+        ? clampScore(92 - (temporalConflictCount / situationCount) * 500 + Math.min(8, explicitOrderingCount / Math.max(1, eventOrderingCount) * 8))
+        : 35;
     const scopeRate = propositionCount ? Math.min(1, scopeCount / propositionCount) : 0;
     const predicatePrecisionRate = propositionCount ? reviewablePropositions / propositionCount : 0;
     const discourse = snapshot.discourseEvalLedgerSummary?.counters;
@@ -157,13 +167,13 @@ function buildMetrics(snapshot: GraphRebuildSnapshot, receipt: GraphIndexRunRece
     const reviewedTotal = accepted + rejected + ambiguous;
     const acceptedRate = reviewedTotal ? accepted / reviewedTotal : 0;
     const compiler = snapshot.documentCompilerSummary;
-    const plannedCommits = compiler?.counters.topologyCommits || 0;
+    const nativeCandidates = compiler?.counters.nativeCompileCandidates || 0;
     const mutationLedger = snapshot.documentGraphMutationLedger;
     const commits = mutationLedger?.counters.active || 0;
     const reversibleReceipts = compiler?.counters.reversibleReceipts || 0;
-    const mutationScore = plannedCommits === commits && reversibleReceipts >= plannedCommits
+    const mutationScore = commits === 0 && nativeCandidates >= 0
         ? 100
-        : clampScore((commits / Math.max(1, plannedCommits)) * 100);
+        : clampScore((commits / Math.max(1, nativeCandidates)) * 100);
     const retrieval = snapshot.memoryGraphRagBridgeSummary?.counters;
     const retrievalRate = retrieval?.evalRowCount ? retrieval.passedEvalRows / retrieval.evalRowCount : 0;
     const bridgeTotal = (discourse?.acceptedCandidates || 0) + (discourse?.rejectedCandidates || 0) + (discourse?.ambiguousCases || 0);
@@ -214,6 +224,8 @@ function buildMetrics(snapshot: GraphRebuildSnapshot, receipt: GraphIndexRunRece
                 ? [
                     `${formatNumber(propositionSemantics.counters.resolvedArguments)} arguments resolve directly to registered entities.`,
                     `${formatNumber(scopeCount)} scope readings capture negation, modality, conditionals, attribution, questions, or directives.`,
+                    `${formatNumber(factualityCount)} truth envelopes classify assertion, quotation, belief, command, and conditional status.`,
+                    `${formatNumber(recoveryCount)} document-window argument recoveries fill omitted subjects, quote speakers, aliases, or repeated event roles.`,
                     `${formatNumber(propositionSemantics.counters.nAry)} propositions preserve three or more semantic roles.`,
                     `${formatNumber(ledgerOnlyPropositions)} predicate readings stay ledger-only; ${formatNumber(modifierPropositions)} are modifier or nominal-event readings.`,
                 ]
@@ -232,12 +244,27 @@ function buildMetrics(snapshot: GraphRebuildSnapshot, receipt: GraphIndexRunRece
                 ]
                 : ['Run native document semantics to classify predicate admission.'],
             semanticPropositionRecords(snapshot).filter((row) => row.tone === 'quiet').slice(0, 80)),
+        metric('temporal-continuity', 'semantic', 'Temporal and state continuity', situationCount
+            ? `${formatNumber(situationCount)} situations / ${formatNumber(temporalConflictCount)} conflicts`
+            : 'Not attached', continuityScore,
+            situationCount
+                ? `${formatNumber(stateIntervalCount)} state intervals and ${formatNumber(eventOrderingCount)} event orderings preserve change across the document.`
+                : 'No proposition-level situation timeline is attached.',
+            propositionSemantics
+                ? [
+                    `${formatNumber(explicitOrderingCount)} orderings come from explicit before, after, during, or sequence cues.`,
+                    `${formatNumber(propositionSemantics.counters.persistentStateIntervals || 0)} intervals persist across repeated mentions; ${formatNumber(propositionSemantics.counters.terminatedStateIntervals || 0)} terminate or transition.`,
+                    `${formatNumber(propositionSemantics.counters.recurrenceOrderings || 0)} recurring situations link repeated events without merging their evidence.`,
+                    `${formatNumber(propositionSemantics.counters.worldStateIneligibleSituations || 0)} scoped situations are retained but blocked from world-state commitment.`,
+                ]
+                : ['Run native document semantics to build continuity records.'],
+            temporalContinuityRecords(snapshot)),
         metric('review-ratio', 'semantic', 'Accepted / rejected ratio', reviewedTotal ? `${accepted} / ${rejected}` : 'No decisions', reviewedTotal ? clampScore(acceptedRate * 115) : null,
             reviewedTotal ? `${percent(acceptedRate)} accepted across ${reviewedTotal} evaluated objects.` : 'The review ledger has not accumulated decisions yet.',
             [`${ambiguous} objects remain proposed or ambiguous.`], decisionRecords(snapshot)),
-        metric('graph-mutations', 'graph', 'Graph mutation count', `${commits} commits`, mutationScore,
-            commits ? `${commits} native commits are active with ${reversibleReceipts} reversible compiler receipts.` : 'No durable topology mutation occurred during this run.',
-            [`${plannedCommits} topology commits passed compiler policy.`, `${mutationLedger?.counters.undone || 0} prior commits were undone.`, `${compiler?.counters.ledgerOnly || 0} outputs remained ledger-only.`], topologyRecords(snapshot)),
+        metric('graph-mutations', 'graph', 'Graph mutation count', `${commits} commits / ${nativeCandidates} candidates`, mutationScore,
+            commits ? `${commits} native commits are active with ${reversibleReceipts} reversible compiler receipts.` : 'No TypeScript durable topology mutation occurred during this run.',
+            [`${nativeCandidates} semantic situation payloads are eligible for native graph compilation.`, `${mutationLedger?.counters.undone || 0} prior commits were undone.`, `${compiler?.counters.ledgerOnly || 0} outputs remained ledger-only.`], topologyRecords(snapshot)),
         metric('retrieval-quality', 'retrieval', 'Retrieval hit quality', retrieval?.evalRowCount ? percent(retrievalRate) : 'No eval rows', retrieval?.evalRowCount ? retrievalRate * 100 : null,
             retrieval?.evalRowCount ? `${retrieval.passedEvalRows} of ${retrieval.evalRowCount} retrieval checks passed.` : 'No retrieval evaluation ledger is available.',
             [`${retrieval?.failedEvalRows || 0} checks failed expected-layer retrieval.`], retrievalRecords(snapshot)),
@@ -319,14 +346,46 @@ function evidenceRecords(spans: NonNullable<GraphRebuildSnapshot['documentSideca
 
 function semanticPropositionRecords(snapshot: GraphRebuildSnapshot): GraphEvaluationRecord[] {
     return (snapshot.documentSemanticSummary?.documents || []).flatMap((document) =>
-        document.propositions.map((proposition) => ({
-            id: proposition.id,
-            title: proposition.predicate || proposition.relationType,
-            detail: proposition.preview,
-            meta: `${proposition.predicateQuality || 'predicate'} / ${proposition.arguments.length} roles / ${Math.round(proposition.confidenceMillis / 10)}% confidence`,
-            tone: proposition.reviewState === 'proposed' ? 'suspicious' as const : 'quiet' as const,
-        })),
+        document.propositions.map((proposition) => {
+            const unresolvedRoles = proposition.arguments.filter((argument) =>
+                argument.roleFailureReasons?.includes('unresolved_entity'),
+            ).length;
+            const recovered = proposition.documentArgumentRecoveries?.length || 0;
+            return {
+                id: proposition.id,
+                title: proposition.predicate || proposition.relationType,
+                detail: proposition.preview,
+                meta: `${proposition.factuality?.factuality || 'asserted'} / ${proposition.frame?.frame || 'unframed'} / ${proposition.frame?.source || 'no_frame_source'} / ${proposition.predicateQuality || 'predicate'} / ${proposition.arguments.length} roles + ${recovered} recovered / ${unresolvedRoles} unresolved / ${Math.round(proposition.confidenceMillis / 10)}% confidence`,
+                tone: proposition.reviewState === 'proposed' ? 'suspicious' as const : 'quiet' as const,
+            };
+        }),
     );
+}
+
+function temporalContinuityRecords(snapshot: GraphRebuildSnapshot): GraphEvaluationRecord[] {
+    return (snapshot.documentSemanticSummary?.documents || []).flatMap((document) => [
+        ...(document.temporalConflicts || []).map((conflict) => ({
+            id: conflict.id,
+            title: conflict.kind.replace(/_/g, ' '),
+            detail: conflict.detectorReasons.join(', '),
+            meta: `${conflict.severity} / ${Math.round(conflict.confidenceMillis / 10)}% / ${document.noteId}`,
+            tone: conflict.severity === 'high' ? 'degraded' as const : 'suspicious' as const,
+        })),
+        ...(document.stateIntervals || []).slice(0, 40).map((interval) => ({
+            id: interval.id,
+            title: `${interval.subjectKey}: ${interval.predicate}`,
+            detail: interval.detectorReasons.join(', '),
+            meta: `${interval.status} / ${interval.polarity} / ${interval.mentionSituationIds.length} mentions`,
+            tone: interval.failureReasons.length ? 'suspicious' as const : 'quiet' as const,
+        })),
+        ...(document.eventOrderings || []).slice(0, 40).map((ordering) => ({
+            id: ordering.id,
+            title: ordering.relation.replace(/_/g, ' '),
+            detail: ordering.detectorReasons.join(', '),
+            meta: `${ordering.source} / ${Math.round(ordering.confidenceMillis / 10)}%`,
+            tone: ordering.failureReasons.length ? 'suspicious' as const : 'quiet' as const,
+        })),
+    ]).slice(0, 120);
 }
 
 function profileRecords(snapshot: GraphRebuildSnapshot): GraphEvaluationRecord[] {

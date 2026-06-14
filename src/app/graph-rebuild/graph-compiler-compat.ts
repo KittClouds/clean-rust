@@ -116,7 +116,6 @@ function buildCompatibilityGraphCompilerOutput(snapshot: GraphRebuildSnapshot): 
         roles.push(role(id, 'subject', atomId('entity', state.entityId), 0.72), role(id, 'state', atomId('state', state.id), 0.72));
         for (const evidenceId of evidenceIds) roles.push(role(id, 'evidence', evidenceId, 0.72));
     }
-    pushDocumentCompilerOutputs();
     for (const edge of snapshot.edges) {
         const provenance = provenanceByEdge.get(compilerEdgeKey(edge.sourceId, edge.targetId, edge.type)) || {};
         projectedEdges.push({ id: `projection:legacy:${edge.id}`, sourceId: atomId('entity', edge.sourceId), targetId: atomId('entity', edge.targetId), edgeType: edge.type, projectionKind: 'legacyBinary', sourceFactId: provenance.factId, sourceBundleId: provenance.bundleId, confidence: edge.confidence });
@@ -134,60 +133,6 @@ function buildCompatibilityGraphCompilerOutput(snapshot: GraphRebuildSnapshot): 
         roles.push(role(id, leftRole, atomId('event', sourceId), confidence), role(id, rightRole, atomId('event', targetId), confidence));
         for (const evidenceId of evidenceIds) roles.push(role(id, 'evidence', evidenceId, confidence));
         projectedEdges.push(projection(`projection:${lane}:${idSource}`, atomId('event', sourceId), atomId('event', targetId), predicate, 'legacyBinary', confidence, id));
-    }
-
-    function pushDocumentCompilerOutputs(): void {
-        const compiler = snapshot.documentCompilerSummary;
-        if (!compiler) return;
-        const evidenceSpans = new Map((snapshot.documentSidecarSummary?.evidenceSpans || []).map((span) => [span.id, span]));
-        const mentionAtomIds = new Map<string, string>();
-        for (const mention of compiler.entityMentions.filter((row) => row.status === 'pending_commit')) {
-            const evidenceIds = mention.evidenceSpanIds.map(documentEvidenceId);
-            const atomIdValue = atomId('documentMention', mention.id);
-            mentionAtomIds.set(mention.id, atomIdValue);
-            atoms.push(atom('concept', atomIdValue, mention.id, mention.surface, mention.noteId, undefined, undefined, evidenceIds));
-            for (const evidenceId of mention.evidenceSpanIds) pushDocumentEvidence(evidenceId);
-        }
-        for (const hyperedge of compiler.hyperedges.filter((row) => row.status === 'pending_commit')) {
-            const id = `fact:document-hyperedge:${hyperedge.id}`;
-            const evidenceIds = hyperedge.evidenceSpanIds.map(documentEvidenceId);
-            facts.push(factLike(id, 'relationshipFact', hyperedge.predicate, hyperedge.id, 'accepted', evidenceIds, hyperedge.confidence));
-            for (const evidenceId of hyperedge.evidenceSpanIds) pushDocumentEvidence(evidenceId);
-            for (const [index, hyperRole] of hyperedge.roles.entries()) {
-                const atomIdValue = atomIdForDocumentRole(hyperRole.targetKind, hyperRole.targetId, hyperRole.surface || hyperRole.role);
-                roles.push(role(id, hyperRole.role, atomIdValue, hyperRole.confidence));
-                projectedEdges.push(projection(
-                    `projection:document-hyperedge:${slug(`${hyperedge.id}:${hyperRole.role}:${index}`)}`,
-                    atomId('relationFact', id),
-                    atomIdValue,
-                    `role:${hyperRole.role}`,
-                    'factRole',
-                    hyperRole.confidence,
-                    id,
-                ));
-            }
-        }
-
-        function pushDocumentEvidence(evidenceSpanId: string): void {
-            const span = evidenceSpans.get(evidenceSpanId);
-            pushEvidence({
-                id: documentEvidenceId(evidenceSpanId),
-                kind: 'sourceSpan',
-                noteId: span?.noteId,
-                chunkId: span?.chunkId,
-                sourceRange: span ? { start: span.start, end: span.end } : null,
-                sourceId: evidenceSpanId,
-                confidence: span?.confidence.score || 0.7,
-            });
-        }
-
-        function atomIdForDocumentRole(targetKind: string, targetId: string, label: string): string {
-            if (targetKind === 'entity_mention') return mentionAtomIds.get(targetId) || atomId('documentMention', targetId);
-            if (targetKind === 'evidence_span') return documentEvidenceId(targetId);
-            const atomIdValue = atomId('documentUnit', targetId);
-            atoms.push(atom('claim', atomIdValue, targetId, label, undefined, undefined, undefined, []));
-            return atomIdValue;
-        }
     }
 }
 
@@ -299,16 +244,8 @@ function eventEvidenceId(id: string): string {
     return `evidence:event:${id}`;
 }
 
-function documentEvidenceId(id: string): string {
-    return `evidence:document:${id}`;
-}
-
 function compilerEdgeKey(left: string, right: string, edgeType: string): string {
     return [left, right].sort().join(':') + `:${edgeType}`;
-}
-
-function slug(value: string): string {
-    return value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'row';
 }
 
 function emptyReceipts(): GraphCompileReceipts {

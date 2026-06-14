@@ -41,13 +41,7 @@ import { buildGraphDiscourseSpineSummary } from './graph-discourse-spine';
 import { buildHopfResonanceSpace } from './graph-hopf-resonance-space';
 import { buildGraphMemoryGraphRagBridgeSummary } from './graph-memory-graphrag-bridge';
 import {
-    buildGraphDocumentDurableCommitRequests,
     emptyGraphDocumentGraphMutationLedger,
-    planGraphDocumentMutationReconciliation,
-    recordGraphDocumentCommit,
-    recordGraphDocumentUndo,
-    type GraphDocumentDurableCommitResult,
-    type GraphDocumentDurableUndoResult,
     type GraphDocumentGraphMutationLedger,
 } from './graph-document-durable-commit';
 import { buildGraphSemanticAdjudicationDAGSummary } from './graph-semantic-adjudication';
@@ -385,36 +379,7 @@ export class GraphRebuildService {
         snapshot: GraphRebuildSnapshot,
     ): Promise<GraphRebuildSnapshot> {
         const previousLedger = await this.loadDocumentGraphMutationLedger(snapshot.scopeId);
-        if (this.phoenix.target !== 'native') {
-            snapshot.documentGraphMutationLedger = previousLedger
-                || emptyGraphDocumentGraphMutationLedger();
-            return snapshot;
-        }
-        const desired = buildGraphDocumentDurableCommitRequests({
-            scopeId: snapshot.scopeId,
-            compiler: snapshot.documentCompilerSummary,
-            sidecar: snapshot.documentSidecarSummary,
-        });
-        const now = Date.now();
-        const plan = planGraphDocumentMutationReconciliation(desired, previousLedger, now);
-        let ledger = previousLedger || emptyGraphDocumentGraphMutationLedger();
-        for (const request of plan.undos) {
-            const result = await this.phoenix.storeCommand(
-                'documentGraph:undo',
-                request as unknown as Record<string, unknown>,
-            ) as GraphDocumentDurableUndoResult;
-            requireDocumentGraphMutationResult(result?.commitId, request.commitId, 'undo');
-            ledger = recordGraphDocumentUndo(ledger, request);
-        }
-        for (const request of plan.commits) {
-            const result = await this.phoenix.storeCommand(
-                'documentGraph:commit',
-                request as unknown as Record<string, unknown>,
-            ) as GraphDocumentDurableCommitResult;
-            requireDocumentGraphMutationResult(result?.commitId, request.commitId, 'commit');
-            ledger = recordGraphDocumentCommit(ledger, request, result, now);
-        }
-        snapshot.documentGraphMutationLedger = ledger;
+        snapshot.documentGraphMutationLedger = previousLedger || emptyGraphDocumentGraphMutationLedger();
         return snapshot;
     }
 
@@ -588,17 +553,6 @@ export class GraphRebuildService {
     }
 }
 
-function requireDocumentGraphMutationResult(
-    actualCommitId: string | undefined,
-    expectedCommitId: string,
-    operation: 'commit' | 'undo',
-): void {
-    if (actualCommitId === expectedCommitId) return;
-    throw new Error(
-        `Document graph ${operation} returned ${actualCommitId || 'no commit id'} for ${expectedCommitId}`,
-    );
-}
-
 export function recoverGraphRebuildOccurrences(
     noteTexts: Record<string, string>,
     entities: RegisteredEntity[],
@@ -662,6 +616,18 @@ export function snapshotAnchorsToGraphRebuildOccurrences(
 }
 
 export function graphRebuildSnapshotToNativeCompilerPayload(snapshot: GraphRebuildSnapshot): GraphRebuildSnapshot {
+    const documentCompilerSummary = snapshot.documentCompilerSummary
+        ? {
+            hyperedges: snapshot.documentCompilerSummary.hyperedges.filter((row) => row.status === 'pending_commit'),
+        } as GraphRebuildSnapshot['documentCompilerSummary']
+        : undefined;
+    const evidenceIds = new Set((documentCompilerSummary?.hyperedges || [])
+        .flatMap((row) => row.evidenceSpanIds || []));
+    const documentSidecarSummary = snapshot.documentSidecarSummary && evidenceIds.size
+        ? {
+            evidenceSpans: snapshot.documentSidecarSummary.evidenceSpans.filter((row) => evidenceIds.has(row.id)),
+        } as GraphRebuildSnapshot['documentSidecarSummary']
+        : undefined;
     return {
         schemaVersion: snapshot.schemaVersion,
         id: snapshot.id,
@@ -685,6 +651,8 @@ export function graphRebuildSnapshotToNativeCompilerPayload(snapshot: GraphRebui
         nodes: snapshot.nodes,
         edges: snapshot.edges,
         calendarRegistrySummary: snapshot.calendarRegistrySummary,
+        documentSidecarSummary,
+        documentCompilerSummary,
         counters: snapshot.counters,
     };
 }

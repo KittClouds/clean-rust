@@ -18,6 +18,8 @@ use super::types::{
 use super::verify::verify_graph_compile_output;
 use crate::types::{
     GraphAnchor, GraphCalendarRegistryBridgeSummary, GraphCalendarRegistryReceipt, GraphChunk,
+    GraphDocumentCompilerHyperedge, GraphDocumentCompilerHyperedgeRole,
+    GraphDocumentCompilerSummary, GraphDocumentEvidenceSpan, GraphDocumentSidecarSummary,
     GraphEvent, GraphMemoryState, GraphMention, GraphNode, GraphScopeKind, GraphTemporalEdge,
 };
 
@@ -52,6 +54,7 @@ pub fn compile_graph_snapshot(input: GraphCompilerInput<'_>) -> GraphCompilerOut
     );
     build.story_edges(input.causal_edges, FactLane::CausalFact, "cause", "effect");
     build.calendar_registry(input.calendar_registry);
+    build.document_situation_hyperedges(input.document_compiler, input.document_sidecar);
     legacy_relationship_keys(&mut build.relation_by_edge, input.relationships);
     legacy_projections(
         &mut build.output,
@@ -358,6 +361,154 @@ impl CompilerBuild {
         );
     }
 
+    fn document_situation_hyperedges(
+        &mut self,
+        compiler: Option<&GraphDocumentCompilerSummary>,
+        sidecar: Option<&GraphDocumentSidecarSummary>,
+    ) {
+        let Some(compiler) = compiler else {
+            return;
+        };
+        let evidence_by_id = sidecar
+            .map(|summary| {
+                summary
+                    .evidence_spans
+                    .iter()
+                    .map(|span| (span.id.clone(), span))
+                    .collect::<HashMap<_, _>>()
+            })
+            .unwrap_or_default();
+        for hyperedge in compiler.hyperedges.iter().filter(|hyperedge| {
+            hyperedge.status == "pending_commit"
+                && hyperedge.compilation_basis.as_deref() == Some("semantic_situation_frame")
+                && hyperedge.semantic_situation_id.is_some()
+                && hyperedge.frame.is_some()
+                && hyperedge.temporal_conflict_ids.is_empty()
+        }) {
+            self.document_situation_hyperedge(hyperedge, &evidence_by_id);
+        }
+    }
+
+    fn document_situation_hyperedge(
+        &mut self,
+        hyperedge: &GraphDocumentCompilerHyperedge,
+        evidence_by_id: &HashMap<CompactString, &GraphDocumentEvidenceSpan>,
+    ) {
+        let situation_id = hyperedge.semantic_situation_id.clone().unwrap_or_default();
+        let frame = hyperedge
+            .frame
+            .clone()
+            .unwrap_or_else(|| hyperedge.predicate.clone());
+        let fact_id = format_compact!("fact:document-hyperedge:{}", hyperedge.id);
+        let evidence_ids = hyperedge
+            .evidence_span_ids
+            .iter()
+            .map(|id| self.document_evidence(id, evidence_by_id.get(id).copied()))
+            .collect::<Vec<_>>();
+        self.fact_with_semantics(
+            fact_id.clone(),
+            FactLane::RelationshipFact,
+            frame.clone(),
+            situation_id.clone(),
+            "accepted".into(),
+            evidence_ids.clone(),
+            hyperedge.confidence,
+            Some(situation_id),
+            Some(frame),
+            hyperedge.factuality.clone(),
+            hyperedge.state_interval_ids.clone(),
+            hyperedge.event_ordering_ids.clone(),
+            hyperedge.temporal_conflict_ids.clone(),
+        );
+        for (index, role) in hyperedge.roles.iter().enumerate() {
+            let role_atom_id = self.document_role_atom(role, &evidence_ids);
+            self.role_with_semantics(
+                &fact_id,
+                role.semantic_role.as_deref().unwrap_or(role.role.as_str()),
+                role_atom_id.clone(),
+                role.confidence,
+                role.semantic_role.clone(),
+                role.slot_type.clone(),
+                role.required,
+                role.resolved,
+            );
+            self.projection(
+                format_compact!("projection:document-hyperedge:{}:{}", hyperedge.id, index),
+                atom_id("relationFact", &fact_id),
+                role_atom_id,
+                format_compact!(
+                    "role:{}",
+                    role.semantic_role.as_deref().unwrap_or(role.role.as_str())
+                ),
+                "factRole".into(),
+                Some(fact_id.clone()),
+                role.confidence,
+            );
+        }
+        self.evidence_roles(&fact_id, &evidence_ids, hyperedge.confidence);
+    }
+
+    fn document_role_atom(
+        &mut self,
+        role: &GraphDocumentCompilerHyperedgeRole,
+        evidence_ids: &[CompactString],
+    ) -> CompactString {
+        match role.target_kind.as_str() {
+            "entity" => atom_id("entity", &role.target_id),
+            "evidence_span" => atom_id("documentEvidence", &role.target_id),
+            "entity_mention" => {
+                let id = atom_id("documentMention", &role.target_id);
+                self.atom(
+                    GraphAtomKind::Concept,
+                    id.clone(),
+                    role.target_id.clone(),
+                    role.surface.clone().unwrap_or_else(|| role.role.clone()),
+                    None,
+                    None,
+                    None,
+                    evidence_ids.to_vec(),
+                );
+                id
+            }
+            _ => {
+                let id = atom_id("documentUnit", &role.target_id);
+                self.atom(
+                    GraphAtomKind::Claim,
+                    id.clone(),
+                    role.target_id.clone(),
+                    role.surface.clone().unwrap_or_else(|| role.role.clone()),
+                    None,
+                    None,
+                    None,
+                    Vec::new(),
+                );
+                id
+            }
+        }
+    }
+
+    fn document_evidence(
+        &mut self,
+        evidence_id: &CompactString,
+        span: Option<&GraphDocumentEvidenceSpan>,
+    ) -> CompactString {
+        let id = atom_id("documentEvidence", evidence_id);
+        let source_range = span.map(|value| TextRange {
+            start: value.start,
+            end: value.end,
+        });
+        self.evidence(
+            id.clone(),
+            EvidenceKind::SourceSpan,
+            span.map(|value| value.note_id.clone()),
+            span.and_then(|value| value.chunk_id.clone()),
+            evidence_id.clone(),
+            source_range,
+            span.map(|value| value.confidence.score).unwrap_or(0.7),
+        );
+        id
+    }
+
     fn ensure_evidence_ids(
         &mut self,
         source_ids: &[CompactString],
@@ -408,6 +559,40 @@ impl CompilerBuild {
         evidence_ids: Vec<CompactString>,
         confidence: f32,
     ) {
+        self.fact_with_semantics(
+            id,
+            lane,
+            predicate,
+            source_record_id,
+            status,
+            evidence_ids,
+            confidence,
+            None,
+            None,
+            None,
+            Vec::new(),
+            Vec::new(),
+            Vec::new(),
+        );
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn fact_with_semantics(
+        &mut self,
+        id: CompactString,
+        lane: FactLane,
+        predicate: CompactString,
+        source_record_id: CompactString,
+        status: CompactString,
+        evidence_ids: Vec<CompactString>,
+        confidence: f32,
+        semantic_situation_id: Option<CompactString>,
+        semantic_frame: Option<CompactString>,
+        factuality: Option<CompactString>,
+        state_interval_ids: Vec<CompactString>,
+        event_ordering_ids: Vec<CompactString>,
+        temporal_conflict_ids: Vec<CompactString>,
+    ) {
         self.atom(
             GraphAtomKind::RelationFact,
             atom_id("relationFact", &id),
@@ -426,6 +611,12 @@ impl CompilerBuild {
             status,
             evidence_ids,
             confidence,
+            semantic_situation_id,
+            semantic_frame,
+            factuality,
+            state_interval_ids,
+            event_ordering_ids,
+            temporal_conflict_ids,
         });
     }
 
@@ -436,11 +627,30 @@ impl CompilerBuild {
         atom_id: CompactString,
         confidence: f32,
     ) {
+        self.role_with_semantics(fact_id, role, atom_id, confidence, None, None, None, None);
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn role_with_semantics(
+        &mut self,
+        fact_id: &CompactString,
+        role: &str,
+        atom_id: CompactString,
+        confidence: f32,
+        semantic_role: Option<CompactString>,
+        slot_type: Option<CompactString>,
+        required: Option<bool>,
+        resolved: Option<bool>,
+    ) {
         self.output.roles.push(FactRole {
             fact_id: fact_id.clone(),
             role: role.into(),
             atom_id,
             confidence,
+            semantic_role,
+            slot_type,
+            required,
+            resolved,
         });
     }
 

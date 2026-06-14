@@ -43,7 +43,7 @@ describe('buildGraphDiscourseWorkbenchView', () => {
         expect(view?.recordsByTab.stats.some((record) => record.id === 'stats:document-review-proposed')).toBe(true);
     });
 
-    it('surfaces document compiler diffs with receipts and created graph ids', () => {
+    it('surfaces document compile-plan diffs as native payload candidates', () => {
         const view = buildGraphDiscourseWorkbenchView(snapshot(), entities());
         const row = view?.recordsByTab.relations.find((record) => record.id.includes('document-compiler'));
 
@@ -53,7 +53,9 @@ describe('buildGraphDiscourseWorkbenchView', () => {
         expect(row?.evidenceIds).toEqual(['evidence-1']);
         expect(row?.targetIds).toEqual(expect.arrayContaining(['fact:document-hyperedge:hyper-1']));
         expect(row?.facts.some((fact) => fact.label === 'Before graph' && fact.value.includes('2 atoms'))).toBe(true);
-        expect(row?.facts.some((fact) => fact.label === 'Undo' && fact.value.includes('remove_document_compiler_outputs'))).toBe(true);
+        expect(row?.detail).toBe('native graph compiler payload candidate');
+        expect(row?.tags).toContain('native_compile_candidate');
+        expect(row?.facts.some((fact) => fact.label === 'Undo' && fact.value.includes('remove_document_compiler_ledger_row'))).toBe(true);
         expect(view?.recordsByTab.stats.some((record) => record.id === 'stats:document-compiler-diffs')).toBe(true);
     });
 
@@ -331,13 +333,16 @@ function snapshot(): GraphRebuildSnapshot {
             },
         },
         documentCompilerSummary: {
-            schemaVersion: 'phoenix-document-compiler/v1',
+            schemaVersion: 'phoenix-document-compiler/v2',
+            authority: 'typescript_compile_plan',
+            nativeCompilerRequired: true,
+            mutationPolicy: 'ts_never_commits_document_graph',
             builtAt: 1,
             sourceSidecarBuiltAt: 1,
             sourceReviewBuiltAt: 1,
-            compilePolicy: 'reviewed_or_high_confidence_facts_only',
+            compilePolicy: 'situation_frames_reviewed_or_high_confidence_only',
             sidecarPolicy: 'structure_is_disposable_anchors_are_durable',
-            topologyPolicy: 'topology_commits_require_reversible_receipts',
+            topologyPolicy: 'topology_commits_require_reversible_situation_receipts',
             highConfidenceThreshold: 0.84,
             entityMentions: [{
                 id: 'mention-kai',
@@ -425,10 +430,11 @@ function snapshot(): GraphRebuildSnapshot {
                 outputId: 'hyper-1',
                 operation: 'add_hyperedge',
                 status: 'pending_commit',
-                mutationAllowed: true,
-                topologyCommit: true,
+                nativeCompileCandidate: true,
+                mutationAllowed: false,
+                topologyCommit: false,
                 beforeGraph: { atomCount: 2, factCount: 1, edgeCount: 1 },
-                afterGraph: { atomCount: 4, factCount: 2, edgeCount: 2 },
+                afterGraph: { atomCount: 2, factCount: 1, edgeCount: 1 },
                 createdAtomIds: ['atom:document-mention:mention-kai', 'atom:document-mention:mention-hazel'],
                 createdFactIds: ['fact:document-hyperedge:hyper-1'],
                 createdEdgeIds: ['edge:hyper-1:evidence-1'],
@@ -441,10 +447,10 @@ function snapshot(): GraphRebuildSnapshot {
                 outputKind: 'hyperedge',
                 outputId: 'hyper-1',
                 reversible: true,
-                mutationAllowed: true,
-                invariant: 'document_compiler_reversible_topology_commit',
+                mutationAllowed: false,
+                invariant: 'document_compiler_native_payload_candidate',
                 undoPatch: {
-                    operation: 'remove_document_compiler_outputs',
+                    operation: 'remove_document_compiler_ledger_row',
                     removeAtomIds: ['atom:document-mention:mention-kai', 'atom:document-mention:mention-hazel'],
                     removeFactIds: ['fact:document-hyperedge:hyper-1'],
                     removeEdgeIds: ['edge:hyper-1:evidence-1'],
@@ -463,14 +469,15 @@ function snapshot(): GraphRebuildSnapshot {
                 documentStructureEdges: 0,
                 retrievalOverlays: 0,
                 topologyDiffs: 1,
-                topologyCommits: 1,
+                topologyCommits: 0,
+                nativeCompileCandidates: 1,
                 ledgerOnly: 0,
                 overlayOnly: 0,
                 reviewable: 0,
                 blocked: 0,
                 receipts: 1,
                 reversibleReceipts: 1,
-                mutationAllowed: 1,
+                mutationAllowed: 0,
                 highConfidenceFacts: 0,
                 reviewedFacts: 1,
                 ambiguousFacts: 0,

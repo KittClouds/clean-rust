@@ -448,7 +448,9 @@ function documentCompilerRecord(
         kind: `document-compiler:${diff.outputKind}`,
         title: compilerTitle(diff, summary),
         subtitle: `${titleCase(diff.status)} / ${titleCase(diff.outputKind)}`,
-        detail: diff.topologyCommit ? 'topology diff ready for commit' : 'visible ledger or overlay output',
+        detail: diff.nativeCompileCandidate
+            ? 'native graph compiler payload candidate'
+            : diff.topologyCommit ? 'topology diff ready for commit' : 'visible ledger or overlay output',
         status: diff.status,
         score: compilerScore(diff, summary),
         tone: toneForDocumentCompiler(diff),
@@ -468,6 +470,7 @@ function documentCompilerRecord(
             diff.outputKind,
             diff.operation,
             diff.status,
+            diff.nativeCompileCandidate ? 'native_compile_candidate' : '',
             diff.topologyCommit ? 'topology_commit' : 'no_topology_commit',
             receipt?.invariant,
         ],
@@ -506,9 +509,9 @@ function statRecords(snapshot: GraphRebuildSnapshot): GraphDiscourseWorkbenchRec
         statRecord('document-review-proposed', 'Review proposed', review?.counters.proposedRows || 0, `${review?.counters.actionableRows || 0} actionable`),
         statRecord('document-review-ledger', 'Review ledger', review?.counters.ledgerOnlyRows || 0, `${review?.counters.stateRecords || 0} state records`),
         statRecord('document-review-receipts', 'Review receipts', review?.counters.receipts || 0, `${review?.counters.reversibleReceipts || 0} reversible`),
-        statRecord('document-compiler-hyperedges', 'Compiler hyperedges', compiler?.counters.hyperedges || 0, `${compiler?.counters.naryHyperedges || 0} n-ary`),
-        statRecord('document-compiler-diffs', 'Compiler diffs', compiler?.counters.topologyDiffs || 0, `${compiler?.counters.topologyCommits || 0} commits`),
-        statRecord('document-compiler-receipts', 'Compiler receipts', compiler?.counters.receipts || 0, `${compiler?.counters.reversibleReceipts || 0} reversible`),
+        statRecord('document-compiler-hyperedges', 'Plan hyperedges', compiler?.counters.hyperedges || 0, `${compiler?.counters.naryHyperedges || 0} n-ary`),
+        statRecord('document-compiler-diffs', 'Plan diffs', compiler?.counters.topologyDiffs || 0, `${compiler?.counters.nativeCompileCandidates || 0} native candidates`),
+        statRecord('document-compiler-receipts', 'Plan receipts', compiler?.counters.receipts || 0, `${compiler?.counters.reversibleReceipts || 0} reversible`),
     ];
 }
 
