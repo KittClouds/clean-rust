@@ -479,7 +479,7 @@ describe('GraphRebuildService persistence helpers', () => {
         expect(persisted?.embeddingTargets).toEqual(snapshot.embeddingTargets);
     });
 
-    it('keeps semantic task plans in memory without making them durable reload payload', () => {
+    it('does not hydrate semantic decision views when they are absent from compact payloads', () => {
         const snapshot = buildGraphRebuildSnapshot({
             scopeKind: 'global',
             scopeId: 'global',
@@ -510,13 +510,13 @@ describe('GraphRebuildService persistence helpers', () => {
         expect(persisted?.semanticEvalLedgerSummary).toBeUndefined();
         expect(persisted?.semanticCandidateSummary).toEqual(snapshot.semanticCandidateSummary);
         const hydrated = persisted ? hydrateGraphRebuildSnapshotDerivedViews(persisted) : null;
-        expect(hydrated?.semanticRerankSummary).toEqual(snapshot.semanticRerankSummary);
-        expect(hydrated?.semanticAdjudicationSummary).toEqual(snapshot.semanticAdjudicationSummary);
-        expect(hydrated?.semanticEvalLedgerSummary).toEqual(snapshot.semanticEvalLedgerSummary);
-        expect(hydrated?.counters.semanticAdjudicationTopologyCommits).toBe(snapshot.counters.semanticAdjudicationTopologyCommits);
+        expect(hydrated).toBe(persisted);
+        expect(hydrated?.semanticRerankSummary).toBeUndefined();
+        expect(hydrated?.semanticAdjudicationSummary).toBeUndefined();
+        expect(hydrated?.semanticEvalLedgerSummary).toBeUndefined();
     });
 
-    it('hydrates Hopf resonance as a derived reload view instead of durable payload bulk', () => {
+    it('does not hydrate Hopf resonance when it is absent from compact payloads', () => {
         const snapshot = buildGraphRebuildSnapshot({
             scopeKind: 'global',
             scopeId: 'global',
@@ -540,12 +540,12 @@ describe('GraphRebuildService persistence helpers', () => {
 
         expect(persistedView.hopfResonanceSpace).toBeUndefined();
         expect(persisted?.hopfResonanceSpace).toBeUndefined();
-        expect(hydrated?.hopfResonanceSpace).toEqual(snapshot.hopfResonanceSpace);
-        expect(hydrated?.counters.hopfResonanceAssignments).toBe(snapshot.counters.hopfResonanceAssignments);
+        expect(hydrated).toBe(persisted);
+        expect(hydrated?.hopfResonanceSpace).toBeUndefined();
         expect(hydrated?.embeddingTargets).toEqual(snapshot.embeddingTargets);
     });
 
-    it('hydrates discourse spine as a derived reload view instead of durable payload bulk', () => {
+    it('does not hydrate discourse summaries when they are absent from compact payloads', () => {
         const snapshot = buildGraphRebuildSnapshot({
             scopeKind: 'global',
             scopeId: 'global',
@@ -580,17 +580,16 @@ describe('GraphRebuildService persistence helpers', () => {
         expect(persisted?.discourseEvalLedgerSummary).toBeUndefined();
         expect(persisted?.discoursePromotionSurfaceSummary).toBeUndefined();
         expect(persisted?.discourseCompilerOverlaySummary).toBeUndefined();
-        expect(hydrated?.discourseSpineSummary).toEqual(snapshot.discourseSpineSummary);
-        expect(hydrated?.counters.discourseSpineTargets).toBe(snapshot.counters.discourseSpineTargets);
-        expect(hydrated?.discourseBridgeCandidateSummary).toEqual(snapshot.discourseBridgeCandidateSummary);
-        expect(hydrated?.discourseBridgeAdjudicationSummary).toEqual(snapshot.discourseBridgeAdjudicationSummary);
-        expect(hydrated?.discourseEvalLedgerSummary).toEqual(snapshot.discourseEvalLedgerSummary);
-        expect(hydrated?.discoursePromotionSurfaceSummary).toEqual(snapshot.discoursePromotionSurfaceSummary);
-        expect(hydrated?.discourseCompilerOverlaySummary).toEqual(snapshot.discourseCompilerOverlaySummary);
-        expect(hydrated?.counters.discourseCompilerOverlayEdges).toBe(snapshot.counters.discourseCompilerOverlayEdges);
+        expect(hydrated).toBe(persisted);
+        expect(hydrated?.discourseSpineSummary).toBeUndefined();
+        expect(hydrated?.discourseBridgeCandidateSummary).toBeUndefined();
+        expect(hydrated?.discourseBridgeAdjudicationSummary).toBeUndefined();
+        expect(hydrated?.discourseEvalLedgerSummary).toBeUndefined();
+        expect(hydrated?.discoursePromotionSurfaceSummary).toBeUndefined();
+        expect(hydrated?.discourseCompilerOverlaySummary).toBeUndefined();
     });
 
-    it('hydrates MemoryGraphRAG bridge as a derived reload view instead of durable payload bulk', () => {
+    it('does not hydrate MemoryGraphRAG bridge when it is absent from compact payloads', () => {
         const snapshot = buildGraphRebuildSnapshot({
             scopeKind: 'global',
             scopeId: 'global',
@@ -615,9 +614,9 @@ describe('GraphRebuildService persistence helpers', () => {
 
         expect(persistedView.memoryGraphRagBridgeSummary).toBeUndefined();
         expect(persisted?.memoryGraphRagBridgeSummary).toBeUndefined();
-        expect(hydrated?.memoryGraphRagBridgeSummary).toEqual(snapshot.memoryGraphRagBridgeSummary);
-        expect(hydrated?.counters.memoryGraphRagRecords).toBe(snapshot.counters.memoryGraphRagRecords);
-        expect(hydrated?.semanticEvalLedgerSummary).toEqual(snapshot.semanticEvalLedgerSummary);
+        expect(hydrated).toBe(persisted);
+        expect(hydrated?.memoryGraphRagBridgeSummary).toBeUndefined();
+        expect(hydrated?.semanticEvalLedgerSummary).toBeUndefined();
     });
 
     it('persists graph compiler as a derived in-memory sidecar, not primary snapshot payload', () => {

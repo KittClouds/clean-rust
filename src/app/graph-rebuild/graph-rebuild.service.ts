@@ -18,11 +18,6 @@ import {
     type StoreScopedDocument,
 } from '../services/phoenix-store.service';
 import { attachGraphCompilerReadModels } from './graph-compiler-read-model';
-import { buildGraphDiscourseBridgeAdjudicationSummary } from './graph-discourse-bridge-adjudication';
-import { buildGraphDiscourseBridgeCandidateSummary } from './graph-discourse-bridge-candidates';
-import { buildGraphDiscourseCompilerOverlaySummary } from './graph-discourse-compiler-overlay';
-import { buildGraphDiscourseEvalLedgerSummary } from './graph-discourse-eval-ledger';
-import { buildGraphDiscoursePromotionSurfaceSummary } from './graph-discourse-promotion-surface';
 import {
     buildFallbackDocumentProfileSummary,
     normalizeDocumentProfileSummary,
@@ -40,16 +35,10 @@ import type { GraphAtlasPacket } from './graph-atlas-packet';
 import { buildGraphRebuildSnapshot } from './graph-rebuild-builder';
 import { buildGraphRebuildEmbeddingGraphPostProcess } from './graph-rebuild-embedding-postprocess';
 import { selectGraphRebuildEmbeddingTargetPlan } from './graph-rebuild-embedding-target-policy';
-import { buildGraphDiscourseSpineSummary } from './graph-discourse-spine';
-import { buildHopfResonanceSpace } from './graph-hopf-resonance-space';
-import { buildGraphMemoryGraphRagBridgeSummary } from './graph-memory-graphrag-bridge';
 import {
     emptyGraphDocumentGraphMutationLedger,
     type GraphDocumentGraphMutationLedger,
 } from './graph-document-durable-commit';
-import { buildGraphSemanticAdjudicationDAGSummary } from './graph-semantic-adjudication';
-import { buildGraphSemanticEvalLedgerSummary } from './graph-semantic-eval-ledger';
-import { buildGraphSemanticRerankSummary } from './graph-semantic-rerank';
 import {
     buildAdaptiveGraphRebuildChunks,
     buildGraphRebuildChunksFromRanges,
@@ -365,8 +354,7 @@ export class GraphRebuildService {
 
     async loadPersistedSnapshot(scopeId: string): Promise<GraphRebuildSnapshot | null> {
         const document = await this.store.getScopedDocument(scopeId, GRAPH_REBUILD_NAMESPACE, SNAPSHOT_DOCUMENT_KEY);
-        const snapshot = document ? scopedDocumentToGraphRebuildSnapshot(document) : null;
-        return snapshot ? hydrateGraphRebuildSnapshotDerivedViews(snapshot) : null;
+        return document ? scopedDocumentToGraphRebuildSnapshot(document) : null;
     }
 
     async loadPersistedGraphModelV2OverGraph(scopeId: string): Promise<GraphModelV2OverGraphExport | null> {
@@ -712,13 +700,15 @@ function updateEmbeddingTargetCounters(
 function refreshTargetDerivedReadModels(snapshot: GraphRebuildSnapshot): void {
     delete snapshot.hopfResonanceSpace;
     delete snapshot.memoryGraphRagBridgeSummary;
+    delete snapshot.semanticRerankSummary;
+    delete snapshot.semanticAdjudicationSummary;
+    delete snapshot.semanticEvalLedgerSummary;
     delete snapshot.discourseSpineSummary;
     delete snapshot.discourseBridgeCandidateSummary;
     delete snapshot.discourseBridgeAdjudicationSummary;
     delete snapshot.discourseEvalLedgerSummary;
     delete snapshot.discoursePromotionSurfaceSummary;
     delete snapshot.discourseCompilerOverlaySummary;
-    Object.assign(snapshot, hydrateGraphRebuildSnapshotDerivedViews(snapshot));
 }
 
 function anchorSpanStillMatches(
@@ -872,168 +862,9 @@ export function graphRebuildSnapshotPersistenceView(snapshot: GraphRebuildSnapsh
 }
 
 export function hydrateGraphRebuildSnapshotDerivedViews(snapshot: GraphRebuildSnapshot): GraphRebuildSnapshot {
-    if (!snapshot.embeddingTargets.length) return snapshot;
-    let hydrated = snapshot;
-    if (!hydrated.hopfResonanceSpace) {
-        hydrated = cloneGraphRebuildSnapshotForHydration(hydrated);
-        const hopfResonanceSpace = buildHopfResonanceSpace(hydrated, { generatedAt: hydrated.builtAt });
-        if (hopfResonanceSpace.assignments.length !== hydrated.embeddingTargets.length) {
-            throw new Error(
-                `Hopf resonance hydration contract failed: ${hopfResonanceSpace.assignments.length} assignments for ${hydrated.embeddingTargets.length} embedding targets`,
-            );
-        }
-        hydrated.hopfResonanceSpace = hopfResonanceSpace;
-        hydrated.counters.hopfResonanceAssignments = hopfResonanceSpace.assignments.length;
-        hydrated.counters.hopfResonanceOccupiedCells = hopfResonanceSpace.counters.occupiedCellCount;
-        hydrated.counters.hopfResonanceFibers = hopfResonanceSpace.fibers.length;
-        hydrated.counters.hopfResonanceDocCharts = hopfResonanceSpace.docCharts.length;
-        hydrated.counters.hopfResonanceBraids = hopfResonanceSpace.braids.length;
-        hydrated.counters.hopfResonanceDroppedTargets = hopfResonanceSpace.counters.droppedTargets;
-        hydrated.counters.hopfResonanceMutationAllowed = hopfResonanceSpace.counters.mutationAllowedCount;
-    }
-    if (!hydrated.semanticRerankSummary && hydrated.semanticCandidateSummary) {
-        hydrated = cloneGraphRebuildSnapshotForHydration(hydrated);
-        const semanticRerankSummary = buildGraphSemanticRerankSummary(
-            hydrated,
-            hydrated.semanticCandidateSummary,
-            hydrated.manifoldSpecializationSummary,
-            hydrated.builtAt,
-        );
-        hydrated.semanticRerankSummary = semanticRerankSummary;
-        hydrated.counters.semanticRerankInputs = semanticRerankSummary.inputs.length;
-        hydrated.counters.semanticRerankJudgments = semanticRerankSummary.judgments.length;
-        hydrated.counters.semanticRerankReceipts = semanticRerankSummary.receipts.length;
-        hydrated.counters.semanticRerankPlannedModelCalls = semanticRerankSummary.counters.plannedModelCalls;
-        hydrated.counters.semanticRerankMutationAllowed = semanticRerankSummary.counters.mutationAllowedCount;
-    }
-    if (!hydrated.semanticAdjudicationSummary && hydrated.semanticCandidateSummary && hydrated.semanticRerankSummary) {
-        hydrated = cloneGraphRebuildSnapshotForHydration(hydrated);
-        const semanticAdjudicationSummary = buildGraphSemanticAdjudicationDAGSummary(hydrated, hydrated.builtAt);
-        hydrated.semanticAdjudicationSummary = semanticAdjudicationSummary;
-        hydrated.counters.semanticAdjudicationDecisions = semanticAdjudicationSummary.decisions.length;
-        hydrated.counters.semanticAdjudicationMutations = semanticAdjudicationSummary.mutations.length;
-        hydrated.counters.semanticAdjudicationReceipts = semanticAdjudicationSummary.receipts.length;
-        hydrated.counters.semanticAdjudicationTopologyCommits = semanticAdjudicationSummary.counters.topologyCommitCount;
-        hydrated.counters.semanticAdjudicationLedgerOnly = semanticAdjudicationSummary.counters.ledgerOnlyCount;
-    }
-    if (
-        !hydrated.semanticEvalLedgerSummary
-        && hydrated.semanticCandidateSummary
-        && hydrated.semanticRerankSummary
-        && hydrated.semanticAdjudicationSummary
-    ) {
-        hydrated = cloneGraphRebuildSnapshotForHydration(hydrated);
-        const semanticEvalLedgerSummary = buildGraphSemanticEvalLedgerSummary(hydrated, hydrated.builtAt);
-        hydrated.semanticEvalLedgerSummary = semanticEvalLedgerSummary;
-        hydrated.counters.semanticEvalLedgerRows = semanticEvalLedgerSummary.entries.length;
-        hydrated.counters.semanticEvalAcceptedCandidates = semanticEvalLedgerSummary.counters.acceptedCandidates;
-        hydrated.counters.semanticEvalRejectedCandidates = semanticEvalLedgerSummary.counters.rejectedCandidates;
-        hydrated.counters.semanticEvalAmbiguousCases = semanticEvalLedgerSummary.counters.ambiguousCases;
-        hydrated.counters.semanticEvalModelDisagreements = semanticEvalLedgerSummary.counters.modelDisagreements;
-        hydrated.counters.semanticEvalManifoldDisagreements = semanticEvalLedgerSummary.counters.manifoldDisagreements;
-        hydrated.counters.semanticEvalGraphChangeRows = semanticEvalLedgerSummary.counters.graphChangeRows;
-    }
-    if (!hydrated.memoryGraphRagBridgeSummary) {
-        hydrated = cloneGraphRebuildSnapshotForHydration(hydrated);
-        const memoryGraphRagBridgeSummary = buildGraphMemoryGraphRagBridgeSummary(hydrated, hydrated.builtAt);
-        hydrated.memoryGraphRagBridgeSummary = memoryGraphRagBridgeSummary;
-        hydrated.counters.memoryGraphRagRecords = memoryGraphRagBridgeSummary.counters.recordCount;
-        hydrated.counters.memoryGraphRagSchemaRecords = memoryGraphRagBridgeSummary.counters.schemaRecords;
-        hydrated.counters.memoryGraphRagFactRecords = memoryGraphRagBridgeSummary.counters.factRecords;
-        hydrated.counters.memoryGraphRagPassageRecords = memoryGraphRagBridgeSummary.counters.passageRecords;
-        hydrated.counters.memoryGraphRagEvalRows = memoryGraphRagBridgeSummary.counters.evalRowCount;
-        hydrated.counters.memoryGraphRagPassedEvalRows = memoryGraphRagBridgeSummary.counters.passedEvalRows;
-        hydrated.counters.memoryGraphRagReceipts = memoryGraphRagBridgeSummary.counters.receiptCount;
-        hydrated.counters.memoryGraphRagMutationAllowed = memoryGraphRagBridgeSummary.counters.mutationAllowedCount;
-    }
-    if (!hydrated.discourseSpineSummary) {
-        hydrated = cloneGraphRebuildSnapshotForHydration(hydrated);
-        const discourseSpineSummary = buildGraphDiscourseSpineSummary(hydrated, hydrated.builtAt);
-        hydrated.discourseSpineSummary = discourseSpineSummary;
-        hydrated.counters.discourseSpineTargets = discourseSpineSummary.counters.targetCount;
-        hydrated.counters.discourseSpineLabels = discourseSpineSummary.counters.labelCount;
-        hydrated.counters.discourseSpineClusters = discourseSpineSummary.counters.clusterCount;
-        hydrated.counters.discourseSpineBridges = discourseSpineSummary.counters.bridgeCount;
-        hydrated.counters.discourseSpineResonance = discourseSpineSummary.counters.resonanceCandidates;
-        hydrated.counters.discourseSpineResolution = discourseSpineSummary.counters.resolutionCandidates;
-        hydrated.counters.discourseSpineReceipts = discourseSpineSummary.counters.receiptCount;
-        hydrated.counters.discourseSpineMutationAllowed = discourseSpineSummary.counters.mutationAllowedCount;
-    }
-    if (!hydrated.discourseBridgeCandidateSummary) {
-        hydrated = cloneGraphRebuildSnapshotForHydration(hydrated);
-        const discourseBridgeCandidateSummary = buildGraphDiscourseBridgeCandidateSummary(
-            hydrated,
-            hydrated.discourseSpineSummary,
-            hydrated.builtAt,
-        );
-        hydrated.discourseBridgeCandidateSummary = discourseBridgeCandidateSummary;
-        hydrated.counters.discourseBridgeCandidates = discourseBridgeCandidateSummary.counters.candidateCount;
-        hydrated.counters.discourseBridgeInputs = discourseBridgeCandidateSummary.counters.inputCount;
-        hydrated.counters.discourseBridgeJudgments = discourseBridgeCandidateSummary.counters.judgmentCount;
-        hydrated.counters.discourseBridgeEvalRows = discourseBridgeCandidateSummary.counters.evalRowCount;
-        hydrated.counters.discourseBridgeReceipts = discourseBridgeCandidateSummary.counters.receiptCount;
-        hydrated.counters.discourseBridgePlannedModelCalls = discourseBridgeCandidateSummary.counters.plannedModelCalls;
-        hydrated.counters.discourseBridgeMutationAllowed = discourseBridgeCandidateSummary.counters.mutationAllowedCount;
-    }
-    if (!hydrated.discourseBridgeAdjudicationSummary) {
-        hydrated = cloneGraphRebuildSnapshotForHydration(hydrated);
-        const discourseBridgeAdjudicationSummary = buildGraphDiscourseBridgeAdjudicationSummary(
-            hydrated,
-            hydrated.discourseBridgeCandidateSummary,
-            hydrated.builtAt,
-        );
-        hydrated.discourseBridgeAdjudicationSummary = discourseBridgeAdjudicationSummary;
-        hydrated.counters.discourseBridgeAdjudicationDecisions = discourseBridgeAdjudicationSummary.counters.decisionCount;
-        hydrated.counters.discourseBridgeAdjudicationAccepted = discourseBridgeAdjudicationSummary.counters.acceptedCount;
-        hydrated.counters.discourseBridgeAdjudicationSupported = discourseBridgeAdjudicationSummary.counters.supportedCount;
-        hydrated.counters.discourseBridgeAdjudicationDeferred = discourseBridgeAdjudicationSummary.counters.deferredCount;
-        hydrated.counters.discourseBridgeAdjudicationRejected = discourseBridgeAdjudicationSummary.counters.rejectedCount;
-        hydrated.counters.discourseBridgeAdjudicationReceipts = discourseBridgeAdjudicationSummary.counters.receiptCount;
-        hydrated.counters.discourseBridgeAdjudicationLedgerOnly = discourseBridgeAdjudicationSummary.counters.ledgerOnlyCount;
-        hydrated.counters.discourseBridgeAdjudicationTopologyCommits = discourseBridgeAdjudicationSummary.counters.topologyCommitCount;
-        hydrated.counters.discourseBridgeAdjudicationMutationAllowed = discourseBridgeAdjudicationSummary.counters.mutationAllowedCount;
-    }
-    if (!hydrated.discourseEvalLedgerSummary) {
-        hydrated = cloneGraphRebuildSnapshotForHydration(hydrated);
-        const discourseEvalLedgerSummary = buildGraphDiscourseEvalLedgerSummary(hydrated, hydrated.builtAt);
-        hydrated.discourseEvalLedgerSummary = discourseEvalLedgerSummary;
-        hydrated.counters.discourseEvalLedgerRows = discourseEvalLedgerSummary.counters.rowCount;
-        hydrated.counters.discourseEvalAcceptedCandidates = discourseEvalLedgerSummary.counters.acceptedCandidates;
-        hydrated.counters.discourseEvalRejectedCandidates = discourseEvalLedgerSummary.counters.rejectedCandidates;
-        hydrated.counters.discourseEvalAmbiguousCases = discourseEvalLedgerSummary.counters.ambiguousCases;
-        hydrated.counters.discourseEvalModelDisagreements = discourseEvalLedgerSummary.counters.modelDisagreements;
-        hydrated.counters.discourseEvalManifoldDisagreements = discourseEvalLedgerSummary.counters.manifoldDisagreements;
-        hydrated.counters.discourseEvalGraphChangeRows = discourseEvalLedgerSummary.counters.graphChangeRows;
-    }
-    if (!hydrated.discoursePromotionSurfaceSummary) {
-        hydrated = cloneGraphRebuildSnapshotForHydration(hydrated);
-        const discoursePromotionSurfaceSummary = buildGraphDiscoursePromotionSurfaceSummary(hydrated, hydrated.builtAt);
-        hydrated.discoursePromotionSurfaceSummary = discoursePromotionSurfaceSummary;
-        hydrated.counters.discoursePromotionChunkWormholes = discoursePromotionSurfaceSummary.counters.chunkWormholeCount;
-        hydrated.counters.discoursePromotionDocumentClusters = discoursePromotionSurfaceSummary.counters.documentClusterCount;
-        hydrated.counters.discoursePromotionResolverCandidates = discoursePromotionSurfaceSummary.counters.resolverCandidateCount;
-        hydrated.counters.discoursePromotionCompilerHints = discoursePromotionSurfaceSummary.counters.compilerHintCount;
-        hydrated.counters.discoursePromotionReceipts = discoursePromotionSurfaceSummary.counters.receiptCount;
-        hydrated.counters.discoursePromotionGraphPatches = discoursePromotionSurfaceSummary.counters.graphPatchCount;
-        hydrated.counters.discoursePromotionMutationAllowed = discoursePromotionSurfaceSummary.counters.mutationAllowedCount;
-    }
-    if (!hydrated.discourseCompilerOverlaySummary) {
-        hydrated = cloneGraphRebuildSnapshotForHydration(hydrated);
-        const discourseCompilerOverlaySummary = buildGraphDiscourseCompilerOverlaySummary(hydrated, hydrated.builtAt);
-        hydrated.discourseCompilerOverlaySummary = discourseCompilerOverlaySummary;
-        hydrated.counters.discourseCompilerOverlayEdges = discourseCompilerOverlaySummary.counters.overlayEdgeCount;
-        hydrated.counters.discourseCompilerOverlayChunkWormholes = discourseCompilerOverlaySummary.counters.chunkWormholeEdges;
-        hydrated.counters.discourseCompilerOverlayDocumentClusters = discourseCompilerOverlaySummary.counters.documentClusterEdges;
-        hydrated.counters.discourseCompilerOverlayResolvers = discourseCompilerOverlaySummary.counters.resolverEdges;
-        hydrated.counters.discourseCompilerOverlayReceipts = discourseCompilerOverlaySummary.counters.receiptCount;
-        hydrated.counters.discourseCompilerOverlayGraphPatches = discourseCompilerOverlaySummary.counters.graphPatchCount;
-        hydrated.counters.discourseCompilerOverlayMutationAllowed = discourseCompilerOverlaySummary.counters.mutationAllowedCount;
-    }
-    return hydrated;
-}
-
-function cloneGraphRebuildSnapshotForHydration(snapshot: GraphRebuildSnapshot): GraphRebuildSnapshot {
-    return { ...snapshot, counters: { ...snapshot.counters } };
+    // Compatibility hook retained for old callsites; derived Atlas summaries
+    // must now arrive from persisted/Rust-owned payloads, not TS reload work.
+    return snapshot;
 }
 
 function encodeGraphRebuildSnapshotPayload(snapshot: GraphRebuildSnapshot): string {
