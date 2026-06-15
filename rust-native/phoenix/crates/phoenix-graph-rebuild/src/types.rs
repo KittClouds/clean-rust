@@ -141,7 +141,7 @@ pub struct GraphMemoryState {
     pub evidence_ids: Vec<CompactString>,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct GraphEmbeddingTarget {
     pub id: CompactString,
@@ -153,6 +153,8 @@ pub struct GraphEmbeddingTarget {
     pub label: CompactString,
     pub text: CompactString,
     pub evidence_ids: Vec<CompactString>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub parent_ids: Vec<CompactString>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -293,9 +295,13 @@ pub struct GraphDocumentEvidenceSpan {
     pub id: CompactString,
     pub note_id: CompactString,
     #[serde(default)]
+    pub unit_id: Option<CompactString>,
+    #[serde(default)]
     pub chunk_id: Option<CompactString>,
     pub start: u32,
     pub end: u32,
+    #[serde(default)]
+    pub preview: Option<CompactString>,
     #[serde(default)]
     pub confidence: GraphDocumentConfidence,
 }
@@ -304,7 +310,181 @@ pub struct GraphDocumentEvidenceSpan {
 #[serde(rename_all = "camelCase")]
 pub struct GraphDocumentSidecarSummary {
     #[serde(default)]
+    pub units: Vec<GraphDocumentUnitSummary>,
+    #[serde(default)]
+    pub sections: Vec<GraphDocumentUnitSummary>,
+    #[serde(default)]
+    pub regions: Vec<GraphDocumentUnitSummary>,
+    #[serde(default)]
+    pub rhetorical_units: Vec<GraphDocumentUnitSummary>,
+    #[serde(default)]
+    pub retrieval_units: Vec<GraphDocumentUnitSummary>,
+    #[serde(default)]
+    pub graph_fact_candidates: Vec<GraphDocumentUnitSummary>,
+    #[serde(default)]
     pub evidence_spans: Vec<GraphDocumentEvidenceSpan>,
+}
+
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct GraphDocumentUnitSummary {
+    pub id: CompactString,
+    pub note_id: CompactString,
+    pub kind: CompactString,
+    pub label: CompactString,
+    #[serde(default)]
+    pub start: u32,
+    #[serde(default)]
+    pub end: u32,
+    #[serde(default)]
+    pub depth: u32,
+    #[serde(default)]
+    pub parent_id: Option<CompactString>,
+    #[serde(default)]
+    pub child_ids: Vec<CompactString>,
+    #[serde(default)]
+    pub evidence_span_ids: Vec<CompactString>,
+    #[serde(default)]
+    pub target_chunk_ids: Vec<CompactString>,
+    #[serde(default)]
+    pub subject_surfaces: Vec<CompactString>,
+    #[serde(default)]
+    pub object_surfaces: Vec<CompactString>,
+    #[serde(default)]
+    pub predicate: Option<CompactString>,
+    #[serde(default)]
+    pub relation_type: Option<CompactString>,
+    #[serde(default)]
+    pub frame_family: Option<CompactString>,
+    #[serde(default)]
+    pub semantic_situation_id: Option<CompactString>,
+    #[serde(default)]
+    pub state_interval_ids: Vec<CompactString>,
+    #[serde(default)]
+    pub event_ordering_ids: Vec<CompactString>,
+    #[serde(default)]
+    pub temporal_conflict_ids: Vec<CompactString>,
+}
+
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct GraphDocumentReviewSummary {
+    #[serde(default)]
+    pub rows: Vec<GraphDocumentReviewRow>,
+}
+
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct GraphDocumentReviewRow {
+    pub id: CompactString,
+    pub object_id: CompactString,
+    pub object_kind: CompactString,
+    pub state: CompactString,
+    pub title: CompactString,
+    #[serde(default)]
+    pub subtitle: CompactString,
+    #[serde(default)]
+    pub detail: CompactString,
+    pub note_id: CompactString,
+    #[serde(default)]
+    pub source_start: u32,
+    #[serde(default)]
+    pub source_end: u32,
+    #[serde(default)]
+    pub confidence: f32,
+    #[serde(default)]
+    pub detector: CompactString,
+    #[serde(default)]
+    pub parent_unit_ids: Vec<CompactString>,
+    #[serde(default)]
+    pub child_unit_ids: Vec<CompactString>,
+    #[serde(default)]
+    pub evidence_span_ids: Vec<CompactString>,
+    #[serde(default)]
+    pub related_object_ids: Vec<CompactString>,
+    #[serde(default)]
+    pub why: Vec<CompactString>,
+}
+
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct GraphDiscourseSpineSummary {
+    #[serde(default)]
+    pub targets: Vec<GraphDiscourseSpineTargetSummary>,
+    #[serde(default)]
+    pub clusters: Vec<GraphDiscourseSpineCluster>,
+    #[serde(default)]
+    pub bridges: Vec<GraphDiscourseSpineBridge>,
+}
+
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct GraphDiscourseSpineTargetSummary {
+    pub target_id: CompactString,
+    pub source_id: CompactString,
+    pub kind: CompactString,
+    pub label: CompactString,
+    #[serde(default)]
+    pub note_id: Option<CompactString>,
+    #[serde(default)]
+    pub chunk_id: Option<CompactString>,
+    #[serde(default)]
+    pub parent_target_ids: Vec<CompactString>,
+    #[serde(default)]
+    pub entity_ids: Vec<CompactString>,
+}
+
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct GraphDiscourseSpineCluster {
+    pub id: CompactString,
+    pub kind: CompactString,
+    pub label: CompactString,
+    #[serde(default)]
+    pub target_ids: Vec<CompactString>,
+    #[serde(default)]
+    pub score: f32,
+}
+
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct GraphDiscourseSpineBridge {
+    pub id: CompactString,
+    pub kind: CompactString,
+    pub status: CompactString,
+    pub source_target_id: CompactString,
+    pub target_target_id: CompactString,
+    pub label: CompactString,
+    #[serde(default)]
+    pub evidence_target_ids: Vec<CompactString>,
+    #[serde(default)]
+    pub shared_label_ids: Vec<CompactString>,
+    #[serde(default)]
+    pub shared_entity_ids: Vec<CompactString>,
+}
+
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct GraphDocumentCompilerProvenance {
+    #[serde(default)]
+    pub source_object_id: CompactString,
+    #[serde(default)]
+    pub source_object_kind: CompactString,
+    #[serde(default)]
+    pub source_review_row_id: Option<CompactString>,
+    #[serde(default)]
+    pub review_state: Option<CompactString>,
+    pub note_id: CompactString,
+    #[serde(default)]
+    pub source_start: u32,
+    #[serde(default)]
+    pub source_end: u32,
+    #[serde(default)]
+    pub evidence_span_ids: Vec<CompactString>,
+    #[serde(default)]
+    pub lineage_unit_ids: Vec<CompactString>,
+    #[serde(default)]
+    pub reasons: Vec<CompactString>,
 }
 
 #[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
@@ -338,9 +518,17 @@ pub struct GraphDocumentCompilerHyperedge {
     #[serde(default)]
     pub frame: Option<CompactString>,
     #[serde(default)]
+    pub frame_family: Option<CompactString>,
+    #[serde(default)]
+    pub situation_kind: Option<CompactString>,
+    #[serde(default)]
     pub factuality: Option<CompactString>,
     #[serde(default)]
+    pub speech_act: Option<CompactString>,
+    #[serde(default)]
     pub semantic_situation_id: Option<CompactString>,
+    #[serde(default)]
+    pub semantic_proposition_id: Option<CompactString>,
     #[serde(default)]
     pub state_interval_ids: Vec<CompactString>,
     #[serde(default)]
@@ -356,6 +544,8 @@ pub struct GraphDocumentCompilerHyperedge {
     #[serde(default)]
     pub confidence: f32,
     pub status: CompactString,
+    #[serde(default)]
+    pub provenance: Option<GraphDocumentCompilerProvenance>,
 }
 
 #[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
@@ -394,6 +584,10 @@ pub struct GraphRebuildSnapshot {
     #[serde(default)]
     pub document_sidecar_summary: Option<GraphDocumentSidecarSummary>,
     #[serde(default)]
+    pub document_review_summary: Option<GraphDocumentReviewSummary>,
+    #[serde(default)]
     pub document_compiler_summary: Option<GraphDocumentCompilerSummary>,
+    #[serde(default)]
+    pub discourse_spine_summary: Option<GraphDiscourseSpineSummary>,
     pub counters: GraphCounters,
 }

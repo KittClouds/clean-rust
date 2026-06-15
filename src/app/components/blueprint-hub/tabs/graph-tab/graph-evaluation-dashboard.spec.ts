@@ -41,6 +41,7 @@ describe('buildGraphEvaluationDashboard', () => {
             'entity-prior-noise',
             'proposition-substrate',
             'predicate-precision',
+            'temporal-continuity',
             'review-ratio',
             'graph-mutations',
             'retrieval-quality',

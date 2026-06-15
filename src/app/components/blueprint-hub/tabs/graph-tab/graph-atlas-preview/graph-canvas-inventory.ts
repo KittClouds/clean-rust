@@ -1,5 +1,7 @@
 import type { DocumentUnit, EvidenceSpan, GraphFactCandidate, RhetoricalUnit } from '../../../../../graph-rebuild/graph-document-sidecar';
+import type { GraphCompilerAtom, GraphCompilerFactRole } from '../../../../../graph-rebuild/graph-compiler-read-model';
 import type { GraphDocumentReviewRow } from '../../../../../graph-rebuild/graph-document-review';
+import type { GraphAtlasFamily, GraphAtlasManifoldTarget, GraphAtlasObject, GraphAtlasPacket } from '../../../../../graph-rebuild/graph-atlas-packet';
 import type { GraphRebuildSnapshot } from '../../../../../graph-rebuild/graph-rebuild-snapshot';
 import { entityColorStore } from '../../../../../lib/store/entityColorStore';
 import type { GraphInventory } from './graph-atlas-preview.component';
@@ -10,8 +12,14 @@ const STRUCTURE_KINDS = new Set([
     'list', 'table', 'figure', 'code_block', 'caption', 'parent_chunk', 'leaf_chunk',
 ]);
 
+/**
+ * Compatibility adapter over GraphRebuildSnapshot. Rust Atlas packets should
+ * become the graph-family source; TS keeps filtering/rendering only.
+ */
 export function buildGraphCanvasInventory(snapshot: GraphRebuildSnapshot | null): GraphInventory {
     if (!snapshot) return { nodes: [], edges: [], kindCounts: [], sourceLabel: 'graph rebuild snapshot' };
+    const packetInventory = buildAtlasPacketInventory(snapshot.atlasPacket);
+    if (packetInventory) return packetInventory;
     const nodes: GalaxyRenderableNode[] = [];
     const edges: GalaxyInputEdge[] = [];
     const reviewRows = new Map((snapshot.documentReviewSummary?.rows || []).map((row) => [row.objectId, row]));
@@ -22,6 +30,7 @@ export function buildGraphCanvasInventory(snapshot: GraphRebuildSnapshot | null)
     addChunkGraph(snapshot, nodes, edges);
     addStructureGraph(snapshot, reviewRows, evidenceByUnit, nodes, edges);
     addFactGraph(snapshot, reviewRows, evidenceByUnit, nodes, edges);
+    addCompiledSituationGraph(snapshot, reviewRows, nodes, edges);
     addDiscourseGraph(snapshot, nodes, edges);
 
     return {
@@ -224,6 +233,308 @@ function addFactGraph(
             });
         }
     }
+}
+
+function buildAtlasPacketInventory(packet: GraphAtlasPacket | undefined): GraphInventory | null {
+    if (!packet || (!packet.objects.length && !packet.manifoldTargets.length)) return null;
+    const nodes: GalaxyRenderableNode[] = [];
+    const edges: GalaxyInputEdge[] = [];
+    const nodeIds = new Set<string>();
+    const targetObjectById = new Map(packet.manifoldTargets.map((target) => [target.id, target.objectId]));
+
+    for (const [index, object] of packet.objects.entries()) {
+        nodes.push(atlasObjectNode(object, index));
+        nodeIds.add(object.id);
+    }
+    for (const [index, target] of packet.manifoldTargets.entries()) {
+        if (nodeIds.has(target.objectId)) continue;
+        nodes.push(atlasTargetNode(target, nodes.length + index));
+        nodeIds.add(target.objectId);
+    }
+    const edgeIds = new Set<string>();
+    for (const object of packet.objects) {
+        for (const targetId of object.targetIds || []) {
+            const resolvedTargetId = nodeIds.has(targetId) ? targetId : targetObjectById.get(targetId);
+            if (!resolvedTargetId || resolvedTargetId === object.id || !nodeIds.has(resolvedTargetId)) continue;
+            pushAtlasPacketEdge(edges, edgeIds, object.id, resolvedTargetId, object.family, 'object_target');
+        }
+    }
+    for (const target of packet.manifoldTargets) {
+        for (const parentId of target.parentIds || []) {
+            const parentObjectId = targetObjectById.get(parentId) || (nodeIds.has(parentId) ? parentId : '');
+            if (!parentObjectId || parentObjectId === target.objectId || !nodeIds.has(parentObjectId)) continue;
+            pushAtlasPacketEdge(edges, edgeIds, parentObjectId, target.objectId, target.family, 'manifold_parent');
+        }
+    }
+    return {
+        nodes,
+        edges,
+        kindCounts: graphKindCounts(nodes),
+        sourceLabel: `${packet.sourceContract.authority} / ${packet.sourceContract.vectorContract}`,
+    };
+}
+
+function atlasObjectNode(object: GraphAtlasObject, index: number): GalaxyRenderableNode {
+    const family = object.family || 'unknown';
+    return {
+        id: object.id,
+        label: object.label || object.id,
+        kind: object.kind || family,
+        totalMentions: Math.max(1, object.evidenceIds.length || object.anchorIds.length || object.targetIds.length),
+        ...stablePoint(object.id, index),
+        colorHsl: atlasFamilyHsl(family),
+        metadata: {
+            sourceType: 'rust-atlas-packet',
+            sourceSystem: 'rust',
+            sourceId: object.sourceIds[0] || object.id,
+            atlasObjectId: object.id,
+            graphFamily: family,
+            graphKind: family,
+            canvasLens: atlasCanvasLens(family),
+            reviewState: object.status,
+            confidence: object.status === 'accepted' ? 1 : 0.64,
+            subtitle: `${family} / ${object.status}`,
+            searchableText: `${object.label} ${object.kind} ${family} ${object.sourceIds.join(' ')}`,
+            relatedEntityIds: object.registryEntityId ? [object.registryEntityId] : [],
+            noteIds: object.noteIds,
+            chunkIds: object.chunkIds,
+            anchorIds: object.anchorIds,
+            evidenceIds: object.evidenceIds,
+            memberIds: object.targetIds,
+            graphImpact: 'Rust Atlas packet object; Graph and Embed modes share this packet.',
+        },
+    };
+}
+
+function atlasTargetNode(target: GraphAtlasManifoldTarget, index: number): GalaxyRenderableNode {
+    const family = target.family || 'unknown';
+    return {
+        id: target.objectId,
+        label: target.label || target.objectId,
+        kind: target.kind || family,
+        totalMentions: Math.max(1, target.evidenceIds.length),
+        ...stablePoint(target.objectId, index),
+        colorHsl: atlasFamilyHsl(family),
+        metadata: {
+            sourceType: 'rust-atlas-packet-target',
+            sourceSystem: 'rust',
+            sourceId: target.sourceId,
+            atlasObjectId: target.objectId,
+            atlasTargetId: target.id,
+            graphFamily: family,
+            graphKind: family,
+            canvasLens: atlasCanvasLens(family),
+            reviewState: target.admission,
+            confidence: target.vectorStatus === 'modelVector' ? 1 : 0.56,
+            subtitle: `${family} / ${target.coordinateSource}`,
+            searchableText: `${target.label} ${target.kind} ${family} ${target.sourceId}`,
+            relatedEntityIds: target.registryEntityId ? [target.registryEntityId] : [],
+            noteId: target.noteId,
+            chunkId: target.chunkId,
+            evidenceIds: target.evidenceIds,
+            parentIds: target.parentIds || [],
+            graphImpact: 'Rust manifold target projected as an Atlas object fallback.',
+        },
+    };
+}
+
+function pushAtlasPacketEdge(
+    edges: GalaxyInputEdge[],
+    seen: Set<string>,
+    sourceId: string,
+    targetId: string,
+    family: GraphAtlasFamily,
+    type: string,
+): void {
+    const id = `atlas-packet:${type}:${sourceId}->${targetId}`;
+    if (seen.has(id)) return;
+    seen.add(id);
+    edges.push({
+        id,
+        sourceId,
+        targetId,
+        type,
+        confidence: 0.86,
+        metadata: {
+            sourceType: 'rust-atlas-packet',
+            graphFamily: family,
+            canvasLens: atlasCanvasLens(family),
+            reviewState: 'accepted',
+            graphImpact: 'Packet topology edge shared by Graph and Embed views.',
+        },
+    });
+}
+
+function atlasCanvasLens(family: GraphAtlasFamily): string {
+    if (family === 'entity' || family === 'registry') return 'entities';
+    if (family === 'structure' || family === 'evidence') return 'structure';
+    if (family === 'discourse') return 'discourse';
+    return family === 'review' ? 'proposed' : 'facts';
+}
+
+function atlasFamilyHsl(family: GraphAtlasFamily): string {
+    if (family === 'entity' || family === 'registry') return graphKindHsl('entity');
+    if (family === 'structure' || family === 'evidence') return graphKindHsl('structure');
+    if (family === 'discourse') return graphKindHsl('discourse');
+    if (family === 'temporal' || family === 'causal' || family === 'memory') return entityColorStore.getRawGraphNodeHsl('eventNode');
+    if (family === 'review') return '44 84% 58%';
+    if (family === 'hypergraph') return '286 70% 62%';
+    return graphKindHsl('fact');
+}
+
+function addCompiledSituationGraph(
+    snapshot: GraphRebuildSnapshot,
+    reviewRows: Map<string, GraphDocumentReviewRow>,
+    nodes: GalaxyRenderableNode[],
+    edges: GalaxyInputEdge[],
+): void {
+    const compiler = snapshot.documentCompilerSummary;
+    const factGraph = snapshot.graphCompiler;
+    if (!compiler || !factGraph) return;
+    const nodeIds = new Set(nodes.map((node) => node.id));
+    const entityNodes = new Map<string, string>();
+    for (const entity of snapshot.nodes) {
+        entityNodes.set(entity.id, entity.id);
+        entityNodes.set(entity.entityId, entity.id);
+    }
+    const atomById = new Map(factGraph.atoms.map((atom) => [atom.id, atom]));
+    const evidenceByCompilerId = new Map(factGraph.evidenceAnchors.map((evidence) => [evidence.id, evidence]));
+    const rolesByFact = new Map<string, GraphCompilerFactRole[]>();
+    for (const role of factGraph.roles) {
+        rolesByFact.set(role.factId, [...(rolesByFact.get(role.factId) || []), role]);
+    }
+    const evidenceById = new Map((snapshot.documentSidecarSummary?.evidenceSpans || []).map((span) => [span.id, span]));
+
+    for (const fact of factGraph.facts.filter((candidate) =>
+        candidate.status === 'accepted' && Boolean(candidate.semanticSituationId)
+    )) {
+        const hyperedge = compiler.hyperedges.find((candidate) =>
+            `fact:document-hyperedge:${candidate.id}` === fact.id
+        );
+        if (!hyperedge) continue;
+        const row = reviewRows.get(hyperedge.provenance.sourceObjectId)
+            || (hyperedge.provenance.sourceReviewRowId
+                ? reviewRows.get(hyperedge.provenance.sourceReviewRowId)
+                : undefined);
+        const roleTargets = (rolesByFact.get(fact.id) || [])
+            .map((role) => compiledRoleTarget(
+                role,
+                atomById,
+                evidenceByCompilerId,
+                entityNodes,
+                nodeIds,
+                nodes,
+            ))
+            .filter((target): target is { role: GraphCompilerFactRole; nodeId: string } => !!target);
+        const participantIds = new Set(roleTargets
+            .filter((target) => target.role.role !== 'evidence')
+            .map((target) => target.nodeId));
+        if (participantIds.size < 2) continue;
+
+        const id = `situation:${fact.id}`;
+        const firstEvidence = hyperedge.evidenceSpanIds.map((evidenceId) => evidenceById.get(evidenceId)).find(Boolean);
+        const reviewState = row?.state || hyperedge.provenance.reviewState || fact.status;
+        nodes.push({
+            id,
+            label: fact.semanticFrame || hyperedge.frame || fact.predicate,
+            kind: hyperedge.frameFamily || hyperedge.sourceKind || 'semantic_situation',
+            totalMentions: roleTargets.length,
+            ...stablePoint(fact.id, nodes.length),
+            colorHsl: graphKindHsl('fact'),
+            metadata: {
+                sourceType: 'rust-compiled-semantic-situation',
+                compilerSource: snapshot.graphCompilerSource,
+                compilerFactId: fact.id,
+                graphKind: 'facts',
+                canvasLens: 'facts',
+                reviewState,
+                confidence: fact.confidence,
+                detector: 'rust_graph_compiler',
+                subtitle: `${hyperedge.frameFamily || hyperedge.sourceKind} / ${participantIds.size} participants`,
+                sourceSnippet: firstEvidence?.preview || row?.detail || fact.predicate,
+                searchableText: `${fact.semanticFrame || ''} ${fact.predicate} ${hyperedge.roles.map((role) => role.surface || '').join(' ')}`,
+                noteId: hyperedge.provenance.noteId,
+                sourceStart: hyperedge.provenance.sourceStart,
+                sourceEnd: hyperedge.provenance.sourceEnd,
+                reasons: hyperedge.provenance.reasons,
+                evidenceIds: hyperedge.evidenceSpanIds,
+                relatedEntityIds: roleTargets
+                    .filter((target) => entityNodes.has(target.nodeId))
+                    .map((target) => target.nodeId),
+                memberIds: roleTargets.map((target) => target.nodeId),
+                reviewObjectId: hyperedge.provenance.sourceReviewRowId || hyperedge.provenance.sourceObjectId,
+                reviewActions: row?.availableActions.map((action) => action.kind) || [],
+                graphImpact: 'Compiled semantic situation rendered as one incidence node with typed role edges.',
+            },
+        });
+        nodeIds.add(id);
+
+        for (const target of roleTargets) {
+            edges.push({
+                id: `situation-role:${fact.id}:${target.role.role}:${target.nodeId}`,
+                sourceId: id,
+                targetId: target.nodeId,
+                type: `role:${target.role.semanticRole || target.role.role}`,
+                confidence: target.role.confidence,
+                metadata: {
+                    canvasLens: 'facts',
+                    reviewState,
+                    confidence: target.role.confidence,
+                    detector: 'rust_graph_compiler',
+                    evidenceIds: hyperedge.evidenceSpanIds,
+                    relatedEntityIds: [target.nodeId],
+                    role: target.role.role,
+                    semanticRole: target.role.semanticRole,
+                    graphImpact: 'Typed role incidence rendered through the standard edge buffer.',
+                },
+            });
+        }
+    }
+}
+
+function compiledRoleTarget(
+    role: GraphCompilerFactRole,
+    atomById: Map<string, GraphCompilerAtom>,
+    evidenceByCompilerId: Map<string, { id: string; sourceId: string; kind: string; confidence: number }>,
+    entityNodes: Map<string, string>,
+    nodeIds: Set<string>,
+    nodes: GalaxyRenderableNode[],
+): { role: GraphCompilerFactRole; nodeId: string } | null {
+    const atom = atomById.get(role.atomId);
+    if (atom?.kind === 'entity' || atom?.kind === 'concept') {
+        const entityId = atom.entityId || atom.sourceId;
+        const nodeId = entityNodes.get(entityId);
+        if (nodeId) return { role, nodeId };
+    }
+    const evidence = evidenceByCompilerId.get(role.atomId);
+    const nodeId = `compiler-atom:${role.atomId}`;
+    if (!atom && !evidence) return null;
+    if (!nodeIds.has(nodeId)) {
+        const label = atom?.label || evidence?.sourceId || role.role;
+        nodes.push({
+            id: nodeId,
+            label,
+            kind: atom?.kind || 'evidenceAnchor',
+            totalMentions: 1,
+            ...stablePoint(role.atomId, nodes.length),
+            colorHsl: graphKindHsl(role.role === 'evidence' ? 'structure' : 'fact'),
+            metadata: {
+                sourceType: role.role === 'evidence' ? 'compiler-evidence' : 'compiler-role-atom',
+                graphKind: role.role === 'evidence' ? 'structure' : 'facts',
+                canvasLens: 'facts',
+                reviewState: 'accepted',
+                confidence: role.confidence,
+                detector: 'rust_graph_compiler',
+                subtitle: role.semanticRole || role.role,
+                sourceSnippet: label,
+                searchableText: `${label} ${role.role} ${role.semanticRole || ''}`,
+                evidenceIds: evidence ? [evidence.sourceId] : atom?.evidenceIds || [],
+                graphImpact: 'Compiled role target from the authoritative graph fact.',
+            },
+        });
+        nodeIds.add(nodeId);
+    }
+    return { role, nodeId };
 }
 
 function addDiscourseGraph(snapshot: GraphRebuildSnapshot, nodes: GalaxyRenderableNode[], edges: GalaxyInputEdge[]): void {

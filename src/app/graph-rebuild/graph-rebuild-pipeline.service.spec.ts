@@ -196,21 +196,16 @@ describe('GraphRebuildPipelineService', () => {
                     id: 'stagedNativeScenePacket',
                     label: 'Staged Native Scene Packet',
                     counters: expect.objectContaining({
-                        scenePacketAvailable: 1,
+                        scenePacketAvailable: 0,
                         rendererWired: 0,
-                        nodeParityOk: 1,
-                        hierarchyHints: 1,
+                        skippedCriticalPath: 1,
+                        expectedNodes: 3,
                     }),
+                    message: expect.stringContaining('must not block UI commit'),
                 }),
             ]),
         }));
-        expect(phoenixUiApi.loadStagedGraphScenePacket).toHaveBeenCalledWith(expect.objectContaining({
-            source: 'scopedSnapshot',
-            manifold: 'siegel',
-            limit: 4096,
-        }));
-        expect(phoenixUiApi.loadStagedGraphScenePacket.mock.calls[0][0].nodes).toBeUndefined();
-        expect(phoenixUiApi.loadStagedGraphScenePacket.mock.calls[0][0].edges).toBeUndefined();
+        expect(phoenixUiApi.loadStagedGraphScenePacket).not.toHaveBeenCalled();
     });
 
     it('expands global graph rebuilds to loaded note ids for deterministic chunking', async () => {

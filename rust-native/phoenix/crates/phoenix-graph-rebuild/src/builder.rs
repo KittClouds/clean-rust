@@ -220,7 +220,9 @@ pub fn build_graph_rebuild_snapshot(
         edges,
         calendar_registry_summary: None,
         document_sidecar_summary: None,
+        document_review_summary: None,
         document_compiler_summary: None,
+        discourse_spine_summary: None,
         counters,
     })
 }

@@ -25,6 +25,7 @@ import type { GraphDocumentReviewSummary } from './graph-document-review';
 import type { GraphDocumentCompilerSummary } from './graph-document-compiler';
 import type { GraphDocumentGraphMutationLedger } from './graph-document-durable-commit';
 import type { GraphOperatorMutationJournal } from './graph-operator-mutation-journal';
+import type { GraphAtlasPacket } from './graph-atlas-packet';
 
 export type GraphRebuildScopeKind = 'global' | 'folder' | 'narrative' | 'note' | 'multiNote';
 export type GraphRebuildAnchorSource = EntityOccurrence['source'] | 'accepted_suggestion';
@@ -2251,6 +2252,7 @@ export interface GraphRebuildSnapshot {
     graphCompileReceipts?: GraphCompileReceipts;
     graphCompilerSource?: GraphCompilerSource;
     projectedUiGraph?: GraphCompilerProjectedUiEdge[];
+    atlasPacket?: GraphAtlasPacket;
     graphModelV2?: GraphModelV2Snapshot;
     graphAwareLinkSuggestions?: GraphRebuildLinkSuggestion[];
     entityLinkSuggestions?: GraphRebuildEntityLinkSuggestion[];

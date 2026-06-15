@@ -48,13 +48,22 @@ import { buildHopfResonanceSpace } from './graph-hopf-resonance-space';
 import { buildGraphDocumentSidecar } from './graph-document-sidecar';
 import { buildGraphDocumentReviewSummary } from './graph-document-review';
 import { buildGraphDocumentCompilePlanSummary } from './graph-document-compiler';
-import { replayGraphOperatorMutationJournal } from './graph-operator-mutation-journal';
+import { replayGraphOperatorMutationJournalReview } from './graph-operator-mutation-journal';
 
 export { buildGraphRebuildAliasResolver, normalizeGraphRebuildCandidate };
+
+export const GRAPH_REBUILD_TS_BUILDER_AUTHORITY = {
+    role: 'compatibility-only',
+    replacement: 'rust-atlas-object-packet',
+} as const;
 
 const CO_OCCURRENCE_MAX_GAP_CHARS = 720;
 const CO_OCCURRENCE_LINKS_PER_ANCHOR = 4;
 
+/**
+ * Compatibility builder retained until the Rust AtlasObject / GraphFamily /
+ * ManifoldTarget packet becomes the graph-family authority.
+ */
 export function buildGraphRebuildSnapshot(input: BuildGraphRebuildSnapshotInput): GraphRebuildSnapshot {
     const builtAt = input.builtAt ?? Date.now();
     const chunks = normalizeChunks(input.chunks || []);
@@ -82,6 +91,44 @@ export function buildGraphRebuildSnapshot(input: BuildGraphRebuildSnapshotInput)
     const acceptedRelationships = relationships.filter((relationship) => relationship.status === 'accepted').length;
     const reviewRelationships = relationships.filter((relationship) => relationship.status === 'review').length;
     const rejectedRelationships = relationships.filter((relationship) => relationship.status === 'rejected').length;
+    const noteIds = input.noteIds ? [...input.noteIds] : unique([
+        ...chunks.map((chunk) => chunk.noteId),
+        ...entityAnchors.map((anchor) => anchor.noteId),
+    ]);
+    const documentSidecarSummary = buildGraphDocumentSidecar({
+        noteIds,
+        noteTexts: input.noteTexts || {},
+        chunks,
+        builtAt,
+        documentProfileSummary: input.documentProfileSummary,
+        documentSemanticSummary: input.documentSemanticSummary,
+    });
+    const baseDocumentReviewSummary = buildGraphDocumentReviewSummary(documentSidecarSummary, builtAt);
+    const operatorReplay = input.operatorMutationJournal
+        ? replayGraphOperatorMutationJournalReview(
+            baseDocumentReviewSummary,
+            input.operatorMutationJournal,
+            input.scopeId,
+            builtAt,
+        )
+        : null;
+    const documentReviewSummary = operatorReplay?.review || baseDocumentReviewSummary;
+    const operatorMutationJournal = operatorReplay?.journal;
+    const documentCompilerSummary = buildGraphDocumentCompilePlanSummary({
+        sidecar: documentSidecarSummary,
+        review: documentReviewSummary,
+        builtAt,
+        entities: nodes.map((node) => ({ id: node.entityId, label: node.label, aliases: node.aliases })),
+        baseline: {
+            atomCount: nodes.length,
+            factCount: relationships.length
+                + derived.events.length
+                + derived.temporalEdges.length
+                + derived.causalEdges.length
+                + derived.memoryState.length,
+            edgeCount: edges.length,
+        },
+    });
     const embeddingTargetPlan = buildGraphRebuildEmbeddingTargetPlan(
         input,
         chunks,
@@ -92,6 +139,7 @@ export function buildGraphRebuildSnapshot(input: BuildGraphRebuildSnapshotInput)
         derived.temporalEdges,
         derived.causalEdges,
         derived.memoryState,
+        documentCompilerSummary,
     );
     const embeddingTargets = embeddingTargetPlan.targets;
     const queuedTargetIds = new Set(embeddingTargetPlan.queuedTargetIds || []);
@@ -126,35 +174,6 @@ export function buildGraphRebuildSnapshot(input: BuildGraphRebuildSnapshotInput)
             embeddingGraphPostProcess,
         })
         : { suggestions: [], counters: emptyEntityLinkCounters(mentions) };
-    const noteIds = input.noteIds ? [...input.noteIds] : unique([
-        ...chunks.map((chunk) => chunk.noteId),
-        ...entityAnchors.map((anchor) => anchor.noteId),
-    ]);
-    const documentSidecarSummary = buildGraphDocumentSidecar({
-        noteIds,
-        noteTexts: input.noteTexts || {},
-        chunks,
-        builtAt,
-        documentProfileSummary: input.documentProfileSummary,
-        documentSemanticSummary: input.documentSemanticSummary,
-    });
-    const documentReviewSummary = buildGraphDocumentReviewSummary(documentSidecarSummary, builtAt);
-    const documentCompilerSummary = buildGraphDocumentCompilePlanSummary({
-        sidecar: documentSidecarSummary,
-        review: documentReviewSummary,
-        builtAt,
-        entities: nodes.map((node) => ({ id: node.entityId, label: node.label, aliases: node.aliases })),
-        baseline: {
-            atomCount: nodes.length,
-            factCount: relationships.length
-                + derived.events.length
-                + derived.temporalEdges.length
-                + derived.causalEdges.length
-                + derived.memoryState.length,
-            edgeCount: edges.length,
-        },
-    });
-
     let snapshot: GraphRebuildSnapshot = {
         schemaVersion: 'phoenix-graph-rebuild/v1',
         id: `graph-rebuild:${input.scopeKind}:${input.scopeId}:${builtAt}`,
@@ -188,6 +207,7 @@ export function buildGraphRebuildSnapshot(input: BuildGraphRebuildSnapshotInput)
         documentSemanticSummary: input.documentSemanticSummary,
         documentReviewSummary,
         documentCompilerSummary,
+        operatorMutationJournal,
         counters: {
             entities: input.entities.length,
             aliases: resolver.aliasCount,
@@ -341,15 +361,18 @@ export function buildGraphRebuildSnapshot(input: BuildGraphRebuildSnapshotInput)
             documentCompilerHighConfidenceFacts: documentCompilerSummary.counters.highConfidenceFacts,
             documentCompilerReviewedFacts: documentCompilerSummary.counters.reviewedFacts,
             documentCompilerAmbiguousFacts: documentCompilerSummary.counters.ambiguousFacts,
+            operatorMutationIntents: operatorMutationJournal?.counters.intents || 0,
+            operatorMutationActive: operatorMutationJournal?.counters.active || 0,
+            operatorMutationApplied: operatorMutationJournal?.counters.applied || 0,
+            operatorMutationConflicted: operatorMutationJournal?.counters.conflicted || 0,
+            operatorMutationUndone: operatorMutationJournal?.counters.undone || 0,
+            operatorMutationReceipts: operatorMutationJournal?.counters.receipts || 0,
             eventAspects: derived.events.filter((event) => Boolean(event.aspect)).length,
             dropReasons: drops,
             resolution: hygiene.resolution,
         },
         resolutionSuggestions: hygiene.suggestions,
     };
-    if (input.operatorMutationJournal) {
-        snapshot = replayGraphOperatorMutationJournal(snapshot, input.operatorMutationJournal, builtAt).snapshot;
-    }
     const hopfResonanceSpace = buildHopfResonanceSpace(snapshot, { generatedAt: builtAt });
     if (hopfResonanceSpace.assignments.length !== snapshot.embeddingTargets.length) {
         throw new Error(

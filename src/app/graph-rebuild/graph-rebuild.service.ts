@@ -36,7 +36,10 @@ import {
     isGraphOperatorMutationJournal,
     type GraphOperatorMutationJournal,
 } from './graph-operator-mutation-journal';
+import type { GraphAtlasPacket } from './graph-atlas-packet';
 import { buildGraphRebuildSnapshot } from './graph-rebuild-builder';
+import { buildGraphRebuildEmbeddingGraphPostProcess } from './graph-rebuild-embedding-postprocess';
+import { selectGraphRebuildEmbeddingTargetPlan } from './graph-rebuild-embedding-target-policy';
 import { buildGraphDiscourseSpineSummary } from './graph-discourse-spine';
 import { buildHopfResonanceSpace } from './graph-hopf-resonance-space';
 import { buildGraphMemoryGraphRagBridgeSummary } from './graph-memory-graphrag-bridge';
@@ -62,6 +65,8 @@ import type {
     GraphIndexEmbeddingStagePolicy,
     GraphRebuildBuildTimings,
     GraphRebuildChunk,
+    GraphRebuildEmbeddingTarget,
+    GraphRebuildEmbeddingTargetPlan,
     GraphRebuildEmbeddingProfile,
     GraphRebuildNoteFolderContext,
     GraphRebuildRelationshipHint,
@@ -134,6 +139,13 @@ interface CompressedGraphCompilerFactGraphPayload {
 
 export type NativeGraphCompilerSidecar = Partial<GraphCompilerDualWriteSidecar> & {
     factGraphPayload?: CompressedGraphCompilerFactGraphPayload;
+    atlasPacket?: GraphAtlasPacket;
+    embeddingTargets?: GraphRebuildEmbeddingTarget[];
+};
+
+export type NativeGraphCompilerDecodedSidecar = GraphCompilerDualWriteSidecar & {
+    atlasPacket?: GraphAtlasPacket;
+    embeddingTargets?: GraphRebuildEmbeddingTarget[];
 };
 
 export interface GraphRebuildSnapshotDocumentPayloadStats {
@@ -227,7 +239,7 @@ export class GraphRebuildService {
                 operatorMutationJournal: operatorMutationJournal || undefined,
                 builtAt,
             }));
-            await this.attachNativeGraphCompilerSidecar(snapshot, timings);
+            await this.attachNativeGraphCompilerSidecar(snapshot, timings, request);
             snapshot = await this.reconcileDocumentGraphMutations(snapshot);
             finalizeBuildTimings(timings, totalStarted);
             snapshot.buildTimings = timings;
@@ -256,6 +268,7 @@ export class GraphRebuildService {
     private async attachNativeGraphCompilerSidecar(
         snapshot: GraphRebuildSnapshot,
         timings?: GraphRebuildBuildTimings,
+        request?: Pick<GraphRebuildBuildRequest, 'embeddingStagePolicy' | 'postProcessMode'>,
     ): Promise<void> {
         const started = performance.now();
         try {
@@ -263,6 +276,10 @@ export class GraphRebuildService {
                 snapshot: graphRebuildSnapshotToNativeCompilerPayload(snapshot),
             }) as NativeGraphCompilerSidecar | null;
             const sidecar = decodeNativeGraphCompilerSidecar(rawSidecar);
+            if (sidecar?.atlasPacket) snapshot.atlasPacket = sidecar.atlasPacket;
+            if (sidecar?.embeddingTargets?.length) {
+                this.applyNativeEmbeddingTargets(snapshot, sidecar.embeddingTargets, request);
+            }
             if (!sidecar?.factGraph) return;
             attachGraphCompilerReadModels(snapshot, sidecar, 'rust');
         } catch (error) {
@@ -270,6 +287,36 @@ export class GraphRebuildService {
         } finally {
             if (timings) timings.nativeCompilerMs = elapsedMs(started);
         }
+    }
+
+    private applyNativeEmbeddingTargets(
+        snapshot: GraphRebuildSnapshot,
+        nativeTargets: GraphRebuildEmbeddingTarget[],
+        request?: Pick<GraphRebuildBuildRequest, 'embeddingStagePolicy' | 'postProcessMode'>,
+    ): void {
+        const plan = selectGraphRebuildEmbeddingTargetPlan(
+            nativeTargets,
+            snapshot.relationships,
+            snapshot.temporalEdges,
+            snapshot.causalEdges,
+            request?.embeddingStagePolicy,
+        );
+        snapshot.embeddingTargets = plan.targets;
+        snapshot.embeddingTargetPlan = plan;
+        const queuedTargetIds = new Set(plan.queuedTargetIds || []);
+        const workTargets = snapshot.embeddingTargets.filter((target) =>
+            queuedTargetIds.size ? queuedTargetIds.has(target.id) : target.admissionStatus === 'admitted',
+        );
+        const postProcessMode = request?.postProcessMode || (snapshot.embeddingGraphPostProcess ? 'full' : 'core');
+        snapshot.embeddingGraphPostProcess = postProcessMode === 'full'
+            ? buildGraphRebuildEmbeddingGraphPostProcess(workTargets, snapshot.embeddingProfile)
+            : undefined;
+        if (snapshot.embeddingGraphPostProcess) {
+            snapshot.embeddingProfile = snapshot.embeddingGraphPostProcess.profile;
+            snapshot.embeddingModelAdapter = snapshot.embeddingGraphPostProcess.adapter;
+        }
+        updateEmbeddingTargetCounters(snapshot, plan, workTargets.length);
+        refreshTargetDerivedReadModels(snapshot);
     }
 
     private async classifyDocumentProfiles(
@@ -309,7 +356,9 @@ export class GraphRebuildService {
             });
             return isGraphDocumentSemanticSummary(native) ? native : undefined;
         } catch (error) {
-            console.warn('[GraphRebuild] Native document semantics unavailable; retaining compatibility facts', error);
+            if (!isUnsupportedStoreCommand(error, 'documentSemantic:build')) {
+                console.warn('[GraphRebuild] Native document semantics unavailable; retaining compatibility facts', error);
+            }
             return undefined;
         }
     }
@@ -616,18 +665,6 @@ export function snapshotAnchorsToGraphRebuildOccurrences(
 }
 
 export function graphRebuildSnapshotToNativeCompilerPayload(snapshot: GraphRebuildSnapshot): GraphRebuildSnapshot {
-    const documentCompilerSummary = snapshot.documentCompilerSummary
-        ? {
-            hyperedges: snapshot.documentCompilerSummary.hyperedges.filter((row) => row.status === 'pending_commit'),
-        } as GraphRebuildSnapshot['documentCompilerSummary']
-        : undefined;
-    const evidenceIds = new Set((documentCompilerSummary?.hyperedges || [])
-        .flatMap((row) => row.evidenceSpanIds || []));
-    const documentSidecarSummary = snapshot.documentSidecarSummary && evidenceIds.size
-        ? {
-            evidenceSpans: snapshot.documentSidecarSummary.evidenceSpans.filter((row) => evidenceIds.has(row.id)),
-        } as GraphRebuildSnapshot['documentSidecarSummary']
-        : undefined;
     return {
         schemaVersion: snapshot.schemaVersion,
         id: snapshot.id,
@@ -651,10 +688,37 @@ export function graphRebuildSnapshotToNativeCompilerPayload(snapshot: GraphRebui
         nodes: snapshot.nodes,
         edges: snapshot.edges,
         calendarRegistrySummary: snapshot.calendarRegistrySummary,
-        documentSidecarSummary,
-        documentCompilerSummary,
+        documentSidecarSummary: snapshot.documentSidecarSummary,
+        documentReviewSummary: snapshot.documentReviewSummary,
+        documentCompilerSummary: snapshot.documentCompilerSummary,
+        discourseSpineSummary: snapshot.discourseSpineSummary,
         counters: snapshot.counters,
     };
+}
+
+function updateEmbeddingTargetCounters(
+    snapshot: GraphRebuildSnapshot,
+    plan: GraphRebuildEmbeddingTargetPlan,
+    queuedCount: number,
+): void {
+    snapshot.counters.embeddingTargets = snapshot.embeddingTargets.length;
+    snapshot.counters.embeddingTargetCandidates = plan.candidateCount;
+    snapshot.counters.embeddingQueuedTargets = queuedCount;
+    snapshot.counters.embeddingTargetDeferred = plan.deferredCount;
+    snapshot.counters.embeddingSchedulerDeferredTargets = plan.schedulerDeferredCount;
+    snapshot.counters.embeddingPolicyDeferredTargets = plan.policyDeferredCount;
+}
+
+function refreshTargetDerivedReadModels(snapshot: GraphRebuildSnapshot): void {
+    delete snapshot.hopfResonanceSpace;
+    delete snapshot.memoryGraphRagBridgeSummary;
+    delete snapshot.discourseSpineSummary;
+    delete snapshot.discourseBridgeCandidateSummary;
+    delete snapshot.discourseBridgeAdjudicationSummary;
+    delete snapshot.discourseEvalLedgerSummary;
+    delete snapshot.discoursePromotionSurfaceSummary;
+    delete snapshot.discourseCompilerOverlaySummary;
+    Object.assign(snapshot, hydrateGraphRebuildSnapshotDerivedViews(snapshot));
 }
 
 function anchorSpanStillMatches(
@@ -1012,16 +1076,41 @@ function decodeGraphRebuildJsonPayload<T>(payload: string): T {
 
 export function decodeNativeGraphCompilerSidecar(
     sidecar: NativeGraphCompilerSidecar | null | undefined,
-): GraphCompilerDualWriteSidecar | null {
+): NativeGraphCompilerDecodedSidecar | null {
     if (!sidecar) return null;
-    if (sidecar.factGraph) return sidecar as GraphCompilerDualWriteSidecar;
-    const compressed = sidecar.factGraphPayload;
+    const raw = sidecar as NativeGraphCompilerSidecar & {
+        fact_graph?: GraphCompilerDualWriteSidecar['factGraph'];
+        projected_ui_graph?: GraphCompilerDualWriteSidecar['projectedUiGraph'];
+        fact_graph_payload?: CompressedGraphCompilerFactGraphPayload;
+    };
+    const factGraph = sidecar.factGraph || raw.fact_graph;
+    const embeddingTargets = sidecar.embeddingTargets || [];
+    const atlasPacket = sidecar.atlasPacket;
+    if (factGraph) {
+        return {
+            ...sidecar,
+            factGraph,
+            projectedUiGraph: sidecar.projectedUiGraph || raw.projected_ui_graph,
+            receipts: sidecar.receipts || factGraph.receipts,
+            atlasPacket,
+            embeddingTargets,
+        } as NativeGraphCompilerDecodedSidecar;
+    }
+    const compressed = sidecar.factGraphPayload || raw.fact_graph_payload;
     if (!isCompressedGraphCompilerFactGraphPayload(compressed)) return null;
-    const factGraph = JSON.parse(strFromU8(gunzipSync(base64ToBytes(compressed.payload))));
+    const decodedFactGraph = JSON.parse(strFromU8(gunzipSync(base64ToBytes(compressed.payload))));
     return {
         ...sidecar,
-        factGraph,
-    } as GraphCompilerDualWriteSidecar;
+        factGraph: decodedFactGraph,
+        projectedUiGraph: sidecar.projectedUiGraph || raw.projected_ui_graph,
+        receipts: sidecar.receipts || decodedFactGraph.receipts,
+        atlasPacket,
+        embeddingTargets,
+    } as NativeGraphCompilerDecodedSidecar;
+}
+
+function isUnsupportedStoreCommand(error: unknown, command: string): boolean {
+    return error instanceof Error && error.message.includes(`unsupported store command: ${command}`);
 }
 
 function isCompressedGraphRebuildJsonPayload(value: unknown): value is CompressedGraphRebuildJsonPayload {

@@ -11,6 +11,11 @@ import type {
     GraphRebuildRelationship,
     GraphRebuildTemporalEdge,
 } from './graph-rebuild-snapshot';
+import type {
+    GraphDocumentCompilerSummary,
+    GraphDocumentHyperedge,
+    GraphDocumentHyperedgeRole,
+} from './graph-document-compiler-types';
 import { selectGraphRebuildEmbeddingTargetPlan } from './graph-rebuild-embedding-target-policy';
 import { summarizeMeaningFrame } from './graph-rebuild-meaning-frames';
 
@@ -34,6 +39,7 @@ export function buildGraphRebuildEmbeddingTargetPlan(
     temporalEdges: GraphRebuildTemporalEdge[],
     causalEdges: GraphRebuildCausalEdge[],
     memoryState: GraphRebuildMemoryState[],
+    documentCompiler?: GraphDocumentCompilerSummary,
 ): GraphRebuildEmbeddingTargetPlan & { targets: GraphRebuildEmbeddingTarget[] } {
     const targets: GraphRebuildEmbeddingTarget[] = [];
     const nodeByEntityId = new Map(nodes.map((node) => [node.entityId, node]));
@@ -150,6 +156,15 @@ export function buildGraphRebuildEmbeddingTargetPlan(
         evidenceIds: state.evidenceIds,
         parentIds: state.noteId ? [structureRootId(state.noteId, 'identity')] : [],
     });
+    const targetIds = new Set(targets.map((target) => target.id));
+    for (const hyperedge of documentCompiler?.hyperedges || []) {
+        if (!isNativeDocumentSituationCandidate(hyperedge)) continue;
+        for (const target of documentSituationTargets(input, hyperedge)) {
+            if (targetIds.has(target.id)) continue;
+            targetIds.add(target.id);
+            targets.push(target);
+        }
+    }
     return selectGraphRebuildEmbeddingTargetPlan(targets, relationships, temporalEdges, causalEdges, input.embeddingStagePolicy);
 }
 
@@ -163,8 +178,116 @@ export function buildGraphRebuildEmbeddingTargets(
     temporalEdges: GraphRebuildTemporalEdge[],
     causalEdges: GraphRebuildCausalEdge[],
     memoryState: GraphRebuildMemoryState[],
+    documentCompiler?: GraphDocumentCompilerSummary,
 ): GraphRebuildEmbeddingTarget[] {
-    return buildGraphRebuildEmbeddingTargetPlan(input, chunks, anchors, nodes, relationships, events, temporalEdges, causalEdges, memoryState).targets;
+    return buildGraphRebuildEmbeddingTargetPlan(
+        input,
+        chunks,
+        anchors,
+        nodes,
+        relationships,
+        events,
+        temporalEdges,
+        causalEdges,
+        memoryState,
+        documentCompiler,
+    ).targets;
+}
+
+function documentSituationTargets(
+    input: BuildGraphRebuildSnapshotInput,
+    hyperedge: GraphDocumentHyperedge,
+): GraphRebuildEmbeddingTarget[] {
+    const factId = `fact:document-hyperedge:${hyperedge.id}`;
+    const noteId = hyperedge.provenance.noteId;
+    const source = input.noteTexts?.[noteId]?.slice(
+        hyperedge.provenance.sourceStart,
+        hyperedge.provenance.sourceEnd,
+    ).trim();
+    const roleTargetIds = hyperedge.roles.map(documentRoleEmbeddingTargetId);
+    const roleSummary = hyperedge.roles
+        .map((role) => `${role.semanticRole || role.role}:${role.surface || role.targetId}`)
+        .join(' | ');
+    const roleTargets = hyperedge.roles
+        .map((role) => documentRoleTarget(hyperedge, role))
+        .filter((target): target is GraphRebuildEmbeddingTarget => !!target);
+    const situationTarget: GraphRebuildEmbeddingTarget = {
+        id: `embed:${factId}`,
+        kind: 'graphFact',
+        sourceId: factId,
+        noteId,
+        ...folderFields(input, noteId),
+        label: hyperedge.frame || hyperedge.triggerPredicate || hyperedge.predicate,
+        text: limitText([
+            `semantic_situation:${hyperedge.semanticSituationId || hyperedge.id}`,
+            `frame:${hyperedge.frame || hyperedge.predicate}`,
+            hyperedge.frameFamily ? `frame_family:${hyperedge.frameFamily}` : '',
+            hyperedge.factuality ? `factuality:${hyperedge.factuality}` : '',
+            hyperedge.speechAct ? `speech_act:${hyperedge.speechAct}` : '',
+            `confidence:${hyperedge.confidence.toFixed(2)}`,
+            `roles:${roleSummary}`,
+            source ? `evidence_context:${source}` : '',
+        ].filter(Boolean).join('\n'), 2200),
+        evidenceIds: hyperedge.evidenceSpanIds,
+        parentIds: unique([
+            structureRootId(noteId, hyperedge.situationKind === 'state' ? 'identity' : 'temporal'),
+            ...roleTargetIds,
+        ]),
+    };
+    return [...roleTargets, situationTarget];
+}
+
+function isNativeDocumentSituationCandidate(hyperedge: GraphDocumentHyperedge): boolean {
+    return hyperedge.status === 'pending_commit'
+        && hyperedge.compilationBasis === 'semantic_situation_frame'
+        && Boolean(hyperedge.semanticSituationId)
+        && Boolean(hyperedge.frame)
+        && !(hyperedge.temporalConflictIds?.length);
+}
+
+function documentRoleEmbeddingTargetId(role: GraphDocumentHyperedgeRole): string {
+    if (role.targetKind === 'entity') return `embed:entity:${role.targetId}`;
+    if (role.targetKind === 'entity_mention') return `embed:atom:documentMention:${role.targetId}`;
+    if (role.targetKind === 'evidence_span') return `embed:atom:documentEvidence:${role.targetId}`;
+    return `embed:atom:documentUnit:${role.targetId}`;
+}
+
+function documentRoleTarget(
+    hyperedge: GraphDocumentHyperedge,
+    role: GraphDocumentHyperedgeRole,
+): GraphRebuildEmbeddingTarget | null {
+    if (role.targetKind === 'entity') return null;
+    const noteId = hyperedge.provenance.noteId;
+    const semanticRole = role.semanticRole || role.role;
+    const kind = role.targetKind === 'entity_mention'
+        ? 'concept'
+        : role.targetKind === 'evidence_span'
+            ? 'evidenceSpan'
+            : 'documentUnit';
+    const root = role.targetKind === 'evidence_span'
+        ? 'evidence'
+        : role.targetKind === 'entity_mention'
+            ? 'identity'
+            : 'document-structure';
+    return {
+        id: documentRoleEmbeddingTargetId(role),
+        kind,
+        sourceId: role.targetId,
+        noteId,
+        label: role.surface || semanticRole,
+        text: limitText([
+            `hypergraph_role:${semanticRole}`,
+            `target_kind:${role.targetKind}`,
+            `slot_type:${role.slotType || 'participant'}`,
+            `resolved:${role.resolved !== false}`,
+            `confidence:${role.confidence.toFixed(2)}`,
+            role.surface ? `surface:${role.surface}` : '',
+        ].filter(Boolean).join('\n'), 640),
+        evidenceIds: role.targetKind === 'evidence_span'
+            ? [role.targetId]
+            : hyperedge.evidenceSpanIds,
+        parentIds: [structureRootId(noteId, root)],
+    };
 }
 
 function temporalTarget(

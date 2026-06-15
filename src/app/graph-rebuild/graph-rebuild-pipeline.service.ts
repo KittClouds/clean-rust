@@ -7,7 +7,6 @@ import type { AtlasCapabilityId } from '../components/search-panel/atlas-capabil
 import type { AtlasBuildScope, AtlasRunOptions } from '../services/atlas-capability-runtime.model';
 import { AtlasCapabilityRuntimeService } from '../services/atlas-capability-runtime.service';
 import { NerService } from '../services/ner.service';
-import { decodeGraphScenePacketBuffers, graphScenePacketEncodedChars } from '../services/phoenix-graph-scene-packet.decode';
 import { phoenixTransportAudit, type PhoenixTransportAuditSnapshot } from '../services/phoenix-transport-audit';
 import { PhoenixStoreService, type PhoenixContentMutationTiming } from '../services/phoenix-store.service';
 import { PhoenixUiApiService } from '../services/phoenix-ui-api.service';
@@ -220,7 +219,7 @@ export class GraphRebuildPipelineService {
             appendDiscourseCompilerOverlayStage(stageReceipts, completedSnapshot);
             appendCalendarRegistryStage(stageReceipts, completedSnapshot);
             appendSnapshotTimingStages(stageReceipts, completedSnapshot);
-            await this.appendStagedNativeScenePacketStage(stageReceipts, completedSnapshot, scope);
+            appendStagedNativeScenePacketSkippedStage(stageReceipts, completedSnapshot);
             appendTransportTimingStage(stageReceipts, transportStarted, phoenixTransportAudit.snapshot());
 
             const completedAt = Date.now();
@@ -377,7 +376,7 @@ export class GraphRebuildPipelineService {
                 appendDiscourseCompilerOverlayStage(stageReceipts, snapshot);
                 appendCalendarRegistryStage(stageReceipts, snapshot);
                 appendSnapshotTimingStages(stageReceipts, snapshot);
-                await this.appendStagedNativeScenePacketStage(stageReceipts, snapshot, scope);
+                appendStagedNativeScenePacketSkippedStage(stageReceipts, snapshot);
             }
 
             for (const projection of PROJECTION_CAPABILITIES) {
@@ -501,7 +500,7 @@ export class GraphRebuildPipelineService {
                 projectionReceipts.push(await buildSiegelBackboneProjectionReceipt(cachedSnapshot));
                 const completedAt = Date.now();
                 const cacheStage = postProcessCacheStage(runStarted, completedAt, deltaPlan);
-                await this.appendStagedNativeScenePacketStage(stageReceipts, cachedSnapshot, scope);
+                appendStagedNativeScenePacketSkippedStage(stageReceipts, cachedSnapshot);
                 appendTransportTimingStage(stageReceipts, transportStarted, phoenixTransportAudit.snapshot());
                 const receipt = this.buildRunReceipt({
                     idPrefix: 'postprocess-atlas',
@@ -608,7 +607,7 @@ export class GraphRebuildPipelineService {
             appendDiscourseCompilerOverlayStage(stageReceipts, completedSnapshot);
             appendCalendarRegistryStage(stageReceipts, completedSnapshot);
             appendSnapshotTimingStages(stageReceipts, completedSnapshot);
-            await this.appendStagedNativeScenePacketStage(stageReceipts, completedSnapshot, scope);
+            appendStagedNativeScenePacketSkippedStage(stageReceipts, completedSnapshot);
 
             for (const projection of PROJECTION_CAPABILITIES) {
                 projectionReceipts.push(snapshotOwnedProjectionReceipt(projection.mode, completedSnapshot));
@@ -785,76 +784,6 @@ export class GraphRebuildPipelineService {
         receipt.completedAt = Math.max(receipt.completedAt, completedAt);
         receipt.durationMs = receipt.completedAt - receipt.startedAt;
         this.lastReceiptState.set({ ...receipt, stageReceipts: [...receipt.stageReceipts] });
-    }
-
-    private async appendStagedNativeScenePacketStage(
-        stageReceipts: GraphIndexStageReceipt[],
-        snapshot: GraphRebuildSnapshot | null,
-        scope: GraphIndexRunScope,
-    ): Promise<void> {
-        if (!snapshot?.counters.embeddingTargets) return;
-        const limit = Math.max(4096, snapshot.counters.embeddingTargets);
-        const started = performance.now();
-        const packet = await this.phoenixUiApi.loadStagedGraphScenePacket({
-            source: 'scopedSnapshot',
-            manifold: 'siegel',
-            sourceMode: 'embeddings',
-            scope: graphScenePacketScope(scope),
-            limit,
-        });
-        const loadMs = elapsedTimingMs(started);
-        if (!packet) {
-            stageReceipts.push(instrumentationStage(
-                'stagedNativeScenePacket',
-                'Staged Native Scene Packet',
-                loadMs,
-                {
-                    scenePacketAvailable: 0,
-                    rendererWired: 0,
-                },
-                'Staged native scene packet benchmark unavailable; live renderer left untouched',
-            ));
-            return;
-        }
-        const decodeStarted = performance.now();
-        const buffers = decodeGraphScenePacketBuffers(packet);
-        const decodeMs = elapsedTimingMs(decodeStarted);
-        const expectedNodes = snapshot.embeddingTargets?.length || snapshot.counters.embeddingTargets || 0;
-        const nodeDelta = Math.abs(packet.counters.renderedNodes - expectedNodes);
-        const stage = instrumentationStage(
-            'stagedNativeScenePacket',
-            'Staged Native Scene Packet',
-            loadMs + decodeMs,
-                {
-                    scenePacketAvailable: 1,
-                    rendererWired: 0,
-                    sourceScopedSnapshot: 1,
-                    manifoldSiegel: 1,
-                    packetNodes: packet.counters.renderedNodes,
-                    packetEdges: packet.counters.renderedEdges,
-                    expectedNodes,
-                nodeDelta,
-                nodeParityOk: nodeDelta === 0 ? 1 : 0,
-                embeddingBackboneEdges: snapshot.counters.embeddingBackboneEdges || 0,
-                cleanGraphEdges: snapshot.counters.edges || 0,
-                packetBufferBytes: packet.counters.bufferBytes,
-                packetEncodedChars: graphScenePacketEncodedChars(packet),
-                packetLoadMs: loadMs,
-                packetDecodeMs: decodeMs,
-                hierarchyShellRanks: buffers.hierarchyShellRanks?.length === packet.ids.length ? 1 : 0,
-                hierarchyHints: packet.hierarchyHints?.length === packet.ids.length ? 1 : 0,
-                decodedFloat32Values: buffers.positions3d.length
-                    + buffers.positions2d.length
-                    + buffers.radii.length
-                    + buffers.colors.length
-                    + buffers.edgeColors.length
-                    + buffers.edgeAlpha.length
-                    + (buffers.hierarchyShellRadii?.length || 0),
-            },
-            'Staged only; scoped graph-rebuild snapshot decoded through native packet without switching the live renderer',
-        );
-        stage.outputCount = packet.counters.renderedNodes + packet.counters.renderedEdges;
-        stageReceipts.push(stage);
     }
 
     private async safeLoadSnapshot(scopeId: string): Promise<GraphRebuildSnapshot | null> {
@@ -1950,13 +1879,25 @@ function atlasScopeFromGraphScope(scope: GraphIndexRunScope): AtlasBuildScope {
     return { mode: 'global' };
 }
 
-function graphScenePacketScope(scope: GraphIndexRunScope): Record<string, unknown> {
-    return {
-        kind: scope.kind,
-        scopeId: scope.scopeId,
-        label: scope.label,
-        noteIds: scope.noteIds,
-    };
+function appendStagedNativeScenePacketSkippedStage(
+    stageReceipts: GraphIndexStageReceipt[],
+    snapshot: GraphRebuildSnapshot | null,
+): void {
+    if (!snapshot?.counters.embeddingTargets) return;
+    stageReceipts.push(instrumentationStage(
+        'stagedNativeScenePacket',
+        'Staged Native Scene Packet',
+        0,
+        {
+            scenePacketAvailable: 0,
+            rendererWired: 0,
+            skippedCriticalPath: 1,
+            expectedNodes: snapshot.embeddingTargets?.length || snapshot.counters.embeddingTargets || 0,
+            embeddingBackboneEdges: snapshot.counters.embeddingBackboneEdges || 0,
+            cleanGraphEdges: snapshot.counters.edges || 0,
+        },
+        'Skipped during postprocess; native scene-packet benchmarks must not block UI commit',
+    ));
 }
 
 function capabilityLabel(id: AtlasCapabilityId): string {

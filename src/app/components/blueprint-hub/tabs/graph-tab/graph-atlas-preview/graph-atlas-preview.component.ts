@@ -14,6 +14,7 @@ import type { AtlasManifoldMode } from '../../../../../services/manifold-atlas.t
 import { buildAtlasCountReconciliation } from '../../../../../services/atlas-count-ledger.model';
 import { BlueprintHubService } from '../../../blueprint-hub.service';
 import type { GraphRebuildCounters, GraphRebuildSnapshot } from '../../../../../graph-rebuild/graph-rebuild-snapshot';
+import { buildGraphProjectionContractReport } from '../../../../../graph-rebuild/graph-projection-contract-report';
 import { type EmbeddingAtlasData, type EmbeddingQueryTrace, type EmbeddingSourcePreview } from './graph-embedding-atlas';
 import { manifoldAdapter } from './graph-manifold-atlas';
 import { buildGraphRebuildEmbeddingAtlas } from './graph-rebuild-embedding-atlas';
@@ -153,6 +154,9 @@ function readPersistedAtlasViewState(): PersistedAtlasViewState {
                         <span class="rounded-full border border-cyan-400/15 bg-cyan-500/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-cyan-100">{{ primaryCountLabel() }} {{ activeNodeCount() }}</span>
                         <span class="rounded-full border border-violet-400/15 bg-violet-500/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-violet-100">{{ secondaryCountLabel() }} {{ activeEdgeCount() }}</span>
                         <span class="rounded-full border border-amber-300/15 bg-amber-500/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-amber-100">Source: {{ dataSourceLabel() }}</span>
+                        @if (projectionContract(); as contract) {
+                        <span class="projection-contract-chip">Contract: {{ contract.pipelineLabel }} / {{ contract.semanticCoordinatesLabel }} / {{ contract.parityLabel }}</span>
+                        }
                         @if (atlasMode === 'graph') {
                         <span class="rounded-full border border-emerald-300/15 bg-emerald-500/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-emerald-100">Anchors {{ graphAnchorCount() }}</span>
                         <span class="rounded-full border border-sky-300/15 bg-sky-500/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-sky-100">Chunks {{ graphChunkCount() }}</span>
@@ -550,6 +554,21 @@ function readPersistedAtlasViewState(): PersistedAtlasViewState {
         .atlas-canvas-surface { container-type: inline-size; }
         .canvas-lens-rail { max-width: calc(100% - 32px); }
         .canvas-projection-rail { max-width: calc(100% - 32px); scrollbar-width: none; }
+        .projection-contract-chip {
+            display: inline-flex;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            border-radius: 999px;
+            border: 1px solid rgba(125, 225, 209, 0.16);
+            background: rgba(13, 148, 136, 0.11);
+            padding: 4px 10px;
+            color: rgb(204 251 241);
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
         .canvas-projection-rail-top {
             left: 82px;
             top: 12px;
@@ -917,6 +936,15 @@ export class GraphAtlasPreviewComponent implements OnInit {
         renderedKinds: this.graphInventory().kindCounts,
         sourceLabel: 'Graph Rebuild Snapshot',
     }));
+    readonly projectionContract = computed(() => {
+        const inventory = this.graphInventory();
+        const atlas = this.graphRebuildEmbeddingAtlas() ?? this.embeddingAtlas();
+        return buildGraphProjectionContractReport(this.graphSnapshotSignal(), {
+            graphNodes: inventory.nodes.length,
+            embeddingNodes: atlas.nodes.length,
+            embeddingEdges: atlas.edges.length,
+        });
+    });
     readonly PlusIcon = Plus;
     readonly SearchIcon = Search;
     readonly SettingsIcon = Settings2;

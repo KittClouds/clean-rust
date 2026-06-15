@@ -382,6 +382,33 @@ describe('GraphRebuildService persistence helpers', () => {
         expect(sidecar?.projectedUiGraph).toBeUndefined();
     });
 
+    it('decodes native snake-case compiler sidecars at the Rust boundary', () => {
+        const snapshot = buildGraphRebuildSnapshot({
+            scopeKind: 'global',
+            scopeId: 'global',
+            noteIds: ['note-1'],
+            entities: [entity('entity-kai', 'Kai', []), entity('entity-hazel', 'Hazel', [])],
+            chunks: [{ id: 'note-1:chunk:0', noteId: 'note-1', start: 0, end: 30, ordinal: 0, source: 'dynamic-chunking' }],
+            occurrences: [
+                occurrence('note-1', 'entity-kai', 0, 3),
+                occurrence('note-1', 'entity-hazel', 12, 17),
+            ],
+            noteTexts: { 'note-1': 'Kai approved Hazel.' },
+            builtAt: 43,
+        });
+        const factGraph = snapshot.graphCompiler;
+        if (!factGraph) throw new Error('Expected graph compiler output.');
+
+        const sidecar = decodeNativeGraphCompilerSidecar({
+            fact_graph: factGraph,
+            projected_ui_graph: { nodes: [], edges: [] },
+        } as never);
+
+        expect(sidecar?.factGraph).toEqual(factGraph);
+        expect(sidecar?.projectedUiGraph).toEqual({ nodes: [], edges: [] });
+        expect(sidecar?.receipts).toEqual(factGraph.receipts);
+    });
+
     it('profiles snapshot payload sections without changing the scoped document contract', () => {
         const snapshot = buildGraphRebuildSnapshot({
             scopeKind: 'global',

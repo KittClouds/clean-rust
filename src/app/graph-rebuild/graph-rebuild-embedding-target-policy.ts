@@ -99,6 +99,7 @@ function selectEmbeddingTargets(
     const selected = new Map<string, GraphRebuildEmbeddingTarget>();
     const byKind = groupTargetsByKind(targets);
     const byLane = groupTargetsByLane(targets);
+    const targetById = new Map(targets.map((target) => [target.id, target]));
     const entityById = new Map((byKind.get('entity') || []).map((target) => [target.entityId || target.sourceId, target]));
     const eventById = new Map((byKind.get('event') || []).map((target) => [target.sourceId, target]));
     const relationshipById = new Map(relationships.map((relationship) => [relationship.id, relationship]));
@@ -127,10 +128,16 @@ function selectEmbeddingTargets(
     }
     for (const target of ranked(byLane.get('relationship_fact') || []).slice(0, RELATION_TARGET_BUDGET)) {
         const relationship = relationshipById.get(target.sourceId);
+        const situationRoleTargets = target.sourceId.startsWith('fact:document-hyperedge:')
+            ? (target.parentIds || [])
+                .filter((id) => id.startsWith('embed:entity:') || id.startsWith('embed:atom:'))
+                .map((id) => targetById.get(id))
+            : [];
         addGroup([
             target,
             relationship ? entityById.get(relationship.sourceEntityId) : undefined,
             relationship ? entityById.get(relationship.targetEntityId) : undefined,
+            ...situationRoleTargets,
         ]);
     }
     addMany(ranked(byKind.get('entity') || []), ENTITY_TARGET_BUDGET);
@@ -171,6 +178,9 @@ function targetLane(target: GraphRebuildEmbeddingTarget): GraphRebuildSignalTarg
     if (kind === 'chunk') return 'chunk_spine';
     if (kind === 'entity') return 'entity_anchor';
     if (kind === 'anchor') return 'anchor_evidence';
+    if (kind === 'concept') return 'entity_linker';
+    if (kind === 'evidencespan') return 'anchor_evidence';
+    if (kind === 'documentunit') return 'chunk_spine';
     if (kind === 'event') return 'event_identity';
     if (kind === 'temporalfact') return 'temporal_fact';
     if (kind === 'causalfact') return 'causal_fact';

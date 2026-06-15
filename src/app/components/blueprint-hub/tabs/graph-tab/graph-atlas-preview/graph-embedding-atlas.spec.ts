@@ -323,6 +323,95 @@ describe('embedding atlas projection', () => {
         });
     });
 
+    it('projects compiled semantic situations as typed n-ary role incidences', () => {
+        const factId = 'fact:document-hyperedge:transfer-1';
+        const situationId = `embed:${factId}`;
+        const snapshot = {
+            schemaVersion: 'phoenix-graph-rebuild/v1',
+            id: 'snapshot-hypergraph-atlas',
+            source: 'phoenix-graph-rebuild',
+            scopeKind: 'global',
+            scopeId: 'global',
+            noteIds: ['note-1'],
+            builtAt: 1,
+            chunks: [],
+            mentions: [],
+            entityAnchors: [],
+            relationships: [],
+            events: [],
+            episodes: [],
+            temporalEdges: [],
+            causalEdges: [],
+            memoryState: [],
+            embeddingTargets: [
+                { id: 'embed:entity:kai', kind: 'entity', sourceId: 'kai', entityId: 'kai', entityKind: 'CHARACTER', label: 'Kai', text: 'Kai', evidenceIds: [] },
+                { id: 'embed:entity:hazel', kind: 'entity', sourceId: 'hazel', entityId: 'hazel', entityKind: 'CHARACTER', label: 'Hazel', text: 'Hazel', evidenceIds: [] },
+                { id: 'embed:atom:documentMention:key', kind: 'concept', sourceId: 'key', noteId: 'note-1', label: 'the key', text: 'hypergraph_role:theme', evidenceIds: ['evidence-1'] },
+                {
+                    id: situationId,
+                    kind: 'graphFact',
+                    sourceId: factId,
+                    noteId: 'note-1',
+                    label: 'transfer_possession',
+                    text: 'semantic_situation:transfer-1 confidence:0.92',
+                    evidenceIds: ['evidence-1'],
+                    parentIds: ['embed:entity:kai', 'embed:entity:hazel', 'embed:atom:documentMention:key'],
+                },
+            ],
+            embeddingVectors: [],
+            projectionRefs: [],
+            nodes: [
+                { entityId: 'kai', label: 'Kai', kind: 'CHARACTER', anchorIds: [] },
+                { entityId: 'hazel', label: 'Hazel', kind: 'CHARACTER', anchorIds: [] },
+            ],
+            edges: [],
+            counters: null,
+            graphModelV2: {
+                schemaVersion: 'phoenix-graph-model/v2',
+                sourceSnapshotId: 'snapshot-hypergraph-atlas',
+                builtAt: 1,
+                atoms: [],
+                laneRoots: [],
+                bundles: [],
+                facts: [{
+                    id: factId,
+                    family: 'transfer',
+                    relationType: 'transfer_possession',
+                    lane: 'relationship_fact',
+                    status: 'accepted',
+                    confidence: 0.92,
+                    evidenceIds: ['atom:documentEvidence:evidence-1'],
+                    sourceRecordId: 'semantic-situation:transfer-1',
+                    semanticSituationId: 'semantic-situation:transfer-1',
+                    semanticFrame: 'transfer_possession',
+                }],
+                roles: [],
+                styleTags: [],
+                projectionEdges: [
+                    { id: 'projection:transfer:actor', sourceId: `atom:relationFact:${factId}`, targetId: 'atom:entity:kai', edgeType: 'role:actor', projectionKind: 'factRole', sourceFactId: factId, confidence: 0.94 },
+                    { id: 'projection:transfer:recipient', sourceId: `atom:relationFact:${factId}`, targetId: 'atom:entity:hazel', edgeType: 'role:recipient', projectionKind: 'factRole', sourceFactId: factId, confidence: 0.91 },
+                    { id: 'projection:transfer:theme', sourceId: `atom:relationFact:${factId}`, targetId: 'atom:documentMention:key', edgeType: 'role:theme', projectionKind: 'factRole', sourceFactId: factId, confidence: 0.78 },
+                ],
+                counters: { atoms: 0, laneRoots: 0, bundles: 0, facts: 1, roles: 3, styleTags: 0, projectionEdges: 3, stagedCooccurrenceBundles: 0, weakCooccurrenceFacts: 0, hyperedgeFacts: 1 },
+            },
+        } as any;
+
+        const atlas = buildGraphRebuildEmbeddingAtlas(snapshot, 'hybrid');
+
+        expect(atlas.nodes.map((node) => node.id)).toEqual(expect.arrayContaining([
+            situationId,
+            'embed:entity:kai',
+            'embed:entity:hazel',
+            'embed:atom:documentMention:key',
+        ]));
+        expect(atlas.edges).toEqual(expect.arrayContaining([
+            expect.objectContaining({ sourceId: situationId, targetId: 'embed:entity:kai', type: 'actor' }),
+            expect.objectContaining({ sourceId: situationId, targetId: 'embed:entity:hazel', type: 'recipient' }),
+            expect.objectContaining({ sourceId: situationId, targetId: 'embed:atom:documentMention:key', type: 'theme' }),
+        ]));
+        expect(atlas.edges.some((edge) => edge.type === 'target-parent' && edge.targetId === situationId)).toBe(false);
+    });
+
     it('carries embedding topology into Product manifold metadata without linking identities', () => {
         const atlas = buildGraphRebuildEmbeddingAtlas({
             schemaVersion: 'phoenix-graph-rebuild/v1',

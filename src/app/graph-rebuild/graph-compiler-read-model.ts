@@ -406,7 +406,7 @@ function graphModelAtomKind(kind: GraphCompilerAtomKind): GraphModelV2AtomKind |
 }
 
 function graphModelRole(roleName: string): GraphModelV2FactRole['role'] {
-    if (['subject', 'source', 'target', 'actor', 'speaker', 'listener', 'cause', 'effect', 'object', 'location', 'time', 'state', 'leftMention', 'rightMention', 'evidence'].includes(roleName)) return roleName as GraphModelV2FactRole['role'];
+    if (['subject', 'source', 'target', 'actor', 'speaker', 'listener', 'cause', 'effect', 'object', 'agent', 'bearer', 'experiencer', 'topic', 'recipient', 'theme', 'location', 'time', 'manner', 'instrument', 'purpose', 'condition', 'state', 'leftMention', 'rightMention', 'evidence'].includes(roleName)) return roleName as GraphModelV2FactRole['role'];
     return 'evidence';
 }
 

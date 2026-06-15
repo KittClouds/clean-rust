@@ -116,6 +116,28 @@
         </span>
       </div>
 
+      <div class="stage8-contract" [ngClass]="'stage8-tone-' + stage8.contract.status">
+        <div class="stage8-contract-main">
+          <span>Projection contract</span>
+          <strong>{{ stage8.contract.summary }}</strong>
+          <small>Graph = topology / Embed = target projection</small>
+        </div>
+        <div class="stage8-contract-ledger">
+          <span>
+            <b>{{ stage8.contract.compilerLabel }}</b>
+            <small>{{ stage8.contract.pipelineLabel }}</small>
+          </span>
+          <span>
+            <b>{{ stage8.contract.semanticCoordinatesLabel }}</b>
+            <small>{{ stage8.contract.vectorDetail }}</small>
+          </span>
+          <span>
+            <b>{{ stage8.contract.parityLabel }}</b>
+            <small>{{ stage8.contract.parityDetail }}</small>
+          </span>
+        </div>
+      </div>
+
       <div class="stage8-lanes">
         <button *ngFor="let lane of stage8.lanes" type="button" class="stage8-lane"
           [ngClass]="'stage8-tone-' + lane.tone" [disabled]="!lane.queue"

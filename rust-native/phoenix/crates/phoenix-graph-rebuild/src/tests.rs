@@ -250,11 +250,14 @@ fn dual_write_compiles_only_reviewed_document_situations_to_hyperedges() {
         evidence_spans: vec![GraphDocumentEvidenceSpan {
             id: "evidence:situation:1".into(),
             note_id: "note-situation".into(),
+            unit_id: None,
             chunk_id: Some("note-situation:chunk:0".into()),
             start: 0,
             end: text.len() as u32,
+            preview: None,
             confidence: GraphDocumentConfidence { score: 0.91 },
         }],
+        ..GraphDocumentSidecarSummary::default()
     });
     snapshot.document_compiler_summary = Some(GraphDocumentCompilerSummary {
         hyperedges: vec![
@@ -674,8 +677,12 @@ fn situation_hyperedge(
         predicate: "transfer_possession".into(),
         trigger_predicate: Some("gave".into()),
         frame: Some("transfer_possession".into()),
+        frame_family: Some("transfer".into()),
+        situation_kind: Some("event".into()),
         factuality: Some("asserted".into()),
+        speech_act: Some("assertive".into()),
         semantic_situation_id: Some(situation_id.into()),
+        semantic_proposition_id: None,
         state_interval_ids: Vec::new(),
         event_ordering_ids: Vec::new(),
         temporal_conflict_ids,
@@ -695,6 +702,7 @@ fn situation_hyperedge(
         evidence_span_ids: vec!["evidence:situation:1".into()],
         confidence: 0.91,
         status: "pending_commit".into(),
+        provenance: None,
     }
 }
 

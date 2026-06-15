@@ -16,6 +16,7 @@ import type {
     GraphRebuildEmbeddingTarget,
     GraphRebuildSnapshot,
 } from '../../../../../graph-rebuild/graph-rebuild-snapshot';
+import type { GraphAtlasManifoldTarget } from '../../../../../graph-rebuild/graph-atlas-packet';
 import {
     normalizeEmbeddingProfile,
     sparseEmbeddingSignature,
@@ -111,23 +112,25 @@ export function buildGraphRebuildEmbeddingAtlas(
     snapshot: GraphRebuildSnapshot,
     manifold: AtlasManifoldMode,
 ): EmbeddingAtlasData {
-    const entityKindById = new Map(snapshot.nodes.map((node) => [node.entityId, node.kind]));
-    const profile = normalizeEmbeddingProfile(snapshot.embeddingProfile);
-    const postByTarget = new Map((snapshot.embeddingGraphPostProcess?.targets || []).map((row) => [row.targetId, row]));
-    const mentionCompaction = compactEntityMentionTargets(snapshot, selectEmbeddingTargets(snapshot));
+    // Compatibility adapter: Rust Atlas packets own target membership/coordinates.
+    const atlasSnapshot = snapshotWithAtlasPacketTargets(snapshot);
+    const entityKindById = new Map(atlasSnapshot.nodes.map((node) => [node.entityId, node.kind]));
+    const profile = normalizeEmbeddingProfile(atlasSnapshot.embeddingProfile);
+    const postByTarget = new Map((atlasSnapshot.embeddingGraphPostProcess?.targets || []).map((row) => [row.targetId, row]));
+    const mentionCompaction = compactEntityMentionTargets(atlasSnapshot, selectEmbeddingTargets(atlasSnapshot));
     const selected = mentionCompaction.targets
         .map((target) => hydrateTargetEntityKind(target, entityKindById));
-    const hierarchyByTarget = buildTargetHierarchyContext(snapshot);
-    const truthByTarget = buildGraphSignalTruthIndex(snapshot);
-    const commitmentBySourceId = buildBundleCommitmentIndex(snapshot);
+    const hierarchyByTarget = buildTargetHierarchyContext(atlasSnapshot);
+    const truthByTarget = buildGraphSignalTruthIndex(atlasSnapshot);
+    const commitmentBySourceId = buildBundleCommitmentIndex(atlasSnapshot);
     const vectors = selected.map((target) => textVector(target, profile.selectedDimensions));
     const capsDocumentDirections = buildCapsDocumentDirections(selected, vectors, manifold);
-    const hopfBasePlan = manifold === 'hopf' ? buildHopfAtlasAssignmentPlan(snapshot, selected, vectors, postByTarget) : undefined;
+    const hopfBasePlan = manifold === 'hopf' ? buildHopfAtlasAssignmentPlan(atlasSnapshot, selected, vectors, postByTarget) : undefined;
     const rawNodes = selected.map((target, index) =>
         targetNode(target, vectors[index], index, selected.length, manifold, postByTarget.get(target.id), hopfBasePlan?.get(target.id), hierarchyByTarget.get(target.id), truthByTarget.get(target.id), commitmentBySourceId.get(target.sourceId) || commitmentBySourceId.get(target.id), mentionCompaction.receiptsByEntityTargetId.get(target.id), capsDocumentDirections),
     );
     const nodeIds = new Set(rawNodes.map((node) => node.id));
-    const rawEdges = buildTargetEdges(snapshot).filter((edge) => nodeIds.has(edge.sourceId) && nodeIds.has(edge.targetId));
+    const rawEdges = buildTargetEdges(atlasSnapshot).filter((edge) => nodeIds.has(edge.sourceId) && nodeIds.has(edge.targetId));
     const traversal = manifold === 'product' ? buildGraphRebuildProductTraversal(selected, rawEdges) : emptyProductTraversal();
     const nodes = rawNodes.map((node) => {
         const productTraversal = traversal.nodeMetadata.get(node.id);
@@ -154,7 +157,7 @@ export function buildGraphRebuildEmbeddingAtlas(
     return {
         nodes,
         edges,
-        sourceLabel: `graph rebuild snapshot -> ${graphRebuildProjectionLabel(manifold)} projection`,
+        sourceLabel: `${atlasProjectionSourceLabel(atlasSnapshot)} -> ${graphRebuildProjectionLabel(manifold)} projection`,
         searchIndex: nodes.map((node, index): EmbeddingAtlasSearchItem => ({
             nodeId: node.id,
             vector: vectors[index],
@@ -162,9 +165,9 @@ export function buildGraphRebuildEmbeddingAtlas(
         manifold: {
             mode: manifold,
             geometryVersion: graphRebuildGeometryVersion(manifold),
-            sourceLabel: 'graph rebuild snapshot',
+            sourceLabel: atlasProjectionSourceLabel(atlasSnapshot),
             capabilities: graphRebuildCapabilities(manifold),
-            projectionSource: 'graph_rebuild_embedding_targets',
+            projectionSource: atlasSnapshot.atlasPacket ? 'rust_atlas_packet_manifold_targets' : 'graph_rebuild_embedding_targets',
             cells: [],
             charts: [],
             seams: [],
@@ -177,6 +180,41 @@ export function buildGraphRebuildEmbeddingAtlas(
             anchorProjections: [],
         },
     };
+}
+
+function snapshotWithAtlasPacketTargets(snapshot: GraphRebuildSnapshot): GraphRebuildSnapshot {
+    const packet = snapshot.atlasPacket;
+    if (!packet?.manifoldTargets?.length) return snapshot;
+    const targets = atlasPacketEmbeddingTargets(packet.manifoldTargets, snapshot.embeddingTargets);
+    return { ...snapshot, embeddingTargets: targets };
+}
+
+function atlasPacketEmbeddingTargets(
+    packetTargets: GraphAtlasManifoldTarget[],
+    displayTargets: GraphRebuildEmbeddingTarget[],
+): GraphRebuildEmbeddingTarget[] {
+    const byId = new Map(displayTargets.map((target) => [target.id, target]));
+    return packetTargets.map((target): GraphRebuildEmbeddingTarget => {
+        const display = byId.get(target.id);
+        return {
+            ...display,
+            id: target.id,
+            kind: target.kind,
+            sourceId: target.sourceId,
+            noteId: target.noteId,
+            chunkId: target.chunkId,
+            entityId: target.registryEntityId,
+            entityKind: display?.entityKind,
+            label: target.label,
+            text: display?.text || `${target.family}:${target.coordinateSource}\nobject:${target.objectId}`,
+            evidenceIds: target.evidenceIds || [],
+            parentIds: target.parentIds || display?.parentIds || [],
+        };
+    });
+}
+
+function atlasProjectionSourceLabel(snapshot: GraphRebuildSnapshot): string {
+    return snapshot.atlasPacket?.sourceContract.authority || 'graph rebuild snapshot';
 }
 
 function selectEmbeddingTargets(snapshot: GraphRebuildSnapshot): GraphRebuildEmbeddingTarget[] {
@@ -278,13 +316,16 @@ function coverageOrderedTargets(targets: GraphRebuildEmbeddingTarget[]): GraphRe
             case 'note': return 900;
             case 'structure-root': return 890;
             case 'chunk': return 880;
+            case 'document-unit': return 875;
             case 'causal-fact': return 860;
             case 'temporal-fact': return 850;
             case 'event': return 830;
             case 'memory-state': return 810;
             case 'graph-fact': return 790;
             case 'entity': return 760;
+            case 'concept': return 750;
             case 'anchor': return 700;
+            case 'evidence-span': return 700;
             default: return 650;
         }
     };
@@ -450,8 +491,8 @@ function productRouteLaneForTarget(target: GraphRebuildEmbeddingTarget): string 
     if (/event/.test(lane)) return 'event';
     if (/memory/.test(lane)) return 'relationship';
     const kind = displayKind(target.kind);
-    if (/document|chunk|anchor/.test(kind)) return 'evidence';
-    if (/entity|character|location|network/.test(kind)) return 'identity';
+    if (/document|chunk|anchor|evidence/.test(kind)) return 'evidence';
+    if (/entity|character|location|network|concept/.test(kind)) return 'identity';
     if (/temporal/.test(kind)) return 'temporal';
     if (/causal/.test(kind)) return 'causal';
     if (/event/.test(kind)) return 'event';
@@ -1962,8 +2003,13 @@ function buildTargetEdges(snapshot: GraphRebuildSnapshot): GalaxyInputEdge[] {
         add(`embed:note-chunk:${chunk.id}`, `embed:note:${chunk.noteId}`, `embed:chunk:${chunk.id}`, 'note-chunk', 0.9);
     }
     const targetIds = new Set(snapshot.embeddingTargets.map((target) => target.id));
+    const typedIncidenceFactIds = new Set((snapshot.graphModelV2?.projectionEdges || [])
+        .filter((edge) => edge.projectionKind === 'factRole' && edge.sourceFactId)
+        .map((edge) => edge.sourceFactId as string));
     for (const target of snapshot.embeddingTargets) {
         for (const parentId of target.parentIds || []) {
+            if (typedIncidenceFactIds.has(target.sourceId)
+                && (parentId.startsWith('embed:entity:') || parentId.startsWith('embed:atom:'))) continue;
             if (targetIds.has(parentId)) add(`embed:target-parent:${parentId}:${target.id}`, parentId, target.id, 'target-parent', 0.88);
         }
     }
@@ -2043,19 +2089,25 @@ function graphModelV2TargetToEmbeddingId(targetId: string): string | null {
     const sourceId = rest.join(':');
     if (!sourceId) return null;
     if (prefix === 'atom') {
+        if (kind === 'relationFact') return graphModelFactToEmbeddingId(sourceId);
         if (kind === 'document') return `embed:note:${sourceId}`;
         if (kind === 'chunk') return `embed:chunk:${sourceId}`;
         if (kind === 'evidence' || kind === 'sourceSpan') return `embed:anchor:${sourceId}`;
+        if (kind === 'documentMention' || kind === 'documentEvidence' || kind === 'documentUnit') return `embed:${targetId}`;
         if (kind === 'entity') return `embed:entity:${sourceId}`;
         if (kind === 'event') return `embed:event:${sourceId}`;
         if (kind === 'state') return `embed:memory:${sourceId}`;
     }
-    if (prefix === 'fact') {
-        if (kind === 'relationship') return `embed:graph-fact:${sourceId}`;
-        if (kind === 'temporal') return `embed:temporalFact:${sourceId}`;
-        if (kind === 'causal') return `embed:causalFact:${sourceId}`;
-        if (kind === 'memory') return `embed:memory:${sourceId}`;
-    }
+    if (prefix === 'fact') return graphModelFactToEmbeddingId(targetId);
+    return null;
+}
+
+function graphModelFactToEmbeddingId(factId: string): string | null {
+    if (factId.startsWith('fact:document-hyperedge:')) return `embed:${factId}`;
+    if (factId.startsWith('fact:relationship:')) return `embed:graph-fact:${factId.slice('fact:relationship:'.length)}`;
+    if (factId.startsWith('fact:temporal:')) return `embed:temporalFact:${factId.slice('fact:temporal:'.length)}`;
+    if (factId.startsWith('fact:causal:')) return `embed:causalFact:${factId.slice('fact:causal:'.length)}`;
+    if (factId.startsWith('fact:memory:')) return `embed:memory:${factId.slice('fact:memory:'.length)}`;
     return null;
 }
 
@@ -2192,8 +2244,11 @@ function kindHsl(kind: string): string {
         case 'note': return entityColorStore.getRawGraphNodeHsl('document');
         case 'structure-root': return entityColorStore.getRawGraphNodeHsl('document');
         case 'chunk': return entityColorStore.getRawGraphNodeHsl('chunk');
+        case 'document-unit': return entityColorStore.getRawGraphNodeHsl('chunk');
         case 'entity': return '282 70% 62%';
+        case 'concept': return entityColorStore.getRawGraphNodeHsl('anchor');
         case 'anchor': return entityColorStore.getRawGraphNodeHsl('anchor');
+        case 'evidence-span': return entityColorStore.getRawGraphNodeHsl('anchor');
         case 'graph-fact': return entityColorStore.getRawGraphNodeHsl('graphFact');
         case 'event': return entityColorStore.getRawGraphNodeHsl('eventNode');
         case 'temporal-fact': return entityColorStore.getRawGraphNodeHsl('temporalFact');

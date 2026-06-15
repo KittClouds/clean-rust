@@ -17,9 +17,9 @@ use crate::tts::{
 use base64::{engine::general_purpose::STANDARD as BASE64_STANDARD, Engine as _};
 use flate2::{read::GzDecoder, write::GzEncoder, Compression};
 use phoenix_graph_rebuild::{
-    build_chunks, build_document_semantic_summary, classify_document_profiles,
-    compile_legacy_snapshot, Chunk, ChunkerConfig, DocumentProfileRequest, DocumentSemanticRequest,
-    GraphRebuildSnapshot,
+    build_atlas_packet, build_chunks, build_document_semantic_summary, build_snapshot_embedding_targets,
+    classify_document_profiles, compile_legacy_snapshot, Chunk, ChunkerConfig,
+    DocumentProfileRequest, DocumentSemanticRequest, GraphRebuildSnapshot,
 };
 use phoenix_hyperbolic::lorentz_tree::{
     HyperboloidPoint, LorentzForest, LorentzForestIndex, LorentzNode, LorentzQueryMode,
@@ -883,10 +883,17 @@ impl PhoenixApi for PhoenixApiImpl {
                 "phoenix-graph-compiler-payload/gzip-base64/v1",
                 fact_graph.schema_version.as_str(),
             )?;
+            let embedding_targets = build_snapshot_embedding_targets(&snapshot);
+            let mut atlas_snapshot = snapshot.clone();
+            atlas_snapshot.embedding_targets = embedding_targets.clone();
+            let atlas_packet = build_atlas_packet(&atlas_snapshot);
             return serialize_json(&json!({
                 "success": true,
                 "payload": {
                     "factGraphPayload": fact_graph_payload,
+                    "atlasPacket": atlas_packet,
+                    "embeddingTargetSource": "rust-graph-family-targets/v1",
+                    "embeddingTargets": embedding_targets,
                 },
                 "error": null,
             }));

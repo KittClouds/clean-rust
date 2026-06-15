@@ -97,6 +97,10 @@ import {
   buildReviewClusterViews,
   type ProductDiagnosticsReviewCluster,
 } from '../blueprint-hub/tabs/graph-tab/graph-product-diagnostics';
+import {
+  buildGraphProjectionContractReport,
+  type GraphProjectionContractReport,
+} from '../../graph-rebuild/graph-projection-contract-report';
 
 type BuilderCapabilityCard = {
   capability: AtlasCapability;
@@ -241,6 +245,7 @@ interface Stage8WorkbenchView {
   label: string;
   detail: string;
   router: Stage8RouterView;
+  contract: GraphProjectionContractReport;
   lanes: Stage8LaneView[];
   reviewItems: Stage8ReviewItemView[];
   receipts: LastRunReceiptRow[];
@@ -1917,6 +1922,7 @@ function buildStage8WorkbenchView(
   const embeddingVectors = counters?.embeddingVectors ?? snapshot?.embeddingVectors.length ?? 0;
   const receiptFailures = counters?.finalLinkReceiptFailures ?? snapshot?.finalLinkPatchLog?.counters.failedReceipts ?? 0;
   const routerStage = stage8RouterStage(receipt);
+  const contract = buildGraphProjectionContractReport(snapshot, { receipt });
   const semanticReady = vectorStatus === 'ready'
     || receipt?.modelReadiness?.some((model) => model.id === 'semanticEmbedding' && model.status === 'ready')
     || false;
@@ -1943,6 +1949,7 @@ function buildStage8WorkbenchView(
       timing: routerStage ? `${routerStage.durationMs.toLocaleString()} ms` : 'pending',
       tone: routerTone,
     },
+    contract,
     lanes: [
       stage8Lane('identity', 'Identity', identityReviews, `${entityLinking?.sameEntity || 0} same / ${entityLinking?.ambiguous || 0} ambiguous`, identityReviews ? 'review' : 'quiet', 'identity'),
       stage8Lane('aliases', 'Aliases', counters?.aliases || 0, `${aliasPatches} alias patches / ${entityLinking?.aliasOf || 0} linker votes`, aliasPatches ? 'review' : 'ready', 'identity'),

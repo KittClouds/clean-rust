@@ -12,6 +12,7 @@
 
 .stage8-head,
 .stage8-router,
+.stage8-contract,
 .stage8-section-head,
 .stage8-review-item,
 .stage8-receipt-row {
@@ -158,6 +159,66 @@
   min-width: 0;
   flex-wrap: wrap;
   gap: 4px;
+}
+
+.stage8-contract {
+  display: grid;
+  gap: 6px;
+  padding: 7px;
+  border: 1px solid rgba(148, 163, 184, 0.13);
+  border-radius: 7px;
+  background: rgba(0, 0, 0, 0.24);
+}
+
+.stage8-contract-main,
+.stage8-contract-ledger {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.stage8-contract-main {
+  display: grid;
+  gap: 2px;
+}
+
+.stage8-contract-main span {
+  color: #a7f3d0;
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.stage8-contract-main strong {
+  color: #f8fafc;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.stage8-contract-main small,
+.stage8-contract-ledger small {
+  color: #8aa2c4;
+  font-size: 8px;
+}
+
+.stage8-contract-ledger span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  max-width: 100%;
+  padding: 3px 6px;
+  border: 1px solid rgba(125, 225, 209, 0.14);
+  border-radius: 999px;
+  background: rgba(6, 78, 59, 0.12);
+}
+
+.stage8-contract-ledger b {
+  color: #f8fafc;
+  font-size: 8px;
+  font-style: normal;
+  font-weight: 900;
 }
 
 .stage8-lanes {

@@ -88,6 +88,14 @@ export interface GraphOperatorMutationReplayResult {
     conflictedIntentIds: string[];
 }
 
+export interface GraphOperatorMutationReviewReplayResult {
+    review: NonNullable<GraphRebuildSnapshot['documentReviewSummary']>;
+    journal: GraphOperatorMutationJournal;
+    appliedIntentIds: string[];
+    conflictedIntentIds: string[];
+    changedReview: boolean;
+}
+
 export function emptyGraphOperatorMutationJournal(
     scopeId: string,
     updatedAt = Date.now(),
@@ -153,6 +161,29 @@ export function replayGraphOperatorMutationJournal(
         };
     }
 
+    const replay = replayGraphOperatorMutationJournalReview(
+        review,
+        journal,
+        snapshot.scopeId,
+        builtAt,
+    );
+    const nextSnapshot = replay.changedReview
+        ? withReviewCompiler(snapshot, replay.review, builtAt, replay.journal)
+        : withOperatorJournalCounters(snapshot, replay.journal);
+    return {
+        snapshot: nextSnapshot,
+        journal: replay.journal,
+        appliedIntentIds: replay.appliedIntentIds,
+        conflictedIntentIds: replay.conflictedIntentIds,
+    };
+}
+
+export function replayGraphOperatorMutationJournalReview(
+    review: NonNullable<GraphRebuildSnapshot['documentReviewSummary']>,
+    journal: GraphOperatorMutationJournal,
+    scopeId: string,
+    builtAt = Date.now(),
+): GraphOperatorMutationReviewReplayResult {
     let nextReview = review;
     let changedReview = false;
     const receiptsById = new Map(journal.receipts.map((receipt) => [receipt.id, receipt]));
@@ -197,15 +228,18 @@ export function replayGraphOperatorMutationJournal(
 
     const nextJournal = withJournalCounters({
         ...journal,
-        scopeId: snapshot.scopeId,
+        scopeId,
         updatedAt: builtAt,
         intents,
         receipts: [...receiptsById.values()].sort((left, right) => left.createdAt - right.createdAt || left.id.localeCompare(right.id)),
     });
-    const nextSnapshot = changedReview
-        ? withReviewCompiler(snapshot, { ...nextReview, builtAt }, builtAt, nextJournal)
-        : withOperatorJournalCounters(snapshot, nextJournal);
-    return { snapshot: nextSnapshot, journal: nextJournal, appliedIntentIds, conflictedIntentIds };
+    return {
+        review: changedReview ? { ...nextReview, builtAt } : nextReview,
+        journal: nextJournal,
+        appliedIntentIds,
+        conflictedIntentIds,
+        changedReview,
+    };
 }
 
 export function fingerprintGraphDocumentReviewRow(row: GraphDocumentReviewRow): string {

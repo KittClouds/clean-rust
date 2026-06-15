@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { buildGraphRebuildSnapshot } from './graph-rebuild-builder';
+import { buildGraphModelV2FromCompilerOutput } from './graph-compiler-read-model';
 import { createGraphModelV2ReadModel } from './graph-model-v2-read-model';
 
 describe('graph model v2 read model', () => {
@@ -52,6 +53,33 @@ describe('graph model v2 read model', () => {
             projectionEdges: expect.any(Number),
             styleTags: expect.any(Number),
         });
+    });
+
+    it('preserves semantic hypergraph role names in the compiler read model', () => {
+        const factId = 'fact:document-hyperedge:transfer-1';
+        const model = buildGraphModelV2FromCompilerOutput('snapshot-1', {
+            scopeId: 'global',
+            builtAt: 1,
+            atoms: [],
+            bundles: [],
+            facts: [{
+                id: factId,
+                lane: 'relationshipFact',
+                predicate: 'transfer_possession',
+                sourceRecordId: 'semantic-situation:1',
+                status: 'accepted',
+                evidenceIds: [],
+                confidence: 0.92,
+            }],
+            roles: [
+                { factId, role: 'recipient', semanticRole: 'recipient', atomId: 'atom:entity:hazel', confidence: 0.9 },
+                { factId, role: 'theme', semanticRole: 'theme', atomId: 'atom:documentMention:key', confidence: 0.8 },
+            ],
+            projectedEdges: [],
+            evidenceAnchors: [],
+        } as any);
+
+        expect(model.roles.map((role) => role.role)).toEqual(['recipient', 'theme']);
     });
 });
 

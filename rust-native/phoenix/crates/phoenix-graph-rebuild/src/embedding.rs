@@ -7,6 +7,9 @@ use crate::types::{
     GraphRelationship, GraphTemporalEdge,
 };
 
+mod snapshot_targets;
+pub use snapshot_targets::build_snapshot_embedding_targets;
+
 pub fn build_embedding_targets(
     note_id: &str,
     note_text: &str,
@@ -40,6 +43,7 @@ pub fn build_embedding_targets(
         label: format_compact!("Note {note_id}"),
         text: note_embedding_text(note_id, note_text),
         evidence_ids: Vec::new(),
+        parent_ids: Vec::new(),
     });
     targets.extend(structure_root_targets(note_id));
     targets.extend(chunks.iter().map(|chunk| GraphEmbeddingTarget {
@@ -52,6 +56,7 @@ pub fn build_embedding_targets(
         label: format_compact!("Chunk {}", chunk.ordinal + 1),
         text: chunk_embedding_text(note_text, chunk),
         evidence_ids: Vec::new(),
+        parent_ids: vec![structure_root_id(&chunk.note_id, "document-structure")],
     }));
     targets.extend(nodes.iter().map(|node| GraphEmbeddingTarget {
         id: format_compact!("embed:entity:{}", node.entity_id.0),
@@ -63,6 +68,7 @@ pub fn build_embedding_targets(
         label: node.label.clone(),
         text: node.label.clone(),
         evidence_ids: node.anchor_ids.clone(),
+        parent_ids: Vec::new(),
     }));
     targets.extend(representative_anchors(anchors).into_iter().map(|anchor| {
         GraphEmbeddingTarget {
@@ -75,6 +81,7 @@ pub fn build_embedding_targets(
             label: anchor.surface.clone(),
             text: anchor.surface.clone(),
             evidence_ids: vec![anchor.id.clone()],
+            parent_ids: vec![structure_root_id(&anchor.note_id, "evidence")],
         }
     }));
     targets.extend(
@@ -105,6 +112,7 @@ pub fn build_embedding_targets(
                     relationship.status
                 ),
                 evidence_ids: relationship.evidence_anchor_ids.clone(),
+                parent_ids: Vec::new(),
             }),
     );
     targets.extend(events.iter().map(|event| GraphEmbeddingTarget {
@@ -117,6 +125,7 @@ pub fn build_embedding_targets(
         label: event.label.clone(),
         text: event.label.clone(),
         evidence_ids: event.evidence_anchor_ids.clone(),
+        parent_ids: Vec::new(),
     }));
     targets.extend(
         temporal_edges
@@ -128,16 +137,23 @@ pub fn build_embedding_targets(
             .iter()
             .map(|edge| temporal_target(note_id, edge, "causalFact")),
     );
-    targets.extend(memory_state.iter().map(|state| GraphEmbeddingTarget {
-        id: format_compact!("embed:memory:{}", state.id),
-        kind: "memoryState".into(),
-        source_id: state.id.clone(),
-        note_id: state.note_id.clone(),
-        chunk_id: None,
-        entity_id: Some(state.entity_id.clone()),
-        label: state.key.clone(),
-        text: format_compact!("{} {}", state.key, state.value),
-        evidence_ids: state.evidence_ids.clone(),
+    targets.extend(memory_state.iter().map(|state| {
+        GraphEmbeddingTarget {
+            id: format_compact!("embed:memory:{}", state.id),
+            kind: "memoryState".into(),
+            source_id: state.id.clone(),
+            note_id: state.note_id.clone(),
+            chunk_id: None,
+            entity_id: Some(state.entity_id.clone()),
+            label: state.key.clone(),
+            text: format_compact!("{} {}", state.key, state.value),
+            evidence_ids: state.evidence_ids.clone(),
+            parent_ids: state
+                .note_id
+                .as_ref()
+                .map(|note_id| vec![structure_root_id(note_id, "identity")])
+                .unwrap_or_default(),
+        }
     }));
     targets
 }
@@ -181,6 +197,7 @@ fn structure_root_targets(note_id: &str) -> Vec<GraphEmbeddingTarget> {
         label: label.into(),
         text: format_compact!("structure_root:{} note:{} {}", key, note_id, text),
         evidence_ids: Vec::new(),
+        parent_ids: vec![format_compact!("embed:note:{note_id}")],
     })
     .collect()
 }
@@ -234,7 +251,12 @@ fn temporal_target(note_id: &str, edge: &GraphTemporalEdge, prefix: &str) -> Gra
             edge.target_id
         ),
         evidence_ids: edge.evidence_ids.clone(),
+        parent_ids: Vec::new(),
     }
+}
+
+fn structure_root_id(note_id: &str, key: &str) -> CompactString {
+    format_compact!("embed:structure-root:{note_id}:{key}")
 }
 
 fn note_embedding_text(note_id: &str, note_text: &str) -> CompactString {

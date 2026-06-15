@@ -5,6 +5,7 @@
 //! projection consumers. It does not call the legacy staged orchestrator.
 
 mod adjudication;
+mod atlas_packet;
 mod builder;
 mod compiler;
 mod embedding;
@@ -14,6 +15,11 @@ mod semantic;
 mod tests;
 mod types;
 
+pub use atlas_packet::{
+    build_atlas_packet, AtlasFamilyCount, AtlasObject, AtlasObjectStatus, AtlasPacket,
+    AtlasPacketCounters, AtlasSourceContract, AtlasVectorStatus, GraphFamily, ManifoldAdmission,
+    ManifoldTarget,
+};
 pub use builder::{
     build_graph_rebuild_snapshot, GraphRebuildBuilder, GraphRebuildError, GraphRebuildInput,
 };
@@ -29,6 +35,7 @@ pub use compiler::{
     GraphCompilerError, GraphCompilerInput, GraphCompilerOutput, GraphPrototypeFamily,
     GraphRootReceipt, ProjectedGraphEdge, RelationFact,
 };
+pub use embedding::build_snapshot_embedding_targets;
 pub use phoenix_chunker_native::{
     build_chunks, classify_document_profiles, Chunk, ChunkerConfig, DocumentProfileRequest,
     DocumentProfileSummary,
@@ -46,7 +53,8 @@ pub use types::{
     GraphAnchor, GraphCalendarRegistryBridgeCounters, GraphCalendarRegistryBridgeSummary,
     GraphCalendarRegistryReceipt, GraphChunk, GraphCounters, GraphDocumentCompilerHyperedge,
     GraphDocumentCompilerHyperedgeRole, GraphDocumentCompilerSummary, GraphDocumentConfidence,
-    GraphDocumentEvidenceSpan, GraphDocumentSidecarSummary, GraphDropReasons, GraphEdge,
+    GraphDocumentEvidenceSpan, GraphDocumentReviewRow, GraphDocumentReviewSummary,
+    GraphDocumentSidecarSummary, GraphDocumentUnitSummary, GraphDropReasons, GraphEdge,
     GraphEmbeddingTarget, GraphEpisode, GraphEvent, GraphMemoryState, GraphMention, GraphNode,
     GraphProjectionRef, GraphRebuildSnapshot, GraphRelationship, GraphScopeKind, GraphTemporalEdge,
 };
