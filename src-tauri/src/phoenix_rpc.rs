@@ -5,7 +5,6 @@ use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
 
 use crate::graph_galaxy::{compile_scene, DesktopGalaxyScene, DesktopGalaxySceneRequest};
-use crate::graph_scene_hierarchy::graph_rebuild_hierarchy_hint;
 use crate::graph_scene_packet::{
     compile_packet, GraphScenePacket, GraphScenePacketEdgeInput, GraphScenePacketInput,
     GraphScenePacketNodeInput, GraphScenePacketRequest, GraphScenePacketSettings,
@@ -17,9 +16,9 @@ use crate::tts::{
 use base64::{engine::general_purpose::STANDARD as BASE64_STANDARD, Engine as _};
 use flate2::{read::GzDecoder, write::GzEncoder, Compression};
 use phoenix_graph_rebuild::{
-    build_atlas_packet, build_chunks, build_document_semantic_summary, build_snapshot_embedding_targets,
-    classify_document_profiles, compile_legacy_snapshot, Chunk, ChunkerConfig,
-    DocumentProfileRequest, DocumentSemanticRequest, GraphRebuildSnapshot,
+    build_atlas_packet, build_chunks, build_document_semantic_summary,
+    build_snapshot_embedding_targets, classify_document_profiles, compile_legacy_snapshot, Chunk,
+    ChunkerConfig, DocumentProfileRequest, DocumentSemanticRequest, GraphRebuildSnapshot,
 };
 use phoenix_hyperbolic::lorentz_tree::{
     HyperboloidPoint, LorentzForest, LorentzForestIndex, LorentzNode, LorentzQueryMode,
@@ -573,7 +572,7 @@ const HOPF_PROJECTION_VERSION: &str = "hopf_stereographic_v1";
 const LORENTZ_GEOMETRY_VERSION: &str = "lorentz_h4_forest_v1";
 const PRODUCT_GEOMETRY_VERSION: &str = "product_lorentz_hopf_v1";
 const GRAPH_REBUILD_NAMESPACE: &str = "phoenix_graph_rebuild_v1";
-const GRAPH_REBUILD_SNAPSHOT_DOCUMENT_KEY: &str = "snapshot";
+const GRAPH_MODEL_V2_OVERGRAPH_DOCUMENT_KEY: &str = "graph-model-v2-overgraph";
 const GRAPH_REBUILD_COMPRESSED_JSON_SCHEMA: &str =
     "phoenix-graph-rebuild-json-payload/gzip-base64/v1";
 const GRAPH_REBUILD_COMPRESSED_SNAPSHOT_SCHEMA: &str =
@@ -1385,7 +1384,7 @@ fn graph_scene_packet_input_from_scoped_snapshot(
     source: String,
     manifold: String,
     layout_mode: String,
-    source_mode: String,
+    _source_mode: String,
     limit: usize,
     settings: GraphScenePacketSettings,
 ) -> Result<GraphScenePacketInput, String> {
@@ -1399,10 +1398,10 @@ fn graph_scene_packet_input_from_scoped_snapshot(
         json!({
             "scope_folder_id": scope_id,
             "namespace": GRAPH_REBUILD_NAMESPACE,
-            "document_key": GRAPH_REBUILD_SNAPSHOT_DOCUMENT_KEY,
+            "document_key": GRAPH_MODEL_V2_OVERGRAPH_DOCUMENT_KEY,
         }),
     )?
-    .ok_or_else(|| format!("graph rebuild snapshot document missing for scope {scope_id}"))?;
+    .ok_or_else(|| format!("graph model v2 OverGraph document missing for scope {scope_id}"))?;
     let payload = row
         .get("payload")
         .and_then(Value::as_str)
@@ -1410,83 +1409,103 @@ fn graph_scene_packet_input_from_scoped_snapshot(
         .unwrap_or_else(|| row.get("payload").map(Value::to_string).unwrap_or_default());
     if payload.is_empty() {
         return Err(format!(
-            "graph rebuild snapshot document for scope {scope_id} had no payload"
+            "graph model v2 OverGraph document for scope {scope_id} had no payload"
         ));
     }
-    let snapshot = decode_graph_rebuild_scoped_payload(&payload)?;
-    graph_scene_packet_input_from_rebuild_snapshot_value(
-        &snapshot,
+    let overgraph = decode_graph_rebuild_scoped_payload(&payload)?;
+    graph_scene_packet_input_from_overgraph_value(
+        &overgraph,
         source,
         manifold,
         layout_mode,
-        source_mode,
         limit,
         settings,
     )
 }
 
-fn graph_scene_packet_input_from_rebuild_snapshot_value(
-    snapshot: &Value,
+fn graph_scene_packet_input_from_overgraph_value(
+    overgraph: &Value,
     source: String,
     manifold: String,
     layout_mode: String,
-    source_mode: String,
     limit: usize,
     settings: GraphScenePacketSettings,
 ) -> Result<GraphScenePacketInput, String> {
-    let nodes_value = snapshot
-        .get("embeddingTargets")
+    let graph_batch = overgraph
+        .get("graphBatch")
+        .ok_or_else(|| "graph model v2 OverGraph payload missing graphBatch".to_owned())?;
+    let vertices = graph_batch
+        .get("vertices")
         .and_then(Value::as_array)
-        .ok_or_else(|| "graph rebuild snapshot payload missing embeddingTargets".to_owned())?;
-    let mut target_ids = HashSet::with_capacity(nodes_value.len());
-    let mut nodes = Vec::with_capacity(nodes_value.len());
-    for (index, target) in nodes_value.iter().enumerate() {
-        let id = str_field(target, "id", "id");
+        .ok_or_else(|| "graph model v2 OverGraph payload missing graphBatch.vertices".to_owned())?;
+    let edge_rows = graph_batch
+        .get("edges")
+        .and_then(Value::as_array)
+        .map(Vec::as_slice)
+        .unwrap_or(&[]);
+    let mut node_ids = HashSet::with_capacity(vertices.len());
+    let mut nodes = Vec::with_capacity(vertices.len());
+    for vertex in vertices {
+        let id = str_field(vertex, "id", "id");
         if id.is_empty() {
             continue;
         }
-        target_ids.insert(id.to_owned());
-        let vector = stable_packet_vector(id, index);
-        let kind = str_field(target, "kind", "kind");
+        node_ids.insert(id.to_owned());
+        let class_name = str_field(vertex, "class", "class");
+        let kind = str_field(vertex, "kind", "kind");
+        let label = overgraph_vertex_label(vertex, id);
         nodes.push(GraphScenePacketNodeInput {
             id: id.to_owned(),
-            label: {
-                let label = str_field(target, "label", "label");
-                if label.is_empty() {
-                    kind.to_owned()
-                } else {
-                    label.to_owned()
-                }
+            label,
+            kind: if kind.is_empty() {
+                class_name.to_owned()
+            } else {
+                kind.to_owned()
             },
-            kind: kind.to_owned(),
-            source_type: graph_rebuild_packet_source_type(target).to_owned(),
-            vector: vector.to_vec(),
-            base_vector: Some(vector),
-            total_mentions: Some(target_total_mentions(target)),
-            hierarchy_hint: graph_rebuild_hierarchy_hint(target, index),
+            source_type: overgraph_vertex_source_type(vertex).to_owned(),
+            vector: Vec::new(),
+            base_vector: None,
+            total_mentions: Some(overgraph_vertex_total_mentions(vertex)),
+            hierarchy_hint: None,
         });
     }
 
-    let mut edges = Vec::new();
-    if let Some(post_process) = snapshot.get("embeddingGraphPostProcess") {
-        push_graph_rebuild_packet_edges(
-            post_process.get("backboneEdges").and_then(Value::as_array),
-            &target_ids,
-            &mut edges,
-        );
-        push_graph_rebuild_packet_edges(
-            post_process.get("bridgeEdges").and_then(Value::as_array),
-            &target_ids,
-            &mut edges,
-        );
+    let mut edges = Vec::with_capacity(edge_rows.len());
+    let mut seen_edges = HashSet::with_capacity(edge_rows.len());
+    for edge in edge_rows {
+        let source_id = str_field(edge, "source_id", "sourceId");
+        let target_id = str_field(edge, "target_id", "targetId");
+        if source_id.is_empty()
+            || target_id.is_empty()
+            || !node_ids.contains(source_id)
+            || !node_ids.contains(target_id)
+        {
+            continue;
+        }
+        let edge_type = str_field(edge, "edge_type", "edgeType");
+        let edge_id = overgraph_edge_id(source_id, target_id, edge_type);
+        if !seen_edges.insert(edge_id.clone()) {
+            continue;
+        }
+        edges.push(GraphScenePacketEdgeInput {
+            id: edge_id,
+            source_id: source_id.to_owned(),
+            target_id: target_id.to_owned(),
+            edge_type: if edge_type.is_empty() {
+                "overgraph-edge".to_owned()
+            } else {
+                edge_type.to_owned()
+            },
+            confidence: overgraph_edge_confidence(edge),
+        });
     }
 
     Ok(GraphScenePacketInput {
         source,
         manifold,
         layout_mode,
-        source_mode,
-        source_label: "scoped graph-rebuild snapshot".to_owned(),
+        source_mode: "graph".to_owned(),
+        source_label: "Rust OverGraph rows (no synthetic vectors)".to_owned(),
         limit,
         settings,
         nodes,
@@ -1494,96 +1513,82 @@ fn graph_scene_packet_input_from_rebuild_snapshot_value(
     })
 }
 
-fn push_graph_rebuild_packet_edges(
-    rows: Option<&Vec<Value>>,
-    target_ids: &HashSet<String>,
-    out: &mut Vec<GraphScenePacketEdgeInput>,
-) {
-    let Some(rows) = rows else { return };
-    out.reserve(rows.len());
-    for row in rows {
-        let source_id = str_field(row, "source_target_id", "sourceTargetId");
-        let target_id = str_field(row, "target_target_id", "targetTargetId");
-        if source_id.is_empty()
-            || target_id.is_empty()
-            || !target_ids.contains(source_id)
-            || !target_ids.contains(target_id)
-        {
-            continue;
-        }
-        let id = str_field(row, "id", "id");
-        let edge_type = str_field(row, "role", "role");
-        out.push(GraphScenePacketEdgeInput {
-            id: if id.is_empty() {
-                format!("{source_id}:semantic-neighbor:{target_id}")
-            } else {
-                id.to_owned()
-            },
-            source_id: source_id.to_owned(),
-            target_id: target_id.to_owned(),
-            edge_type: if edge_type.is_empty() {
-                "semantic-neighbor".to_owned()
-            } else {
-                edge_type.to_owned()
-            },
-            confidence: f32_field(row, "score").unwrap_or(0.5),
-        });
+fn overgraph_vertex_label(vertex: &Value, id: &str) -> String {
+    if let Some(label) = vertex
+        .get("labels")
+        .and_then(Value::as_array)
+        .and_then(|labels| labels.iter().find_map(Value::as_str))
+        .filter(|label| !label.is_empty())
+    {
+        return label.to_owned();
     }
-}
-
-fn graph_rebuild_packet_source_type(target: &Value) -> &'static str {
-    let lane = str_field(target, "lane", "lane");
-    let role = str_field(target, "structural_role", "structuralRole");
-    if role == "root" || lane == "document_spine" {
-        "root"
-    } else if lane == "chunk_spine" {
-        "chunk"
-    } else if lane == "entity_anchor" {
-        "entity"
-    } else if lane == "anchor_evidence" {
-        "evidence"
-    } else if lane == "event_identity" {
-        "event"
-    } else if lane == "temporal_fact" {
-        "temporal"
-    } else if lane == "causal_fact" {
-        "causal"
-    } else if lane == "memory_state" {
-        "memory"
-    } else if !role.is_empty() {
-        "graph"
+    let value_label = vertex
+        .get("value")
+        .and_then(|value| value.get("label"))
+        .and_then(Value::as_str)
+        .unwrap_or_default();
+    if value_label.is_empty() {
+        id.to_owned()
     } else {
-        "target"
+        value_label.to_owned()
     }
 }
 
-fn target_total_mentions(target: &Value) -> u32 {
-    let evidence = target
-        .get("evidenceIds")
-        .or_else(|| target.get("evidence_ids"))
-        .and_then(Value::as_array)
-        .map(Vec::len)
-        .unwrap_or(0);
-    let parents = target
-        .get("parentIds")
-        .or_else(|| target.get("parent_ids"))
-        .and_then(Value::as_array)
-        .map(Vec::len)
-        .unwrap_or(0);
-    count_for_wire(evidence.max(parents).max(1))
+fn overgraph_vertex_source_type(vertex: &Value) -> &'static str {
+    match str_field(vertex, "class", "class") {
+        "document" => "document",
+        "chunk" => "chunk",
+        "entity" => "entity",
+        "mention" => "mention",
+        "timeAnchor" => "temporal",
+        "memory" | "state" => "memory",
+        "event" => "event",
+        "generic" => "graph",
+        _ => "overgraph",
+    }
 }
 
-fn stable_packet_vector(id: &str, index: usize) -> [f32; 3] {
-    let mut hash = 2_166_136_261_u32 ^ index as u32;
-    for byte in id.bytes() {
-        hash ^= byte as u32;
-        hash = hash.wrapping_mul(16_777_619);
+fn overgraph_vertex_total_mentions(vertex: &Value) -> u32 {
+    let labels = vertex
+        .get("labels")
+        .and_then(Value::as_array)
+        .map(Vec::len)
+        .unwrap_or(0);
+    let evidence = vertex
+        .get("provenance")
+        .and_then(|provenance| provenance.get("evidenceRefs"))
+        .or_else(|| {
+            vertex
+                .get("provenance")
+                .and_then(|provenance| provenance.get("evidence_refs"))
+        })
+        .and_then(Value::as_array)
+        .map(Vec::len)
+        .unwrap_or(0);
+    let weight = f32_field(vertex, "weight")
+        .map(|value| (value.abs() / 200.0).ceil() as usize)
+        .unwrap_or(0);
+    count_for_wire(labels.max(evidence).max(weight).max(1))
+}
+
+fn overgraph_edge_id(source_id: &str, target_id: &str, edge_type: &str) -> String {
+    if edge_type.is_empty() {
+        format!("overgraph:{source_id}->{target_id}:edge")
+    } else {
+        format!("overgraph:{source_id}->{target_id}:{edge_type}")
     }
-    let x = ((hash & 0xff) as f32 / 127.5) - 1.0;
-    let y = (((hash >> 8) & 0xff) as f32 / 127.5) - 1.0;
-    let z = (((hash >> 16) & 0xff) as f32 / 127.5) - 1.0;
-    let norm = (x * x + y * y + z * z).sqrt().max(1e-6);
-    [x / norm, y / norm, z / norm]
+}
+
+fn overgraph_edge_confidence(edge: &Value) -> f32 {
+    edge.get("provenance")
+        .and_then(|provenance| provenance.get("confidence"))
+        .and_then(Value::as_f64)
+        .filter(|value| value.is_finite())
+        .map(|value| value as f32)
+        .or_else(|| {
+            f32_field(edge, "weight").map(|weight| (weight.abs() / 1000.0).clamp(0.05, 1.0))
+        })
+        .unwrap_or(0.62)
 }
 
 fn decode_graph_rebuild_scoped_payload(payload: &str) -> Result<Value, String> {
@@ -4162,103 +4167,85 @@ mod tests {
     }
 
     #[test]
-    fn graph_rebuild_scoped_snapshot_value_builds_packet_input() {
-        let snapshot = json!({
-            "schemaVersion": "phoenix-graph-rebuild/v1",
-            "embeddingTargets": [
-                {
-                    "id": "embed:document:note-1",
-                    "kind": "document",
-                    "label": "Note 1",
-                    "lane": "document_spine",
-                    "evidenceIds": []
-                },
-                {
-                    "id": "embed:chunk:note-1:0",
-                    "kind": "chunk",
-                    "label": "Chunk 1",
-                    "lane": "chunk_spine",
-                    "parentIds": ["embed:document:note-1"]
-                },
-                {
-                    "id": "embed:event:event-a",
-                    "kind": "event",
-                    "sourceId": "event-a",
-                    "label": "Cause event",
-                    "lane": "event_identity",
-                    "noteId": "note-1",
-                    "chunkId": "note-1:0",
-                    "parentIds": ["embed:chunk:note-1:0"]
-                },
-                {
-                    "id": "embed:event:event-b",
-                    "kind": "event",
-                    "sourceId": "event-b",
-                    "label": "Outcome event",
-                    "lane": "event_identity",
-                    "noteId": "note-1",
-                    "chunkId": "note-1:0",
-                    "parentIds": ["embed:chunk:note-1:0"]
-                },
-                {
-                    "id": "embed:causalFact:cause-1",
-                    "kind": "causalFact",
-                    "sourceId": "cause-1",
-                    "label": "causes_or_explains",
-                    "lane": "causal_fact",
-                    "noteId": "note-1",
-                    "parentIds": [
-                        "embed:structure-root:note-1:causal",
-                        "embed:event:event-a",
-                        "embed:event:event-b"
-                    ]
-                }
-            ],
-            "embeddingGraphPostProcess": {
-                "backboneEdges": [
+    fn graph_model_v2_overgraph_value_builds_packet_input_without_fake_vectors() {
+        let overgraph = json!({
+            "schemaVersion": "phoenix-graph-model-v2-overgraph/v1",
+            "graphBatch": {
+                "vertices": [
                     {
-                        "id": "edge:1",
-                        "sourceTargetId": "embed:document:note-1",
-                        "targetTargetId": "embed:chunk:note-1:0",
-                        "role": "hierarchy",
-                        "score": 0.91
+                        "id": "atom:document:note-1",
+                        "kind": "graphModelV2Atom:document",
+                        "class": "document",
+                        "labels": ["Note 1"],
+                        "weight": 400,
+                        "value": { "label": "Note 1" },
+                        "provenance": { "confidence": 0.91, "evidenceRefs": [] }
                     },
                     {
-                        "id": "edge:dropped",
-                        "sourceTargetId": "missing",
-                        "targetTargetId": "embed:chunk:note-1:0",
-                        "role": "hierarchy",
-                        "score": 0.91
+                        "id": "atom:chunk:note-1:0",
+                        "kind": "graphModelV2Atom:chunk",
+                        "class": "chunk",
+                        "labels": ["Chunk 1"],
+                        "weight": 200,
+                        "value": { "label": "Chunk 1" },
+                        "provenance": { "confidence": 0.88, "evidenceRefs": ["evidence:1"] }
+                    },
+                    {
+                        "id": "fact:rel-1",
+                        "kind": "graphModelV2Fact:causal",
+                        "class": "generic",
+                        "labels": [],
+                        "weight": 700,
+                        "value": { "label": "causes_or_explains" },
+                        "provenance": { "confidence": 0.76, "evidenceRefs": ["evidence:1"] }
                     }
                 ],
-                "bridgeEdges": []
+                "edges": [
+                    {
+                        "sourceId": "atom:document:note-1",
+                        "targetId": "atom:chunk:note-1:0",
+                        "edgeType": "contains",
+                        "weight": 910,
+                        "provenance": { "confidence": 0.91, "evidenceRefs": [] }
+                    },
+                    {
+                        "sourceId": "missing",
+                        "targetId": "fact:rel-1",
+                        "edgeType": "dropped",
+                        "weight": 900,
+                        "provenance": { "confidence": 0.9, "evidenceRefs": [] }
+                    }
+                ]
             }
         });
 
-        let input = graph_scene_packet_input_from_rebuild_snapshot_value(
-            &snapshot,
+        let input = graph_scene_packet_input_from_overgraph_value(
+            &overgraph,
             "scopedSnapshot".to_owned(),
             "siegel".to_owned(),
             "siegelFinsler".to_owned(),
-            "embeddings".to_owned(),
             4096,
             GraphScenePacketSettings::default(),
         )
         .unwrap();
 
-        assert_eq!(input.nodes.len(), 5);
+        assert_eq!(input.nodes.len(), 3);
         assert_eq!(input.edges.len(), 1);
-        assert_eq!(input.nodes[0].source_type, "root");
-        assert_eq!(input.nodes[1].source_type, "chunk");
-        let causal_hint = input.nodes[4]
-            .hierarchy_hint
-            .as_ref()
-            .expect("causal hierarchy hint");
-        assert_eq!(causal_hint.cap_id, "event:event-b:causal");
+        assert_eq!(input.source_mode, "graph");
         assert_eq!(
-            causal_hint.parent_node_id.as_deref(),
-            Some("embed:event:event-b")
+            input.source_label,
+            "Rust OverGraph rows (no synthetic vectors)"
         );
-        assert_eq!(causal_hint.shell_radius, 1.14);
+        assert_eq!(input.nodes[0].source_type, "document");
+        assert_eq!(input.nodes[1].source_type, "chunk");
+        assert_eq!(input.nodes[2].source_type, "graph");
+        assert!(input.nodes.iter().all(|node| node.vector.is_empty()));
+        assert!(input.nodes.iter().all(|node| node.base_vector.is_none()));
+        assert!(input.nodes.iter().all(|node| node.hierarchy_hint.is_none()));
+        assert_eq!(
+            input.edges[0].id,
+            "overgraph:atom:document:note-1->atom:chunk:note-1:0:contains"
+        );
+        assert_eq!(input.edges[0].confidence, 0.91);
     }
 }
