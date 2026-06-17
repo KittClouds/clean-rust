@@ -532,12 +532,12 @@ function hierarchyContractRadius(node: GalaxyNode, lane: string): number {
     const documentUnitKind = graphText(metadata['atlasDocumentUnitKind'], metadata['documentUnitKind']);
     const stateContextKind = graphText(metadata['atlasStateContextKind'], metadata['stateContextKind']);
     const text = `${sourceType} ${kind} ${styleKey} ${family} ${structuralRole} ${documentUnitKind} ${stateContextKind} ${lane}`.toLowerCase();
-    if (/\b(note|document)\b/.test(text) && !/structure.?root|root:/.test(text)) return 2.08;
-    if (/structure.?root|root:/.test(text) || structuralRole === 'root') return 1.9;
-    if (/chunk|leaf|claim|action.?block|contrast|looked|glanced/.test(text)) return 1.64;
-    if (/anchor|mention|evidence/.test(text) || structuralRole === 'evidence') return 1.38;
-    if (/entity|character|location|creature|npc|item|network|group/.test(text)) return 1.16;
-    if (/memory|state|context|decision|rank.?status|service|affiliation|family.?context/.test(text)) return 0.9;
+    if (/\b(note|document)\b/.test(text) && !/structure.?root|root:/.test(text)) return 2.1;
+    if (/structure.?root|root:/.test(text) || structuralRole === 'root') return 1.78;
+    if (/chunk|leaf|claim|action.?block|contrast|looked|glanced/.test(text)) return 1.46;
+    if (/anchor|mention|evidence/.test(text) || structuralRole === 'evidence') return 1.14;
+    if (/entity|character|location|creature|npc|item|network|group/.test(text)) return 0.86;
+    if (/memory|state|context|decision|rank.?status|service|affiliation|family.?context/.test(text)) return 0.58;
     return NaN;
 }
 
@@ -583,8 +583,10 @@ function capIdFor(
     lorentz: Record<string, unknown>,
     primary: Record<string, unknown>,
 ): string {
+    const documentCapId = documentContainmentCapIdFor(node, lorentz, primary);
     const structuralCapId = structuralCapIdFor(node, lane);
     return firstText(
+        documentCapId,
         lorentz['capId'],
         structuralCapId,
         node.entity.metadata?.['embeddingClusterId'],
@@ -594,6 +596,31 @@ function capIdFor(
         primary['treeId'],
         `lane:${lane}`,
     );
+}
+
+function documentContainmentCapIdFor(node: GalaxyNode, lorentz: Record<string, unknown>, primary: Record<string, unknown>): string {
+    const metadata = node.entity.metadata || {};
+    const noteIds = arrayText(metadata['noteIds']);
+    const noteId = firstText(
+        metadata['noteId'],
+        noteIds[0],
+        /note|document|doc/.test(String(metadata['sourceType'] || node.entity.kind || '').toLowerCase()) ? metadata['sourceId'] : '',
+    );
+    if (noteId) return `document:${noteId}`;
+    return firstText(
+        documentCapRoot(lorentz['capId']),
+        documentCapRoot(primary['capId']),
+        documentCapRoot(lorentz['parentCapId']),
+        documentCapRoot(primary['parentCapId']),
+        ...arrayText(lorentz['parentCapIds']).map(documentCapRoot),
+        ...arrayText(primary['parentCapIds']).map(documentCapRoot),
+    );
+}
+
+function documentCapRoot(value: unknown): string {
+    const text = String(value || '').trim();
+    const match = /^document:([^:]+)/.exec(text);
+    return match ? `document:${match[1]}` : '';
 }
 
 function structuralCapIdFor(node: GalaxyNode, lane: string): string {

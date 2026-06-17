@@ -348,14 +348,14 @@ export function finite(value: unknown): number {
 }
 
 const HIERARCHY_SHELL_BANDS: Record<HierarchyShellBand['id'], HierarchyShellBand> = {
-    document: { id: 'document', rank: 0, radius: 2.08, min: 2.02, max: 2.14 },
-    documentRoot: { id: 'documentRoot', rank: 1, radius: 1.9, min: 1.84, max: 1.98 },
-    chunk: { id: 'chunk', rank: 2, radius: 1.64, min: 1.56, max: 1.74 },
-    evidence: { id: 'evidence', rank: 3, radius: 1.38, min: 1.3, max: 1.48 },
-    event: { id: 'event', rank: 4, radius: 1.3, min: 1.22, max: 1.4 },
-    fact: { id: 'fact', rank: 5, radius: 1.22, min: 1.14, max: 1.32 },
-    entity: { id: 'entity', rank: 6, radius: 1.16, min: 1.06, max: 1.26 },
-    memory: { id: 'memory', rank: 7, radius: 0.9, min: 0.78, max: 1.0 },
+    document: { id: 'document', rank: 0, radius: 2.1, min: 2.04, max: 2.14 },
+    documentRoot: { id: 'documentRoot', rank: 1, radius: 1.78, min: 1.7, max: 1.86 },
+    chunk: { id: 'chunk', rank: 2, radius: 1.46, min: 1.38, max: 1.54 },
+    evidence: { id: 'evidence', rank: 3, radius: 1.14, min: 1.06, max: 1.22 },
+    event: { id: 'event', rank: 4, radius: 1.06, min: 0.98, max: 1.16 },
+    fact: { id: 'fact', rank: 5, radius: 0.98, min: 0.9, max: 1.08 },
+    entity: { id: 'entity', rank: 6, radius: 0.86, min: 0.76, max: 0.94 },
+    memory: { id: 'memory', rank: 7, radius: 0.58, min: 0.46, max: 0.68 },
 };
 
 function hierarchyKindText(node: GalaxyNode): string {

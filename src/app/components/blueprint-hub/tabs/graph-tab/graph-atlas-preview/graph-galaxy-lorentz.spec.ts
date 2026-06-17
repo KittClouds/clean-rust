@@ -96,25 +96,29 @@ describe('Lorentz tree galaxy visualization data', () => {
         expect(byId.get('evidence')!.depth).toBeGreaterThan(byId.get('entity')!.depth);
     });
 
-    it('pulls child cap centers into declared parent cap containment', () => {
+    it('keeps document, roots, chunks, evidence, and entities inside one document cap', () => {
         const scene = buildGalaxyScene([
             containmentNode('doc', 'Red Mesa', 'note', 'document:note-1', null, 2.08, 'document_spine', [0, 0, 1]),
             containmentNode('root', 'Document root', 'structureRoot', 'document:note-1:root:document', 'document:note-1', 1.92, 'document_spine', [1, 0, 0]),
             containmentNode('chunk', 'Chunk 1', 'chunk', 'document:note-1:chunk:chunk-1', 'document:note-1:root:document', 1.66, 'chunk_spine', [-1, 0, 0]),
             containmentNode('entity', 'Kai', 'entity', 'identity:kai', 'document:note-1:chunk:chunk-1', 1.42, 'entity_anchor', [0, 1, 0]),
+            containmentNode('evidence', 'Kai mention', 'anchor', 'document:note-1:chunk:chunk-1:evidence', 'document:note-1:chunk:chunk-1', 0.92, 'anchor_evidence', [1, -0.8, 0]),
         ], [
             { id: 'doc-root', sourceId: 'doc', targetId: 'root', type: 'target-parent', confidence: 0.9 },
             { id: 'root-chunk', sourceId: 'root', targetId: 'chunk', type: 'target-parent', confidence: 0.9 },
             { id: 'chunk-entity', sourceId: 'chunk', targetId: 'entity', type: 'chunk-entity', confidence: 0.9 },
+            { id: 'chunk-evidence', sourceId: 'chunk', targetId: 'evidence', type: 'target-parent', confidence: 0.85 },
         ], mergeGalaxySettings({ layoutMode: 'lorentzTree' }));
-        const doc = guideCenter(scene, 'caps:boundary:document:note-1');
-        const root = guideCenter(scene, 'caps:boundary:document:note-1:root:document');
-        const chunk = guideCenter(scene, 'caps:boundary:document:note-1:chunk:chunk-1');
-        const entity = guideCenter(scene, 'caps:boundary:identity:kai');
+        const boundaryIds = scene.lorentzGuides
+            ?.filter((guide) => guide.id.startsWith('caps:boundary:'))
+            .map((guide) => guide.id) ?? [];
+        const byId = new Map(scene.nodes.map((node) => [node.entity.id, node]));
 
-        expect(dotVec(doc, root)).toBeGreaterThan(0.72);
-        expect(dotVec(root, chunk)).toBeGreaterThan(0.72);
-        expect(dotVec(chunk, entity)).toBeGreaterThan(0.66);
+        expect(boundaryIds).toEqual(['caps:boundary:document:note-1']);
+        expect(radiusOf(byId.get('doc')!)).toBeGreaterThan(radiusOf(byId.get('root')!));
+        expect(radiusOf(byId.get('root')!)).toBeGreaterThan(radiusOf(byId.get('chunk')!));
+        expect(radiusOf(byId.get('chunk')!)).toBeGreaterThan(radiusOf(byId.get('evidence')!));
+        expect(radiusOf(byId.get('evidence')!)).toBeGreaterThan(radiusOf(byId.get('entity')!));
     });
 
     it('keeps descendants on shell depth while constraining them inside their spherical caps', () => {
@@ -372,22 +376,6 @@ function taxonomyNode(
             },
         },
     };
-}
-
-function guideCenter(scene: ReturnType<typeof buildGalaxyScene>, id: string): [number, number, number] {
-    const guide = scene.lorentzGuides?.find((item) => item.id === id);
-    expect(guide).toBeTruthy();
-    const positions = guide!.positions3d;
-    let x = 0;
-    let y = 0;
-    let z = 0;
-    for (let index = 0; index < positions.length; index += 3) {
-        x += positions[index];
-        y += positions[index + 1];
-        z += positions[index + 2];
-    }
-    const norm = Math.max(0.000001, Math.hypot(x, y, z));
-    return [x / norm, y / norm, z / norm];
 }
 
 function dotVec(left: [number, number, number], right: [number, number, number]): number {
