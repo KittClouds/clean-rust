@@ -117,6 +117,33 @@ describe('Lorentz tree galaxy visualization data', () => {
         expect(dotVec(chunk, entity)).toBeGreaterThan(0.66);
     });
 
+    it('keeps descendants on shell depth while constraining them inside their spherical caps', () => {
+        const scene = buildGalaxyScene([
+            containmentNode('doc', 'Red Mesa', 'note', 'document:note-1', null, 2.08, 'document_spine', [0, 0, 1]),
+            containmentNode('root', 'Document root', 'structureRoot', 'document:note-1:root:document', 'document:note-1', 1.92, 'document_spine', [0.95, 0.2, 0]),
+            containmentNode('chunk', 'Chunk 1', 'chunk', 'document:note-1:chunk:chunk-1', 'document:note-1:root:document', 1.66, 'chunk_spine', [-0.9, 0.25, 0.1]),
+            containmentNode('entity', 'Kai', 'entity', 'identity:kai', 'document:note-1:chunk:chunk-1', 1.42, 'entity_anchor', [0, -1, 0]),
+            containmentNode('evidence', 'Kai mention', 'anchor', 'document:note-1:chunk:chunk-1:evidence', 'document:note-1:chunk:chunk-1', 0.92, 'anchor_evidence', [1, -0.8, 0]),
+        ], [
+            { id: 'doc-root', sourceId: 'doc', targetId: 'root', type: 'target-parent', confidence: 0.9 },
+            { id: 'root-chunk', sourceId: 'root', targetId: 'chunk', type: 'target-parent', confidence: 0.9 },
+            { id: 'chunk-entity', sourceId: 'chunk', targetId: 'entity', type: 'chunk-entity', confidence: 0.9 },
+            { id: 'chunk-evidence', sourceId: 'chunk', targetId: 'evidence', type: 'target-parent', confidence: 0.85 },
+            { id: 'entity-evidence', sourceId: 'entity', targetId: 'evidence', type: 'evidence', confidence: 0.82 },
+        ], mergeGalaxySettings({ layoutMode: 'lorentzTree' }));
+        const byId = new Map(scene.nodes.map((node) => [node.entity.id, node]));
+        const chunkDirection = normalizedNode(byId.get('chunk')!);
+        const entityDirection = normalizedNode(byId.get('entity')!);
+        const evidenceDirection = normalizedNode(byId.get('evidence')!);
+
+        expect(radiusOf(byId.get('doc')!)).toBeGreaterThan(radiusOf(byId.get('root')!));
+        expect(radiusOf(byId.get('root')!)).toBeGreaterThan(radiusOf(byId.get('chunk')!));
+        expect(radiusOf(byId.get('chunk')!)).toBeGreaterThan(radiusOf(byId.get('entity')!));
+        expect(radiusOf(byId.get('entity')!)).toBeGreaterThan(radiusOf(byId.get('evidence')!));
+        expect(dotVec(chunkDirection, entityDirection)).toBeGreaterThan(0.97);
+        expect(dotVec(chunkDirection, evidenceDirection)).toBeGreaterThan(0.97);
+    });
+
     it('does not emit Lorentz guide data for Hybrid or Hopf universes', () => {
         const atlas = buildLorentzAtlas(lorentzSnapshot());
         const hybrid = buildGalaxyScene(atlas.nodes, atlas.edges, mergeGalaxySettings({ layoutMode: 'hybridSpace' }));
@@ -298,6 +325,15 @@ function guideCenter(scene: ReturnType<typeof buildGalaxyScene>, id: string): [n
 
 function dotVec(left: [number, number, number], right: [number, number, number]): number {
     return left[0] * right[0] + left[1] * right[1] + left[2] * right[2];
+}
+
+function normalizedNode(node: { x: number; y: number; z: number }): [number, number, number] {
+    const norm = Math.max(0.000001, Math.hypot(node.x, node.y, node.z));
+    return [node.x / norm, node.y / norm, node.z / norm];
+}
+
+function radiusOf(node: { x: number; y: number; z: number }): number {
+    return Math.hypot(node.x, node.y, node.z);
 }
 
 function hyperboloidPoint(radius: number, direction: [number, number, number, number]): [number, number, number, number, number] {

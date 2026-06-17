@@ -89,12 +89,14 @@ export function applyLorentzTreeLayout(nodes: GalaxyNode[], links: GalaxyEdge[],
     }
 
     relaxCapLinks(nodes, links, infos);
+    confineNodesToCaps(nodes, infos, capById);
     for (let index = 0; index < nodes.length; index++) {
         projectNodeToRadius(nodes[index], infos[index].targetRadius);
         nodes[index].depth = clamp(length(vectorOf(nodes[index])) / CAP_SCENE_RADIUS, 0, 1);
     }
     tuneCapLinks(nodes, links, infos);
     enforceHierarchyShellContract(nodes);
+    confineNodesToCaps(nodes, infos, capById);
     for (const node of nodes) {
         node.depth = clamp(length(vectorOf(node)) / CAP_SCENE_RADIUS, 0, 1);
         node.baseX = node.x;
@@ -206,7 +208,7 @@ function arrayText(value: unknown): string[] {
 
 function applyCapContainment(caps: CapInfo[]): void {
     const byId = new Map(caps.map((cap) => [cap.id, cap]));
-    for (let pass = 0; pass < 3; pass++) {
+    for (let pass = 0; pass < 6; pass++) {
         for (const cap of caps) {
             const parents = cap.parentIds.map((id) => byId.get(id)).filter((item): item is CapInfo => Boolean(item));
             if (!parents.length) continue;
@@ -220,27 +222,58 @@ function applyCapContainment(caps: CapInfo[]): void {
 
 function containmentWeight(cap: CapInfo): number {
     const id = cap.id.toLowerCase();
-    if (/^document:[^:]+:root:/.test(id)) return 0.82;
-    if (/^document:[^:]+:chunk:/.test(id)) return 0.76;
-    if (/^identity:|:facts:|:memory|:temporal|:causal|event:/.test(id)) return 0.68;
-    return 0.62;
+    if (/^document:[^:]+:root:/.test(id)) return 0.94;
+    if (/^document:[^:]+:chunk:/.test(id)) return 0.9;
+    if (/^identity:|:facts:|:memory|:temporal|:causal|event:/.test(id)) return 0.84;
+    return 0.78;
 }
 
 function hierarchyDirection(info: HierarchyInfo, cap: CapInfo): Vec3 {
     const lane = laneDirection(info.lane);
     const frame = tangentFrame(cap.center);
     const orbit = add(scale(frame.a, Math.cos(info.phase * TAU)), scale(frame.b, Math.sin(info.phase * TAU)));
-    const spread = clamp(0.08 + info.ambiguity * 0.28 + (info.role === 'bridge' ? 0.08 : 0), 0.06, 0.42);
-    const base = normalize(add(add(scale(info.direction, 0.53), scale(cap.center, 0.31)), scale(lane, 0.16)), cap.center);
+    const spread = capNodeAperture(info);
+    const base = normalize(add(add(scale(cap.center, 0.78), scale(info.direction, 0.16)), scale(lane, 0.06)), cap.center);
     let shaped = normalize(add(scale(base, 1 - spread), scale(orbit, spread)), cap.center);
     if (info.lane === 'temporal') {
-        shaped = normalize(add(scale(shaped, 0.56), scale(temporalRingDirection(info.phase), 0.44)), shaped);
+        shaped = normalize(add(scale(shaped, 0.82), scale(temporalRingDirection(info.phase), 0.18)), shaped);
     } else if (info.lane === 'causal') {
-        shaped = normalize(add(scale(shaped, 0.64), scale(causalConeDirection(info.phase, info.level), 0.36)), shaped);
+        shaped = normalize(add(scale(shaped, 0.84), scale(causalConeDirection(info.phase, info.level), 0.16)), shaped);
     } else if (info.lane === 'document') {
-        shaped = normalize(add(scale(shaped, 0.7), scale(documentTreeDirection(info.phase, info.level), 0.3)), shaped);
+        shaped = normalize(add(scale(shaped, 0.86), scale(documentTreeDirection(info.phase, info.level), 0.14)), shaped);
     }
-    return shaped;
+    return limitDirectionToCap(shaped, cap.center, spread);
+}
+
+function confineNodesToCaps(nodes: GalaxyNode[], infos: HierarchyInfo[], capById: Map<string, CapInfo>): void {
+    for (let index = 0; index < nodes.length; index++) {
+        const info = infos[index];
+        const cap = capById.get(info.capId);
+        if (!cap) continue;
+        const direction = limitDirectionToCap(normalize(vectorOf(nodes[index]), info.direction), cap.center, capNodeAperture(info));
+        nodes[index].x = direction.x * info.targetRadius;
+        nodes[index].y = direction.y * info.targetRadius;
+        nodes[index].z = direction.z * info.targetRadius;
+    }
+}
+
+function capNodeAperture(info: HierarchyInfo): number {
+    if (!info.parentCapIds.length && info.level <= 1) return clamp(0.2 + info.ambiguity * 0.08, 0.16, 0.32);
+    if (info.level <= 1) return clamp(0.14 + info.ambiguity * 0.08, 0.1, 0.22);
+    if (info.level === 2) return clamp(0.12 + info.ambiguity * 0.08, 0.08, 0.2);
+    if (info.level === 3) return clamp(0.08 + info.ambiguity * 0.04, 0.06, 0.13);
+    return clamp(0.06 + info.ambiguity * 0.04, 0.04, 0.11);
+}
+
+function limitDirectionToCap(direction: Vec3, center: Vec3, aperture: number): Vec3 {
+    const normalizedCenter = normalize(center, { x: 0, y: 0, z: 1 });
+    const normalizedDirection = normalize(direction, normalizedCenter);
+    const dot = normalizedDirection.x * normalizedCenter.x + normalizedDirection.y * normalizedCenter.y + normalizedDirection.z * normalizedCenter.z;
+    const minDot = Math.cos(aperture);
+    if (dot >= minDot) return normalizedDirection;
+    const tangent = normalize(add(normalizedDirection, scale(normalizedCenter, -dot)), tangentFrame(normalizedCenter).a);
+    const sin = Math.sin(aperture);
+    return normalize(add(scale(normalizedCenter, minDot), scale(tangent, sin)), normalizedCenter);
 }
 
 function relaxCapLinks(nodes: GalaxyNode[], links: GalaxyEdge[], infos: HierarchyInfo[]): void {
