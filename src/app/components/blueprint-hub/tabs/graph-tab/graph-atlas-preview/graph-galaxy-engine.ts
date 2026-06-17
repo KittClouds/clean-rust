@@ -28,6 +28,7 @@ export type GalaxyNodeShapeMode = 'atom' | 'halo' | 'sphere';
 export type GalaxySphereSurfaceMode = 'solid' | 'glass';
 export type GalaxyLayoutMode = 'single' | 'multiGalaxy' | 'hybridSpace' | 'hopfProjection' | 'lorentzTree' | 'productManifold' | 'siegelFinsler';
 export type GalaxyEmbeddingTopologyMode = 'off' | 'clusters' | 'regions' | 'lanes' | 'medoids' | 'outliers' | 'backbone' | 'bridges';
+export type GalaxyRenderSourceMode = 'entities' | 'graph' | 'embeddings';
 
 export type GalaxyHybridInteriorMode = 'busemannCommitment';
 
@@ -195,6 +196,7 @@ export interface GalaxyRenderSettings {
     lorentzSpaceIntensity: number;
     productKleinVisible: boolean;
     embeddingTopologyMode: GalaxyEmbeddingTopologyMode;
+    sourceMode: GalaxyRenderSourceMode;
 }
 
 export interface GalaxyInputEdge {
@@ -386,6 +388,7 @@ export const DEFAULT_GALAXY_SETTINGS: GalaxyRenderSettings = {
     lorentzSpaceIntensity: 1,
     productKleinVisible: true,
     embeddingTopologyMode: 'off',
+    sourceMode: 'entities',
 };
 
 export function mergeGalaxySettings(settings?: Partial<GalaxyRenderSettings> | null): GalaxyRenderSettings {
@@ -459,7 +462,7 @@ export function buildGalaxyScene(
 
     if (settings.layoutMode === 'lorentzTree') {
         applyGalaxyMetadata(nodes);
-        const lorentzGuides = applyLorentzTreeLayout(nodes, links);
+        const lorentzGuides = applyLorentzTreeLayout(nodes, links, { sourceMode: settings.sourceMode });
         return attachRelationControls({ nodes, links, layoutMode: 'lorentzTree', groups: [], lorentzGuides }, relationPlan.controls);
     }
 

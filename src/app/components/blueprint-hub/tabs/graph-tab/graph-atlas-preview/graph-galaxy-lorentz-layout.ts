@@ -1,4 +1,4 @@
-import type { GalaxyEdge, GalaxyLorentzGuide, GalaxyNode, Rgb } from './graph-galaxy-engine';
+import type { GalaxyEdge, GalaxyLorentzGuide, GalaxyNode, GalaxyRenderSourceMode, Rgb } from './graph-galaxy-engine';
 import { relationFamilyFromText } from './graph-relation-visual-style';
 import {
     TAU,
@@ -67,11 +67,16 @@ interface HierarchyInfo {
     confidence: number;
 }
 
-export function applyLorentzTreeLayout(nodes: GalaxyNode[], links: GalaxyEdge[], options: { productTopologyGeometry?: boolean } = {}): GalaxyLorentzGuide[] {
-    void options;
-    if (!nodes.length) return [];
+interface LorentzTreeLayoutOptions {
+    productTopologyGeometry?: boolean;
+    sourceMode?: GalaxyRenderSourceMode;
+}
 
-    const infos = nodes.map(hierarchyInfo);
+export function applyLorentzTreeLayout(nodes: GalaxyNode[], links: GalaxyEdge[], options: LorentzTreeLayoutOptions = {}): GalaxyLorentzGuide[] {
+    if (!nodes.length) return [];
+    const embedCapContract = options.sourceMode === 'embeddings';
+
+    const infos = nodes.map((node) => hierarchyInfo(node, embedCapContract));
     const caps = buildCaps(nodes, infos);
     const capById = new Map(caps.map((cap) => [cap.id, cap]));
 
@@ -112,7 +117,7 @@ export function applyLorentzTreeLayout(nodes: GalaxyNode[], links: GalaxyEdge[],
     ];
 }
 
-function hierarchyInfo(node: GalaxyNode): HierarchyInfo {
+function hierarchyInfo(node: GalaxyNode, embedCapContract: boolean): HierarchyInfo {
     const metadata = node.entity.metadata || {};
     const product = record(metadata['product']);
     const region = record(product['region']);
@@ -141,7 +146,7 @@ function hierarchyInfo(node: GalaxyNode): HierarchyInfo {
     const level = hierarchyLevel(node, role, lane, lorentz, primary, specificity);
     return {
         id: node.entity.id,
-        capId: capIdFor(node, lane, product, region, lorentz, primary),
+        capId: capIdFor(node, lane, product, region, lorentz, primary, embedCapContract),
         lane,
         role,
         treeKind,
@@ -149,7 +154,7 @@ function hierarchyInfo(node: GalaxyNode): HierarchyInfo {
         phase,
         specificity,
         ambiguity,
-        targetRadius: hierarchyRadius(node, specificity, role, lane, confidence, ambiguity),
+        targetRadius: hierarchyRadius(node, specificity, role, lane, confidence, ambiguity, embedCapContract),
         direction: rawDirection(node, lorentz),
         parentCapIds: parentCapIdsFor(lorentz, primary),
         confidence,
@@ -499,9 +504,10 @@ function hierarchyRadius(
     lane: string,
     confidence: number,
     ambiguity: number,
+    embedCapContract: boolean,
 ): number {
     const lorentz = record(node.entity.metadata?.['lorentz']);
-    const contractRadius = hierarchyContractRadius(node, lane);
+    const contractRadius = embedCapContract ? hierarchyContractRadius(node, lane) : NaN;
     if (Number.isFinite(contractRadius)) return contractShellRadiusForNode(node, contractRadius);
     const explicitRadius = Number(lorentz['shellRadius']);
     if (Number.isFinite(explicitRadius)) return contractShellRadiusForNode(node, clamp(explicitRadius, 0.38, CAP_SCENE_RADIUS * 0.985));
@@ -582,8 +588,9 @@ function capIdFor(
     region: Record<string, unknown>,
     lorentz: Record<string, unknown>,
     primary: Record<string, unknown>,
+    embedCapContract: boolean,
 ): string {
-    const documentCapId = documentContainmentCapIdFor(node, lorentz, primary);
+    const documentCapId = embedCapContract ? documentContainmentCapIdFor(node, lorentz, primary) : '';
     const structuralCapId = structuralCapIdFor(node, lane);
     return firstText(
         documentCapId,

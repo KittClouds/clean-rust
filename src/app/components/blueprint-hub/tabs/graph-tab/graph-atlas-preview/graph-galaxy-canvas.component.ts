@@ -129,8 +129,8 @@ export class GraphGalaxyCanvasComponent implements AfterViewInit, OnChanges, OnD
 
     ngOnChanges(changes: SimpleChanges): void {
         if (changes['settings']) {
-            const previous = mergeGalaxySettings(changes['settings'].previousValue);
-            const current = mergeGalaxySettings(this.settings);
+            const previous = this.mergeSettingsForSource(changes['settings'].previousValue);
+            const current = this.currentSettings();
             if (this.renderer.hasContext()) this.renderer.setSettings(this.settings);
             if (galaxySettingsNeedSceneRebuild(previous, current)) this.markLayoutDirty();
             if (this.viewReady) this.syncSurface();
@@ -183,7 +183,7 @@ export class GraphGalaxyCanvasComponent implements AfterViewInit, OnChanges, OnD
 
     onPointerDown(event: PointerEvent): void {
         event.preventDefault();
-        const settings = mergeGalaxySettings(this.settings);
+        const settings = this.currentSettings();
         const pointer = this.pointerFromEvent(event);
         const useLasso = event.button === 0 && (this.lassoEnabled || event.shiftKey);
         const picked = useLasso ? null : this.pick(event);
@@ -285,7 +285,7 @@ export class GraphGalaxyCanvasComponent implements AfterViewInit, OnChanges, OnD
             this.fitToGraph();
             return;
         }
-        if (hit.kind === 'node' && mergeGalaxySettings(this.settings).clickFocus) this.focusEntity(hit.id);
+        if (hit.kind === 'node' && this.currentSettings().clickFocus) this.focusEntity(hit.id);
     }
 
     private start(): void {
@@ -298,7 +298,7 @@ export class GraphGalaxyCanvasComponent implements AfterViewInit, OnChanges, OnD
                 return;
             }
             if (this.renderer.hasActiveForces()) this.renderer.tickForces();
-            if (mergeGalaxySettings(this.settings).autoRotate) this.renderer.rotate(0.18, 0);
+            if (this.currentSettings().autoRotate) this.renderer.rotate(0.18, 0);
             this.draw();
             this.frameId = requestAnimationFrame(render);
         };
@@ -325,7 +325,7 @@ export class GraphGalaxyCanvasComponent implements AfterViewInit, OnChanges, OnD
     }
 
     private shouldAnimate(): boolean {
-        const settings = mergeGalaxySettings(this.settings);
+        const settings = this.currentSettings();
         return this.canHoldSurface() && (
             this.dragging ||
             this.renderer.hasActiveForces() ||
@@ -395,7 +395,7 @@ export class GraphGalaxyCanvasComponent implements AfterViewInit, OnChanges, OnD
         this.needsLayout = false;
         const version = this.layoutVersion;
         const buildStarted = performance.now();
-        this.sceneBuildPromise = compileGalaxyScene(this.phoenix, this.entities, this.edges, mergeGalaxySettings(this.settings))
+        this.sceneBuildPromise = compileGalaxyScene(this.phoenix, this.entities, this.edges, this.currentSettings())
             .then((scene) => {
                 if (this.destroyed || this.layoutVersion !== version) return;
                 const sceneCompileMs = performance.now() - buildStarted;
@@ -426,6 +426,14 @@ export class GraphGalaxyCanvasComponent implements AfterViewInit, OnChanges, OnD
 
     private updateHover(event: MouseEvent): void {
         this.setHover(this.pickObject(event));
+    }
+
+    private currentSettings(): GalaxyRenderSettings {
+        return this.mergeSettingsForSource(this.settings);
+    }
+
+    private mergeSettingsForSource(settings: Partial<GalaxyRenderSettings> | null | undefined): GalaxyRenderSettings {
+        return mergeGalaxySettings({ ...settings, sourceMode: this.sourceMode });
     }
 
     private setHover(hit: GraphCanvasHit | null): void {

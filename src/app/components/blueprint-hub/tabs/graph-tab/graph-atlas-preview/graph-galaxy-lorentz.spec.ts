@@ -71,7 +71,7 @@ describe('Lorentz tree galaxy visualization data', () => {
         ], [
             { id: 'entity-signal', sourceId: 'kai', targetId: 'signal', type: 'supports', confidence: 0.82 },
             { id: 'signal-context', sourceId: 'signal', targetId: 'context', type: 'memory', confidence: 0.62 },
-        ], mergeGalaxySettings({ layoutMode: 'lorentzTree' }));
+        ], mergeGalaxySettings({ layoutMode: 'lorentzTree', sourceMode: 'embeddings' }));
         const byId = new Map(scene.nodes.map((node) => [node.entity.id, node]));
 
         expect(byId.get('signal')!.depth).toBeGreaterThan(byId.get('kai')!.depth);
@@ -108,7 +108,7 @@ describe('Lorentz tree galaxy visualization data', () => {
             { id: 'root-chunk', sourceId: 'root', targetId: 'chunk', type: 'target-parent', confidence: 0.9 },
             { id: 'chunk-entity', sourceId: 'chunk', targetId: 'entity', type: 'chunk-entity', confidence: 0.9 },
             { id: 'chunk-evidence', sourceId: 'chunk', targetId: 'evidence', type: 'target-parent', confidence: 0.85 },
-        ], mergeGalaxySettings({ layoutMode: 'lorentzTree' }));
+        ], mergeGalaxySettings({ layoutMode: 'lorentzTree', sourceMode: 'embeddings' }));
         const boundaryIds = scene.lorentzGuides
             ?.filter((guide) => guide.id.startsWith('caps:boundary:'))
             .map((guide) => guide.id) ?? [];
@@ -134,7 +134,7 @@ describe('Lorentz tree galaxy visualization data', () => {
             { id: 'chunk-entity', sourceId: 'chunk', targetId: 'entity', type: 'chunk-entity', confidence: 0.9 },
             { id: 'chunk-evidence', sourceId: 'chunk', targetId: 'evidence', type: 'target-parent', confidence: 0.85 },
             { id: 'entity-evidence', sourceId: 'entity', targetId: 'evidence', type: 'evidence', confidence: 0.82 },
-        ], mergeGalaxySettings({ layoutMode: 'lorentzTree' }));
+        ], mergeGalaxySettings({ layoutMode: 'lorentzTree', sourceMode: 'embeddings' }));
         const byId = new Map(scene.nodes.map((node) => [node.entity.id, node]));
         const chunkDirection = normalizedNode(byId.get('chunk')!);
         const entityDirection = normalizedNode(byId.get('entity')!);
@@ -170,6 +170,25 @@ describe('Lorentz tree galaxy visualization data', () => {
         expect(radiusOf(byId.get('chunk')!)).toBeGreaterThan(radiusOf(byId.get('evidence')!));
         expect(radiusOf(byId.get('evidence')!)).toBeGreaterThan(radiusOf(byId.get('entity')!));
         expect(radiusOf(byId.get('entity')!)).toBeGreaterThan(radiusOf(byId.get('state')!));
+    });
+
+    it('does not apply the Embed document cap contract to Graph lens CAPS', () => {
+        const scene = buildGalaxyScene([
+            containmentNode('doc', 'Red Mesa', 'note', 'document:note-1', null, 2.08, 'document_spine', [0, 0, 1]),
+            containmentNode('root', 'Document root', 'structureRoot', 'document:note-1:root:document', 'document:note-1', 1.92, 'document_spine', [1, 0, 0]),
+            containmentNode('chunk', 'Chunk 1', 'chunk', 'document:note-1:chunk:chunk-1', 'document:note-1:root:document', 1.66, 'chunk_spine', [-1, 0, 0]),
+        ], [
+            { id: 'doc-root', sourceId: 'doc', targetId: 'root', type: 'target-parent', confidence: 0.9 },
+            { id: 'root-chunk', sourceId: 'root', targetId: 'chunk', type: 'target-parent', confidence: 0.9 },
+        ], mergeGalaxySettings({ layoutMode: 'lorentzTree', sourceMode: 'graph' }));
+        const boundaryIds = scene.lorentzGuides
+            ?.filter((guide) => guide.id.startsWith('caps:boundary:'))
+            .map((guide) => guide.id)
+            .sort() ?? [];
+
+        expect(boundaryIds).toContain('caps:boundary:document:note-1');
+        expect(boundaryIds).toContain('caps:boundary:document:note-1:root:document');
+        expect(boundaryIds).toContain('caps:boundary:document:note-1:chunk:chunk-1');
     });
 
     it('does not emit Lorentz guide data for Hybrid or Hopf universes', () => {
