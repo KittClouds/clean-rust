@@ -54,6 +54,7 @@ export interface GraphCanvasInspectorRecord {
     memberIds: string[];
     members: Array<{ id: string; label: string; kind: string }>;
     graphImpact: string;
+    styleKey: string;
     reviewObjectIds: string[];
     reviewActions: string[];
     focusNodeIds: string[];
@@ -178,6 +179,7 @@ function nodeRecord(node: GalaxyRenderableNode): GraphCanvasInspectorRecord {
         memberIds: metadataStrings(metadata, 'memberIds'),
         members: [],
         graphImpact: metadataString(metadata, 'graphImpact'),
+        styleKey: styleKeyForMetadata(metadata, node.kind),
         reviewObjectIds: metadataString(metadata, 'reviewObjectId') ? [metadataString(metadata, 'reviewObjectId')] : [],
         reviewActions: metadataStrings(metadata, 'reviewActions'),
         focusNodeIds: [node.id],
@@ -209,6 +211,7 @@ function edgeRecord(
         memberIds: [edge.sourceId, edge.targetId],
         members: [source, target].filter(isNode).map((node) => ({ id: node.id, label: node.label, kind: node.kind })),
         graphImpact: metadataString(metadata, 'graphImpact') || 'Connects two inspectable graph objects.',
+        styleKey: styleKeyForMetadata(metadata, edge.type),
         reviewObjectIds: metadataString(metadata, 'reviewObjectId') ? [metadataString(metadata, 'reviewObjectId')] : [],
         reviewActions: metadataStrings(metadata, 'reviewActions'),
         focusNodeIds: [edge.sourceId, edge.targetId],
@@ -236,6 +239,7 @@ function clusterRecord(hit: GraphCanvasClusterHit, members: GalaxyRenderableNode
         memberIds: hit.nodeIds,
         members: members.map((node) => ({ id: node.id, label: node.label, kind: node.kind })),
         graphImpact: 'Groups objects that share a detected semantic region.',
+        styleKey: styleKeyForMetadata(lead, members[0]?.kind || ''),
         reviewObjectIds: unique(members.map((node) => metadataString(node.metadata, 'reviewObjectId')).filter(Boolean)),
         reviewActions: unique(members.flatMap((node) => metadataStrings(node.metadata, 'reviewActions'))),
         focusNodeIds: hit.nodeIds,
@@ -277,6 +281,14 @@ function metadataNumber(metadata: Record<string, unknown> | undefined, key: stri
 function metadataStrings(metadata: Record<string, unknown> | undefined, key: string): string[] {
     const value = metadata?.[key];
     return Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : [];
+}
+
+function styleKeyForMetadata(metadata: Record<string, unknown> | undefined, fallback: string): string {
+    return metadataString(metadata, 'graphColorKind')
+        || metadataString(metadata, 'graphRelationFamily')
+        || metadataString(metadata, 'graphKind')
+        || metadataString(metadata, 'atlasKind')
+        || fallback;
 }
 
 function unique(values: string[]): string[] {

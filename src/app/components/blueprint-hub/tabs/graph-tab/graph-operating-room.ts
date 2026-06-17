@@ -56,7 +56,7 @@ export function buildGraphOperatingRoomView(
     const recordsById = Object.fromEntries(records.map((row) => [row.id, row]));
     const counts = countCards(recordsByRoom, snapshot);
     return {
-        tabs: ROOM_IDS.map((id) => roomTab(id, recordsByRoom[id])),
+        tabs: ROOM_IDS.map((id) => roomTab(id, recordsByRoom[id], snapshot, entities.length)),
         counts,
         countsById: Object.fromEntries(counts.map((row) => [row.id, row])),
         recordsByRoom,
@@ -193,20 +193,81 @@ function countCards(
     snapshot: GraphRebuildSnapshot | null,
 ): GraphOperatingRoomCount[] {
     const all = uniqueRecords(ROOM_IDS.flatMap((room) => rooms[room]));
+    const fallback = roomFallbackCounts(snapshot);
     return [
         count('entities-total', 'entities', 'Registered', rooms.entities, `${snapshot?.counters.nodes || 0} graph nodes`, 'ready'),
-        count('structure-total', 'structure', 'Structure', rooms.structure, `${snapshot?.documentSidecarSummary?.counters.units || 0} units`, toneForRows(rooms.structure)),
+        count('structure-total', 'structure', 'Structure', rooms.structure, `${fallback.structureUnits} units`, toneForRows(rooms.structure), fallback.structureUnits),
         count('structure-profiles', 'structure', 'Profiles', filter(rooms.structure, (row) => row.kind.startsWith('document-profile:')), 'document and region weighting', toneForRows(filter(rooms.structure, (row) => row.kind.startsWith('document-profile:')))),
-        count('facts-relations', 'facts', 'Relations', filter(rooms.facts, (row) => relationLike(row)), 'relation candidates and facts', toneForRows(filter(rooms.facts, relationLike))),
-        count('facts-hyperedges', 'facts', 'Hyperedges', filter(rooms.facts, (row) => row.kind.includes('hyperedge')), 'n-ary document facts', toneForRows(filter(rooms.facts, (row) => row.kind.includes('hyperedge')))),
-        count('review-gaps', 'review', 'Gaps', filter(rooms.review, (row) => row.tab === 'gaps' || row.status === 'reviewable'), 'open gap records', 'review'),
-        count('review-accepted', 'review', 'Accepted', filter(rooms.review, (row) => ['accepted', 'supported', 'pending_commit'].includes(row.status)), 'accepted objects', 'ready'),
-        count('review-ambiguous', 'review', 'Ambiguous', filter(rooms.review, (row) => row.status === 'deferred' || row.status === 'reviewable' || row.tags.includes('ambiguous_case')), 'ambiguity queue', 'review'),
-        count('discourse-wormholes', 'discourse', 'Wormholes', filter(rooms.discourse, (row) => row.tags.includes('chunk_wormhole') || row.kind.includes('wormhole')), 'wormhole evidence', toneForRows(filter(rooms.discourse, (row) => row.tags.includes('chunk_wormhole') || row.kind.includes('wormhole')))),
-        count('discourse-packets', 'discourse', 'Packets', filter(rooms.discourse, (row) => row.tags.join(' ').includes('cross_doc')), 'cross-doc idea packets', toneForRows(rooms.discourse)),
-        count('metrics-receipts', 'metrics', 'Receipts', filter(all, (row) => row.receiptIds.length > 0), 'receipt ledger', toneForRows(filter(all, (row) => row.receiptIds.length > 0))),
+        count('facts-relations', 'facts', 'Relations', filter(rooms.facts, (row) => relationLike(row)), 'relation candidates and facts', toneForRows(filter(rooms.facts, relationLike)), fallback.factRelations),
+        count('facts-hyperedges', 'facts', 'Hyperedges', filter(rooms.facts, (row) => row.kind.includes('hyperedge')), 'n-ary document facts', toneForRows(filter(rooms.facts, (row) => row.kind.includes('hyperedge'))), fallback.factHyperedges),
+        count('review-gaps', 'review', 'Gaps', filter(rooms.review, (row) => row.tab === 'gaps' || row.status === 'reviewable'), 'open gap records', 'review', fallback.reviewGaps),
+        count('review-accepted', 'review', 'Accepted', filter(rooms.review, (row) => ['accepted', 'supported', 'pending_commit'].includes(row.status)), 'accepted objects', 'ready', fallback.reviewAccepted),
+        count('review-ambiguous', 'review', 'Ambiguous', filter(rooms.review, (row) => row.status === 'deferred' || row.status === 'reviewable' || row.tags.includes('ambiguous_case')), 'ambiguity queue', 'review', fallback.reviewAmbiguous),
+        count('discourse-wormholes', 'discourse', 'Wormholes', filter(rooms.discourse, (row) => row.tags.includes('chunk_wormhole') || row.kind.includes('wormhole')), 'wormhole evidence', toneForRows(filter(rooms.discourse, (row) => row.tags.includes('chunk_wormhole') || row.kind.includes('wormhole'))), fallback.discourseWormholes),
+        count('discourse-packets', 'discourse', 'Packets', filter(rooms.discourse, (row) => row.tags.join(' ').includes('cross_doc')), 'cross-doc idea packets', toneForRows(rooms.discourse), fallback.discoursePackets),
+        count('metrics-receipts', 'metrics', 'Receipts', filter(all, (row) => row.receiptIds.length > 0), 'receipt ledger', toneForRows(filter(all, (row) => row.receiptIds.length > 0)), fallback.receipts),
         count('metrics-health', 'metrics', 'Health', rooms.metrics, 'chunk, graph, and index health', toneForRows(rooms.metrics)),
     ];
+}
+
+interface GraphOperatingRoomFallbackCounts {
+    structureUnits: number;
+    factRelations: number;
+    factHyperedges: number;
+    reviewGaps: number;
+    reviewAccepted: number;
+    reviewAmbiguous: number;
+    discourseWormholes: number;
+    discoursePackets: number;
+    receipts: number;
+}
+
+function roomFallbackCounts(snapshot: GraphRebuildSnapshot | null): GraphOperatingRoomFallbackCounts {
+    const sidecar = snapshot?.documentSidecarSummary?.counters;
+    const review = snapshot?.documentReviewSummary?.counters;
+    const compiler = snapshot?.documentCompilerSummary?.counters;
+    const entityLinking = snapshot?.counters.entityLinking;
+    return {
+        structureUnits: maxCount(
+            sidecar?.units,
+            counter(snapshot, 'documentSidecarUnits'),
+            atlasFamilies(snapshot, ['structure', 'evidence']),
+        ),
+        factRelations: maxCount(
+            counter(snapshot, 'relationships') + counter(snapshot, 'events') + counter(snapshot, 'temporalEdges') + counter(snapshot, 'causalEdges') + counter(snapshot, 'memoryState'),
+            counter(snapshot, 'documentSidecarGraphFacts') + counter(snapshot, 'documentCompilerRelationCandidates') + counter(snapshot, 'documentCompilerEvidenceEdges'),
+            atlasFamilies(snapshot, ['fact', 'temporal', 'causal', 'memory']),
+        ),
+        factHyperedges: maxCount(
+            compiler?.hyperedges,
+            counter(snapshot, 'documentCompilerHyperedges'),
+            atlasFamilies(snapshot, ['hypergraph']),
+        ),
+        reviewGaps: maxCount(
+            review?.actionableRows,
+            counter(snapshot, 'documentReviewActionableRows') + counter(snapshot, 'documentCompilerReviewable') + counter(snapshot, 'reviewRelationships'),
+            counter(snapshot, 'semanticEvalAmbiguousCases') + counter(snapshot, 'discourseEvalAmbiguousCases') + (entityLinking?.ambiguous || 0),
+        ),
+        reviewAccepted: maxCount(
+            review?.acceptedRows,
+            counter(snapshot, 'documentReviewAcceptedRows') + counter(snapshot, 'acceptedRelationships'),
+            counter(snapshot, 'semanticEvalAcceptedCandidates') + counter(snapshot, 'discourseEvalAcceptedCandidates') + counter(snapshot, 'documentCompilerTopologyCommits'),
+        ),
+        reviewAmbiguous: maxCount(
+            counter(snapshot, 'semanticEvalAmbiguousCases') + counter(snapshot, 'discourseEvalAmbiguousCases'),
+            counter(snapshot, 'documentCompilerAmbiguousFacts') + (entityLinking?.ambiguous || 0),
+        ),
+        discourseWormholes: maxCount(
+            counter(snapshot, 'discoursePromotionChunkWormholes'),
+            counter(snapshot, 'discourseCompilerOverlayChunkWormholes'),
+        ),
+        discoursePackets: maxCount(
+            counter(snapshot, 'discourseSpineTargets'),
+            counter(snapshot, 'discourseBridgeCandidates') + counter(snapshot, 'discoursePromotionDocumentClusters') + counter(snapshot, 'discourseCompilerOverlayDocumentClusters'),
+            atlasFamilies(snapshot, ['discourse']),
+        ),
+        receipts: receiptCounterTotal(snapshot),
+    };
 }
 
 function count(
@@ -216,21 +277,52 @@ function count(
     rows: GraphDiscourseWorkbenchRecord[],
     detail: string,
     tone: GraphDiscourseTone,
+    fallbackValue = 0,
 ): GraphOperatingRoomCount {
     const uniqueRows = uniqueRecords(rows);
+    const value = Math.max(uniqueRows.length, fallbackValue);
     return {
         id,
         roomId,
         label,
-        value: uniqueRows.length,
+        value,
         detail,
-        tone,
+        tone: tone === 'quiet' && value > 0 ? 'ready' : tone,
         recordIds: uniqueRows.map((row) => row.id),
     };
 }
 
-function roomTab(id: GraphOperatingRoomId, records: GraphDiscourseWorkbenchRecord[]): GraphOperatingRoomTab {
-    return { id, label: title(id), detail: roomDetail(id), count: records.length, tone: toneForRows(records) };
+function roomTab(
+    id: GraphOperatingRoomId,
+    records: GraphDiscourseWorkbenchRecord[],
+    snapshot: GraphRebuildSnapshot | null,
+    entityCount: number,
+): GraphOperatingRoomTab {
+    const fallback = roomTabFallbackCount(id, snapshot, entityCount);
+    const countValue = Math.max(records.length, fallback);
+    const tone = toneForRows(records);
+    return { id, label: title(id), detail: roomDetail(id), count: countValue, tone: tone === 'quiet' && countValue > 0 ? 'ready' : tone };
+}
+
+function roomTabFallbackCount(
+    id: GraphOperatingRoomId,
+    snapshot: GraphRebuildSnapshot | null,
+    entityCount: number,
+): number {
+    const fallback = roomFallbackCounts(snapshot);
+    if (id === 'entities') return Math.max(entityCount, snapshot?.atlasPacket?.counters.registryEntities || 0);
+    if (id === 'structure') return fallback.structureUnits;
+    if (id === 'facts') return fallback.factRelations + fallback.factHyperedges;
+    if (id === 'review') return maxCount(
+        counter(snapshot, 'documentReviewRows'),
+        counter(snapshot, 'semanticEvalLedgerRows') + counter(snapshot, 'discourseEvalLedgerRows'),
+        fallback.reviewGaps,
+        fallback.reviewAccepted,
+        fallback.reviewAmbiguous,
+        atlasFamilies(snapshot, ['review']),
+    );
+    if (id === 'discourse') return maxCount(fallback.discoursePackets + fallback.discourseWormholes, counter(snapshot, 'discourseEvalLedgerRows'));
+    return Math.max(recordsMetricCount(snapshot), fallback.receipts);
 }
 
 function emptyRoomMap(): Record<GraphOperatingRoomId, GraphDiscourseWorkbenchRecord[]> {
@@ -298,6 +390,61 @@ function uniqueRooms(values: GraphOperatingRoomId[]): GraphOperatingRoomId[] {
 
 function uniqueRecords(values: GraphDiscourseWorkbenchRecord[]): GraphDiscourseWorkbenchRecord[] {
     return [...new Map(values.map((row) => [row.id, row])).values()];
+}
+
+function counter(snapshot: GraphRebuildSnapshot | null, key: string): number {
+    const value = (snapshot?.counters as Record<string, unknown> | undefined)?.[key];
+    return typeof value === 'number' && Number.isFinite(value) ? value : 0;
+}
+
+function atlasFamilies(snapshot: GraphRebuildSnapshot | null, families: string[]): number {
+    const familySet = new Set(families);
+    const packet = snapshot?.atlasPacket;
+    const direct = packet?.objects?.filter((object) => familySet.has(object.family)).length || 0;
+    const summarized = packet?.counters?.families
+        ?.filter((row) => familySet.has(row.family))
+        .reduce((sum, row) => sum + row.count, 0) || 0;
+    return Math.max(direct, summarized);
+}
+
+function receiptCounterTotal(snapshot: GraphRebuildSnapshot | null): number {
+    return [
+        'documentReviewReceipts',
+        'documentCompilerReceipts',
+        'calendarRegistryReceipts',
+        'semanticTaskReceipts',
+        'semanticCandidateReceipts',
+        'semanticRerankReceipts',
+        'semanticAdjudicationReceipts',
+        'discourseSpineReceipts',
+        'discourseBridgeReceipts',
+        'discourseBridgeAdjudicationReceipts',
+        'discoursePromotionReceipts',
+        'discourseCompilerOverlayReceipts',
+        'memoryGraphRagReceipts',
+        'manifoldContributionReceipts',
+        'operatorMutationReceipts',
+    ].reduce((sum, key) => sum + counter(snapshot, key), 0);
+}
+
+function recordsMetricCount(snapshot: GraphRebuildSnapshot | null): number {
+    return [
+        counter(snapshot, 'nodes'),
+        counter(snapshot, 'edges'),
+        counter(snapshot, 'embeddingTargets'),
+        counter(snapshot, 'semanticEvalLedgerRows'),
+        counter(snapshot, 'discourseEvalLedgerRows'),
+        counter(snapshot, 'documentCompilerTopologyDiffs'),
+        counter(snapshot, 'documentReviewRows'),
+        counter(snapshot, 'calendarRegistryReceipts'),
+        counter(snapshot, 'memoryGraphRagRecords'),
+        counter(snapshot, 'manifoldSpecializations'),
+        counter(snapshot, 'projectionRefs'),
+    ].filter((value) => value > 0).length;
+}
+
+function maxCount(...values: Array<number | undefined>): number {
+    return Math.max(0, ...values.map((value) => Math.max(0, Math.round(value || 0))));
 }
 
 function title(value: string): string {

@@ -6,12 +6,19 @@ import type {
     GraphAtlasPacket,
 } from '../../../../../graph-rebuild/graph-atlas-packet';
 import type { GraphRebuildSnapshot } from '../../../../../graph-rebuild/graph-rebuild-snapshot';
-import { entityColorStore } from '../../../../../lib/store/entityColorStore';
+import { entityColorStore, normalizeGraphNodeColorKind } from '../../../../../lib/store/entityColorStore';
 import type { GraphInventory } from './graph-atlas-preview.component';
 import type { GalaxyInputEdge, GalaxyRenderableNode } from './graph-galaxy-engine';
+import { relationFamilyFromText } from './graph-relation-visual-style';
 
 type CanvasLens = 'entities' | 'structure' | 'facts' | 'discourse' | 'accepted' | 'proposed';
 type CanvasReviewState = 'accepted' | 'proposed' | 'rejected' | 'muted';
+interface AtlasVisualStyle {
+    colorKind: string;
+    relationFamily: string;
+    entityKind: string;
+    colorHsl: string;
+}
 
 const EMPTY_PACKET_LABEL = 'rust atlas packet missing';
 
@@ -49,12 +56,12 @@ function buildAtlasPacketInventory(packet: GraphAtlasPacket): GraphInventory {
     }
 
     for (const [index, object] of packet.objects.entries()) {
-        nodes.push(atlasObjectNode(object, targetByObjectId.get(object.id), index));
+        nodes.push(atlasObjectNode(packet, object, targetByObjectId.get(object.id), index));
         nodeIds.add(object.id);
     }
     for (const target of packet.manifoldTargets) {
         if (nodeIds.has(target.objectId)) continue;
-        nodes.push(atlasTargetNode(target, nodes.length));
+        nodes.push(atlasTargetNode(packet, target, nodes.length));
         nodeIds.add(target.objectId);
     }
 
@@ -63,14 +70,15 @@ function buildAtlasPacketInventory(packet: GraphAtlasPacket): GraphInventory {
         for (const targetId of object.targetIds || []) {
             const resolvedTargetId = resolveAtlasObjectId(targetId, nodeIds, targetObjectById, objectIdBySourceId);
             if (!resolvedTargetId || resolvedTargetId === object.id) continue;
+            const objectStatus = object.status || 'unknown';
             pushAtlasPacketEdge(edges, edgeIds, {
                 sourceId: object.id,
                 targetId: resolvedTargetId,
                 family: object.family,
-                status: object.status,
+                status: objectStatus,
                 type: 'object_target',
                 label: object.kind,
-                confidence: confidenceForStatus(object.status),
+                confidence: confidenceForStatus(objectStatus),
                 evidenceIds: object.evidenceIds,
             });
         }
@@ -102,39 +110,62 @@ function buildAtlasPacketInventory(packet: GraphAtlasPacket): GraphInventory {
 }
 
 function atlasObjectNode(
+    packet: GraphAtlasPacket,
     object: GraphAtlasObject,
     target: GraphAtlasManifoldTarget | undefined,
     index: number,
 ): GalaxyRenderableNode {
     const family = object.family || 'unknown';
-    const status = reviewStateForStatus(object.status);
+    const objectStatus = object.status || 'unknown';
+    const status = reviewStateForStatus(objectStatus);
     const noteId = object.noteIds[0] || target?.noteId || '';
     const chunkId = object.chunkIds[0] || target?.chunkId || '';
+    const style = atlasVisualStyle(
+        family,
+        object.kind,
+        object.label,
+        object.sourceIds,
+        object.styleKey,
+        object.stateContextKind,
+    );
     return {
         id: object.id,
         label: object.label || object.id,
         kind: family,
         totalMentions: atlasObjectWeight(object, target),
         ...stablePoint(object.id, index),
-        colorHsl: atlasFamilyHsl(family),
+        colorHsl: style.colorHsl,
         metadata: {
             sourceType: 'rust-atlas-packet-object',
             sourceSystem: 'rust',
             sourceId: object.sourceIds[0] || target?.sourceId || object.id,
+            snapshotId: packet.snapshotId,
+            scopeId: packet.scopeId,
+            builtAt: packet.builtAt,
+            sourceContract: packet.sourceContract.authority,
+            vectorContract: packet.sourceContract.vectorContract,
             atlasObjectId: object.id,
             atlasKind: object.kind,
             atlasFamily: family,
-            atlasStatus: object.status,
+            atlasStatus: objectStatus,
+            atlasLane: object.lane || target?.lane || '',
+            atlasStructuralRole: object.structuralRole || target?.structuralRole || '',
+            atlasDocumentUnitKind: object.documentUnitKind || target?.documentUnitKind || '',
+            atlasStateContextKind: object.stateContextKind || target?.stateContextKind || '',
             atlasTargetId: target?.id || '',
+            atlasVectorStatus: target?.vectorStatus || '',
+            entityKind: style.entityKind,
             graphFamily: family,
-            graphKind: family,
-            graphColorKind: family,
+            graphKind: object.styleKey || object.kind || family,
+            graphColorKind: style.colorKind,
+            styleKey: style.colorKind,
+            graphRelationFamily: style.relationFamily,
             canvasLens: atlasCanvasLens(family),
             reviewState: status,
-            confidence: confidenceForStatus(object.status),
+            confidence: confidenceForStatus(objectStatus),
             detector: object.sourceIds.length ? 'rust_atlas_packet' : 'rust_atlas_packet_registry',
-            subtitle: `${family} / ${object.status} / ${object.kind}`,
-            searchableText: `${object.label} ${object.kind} ${family} ${object.status} ${object.sourceIds.join(' ')}`,
+            subtitle: `${family} / ${objectStatus} / ${object.kind}`,
+            searchableText: `${object.label} ${object.kind} ${family} ${objectStatus} ${object.sourceIds.join(' ')}`,
             relatedEntityIds: object.registryEntityId ? [object.registryEntityId] : [],
             noteId,
             chunkId,
@@ -148,29 +179,50 @@ function atlasObjectNode(
     };
 }
 
-function atlasTargetNode(target: GraphAtlasManifoldTarget, index: number): GalaxyRenderableNode {
+function atlasTargetNode(packet: GraphAtlasPacket, target: GraphAtlasManifoldTarget, index: number): GalaxyRenderableNode {
     const family = target.family || 'unknown';
     const status = reviewStateForAdmission(target.admission);
+    const style = atlasVisualStyle(
+        family,
+        target.kind,
+        target.label,
+        [target.sourceId, target.coordinateSource],
+        target.styleKey,
+        target.stateContextKind,
+    );
     return {
         id: target.objectId,
         label: target.label || target.objectId,
         kind: family,
         totalMentions: Math.max(1, target.evidenceIds.length, (target.parentIds || []).length),
         ...stablePoint(target.objectId, index),
-        colorHsl: atlasFamilyHsl(family),
+        colorHsl: style.colorHsl,
         metadata: {
             sourceType: 'rust-atlas-packet-target',
             sourceSystem: 'rust',
             sourceId: target.sourceId,
+            snapshotId: packet.snapshotId,
+            scopeId: packet.scopeId,
+            builtAt: packet.builtAt,
+            sourceContract: packet.sourceContract.authority,
+            vectorContract: packet.sourceContract.vectorContract,
             atlasObjectId: target.objectId,
             atlasTargetId: target.id,
             atlasKind: target.kind,
             atlasFamily: family,
             atlasStatus: target.admission,
+            atlasObjectStatus: target.status,
+            atlasLane: target.lane || '',
+            atlasStructuralRole: target.structuralRole || '',
+            atlasDocumentUnitKind: target.documentUnitKind || '',
+            atlasStateContextKind: target.stateContextKind || '',
             atlasVectorStatus: target.vectorStatus,
+            entityKind: target.entityKind || style.entityKind,
             graphFamily: family,
-            graphKind: family,
-            graphColorKind: family,
+            graphKind: target.styleKey || target.stateContextKind || target.kind || family,
+            graphColorKind: style.colorKind,
+            styleKey: style.colorKind,
+            graphRelationFamily: style.relationFamily,
             canvasLens: atlasCanvasLens(family),
             reviewState: status,
             confidence: target.vectorStatus === 'modelVector' ? 1 : 0.56,
@@ -205,6 +257,7 @@ function pushAtlasPacketEdge(
     if (seen.has(id)) return;
     seen.add(id);
     const status = normalizeReviewState(input.status);
+    const style = atlasVisualStyle(input.family, input.label, input.type, [input.sourceId, input.targetId]);
     edges.push({
         id,
         sourceId: input.sourceId,
@@ -215,9 +268,9 @@ function pushAtlasPacketEdge(
             sourceType: 'rust-atlas-packet-edge',
             sourceSystem: 'rust',
             graphFamily: input.family,
-            graphKind: input.family,
-            graphRelationFamily: input.label,
-            graphColorKind: input.family,
+            graphKind: input.label || input.family,
+            graphRelationFamily: style.relationFamily,
+            graphColorKind: style.colorKind,
             canvasLens: atlasCanvasLens(input.family),
             reviewState: status,
             confidence: input.confidence,
@@ -284,15 +337,83 @@ function confidenceForStatus(status: GraphAtlasObjectStatus): number {
     return 0.56;
 }
 
+function atlasVisualStyle(
+    family: GraphAtlasFamily,
+    kind: string,
+    label: string,
+    extraParts: readonly string[] = [],
+    packetStyleKey = '',
+    packetStateContextKind = '',
+): AtlasVisualStyle {
+    const explicitStyleKey = packetStateContextKind || packetStyleKey;
+    const entityKind = family === 'entity' || family === 'registry' ? (packetStyleKey || kind) : '';
+    const directColorKind = explicitStyleKey && !entityKind
+        ? explicitStyleKey
+        : directGraphStyleKeyForAtlasKind(family, kind, label);
+    const relationFamily = directColorKind ? '' : relationFamilyFromText(kind, label, ...extraParts) || '';
+    const colorKind = entityKind || directColorKind || relationFamily || 'graphFact';
+    return {
+        colorKind,
+        relationFamily,
+        entityKind,
+        colorHsl: atlasStyleHsl(family, colorKind, entityKind),
+    };
+}
+
+function directGraphStyleKeyForAtlasKind(family: GraphAtlasFamily, kind: string, label: string): string {
+    const token = compactStyleToken(`${kind} ${label}`);
+    if (family === 'structure') {
+        if (token.includes('chunk') || token.includes('documentunit') || token.includes('leaf')) return 'chunk';
+        return 'document';
+    }
+    if (family === 'evidence') return 'anchor';
+    if (family === 'temporal' || token.includes('temporalfact')) return 'temporalFact';
+    if (family === 'causal' || token.includes('causalfact')) return 'causalFact';
+    if (family === 'memory' || token.includes('memorystate')) return memoryStyleKey(kind, label);
+    if (family === 'discourse') return 'communication';
+    if (family === 'review') return 'rankStatus';
+    if (family === 'hypergraph') return 'relationship';
+    if (family === 'fact') {
+        if (token.includes('event')) return 'eventNode';
+        if (token.includes('graphfact')) return 'graphFact';
+        return '';
+    }
+    return '';
+}
+
+function memoryStyleKey(kind: string, label: string): string {
+    const token = compactStyleToken(`${kind} ${label}`);
+    if (token.includes('decisionstate') || token.includes('decision')) return 'decisionState';
+    if (token.includes('rankorstatus') || token.includes('rankstatus') || token.includes('rank')) return 'rankStatus';
+    if (token.includes('servicecontext') || token.includes('servicerank') || token.includes('service')) return 'serviceContext';
+    if (token.includes('affiliationcontext') || token.includes('affiliatecontext') || token.includes('affiliantcontext') || token.includes('affiliation')) return 'affiliationContext';
+    if (token.includes('familycontext') || token.includes('family')) return 'familyContext';
+    return 'memoryState';
+}
+
+function atlasStyleHsl(family: GraphAtlasFamily, colorKind: string, entityKind: string): string {
+    if (entityKind) return entityColorStore.getRawHsl(entityKind);
+    const graphKind = normalizeGraphNodeColorKind(colorKind);
+    if (graphKind) return entityColorStore.getRawGraphNodeHsl(graphKind);
+    return atlasFamilyHsl(family);
+}
+
 function atlasFamilyHsl(family: GraphAtlasFamily): string {
-    if (family === 'entity' || family === 'registry') return entityColorStore.getRawHsl('character' as never);
-    if (family === 'structure' || family === 'evidence') return '184 72% 48%';
-    if (family === 'discourse') return '92 68% 52%';
-    if (family === 'temporal' || family === 'causal' || family === 'memory') return entityColorStore.getRawGraphNodeHsl('eventNode');
-    if (family === 'review') return '44 84% 58%';
-    if (family === 'hypergraph') return '286 70% 62%';
-    if (family === 'fact') return '326 74% 57%';
+    if (family === 'entity' || family === 'registry') return entityColorStore.getRawHsl('CHARACTER');
+    if (family === 'structure') return entityColorStore.getRawGraphNodeHsl('document');
+    if (family === 'evidence') return entityColorStore.getRawGraphNodeHsl('anchor');
+    if (family === 'discourse') return entityColorStore.getRawGraphNodeHsl('communication');
+    if (family === 'temporal') return entityColorStore.getRawGraphNodeHsl('temporalFact');
+    if (family === 'causal') return entityColorStore.getRawGraphNodeHsl('causalFact');
+    if (family === 'memory') return entityColorStore.getRawGraphNodeHsl('memoryState');
+    if (family === 'review') return entityColorStore.getRawGraphNodeHsl('rankStatus');
+    if (family === 'hypergraph') return entityColorStore.getRawGraphNodeHsl('relationship');
+    if (family === 'fact') return entityColorStore.getRawGraphNodeHsl('graphFact');
     return '220 10% 54%';
+}
+
+function compactStyleToken(value: string): string {
+    return String(value || '').toLowerCase().replace(/[^a-z0-9]+/g, '');
 }
 
 function graphKindCounts(nodes: GalaxyRenderableNode[]): Array<{ kind: string; count: number }> {

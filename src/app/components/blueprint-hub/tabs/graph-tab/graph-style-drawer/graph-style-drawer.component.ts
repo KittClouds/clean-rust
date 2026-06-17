@@ -8,6 +8,7 @@ import {
     entityColorStore,
     hexColorToHsl,
     hslColorToHex,
+    normalizeGraphNodeColorKind,
     type GraphNodeColorKind,
 } from '../../../../../lib/store/entityColorStore';
 import {
@@ -124,6 +125,11 @@ export class GraphStyleDrawerComponent implements OnDestroy {
         if (Object.prototype.hasOwnProperty.call(DEFAULT_ENTITY_COLORS, normalized)) {
             this.selectedKind.set(normalized);
         }
+    }
+
+    @Input() set initialGraphNodeKind(value: GraphNodeColorKind | string | null | undefined) {
+        const normalized = normalizeGraphNodeColorKind(value);
+        if (normalized) this.selectedGraphNodeKind.set(normalized);
     }
 
     ngOnDestroy(): void {

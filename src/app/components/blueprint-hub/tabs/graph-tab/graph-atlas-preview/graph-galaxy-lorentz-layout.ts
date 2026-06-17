@@ -43,6 +43,7 @@ const MAX_MEMBERSHIP_GUIDES = 260;
 interface CapInfo extends Rgb {
     id: string;
     lane: string;
+    parentIds: string[];
     center: Vec3;
     indexes: number[];
     radiusSum: number;
@@ -62,6 +63,7 @@ interface HierarchyInfo {
     ambiguity: number;
     targetRadius: number;
     direction: Vec3;
+    parentCapIds: string[];
     confidence: number;
 }
 
@@ -147,6 +149,7 @@ function hierarchyInfo(node: GalaxyNode): HierarchyInfo {
         ambiguity,
         targetRadius: hierarchyRadius(node, specificity, role, lane, confidence, ambiguity),
         direction: rawDirection(node, lorentz),
+        parentCapIds: parentCapIdsFor(lorentz, primary),
         confidence,
     };
 }
@@ -161,6 +164,7 @@ function buildCaps(nodes: GalaxyNode[], infos: HierarchyInfo[]): CapInfo[] {
             cap = {
                 id: info.capId,
                 lane: info.lane,
+                parentIds: [],
                 center: { x: 0, y: 0, z: 0 },
                 indexes: [],
                 radiusSum: 0,
@@ -169,6 +173,9 @@ function buildCaps(nodes: GalaxyNode[], infos: HierarchyInfo[]): CapInfo[] {
                 ...color,
             };
             byId.set(info.capId, cap);
+        }
+        for (const parentId of info.parentCapIds) {
+            if (parentId && parentId !== info.capId && !cap.parentIds.includes(parentId)) cap.parentIds.push(parentId);
         }
         const lane = laneDirection(info.lane);
         const concentration = clamp(0.86 + info.confidence * 0.28 + info.specificity * 0.18 - info.ambiguity * 0.14, 0.62, 1.28);
@@ -180,9 +187,43 @@ function buildCaps(nodes: GalaxyNode[], infos: HierarchyInfo[]): CapInfo[] {
         cap.ambiguitySum += info.ambiguity;
         cap.importance += 1 + Math.max(0, nodes[index].entity.totalMentions || 0) * 0.15 + info.confidence;
     }
-    return [...byId.values()]
+    const caps = [...byId.values()]
         .map((cap) => ({ ...cap, center: normalize(cap.center, laneDirection(cap.lane)) }))
         .sort((left, right) => right.importance - left.importance || left.id.localeCompare(right.id));
+    applyCapContainment(caps);
+    return caps;
+}
+
+function parentCapIdsFor(lorentz: Record<string, unknown>, primary: Record<string, unknown>): string[] {
+    const direct = arrayText(lorentz['parentCapIds']);
+    const single = firstText(lorentz['parentCapId'], primary['parentCapId']);
+    return [...new Set([...direct, single].filter(Boolean))];
+}
+
+function arrayText(value: unknown): string[] {
+    return Array.isArray(value) ? value.map((item) => String(item || '').trim()).filter(Boolean) : [];
+}
+
+function applyCapContainment(caps: CapInfo[]): void {
+    const byId = new Map(caps.map((cap) => [cap.id, cap]));
+    for (let pass = 0; pass < 3; pass++) {
+        for (const cap of caps) {
+            const parents = cap.parentIds.map((id) => byId.get(id)).filter((item): item is CapInfo => Boolean(item));
+            if (!parents.length) continue;
+            const parentCenter = normalize(parents.reduce((sum, parent) => add(sum, parent.center), { x: 0, y: 0, z: 0 }), parents[0].center);
+            const lane = laneDirection(cap.lane);
+            const weight = containmentWeight(cap);
+            cap.center = normalize(add(add(scale(parentCenter, weight), scale(cap.center, 1 - weight)), scale(lane, 0.04)), parentCenter);
+        }
+    }
+}
+
+function containmentWeight(cap: CapInfo): number {
+    const id = cap.id.toLowerCase();
+    if (/^document:[^:]+:root:/.test(id)) return 0.82;
+    if (/^document:[^:]+:chunk:/.test(id)) return 0.76;
+    if (/^identity:|:facts:|:memory|:temporal|:causal|event:/.test(id)) return 0.68;
+    return 0.62;
 }
 
 function hierarchyDirection(info: HierarchyInfo, cap: CapInfo): Vec3 {

@@ -54,6 +54,8 @@ import type {
     GraphIndexEmbeddingStagePolicy,
     GraphRebuildBuildTimings,
     GraphRebuildChunk,
+    GraphRebuildContentBlobField,
+    GraphRebuildContentManifest,
     GraphRebuildEmbeddingTarget,
     GraphRebuildEmbeddingTargetPlan,
     GraphRebuildEmbeddingProfile,
@@ -71,6 +73,8 @@ const RECEIPT_DOCUMENT_KEY = 'receipt';
 const OPERATOR_MUTATION_JOURNAL_DOCUMENT_KEY = 'operator-mutation-journal';
 export const GRAPH_MODEL_V2_OVERGRAPH_DOCUMENT_KEY = 'graph-model-v2-overgraph';
 const POST_PROCESS_CACHE_PREFIX = 'postprocess-cache';
+const SNAPSHOT_CONTENT_BLOB_PREFIX = 'snapshot-blob';
+const CONTENT_BLOB_SCHEMA_VERSION = 'phoenix-graph-rebuild-content-blob/v1';
 const COMPRESSED_JSON_SCHEMA_VERSION = 'phoenix-graph-rebuild-json-payload/gzip-base64/v1';
 const COMPRESSED_SNAPSHOT_SCHEMA_VERSION = 'phoenix-graph-rebuild-payload/gzip-base64/v1';
 const SNAPSHOT_COMPRESSION_MIN_CHARS = 64 * 1024;
@@ -124,6 +128,16 @@ interface CompressedGraphCompilerFactGraphPayload {
     rawBytes: number;
     compressedBytes: number;
     payload: string;
+}
+
+export interface GraphRebuildContentBlobPayload {
+    schemaVersion: typeof CONTENT_BLOB_SCHEMA_VERSION;
+    snapshotId: string;
+    scopeId: string;
+    builtAt: number;
+    field: GraphRebuildContentBlobField;
+    hash: string;
+    value: unknown;
 }
 
 export type NativeGraphCompilerSidecar = Partial<GraphCompilerDualWriteSidecar> & {
@@ -353,6 +367,8 @@ export class GraphRebuildService {
     }
 
     async loadPersistedSnapshot(scopeId: string): Promise<GraphRebuildSnapshot | null> {
+        const current = this.snapshotState();
+        if (current?.scopeId === scopeId) return current;
         const document = await this.store.getScopedDocument(scopeId, GRAPH_REBUILD_NAMESPACE, SNAPSHOT_DOCUMENT_KEY);
         return document ? scopedDocumentToGraphRebuildSnapshot(document) : null;
     }
@@ -360,6 +376,14 @@ export class GraphRebuildService {
     async loadPersistedGraphModelV2OverGraph(scopeId: string): Promise<GraphModelV2OverGraphExport | null> {
         const document = await this.store.getScopedDocument(scopeId, GRAPH_REBUILD_NAMESPACE, GRAPH_MODEL_V2_OVERGRAPH_DOCUMENT_KEY);
         return document ? scopedDocumentToGraphModelV2OverGraphExport(document) : null;
+    }
+
+    async loadPersistedSnapshotContentBlob(
+        scopeId: string,
+        documentKey: string,
+    ): Promise<GraphRebuildContentBlobPayload | null> {
+        const document = await this.store.getScopedDocument(scopeId, GRAPH_REBUILD_NAMESPACE, documentKey);
+        return document ? scopedDocumentToGraphRebuildContentBlob(document) : null;
     }
 
     async persistRunReceipt(receipt: GraphIndexRunReceipt): Promise<PhoenixContentMutationTiming> {
@@ -469,7 +493,9 @@ export class GraphRebuildService {
         emitEvent = true,
     ): Promise<void> {
         const serializeStarted = performance.now();
-        const persistedSnapshot = graphRebuildSnapshotPersistenceView(snapshot);
+        const contentBlobEntries = graphRebuildSnapshotContentBlobEntries(snapshot);
+        const persistedSnapshot = graphRebuildSnapshotPersistenceView(snapshot, contentBlobEntries);
+        const contentBlobDocuments = graphRebuildSnapshotContentBlobDocuments(snapshot, contentBlobEntries);
         const primaryEncodeStarted = performance.now();
         const document = graphRebuildSnapshotToScopedDocument(persistedSnapshot);
         if (timings) timings.snapshotPrimaryEncodeMs = elapsedMs(primaryEncodeStarted);
@@ -482,13 +508,16 @@ export class GraphRebuildService {
             : undefined;
         if (timings) {
             const profileStarted = performance.now();
-            timings.snapshotPayloadBreakdown = graphRebuildSnapshotPayloadCounters(
-                persistedSnapshot,
-                document.payload.length,
-                overGraphDocument?.payload.length || 0,
-                documentPayloadStats,
-                overGraphDocumentPayloadStats,
-            );
+            timings.snapshotPayloadBreakdown = {
+                ...graphRebuildSnapshotPayloadCounters(
+                    persistedSnapshot,
+                    document.payload.length,
+                    overGraphDocument?.payload.length || 0,
+                    documentPayloadStats,
+                    overGraphDocumentPayloadStats,
+                ),
+                ...graphRebuildContentBlobPayloadCounters(contentBlobDocuments),
+            };
             timings.snapshotPayloadProfileMs = elapsedMs(profileStarted);
             timings.snapshotSerializeMs = elapsedMs(serializeStarted);
             timings.snapshotPayloadChars = document.payload.length;
@@ -501,9 +530,21 @@ export class GraphRebuildService {
             timings.snapshotOverGraphCompressedBytes = overGraphDocumentPayloadStats?.compressedBytes || 0;
             timings.snapshotOverGraphCompressionSavedChars = overGraphDocumentPayloadStats?.savedChars || 0;
             timings.snapshotOverGraphCompressionRatioPct = overGraphDocumentPayloadStats?.ratioPct || 0;
-            timings.snapshotTotalPayloadChars = document.payload.length + (overGraphDocument?.payload.length || 0);
+            timings.snapshotTotalPayloadChars = document.payload.length
+                + (overGraphDocument?.payload.length || 0)
+                + contentBlobDocuments.reduce((sum, blob) => sum + blob.payload.length, 0);
         }
         const storeStarted = performance.now();
+        for (const blobDocument of contentBlobDocuments) {
+            const existing = await this.store.getScopedDocument(
+                blobDocument.scopeFolderId,
+                blobDocument.namespace,
+                blobDocument.documentKey,
+            );
+            if (!existing || existing.payload !== blobDocument.payload) {
+                await this.store.upsertScopedDocument(blobDocument);
+            }
+        }
         const primaryStoreStarted = performance.now();
         await this.store.upsertScopedDocument(document);
         if (timings) timings.snapshotPrimaryStoreMs = elapsedMs(primaryStoreStarted);
@@ -835,16 +876,139 @@ export function graphRebuildSnapshotToScopedDocument(snapshot: GraphRebuildSnaps
     };
 }
 
-export function graphRebuildSnapshotPersistenceView(snapshot: GraphRebuildSnapshot): GraphRebuildSnapshot {
+export interface GraphRebuildContentBlobEntry {
+    field: GraphRebuildContentBlobField;
+    documentKey: string;
+    payload: string;
+    ref: NonNullable<GraphRebuildContentManifest['refs'][GraphRebuildContentBlobField]>;
+}
+
+const SNAPSHOT_CONTENT_BLOB_FIELDS: GraphRebuildContentBlobField[] = [
+    'sourceRows',
+    'renderRows',
+    'embeddingTargets',
+    'embeddingTargetPlan',
+    'embeddingGraphPostProcess',
+    'graphModelV2',
+    'semanticCandidateSummary',
+    'manifoldSpecializationSummary',
+    'atlasDebugSummaries',
+];
+
+export function graphRebuildSnapshotContentBlobDocuments(
+    snapshot: GraphRebuildSnapshot,
+    entries = graphRebuildSnapshotContentBlobEntries(snapshot),
+): StoreScopedDocument[] {
+    const now = Date.now();
+    return entries.map((entry) => ({
+        id: `${GRAPH_REBUILD_NAMESPACE}:${snapshot.scopeId}:${entry.documentKey}`,
+        scopeFolderId: snapshot.scopeId,
+        narrativeId: snapshot.scopeKind === 'narrative' ? snapshot.scopeId : '',
+        namespace: GRAPH_REBUILD_NAMESPACE,
+        documentKey: entry.documentKey,
+        payload: entry.payload,
+        createdAt: snapshot.builtAt || now,
+        updatedAt: now,
+    }));
+}
+
+export function graphRebuildSnapshotContentManifest(
+    snapshot: GraphRebuildSnapshot,
+    entries = graphRebuildSnapshotContentBlobEntries(snapshot),
+): GraphRebuildContentManifest | undefined {
+    if (!entries.length) return undefined;
+    const refs: GraphRebuildContentManifest['refs'] = {};
+    for (const entry of entries) refs[entry.field] = entry.ref;
+    return {
+        schemaVersion: 'phoenix-graph-rebuild-content-manifest/v1',
+        snapshotId: snapshot.id,
+        scopeId: snapshot.scopeId,
+        builtAt: snapshot.builtAt,
+        refs,
+    };
+}
+
+export function graphRebuildSnapshotContentBlobEntries(
+    snapshot: GraphRebuildSnapshot,
+): GraphRebuildContentBlobEntry[] {
+    const entries: GraphRebuildContentBlobEntry[] = [];
+    const createdAt = snapshot.builtAt;
+    for (const field of SNAPSHOT_CONTENT_BLOB_FIELDS) {
+        const value = snapshotContentBlobValue(snapshot, field);
+        if (isEmptySnapshotContentBlobValue(value)) continue;
+        const raw = JSON.stringify(value);
+        const hash = graphRebuildContentHash(raw);
+        const documentKey = `${SNAPSHOT_CONTENT_BLOB_PREFIX}:${field}:${hash}`;
+        const payload: GraphRebuildContentBlobPayload = {
+            schemaVersion: CONTENT_BLOB_SCHEMA_VERSION,
+            snapshotId: snapshot.id,
+            scopeId: snapshot.scopeId,
+            builtAt: snapshot.builtAt,
+            field,
+            hash,
+            value,
+        };
+        const encoded = encodeGraphRebuildJsonPayload(payload, CONTENT_BLOB_SCHEMA_VERSION);
+        const stats = graphRebuildSnapshotDocumentPayloadStats(encoded);
+        entries.push({
+            field,
+            documentKey,
+            payload: encoded,
+            ref: {
+                schemaVersion: 'phoenix-graph-rebuild-content-blob-ref/v1',
+                field,
+                hash,
+                documentKey,
+                sourceSchemaVersion: snapshotContentBlobSourceSchemaVersion(field, value),
+                rawChars: raw.length,
+                payloadChars: encoded.length,
+                compressedBytes: stats.compressedBytes,
+                itemCount: snapshotContentBlobItemCount(value),
+                createdAt,
+            },
+        });
+    }
+    return entries;
+}
+
+export function graphRebuildSnapshotPersistenceView(
+    snapshot: GraphRebuildSnapshot,
+    contentBlobEntries = graphRebuildSnapshotContentBlobEntries(snapshot),
+): GraphRebuildSnapshot {
     const persisted = { ...snapshot };
+    const contentManifest = graphRebuildSnapshotContentManifest(snapshot, contentBlobEntries)
+        || snapshot.contentManifest;
+    if (contentManifest) persisted.contentManifest = contentManifest;
+    persisted.chunks = [];
+    persisted.mentions = [];
+    persisted.entityAnchors = [];
+    persisted.relationships = [];
+    persisted.events = [];
+    persisted.temporalEdges = [];
+    persisted.causalEdges = [];
+    persisted.memoryState = [];
+    persisted.embeddingTargets = [];
+    persisted.projectionRefs = [];
+    persisted.nodes = [];
+    persisted.edges = [];
+    delete persisted.embeddingTargetPlan;
+    delete persisted.embeddingGraphPostProcess;
+    delete persisted.structuralPostProcess;
+    delete persisted.projectedUiGraph;
+    delete persisted.graphModelV2;
+    delete persisted.graphAwareLinkSuggestions;
+    delete persisted.entityLinkSuggestions;
+    delete persisted.shadowLinkSuggestions;
+    delete persisted.finalLinkPatchLog;
+    delete persisted.semanticCandidateSummary;
+    delete persisted.manifoldSpecializationSummary;
+    delete persisted.documentSidecarSummary;
+    delete persisted.documentSemanticSummary;
+    delete persisted.documentReviewSummary;
+    delete persisted.documentCompilerSummary;
+    delete persisted.calendarRegistrySummary;
     if (snapshot.graphCompiler && snapshot.graphModelV2) {
         delete persisted.graphCompiler;
-    }
-    if (snapshot.embeddingTargetPlan) {
-        const { targets: _targets, ...plan } = snapshot.embeddingTargetPlan as GraphRebuildSnapshot['embeddingTargetPlan'] & {
-            targets?: unknown;
-        };
-        persisted.embeddingTargetPlan = plan;
     }
     delete persisted.hopfResonanceSpace;
     delete persisted.memoryGraphRagBridgeSummary;
@@ -861,10 +1025,15 @@ export function graphRebuildSnapshotPersistenceView(snapshot: GraphRebuildSnapsh
     return persisted;
 }
 
-export function hydrateGraphRebuildSnapshotDerivedViews(snapshot: GraphRebuildSnapshot): GraphRebuildSnapshot {
-    // Compatibility hook retained for old callsites; derived Atlas summaries
-    // must now arrive from persisted/Rust-owned payloads, not TS reload work.
-    return snapshot;
+export function scopedDocumentToGraphRebuildContentBlob(
+    document: StoreScopedDocument,
+): GraphRebuildContentBlobPayload | null {
+    try {
+        const parsed = decodeGraphRebuildJsonPayload<GraphRebuildContentBlobPayload>(document.payload);
+        return parsed?.schemaVersion === CONTENT_BLOB_SCHEMA_VERSION ? parsed : null;
+    } catch {
+        return null;
+    }
 }
 
 function encodeGraphRebuildSnapshotPayload(snapshot: GraphRebuildSnapshot): string {
@@ -1050,6 +1219,24 @@ export function graphRebuildSnapshotPayloadCounters(
     return counters;
 }
 
+function graphRebuildContentBlobPayloadCounters(documents: StoreScopedDocument[]): Record<string, number> {
+    if (!documents.length) return {};
+    const counters: Record<string, number> = {
+        snapshotContentBlobDocuments: documents.length,
+        snapshotContentBlobPayloadChars: documents.reduce((sum, document) => sum + document.payload.length, 0),
+    };
+    let rawChars = 0;
+    let compressedBytes = 0;
+    for (const document of documents) {
+        const stats = graphRebuildSnapshotDocumentPayloadStats(document.payload);
+        rawChars += stats.rawChars;
+        compressedBytes += stats.compressedBytes;
+    }
+    counters['snapshotContentBlobRawPayloadChars'] = rawChars;
+    counters['snapshotContentBlobCompressedBytes'] = compressedBytes;
+    return counters;
+}
+
 export function scopedDocumentToGraphRebuildSnapshot(document: StoreScopedDocument): GraphRebuildSnapshot | null {
     try {
         const parsed = decodeGraphRebuildSnapshotPayload(document.payload);
@@ -1220,11 +1407,130 @@ const SNAPSHOT_PAYLOAD_PROFILE_FIELDS: Array<[string, keyof GraphRebuildSnapshot
     ['payloadDiscoursePromotionSurfaceSummaryChars', 'discoursePromotionSurfaceSummary'],
     ['payloadDiscourseCompilerOverlaySummaryChars', 'discourseCompilerOverlaySummary'],
     ['payloadCalendarRegistrySummaryChars', 'calendarRegistrySummary'],
+    ['payloadContentManifestChars', 'contentManifest'],
 ];
 
 function jsonPayloadChars(value: unknown): number {
     if (value === undefined) return 0;
     return JSON.stringify(value).length;
+}
+
+function isEmptySnapshotContentBlobValue(value: unknown): boolean {
+    if (value === undefined || value === null) return true;
+    return Array.isArray(value) && value.length === 0;
+}
+
+function snapshotContentBlobValue(
+    snapshot: GraphRebuildSnapshot,
+    field: GraphRebuildContentBlobField,
+): unknown {
+    switch (field) {
+        case 'sourceRows':
+            return compactBlobGroup({
+                chunks: snapshot.chunks,
+                mentions: snapshot.mentions,
+                entityAnchors: snapshot.entityAnchors,
+                relationships: snapshot.relationships,
+                events: snapshot.events,
+                temporalEdges: snapshot.temporalEdges,
+                causalEdges: snapshot.causalEdges,
+                memoryState: snapshot.memoryState,
+            });
+        case 'renderRows':
+            return compactBlobGroup({
+                projectionRefs: snapshot.projectionRefs,
+                nodes: snapshot.nodes,
+                edges: snapshot.edges,
+                structuralPostProcess: snapshot.structuralPostProcess,
+                projectedUiGraph: snapshot.projectedUiGraph,
+            });
+        case 'embeddingTargets':
+            return snapshot.embeddingTargets;
+        case 'embeddingTargetPlan':
+            return compactEmbeddingTargetPlan(snapshot.embeddingTargetPlan);
+        case 'embeddingGraphPostProcess':
+            return snapshot.embeddingGraphPostProcess;
+        case 'graphModelV2':
+            return snapshot.graphModelV2;
+        case 'semanticCandidateSummary':
+            return snapshot.semanticCandidateSummary;
+        case 'manifoldSpecializationSummary':
+            return snapshot.manifoldSpecializationSummary;
+        case 'atlasDebugSummaries':
+            return compactBlobGroup({
+                graphAwareLinkSuggestions: snapshot.graphAwareLinkSuggestions,
+                entityLinkSuggestions: snapshot.entityLinkSuggestions,
+                shadowLinkSuggestions: snapshot.shadowLinkSuggestions,
+                finalLinkPatchLog: snapshot.finalLinkPatchLog,
+                documentSidecarSummary: snapshot.documentSidecarSummary,
+                documentSemanticSummary: snapshot.documentSemanticSummary,
+                documentReviewSummary: snapshot.documentReviewSummary,
+                documentCompilerSummary: snapshot.documentCompilerSummary,
+                calendarRegistrySummary: snapshot.calendarRegistrySummary,
+            });
+    }
+    return undefined;
+}
+
+function compactBlobGroup(group: Record<string, unknown>): Record<string, unknown> | undefined {
+    const compact: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(group)) {
+        if (!isEmptySnapshotContentBlobValue(value)) compact[key] = value;
+    }
+    return Object.keys(compact).length ? compact : undefined;
+}
+
+function compactEmbeddingTargetPlan(
+    plan: GraphRebuildEmbeddingTargetPlan | undefined,
+): Omit<GraphRebuildEmbeddingTargetPlan, 'targets'> | undefined {
+    if (!plan) return undefined;
+    const { targets: _targets, ...compact } = plan as GraphRebuildEmbeddingTargetPlan & { targets?: unknown };
+    return compact;
+}
+
+function snapshotContentBlobSourceSchemaVersion(
+    field: GraphRebuildContentBlobField,
+    value: unknown,
+): string {
+    const record = value && typeof value === 'object'
+        ? value as { schemaVersion?: unknown }
+        : null;
+    return typeof record?.schemaVersion === 'string'
+        ? record.schemaVersion
+        : `phoenix-graph-rebuild-${field}/v1`;
+}
+
+function snapshotContentBlobItemCount(value: unknown): number | undefined {
+    if (Array.isArray(value)) return value.length;
+    const record = value && typeof value === 'object' ? value as Record<string, unknown> : null;
+    if (!record) return undefined;
+    for (const key of ['targets', 'candidates', 'contributions', 'atoms', 'facts']) {
+        const rows = record[key];
+        if (Array.isArray(rows)) return rows.length;
+    }
+    let total = 0;
+    let counted = false;
+    for (const child of Object.values(record)) {
+        if (Array.isArray(child)) {
+            total += child.length;
+            counted = true;
+        }
+    }
+    if (counted) return total;
+    return undefined;
+}
+
+function graphRebuildContentHash(raw: string): string {
+    let left = 0x811c9dc5;
+    let right = 0x45d9f3b;
+    for (let index = 0; index < raw.length; index += 1) {
+        const code = raw.charCodeAt(index);
+        left ^= code;
+        left = Math.imul(left, 0x01000193) >>> 0;
+        right ^= code + index;
+        right = Math.imul(right, 0x85ebca6b) >>> 0;
+    }
+    return `fnv64-${left.toString(16).padStart(8, '0')}${right.toString(16).padStart(8, '0')}`;
 }
 
 async function timedAsync<T>(

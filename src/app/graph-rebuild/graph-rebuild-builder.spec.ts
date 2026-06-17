@@ -175,6 +175,45 @@ describe('Phoenix graph rebuild builder', () => {
         expect(snapshot.structuralPostProcess?.components).toHaveLength(1);
     });
 
+    it('keeps registry-only Alex entities as first-class graph nodes and targets', () => {
+        const snapshot = buildGraphRebuildSnapshot({
+            scopeKind: 'note',
+            scopeId: 'note:registry',
+            noteIds: ['note-1'],
+            entities: [
+                entity('e-kai', 'Kai', ['Captain Kai']),
+                entity('e-hazel', 'Hazel', []),
+            ],
+            chunks: [
+                { id: 'note-1:block:0', noteId: 'note-1', start: 0, end: 40, ordinal: 0, source: 'note-block' },
+            ],
+            occurrences: [
+                occurrence('note-1', 'e-kai', 'Kai', 0, 3),
+            ],
+            noteTexts: {
+                'note-1': 'Kai checked the registry before leaving.',
+            },
+            builtAt: 20,
+        });
+
+        expect(snapshot.nodes.map((node) => [node.entityId, node.totalMentions]).sort()).toEqual([
+            ['e-hazel', 0],
+            ['e-kai', 1],
+        ]);
+        expect(snapshot.embeddingTargets.find((target) => target.id === 'embed:entity:e-hazel')).toMatchObject({
+            kind: 'entity',
+            entityId: 'e-hazel',
+            entityKind: 'CHARACTER',
+            label: 'Hazel',
+            evidenceIds: [],
+            parentIds: [],
+        });
+        expect(snapshot.embeddingTargets.find((target) => target.id === 'embed:entity:e-hazel')?.text)
+            .toContain('mentions:0');
+        expect(snapshot.counters.nodes).toBe(2);
+        expect(snapshot.counters.embeddingEntityAnchors).toBeGreaterThan(1);
+    });
+
     it('uses an injected Rust compiler sidecar as the graph model authority', () => {
         const receipts = {
             roots: [],

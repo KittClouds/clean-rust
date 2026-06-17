@@ -542,6 +542,19 @@ function planLaneCandidates(
 
 function buildNodes(anchors: GraphRebuildEntityAnchor[], entitiesById: Map<string, RegisteredEntity>): GraphRebuildNode[] {
     const byEntity = new Map<string, GraphRebuildNode>();
+    for (const entity of entitiesById.values()) {
+        if (!entity.id || !entity.label) continue;
+        byEntity.set(entity.id, {
+            id: entity.id,
+            entityId: entity.id,
+            label: entity.label,
+            kind: entity.kind,
+            aliases: [...(entity.aliases || [])],
+            anchorIds: [],
+            noteIds: [],
+            totalMentions: 0,
+        });
+    }
     for (const anchor of anchors) {
         const entity = entitiesById.get(anchor.entityId);
         if (!entity) continue;
@@ -560,7 +573,11 @@ function buildNodes(anchors: GraphRebuildEntityAnchor[], entitiesById: Map<strin
         node.totalMentions += 1;
         byEntity.set(entity.id, node);
     }
-    return [...byEntity.values()].sort((left, right) => right.totalMentions - left.totalMentions || left.label.localeCompare(right.label));
+    return [...byEntity.values()].sort((left, right) =>
+        right.totalMentions - left.totalMentions
+        || left.kind.localeCompare(right.kind)
+        || left.label.localeCompare(right.label),
+    );
 }
 
 function buildEdges(anchors: GraphRebuildEntityAnchor[], drops: GraphRebuildDropReasons): GraphRebuildEdge[] {

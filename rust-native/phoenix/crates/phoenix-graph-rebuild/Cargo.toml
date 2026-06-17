@@ -23,3 +23,7 @@ thiserror.workspace = true
 [[example]]
 name = "semantic_audit"
 path = "examples/semantic_audit.rs"
+
+[[example]]
+name = "atlas_packet_from_snapshot"
+path = "examples/atlas_packet_from_snapshot.rs"

@@ -9,6 +9,20 @@ use crate::types::{
     GraphRelationship, GraphScopeKind, GraphTemporalEdge,
 };
 
+mod ids;
+mod taxonomy;
+
+use ids::{
+    anchor_object_id, chunk_object_id, entity_object_id, event_object_id, fact_object_id,
+    hyperedge_object_id, hyperedge_role_object_id, memory_object_id, note_object_id,
+    story_edge_object_id,
+};
+use taxonomy::{
+    admission_for_target, document_unit_kind, entity_kind_from_target, hyperedge_role_style_key,
+    memory_style_key, relation_style_key, state_context_kind, status_for_admission,
+    story_edge_lane, story_edge_style_key, target_lane, target_structural_role, target_style_key,
+};
+
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct AtlasPacket {
@@ -89,6 +103,16 @@ pub struct AtlasObject {
     pub status: AtlasObjectStatus,
     pub kind: CompactString,
     pub label: CompactString,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub style_key: Option<CompactString>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub lane: Option<CompactString>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub structural_role: Option<CompactString>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub document_unit_kind: Option<CompactString>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub state_context_kind: Option<CompactString>,
     #[serde(default)]
     pub registry_entity_id: Option<EntityId>,
     #[serde(default)]
@@ -112,10 +136,23 @@ pub struct ManifoldTarget {
     pub object_id: CompactString,
     pub family: GraphFamily,
     pub admission: ManifoldAdmission,
+    pub status: AtlasObjectStatus,
     pub vector_status: AtlasVectorStatus,
     pub coordinate_source: CompactString,
     pub kind: CompactString,
     pub label: CompactString,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub entity_kind: Option<CompactString>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub style_key: Option<CompactString>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub lane: Option<CompactString>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub structural_role: Option<CompactString>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub document_unit_kind: Option<CompactString>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub state_context_kind: Option<CompactString>,
     pub source_id: CompactString,
     #[serde(default)]
     pub registry_entity_id: Option<EntityId>,
@@ -303,6 +340,11 @@ fn note_object(snapshot: &GraphRebuildSnapshot, note_id: &CompactString) -> Atla
         status: AtlasObjectStatus::Accepted,
         kind: "note".into(),
         label: format_compact!("Note {note_id}"),
+        style_key: Some("document".into()),
+        lane: Some("document_spine".into()),
+        structural_role: Some("root".into()),
+        document_unit_kind: None,
+        state_context_kind: None,
         registry_entity_id: None,
         note_ids: vec![note_id.clone()],
         chunk_ids: Vec::new(),
@@ -316,10 +358,15 @@ fn note_object(snapshot: &GraphRebuildSnapshot, note_id: &CompactString) -> Atla
 fn entity_object(node: &GraphNode) -> AtlasObject {
     AtlasObject {
         id: entity_object_id(&node.entity_id),
-        family: GraphFamily::Entity,
+        family: GraphFamily::Registry,
         status: AtlasObjectStatus::Accepted,
         kind: node.kind.clone(),
         label: node.label.clone(),
+        style_key: Some(node.kind.clone()),
+        lane: Some("entity_anchor".into()),
+        structural_role: Some("child".into()),
+        document_unit_kind: None,
+        state_context_kind: None,
         registry_entity_id: Some(node.entity_id.clone()),
         note_ids: node.note_ids.clone(),
         chunk_ids: Vec::new(),
@@ -337,6 +384,11 @@ fn chunk_object(chunk: &GraphChunk) -> AtlasObject {
         status: AtlasObjectStatus::LedgerOnly,
         kind: "chunk".into(),
         label: format_compact!("Chunk {}", chunk.ordinal + 1),
+        style_key: Some("chunk".into()),
+        lane: Some("chunk_spine".into()),
+        structural_role: Some("spine".into()),
+        document_unit_kind: None,
+        state_context_kind: None,
         registry_entity_id: None,
         note_ids: vec![chunk.note_id.clone()],
         chunk_ids: vec![chunk.id.clone()],
@@ -354,6 +406,11 @@ fn anchor_object(anchor: &GraphAnchor) -> AtlasObject {
         status: AtlasObjectStatus::Accepted,
         kind: "entityAnchor".into(),
         label: anchor.surface.clone(),
+        style_key: Some("anchor".into()),
+        lane: Some("anchor_evidence".into()),
+        structural_role: Some("evidence".into()),
+        document_unit_kind: None,
+        state_context_kind: None,
         registry_entity_id: Some(anchor.entity_id.clone()),
         note_ids: vec![anchor.note_id.clone()],
         chunk_ids: anchor.chunk_id.iter().cloned().collect(),
@@ -376,6 +433,14 @@ fn relationship_object(relationship: &GraphRelationship) -> AtlasObject {
             relationship.relation_type,
             relationship.target_entity_id.0
         ),
+        style_key: Some(relation_style_key(
+            relationship.relation_type.as_str(),
+            relationship.rationale.as_str(),
+        )),
+        lane: Some("relationship_fact".into()),
+        structural_role: Some("fact".into()),
+        document_unit_kind: None,
+        state_context_kind: None,
         registry_entity_id: None,
         note_ids: Vec::new(),
         chunk_ids: Vec::new(),
@@ -396,6 +461,11 @@ fn event_object(event: &GraphEvent) -> AtlasObject {
         status: AtlasObjectStatus::Accepted,
         kind: "event".into(),
         label: event.label.clone(),
+        style_key: Some("eventNode".into()),
+        lane: Some("event_identity".into()),
+        structural_role: Some("fact".into()),
+        document_unit_kind: None,
+        state_context_kind: None,
         registry_entity_id: event.entity_ids.first().cloned(),
         note_ids: vec![event.note_id.clone()],
         chunk_ids: event.chunk_id.iter().cloned().collect(),
@@ -413,6 +483,11 @@ fn story_edge_object(edge: &GraphTemporalEdge, family: GraphFamily, kind: &str) 
         status: AtlasObjectStatus::Accepted,
         kind: kind.into(),
         label: edge.relation_type.clone(),
+        style_key: Some(story_edge_style_key(kind)),
+        lane: Some(story_edge_lane(kind)),
+        structural_role: Some("fact".into()),
+        document_unit_kind: None,
+        state_context_kind: None,
         registry_entity_id: None,
         note_ids: Vec::new(),
         chunk_ids: Vec::new(),
@@ -434,6 +509,11 @@ fn memory_object(state: &GraphMemoryState) -> AtlasObject {
         status: AtlasObjectStatus::Accepted,
         kind: "memoryState".into(),
         label: state.key.clone(),
+        style_key: Some(memory_style_key(state.key.as_str(), state.value.as_str())),
+        lane: Some("memory_state".into()),
+        structural_role: Some("child".into()),
+        document_unit_kind: None,
+        state_context_kind: Some(memory_style_key(state.key.as_str(), state.value.as_str())),
         registry_entity_id: Some(state.entity_id.clone()),
         note_ids: state.note_id.iter().cloned().collect(),
         chunk_ids: Vec::new(),
@@ -454,6 +534,11 @@ fn hyperedge_object(hyperedge: &GraphDocumentCompilerHyperedge) -> AtlasObject {
             .trigger_predicate
             .clone()
             .unwrap_or_else(|| hyperedge.predicate.clone()),
+        style_key: Some("relationship".into()),
+        lane: Some("hypergraph".into()),
+        structural_role: Some("fact".into()),
+        document_unit_kind: None,
+        state_context_kind: None,
         registry_entity_id: None,
         note_ids: Vec::new(),
         chunk_ids: Vec::new(),
@@ -493,6 +578,19 @@ fn hyperedge_role_object(
             .surface
             .clone()
             .unwrap_or_else(|| role.target_id.clone()),
+        style_key: Some(hyperedge_role_style_key(role)),
+        lane: Some("hypergraph_role".into()),
+        structural_role: Some(
+            role.semantic_role
+                .clone()
+                .unwrap_or_else(|| role.role.clone()),
+        ),
+        document_unit_kind: if role.target_kind == "document_unit" {
+            Some("document_unit".into())
+        } else {
+            None
+        },
+        state_context_kind: None,
         registry_entity_id: if role.target_kind == "entity" {
             Some(EntityId(role.target_id.as_str().to_owned()))
         } else {
@@ -518,15 +616,36 @@ fn manifold_target(
     coordinate_source: &CompactString,
 ) -> ManifoldTarget {
     let object_id = object_id_for_target(target, source_to_object);
+    let family = family_for_target(target);
+    let admission = admission_for_target(target);
+    let lane = target_lane(target, family);
+    let structural_role = target_structural_role(target, family, lane.as_deref());
+    let document_unit_kind = document_unit_kind(target);
+    let state_context_kind = state_context_kind(target);
+    let style_key = target
+        .style_key
+        .clone()
+        .or_else(|| state_context_kind.clone())
+        .or_else(|| target_style_key(target, family, document_unit_kind.as_deref()));
     ManifoldTarget {
         id: target.id.clone(),
         object_id,
-        family: family_for_target(target),
-        admission: ManifoldAdmission::Candidate,
+        family,
+        admission,
+        status: status_for_admission(admission),
         vector_status,
         coordinate_source: coordinate_source.clone(),
         kind: target.kind.clone(),
         label: target.label.clone(),
+        entity_kind: target
+            .entity_kind
+            .clone()
+            .or_else(|| entity_kind_from_target(target)),
+        style_key,
+        lane,
+        structural_role,
+        document_unit_kind,
+        state_context_kind,
         source_id: target.source_id.clone(),
         registry_entity_id: target.entity_id.clone(),
         note_id: target.note_id.clone(),
@@ -540,11 +659,13 @@ fn object_id_for_target(
     target: &GraphEmbeddingTarget,
     source_to_object: &HashMap<CompactString, CompactString>,
 ) -> CompactString {
-    if let Some(entity_id) = &target.entity_id {
-        return entity_object_id(entity_id);
-    }
     if let Some(object_id) = source_to_object.get(&target.source_id) {
         return object_id.clone();
+    }
+    if target.kind == "entity" {
+        if let Some(entity_id) = &target.entity_id {
+            return entity_object_id(entity_id);
+        }
     }
     if target.kind == "note" {
         return note_object_id(&target.source_id);
@@ -567,7 +688,7 @@ fn family_for_target(target: &GraphEmbeddingTarget) -> GraphFamily {
     }
     match target.kind.as_str() {
         "note" | "chunk" | "structureRoot" | "documentUnit" => GraphFamily::Structure,
-        "entity" => GraphFamily::Entity,
+        "entity" => GraphFamily::Registry,
         "anchor" | "evidenceSpan" => GraphFamily::Evidence,
         "graphFact" | "event" => GraphFamily::Fact,
         "temporalFact" => GraphFamily::Temporal,
@@ -648,49 +769,6 @@ fn push_object(
             .or_insert_with(|| object.id.clone());
     }
     objects.push(object);
-}
-
-fn note_object_id(note_id: &CompactString) -> CompactString {
-    format_compact!("atlas:note:{note_id}")
-}
-
-fn entity_object_id(entity_id: &EntityId) -> CompactString {
-    entity_id.0.as_str().into()
-}
-
-fn chunk_object_id(chunk_id: &CompactString) -> CompactString {
-    format_compact!("atlas:chunk:{chunk_id}")
-}
-
-fn anchor_object_id(anchor_id: &CompactString) -> CompactString {
-    format_compact!("atlas:anchor:{anchor_id}")
-}
-
-fn fact_object_id(fact_id: &CompactString) -> CompactString {
-    format_compact!("atlas:fact:{fact_id}")
-}
-
-fn event_object_id(event_id: &CompactString) -> CompactString {
-    format_compact!("atlas:event:{event_id}")
-}
-
-fn story_edge_object_id(kind: &str, edge_id: &CompactString) -> CompactString {
-    format_compact!("atlas:{kind}:{edge_id}")
-}
-
-fn memory_object_id(memory_id: &CompactString) -> CompactString {
-    format_compact!("atlas:memory:{memory_id}")
-}
-
-fn hyperedge_object_id(hyperedge_id: &CompactString) -> CompactString {
-    format_compact!("atlas:hyperedge:{hyperedge_id}")
-}
-
-fn hyperedge_role_object_id(
-    hyperedge_id: &CompactString,
-    role_id: &CompactString,
-) -> CompactString {
-    format_compact!("atlas:hyperedge-role:{hyperedge_id}:{role_id}")
 }
 
 fn family_sort_key(family: GraphFamily) -> u8 {

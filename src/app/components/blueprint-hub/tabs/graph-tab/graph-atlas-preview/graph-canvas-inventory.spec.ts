@@ -28,6 +28,8 @@ describe('graph canvas inventory', () => {
         expect(fact?.kind).toBe('fact');
         expect(fact?.metadata?.['canvasLens']).toBe('facts');
         expect(fact?.metadata?.['reviewState']).toBe('accepted');
+        expect(fact?.metadata?.['graphColorKind']).toBe('cooccurrence');
+        expect(fact?.metadata?.['graphRelationFamily']).toBe('cooccurrence');
         expect(review?.kind).toBe('review');
         expect(review?.metadata?.['canvasLens']).toBe('facts');
         expect(review?.metadata?.['reviewState']).toBe('proposed');
@@ -52,6 +54,31 @@ describe('graph canvas inventory', () => {
             'fact:rel-1',
             'review:row-1',
         ]);
+    });
+
+    it('derives Style Lab keys from Rust Atlas object kinds', () => {
+        const next = snapshot();
+        next.atlasPacket!.objects.push(
+            atlasObject('fact:event-1', 'fact', 'accepted', 'event', 'Amara enters'),
+            atlasObject('temporal:1', 'temporal', 'accepted', 'temporalFact', 'before'),
+            atlasObject('causal:1', 'causal', 'accepted', 'causalFact', 'because'),
+            {
+                ...atlasObject('memory:1', 'memory', 'accepted', 'memoryState', 'plain label'),
+                styleKey: 'decisionState',
+                stateContextKind: 'decisionState',
+                lane: 'memory_state',
+                structuralRole: 'child',
+            },
+        );
+
+        const inventory = buildGraphCanvasInventory(next);
+        const styleKey = (id: string) => inventory.nodes.find((node) => node.id === id)?.metadata?.['graphColorKind'];
+
+        expect(styleKey('fact:rel-1')).toBe('cooccurrence');
+        expect(styleKey('fact:event-1')).toBe('eventNode');
+        expect(styleKey('temporal:1')).toBe('temporalFact');
+        expect(styleKey('causal:1')).toBe('causalFact');
+        expect(styleKey('memory:1')).toBe('decisionState');
     });
 
     it('does not synthesize TS graph rows when the Rust packet is absent', () => {
@@ -151,6 +178,7 @@ function snapshot(): GraphRebuildSnapshot {
                     objectId: 'document:note-1',
                     family: 'structure',
                     admission: 'candidate',
+                    status: 'proposed',
                     vectorStatus: 'missing',
                     coordinateSource: 'none',
                     kind: 'document',
@@ -165,6 +193,7 @@ function snapshot(): GraphRebuildSnapshot {
                     objectId: 'chunk:note-1:0',
                     family: 'structure',
                     admission: 'candidate',
+                    status: 'proposed',
                     vectorStatus: 'missing',
                     coordinateSource: 'none',
                     kind: 'chunk',
@@ -186,4 +215,26 @@ function snapshot(): GraphRebuildSnapshot {
             },
         },
     } as unknown as GraphRebuildSnapshot;
+}
+
+function atlasObject(
+    id: string,
+    family: string,
+    status: string,
+    kind: string,
+    label: string,
+) {
+    return {
+        id,
+        family,
+        status,
+        kind,
+        label,
+        noteIds: ['note-1'],
+        chunkIds: ['note-1:0'],
+        anchorIds: [],
+        evidenceIds: ['evidence-1'],
+        sourceIds: [id],
+        targetIds: [],
+    } as any;
 }

@@ -107,6 +107,17 @@ export class GraphRebuildPipelineService {
         return this.modelReadiness(request).find((model) => model.id === 'dynamicNer')?.status === 'ready';
     }
 
+    graphModelsReady(request: GraphIndexRunRequest): boolean {
+        const readiness = this.modelReadiness(request);
+        return ['dynamicNer', 'nli'].every((id) =>
+            readiness.find((model) => model.id === id)?.status === 'ready',
+        );
+    }
+
+    embeddingModelReady(request: GraphIndexRunRequest): boolean {
+        return this.modelReadiness(request).find((model) => model.id === 'semanticEmbedding')?.status === 'ready';
+    }
+
     async loadModels(request: GraphIndexRunRequest): Promise<void> {
         if (this.runningState()) return;
         this.runningState.set(true);
@@ -127,6 +138,7 @@ export class GraphRebuildPipelineService {
         }
     }
 
+    /** @deprecated Diagnostic compatibility path. Product builds should call buildGraph(). */
     async buildCoreGraph(request: GraphIndexRunRequest): Promise<PipelineResult> {
         if (this.runningState()) {
             throw new Error('Full Atlas Index is already running.');
@@ -256,6 +268,218 @@ export class GraphRebuildPipelineService {
                 completedAt,
                 stageReceipts,
                 projectionReceipts: [],
+                snapshot,
+                status: 'failed',
+                message: error instanceof Error ? error.message : String(error),
+            });
+            if (snapshot) this.lastSnapshotState.set(snapshot);
+            this.lastReceiptState.set(failedReceipt);
+            throw error;
+        } finally {
+            resumeContentCheckpoints?.();
+            this.runningState.set(false);
+        }
+    }
+
+    async loadGraphModels(request: GraphIndexRunRequest): Promise<void> {
+        if (this.runningState()) return;
+        this.runningState.set(true);
+        try {
+            const options = this.atlasOptions(request);
+            await this.atlasRuntime.warmModelLane('dynamicNer', options);
+            await this.atlasRuntime.warmModelLane('nli', options);
+        } finally {
+            this.runningState.set(false);
+        }
+    }
+
+    async loadEmbeddingModel(request: GraphIndexRunRequest): Promise<void> {
+        if (this.runningState()) return;
+        this.runningState.set(true);
+        try {
+            await this.atlasRuntime.warmModelLane('semanticEmbedding', this.atlasOptions(request));
+        } finally {
+            this.runningState.set(false);
+        }
+    }
+
+    async buildGraph(request: GraphIndexRunRequest): Promise<PipelineResult> {
+        if (this.runningState()) {
+            throw new Error('Full Atlas Index is already running.');
+        }
+        const modelReadiness = this.modelReadiness(request);
+        const graphCold = modelReadiness
+            .filter((model) => model.id === 'dynamicNer' || model.id === 'nli')
+            .filter((model) => model.status !== 'ready');
+        if (graphCold.length) {
+            throw new Error(`Load graph models first: ${graphCold.map((model) => model.label).join(', ')}.`);
+        }
+
+        this.runningState.set(true);
+        const runStarted = Date.now();
+        const transportStarted = phoenixTransportAudit.snapshot();
+        const stageReceipts: GraphIndexStageReceipt[] = [];
+        const projectionReceipts: GraphIndexProjectionReceipt[] = [];
+        const snapshotRef: { value?: GraphRebuildSnapshot } = {};
+        let relationshipHints: GraphRebuildRelationshipHint[] = [];
+        let postProcessFingerprintValue: string | undefined;
+        let resumeContentCheckpoints: (() => void) | null = null;
+        try {
+            const docs = await this.loadScopedDocuments(request.scope.noteIds);
+            const scope = expandScopeNoteIds(request.scope, docs);
+            const options = this.atlasOptions({ ...request, scope, postProcessMode: 'full' });
+            const entities = smartGraphRegistry.getAllEntities().length
+                ? smartGraphRegistry.getAllEntities()
+                : request.entities;
+            const fingerprint = postProcessFingerprint(scope, docs, entities, request.modelSelection, request.embeddingStagePolicy);
+            postProcessFingerprintValue = fingerprint;
+
+            const nerStage = await this.runStage('dynamicNer', 'Dynamic NER + Alex Deltas', async () => {
+                const counts = await this.runNerDeltas(docs);
+                return {
+                    outputCount: counts['acceptedAnchors'] || 0,
+                    counters: counts,
+                    message: `${counts['acceptedAnchors'] || 0} accepted anchors from ${counts['candidates'] || 0} candidates`,
+                };
+            });
+            stageReceipts.push(nerStage);
+            assertStageCompleted(nerStage);
+
+            appendDeltaPostProcessPlanStage(stageReceipts, {
+                policy: request.policy,
+                docs,
+                entities,
+                cachedSnapshot: null,
+                fingerprintMatched: false,
+            });
+            stageReceipts.push(signalCandidatePlanStage({
+                discoveryStage: nerStage,
+                docs,
+                entities,
+                cachedSnapshot: null,
+            }));
+
+            for (const capability of POSTPROCESS_FACT_CAPABILITIES) {
+                let rawStageResult: unknown;
+                const captureRelationshipHints = capability === 'nliAdjudication'
+                    ? (rawResult: unknown) => {
+                        rawStageResult = rawResult;
+                        relationshipHints = relationshipHintsFromNliResult(rawResult);
+                    }
+                    : undefined;
+                const receipt = await this.runCapabilityStage(capability, options, captureRelationshipHints);
+                stageReceipts.push(receipt);
+                assertStageCompleted(receipt);
+                if (capability === 'nliAdjudication') {
+                    appendNliStagingStages(stageReceipts, rawStageResult);
+                }
+            }
+
+            resumeContentCheckpoints = this.deferContentCheckpoints();
+            const graphStage = await this.runStage('graphBuildSnapshot', 'Build Graph Snapshot', async () => {
+                const snapshot = await this.graphRebuild.buildAndPersistSnapshot({
+                    scopeKind: scope.kind,
+                    scopeId: scope.scopeId,
+                    noteIds: scope.noteIds,
+                    entities,
+                    relationshipHints,
+                    embeddingProfile: embeddingProfileFromModelSelection(request.modelSelection),
+                    postProcessMode: 'full',
+                    embeddingStagePolicy: request.embeddingStagePolicy,
+                    candidateCount: nerStage.counters['candidates'] || 0,
+                    calendarRegistrySnapshot: request.calendarRegistrySnapshot,
+                });
+                snapshotRef.value = snapshot;
+                return {
+                    outputCount: (snapshot.counters.nodes || 0)
+                        + (snapshot.counters.edges || 0)
+                        + (snapshot.counters.embeddingTargets || 0),
+                    counters: {
+                        chunks: snapshot.counters.chunks,
+                        anchors: snapshot.counters.acceptedAnchors,
+                        nodes: snapshot.counters.nodes,
+                        edges: snapshot.counters.edges,
+                        acceptedRelationships: snapshot.counters.acceptedRelationships,
+                        reviewRelationships: snapshot.counters.reviewRelationships,
+                        rejectedRelationships: snapshot.counters.rejectedRelationships,
+                        embeddingTargets: snapshot.counters.embeddingTargets,
+                        embeddingClusters: snapshot.counters.embeddingClusters || 0,
+                        embeddingBackboneEdges: snapshot.counters.embeddingBackboneEdges || 0,
+                        embeddingOutliers: snapshot.counters.embeddingOutliers || 0,
+                        embeddingPlannedPairs: snapshot.counters.embeddingPlannedPairs || 0,
+                        embeddingPrunedPairs: snapshot.counters.embeddingPrunedPairs || 0,
+                        linkSuggestions: snapshot.counters.graphAwareLinkSuggestions || 0,
+                        entityLinks: snapshot.counters.entityLinkSuggestions || 0,
+                        nliHints: relationshipHints.length,
+                    },
+                    message: `${snapshot.counters.nodes} nodes / ${snapshot.counters.edges} edges / ${snapshot.counters.embeddingTargets} targets`,
+                };
+            });
+            stageReceipts.push(graphStage);
+            assertStageCompleted(graphStage);
+
+            const completedSnapshot = snapshotRef.value;
+            if (!completedSnapshot) {
+                throw new Error('Build graph stage completed without a snapshot.');
+            }
+            appendSignalCoverageStages(stageReceipts, completedSnapshot);
+            appendGraphTruthContractStage(stageReceipts, completedSnapshot);
+            appendEntityLinkerPlanStage(stageReceipts, completedSnapshot, request.embeddingStagePolicy?.entityLinkerEnabled !== false);
+            appendEdgeJudgmentPlanStage(stageReceipts, completedSnapshot);
+            appendSemanticRerankStage(stageReceipts, completedSnapshot);
+            appendMemoryGraphRagBridgeStage(stageReceipts, completedSnapshot);
+            appendDiscourseSpineStage(stageReceipts, completedSnapshot);
+            appendDiscourseBridgeCandidateStage(stageReceipts, completedSnapshot);
+            appendDiscourseBridgeAdjudicationStage(stageReceipts, completedSnapshot);
+            appendDiscourseEvalLedgerStage(stageReceipts, completedSnapshot);
+            appendDiscoursePromotionSurfaceStage(stageReceipts, completedSnapshot);
+            appendDiscourseCompilerOverlayStage(stageReceipts, completedSnapshot);
+            appendCalendarRegistryStage(stageReceipts, completedSnapshot);
+            appendSnapshotTimingStages(stageReceipts, completedSnapshot);
+            appendStagedNativeScenePacketSkippedStage(stageReceipts, completedSnapshot);
+
+            for (const projection of PROJECTION_CAPABILITIES) {
+                projectionReceipts.push(snapshotOwnedProjectionReceipt(projection.mode, completedSnapshot));
+            }
+            projectionReceipts.push(await buildSiegelBackboneProjectionReceipt(completedSnapshot));
+            appendTransportTimingStage(stageReceipts, transportStarted, phoenixTransportAudit.snapshot());
+
+            const completedAt = Date.now();
+            const receipt = this.buildRunReceipt({
+                idPrefix: 'graph-atlas',
+                scope,
+                policy: request.policy,
+                postProcessMode: 'full',
+                postProcessFingerprint: fingerprint,
+                postProcessCacheHit: false,
+                modelSelection: request.modelSelection,
+                modelReadiness: this.modelReadiness({ ...request, scope }),
+                startedAt: runStarted,
+                completedAt,
+                stageReceipts,
+                projectionReceipts,
+                snapshot: completedSnapshot,
+                message: `Build Graph produced ${completedSnapshot.counters.nodes} nodes, ${completedSnapshot.counters.edges} edges, and ${completedSnapshot.counters.embeddingTargets} targets.`,
+            });
+            await this.publishRunReceipt(receipt, completedSnapshot);
+            await this.persistRunReceiptWithTiming(receipt);
+            resumeContentCheckpoints();
+            return { receipt, snapshot: completedSnapshot };
+        } catch (error) {
+            const completedAt = Date.now();
+            const snapshot = snapshotRef.value || null;
+            const failedReceipt = this.buildRunReceipt({
+                idPrefix: 'graph-atlas:failed',
+                scope: request.scope,
+                policy: request.policy,
+                postProcessMode: 'full',
+                postProcessFingerprint: snapshot ? postProcessFingerprintValue : undefined,
+                modelSelection: request.modelSelection,
+                modelReadiness,
+                startedAt: runStarted,
+                completedAt,
+                stageReceipts,
+                projectionReceipts,
                 snapshot,
                 status: 'failed',
                 message: error instanceof Error ? error.message : String(error),
@@ -447,14 +671,17 @@ export class GraphRebuildPipelineService {
         }
     }
 
+    /** @deprecated Diagnostic compatibility path. Product builds should call buildGraph(). */
     async postProcessAtlas(request: GraphIndexRunRequest): Promise<PipelineResult> {
         if (this.runningState()) {
             throw new Error('Full Atlas Index is already running.');
         }
         const modelReadiness = this.modelReadiness(request);
-        const cold = modelReadiness.filter((model) => !model.optional && model.status !== 'ready');
+        const cold = modelReadiness
+            .filter((model) => model.id === 'nli')
+            .filter((model) => model.status !== 'ready');
         if (cold.length) {
-            throw new Error(`Load models first: ${cold.map((model) => model.label).join(', ')}.`);
+            throw new Error(`Load graph models first: ${cold.map((model) => model.label).join(', ')}.`);
         }
 
         this.runningState.set(true);

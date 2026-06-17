@@ -63,7 +63,7 @@
                     (entitySelected)="selectEntity($event)"
                     (addEntityRequested)="openCreator()"
                     (scanRequested)="runSuggestionScan('canvas', $event)"
-                    (styleRequested)="toggleStyleDrawer()"
+                    (styleRequested)="toggleStyleDrawer($event)"
                     (atlasModeChange)="atlasMode.set($event)"
                     (atlasSearchChange)="atlasSearch.set($event)"
                     (lensModeChange)="graphLensMode.set($event)"></app-graph-lens-workspace>
@@ -78,7 +78,10 @@
     </main>
 
     @if (isStyleDrawerOpen()) {
-    <app-graph-style-drawer [initialKind]="styleTargetKind()" (close)="closeStyleDrawer()"></app-graph-style-drawer>
+    <app-graph-style-drawer
+        [initialKind]="styleTargetKind()"
+        [initialGraphNodeKind]="styleTargetGraphNodeKind()"
+        (close)="closeStyleDrawer()"></app-graph-style-drawer>
     }
 </div>
 

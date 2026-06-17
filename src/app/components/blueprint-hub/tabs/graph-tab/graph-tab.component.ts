@@ -55,6 +55,8 @@ export class GraphTabComponent {
     isCreatorOpen = signal(false);
     editingEntity = signal<EntityCreatorData | undefined>(undefined);
     isStyleDrawerOpen = signal(false);
+    styleTargetKindOverride = signal<string | null>(null);
+    styleTargetGraphNodeKind = signal<string | null>(null);
     atlasSearch = signal('');
     atlasMode = signal<AtlasMode>('graph');
     operatingRoom = signal<GraphOperatingRoomId>('entities');
@@ -106,7 +108,7 @@ export class GraphTabComponent {
 
         return edges;
     });
-    styleTargetKind = computed(() => this.activeEntity()?.kind ?? 'CHARACTER');
+    styleTargetKind = computed(() => this.styleTargetKindOverride() ?? this.activeEntity()?.kind ?? 'CHARACTER');
     stewardContextId = computed(() => this.machineScope());
 
     // No manual registry subscription needed — entities are a computed signal
@@ -130,7 +132,15 @@ export class GraphTabComponent {
         if (room === 'metrics') this.showAtlas();
     }
 
-    toggleStyleDrawer() {
+    toggleStyleDrawer(styleKey?: string | null | void) {
+        if (typeof styleKey === 'string' && styleKey.trim()) {
+            this.styleTargetKindOverride.set(styleKey);
+            this.styleTargetGraphNodeKind.set(styleKey);
+            this.isStyleDrawerOpen.set(true);
+            return;
+        }
+        this.styleTargetKindOverride.set(null);
+        this.styleTargetGraphNodeKind.set(null);
         this.isStyleDrawerOpen.update((open) => !open);
     }
 

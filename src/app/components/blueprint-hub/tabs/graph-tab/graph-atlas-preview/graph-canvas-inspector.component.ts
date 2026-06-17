@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { Anchor, Check, Crosshair, FileSearch, VolumeX, X, XCircle } from 'lucide-angular';
+import { Anchor, Check, Crosshair, FileSearch, Palette, VolumeX, X, XCircle } from 'lucide-angular';
 import { LucideAngularModule } from 'lucide-angular';
 
 import type {
@@ -50,6 +50,9 @@ import type {
                 <span class="status-pill" [attr.data-state]="item.status">{{ item.status }}</span>
                 @if (item.confidence !== null) {
                 <span>{{ item.confidence | percent:'1.0-0' }} confidence</span>
+                }
+                @if (item.styleKey) {
+                <span>Style key: {{ item.styleKey }}</span>
                 }
                 @if (item.detector) {
                 <span>{{ item.detector }}</span>
@@ -110,6 +113,12 @@ import type {
                 <lucide-icon [img]="CrosshairIcon" class="h-4 w-4"></lucide-icon>
                 Focus on canvas
             </button>
+            @if (item.styleKey) {
+            <button type="button" class="style-button" (click)="styleRequested.emit(item.styleKey)">
+                <lucide-icon [img]="PaletteIcon" class="h-4 w-4"></lucide-icon>
+                Style selected kind
+            </button>
+            }
             }
 
             @if (reviewObjectIds().length) {
@@ -154,9 +163,10 @@ import type {
         .status-pill[data-state="proposed"],.batch-dot[data-state="proposed"] { border-color: #facc15; color: #fde047; background: #facc15; }
         .inspector-section { margin: 0 1rem; padding: .9rem 0; border-bottom: 1px solid rgba(255,255,255,.07); }
         blockquote { margin: .55rem 0 .65rem; color: #d4d4d8; font-size: .82rem; line-height: 1.55; }
-        .text-action,.focus-button { display: inline-flex; align-items: center; gap: .45rem; border: 1px solid rgba(94,234,212,.2); background: rgba(20,184,166,.08); color: #99f6e4; font-size: .72rem; font-weight: 700; }
+        .text-action,.focus-button,.style-button { display: inline-flex; align-items: center; gap: .45rem; border: 1px solid rgba(94,234,212,.2); background: rgba(20,184,166,.08); color: #99f6e4; font-size: .72rem; font-weight: 700; }
         .text-action { padding: .48rem .62rem; }
         .focus-button { margin: 1rem; padding: .62rem .8rem; }
+        .style-button { margin: 0 1rem 1rem; padding: .62rem .8rem; border-color: rgba(168,85,247,.24); background: rgba(88,28,135,.18); color: #ddd6fe; }
         .reason-row,.body-copy { margin: .45rem 0 0; color: #a1a1aa; font-size: .77rem; line-height: 1.45; }
         .reason-row::before { content: ''; display: inline-block; width: .38rem; height: 1px; margin-right: .5rem; vertical-align: middle; background: #2dd4bf; }
         .member-list,.batch-list { display: grid; gap: .35rem; }
@@ -185,6 +195,7 @@ export class GraphCanvasInspectorComponent {
     @Input() busy = false;
     @Output() close = new EventEmitter<void>();
     @Output() focusRequested = new EventEmitter<string[]>();
+    @Output() styleRequested = new EventEmitter<string>();
     @Output() sourceRequested = new EventEmitter<GraphCanvasSourceRequest>();
     @Output() reviewRequested = new EventEmitter<GraphCanvasReviewRequest>();
 
@@ -195,6 +206,7 @@ export class GraphCanvasInspectorComponent {
     readonly AnchorIcon = Anchor;
     readonly CrosshairIcon = Crosshair;
     readonly FileSearchIcon = FileSearch;
+    readonly PaletteIcon = Palette;
 
     objectKindLabel(record: GraphCanvasInspectorRecord | null): string {
         return record ? `${record.objectKind} detail` : 'Graph detail';

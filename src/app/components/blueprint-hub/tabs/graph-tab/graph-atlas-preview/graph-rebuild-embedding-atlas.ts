@@ -16,7 +16,7 @@ import type {
     GraphRebuildEmbeddingTarget,
     GraphRebuildSnapshot,
 } from '../../../../../graph-rebuild/graph-rebuild-snapshot';
-import type { GraphAtlasManifoldTarget } from '../../../../../graph-rebuild/graph-atlas-packet';
+import type { GraphAtlasManifoldTarget, GraphAtlasObject, GraphAtlasPacket } from '../../../../../graph-rebuild/graph-atlas-packet';
 import {
     normalizeEmbeddingProfile,
     sparseEmbeddingSignature,
@@ -182,35 +182,257 @@ export function buildGraphRebuildEmbeddingAtlas(
     };
 }
 
+export function graphRebuildEmbeddingTargetCount(snapshot: GraphRebuildSnapshot | null | undefined): number {
+    return snapshot?.embeddingTargets.length
+        || (snapshot?.atlasPacket ? atlasPacketEmbeddingTargetCount(snapshot.atlasPacket) : 0)
+        || snapshot?.counters.embeddingTargets
+        || 0;
+}
+
 function snapshotWithAtlasPacketTargets(snapshot: GraphRebuildSnapshot): GraphRebuildSnapshot {
     const packet = snapshot.atlasPacket;
-    if (!packet?.manifoldTargets?.length) return snapshot;
-    const targets = atlasPacketEmbeddingTargets(packet.manifoldTargets, snapshot.embeddingTargets);
+    if (!packet?.manifoldTargets?.length && !packet?.objects?.length) return snapshot;
+    const targets = normalizeEmbedStructureParents(atlasPacketEmbeddingTargets(packet, snapshot.embeddingTargets));
     return { ...snapshot, embeddingTargets: targets };
 }
 
 function atlasPacketEmbeddingTargets(
-    packetTargets: GraphAtlasManifoldTarget[],
+    packet: GraphAtlasPacket,
     displayTargets: GraphRebuildEmbeddingTarget[],
 ): GraphRebuildEmbeddingTarget[] {
     const byId = new Map(displayTargets.map((target) => [target.id, target]));
-    return packetTargets.map((target): GraphRebuildEmbeddingTarget => {
+    const objectById = new Map(packet.objects.map((object) => [object.id, object]));
+    const objectBySourceId = atlasPacketObjectBySourceId(packet.objects);
+    const representedObjectIds = atlasPacketRepresentedObjectIds(packet, objectById, objectBySourceId);
+    const targetIdByObjectRef = atlasPacketTargetIdByObjectRef(packet);
+    const targets = packet.manifoldTargets.map((target): GraphRebuildEmbeddingTarget => {
         const display = byId.get(target.id);
+        const object = atlasPacketObjectForTarget(target, objectById, objectBySourceId);
         return {
             ...display,
             id: target.id,
-            kind: target.kind,
-            sourceId: target.sourceId,
-            noteId: target.noteId,
-            chunkId: target.chunkId,
-            entityId: target.registryEntityId,
-            entityKind: display?.entityKind,
-            label: target.label,
-            text: display?.text || `${target.family}:${target.coordinateSource}\nobject:${target.objectId}`,
-            evidenceIds: target.evidenceIds || [],
-            parentIds: target.parentIds || display?.parentIds || [],
+            kind: atlasPacketTargetKind(target.kind, object),
+            sourceId: target.sourceId || atlasPacketObjectSourceId(object) || target.objectId,
+            noteId: target.noteId || object?.noteIds[0],
+            chunkId: target.chunkId || object?.chunkIds[0],
+            entityId: target.registryEntityId || object?.registryEntityId,
+            entityKind: display?.entityKind || target.entityKind || atlasPacketObjectEntityKind(object),
+            label: target.label || object?.label || target.id,
+            text: display?.text || atlasPacketTargetSummary(target),
+            evidenceIds: target.evidenceIds?.length ? target.evidenceIds : object?.evidenceIds || [],
+            lane: (target.lane || object?.lane || display?.lane) as GraphRebuildEmbeddingTarget['lane'],
+            structuralRole: (target.structuralRole || object?.structuralRole || display?.structuralRole) as GraphRebuildEmbeddingTarget['structuralRole'],
+            admissionStatus: atlasAdmissionStatus(target.admission) || display?.admissionStatus,
+            styleKey: target.styleKey || object?.styleKey || target.stateContextKind || object?.stateContextKind || display?.styleKey,
+            documentUnitKind: target.documentUnitKind || object?.documentUnitKind || display?.documentUnitKind,
+            stateContextKind: target.stateContextKind || object?.stateContextKind || display?.stateContextKind,
+            atlasFamily: target.family,
+            atlasStatus: target.status,
+            parentIds: target.parentIds?.length
+                ? target.parentIds
+                : atlasPacketObjectParentIds(object, targetIdByObjectRef, target.id) || display?.parentIds || [],
         };
     });
+    for (const object of packet.objects) {
+        if (representedObjectIds.has(object.id)) continue;
+        const target = atlasPacketObjectEmbeddingTarget(object, byId, targetIdByObjectRef);
+        if (target) targets.push(target);
+    }
+    return targets;
+}
+
+function atlasPacketEmbeddingTargetCount(packet: GraphAtlasPacket): number {
+    const objectById = new Map(packet.objects.map((object) => [object.id, object]));
+    const objectBySourceId = atlasPacketObjectBySourceId(packet.objects);
+    const representedObjectIds = atlasPacketRepresentedObjectIds(packet, objectById, objectBySourceId);
+    return packet.manifoldTargets.length
+        + packet.objects.filter((object) => !representedObjectIds.has(object.id)).length;
+}
+
+function atlasPacketRepresentedObjectIds(
+    packet: GraphAtlasPacket,
+    objectById: Map<string, GraphAtlasObject>,
+    objectBySourceId: Map<string, GraphAtlasObject>,
+): Set<string> {
+    return new Set(packet.manifoldTargets
+        .map((target) => atlasPacketObjectForTarget(target, objectById, objectBySourceId)?.id || target.objectId)
+        .filter(Boolean));
+}
+
+function atlasPacketObjectBySourceId(objects: GraphAtlasObject[]): Map<string, GraphAtlasObject> {
+    const refs = new Map<string, GraphAtlasObject>();
+    const add = (ref: string | undefined, object: GraphAtlasObject) => {
+        if (!ref || refs.has(ref)) return;
+        refs.set(ref, object);
+    };
+    for (const object of objects) {
+        add(object.id, object);
+        add(object.registryEntityId, object);
+        for (const sourceId of object.sourceIds || []) add(sourceId, object);
+        for (const noteId of object.noteIds || []) add(noteId, object);
+        for (const chunkId of object.chunkIds || []) add(chunkId, object);
+        for (const anchorId of object.anchorIds || []) add(anchorId, object);
+        for (const evidenceId of object.evidenceIds || []) add(evidenceId, object);
+    }
+    return refs;
+}
+
+function atlasPacketObjectForTarget(
+    target: GraphAtlasManifoldTarget,
+    objectById: Map<string, GraphAtlasObject>,
+    objectBySourceId: Map<string, GraphAtlasObject>,
+): GraphAtlasObject | undefined {
+    return objectBySourceId.get(target.sourceId) || objectById.get(target.objectId);
+}
+
+function atlasPacketTargetIdByObjectRef(packet: GraphAtlasPacket): Map<string, string> {
+    const refs = new Map<string, string>();
+    const add = (ref: string | undefined, targetId: string) => {
+        if (!ref || refs.has(ref)) return;
+        refs.set(ref, targetId);
+    };
+    for (const target of packet.manifoldTargets) {
+        add(target.objectId, target.id);
+        add(target.sourceId, target.id);
+        add(target.registryEntityId, target.id);
+        add(target.noteId, target.id);
+        add(target.chunkId, target.id);
+        for (const evidenceId of target.evidenceIds || []) add(evidenceId, target.id);
+    }
+    for (const object of packet.objects) {
+        const targetId = atlasPacketObjectTargetId(object);
+        add(object.id, targetId);
+        add(object.registryEntityId, targetId);
+        for (const sourceId of object.sourceIds || []) add(sourceId, targetId);
+        for (const noteId of object.noteIds || []) add(noteId, targetId);
+        for (const chunkId of object.chunkIds || []) add(chunkId, targetId);
+        for (const anchorId of object.anchorIds || []) add(anchorId, targetId);
+        for (const evidenceId of object.evidenceIds || []) add(evidenceId, targetId);
+    }
+    return refs;
+}
+
+function atlasPacketObjectEmbeddingTarget(
+    object: GraphAtlasObject,
+    displayTargets: Map<string, GraphRebuildEmbeddingTarget>,
+    targetIdByObjectRef: Map<string, string>,
+): GraphRebuildEmbeddingTarget | null {
+    const id = atlasPacketObjectTargetId(object);
+    const display = displayTargets.get(id);
+    const sourceId = object.sourceIds[0] || object.registryEntityId || object.id;
+    const parentIds = atlasPacketObjectParentIds(object, targetIdByObjectRef, id);
+    return {
+        ...display,
+        id,
+        kind: atlasPacketObjectKind(object),
+        sourceId,
+        noteId: object.noteIds[0] || display?.noteId,
+        chunkId: object.chunkIds[0] || display?.chunkId,
+        entityId: object.registryEntityId || display?.entityId,
+        entityKind: display?.entityKind || atlasPacketObjectEntityKind(object),
+        label: object.label || display?.label || object.id,
+        text: display?.text || atlasPacketObjectSummary(object),
+        evidenceIds: object.evidenceIds || [],
+        lane: (object.lane || display?.lane) as GraphRebuildEmbeddingTarget['lane'],
+        structuralRole: (object.structuralRole || display?.structuralRole) as GraphRebuildEmbeddingTarget['structuralRole'],
+        admissionStatus: atlasObjectAdmissionStatus(object.status) || display?.admissionStatus,
+        styleKey: object.styleKey || object.stateContextKind || display?.styleKey,
+        documentUnitKind: object.documentUnitKind || display?.documentUnitKind,
+        stateContextKind: object.stateContextKind || display?.stateContextKind,
+        atlasFamily: object.family,
+        atlasStatus: object.status,
+        parentIds: parentIds?.length ? parentIds : display?.parentIds || [],
+    };
+}
+
+function atlasPacketTargetKind(kind: string, object: GraphAtlasObject | undefined): string {
+    if (object && (object.family === 'registry' || object.family === 'entity')) return 'entity';
+    return kind || (object ? atlasPacketObjectKind(object) : 'target');
+}
+
+function atlasPacketObjectKind(object: GraphAtlasObject): string {
+    if (object.family === 'registry' || object.family === 'entity') return 'entity';
+    return object.kind;
+}
+
+function atlasPacketObjectEntityKind(object: GraphAtlasObject | undefined): string | undefined {
+    if (!object || (object.family !== 'registry' && object.family !== 'entity')) return undefined;
+    return object.kind;
+}
+
+function atlasPacketObjectSourceId(object: GraphAtlasObject | undefined): string | undefined {
+    if (!object) return undefined;
+    return object.sourceIds[0] || object.registryEntityId || object.id;
+}
+
+function atlasPacketObjectParentIds(
+    object: GraphAtlasObject | undefined,
+    targetIdByObjectRef: Map<string, string>,
+    targetId: string,
+): string[] | undefined {
+    if (!object?.targetIds?.length) return undefined;
+    const parentIds = object.targetIds
+        .map((ref) => targetIdByObjectRef.get(ref) || ref)
+        .filter((ref) => ref && ref !== targetId);
+    return parentIds.length ? parentIds : undefined;
+}
+
+function atlasPacketObjectTargetId(object: GraphAtlasObject): string {
+    const sourceId = object.sourceIds[0];
+    if ((object.family === 'registry' || object.family === 'entity') && object.registryEntityId) {
+        return `embed:entity:${object.registryEntityId}`;
+    }
+    if (object.kind === 'note' && (sourceId || object.noteIds[0])) return `embed:note:${sourceId || object.noteIds[0]}`;
+    if (object.kind === 'chunk' && (sourceId || object.chunkIds[0])) return `embed:chunk:${sourceId || object.chunkIds[0]}`;
+    if (object.kind === 'entityAnchor' && (sourceId || object.anchorIds[0])) return `embed:anchor:${sourceId || object.anchorIds[0]}`;
+    if (object.kind === 'event' && sourceId) return `embed:event:${sourceId}`;
+    if (object.kind === 'memoryState' && sourceId) return `embed:memory:${sourceId}`;
+    if (object.family === 'temporal' && sourceId) return `embed:temporalFact:${sourceId}`;
+    if (object.family === 'causal' && sourceId) return `embed:causalFact:${sourceId}`;
+    if (object.family === 'fact' && sourceId) return `embed:graph-fact:${sourceId}`;
+    return `embed:atlas-object:${object.id}`;
+}
+
+function atlasAdmissionStatus(
+    admission: GraphAtlasManifoldTarget['admission'],
+): GraphRebuildEmbeddingTarget['admissionStatus'] | undefined {
+    if (admission === 'admitted' || admission === 'deferred') return admission;
+    if (admission === 'rejected') return 'deferred';
+    return undefined;
+}
+
+function atlasObjectAdmissionStatus(
+    status: GraphAtlasObject['status'],
+): GraphRebuildEmbeddingTarget['admissionStatus'] | undefined {
+    if (status === 'accepted' || status === 'compiledToGraph' || status === 'promotedToAnchor') return 'admitted';
+    if (status === 'rejected' || status === 'deferred' || status === 'muted') return 'deferred';
+    return undefined;
+}
+
+function atlasPacketObjectSummary(object: GraphAtlasObject): string {
+    return [
+        `family:${object.family}`,
+        `status:${object.status || 'unknown'}`,
+        `style:${object.styleKey || object.stateContextKind || object.kind}`,
+        object.lane ? `lane:${object.lane}` : '',
+        object.structuralRole ? `role:${object.structuralRole}` : '',
+        object.documentUnitKind ? `document_unit:${object.documentUnitKind}` : '',
+        object.stateContextKind ? `state_context:${object.stateContextKind}` : '',
+        object.registryEntityId ? `registry:${object.registryEntityId}` : '',
+        object.sourceIds.length ? `sources:${object.sourceIds.join(',')}` : '',
+    ].filter(Boolean).join('\n');
+}
+
+function atlasPacketTargetSummary(target: GraphAtlasManifoldTarget): string {
+    return [
+        `family:${target.family}`,
+        `style:${target.styleKey || target.stateContextKind || target.kind}`,
+        target.lane ? `lane:${target.lane}` : '',
+        target.structuralRole ? `role:${target.structuralRole}` : '',
+        target.documentUnitKind ? `document_unit:${target.documentUnitKind}` : '',
+        target.stateContextKind ? `state_context:${target.stateContextKind}` : '',
+        `object:${target.objectId}`,
+    ].filter(Boolean).join('\n');
 }
 
 function atlasProjectionSourceLabel(snapshot: GraphRebuildSnapshot): string {
@@ -267,12 +489,12 @@ function compactEntityMentionTargets(
         recordAnchor(anchor.entityId, anchor.id, anchor.noteId, anchor.chunkId, anchor.surface, anchor.confidence);
     }
     for (const target of selected) {
-        if (target.kind !== 'anchor' || !target.entityId) continue;
+        if (!isEntityMentionAnchorTarget(target) || !target.entityId) continue;
         recordAnchor(target.entityId, target.sourceId || target.id.replace(/^embed:anchor:/, ''), target.noteId, target.chunkId, target.label, targetConfidence(target));
     }
 
     for (const target of selected) {
-        if (target.kind !== 'anchor' || !target.entityId) continue;
+        if (!isEntityMentionAnchorTarget(target) || !target.entityId) continue;
         const entityTargetId = `embed:entity:${target.entityId}`;
         if (!selectedById.has(entityTargetId)) continue;
         selectedById.delete(target.id);
@@ -300,14 +522,166 @@ function compactEntityMentionTargets(
     };
 }
 
+function isEntityMentionAnchorTarget(target: GraphRebuildEmbeddingTarget): boolean {
+    return target.kind === 'anchor'
+        || displayKind(target.kind) === 'entity-anchor'
+        || target.id.startsWith('embed:anchor:')
+        || target.lane === 'anchor_evidence'
+        || target.styleKey === 'anchor';
+}
+
 function isVisibleAtlasTarget(target: GraphRebuildEmbeddingTarget): boolean {
-    return !isWeakCooccurrenceTarget(target);
+    return isCuratedEmbedManifoldTarget(target) && !isWeakCooccurrenceTarget(target);
 }
 
 function isWeakCooccurrenceTarget(target: GraphRebuildEmbeddingTarget): boolean {
     return target.lane === 'cooccurrence_weak'
+        || compactEmbedToken(target.styleKey || '') === 'cooccurrence'
         || (displayKind(target.kind) === 'graph-fact'
             && relationFamilyFromText(target.label, target.text, target.sourceId) === 'cooccurrence');
+}
+
+const CURATED_EMBED_DROP_KINDS = new Set([
+    'sentence',
+    'text-sentence',
+    'document-sentence',
+    'paragraph',
+    'text-paragraph',
+    'document-paragraph',
+    'paragraph-group',
+    'section',
+    'region',
+    'mention',
+    'entity-mention',
+    'raw-mention',
+    'occurrence',
+    'raw-occurrence',
+    'alias-patch',
+    'linker-vote',
+    'receipt',
+    'debug',
+]);
+
+const CURATED_DOCUMENT_UNIT_TOKENS = [
+    'leaf',
+    'claim',
+    'actionblock',
+    'action',
+    'contrast',
+    'looked',
+    'glanced',
+    'evidence',
+    'decision',
+];
+
+function isCuratedEmbedManifoldTarget(target: GraphRebuildEmbeddingTarget): boolean {
+    const kind = displayKind(target.kind);
+    if (CURATED_EMBED_DROP_KINDS.has(kind) || isSentenceOrParagraphTarget(target, kind)) return false;
+    if (isRawEmbedScaffoldTarget(target, kind)) return false;
+    if (kind === 'document-unit') return isCuratedDocumentUnitTarget(target);
+    return true;
+}
+
+function normalizeEmbedStructureParents(targets: GraphRebuildEmbeddingTarget[]): GraphRebuildEmbeddingTarget[] {
+    const targetIds = new Set(targets.map((target) => target.id));
+    return targets.map((target) => {
+        if (!isDocumentStructureUnitTarget(target) || !target.chunkId) return target;
+        const chunkParentId = `embed:chunk:${target.chunkId}`;
+        if (!targetIds.has(chunkParentId)) return target;
+        const rootParents = (target.parentIds || [])
+            .filter((parentId) => parentId.startsWith('embed:structure-root:'));
+        const otherParents = (target.parentIds || [])
+            .filter((parentId) => parentId !== chunkParentId
+                && !parentId.startsWith('embed:document-unit:')
+                && !parentId.startsWith('embed:structure-root:'));
+        const parentIds = [...new Set([chunkParentId, ...rootParents, ...otherParents])];
+        return { ...target, parentIds };
+    });
+}
+
+function isCuratedDocumentUnitTarget(target: GraphRebuildEmbeddingTarget): boolean {
+    const documentUnitKind = compactEmbedToken(target.documentUnitKind || '');
+    if (documentUnitKind) {
+        return CURATED_DOCUMENT_UNIT_TOKENS.some((token) => documentUnitKind.includes(token));
+    }
+    const profile = compactEmbedProfileText(target, true);
+    return CURATED_DOCUMENT_UNIT_TOKENS.some((token) => profile.includes(token));
+}
+
+function compactEmbedToken(value: string): string {
+    return String(value || '').toLowerCase().replace(/[^a-z0-9]+/g, '');
+}
+
+function isSentenceOrParagraphTarget(target: GraphRebuildEmbeddingTarget, kind: string): boolean {
+    if (kind.endsWith('-sentence') || kind.endsWith('-paragraph')) return true;
+    if (isDocumentStructureUnitTarget(target)) {
+        const unitProfile = compactEmbedProfileText(target, true);
+        if ([
+            'paragraph',
+            'paragraphgroup',
+            'sentence',
+            'textsentence',
+            'documentsentence',
+            'textparagraph',
+            'documentparagraph',
+        ].some((token) => unitProfile.includes(token))) {
+            return true;
+        }
+    }
+    const documentUnitKind = compactEmbedToken(target.documentUnitKind || '');
+    if (documentUnitKind) {
+        return [
+            'paragraph',
+            'paragraphgroup',
+            'sentence',
+            'textsentence',
+            'documentsentence',
+            'textparagraph',
+            'documentparagraph',
+        ].some((token) => documentUnitKind === token || documentUnitKind.includes(token));
+    }
+    const profile = compactEmbedProfileText(target, false);
+    return [
+        'kindparagraph',
+        'kindsentence',
+        'documentsidecarparagraph',
+        'documentsidecarsentence',
+        'paragraphgroup',
+        'paragraphindex',
+        'sentenceindex',
+    ].some((token) => profile.includes(token));
+}
+
+function isDocumentStructureUnitTarget(target: GraphRebuildEmbeddingTarget): boolean {
+    return displayKind(target.kind) === 'document-unit'
+        || target.id.startsWith('embed:document-unit:')
+        || target.sourceId.startsWith('document-unit:')
+        || target.documentUnitKind !== undefined;
+}
+
+function isRawEmbedScaffoldTarget(target: GraphRebuildEmbeddingTarget, kind: string): boolean {
+    if (kind.includes('candidate') || kind.includes('receipt') || kind.includes('debug')) return true;
+    const profile = compactEmbedProfileText(target, false);
+    return [
+        'rawmention',
+        'rawoccurrence',
+        'aliaspatch',
+        'linkervote',
+        'candidatetrace',
+        'debugpacket',
+    ].some((token) => profile.includes(token));
+}
+
+function compactEmbedProfileText(target: GraphRebuildEmbeddingTarget, includeBody: boolean): string {
+    return compactSiegelToken([
+        target.id,
+        target.kind,
+        target.sourceId,
+        target.lane,
+        target.structuralRole,
+        target.label,
+        includeBody ? target.text : '',
+    ].filter(Boolean).join(' '));
 }
 
 function coverageOrderedTargets(targets: GraphRebuildEmbeddingTarget[]): GraphRebuildEmbeddingTarget[] {
@@ -1647,10 +2021,12 @@ function productLorentzMetadata(
     const supportChunkIds = capsSupportChunkIds(target, hierarchyContext);
     const capId = productCapId(target, region.id, hierarchyContext, supportNoteIds);
     const parentId = productCapParentId(target, parentNodeId, hierarchyContext);
+    const parentCapIds = productCapParentIds(target, hierarchyContext, supportNoteIds, supportChunkIds);
+    const parentCapId = parentCapIds[0] || null;
     const level = productRegionLevel(target, post);
     const specificity = productHierarchySpecificity(target, post);
     const ambiguity = productHierarchyAmbiguity(post);
-    const capDirection = capsDirectionForTarget(target, point, hierarchyContext, supportNoteIds, capsDocumentDirections);
+    const capDirection = capsDirectionForTarget(target, point, hierarchyContext, supportNoteIds, supportChunkIds, capsDocumentDirections);
     return {
         geometry: 'hierarchy_caps_v1',
         klein: [
@@ -1660,6 +2036,9 @@ function productLorentzMetadata(
             lane.fiberPhase,
         ],
         capId,
+        parentCapId,
+        parentCapIds,
+        containmentPath: capsContainmentPath(capId, parentCapIds),
         capDirection: [capDirection.x, capDirection.y, capDirection.z],
         capPhase: lane.fiberPhase,
         shellRadius: productCapShellRadius(target, specificity, ambiguity),
@@ -1680,12 +2059,14 @@ function productLorentzMetadata(
             treeId: capId,
             treeKind,
             parentNodeId: parentId,
+            parentCapId,
             level,
-            pathKey: `${capId}/${parentId || 'root'}/${target.id}`,
+            pathKey: `${parentCapId || 'root'}/${capId}/${target.id}`,
         }, {
             treeId: `product-lane:${region.laneKind}`,
             treeKind: region.laneKind,
             parentNodeId: parentId,
+            parentCapId,
             level,
             pathKey: `product-lane:${region.laneKind}/${post.clusterId}/${target.id}`,
         }],
@@ -1757,12 +2138,14 @@ function capsDirectionForTarget(
     point: { x: number; y: number; z: number },
     hierarchyContext: TargetHierarchyContext | undefined,
     supportNoteIds: string[],
+    supportChunkIds: string[],
     documentDirections?: Map<string, CapsVec3>,
 ): CapsVec3 {
     const kind = displayKind(target.kind);
     const noteId = target.noteId || hierarchyContext?.noteId || supportNoteIds[0];
     const fallback = capsNormalize(point, capsStableVector(target.id));
     const docDirection = capsAverageDocumentDirections(supportNoteIds.length ? supportNoteIds : noteId ? [noteId] : [], documentDirections, fallback);
+    const chunkDirection = capsAverageChunkDirections(supportChunkIds, supportNoteIds, documentDirections, docDirection);
     if (kind === 'note') return fallback;
     if (kind === 'structure-root') {
         const rootLane = capsStructureRootKey(target);
@@ -1774,23 +2157,25 @@ function capsDirectionForTarget(
     }
     if (kind === 'chunk') {
         return capsNormalize(capsWeighted([
-            [docDirection, 0.68],
-            [capsStableVector(target.chunkId || target.sourceId), 0.22],
-            [fallback, 0.1],
+            [docDirection, 0.78],
+            [chunkDirection, 0.16],
+            [fallback, 0.06],
         ]), docDirection);
     }
     if (kind === 'entity') {
         return capsNormalize(capsWeighted([
-            [docDirection, supportNoteIds.length > 1 ? 0.7 : 0.58],
-            [capsLaneDirection('identity'), 0.18],
-            [fallback, supportNoteIds.length > 1 ? 0.12 : 0.24],
-            [capsStableVector(target.entityId || target.sourceId), 0.08],
+            [docDirection, supportNoteIds.length > 1 ? 0.62 : 0.5],
+            [chunkDirection, supportChunkIds.length ? 0.28 : 0.12],
+            [capsLaneDirection('identity'), 0.08],
+            [fallback, supportNoteIds.length > 1 ? 0.08 : 0.1],
+            [capsStableVector(target.entityId || target.sourceId), 0.04],
         ]), docDirection);
     }
     return capsNormalize(capsWeighted([
-        [docDirection, 0.52],
-        [capsLaneDirection(target.lane || kind), 0.24],
-        [fallback, 0.24],
+        [docDirection, 0.44],
+        [chunkDirection, supportChunkIds.length ? 0.34 : 0.1],
+        [capsLaneDirection(target.lane || kind), 0.12],
+        [fallback, 0.1],
     ]), fallback);
 }
 
@@ -1805,6 +2190,26 @@ function capsAverageDocumentDirections(
         documentDirections?.get(noteId) || capsStableVector(`document:${noteId}`),
         1,
     ]);
+    return capsNormalize(capsWeighted(weighted), fallback);
+}
+
+function capsAverageChunkDirections(
+    chunkIds: string[],
+    noteIds: string[],
+    documentDirections: Map<string, CapsVec3> | undefined,
+    fallback: CapsVec3,
+): CapsVec3 {
+    const uniqueChunkIds = [...new Set(chunkIds)].filter(Boolean);
+    if (!uniqueChunkIds.length) return fallback;
+    const uniqueNoteIds = [...new Set(noteIds)].filter(Boolean);
+    const weighted: Array<[CapsVec3, number]> = [];
+    for (const chunkId of uniqueChunkIds) {
+        const noteDirection = capsAverageDocumentDirections(uniqueNoteIds, documentDirections, fallback);
+        weighted.push([capsNormalize(capsWeighted([
+            [noteDirection, 0.86],
+            [capsStableVector(`chunk:${chunkId}`), 0.14],
+        ]), noteDirection), 1]);
+    }
     return capsNormalize(capsWeighted(weighted), fallback);
 }
 
@@ -1838,6 +2243,91 @@ function capsStructureRootKey(target: GraphRebuildEmbeddingTarget): string {
     if (/causal|cause|effect/.test(text)) return 'causal';
     if (/evidence|source|provenance/.test(text)) return 'evidence';
     return 'document';
+}
+
+function productCapParentIds(
+    target: GraphRebuildEmbeddingTarget,
+    hierarchyContext: TargetHierarchyContext | undefined,
+    supportNoteIds: string[],
+    supportChunkIds: string[],
+): string[] {
+    const kind = displayKind(target.kind);
+    const parents = target.parentIds || [];
+    const noteIds = [...new Set([
+        target.noteId || '',
+        hierarchyContext?.noteId || '',
+        ...supportNoteIds,
+    ].filter(Boolean))].sort();
+    const chunkIds = [...new Set([
+        target.chunkId || '',
+        hierarchyContext?.chunkId || '',
+        ...supportChunkIds,
+    ].filter(Boolean))].sort();
+    const chunkCaps = capsChunkParentCaps(noteIds, chunkIds);
+    const rootKey = capsParentRootKey(target, parents);
+    const rootCaps = noteIds.map((noteId) => `document:${noteId}:root:${rootKey}`);
+    if (kind === 'note') return [];
+    if (kind === 'structure-root') return noteIds.map((noteId) => `document:${noteId}`);
+    if (kind === 'chunk') return rootCaps.length ? rootCaps : noteIds.map((noteId) => `document:${noteId}`);
+    if (kind === 'entity') return chunkCaps.length ? chunkCaps : rootCaps;
+    if (kind === 'anchor' || kind === 'event') return chunkCaps.length ? chunkCaps : rootCaps;
+    if (kind === 'memory-state') {
+        const entityParent = firstParentWithPrefix(parents, 'embed:entity:') || (target.entityId ? `embed:entity:${target.entityId}` : null);
+        return entityParent ? [capsNodeCapToken(entityParent)] : chunkCaps.length ? chunkCaps : rootCaps;
+    }
+    if (kind === 'causal-fact') {
+        const eventParent = lastParentWithPrefix(parents, 'embed:event:');
+        return eventParent ? [capsNodeCapToken(eventParent)] : chunkCaps.length ? chunkCaps : rootCaps;
+    }
+    if (kind === 'temporal-fact') {
+        const eventParent = firstParentWithPrefix(parents, 'embed:event:');
+        return eventParent ? [capsNodeCapToken(eventParent)] : chunkCaps.length ? chunkCaps : rootCaps;
+    }
+    if (kind === 'graph-fact') {
+        const entityParent = firstParentWithPrefix(parents, 'embed:entity:');
+        if (chunkCaps.length) return chunkCaps;
+        return entityParent ? [capsNodeCapToken(entityParent)] : rootCaps;
+    }
+    return chunkCaps.length ? chunkCaps : rootCaps;
+}
+
+function capsParentRootKey(target: GraphRebuildEmbeddingTarget, parentIds: string[]): string {
+    for (const parentId of parentIds) {
+        const root = parentId.match(/^embed:structure-root:[^:]+:(.+)$/)?.[1];
+        if (root) return capsNormalizeRootKey(root);
+    }
+    return capsStructureRootKey(target);
+}
+
+function capsNormalizeRootKey(value: string): string {
+    if (/document|structure|chunk/.test(value)) return 'document';
+    if (/identity|entity|alias/.test(value)) return 'identity';
+    if (/temporal|timeline/.test(value)) return 'temporal';
+    if (/causal|cause/.test(value)) return 'causal';
+    if (/evidence|source/.test(value)) return 'evidence';
+    return normalizeHopfToken(value);
+}
+
+function capsChunkParentCaps(noteIds: string[], chunkIds: string[]): string[] {
+    if (!noteIds.length || !chunkIds.length) return [];
+    const out = new Set<string>();
+    for (const chunkId of chunkIds) {
+        const embeddedNote = noteIds.find((noteId) => chunkId.startsWith(`${noteId}:`));
+        if (embeddedNote) {
+            out.add(`document:${embeddedNote}:chunk:${chunkId}`);
+            continue;
+        }
+        if (noteIds.length === 1) {
+            out.add(`document:${noteIds[0]}:chunk:${chunkId}`);
+            continue;
+        }
+        for (const noteId of noteIds) out.add(`document:${noteId}:chunk:${chunkId}`);
+    }
+    return [...out].sort();
+}
+
+function capsContainmentPath(capId: string, parentCapIds: string[]): string {
+    return parentCapIds.length ? `${parentCapIds[0]}/${capId}` : capId;
 }
 
 function capsLaneDirection(lane: string): CapsVec3 {
@@ -2152,17 +2642,27 @@ function projectSiegelVector(
 ): { x: number; y: number; z: number } {
     const depth = siegelDepth(target, hierarchyContext);
     const lane = siegelBandForTarget(target, hierarchyContext);
-    const phase = unitHash(`${target.id}:siegel-projection`);
+    const projectionSeed = siegelProjectionSeed(target);
+    const phase = unitHash(`${projectionSeed}:siegel-projection`);
+    const localPhase = unitHash(`${target.id}:siegel-local`) - 0.5;
     const angle = phase * Math.PI * 2;
     const semantic = targetSemanticSpread(vector, index, total);
     const layer = siegelDepthLayer(depth);
     const laneShift = siegelLaneShift(lane);
-    const radius = (0.58 + semantic.radial * 0.3 + phase * 0.08) * (1 + depth * 0.025);
+    const structureChildScale = isDocumentStructureUnitTarget(target) && target.chunkId ? 0.42 : 1;
+    const radius = (0.58 + semantic.radial * 0.3 * structureChildScale + phase * 0.08 + localPhase * 0.04) * (1 + depth * 0.025);
     return {
         x: (Math.cos(angle) * radius + vector[0] * 0.22 + laneShift.x) * 1.12,
         y: layer + vector[1] * 0.1 + laneShift.y,
         z: (Math.sin(angle) * radius + vector[2] * 0.3 + laneShift.z + semantic.z * 0.18) * 1.28,
     };
+}
+
+function siegelProjectionSeed(target: GraphRebuildEmbeddingTarget): string {
+    if (isDocumentStructureUnitTarget(target) && target.chunkId) {
+        return `embed:chunk:${target.chunkId}`;
+    }
+    return target.id;
 }
 
 function targetSemanticSpread(vector: Float32Array, index: number, total: number): { radial: number; z: number } {
@@ -2204,6 +2704,12 @@ function normalizeHopfToken(value: string): string {
 }
 
 function targetRenderKind(target: GraphRebuildEmbeddingTarget): string {
+    if (target.styleKey) {
+        return displayKind(target.styleKey);
+    }
+    if (target.stateContextKind) {
+        return displayKind(target.stateContextKind);
+    }
     if (displayKind(target.kind) === 'memory-state') {
         return displayKind(memoryStateGraphColorKind(target));
     }
@@ -2215,6 +2721,12 @@ function targetRenderKind(target: GraphRebuildEmbeddingTarget): string {
 
 function targetColorHsl(target: GraphRebuildEmbeddingTarget): string {
     const kind = displayKind(target.kind);
+    if (target.styleKey && kind !== 'entity') {
+        return entityColorStore.getRawGraphNodeHsl(target.styleKey as any) || kindHsl(kind);
+    }
+    if (target.stateContextKind) {
+        return entityColorStore.getRawGraphNodeHsl(target.stateContextKind as any) || kindHsl(kind);
+    }
     if (kind === 'graph-fact') {
         return relationHslFromText(target.label, target.text, target.sourceId) || kindHsl(kind);
     }
@@ -2228,6 +2740,8 @@ function targetColorHsl(target: GraphRebuildEmbeddingTarget): string {
 }
 
 function memoryStateGraphColorKind(target: GraphRebuildEmbeddingTarget): string {
+    if (target.stateContextKind) return target.stateContextKind;
+    if (target.styleKey) return target.styleKey;
     const token = compactSiegelToken(`${target.label || ''} ${target.text || ''} ${target.sourceId || ''}`);
     if (token.includes('decisionstate') || token.includes('approved') || token.includes('accepted')) return 'decisionState';
     if (token.includes('rankorstatus') || token.includes('rankstatus') || token.includes('rank')) return 'rankStatus';

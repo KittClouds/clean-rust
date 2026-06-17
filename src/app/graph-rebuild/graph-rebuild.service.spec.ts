@@ -8,16 +8,17 @@ import {
     graphModelV2OverGraphExportToScopedDocument,
     graphIndexReceiptToScopedDocument,
     graphRebuildSnapshotDocumentPayloadStats,
+    graphRebuildSnapshotContentBlobDocuments,
     graphRebuildSnapshotPayloadCounters,
     graphRebuildSnapshotPersistenceView,
     graphRebuildSnapshotToNativeCompilerPayload,
     graphRebuildSnapshotToScopedDocument,
-    hydrateGraphRebuildSnapshotDerivedViews,
     mergeGraphRebuildOccurrences,
     postProcessCacheToScopedDocument,
     recoverGraphRebuildOccurrences,
     scopedDocumentToGraphModelV2OverGraphExport,
     scopedDocumentToGraphIndexReceipt,
+    scopedDocumentToGraphRebuildContentBlob,
     scopedDocumentToGraphRebuildSnapshot,
     snapshotAnchorsToGraphRebuildOccurrences,
     dynamicChunksForNote,
@@ -199,7 +200,7 @@ describe('GraphRebuildService persistence helpers', () => {
 
         expect(document.namespace).toBe(GRAPH_REBUILD_NAMESPACE);
         expect(document.scopeFolderId).toBe('global');
-        expect(scopedDocumentToGraphRebuildSnapshot(document)).toEqual(snapshot);
+        expect(scopedDocumentToGraphRebuildSnapshot(document)).toEqual(graphRebuildSnapshotPersistenceView(snapshot));
     });
 
     it('roundtrips Full Atlas Index receipts through Overgraph scoped documents', () => {
@@ -425,6 +426,10 @@ describe('GraphRebuildService persistence helpers', () => {
         });
         const document = graphRebuildSnapshotToScopedDocument(snapshot);
         const overGraphDocument = graphModelV2OverGraphExportToScopedDocument(snapshot);
+        const blobDocuments = graphRebuildSnapshotContentBlobDocuments(snapshot);
+        const embeddingTargetsBlob = blobDocuments.find((blob) =>
+            blob.documentKey.includes(':embeddingTargets:'),
+        );
 
         const persistedSnapshot = graphRebuildSnapshotPersistenceView(snapshot);
         const counters = graphRebuildSnapshotPayloadCounters(
@@ -443,9 +448,13 @@ describe('GraphRebuildService persistence helpers', () => {
         expect(counters['snapshotTotalScopedPayloadChars']).toBe(
             document.payload.length + (overGraphDocument?.payload.length || 0),
         );
-        expect(counters['payloadEmbeddingTargetsChars']).toBeGreaterThan(0);
-        expect(counters['payloadGraphModelV2Chars']).toBeGreaterThan(0);
+        expect(counters['payloadContentManifestChars']).toBeGreaterThan(0);
+        expect(counters['payloadEmbeddingTargetsChars']).toBe(JSON.stringify([]).length);
+        expect(counters['payloadGraphModelV2Chars'] || 0).toBe(0);
         expect(counters['payloadGraphCompilerChars'] || 0).toBe(0);
+        expect(embeddingTargetsBlob).toBeTruthy();
+        expect(scopedDocumentToGraphRebuildContentBlob(embeddingTargetsBlob!)?.value)
+            .toEqual(snapshot.embeddingTargets);
     });
 
     it('persists the embedding target plan as lane/count receipts, not duplicate target rows', () => {
@@ -469,14 +478,24 @@ describe('GraphRebuildService persistence helpers', () => {
         const persistedView = graphRebuildSnapshotPersistenceView(snapshot);
         const document = graphRebuildSnapshotToScopedDocument(snapshot);
         const persisted = scopedDocumentToGraphRebuildSnapshot(document);
+        const targetPlanBlob = graphRebuildSnapshotContentBlobDocuments(snapshot).find((blob) =>
+            blob.documentKey.includes(':embeddingTargetPlan:'),
+        );
+        const { targets: _targets, ...compactTargetPlan } = snapshot.embeddingTargetPlan as GraphRebuildSnapshot['embeddingTargetPlan'] & {
+            targets?: unknown;
+        };
 
-        expect((persistedView.embeddingTargetPlan as GraphRebuildSnapshot['embeddingTargetPlan'] & { targets?: unknown[] })?.targets)
-            .toBeUndefined();
-        expect((persisted?.embeddingTargetPlan as GraphRebuildSnapshot['embeddingTargetPlan'] & { targets?: unknown[] })?.targets)
-            .toBeUndefined();
-        expect(persisted?.embeddingTargetPlan?.lanes).toEqual(snapshot.embeddingTargetPlan?.lanes);
-        expect(persisted?.embeddingTargetPlan?.candidateCount).toBe(snapshot.embeddingTargetPlan?.candidateCount);
-        expect(persisted?.embeddingTargets).toEqual(snapshot.embeddingTargets);
+        expect(persistedView.embeddingTargetPlan).toBeUndefined();
+        expect(persisted?.embeddingTargetPlan).toBeUndefined();
+        expect(persisted?.embeddingTargets).toEqual([]);
+        expect(persisted?.contentManifest?.refs.embeddingTargetPlan?.itemCount)
+            .toBeGreaterThan(0);
+        expect(persisted?.contentManifest?.refs.embeddingTargets?.itemCount)
+            .toBe(snapshot.embeddingTargets.length);
+        expect(targetPlanBlob).toBeTruthy();
+        const targetPlanBlobValue = scopedDocumentToGraphRebuildContentBlob(targetPlanBlob!)?.value;
+        expect(targetPlanBlobValue).toEqual(compactTargetPlan);
+        expect((targetPlanBlobValue as { targets?: unknown } | undefined)?.targets).toBeUndefined();
     });
 
     it('does not hydrate semantic decision views when they are absent from compact payloads', () => {
@@ -508,12 +527,9 @@ describe('GraphRebuildService persistence helpers', () => {
         expect(persisted?.semanticRerankSummary).toBeUndefined();
         expect(persisted?.semanticAdjudicationSummary).toBeUndefined();
         expect(persisted?.semanticEvalLedgerSummary).toBeUndefined();
-        expect(persisted?.semanticCandidateSummary).toEqual(snapshot.semanticCandidateSummary);
-        const hydrated = persisted ? hydrateGraphRebuildSnapshotDerivedViews(persisted) : null;
-        expect(hydrated).toBe(persisted);
-        expect(hydrated?.semanticRerankSummary).toBeUndefined();
-        expect(hydrated?.semanticAdjudicationSummary).toBeUndefined();
-        expect(hydrated?.semanticEvalLedgerSummary).toBeUndefined();
+        expect(persisted?.semanticCandidateSummary).toBeUndefined();
+        expect(persisted?.contentManifest?.refs.semanticCandidateSummary?.itemCount)
+            .toBe(snapshot.semanticCandidateSummary?.candidates.length);
     });
 
     it('does not hydrate Hopf resonance when it is absent from compact payloads', () => {
@@ -536,13 +552,10 @@ describe('GraphRebuildService persistence helpers', () => {
         const persistedView = graphRebuildSnapshotPersistenceView(snapshot);
         const document = graphRebuildSnapshotToScopedDocument(snapshot);
         const persisted = scopedDocumentToGraphRebuildSnapshot(document);
-        const hydrated = persisted ? hydrateGraphRebuildSnapshotDerivedViews(persisted) : null;
 
         expect(persistedView.hopfResonanceSpace).toBeUndefined();
         expect(persisted?.hopfResonanceSpace).toBeUndefined();
-        expect(hydrated).toBe(persisted);
-        expect(hydrated?.hopfResonanceSpace).toBeUndefined();
-        expect(hydrated?.embeddingTargets).toEqual(snapshot.embeddingTargets);
+        expect(persisted?.embeddingTargets).toEqual([]);
     });
 
     it('does not hydrate discourse summaries when they are absent from compact payloads', () => {
@@ -566,7 +579,6 @@ describe('GraphRebuildService persistence helpers', () => {
         const persistedView = graphRebuildSnapshotPersistenceView(snapshot);
         const document = graphRebuildSnapshotToScopedDocument(snapshot);
         const persisted = scopedDocumentToGraphRebuildSnapshot(document);
-        const hydrated = persisted ? hydrateGraphRebuildSnapshotDerivedViews(persisted) : null;
 
         expect(persistedView.discourseSpineSummary).toBeUndefined();
         expect(persistedView.discourseBridgeCandidateSummary).toBeUndefined();
@@ -580,13 +592,6 @@ describe('GraphRebuildService persistence helpers', () => {
         expect(persisted?.discourseEvalLedgerSummary).toBeUndefined();
         expect(persisted?.discoursePromotionSurfaceSummary).toBeUndefined();
         expect(persisted?.discourseCompilerOverlaySummary).toBeUndefined();
-        expect(hydrated).toBe(persisted);
-        expect(hydrated?.discourseSpineSummary).toBeUndefined();
-        expect(hydrated?.discourseBridgeCandidateSummary).toBeUndefined();
-        expect(hydrated?.discourseBridgeAdjudicationSummary).toBeUndefined();
-        expect(hydrated?.discourseEvalLedgerSummary).toBeUndefined();
-        expect(hydrated?.discoursePromotionSurfaceSummary).toBeUndefined();
-        expect(hydrated?.discourseCompilerOverlaySummary).toBeUndefined();
     });
 
     it('does not hydrate MemoryGraphRAG bridge when it is absent from compact payloads', () => {
@@ -610,13 +615,10 @@ describe('GraphRebuildService persistence helpers', () => {
         const persistedView = graphRebuildSnapshotPersistenceView(snapshot);
         const document = graphRebuildSnapshotToScopedDocument(snapshot);
         const persisted = scopedDocumentToGraphRebuildSnapshot(document);
-        const hydrated = persisted ? hydrateGraphRebuildSnapshotDerivedViews(persisted) : null;
 
         expect(persistedView.memoryGraphRagBridgeSummary).toBeUndefined();
         expect(persisted?.memoryGraphRagBridgeSummary).toBeUndefined();
-        expect(hydrated).toBe(persisted);
-        expect(hydrated?.memoryGraphRagBridgeSummary).toBeUndefined();
-        expect(hydrated?.semanticEvalLedgerSummary).toBeUndefined();
+        expect(persisted?.semanticEvalLedgerSummary).toBeUndefined();
     });
 
     it('persists graph compiler as a derived in-memory sidecar, not primary snapshot payload', () => {
@@ -641,7 +643,8 @@ describe('GraphRebuildService persistence helpers', () => {
         const persisted = scopedDocumentToGraphRebuildSnapshot(document);
 
         expect(persisted?.graphCompiler).toBeUndefined();
-        expect(persisted?.graphModelV2).toEqual(snapshot.graphModelV2);
+        expect(persisted?.graphModelV2).toBeUndefined();
+        expect(persisted?.contentManifest?.refs.graphModelV2?.rawChars).toBeGreaterThan(0);
         expect(persisted?.graphCompileReceipts).toEqual(snapshot.graphCompileReceipts);
         expect(snapshot.graphCompiler).toBeTruthy();
     });
@@ -675,13 +678,23 @@ describe('GraphRebuildService persistence helpers', () => {
         const jsonPersistedSnapshot = JSON.parse(JSON.stringify(persistedView));
         const stats = graphRebuildSnapshotDocumentPayloadStats(document.payload);
         const counters = graphRebuildSnapshotPayloadCounters(persistedView, document.payload.length, 0, stats);
+        const blobDocuments = graphRebuildSnapshotContentBlobDocuments(snapshot);
+        const semanticBlob = blobDocuments.find((blob) =>
+            blob.documentKey.includes(':semanticCandidateSummary:'),
+        );
+        const semanticBlobStats = semanticBlob
+            ? graphRebuildSnapshotDocumentPayloadStats(semanticBlob.payload)
+            : null;
+        const semanticPayload = semanticBlob ? scopedDocumentToGraphRebuildContentBlob(semanticBlob) : null;
 
         expect(document.payload.length).toBeLessThan(rawChars);
-        expect(document.payload.length).toBeLessThan(persistedRawChars);
+        expect(persistedRawChars).toBeLessThan(rawChars);
         expect(persisted).toEqual(jsonPersistedSnapshot);
         expect(counters['snapshotPrimaryRawPayloadChars']).toBe(persistedRawChars);
-        expect(counters['snapshotCompressionSavedChars']).toBeGreaterThan(0);
-        expect(counters['snapshotCompressionRatioPct']).toBeLessThan(100);
+        expect(semanticBlob).toBeTruthy();
+        expect(semanticPayload?.value).toEqual(snapshot.semanticCandidateSummary);
+        expect(semanticBlobStats?.savedChars).toBeGreaterThan(0);
+        expect(semanticBlobStats?.ratioPct).toBeLessThan(100);
     });
 
     it('keeps postprocess cache documents as lightweight snapshot references', () => {

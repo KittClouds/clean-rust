@@ -10,6 +10,7 @@ import {
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { RegisteredEntity } from '../../../../lib/registry';
+import type { GraphRebuildSnapshot } from '../../../../graph-rebuild/graph-rebuild-snapshot';
 import { entityColorStore } from '../../../../lib/store/entityColorStore';
 import { buildGraphRebuildSnapshot } from '../../../../graph-rebuild/graph-rebuild-builder';
 import { buildAdaptiveGraphRebuildChunks } from '../../../../graph-rebuild/graph-rebuild-meaning-frames';
@@ -124,6 +125,26 @@ describe('GraphEntitySidebarComponent discourse focus', () => {
         expect(component.selectedOperatingRecord()?.facts.some((fact) => fact.label === 'Lineage')).toBe(true);
     });
 
+    it('keeps compact persisted Atlas room counts from run counters', () => {
+        component.diagnosticsSnapshot.set(compactRunSnapshot());
+
+        const tabs = Object.fromEntries(component.operatingRoomTabs().map((tab) => [tab.id, tab.count]));
+        const counts = component.operatingRoom().countsById;
+
+        expect(tabs).toMatchObject({
+            entities: 3,
+            structure: 3953,
+            facts: 741,
+            review: 1192,
+            discourse: 234,
+            metrics: 11,
+        });
+        expect(counts['structure-total'].value).toBe(3953);
+        expect(counts['facts-relations'].value).toBe(741);
+        expect(counts['review-gaps'].value).toBe(1192);
+        expect(counts['discourse-packets'].value).toBe(234);
+    });
+
     it('opens the evaluation workspace when Metrics is selected', () => {
         const rooms: string[] = [];
         component.operatingRoomChange.subscribe((room) => rooms.push(room));
@@ -209,4 +230,81 @@ function entities(): RegisteredEntity[] {
         { id: 'hazel', label: 'Hazel', kind: 'CHARACTER', aliases: [], attributes: {}, createdAt: 1, updatedAt: 1 },
         { id: 'mesa', label: 'Red Mesa', kind: 'LOCATION', aliases: [], attributes: {}, createdAt: 1, updatedAt: 1 },
     ] as RegisteredEntity[];
+}
+
+function compactRunSnapshot(): GraphRebuildSnapshot {
+    return {
+        schemaVersion: 'phoenix-graph-rebuild/v1',
+        id: 'compact-run',
+        source: 'phoenix-graph-rebuild',
+        scopeKind: 'global',
+        scopeId: 'global',
+        noteIds: ['note-1'],
+        builtAt: 1,
+        chunks: [],
+        mentions: [],
+        entityAnchors: [],
+        relationships: [],
+        events: [],
+        episodes: [],
+        temporalEdges: [],
+        causalEdges: [],
+        memoryState: [],
+        embeddingTargets: [],
+        embeddingVectors: [],
+        projectionRefs: [],
+        nodes: [],
+        edges: [],
+        atlasPacket: {
+            schemaVersion: 'phoenix-atlas-packet/v1',
+            snapshotId: 'compact-run',
+            scopeKind: 'global',
+            scopeId: 'global',
+            builtAt: 1,
+            sourceContract: {
+                authority: 'rust-atlas-packet',
+                identityAuthority: 'registry',
+                vectorContract: 'missing',
+                tsGraphBuilderRole: 'visuals_only',
+            },
+            objects: [],
+            manifoldTargets: [],
+            counters: {
+                objects: 0,
+                manifoldTargets: 0,
+                registryEntities: 3,
+                evidenceAnchors: 903,
+                modelVectors: 0,
+                families: [],
+            },
+        },
+        counters: {
+            entities: 3,
+            aliases: 0,
+            candidates: 0,
+            mentions: 903,
+            acceptedAnchors: 903,
+            chunks: 42,
+            relationshipCandidates: 0,
+            relationships: 700,
+            acceptedRelationships: 38,
+            reviewRelationships: 0,
+            rejectedRelationships: 0,
+            events: 20,
+            episodes: 0,
+            temporalEdges: 12,
+            causalEdges: 9,
+            memoryState: 0,
+            embeddingTargets: 1325,
+            embeddingVectors: 0,
+            projectionRefs: 0,
+            nodes: 332,
+            edges: 126,
+            documentSidecarUnits: 3953,
+            documentReviewRows: 1192,
+            documentReviewActionableRows: 1192,
+            discourseSpineTargets: 234,
+            dropReasons: {},
+        },
+    } as unknown as GraphRebuildSnapshot;
 }

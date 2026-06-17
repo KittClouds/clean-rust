@@ -448,22 +448,22 @@ describe('SearchPanelComponent model recipe lifecycle', () => {
         expect(component.chunkingStatus().estimatedChunks).toBeGreaterThan(2);
     });
 
-    it('runs the unified Full Atlas Index only from the explicit button path', async () => {
+    it('runs the one-shot Build Graph path from the explicit primary button', async () => {
         const pipeline = injector.get(GraphRebuildPipelineService) as unknown as ReturnType<typeof createFullAtlasPipelineMock>;
-        pipeline.modelsReady.mockReturnValue(true);
+        pipeline.graphModelsReady.mockReturnValue(true);
         pipeline.modelReadiness.mockReturnValue([
             { id: 'dynamicNer', label: 'Dynamic NER', status: 'ready', detail: 'ready' },
-            { id: 'semanticEmbedding', label: 'Semantic Embedding', status: 'ready', detail: 'ready' },
+            { id: 'semanticEmbedding', label: 'Semantic Embedding', status: 'idle', detail: 'idle' },
             { id: 'nli', label: 'NLI', status: 'ready', detail: 'ready' },
         ]);
 
         component.setBuildScopeMode('note');
-        await component.buildCoreAtlas();
+        await component.buildGraphAtlas();
 
-        expect(pipeline.buildCoreGraph).toHaveBeenCalledTimes(1);
-        expect(pipeline.buildCoreGraph.mock.calls[0][0]).toEqual(expect.objectContaining({
+        expect(pipeline.buildGraph).toHaveBeenCalledTimes(1);
+        expect(pipeline.buildGraph.mock.calls[0][0]).toEqual(expect.objectContaining({
             policy: 'delta',
-            postProcessMode: 'core',
+            postProcessMode: 'full',
             calendarRegistrySnapshot: expect.objectContaining({ id: 'calendar-registry:test' }),
             scope: expect.objectContaining({
                 kind: 'note',
@@ -471,8 +471,48 @@ describe('SearchPanelComponent model recipe lifecycle', () => {
                 noteIds: ['note-1'],
             }),
         }));
-        expect(component.lastRunStatus().label).toBe('Clean graph complete');
+        expect(pipeline.buildCoreGraph).not.toHaveBeenCalled();
+        expect(pipeline.postProcessAtlas).not.toHaveBeenCalled();
+        expect(component.lastRunStatus().label).toBe('Graph build complete');
         expect(machine.requestGraphFocus).toHaveBeenCalled();
+    });
+
+    it('keeps Jina out of Build Graph and uses it only for Embed Atlas', async () => {
+        const pipeline = injector.get(GraphRebuildPipelineService) as unknown as ReturnType<typeof createFullAtlasPipelineMock>;
+        pipeline.graphModelsReady.mockReturnValue(true);
+        pipeline.embeddingModelReady.mockReturnValue(false);
+        component.notes.set([
+            {
+                id: 'note-1',
+                title: 'Runtime Note',
+                content: 'Aella met Kai near the harbor.',
+                narrativeId: '',
+                folderId: 'folder-1',
+                hasBody: true,
+            },
+        ]);
+        component.setBuildScopeMode('note');
+
+        await component.buildGraphAtlas();
+
+        expect(pipeline.buildGraph).toHaveBeenCalledTimes(1);
+        expect(machine.loadSemanticModel).not.toHaveBeenCalled();
+        expect(machine.indexSemanticDocuments).not.toHaveBeenCalled();
+
+        await component.embedAtlas();
+
+        expect(machine.loadSemanticModel).toHaveBeenCalledWith(
+            'jina-v5-nano-retrieval',
+            'Jina v5 Nano',
+            '768d',
+        );
+        expect(machine.indexSemanticDocuments).toHaveBeenCalledWith([
+            expect.objectContaining({
+                id: 'note-1',
+                title: 'Runtime Note',
+                content: expect.stringContaining('Aella'),
+            }),
+        ]);
     });
 
     it('runs the staged postprocess action separately from core graph', async () => {
@@ -553,6 +593,7 @@ function createMachineMock() {
     const notice = signal<string | null>(null);
     const error = signal<string | null>(null);
     const activeJob = signal<any>(null);
+    const vectorStatus = signal<any>('idle');
     return {
         query: signal(''),
         scope: signal('global'),
@@ -562,7 +603,7 @@ function createMachineMock() {
         graphLensMode: signal('unified'),
         stages: signal({}),
         activeSignals: signal({ count: 0 }),
-        vectorStatus: signal<any>('idle'),
+        vectorStatus,
         graphStatus: signal<any>('idle'),
         graphAudit: signal(null),
         manifoldMode: signal('hybrid'),
@@ -584,7 +625,12 @@ function createMachineMock() {
         toggleLane: vi.fn(),
         requestGraphFocus: vi.fn(),
         setNotice: vi.fn((message: string) => notice.set(message)),
-        loadSemanticModel: vi.fn(async () => undefined),
+        loadSemanticModel: vi.fn(async () => {
+            vectorStatus.set('ready');
+        }),
+        indexSemanticDocuments: vi.fn(async () => {
+            vectorStatus.set('ready');
+        }),
         refreshAuditSafe: vi.fn(),
         search: vi.fn(async () => []),
     };
@@ -707,7 +753,11 @@ function createFullAtlasPipelineMock() {
         ]),
         modelsReady: vi.fn(() => false),
         coreModelsReady: vi.fn(() => true),
+        graphModelsReady: vi.fn(() => true),
+        embeddingModelReady: vi.fn(() => false),
         loadModels: vi.fn(async () => undefined),
+        loadGraphModels: vi.fn(async () => undefined),
+        loadEmbeddingModel: vi.fn(async () => undefined),
         warmOptionalModel: vi.fn(async () => undefined),
         buildCoreGraph: vi.fn(async () => {
             const receipt = {
@@ -733,6 +783,20 @@ function createFullAtlasPipelineMock() {
             return {
                 receipt,
                 snapshot: { counters: { nodes: 2, edges: 1 } },
+            };
+        }),
+        buildGraph: vi.fn(async () => {
+            const receipt = {
+                id: 'graph-atlas:note:note-1:123',
+                status: 'completed',
+                message: 'Build Graph produced 2 nodes, 1 edges, and 3 embedding targets.',
+                postProcessMode: 'full',
+                durationMs: 12,
+            };
+            lastReceipt.set(receipt);
+            return {
+                receipt,
+                snapshot: { counters: { nodes: 2, edges: 1, embeddingTargets: 3 } },
             };
         }),
         postProcessAtlas: vi.fn(async () => {

@@ -36,9 +36,14 @@ export interface GraphAtlasSourceContract {
 export interface GraphAtlasObject {
     id: string;
     family: GraphAtlasFamily;
-    status: GraphAtlasObjectStatus;
+    status?: GraphAtlasObjectStatus;
     kind: string;
     label: string;
+    styleKey?: string;
+    lane?: string;
+    structuralRole?: string;
+    documentUnitKind?: string;
+    stateContextKind?: string;
     registryEntityId?: string;
     noteIds: string[];
     chunkIds: string[];
@@ -55,8 +60,15 @@ export interface GraphAtlasManifoldTarget {
     admission: 'candidate' | 'admitted' | 'deferred' | 'rejected';
     vectorStatus: 'missing' | 'modelVector' | 'external';
     coordinateSource: string;
+    status: GraphAtlasObjectStatus;
     kind: string;
     label: string;
+    entityKind?: string;
+    styleKey?: string;
+    lane?: string;
+    structuralRole?: string;
+    documentUnitKind?: string;
+    stateContextKind?: string;
     sourceId: string;
     registryEntityId?: string;
     noteId?: string;

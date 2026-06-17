@@ -75,6 +75,7 @@ fn base_targets_from_snapshot(snapshot: &GraphRebuildSnapshot) -> Vec<GraphEmbed
             text: format_compact!("note:{note_id}"),
             evidence_ids: Vec::new(),
             parent_ids: Vec::new(),
+            ..GraphEmbeddingTarget::default()
         });
         targets.extend(structure_root_targets(note_id));
     }
@@ -96,6 +97,7 @@ fn base_targets_from_snapshot(snapshot: &GraphRebuildSnapshot) -> Vec<GraphEmbed
         ),
         evidence_ids: Vec::new(),
         parent_ids: vec![structure_root_id(&chunk.note_id, "document-structure")],
+        ..GraphEmbeddingTarget::default()
     }));
     targets.extend(snapshot.nodes.iter().map(|node| GraphEmbeddingTarget {
         id: format_compact!("embed:entity:{}", node.entity_id.0),
@@ -114,6 +116,7 @@ fn base_targets_from_snapshot(snapshot: &GraphRebuildSnapshot) -> Vec<GraphEmbed
         ),
         evidence_ids: node.anchor_ids.clone(),
         parent_ids: Vec::new(),
+        ..GraphEmbeddingTarget::default()
     }));
     targets.extend(
         representative_anchors(&snapshot.entity_anchors)
@@ -134,6 +137,7 @@ fn base_targets_from_snapshot(snapshot: &GraphRebuildSnapshot) -> Vec<GraphEmbed
                 ),
                 evidence_ids: vec![anchor.id.clone()],
                 parent_ids: vec![structure_root_id(&anchor.note_id, "evidence")],
+                ..GraphEmbeddingTarget::default()
             }),
     );
     targets.extend(snapshot.relationships.iter().filter_map(|relationship| {
@@ -166,6 +170,7 @@ fn base_targets_from_snapshot(snapshot: &GraphRebuildSnapshot) -> Vec<GraphEmbed
                 format_compact!("embed:entity:{}", relationship.source_entity_id.0),
                 format_compact!("embed:entity:{}", relationship.target_entity_id.0),
             ],
+            ..GraphEmbeddingTarget::default()
         })
     }));
     targets.extend(snapshot.events.iter().map(|event| GraphEmbeddingTarget {
@@ -179,6 +184,7 @@ fn base_targets_from_snapshot(snapshot: &GraphRebuildSnapshot) -> Vec<GraphEmbed
         text: event.label.clone(),
         evidence_ids: event.evidence_anchor_ids.clone(),
         parent_ids: vec![structure_root_id(&event.note_id, "temporal")],
+        ..GraphEmbeddingTarget::default()
     }));
     let default_note = snapshot
         .note_ids
@@ -213,6 +219,7 @@ fn base_targets_from_snapshot(snapshot: &GraphRebuildSnapshot) -> Vec<GraphEmbed
                 .as_ref()
                 .map(|note_id| vec![structure_root_id(note_id, "identity")])
                 .unwrap_or_default(),
+            ..GraphEmbeddingTarget::default()
         }
     }));
     targets
@@ -324,6 +331,7 @@ fn document_unit_target(
         ]),
         evidence_ids,
         parent_ids,
+        ..GraphEmbeddingTarget::default()
     }
 }
 
@@ -345,6 +353,7 @@ fn evidence_span_target(span: &GraphDocumentEvidenceSpan) -> GraphEmbeddingTarge
         ]),
         evidence_ids: vec![span.id.clone()],
         parent_ids: vec![structure_root_id(&span.note_id, "evidence")],
+        ..GraphEmbeddingTarget::default()
     }
 }
 
@@ -381,6 +390,7 @@ fn add_document_review_targets(
                 ]),
                 evidence_ids: row.evidence_span_ids.clone(),
                 parent_ids: review_parent_ids(row),
+                ..GraphEmbeddingTarget::default()
             },
         );
     }
@@ -439,6 +449,7 @@ fn add_document_compiler_targets(
                 text: hyperedge_text(hyperedge),
                 evidence_ids: hyperedge.evidence_span_ids.clone(),
                 parent_ids: role_ids,
+                ..GraphEmbeddingTarget::default()
             },
         );
     }
@@ -486,6 +497,7 @@ fn hyperedge_role_target(
             hyperedge.evidence_span_ids.clone()
         },
         parent_ids: hyperedge_role_parent_ids(role, note_id),
+        ..GraphEmbeddingTarget::default()
     }
 }
 
@@ -565,6 +577,7 @@ fn add_discourse_targets(
                 ]),
                 evidence_ids: cluster.target_ids.clone(),
                 parent_ids: cluster.target_ids.clone(),
+                ..GraphEmbeddingTarget::default()
             },
         );
     }
@@ -591,6 +604,7 @@ fn add_discourse_targets(
                     bridge.source_target_id.clone(),
                     bridge.target_target_id.clone(),
                 ],
+                ..GraphEmbeddingTarget::default()
             },
         );
     }

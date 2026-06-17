@@ -96,6 +96,27 @@ describe('Lorentz tree galaxy visualization data', () => {
         expect(byId.get('entity')!.depth).toBeGreaterThan(byId.get('evidence')!.depth);
     });
 
+    it('pulls child cap centers into declared parent cap containment', () => {
+        const scene = buildGalaxyScene([
+            containmentNode('doc', 'Red Mesa', 'note', 'document:note-1', null, 2.08, 'document_spine', [0, 0, 1]),
+            containmentNode('root', 'Document root', 'structureRoot', 'document:note-1:root:document', 'document:note-1', 1.92, 'document_spine', [1, 0, 0]),
+            containmentNode('chunk', 'Chunk 1', 'chunk', 'document:note-1:chunk:chunk-1', 'document:note-1:root:document', 1.66, 'chunk_spine', [-1, 0, 0]),
+            containmentNode('entity', 'Kai', 'entity', 'identity:kai', 'document:note-1:chunk:chunk-1', 1.42, 'entity_anchor', [0, 1, 0]),
+        ], [
+            { id: 'doc-root', sourceId: 'doc', targetId: 'root', type: 'target-parent', confidence: 0.9 },
+            { id: 'root-chunk', sourceId: 'root', targetId: 'chunk', type: 'target-parent', confidence: 0.9 },
+            { id: 'chunk-entity', sourceId: 'chunk', targetId: 'entity', type: 'chunk-entity', confidence: 0.9 },
+        ], mergeGalaxySettings({ layoutMode: 'lorentzTree' }));
+        const doc = guideCenter(scene, 'caps:boundary:document:note-1');
+        const root = guideCenter(scene, 'caps:boundary:document:note-1:root:document');
+        const chunk = guideCenter(scene, 'caps:boundary:document:note-1:chunk:chunk-1');
+        const entity = guideCenter(scene, 'caps:boundary:identity:kai');
+
+        expect(dotVec(doc, root)).toBeGreaterThan(0.72);
+        expect(dotVec(root, chunk)).toBeGreaterThan(0.72);
+        expect(dotVec(chunk, entity)).toBeGreaterThan(0.66);
+    });
+
     it('does not emit Lorentz guide data for Hybrid or Hopf universes', () => {
         const atlas = buildLorentzAtlas(lorentzSnapshot());
         const hybrid = buildGalaxyScene(atlas.nodes, atlas.edges, mergeGalaxySettings({ layoutMode: 'hybridSpace' }));
@@ -219,6 +240,64 @@ function capShellNode(id: string, label: string, sourceType: string, shellRadius
             },
         },
     };
+}
+
+function containmentNode(
+    id: string,
+    label: string,
+    sourceType: string,
+    capId: string,
+    parentCapId: string | null,
+    shellRadius: number,
+    signalLane: string,
+    capDirection: [number, number, number],
+) {
+    return {
+        id,
+        label,
+        kind: sourceType,
+        atlasX: capDirection[0],
+        atlasY: capDirection[1],
+        atlasZ: capDirection[2],
+        totalMentions: 2,
+        metadata: {
+            sourceType,
+            signalLane,
+            targetConfidence: 0.9,
+            lorentz: {
+                capId,
+                parentCapId,
+                parentCapIds: parentCapId ? [parentCapId] : [],
+                capDirection,
+                capPhase: 0.25,
+                shellRadius,
+                signalLane,
+                specificity: 0.82,
+                ambiguity: 0.04,
+                primaryTreeKind: 'documentStructure',
+            },
+        },
+    };
+}
+
+function guideCenter(scene: ReturnType<typeof buildGalaxyScene>, id: string): [number, number, number] {
+    const guide = scene.lorentzGuides?.find((item) => item.id === id);
+    expect(guide).toBeTruthy();
+    const positions = guide!.positions3d;
+    let x = 0;
+    let y = 0;
+    let z = 0;
+    for (let index = 0; index < positions.length; index += 3) {
+        x += positions[index];
+        y += positions[index + 1];
+        z += positions[index + 2];
+    }
+    const norm = Math.max(0.000001, Math.hypot(x, y, z));
+    return [x / norm, y / norm, z / norm];
+}
+
+function dotVec(left: [number, number, number], right: [number, number, number]): number {
+    return left[0] * right[0] + left[1] * right[1] + left[2] * right[2];
 }
 
 function hyperboloidPoint(radius: number, direction: [number, number, number, number]): [number, number, number, number, number] {

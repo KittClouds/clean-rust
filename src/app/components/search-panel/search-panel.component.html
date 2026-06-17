@@ -194,32 +194,50 @@
     </details>
 
     <div class="recipe-actions full-atlas-actions">
-      <button type="button" class="secondary-action warm-required-action" [ngClass]="fullAtlasModelsReady() ? 'warm-ready' : 'warm-cold'"
-        (click)="loadFullAtlasModels()" [disabled]="fullAtlasBusy()">
+      <button type="button" class="secondary-action warm-required-action" [ngClass]="graphModelsReady() ? 'warm-ready' : 'warm-cold'"
+        (click)="loadGraphModels()" [disabled]="fullAtlasBusy()">
         <ng-icon [name]="fullAtlasBusy() ? 'lucideLoader2' : 'lucideMicrochip'" class="h-3.5 w-3.5"
           [class.animate-spin]="fullAtlasBusy()"></ng-icon>
         {{ loadModelsButtonLabel() }}
       </button>
-      <button type="button" class="primary-action" (click)="buildCoreAtlas()"
-        [disabled]="isFullAtlasBuildDisabled()">
+      <button type="button" class="primary-action" (click)="buildGraphAtlas()"
+        [disabled]="isGraphBuildDisabled()">
         <ng-icon [name]="fullAtlasBusy() ? 'lucideLoader2' : 'lucideSparkles'" class="h-3.5 w-3.5"
           [class.animate-spin]="fullAtlasBusy()"></ng-icon>
         {{ fullAtlasBuildButtonLabel() }}
       </button>
-      <button type="button" class="secondary-action postprocess-action" (click)="postProcessAtlas()"
-        [disabled]="isPostProcessDisabled()">
-        <ng-icon [name]="fullAtlasBusy() ? 'lucideLoader2' : 'lucideGitBranch'" class="h-3.5 w-3.5"
-          [class.animate-spin]="fullAtlasBusy()"></ng-icon>
-        {{ postProcessButtonLabel() }}
-      </button>
-      <button type="button" class="secondary-action ner-suggestions-action"
-        title="Run Dynamic NER and populate entity suggestions without rebuilding the graph"
-        (click)="runEntitySuggestionStage()" [disabled]="isRunNerDisabled()">
-        <ng-icon [name]="isRecipeBusy('runNer') ? 'lucideLoader2' : 'lucideCpu'" class="h-3.5 w-3.5"
-          [class.animate-spin]="isRecipeBusy('runNer')"></ng-icon>
-        {{ nerSuggestionsButtonLabel() }}
+      <button type="button" class="secondary-action postprocess-action" (click)="embedAtlas()"
+        [disabled]="isEmbedAtlasDisabled()">
+        <ng-icon [name]="vectorStatus() === 'loading' || vectorStatus() === 'indexing' ? 'lucideLoader2' : 'lucideZap'"
+          class="h-3.5 w-3.5" [class.animate-spin]="vectorStatus() === 'loading' || vectorStatus() === 'indexing'"></ng-icon>
+        {{ embedAtlasButtonLabel() }}
       </button>
     </div>
+
+    <details class="full-atlas-advanced">
+      <summary>Diagnostics: split graph stages</summary>
+      <div class="recipe-actions full-atlas-actions">
+        <button type="button" class="secondary-action" (click)="buildCoreAtlas()"
+          [disabled]="isFullAtlasBuildDisabled()">
+          <ng-icon [name]="fullAtlasBusy() ? 'lucideLoader2' : 'lucideGitBranch'" class="h-3.5 w-3.5"
+            [class.animate-spin]="fullAtlasBusy()"></ng-icon>
+          Diagnostic Core
+        </button>
+        <button type="button" class="secondary-action postprocess-action" (click)="postProcessAtlas()"
+          [disabled]="isPostProcessDisabled()">
+          <ng-icon [name]="fullAtlasBusy() ? 'lucideLoader2' : 'lucideGitBranch'" class="h-3.5 w-3.5"
+            [class.animate-spin]="fullAtlasBusy()"></ng-icon>
+          {{ postProcessButtonLabel() }}
+        </button>
+        <button type="button" class="secondary-action ner-suggestions-action"
+          title="Run Dynamic NER and populate entity suggestions without rebuilding the graph"
+          (click)="runEntitySuggestionStage()" [disabled]="isRunNerDisabled()">
+          <ng-icon [name]="isRecipeBusy('runNer') ? 'lucideLoader2' : 'lucideCpu'" class="h-3.5 w-3.5"
+            [class.animate-spin]="isRecipeBusy('runNer')"></ng-icon>
+          {{ nerSuggestionsButtonLabel() }}
+        </button>
+      </div>
+    </details>
 
     <div class="last-run">
       <span>Last run</span>

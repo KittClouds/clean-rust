@@ -3,7 +3,7 @@ import { DEFAULT_ENTITY_COLORS, DEFAULT_GRAPH_NODE_COLORS } from '../../../../..
 import type { NoteBlockProjection } from '../../../../../lib/dexie/db';
 import { buildGraphModelV2Snapshot } from '../../../../../graph-rebuild/graph-model-v2';
 import { buildLeafEmbeddingAtlas } from './graph-embedding-atlas';
-import { buildGraphRebuildEmbeddingAtlas } from './graph-rebuild-embedding-atlas';
+import { buildGraphRebuildEmbeddingAtlas, graphRebuildEmbeddingTargetCount } from './graph-rebuild-embedding-atlas';
 
 function block(id: string, text: string, ordinal: number): NoteBlockProjection {
     return {
@@ -215,6 +215,862 @@ describe('embedding atlas projection', () => {
         expect(styleLabDefaults.has(colors.get('embed:graph-fact:observe') || '')).toBe(false);
         expect(styleLabDefaults.has(colors.get('embed:graph-fact:comment') || '')).toBe(false);
         expect(atlas.sourceLabel).toContain('graph rebuild snapshot');
+    });
+
+    it('renders compact Rust Atlas packet manifold targets when target rows are blobbed', () => {
+        const snapshot = {
+            schemaVersion: 'phoenix-graph-rebuild/v1',
+            id: 'snapshot-compact-packet',
+            source: 'phoenix-graph-rebuild',
+            scopeKind: 'global',
+            scopeId: 'global',
+            noteIds: ['note-1'],
+            builtAt: 1,
+            chunks: [],
+            mentions: [],
+            entityAnchors: [],
+            relationships: [],
+            events: [],
+            episodes: [],
+            temporalEdges: [],
+            causalEdges: [],
+            memoryState: [],
+            embeddingTargets: [],
+            embeddingVectors: [],
+            projectionRefs: [],
+            nodes: [],
+            edges: [],
+            counters: { embeddingTargets: 2 },
+            atlasPacket: {
+                schemaVersion: 'phoenix-atlas-packet/v1',
+                snapshotId: 'snapshot-compact-packet',
+                scopeKind: 'global',
+                scopeId: 'global',
+                builtAt: 1,
+                sourceContract: {
+                    authority: 'rust-atlas-packet',
+                    identityAuthority: 'registry',
+                    vectorContract: 'vectors missing',
+                    tsGraphBuilderRole: 'compatibility-only',
+                },
+                objects: [],
+                manifoldTargets: [
+                    {
+                        id: 'embed:entity:kai',
+                        objectId: 'object:entity:kai',
+                        family: 'entity',
+                        admission: 'admitted',
+                        vectorStatus: 'missing',
+                        coordinateSource: 'deterministic-signature',
+                        kind: 'entity',
+                        label: 'Kai',
+                        sourceId: 'kai',
+                        registryEntityId: 'kai',
+                        evidenceIds: [],
+                    },
+                    {
+                        id: 'embed:chunk:chunk-1',
+                        objectId: 'object:chunk:chunk-1',
+                        family: 'structure',
+                        admission: 'admitted',
+                        vectorStatus: 'missing',
+                        coordinateSource: 'deterministic-signature',
+                        kind: 'chunk',
+                        label: 'Chunk 1',
+                        sourceId: 'chunk-1',
+                        noteId: 'note-1',
+                        chunkId: 'chunk-1',
+                        evidenceIds: [],
+                        parentIds: ['embed:entity:kai'],
+                    },
+                ],
+                counters: {
+                    objects: 0,
+                    manifoldTargets: 2,
+                    registryEntities: 1,
+                    evidenceAnchors: 0,
+                    modelVectors: 0,
+                    families: [],
+                },
+            },
+        } as any;
+
+        const atlas = buildGraphRebuildEmbeddingAtlas(snapshot, 'hopf');
+
+        expect(graphRebuildEmbeddingTargetCount(snapshot)).toBe(2);
+        expect(atlas.nodes.map((node) => node.id)).toEqual(expect.arrayContaining([
+            'embed:entity:kai',
+            'embed:chunk:chunk-1',
+        ]));
+        expect(atlas.edges).toEqual(expect.arrayContaining([
+            expect.objectContaining({
+                sourceId: 'embed:entity:kai',
+                targetId: 'embed:chunk:chunk-1',
+                type: 'target-parent',
+            }),
+        ]));
+        expect(atlas.manifold?.projectionSource).toBe('rust_atlas_packet_manifold_targets');
+    });
+
+    it('filters packet-only embed targets from Rust taxonomy fields instead of fallback text', () => {
+        const snapshot = {
+            schemaVersion: 'phoenix-graph-rebuild/v1',
+            id: 'snapshot-packet-taxonomy',
+            source: 'phoenix-graph-rebuild',
+            scopeKind: 'global',
+            scopeId: 'global',
+            noteIds: ['note-1'],
+            builtAt: 1,
+            chunks: [],
+            mentions: [],
+            entityAnchors: [],
+            relationships: [],
+            events: [],
+            episodes: [],
+            temporalEdges: [],
+            causalEdges: [],
+            memoryState: [],
+            embeddingTargets: [],
+            embeddingVectors: [],
+            projectionRefs: [],
+            nodes: [],
+            edges: [],
+            counters: { embeddingTargets: 4 },
+            atlasPacket: {
+                schemaVersion: 'phoenix-atlas-packet/v1',
+                snapshotId: 'snapshot-packet-taxonomy',
+                scopeKind: 'global',
+                scopeId: 'global',
+                builtAt: 1,
+                sourceContract: {
+                    authority: 'rust-atlas-packet',
+                    identityAuthority: 'registry',
+                    vectorContract: 'vectors missing',
+                    tsGraphBuilderRole: 'compatibility-only',
+                },
+                objects: [],
+                manifoldTargets: [
+                    {
+                        id: 'embed:document-unit:paragraph-1',
+                        objectId: 'object:paragraph-1',
+                        family: 'structure',
+                        admission: 'admitted',
+                        status: 'accepted',
+                        vectorStatus: 'missing',
+                        coordinateSource: 'deterministic-signature',
+                        kind: 'documentUnit',
+                        label: 'Paragraph',
+                        styleKey: 'chunk',
+                        lane: 'chunk_spine',
+                        structuralRole: 'child',
+                        documentUnitKind: 'paragraph',
+                        sourceId: 'paragraph-1',
+                        evidenceIds: [],
+                    },
+                    {
+                        id: 'embed:document-unit:leaf-1',
+                        objectId: 'object:leaf-1',
+                        family: 'structure',
+                        admission: 'admitted',
+                        status: 'accepted',
+                        vectorStatus: 'missing',
+                        coordinateSource: 'deterministic-signature',
+                        kind: 'documentUnit',
+                        label: 'Leaf',
+                        styleKey: 'chunk',
+                        lane: 'chunk_spine',
+                        structuralRole: 'child',
+                        documentUnitKind: 'leaf',
+                        sourceId: 'leaf-1',
+                        evidenceIds: [],
+                    },
+                    {
+                        id: 'embed:memory:rank-1',
+                        objectId: 'object:memory-1',
+                        family: 'memory',
+                        admission: 'admitted',
+                        status: 'accepted',
+                        vectorStatus: 'missing',
+                        coordinateSource: 'deterministic-signature',
+                        kind: 'memoryState',
+                        label: 'memory',
+                        styleKey: 'rankStatus',
+                        lane: 'memory_state',
+                        structuralRole: 'child',
+                        stateContextKind: 'rankStatus',
+                        sourceId: 'rank-1',
+                        evidenceIds: [],
+                    },
+                    {
+                        id: 'embed:graph-fact:weak-co',
+                        objectId: 'object:weak-co',
+                        family: 'fact',
+                        admission: 'admitted',
+                        status: 'accepted',
+                        vectorStatus: 'missing',
+                        coordinateSource: 'deterministic-signature',
+                        kind: 'graphFact',
+                        label: 'weak relation',
+                        styleKey: 'cooccurrence',
+                        lane: 'cooccurrence_weak',
+                        structuralRole: 'fact',
+                        sourceId: 'weak-co',
+                        evidenceIds: [],
+                    },
+                ],
+                counters: {
+                    objects: 0,
+                    manifoldTargets: 4,
+                    registryEntities: 0,
+                    evidenceAnchors: 0,
+                    modelVectors: 0,
+                    families: [],
+                },
+            },
+        } as any;
+
+        const atlas = buildGraphRebuildEmbeddingAtlas(snapshot, 'product');
+        const ids = new Set(atlas.nodes.map((node) => node.id));
+        const memory = atlas.nodes.find((node) => node.id === 'embed:memory:rank-1');
+
+        expect(ids.has('embed:document-unit:paragraph-1')).toBe(false);
+        expect(ids.has('embed:document-unit:leaf-1')).toBe(true);
+        expect(ids.has('embed:graph-fact:weak-co')).toBe(false);
+        expect(memory?.metadata?.['graphMemoryStateKind']).toBe('rankStatus');
+    });
+
+    it('parents packet structure units through chunks and keeps sentence/paragraph out of Embed', () => {
+        const snapshot = {
+            schemaVersion: 'phoenix-graph-rebuild/v1',
+            id: 'snapshot-packet-structure-parentage',
+            source: 'phoenix-graph-rebuild',
+            scopeKind: 'global',
+            scopeId: 'global',
+            noteIds: ['note-1'],
+            builtAt: 1,
+            chunks: [],
+            mentions: [],
+            entityAnchors: [],
+            relationships: [],
+            events: [],
+            episodes: [],
+            temporalEdges: [],
+            causalEdges: [],
+            memoryState: [],
+            embeddingTargets: [],
+            embeddingVectors: [],
+            projectionRefs: [],
+            nodes: [],
+            edges: [],
+            counters: { embeddingTargets: 5 },
+            atlasPacket: {
+                schemaVersion: 'phoenix-atlas-packet/v1',
+                snapshotId: 'snapshot-packet-structure-parentage',
+                scopeKind: 'global',
+                scopeId: 'global',
+                builtAt: 1,
+                sourceContract: {
+                    authority: 'rust-atlas-packet',
+                    identityAuthority: 'registry',
+                    vectorContract: 'vectors missing',
+                    tsGraphBuilderRole: 'compatibility-only',
+                },
+                objects: [],
+                manifoldTargets: [
+                    {
+                        id: 'embed:structure-root:note-1:document-structure',
+                        objectId: 'atlas:root:note-1:document-structure',
+                        family: 'structure',
+                        admission: 'admitted',
+                        status: 'accepted',
+                        vectorStatus: 'missing',
+                        coordinateSource: 'deterministic-signature',
+                        kind: 'structureRoot',
+                        label: 'Document structure',
+                        styleKey: 'document',
+                        lane: 'document_spine',
+                        structuralRole: 'root',
+                        sourceId: 'note-1:document-structure',
+                        noteId: 'note-1',
+                        evidenceIds: [],
+                    },
+                    {
+                        id: 'embed:chunk:chunk-1',
+                        objectId: 'atlas:chunk:chunk-1',
+                        family: 'structure',
+                        admission: 'admitted',
+                        status: 'accepted',
+                        vectorStatus: 'missing',
+                        coordinateSource: 'deterministic-signature',
+                        kind: 'chunk',
+                        label: 'Chunk 1',
+                        styleKey: 'chunk',
+                        lane: 'chunk_spine',
+                        structuralRole: 'spine',
+                        sourceId: 'chunk-1',
+                        noteId: 'note-1',
+                        chunkId: 'chunk-1',
+                        evidenceIds: [],
+                        parentIds: ['embed:structure-root:note-1:document-structure'],
+                    },
+                    {
+                        id: 'embed:document-unit:paragraph-1',
+                        objectId: 'atlas:document-unit:paragraph-1',
+                        family: 'structure',
+                        admission: 'admitted',
+                        status: 'accepted',
+                        vectorStatus: 'missing',
+                        coordinateSource: 'deterministic-signature',
+                        kind: 'documentUnit',
+                        label: 'Paragraph 1',
+                        styleKey: 'chunk',
+                        lane: 'chunk_spine',
+                        structuralRole: 'child',
+                        sourceId: 'paragraph-1',
+                        noteId: 'note-1',
+                        chunkId: 'chunk-1',
+                        evidenceIds: [],
+                        parentIds: ['embed:structure-root:note-1:document-structure'],
+                    },
+                    {
+                        id: 'embed:document-unit:sentence-1',
+                        objectId: 'atlas:document-unit:sentence-1',
+                        family: 'structure',
+                        admission: 'admitted',
+                        status: 'accepted',
+                        vectorStatus: 'missing',
+                        coordinateSource: 'deterministic-signature',
+                        kind: 'documentUnit',
+                        label: 'Sentence 1',
+                        styleKey: 'chunk',
+                        lane: 'chunk_spine',
+                        structuralRole: 'child',
+                        sourceId: 'sentence-1',
+                        noteId: 'note-1',
+                        chunkId: 'chunk-1',
+                        evidenceIds: [],
+                        parentIds: ['embed:document-unit:paragraph-1'],
+                    },
+                    {
+                        id: 'embed:document-unit:leaf-1',
+                        objectId: 'atlas:document-unit:leaf-1',
+                        family: 'structure',
+                        admission: 'admitted',
+                        status: 'accepted',
+                        vectorStatus: 'missing',
+                        coordinateSource: 'deterministic-signature',
+                        kind: 'documentUnit',
+                        label: 'Leaf',
+                        styleKey: 'chunk',
+                        lane: 'chunk_spine',
+                        structuralRole: 'child',
+                        documentUnitKind: 'leaf',
+                        sourceId: 'leaf-1',
+                        noteId: 'note-1',
+                        chunkId: 'chunk-1',
+                        evidenceIds: [],
+                        parentIds: ['embed:document-unit:paragraph-1', 'embed:structure-root:note-1:document-structure'],
+                    },
+                ],
+                counters: {
+                    objects: 0,
+                    manifoldTargets: 5,
+                    registryEntities: 0,
+                    evidenceAnchors: 0,
+                    modelVectors: 0,
+                    families: [],
+                },
+            },
+        } as any;
+
+        const atlas = buildGraphRebuildEmbeddingAtlas(snapshot, 'siegel');
+        const ids = new Set(atlas.nodes.map((node) => node.id));
+        const leaf = atlas.nodes.find((node) => node.id === 'embed:document-unit:leaf-1');
+
+        expect(ids.has('embed:document-unit:paragraph-1')).toBe(false);
+        expect(ids.has('embed:document-unit:sentence-1')).toBe(false);
+        expect(ids.has('embed:document-unit:leaf-1')).toBe(true);
+        expect(leaf?.metadata?.signalParentIds).toEqual([
+            'embed:chunk:chunk-1',
+            'embed:structure-root:note-1:document-structure',
+        ]);
+        expect(atlas.edges).toEqual(expect.arrayContaining([
+            expect.objectContaining({
+                sourceId: 'embed:chunk:chunk-1',
+                targetId: 'embed:document-unit:leaf-1',
+                type: 'target-parent',
+            }),
+        ]));
+        expect(atlas.edges.some((edge) =>
+            edge.sourceId === 'embed:document-unit:paragraph-1'
+            && edge.targetId === 'embed:document-unit:leaf-1',
+        )).toBe(false);
+    });
+
+    it('renders accepted Rust packet objects in embed when no manifold target row exists yet', () => {
+        const snapshot = {
+            schemaVersion: 'phoenix-graph-rebuild/v1',
+            id: 'snapshot-object-only-packet',
+            source: 'phoenix-graph-rebuild',
+            scopeKind: 'global',
+            scopeId: 'global',
+            noteIds: ['note-1'],
+            builtAt: 1,
+            chunks: [],
+            mentions: [],
+            entityAnchors: [],
+            relationships: [],
+            events: [],
+            episodes: [],
+            temporalEdges: [],
+            causalEdges: [],
+            memoryState: [],
+            embeddingTargets: [],
+            embeddingVectors: [],
+            projectionRefs: [],
+            nodes: [],
+            edges: [],
+            counters: { embeddingTargets: 2 },
+            atlasPacket: {
+                schemaVersion: 'phoenix-atlas-packet/v1',
+                snapshotId: 'snapshot-object-only-packet',
+                scopeKind: 'global',
+                scopeId: 'global',
+                builtAt: 1,
+                sourceContract: {
+                    authority: 'rust-atlas-packet',
+                    identityAuthority: 'registry',
+                    vectorContract: 'vectors missing',
+                    tsGraphBuilderRole: 'compatibility-only',
+                },
+                objects: [
+                    {
+                        id: 'object:entity:kai',
+                        family: 'registry',
+                        status: 'accepted',
+                        kind: 'character',
+                        label: 'Kai',
+                        styleKey: 'character',
+                        lane: 'entity_anchor',
+                        structuralRole: 'child',
+                        registryEntityId: 'kai',
+                        noteIds: ['note-1'],
+                        chunkIds: [],
+                        anchorIds: [],
+                        evidenceIds: [],
+                        sourceIds: ['kai'],
+                        targetIds: [],
+                    },
+                    {
+                        id: 'object:memory:rank-1',
+                        family: 'memory',
+                        status: 'accepted',
+                        kind: 'memoryState',
+                        label: 'rank',
+                        styleKey: 'rankStatus',
+                        lane: 'memory_state',
+                        structuralRole: 'child',
+                        stateContextKind: 'rankStatus',
+                        registryEntityId: 'kai',
+                        noteIds: ['note-1'],
+                        chunkIds: [],
+                        anchorIds: [],
+                        evidenceIds: ['ev-1'],
+                        sourceIds: ['rank-1'],
+                        targetIds: ['object:entity:kai'],
+                    },
+                ],
+                manifoldTargets: [],
+                counters: {
+                    objects: 2,
+                    manifoldTargets: 0,
+                    registryEntities: 1,
+                    evidenceAnchors: 1,
+                    modelVectors: 0,
+                    families: [],
+                },
+            },
+        } as any;
+
+        const atlas = buildGraphRebuildEmbeddingAtlas(snapshot, 'siegel');
+        const ids = new Set(atlas.nodes.map((node) => node.id));
+        const memory = atlas.nodes.find((node) => node.id === 'embed:memory:rank-1');
+
+        expect(graphRebuildEmbeddingTargetCount(snapshot)).toBe(2);
+        expect(ids.has('embed:entity:kai')).toBe(true);
+        expect(ids.has('embed:memory:rank-1')).toBe(true);
+        expect(memory?.kind).toBe('rank-status');
+        expect(memory?.metadata?.['graphMemoryStateKind']).toBe('rankStatus');
+        expect(atlas.edges).toEqual(expect.arrayContaining([
+            expect.objectContaining({
+                sourceId: 'embed:entity:kai',
+                targetId: 'embed:memory:rank-1',
+                type: 'target-parent',
+            }),
+        ]));
+    });
+
+    it('keeps registry taxonomy when a manifold target already represents the object', () => {
+        const snapshot = {
+            schemaVersion: 'phoenix-graph-rebuild/v1',
+            id: 'snapshot-represented-registry-packet',
+            source: 'phoenix-graph-rebuild',
+            scopeKind: 'global',
+            scopeId: 'global',
+            noteIds: ['note-1'],
+            builtAt: 1,
+            chunks: [],
+            mentions: [],
+            entityAnchors: [],
+            relationships: [],
+            events: [],
+            episodes: [],
+            temporalEdges: [],
+            causalEdges: [],
+            memoryState: [],
+            embeddingTargets: [],
+            embeddingVectors: [],
+            projectionRefs: [],
+            nodes: [],
+            edges: [],
+            counters: { embeddingTargets: 2 },
+            atlasPacket: {
+                schemaVersion: 'phoenix-atlas-packet/v1',
+                snapshotId: 'snapshot-represented-registry-packet',
+                scopeKind: 'global',
+                scopeId: 'global',
+                builtAt: 1,
+                sourceContract: {
+                    authority: 'rust-atlas-packet',
+                    identityAuthority: 'registry',
+                    vectorContract: 'vectors missing',
+                    tsGraphBuilderRole: 'compatibility-only',
+                },
+                objects: [
+                    {
+                        id: 'object:entity:amara',
+                        family: 'registry',
+                        status: 'accepted',
+                        kind: 'character',
+                        label: 'Amara',
+                        styleKey: 'character',
+                        lane: 'entity_anchor',
+                        structuralRole: 'child',
+                        registryEntityId: 'amara',
+                        noteIds: ['note-1'],
+                        chunkIds: [],
+                        anchorIds: [],
+                        evidenceIds: [],
+                        sourceIds: ['amara'],
+                        targetIds: [],
+                    },
+                    {
+                        id: 'object:entity:arcadia',
+                        family: 'registry',
+                        status: 'accepted',
+                        kind: 'location',
+                        label: 'Arcadia',
+                        styleKey: 'location',
+                        lane: 'entity_anchor',
+                        structuralRole: 'child',
+                        registryEntityId: 'arcadia',
+                        noteIds: ['note-1'],
+                        chunkIds: [],
+                        anchorIds: [],
+                        evidenceIds: [],
+                        sourceIds: ['arcadia'],
+                        targetIds: [],
+                    },
+                ],
+                manifoldTargets: [
+                    {
+                        id: 'embed:entity:amara',
+                        objectId: 'object:entity:amara',
+                        family: 'entity',
+                        admission: 'admitted',
+                        status: 'accepted',
+                        vectorStatus: 'missing',
+                        coordinateSource: 'deterministic-signature',
+                        kind: 'entity',
+                        label: 'Amara',
+                        sourceId: 'amara',
+                        registryEntityId: 'amara',
+                        evidenceIds: [],
+                    },
+                    {
+                        id: 'embed:entity:arcadia',
+                        objectId: 'object:entity:arcadia',
+                        family: 'entity',
+                        admission: 'admitted',
+                        status: 'accepted',
+                        vectorStatus: 'missing',
+                        coordinateSource: 'deterministic-signature',
+                        kind: 'entity',
+                        label: 'Arcadia',
+                        sourceId: 'arcadia',
+                        registryEntityId: 'arcadia',
+                        evidenceIds: [],
+                    },
+                ],
+                counters: {
+                    objects: 2,
+                    manifoldTargets: 2,
+                    registryEntities: 2,
+                    evidenceAnchors: 0,
+                    modelVectors: 0,
+                    families: [],
+                },
+            },
+        } as any;
+
+        const atlas = buildGraphRebuildEmbeddingAtlas(snapshot, 'siegel');
+        const amara = atlas.nodes.find((node) => node.id === 'embed:entity:amara');
+        const arcadia = atlas.nodes.find((node) => node.id === 'embed:entity:arcadia');
+
+        expect(graphRebuildEmbeddingTargetCount(snapshot)).toBe(2);
+        expect(amara?.kind).toBe('character');
+        expect(amara?.metadata?.['entityKind']).toBe('character');
+        expect(arcadia?.kind).toBe('location');
+        expect(arcadia?.metadata?.['entityKind']).toBe('location');
+        expect(atlas.nodes.filter((node) => node.id.startsWith('embed:entity:'))).toHaveLength(2);
+    });
+
+    it('repairs packet target object refs so anchors and memory do not duplicate entities', () => {
+        const snapshot = {
+            schemaVersion: 'phoenix-graph-rebuild/v1',
+            id: 'snapshot-entity-duplicate-refs',
+            source: 'phoenix-graph-rebuild',
+            scopeKind: 'global',
+            scopeId: 'global',
+            noteIds: ['note-1'],
+            builtAt: 1,
+            chunks: [],
+            mentions: [],
+            entityAnchors: [{
+                id: 'anchor-kai',
+                noteId: 'note-1',
+                chunkId: 'chunk-1',
+                surface: 'Kai',
+                sourceStart: 0,
+                sourceEnd: 3,
+                source: 'accepted_suggestion',
+                confidence: 0.92,
+                entityId: 'kai',
+                status: 'accepted',
+                generation: 1,
+            }],
+            relationships: [],
+            events: [],
+            episodes: [],
+            temporalEdges: [],
+            causalEdges: [],
+            memoryState: [],
+            embeddingTargets: [],
+            embeddingVectors: [],
+            projectionRefs: [],
+            nodes: [],
+            edges: [],
+            counters: { embeddingTargets: 3 },
+            atlasPacket: {
+                schemaVersion: 'phoenix-atlas-packet/v1',
+                snapshotId: 'snapshot-entity-duplicate-refs',
+                scopeKind: 'global',
+                scopeId: 'global',
+                builtAt: 1,
+                sourceContract: {
+                    authority: 'rust-atlas-packet',
+                    identityAuthority: 'registry',
+                    vectorContract: 'vectors missing',
+                    tsGraphBuilderRole: 'compatibility-only',
+                },
+                objects: [
+                    {
+                        id: 'kai',
+                        family: 'registry',
+                        status: 'accepted',
+                        kind: 'character',
+                        label: 'Kai',
+                        styleKey: 'character',
+                        lane: 'entity_anchor',
+                        structuralRole: 'child',
+                        registryEntityId: 'kai',
+                        noteIds: ['note-1'],
+                        chunkIds: [],
+                        anchorIds: ['anchor-kai'],
+                        evidenceIds: ['anchor-kai'],
+                        sourceIds: ['kai'],
+                        targetIds: [],
+                    },
+                    {
+                        id: 'atlas:anchor:anchor-kai',
+                        family: 'evidence',
+                        status: 'accepted',
+                        kind: 'entityAnchor',
+                        label: 'Kai',
+                        styleKey: 'anchor',
+                        lane: 'anchor_evidence',
+                        structuralRole: 'evidence',
+                        registryEntityId: 'kai',
+                        noteIds: ['note-1'],
+                        chunkIds: ['chunk-1'],
+                        anchorIds: ['anchor-kai'],
+                        evidenceIds: ['anchor-kai'],
+                        sourceIds: ['anchor-kai', 'kai'],
+                        targetIds: ['kai'],
+                    },
+                    {
+                        id: 'atlas:memory:rank-kai',
+                        family: 'memory',
+                        status: 'accepted',
+                        kind: 'memoryState',
+                        label: 'rank',
+                        styleKey: 'rankStatus',
+                        lane: 'memory_state',
+                        structuralRole: 'child',
+                        stateContextKind: 'rankStatus',
+                        registryEntityId: 'kai',
+                        noteIds: ['note-1'],
+                        chunkIds: [],
+                        anchorIds: [],
+                        evidenceIds: [],
+                        sourceIds: ['rank-kai'],
+                        targetIds: ['kai'],
+                    },
+                ],
+                manifoldTargets: [
+                    {
+                        id: 'embed:entity:kai',
+                        objectId: 'kai',
+                        family: 'registry',
+                        admission: 'admitted',
+                        status: 'accepted',
+                        vectorStatus: 'missing',
+                        coordinateSource: 'deterministic-signature',
+                        kind: 'entity',
+                        label: 'Kai',
+                        sourceId: 'kai',
+                        registryEntityId: 'kai',
+                        evidenceIds: ['anchor-kai'],
+                    },
+                    {
+                        id: 'embed:anchor:anchor-kai',
+                        objectId: 'kai',
+                        family: 'evidence',
+                        admission: 'admitted',
+                        status: 'accepted',
+                        vectorStatus: 'missing',
+                        coordinateSource: 'deterministic-signature',
+                        kind: 'anchor',
+                        label: 'Kai',
+                        sourceId: 'anchor-kai',
+                        registryEntityId: 'kai',
+                        evidenceIds: ['anchor-kai'],
+                    },
+                    {
+                        id: 'embed:memory:rank-kai',
+                        objectId: 'kai',
+                        family: 'memory',
+                        admission: 'admitted',
+                        status: 'accepted',
+                        vectorStatus: 'missing',
+                        coordinateSource: 'deterministic-signature',
+                        kind: 'memoryState',
+                        label: 'rank',
+                        sourceId: 'rank-kai',
+                        registryEntityId: 'kai',
+                        evidenceIds: [],
+                    },
+                ],
+                counters: {
+                    objects: 3,
+                    manifoldTargets: 3,
+                    registryEntities: 1,
+                    evidenceAnchors: 1,
+                    modelVectors: 0,
+                    families: [],
+                },
+            },
+        } as any;
+
+        const atlas = buildGraphRebuildEmbeddingAtlas(snapshot, 'siegel');
+        const ids = new Set(atlas.nodes.map((node) => node.id));
+        const memory = atlas.nodes.find((node) => node.id === 'embed:memory:rank-kai');
+
+        expect(ids.has('embed:entity:kai')).toBe(true);
+        expect(ids.has('embed:anchor:anchor-kai')).toBe(false);
+        expect(ids.has('embed:memory:rank-kai')).toBe(true);
+        expect(atlas.nodes.filter((node) => node.id.startsWith('embed:entity:'))).toHaveLength(1);
+        expect(memory?.kind).toBe('rank-status');
+        expect(memory?.metadata?.['graphMemoryStateKind']).toBe('rankStatus');
+        expect(atlas.nodes.find((node) => node.id === 'embed:entity:kai')?.metadata?.mentionCompaction).toMatchObject({
+            anchorCount: 1,
+            anchorIds: ['anchor-kai'],
+        });
+    });
+
+    it('curates embed manifolds to full graph targets without sentence and paragraph scaffolding', () => {
+        const snapshot = {
+            schemaVersion: 'phoenix-graph-rebuild/v1',
+            id: 'snapshot-curated-embed-targets',
+            source: 'phoenix-graph-rebuild',
+            scopeKind: 'global',
+            scopeId: 'global',
+            noteIds: ['note-1'],
+            builtAt: 1,
+            chunks: [],
+            mentions: [],
+            entityAnchors: [],
+            relationships: [],
+            events: [],
+            episodes: [],
+            temporalEdges: [],
+            causalEdges: [],
+            memoryState: [],
+            embeddingTargets: [
+                { id: 'embed:note:note-1', kind: 'note', sourceId: 'note-1', noteId: 'note-1', label: 'Document 1', text: 'Document spine', evidenceIds: [] },
+                { id: 'embed:chunk:chunk-1', kind: 'chunk', sourceId: 'chunk-1', noteId: 'note-1', chunkId: 'chunk-1', label: 'Chunk 1', text: 'Chunk spine', evidenceIds: [], parentIds: ['embed:note:note-1'] },
+                { id: 'embed:document-unit:paragraph-1', kind: 'documentUnit', sourceId: 'paragraph-1', noteId: 'note-1', chunkId: 'chunk-1', label: 'Paragraph 1', text: 'document_sidecar:paragraph\nkind:paragraph', evidenceIds: [], parentIds: ['embed:chunk:chunk-1'] },
+                { id: 'embed:document-unit:sentence-1', kind: 'documentUnit', sourceId: 'sentence-1', noteId: 'note-1', chunkId: 'chunk-1', label: 'Sentence 1', text: 'document_sidecar:sentence\nkind:sentence', evidenceIds: [], parentIds: ['embed:document-unit:paragraph-1'] },
+                { id: 'embed:document-unit:leaf-1', kind: 'documentUnit', sourceId: 'leaf-1', noteId: 'note-1', chunkId: 'chunk-1', label: 'Leaf', text: 'document_sidecar:retrieval_unit\nkind:leaf', evidenceIds: [], parentIds: ['embed:chunk:chunk-1'] },
+                { id: 'embed:document-unit:claim-1', kind: 'documentUnit', sourceId: 'claim-1', noteId: 'note-1', chunkId: 'chunk-1', label: 'Claim', text: 'document_sidecar:rhetorical_unit\nkind:claim', evidenceIds: [], parentIds: ['embed:chunk:chunk-1'] },
+                { id: 'embed:document-unit:action-1', kind: 'documentUnit', sourceId: 'action-1', noteId: 'note-1', chunkId: 'chunk-1', label: 'Action block', text: 'document_sidecar:rhetorical_unit\nkind:action_block', evidenceIds: [], parentIds: ['embed:chunk:chunk-1'] },
+                { id: 'embed:document-unit:contrast-1', kind: 'documentUnit', sourceId: 'contrast-1', noteId: 'note-1', chunkId: 'chunk-1', label: 'Contrast', text: 'document_sidecar:rhetorical_unit\nkind:contrast', evidenceIds: [], parentIds: ['embed:chunk:chunk-1'] },
+                { id: 'embed:document-unit:looked-1', kind: 'documentUnit', sourceId: 'looked-1', noteId: 'note-1', chunkId: 'chunk-1', label: 'Looked', text: 'relation_type:looked\nkind:action', evidenceIds: [], parentIds: ['embed:chunk:chunk-1'] },
+                { id: 'embed:document-unit:glanced-1', kind: 'documentUnit', sourceId: 'glanced-1', noteId: 'note-1', chunkId: 'chunk-1', label: 'Glanced', text: 'relation_type:glanced\nkind:action', evidenceIds: [], parentIds: ['embed:chunk:chunk-1'] },
+                { id: 'embed:document-unit:decision-1', kind: 'documentUnit', sourceId: 'decision-1', noteId: 'note-1', chunkId: 'chunk-1', label: 'Decision', text: 'semantic_situation:decision\nkind:decision', evidenceIds: [], parentIds: ['embed:chunk:chunk-1'] },
+                { id: 'embed:document-evidence:evidence-1', kind: 'evidenceSpan', sourceId: 'evidence-1', noteId: 'note-1', chunkId: 'chunk-1', label: 'Evidence', text: 'document_evidence_span:evidence-1', evidenceIds: ['evidence-1'], parentIds: ['embed:chunk:chunk-1'] },
+                { id: 'embed:graph-fact:observe-1', kind: 'graphFact', sourceId: 'observe-1', label: 'Kai observes Hazel', text: 'Kai observes Hazel [accepted]', evidenceIds: ['evidence-1'], parentIds: ['embed:chunk:chunk-1'] },
+                { id: 'embed:graph-fact:weak-co', kind: 'graphFact', sourceId: 'weak-co', label: 'Kai co_occurs_with Hazel', text: 'Kai co_occurs_with Hazel', evidenceIds: [], lane: 'cooccurrence_weak' },
+                { id: 'embed:raw-mention:kai', kind: 'rawMention', sourceId: 'raw-mention:kai', label: 'Kai mention', text: 'raw mention scaffold', evidenceIds: [] },
+            ],
+            embeddingVectors: [],
+            projectionRefs: [],
+            nodes: [],
+            edges: [],
+            counters: null as any,
+        } as any;
+
+        const atlas = buildGraphRebuildEmbeddingAtlas(snapshot, 'product');
+        const ids = atlas.nodes.map((node) => node.id);
+        const idSet = new Set(ids);
+
+        expect(ids).toEqual(expect.arrayContaining([
+            'embed:note:note-1',
+            'embed:chunk:chunk-1',
+            'embed:document-unit:leaf-1',
+            'embed:document-unit:claim-1',
+            'embed:document-unit:action-1',
+            'embed:document-unit:contrast-1',
+            'embed:document-unit:looked-1',
+            'embed:document-unit:glanced-1',
+            'embed:document-unit:decision-1',
+            'embed:document-evidence:evidence-1',
+            'embed:graph-fact:observe-1',
+        ]));
+        expect(idSet.has('embed:document-unit:paragraph-1')).toBe(false);
+        expect(idSet.has('embed:document-unit:sentence-1')).toBe(false);
+        expect(idSet.has('embed:graph-fact:weak-co')).toBe(false);
+        expect(idSet.has('embed:raw-mention:kai')).toBe(false);
     });
 
     it('uses graph model v2 projection edges for graph-rebuild relationship rendering', () => {
@@ -701,15 +1557,21 @@ describe('embedding atlas projection', () => {
         expect(byId.get('embed:note:note-1')).toMatchObject({ capId: 'document:note-1', signalLane: 'document_spine' });
         expect(byId.get('embed:structure-root:note-1:document-structure')).toMatchObject({
             capId: 'document:note-1:root:document',
+            parentCapId: 'document:note-1',
             signalLane: 'document_spine',
             parentNodeId: 'embed:note:note-1',
         });
         expect(byId.get('embed:chunk:chunk-1')).toMatchObject({
             capId: 'document:note-1:chunk:chunk-1',
+            parentCapId: 'document:note-1:root:document',
             signalLane: 'chunk_spine',
             parentNodeId: 'embed:structure-root:note-1:document-structure',
         });
-        expect(byId.get('embed:entity:kai')).toMatchObject({ capId: 'identity:kai', signalLane: 'entity_anchor' });
+        expect(byId.get('embed:entity:kai')).toMatchObject({
+            capId: 'identity:kai',
+            parentCapId: 'document:note-1:chunk:chunk-1',
+            signalLane: 'entity_anchor',
+        });
         expect(nodesById.has('embed:anchor:a1')).toBe(false);
         expect(nodesById.get('embed:entity:kai')?.metadata?.mentionCompaction).toMatchObject({
             anchorCount: 1,
@@ -899,6 +1761,10 @@ describe('embedding atlas projection', () => {
         expect(rootOne['capId']).toBe('document:note-1:root:identity');
         expect(rootTwo['capId']).toBe('document:note-2:root:identity');
         expect(entity['capId']).toBe('identity:amara');
+        expect(entity['parentCapIds']).toEqual(expect.arrayContaining([
+            'document:note-1:chunk:chunk-1',
+            'document:note-2:chunk:chunk-2',
+        ]));
         expect(entity['supportNoteIds']).toEqual(['note-1', 'note-2']);
         expect(dot3(entity['capDirection'] as number[], average3(noteOne['capDirection'] as number[], noteTwo['capDirection'] as number[]))).toBeGreaterThan(0.82);
         expect(Number(noteOne['shellRadius'])).toBeGreaterThan(Number(rootOne['shellRadius']));

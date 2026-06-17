@@ -14,6 +14,9 @@
     "desktop:build": "npm run build && cargo build --release --manifest-path src-tauri/Cargo.toml",
     "watch": "ng build --watch --configuration development",
     "hopf:space": "node scripts/hopf-resonance-space-smoke.mjs",
+    "bench:graph:bifurcated": "node scripts/graph-build-bifurcated-baseline.mjs",
+    "bench:graph:zeroshot": "node scripts/graph-build-zeroshot-baseline.mjs",
+    "audit:graph-taxonomy": "node scripts/graph-atlas-taxonomy-audit.mjs",
     "test": "vitest run",
     "test:watch": "vitest"
   },

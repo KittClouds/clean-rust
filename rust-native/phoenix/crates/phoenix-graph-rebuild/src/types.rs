@@ -150,9 +150,25 @@ pub struct GraphEmbeddingTarget {
     pub note_id: Option<CompactString>,
     pub chunk_id: Option<CompactString>,
     pub entity_id: Option<EntityId>,
+    #[serde(default)]
+    pub entity_kind: Option<CompactString>,
     pub label: CompactString,
     pub text: CompactString,
     pub evidence_ids: Vec<CompactString>,
+    #[serde(default)]
+    pub lane: Option<CompactString>,
+    #[serde(default)]
+    pub structural_role: Option<CompactString>,
+    #[serde(default)]
+    pub admission_status: Option<CompactString>,
+    #[serde(default)]
+    pub work_status: Option<CompactString>,
+    #[serde(default)]
+    pub style_key: Option<CompactString>,
+    #[serde(default)]
+    pub document_unit_kind: Option<CompactString>,
+    #[serde(default)]
+    pub state_context_kind: Option<CompactString>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub parent_ids: Vec<CompactString>,
 }

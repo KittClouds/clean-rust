@@ -44,6 +44,7 @@ pub fn build_embedding_targets(
         text: note_embedding_text(note_id, note_text),
         evidence_ids: Vec::new(),
         parent_ids: Vec::new(),
+        ..GraphEmbeddingTarget::default()
     });
     targets.extend(structure_root_targets(note_id));
     targets.extend(chunks.iter().map(|chunk| GraphEmbeddingTarget {
@@ -57,6 +58,7 @@ pub fn build_embedding_targets(
         text: chunk_embedding_text(note_text, chunk),
         evidence_ids: Vec::new(),
         parent_ids: vec![structure_root_id(&chunk.note_id, "document-structure")],
+        ..GraphEmbeddingTarget::default()
     }));
     targets.extend(nodes.iter().map(|node| GraphEmbeddingTarget {
         id: format_compact!("embed:entity:{}", node.entity_id.0),
@@ -69,6 +71,7 @@ pub fn build_embedding_targets(
         text: node.label.clone(),
         evidence_ids: node.anchor_ids.clone(),
         parent_ids: Vec::new(),
+        ..GraphEmbeddingTarget::default()
     }));
     targets.extend(representative_anchors(anchors).into_iter().map(|anchor| {
         GraphEmbeddingTarget {
@@ -82,6 +85,7 @@ pub fn build_embedding_targets(
             text: anchor.surface.clone(),
             evidence_ids: vec![anchor.id.clone()],
             parent_ids: vec![structure_root_id(&anchor.note_id, "evidence")],
+            ..GraphEmbeddingTarget::default()
         }
     }));
     targets.extend(
@@ -113,6 +117,7 @@ pub fn build_embedding_targets(
                 ),
                 evidence_ids: relationship.evidence_anchor_ids.clone(),
                 parent_ids: Vec::new(),
+                ..GraphEmbeddingTarget::default()
             }),
     );
     targets.extend(events.iter().map(|event| GraphEmbeddingTarget {
@@ -126,6 +131,7 @@ pub fn build_embedding_targets(
         text: event.label.clone(),
         evidence_ids: event.evidence_anchor_ids.clone(),
         parent_ids: Vec::new(),
+        ..GraphEmbeddingTarget::default()
     }));
     targets.extend(
         temporal_edges
@@ -153,6 +159,7 @@ pub fn build_embedding_targets(
                 .as_ref()
                 .map(|note_id| vec![structure_root_id(note_id, "identity")])
                 .unwrap_or_default(),
+            ..GraphEmbeddingTarget::default()
         }
     }));
     targets
@@ -198,6 +205,7 @@ fn structure_root_targets(note_id: &str) -> Vec<GraphEmbeddingTarget> {
         text: format_compact!("structure_root:{} note:{} {}", key, note_id, text),
         evidence_ids: Vec::new(),
         parent_ids: vec![format_compact!("embed:note:{note_id}")],
+        ..GraphEmbeddingTarget::default()
     })
     .collect()
 }
@@ -252,6 +260,7 @@ fn temporal_target(note_id: &str, edge: &GraphTemporalEdge, prefix: &str) -> Gra
         ),
         evidence_ids: edge.evidence_ids.clone(),
         parent_ids: Vec::new(),
+        ..GraphEmbeddingTarget::default()
     }
 }
 

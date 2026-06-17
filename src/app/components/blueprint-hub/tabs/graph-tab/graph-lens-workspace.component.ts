@@ -115,7 +115,7 @@ function readPersistedGraphLensState(): GraphLensState {
                 (entitySelected)="entitySelected.emit($event)"
                 (addEntityRequested)="addEntityRequested.emit()"
                 (scanRequested)="scanRequested.emit(lens())"
-                (styleRequested)="styleRequested.emit()"
+                (styleRequested)="styleRequested.emit($event)"
                 (atlasModeChange)="atlasModeChange.emit($event)"
                 (atlasSearchChange)="atlasSearchChange.emit($event)"
                 (reviewRequested)="handleCanvasReview($event)"
@@ -169,7 +169,7 @@ export class GraphLensWorkspaceComponent implements OnDestroy {
     @Output() entitySelected = new EventEmitter<RegisteredEntity>();
     @Output() addEntityRequested = new EventEmitter<void>();
     @Output() scanRequested = new EventEmitter<GraphLensState>();
-    @Output() styleRequested = new EventEmitter<void>();
+    @Output() styleRequested = new EventEmitter<string | void>();
     @Output() atlasModeChange = new EventEmitter<AtlasMode>();
     @Output() lensModeChange = new EventEmitter<GraphLensMode>();
     @Output() atlasSearchChange = new EventEmitter<string>();

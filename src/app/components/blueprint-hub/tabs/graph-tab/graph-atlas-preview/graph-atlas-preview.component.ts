@@ -6,9 +6,7 @@ import { LucideAngularModule } from 'lucide-angular';
 
 import { entitySourceSystem, type RegisteredEntity } from '../../../../../lib/registry';
 import type { EntitySuggestionProviderId } from '../../../../../lib/entity-suggestions/entity-suggestion.types';
-import { entityColorStore } from '../../../../../lib/store/entityColorStore';
 import { PhoenixUiApiService } from '../../../../../services/phoenix-ui-api.service';
-import type { PhoenixGraphDeltaBinaryResult } from '../../../../../services/phoenix-wasm.service';
 import { PhoenixMachineControlService } from '../../../../../services/phoenix-machine-control.service';
 import type { AtlasManifoldMode } from '../../../../../services/manifold-atlas.types';
 import { buildAtlasCountReconciliation } from '../../../../../services/atlas-count-ledger.model';
@@ -17,7 +15,7 @@ import type { GraphRebuildCounters, GraphRebuildSnapshot } from '../../../../../
 import { buildGraphProjectionContractReport } from '../../../../../graph-rebuild/graph-projection-contract-report';
 import { type EmbeddingAtlasData, type EmbeddingQueryTrace, type EmbeddingSourcePreview } from './graph-embedding-atlas';
 import { manifoldAdapter } from './graph-manifold-atlas';
-import { buildGraphRebuildEmbeddingAtlas } from './graph-rebuild-embedding-atlas';
+import { buildGraphRebuildEmbeddingAtlas, graphRebuildEmbeddingTargetCount } from './graph-rebuild-embedding-atlas';
 import {
     registryEntityKindOrder,
     registryEntityProjectionPoint,
@@ -234,9 +232,11 @@ function readPersistedAtlasViewState(): PersistedAtlasViewState {
                         </button>
                     </div>
                     }
-                    @if (atlasMode === 'embeddings') {
+                    @if (atlasMode === 'graph' || atlasMode === 'embeddings') {
                     <div class="canvas-projection-rail pointer-events-auto absolute left-4 top-16 z-30 flex flex-wrap items-center gap-0.5 overflow-x-auto border border-white/10 bg-black/65 p-0.5 shadow-xl backdrop-blur"
-                        [class.canvas-projection-rail-top]="controlsCollapsed" aria-label="Embedding manifold projection">
+                        [class.canvas-projection-rail-top]="controlsCollapsed && atlasMode === 'embeddings'"
+                        [class.canvas-projection-rail-graph]="atlasMode === 'graph'"
+                        [attr.aria-label]="atlasMode === 'graph' ? 'Graph manifold layout' : 'Embedding manifold projection'">
                         <div class="flex border-r border-white/10 pr-1">
                             <button type="button" class="px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.1em] transition"
                                 [class.bg-violet-500/20]="manifoldMode() === 'hybrid'" [class.text-violet-100]="manifoldMode() === 'hybrid'"
@@ -276,6 +276,17 @@ function readPersistedAtlasViewState(): PersistedAtlasViewState {
                         }
                     </div>
                     }
+                    @if (atlasTruth(); as truth) {
+                    <div class="atlas-truth-strip pointer-events-none absolute right-4 top-16 z-30 flex max-w-[min(620px,calc(100%-2rem))] flex-wrap justify-end gap-1.5 text-[10px] font-semibold uppercase tracking-[0.12em]">
+                        <span>{{ truth.source }}</span>
+                        <span>Scope {{ truth.scopeId }}</span>
+                        <span>Snapshot {{ truth.snapshotId }}</span>
+                        <span>Built {{ truth.builtAt }}</span>
+                        <span>{{ truth.lens }}</span>
+                        <span>{{ truth.layout }}</span>
+                        <span>Vectors {{ truth.vectors }}</span>
+                    </div>
+                    }
                     @if (activeNodeCount() === 0) {
                     <div class="flex h-full min-h-[430px] items-center justify-center rounded-none border border-dashed border-white/10 text-center">
                         <div>
@@ -297,6 +308,7 @@ function readPersistedAtlasViewState(): PersistedAtlasViewState {
                         [busy]="canvasReviewBusy"
                         (close)="closeCanvasInspector()"
                         (focusRequested)="focusCanvasNodes($event)"
+                        (styleRequested)="styleRequested.emit($event)"
                         (sourceRequested)="sourceRequested.emit($event)"
                         (reviewRequested)="reviewRequested.emit($event)">
                     </app-graph-canvas-inspector>
@@ -419,6 +431,14 @@ function readPersistedAtlasViewState(): PersistedAtlasViewState {
                             }
                             @if (settings.layoutMode === 'productManifold') {
                             <button type="button" class="galaxy-control-button" (click)="toggleProductKlein()">Klein Ball<span>{{ settings.productKleinVisible ? 'on' : 'off' }}</span></button>
+                            }
+                        </div>
+                        <div class="mt-3 grid grid-cols-2 gap-2">
+                            <button type="button" class="galaxy-control-button" (click)="styleRequested.emit(currentLensStyleKey())">Style this lens<span>{{ currentLensStyleKey() }}</span></button>
+                            @if (selectedStyleKey(); as styleKey) {
+                            <button type="button" class="galaxy-control-button" (click)="styleRequested.emit(styleKey)">Style selected kind<span>{{ styleKey }}</span></button>
+                            } @else {
+                            <button type="button" class="galaxy-control-button" (click)="styleRequested.emit(currentLensStyleKey())">Style selected kind<span>lens default</span></button>
                             }
                         </div>
                         @if ((settings.layoutMode === 'hybridSpace' || settings.layoutMode === 'productManifold') && settings.hybridShellVisible) {
@@ -576,6 +596,27 @@ function readPersistedAtlasViewState(): PersistedAtlasViewState {
             flex-wrap: nowrap;
             transform: none;
         }
+        .canvas-projection-rail-graph {
+            top: 112px;
+            max-width: calc(100% - 32px);
+        }
+        .atlas-truth-strip {
+            color: rgb(212 212 216);
+        }
+        .atlas-truth-strip span {
+            max-width: 220px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.10);
+            background: rgba(0, 0, 0, 0.58);
+            padding: 4px 8px;
+        }
+        .atlas-truth-strip span:first-child {
+            border-color: rgba(45, 212, 191, 0.22);
+            color: rgb(153 246 228);
+        }
         .canvas-projection-rail::-webkit-scrollbar { display: none; }
         @container (max-width: 820px) {
             .canvas-projection-rail-top {
@@ -584,6 +625,15 @@ function readPersistedAtlasViewState(): PersistedAtlasViewState {
                 max-width: calc(100% - 32px);
                 flex-wrap: wrap;
                 transform: none;
+            }
+            .canvas-projection-rail-graph {
+                top: 112px;
+            }
+            .atlas-truth-strip {
+                left: 16px;
+                right: 16px;
+                top: 154px;
+                justify-content: flex-start;
             }
         }
         .canvas-control-rail::-webkit-scrollbar { display: none; }
@@ -839,7 +889,6 @@ export class GraphAtlasPreviewComponent implements OnInit {
     private readonly phoenixUiApi = inject(PhoenixUiApiService);
     private readonly machine = inject(PhoenixMachineControlService);
     private readonly hubService = inject(BlueprintHubService);
-    private graphLoadToken = 0;
     private readonly atlasLoadedKeys = new Map<AtlasManifoldMode, string>();
     private readonly atlasLoadingKeys = new Map<AtlasManifoldMode, string>();
     private activeGraphCache: ActiveAtlasGraph | null = null;
@@ -883,7 +932,7 @@ export class GraphAtlasPreviewComponent implements OnInit {
     @Output() entitySelected = new EventEmitter<RegisteredEntity>();
     @Output() addEntityRequested = new EventEmitter<void>();
     @Output() scanRequested = new EventEmitter<GraphLensState>();
-    @Output() styleRequested = new EventEmitter<void>();
+    @Output() styleRequested = new EventEmitter<string | void>();
     @Output() atlasModeChange = new EventEmitter<AtlasMode>();
     @Output() lensModeChange = new EventEmitter<GraphLensMode>();
     @Output() atlasSearchChange = new EventEmitter<string>();
@@ -920,7 +969,8 @@ export class GraphAtlasPreviewComponent implements OnInit {
     readonly embeddingAtlas = computed(() => this.embeddingAtlasByMode()[this.manifoldMode()]);
     readonly graphRebuildEmbeddingAtlas = computed(() => {
         const snapshot = this.graphSnapshotSignal();
-        return snapshot?.embeddingTargets.length
+        if (!snapshot) return null;
+        return graphRebuildEmbeddingTargetCount(snapshot) > 0
             ? buildGraphRebuildEmbeddingAtlas(snapshot, this.manifoldMode())
             : null;
     });
@@ -994,7 +1044,10 @@ export class GraphAtlasPreviewComponent implements OnInit {
 
     ngOnInit(): void {
         if (this.atlasMode === 'graph' && this.settings.layoutMode === 'single') {
-            this.settings = mergeGalaxySettings({ ...this.settings, layoutMode: 'multiGalaxy' });
+            this.settings = mergeGalaxySettings({
+                ...this.settings,
+                ...this.layoutPatchForManifold(this.manifoldMode()),
+            });
         }
         this.atlasModeChange.emit(this.atlasMode);
     }
@@ -1013,14 +1066,12 @@ export class GraphAtlasPreviewComponent implements OnInit {
         this.closeCanvasInspector();
         if (mode === 'entities' && this.settings.layoutMode !== 'single') {
             this.updateSettings({ layoutMode: 'single' });
-        } else if (mode === 'graph' && this.settings.layoutMode !== 'multiGalaxy') {
-            this.updateSettings({ layoutMode: 'multiGalaxy' });
+        } else if (mode === 'graph' && this.settings.layoutMode === 'single') {
+            this.updateSettings(this.layoutPatchForManifold(this.manifoldMode()));
         } else if (mode === 'embeddings') {
             const layoutMode = this.layoutForManifold(this.manifoldMode());
             if (this.settings.layoutMode === 'single' || this.settings.layoutMode !== layoutMode && this.manifoldMode() !== 'hybrid') {
-                this.updateSettings(layoutMode === 'hybridSpace'
-                    ? { layoutMode, edgeMode: 'hidden', hybridHorospheresVisible: true, hybridShellOpacity: Math.min(this.settings.hybridShellOpacity, 0.72) }
-                    : { layoutMode });
+                this.updateSettings(this.layoutPatchForManifold(this.manifoldMode()));
             }
             void this.refreshEmbeddingAtlas(this.currentReadContext(), this.manifoldMode());
         }
@@ -1048,7 +1099,7 @@ export class GraphAtlasPreviewComponent implements OnInit {
     }
 
     setLayoutMode(mode: GalaxyLayoutMode): void {
-        if (mode !== 'single' && mode !== 'multiGalaxy' && this.atlasMode !== 'embeddings') return;
+        if (this.atlasMode === 'entities' && mode !== 'single') return;
         if ((mode === 'hybridSpace' || mode === 'multiGalaxy') && this.manifoldMode() !== 'hybrid') {
             this.machine.setManifoldMode('hybrid');
         } else if (mode === 'hopfProjection' && this.manifoldMode() !== 'hopf') {
@@ -1061,20 +1112,18 @@ export class GraphAtlasPreviewComponent implements OnInit {
             this.machine.setManifoldMode('siegel');
         }
         this.updateSettings(mode === 'hybridSpace'
-            ? { layoutMode: mode, edgeMode: 'hidden', hybridHorospheresVisible: true, hybridShellOpacity: Math.min(this.settings.hybridShellOpacity, 0.72) }
+            ? this.hybridShellLayoutPatch(mode)
             : { layoutMode: mode });
         this.persistViewState();
     }
 
     setManifoldMode(mode: AtlasManifoldMode): void {
         this.machine.setManifoldMode(mode);
-        if (this.atlasMode !== 'embeddings') this.setAtlasMode('embeddings');
-        const layoutMode = this.layoutForManifold(mode);
-        if (this.settings.layoutMode !== layoutMode) this.updateSettings(layoutMode === 'hybridSpace'
-            ? { layoutMode, edgeMode: 'hidden', hybridHorospheresVisible: true, hybridShellOpacity: Math.min(this.settings.hybridShellOpacity, 0.72) }
-            : { layoutMode });
+        const patch = this.layoutPatchForManifold(mode);
+        if (this.settings.layoutMode !== patch.layoutMode) this.updateSettings(patch);
         this.queryTrace.set(null);
         this.selectedEntityId = null;
+        if (this.atlasMode === 'embeddings') void this.refreshEmbeddingAtlas(this.currentReadContext(), mode);
         this.persistViewState();
     }
 
@@ -1128,11 +1177,18 @@ export class GraphAtlasPreviewComponent implements OnInit {
         if (this.usesGraphRebuildEmbeddingAtlas()) {
             const snapshot = this.graphSnapshotSignal();
             const atlas = this.graphRebuildEmbeddingAtlas();
-            const targets = atlas?.nodes.length ?? snapshot?.embeddingTargets.length ?? 0;
-            const totalTargets = snapshot?.embeddingTargets.length ?? targets;
+            const targets = atlas?.nodes.length ?? graphRebuildEmbeddingTargetCount(snapshot);
+            const totalTargets = graphRebuildEmbeddingTargetCount(snapshot) || targets;
             const targetLabel = totalTargets > targets ? `${targets} visible / ${totalTargets} targets` : `${targets} targets`;
-            const chunks = snapshot?.embeddingTargets.filter((target) => target.kind === 'chunk').length ?? snapshot?.chunks.length ?? 0;
-            const entities = snapshot?.embeddingTargets.filter((target) => target.kind === 'entity').length ?? snapshot?.nodes.length ?? 0;
+            const packetTargets = snapshot?.atlasPacket?.manifoldTargets || [];
+            const chunks = snapshot?.embeddingTargets.filter((target) => target.kind === 'chunk').length
+                || packetTargets.filter((target) => target.kind === 'chunk').length
+                || snapshot?.chunks.length
+                || 0;
+            const entities = snapshot?.embeddingTargets.filter((target) => target.kind === 'entity').length
+                || packetTargets.filter((target) => target.kind === 'entity').length
+                || snapshot?.nodes.length
+                || 0;
             return `${targetLabel} / ${chunks} chunks / ${entities} entities / ${atlas?.edges.length ?? 0} links`;
         }
         const inventory = this.graphInventory();
@@ -1222,6 +1278,25 @@ export class GraphAtlasPreviewComponent implements OnInit {
 
     canvasBatchRecords() {
         return graphCanvasBatchRecords(this.batchSelectedNodeIds(), this.activeNodes());
+    }
+
+    selectedStyleKey(): string {
+        return this.canvasInspectorRecord()?.styleKey || this.canvasHoverRecord()?.styleKey || '';
+    }
+
+    currentLensStyleKey(): string {
+        const selected = this.selectedStyleKey();
+        if (selected) return selected;
+        if (this.atlasMode === 'entities') return 'CHARACTER';
+        if (this.atlasMode === 'embeddings') return this.manifoldMode() === 'lorentz' ? 'temporalFact' : 'graphFact';
+        switch (this.canvasLens()) {
+            case 'entities': return 'CHARACTER';
+            case 'structure': return 'document';
+            case 'discourse': return 'communication';
+            case 'accepted': return 'approval';
+            case 'proposed': return 'rankStatus';
+            default: return 'graphFact';
+        }
     }
 
     runAtlasQuery(): void {
@@ -1442,13 +1517,35 @@ export class GraphAtlasPreviewComponent implements OnInit {
 
     dataSourceLabel(): string {
         if (this.atlasMode === 'entities') return 'Registry';
-        if (this.atlasMode === 'graph') return 'Graph Rebuild Snapshot';
+        if (this.atlasMode === 'graph') return this.graphSnapshotSignal()?.atlasPacket?.sourceContract.authority || 'Graph Rebuild Snapshot';
         if (this.usesGraphRebuildEmbeddingAtlas()) return `Graph Rebuild Snapshot -> ${this.currentProjectionLabel()} Space`;
         if (this.manifoldMode() === 'lorentz') return 'Hierarchy Caps Sidecar';
         if (this.manifoldMode() === 'hopf') return 'Semantic Atlas -> Hopf Projection';
         if (this.manifoldMode() === 'product') return 'Semantic Atlas -> Product Space';
         if (this.manifoldMode() === 'siegel') return 'Semantic Atlas -> Siegel-Finsler Space';
         return 'Semantic Atlas -> Hybrid Space';
+    }
+
+    atlasTruth(): { source: string; scopeId: string; snapshotId: string; builtAt: string; lens: string; layout: string; vectors: string } | null {
+        const packet = this.graphSnapshotSignal()?.atlasPacket;
+        if (!packet) return null;
+        const layout = this.atlasMode === 'entities'
+            ? 'registry / single'
+            : `${this.manifoldMode()} / ${this.settings.layoutMode}`;
+        const lens = this.atlasMode === 'graph'
+            ? `lens ${this.canvasLens()}`
+            : this.atlasMode === 'embeddings'
+                ? `lens ${this.currentProjectionLabel()}`
+                : 'lens registry';
+        return {
+            source: packet.sourceContract.authority || 'rust-atlas-packet',
+            scopeId: compactTruthId(packet.scopeId),
+            snapshotId: compactTruthId(packet.snapshotId),
+            builtAt: builtAtTruthLabel(packet.builtAt),
+            lens,
+            layout,
+            vectors: vectorTruthLabel(packet.counters.modelVectors, packet.sourceContract.vectorContract),
+        };
     }
 
     graphAnchorCount(): number {
@@ -1609,6 +1706,20 @@ export class GraphAtlasPreviewComponent implements OnInit {
         if (mode === 'lorentz') return 'lorentzTree';
         if (mode === 'siegel') return 'siegelFinsler';
         return 'hybridSpace';
+    }
+
+    private layoutPatchForManifold(mode: AtlasManifoldMode): Partial<GalaxyRenderSettings> & { layoutMode: GalaxyLayoutMode } {
+        const layoutMode = this.layoutForManifold(mode);
+        return layoutMode === 'hybridSpace' ? this.hybridShellLayoutPatch(layoutMode) : { layoutMode };
+    }
+
+    private hybridShellLayoutPatch(layoutMode: GalaxyLayoutMode): Partial<GalaxyRenderSettings> & { layoutMode: GalaxyLayoutMode } {
+        return {
+            layoutMode,
+            edgeMode: 'hidden',
+            hybridHorospheresVisible: true,
+            hybridShellOpacity: Math.min(this.settings.hybridShellOpacity, 0.72),
+        };
     }
 
     private activeGraph(): ActiveAtlasGraph {
@@ -1795,22 +1906,6 @@ export class GraphAtlasPreviewComponent implements OnInit {
         return [...atlas.edges, ...anchorEdges];
     }
 
-    private async refreshGraphInventory(context: GraphAtlasReadContext): Promise<void> {
-        const token = ++this.graphLoadToken;
-        try {
-            const delta = await this.phoenixUiApi.knowledgeGraphDelta(context.searchScope);
-            if (token === this.graphLoadToken) {
-                this.graphInventory.set(filterGraphInventoryForNotes(
-                    graphInventoryFromDelta(delta),
-                    context.noteIds,
-                ));
-            }
-        } catch (error) {
-            console.warn('[GraphAtlasPreview] Failed to load graph inventory', error);
-            if (token === this.graphLoadToken) this.graphInventory.set(EMPTY_GRAPH_INVENTORY);
-        }
-    }
-
     private async refreshEmbeddingAtlas(context: GraphAtlasReadContext, manifold: AtlasManifoldMode, force = false): Promise<void> {
         const requestKey = `${manifold}:${context.key}`;
         if (!force && this.atlasLoadingKeys.get(manifold) === requestKey) return;
@@ -1856,171 +1951,30 @@ function emptyEmbeddingAtlas(sourceLabel: string): EmbeddingAtlasData {
     return { nodes: [], edges: [], sourceLabel, searchIndex: [] };
 }
 
-function graphLeavesFromAudit(audit: { nodeKinds: Array<{ key: string; count: number }> } | null): number | null {
-    return audit?.nodeKinds.find((bucket) => ['leaf', 'chunk'].includes(bucket.key))?.count ?? null;
+function compactTruthId(value: string): string {
+    const text = String(value || 'unknown');
+    if (text.length <= 18) return text;
+    return `${text.slice(0, 8)}...${text.slice(-6)}`;
 }
 
-function graphInventoryFromDelta(delta: PhoenixGraphDeltaBinaryResult): GraphInventory {
-    const nodes: GalaxyRenderableNode[] = [];
-    const idSet = new Set<string>();
-
-    for (const chunk of delta.chunks || []) {
-        const id = chunk.vertexId || `leaf:${chunk.chunkId}`;
-        if (!id || idSet.has(id)) continue;
-        idSet.add(id);
-        nodes.push({
-            id,
-            label: `Leaf ${chunk.chapterId}:${chunk.start}-${chunk.end}`,
-            kind: 'leaf',
-            totalMentions: 1,
-            ...stableAtlasPoint(id, nodes.length),
-            colorHsl: graphKindHsl('leaf'),
-            metadata: {
-                sourceType: 'graph',
-                graphKind: 'leaf',
-                graphColorKind: 'chunk',
-                graphNodeId: id,
-                chunkId: chunk.chunkId,
-                documentId: chunk.documentId,
-                noteId: chunk.noteId,
-                graphSource: 'graph_delta',
-            },
-        });
-    }
-
-    for (const node of delta.nodes || []) {
-        const id = node.nodeId;
-        if (!id || idSet.has(id)) continue;
-        idSet.add(id);
-        const kind = graphStateContextKind(normalizeGraphKind(node.kind || 'generic'), node.label || id);
-        nodes.push({
-            id,
-            label: node.label || id,
-            kind,
-            totalMentions: Math.max(1, Math.abs(Number(node.weight || 1))),
-            ...stableAtlasPoint(id, nodes.length),
-            colorHsl: graphKindHsl(kind),
-            metadata: {
-                sourceType: 'graph',
-                graphKind: kind,
-                graphColorKind: kind,
-                graphNodeId: id,
-                sourceEntityId: node.entityId,
-                documentId: node.documentId,
-                graphSource: 'graph_delta',
-            },
-        });
-    }
-
-    const edges: AtlasPreviewEdge[] = [];
-    const edgeSeen = new Set<string>();
-    for (const edge of delta.edges || []) {
-        if (!idSet.has(edge.sourceId) || !idSet.has(edge.targetId)) continue;
-        const id = `graph:${edge.sourceId}->${edge.targetId}:${edge.edgeType}`;
-        if (edgeSeen.has(id)) continue;
-        edgeSeen.add(id);
-        edges.push({
-            id,
-            sourceId: edge.sourceId,
-            targetId: edge.targetId,
-            type: edge.edgeType || 'graph-edge',
-            confidence: Math.max(0.25, Math.min(1.8, Math.abs(Number(edge.weight || 1)) / 8)),
-        });
-    }
-
-    return {
-        nodes,
-        edges,
-        kindCounts: graphKindCounts(nodes),
-        sourceLabel: 'backend graph delta',
-    };
+function builtAtTruthLabel(value: number): string {
+    if (!Number.isFinite(value) || value <= 0) return 'unknown';
+    const millis = value > 10_000_000_000 ? value : value * 1000;
+    const date = new Date(millis);
+    if (Number.isNaN(date.getTime())) return String(value);
+    return date.toISOString().replace('T', ' ').slice(0, 16);
 }
 
-function filterGraphInventoryForNotes(inventory: GraphInventory, noteIds: readonly string[]): GraphInventory {
-    if (!noteIds.length) return inventory;
-    const allowedNotes = new Set(noteIds);
-    const nodes = inventory.nodes.filter((node) => {
-        const metadata = node.metadata ?? {};
-        const noteId = String(metadata['noteId'] || metadata['documentId'] || '');
-        return allowedNotes.has(noteId);
-    });
-    const ids = new Set(nodes.map((node) => node.id));
-    const edges = inventory.edges.filter((edge) => ids.has(edge.sourceId) && ids.has(edge.targetId));
-    return {
-        ...inventory,
-        nodes,
-        edges,
-        kindCounts: graphKindCounts(nodes),
-    };
-}
-
-function graphKindCounts(nodes: GalaxyRenderableNode[]): Array<{ kind: string; count: number }> {
-    const counts = new Map<string, number>();
-    for (const node of nodes) {
-        const kind = normalizeGraphKind(node.kind);
-        counts.set(kind, (counts.get(kind) || 0) + 1);
-    }
-    return [...counts.entries()]
-        .map(([kind, count]) => ({ kind, count }))
-        .sort((left, right) => right.count - left.count || left.kind.localeCompare(right.kind));
+function vectorTruthLabel(modelVectors: number, contract: string): string {
+    if (modelVectors > 0) return `model ${modelVectors}`;
+    const normalized = String(contract || '').replace(/[_-]+/g, ' ').trim().toLowerCase();
+    if (!normalized || normalized.includes('missing') || normalized.includes('no model') || normalized.includes('none')) return 'missing';
+    if (normalized.includes('model')) return 'model';
+    return 'missing';
 }
 
 function normalizeGraphKind(kind: string): string {
     return String(kind || 'generic').trim().toLowerCase().replace(/[_\s]+/g, '-');
-}
-
-function graphKindHsl(kind: string): string {
-    switch (graphStateContextKind(normalizeGraphKind(kind))) {
-        case 'document': return entityColorStore.getRawGraphNodeHsl('document');
-        case 'chunk':
-        case 'leaf': return entityColorStore.getRawGraphNodeHsl('chunk');
-        case 'entity': return '280 70% 60%';
-        case 'mention': return entityColorStore.getRawGraphNodeHsl('anchor');
-        case 'alias': return '315 72% 58%';
-        case 'event': return entityColorStore.getRawGraphNodeHsl('eventNode');
-        case 'state':
-        case 'memory':
-        case 'memory-state': return entityColorStore.getRawGraphNodeHsl('memoryState');
-        case 'decision-state': return entityColorStore.getRawGraphNodeHsl('decisionState');
-        case 'rank-status':
-        case 'rank-or-status': return entityColorStore.getRawGraphNodeHsl('rankStatus');
-        case 'service-context':
-        case 'service-rank': return entityColorStore.getRawGraphNodeHsl('serviceContext');
-        case 'affiliation-context':
-        case 'affiliate-context':
-        case 'affiliant-context': return entityColorStore.getRawGraphNodeHsl('affiliationContext');
-        case 'family-context': return entityColorStore.getRawGraphNodeHsl('familyContext');
-        case 'timeanchor':
-        case 'time-anchor': return entityColorStore.getRawGraphNodeHsl('temporal');
-        case 'candidate': return '260 28% 58%';
-        default: return '220 10% 54%';
-    }
-}
-
-function graphStateContextKind(kind: string, label = ''): string {
-    const token = `${kind} ${label}`.toLowerCase().replace(/[^a-z0-9]+/g, '');
-    const stateish = /state|memory|decision|rank|service|affiliation|affiliate|affiliant|family/.test(token);
-    if (!stateish) return kind;
-    if (token.includes('decisionstate') || token.includes('decision')) return 'decision-state';
-    if (token.includes('rankorstatus') || token.includes('rankstatus') || token.includes('rank')) return 'rank-status';
-    if (token.includes('servicecontext') || token.includes('servicerank') || token.includes('service')) return 'service-context';
-    if (token.includes('affiliationcontext') || token.includes('affiliatecontext') || token.includes('affiliantcontext') || token.includes('affiliation')) {
-        return 'affiliation-context';
-    }
-    if (token.includes('familycontext')) return 'family-context';
-    return kind === 'state' || kind === 'memory' ? 'memory-state' : kind;
-}
-
-function stableAtlasPoint(id: string, index: number): { atlasX: number; atlasY: number; atlasZ: number } {
-    const angle = index * 2.399963229728653 + hashUnit(id) * 0.72;
-    const y = 1 - ((index % 97) / 96) * 2;
-    const radial = Math.sqrt(Math.max(0, 1 - y * y));
-    const radius = 0.88 + hashUnit(`${id}:radius`) * 0.16;
-    return {
-        atlasX: Math.cos(angle) * radial * radius,
-        atlasY: y * 0.72,
-        atlasZ: Math.sin(angle) * radial * radius,
-    };
 }
 
 function matchingEmbeddingNodes(entity: GalaxyRenderableNode, nodes: GalaxyRenderableNode[]): GalaxyRenderableNode[] {

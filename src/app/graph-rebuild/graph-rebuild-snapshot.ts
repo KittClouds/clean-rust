@@ -356,6 +356,11 @@ export interface GraphRebuildEmbeddingTarget {
     evidenceIds: string[];
     lane?: GraphRebuildSignalTargetLane;
     structuralRole?: GraphRebuildSignalStructuralRole;
+    styleKey?: string;
+    documentUnitKind?: string;
+    stateContextKind?: string;
+    atlasFamily?: string;
+    atlasStatus?: string;
     admissionTier?: number;
     admissionStatus?: GraphRebuildSignalAdmissionStatus;
     workStatus?: GraphRebuildSignalWorkStatus;
@@ -2221,6 +2226,38 @@ export interface GraphRebuildBuildTimings {
     totalMs: number;
 }
 
+export type GraphRebuildContentBlobField =
+    | 'sourceRows'
+    | 'renderRows'
+    | 'embeddingTargets'
+    | 'embeddingTargetPlan'
+    | 'embeddingGraphPostProcess'
+    | 'graphModelV2'
+    | 'semanticCandidateSummary'
+    | 'manifoldSpecializationSummary'
+    | 'atlasDebugSummaries';
+
+export interface GraphRebuildContentBlobRef {
+    schemaVersion: 'phoenix-graph-rebuild-content-blob-ref/v1';
+    field: GraphRebuildContentBlobField;
+    hash: string;
+    documentKey: string;
+    sourceSchemaVersion: string;
+    rawChars: number;
+    payloadChars: number;
+    compressedBytes: number;
+    itemCount?: number;
+    createdAt: number;
+}
+
+export interface GraphRebuildContentManifest {
+    schemaVersion: 'phoenix-graph-rebuild-content-manifest/v1';
+    snapshotId: string;
+    scopeId: string;
+    builtAt: number;
+    refs: Partial<Record<GraphRebuildContentBlobField, GraphRebuildContentBlobRef>>;
+}
+
 export interface GraphRebuildSnapshot {
     schemaVersion: 'phoenix-graph-rebuild/v1';
     id: string;
@@ -2279,6 +2316,7 @@ export interface GraphRebuildSnapshot {
     documentGraphMutationLedger?: GraphDocumentGraphMutationLedger;
     operatorMutationJournal?: GraphOperatorMutationJournal;
     calendarRegistrySummary?: GraphCalendarRegistryBridgeSummary;
+    contentManifest?: GraphRebuildContentManifest;
     counters: GraphRebuildCounters;
     buildTimings?: GraphRebuildBuildTimings;
     resolutionSuggestions?: GraphRebuildResolutionSuggestion[];

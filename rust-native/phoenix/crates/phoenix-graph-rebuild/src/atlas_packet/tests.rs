@@ -15,13 +15,31 @@ fn packet_binds_entity_targets_to_registry_objects() {
         .objects
         .iter()
         .any(|object| object.id == "character:rift"
-            && object.family == GraphFamily::Entity
+            && object.family == GraphFamily::Registry
             && object.status == AtlasObjectStatus::Accepted));
     assert!(packet.manifold_targets.iter().any(|target| target.id
         == "embed:entity:character:rift"
         && target.object_id == "character:rift"
-        && target.family == GraphFamily::Entity
-        && target.vector_status == AtlasVectorStatus::Missing));
+        && target.family == GraphFamily::Registry
+        && target.vector_status == AtlasVectorStatus::Missing
+        && target.style_key.as_deref() == Some("character")
+        && target.lane.as_deref() == Some("entity_anchor")));
+    assert!(packet
+        .manifold_targets
+        .iter()
+        .any(|target| target.id == "embed:graph-fact:rel-1"
+            && target.style_key.as_deref() == Some("cooccurrence")
+            && target.lane.as_deref() == Some("relationship_fact")
+            && target.admission == ManifoldAdmission::Candidate
+            && target.status == AtlasObjectStatus::Proposed));
+    assert!(packet
+        .manifold_targets
+        .iter()
+        .any(|target| target.id == "embed:memory:mem-1"
+            && target.object_id == "atlas:memory:mem-1"
+            && target.family == GraphFamily::Memory
+            && target.registry_entity_id.as_ref().map(|id| id.0.as_str())
+                == Some("character:rift")));
     assert!(packet
         .objects
         .iter()
@@ -59,6 +77,14 @@ fn sample_snapshot() -> GraphRebuildSnapshot {
         confidence: 1.0,
         generation: 7,
     };
+    let memory = GraphMemoryState {
+        id: "mem-1".into(),
+        entity_id: entity_id.clone(),
+        note_id: Some("note-a".into()),
+        key: "rank".into(),
+        value: "captain".into(),
+        evidence_ids: vec![anchor.id.clone()],
+    };
     let node = GraphNode {
         id: entity_id.clone(),
         entity_id: entity_id.clone(),
@@ -94,6 +120,7 @@ fn sample_snapshot() -> GraphRebuildSnapshot {
             text: "Rift".into(),
             evidence_ids: vec![anchor.id.clone()],
             parent_ids: Vec::new(),
+            ..GraphEmbeddingTarget::default()
         },
         GraphEmbeddingTarget {
             id: "embed:graph-fact:rel-1".into(),
@@ -106,6 +133,20 @@ fn sample_snapshot() -> GraphRebuildSnapshot {
             text: "Rift co_occurs_with Rift".into(),
             evidence_ids: vec![anchor.id.clone()],
             parent_ids: Vec::new(),
+            ..GraphEmbeddingTarget::default()
+        },
+        GraphEmbeddingTarget {
+            id: "embed:memory:mem-1".into(),
+            kind: "memoryState".into(),
+            source_id: "mem-1".into(),
+            note_id: Some("note-a".into()),
+            chunk_id: None,
+            entity_id: Some(entity_id.clone()),
+            label: "rank".into(),
+            text: "rank captain".into(),
+            evidence_ids: vec![anchor.id.clone()],
+            parent_ids: Vec::new(),
+            ..GraphEmbeddingTarget::default()
         },
     ];
     GraphRebuildSnapshot {
@@ -124,7 +165,7 @@ fn sample_snapshot() -> GraphRebuildSnapshot {
         episodes: Vec::new(),
         temporal_edges: Vec::new(),
         causal_edges: Vec::new(),
-        memory_state: Vec::new(),
+        memory_state: vec![memory],
         embedding_targets,
         embedding_vectors: Vec::new(),
         projection_refs: Vec::new(),
@@ -138,7 +179,7 @@ fn sample_snapshot() -> GraphRebuildSnapshot {
         counters: GraphCounters {
             entities: 1,
             accepted_anchors: 1,
-            embedding_targets: 2,
+            embedding_targets: 3,
             nodes: 1,
             drop_reasons: GraphDropReasons::default(),
             ..GraphCounters::default()

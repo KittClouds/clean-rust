@@ -208,6 +208,56 @@ describe('GraphRebuildPipelineService', () => {
         expect(phoenixUiApi.loadStagedGraphScenePacket).not.toHaveBeenCalled();
     });
 
+    it('builds the graph in one pass without invoking Semantic Atlas', async () => {
+        atlasRuntime.capabilityState.mockImplementation((capability: string) => ({
+            requiredModels: [{
+                id: capability === 'semanticAtlas' ? 'semanticEmbedding' : capability === 'nliAdjudication' ? 'nli' : 'dynamicNer',
+                readiness: capability === 'semanticAtlas' ? 'idle' : 'ready',
+                statusLabel: capability === 'semanticAtlas' ? 'idle' : 'ready',
+            }],
+        }));
+
+        const result = await service.buildGraph({
+            ...request(),
+            policy: 'force',
+        });
+
+        expect(ner.runDynamicScan).toHaveBeenCalledTimes(1);
+        expect(atlasRuntime.runCapability).not.toHaveBeenCalledWith('semanticAtlas', expect.anything());
+        expect(atlasRuntime.runCapability).toHaveBeenCalledWith('nliAdjudication', expect.objectContaining({
+            buildPolicy: 'force',
+            skipModelWarm: true,
+        }));
+        expect(graphRebuild.buildAndPersistSnapshot).toHaveBeenCalledTimes(1);
+        expect(graphRebuild.buildAndPersistSnapshot).toHaveBeenCalledWith(expect.objectContaining({
+            postProcessMode: 'full',
+            relationshipHints: [expect.objectContaining({
+                sourceId: 'entity-kai',
+                targetId: 'entity-hazel',
+                status: 'accepted',
+            })],
+        }));
+        expect(result.receipt.id).toContain('graph-atlas:');
+        expect(result.receipt.stageReceipts).toEqual(expect.arrayContaining([
+            expect.objectContaining({ id: 'dynamicNer', label: 'Dynamic NER + Alex Deltas' }),
+            expect.objectContaining({ id: 'deltaPostprocessPlan', label: 'Delta Postprocess Plan' }),
+            expect.objectContaining({ id: 'signalCandidatePlan', label: 'Signal Candidate Plan' }),
+            expect.objectContaining({ id: 'nliCandidatePlan', label: 'NLI Candidate Plan' }),
+            expect.objectContaining({ id: 'graphBuildSnapshot', label: 'Build Graph Snapshot' }),
+            expect.objectContaining({ id: 'receiptDbOps', label: 'Receipt DB Ops' }),
+        ]));
+        expect(result.receipt.projectionReceipts).toEqual(expect.arrayContaining([
+            expect.objectContaining({
+                mode: 'hybrid',
+                status: 'synced',
+                counters: expect.objectContaining({
+                    graphRebuildReadModelProjection: 1,
+                    nativeSemanticSidecarBypassed: 1,
+                }),
+            }),
+        ]));
+    });
+
     it('expands global graph rebuilds to loaded note ids for deterministic chunking', async () => {
         notesMock.rows = [
             {
