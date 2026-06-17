@@ -253,8 +253,14 @@ export function hierarchyShellBandForNode(node: GalaxyNode): HierarchyShellBand 
     if (/embed:note:|source:note|kind:note|document(?!_spine)|source:doc|kind:doc/.test(text)) {
         return HIERARCHY_SHELL_BANDS.document;
     }
+    if (/embed:anchor:|anchor_evidence|source:anchor|kind:anchor|evidence|mention|provenance/.test(text)) {
+        return HIERARCHY_SHELL_BANDS.evidence;
+    }
     if (/embed:chunk:|source:chunk|kind:chunk|chunk_spine/.test(text)) {
         return HIERARCHY_SHELL_BANDS.chunk;
+    }
+    if (/memory_state|memory|state|context|rank.?status|service|affiliation/.test(text)) {
+        return HIERARCHY_SHELL_BANDS.memory;
     }
     if (/event_identity|source:event|kind:event|temporal_fact|causal_fact|temporal|causal/.test(text)) {
         return HIERARCHY_SHELL_BANDS.event;
@@ -262,14 +268,8 @@ export function hierarchyShellBandForNode(node: GalaxyNode): HierarchyShellBand 
     if (/relationship_fact|graph.?fact|relation.?fact|relationship|relation/.test(text)) {
         return HIERARCHY_SHELL_BANDS.fact;
     }
-    if (/embed:anchor:|anchor_evidence|source:anchor|kind:anchor|evidence|mention|provenance/.test(text)) {
-        return HIERARCHY_SHELL_BANDS.evidence;
-    }
     if (/embed:entity:|entity_anchor|source:entity|kind:entity|character|location|creature|concept/.test(text)) {
         return HIERARCHY_SHELL_BANDS.entity;
-    }
-    if (/memory_state|memory|state|context|rank.?status|service|affiliation/.test(text)) {
-        return HIERARCHY_SHELL_BANDS.memory;
     }
     return null;
 }

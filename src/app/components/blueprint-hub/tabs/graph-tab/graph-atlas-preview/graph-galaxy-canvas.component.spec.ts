@@ -14,6 +14,13 @@ describe('GraphGalaxyCanvasComponent settings rebuild routing', () => {
         expect(galaxySettingsNeedSceneRebuild(previous, current)).toBe(true);
     });
 
+    it('rebuilds the compiled scene when Atlas source mode changes', () => {
+        const previous = mergeGalaxySettings({ sourceMode: 'graph' });
+        const current = mergeGalaxySettings({ sourceMode: 'embeddings' });
+
+        expect(galaxySettingsNeedSceneRebuild(previous, current)).toBe(true);
+    });
+
     it('keeps renderer-only settings on the cheap path', () => {
         const previous = mergeGalaxySettings({ labelMode: 'hover' });
         const current = mergeGalaxySettings({ labelMode: 'always' });

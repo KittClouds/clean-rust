@@ -540,10 +540,10 @@ function hierarchyContractRadius(node: GalaxyNode, lane: string): number {
     const text = `${sourceType} ${kind} ${styleKey} ${family} ${structuralRole} ${documentUnitKind} ${stateContextKind} ${lane}`.toLowerCase();
     if (/\b(note|document)\b/.test(text) && !/structure.?root|root:/.test(text)) return 2.1;
     if (/structure.?root|root:/.test(text) || structuralRole === 'root') return 1.78;
-    if (/chunk|leaf|claim|action.?block|contrast|looked|glanced/.test(text)) return 1.46;
     if (/anchor|mention|evidence/.test(text) || structuralRole === 'evidence') return 1.14;
-    if (/entity|character|location|creature|npc|item|network|group/.test(text)) return 0.86;
     if (/memory|state|context|decision|rank.?status|service|affiliation|family.?context/.test(text)) return 0.58;
+    if (/chunk|leaf|claim|action.?block|contrast|looked|glanced/.test(text)) return 1.46;
+    if (/entity|character|location|creature|npc|item|network|group/.test(text)) return 0.86;
     return NaN;
 }
 

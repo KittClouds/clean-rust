@@ -131,7 +131,7 @@ export class GraphGalaxyCanvasComponent implements AfterViewInit, OnChanges, OnD
         if (changes['settings']) {
             const previous = this.mergeSettingsForSource(changes['settings'].previousValue);
             const current = this.currentSettings();
-            if (this.renderer.hasContext()) this.renderer.setSettings(this.settings);
+            if (this.renderer.hasContext()) this.renderer.setSettings(current);
             if (galaxySettingsNeedSceneRebuild(previous, current)) this.markLayoutDirty();
             if (this.viewReady) this.syncSurface();
         }
@@ -365,7 +365,7 @@ export class GraphGalaxyCanvasComponent implements AfterViewInit, OnChanges, OnD
         const created = this.renderer.mount(canvas);
         if (!created) return;
         graphGalaxyRuntimeMeter.recordContext(this.meterId, true);
-        this.renderer.setSettings(this.settings);
+        this.renderer.setSettings(this.currentSettings());
         this.renderer.setMode(this.viewMode === 'map' ? '2d' : '3d');
         if (this.scene) {
             const setSceneStarted = performance.now();
@@ -406,7 +406,7 @@ export class GraphGalaxyCanvasComponent implements AfterViewInit, OnChanges, OnD
                 const setSceneStarted = performance.now();
                 this.renderer.setScene(this.scene);
                 const rendererSetSceneMs = performance.now() - setSceneStarted;
-                this.renderer.setSettings(this.settings);
+                this.renderer.setSettings(this.currentSettings());
                 this.renderer.setMode(this.viewMode === 'map' ? '2d' : '3d');
                 graphGalaxyRuntimeMeter.recordScene(this.meterId, scene.nodes.length, scene.links.length);
                 this.recordRendererTimings({
@@ -476,6 +476,7 @@ export class GraphGalaxyCanvasComponent implements AfterViewInit, OnChanges, OnD
 
 export function galaxySettingsNeedSceneRebuild(previous: GalaxyRenderSettings, current: GalaxyRenderSettings): boolean {
     return previous.layoutMode !== current.layoutMode ||
+        previous.sourceMode !== current.sourceMode ||
         previous.embeddingTopologyMode !== current.embeddingTopologyMode ||
         previous.nodeDistance !== current.nodeDistance ||
         previous.edgeLength !== current.edgeLength ||

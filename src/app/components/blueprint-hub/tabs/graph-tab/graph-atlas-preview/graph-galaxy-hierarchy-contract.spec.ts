@@ -27,9 +27,9 @@ describe('graph galaxy hierarchy contract', () => {
         expect(validateHierarchyShellContract(scene.nodes)).toEqual([]);
         expect(byId.get('embed:note:note-1')!).toBeGreaterThan(byId.get('embed:structure-root:note-1:identity')!);
         expect(byId.get('embed:structure-root:note-1:identity')!).toBeGreaterThan(byId.get('embed:chunk:chunk-1')!);
-        expect(byId.get('embed:chunk:chunk-1')!).toBeGreaterThan(byId.get('embed:entity:kai')!);
-        expect(byId.get('embed:entity:kai')!).toBeGreaterThan(byId.get('embed:event:trust')!);
-        expect(byId.get('embed:event:trust')!).toBeGreaterThan(byId.get('embed:anchor:mention-1')!);
+        expect(byId.get('embed:chunk:chunk-1')!).toBeGreaterThan(byId.get('embed:anchor:mention-1')!);
+        expect(byId.get('embed:anchor:mention-1')!).toBeGreaterThan(byId.get('embed:event:trust')!);
+        expect(byId.get('embed:event:trust')!).toBeGreaterThan(byId.get('embed:entity:kai')!);
     });
 
     it('preserves document-root-chunk-entity order for graph rebuild Caps snapshots', () => {
@@ -52,10 +52,36 @@ describe('graph galaxy hierarchy contract', () => {
         const runtime = galaxySceneToV2(scene, 'embeddings');
         const indexById = new Map(runtime.ids.map((id, index) => [id, index]));
 
-        expect(runtime.hierarchyShellRadii?.[indexById.get('embed:note:note-a')!]).toBeCloseTo(2.08, 3);
-        expect(runtime.hierarchyShellRadii?.[indexById.get('embed:structure-root:note-a:identity')!]).toBeCloseTo(1.92, 3);
-        expect(runtime.hierarchyShellRadii?.[indexById.get('embed:chunk:note-a:chunk-1')!]).toBeCloseTo(1.66, 3);
-        expect(runtime.hierarchyShellRadii?.[indexById.get('embed:entity:kai')!]).toBeCloseTo(1.42, 3);
+        expect(runtime.hierarchyShellRadii?.[indexById.get('embed:note:note-a')!]).toBeCloseTo(2.1, 3);
+        expect(runtime.hierarchyShellRadii?.[indexById.get('embed:structure-root:note-a:identity')!]).toBeCloseTo(1.78, 3);
+        expect(runtime.hierarchyShellRadii?.[indexById.get('embed:chunk:note-a:chunk-1')!]).toBeCloseTo(1.46, 3);
+        expect(runtime.hierarchyShellRadii?.[indexById.get('embed:entity:kai')!]).toBeCloseTo(0.86, 3);
+    });
+
+    it('keeps mixed Atlas taxonomy on the intended Embed Caps shells', () => {
+        const scene = buildGalaxyScene([
+            mixedNode('embed:note:note-a', 'note', 'document_spine', 'root', '', '', 0.4),
+            mixedNode('embed:structure-root:note-a:identity', 'structureRoot', 'document_spine', 'root', '', '', 0.4),
+            mixedNode('embed:chunk:note-a:chunk-1', 'chunk', 'chunk_spine', 'child', 'leaf', '', 2.08),
+            mixedNode('embed:chunk:note-a:chunk-1:evidence:a1', 'anchor', 'anchor_evidence', 'evidence', 'chunk', '', 1.9),
+            mixedNode('embed:entity:kai', 'entity', 'character', 'child', '', '', 1.8),
+            mixedNode('embed:entity:kai:rank-state', 'entity', 'character', 'child', '', 'rankStatus', 1.7),
+        ], [
+            edge('note-root', 'embed:note:note-a', 'embed:structure-root:note-a:identity', 'target-parent'),
+            edge('root-chunk', 'embed:structure-root:note-a:identity', 'embed:chunk:note-a:chunk-1', 'target-parent'),
+            edge('chunk-evidence', 'embed:chunk:note-a:chunk-1', 'embed:chunk:note-a:chunk-1:evidence:a1', 'target-parent'),
+            edge('evidence-entity', 'embed:chunk:note-a:chunk-1:evidence:a1', 'embed:entity:kai', 'anchor-entity'),
+            edge('entity-state', 'embed:entity:kai', 'embed:entity:kai:rank-state', 'memory-entity'),
+        ], mergeGalaxySettings({ layoutMode: 'lorentzTree', sourceMode: 'embeddings' }));
+        const runtime = galaxySceneToV2(scene, 'embeddings');
+        const byId = new Map(scene.nodes.map((node) => [node.entity.id, radius(node)]));
+        const indexById = new Map(runtime.ids.map((id, index) => [id, index]));
+
+        expect(byId.get('embed:chunk:note-a:chunk-1')!).toBeGreaterThan(byId.get('embed:chunk:note-a:chunk-1:evidence:a1')!);
+        expect(byId.get('embed:chunk:note-a:chunk-1:evidence:a1')!).toBeGreaterThan(byId.get('embed:entity:kai')!);
+        expect(byId.get('embed:entity:kai')!).toBeGreaterThan(byId.get('embed:entity:kai:rank-state')!);
+        expect(runtime.hierarchyShellRadii?.[indexById.get('embed:chunk:note-a:chunk-1:evidence:a1')!]).toBeCloseTo(1.14, 3);
+        expect(runtime.hierarchyShellRadii?.[indexById.get('embed:entity:kai:rank-state')!]).toBeCloseTo(0.58, 3);
     });
 
     it('does not cap graph rebuild atlas visibility before the document spine', () => {
@@ -274,6 +300,44 @@ function target(
 
 function edge(id: string, sourceId: string, targetId: string, type: string) {
     return { id, sourceId, targetId, type, confidence: 0.9 };
+}
+
+function mixedNode(
+    id: string,
+    atlasKind: string,
+    styleKey: string,
+    structuralRole: string,
+    documentUnitKind: string,
+    stateContextKind: string,
+    shellRadius: number,
+): GalaxyRenderableNode {
+    return {
+        id,
+        label: id,
+        kind: atlasKind,
+        atlasX: 0.24,
+        atlasY: 0.12,
+        atlasZ: 1,
+        totalMentions: 2,
+        metadata: {
+            sourceType: atlasKind,
+            atlasKind,
+            atlasFamily: styleKey,
+            atlasStructuralRole: structuralRole,
+            atlasDocumentUnitKind: documentUnitKind,
+            atlasStateContextKind: stateContextKind,
+            styleKey,
+            graphColorKind: styleKey,
+            targetConfidence: 0.9,
+            lorentz: {
+                capId: 'document:note-a',
+                capDirection: [0.24, 0.12, 1],
+                shellRadius,
+                signalLane: styleKey,
+                primaryTreeKind: 'documentStructure',
+            },
+        },
+    };
 }
 
 function radius(node: { x: number; y: number; z: number }): number {
