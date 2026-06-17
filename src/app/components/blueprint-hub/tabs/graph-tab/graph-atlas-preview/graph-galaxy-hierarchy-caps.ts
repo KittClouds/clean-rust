@@ -256,20 +256,20 @@ export function hierarchyShellBandForNode(node: GalaxyNode): HierarchyShellBand 
     if (/embed:chunk:|source:chunk|kind:chunk|chunk_spine/.test(text)) {
         return HIERARCHY_SHELL_BANDS.chunk;
     }
-    if (/embed:entity:|entity_anchor|source:entity|kind:entity|character|location|creature|concept/.test(text)) {
-        return HIERARCHY_SHELL_BANDS.entity;
-    }
     if (/event_identity|source:event|kind:event|temporal_fact|causal_fact|temporal|causal/.test(text)) {
         return HIERARCHY_SHELL_BANDS.event;
     }
     if (/relationship_fact|graph.?fact|relation.?fact|relationship|relation/.test(text)) {
         return HIERARCHY_SHELL_BANDS.fact;
     }
-    if (/memory_state|memory|state|context/.test(text)) {
-        return HIERARCHY_SHELL_BANDS.memory;
-    }
     if (/embed:anchor:|anchor_evidence|source:anchor|kind:anchor|evidence|mention|provenance/.test(text)) {
         return HIERARCHY_SHELL_BANDS.evidence;
+    }
+    if (/embed:entity:|entity_anchor|source:entity|kind:entity|character|location|creature|concept/.test(text)) {
+        return HIERARCHY_SHELL_BANDS.entity;
+    }
+    if (/memory_state|memory|state|context|rank.?status|service|affiliation/.test(text)) {
+        return HIERARCHY_SHELL_BANDS.memory;
     }
     return null;
 }
@@ -349,13 +349,13 @@ export function finite(value: unknown): number {
 
 const HIERARCHY_SHELL_BANDS: Record<HierarchyShellBand['id'], HierarchyShellBand> = {
     document: { id: 'document', rank: 0, radius: 2.08, min: 2.02, max: 2.14 },
-    documentRoot: { id: 'documentRoot', rank: 1, radius: 1.92, min: 1.86, max: 1.98 },
-    chunk: { id: 'chunk', rank: 2, radius: 1.66, min: 1.58, max: 1.74 },
-    entity: { id: 'entity', rank: 3, radius: 1.42, min: 1.34, max: 1.52 },
-    event: { id: 'event', rank: 4, radius: 1.24, min: 1.14, max: 1.34 },
-    fact: { id: 'fact', rank: 5, radius: 1.14, min: 1.06, max: 1.24 },
-    memory: { id: 'memory', rank: 6, radius: 1.04, min: 0.96, max: 1.16 },
-    evidence: { id: 'evidence', rank: 7, radius: 0.92, min: 0.78, max: 1.0 },
+    documentRoot: { id: 'documentRoot', rank: 1, radius: 1.9, min: 1.84, max: 1.98 },
+    chunk: { id: 'chunk', rank: 2, radius: 1.64, min: 1.56, max: 1.74 },
+    evidence: { id: 'evidence', rank: 3, radius: 1.38, min: 1.3, max: 1.48 },
+    event: { id: 'event', rank: 4, radius: 1.3, min: 1.22, max: 1.4 },
+    fact: { id: 'fact', rank: 5, radius: 1.22, min: 1.14, max: 1.32 },
+    entity: { id: 'entity', rank: 6, radius: 1.16, min: 1.06, max: 1.26 },
+    memory: { id: 'memory', rank: 7, radius: 0.9, min: 0.78, max: 1.0 },
 };
 
 function hierarchyKindText(node: GalaxyNode): string {
@@ -369,6 +369,10 @@ function hierarchyKindText(node: GalaxyNode): string {
         lorentz['signalLane'],
         metadata['signalStructuralRole'],
         lorentz['structuralRole'],
+        metadata['atlasStructuralRole'],
+        metadata['atlasDocumentUnitKind'],
+        metadata['atlasStateContextKind'],
+        metadata['styleKey'],
         metadata['graphKind'],
         metadata['graphColorKind'],
     ].join(' ').toLowerCase();

@@ -501,6 +501,8 @@ function hierarchyRadius(
     ambiguity: number,
 ): number {
     const lorentz = record(node.entity.metadata?.['lorentz']);
+    const contractRadius = hierarchyContractRadius(node, lane);
+    if (Number.isFinite(contractRadius)) return contractShellRadiusForNode(node, contractRadius);
     const explicitRadius = Number(lorentz['shellRadius']);
     if (Number.isFinite(explicitRadius)) return contractShellRadiusForNode(node, clamp(explicitRadius, 0.38, CAP_SCENE_RADIUS * 0.985));
     const sourceType = String(node.entity.metadata?.sourceType || node.entity.kind || '').toLowerCase();
@@ -518,6 +520,29 @@ function hierarchyRadius(
     }
     if (lane === 'temporal') radius = clamp(radius, 1.08, 1.72);
     return contractShellRadiusForNode(node, clamp(radius, 0.38, CAP_SCENE_RADIUS * 0.985));
+}
+
+function hierarchyContractRadius(node: GalaxyNode, lane: string): number {
+    const metadata = node.entity.metadata || {};
+    const sourceType = graphText(metadata['sourceType'], node.entity.kind);
+    const kind = graphText(node.entity.kind, metadata['atlasKind']);
+    const styleKey = graphText(metadata['styleKey'], metadata['graphColorKind'], metadata['graphKind']);
+    const family = graphText(metadata['atlasFamily'], metadata['graphFamily']);
+    const structuralRole = graphText(metadata['atlasStructuralRole'], metadata['structuralRole']);
+    const documentUnitKind = graphText(metadata['atlasDocumentUnitKind'], metadata['documentUnitKind']);
+    const stateContextKind = graphText(metadata['atlasStateContextKind'], metadata['stateContextKind']);
+    const text = `${sourceType} ${kind} ${styleKey} ${family} ${structuralRole} ${documentUnitKind} ${stateContextKind} ${lane}`.toLowerCase();
+    if (/\b(note|document)\b/.test(text) && !/structure.?root|root:/.test(text)) return 2.08;
+    if (/structure.?root|root:/.test(text) || structuralRole === 'root') return 1.9;
+    if (/chunk|leaf|claim|action.?block|contrast|looked|glanced/.test(text)) return 1.64;
+    if (/anchor|mention|evidence/.test(text) || structuralRole === 'evidence') return 1.38;
+    if (/entity|character|location|creature|npc|item|network|group/.test(text)) return 1.16;
+    if (/memory|state|context|decision|rank.?status|service|affiliation|family.?context/.test(text)) return 0.9;
+    return NaN;
+}
+
+function graphText(...values: unknown[]): string {
+    return values.map((value) => String(value || '').trim()).filter(Boolean).join(' ').toLowerCase();
 }
 
 function hierarchyShellRadius(sourceType: string, kind: string, lane: string): number {

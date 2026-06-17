@@ -74,8 +74,8 @@ describe('Lorentz tree galaxy visualization data', () => {
         ], mergeGalaxySettings({ layoutMode: 'lorentzTree' }));
         const byId = new Map(scene.nodes.map((node) => [node.entity.id, node]));
 
-        expect(byId.get('kai')!.depth).toBeGreaterThan(byId.get('signal')!.depth);
-        expect(byId.get('signal')!.depth).toBeGreaterThan(byId.get('context')!.depth);
+        expect(byId.get('signal')!.depth).toBeGreaterThan(byId.get('kai')!.depth);
+        expect(byId.get('kai')!.depth).toBeGreaterThan(byId.get('context')!.depth);
     });
 
     it('honors explicit graph-rebuild cap shell radii without changing fallback Lorentz fixtures', () => {
@@ -92,8 +92,8 @@ describe('Lorentz tree galaxy visualization data', () => {
         const byId = new Map(scene.nodes.map((node) => [node.entity.id, node]));
 
         expect(byId.get('doc')!.depth).toBeGreaterThan(byId.get('chunk')!.depth);
-        expect(byId.get('chunk')!.depth).toBeGreaterThan(byId.get('entity')!.depth);
-        expect(byId.get('entity')!.depth).toBeGreaterThan(byId.get('evidence')!.depth);
+        expect(byId.get('chunk')!.depth).toBeGreaterThan(byId.get('evidence')!.depth);
+        expect(byId.get('evidence')!.depth).toBeGreaterThan(byId.get('entity')!.depth);
     });
 
     it('pulls child cap centers into declared parent cap containment', () => {
@@ -138,10 +138,34 @@ describe('Lorentz tree galaxy visualization data', () => {
 
         expect(radiusOf(byId.get('doc')!)).toBeGreaterThan(radiusOf(byId.get('root')!));
         expect(radiusOf(byId.get('root')!)).toBeGreaterThan(radiusOf(byId.get('chunk')!));
-        expect(radiusOf(byId.get('chunk')!)).toBeGreaterThan(radiusOf(byId.get('entity')!));
-        expect(radiusOf(byId.get('entity')!)).toBeGreaterThan(radiusOf(byId.get('evidence')!));
+        expect(radiusOf(byId.get('chunk')!)).toBeGreaterThan(radiusOf(byId.get('evidence')!));
+        expect(radiusOf(byId.get('evidence')!)).toBeGreaterThan(radiusOf(byId.get('entity')!));
         expect(dotVec(chunkDirection, entityDirection)).toBeGreaterThan(0.97);
         expect(dotVec(chunkDirection, evidenceDirection)).toBeGreaterThan(0.97);
+    });
+
+    it('uses Rust packet taxonomy as the CAPS shell depth contract', () => {
+        const scene = buildGalaxyScene([
+            taxonomyNode('note', 'Chapter note', 'note', 'document', 'root', '', '', 0.92),
+            taxonomyNode('root', 'Identity root', 'structureRoot', 'document', 'root', '', '', 0.38),
+            taxonomyNode('chunk', 'Chunk 1', 'chunk', 'chunk', 'spine', 'leaf', '', 0.4),
+            taxonomyNode('evidence', 'Kai mention', 'anchor', 'anchor', 'evidence', '', '', 0.52),
+            taxonomyNode('entity', 'Kai', 'entity', 'character', 'child', '', '', 0.86),
+            taxonomyNode('state', 'Rank status', 'memoryState', 'rankStatus', 'child', '', 'rankStatus', 0.99),
+        ], [
+            { id: 'note-root', sourceId: 'note', targetId: 'root', type: 'target-parent', confidence: 0.9 },
+            { id: 'root-chunk', sourceId: 'root', targetId: 'chunk', type: 'target-parent', confidence: 0.9 },
+            { id: 'chunk-evidence', sourceId: 'chunk', targetId: 'evidence', type: 'target-parent', confidence: 0.86 },
+            { id: 'evidence-entity', sourceId: 'evidence', targetId: 'entity', type: 'evidence', confidence: 0.82 },
+            { id: 'entity-state', sourceId: 'entity', targetId: 'state', type: 'memory', confidence: 0.78 },
+        ], mergeGalaxySettings({ layoutMode: 'lorentzTree' }));
+        const byId = new Map(scene.nodes.map((node) => [node.entity.id, node]));
+
+        expect(radiusOf(byId.get('note')!)).toBeGreaterThan(radiusOf(byId.get('root')!));
+        expect(radiusOf(byId.get('root')!)).toBeGreaterThan(radiusOf(byId.get('chunk')!));
+        expect(radiusOf(byId.get('chunk')!)).toBeGreaterThan(radiusOf(byId.get('evidence')!));
+        expect(radiusOf(byId.get('evidence')!)).toBeGreaterThan(radiusOf(byId.get('entity')!));
+        expect(radiusOf(byId.get('entity')!)).toBeGreaterThan(radiusOf(byId.get('state')!));
     });
 
     it('does not emit Lorentz guide data for Hybrid or Hopf universes', () => {
@@ -302,6 +326,49 @@ function containmentNode(
                 specificity: 0.82,
                 ambiguity: 0.04,
                 primaryTreeKind: 'documentStructure',
+            },
+        },
+    };
+}
+
+function taxonomyNode(
+    id: string,
+    label: string,
+    sourceType: string,
+    styleKey: string,
+    structuralRole: string,
+    documentUnitKind: string,
+    stateContextKind: string,
+    shellRadius: number,
+) {
+    return {
+        id,
+        label,
+        kind: sourceType,
+        atlasX: 1,
+        atlasY: 0.2,
+        atlasZ: 0.1,
+        totalMentions: 2,
+        metadata: {
+            sourceType: 'rust-atlas-packet-target',
+            atlasKind: sourceType,
+            atlasFamily: styleKey,
+            atlasLane: styleKey,
+            atlasStructuralRole: structuralRole,
+            atlasDocumentUnitKind: documentUnitKind,
+            atlasStateContextKind: stateContextKind,
+            styleKey,
+            graphColorKind: styleKey,
+            targetConfidence: 0.9,
+            lorentz: {
+                capId: 'document:note-1',
+                capDirection: [1, 0.2, 0.1],
+                capPhase: 0.25,
+                shellRadius,
+                signalLane: styleKey,
+                specificity: 0.82,
+                ambiguity: 0.04,
+                primaryTreeKind: styleKey,
             },
         },
     };
