@@ -42,6 +42,8 @@ export interface HierarchyShellBand {
     max: number;
 }
 
+export type CapsHierarchyRole = HierarchyShellBand['id'];
+
 interface BridgeInfo {
     capId: string;
     lane: string;
@@ -246,12 +248,14 @@ export function validateHierarchyShellContract(nodes: GalaxyNode[]): string[] {
 }
 
 export function hierarchyShellBandForNode(node: GalaxyNode): HierarchyShellBand | null {
+    const explicit = explicitHierarchyRoleForNode(node);
+    if (explicit) return HIERARCHY_SHELL_BANDS[explicit];
     const text = hierarchyKindText(node);
-    if (/embed:structure-root:|structure.?root|document.?root|lane.?root/.test(text)) {
-        return HIERARCHY_SHELL_BANDS.documentRoot;
-    }
     if (/embed:note:|source:note|kind:note|document(?!_spine)|source:doc|kind:doc/.test(text)) {
         return HIERARCHY_SHELL_BANDS.document;
+    }
+    if (/embed:structure-root:|structure.?root|document.?root|lane.?root/.test(text)) {
+        return HIERARCHY_SHELL_BANDS.documentRoot;
     }
     if (/embed:anchor:|anchor_evidence|source:anchor|kind:anchor|evidence|mention|provenance/.test(text)) {
         return HIERARCHY_SHELL_BANDS.evidence;
@@ -272,6 +276,15 @@ export function hierarchyShellBandForNode(node: GalaxyNode): HierarchyShellBand 
         return HIERARCHY_SHELL_BANDS.entity;
     }
     return null;
+}
+
+export function hierarchyShellBandForRole(role: string | null | undefined): HierarchyShellBand | null {
+    const normalized = normalizeHierarchyRole(role);
+    return normalized ? HIERARCHY_SHELL_BANDS[normalized] : null;
+}
+
+export function hierarchyShellBandsInOrder(): HierarchyShellBand[] {
+    return HIERARCHY_SHELL_ORDER.map((role) => HIERARCHY_SHELL_BANDS[role]);
 }
 
 export function vectorOf(node: GalaxyNode): Vec3 {
@@ -347,16 +360,75 @@ export function finite(value: unknown): number {
     return Number.isFinite(number) ? number : 0;
 }
 
-const HIERARCHY_SHELL_BANDS: Record<HierarchyShellBand['id'], HierarchyShellBand> = {
+export const HIERARCHY_SHELL_BANDS: Record<HierarchyShellBand['id'], HierarchyShellBand> = {
     document: { id: 'document', rank: 0, radius: 2.1, min: 2.04, max: 2.14 },
     documentRoot: { id: 'documentRoot', rank: 1, radius: 1.78, min: 1.7, max: 1.86 },
     chunk: { id: 'chunk', rank: 2, radius: 1.46, min: 1.38, max: 1.54 },
     evidence: { id: 'evidence', rank: 3, radius: 1.14, min: 1.06, max: 1.22 },
-    event: { id: 'event', rank: 4, radius: 1.06, min: 0.98, max: 1.16 },
-    fact: { id: 'fact', rank: 5, radius: 0.98, min: 0.9, max: 1.08 },
-    entity: { id: 'entity', rank: 6, radius: 0.86, min: 0.76, max: 0.94 },
-    memory: { id: 'memory', rank: 7, radius: 0.58, min: 0.46, max: 0.68 },
+    entity: { id: 'entity', rank: 4, radius: 0.86, min: 0.76, max: 0.94 },
+    event: { id: 'event', rank: 5, radius: 0.7, min: 0.62, max: 0.78 },
+    fact: { id: 'fact', rank: 6, radius: 0.66, min: 0.58, max: 0.74 },
+    memory: { id: 'memory', rank: 7, radius: 0.52, min: 0.42, max: 0.62 },
 };
+
+export const HIERARCHY_SHELL_ORDER: readonly CapsHierarchyRole[] = [
+    'document',
+    'documentRoot',
+    'chunk',
+    'evidence',
+    'entity',
+    'event',
+    'fact',
+    'memory',
+];
+
+function explicitHierarchyRoleForNode(node: GalaxyNode): CapsHierarchyRole | null {
+    const metadata = node.entity.metadata || {};
+    const lorentz = record(metadata['lorentz']);
+    return normalizeHierarchyRole(
+        metadata['capsHierarchyRole']
+            || metadata['hierarchyRole']
+            || lorentz['capsHierarchyRole']
+            || lorentz['hierarchyRole'],
+    );
+}
+
+function normalizeHierarchyRole(value: unknown): CapsHierarchyRole | null {
+    const text = String(value || '').trim().replace(/[-_\s]+/g, '').toLowerCase();
+    switch (text) {
+        case 'document':
+        case 'note':
+        case 'doc':
+            return 'document';
+        case 'documentroot':
+        case 'root':
+        case 'structureroot':
+            return 'documentRoot';
+        case 'chunk':
+        case 'documentunit':
+            return 'chunk';
+        case 'evidence':
+        case 'anchor':
+        case 'evidencespan':
+            return 'evidence';
+        case 'entity':
+        case 'identity':
+            return 'entity';
+        case 'event':
+            return 'event';
+        case 'fact':
+        case 'graphfact':
+        case 'relationshipfact':
+            return 'fact';
+        case 'memory':
+        case 'memorystate':
+        case 'state':
+        case 'context':
+            return 'memory';
+        default:
+            return null;
+    }
+}
 
 function hierarchyKindText(node: GalaxyNode): string {
     const metadata = node.entity.metadata || {};

@@ -4,7 +4,7 @@ import type { GraphRebuildSnapshot } from '../../../../../graph-rebuild/graph-re
 import { buildGalaxyScene, mergeGalaxySettings, type GalaxyRenderableNode } from './graph-galaxy-engine';
 import { galaxySceneToV2 } from './graph-galaxy-scene-v2';
 import { buildGraphRebuildEmbeddingAtlas } from './graph-rebuild-embedding-atlas';
-import { validateHierarchyShellContract } from './graph-galaxy-hierarchy-caps';
+import { hierarchyShellBandsInOrder, validateHierarchyShellContract } from './graph-galaxy-hierarchy-caps';
 
 describe('graph galaxy hierarchy contract', () => {
     it('cannot render inverted Caps shells even when metadata lies', () => {
@@ -28,8 +28,8 @@ describe('graph galaxy hierarchy contract', () => {
         expect(byId.get('embed:note:note-1')!).toBeGreaterThan(byId.get('embed:structure-root:note-1:identity')!);
         expect(byId.get('embed:structure-root:note-1:identity')!).toBeGreaterThan(byId.get('embed:chunk:chunk-1')!);
         expect(byId.get('embed:chunk:chunk-1')!).toBeGreaterThan(byId.get('embed:anchor:mention-1')!);
-        expect(byId.get('embed:anchor:mention-1')!).toBeGreaterThan(byId.get('embed:event:trust')!);
-        expect(byId.get('embed:event:trust')!).toBeGreaterThan(byId.get('embed:entity:kai')!);
+        expect(byId.get('embed:anchor:mention-1')!).toBeGreaterThan(byId.get('embed:entity:kai')!);
+        expect(byId.get('embed:entity:kai')!).toBeGreaterThan(byId.get('embed:event:trust')!);
     });
 
     it('preserves document-root-chunk-entity order for graph rebuild Caps snapshots', () => {
@@ -81,7 +81,7 @@ describe('graph galaxy hierarchy contract', () => {
         expect(byId.get('embed:chunk:note-a:chunk-1:evidence:a1')!).toBeGreaterThan(byId.get('embed:entity:kai')!);
         expect(byId.get('embed:entity:kai')!).toBeGreaterThan(byId.get('embed:entity:kai:rank-state')!);
         expect(runtime.hierarchyShellRadii?.[indexById.get('embed:chunk:note-a:chunk-1:evidence:a1')!]).toBeCloseTo(1.14, 3);
-        expect(runtime.hierarchyShellRadii?.[indexById.get('embed:entity:kai:rank-state')!]).toBeCloseTo(0.58, 3);
+        expect(runtime.hierarchyShellRadii?.[indexById.get('embed:entity:kai:rank-state')!]).toBeCloseTo(0.52, 3);
     });
 
     it('does not cap graph rebuild atlas visibility before the document spine', () => {
@@ -110,6 +110,37 @@ describe('graph galaxy hierarchy contract', () => {
         }
     });
 
+    it('keeps every graph rebuild embedding target as a point in Embed Caps', () => {
+        const snapshot = contractSnapshot();
+        snapshot.embeddingTargets.push(...Array.from({ length: 96 }, (_, index) =>
+            target(`embed:graph-fact:signal-${index}`, 'graphFact', `signal-${index}`, `Signal ${index} supports Kai [accepted]`, 'relationship_fact', 'note-a', 'note-a:chunk-1', ['embed:entity:kai']),
+        ));
+        const atlas = buildGraphRebuildEmbeddingAtlas(snapshot, 'lorentz');
+        const scene = buildGalaxyScene(atlas.nodes, atlas.edges, mergeGalaxySettings({ layoutMode: 'lorentzTree', sourceMode: 'embeddings' }));
+        const byId = new Map(scene.nodes.map((node) => [node.entity.id, radius(node)]));
+
+        expect(scene.nodes).toHaveLength(atlas.nodes.length);
+        expect(new Set(scene.nodes.map((node) => node.entity.id)).has('embed:graph-fact:signal-0')).toBe(true);
+        expect(byId.get('embed:entity:kai')!).toBeGreaterThan(byId.get('embed:graph-fact:signal-0')!);
+    });
+
+    it('keeps dense Embed Caps children distributed around their hierarchy shell', () => {
+        const snapshot = singleDocumentContractSnapshot();
+        snapshot.embeddingTargets.push(...Array.from({ length: 32 }, (_, index) =>
+            target(`embed:graph-fact:ring-${index}`, 'graphFact', `ring-${index}`, `Ring fact ${index}`, 'relationship_fact', 'note-a', 'note-a:chunk-1', ['embed:entity:kai']),
+        ));
+        const atlas = buildGraphRebuildEmbeddingAtlas(snapshot, 'lorentz');
+        const scene = buildGalaxyScene(atlas.nodes, atlas.edges, mergeGalaxySettings({ layoutMode: 'lorentzTree', sourceMode: 'embeddings' }));
+        const factNodes = scene.nodes.filter((node) => node.entity.id.startsWith('embed:graph-fact:ring-'));
+
+        expect(validateHierarchyShellContract(scene.nodes)).toEqual([]);
+        expect(factNodes).toHaveLength(32);
+        for (const node of factNodes) {
+            expect(radius(node)).toBeCloseTo(0.66, 2);
+        }
+        expect(maxPairwiseDistance(factNodes)).toBeGreaterThan(0.5);
+    });
+
     it('uses structural forest ownership instead of flat type caps', () => {
         const snapshot = contractSnapshot();
         snapshot.embeddingTargets.push(
@@ -128,11 +159,72 @@ describe('graph galaxy hierarchy contract', () => {
         const entityLorentz = byId.get('embed:entity:kai')?.metadata?.lorentz as Record<string, unknown>;
         const causalLorentz = byId.get('embed:causalFact:cause-1')?.metadata?.lorentz as Record<string, unknown>;
 
-        expect(entityLorentz?.['capId']).toBe('identity:kai');
-        expect(entityLorentz?.['parentNodeId']).toBe('embed:structure-root:note-a:identity');
-        expect(causalLorentz?.['capId']).toBe('event:event-b:causal');
+        expect(entityLorentz?.['capId']).toBe('document:note-a:chunk:note-a:chunk-1:evidence:entity:kai');
+        expect(entityLorentz?.['parentCapIds']).toContain('document:note-a:chunk:note-a:chunk-1:evidence');
+        expect(entityLorentz?.['parentNodeId']).toBe('embed:chunk:note-a:chunk-1');
+        expect(causalLorentz?.['capId']).toBe('document:note-a:chunk:note-a:chunk-1:evidence:event:event-b:causal');
+        expect(causalLorentz?.['parentCapIds']).toEqual(['document:note-a:chunk:note-a:chunk-1:evidence:event:event-b']);
         expect(causalLorentz?.['parentNodeId']).toBe('embed:event:event-b');
         expect(causalLorentz?.['supportChunkIds']).toEqual(['note-a:chunk-1']);
+    });
+
+    it('keeps explicit Embed Caps groups nested instead of flattening to the document cap', () => {
+        const scene = buildGalaxyScene([
+            capNode('embed:note:note-a', 'note', 'document:note-a', []),
+            capNode('embed:structure-root:note-a:identity', 'structureRoot', 'document:note-a:root:identity', ['document:note-a']),
+            capNode('embed:chunk:note-a:chunk-1', 'chunk', 'document:note-a:chunk:note-a:chunk-1', ['document:note-a:root:identity']),
+            capNode('embed:anchor:mention-1', 'anchor', 'document:note-a:chunk:note-a:chunk-1:evidence', ['document:note-a:chunk:note-a:chunk-1']),
+            capNode('embed:entity:kai', 'entity', 'document:note-a:chunk:note-a:chunk-1:evidence:entity:kai', ['document:note-a:chunk:note-a:chunk-1:evidence']),
+            capNode('embed:memory:kai:rank', 'memoryState', 'document:note-a:chunk:note-a:chunk-1:evidence:entity:kai:memory', ['document:note-a:chunk:note-a:chunk-1:evidence:entity:kai']),
+        ], [
+            edge('note-root', 'embed:note:note-a', 'embed:structure-root:note-a:identity', 'target-parent'),
+            edge('root-chunk', 'embed:structure-root:note-a:identity', 'embed:chunk:note-a:chunk-1', 'target-parent'),
+            edge('chunk-anchor', 'embed:chunk:note-a:chunk-1', 'embed:anchor:mention-1', 'chunk-anchor'),
+            edge('anchor-entity', 'embed:anchor:mention-1', 'embed:entity:kai', 'anchor-entity'),
+            edge('entity-state', 'embed:entity:kai', 'embed:memory:kai:rank', 'memory-entity'),
+        ], mergeGalaxySettings({ layoutMode: 'lorentzTree', sourceMode: 'embeddings' }));
+        const boundaryIds = rootLaneTreeIds(scene);
+
+        expect(boundaryIds).toContain('document:note-a');
+        expect(boundaryIds).toContain('document:note-a:root:identity');
+        expect(boundaryIds).toContain('document:note-a:chunk:note-a:chunk-1');
+        expect(boundaryIds).toContain('document:note-a:chunk:note-a:chunk-1:evidence');
+        expect(boundaryIds).toContain('document:note-a:chunk:note-a:chunk-1:evidence:entity:kai');
+        expect(boundaryIds).toContain('document:note-a:chunk:note-a:chunk-1:evidence:entity:kai:memory');
+    });
+
+    it('synthesizes the Embed Caps hierarchy when embedding post-process vectors are missing', () => {
+        const snapshot = singleDocumentContractSnapshot();
+        snapshot.embeddingTargets.push(
+            target('embed:anchor:mention-1', 'anchor', 'mention-1', 'Kai mention', 'anchor_evidence', 'note-a', 'note-a:chunk-1', ['embed:chunk:note-a:chunk-1']),
+        );
+
+        const atlas = buildGraphRebuildEmbeddingAtlas(snapshot, 'lorentz');
+        const scene = buildGalaxyScene(atlas.nodes, atlas.edges, mergeGalaxySettings({ layoutMode: 'lorentzTree', sourceMode: 'embeddings' }));
+        const byId = new Map(atlas.nodes.map((node) => [node.id, node]));
+        const entityLorentz = byId.get('embed:entity:kai')?.metadata?.lorentz as Record<string, unknown>;
+        const boundaryIds = rootLaneTreeIds(scene);
+
+        expect(entityLorentz?.['capId']).toBe('document:note-a:chunk:note-a:chunk-1:evidence:entity:kai');
+        expect(entityLorentz?.['parentCapIds']).toEqual(['document:note-a:chunk:note-a:chunk-1:evidence']);
+        expect(boundaryIds).toContain('document:note-a:root:identity');
+        expect(boundaryIds).toContain('document:note-a:chunk:note-a:chunk-1');
+        expect(boundaryIds).toContain('document:note-a:chunk:note-a:chunk-1:evidence');
+        expect(boundaryIds).toContain('document:note-a:chunk:note-a:chunk-1:evidence:entity:kai');
+    });
+
+    it('draws Embed Caps level guides from the hierarchy contract', () => {
+        const atlas = buildGraphRebuildEmbeddingAtlas(singleDocumentContractSnapshot(), 'lorentz');
+        const scene = buildGalaxyScene(atlas.nodes, atlas.edges, mergeGalaxySettings({ layoutMode: 'lorentzTree', sourceMode: 'embeddings' }));
+        const shellGuides = new Map((scene.lorentzGuides || [])
+            .filter((guide) => guide.guideKind === 'levelShell')
+            .map((guide) => [guide.id, guide]));
+
+        for (const band of hierarchyShellBandsInOrder()) {
+            const guide = shellGuides.get(`caps:shell:${band.id}`);
+            expect(guide).toBeTruthy();
+            expect(guideRadius(guide!.positions3d)).toBeCloseTo(band.radius, 3);
+        }
     });
 
     it('does not silently downsample large scene nodes or unique edges', () => {
@@ -340,6 +432,84 @@ function mixedNode(
     };
 }
 
+function capNode(
+    id: string,
+    sourceType: string,
+    capId: string,
+    parentCapIds: string[],
+): GalaxyRenderableNode {
+    const shellRadius = sourceType === 'note'
+        ? 2.1
+        : sourceType === 'structureRoot'
+            ? 1.78
+            : sourceType === 'chunk'
+                ? 1.46
+                : sourceType === 'anchor'
+                    ? 1.14
+                    : sourceType === 'entity'
+                        ? 0.86
+                        : 0.58;
+    return {
+        id,
+        label: id,
+        kind: sourceType,
+        atlasX: 0.24,
+        atlasY: 0.12,
+        atlasZ: 1,
+        totalMentions: 2,
+        metadata: {
+            sourceType,
+            noteId: 'note-a',
+            chunkId: id.includes(':chunk-1') || id.includes(':mention-1') || id.includes(':kai') ? 'note-a:chunk-1' : undefined,
+            targetConfidence: 0.9,
+            lorentz: {
+                capId,
+                parentCapIds,
+                capDirection: [0.24, 0.12, 1],
+                shellRadius,
+                primaryTreeKind: 'documentStructure',
+            },
+        },
+    };
+}
+
+function singleDocumentContractSnapshot(): GraphRebuildSnapshot {
+    const snapshot = contractSnapshot();
+    snapshot.noteIds = ['note-a'];
+    snapshot.chunks = snapshot.chunks.filter((chunk) => chunk.noteId === 'note-a');
+    snapshot.embeddingTargets = snapshot.embeddingTargets.filter((item) => !item.id.includes('note-b'));
+    const entity = snapshot.embeddingTargets.find((item) => item.id === 'embed:entity:kai');
+    if (entity) {
+        entity.noteId = 'note-a';
+        entity.chunkId = 'note-a:chunk-1';
+        entity.parentIds = ['embed:chunk:note-a:chunk-1'];
+    }
+    return snapshot;
+}
+
+function rootLaneTreeIds(scene: { lorentzGuides?: Array<{ guideKind: string; treeId: string }> }): string[] {
+    return (scene.lorentzGuides || [])
+        .filter((guide) => guide.guideKind === 'rootLane')
+        .map((guide) => guide.treeId);
+}
+
 function radius(node: { x: number; y: number; z: number }): number {
     return Number(Math.hypot(node.x, node.y, node.z).toFixed(4));
+}
+
+function guideRadius(positions: Float32Array): number {
+    return Number(Math.hypot(positions[0], positions[1], positions[2]).toFixed(4));
+}
+
+function maxPairwiseDistance(nodes: Array<{ x: number; y: number; z: number }>): number {
+    let maxDistance = 0;
+    for (let left = 0; left < nodes.length; left++) {
+        for (let right = left + 1; right < nodes.length; right++) {
+            const dx = nodes[left].x - nodes[right].x;
+            const dy = nodes[left].y - nodes[right].y;
+            const dz = nodes[left].z - nodes[right].z;
+            maxDistance = Math.max(maxDistance, Math.hypot(dx, dy, dz));
+        }
+    }
+    return Number(maxDistance.toFixed(4));
 }

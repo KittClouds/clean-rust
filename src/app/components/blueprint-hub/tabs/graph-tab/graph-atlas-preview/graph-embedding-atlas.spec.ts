@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { DEFAULT_ENTITY_COLORS, DEFAULT_GRAPH_NODE_COLORS } from '../../../../../lib/store/entityColorStore';
 import type { NoteBlockProjection } from '../../../../../lib/dexie/db';
+import { buildGraphAtlasTaxonomyAudit } from '../../../../../graph-rebuild/graph-atlas-taxonomy-audit';
 import { buildGraphModelV2Snapshot } from '../../../../../graph-rebuild/graph-model-v2';
 import { buildLeafEmbeddingAtlas } from './graph-embedding-atlas';
 import { buildGraphRebuildEmbeddingAtlas, graphRebuildEmbeddingTargetCount } from './graph-rebuild-embedding-atlas';
@@ -335,7 +336,7 @@ describe('embedding atlas projection', () => {
             projectionRefs: [],
             nodes: [],
             edges: [],
-            counters: { embeddingTargets: 4 },
+            counters: { embeddingTargets: 6 },
             atlasPacket: {
                 schemaVersion: 'phoenix-atlas-packet/v1',
                 snapshotId: 'snapshot-packet-taxonomy',
@@ -385,6 +386,38 @@ describe('embedding atlas projection', () => {
                         evidenceIds: [],
                     },
                     {
+                        id: 'embed:document-unit:style-sentence-1',
+                        objectId: 'object:style-sentence-1',
+                        family: 'structure',
+                        admission: 'admitted',
+                        status: 'accepted',
+                        vectorStatus: 'missing',
+                        coordinateSource: 'deterministic-signature',
+                        kind: 'documentUnit',
+                        label: 'Styled sentence',
+                        styleKey: 'sentence',
+                        lane: 'chunk_spine',
+                        structuralRole: 'child',
+                        sourceId: 'style-sentence-1',
+                        evidenceIds: [],
+                    },
+                    {
+                        id: 'embed:document-unit:style-paragraph-1',
+                        objectId: 'object:style-paragraph-1',
+                        family: 'structure',
+                        admission: 'admitted',
+                        status: 'accepted',
+                        vectorStatus: 'missing',
+                        coordinateSource: 'deterministic-signature',
+                        kind: 'documentUnit',
+                        label: 'Styled paragraph',
+                        styleKey: 'paragraph',
+                        lane: 'chunk_spine',
+                        structuralRole: 'child',
+                        sourceId: 'style-paragraph-1',
+                        evidenceIds: [],
+                    },
+                    {
                         id: 'embed:memory:rank-1',
                         objectId: 'object:memory-1',
                         family: 'memory',
@@ -420,7 +453,7 @@ describe('embedding atlas projection', () => {
                 ],
                 counters: {
                     objects: 0,
-                    manifoldTargets: 4,
+                    manifoldTargets: 6,
                     registryEntities: 0,
                     evidenceAnchors: 0,
                     modelVectors: 0,
@@ -434,6 +467,8 @@ describe('embedding atlas projection', () => {
         const memory = atlas.nodes.find((node) => node.id === 'embed:memory:rank-1');
 
         expect(ids.has('embed:document-unit:paragraph-1')).toBe(false);
+        expect(ids.has('embed:document-unit:style-sentence-1')).toBe(false);
+        expect(ids.has('embed:document-unit:style-paragraph-1')).toBe(false);
         expect(ids.has('embed:document-unit:leaf-1')).toBe(true);
         expect(ids.has('embed:graph-fact:weak-co')).toBe(false);
         expect(memory?.metadata?.['graphMemoryStateKind']).toBe('rankStatus');
@@ -1031,6 +1066,8 @@ describe('embedding atlas projection', () => {
                 { id: 'embed:chunk:chunk-1', kind: 'chunk', sourceId: 'chunk-1', noteId: 'note-1', chunkId: 'chunk-1', label: 'Chunk 1', text: 'Chunk spine', evidenceIds: [], parentIds: ['embed:note:note-1'] },
                 { id: 'embed:document-unit:paragraph-1', kind: 'documentUnit', sourceId: 'paragraph-1', noteId: 'note-1', chunkId: 'chunk-1', label: 'Paragraph 1', text: 'document_sidecar:paragraph\nkind:paragraph', evidenceIds: [], parentIds: ['embed:chunk:chunk-1'] },
                 { id: 'embed:document-unit:sentence-1', kind: 'documentUnit', sourceId: 'sentence-1', noteId: 'note-1', chunkId: 'chunk-1', label: 'Sentence 1', text: 'document_sidecar:sentence\nkind:sentence', evidenceIds: [], parentIds: ['embed:document-unit:paragraph-1'] },
+                { id: 'embed:document-unit:style-paragraph-1', kind: 'documentUnit', sourceId: 'style-paragraph-1', noteId: 'note-1', chunkId: 'chunk-1', label: 'Styled paragraph', text: 'structured unit', styleKey: 'paragraph', evidenceIds: [], parentIds: ['embed:chunk:chunk-1'] },
+                { id: 'embed:document-unit:style-sentence-1', kind: 'documentUnit', sourceId: 'style-sentence-1', noteId: 'note-1', chunkId: 'chunk-1', label: 'Styled sentence', text: 'structured unit', styleKey: 'sentence', evidenceIds: [], parentIds: ['embed:chunk:chunk-1'] },
                 { id: 'embed:document-unit:leaf-1', kind: 'documentUnit', sourceId: 'leaf-1', noteId: 'note-1', chunkId: 'chunk-1', label: 'Leaf', text: 'document_sidecar:retrieval_unit\nkind:leaf', evidenceIds: [], parentIds: ['embed:chunk:chunk-1'] },
                 { id: 'embed:document-unit:claim-1', kind: 'documentUnit', sourceId: 'claim-1', noteId: 'note-1', chunkId: 'chunk-1', label: 'Claim', text: 'document_sidecar:rhetorical_unit\nkind:claim', evidenceIds: [], parentIds: ['embed:chunk:chunk-1'] },
                 { id: 'embed:document-unit:action-1', kind: 'documentUnit', sourceId: 'action-1', noteId: 'note-1', chunkId: 'chunk-1', label: 'Action block', text: 'document_sidecar:rhetorical_unit\nkind:action_block', evidenceIds: [], parentIds: ['embed:chunk:chunk-1'] },
@@ -1069,8 +1106,47 @@ describe('embedding atlas projection', () => {
         ]));
         expect(idSet.has('embed:document-unit:paragraph-1')).toBe(false);
         expect(idSet.has('embed:document-unit:sentence-1')).toBe(false);
+        expect(idSet.has('embed:document-unit:style-paragraph-1')).toBe(false);
+        expect(idSet.has('embed:document-unit:style-sentence-1')).toBe(false);
         expect(idSet.has('embed:graph-fact:weak-co')).toBe(false);
         expect(idSet.has('embed:raw-mention:kai')).toBe(false);
+    });
+
+    it('audits sentence and paragraph style keys as explicit Embed exclusions', () => {
+        const snapshot = {
+            schemaVersion: 'phoenix-graph-rebuild/v1',
+            id: 'snapshot-style-key-exclusions',
+            source: 'phoenix-graph-rebuild',
+            scopeKind: 'global',
+            scopeId: 'global',
+            noteIds: ['note-1'],
+            builtAt: 1,
+            chunks: [],
+            mentions: [],
+            entityAnchors: [],
+            relationships: [],
+            events: [],
+            episodes: [],
+            temporalEdges: [],
+            causalEdges: [],
+            memoryState: [],
+            embeddingTargets: [
+                { id: 'embed:document-unit:style-paragraph-1', kind: 'documentUnit', sourceId: 'style-paragraph-1', noteId: 'note-1', label: 'Styled paragraph', text: 'structured unit', styleKey: 'paragraph', evidenceIds: [] },
+                { id: 'embed:document-unit:style-sentence-1', kind: 'documentUnit', sourceId: 'style-sentence-1', noteId: 'note-1', label: 'Styled sentence', text: 'structured unit', styleKey: 'sentence', evidenceIds: [] },
+                { id: 'embed:entity:kai', kind: 'entity', sourceId: 'kai', entityId: 'kai', entityKind: 'CHARACTER', label: 'Kai', text: 'Kai', evidenceIds: [] },
+            ],
+            embeddingVectors: [],
+            projectionRefs: [],
+            nodes: [],
+            edges: [],
+            counters: null as any,
+        } as any;
+
+        const audit = buildGraphAtlasTaxonomyAudit(snapshot);
+        const exclusions = new Map(audit.embedExclusions.map((row) => [`${row.styleKey}:${row.reason}`, row.count]));
+
+        expect(exclusions.get('paragraph:sentence_or_paragraph')).toBe(1);
+        expect(exclusions.get('sentence:sentence_or_paragraph')).toBe(1);
     });
 
     it('uses graph model v2 projection edges for graph-rebuild relationship rendering', () => {
@@ -1422,7 +1498,7 @@ describe('embedding atlas projection', () => {
             }),
         });
         expect(kai.metadata?.lorentz).toMatchObject({
-            level: 3,
+            level: 4,
             primaryTreeKind: 'identity',
             regionRole: 'core',
             dominantLane: 'entity',
@@ -1568,8 +1644,8 @@ describe('embedding atlas projection', () => {
             parentNodeId: 'embed:structure-root:note-1:document-structure',
         });
         expect(byId.get('embed:entity:kai')).toMatchObject({
-            capId: 'identity:kai',
-            parentCapId: 'document:note-1:chunk:chunk-1',
+            capId: 'document:note-1:chunk:chunk-1:evidence:entity:kai',
+            parentCapId: 'document:note-1:chunk:chunk-1:evidence',
             signalLane: 'entity_anchor',
         });
         expect(nodesById.has('embed:anchor:a1')).toBe(false);
@@ -1660,7 +1736,7 @@ describe('embedding atlas projection', () => {
         expect(note['capId']).toBe('document:note-1');
         expect(noteTwo['capId']).toBe('document:note-2');
         expect(chunk['capId']).toBe('document:note-1:chunk:chunk-1');
-        expect(entity['capId']).toBe('identity:kai');
+        expect(entity['capId']).toBe('document:note-1:chunk:chunk-1:evidence:entity:kai');
         expect(Number(note['shellRadius'])).toBeGreaterThan(Number(chunk['shellRadius']));
         expect(Number(chunk['shellRadius'])).toBeGreaterThan(Number(entity['shellRadius']));
     });
@@ -1760,10 +1836,10 @@ describe('embedding atlas projection', () => {
 
         expect(rootOne['capId']).toBe('document:note-1:root:identity');
         expect(rootTwo['capId']).toBe('document:note-2:root:identity');
-        expect(entity['capId']).toBe('identity:amara');
+        expect(entity['capId']).toBe('document:note-1:chunk:chunk-1:evidence:entity:amara');
         expect(entity['parentCapIds']).toEqual(expect.arrayContaining([
-            'document:note-1:chunk:chunk-1',
-            'document:note-2:chunk:chunk-2',
+            'document:note-1:chunk:chunk-1:evidence',
+            'document:note-2:chunk:chunk-2:evidence',
         ]));
         expect(entity['supportNoteIds']).toEqual(['note-1', 'note-2']);
         expect(dot3(entity['capDirection'] as number[], average3(noteOne['capDirection'] as number[], noteTwo['capDirection'] as number[]))).toBeGreaterThan(0.82);

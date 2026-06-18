@@ -14,6 +14,9 @@ import {
 import type {
     GraphRebuildEmbeddingTargetPostProcess,
     GraphRebuildEmbeddingTarget,
+    GraphRebuildProductLaneFeatures,
+    GraphRebuildProductLaneKind,
+    GraphRebuildProductTopologyRegion,
     GraphRebuildSnapshot,
 } from '../../../../../graph-rebuild/graph-rebuild-snapshot';
 import type { GraphAtlasManifoldTarget, GraphAtlasObject, GraphAtlasPacket } from '../../../../../graph-rebuild/graph-atlas-packet';
@@ -34,6 +37,7 @@ import type { GalaxyInputEdge, GalaxyRenderableNode } from './graph-galaxy-engin
 import type { EmbeddingAtlasData, EmbeddingAtlasSearchItem } from './graph-embedding-atlas';
 import { relationFamilyFromText, relationHslFromText } from './graph-relation-visual-style';
 import { entityColorStore } from '../../../../../lib/store/entityColorStore';
+import { HIERARCHY_SHELL_BANDS, type CapsHierarchyRole, type HierarchyShellBand } from './graph-galaxy-hierarchy-caps';
 
 const HOPF_RESONANCE_DIMS = 96;
 const HOPF_RESONANCE_NEIGHBORS = 8;
@@ -81,6 +85,14 @@ type TargetHierarchyContext = {
 };
 
 type CapsVec3 = { x: number; y: number; z: number };
+
+type CapsHierarchyPath = {
+    role: CapsHierarchyRole;
+    band: HierarchyShellBand;
+    capId: string;
+    parentCapIds: string[];
+    parentNodeId: string | null;
+};
 
 type MentionCompactionReceipt = {
     mode: 'entity_mention_compaction_v1';
@@ -574,6 +586,16 @@ const CURATED_DOCUMENT_UNIT_TOKENS = [
     'decision',
 ];
 
+const SENTENCE_PARAGRAPH_TAXONOMY_TOKENS = [
+    'paragraph',
+    'paragraphgroup',
+    'sentence',
+    'textsentence',
+    'documentsentence',
+    'textparagraph',
+    'documentparagraph',
+];
+
 function isCuratedEmbedManifoldTarget(target: GraphRebuildEmbeddingTarget): boolean {
     const kind = displayKind(target.kind);
     if (CURATED_EMBED_DROP_KINDS.has(kind) || isSentenceOrParagraphTarget(target, kind)) return false;
@@ -614,31 +636,22 @@ function compactEmbedToken(value: string): string {
 
 function isSentenceOrParagraphTarget(target: GraphRebuildEmbeddingTarget, kind: string): boolean {
     if (kind.endsWith('-sentence') || kind.endsWith('-paragraph')) return true;
+    if ([
+        kind,
+        target.styleKey || '',
+        target.stateContextKind || '',
+    ].some(isSentenceOrParagraphTaxonomyToken)) {
+        return true;
+    }
     if (isDocumentStructureUnitTarget(target)) {
         const unitProfile = compactEmbedProfileText(target, true);
-        if ([
-            'paragraph',
-            'paragraphgroup',
-            'sentence',
-            'textsentence',
-            'documentsentence',
-            'textparagraph',
-            'documentparagraph',
-        ].some((token) => unitProfile.includes(token))) {
+        if (SENTENCE_PARAGRAPH_TAXONOMY_TOKENS.some((token) => unitProfile.includes(token))) {
             return true;
         }
     }
     const documentUnitKind = compactEmbedToken(target.documentUnitKind || '');
     if (documentUnitKind) {
-        return [
-            'paragraph',
-            'paragraphgroup',
-            'sentence',
-            'textsentence',
-            'documentsentence',
-            'textparagraph',
-            'documentparagraph',
-        ].some((token) => documentUnitKind === token || documentUnitKind.includes(token));
+        return SENTENCE_PARAGRAPH_TAXONOMY_TOKENS.some((token) => documentUnitKind === token || documentUnitKind.includes(token));
     }
     const profile = compactEmbedProfileText(target, false);
     return [
@@ -650,6 +663,11 @@ function isSentenceOrParagraphTarget(target: GraphRebuildEmbeddingTarget, kind: 
         'paragraphindex',
         'sentenceindex',
     ].some((token) => profile.includes(token));
+}
+
+function isSentenceOrParagraphTaxonomyToken(value: string): boolean {
+    const token = compactEmbedToken(value);
+    return Boolean(token && SENTENCE_PARAGRAPH_TAXONOMY_TOKENS.some((dropToken) => token === dropToken || token.includes(dropToken)));
 }
 
 function isDocumentStructureUnitTarget(target: GraphRebuildEmbeddingTarget): boolean {
@@ -1203,6 +1221,12 @@ function targetNode(
         ? relationFamilyFromText(target.label, target.text, target.sourceId)
         : null;
     const totalMentions = mentionCompaction?.anchorCount ?? target.evidenceIds.length;
+    const lorentzMetadata = manifold === 'lorentz' || post
+        ? productLorentzMetadata(target, point, post, hierarchyContext, capsDocumentDirections)
+        : undefined;
+    const capsHierarchyRole = typeof lorentzMetadata?.['capsHierarchyRole'] === 'string'
+        ? lorentzMetadata['capsHierarchyRole']
+        : undefined;
     return {
         id: target.id,
         label: target.label || target.id,
@@ -1219,6 +1243,7 @@ function targetNode(
             graphColorKind: relationFamily || targetRenderKind(target),
             graphRelationFamily: relationFamily || undefined,
             graphMemoryStateKind: displayKind(target.kind) === 'memory-state' ? memoryStateGraphColorKind(target) : undefined,
+            capsHierarchyRole,
             signalLane: target.lane,
             signalStructuralRole: target.structuralRole,
             signalAdmissionTier: target.admissionTier,
@@ -1269,7 +1294,7 @@ function targetNode(
                 lanes: post.productLaneFeatures,
             } : undefined,
             siegel: manifold === 'siegel' ? graphRebuildSiegelMetadata(target, post, hierarchyContext) : undefined,
-            lorentz: post ? productLorentzMetadata(target, point, post, hierarchyContext, capsDocumentDirections) : undefined,
+            lorentz: lorentzMetadata,
             hopf: manifold === 'hopf'
                 ? graphRebuildHopfMetadata(target, post, manifold, hopfBase)
                 : post ? graphRebuildHopfMetadata(target, post, manifold) : undefined,
@@ -2006,24 +2031,26 @@ function fallbackOrthogonalAxis(axis: Float32Array): Float32Array {
 function productLorentzMetadata(
     target: GraphRebuildEmbeddingTarget,
     point: { x: number; y: number; z: number },
-    post: GraphRebuildEmbeddingTargetPostProcess,
+    post: GraphRebuildEmbeddingTargetPostProcess | undefined,
     hierarchyContext?: TargetHierarchyContext,
     capsDocumentDirections?: Map<string, CapsVec3>,
 ): Record<string, unknown> {
-    const lane = post.productLaneFeatures;
-    const region = post.productTopologyRegion;
+    const lane = post?.productLaneFeatures ?? fallbackProductLaneFeatures(target);
+    const region = post?.productTopologyRegion ?? fallbackProductTopologyRegion(target, lane);
     const radius = Math.max(0.001, Math.hypot(point.x, point.y, point.z));
     const depth = Math.max(0, Math.min(1, 1 - lane.semanticDepth));
     const scale = 0.22 + depth * 0.66;
-    const treeKind = productFiberKind(post.clusterRole, region.laneKind);
-    const parentNodeId = post.medoidTargetId && post.medoidTargetId !== target.id ? post.medoidTargetId : null;
+    const clusterRole = post?.clusterRole ?? fallbackProductClusterRole(target);
+    const treeKind = productFiberKind(clusterRole, region.laneKind);
+    const parentNodeId = post?.medoidTargetId && post.medoidTargetId !== target.id ? post.medoidTargetId : null;
     const supportNoteIds = capsSupportNoteIds(target, hierarchyContext);
     const supportChunkIds = capsSupportChunkIds(target, hierarchyContext);
-    const capId = productCapId(target, region.id, hierarchyContext, supportNoteIds);
-    const parentId = productCapParentId(target, parentNodeId, hierarchyContext);
-    const parentCapIds = productCapParentIds(target, hierarchyContext, supportNoteIds, supportChunkIds);
+    const hierarchy = capsHierarchyPath(target, hierarchyContext, supportNoteIds, supportChunkIds, parentNodeId);
+    const capId = hierarchy.capId;
+    const parentId = hierarchy.parentNodeId;
+    const parentCapIds = hierarchy.parentCapIds;
     const parentCapId = parentCapIds[0] || null;
-    const level = productRegionLevel(target, post);
+    const level = hierarchy.band.rank;
     const specificity = productHierarchySpecificity(target, post);
     const ambiguity = productHierarchyAmbiguity(post);
     const capDirection = capsDirectionForTarget(target, point, hierarchyContext, supportNoteIds, supportChunkIds, capsDocumentDirections);
@@ -2041,7 +2068,10 @@ function productLorentzMetadata(
         containmentPath: capsContainmentPath(capId, parentCapIds),
         capDirection: [capDirection.x, capDirection.y, capDirection.z],
         capPhase: lane.fiberPhase,
-        shellRadius: productCapShellRadius(target, specificity, ambiguity),
+        shellRadius: hierarchy.band.radius,
+        capsHierarchyRole: hierarchy.role,
+        hierarchyRole: hierarchy.role,
+        hierarchyRank: hierarchy.band.rank,
         parentNodeId: parentId,
         signalLane: target.lane,
         structuralRole: target.structuralRole,
@@ -2068,9 +2098,208 @@ function productLorentzMetadata(
             parentNodeId: parentId,
             parentCapId,
             level,
-            pathKey: `product-lane:${region.laneKind}/${post.clusterId}/${target.id}`,
+            pathKey: `product-lane:${region.laneKind}/${post?.clusterId || region.clusterId}/${target.id}`,
         }],
     };
+}
+
+function fallbackProductLaneFeatures(target: GraphRebuildEmbeddingTarget): GraphRebuildProductLaneFeatures {
+    const dominantLane = fallbackProductLaneKind(target);
+    const laneWeights: Record<GraphRebuildProductLaneKind, number> = {
+        semantic: 0.08,
+        document: 0.08,
+        relation: 0.08,
+        temporal: 0.08,
+        causal: 0.08,
+        evidence: 0.08,
+        entity: 0.08,
+    };
+    laneWeights[dominantLane] = 0.9;
+    return {
+        semanticDepth: dominantLane === 'semantic' ? 0.74 : 0.26,
+        documentDepth: dominantLane === 'document' ? 0.86 : 0.18,
+        relationDepth: dominantLane === 'relation' ? 0.82 : 0.16,
+        clusterRadius: 0.18,
+        fiberPhase: unitHash(`${target.id}:caps-phase`),
+        confidence: targetConfidence(target),
+        dominantLane,
+        laneWeights,
+    };
+}
+
+function fallbackProductTopologyRegion(
+    target: GraphRebuildEmbeddingTarget,
+    lane: GraphRebuildProductLaneFeatures,
+): GraphRebuildProductTopologyRegion {
+    const laneKind = lane.dominantLane;
+    const clusterId = `caps:${laneKind}:${normalizeHopfToken(target.id)}`;
+    return {
+        id: clusterId,
+        role: 'core',
+        laneKind,
+        clusterId,
+        medoidTargetId: target.id,
+        memberCount: 1,
+        density: 1,
+        confidence: targetConfidence(target),
+        bridgeTargetIds: [],
+        backboneTargetIds: [target.id],
+    };
+}
+
+function fallbackProductLaneKind(target: GraphRebuildEmbeddingTarget): GraphRebuildProductLaneKind {
+    const kind = displayKind(target.kind);
+    const lane = String(target.lane || '').toLowerCase();
+    if (kind === 'note' || kind === 'structure-root' || kind === 'chunk' || /document|chunk/.test(lane)) return 'document';
+    if (kind === 'anchor' || /anchor|evidence/.test(lane)) return 'evidence';
+    if (kind === 'entity' || /entity|identity|character|location/.test(lane)) return 'entity';
+    if (kind === 'causal-fact' || /causal/.test(lane)) return 'causal';
+    if (kind === 'event' || kind === 'temporal-fact' || /event|temporal/.test(lane)) return 'temporal';
+    if (kind === 'graph-fact' || /relationship|relation|fact/.test(lane)) return 'relation';
+    return 'semantic';
+}
+
+function fallbackProductClusterRole(target: GraphRebuildEmbeddingTarget): GraphRebuildEmbeddingTargetPostProcess['clusterRole'] {
+    const kind = displayKind(target.kind);
+    if (kind === 'note' || kind === 'structure-root' || kind === 'chunk') return 'document_region';
+    if (kind === 'entity') return 'entity_region';
+    if (kind === 'event') return 'event_region';
+    if (kind === 'graph-fact' || kind === 'temporal-fact' || kind === 'causal-fact' || kind === 'memory-state') return 'fact_region';
+    return 'mixed_region';
+}
+
+function capsHierarchyPath(
+    target: GraphRebuildEmbeddingTarget,
+    hierarchyContext: TargetHierarchyContext | undefined,
+    supportNoteIds: string[],
+    supportChunkIds: string[],
+    fallbackParentNodeId: string | null,
+): CapsHierarchyPath {
+    const role = capsHierarchyRoleForTarget(target);
+    const band = HIERARCHY_SHELL_BANDS[role];
+    const parents = target.parentIds || [];
+    const noteIds = [...new Set([target.noteId || '', hierarchyContext?.noteId || '', ...supportNoteIds].filter(Boolean))].sort();
+    const chunkIds = [...new Set([target.chunkId || '', hierarchyContext?.chunkId || '', ...supportChunkIds].filter(Boolean))].sort();
+    const noteId = target.noteId || hierarchyContext?.noteId || noteIds[0];
+    const chunkId = target.chunkId || hierarchyContext?.chunkId || chunkIds[0];
+    const rootKey = role === 'documentRoot' ? capsStructureRootKey(target) : capsParentRootKey(target, parents);
+    const documentCap = noteId ? `document:${noteId}` : '';
+    const rootCap = noteId ? `document:${noteId}:root:${rootKey}` : '';
+    const chunkCap = noteId && chunkId ? `document:${noteId}:chunk:${chunkId}` : '';
+    const evidenceCap = chunkCap ? `${chunkCap}:evidence` : '';
+    const entityId = capsTargetEntityId(target);
+    const entityCap = entityId ? capsEntityCapId(entityId, noteId, chunkId, noteIds, chunkIds) : '';
+    const eventParent = role === 'event' ? capsEventParentId(target) : null;
+    const eventParentCap = eventParent
+        ? capsEventCapIdFor(eventParent.slice('embed:event:'.length), entityId, noteId, chunkId, noteIds, chunkIds)
+        : '';
+    const family = relationFamilyFromText(target.label, target.text, target.sourceId) || 'relationship';
+    return {
+        role,
+        band,
+        capId: capsHierarchyCapId(target, role, documentCap, rootCap, chunkCap, evidenceCap, entityCap, eventParentCap, family),
+        parentCapIds: capsHierarchyParentCapIds(role, noteIds, chunkIds, rootKey, entityCap, eventParentCap),
+        parentNodeId: capsHierarchyParentNodeId(target, role, noteId, chunkId, fallbackParentNodeId),
+    };
+}
+
+function capsHierarchyRoleForTarget(target: GraphRebuildEmbeddingTarget): CapsHierarchyRole {
+    const kind = displayKind(target.kind);
+    const lane = target.lane || '';
+    if (kind === 'note') return 'document';
+    if (kind === 'structure-root') return 'documentRoot';
+    if (kind === 'chunk' || kind === 'document-unit' || lane === 'document_spine' || lane === 'chunk_spine') return 'chunk';
+    if (kind === 'anchor' || kind === 'evidence-span' || lane === 'anchor_evidence') return 'evidence';
+    if (kind === 'entity' || lane === 'entity_anchor') return 'entity';
+    if (kind === 'event' || lane === 'event_identity') return 'event';
+    if (kind === 'memory-state' || lane === 'memory_state') return 'memory';
+    if (kind === 'graph-fact' || lane === 'relationship_fact') return 'fact';
+    if (kind === 'causal-fact' || kind === 'temporal-fact' || lane === 'causal_fact' || lane === 'temporal_fact') return 'event';
+    return 'memory';
+}
+
+function capsHierarchyCapId(
+    target: GraphRebuildEmbeddingTarget,
+    role: CapsHierarchyRole,
+    documentCap: string,
+    rootCap: string,
+    chunkCap: string,
+    evidenceCap: string,
+    entityCap: string,
+    eventParentCap: string,
+    family: string,
+): string {
+    const sourceKey = normalizeHopfToken(target.sourceId || target.id);
+    if (role === 'document') return documentCap || `document:${sourceKey}`;
+    if (role === 'documentRoot') return rootCap || `document:unknown:root:${capsStructureRootKey(target)}`;
+    if (role === 'chunk') return chunkCap || `chunk:${sourceKey}`;
+    if (role === 'evidence') return evidenceCap || `evidence:${sourceKey}`;
+    if (role === 'entity') return entityCap || `identity:${normalizeHopfToken(target.entityId || target.sourceId || target.id)}`;
+    if (role === 'event') {
+        if (displayKind(target.kind) === 'causal-fact') return eventParentCap ? `${eventParentCap}:causal` : `${evidenceCap || chunkCap || 'event'}:causal`;
+        if (displayKind(target.kind) === 'temporal-fact') return eventParentCap ? `${eventParentCap}:temporal` : `${evidenceCap || chunkCap || 'event'}:temporal`;
+        return `${entityCap || evidenceCap || chunkCap || documentCap || 'event'}:event:${sourceKey}`;
+    }
+    if (role === 'fact') return `${entityCap || evidenceCap || chunkCap || documentCap || 'signals'}:facts:${family}`;
+    return `${entityCap || evidenceCap || chunkCap || documentCap || 'signals'}:memory`;
+}
+
+function capsHierarchyParentCapIds(
+    role: CapsHierarchyRole,
+    noteIds: string[],
+    chunkIds: string[],
+    rootKey: string,
+    entityCap: string,
+    eventParentCap: string,
+): string[] {
+    const rootCaps = capsRootParentCaps(noteIds, rootKey);
+    const chunkCaps = capsChunkParentCaps(noteIds, chunkIds);
+    const evidenceCaps = capsEvidenceParentCaps(noteIds, chunkIds);
+    if (role === 'document') return [];
+    if (role === 'documentRoot') return noteIds.map((noteId) => `document:${noteId}`);
+    if (role === 'chunk') return rootCaps.length ? rootCaps : noteIds.map((noteId) => `document:${noteId}`);
+    if (role === 'evidence') return chunkCaps.length ? chunkCaps : rootCaps;
+    if (role === 'entity') return evidenceCaps.length ? evidenceCaps : chunkCaps.length ? chunkCaps : rootCaps;
+    if (eventParentCap) return [eventParentCap];
+    if (role === 'event' || role === 'fact' || role === 'memory') {
+        return entityCap ? [entityCap] : evidenceCaps.length ? evidenceCaps : chunkCaps.length ? chunkCaps : rootCaps;
+    }
+    return chunkCaps.length ? chunkCaps : rootCaps;
+}
+
+function capsHierarchyParentNodeId(
+    target: GraphRebuildEmbeddingTarget,
+    role: CapsHierarchyRole,
+    noteId: string | undefined,
+    chunkId: string | undefined,
+    fallbackParentNodeId: string | null,
+): string | null {
+    const parents = target.parentIds || [];
+    if (role === 'document') return null;
+    if (role === 'documentRoot' && noteId) return `embed:note:${noteId}`;
+    if (role === 'chunk') return firstParentWithPrefix(parents, `embed:structure-root:${noteId || ''}:`) || (noteId ? `embed:note:${noteId}` : fallbackParentNodeId);
+    if (role === 'evidence' && chunkId) return `embed:chunk:${chunkId}`;
+    if (role === 'entity') return firstParentWithPrefix(parents, 'embed:anchor:') || (chunkId ? `embed:chunk:${chunkId}` : fallbackParentNodeId);
+    if (role === 'event') return capsEventParentId(target) || firstParentWithPrefix(parents, 'embed:entity:') || (target.entityId ? `embed:entity:${target.entityId}` : fallbackParentNodeId);
+    if (role === 'fact') return firstParentWithPrefix(parents, 'embed:entity:') || fallbackParentNodeId;
+    if (role === 'memory') return firstParentWithPrefix(parents, 'embed:entity:') || (target.entityId ? `embed:entity:${target.entityId}` : fallbackParentNodeId);
+    return fallbackParentNodeId;
+}
+
+function capsTargetEntityId(target: GraphRebuildEmbeddingTarget): string {
+    const parent = firstParentWithPrefix(target.parentIds || [], 'embed:entity:');
+    if (parent) return parent.slice('embed:entity:'.length);
+    if (target.entityId) return target.entityId;
+    if (displayKind(target.kind) === 'entity') return target.sourceId || target.id.replace(/^embed:entity:/, '');
+    return '';
+}
+
+function capsEventParentId(target: GraphRebuildEmbeddingTarget): string | null {
+    const parents = target.parentIds || [];
+    const kind = displayKind(target.kind);
+    if (kind === 'causal-fact') return lastParentWithPrefix(parents, 'embed:event:');
+    if (kind === 'temporal-fact') return firstParentWithPrefix(parents, 'embed:event:');
+    return firstParentWithPrefix(parents, 'embed:event:') || lastParentWithPrefix(parents, 'embed:event:');
 }
 
 function productCapId(
@@ -2079,44 +2308,8 @@ function productCapId(
     hierarchyContext: TargetHierarchyContext | undefined,
     supportNoteIds: string[],
 ): string {
-    const kind = displayKind(target.kind);
-    const parents = target.parentIds || [];
-    const noteId = target.noteId || hierarchyContext?.noteId || supportNoteIds[0];
     const supportChunkIds = capsSupportChunkIds(target, hierarchyContext);
-    const chunkId = target.chunkId || hierarchyContext?.chunkId || supportChunkIds[0];
-    if (kind === 'note' && noteId) return `document:${noteId}`;
-    if (kind === 'structure-root' && noteId) return `document:${noteId}:root:${capsStructureRootKey(target)}`;
-    if (kind === 'chunk' && noteId) return `document:${noteId}:chunk:${target.chunkId || target.sourceId}`;
-    if (kind === 'entity') {
-        const entityId = target.entityId || target.sourceId;
-        return `identity:${entityId}`;
-    }
-    if (kind === 'anchor' && noteId && chunkId) return `document:${noteId}:chunk:${chunkId}:evidence`;
-    if (kind === 'event') return `event:${target.sourceId}`;
-    if (kind === 'causal-fact') {
-        const outcomeId = lastParentWithPrefix(parents, 'embed:event:');
-        if (outcomeId) return `${capsNodeCapToken(outcomeId)}:causal`;
-        if (noteId && chunkId) return `document:${noteId}:chunk:${chunkId}:causal`;
-    }
-    if (kind === 'temporal-fact') {
-        const eventId = firstParentWithPrefix(parents, 'embed:event:');
-        if (eventId) return `${capsNodeCapToken(eventId)}:temporal`;
-        if (noteId && chunkId) return `document:${noteId}:chunk:${chunkId}:temporal`;
-    }
-    if (kind === 'graph-fact') {
-        const family = relationFamilyFromText(target.label, target.text, target.sourceId) || 'relationship';
-        if (noteId && chunkId) return `document:${noteId}:chunk:${chunkId}:facts:${family}`;
-        const entityParent = firstParentWithPrefix(parents, 'embed:entity:');
-        if (entityParent) return `${capsNodeCapToken(entityParent)}:facts:${family}`;
-        if (noteId) return `document:${noteId}:facts:${family}`;
-    }
-    if (kind === 'memory-state') {
-        const entityParent = firstParentWithPrefix(parents, 'embed:entity:') || (target.entityId ? `embed:entity:${target.entityId}` : null);
-        if (entityParent) return `${capsNodeCapToken(entityParent)}:memory`;
-        if (noteId) return `document:${noteId}:memory`;
-    }
-    if (noteId) return `document:${noteId}:signals`;
-    return fallback;
+    return capsHierarchyPath(target, hierarchyContext, supportNoteIds, supportChunkIds, null).capId || fallback;
 }
 
 function buildCapsDocumentDirections(
@@ -2221,6 +2414,9 @@ function capsSupportNoteIds(target: GraphRebuildEmbeddingTarget, context?: Targe
         const noteId = parentId.match(/^embed:note:(.+)$/)?.[1]
             || parentId.match(/^embed:structure-root:([^:]+):/)?.[1];
         if (noteId) out.add(noteId);
+        const chunkId = parentId.match(/^embed:chunk:(.+)$/)?.[1];
+        const embeddedNoteId = chunkId?.match(/^([^:]+):/)?.[1];
+        if (embeddedNoteId) out.add(embeddedNoteId);
     }
     return [...out].sort();
 }
@@ -2251,44 +2447,7 @@ function productCapParentIds(
     supportNoteIds: string[],
     supportChunkIds: string[],
 ): string[] {
-    const kind = displayKind(target.kind);
-    const parents = target.parentIds || [];
-    const noteIds = [...new Set([
-        target.noteId || '',
-        hierarchyContext?.noteId || '',
-        ...supportNoteIds,
-    ].filter(Boolean))].sort();
-    const chunkIds = [...new Set([
-        target.chunkId || '',
-        hierarchyContext?.chunkId || '',
-        ...supportChunkIds,
-    ].filter(Boolean))].sort();
-    const chunkCaps = capsChunkParentCaps(noteIds, chunkIds);
-    const rootKey = capsParentRootKey(target, parents);
-    const rootCaps = noteIds.map((noteId) => `document:${noteId}:root:${rootKey}`);
-    if (kind === 'note') return [];
-    if (kind === 'structure-root') return noteIds.map((noteId) => `document:${noteId}`);
-    if (kind === 'chunk') return rootCaps.length ? rootCaps : noteIds.map((noteId) => `document:${noteId}`);
-    if (kind === 'entity') return chunkCaps.length ? chunkCaps : rootCaps;
-    if (kind === 'anchor' || kind === 'event') return chunkCaps.length ? chunkCaps : rootCaps;
-    if (kind === 'memory-state') {
-        const entityParent = firstParentWithPrefix(parents, 'embed:entity:') || (target.entityId ? `embed:entity:${target.entityId}` : null);
-        return entityParent ? [capsNodeCapToken(entityParent)] : chunkCaps.length ? chunkCaps : rootCaps;
-    }
-    if (kind === 'causal-fact') {
-        const eventParent = lastParentWithPrefix(parents, 'embed:event:');
-        return eventParent ? [capsNodeCapToken(eventParent)] : chunkCaps.length ? chunkCaps : rootCaps;
-    }
-    if (kind === 'temporal-fact') {
-        const eventParent = firstParentWithPrefix(parents, 'embed:event:');
-        return eventParent ? [capsNodeCapToken(eventParent)] : chunkCaps.length ? chunkCaps : rootCaps;
-    }
-    if (kind === 'graph-fact') {
-        const entityParent = firstParentWithPrefix(parents, 'embed:entity:');
-        if (chunkCaps.length) return chunkCaps;
-        return entityParent ? [capsNodeCapToken(entityParent)] : rootCaps;
-    }
-    return chunkCaps.length ? chunkCaps : rootCaps;
+    return capsHierarchyPath(target, hierarchyContext, supportNoteIds, supportChunkIds, null).parentCapIds;
 }
 
 function capsParentRootKey(target: GraphRebuildEmbeddingTarget, parentIds: string[]): string {
@@ -2308,6 +2467,10 @@ function capsNormalizeRootKey(value: string): string {
     return normalizeHopfToken(value);
 }
 
+function capsRootParentCaps(noteIds: string[], rootKey: string): string[] {
+    return noteIds.map((noteId) => `document:${noteId}:root:${rootKey}`);
+}
+
 function capsChunkParentCaps(noteIds: string[], chunkIds: string[]): string[] {
     if (!noteIds.length || !chunkIds.length) return [];
     const out = new Set<string>();
@@ -2324,6 +2487,55 @@ function capsChunkParentCaps(noteIds: string[], chunkIds: string[]): string[] {
         for (const noteId of noteIds) out.add(`document:${noteId}:chunk:${chunkId}`);
     }
     return [...out].sort();
+}
+
+function capsEvidenceParentCaps(noteIds: string[], chunkIds: string[]): string[] {
+    return capsChunkParentCaps(noteIds, chunkIds).map((capId) => `${capId}:evidence`);
+}
+
+function capsEntityCapId(
+    entityId: string,
+    noteId: string | undefined,
+    chunkId: string | undefined,
+    supportNoteIds: string[],
+    supportChunkIds: string[],
+): string {
+    const noteIds = [...new Set([noteId || '', ...supportNoteIds].filter(Boolean))];
+    const chunkIds = [...new Set([chunkId || '', ...supportChunkIds].filter(Boolean))];
+    const primaryNoteId = noteId || noteIds[0];
+    const primaryChunkId = chunkId || chunkIds[0];
+    if (primaryNoteId && primaryChunkId) return `document:${primaryNoteId}:chunk:${primaryChunkId}:evidence:entity:${entityId}`;
+    if (primaryNoteId) return `document:${primaryNoteId}:entity:${entityId}`;
+    return `identity:${entityId}`;
+}
+
+function capsEventCapId(
+    target: GraphRebuildEmbeddingTarget,
+    noteId: string | undefined,
+    chunkId: string | undefined,
+    supportNoteIds: string[],
+    supportChunkIds: string[],
+): string {
+    const entityParent = firstParentWithPrefix(target.parentIds || [], 'embed:entity:') || (target.entityId ? `embed:entity:${target.entityId}` : null);
+    const entityId = entityParent ? entityParent.slice('embed:entity:'.length) : '';
+    return capsEventCapIdFor(target.sourceId || target.id, entityId, noteId, chunkId, supportNoteIds, supportChunkIds);
+}
+
+function capsEventCapIdFor(
+    eventId: string,
+    entityId: string,
+    noteId: string | undefined,
+    chunkId: string | undefined,
+    supportNoteIds: string[],
+    supportChunkIds: string[],
+): string {
+    const entityCap = entityId ? capsEntityCapId(entityId, noteId, chunkId, supportNoteIds, supportChunkIds) : '';
+    if (entityCap && !entityCap.startsWith('identity:')) return `${entityCap}:event:${eventId}`;
+    const primaryNoteId = noteId || supportNoteIds[0];
+    const primaryChunkId = chunkId || supportChunkIds[0];
+    if (primaryNoteId && primaryChunkId) return `document:${primaryNoteId}:chunk:${primaryChunkId}:evidence:event:${eventId}`;
+    if (primaryNoteId) return `document:${primaryNoteId}:event:${eventId}`;
+    return `event:${eventId}`;
 }
 
 function capsContainmentPath(capId: string, parentCapIds: string[]): string {
@@ -2372,13 +2584,14 @@ function productCapParentId(
     const kind = displayKind(target.kind);
     if (kind === 'structure-root' && noteId) return `embed:note:${noteId}`;
     if (target.kind === 'chunk' && noteId) return firstParentWithPrefix(parents, `embed:structure-root:${noteId}:document-structure`) || `embed:note:${noteId}`;
+    if (target.kind === 'entity' && chunkId) return firstParentWithPrefix(parents, 'embed:anchor:') || `embed:chunk:${chunkId}`;
     if (target.kind === 'entity' && noteId) return firstParentWithPrefix(parents, `embed:structure-root:${noteId}:identity`) || `embed:structure-root:${noteId}:identity`;
     if (target.kind === 'anchor' && chunkId) return `embed:chunk:${chunkId}`;
     if (target.kind === 'anchor' && target.entityId) return `embed:entity:${target.entityId}`;
-    if (kind === 'event' && chunkId) return `embed:chunk:${chunkId}`;
+    if (kind === 'event') return firstParentWithPrefix(parents, 'embed:entity:') || (chunkId ? `embed:chunk:${chunkId}` : fallback);
     if (kind === 'causal-fact') return lastParentWithPrefix(parents, 'embed:event:') || firstParentWithPrefix(parents, `embed:structure-root:${noteId || ''}:causal`) || fallback;
     if (kind === 'temporal-fact') return firstParentWithPrefix(parents, 'embed:event:') || firstParentWithPrefix(parents, `embed:structure-root:${noteId || ''}:temporal`) || fallback;
-    if (kind === 'graph-fact') return chunkId ? `embed:chunk:${chunkId}` : firstParentWithPrefix(parents, 'embed:entity:') || fallback;
+    if (kind === 'graph-fact') return firstParentWithPrefix(parents, 'embed:entity:') || (chunkId ? `embed:chunk:${chunkId}` : fallback);
     if (kind === 'memory-state' && target.entityId) return `embed:entity:${target.entityId}`;
     if (parents.length) return parents[0];
     return fallback;
@@ -2389,46 +2602,19 @@ function productCapShellRadius(
     specificity: number,
     ambiguity: number,
 ): number {
-    const lane = target.lane || 'unknown';
-    const kind = displayKind(target.kind);
-    let radius = 1.28;
-    if (kind === 'note') radius = 2.08;
-    else if (kind === 'structure-root') radius = 1.92;
-    else if (kind === 'chunk' || lane === 'chunk_spine') radius = 1.66;
-    else if (kind === 'entity' || lane === 'entity_anchor') radius = 1.42;
-    else if (lane === 'document_spine') radius = 1.72;
-    else if (lane === 'event_identity' || lane === 'temporal_fact' || lane === 'causal_fact') radius = 1.24;
-    else if (lane === 'relationship_fact') radius = 1.16;
-    else if (lane === 'memory_state') radius = 1.08;
-    else if (lane === 'cooccurrence_weak') radius = 1.02;
-    else if (lane === 'anchor_evidence') radius = 0.92;
-    const confidence = targetConfidence(target);
-    const confidenceDrop = lane === 'document_spine' ? 0.08 : 0.24;
-    radius -= (1 - confidence) * confidenceDrop;
-    radius += (specificity - 0.72) * 0.08;
-    radius -= ambiguity * 0.08;
-    const [min, max] = productCapShellBand(target);
-    return clampRange(radius, min, max);
+    void specificity;
+    void ambiguity;
+    return HIERARCHY_SHELL_BANDS[capsHierarchyRoleForTarget(target)].radius;
 }
 
 function productCapShellBand(target: GraphRebuildEmbeddingTarget): [number, number] {
-    const lane = target.lane || 'unknown';
-    const kind = displayKind(target.kind);
-    if (kind === 'note') return [2.02, 2.12];
-    if (kind === 'structure-root') return [1.86, 1.98];
-    if (kind === 'chunk' || lane === 'document_spine' || lane === 'chunk_spine') return [1.56, 1.74];
-    if (kind === 'entity' || lane === 'entity_anchor') return [1.34, 1.52];
-    if (lane === 'event_identity' || lane === 'temporal_fact' || lane === 'causal_fact') return [1.14, 1.34];
-    if (lane === 'relationship_fact') return [1.08, 1.26];
-    if (lane === 'memory_state') return [0.98, 1.18];
-    if (lane === 'cooccurrence_weak') return [0.92, 1.12];
-    if (lane === 'anchor_evidence') return [0.78, 1.0];
-    return [0.54, 2.12];
+    const band = HIERARCHY_SHELL_BANDS[capsHierarchyRoleForTarget(target)];
+    return [band.min, band.max];
 }
 
 function productHierarchySpecificity(
     target: GraphRebuildEmbeddingTarget,
-    post: GraphRebuildEmbeddingTargetPostProcess,
+    post?: GraphRebuildEmbeddingTargetPostProcess,
 ): number {
     const kind = displayKind(target.kind);
     let base = 0.58;
@@ -2438,33 +2624,21 @@ function productHierarchySpecificity(
     else if (kind === 'entity') base = 0.82;
     else if (kind === 'event' || kind === 'temporal-fact' || kind === 'causal-fact') base = 0.74;
     else if (kind === 'graph-fact' || kind === 'memory-state') base = 0.64;
-    const role = post.productTopologyRegion.role;
+    const role = post?.productTopologyRegion.role || 'core';
     const roleBoost = role === 'outlier' ? 0.14 : role === 'boundary' ? 0.08 : role === 'bridge' ? 0.05 : role === 'core' ? -0.04 : 0;
-    return clamp01(base + roleBoost + post.productLaneFeatures.semanticDepth * 0.08);
+    return clamp01(base + roleBoost + (post?.productLaneFeatures.semanticDepth ?? 0.26) * 0.08);
 }
 
-function productHierarchyAmbiguity(post: GraphRebuildEmbeddingTargetPostProcess): number {
+function productHierarchyAmbiguity(post?: GraphRebuildEmbeddingTargetPostProcess): number {
+    if (!post) return 0.08;
     const role = post.productTopologyRegion.role;
     const roleBoost = role === 'outlier' ? 0.22 : role === 'bridge' ? 0.12 : role === 'boundary' ? 0.08 : 0;
     return clamp01(post.productLaneFeatures.clusterRadius * 0.52 + post.outlierScore * 0.28 + roleBoost);
 }
 
-function productRegionLevel(target: GraphRebuildEmbeddingTarget, post: GraphRebuildEmbeddingTargetPostProcess): number {
-    const kind = displayKind(target.kind);
-    if (target.lane === 'document_spine' && kind === 'note') return 0;
-    if (kind === 'structure-root') return 1;
-    if (target.lane === 'document_spine' || target.lane === 'chunk_spine' || kind === 'chunk') return 2;
-    if (target.lane === 'entity_anchor' || kind === 'entity') return 3;
-    if (target.lane === 'anchor_evidence' || kind === 'anchor') return 4;
-    if (target.lane === 'relationship_fact' || target.lane === 'event_identity' || target.lane === 'temporal_fact' || target.lane === 'causal_fact') return 3;
-    if (target.lane === 'memory_state' || target.lane === 'cooccurrence_weak') return 4;
-    const role = post.productTopologyRegion.role;
-    if (post.medoidTargetId === post.targetId && role === 'core') return 0;
-    if (role === 'core') return 1;
-    if (role === 'backbone') return 1;
-    if (role === 'bridge') return 2;
-    if (role === 'boundary') return 3;
-    return 4;
+function productRegionLevel(target: GraphRebuildEmbeddingTarget, post?: GraphRebuildEmbeddingTargetPostProcess): number {
+    void post;
+    return HIERARCHY_SHELL_BANDS[capsHierarchyRoleForTarget(target)].rank;
 }
 
 function productFiberKind(role: string, laneKind?: string): string {

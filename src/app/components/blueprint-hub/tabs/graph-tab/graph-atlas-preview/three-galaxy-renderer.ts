@@ -7,8 +7,13 @@ import { GraphGalaxyForceController, productManifoldExpansionScale } from './gra
 import {
     buildGalaxyGlows,
     buildGalaxyNodes,
+    galaxyGlassNodeBatch,
+    galaxyGlassNodeStateIndex,
+    galaxyGlowBatch,
     galaxyNodePickShapeBoost,
     galaxyNodeShapeScale,
+    type GalaxyGlassNodeBatch,
+    type GalaxyGlowBatch,
     type GalaxyNodeMaterial,
     type GalaxyNodeObject,
 } from './graph-galaxy-objects';
@@ -116,6 +121,10 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
     private readonly densityVector = new THREE.Vector3();
     private readonly edgeSurfacePoint = new THREE.Vector3();
     private readonly fieldVector = new THREE.Vector3();
+    private readonly instanceMatrix = new THREE.Matrix4();
+    private readonly instancePosition = new THREE.Vector3();
+    private readonly instanceQuaternion = new THREE.Quaternion();
+    private readonly instanceScale = new THREE.Vector3();
     private readonly force = new GraphGalaxyForceController();
     private readonly dragVector = new THREE.Vector3();
     private readonly atomTexture = makeAtomTexture();
@@ -147,6 +156,7 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
     private densityNodeBins = new Int32Array(0);
     private densityFactors = new Float32Array(0);
     private guidePositionBuffer = new Float32Array(0);
+    private labelSignature = '';
     private readonly timings: ThreeGalaxyRendererTimings = emptyRendererTimings();
 
     constructor() {
@@ -189,6 +199,7 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
         this.shells = this.buildGroupShells(scene);
         this.nodes = buildGalaxyNodes(scene, this.settings, this.nodeTexture, this.atomTexture);
         this.glows = buildGalaxyGlows(scene, this.haloTexture);
+        this.updateGlowViewport();
         this.edges = this.buildEdges(scene);
         this.force.bind(scene);
         this.force.setSettings(this.settings);
@@ -260,6 +271,7 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
         this.ortho.top = 3.1;
         this.ortho.bottom = -3.1;
         this.updateCamera();
+        this.updateGlowViewport();
     }
 
     render(): void {
@@ -397,13 +409,13 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
     selectNode(id: string | null): void {
         if (this.selectedId === id) return;
         this.selectedId = id;
-        this.applyModePositions();
+        this.applyFocusState();
     }
 
     hoverNode(id: string | null): void {
         if (this.hoverId === id) return;
         this.hoverId = id;
-        this.applyModePositions();
+        this.applyFocusState();
     }
 
     pick(pointer: GraphRendererPointer): string | null {
@@ -417,7 +429,8 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
             if (!this.sceneData) return null;
             const screenHit = this.screenSpacePick(pointer);
             if (screenHit >= 0) return { kind: 'node', id: this.sceneData.ids[screenHit] };
-            if (this.nodes) {
+            const skipRaycastFallback = this.sceneData.ids.length > 600 || Boolean(galaxyGlassNodeBatch(this.nodes));
+            if (this.nodes && !skipRaycastFallback) {
                 this.pointer.x = (pointer.x / Math.max(1, pointer.width)) * 2 - 1;
                 this.pointer.y = -(pointer.y / Math.max(1, pointer.height)) * 2 + 1;
                 this.raycaster.setFromCamera(this.pointer, this.camera());
@@ -516,7 +529,29 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
         this.updateEdgeGeometry(data, positions, focus);
         this.recordTiming('edgeGeometryMs', edgeStarted);
         const labelsStarted = this.now();
-        this.rebuildLabels(data, positions);
+        this.updateLabels(data, positions, true);
+        this.recordTiming('labelsMs', labelsStarted);
+        this.recordTiming('applyModeMs', started);
+    }
+
+    private applyFocusState(): void {
+        const data = this.sceneData;
+        const positions = this.positions();
+        if (!data || !positions) return;
+        const started = this.now();
+        const focusStarted = this.now();
+        const focus = buildGalaxyFocusMask(data, this.selectedId, this.hoverId);
+        this.recordTiming('focusMs', focusStarted);
+        this.focusMask = focus;
+        this.updateGuideFocus(data, focus);
+        const instancesStarted = this.now();
+        this.updateInstances(data, positions, focus);
+        this.recordTiming('instancesMs', instancesStarted);
+        const edgeStarted = this.now();
+        this.updateEdgeColors(data, positions, focus);
+        this.recordTiming('edgeGeometryMs', edgeStarted);
+        const labelsStarted = this.now();
+        this.updateLabels(data, positions, false);
         this.recordTiming('labelsMs', labelsStarted);
         this.recordTiming('applyModeMs', started);
     }
@@ -546,10 +581,9 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
     private updateInstances(data: GalaxySceneV2, positions: Float32Array, focus: GalaxyFocusMask): void {
         if (!this.nodes || !this.glows) return;
         const density = this.nodeDensityFactors(data, positions);
+        const glassBatch = galaxyGlassNodeBatch(this.nodes);
+        const glowBatch = galaxyGlowBatch(this.glows);
         for (let i = 0; i < data.ids.length; i++) {
-            const node = this.nodes.children[i] as GalaxyNodeObject | undefined;
-            const glow = this.glows.children[i] as THREE.Sprite | undefined;
-            if (!node || !glow) continue;
             const densityFactor = density[i] ?? 1;
             const active = data.ids[i] === this.selectedId;
             const hovered = data.ids[i] === this.hoverId;
@@ -564,37 +598,120 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
             const halo = atom ? 0 : core * this.settings.glow * (sphere
                     ? (hovered ? 1.94 : active ? 2.12 : neighbor ? 1.28 : dimmed ? 0.52 : 0.94)
                     : (hovered ? 4.9 : active ? 5.05 : neighbor ? 3.1 : dimmed ? 1.15 : 2.45));
-            node.position.set(positions[i * 3], positions[i * 3 + 1], positions[i * 3 + 2]);
-            node.scale.setScalar(core * galaxyNodeShapeScale(this.nodeShape, {
+            const offset = i * 3;
+            const x = positions[offset];
+            const y = positions[offset + 1];
+            const z = positions[offset + 2];
+            const nodeScale = core * galaxyNodeShapeScale(this.nodeShape, {
                 active,
                 hovered,
                 neighbor,
                 dimmed,
                 productAtom,
-            }));
+            });
             this.nodeColor(data, i, active, hovered, neighbor, dimmed);
-            const material = node.material as GalaxyNodeMaterial;
-            material.color.copy(this.color);
-            const baseOpacity = productAtom
-                ? (dimmed ? 0.16 : neighbor ? 0.86 : hovered || active ? 1 : 0.98)
-                : (dimmed ? 0.18 : neighbor ? 0.82 : hovered || active ? 1 : 0.94);
-            material.opacity = material instanceof THREE.MeshPhysicalMaterial
-                ? baseOpacity * (hovered || active ? 0.88 : neighbor ? 0.8 : 0.76)
-                : baseOpacity;
-            if (material instanceof THREE.MeshPhysicalMaterial) {
-                material.emissive.copy(this.color);
-                material.emissiveIntensity = dimmed ? 0.06 : hovered || active ? 0.34 : neighbor ? 0.22 : 0.16;
+            if (glassBatch) {
+                this.writeGlassNodeInstance(
+                    glassBatch,
+                    i,
+                    galaxyGlassNodeStateIndex(active, hovered, neighbor, dimmed),
+                    x,
+                    y,
+                    z,
+                    nodeScale,
+                );
+            } else {
+                const node = this.nodes.children[i] as GalaxyNodeObject | undefined;
+                if (!node) continue;
+                node.position.set(x, y, z);
+                node.scale.setScalar(nodeScale);
+                const material = node.material as GalaxyNodeMaterial;
+                material.color.copy(this.color);
+                const baseOpacity = productAtom
+                    ? (dimmed ? 0.16 : neighbor ? 0.86 : hovered || active ? 1 : 0.98)
+                    : (dimmed ? 0.18 : neighbor ? 0.82 : hovered || active ? 1 : 0.94);
+                material.opacity = material instanceof THREE.MeshPhysicalMaterial
+                    ? baseOpacity * (hovered || active ? 0.88 : neighbor ? 0.8 : 0.76)
+                    : baseOpacity;
+                if (material instanceof THREE.MeshPhysicalMaterial) {
+                    material.emissive.copy(this.color);
+                    material.emissiveIntensity = dimmed ? 0.06 : hovered || active ? 0.34 : neighbor ? 0.22 : 0.16;
+                }
             }
-            glow.position.copy(node.position);
-            glow.scale.setScalar(halo * (0.82 + densityFactor * 0.18));
             this.glowColor(data, i, active, hovered, dimmed);
-            glow.material.color.copy(this.color);
             const glowBase = atom ? 0 : sphere
                     ? (dimmed ? 0.012 : hovered || active ? 0.28 : neighbor ? 0.11 : 0.078)
                     : (dimmed ? 0.04 : hovered || active ? 0.58 : neighbor ? 0.28 : 0.22);
-            glow.material.opacity = THREE.MathUtils.clamp(glowBase * this.settings.glow * densityFactor, 0, 0.24);
-            glow.visible = glow.material.opacity > 0;
+            const glowOpacity = THREE.MathUtils.clamp(glowBase * this.settings.glow * densityFactor, 0, 0.24);
+            const glowScale = halo * (0.82 + densityFactor * 0.18);
+            if (glowBatch) {
+                this.writeGlowPoint(glowBatch, i, x, y, z, glowScale, glowOpacity);
+            } else {
+                const glow = this.glows.children[i] as THREE.Sprite | undefined;
+                if (!glow) continue;
+                glow.position.set(x, y, z);
+                glow.scale.setScalar(glowScale);
+                glow.material.color.copy(this.color);
+                glow.material.opacity = glowOpacity;
+                glow.visible = glowOpacity > 0;
+            }
         }
+        if (glassBatch) this.markGlassNodeBatchDirty(glassBatch);
+        if (glowBatch) this.markGlowBatchDirty(glowBatch);
+    }
+
+    private writeGlassNodeInstance(
+        batch: GalaxyGlassNodeBatch,
+        index: number,
+        stateIndex: number,
+        x: number,
+        y: number,
+        z: number,
+        scale: number,
+    ): void {
+        this.instancePosition.set(x, y, z);
+        for (let meshIndex = 0; meshIndex < batch.meshes.length; meshIndex++) {
+            const mesh = batch.meshes[meshIndex];
+            this.instanceScale.setScalar(meshIndex === stateIndex ? scale : 0);
+            this.instanceMatrix.compose(this.instancePosition, this.instanceQuaternion, this.instanceScale);
+            mesh.setMatrixAt(index, this.instanceMatrix);
+            if (meshIndex === stateIndex) {
+                mesh.setColorAt(index, this.color);
+            }
+        }
+    }
+
+    private markGlassNodeBatchDirty(batch: GalaxyGlassNodeBatch): void {
+        for (const mesh of batch.meshes) {
+            mesh.instanceMatrix.needsUpdate = true;
+            if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+        }
+    }
+
+    private writeGlowPoint(batch: GalaxyGlowBatch, index: number, x: number, y: number, z: number, size: number, alpha: number): void {
+        const offset = index * 3;
+        batch.positions[offset] = x;
+        batch.positions[offset + 1] = y;
+        batch.positions[offset + 2] = z;
+        batch.colors[offset] = this.color.r;
+        batch.colors[offset + 1] = this.color.g;
+        batch.colors[offset + 2] = this.color.b;
+        batch.sizes[index] = alpha > 0 ? size : 0;
+        batch.alphas[index] = alpha;
+    }
+
+    private markGlowBatchDirty(batch: GalaxyGlowBatch): void {
+        const geometry = batch.points.geometry;
+        (geometry.getAttribute('position') as THREE.BufferAttribute).needsUpdate = true;
+        (geometry.getAttribute('color') as THREE.BufferAttribute).needsUpdate = true;
+        (geometry.getAttribute('aSize') as THREE.BufferAttribute).needsUpdate = true;
+        (geometry.getAttribute('aAlpha') as THREE.BufferAttribute).needsUpdate = true;
+    }
+
+    private updateGlowViewport(): void {
+        const batch = galaxyGlowBatch(this.glows);
+        const height = this.renderer?.domElement.height || this.renderer?.domElement.clientHeight || 800;
+        if (batch) batch.points.material.uniforms['viewportHeight'].value = Math.max(1, height);
     }
 
     private nodeDensityFactors(data: GalaxySceneV2, positions: Float32Array): Float32Array {
@@ -725,11 +842,63 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
         this.edges.geometry.computeBoundingSphere();
     }
 
+    private updateEdgeColors(data: GalaxySceneV2, positions: Float32Array, focus: GalaxyFocusMask): void {
+        if (!this.edges) return;
+        const colorAttr = this.edges.geometry.getAttribute('color') as THREE.BufferAttribute;
+        colorAttr.array.fill(0);
+        let cursor = 0;
+        const tubeMode = this.settings.edgeMode === 'tube';
+        const treeFilaments = this.usesTreeFilamentEdges(data);
+        const leanEdges = this.usesLeanEdgeContract(data);
+        const baseSteps = tubeMode
+            ? MAX_EDGE_SEGMENTS
+            : this.settings.edgeMode === 'curved'
+            ? (treeFilaments && !leanEdges ? TREE_FILAMENT_EDGE_SEGMENTS : MAX_EDGE_SEGMENTS)
+            : 1;
+        for (let edge = 0; edge < data.edgePairs.length / 2; edge++) {
+            const source = data.edgePairs[edge * 2];
+            const target = data.edgePairs[edge * 2 + 1];
+            const ax = positions[source * 3], ay = positions[source * 3 + 1], az = positions[source * 3 + 2];
+            const bx = positions[target * 3], by = positions[target * 3 + 1], bz = positions[target * 3 + 2];
+            const surfaceEdge = this.capsSurfaceEdge(data, ax, ay, az, bx, by, bz);
+            const hopfEdge = !surfaceEdge && !tubeMode && this.mode === '3d' && data.layoutMode === 'hopfProjection' && this.settings.edgeMode === 'curved';
+            const hopfCrossBase = hopfEdge && this.isHopfCrossBaseEdge(data, source, target);
+            const steps = surfaceEdge
+                ? (treeFilaments && !leanEdges ? TREE_FILAMENT_EDGE_SEGMENTS : MAX_EDGE_SEGMENTS)
+                : hopfEdge
+                ? (hopfCrossBase ? (leanEdges ? LEAN_HOPF_CROSS_EDGE_SEGMENTS : HOPF_CROSS_EDGE_SEGMENTS) : (leanEdges ? LEAN_HOPF_EDGE_SEGMENTS : HOPF_EDGE_SEGMENTS))
+                : baseSteps;
+            const strokes = this.edgeStrokeCount(data, edge);
+            for (let stroke = 0; stroke < strokes; stroke++) {
+                const tone = this.edgeStrokeTone(stroke, strokes);
+                for (let step = 0; step < steps; step++) {
+                    this.writeEdgeColor(colorAttr, cursor++, data, focus, edge, step / steps, tone);
+                    this.writeEdgeColor(colorAttr, cursor++, data, focus, edge, (step + 1) / steps, tone);
+                }
+            }
+        }
+        colorAttr.needsUpdate = true;
+    }
+
     private isHopfCrossBaseEdge(data: GalaxySceneV2, source: number, target: number): boolean {
         if (data.layoutMode !== 'hopfProjection') return false;
         const sourceBase = data.hopfBaseIds?.[source] || '';
         const targetBase = data.hopfBaseIds?.[target] || '';
         return Boolean(sourceBase && targetBase && sourceBase !== targetBase);
+    }
+
+    private updateLabels(data: GalaxySceneV2, positions: Float32Array, force: boolean): void {
+        const signature = this.labelSetSignature(data);
+        if (!force && signature === this.labelSignature) return;
+        this.labelSignature = signature;
+        this.rebuildLabels(data, positions);
+    }
+
+    private labelSetSignature(data: GalaxySceneV2): string {
+        if (this.settings.labelMode === 'off') return 'off';
+        const selected = this.selectedId ? data.ids.indexOf(this.selectedId) : -1;
+        const hovered = this.hoverId ? data.ids.indexOf(this.hoverId) : -1;
+        return `${this.settings.labelMode}:${this.settings.labelLimit}:${data.ids.length}:${selected}:${hovered}`;
     }
 
     private rebuildLabels(data: GalaxySceneV2, positions: Float32Array): void {
@@ -863,11 +1032,16 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
             material.linewidth = this.edgeMaterialWidth();
             material.needsUpdate = true;
         }
-        this.glows?.children.forEach((child) => {
-            const material = (child as THREE.Sprite).material;
-            material.opacity = THREE.MathUtils.clamp(this.settings.glow * 0.2, 0, 0.34);
-            material.needsUpdate = true;
-        });
+        const glowBatch = galaxyGlowBatch(this.glows);
+        if (glowBatch) {
+            glowBatch.points.material.needsUpdate = true;
+        } else {
+            this.glows?.children.forEach((child) => {
+                const material = (child as THREE.Sprite).material;
+                material.opacity = THREE.MathUtils.clamp(this.settings.glow * 0.2, 0, 0.34);
+                material.needsUpdate = true;
+            });
+        }
         this.shells?.traverse((child) => {
             const drawable = child as THREE.Mesh | THREE.LineSegments;
             const material = drawable.material as THREE.Material | undefined;
@@ -1248,9 +1422,8 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
             if (!group) continue;
             this.scene.remove(group);
             group.traverse((child) => {
-                const drawable = child as THREE.Mesh | THREE.Sprite;
-                const geometry = (drawable as THREE.Mesh).geometry;
-                geometry?.dispose();
+                const drawable = child as THREE.Object3D & { geometry?: THREE.BufferGeometry; material?: THREE.Material | THREE.Material[] };
+                drawable.geometry?.dispose();
                 const material = drawable.material;
                 if (Array.isArray(material)) material.forEach((item) => item.dispose());
                 else material?.dispose();
@@ -1258,6 +1431,7 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
         }
         this.nodes = buildGalaxyNodes(data, this.settings, this.nodeTexture, this.atomTexture);
         this.glows = buildGalaxyGlows(data, this.haloTexture);
+        this.updateGlowViewport();
         if (this.glows) this.scene.add(this.glows);
         if (this.nodes) this.scene.add(this.nodes);
     }
@@ -2740,6 +2914,7 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
             }
         }
         this.clearLabels();
+        this.labelSignature = '';
         this.nodes = null;
         this.glows = null;
         this.shells = null;

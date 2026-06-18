@@ -16,7 +16,7 @@ vi.mock('./graph-galaxy-textures', async () => {
 import * as THREE from 'three';
 
 import { buildGalaxyFocusMask } from './graph-galaxy-focus';
-import { buildGalaxyGlows } from './graph-galaxy-objects';
+import { buildGalaxyGlows, galaxyGlowBatch } from './graph-galaxy-objects';
 import { ThreeGalaxyRenderer } from './three-galaxy-renderer';
 
 type RendererProbe = {
@@ -103,6 +103,23 @@ describe('Galaxy camera controls', () => {
 });
 
 describe('Product manifold guide styling', () => {
+    it('routes hover and selection through focus refresh instead of full geometry refresh', () => {
+        const renderer = new ThreeGalaxyRenderer() as unknown as {
+            selectNode(id: string | null): void;
+            hoverNode(id: string | null): void;
+            applyFocusState: ReturnType<typeof vi.fn>;
+            applyModePositions: ReturnType<typeof vi.fn>;
+        };
+        renderer.applyFocusState = vi.fn();
+        renderer.applyModePositions = vi.fn();
+
+        renderer.selectNode('node:a');
+        renderer.hoverNode('node:b');
+
+        expect(renderer.applyFocusState).toHaveBeenCalledTimes(2);
+        expect(renderer.applyModePositions).not.toHaveBeenCalled();
+    });
+
     it('keeps evidence fibers visually above scaffold and Lorentz guides', () => {
         const renderer = new ThreeGalaxyRenderer() as unknown as RendererProbe;
         const productDataWeight = renderer.hopfGuideWeightForKind('dataFiber', 'product');
@@ -334,8 +351,12 @@ describe('Product manifold guide styling', () => {
 
     it('prevents dense node overlaps from additive halo blowout', () => {
         const glows = buildGalaxyGlows({ ids: ['a'] } as any, new THREE.Texture());
-        const material = glows?.children[0] instanceof THREE.Sprite ? glows.children[0].material : null;
-        expect(material?.blending).toBe(THREE.NormalBlending);
+        const batch = galaxyGlowBatch(glows);
+        expect(batch?.points).toBeInstanceOf(THREE.Points);
+        expect(batch?.points.material.blending).toBe(THREE.NormalBlending);
+        expect(batch?.points.material.name).toBe('GalaxyGlowBatch');
+        expect(batch?.points.material.vertexColors).toBe(false);
+        expect(batch?.positions.length).toBe(3);
 
         const renderer = new ThreeGalaxyRenderer() as unknown as RendererProbe & {
             renderer: { domElement: { clientWidth: number; clientHeight: number } };

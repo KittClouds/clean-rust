@@ -412,7 +412,9 @@ export function buildGalaxyScene(
     edges: GalaxyInputEdge[],
     settings: GalaxyRenderSettings,
 ): GalaxyScene {
-    const relationPlan = compileRelationControlPlan(entitiesInput, edges);
+    const relationPlan = settings.sourceMode === 'embeddings'
+        ? { nodes: entitiesInput, edges, controls: [] }
+        : compileRelationControlPlan(entitiesInput, edges);
     const entities = orderEntitiesForStableRender(relationPlan.nodes);
     assertNoImplicitNodeDrop(relationPlan.nodes.length, entities.length);
     const preserveAtlasLayout = shouldPreserveAtlasLayout(entities);

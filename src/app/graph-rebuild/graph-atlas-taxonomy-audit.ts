@@ -87,6 +87,16 @@ const CURATED_DOCUMENT_UNIT_TOKENS = [
     'decision',
 ];
 
+const SENTENCE_PARAGRAPH_TAXONOMY_TOKENS = [
+    'paragraph',
+    'paragraphgroup',
+    'sentence',
+    'textsentence',
+    'documentsentence',
+    'textparagraph',
+    'documentparagraph',
+];
+
 export interface GraphAtlasTaxonomyAudit {
     schemaVersion: 'phoenix-atlas-taxonomy-audit/v1';
     snapshot: {
@@ -691,17 +701,16 @@ function isCuratedDocumentUnitTarget(target: GraphRebuildEmbeddingTarget): boole
 
 function isSentenceOrParagraphTarget(target: GraphRebuildEmbeddingTarget, kind: string): boolean {
     if (kind.endsWith('-sentence') || kind.endsWith('-paragraph')) return true;
+    if ([
+        kind,
+        target.styleKey || '',
+        target.stateContextKind || '',
+    ].some(isSentenceOrParagraphTaxonomyToken)) {
+        return true;
+    }
     const documentUnitKind = compactToken(target.documentUnitKind || '');
     if (documentUnitKind) {
-        return [
-            'paragraph',
-            'paragraphgroup',
-            'sentence',
-            'textsentence',
-            'documentsentence',
-            'textparagraph',
-            'documentparagraph',
-        ].some((token) => documentUnitKind === token || documentUnitKind.includes(token));
+        return SENTENCE_PARAGRAPH_TAXONOMY_TOKENS.some((token) => documentUnitKind === token || documentUnitKind.includes(token));
     }
     const profile = compactEmbedProfileText(target, false);
     return [
@@ -713,6 +722,11 @@ function isSentenceOrParagraphTarget(target: GraphRebuildEmbeddingTarget, kind: 
         'paragraphindex',
         'sentenceindex',
     ].some((token) => profile.includes(token));
+}
+
+function isSentenceOrParagraphTaxonomyToken(value: string): boolean {
+    const token = compactToken(value);
+    return Boolean(token && SENTENCE_PARAGRAPH_TAXONOMY_TOKENS.some((dropToken) => token === dropToken || token.includes(dropToken)));
 }
 
 function isRawEmbedScaffoldTarget(target: GraphRebuildEmbeddingTarget, kind: string): boolean {
