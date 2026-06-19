@@ -2,7 +2,7 @@ import '@angular/compiler';
 
 import { Injector, computed, createEnvironmentInjector, runInInjectionContext, signal, type EnvironmentInjector } from '@angular/core';
 import { spawnSync } from 'node:child_process';
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -79,22 +79,18 @@ import type {
 import { buildGraphAtlasTaxonomyAudit } from './graph-atlas-taxonomy-audit';
 
 const SHOULD_RUN = process.env['GRAPH_BUILD_BASELINE'] === '1';
-const BASELINE_MODE = process.env['GRAPH_BUILD_BASELINE_MODE'] || 'bifurcated';
-const BIFURCATED_OUTPUT_URL = new URL('../../../target/graph-build-baselines/current-bifurcated-shortrun.json', import.meta.url);
 const ZEROSHOT_OUTPUT_URL = new URL('../../../target/graph-build-baselines/zero-shot-shortrun.json', import.meta.url);
 const TAXONOMY_AUDIT_OUTPUT_URL = new URL('../../../target/graph-build-baselines/atlas-taxonomy-audit-shortrun.json', import.meta.url);
 const SHORTRUN_URL = new URL('../../../docs/shortrun.md', import.meta.url);
-const BIFURCATED_OUTPUT_PATH = fileURLToPath(BIFURCATED_OUTPUT_URL);
 const ZEROSHOT_OUTPUT_PATH = fileURLToPath(ZEROSHOT_OUTPUT_URL);
 const TAXONOMY_AUDIT_OUTPUT_PATH = fileURLToPath(TAXONOMY_AUDIT_OUTPUT_URL);
 const SHORTRUN_PATH = fileURLToPath(SHORTRUN_URL);
 const SHOULD_WRITE_TAXONOMY_AUDIT = process.env['GRAPH_BUILD_TAXONOMY_AUDIT'] === '1';
 
 const describeBaseline = describe;
-const itBifurcated = SHOULD_RUN && BASELINE_MODE === 'bifurcated' ? it : it.skip;
-const itZeroShot = SHOULD_RUN && BASELINE_MODE === 'zeroshot' ? it : it.skip;
+const itZeroShot = SHOULD_RUN ? it : it.skip;
 
-describeBaseline('current bifurcated graph build baseline', () => {
+describeBaseline('product graph build gate', () => {
     let injector: EnvironmentInjector;
     let pipeline: GraphRebuildPipelineService;
     let store: ReturnType<typeof createMemoryStore>;
@@ -126,39 +122,6 @@ describeBaseline('current bifurcated graph build baseline', () => {
         injector.destroy();
         vi.clearAllMocks();
     });
-
-    itBifurcated('writes the shortrun clean plus postprocess baseline report', async () => {
-        const request = graphRunRequest();
-        const coreStarted = performance.now();
-        const core = await pipeline.buildCoreGraph(request);
-        const coreWallMs = elapsed(coreStarted);
-
-        const postStarted = performance.now();
-        const postprocess = await pipeline.postProcessAtlas({ ...request, policy: 'force' });
-        const postprocessWallMs = elapsed(postStarted);
-
-        const report = buildBaselineReport({
-            request,
-            core,
-            coreWallMs,
-            postprocess,
-            postprocessWallMs,
-            store,
-            runtime,
-            backend,
-        });
-        mkdirSync(dirname(BIFURCATED_OUTPUT_PATH), { recursive: true });
-        writeFileSync(BIFURCATED_OUTPUT_PATH, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
-        console.log(`[graph-build-baseline] wrote ${BIFURCATED_OUTPUT_PATH}`);
-        console.log(`[graph-build-baseline] totalWallMs=${report.totals.wallMs} nodes=${report.finalSnapshot.counters.nodes} edges=${report.finalSnapshot.counters.edges} targets=${report.finalSnapshot.counters.embeddingTargets} vectors=${report.finalSnapshot.counters.embeddingVectors}`);
-
-        expect(core.receipt.postProcessMode).toBe('core');
-        expect(postprocess.receipt.postProcessMode).toBe('full');
-        expect(report.finalSnapshot.counters.nodes).toBeGreaterThan(0);
-        expect(report.finalSnapshot.counters.embeddingTargets).toBeGreaterThan(0);
-        expect(report.modelCalls.capabilityCalls).not.toContain('semanticAtlas');
-        expect(report.finalSnapshot.counters.embeddingVectors).toBe(0);
-    }, 30_000);
 
     itZeroShot('writes the shortrun zero-shot graph build report', async () => {
         const request = graphRunRequest();
@@ -260,64 +223,6 @@ function graphRunRequest(): GraphIndexRunRequest {
     };
 }
 
-function buildBaselineReport(input: {
-    request: GraphIndexRunRequest;
-    core: { receipt: GraphIndexRunReceipt; snapshot: GraphRebuildSnapshot };
-    coreWallMs: number;
-    postprocess: { receipt: GraphIndexRunReceipt; snapshot: GraphRebuildSnapshot };
-    postprocessWallMs: number;
-    store: ReturnType<typeof createMemoryStore>;
-    runtime: ReturnType<typeof createRuntimeHarness>;
-    backend: ReturnType<typeof createBackendHarness>;
-}) {
-    const text = harnessState.notes[0]?.markdownContent || '';
-    const runs = [
-        runReport('cleanGraph', input.core.receipt, input.core.snapshot, input.coreWallMs),
-        runReport('postprocess', input.postprocess.receipt, input.postprocess.snapshot, input.postprocessWallMs),
-    ];
-    return {
-        schemaVersion: 'phoenix-graph-build-baseline/v1',
-        scenario: 'current-clean-plus-postprocess-shortrun',
-        generatedAt: new Date().toISOString(),
-        fixture: {
-            path: 'docs/shortrun.md',
-            noteId: 'shortrun',
-            scopeId: input.request.scope.scopeId,
-            chars: text.length,
-            words: text.split(/\s+/).filter(Boolean).length,
-            lines: text.split(/\r?\n/).length,
-            entitySeeds: harnessState.entities.length,
-        },
-        contract: {
-            buildShape: 'bifurcated',
-            stages: ['buildCoreGraph', 'postProcessAtlas'],
-            graphModelsRequiredByHarness: ['dynamicNer', 'nli'],
-            semanticEmbeddingUsedForGraphBuild: false,
-        },
-        modelCalls: {
-            readinessChecks: input.runtime.readinessChecks,
-            warmCalls: input.runtime.warmCalls,
-            capabilityCalls: input.runtime.capabilityCalls,
-            semanticAtlasInvoked: input.runtime.capabilityCalls.includes('semanticAtlas'),
-        },
-        persistence: {
-            upserts: input.store.upserts,
-            reads: input.store.reads,
-            pausedSnapshots: input.store.pausedSnapshots,
-            resumedSnapshots: input.store.resumedSnapshots,
-        },
-        backendCommands: input.backend.commands,
-        runs,
-        totals: {
-            wallMs: round(input.coreWallMs + input.postprocessWallMs),
-            receiptStages: runs.reduce((sum, run) => sum + run.receipt.stageCount, 0),
-            scopedDocumentUpserts: input.store.upserts.length,
-            backendCommands: input.backend.commands.length,
-        },
-        finalSnapshot: snapshotReport(input.postprocess.snapshot),
-    };
-}
-
 function buildZeroShotReport(input: {
     request: GraphIndexRunRequest;
     graph: { receipt: GraphIndexRunReceipt; snapshot: GraphRebuildSnapshot };
@@ -328,7 +233,6 @@ function buildZeroShotReport(input: {
 }) {
     const text = harnessState.notes[0]?.markdownContent || '';
     const run = runReport('zeroShot', input.graph.receipt, input.graph.snapshot, input.wallMs);
-    const bifurcated = loadBifurcatedReport();
     const finalSnapshot = snapshotReport(input.graph.snapshot);
     return {
         schemaVersion: 'phoenix-graph-build-baseline/v1',
@@ -370,17 +274,12 @@ function buildZeroShotReport(input: {
             scopedDocumentUpserts: input.store.upserts.length,
             backendCommands: input.backend.commands.length,
         },
-        comparisonToBifurcated: bifurcated ? compareReports(bifurcated, {
-            wallMs: round(input.wallMs),
-            scopedDocumentUpserts: input.store.upserts.length,
-            finalSnapshot,
-        }) : null,
         finalSnapshot,
     };
 }
 
 function runReport(
-    name: 'cleanGraph' | 'postprocess' | 'zeroShot',
+    name: 'zeroShot',
     receipt: GraphIndexRunReceipt,
     snapshot: GraphRebuildSnapshot,
     wallMs: number,
@@ -492,42 +391,6 @@ function pickCounters(counters: GraphRebuildCounters): Record<string, number> {
         'entityLinkSuggestions',
     ];
     return Object.fromEntries(keys.map((key) => [key, Number(counters[key] || 0)]));
-}
-
-function loadBifurcatedReport(): any | null {
-    if (!existsSync(BIFURCATED_OUTPUT_PATH)) return null;
-    try {
-        return JSON.parse(readFileSync(BIFURCATED_OUTPUT_PATH, 'utf8'));
-    } catch {
-        return null;
-    }
-}
-
-function compareReports(
-    bifurcated: any,
-    zeroShot: { wallMs: number; scopedDocumentUpserts: number; finalSnapshot: ReturnType<typeof snapshotReport> },
-) {
-    const baselineWallMs = Number(bifurcated?.totals?.wallMs || 0);
-    const baselineUpserts = Number(bifurcated?.totals?.scopedDocumentUpserts || 0);
-    const baselineCounters = bifurcated?.finalSnapshot?.counters || {};
-    const zeroCounters = zeroShot.finalSnapshot.counters;
-    const counterKeys = ['nodes', 'edges', 'embeddingTargets', 'embeddingVectors', 'relationships'];
-    return {
-        baselineScenario: bifurcated?.scenario || '',
-        baselineWallMs,
-        zeroShotWallMs: zeroShot.wallMs,
-        wallDeltaMs: signedRound(zeroShot.wallMs - baselineWallMs),
-        wallDeltaPct: baselineWallMs > 0
-            ? signedRound(((zeroShot.wallMs - baselineWallMs) / baselineWallMs) * 100)
-            : 0,
-        baselineScopedDocumentUpserts: baselineUpserts,
-        zeroShotScopedDocumentUpserts: zeroShot.scopedDocumentUpserts,
-        scopedDocumentUpsertDelta: zeroShot.scopedDocumentUpserts - baselineUpserts,
-        counterDelta: Object.fromEntries(counterKeys.map((key) => [
-            key,
-            Number((zeroCounters as Record<string, number>)[key] || 0) - Number(baselineCounters[key] || 0),
-        ])),
-    };
 }
 
 function shortrunNote(text: string) {
@@ -894,8 +757,4 @@ function elapsed(started: number): number {
 
 function round(value: number): number {
     return Math.max(0, Math.round(value * 100) / 100);
-}
-
-function signedRound(value: number): number {
-    return Math.round(value * 100) / 100;
 }

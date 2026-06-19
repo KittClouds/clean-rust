@@ -471,8 +471,6 @@ describe('SearchPanelComponent model recipe lifecycle', () => {
                 noteIds: ['note-1'],
             }),
         }));
-        expect(pipeline.buildCoreGraph).not.toHaveBeenCalled();
-        expect(pipeline.postProcessAtlas).not.toHaveBeenCalled();
         expect(component.lastRunStatus().label).toBe('Graph build complete');
         expect(machine.requestGraphFocus).toHaveBeenCalled();
     });
@@ -740,32 +738,6 @@ function createFullAtlasPipelineMock() {
         loadGraphModels: vi.fn(async () => undefined),
         loadEmbeddingModel: vi.fn(async () => undefined),
         warmOptionalModel: vi.fn(async () => undefined),
-        buildCoreGraph: vi.fn(async () => {
-            const receipt = {
-                status: 'completed',
-                message: 'Clean graph built 2 nodes and 1 edges.',
-                postProcessMode: 'core',
-                durationMs: 12,
-            };
-            lastReceipt.set(receipt);
-            return {
-                receipt,
-                snapshot: { counters: { nodes: 2, edges: 1 } },
-            };
-        }),
-        buildFullAtlas: vi.fn(async () => {
-            const receipt = {
-                status: 'completed',
-                message: 'Full Atlas Index built 2 nodes and 1 edges.',
-                postProcessMode: 'full',
-                durationMs: 12,
-            };
-            lastReceipt.set(receipt);
-            return {
-                receipt,
-                snapshot: { counters: { nodes: 2, edges: 1 } },
-            };
-        }),
         buildGraph: vi.fn(async () => {
             const receipt = {
                 id: 'graph-atlas:note:note-1:123',
@@ -914,6 +886,5 @@ function createFullAtlasPipelineMock() {
                 snapshot: { counters: { nodes: 2, edges: 1, embeddingTargets: 3 } },
             };
         }),
-        postProcessAtlas: vi.fn(),
     };
 }
