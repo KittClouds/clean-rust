@@ -215,20 +215,8 @@
     </div>
 
     <details class="full-atlas-advanced">
-      <summary>Diagnostics: split graph stages</summary>
+      <summary>Diagnostics: entity suggestions</summary>
       <div class="recipe-actions full-atlas-actions">
-        <button type="button" class="secondary-action" (click)="buildCoreAtlas()"
-          [disabled]="isFullAtlasBuildDisabled()">
-          <ng-icon [name]="fullAtlasBusy() ? 'lucideLoader2' : 'lucideGitBranch'" class="h-3.5 w-3.5"
-            [class.animate-spin]="fullAtlasBusy()"></ng-icon>
-          Diagnostic Core
-        </button>
-        <button type="button" class="secondary-action postprocess-action" (click)="postProcessAtlas()"
-          [disabled]="isPostProcessDisabled()">
-          <ng-icon [name]="fullAtlasBusy() ? 'lucideLoader2' : 'lucideGitBranch'" class="h-3.5 w-3.5"
-            [class.animate-spin]="fullAtlasBusy()"></ng-icon>
-          {{ postProcessButtonLabel() }}
-        </button>
         <button type="button" class="secondary-action ner-suggestions-action"
           title="Run Dynamic NER and populate entity suggestions without rebuilding the graph"
           (click)="runEntitySuggestionStage()" [disabled]="isRunNerDisabled()">

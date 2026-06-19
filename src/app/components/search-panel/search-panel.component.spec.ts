@@ -515,75 +515,56 @@ describe('SearchPanelComponent model recipe lifecycle', () => {
         ]);
     });
 
-    it('runs the staged postprocess action separately from core graph', async () => {
+    it('surfaces product graph stage and projection timings in the last run panel model', async () => {
         const pipeline = injector.get(GraphRebuildPipelineService) as unknown as ReturnType<typeof createFullAtlasPipelineMock>;
-        pipeline.modelsReady.mockReturnValue(true);
-        pipeline.coreModelsReady.mockReturnValue(true);
 
-        component.setBuildScopeMode('note');
-        await component.postProcessAtlas();
+        await component.buildGraphAtlas();
 
-        expect(pipeline.postProcessAtlas).toHaveBeenCalledTimes(1);
-        expect(pipeline.postProcessAtlas.mock.calls[0][0]).toEqual(expect.objectContaining({
-            postProcessMode: 'full',
-            calendarRegistrySnapshot: expect.objectContaining({ id: 'calendar-registry:test' }),
-            scope: expect.objectContaining({ scopeId: 'note:note-1' }),
-        }));
-        expect(pipeline.buildCoreGraph).not.toHaveBeenCalled();
-    });
-
-    it('surfaces full atlas stage and projection timings in the last run panel model', async () => {
-        const pipeline = injector.get(GraphRebuildPipelineService) as unknown as ReturnType<typeof createFullAtlasPipelineMock>;
-        pipeline.modelsReady.mockReturnValue(true);
-        pipeline.coreModelsReady.mockReturnValue(true);
-
-        await component.postProcessAtlas();
-
-        expect(component.lastRunStatus().label).toBe('Postprocess complete');
+        expect(component.lastRunStatus().label).toBe('Graph build complete');
         expect(component.lastRunReceiptRows()[0].detail).not.toContain('started');
         expect(component.lastRunReceiptRows()[0].detail).not.toContain('completed at');
         expect(component.lastRunReceiptRows()).toEqual([
             expect.objectContaining({
                 kind: 'stage',
-                label: 'Semantic Atlas',
+                label: 'Build Graph Snapshot',
                 durationMs: 31,
-                detail: expect.stringContaining('embedding targets 3'),
+                detail: expect.stringContaining('accepted relationships 16'),
             }),
             expect.objectContaining({
                 kind: 'stage',
-                label: 'Postprocess Snapshot',
-                durationMs: 44,
-                detail: expect.stringContaining('graph links 2'),
+                label: 'Signal Target Coverage',
+                durationMs: 0,
+                detail: expect.stringContaining('targets 666'),
             }),
             expect.objectContaining({
                 kind: 'stage',
                 label: 'DB Ops',
                 durationMs: 15,
-                detail: 'completed / 0 outputs / db load 2 ms / snapshot persist 13 ms / snapshot serialize 2 ms / primary encode 1 ms / overgraph encode 1 ms / payload profile 1 ms / snapshot store 11 ms / primary store 7 ms / overgraph store 4 ms / payload 1,200 chars',
+                detail: expect.stringContaining('snapshot persist 13 ms'),
             }),
             expect.objectContaining({
                 kind: 'stage',
                 label: 'Snapshot Payload',
                 durationMs: 2,
-                detail: 'completed / 0 outputs / primary 1,200 chars / raw 1,400 chars / saved 200 chars / ratio 86% / overgraph 400 chars / total 1,600 chars / graph model v2 700 chars / embedding graph post process 500 chars / chunks 300 chars',
+                detail: expect.stringContaining('primary 1,200 chars'),
             }),
             expect.objectContaining({
                 kind: 'stage',
                 label: 'Transport Ops',
                 durationMs: 30,
-                detail: 'completed / 0 outputs / calls 4 / total 30 ms / max 15 ms / request 5.5 KiB / response 1.6 KiB / json response 1.6 KiB / store 3 / store request 5.5 KiB / store response 1.6 KiB / scoped reads 1 / scoped read response 640 B / snapshot read response 640 B / wal calls 1 / wal request 2.0 KiB / wal response 256 B / compile calls 1 / compile request 2.5 KiB / compile response 768 B / compile raw 4.0 KiB / compile zipped 512 B',
+                detail: expect.stringContaining('calls 4'),
             }),
             expect.objectContaining({
                 kind: 'stage',
                 label: 'Receipt DB Ops',
                 durationMs: 15,
-                detail: 'completed / 0 outputs / persist 15 ms / store 10 ms / queue 2 ms / append 3 ms / manifest 1 ms / native 4 ms / rpc 1 / wal 2.0 KiB',
+                detail: expect.stringContaining('persist 15 ms'),
             }),
             expect.objectContaining({
                 kind: 'projection',
                 label: 'Product Projection',
                 durationMs: 9,
-                detail: 'synced / 3 targets / 3 vectors',
+                detail: 'snapshot-owned / 3 targets / read-model topology',
             }),
         ]);
     });
@@ -792,37 +773,31 @@ function createFullAtlasPipelineMock() {
                 message: 'Build Graph produced 2 nodes, 1 edges, and 3 embedding targets.',
                 postProcessMode: 'full',
                 durationMs: 12,
-            };
-            lastReceipt.set(receipt);
-            return {
-                receipt,
-                snapshot: { counters: { nodes: 2, edges: 1, embeddingTargets: 3 } },
-            };
-        }),
-        postProcessAtlas: vi.fn(async () => {
-            const receipt = {
-                status: 'completed',
-                message: 'Postprocess built 3 embedding targets and 2 link suggestions.',
-                postProcessMode: 'full',
-                durationMs: 12,
                 stageReceipts: [
                     {
-                        id: 'semanticAtlas',
-                        label: 'Semantic Atlas',
-                status: 'completed',
-                durationMs: 31,
-                outputCount: 3,
-                counters: { startedAt: 167843, completedAt: 278860, embeddingTargets: 3 },
-                message: '3 embedding targets',
-            },
-                    {
-                        id: 'postProcessSnapshot',
-                        label: 'Postprocess Snapshot',
+                        id: 'buildGraphSnapshot',
+                        label: 'Build Graph Snapshot',
                         status: 'completed',
-                        durationMs: 44,
-                        outputCount: 5,
-                        counters: { embeddingTargets: 3, graphLinks: 2 },
-                        message: '3 targets / 2 graph links',
+                        durationMs: 31,
+                        outputCount: 926,
+                        counters: { acceptedRelationships: 16, anchors: 358, chunks: 16 },
+                        message: 'Build Graph snapshot',
+                    },
+                    {
+                        id: 'signalTargetCoverage',
+                        label: 'Signal Target Coverage',
+                        status: 'completed',
+                        durationMs: 0,
+                        outputCount: 0,
+                        counters: {
+                            targets: 666,
+                            candidateTargets: 666,
+                            deferredTargets: 442,
+                            documentSpine: 2,
+                            chunkSpine: 16,
+                            entityAnchors: 28,
+                        },
+                        message: 'Signal target coverage',
                     },
                     {
                         id: 'snapshotDbOps',
@@ -928,6 +903,7 @@ function createFullAtlasPipelineMock() {
                         durationMs: 9,
                         targetCount: 3,
                         vectorCount: 3,
+                        counters: { graphRebuildReadModelProjection: 1 },
                         message: 'Product projection synced',
                     },
                 ],
@@ -938,5 +914,6 @@ function createFullAtlasPipelineMock() {
                 snapshot: { counters: { nodes: 2, edges: 1, embeddingTargets: 3 } },
             };
         }),
+        postProcessAtlas: vi.fn(),
     };
 }

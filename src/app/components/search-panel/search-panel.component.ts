@@ -670,8 +670,6 @@ export class SearchPanelComponent implements OnInit {
     entities: smartGraphRegistry.getAllEntities(),
   }));
   readonly fullAtlasModelReadiness = computed(() => this.fullAtlasPipeline.modelReadiness(this.fullAtlasRequest()));
-  readonly fullAtlasModelsReady = computed(() => this.fullAtlasPipeline.modelsReady(this.fullAtlasRequest()));
-  readonly fullAtlasCoreReady = computed(() => this.fullAtlasPipeline.coreModelsReady(this.fullAtlasRequest()));
   readonly graphModelsReady = computed(() => this.fullAtlasPipeline.graphModelsReady(this.fullAtlasRequest()));
   readonly embeddingModelReady = computed(() =>
     this.fullAtlasPipeline.embeddingModelReady(this.fullAtlasRequest())
@@ -873,10 +871,6 @@ export class SearchPanelComponent implements OnInit {
     }
   }
 
-  async loadFullAtlasModels(): Promise<void> {
-    await this.loadGraphModels();
-  }
-
   async warmFullAtlasModel(modelId: GraphIndexModelReadiness['id'], optional = false): Promise<void> {
     if (!optional || this.fullAtlasBusy()) return;
     this.error.set(null);
@@ -886,10 +880,6 @@ export class SearchPanelComponent implements OnInit {
     } catch (err) {
       this.error.set(this.toErrorMessage(err));
     }
-  }
-
-  async buildFullAtlas(): Promise<void> {
-    await this.buildGraphAtlas();
   }
 
   async buildGraphAtlas(): Promise<void> {
@@ -923,40 +913,6 @@ export class SearchPanelComponent implements OnInit {
     }
   }
 
-  async buildCoreAtlas(): Promise<void> {
-    if (this.isFullAtlasBuildDisabled()) return;
-    this.error.set(null);
-    try {
-      const result = await this.fullAtlasPipeline.buildCoreGraph({
-        ...this.fullAtlasRequest(),
-        postProcessMode: 'core',
-      });
-      this.notice.set(result.receipt.message);
-      this.openGraphLens();
-    } catch (err) {
-      this.error.set(this.toErrorMessage(err));
-    }
-  }
-
-  async postProcessAtlas(): Promise<void> {
-    if (this.isPostProcessDisabled()) return;
-    this.error.set(null);
-    try {
-      const result = await this.fullAtlasPipeline.postProcessAtlas({
-        ...this.fullAtlasRequest(),
-        postProcessMode: 'full',
-      });
-      this.notice.set(result.receipt.message);
-      this.openGraphLens();
-    } catch (err) {
-      this.error.set(this.toErrorMessage(err));
-    }
-  }
-
-  isFullAtlasBuildDisabled(): boolean {
-    return this.fullAtlasBusy() || !this.fullAtlasCoreReady() || !this.hasRunnableBuildScope();
-  }
-
   isGraphBuildDisabled(): boolean {
     return this.fullAtlasBusy() || !this.graphModelsReady() || !this.hasRunnableBuildScope();
   }
@@ -967,18 +923,9 @@ export class SearchPanelComponent implements OnInit {
       || this.vectorStatus() === 'indexing';
   }
 
-  isPostProcessDisabled(): boolean {
-    return this.fullAtlasBusy() || !this.graphModelsReady() || !this.hasRunnableBuildScope();
-  }
-
   fullAtlasBuildButtonLabel(): string {
     if (this.fullAtlasBusy()) return 'Building Graph';
     return this.buildPolicy() === 'force' ? 'Force Build Graph' : 'Build Graph';
-  }
-
-  postProcessButtonLabel(): string {
-    if (this.fullAtlasBusy()) return 'Working';
-    return this.buildPolicy() === 'force' ? 'Diagnostic Postprocess' : 'Diagnostic Postprocess';
   }
 
   loadModelsButtonLabel(): string {
