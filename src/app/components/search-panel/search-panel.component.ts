@@ -899,6 +899,7 @@ export class SearchPanelComponent implements OnInit {
       const result = await this.fullAtlasPipeline.buildGraph({
         ...this.fullAtlasRequest(),
         postProcessMode: 'full',
+        durabilityMode: 'interactive',
       });
       this.notice.set(result.receipt.message);
       this.openGraphLens();
@@ -2669,6 +2670,10 @@ function snapshotDbOpsDetail(
     const value = counterValue(counters, key);
     if (value > 0) parts.push(`${label} ${formatCount(value)} chars`);
   };
+  const addCount = (label: string, key: string): void => {
+    const value = counterValue(counters, key);
+    if (value > 0) parts.push(`${label} ${formatCount(value)}`);
+  };
 
   addMs('db load', 'dbLoadMs');
   addMs('snapshot persist', 'snapshotPersistMs');
@@ -2679,6 +2684,9 @@ function snapshotDbOpsDetail(
   addMs('snapshot store', 'snapshotStoreMs');
   addMs('primary store', 'snapshotPrimaryStoreMs');
   addMs('overgraph store', 'snapshotOverGraphStoreMs');
+  addCount('store docs', 'snapshotStoreDocuments');
+  addCount('blobs written', 'snapshotWrittenContentBlobs');
+  addCount('blobs reused', 'snapshotReusedContentBlobs');
   addChars('payload', 'snapshotPayloadChars');
   return parts.join(' / ');
 }

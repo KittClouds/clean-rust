@@ -25,6 +25,7 @@ import type { GraphDocumentReviewSummary } from './graph-document-review';
 import type { GraphDocumentCompilerSummary } from './graph-document-compiler';
 import type { GraphDocumentGraphMutationLedger } from './graph-document-durable-commit';
 import type { GraphOperatorMutationJournal } from './graph-operator-mutation-journal';
+import type { GraphTruthCommitLedger } from './graph-truth-commit-ledger';
 import type { GraphAtlasPacket } from './graph-atlas-packet';
 
 export type GraphRebuildScopeKind = 'global' | 'folder' | 'narrative' | 'note' | 'multiNote';
@@ -2201,13 +2202,32 @@ export interface GraphRebuildBuildTimings {
     snapshotBuildMs: number;
     stateCommitMs: number;
     nativeCompilerMs?: number;
+    nativeCompilerSkipped?: number;
+    tsAtlasPacketParity?: number;
+    nativeCompilerInputBytesByFamily?: Record<string, number>;
+    nativeTargetsByOriginatingFamily?: Record<string, number>;
+    nativeAtlasSeedRawBytes?: number;
+    nativeAtlasSeedCompressedBytes?: number;
+    authoritySealMs?: number;
+    authorityAssertMs?: number;
     snapshotPersistMs: number;
     snapshotSerializeMs: number;
     snapshotPrimaryEncodeMs?: number;
     snapshotOverGraphEncodeMs?: number;
+    snapshotOverGraphSkipped?: number;
     snapshotStoreMs: number;
     snapshotPrimaryStoreMs?: number;
     snapshotOverGraphStoreMs?: number;
+    snapshotStoreDocuments?: number;
+    snapshotContentBlobReads?: number;
+    snapshotContentBlobManifestTrusted?: number;
+    snapshotContentBlobManifestMatches?: number;
+    snapshotContentBlobManifestMisses?: number;
+    snapshotWrittenContentBlobs?: number;
+    snapshotReusedContentBlobs?: number;
+    previousSnapshotHydrationSkipped?: number;
+    documentSemanticSkipped?: number;
+    nativeChunkerSkipped?: number;
     snapshotEventMs: number;
     snapshotPayloadChars: number;
     snapshotPrimaryRawPayloadChars?: number;
@@ -2235,6 +2255,7 @@ export type GraphRebuildContentBlobField =
     | 'graphModelV2'
     | 'semanticCandidateSummary'
     | 'manifoldSpecializationSummary'
+    | 'atlasPacket'
     | 'atlasDebugSummaries';
 
 export interface GraphRebuildContentBlobRef {
@@ -2256,6 +2277,40 @@ export interface GraphRebuildContentManifest {
     scopeId: string;
     builtAt: number;
     refs: Partial<Record<GraphRebuildContentBlobField, GraphRebuildContentBlobRef>>;
+}
+
+export type GraphSnapshotAuthority =
+    | 'typescript_compatibility_containment'
+    | 'native_graph_truth_commit';
+
+export interface GraphSnapshotAuthorityCounts {
+    notes: number;
+    chunks: number;
+    mentions: number;
+    anchors: number;
+    relationships: number;
+    events: number;
+    temporalEdges: number;
+    causalEdges: number;
+    memoryState: number;
+    coreferenceRecoveries: number;
+    nodes: number;
+    edges: number;
+    embeddingTargets: number;
+    admittedEmbeddingTargets: number;
+    packetObjects: number;
+    packetTargets: number;
+    packetParentLinks: number;
+    packetFamilies: Record<string, number>;
+}
+
+export interface GraphSnapshotAuthorityContract {
+    schemaVersion: 'phoenix-graph-snapshot-authority/v1';
+    authority: GraphSnapshotAuthority;
+    snapshotId: string;
+    scopeId: string;
+    contentHash: string;
+    counts: GraphSnapshotAuthorityCounts;
 }
 
 export interface GraphRebuildSnapshot {
@@ -2313,6 +2368,8 @@ export interface GraphRebuildSnapshot {
     documentSemanticSummary?: GraphDocumentSemanticSummary;
     documentReviewSummary?: GraphDocumentReviewSummary;
     documentCompilerSummary?: GraphDocumentCompilerSummary;
+    graphTruthCommitLedger?: GraphTruthCommitLedger;
+    authorityContract?: GraphSnapshotAuthorityContract;
     documentGraphMutationLedger?: GraphDocumentGraphMutationLedger;
     operatorMutationJournal?: GraphOperatorMutationJournal;
     calendarRegistrySummary?: GraphCalendarRegistryBridgeSummary;
@@ -2324,6 +2381,7 @@ export interface GraphRebuildSnapshot {
 
 export type GraphIndexPolicy = 'delta' | 'force';
 export type GraphIndexPostProcessMode = 'core' | 'full';
+export type GraphBuildDurabilityMode = 'interactive' | 'durable' | 'diagnostic';
 export type GraphIndexRunStatus = 'blocked' | 'running' | 'completed' | 'failed';
 export type GraphIndexStageStatus = 'blocked' | 'skipped' | 'running' | 'completed' | 'failed';
 export type GraphIndexProjectionMode = 'hybrid' | 'hopf' | 'lorentz' | 'product' | 'siegel';
@@ -2352,6 +2410,7 @@ export interface GraphIndexRunRequest {
     scope: GraphIndexRunScope;
     policy: GraphIndexPolicy;
     postProcessMode?: GraphIndexPostProcessMode;
+    durabilityMode?: GraphBuildDurabilityMode;
     modelSelection: GraphIndexModelSelection;
     embeddingStagePolicy?: GraphIndexEmbeddingStagePolicy;
     calendarRegistrySnapshot?: CalendarRegistrySnapshot;
@@ -2387,6 +2446,8 @@ export interface GraphIndexProjectionReceipt {
     targetCount: number;
     vectorCount: number;
     counters?: Record<string, number>;
+    snapshotId?: string;
+    snapshotHash?: string;
     message: string;
 }
 
@@ -2399,6 +2460,7 @@ export interface GraphIndexRunReceipt {
     status: GraphIndexRunStatus;
     modelSelection: GraphIndexModelSelection;
     postProcessMode?: GraphIndexPostProcessMode;
+    durabilityMode?: GraphBuildDurabilityMode;
     postProcessFingerprint?: string;
     postProcessDiscoveryFingerprint?: string;
     postProcessCacheHit?: boolean;
@@ -2409,6 +2471,7 @@ export interface GraphIndexRunReceipt {
     stageReceipts: GraphIndexStageReceipt[];
     projectionReceipts: GraphIndexProjectionReceipt[];
     snapshotId?: string;
+    authorityContract?: GraphSnapshotAuthorityContract;
     counters: GraphRebuildCounters;
     dropReasons: GraphRebuildDropReasons;
     message: string;
@@ -2442,6 +2505,7 @@ export interface BuildGraphRebuildSnapshotInput {
     documentProfileSummary?: GraphDocumentProfileSummary;
     documentSemanticSummary?: GraphDocumentSemanticSummary;
     operatorMutationJournal?: GraphOperatorMutationJournal;
+    durabilityMode?: GraphBuildDurabilityMode;
 }
 
 export interface GraphRebuildNoteFolderContext {

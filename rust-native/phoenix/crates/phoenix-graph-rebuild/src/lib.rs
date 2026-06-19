@@ -35,7 +35,10 @@ pub use compiler::{
     GraphCompilerError, GraphCompilerInput, GraphCompilerOutput, GraphPrototypeFamily,
     GraphRootReceipt, ProjectedGraphEdge, RelationFact,
 };
-pub use embedding::build_snapshot_embedding_targets;
+pub use embedding::{
+    build_snapshot_embedding_target_report, build_snapshot_embedding_targets,
+    GraphEmbeddingTargetBuild, GraphEmbeddingTargetOriginCount,
+};
 pub use phoenix_chunker_native::{
     build_chunks, classify_document_profiles, Chunk, ChunkerConfig, DocumentProfileRequest,
     DocumentProfileSummary,

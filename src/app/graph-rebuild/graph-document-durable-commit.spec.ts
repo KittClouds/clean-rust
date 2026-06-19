@@ -2,8 +2,14 @@ import { describe, expect, it } from 'vitest';
 
 import {
     emptyGraphDocumentGraphMutationLedger,
+    graphDocumentGraphMutationLedgerFromTruthCommits,
     graphDocumentGraphMutationLedgerFor,
 } from './graph-document-durable-commit';
+import {
+    graphTruthCommitLedgerFor,
+    resolveGraphTruthUiState,
+    type GraphTruthCommitLike,
+} from './graph-truth-commit-ledger';
 
 describe('graph document mutation ledger', () => {
     it('starts empty without creating TypeScript document graph commits', () => {
@@ -49,4 +55,63 @@ describe('graph document mutation ledger', () => {
             edges: 1,
         });
     });
+
+    it('projects committed, reverted, and superseded document rows from GraphTruthCommit lineage', () => {
+        const commits = graphTruthFixtures();
+        const truth = graphTruthCommitLedgerFor(commits);
+        const ledger = graphDocumentGraphMutationLedgerFromTruthCommits(commits);
+
+        expect(resolveGraphTruthUiState(truth, 'commit-active')).toBe('committed');
+        expect(resolveGraphTruthUiState(truth, 'receipt-active')).toBe('accepted');
+        expect(resolveGraphTruthUiState(truth, 'commit-reverted')).toBe('reverted');
+        expect(resolveGraphTruthUiState(truth, 'commit-old')).toBe('superseded');
+        expect(ledger.authority).toBe('graph_truth_commit_projection');
+        expect(ledger.records.map((row) => [row.commitId, row.status])).toEqual([
+            ['commit-reverted', 'undone'],
+            ['commit-old', 'undone'],
+            ['commit-active', 'committed'],
+        ]);
+        expect(ledger.counters).toMatchObject({
+            commits: 3,
+            active: 1,
+            undone: 2,
+            vertices: 1,
+            edges: 1,
+        });
+    });
 });
+
+function graphTruthFixtures(): GraphTruthCommitLike[] {
+    return [
+        commit('commit-reverted', 1, 'assert', [], null, ['receipt-reverted'], ['source-reverted']),
+        commit('commit-old', 2, 'assert', [], null, ['receipt-old'], ['source-old']),
+        commit('commit-active', 3, 'supersede', ['commit-old'], null, ['receipt-active'], ['source-active']),
+        commit('commit-reverter', 4, 'revert', [], 'commit-reverted', ['receipt-reverter'], ['source-reverter'], false),
+    ];
+}
+
+function commit(
+    commitId: string,
+    generation: number,
+    operation: GraphTruthCommitLike['operation'],
+    predecessorCommitIds: string[],
+    reversesCommitId: string | null,
+    receiptIds: string[],
+    sourceIds: string[],
+    withBatch = true,
+): GraphTruthCommitLike {
+    return {
+        commitId,
+        generation,
+        operation,
+        predecessorCommitIds,
+        reversesCommitId,
+        receiptIds,
+        sourceGenerations: sourceIds.map((sourceId) => ({ sourceId, generation })),
+        committedAt: generation * 10,
+        batch: withBatch ? {
+            vertices: [{ id: `vertex:${commitId}` }],
+            edges: [{ sourceId: `vertex:${commitId}`, targetId: 'entity:kai', edgeType: 'supports' }],
+        } : { vertices: [], edges: [] },
+    };
+}

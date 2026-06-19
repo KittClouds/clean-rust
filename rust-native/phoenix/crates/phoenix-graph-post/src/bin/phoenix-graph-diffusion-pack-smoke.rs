@@ -135,6 +135,7 @@ fn run(config: SmokeConfig) -> Result<DiffusionPackReport, String> {
             valid_at: None,
             recorded_at: None,
             include_candidate_graph: true,
+            truth_plane: phoenix_graph_post::api::GraphTruthPlane::WorldState,
             seed_limit: config.seed_limit,
             oversample: config.oversample,
             expansion_hops: config.expansion_hops,

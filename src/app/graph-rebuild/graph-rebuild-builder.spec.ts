@@ -175,7 +175,7 @@ describe('Phoenix graph rebuild builder', () => {
         expect(snapshot.structuralPostProcess?.components).toHaveLength(1);
     });
 
-    it('keeps registry-only Alex entities as first-class graph nodes and targets', () => {
+    it('keeps registry-only Alex entities out of graph truth nodes and targets', () => {
         const snapshot = buildGraphRebuildSnapshot({
             scopeKind: 'note',
             scopeId: 'note:registry',
@@ -197,21 +197,12 @@ describe('Phoenix graph rebuild builder', () => {
         });
 
         expect(snapshot.nodes.map((node) => [node.entityId, node.totalMentions]).sort()).toEqual([
-            ['e-hazel', 0],
             ['e-kai', 1],
         ]);
-        expect(snapshot.embeddingTargets.find((target) => target.id === 'embed:entity:e-hazel')).toMatchObject({
-            kind: 'entity',
-            entityId: 'e-hazel',
-            entityKind: 'CHARACTER',
-            label: 'Hazel',
-            evidenceIds: [],
-            parentIds: [],
-        });
-        expect(snapshot.embeddingTargets.find((target) => target.id === 'embed:entity:e-hazel')?.text)
-            .toContain('mentions:0');
-        expect(snapshot.counters.nodes).toBe(2);
-        expect(snapshot.counters.embeddingEntityAnchors).toBeGreaterThan(1);
+        expect(snapshot.embeddingTargets.find((target) => target.id === 'embed:entity:e-hazel')).toBeUndefined();
+        expect(snapshot.counters.entities).toBe(2);
+        expect(snapshot.counters.nodes).toBe(1);
+        expect(snapshot.counters.embeddingTargets).toBeGreaterThan(0);
     });
 
     it('uses an injected Rust compiler sidecar as the graph model authority', () => {
@@ -850,6 +841,7 @@ describe('Phoenix graph rebuild builder', () => {
         expect(adjudication.counters.topologyCommitCount).toBe(snapshot.counters.semanticAdjudicationTopologyCommits);
         expect(adjudication.counters.ledgerOnlyCount).toBe(snapshot.counters.semanticAdjudicationLedgerOnly);
         expect(adjudication.counters.topologyCommitCount).toBeGreaterThan(0);
+        expect(adjudication.counters.appliedMutationCount).toBe(adjudication.mutations.length);
         expect(adjudication.receipts.every((receipt) => receipt.reversible)).toBe(true);
         expect(adjudication.decisions.filter((decision) => decision.state === 'accepted').every((decision) =>
             Boolean(decision.sourceHypothesis)
@@ -863,6 +855,7 @@ describe('Phoenix graph rebuild builder', () => {
         )).toBe(true);
         expect(adjudication.mutations.every((mutation) =>
             snapshot.edges.some((edge) => edge.id === mutation.createdEdgeId)
+            && mutation.status === 'applied'
             && mutation.reversiblePatch.undoOperation === 'remove_semantic_edge_and_fact',
         )).toBe(true);
         expect(adjudication.mutations.every((mutation) =>

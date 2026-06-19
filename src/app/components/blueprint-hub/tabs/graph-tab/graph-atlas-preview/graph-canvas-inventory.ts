@@ -6,6 +6,7 @@ import type {
     GraphAtlasPacket,
 } from '../../../../../graph-rebuild/graph-atlas-packet';
 import type { GraphRebuildSnapshot } from '../../../../../graph-rebuild/graph-rebuild-snapshot';
+import { recordGraphCollapseRenderedInventory } from '../../../../../graph-rebuild/graph-collapse-trace';
 import { entityColorStore, normalizeGraphNodeColorKind } from '../../../../../lib/store/entityColorStore';
 import type { GraphInventory } from './graph-atlas-preview.component';
 import type { GalaxyInputEdge, GalaxyRenderableNode } from './graph-galaxy-engine';
@@ -32,7 +33,9 @@ export function buildGraphCanvasInventory(snapshot: GraphRebuildSnapshot | null)
     if (!packet) {
         return { nodes: [], edges: [], kindCounts: [], sourceLabel: EMPTY_PACKET_LABEL };
     }
-    return buildAtlasPacketInventory(packet);
+    const inventory = buildAtlasPacketInventory(packet);
+    recordGraphCollapseRenderedInventory(snapshot, inventory.nodes.length, inventory.edges.length, inventory.kindCounts);
+    return inventory;
 }
 
 function buildAtlasPacketInventory(packet: GraphAtlasPacket): GraphInventory {

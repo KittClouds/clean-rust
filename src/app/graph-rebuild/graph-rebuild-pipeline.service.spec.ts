@@ -41,7 +41,8 @@ import { AtlasCapabilityRuntimeService } from '../services/atlas-capability-runt
 import { NerService } from '../services/ner.service';
 import { PhoenixStoreService } from '../services/phoenix-store.service';
 import { PhoenixUiApiService } from '../services/phoenix-ui-api.service';
-import type { GraphIndexRunRequest } from './graph-rebuild-snapshot';
+import type { GraphIndexRunRequest, GraphRebuildSnapshot } from './graph-rebuild-snapshot';
+import { sealGraphSnapshotAuthority } from './graph-snapshot-authority';
 import type { CalendarRegistrySnapshot } from '../lib/fantasy-calendar/calendar-registry-snapshot';
 import type { GraphCalendarRegistryBridgeSummary } from './graph-calendar-registry-bridge';
 import type { GraphMemoryGraphRagBridgeSummary } from './graph-memory-graphrag-bridge';
@@ -162,10 +163,11 @@ describe('GraphRebuildPipelineService', () => {
                     }),
                 }),
                 expect.objectContaining({
-                    id: 'graphTruthContract',
-                    label: 'Graph Truth Contract',
+                    id: 'snapshotAuthorityContract',
+                    label: 'Snapshot Authority Contract',
                     counters: expect.objectContaining({
-                        graphTruthTotal: 3,
+                        authorityParity: 1,
+                        embeddingTargets: 3,
                     }),
                 }),
                 expect.objectContaining({
@@ -418,6 +420,12 @@ describe('GraphRebuildPipelineService', () => {
             scopeId: 'note:note-1',
             noteIds: ['note-1'],
             candidateCount: 2,
+            sourceEvidence: expect.objectContaining({
+                stagedOccurrences: expect.arrayContaining([
+                    expect.objectContaining({ entityId: 'entity-kai', source: 'machine_suggestion' }),
+                    expect.objectContaining({ entityId: 'entity-hazel', source: 'machine_suggestion' }),
+                ]),
+            }),
             calendarRegistrySnapshot: expect.objectContaining({ id: 'calendar-registry:test' }),
             relationshipHints: [expect.objectContaining({
                 sourceId: 'entity-kai',
@@ -542,6 +550,25 @@ describe('GraphRebuildPipelineService', () => {
             }),
         ]));
         expect(service.lastSnapshot()?.id).toBe('snapshot-1');
+    });
+
+    it('carries prior same-note anchors into a second force build when the registry is warm and occurrence storage is cold', async () => {
+        const first = await service.buildFullAtlas(request());
+        expect(first.snapshot.entityAnchors).toHaveLength(2);
+        graphRebuild.buildAndPersistSnapshot.mockClear();
+
+        await service.buildFullAtlas(request());
+
+        expect(graphRebuild.buildAndPersistSnapshot).toHaveBeenCalledWith(expect.objectContaining({
+            scopeId: 'note:note-1',
+            sourceEvidence: expect.objectContaining({
+                stagedOccurrences: [],
+                cachedSnapshotOccurrences: expect.arrayContaining([
+                    expect.objectContaining({ entityId: 'entity-kai', surface: 'Kai' }),
+                    expect.objectContaining({ entityId: 'entity-hazel', surface: 'Hazel' }),
+                ]),
+            }),
+        }));
     });
 
     it('defers content checkpoints until the clean graph receipt is persisted', async () => {
@@ -697,10 +724,12 @@ describe('GraphRebuildPipelineService', () => {
 
         expect(graphRebuild.buildAndPersistSnapshot).toHaveBeenCalledWith(expect.objectContaining({
             postProcessMode: 'full',
-            fallbackOccurrences: expect.arrayContaining([
-                expect.objectContaining({ entityId: 'entity-kai', surface: 'Kai' }),
-                expect.objectContaining({ entityId: 'entity-hazel', surface: 'Hazel' }),
-            ]),
+            sourceEvidence: expect.objectContaining({
+                cachedSnapshotOccurrences: expect.arrayContaining([
+                    expect.objectContaining({ entityId: 'entity-kai', surface: 'Kai' }),
+                    expect.objectContaining({ entityId: 'entity-hazel', surface: 'Hazel' }),
+                ]),
+            }),
         }));
     });
 
@@ -797,8 +826,8 @@ describe('GraphRebuildPipelineService', () => {
                 }),
             }),
             expect.objectContaining({
-                id: 'graphTruthContract',
-                label: 'Graph Truth Contract',
+                id: 'snapshotAuthorityContract',
+                label: 'Snapshot Authority Contract',
             }),
             expect.objectContaining({ id: 'snapshotDbOps', label: 'DB Ops' }),
             expect.objectContaining({ id: 'snapshotCpu', label: 'Snapshot CPU' }),
@@ -1273,7 +1302,7 @@ function discourseCompilerOverlaySummary(): GraphDiscourseCompilerOverlaySummary
 
 function createGraphRebuildMock() {
     return {
-        buildAndPersistSnapshot: vi.fn(async () => ({
+        buildAndPersistSnapshot: vi.fn(async () => authorityReadySnapshot({
             id: 'snapshot-1',
             scopeId: 'note:note-1',
             scopeKind: 'note',
@@ -1417,6 +1446,102 @@ function createGraphRebuildMock() {
         persistPostProcessCache: vi.fn(async () => undefined),
         restorePersistedSnapshot: vi.fn(async () => undefined),
     };
+}
+
+function authorityReadySnapshot(input: Partial<GraphRebuildSnapshot>): GraphRebuildSnapshot {
+    const targets = input.embeddingTargets || [];
+    const snapshot = {
+        schemaVersion: 'phoenix-graph-rebuild/v1',
+        id: input.id || 'snapshot-1',
+        source: 'phoenix-graph-rebuild',
+        scopeKind: input.scopeKind || 'note',
+        scopeId: input.scopeId || 'note:note-1',
+        noteIds: ['note-1'],
+        builtAt: 1,
+        chunks: [{ id: 'chunk-1', noteId: 'note-1', start: 0, end: 20, ordinal: 0, source: 'dynamic-chunking' }],
+        mentions: [
+            { id: 'mention-1', noteId: 'note-1', surface: 'Kai', sourceStart: 0, sourceEnd: 3, source: 'dynamic-ner', confidence: 1, entityId: 'entity-kai', status: 'accepted' },
+            { id: 'mention-2', noteId: 'note-1', surface: 'Hazel', sourceStart: 8, sourceEnd: 13, source: 'dynamic-ner', confidence: 1, entityId: 'entity-hazel', status: 'accepted' },
+        ],
+        entityAnchors: [
+            { id: 'anchor-1', noteId: 'note-1', surface: 'Kai', sourceStart: 0, sourceEnd: 3, source: 'dynamic-ner', confidence: 1, entityId: 'entity-kai', status: 'accepted', generation: 1 },
+            { id: 'anchor-2', noteId: 'note-1', surface: 'Hazel', sourceStart: 8, sourceEnd: 13, source: 'dynamic-ner', confidence: 1, entityId: 'entity-hazel', status: 'accepted', generation: 1 },
+        ],
+        relationships: [],
+        events: [],
+        episodes: [],
+        temporalEdges: [],
+        causalEdges: [],
+        memoryState: [],
+        embeddingTargets: targets,
+        embeddingVectors: [],
+        projectionRefs: [],
+        nodes: [
+            { id: 'entity-kai', entityId: 'entity-kai', label: 'Kai', kind: 'CHARACTER', aliases: [], anchorIds: ['anchor-1'], noteIds: ['note-1'], totalMentions: 1 },
+            { id: 'entity-hazel', entityId: 'entity-hazel', label: 'Hazel', kind: 'CHARACTER', aliases: [], anchorIds: ['anchor-2'], noteIds: ['note-1'], totalMentions: 1 },
+        ],
+        edges: [{ id: 'edge-1', sourceId: 'entity-kai', targetId: 'entity-hazel', type: 'semantic-related', weight: 1, confidence: 0.9, evidenceAnchorIds: ['anchor-1', 'anchor-2'], scopeKeys: ['note:note-1'], noteIds: ['note-1'] }],
+        ...input,
+        counters: {
+            mentions: 2,
+            relationships: 0,
+            events: 0,
+            temporalEdges: 0,
+            causalEdges: 0,
+            memoryState: 0,
+            ...input.counters,
+        },
+    } as GraphRebuildSnapshot;
+    const familyFor = (kind: string) => kind === 'entity' ? 'registry' as const : 'fact' as const;
+    const objects = targets.map((target) => ({
+        id: `atlas:${target.id}`,
+        family: familyFor(target.kind),
+        status: 'accepted' as const,
+        kind: target.kind,
+        label: target.label,
+        noteIds: target.noteId ? [target.noteId] : [],
+        chunkIds: target.chunkId ? [target.chunkId] : [],
+        anchorIds: [],
+        evidenceIds: target.evidenceIds,
+        sourceIds: [target.sourceId],
+        targetIds: [],
+    }));
+    snapshot.atlasPacket = {
+        schemaVersion: 'phoenix-atlas-packet/v1',
+        snapshotId: snapshot.id,
+        scopeKind: snapshot.scopeKind,
+        scopeId: snapshot.scopeId,
+        builtAt: snapshot.builtAt,
+        sourceContract: { authority: 'test', identityAuthority: 'test', vectorContract: 'vectors-missing', tsGraphBuilderRole: 'containment' },
+        objects,
+        manifoldTargets: targets.map((target) => ({
+            id: target.id,
+            objectId: `atlas:${target.id}`,
+            family: familyFor(target.kind),
+            admission: 'admitted',
+            vectorStatus: 'missing',
+            coordinateSource: 'none',
+            status: 'accepted',
+            kind: target.kind,
+            label: target.label,
+            sourceId: target.sourceId,
+            evidenceIds: target.evidenceIds,
+            parentIds: target.parentIds,
+        })),
+        counters: {
+            objects: objects.length,
+            manifoldTargets: targets.length,
+            registryEntities: snapshot.nodes.length,
+            evidenceAnchors: snapshot.entityAnchors.length,
+            modelVectors: 0,
+            families: [
+                { family: 'registry', count: objects.filter((object) => object.family === 'registry').length },
+                { family: 'fact', count: objects.filter((object) => object.family === 'fact').length },
+            ].filter((row) => row.count > 0),
+        },
+    };
+    sealGraphSnapshotAuthority(snapshot);
+    return snapshot;
 }
 
 function createPhoenixStoreMock() {
@@ -1627,8 +1752,30 @@ function createNerMock() {
         suggestions: computed(() => suggestions()),
         runDynamicScan: vi.fn(async () => undefined),
         acceptSuggestionForContext: vi.fn(async (id: string) => {
+            const suggestion = suggestions().find((row) => row.id === id);
             suggestions.set(suggestions().filter((suggestion) => suggestion.id !== id));
-            return true;
+            return suggestion ? acceptedOccurrence(suggestion.label) : null;
         }),
+    };
+}
+
+function acceptedOccurrence(label: string) {
+    const key = label.toLowerCase();
+    const start = label === 'Hazel' ? 8 : 0;
+    return {
+        id: `note-1:entity-${key}:${start}:${start + label.length}:machine_suggestion`,
+        noteId: 'note-1',
+        entityId: `entity-${key}`,
+        entityLabel: label,
+        entityKind: 'CHARACTER',
+        sourceStart: start,
+        sourceEnd: start + label.length,
+        surface: label,
+        source: 'machine_suggestion',
+        confidence: 0.9,
+        excerpt: label,
+        generation: 1,
+        createdAt: 1,
+        updatedAt: 1,
     };
 }

@@ -139,6 +139,7 @@ fn run(config: SmokeConfig) -> Result<SmokeReport, String> {
                         valid_at: None,
                         recorded_at: None,
                         include_candidate_graph: true,
+                        truth_plane: GraphTruthPlane::WorldState,
                         seed_limit: config.seed_limit,
                         oversample: config.oversample,
                         expansion_hops: config.expansion_hops,

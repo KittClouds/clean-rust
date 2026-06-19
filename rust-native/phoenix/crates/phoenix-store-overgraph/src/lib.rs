@@ -9,6 +9,7 @@ use overgraph::{
     DatabaseEngine, DbOptions, EngineError, NodeInput, NodeRecord, PropValue, UpsertNodeOptions,
     WalSyncMode,
 };
+use phoenix_graph_kernel::GraphTruthCommit;
 use phoenix_hyperbolic::hybrid_space::{HybridPoint, HybridSpaceConfig};
 use phoenix_hyperbolic::{
     AnnMetric, Candidate as HnswCandidate, HnswBuildParams, HyperbolicDiskHnsw,
@@ -29,24 +30,40 @@ use phoenix_semantic_v2::{
 };
 use phoenix_store_native_core::{
     relation_spec, snapshot_relations_for_partition, AnnGenerationId, AnnIndexFamily, AnnIndexKey,
-    AnnManifest, AnnPackedSegments, BundleHeader, BundleKey, BundleKind, ChunkManifest, IngestMode,
-    NativeSemanticDocumentVectorRecord, NativeSemanticLeafVectorRecord,
-    NativeSemanticNodeVectorRecord, PhoenixArchiveStoreV2, PhoenixBundleStoreV2,
-    PhoenixCausalPatchStore, PhoenixChunkManifestStore, PhoenixErPatchStore,
+    AnnManifest, AnnPackedSegments, BundleHeader, BundleKey, BundleKind, ChunkManifest,
+    GraphTruthCommitAppend, IngestMode, NativeSemanticDocumentVectorRecord,
+    NativeSemanticLeafVectorRecord, NativeSemanticNodeVectorRecord, PhoenixArchiveStoreV2,
+    PhoenixBundleStoreV2, PhoenixCausalPatchStore, PhoenixChunkManifestStore, PhoenixErPatchStore,
     PhoenixEventIdentityPatchStore, PhoenixGraphKernelStoreV2, PhoenixGraphPatchStore,
     PhoenixMemoryPatchStore, PhoenixNativeRowStore, PhoenixRelationMentionSeedStore,
     PhoenixRelationPatchStore, PhoenixSemanticGraphPatchStore, PhoenixSemanticIndexStore,
-    PhoenixStateSchemaPatchStore, PhoenixTemporalPatchStore, PreparedIngestContext,
-    SemanticDocumentNeighbor, SemanticNeighbor, SemanticNodeNeighbor, SnapshotEnvelope,
-    SnapshotPartition, StoreError, ALL_RELATIONS, SEMANTIC_MODEL_ID, SEMANTIC_VECTOR_DIM,
+    PhoenixStateSchemaPatchStore, PhoenixTemporalPatchStore, PreparedDocumentPersistTelemetry,
+    PreparedDocumentSegmentPersistTelemetry, PreparedIngestContext, SemanticDocumentNeighbor,
+    SemanticNeighbor, SemanticNodeNeighbor, SnapshotEnvelope, SnapshotPartition, StoreError,
+    ALL_RELATIONS, SEMANTIC_MODEL_ID, SEMANTIC_VECTOR_DIM,
 };
 use phoenix_types::{IndexedSpan, IngestDocument, ScopeKey, SessionId};
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use serde_json::Value;
 
+mod graph_checkpoint_policy;
+mod graph_kernel_replay_audit;
+#[cfg(test)]
+mod graph_kernel_replay_audit_tests;
+mod graph_learning_persistence;
+#[cfg(test)]
+mod graph_learning_persistence_tests;
 mod graph_topology;
+mod graph_truth_persistence;
+#[cfg(test)]
+mod graph_truth_persistence_tests;
 mod lexical_query;
+mod prepared_segment_payload;
 mod scope_runtime;
+use graph_checkpoint_policy::{
+    KernelCheckpointDecision, KernelCheckpointPolicy, KernelCheckpointPolicyInput,
+};
+pub use graph_kernel_replay_audit::{KernelSnapshotReplayAudit, KernelSnapshotReplayTimings};
 pub use graph_topology::{
     KernelTopologyCounts, KernelTopologyShortestPath, KernelTopologyVertexId,
 };
@@ -107,6 +124,8 @@ const PROP_SESSION_ORD: &str = "session_ord";
 const PROP_SESSION_ID: &str = "session_id";
 const PROP_GENERATION: &str = "generation";
 const PROP_JOURNAL_LEN: &str = "journal_len";
+const PROP_JOURNAL_BYTES: &str = "journal_bytes";
+const PROP_REPLAY_COST_US: &str = "replay_cost_us";
 const PROP_SEQ: &str = "seq";
 const PROP_SOURCE_REVISION: &str = "source_revision";
 const PROP_CREATED_AT: &str = "created_at";
@@ -115,6 +134,7 @@ const PROP_KIND: &str = "kind";
 const PROP_ENTITY_KEY: &str = "entity_key";
 const PROP_BYTE_LEN: &str = "byte_len";
 const PROP_PAYLOAD: &str = "payload";
+const PROP_PAYLOAD_PATH: &str = "payload_path";
 const PROP_RECORD: &str = "record";
 const PROP_COMMIT_ID: &str = "commit_id";
 const PROP_DOCUMENT_VALUE_KEY: &str = "document_value_key";
@@ -212,6 +232,8 @@ pub struct OvergraphTuning {
     pub wal_sync_mode: WalSyncMode,
     pub edge_uniqueness: bool,
     pub ingest_mode: IngestMode,
+    pub kernel_checkpoint_hot_journal_bytes: usize,
+    pub kernel_checkpoint_replay_cost_us: u64,
 }
 
 impl Default for OvergraphTuning {
@@ -224,6 +246,10 @@ impl Default for OvergraphTuning {
             wal_sync_mode: WalSyncMode::default(),
             edge_uniqueness: false,
             ingest_mode: IngestMode::Safe,
+            kernel_checkpoint_hot_journal_bytes: KernelCheckpointPolicy::default()
+                .max_hot_journal_bytes,
+            kernel_checkpoint_replay_cost_us: KernelCheckpointPolicy::default()
+                .max_measured_replay_cost_us,
         }
     }
 }
@@ -239,6 +265,12 @@ impl OvergraphTuning {
         }
         if let Some(value) = read_env_usize("PHOENIX_OVERGRAPH_MAX_IMMUTABLE_MEMTABLES") {
             tuning.max_immutable_memtables = value;
+        }
+        if let Some(value) = read_env_usize("PHOENIX_KERNEL_CHECKPOINT_HOT_JOURNAL_BYTES") {
+            tuning.kernel_checkpoint_hot_journal_bytes = value;
+        }
+        if let Some(value) = read_env_u64("PHOENIX_KERNEL_CHECKPOINT_REPLAY_COST_US") {
+            tuning.kernel_checkpoint_replay_cost_us = value;
         }
         if let Some(value) = read_env_u32("PHOENIX_OVERGRAPH_COMPACT_AFTER_N_FLUSHES") {
             tuning.compact_after_n_flushes = value;
@@ -281,6 +313,7 @@ pub struct PhoenixOvergraphStore {
     ann_query_state_cache: Mutex<HashMap<AnnQueryCacheKey, Arc<CachedAnnQueryState>>>,
     live_kernel_generation: AtomicU64,
     live_kernel_snapshot: Mutex<Option<KernelGraphSnapshot>>,
+    graph_proposal_receipt_index: Mutex<graph_learning_persistence::GraphProposalReceiptIndex>,
 }
 
 impl PhoenixOvergraphStore {
@@ -308,6 +341,7 @@ impl PhoenixOvergraphStore {
             ann_query_state_cache: Mutex::new(HashMap::new()),
             live_kernel_generation: AtomicU64::new(u64::MAX),
             live_kernel_snapshot: Mutex::new(None),
+            graph_proposal_receipt_index: Mutex::new(Default::default()),
         })
     }
 
@@ -1147,8 +1181,17 @@ impl PhoenixOvergraphStore {
             }
         }
 
+        let replay_started = std::time::Instant::now();
         let kernel = DeterministicKernel::default();
         if let Some(checkpoint) = self.load_kernel_checkpoint_with_engine(engine)? {
+            if checkpoint.meta.generation == generation
+                && self.kernel_journal_len_with_engine(engine)? == 0
+            {
+                let snapshot = checkpoint.snapshot;
+                self.cache_live_kernel_snapshot(generation, snapshot.clone());
+                self.record_kernel_replay_cost_with_engine(engine, 0)?;
+                return Ok(snapshot);
+            }
             kernel
                 .rebuild_from_kernel_batches(
                     vec![
@@ -1191,6 +1234,8 @@ impl PhoenixOvergraphStore {
         }
 
         let snapshot = kernel.snapshot().as_ref().clone();
+        let replay_cost_us = replay_started.elapsed().as_micros() as u64;
+        self.record_kernel_replay_cost_with_engine(engine, replay_cost_us)?;
         self.cache_live_kernel_snapshot(generation, snapshot.clone());
         Ok(snapshot)
     }
@@ -1473,61 +1518,66 @@ impl PhoenixOvergraphStore {
                     key, manifest.document_id, manifest.revision
                 )));
             };
-            let payload = load_segment_payload(&node)?;
             match segment_ref.kind {
                 DocumentSegmentKind::StringArena => {
-                    archive.tokens = decode_segment_payload(&payload)?;
+                    archive.tokens = decode_segment_payload_from_node(&self.path, &node)?;
                 }
                 DocumentSegmentKind::SentenceTable => {
-                    archive.sentences = decode_segment_payload(&payload)?;
+                    archive.sentences = decode_segment_payload_from_node(&self.path, &node)?;
                 }
                 DocumentSegmentKind::MentionTable => {
-                    archive.mentions = decode_segment_payload(&payload)?;
+                    archive.mentions = decode_segment_payload_from_node(&self.path, &node)?;
                 }
                 DocumentSegmentKind::ResolverLinkTable => {
-                    archive.resolver_links = decode_segment_payload(&payload)?;
+                    archive.resolver_links = decode_segment_payload_from_node(&self.path, &node)?;
                 }
                 DocumentSegmentKind::ResolvedMentionTable => {
-                    archive.resolved_mentions = decode_segment_payload(&payload)?;
+                    archive.resolved_mentions =
+                        decode_segment_payload_from_node(&self.path, &node)?;
                 }
                 DocumentSegmentKind::AliasConfirmationTable => {
-                    archive.alias_confirmations = decode_segment_payload(&payload)?;
+                    archive.alias_confirmations =
+                        decode_segment_payload_from_node(&self.path, &node)?;
                 }
                 DocumentSegmentKind::CorefClusterTable => {
-                    archive.coref_clusters = decode_segment_payload(&payload)?;
+                    archive.coref_clusters = decode_segment_payload_from_node(&self.path, &node)?;
                 }
                 DocumentSegmentKind::CausalSubstrateTable => {
-                    archive.causal_substrate = Some(decode_segment_payload(&payload)?);
+                    archive.causal_substrate =
+                        Some(decode_segment_payload_from_node(&self.path, &node)?);
                 }
                 DocumentSegmentKind::TemporalSubstrateTable => {
-                    archive.temporal_substrate = Some(decode_segment_payload(&payload)?);
+                    archive.temporal_substrate =
+                        Some(decode_segment_payload_from_node(&self.path, &node)?);
                 }
                 DocumentSegmentKind::EventIdentitySubstrateTable => {
-                    archive.event_identity_substrate = Some(decode_segment_payload(&payload)?);
+                    archive.event_identity_substrate =
+                        Some(decode_segment_payload_from_node(&self.path, &node)?);
                 }
                 DocumentSegmentKind::ChunkTable => {
-                    archive.chunks = decode_segment_payload(&payload)?;
+                    archive.chunks = decode_segment_payload_from_node(&self.path, &node)?;
                 }
                 DocumentSegmentKind::EntityTable => {
-                    archive.entities = decode_segment_payload(&payload)?;
+                    archive.entities = decode_segment_payload_from_node(&self.path, &node)?;
                 }
                 DocumentSegmentKind::RelationTable => {
-                    archive.relations = decode_segment_payload(&payload)?;
+                    archive.relations = decode_segment_payload_from_node(&self.path, &node)?;
                 }
                 DocumentSegmentKind::EvidenceTable => {
-                    archive.evidence_spans = decode_segment_payload(&payload)?;
+                    archive.evidence_spans = decode_segment_payload_from_node(&self.path, &node)?;
                 }
                 DocumentSegmentKind::LexicalPostings => {
-                    lexical = Some(decode_segment_payload(&payload)?);
+                    lexical = Some(decode_segment_payload_from_node(&self.path, &node)?);
                 }
                 DocumentSegmentKind::NarrativeHitTable => {
-                    archive.relation_candidates = decode_segment_payload(&payload)?;
+                    archive.relation_candidates =
+                        decode_segment_payload_from_node(&self.path, &node)?;
                 }
                 DocumentSegmentKind::GraphMutation => {
-                    archive.graph_batch = decode_segment_payload(&payload)?;
+                    archive.graph_batch = decode_segment_payload_from_node(&self.path, &node)?;
                 }
                 DocumentSegmentKind::StructureRelations => {
-                    archive.structure = Some(decode_segment_payload(&payload)?);
+                    archive.structure = Some(decode_segment_payload_from_node(&self.path, &node)?);
                 }
                 _ => {}
             }
@@ -1777,7 +1827,7 @@ impl PhoenixOvergraphStore {
                 )));
             };
             let mut decoded: LexicalPostingsSegment =
-                decode_segment_payload(&load_segment_payload(&node)?)?;
+                decode_segment_payload_from_node(&self.path, &node)?;
             lexical.spans.append(&mut decoded.spans);
             lexical.alias_entries.append(&mut decoded.alias_entries);
         }
@@ -2493,6 +2543,13 @@ impl PhoenixOvergraphStore {
         decode_record_prop(&node, PROP_RECORD)
     }
 
+    fn kernel_checkpoint_policy(&self) -> KernelCheckpointPolicy {
+        KernelCheckpointPolicy {
+            max_hot_journal_bytes: self.tuning.kernel_checkpoint_hot_journal_bytes,
+            max_measured_replay_cost_us: self.tuning.kernel_checkpoint_replay_cost_us,
+        }
+    }
+
     fn kernel_current_generation_with_engine(
         &self,
         engine: &mut DatabaseEngine,
@@ -2519,11 +2576,39 @@ impl PhoenixOvergraphStore {
         Ok(optional_u64_prop(&node, PROP_JOURNAL_LEN).unwrap_or(0) as usize)
     }
 
+    fn kernel_journal_bytes_with_engine(
+        &self,
+        engine: &mut DatabaseEngine,
+    ) -> Result<usize, StoreError> {
+        let Some(node) = engine
+            .get_node_by_key(TYPE_KERNEL_STATE, KERNEL_STATE_KEY)
+            .map_err(store_query_error)?
+        else {
+            return Ok(0);
+        };
+        Ok(optional_u64_prop(&node, PROP_JOURNAL_BYTES).unwrap_or(0) as usize)
+    }
+
+    fn kernel_replay_cost_us_with_engine(
+        &self,
+        engine: &mut DatabaseEngine,
+    ) -> Result<u64, StoreError> {
+        let Some(node) = engine
+            .get_node_by_key(TYPE_KERNEL_STATE, KERNEL_STATE_KEY)
+            .map_err(store_query_error)?
+        else {
+            return Ok(0);
+        };
+        Ok(optional_u64_prop(&node, PROP_REPLAY_COST_US).unwrap_or(0))
+    }
+
     fn upsert_kernel_state_with_engine(
         &self,
         engine: &mut DatabaseEngine,
         generation: u64,
         journal_len: usize,
+        journal_bytes: usize,
+        replay_cost_us: u64,
     ) -> Result<(), StoreError> {
         engine
             .upsert_node(
@@ -2533,12 +2618,96 @@ impl PhoenixOvergraphStore {
                     props: btree_props([
                         (PROP_GENERATION, PropValue::UInt(generation)),
                         (PROP_JOURNAL_LEN, PropValue::UInt(journal_len as u64)),
+                        (PROP_JOURNAL_BYTES, PropValue::UInt(journal_bytes as u64)),
+                        (PROP_REPLAY_COST_US, PropValue::UInt(replay_cost_us)),
                     ]),
                     ..Default::default()
                 },
             )
             .map_err(store_query_error)?;
         Ok(())
+    }
+
+    fn record_kernel_replay_cost_with_engine(
+        &self,
+        engine: &mut DatabaseEngine,
+        replay_cost_us: u64,
+    ) -> Result<(), StoreError> {
+        let generation = self.kernel_current_generation_with_engine(engine)?;
+        let journal_len = self.kernel_journal_len_with_engine(engine)?;
+        let journal_bytes = self.kernel_journal_bytes_with_engine(engine)?;
+        if generation == 0 && journal_len == 0 && journal_bytes == 0 {
+            return Ok(());
+        }
+        self.upsert_kernel_state_with_engine(
+            engine,
+            generation,
+            journal_len,
+            journal_bytes,
+            replay_cost_us,
+        )
+    }
+
+    fn maybe_checkpoint_kernel_journal_with_engine(
+        &self,
+        engine: &mut DatabaseEngine,
+        source_revision: &str,
+    ) -> Result<KernelCheckpointDecision, StoreError> {
+        let input = KernelCheckpointPolicyInput {
+            hot_journal_bytes: self.kernel_journal_bytes_with_engine(engine)?,
+            measured_replay_cost_us: self.kernel_replay_cost_us_with_engine(engine)?,
+        };
+        let decision = self.kernel_checkpoint_policy().decide(input);
+        if decision == KernelCheckpointDecision::KeepJournalHot {
+            return Ok(decision);
+        }
+        let generation = self.kernel_current_generation_with_engine(engine)?;
+        if generation == 0 {
+            return Ok(KernelCheckpointDecision::KeepJournalHot);
+        }
+        let snapshot = self.load_live_kernel_snapshot_with_engine(engine)?;
+        self.write_kernel_checkpoint_with_engine(engine, generation, source_revision, &snapshot)?;
+        Ok(decision)
+    }
+
+    fn write_kernel_checkpoint_with_engine(
+        &self,
+        engine: &mut DatabaseEngine,
+        generation: u64,
+        source_revision: &str,
+        snapshot: &KernelGraphSnapshot,
+    ) -> Result<KernelCheckpointData, StoreError> {
+        let checkpoint = KernelCheckpointData {
+            meta: KernelCheckpointMeta {
+                checkpoint_id: format!("kernel-checkpoint-{generation}"),
+                generation,
+                source_revision: source_revision.to_owned(),
+                created_at: now_ms(),
+            },
+            snapshot: snapshot.clone(),
+        };
+        engine
+            .upsert_node(
+                TYPE_KERNEL_CHECKPOINT,
+                KERNEL_CHECKPOINT_KEY,
+                UpsertNodeOptions {
+                    props: btree_props([
+                        (PROP_GENERATION, PropValue::UInt(generation)),
+                        (
+                            PROP_SOURCE_REVISION,
+                            PropValue::String(source_revision.to_owned()),
+                        ),
+                        (PROP_CREATED_AT, PropValue::Int(checkpoint.meta.created_at)),
+                        (PROP_RECORD, PropValue::Bytes(encode_record(&checkpoint)?)),
+                    ]),
+                    ..Default::default()
+                },
+            )
+            .map_err(store_query_error)?;
+        self.compact_kernel_journal_with_engine(engine, generation)?;
+        self.publish_kernel_topology_with_engine(engine, snapshot)?;
+        self.cache_live_kernel_snapshot(generation, snapshot.clone());
+        Ok(checkpoint)
     }
 
     fn load_kernel_journal_after_with_engine(
@@ -2562,6 +2731,9 @@ impl PhoenixOvergraphStore {
                 .cmp(&right.generation)
                 .then_with(|| left.created_at.cmp(&right.created_at))
         });
+        for entry in &mut entries {
+            graph_truth_persistence::hydrate_graph_truth_journal_entry(engine, entry)?;
+        }
         Ok(entries)
     }
 
@@ -2585,57 +2757,7 @@ impl PhoenixOvergraphStore {
         let current_generation = self
             .kernel_current_generation_with_engine(engine)?
             .max(generation);
-        self.upsert_kernel_state_with_engine(engine, current_generation, remaining)
-    }
-
-    fn append_kernel_entry_with_engine(
-        &self,
-        engine: &mut DatabaseEngine,
-        entry: KernelJournalEntry,
-    ) -> Result<(), StoreError> {
-        let next_seq = self.kernel_journal_len_with_engine(engine)? as u64 + 1;
-        let key = kernel_journal_key(entry.generation, next_seq);
-        engine
-            .upsert_node(
-                TYPE_KERNEL_JOURNAL,
-                &key,
-                UpsertNodeOptions {
-                    props: btree_props([
-                        (PROP_SEQ, PropValue::UInt(next_seq)),
-                        (PROP_GENERATION, PropValue::UInt(entry.generation)),
-                        (
-                            PROP_SOURCE_REVISION,
-                            PropValue::String(entry.source_revision.clone()),
-                        ),
-                        (PROP_CREATED_AT, PropValue::Int(entry.created_at)),
-                        (
-                            PROP_COMMIT_ID,
-                            entry
-                                .commit_id
-                                .clone()
-                                .map(PropValue::String)
-                                .unwrap_or(PropValue::Null),
-                        ),
-                        (PROP_RECORD, PropValue::Bytes(encode_record(&entry)?)),
-                    ]),
-                    ..Default::default()
-                },
-            )
-            .map_err(store_query_error)?;
-        self.upsert_kernel_state_with_engine(engine, entry.generation, next_seq as usize)?;
-        if let Some(commit_id) = entry.commit_id {
-            engine
-                .upsert_node(
-                    TYPE_KERNEL_COMMIT,
-                    &commit_id,
-                    UpsertNodeOptions {
-                        props: btree_props([(PROP_GENERATION, PropValue::UInt(entry.generation))]),
-                        ..Default::default()
-                    },
-                )
-                .map_err(store_query_error)?;
-        }
-        Ok(())
+        self.upsert_kernel_state_with_engine(engine, current_generation, remaining, 0, 0)
     }
 }
 
@@ -2957,6 +3079,207 @@ impl PhoenixBundleStoreV2 for PhoenixOvergraphStore {
     }
 }
 
+impl PhoenixOvergraphStore {
+    fn persist_prepared_documents_native_with_telemetry(
+        &self,
+        prepared: &[PreparedDocument],
+        session_archive: Option<&SessionArchive>,
+        touched_scopes: &[DirtyScopeRecord],
+    ) -> Result<PreparedDocumentPersistTelemetry, StoreError> {
+        let total_started = std::time::Instant::now();
+        let mut telemetry = PreparedDocumentPersistTelemetry {
+            document_count: prepared.len(),
+            dirty_scope_count: touched_scopes.len(),
+            ..PreparedDocumentPersistTelemetry::default()
+        };
+        self.with_engine(|engine| {
+            let mut batch = Vec::<NodeInput>::new();
+            for document in prepared {
+                let started = std::time::Instant::now();
+                let manifest_key = manifest_key(
+                    document.manifest.scope_ord,
+                    document.manifest.document_ord,
+                    document.manifest.revision,
+                );
+                let manifest_bytes = encode_record(&document.manifest)?;
+                let segment_byte_len = document
+                    .segments
+                    .iter()
+                    .map(|segment| segment.payload.len())
+                    .sum::<usize>() as u64;
+                let manifest_props = btree_props([
+                    (
+                        PROP_SCOPE_KEY,
+                        PropValue::String(document.manifest.scope_key.clone()),
+                    ),
+                    (
+                        PROP_SCOPE_ORD,
+                        PropValue::UInt(document.manifest.scope_ord.0),
+                    ),
+                    (
+                        PROP_DOCUMENT_ID,
+                        PropValue::String(document.manifest.document_id.clone()),
+                    ),
+                    (
+                        PROP_DOCUMENT_ORD,
+                        PropValue::UInt(document.manifest.document_ord.0),
+                    ),
+                    (PROP_REVISION, PropValue::UInt(document.manifest.revision)),
+                    (PROP_BYTE_LEN, PropValue::UInt(segment_byte_len)),
+                    (
+                        PROP_CREATED_AT,
+                        PropValue::Int(document.manifest.created_at),
+                    ),
+                    (PROP_RECORD, PropValue::Bytes(manifest_bytes.clone())),
+                ]);
+                telemetry.manifest_record_bytes += manifest_bytes.len();
+                telemetry.manifest_stored_bytes += manifest_bytes.len() * 2;
+                batch.push(NodeInput {
+                    type_id: TYPE_DOCUMENT_MANIFEST,
+                    key: manifest_key,
+                    props: manifest_props.clone(),
+                    weight: 1.0,
+                    dense_vector: None,
+                    sparse_vector: None,
+                });
+                batch.push(NodeInput {
+                    type_id: TYPE_DOCUMENT_LATEST,
+                    key: document_latest_key(
+                        document.manifest.scope_ord,
+                        document.manifest.document_ord,
+                    ),
+                    props: manifest_props,
+                    weight: 1.0,
+                    dense_vector: None,
+                    sparse_vector: None,
+                });
+                telemetry.manifest_prepare_us += started.elapsed().as_micros() as u64;
+
+                for segment in &document.segments {
+                    let payload_write_started = std::time::Instant::now();
+                    let payload_ref = prepared_segment_payload::write_segment_payload(
+                        &self.path,
+                        document.manifest.scope_ord.0,
+                        document.manifest.document_ord.0,
+                        document.manifest.revision,
+                        segment.header.kind().as_u8(),
+                        segment.header.ordinal,
+                        &segment.payload,
+                    )?;
+                    let payload_write_us = payload_write_started.elapsed().as_micros() as u64;
+                    let started = std::time::Instant::now();
+                    let key = segment_key(
+                        document.manifest.scope_ord,
+                        document.manifest.document_ord,
+                        document.manifest.revision,
+                        segment.header.kind(),
+                        segment.header.ordinal,
+                    );
+                    batch.push(NodeInput {
+                        type_id: TYPE_DOCUMENT_SEGMENT,
+                        key,
+                        props: btree_props([
+                            (
+                                PROP_SCOPE_ORD,
+                                PropValue::UInt(document.manifest.scope_ord.0),
+                            ),
+                            (
+                                PROP_DOCUMENT_ORD,
+                                PropValue::UInt(document.manifest.document_ord.0),
+                            ),
+                            (PROP_REVISION, PropValue::UInt(document.manifest.revision)),
+                            (
+                                PROP_KIND,
+                                PropValue::String(
+                                    segment_kind_name(segment.header.kind()).to_owned(),
+                                ),
+                            ),
+                            (
+                                PROP_GENERATION_HINT,
+                                PropValue::UInt(segment.header.ordinal as u64),
+                            ),
+                            (PROP_BYTE_LEN, PropValue::UInt(segment.payload.len() as u64)),
+                            (
+                                PROP_PAYLOAD_PATH,
+                                PropValue::String(payload_ref.relative_path.clone()),
+                            ),
+                        ]),
+                        weight: 1.0,
+                        dense_vector: None,
+                        sparse_vector: None,
+                    });
+                    let prepare_us = started.elapsed().as_micros() as u64;
+                    telemetry.segment_count += 1;
+                    telemetry.segment_prepare_us += prepare_us;
+                    telemetry.segment_payload_write_us += payload_write_us;
+                    telemetry.segment_payload_bytes += segment.payload.len();
+                    telemetry.segment_external_bytes += payload_ref.bytes;
+                    telemetry.segment_uncompressed_bytes +=
+                        segment.header.uncompressed_len as usize;
+                    telemetry
+                        .segments
+                        .push(PreparedDocumentSegmentPersistTelemetry {
+                            document_id: document.manifest.document_id.clone(),
+                            kind: segment_kind_name(segment.header.kind()).to_owned(),
+                            ordinal: segment.header.ordinal,
+                            row_count: segment.header.row_count,
+                            compressed_bytes: segment.payload.len(),
+                            uncompressed_bytes: segment.header.uncompressed_len as usize,
+                            prepare_us,
+                            payload_write_us,
+                            storage: "external".to_owned(),
+                        });
+                }
+            }
+            for dirty_scope in touched_scopes {
+                let started = std::time::Instant::now();
+                let record = encode_record(dirty_scope)?;
+                telemetry.dirty_scope_record_bytes += record.len();
+                batch.push(NodeInput {
+                    type_id: TYPE_DIRTY_SCOPE,
+                    key: dirty_scope.scope_key.clone(),
+                    props: btree_props([
+                        (
+                            PROP_SCOPE_KEY,
+                            PropValue::String(dirty_scope.scope_key.clone()),
+                        ),
+                        (PROP_SCOPE_ORD, PropValue::UInt(dirty_scope.scope_ord.0)),
+                        (PROP_UPDATED_AT, PropValue::Int(dirty_scope.updated_at)),
+                        (PROP_RECORD, PropValue::Bytes(record)),
+                    ]),
+                    weight: 1.0,
+                    dense_vector: None,
+                    sparse_vector: None,
+                });
+                telemetry.dirty_scope_prepare_us += started.elapsed().as_micros() as u64;
+            }
+            telemetry.node_count = batch.len();
+            let started = std::time::Instant::now();
+            self.batch_upsert_nodes_with_engine(engine, batch)?;
+            telemetry.batch_upsert_us = started.elapsed().as_micros() as u64;
+            if let Some(session_archive) = session_archive {
+                let started = std::time::Instant::now();
+                let revision = session_archive
+                    .document_refs
+                    .iter()
+                    .map(|document| document.revision)
+                    .max()
+                    .unwrap_or(0);
+                self.persist_session_archive_native_with_engine(engine, session_archive, revision)?;
+                telemetry.session_archive_us = started.elapsed().as_micros() as u64;
+            }
+            Ok(())
+        })?;
+        let started = std::time::Instant::now();
+        for dirty_scope in touched_scopes {
+            self.invalidate_scope_runtime_caches(&dirty_scope.scope_key)?;
+        }
+        telemetry.cache_invalidate_us = started.elapsed().as_micros() as u64;
+        telemetry.total_us = total_started.elapsed().as_micros() as u64;
+        Ok(telemetry)
+    }
+}
+
 impl PhoenixChunkManifestStore for PhoenixOvergraphStore {
     fn init_chunk_manifest_schema(&self) -> Result<(), StoreError> {
         Ok(())
@@ -3046,138 +3369,26 @@ impl PhoenixArchiveStoreV2 for PhoenixOvergraphStore {
         touched_scopes: &[DirtyScopeRecord],
         _created_at: i64,
     ) -> Result<(), StoreError> {
-        self.with_engine(|engine| {
-            let mut batch = Vec::<NodeInput>::new();
-            for document in prepared {
-                let manifest_key = manifest_key(
-                    document.manifest.scope_ord,
-                    document.manifest.document_ord,
-                    document.manifest.revision,
-                );
-                let manifest_bytes = encode_record(&document.manifest)?;
-                let segment_byte_len = document
-                    .segments
-                    .iter()
-                    .map(|segment| segment.payload.len())
-                    .sum::<usize>() as u64;
-                let manifest_props = btree_props([
-                    (
-                        PROP_SCOPE_KEY,
-                        PropValue::String(document.manifest.scope_key.clone()),
-                    ),
-                    (
-                        PROP_SCOPE_ORD,
-                        PropValue::UInt(document.manifest.scope_ord.0),
-                    ),
-                    (
-                        PROP_DOCUMENT_ID,
-                        PropValue::String(document.manifest.document_id.clone()),
-                    ),
-                    (
-                        PROP_DOCUMENT_ORD,
-                        PropValue::UInt(document.manifest.document_ord.0),
-                    ),
-                    (PROP_REVISION, PropValue::UInt(document.manifest.revision)),
-                    (PROP_BYTE_LEN, PropValue::UInt(segment_byte_len)),
-                    (
-                        PROP_CREATED_AT,
-                        PropValue::Int(document.manifest.created_at),
-                    ),
-                    (PROP_RECORD, PropValue::Bytes(manifest_bytes.clone())),
-                ]);
-                batch.push(NodeInput {
-                    type_id: TYPE_DOCUMENT_MANIFEST,
-                    key: manifest_key,
-                    props: manifest_props.clone(),
-                    weight: 1.0,
-                    dense_vector: None,
-                    sparse_vector: None,
-                });
-                batch.push(NodeInput {
-                    type_id: TYPE_DOCUMENT_LATEST,
-                    key: document_latest_key(
-                        document.manifest.scope_ord,
-                        document.manifest.document_ord,
-                    ),
-                    props: manifest_props,
-                    weight: 1.0,
-                    dense_vector: None,
-                    sparse_vector: None,
-                });
-                for segment in &document.segments {
-                    let key = segment_key(
-                        document.manifest.scope_ord,
-                        document.manifest.document_ord,
-                        document.manifest.revision,
-                        segment.header.kind(),
-                        segment.header.ordinal,
-                    );
-                    batch.push(NodeInput {
-                        type_id: TYPE_DOCUMENT_SEGMENT,
-                        key,
-                        props: btree_props([
-                            (
-                                PROP_SCOPE_ORD,
-                                PropValue::UInt(document.manifest.scope_ord.0),
-                            ),
-                            (
-                                PROP_DOCUMENT_ORD,
-                                PropValue::UInt(document.manifest.document_ord.0),
-                            ),
-                            (PROP_REVISION, PropValue::UInt(document.manifest.revision)),
-                            (
-                                PROP_KIND,
-                                PropValue::String(
-                                    segment_kind_name(segment.header.kind()).to_owned(),
-                                ),
-                            ),
-                            (
-                                PROP_GENERATION_HINT,
-                                PropValue::UInt(segment.header.ordinal as u64),
-                            ),
-                            (PROP_BYTE_LEN, PropValue::UInt(segment.payload.len() as u64)),
-                            (PROP_PAYLOAD, PropValue::Bytes(segment.payload.clone())),
-                        ]),
-                        weight: 1.0,
-                        dense_vector: None,
-                        sparse_vector: None,
-                    });
-                }
-            }
-            for dirty_scope in touched_scopes {
-                batch.push(NodeInput {
-                    type_id: TYPE_DIRTY_SCOPE,
-                    key: dirty_scope.scope_key.clone(),
-                    props: btree_props([
-                        (
-                            PROP_SCOPE_KEY,
-                            PropValue::String(dirty_scope.scope_key.clone()),
-                        ),
-                        (PROP_SCOPE_ORD, PropValue::UInt(dirty_scope.scope_ord.0)),
-                        (PROP_UPDATED_AT, PropValue::Int(dirty_scope.updated_at)),
-                        (PROP_RECORD, PropValue::Bytes(encode_record(dirty_scope)?)),
-                    ]),
-                    weight: 1.0,
-                    dense_vector: None,
-                    sparse_vector: None,
-                });
-            }
-            self.batch_upsert_nodes_with_engine(engine, batch)?;
-            if let Some(session_archive) = session_archive {
-                let revision = session_archive
-                    .document_refs
-                    .iter()
-                    .map(|document| document.revision)
-                    .max()
-                    .unwrap_or(0);
-                self.persist_session_archive_native_with_engine(engine, session_archive, revision)?;
-            }
-            Ok(())
-        })?;
-        for dirty_scope in touched_scopes {
-            self.invalidate_scope_runtime_caches(&dirty_scope.scope_key)?;
-        }
-        Ok(())
+        self.persist_prepared_documents_native_with_telemetry(
+            prepared,
+            session_archive,
+            touched_scopes,
+        )
+        .map(|_| ())
+    }
+
+    fn persist_prepared_documents_with_telemetry(
+        &self,
+        prepared: &[PreparedDocument],
+        session_archive: Option<&SessionArchive>,
+        touched_scopes: &[DirtyScopeRecord],
+        _created_at: i64,
+    ) -> Result<PreparedDocumentPersistTelemetry, StoreError> {
+        self.persist_prepared_documents_native_with_telemetry(
+            prepared,
+            session_archive,
+            touched_scopes,
+        )
     }
 
     fn persist_session_archive(
@@ -4233,6 +4444,10 @@ impl PhoenixGraphKernelStoreV2 for PhoenixOvergraphStore {
         Ok(())
     }
 
+    fn load_live_kernel_snapshot(&self) -> Result<KernelGraphSnapshot, StoreError> {
+        self.with_engine(|engine| self.load_live_kernel_snapshot_with_engine(engine))
+    }
+
     fn load_kernel_checkpoint(&self) -> Result<Option<KernelCheckpointData>, StoreError> {
         self.with_engine(|engine| self.load_kernel_checkpoint_with_engine(engine))
     }
@@ -4244,37 +4459,7 @@ impl PhoenixGraphKernelStoreV2 for PhoenixOvergraphStore {
         snapshot: &KernelGraphSnapshot,
     ) -> Result<KernelCheckpointData, StoreError> {
         self.with_engine(|engine| {
-            let checkpoint = KernelCheckpointData {
-                meta: KernelCheckpointMeta {
-                    checkpoint_id: format!("kernel-checkpoint-{generation}"),
-                    generation,
-                    source_revision: source_revision.to_owned(),
-                    created_at: now_ms(),
-                },
-                snapshot: snapshot.clone(),
-            };
-            engine
-                .upsert_node(
-                    TYPE_KERNEL_CHECKPOINT,
-                    KERNEL_CHECKPOINT_KEY,
-                    UpsertNodeOptions {
-                        props: btree_props([
-                            (PROP_GENERATION, PropValue::UInt(generation)),
-                            (
-                                PROP_SOURCE_REVISION,
-                                PropValue::String(source_revision.to_owned()),
-                            ),
-                            (PROP_CREATED_AT, PropValue::Int(checkpoint.meta.created_at)),
-                            (PROP_RECORD, PropValue::Bytes(encode_record(&checkpoint)?)),
-                        ]),
-                        ..Default::default()
-                    },
-                )
-                .map_err(store_query_error)?;
-            self.compact_kernel_journal_with_engine(engine, generation)?;
-            self.publish_kernel_topology_with_engine(engine, snapshot)?;
-            self.cache_live_kernel_snapshot(generation, snapshot.clone());
-            Ok(checkpoint)
+            self.write_kernel_checkpoint_with_engine(engine, generation, source_revision, snapshot)
         })
     }
 
@@ -4285,62 +4470,45 @@ impl PhoenixGraphKernelStoreV2 for PhoenixOvergraphStore {
         self.with_engine(|engine| self.load_kernel_journal_after_with_engine(engine, generation))
     }
 
-    fn append_kernel_batch(
+    fn append_graph_truth_commit(
         &self,
-        generation: u64,
-        source_revision: &str,
-        batch: &KernelMutationBatch,
-        created_at: i64,
-    ) -> Result<(), StoreError> {
-        self.with_engine(|engine| {
-            self.append_kernel_entry_with_engine(
-                engine,
-                KernelJournalEntry {
-                    generation,
-                    source_revision: source_revision.to_owned(),
-                    batch: Some(batch.clone()),
-                    commit_id: None,
-                    created_at,
-                },
-            )?;
+        commit: &GraphTruthCommit,
+    ) -> Result<GraphTruthCommitAppend, StoreError> {
+        let result = self.with_engine(|engine| {
+            graph_truth_persistence::append_graph_truth_commit_with_engine(self, engine, commit)
+        });
+        if matches!(result, Ok(GraphTruthCommitAppend::Appended)) {
             self.invalidate_live_kernel_snapshot();
+            let _ = self.with_engine(|engine| {
+                self.maybe_checkpoint_kernel_journal_with_engine(
+                    engine,
+                    commit.header.source_generations[0].source_id.as_str(),
+                )
+            });
+        }
+        if result.is_ok() {
             self.live_kernel_generation
-                .store(generation, Ordering::Release);
-            Ok(())
+                .store(commit.header.generation, Ordering::Release);
+        }
+        result
+    }
+
+    fn load_graph_truth_commit(
+        &self,
+        commit_id: &str,
+    ) -> Result<Option<GraphTruthCommit>, StoreError> {
+        self.with_engine(|engine| {
+            graph_truth_persistence::load_graph_truth_commit_with_engine(engine, commit_id)
         })
     }
 
-    fn append_kernel_commit_marker(
-        &self,
-        generation: u64,
-        source_revision: &str,
-        commit_id: &str,
-        created_at: i64,
-    ) -> Result<(), StoreError> {
-        self.with_engine(|engine| {
-            self.append_kernel_entry_with_engine(
-                engine,
-                KernelJournalEntry {
-                    generation,
-                    source_revision: source_revision.to_owned(),
-                    batch: None,
-                    commit_id: Some(commit_id.to_owned()),
-                    created_at,
-                },
-            )?;
-            self.invalidate_live_kernel_snapshot();
-            self.live_kernel_generation
-                .store(generation, Ordering::Release);
-            Ok(())
-        })
+    fn load_graph_truth_commits(&self) -> Result<Vec<GraphTruthCommit>, StoreError> {
+        self.with_engine(graph_truth_persistence::load_graph_truth_commits_with_engine)
     }
 
     fn kernel_generation_for_commit(&self, commit_id: &str) -> Result<Option<u64>, StoreError> {
         self.with_engine(|engine| {
-            Ok(engine
-                .get_node_by_key(TYPE_KERNEL_COMMIT, commit_id)
-                .map_err(store_query_error)?
-                .and_then(|node| optional_u64_prop(&node, PROP_GENERATION)))
+            graph_truth_persistence::kernel_generation_for_commit_with_engine(engine, commit_id)
         })
     }
 
@@ -4358,6 +4526,10 @@ fn store_query_error(error: EngineError) -> StoreError {
 }
 
 fn read_env_usize(name: &str) -> Option<usize> {
+    std::env::var(name).ok()?.parse().ok()
+}
+
+fn read_env_u64(name: &str) -> Option<u64> {
     std::env::var(name).ok()?.parse().ok()
 }
 
@@ -4448,6 +4620,13 @@ fn optional_string_prop(node: &NodeRecord, key: &str) -> Option<String> {
     }
 }
 
+fn optional_string_prop_ref<'a>(node: &'a NodeRecord, key: &str) -> Option<&'a str> {
+    match node.props.get(key) {
+        Some(PropValue::String(value)) => Some(value.as_str()),
+        _ => None,
+    }
+}
+
 fn optional_bytes_prop(node: &NodeRecord, key: &str) -> Option<Vec<u8>> {
     match node.props.get(key) {
         Some(PropValue::Bytes(value)) => Some(value.clone()),
@@ -4455,12 +4634,33 @@ fn optional_bytes_prop(node: &NodeRecord, key: &str) -> Option<Vec<u8>> {
     }
 }
 
-fn load_segment_payload(node: &NodeRecord) -> Result<Vec<u8>, StoreError> {
-    if let Some(payload) = optional_bytes_prop(node, PROP_PAYLOAD) {
-        return Ok(payload);
+fn optional_bytes_prop_ref<'a>(node: &'a NodeRecord, key: &str) -> Option<&'a [u8]> {
+    match node.props.get(key) {
+        Some(PropValue::Bytes(value)) => Some(value.as_slice()),
+        _ => None,
+    }
+}
+
+fn with_segment_payload<T>(
+    store_path: &Path,
+    node: &NodeRecord,
+    f: impl FnOnce(&[u8]) -> Result<T, StoreError>,
+) -> Result<T, StoreError> {
+    if let Some(payload) = optional_bytes_prop_ref(node, PROP_PAYLOAD) {
+        return f(payload);
+    }
+    if let Some(relative_path) = optional_string_prop_ref(node, PROP_PAYLOAD_PATH) {
+        return prepared_segment_payload::with_segment_payload(store_path, relative_path, f);
     }
     let segment: PreparedDocumentSegment = decode_record_prop_required(node, PROP_RECORD)?;
-    Ok(segment.payload)
+    f(&segment.payload)
+}
+
+fn decode_segment_payload_from_node<T: DeserializeOwned>(
+    store_path: &Path,
+    node: &NodeRecord,
+) -> Result<T, StoreError> {
+    with_segment_payload(store_path, node, decode_segment_payload)
 }
 
 fn btree_props<const N: usize>(pairs: [(&str, PropValue); N]) -> BTreeMap<String, PropValue> {

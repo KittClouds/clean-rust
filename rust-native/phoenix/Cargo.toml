@@ -83,6 +83,7 @@ rustling = { version = "0.8.0", default-features = false, features = ["parallel"
 zerocopy = { version = "0.7", features = ["derive"] }
 memchr = "2.7"
 memmap2 = "0.9"
+wide = "0.7.33"
 stop-words = "0.9"
 openrouter-rs = "0.4.7"
 compact_str = { version = "0.8", features = ["serde"] }

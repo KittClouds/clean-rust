@@ -17,8 +17,9 @@ use base64::{engine::general_purpose::STANDARD as BASE64_STANDARD, Engine as _};
 use flate2::{read::GzDecoder, write::GzEncoder, Compression};
 use phoenix_graph_rebuild::{
     build_atlas_packet, build_chunks, build_document_semantic_summary,
-    build_snapshot_embedding_targets, classify_document_profiles, compile_legacy_snapshot, Chunk,
-    ChunkerConfig, DocumentProfileRequest, DocumentSemanticRequest, GraphRebuildSnapshot,
+    build_snapshot_embedding_target_report, classify_document_profiles, compile_legacy_snapshot,
+    AtlasPacket, Chunk, ChunkerConfig, DocumentProfileRequest, DocumentSemanticRequest,
+    GraphEmbeddingTarget, GraphEmbeddingTargetOriginCount, GraphRebuildSnapshot,
 };
 use phoenix_hyperbolic::lorentz_tree::{
     HyperboloidPoint, LorentzForest, LorentzForestIndex, LorentzNode, LorentzQueryMode,
@@ -36,6 +37,14 @@ use phoenix_types::{
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+struct NativeAtlasSeed<'a> {
+    atlas_packet: &'a AtlasPacket,
+    embedding_targets: &'a [GraphEmbeddingTarget],
+    originating_families: &'a [GraphEmbeddingTargetOriginCount],
+}
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -874,7 +883,7 @@ impl PhoenixApi for PhoenixApiImpl {
 
         if command == "graphRebuild:compileDualWrite" {
             let snapshot_value = payload.get("snapshot").cloned().unwrap_or(payload);
-            let snapshot = serde_json::from_value::<GraphRebuildSnapshot>(snapshot_value)
+            let mut snapshot = serde_json::from_value::<GraphRebuildSnapshot>(snapshot_value)
                 .map_err(|error| format!("invalid graph rebuild snapshot: {error}"))?;
             let fact_graph = compile_legacy_snapshot(&snapshot);
             let fact_graph_payload = compressed_json_payload(
@@ -882,17 +891,24 @@ impl PhoenixApi for PhoenixApiImpl {
                 "phoenix-graph-compiler-payload/gzip-base64/v1",
                 fact_graph.schema_version.as_str(),
             )?;
-            let embedding_targets = build_snapshot_embedding_targets(&snapshot);
-            let mut atlas_snapshot = snapshot.clone();
-            atlas_snapshot.embedding_targets = embedding_targets.clone();
-            let atlas_packet = build_atlas_packet(&atlas_snapshot);
+            let target_report = build_snapshot_embedding_target_report(&snapshot);
+            snapshot.embedding_targets.clear();
+            let atlas_packet = build_atlas_packet(&snapshot);
+            let atlas_seed_payload = compressed_json_payload(
+                &NativeAtlasSeed {
+                    atlas_packet: &atlas_packet,
+                    embedding_targets: &target_report.targets,
+                    originating_families: &target_report.originating_families,
+                },
+                "phoenix-atlas-seed-payload/gzip-base64/v1",
+                "phoenix-atlas-seed/v1",
+            )?;
             return serialize_json(&json!({
                 "success": true,
                 "payload": {
                     "factGraphPayload": fact_graph_payload,
-                    "atlasPacket": atlas_packet,
+                    "atlasSeedPayload": atlas_seed_payload,
                     "embeddingTargetSource": "rust-graph-family-targets/v1",
-                    "embeddingTargets": embedding_targets,
                 },
                 "error": null,
             }));

@@ -1,7 +1,8 @@
 pub use phoenix_chunker_native::ChunkLens;
 use phoenix_graph::{GraphMutationBatch, GraptorGraph};
 use phoenix_graph_kernel::{
-    KernelCheckpointData, KernelGraphSnapshot, KernelJournalEntry, KernelMutationBatch,
+    GraphProposalBatchReceipt, GraphTruthCommit, KernelCheckpointData, KernelGraphSnapshot,
+    KernelJournalEntry,
 };
 use phoenix_semantic_v2::{
     AliasPosting, CausalScopeSidecar, DirtyScopeRecord, DocumentArchive, DocumentManifest,
@@ -39,6 +40,45 @@ pub struct SnapshotEnvelope {
     pub created_at: i64,
     pub relations: std::collections::BTreeMap<String, Vec<Value>>,
     pub checksum: Option<String>,
+}
+
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct PreparedDocumentSegmentPersistTelemetry {
+    pub document_id: String,
+    pub kind: String,
+    pub ordinal: u32,
+    pub row_count: u32,
+    pub compressed_bytes: usize,
+    pub uncompressed_bytes: usize,
+    pub prepare_us: u64,
+    pub payload_write_us: u64,
+    pub storage: String,
+}
+
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct PreparedDocumentPersistTelemetry {
+    pub total_us: u64,
+    pub document_count: usize,
+    pub segment_count: usize,
+    pub dirty_scope_count: usize,
+    pub node_count: usize,
+    pub manifest_prepare_us: u64,
+    pub segment_prepare_us: u64,
+    pub segment_payload_write_us: u64,
+    pub dirty_scope_prepare_us: u64,
+    pub batch_upsert_us: u64,
+    pub session_archive_us: u64,
+    pub cache_invalidate_us: u64,
+    pub manifest_record_bytes: usize,
+    pub manifest_stored_bytes: usize,
+    pub segment_payload_bytes: usize,
+    pub segment_external_bytes: usize,
+    pub segment_inline_bytes: usize,
+    pub segment_uncompressed_bytes: usize,
+    pub dirty_scope_record_bytes: usize,
+    pub segments: Vec<PreparedDocumentSegmentPersistTelemetry>,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -596,6 +636,47 @@ pub trait PhoenixArchiveStoreV2 {
         touched_scopes: &[DirtyScopeRecord],
         created_at: i64,
     ) -> Result<(), StoreError>;
+    fn persist_prepared_documents_with_telemetry(
+        &self,
+        prepared: &[PreparedDocument],
+        session_archive: Option<&SessionArchive>,
+        touched_scopes: &[DirtyScopeRecord],
+        created_at: i64,
+    ) -> Result<PreparedDocumentPersistTelemetry, StoreError> {
+        let started = std::time::Instant::now();
+        self.persist_prepared_documents(prepared, session_archive, touched_scopes, created_at)?;
+        let mut telemetry = PreparedDocumentPersistTelemetry {
+            total_us: started.elapsed().as_micros() as u64,
+            document_count: prepared.len(),
+            segment_count: prepared
+                .iter()
+                .map(|document| document.segments.len())
+                .sum(),
+            dirty_scope_count: touched_scopes.len(),
+            ..PreparedDocumentPersistTelemetry::default()
+        };
+        for document in prepared {
+            for segment in &document.segments {
+                telemetry.segment_payload_bytes += segment.payload.len();
+                telemetry.segment_inline_bytes += segment.payload.len();
+                telemetry.segment_uncompressed_bytes += segment.header.uncompressed_len as usize;
+                telemetry
+                    .segments
+                    .push(PreparedDocumentSegmentPersistTelemetry {
+                        document_id: document.manifest.document_id.clone(),
+                        kind: format!("{:?}", segment.header.kind()),
+                        ordinal: segment.header.ordinal,
+                        row_count: segment.header.row_count,
+                        compressed_bytes: segment.payload.len(),
+                        uncompressed_bytes: segment.header.uncompressed_len as usize,
+                        prepare_us: 0,
+                        payload_write_us: 0,
+                        storage: "inline".to_owned(),
+                    });
+            }
+        }
+        Ok(telemetry)
+    }
     fn persist_session_archive(
         &self,
         archive: &SessionArchive,
@@ -888,6 +969,7 @@ pub trait PhoenixDirectGraphStoreV2 {
 
 pub trait PhoenixGraphKernelStoreV2 {
     fn init_graph_kernel_schema(&self) -> Result<(), StoreError>;
+    fn load_live_kernel_snapshot(&self) -> Result<KernelGraphSnapshot, StoreError>;
     fn load_kernel_checkpoint(&self) -> Result<Option<KernelCheckpointData>, StoreError>;
     fn write_kernel_checkpoint(
         &self,
@@ -899,23 +981,42 @@ pub trait PhoenixGraphKernelStoreV2 {
         &self,
         generation: u64,
     ) -> Result<Vec<KernelJournalEntry>, StoreError>;
-    fn append_kernel_batch(
+    fn append_graph_truth_commit(
         &self,
-        generation: u64,
-        source_revision: &str,
-        batch: &KernelMutationBatch,
-        created_at: i64,
-    ) -> Result<(), StoreError>;
-    fn append_kernel_commit_marker(
+        commit: &GraphTruthCommit,
+    ) -> Result<GraphTruthCommitAppend, StoreError>;
+    fn load_graph_truth_commit(
         &self,
-        generation: u64,
-        source_revision: &str,
         commit_id: &str,
-        created_at: i64,
-    ) -> Result<(), StoreError>;
+    ) -> Result<Option<GraphTruthCommit>, StoreError>;
+    fn load_graph_truth_commits(&self) -> Result<Vec<GraphTruthCommit>, StoreError>;
     fn kernel_generation_for_commit(&self, commit_id: &str) -> Result<Option<u64>, StoreError>;
     fn kernel_current_generation(&self) -> Result<u64, StoreError>;
     fn kernel_journal_len(&self) -> Result<usize, StoreError>;
+}
+
+pub trait PhoenixGraphLearningStore {
+    fn append_graph_proposal_receipt(
+        &self,
+        receipt: &GraphProposalBatchReceipt,
+    ) -> Result<GraphProposalReceiptAppend, StoreError>;
+    fn load_graph_proposal_receipt(
+        &self,
+        receipt_id: &str,
+    ) -> Result<Option<GraphProposalBatchReceipt>, StoreError>;
+    fn load_graph_proposal_receipts(&self) -> Result<Vec<GraphProposalBatchReceipt>, StoreError>;
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum GraphTruthCommitAppend {
+    Appended,
+    AlreadyPresent { commit_id: String, generation: u64 },
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum GraphProposalReceiptAppend {
+    Appended { byte_len: usize },
+    AlreadyPresent { receipt_id: String },
 }
 
 pub trait PhoenixNativeStore: PhoenixNativeRowStore + PhoenixGraphDurabilityStore {}

@@ -6,10 +6,12 @@ use serde_json::Value;
 mod binary;
 mod deterministic;
 mod evidence;
+mod graph_truth;
 
 pub use binary::*;
 pub use deterministic::*;
 pub use evidence::*;
+pub use graph_truth::*;
 
 macro_rules! string_id {
     ($name:ident) => {

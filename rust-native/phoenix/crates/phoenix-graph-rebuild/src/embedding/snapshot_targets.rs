@@ -2,6 +2,7 @@ use std::collections::{BTreeSet, HashMap};
 
 use compact_str::{format_compact, CompactString};
 use phoenix_types::EntityId;
+use serde::{Deserialize, Serialize};
 
 use super::{
     representative_anchors, safe_prefix, structure_root_id, structure_root_targets, temporal_target,
@@ -13,14 +14,40 @@ use crate::types::{
     GraphRebuildSnapshot,
 };
 
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct GraphEmbeddingTargetOriginCount {
+    pub family: CompactString,
+    pub targets: usize,
+}
+
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct GraphEmbeddingTargetBuild {
+    pub targets: Vec<GraphEmbeddingTarget>,
+    pub originating_families: Vec<GraphEmbeddingTargetOriginCount>,
+}
+
 pub fn build_snapshot_embedding_targets(
     snapshot: &GraphRebuildSnapshot,
 ) -> Vec<GraphEmbeddingTarget> {
-    let mut targets = if snapshot.embedding_targets.is_empty() {
-        base_targets_from_snapshot(snapshot)
-    } else {
-        snapshot.embedding_targets.clone()
-    };
+    build_snapshot_embedding_target_report(snapshot).targets
+}
+
+pub fn build_snapshot_embedding_target_report(
+    snapshot: &GraphRebuildSnapshot,
+) -> GraphEmbeddingTargetBuild {
+    if !snapshot.embedding_targets.is_empty() {
+        let mut targets = snapshot.embedding_targets.clone();
+        targets.sort_by(|left, right| left.id.cmp(&right.id));
+        return GraphEmbeddingTargetBuild {
+            originating_families: input_target_family_counts(&targets),
+            targets,
+        };
+    }
+    let mut targets = base_targets_from_snapshot(snapshot);
+    let mut originating_families = Vec::with_capacity(5);
+    push_origin_count(&mut originating_families, "snapshot_base", targets.len());
     let mut seen = targets
         .iter()
         .map(|target| target.id.clone())
@@ -28,13 +55,26 @@ pub fn build_snapshot_embedding_targets(
     let sidecar = snapshot.document_sidecar_summary.as_ref();
     let evidence_by_id = evidence_spans_by_id(sidecar);
     if let Some(summary) = sidecar {
+        let before = targets.len();
         add_document_sidecar_targets(&mut targets, &mut seen, summary);
+        push_origin_count(
+            &mut originating_families,
+            "document_sidecar",
+            targets.len() - before,
+        );
     }
+    let before = targets.len();
     add_document_review_targets(
         &mut targets,
         &mut seen,
         snapshot.document_review_summary.as_ref(),
     );
+    push_origin_count(
+        &mut originating_families,
+        "document_review",
+        targets.len() - before,
+    );
+    let before = targets.len();
     add_document_compiler_targets(
         &mut targets,
         &mut seen,
@@ -42,13 +82,54 @@ pub fn build_snapshot_embedding_targets(
         &evidence_by_id,
         snapshot.note_ids.first(),
     );
+    push_origin_count(
+        &mut originating_families,
+        "document_compiler",
+        targets.len() - before,
+    );
+    let before = targets.len();
     add_discourse_targets(
         &mut targets,
         &mut seen,
         snapshot.discourse_spine_summary.as_ref(),
     );
+    push_origin_count(
+        &mut originating_families,
+        "discourse_spine",
+        targets.len() - before,
+    );
     targets.sort_by(|left, right| left.id.cmp(&right.id));
-    targets
+    GraphEmbeddingTargetBuild {
+        targets,
+        originating_families,
+    }
+}
+
+fn input_target_family_counts(
+    targets: &[GraphEmbeddingTarget],
+) -> Vec<GraphEmbeddingTargetOriginCount> {
+    let mut counts = std::collections::BTreeMap::<CompactString, usize>::new();
+    for target in targets {
+        let family = target.lane.as_ref().unwrap_or(&target.kind).clone();
+        *counts.entry(family).or_default() += 1;
+    }
+    counts
+        .into_iter()
+        .map(|(family, targets)| GraphEmbeddingTargetOriginCount { family, targets })
+        .collect()
+}
+
+fn push_origin_count(
+    counts: &mut Vec<GraphEmbeddingTargetOriginCount>,
+    family: &str,
+    targets: usize,
+) {
+    if targets > 0 {
+        counts.push(GraphEmbeddingTargetOriginCount {
+            family: family.into(),
+            targets,
+        });
+    }
 }
 
 fn base_targets_from_snapshot(snapshot: &GraphRebuildSnapshot) -> Vec<GraphEmbeddingTarget> {

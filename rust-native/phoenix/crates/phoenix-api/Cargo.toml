@@ -27,4 +27,5 @@ phoenix-store-overgraph = { path = "../phoenix-store-overgraph" }
 phoenix-types = { path = "../phoenix-types" }
 serde.workspace = true
 serde_json.workspace = true
+rmp-serde.workspace = true
 thiserror.workspace = true

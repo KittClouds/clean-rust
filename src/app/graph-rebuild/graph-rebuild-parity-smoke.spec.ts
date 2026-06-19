@@ -323,8 +323,11 @@ describe('Phoenix graph rebuild parity smoke', () => {
         )).toBe(true);
         expect(snapshot.semanticAdjudicationSummary?.schemaVersion).toBe('phoenix-semantic-adjudication-dag/v1');
         expect(snapshot.semanticAdjudicationSummary?.counters.topologyCommitCount).toBeGreaterThan(0);
+        expect(snapshot.semanticAdjudicationSummary?.counters.appliedMutationCount)
+            .toBe(snapshot.semanticAdjudicationSummary?.mutations.length);
         expect(snapshot.semanticAdjudicationSummary?.mutations.every((mutation) =>
-            snapshot.edges.some((edge) => edge.id === mutation.createdEdgeId),
+            mutation.status === 'applied'
+            && snapshot.edges.some((edge) => edge.id === mutation.createdEdgeId),
         )).toBe(true);
         expect(snapshot.semanticAdjudicationSummary?.decisions.filter((decision) => decision.state !== 'accepted').every((decision) =>
             decision.ledgerOnly === true
@@ -525,11 +528,12 @@ describe('Phoenix graph rebuild parity smoke', () => {
         )).toBe(true);
         expect(snapshot.semanticAdjudicationSummary?.decisions.length).toBe(snapshot.counters.semanticAdjudicationDecisions);
         expect(snapshot.semanticAdjudicationSummary?.counters.topologyCommitCount).toBeGreaterThan(0);
+        expect(snapshot.semanticAdjudicationSummary?.counters.appliedMutationCount)
+            .toBe(snapshot.semanticAdjudicationSummary?.mutations.length);
         expect(snapshot.semanticAdjudicationSummary?.counters.ledgerOnlyCount).toBeGreaterThan(0);
         expect(snapshot.semanticAdjudicationSummary?.receipts.every((receipt) =>
             receipt.reversible
-            && (receipt.mutationAllowed || receipt.affectedGraphAtomIds.length === 0)
-            && (receipt.mutationAllowed || receipt.affectedGraphFactIds.length === 0),
+            && (receipt.state !== 'accepted' || receipt.mutationAllowed === true),
         )).toBe(true);
         expect(snapshot.semanticEvalLedgerSummary?.compactExport.rowCount).toBe(snapshot.counters.semanticEvalLedgerRows);
         expect(snapshot.semanticEvalLedgerSummary?.counters.acceptedCandidates).toBeGreaterThan(0);

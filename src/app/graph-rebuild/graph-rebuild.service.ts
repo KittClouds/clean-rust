@@ -29,16 +29,35 @@ import {
 } from './graph-document-semantic';
 import {
     isGraphOperatorMutationJournal,
+    graphOperatorMutationJournalFromTruthCommits,
     type GraphOperatorMutationJournal,
 } from './graph-operator-mutation-journal';
-import type { GraphAtlasPacket } from './graph-atlas-packet';
+import type {
+    GraphAtlasFamily,
+    GraphAtlasManifoldTarget,
+    GraphAtlasObject,
+    GraphAtlasPacket,
+} from './graph-atlas-packet';
 import { buildGraphRebuildSnapshot } from './graph-rebuild-builder';
+import { finalizeGraphRebuildSnapshot } from './graph-snapshot-finalizer';
+import {
+    buildGraphSnapshotSourceEvidence,
+    mergeGraphRebuildOccurrences as mergeOccurrenceEvidence,
+    type GraphSnapshotSourceEvidenceInput,
+} from './graph-snapshot-source-evidence';
 import { buildGraphRebuildEmbeddingGraphPostProcess } from './graph-rebuild-embedding-postprocess';
 import { selectGraphRebuildEmbeddingTargetPlan } from './graph-rebuild-embedding-target-policy';
 import {
     emptyGraphDocumentGraphMutationLedger,
+    graphDocumentGraphMutationLedgerFromTruthCommits,
     type GraphDocumentGraphMutationLedger,
 } from './graph-document-durable-commit';
+import {
+    graphTruthCommitLedgerFor,
+    normalizeGraphTruthCommits,
+    type GraphTruthCommitLedger,
+    type GraphTruthCommitLike,
+} from './graph-truth-commit-ledger';
 import {
     buildAdaptiveGraphRebuildChunks,
     buildGraphRebuildChunksFromRanges,
@@ -52,6 +71,7 @@ import type {
     GraphIndexRunReceipt,
     GraphIndexPostProcessMode,
     GraphIndexEmbeddingStagePolicy,
+    GraphBuildDurabilityMode,
     GraphRebuildBuildTimings,
     GraphRebuildChunk,
     GraphRebuildContentBlobField,
@@ -66,6 +86,21 @@ import type {
 } from './graph-rebuild-snapshot';
 import type { GraphCompilerDualWriteSidecar } from './graph-compiler-read-model';
 import type { CalendarRegistrySnapshot } from '../lib/fantasy-calendar/calendar-registry-snapshot';
+import {
+    assertGraphSnapshotAuthority,
+    graphSnapshotContentHash,
+    graphSnapshotStableContentValue,
+    hydrateGraphSnapshotContent,
+    type GraphSnapshotHydrationBlob,
+} from './graph-snapshot-authority';
+import {
+    recordGraphCollapseBoundary,
+    recordGraphCollapseFilteredTargets,
+    recordGraphCollapseNativeBoundary,
+    recordGraphCollapseSnapshotBoundary,
+} from './graph-collapse-trace';
+
+export { mergeGraphRebuildOccurrences } from './graph-snapshot-source-evidence';
 
 export const GRAPH_REBUILD_NAMESPACE = 'phoenix_graph_rebuild_v1';
 const SNAPSHOT_DOCUMENT_KEY = 'snapshot';
@@ -130,11 +165,34 @@ interface CompressedGraphCompilerFactGraphPayload {
     payload: string;
 }
 
+interface NativeEmbeddingTargetOriginCount {
+    family: string;
+    targets: number;
+}
+
+interface NativeAtlasSeed {
+    atlasPacket: GraphAtlasPacket;
+    embeddingTargets: GraphRebuildEmbeddingTarget[];
+    originatingFamilies: NativeEmbeddingTargetOriginCount[];
+}
+
+interface CompressedNativeAtlasSeedPayload {
+    schemaVersion: 'phoenix-atlas-seed-payload/gzip-base64/v1';
+    sourceSchemaVersion: 'phoenix-atlas-seed/v1';
+    encoding: 'gzip+base64';
+    rawBytes: number;
+    compressedBytes: number;
+    payload: string;
+}
+
+interface GraphTruthCommitProjection {
+    commits: GraphTruthCommitLike[];
+    ledger: GraphTruthCommitLedger;
+}
+
 export interface GraphRebuildContentBlobPayload {
     schemaVersion: typeof CONTENT_BLOB_SCHEMA_VERSION;
-    snapshotId: string;
     scopeId: string;
-    builtAt: number;
     field: GraphRebuildContentBlobField;
     hash: string;
     value: unknown;
@@ -142,14 +200,31 @@ export interface GraphRebuildContentBlobPayload {
 
 export type NativeGraphCompilerSidecar = Partial<GraphCompilerDualWriteSidecar> & {
     factGraphPayload?: CompressedGraphCompilerFactGraphPayload;
+    atlasSeedPayload?: CompressedNativeAtlasSeedPayload;
     atlasPacket?: GraphAtlasPacket;
     embeddingTargets?: GraphRebuildEmbeddingTarget[];
+    originatingFamilies?: NativeEmbeddingTargetOriginCount[];
 };
 
 export type NativeGraphCompilerDecodedSidecar = GraphCompilerDualWriteSidecar & {
     atlasPacket?: GraphAtlasPacket;
     embeddingTargets?: GraphRebuildEmbeddingTarget[];
+    originatingFamilies?: NativeEmbeddingTargetOriginCount[];
 };
+
+export function authorizeGraphRebuildSnapshotForLoad(
+    snapshot: GraphRebuildSnapshot,
+    onReject?: (error: unknown) => void,
+): GraphRebuildSnapshot | null {
+    try {
+        if (snapshot.authorityContract) assertGraphSnapshotAuthority(snapshot);
+        else finalizeGraphRebuildSnapshot({ snapshot });
+        return snapshot;
+    } catch (error) {
+        onReject?.(error);
+        return null;
+    }
+}
 
 export interface GraphRebuildSnapshotDocumentPayloadStats {
     rawChars: number;
@@ -163,11 +238,16 @@ export interface GraphRebuildBuildRequest {
     scopeId: string;
     noteIds: string[];
     entities: RegisteredEntity[];
-    fallbackOccurrences?: EntityOccurrence[];
+    noteTexts?: Record<string, string>;
+    chunks?: GraphRebuildChunk[];
+    noteFolders?: Record<string, GraphRebuildNoteFolderContext>;
+    previousContentManifest?: GraphRebuildContentManifest;
+    sourceEvidence?: GraphSnapshotSourceEvidenceInput;
     relationshipHints?: GraphRebuildRelationshipHint[];
     embeddingProfile?: Partial<GraphRebuildEmbeddingProfile>;
     postProcessMode?: GraphIndexPostProcessMode;
     embeddingStagePolicy?: GraphIndexEmbeddingStagePolicy;
+    durabilityMode?: GraphBuildDurabilityMode;
     candidateCount?: number;
     calendarRegistrySnapshot?: CalendarRegistrySnapshot;
 }
@@ -194,33 +274,77 @@ export class GraphRebuildService {
         this.buildingState.set(true);
         const totalStarted = performance.now();
         const builtAt = Date.now();
+        const durabilityMode = request.durabilityMode || 'durable';
         const timings = emptyBuildTimings();
+        const currentSnapshot = this.snapshotState();
+        const previousContentManifest = request.previousContentManifest
+            || (currentSnapshot?.scopeId === request.scopeId ? currentSnapshot.contentManifest : undefined);
         try {
             const persistedOccurrences = await timedAsync(timings, 'occurrenceLoadMs', () =>
                 this.loadOccurrences(request.noteIds, request.entities)
             );
-            const noteTexts = await timedAsync(timings, 'noteTextLoadMs', () =>
+            const noteTexts = request.noteTexts || await timedAsync(timings, 'noteTextLoadMs', () =>
                 this.loadNoteTexts(request.noteIds, persistedOccurrences)
             );
-            const chunks = await timedAsync(timings, 'chunkLoadMs', () =>
-                this.loadChunks(request.noteIds, persistedOccurrences, noteTexts)
+            if (request.noteTexts) timings.noteTextLoadMs = 0;
+            const chunks = request.chunks || await timedAsync(timings, 'chunkLoadMs', () =>
+                this.loadChunks(request.noteIds, persistedOccurrences, noteTexts, durabilityMode)
             );
-            const noteFolders = await timedAsync(timings, 'noteFolderLoadMs', () =>
-                this.loadNoteFolderContexts(request.noteIds, persistedOccurrences)
-            );
-            const documentProfileSummary = await timedAsync(timings, 'documentProfileMs', () =>
-                this.classifyDocumentProfiles(noteTexts, builtAt)
-            );
-            const documentSemanticSummary = await timedAsync(timings, 'documentSemanticMs', () =>
-                this.buildDocumentSemanticSummary(noteTexts, request.entities)
-            );
-            const operatorMutationJournal = await this.loadOperatorMutationJournal(request.scopeId);
+            if (request.chunks) timings.chunkLoadMs = 0;
+            if (durabilityMode === 'interactive') timings.nativeChunkerSkipped = 1;
+            const noteFolders = request.noteFolders || (durabilityMode === 'interactive'
+                ? {}
+                : await timedAsync(timings, 'noteFolderLoadMs', () =>
+                    this.loadNoteFolderContexts(request.noteIds, persistedOccurrences)
+                ));
+            if (request.noteFolders || durabilityMode === 'interactive') timings.noteFolderLoadMs = 0;
+            const documentProfileSummary = durabilityMode === 'interactive'
+                ? undefined
+                : await timedAsync(timings, 'documentProfileMs', () =>
+                    this.classifyDocumentProfiles(noteTexts, builtAt)
+                );
+            if (durabilityMode === 'interactive') timings.documentProfileMs = 0;
+            const documentSemanticSummary = durabilityMode === 'interactive'
+                ? undefined
+                : await timedAsync(timings, 'documentSemanticMs', () =>
+                    this.buildDocumentSemanticSummary(noteTexts, request.entities)
+                );
+            if (durabilityMode === 'interactive') {
+                timings.documentSemanticMs = 0;
+                timings.documentSemanticSkipped = 1;
+            }
+            const operatorMutationJournal = await this.loadOperatorMutationJournal(request.scopeId, {
+                allowSnapshotFallback: durabilityMode !== 'interactive',
+            });
             const recoverStarted = performance.now();
-            const fallbackOccurrences = request.fallbackOccurrences || [];
-            const occurrences = mergeGraphRebuildOccurrences(
-                mergeGraphRebuildOccurrences(persistedOccurrences, fallbackOccurrences),
-                recoverGraphRebuildOccurrences(noteTexts, request.entities),
+            const recoveredOccurrences = recoverGraphRebuildOccurrences(noteTexts, request.entities);
+            const hasCurrentSourceEvidence = persistedOccurrences.length > 0
+                || recoveredOccurrences.length > 0
+                || !!request.sourceEvidence?.stagedOccurrences?.length
+                || !!request.sourceEvidence?.cachedSnapshotOccurrences?.length;
+            let previousSnapshot: GraphRebuildSnapshot | null = null;
+            if (durabilityMode === 'interactive' && hasCurrentSourceEvidence) {
+                timings.previousSnapshotHydrationSkipped = 1;
+            } else {
+                previousSnapshot = await this.loadPersistedSnapshot(request.scopeId);
+                timings.previousSnapshotHydrationSkipped = 0;
+            }
+            const priorSnapshotOccurrences = snapshotAnchorsToGraphRebuildOccurrences(
+                previousSnapshot,
+                builtAt,
+                noteTexts,
             );
+            const cachedSnapshotOccurrences = mergeOccurrenceEvidence(
+                request.sourceEvidence?.cachedSnapshotOccurrences || [],
+                priorSnapshotOccurrences,
+            );
+            const sourceEvidence = buildGraphSnapshotSourceEvidence({
+                ...request.sourceEvidence,
+                persistedOccurrences,
+                cachedSnapshotOccurrences,
+                recoveredOccurrences,
+            });
+            const occurrences = sourceEvidence.allOccurrences;
             timings.occurrenceRecoverMs = elapsedMs(recoverStarted);
             let snapshot = timedSync(timings, 'snapshotBuildMs', () => buildGraphRebuildSnapshot({
                 scopeKind: request.scopeKind,
@@ -240,17 +364,48 @@ export class GraphRebuildService {
                 documentProfileSummary,
                 documentSemanticSummary,
                 operatorMutationJournal: operatorMutationJournal || undefined,
+                durabilityMode,
                 builtAt,
             }));
-            await this.attachNativeGraphCompilerSidecar(snapshot, timings, request);
+            recordGraphCollapseBoundary(snapshot.id, snapshot.scopeId, 'source_evidence', {
+                notes: request.noteIds.length,
+                registryEntities: request.entities.length,
+                persistedOccurrences: sourceEvidence.counters.persisted,
+                stagedOccurrences: sourceEvidence.counters.staged,
+                cachedSnapshotOccurrences: sourceEvidence.counters.cachedSnapshot,
+                previousAcceptedAnchors: previousSnapshot?.entityAnchors.length || 0,
+                validatedPriorOccurrences: priorSnapshotOccurrences.length,
+                recoveredOccurrences: sourceEvidence.counters.recovered,
+                totalOccurrences: sourceEvidence.counters.total,
+            });
+            recordGraphCollapseSnapshotBoundary(snapshot, 'typescript_snapshot');
             snapshot = await this.reconcileDocumentGraphMutations(snapshot);
+            const nativeNeeded = durabilityMode !== 'interactive'
+                || !this.attachTsAtlasPacketIfComplete(snapshot, timings);
+            if (nativeNeeded) {
+                await this.attachNativeGraphCompilerSidecar(snapshot, timings, request);
+            } else {
+                timings.nativeCompilerSkipped = 1;
+            }
+            const authoritySealStarted = performance.now();
+            finalizeGraphRebuildSnapshot({
+                snapshot,
+                sourceEvidence,
+                previousSnapshot,
+                hasNonemptySourceText: Object.values(noteTexts).some((text) => text.trim().length > 0),
+            });
+            timings.authoritySealMs = elapsedMs(authoritySealStarted);
             finalizeBuildTimings(timings, totalStarted);
             snapshot.buildTimings = timings;
             const stateStarted = performance.now();
             this.snapshotState.set(snapshot);
             timings.stateCommitMs = elapsedMs(stateStarted);
             const persistStarted = performance.now();
-            await this.persistSnapshot(snapshot, timings, false).then(() => {
+            await this.persistSnapshot(snapshot, timings, false, {
+                durabilityMode,
+                previousContentManifest: previousContentManifest
+                    || previousSnapshot?.contentManifest,
+            }).then(() => {
                 this.errorState.set(null);
             }).catch((error) => {
                 const message = error instanceof Error ? error.message : String(error);
@@ -268,6 +423,29 @@ export class GraphRebuildService {
         }
     }
 
+    private attachTsAtlasPacketIfComplete(
+        snapshot: GraphRebuildSnapshot,
+        timings?: GraphRebuildBuildTimings,
+    ): boolean {
+        const packet = buildCompatibilityAtlasPacketForSnapshot(snapshot);
+        const targetParity = packet.manifoldTargets.length === snapshot.embeddingTargets.length
+            && packet.counters.manifoldTargets === snapshot.counters.embeddingTargets;
+        if (timings) {
+            timings.tsAtlasPacketParity = targetParity ? 1 : 0;
+            timings.nativeTargetsByOriginatingFamily = Object.fromEntries(
+                packet.counters.families.map((row) => [row.family, row.count]),
+            );
+        }
+        if (!targetParity) return false;
+        snapshot.atlasPacket = packet;
+        recordGraphCollapseSnapshotBoundary(snapshot, 'typescript_atlas_packet', {
+            packetObjects: packet.objects.length,
+            packetTargets: packet.manifoldTargets.length,
+            nativeCompilerSkipped: 1,
+        });
+        return true;
+    }
+
     private async attachNativeGraphCompilerSidecar(
         snapshot: GraphRebuildSnapshot,
         timings?: GraphRebuildBuildTimings,
@@ -275,17 +453,48 @@ export class GraphRebuildService {
     ): Promise<void> {
         const started = performance.now();
         try {
+            const compilerPayload = graphRebuildSnapshotToNativeCompilerPayload(snapshot);
+            if (timings) {
+                timings.nativeCompilerInputBytesByFamily = graphRebuildNativeCompilerInputBytes(compilerPayload);
+            }
             const rawSidecar = await this.phoenix.storeCommand('graphRebuild:compileDualWrite', {
-                snapshot: graphRebuildSnapshotToNativeCompilerPayload(snapshot),
+                snapshot: compilerPayload,
             }) as NativeGraphCompilerSidecar | null;
             const sidecar = decodeNativeGraphCompilerSidecar(rawSidecar);
+            if (timings && rawSidecar?.atlasSeedPayload) {
+                timings.nativeAtlasSeedRawBytes = rawSidecar.atlasSeedPayload.rawBytes;
+                timings.nativeAtlasSeedCompressedBytes = rawSidecar.atlasSeedPayload.compressedBytes;
+            }
+            if (timings && sidecar?.originatingFamilies) {
+                timings.nativeTargetsByOriginatingFamily = Object.fromEntries(
+                    sidecar.originatingFamilies.map((row) => [row.family, row.targets]),
+                );
+            }
+            recordGraphCollapseNativeBoundary(snapshot, sidecar);
             if (sidecar?.atlasPacket) snapshot.atlasPacket = sidecar.atlasPacket;
             if (sidecar?.embeddingTargets?.length) {
-                this.applyNativeEmbeddingTargets(snapshot, sidecar.embeddingTargets, request);
+                const nativeTargets = filterNativeEmbeddingTargetsForCommittedSources(snapshot, sidecar.embeddingTargets);
+                recordGraphCollapseFilteredTargets(snapshot, sidecar.embeddingTargets, nativeTargets);
+                if (nativeTargets.length) {
+                    this.applyNativeEmbeddingTargets(
+                        snapshot,
+                        mergeNativeEmbeddingTargets(snapshot.embeddingTargets, nativeTargets),
+                        request,
+                    );
+                }
+            } else {
+                recordGraphCollapseFilteredTargets(snapshot, [], []);
+            }
+            if (snapshot.atlasPacket) {
+                snapshot.atlasPacket = reconcileNativeAtlasPacketForTargets(snapshot, snapshot.atlasPacket);
             }
             if (!sidecar?.factGraph) return;
             attachGraphCompilerReadModels(snapshot, sidecar, 'rust');
         } catch (error) {
+            recordGraphCollapseBoundary(snapshot.id, snapshot.scopeId, 'native_response', {
+                nativeResponseAvailable: 0,
+                nativeError: 1,
+            });
             console.warn('[GraphRebuild] Native graph compiler sidecar unavailable; using compatibility sidecar', error);
         } finally {
             if (timings) timings.nativeCompilerMs = elapsedMs(started);
@@ -368,9 +577,24 @@ export class GraphRebuildService {
 
     async loadPersistedSnapshot(scopeId: string): Promise<GraphRebuildSnapshot | null> {
         const current = this.snapshotState();
-        if (current?.scopeId === scopeId) return current;
+        if (current?.scopeId === scopeId) {
+            const authorizedCurrent = authorizeGraphRebuildSnapshotForLoad(current, (error) =>
+                console.warn('[GraphRebuild] Ignoring in-memory graph rebuild snapshot that failed authority parity', error),
+            );
+            if (authorizedCurrent) return authorizedCurrent;
+            this.snapshotState.set(null);
+        }
         const document = await this.store.getScopedDocument(scopeId, GRAPH_REBUILD_NAMESPACE, SNAPSHOT_DOCUMENT_KEY);
-        return document ? scopedDocumentToGraphRebuildSnapshot(document) : null;
+        const persisted = document ? scopedDocumentToGraphRebuildSnapshot(document) : null;
+        if (!persisted) return null;
+        const hydrated = await this.hydratePersistedSnapshot(persisted);
+        recordGraphCollapseSnapshotBoundary(hydrated, 'persisted_snapshot', { loadedFromStore: 1 });
+        const authorized = authorizeGraphRebuildSnapshotForLoad(hydrated, (error) =>
+            console.warn('[GraphRebuild] Ignoring persisted graph rebuild snapshot that failed authority parity', error),
+        );
+        if (!authorized) return null;
+        this.snapshotState.set(authorized);
+        return authorized;
     }
 
     async loadPersistedGraphModelV2OverGraph(scopeId: string): Promise<GraphModelV2OverGraphExport | null> {
@@ -384,6 +608,13 @@ export class GraphRebuildService {
     ): Promise<GraphRebuildContentBlobPayload | null> {
         const document = await this.store.getScopedDocument(scopeId, GRAPH_REBUILD_NAMESPACE, documentKey);
         return document ? scopedDocumentToGraphRebuildContentBlob(document) : null;
+    }
+
+    private async loadPersistedSnapshotContentManifest(
+        scopeId: string,
+    ): Promise<GraphRebuildContentManifest | null> {
+        const document = await this.store.getScopedDocument(scopeId, GRAPH_REBUILD_NAMESPACE, SNAPSHOT_DOCUMENT_KEY);
+        return document ? scopedDocumentToGraphRebuildSnapshot(document)?.contentManifest || null : null;
     }
 
     async persistRunReceipt(receipt: GraphIndexRunReceipt): Promise<PhoenixContentMutationTiming> {
@@ -425,6 +656,7 @@ export class GraphRebuildService {
 
     async restorePersistedSnapshot(snapshot: GraphRebuildSnapshot): Promise<void> {
         const reconciled = await this.reconcileDocumentGraphMutations(snapshot);
+        finalizeGraphRebuildSnapshot({ snapshot: reconciled });
         this.snapshotState.set(reconciled);
         if (reconciled.operatorMutationJournal) {
             await this.persistOperatorMutationJournal(reconciled.operatorMutationJournal, reconciled.scopeKind);
@@ -439,9 +671,43 @@ export class GraphRebuildService {
     private async reconcileDocumentGraphMutations(
         snapshot: GraphRebuildSnapshot,
     ): Promise<GraphRebuildSnapshot> {
+        const truthProjection = await this.loadGraphTruthCommitProjection(snapshot.scopeId);
+        if (truthProjection) {
+            snapshot.graphTruthCommitLedger = truthProjection.ledger;
+            snapshot.documentGraphMutationLedger = graphDocumentGraphMutationLedgerFromTruthCommits(truthProjection.commits);
+            snapshot.operatorMutationJournal = graphOperatorMutationJournalFromTruthCommits(
+                snapshot.scopeId,
+                truthProjection.commits,
+                snapshot.builtAt,
+            );
+            snapshot.counters = {
+                ...snapshot.counters,
+                operatorMutationIntents: snapshot.operatorMutationJournal.counters.intents,
+                operatorMutationActive: snapshot.operatorMutationJournal.counters.active,
+                operatorMutationApplied: snapshot.operatorMutationJournal.counters.applied,
+                operatorMutationConflicted: snapshot.operatorMutationJournal.counters.conflicted,
+                operatorMutationUndone: snapshot.operatorMutationJournal.counters.undone,
+                operatorMutationReceipts: snapshot.operatorMutationJournal.counters.receipts,
+            };
+            return snapshot;
+        }
         const previousLedger = await this.loadDocumentGraphMutationLedger(snapshot.scopeId);
         snapshot.documentGraphMutationLedger = previousLedger || emptyGraphDocumentGraphMutationLedger();
         return snapshot;
+    }
+
+    private async loadGraphTruthCommitProjection(scopeId: string): Promise<GraphTruthCommitProjection | null> {
+        if (this.phoenix.target !== 'native') return null;
+        try {
+            const payload = await this.phoenix.storeCommand('graphTruth:listCommits', { scopeId });
+            const commits = normalizeGraphTruthCommits(payload);
+            return commits.length ? { commits, ledger: graphTruthCommitLedgerFor(commits) } : null;
+        } catch (error) {
+            if (!isUnsupportedStoreCommand(error, 'graphTruth:listCommits')) {
+                console.warn('[GraphRebuild] Native graph truth commit ledger unavailable; retaining compatibility ledgers', error);
+            }
+            return null;
+        }
     }
 
     private async loadDocumentGraphMutationLedger(
@@ -459,7 +725,10 @@ export class GraphRebuildService {
             : undefined;
     }
 
-    private async loadOperatorMutationJournal(scopeId: string): Promise<GraphOperatorMutationJournal | null> {
+    private async loadOperatorMutationJournal(
+        scopeId: string,
+        options: { allowSnapshotFallback?: boolean } = {},
+    ): Promise<GraphOperatorMutationJournal | null> {
         const current = this.snapshotState();
         if (current?.scopeId === scopeId && current.operatorMutationJournal) {
             return current.operatorMutationJournal;
@@ -470,6 +739,7 @@ export class GraphRebuildService {
             OPERATOR_MUTATION_JOURNAL_DOCUMENT_KEY,
         );
         if (journalDocument) return scopedDocumentToGraphOperatorMutationJournal(journalDocument);
+        if (options.allowSnapshotFallback === false) return null;
         const snapshotDocument = await this.store.getScopedDocument(
             scopeId,
             GRAPH_REBUILD_NAMESPACE,
@@ -491,7 +761,15 @@ export class GraphRebuildService {
         snapshot: GraphRebuildSnapshot,
         timings?: GraphRebuildBuildTimings,
         emitEvent = true,
+        options: {
+            durabilityMode?: GraphBuildDurabilityMode;
+            previousContentManifest?: GraphRebuildContentManifest;
+        } = {},
     ): Promise<void> {
+        const authorityAssertStarted = performance.now();
+        assertGraphSnapshotAuthority(snapshot);
+        if (timings) timings.authorityAssertMs = elapsedMs(authorityAssertStarted);
+        recordGraphCollapseSnapshotBoundary(snapshot, 'persisted_snapshot');
         const serializeStarted = performance.now();
         const contentBlobEntries = graphRebuildSnapshotContentBlobEntries(snapshot);
         const persistedSnapshot = graphRebuildSnapshotPersistenceView(snapshot, contentBlobEntries);
@@ -501,8 +779,13 @@ export class GraphRebuildService {
         if (timings) timings.snapshotPrimaryEncodeMs = elapsedMs(primaryEncodeStarted);
         const documentPayloadStats = graphRebuildSnapshotDocumentPayloadStats(document.payload);
         const overGraphEncodeStarted = performance.now();
-        const overGraphDocument = graphModelV2OverGraphExportToScopedDocument(snapshot);
-        if (timings) timings.snapshotOverGraphEncodeMs = elapsedMs(overGraphEncodeStarted);
+        const overGraphDocument = options.durabilityMode === 'interactive'
+            ? null
+            : graphModelV2OverGraphExportToScopedDocument(snapshot);
+        if (timings) {
+            timings.snapshotOverGraphEncodeMs = elapsedMs(overGraphEncodeStarted);
+            timings.snapshotOverGraphSkipped = options.durabilityMode === 'interactive' ? 1 : 0;
+        }
         const overGraphDocumentPayloadStats = overGraphDocument
             ? graphRebuildSnapshotDocumentPayloadStats(overGraphDocument.payload)
             : undefined;
@@ -516,7 +799,7 @@ export class GraphRebuildService {
                     documentPayloadStats,
                     overGraphDocumentPayloadStats,
                 ),
-                ...graphRebuildContentBlobPayloadCounters(contentBlobDocuments),
+                ...graphRebuildContentBlobPayloadCounters(contentBlobEntries),
             };
             timings.snapshotPayloadProfileMs = elapsedMs(profileStarted);
             timings.snapshotSerializeMs = elapsedMs(serializeStarted);
@@ -535,23 +818,46 @@ export class GraphRebuildService {
                 + contentBlobDocuments.reduce((sum, blob) => sum + blob.payload.length, 0);
         }
         const storeStarted = performance.now();
-        for (const blobDocument of contentBlobDocuments) {
-            const existing = await this.store.getScopedDocument(
-                blobDocument.scopeFolderId,
-                blobDocument.namespace,
-                blobDocument.documentKey,
-            );
-            if (!existing || existing.payload !== blobDocument.payload) {
-                await this.store.upsertScopedDocument(blobDocument);
-            }
+        let previousContentManifest = options.previousContentManifest;
+        if (!previousContentManifest && options.durabilityMode === 'interactive') {
+            previousContentManifest = await this.loadPersistedSnapshotContentManifest(snapshot.scopeId) || undefined;
         }
-        const primaryStoreStarted = performance.now();
-        await this.store.upsertScopedDocument(document);
-        if (timings) timings.snapshotPrimaryStoreMs = elapsedMs(primaryStoreStarted);
-        if (overGraphDocument) {
-            const overGraphStoreStarted = performance.now();
-            await this.store.upsertScopedDocument(overGraphDocument);
-            if (timings) timings.snapshotOverGraphStoreMs = elapsedMs(overGraphStoreStarted);
+        let contentBlobReads = 0;
+        let missingContentBlobDocuments: StoreScopedDocument[];
+        if (options.durabilityMode === 'interactive') {
+            const refs = previousContentManifest?.refs || {};
+            missingContentBlobDocuments = contentBlobDocuments.filter((_, index) => {
+                const entry = contentBlobEntries[index];
+                const ref = refs[entry.field];
+                return !ref || ref.hash !== entry.ref.hash || ref.documentKey !== entry.documentKey;
+            });
+        } else {
+            contentBlobReads = contentBlobDocuments.length;
+            const existingContentBlobs = await Promise.all(contentBlobDocuments.map((blobDocument) =>
+                this.store.getScopedDocument(
+                    blobDocument.scopeFolderId,
+                    blobDocument.namespace,
+                    blobDocument.documentKey,
+                ),
+            ));
+            missingContentBlobDocuments = contentBlobDocuments.filter((_, index) => !existingContentBlobs[index]);
+        }
+        const documentsToWrite = [
+            ...missingContentBlobDocuments,
+            document,
+            ...(overGraphDocument ? [overGraphDocument] : []),
+        ];
+        await this.store.upsertScopedDocuments(documentsToWrite);
+        if (timings) {
+            timings.snapshotPrimaryStoreMs = 0;
+            timings.snapshotOverGraphStoreMs = 0;
+            timings.snapshotStoreDocuments = documentsToWrite.length;
+            timings.snapshotWrittenContentBlobs = missingContentBlobDocuments.length;
+            timings.snapshotReusedContentBlobs = contentBlobDocuments.length - missingContentBlobDocuments.length;
+            timings.snapshotContentBlobReads = contentBlobReads;
+            timings.snapshotContentBlobManifestTrusted = options.durabilityMode === 'interactive' && previousContentManifest ? 1 : 0;
+            timings.snapshotContentBlobManifestMatches = contentBlobDocuments.length - missingContentBlobDocuments.length;
+            timings.snapshotContentBlobManifestMisses = missingContentBlobDocuments.length;
         }
         if (timings) timings.snapshotStoreMs = elapsedMs(storeStarted);
         if (emitEvent) {
@@ -562,6 +868,20 @@ export class GraphRebuildService {
             });
             if (timings) timings.snapshotEventMs = elapsedMs(eventStarted);
         }
+    }
+
+    private async hydratePersistedSnapshot(persisted: GraphRebuildSnapshot): Promise<GraphRebuildSnapshot> {
+        const refs = persisted.contentManifest?.refs || {};
+        const entries = await Promise.all(Object.values(refs).map(async (ref) => {
+            if (!ref) return null;
+            const blob = await this.loadPersistedSnapshotContentBlob(persisted.scopeId, ref.documentKey);
+            return blob ? [ref.field, blob] as const : null;
+        }));
+        const blobs: Partial<Record<GraphRebuildContentBlobField, GraphSnapshotHydrationBlob>> = {};
+        for (const entry of entries) {
+            if (entry) blobs[entry[0]] = entry[1];
+        }
+        return hydrateGraphSnapshotContent(persisted, blobs);
     }
 
     private async loadOccurrences(noteIds: string[], entities: RegisteredEntity[]): Promise<EntityOccurrence[]> {
@@ -603,8 +923,14 @@ export class GraphRebuildService {
         noteIds: string[],
         occurrences: EntityOccurrence[],
         noteTexts: Record<string, string>,
+        durabilityMode: GraphBuildDurabilityMode = 'durable',
     ): Promise<GraphRebuildChunk[]> {
         const scopedNoteIds = noteIds.length ? noteIds : [...new Set(occurrences.map((row) => row.noteId))];
+        if (durabilityMode === 'interactive') {
+            return scopedNoteIds.flatMap((noteId) =>
+                buildAdaptiveGraphRebuildChunks(noteId, noteTexts[noteId] || '')
+            );
+        }
         if (this.phoenix.target === 'native') {
             try {
                 const native = await this.phoenix.storeCommand('documentChunk:build', {
@@ -694,6 +1020,7 @@ export function snapshotAnchorsToGraphRebuildOccurrences(
 }
 
 export function graphRebuildSnapshotToNativeCompilerPayload(snapshot: GraphRebuildSnapshot): GraphRebuildSnapshot {
+    const documentCompilerSummary = nativeCompilerDocumentCompilerSummary(snapshot);
     return {
         schemaVersion: snapshot.schemaVersion,
         id: snapshot.id,
@@ -711,11 +1038,82 @@ export function graphRebuildSnapshotToNativeCompilerPayload(snapshot: GraphRebui
         temporalEdges: snapshot.temporalEdges,
         causalEdges: snapshot.causalEdges,
         memoryState: snapshot.memoryState,
-        embeddingTargets: [],
+        embeddingTargets: snapshot.embeddingTargets.filter((target) => target.admissionStatus === 'admitted'),
         embeddingVectors: [],
         projectionRefs: [],
         nodes: snapshot.nodes,
         edges: snapshot.edges,
+        calendarRegistrySummary: snapshot.calendarRegistrySummary,
+        documentSidecarSummary: nativeCompilerEvidenceSidecar(snapshot, documentCompilerSummary),
+        documentReviewSummary: undefined,
+        documentCompilerSummary,
+        discourseSpineSummary: undefined,
+        counters: snapshot.counters,
+    };
+}
+
+function nativeCompilerDocumentCompilerSummary(
+    snapshot: GraphRebuildSnapshot,
+): GraphRebuildSnapshot['documentCompilerSummary'] {
+    const hyperedges = snapshot.documentCompilerSummary?.hyperedges || [];
+    if (!hyperedges.length) return undefined;
+    return { hyperedges } as GraphRebuildSnapshot['documentCompilerSummary'];
+}
+
+function nativeCompilerEvidenceSidecar(
+    snapshot: GraphRebuildSnapshot,
+    documentCompilerSummary: GraphRebuildSnapshot['documentCompilerSummary'],
+): GraphRebuildSnapshot['documentSidecarSummary'] {
+    const evidenceSpans = snapshot.documentSidecarSummary?.evidenceSpans || [];
+    const evidenceIds = nativeCompilerEvidenceSpanIds(documentCompilerSummary);
+    if (!evidenceSpans.length || !evidenceIds.size) return undefined;
+    const citedSpans = evidenceSpans.filter((span) => evidenceIds.has(span.id));
+    if (!citedSpans.length) return undefined;
+    return { evidenceSpans: citedSpans } as GraphRebuildSnapshot['documentSidecarSummary'];
+}
+
+function nativeCompilerEvidenceSpanIds(
+    documentCompilerSummary: GraphRebuildSnapshot['documentCompilerSummary'],
+): Set<string> {
+    const ids = new Set<string>();
+    for (const hyperedge of documentCompilerSummary?.hyperedges || []) {
+        for (const id of hyperedge.evidenceSpanIds || []) ids.add(id);
+        for (const id of hyperedge.provenance?.evidenceSpanIds || []) ids.add(id);
+        for (const role of hyperedge.roles || []) {
+            if (role.targetKind === 'evidence_span') ids.add(role.targetId);
+        }
+    }
+    return ids;
+}
+
+export function graphRebuildNativeCompilerInputBytes(
+    snapshot: GraphRebuildSnapshot,
+): Record<string, number> {
+    const families: Record<string, unknown> = {
+        envelope: {
+            schemaVersion: snapshot.schemaVersion,
+            id: snapshot.id,
+            source: snapshot.source,
+            scopeKind: snapshot.scopeKind,
+            scopeId: snapshot.scopeId,
+            builtAt: snapshot.builtAt,
+        },
+        structuralRows: {
+            noteIds: snapshot.noteIds,
+            chunks: snapshot.chunks,
+            mentions: snapshot.mentions,
+            entityAnchors: snapshot.entityAnchors,
+            nodes: snapshot.nodes,
+            edges: snapshot.edges,
+        },
+        factRows: {
+            relationships: snapshot.relationships,
+            events: snapshot.events,
+            temporalEdges: snapshot.temporalEdges,
+            causalEdges: snapshot.causalEdges,
+            memoryState: snapshot.memoryState,
+        },
+        admittedTargets: snapshot.embeddingTargets,
         calendarRegistrySummary: snapshot.calendarRegistrySummary,
         documentSidecarSummary: snapshot.documentSidecarSummary,
         documentReviewSummary: snapshot.documentReviewSummary,
@@ -723,6 +1121,10 @@ export function graphRebuildSnapshotToNativeCompilerPayload(snapshot: GraphRebui
         discourseSpineSummary: snapshot.discourseSpineSummary,
         counters: snapshot.counters,
     };
+    return Object.fromEntries(Object.entries(families).map(([family, value]) => [
+        family,
+        value === undefined ? 0 : strToU8(JSON.stringify(value)).byteLength,
+    ]));
 }
 
 function updateEmbeddingTargetCounters(
@@ -738,18 +1140,279 @@ function updateEmbeddingTargetCounters(
     snapshot.counters.embeddingPolicyDeferredTargets = plan.policyDeferredCount;
 }
 
+export function filterNativeEmbeddingTargetsForCommittedSources(
+    snapshot: GraphRebuildSnapshot,
+    targets: GraphRebuildEmbeddingTarget[],
+): GraphRebuildEmbeddingTarget[] {
+    const committed = committedTargetSources(snapshot);
+    return targets.filter((target) => nativeTargetHasCommittedSource(target, committed));
+}
+
+export function mergeNativeEmbeddingTargets(
+    existing: GraphRebuildEmbeddingTarget[],
+    nativeTargets: GraphRebuildEmbeddingTarget[],
+): GraphRebuildEmbeddingTarget[] {
+    const nativeById = new Map(nativeTargets.map((target) => [target.id, target]));
+    const merged = existing.map((target) => nativeById.get(target.id) || target);
+    const existingIds = new Set(existing.map((target) => target.id));
+    for (const target of nativeTargets) {
+        if (!existingIds.has(target.id)) merged.push(target);
+    }
+    return merged;
+}
+
+export function buildCompatibilityAtlasPacketForSnapshot(snapshot: GraphRebuildSnapshot): GraphAtlasPacket {
+    const packet: GraphAtlasPacket = {
+        schemaVersion: 'phoenix-atlas-packet/v1',
+        snapshotId: snapshot.id,
+        scopeKind: snapshot.scopeKind,
+        scopeId: snapshot.scopeId,
+        builtAt: snapshot.builtAt,
+        sourceContract: {
+            authority: 'typescript_compatibility_containment',
+            identityAuthority: 'source_evidence_authority',
+            vectorContract: 'vectors_missing_until_embedding_lane',
+            tsGraphBuilderRole: 'compatibility-packet-parity',
+        },
+        objects: [],
+        manifoldTargets: [],
+        counters: {
+            objects: 0,
+            manifoldTargets: 0,
+            registryEntities: snapshot.nodes.length,
+            evidenceAnchors: snapshot.entityAnchors.length,
+            modelVectors: 0,
+            families: [],
+        },
+    };
+    return reconcileNativeAtlasPacketForTargets(snapshot, packet);
+}
+
+export function reconcileNativeAtlasPacketForTargets(
+    snapshot: GraphRebuildSnapshot,
+    packet: GraphAtlasPacket,
+): GraphAtlasPacket {
+    const packetTargets = new Map(packet.manifoldTargets.map((target) => [target.id, target]));
+    const objectsById = new Map(packet.objects.map((object) => [object.id, object]));
+    const objectsBySourceId = new Map<string, GraphAtlasObject[]>();
+    const objectsByTargetId = new Map<string, GraphAtlasObject[]>();
+    for (const object of packet.objects) {
+        for (const sourceId of object.sourceIds) pushAtlasObjectLookup(objectsBySourceId, sourceId, object);
+        for (const targetId of object.targetIds) pushAtlasObjectLookup(objectsByTargetId, targetId, object);
+    }
+    const objects = new Map(packet.objects.map((object) => [object.id, object]));
+    const targets = snapshot.embeddingTargets.map((target): GraphAtlasManifoldTarget => {
+        const existingTarget = packetTargets.get(target.id);
+        const existingObject = (existingTarget && objectsById.get(existingTarget.objectId))
+            || selectAtlasObjectForTarget(target, objectsByTargetId.get(target.id))
+            || selectAtlasObjectForTarget(target, objectsBySourceId.get(target.sourceId));
+        const objectId = existingTarget?.objectId || existingObject?.id || `atlas:${target.id}`;
+        const family = existingTarget?.family || existingObject?.family || atlasFamilyForTarget(target);
+        objects.set(objectId, atlasObjectForTarget(existingObject, objectId, family, target));
+        return {
+            id: target.id,
+            objectId,
+            family,
+            admission: target.admissionStatus === 'deferred' ? 'deferred' : 'admitted',
+            vectorStatus: existingTarget?.vectorStatus || 'missing',
+            coordinateSource: existingTarget?.coordinateSource || 'none',
+            status: existingTarget?.status || 'accepted',
+            kind: target.kind,
+            label: target.label,
+            entityKind: target.entityKind,
+            styleKey: target.styleKey,
+            lane: target.lane,
+            structuralRole: target.structuralRole,
+            sourceId: target.sourceId,
+            registryEntityId: target.entityId,
+            noteId: target.noteId,
+            chunkId: target.chunkId,
+            evidenceIds: target.evidenceIds,
+            parentIds: target.parentIds,
+        };
+    });
+    const targetIds = new Set(targets.map((target) => target.id));
+    for (const parentId of targets.flatMap((target) => target.parentIds || [])) {
+        if (targetIds.has(parentId)) continue;
+        const parent = objectsById.get(parentId) || objectsBySourceId.get(parentId)?.[0];
+        if (parent) objects.set(parent.id, parent);
+    }
+    const resolvableParents = new Set([
+        ...targets.flatMap((target) => [target.id, target.objectId, target.sourceId]),
+        ...[...objects.values()].flatMap((object) => [object.id, ...object.sourceIds]),
+    ]);
+    const reconciledTargets = targets.map((target) => ({
+        ...target,
+        parentIds: (target.parentIds || []).filter((parentId) => resolvableParents.has(parentId)),
+    }));
+    const reconciledObjects = [...objects.values()].map((object) => ({
+        ...object,
+        targetIds: object.targetIds.filter((targetId) => targetIds.has(targetId)),
+    }));
+    const families = new Map<GraphAtlasFamily, number>();
+    for (const object of reconciledObjects) {
+        families.set(object.family, (families.get(object.family) || 0) + 1);
+    }
+    return {
+        ...packet,
+        objects: reconciledObjects,
+        manifoldTargets: reconciledTargets,
+        counters: {
+            ...packet.counters,
+            objects: reconciledObjects.length,
+            manifoldTargets: reconciledTargets.length,
+            registryEntities: snapshot.nodes.length,
+            evidenceAnchors: snapshot.entityAnchors.length,
+            modelVectors: reconciledTargets.filter((target) => target.vectorStatus === 'modelVector').length,
+            families: [...families.entries()]
+                .sort(([left], [right]) => left.localeCompare(right))
+                .map(([family, count]) => ({ family, count })),
+        },
+    };
+}
+
+function pushAtlasObjectLookup(
+    lookup: Map<string, GraphAtlasObject[]>,
+    key: string,
+    object: GraphAtlasObject,
+): void {
+    const objects = lookup.get(key);
+    if (objects) objects.push(object);
+    else lookup.set(key, [object]);
+}
+
+function selectAtlasObjectForTarget(
+    target: GraphRebuildEmbeddingTarget,
+    candidates: GraphAtlasObject[] | undefined,
+): GraphAtlasObject | undefined {
+    if (!candidates?.length) return undefined;
+    const preferredFamily = atlasFamilyForTarget(target);
+    return candidates.find((object) => object.family === preferredFamily) || candidates[0];
+}
+
+function atlasObjectForTarget(
+    existing: GraphAtlasObject | undefined,
+    id: string,
+    family: GraphAtlasFamily,
+    target: GraphRebuildEmbeddingTarget,
+): GraphAtlasObject {
+    return {
+        id,
+        family,
+        status: existing?.status || 'accepted',
+        kind: target.kind,
+        label: target.label,
+        styleKey: target.styleKey,
+        lane: target.lane,
+        structuralRole: target.structuralRole,
+        documentUnitKind: existing?.documentUnitKind,
+        stateContextKind: existing?.stateContextKind,
+        registryEntityId: target.entityId,
+        noteIds: target.noteId ? [target.noteId] : existing?.noteIds || [],
+        chunkIds: target.chunkId ? [target.chunkId] : existing?.chunkIds || [],
+        anchorIds: target.kind === 'anchor' ? target.evidenceIds : existing?.anchorIds || [],
+        evidenceIds: target.evidenceIds,
+        sourceIds: [...new Set([target.sourceId, ...(existing?.sourceIds || [])])],
+        targetIds: [...new Set([target.id, ...(existing?.targetIds || [])])],
+    };
+}
+
+function atlasFamilyForTarget(target: GraphRebuildEmbeddingTarget): GraphAtlasFamily {
+    const kind = normalizeTargetKind(target.kind);
+    if (kind === 'entity') return 'registry';
+    if (kind === 'note' || kind === 'chunk' || kind === 'structureroot' || kind === 'documentunit') return 'structure';
+    if (kind === 'anchor' || kind === 'evidencespan') return 'evidence';
+    if (kind === 'temporalfact') return 'temporal';
+    if (kind === 'causalfact') return 'causal';
+    if (kind === 'memorystate') return 'memory';
+    if (kind === 'graphfact' || kind === 'event') return 'fact';
+    return 'unknown';
+}
+
+function nativeTargetHasCommittedSource(
+    target: GraphRebuildEmbeddingTarget,
+    committed: ReturnType<typeof committedTargetSources>,
+): boolean {
+    const kind = normalizeTargetKind(target.kind);
+    const lane = target.lane || inferredNativeTargetLane(kind);
+    if (kind === 'note' || kind === 'chunk' || kind === 'structureroot' || kind === 'documentunit') return true;
+    if (lane === 'entity_anchor' || kind === 'entity') {
+        return committed.entities.has(target.entityId || target.sourceId);
+    }
+    if (lane === 'anchor_evidence' || kind === 'anchor' || kind === 'evidencespan') {
+        return committed.anchors.size > 0 && targetReferencesAny(target, committed.anchors);
+    }
+    if (isNativeFactLane(lane) || ['graphfact', 'temporalfact', 'causalfact', 'memorystate', 'event'].includes(kind)) {
+        return committed.facts.size > 0 && targetReferencesAny(target, committed.facts);
+    }
+    return true;
+}
+
+function committedTargetSources(snapshot: GraphRebuildSnapshot) {
+    const anchors = new Set([
+        ...snapshot.mentions.map((row) => row.id),
+        ...snapshot.entityAnchors.map((row) => row.id),
+    ]);
+    const facts = new Set<string>();
+    for (const relationship of snapshot.relationships) {
+        addSourceVariants(facts, relationship.id, ['relationship', 'graph-fact']);
+    }
+    for (const event of snapshot.events) addSourceVariants(facts, event.id, ['event']);
+    for (const edge of snapshot.temporalEdges) addSourceVariants(facts, edge.id, ['temporalFact']);
+    for (const edge of snapshot.causalEdges) addSourceVariants(facts, edge.id, ['causalFact']);
+    for (const state of snapshot.memoryState) addSourceVariants(facts, state.id, ['memory']);
+    return {
+        anchors,
+        entities: new Set(snapshot.nodes.map((node) => node.entityId)),
+        facts,
+    };
+}
+
+function addSourceVariants(out: Set<string>, id: string, prefixes: string[]): void {
+    if (!id) return;
+    out.add(id);
+    out.add(`fact:${id}`);
+    out.add(`embed:${id}`);
+    for (const prefix of prefixes) {
+        out.add(`${prefix}:${id}`);
+        out.add(`fact:${prefix}:${id}`);
+        out.add(`embed:${prefix}:${id}`);
+    }
+}
+
+function targetReferencesAny(target: GraphRebuildEmbeddingTarget, allowed: Set<string>): boolean {
+    if (allowed.has(target.sourceId)) return true;
+    if (target.entityId && allowed.has(target.entityId)) return true;
+    return target.evidenceIds.some((id) => allowed.has(id));
+}
+
+function inferredNativeTargetLane(kind: string): string {
+    if (kind === 'entity') return 'entity_anchor';
+    if (kind === 'anchor' || kind === 'evidencespan') return 'anchor_evidence';
+    if (kind === 'graphfact') return 'relationship_fact';
+    if (kind === 'temporalfact') return 'temporal_fact';
+    if (kind === 'causalfact') return 'causal_fact';
+    if (kind === 'memorystate') return 'memory_state';
+    if (kind === 'event') return 'event_identity';
+    return 'unknown';
+}
+
+function isNativeFactLane(lane: string): boolean {
+    return lane === 'relationship_fact'
+        || lane === 'temporal_fact'
+        || lane === 'causal_fact'
+        || lane === 'memory_state'
+        || lane === 'event_identity';
+}
+
+function normalizeTargetKind(kind: string): string {
+    return String(kind || '').replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase().replace(/[-_\s]+/g, '');
+}
+
 function refreshTargetDerivedReadModels(snapshot: GraphRebuildSnapshot): void {
-    delete snapshot.hopfResonanceSpace;
-    delete snapshot.memoryGraphRagBridgeSummary;
-    delete snapshot.semanticRerankSummary;
-    delete snapshot.semanticAdjudicationSummary;
-    delete snapshot.semanticEvalLedgerSummary;
-    delete snapshot.discourseSpineSummary;
-    delete snapshot.discourseBridgeCandidateSummary;
-    delete snapshot.discourseBridgeAdjudicationSummary;
-    delete snapshot.discourseEvalLedgerSummary;
-    delete snapshot.discoursePromotionSurfaceSummary;
-    delete snapshot.discourseCompilerOverlaySummary;
+    // Temporary containment: native target replacement must not hollow the
+    // TypeScript compatibility summaries that still feed desktop diagnostics.
+    void snapshot;
 }
 
 function anchorSpanStillMatches(
@@ -759,27 +1422,11 @@ function anchorSpanStillMatches(
     surface: string,
     noteTexts?: Record<string, string>,
 ): boolean {
-    if (!noteTexts || !Object.prototype.hasOwnProperty.call(noteTexts, noteId)) return true;
+    if (!noteTexts) return true;
+    if (!Object.prototype.hasOwnProperty.call(noteTexts, noteId)) return false;
     const text = noteTexts[noteId] || '';
     if (start < 0 || end > text.length || end <= start) return false;
     return normalizeSurface(text.slice(start, end)).toLocaleLowerCase() === normalizeSurface(surface).toLocaleLowerCase();
-}
-
-export function mergeGraphRebuildOccurrences(
-    persisted: EntityOccurrence[],
-    recovered: EntityOccurrence[],
-): EntityOccurrence[] {
-    if (!persisted.length) return recovered;
-    if (!recovered.length) return persisted;
-    const seen = new Set(persisted.map(occurrenceKey));
-    const merged = [...persisted];
-    for (const occurrence of recovered) {
-        const key = occurrenceKey(occurrence);
-        if (seen.has(key)) continue;
-        seen.add(key);
-        merged.push(occurrence);
-    }
-    return merged;
 }
 
 function occurrenceSourceFromAnchor(source: string): EntityOccurrence['source'] {
@@ -829,10 +1476,6 @@ function graphRebuildOccurrence(
         createdAt: now,
         updatedAt: now,
     };
-}
-
-function occurrenceKey(occurrence: EntityOccurrence): string {
-    return `${occurrence.noteId}:${occurrence.entityId}:${occurrence.sourceStart}:${occurrence.sourceEnd}`;
 }
 
 function normalizeSurface(value: string): string {
@@ -892,7 +1535,7 @@ const SNAPSHOT_CONTENT_BLOB_FIELDS: GraphRebuildContentBlobField[] = [
     'graphModelV2',
     'semanticCandidateSummary',
     'manifoldSpecializationSummary',
-    'atlasDebugSummaries',
+    'atlasPacket',
 ];
 
 export function graphRebuildSnapshotContentBlobDocuments(
@@ -937,13 +1580,11 @@ export function graphRebuildSnapshotContentBlobEntries(
         const value = snapshotContentBlobValue(snapshot, field);
         if (isEmptySnapshotContentBlobValue(value)) continue;
         const raw = JSON.stringify(value);
-        const hash = graphRebuildContentHash(raw);
+        const hash = graphSnapshotContentHash(JSON.stringify(graphSnapshotStableContentValue(value)));
         const documentKey = `${SNAPSHOT_CONTENT_BLOB_PREFIX}:${field}:${hash}`;
         const payload: GraphRebuildContentBlobPayload = {
             schemaVersion: CONTENT_BLOB_SCHEMA_VERSION,
-            snapshotId: snapshot.id,
             scopeId: snapshot.scopeId,
-            builtAt: snapshot.builtAt,
             field,
             hash,
             value,
@@ -1002,10 +1643,12 @@ export function graphRebuildSnapshotPersistenceView(
     delete persisted.finalLinkPatchLog;
     delete persisted.semanticCandidateSummary;
     delete persisted.manifoldSpecializationSummary;
+    delete persisted.atlasPacket;
     delete persisted.documentSidecarSummary;
     delete persisted.documentSemanticSummary;
     delete persisted.documentReviewSummary;
     delete persisted.documentCompilerSummary;
+    delete persisted.graphTruthCommitLedger;
     delete persisted.calendarRegistrySummary;
     if (snapshot.graphCompiler && snapshot.graphModelV2) {
         delete persisted.graphCompiler;
@@ -1082,30 +1725,52 @@ export function decodeNativeGraphCompilerSidecar(
         fact_graph?: GraphCompilerDualWriteSidecar['factGraph'];
         projected_ui_graph?: GraphCompilerDualWriteSidecar['projectedUiGraph'];
         fact_graph_payload?: CompressedGraphCompilerFactGraphPayload;
+        atlas_seed_payload?: CompressedNativeAtlasSeedPayload;
+        originating_families?: NativeEmbeddingTargetOriginCount[];
     };
     const factGraph = sidecar.factGraph || raw.fact_graph;
-    const embeddingTargets = sidecar.embeddingTargets || [];
-    const atlasPacket = sidecar.atlasPacket;
+    const compressedAtlasSeed = sidecar.atlasSeedPayload || raw.atlas_seed_payload;
+    const atlasSeed = isCompressedNativeAtlasSeedPayload(compressedAtlasSeed)
+        ? JSON.parse(strFromU8(gunzipSync(base64ToBytes(compressedAtlasSeed.payload)))) as NativeAtlasSeed
+        : undefined;
+    const embeddingTargets = atlasSeed?.embeddingTargets || sidecar.embeddingTargets || [];
+    const atlasPacket = atlasSeed?.atlasPacket || sidecar.atlasPacket;
+    const originatingFamilies = atlasSeed?.originatingFamilies
+        || sidecar.originatingFamilies
+        || raw.originating_families
+        || [];
+    const decodedFields = { ...sidecar };
+    delete decodedFields.factGraphPayload;
+    delete decodedFields.atlasSeedPayload;
     if (factGraph) {
         return {
-            ...sidecar,
+            ...decodedFields,
             factGraph,
             projectedUiGraph: sidecar.projectedUiGraph || raw.projected_ui_graph,
             receipts: sidecar.receipts || factGraph.receipts,
             atlasPacket,
             embeddingTargets,
+            originatingFamilies,
         } as NativeGraphCompilerDecodedSidecar;
     }
     const compressed = sidecar.factGraphPayload || raw.fact_graph_payload;
-    if (!isCompressedGraphCompilerFactGraphPayload(compressed)) return null;
+    if (!isCompressedGraphCompilerFactGraphPayload(compressed)) {
+        return atlasPacket ? {
+            ...decodedFields,
+            atlasPacket,
+            embeddingTargets,
+            originatingFamilies,
+        } as NativeGraphCompilerDecodedSidecar : null;
+    }
     const decodedFactGraph = JSON.parse(strFromU8(gunzipSync(base64ToBytes(compressed.payload))));
     return {
-        ...sidecar,
+        ...decodedFields,
         factGraph: decodedFactGraph,
         projectedUiGraph: sidecar.projectedUiGraph || raw.projected_ui_graph,
         receipts: sidecar.receipts || decodedFactGraph.receipts,
         atlasPacket,
         embeddingTargets,
+        originatingFamilies,
     } as NativeGraphCompilerDecodedSidecar;
 }
 
@@ -1219,18 +1884,32 @@ export function graphRebuildSnapshotPayloadCounters(
     return counters;
 }
 
-function graphRebuildContentBlobPayloadCounters(documents: StoreScopedDocument[]): Record<string, number> {
-    if (!documents.length) return {};
+function isCompressedNativeAtlasSeedPayload(value: unknown): value is CompressedNativeAtlasSeedPayload {
+    const record = value && typeof value === 'object' ? value as Partial<CompressedNativeAtlasSeedPayload> : null;
+    return record?.schemaVersion === 'phoenix-atlas-seed-payload/gzip-base64/v1'
+        && record.encoding === 'gzip+base64'
+        && typeof record.payload === 'string';
+}
+
+function graphRebuildContentBlobPayloadCounters(entries: GraphRebuildContentBlobEntry[]): Record<string, number> {
+    if (!entries.length) return {};
     const counters: Record<string, number> = {
-        snapshotContentBlobDocuments: documents.length,
-        snapshotContentBlobPayloadChars: documents.reduce((sum, document) => sum + document.payload.length, 0),
+        snapshotContentBlobDocuments: entries.length,
+        snapshotContentBlobPayloadChars: entries.reduce((sum, entry) => sum + entry.payload.length, 0),
     };
     let rawChars = 0;
     let compressedBytes = 0;
-    for (const document of documents) {
-        const stats = graphRebuildSnapshotDocumentPayloadStats(document.payload);
+    for (const entry of entries) {
+        const stats = graphRebuildSnapshotDocumentPayloadStats(entry.payload);
         rawChars += stats.rawChars;
         compressedBytes += stats.compressedBytes;
+        counters[`snapshotContentBlob.${entry.field}.payloadChars`] = entry.ref.payloadChars;
+        counters[`snapshotContentBlob.${entry.field}.rawPayloadChars`] = stats.rawChars;
+        counters[`snapshotContentBlob.${entry.field}.rawValueChars`] = entry.ref.rawChars;
+        counters[`snapshotContentBlob.${entry.field}.compressedBytes`] = stats.compressedBytes;
+        if (entry.ref.itemCount !== undefined) {
+            counters[`snapshotContentBlob.${entry.field}.items`] = entry.ref.itemCount;
+        }
     }
     counters['snapshotContentBlobRawPayloadChars'] = rawChars;
     counters['snapshotContentBlobCompressedBytes'] = compressedBytes;
@@ -1346,13 +2025,32 @@ function emptyBuildTimings(): GraphRebuildBuildTimings {
         snapshotBuildMs: 0,
         stateCommitMs: 0,
         nativeCompilerMs: 0,
+        nativeCompilerSkipped: 0,
+        tsAtlasPacketParity: 0,
+        nativeCompilerInputBytesByFamily: {},
+        nativeTargetsByOriginatingFamily: {},
+        nativeAtlasSeedRawBytes: 0,
+        nativeAtlasSeedCompressedBytes: 0,
+        authoritySealMs: 0,
+        authorityAssertMs: 0,
         snapshotPersistMs: 0,
         snapshotSerializeMs: 0,
         snapshotPrimaryEncodeMs: 0,
         snapshotOverGraphEncodeMs: 0,
+        snapshotOverGraphSkipped: 0,
         snapshotStoreMs: 0,
         snapshotPrimaryStoreMs: 0,
         snapshotOverGraphStoreMs: 0,
+        snapshotStoreDocuments: 0,
+        snapshotContentBlobReads: 0,
+        snapshotContentBlobManifestTrusted: 0,
+        snapshotContentBlobManifestMatches: 0,
+        snapshotContentBlobManifestMisses: 0,
+        snapshotWrittenContentBlobs: 0,
+        snapshotReusedContentBlobs: 0,
+        previousSnapshotHydrationSkipped: 0,
+        documentSemanticSkipped: 0,
+        nativeChunkerSkipped: 0,
         snapshotEventMs: 0,
         snapshotPayloadChars: 0,
         snapshotPrimaryRawPayloadChars: 0,
@@ -1395,6 +2093,7 @@ const SNAPSHOT_PAYLOAD_PROFILE_FIELDS: Array<[string, keyof GraphRebuildSnapshot
     ['payloadSemanticTaskSummaryChars', 'semanticTaskSummary'],
     ['payloadSemanticCandidateSummaryChars', 'semanticCandidateSummary'],
     ['payloadManifoldSpecializationSummaryChars', 'manifoldSpecializationSummary'],
+    ['payloadAtlasPacketChars', 'atlasPacket'],
     ['payloadSemanticRerankSummaryChars', 'semanticRerankSummary'],
     ['payloadSemanticAdjudicationSummaryChars', 'semanticAdjudicationSummary'],
     ['payloadSemanticEvalLedgerSummaryChars', 'semanticEvalLedgerSummary'],
@@ -1456,6 +2155,12 @@ function snapshotContentBlobValue(
             return snapshot.semanticCandidateSummary;
         case 'manifoldSpecializationSummary':
             return snapshot.manifoldSpecializationSummary;
+        case 'atlasPacket':
+            return snapshot.atlasPacket ? {
+                ...snapshot.atlasPacket,
+                snapshotId: '',
+                builtAt: 0,
+            } : undefined;
         case 'atlasDebugSummaries':
             return compactBlobGroup({
                 graphAwareLinkSuggestions: snapshot.graphAwareLinkSuggestions,
@@ -1518,19 +2223,6 @@ function snapshotContentBlobItemCount(value: unknown): number | undefined {
     }
     if (counted) return total;
     return undefined;
-}
-
-function graphRebuildContentHash(raw: string): string {
-    let left = 0x811c9dc5;
-    let right = 0x45d9f3b;
-    for (let index = 0; index < raw.length; index += 1) {
-        const code = raw.charCodeAt(index);
-        left ^= code;
-        left = Math.imul(left, 0x01000193) >>> 0;
-        right ^= code + index;
-        right = Math.imul(right, 0x85ebca6b) >>> 0;
-    }
-    return `fnv64-${left.toString(16).padStart(8, '0')}${right.toString(16).padStart(8, '0')}`;
 }
 
 async function timedAsync<T>(

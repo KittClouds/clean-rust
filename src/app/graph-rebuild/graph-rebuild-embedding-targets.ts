@@ -157,8 +157,11 @@ export function buildGraphRebuildEmbeddingTargetPlan(
         parentIds: state.noteId ? [structureRootId(state.noteId, 'identity')] : [],
     });
     const targetIds = new Set(targets.map((target) => target.id));
+    const committedEntityIds = new Set(nodes.map((node) => node.entityId));
+    const committedAnchorIds = new Set(anchors.map((anchor) => anchor.id));
     for (const hyperedge of documentCompiler?.hyperedges || []) {
         if (!isNativeDocumentSituationCandidate(hyperedge)) continue;
+        if (!hasCommittedDocumentSituationSupport(hyperedge, committedEntityIds, committedAnchorIds)) continue;
         for (const target of documentSituationTargets(input, hyperedge)) {
             if (targetIds.has(target.id)) continue;
             targetIds.add(target.id);
@@ -243,6 +246,17 @@ function isNativeDocumentSituationCandidate(hyperedge: GraphDocumentHyperedge): 
         && Boolean(hyperedge.semanticSituationId)
         && Boolean(hyperedge.frame)
         && !(hyperedge.temporalConflictIds?.length);
+}
+
+function hasCommittedDocumentSituationSupport(
+    hyperedge: GraphDocumentHyperedge,
+    committedEntityIds: Set<string>,
+    committedAnchorIds: Set<string>,
+): boolean {
+    if (!committedAnchorIds.size) return false;
+    return hyperedge.roles
+        .filter((role) => role.targetKind === 'entity')
+        .every((role) => committedEntityIds.has(role.targetId));
 }
 
 function documentRoleEmbeddingTargetId(role: GraphDocumentHyperedgeRole): string {

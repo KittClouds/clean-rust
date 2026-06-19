@@ -11,6 +11,7 @@ const harnessState = vi.hoisted(() => ({
     notes: [] as any[],
     occurrences: [] as any[],
     entities: [] as any[],
+    nliJudgments: [] as any[],
 }));
 
 vi.mock('../lib/dexie/db', () => ({
@@ -59,6 +60,8 @@ vi.mock('../lib/registry', () => ({
 
 import { GraphRebuildPipelineService } from './graph-rebuild-pipeline.service';
 import { GraphRebuildService } from './graph-rebuild.service';
+import { buildGraphRebuildSnapshot } from './graph-rebuild-builder';
+import { buildAdaptiveGraphRebuildChunks } from './graph-rebuild-meaning-frames';
 import { AtlasCapabilityRuntimeService } from '../services/atlas-capability-runtime.service';
 import { NerService } from '../services/ner.service';
 import { PhoenixBackendService } from '../services/phoenix-backend.service';
@@ -87,7 +90,7 @@ const TAXONOMY_AUDIT_OUTPUT_PATH = fileURLToPath(TAXONOMY_AUDIT_OUTPUT_URL);
 const SHORTRUN_PATH = fileURLToPath(SHORTRUN_URL);
 const SHOULD_WRITE_TAXONOMY_AUDIT = process.env['GRAPH_BUILD_TAXONOMY_AUDIT'] === '1';
 
-const describeBaseline = SHOULD_RUN ? describe : describe.skip;
+const describeBaseline = describe;
 const itBifurcated = SHOULD_RUN && BASELINE_MODE === 'bifurcated' ? it : it.skip;
 const itZeroShot = SHOULD_RUN && BASELINE_MODE === 'zeroshot' ? it : it.skip;
 
@@ -103,6 +106,7 @@ describeBaseline('current bifurcated graph build baseline', () => {
         harnessState.notes = [shortrunNote(text)];
         harnessState.occurrences = [];
         harnessState.entities = shortrunEntities();
+        harnessState.nliJudgments = [];
         store = createMemoryStore();
         backend = createBackendHarness();
         runtime = createRuntimeHarness();
@@ -195,6 +199,44 @@ describeBaseline('current bifurcated graph build baseline', () => {
                 .toBe(JSON.stringify([]).length);
         }
     }, SHOULD_WRITE_TAXONOMY_AUDIT ? 180_000 : 30_000);
+
+    it('gates product buildGraph warm interactive latency and write count', async () => {
+        const text = productGateText();
+        const chunks = buildAdaptiveGraphRebuildChunks('shortrun', text);
+        harnessState.notes = [shortrunNote(text)];
+        harnessState.entities = productGateEntities();
+        harnessState.occurrences = productGateOccurrences(415, 16, 2, chunks.map((chunk) => chunk.id));
+        harnessState.nliJudgments = productGateNliJudgments(text, chunks);
+        const request = { ...graphRunRequest(), durabilityMode: 'interactive' as const };
+        const chars = harnessState.notes[0]?.markdownContent.length || 0;
+        expect(chars).toBeGreaterThanOrEqual(24_000);
+        expect(chars).toBeLessThanOrEqual(26_000);
+        const cold = await pipeline.buildGraph(request);
+        const upsertsBeforeWarm = store.upserts.length;
+        const started = performance.now();
+        const warm = await pipeline.buildGraph(request);
+        const warmWallMs = elapsed(started);
+        const warmScopedWrites = store.upserts.length - upsertsBeforeWarm;
+        const keys = ['mentions', 'acceptedAnchors', 'nodes', 'edges', 'embeddingTargets'] as const;
+        for (const key of keys) expect(warm.snapshot.counters[key]).toBe(cold.snapshot.counters[key]);
+        expect(warm.snapshot.counters.nodes).toBe(27);
+        expect(warm.snapshot.counters.edges).toBe(233);
+        expect(warm.snapshot.counters.embeddingTargets).toBe(666);
+        expect(warm.snapshot.atlasPacket?.objects.length).toBe(cold.snapshot.atlasPacket?.objects.length);
+        expect(warm.snapshot.atlasPacket?.manifoldTargets.length)
+            .toBe(cold.snapshot.atlasPacket?.manifoldTargets.length);
+        expect(warm.snapshot.buildTimings?.snapshotReusedContentBlobs).toBeGreaterThan(0);
+        expect(warm.snapshot.buildTimings?.snapshotWrittenContentBlobs).toBe(0);
+        expect(warm.snapshot.buildTimings?.snapshotContentBlobReads).toBe(0);
+        expect(warm.snapshot.buildTimings?.snapshotContentBlobManifestTrusted).toBe(1);
+        expect(warm.snapshot.buildTimings?.previousSnapshotHydrationSkipped).toBe(1);
+        expect(warm.snapshot.buildTimings?.nativeChunkerSkipped).toBe(1);
+        expect(warm.snapshot.buildTimings?.documentSemanticSkipped).toBe(1);
+        expect(warmScopedWrites).toBeLessThanOrEqual(3);
+        expect(warmWallMs).toBeLessThanOrEqual(1_000);
+        expect(store.upsertScopedDocuments).toHaveBeenCalledTimes(2);
+        console.log(`[graph-product-gate] warmMs=${warmWallMs} scopedWrites=${warmScopedWrites} blobsWritten=${warm.snapshot.buildTimings?.snapshotWrittenContentBlobs || 0} nodes=${warm.snapshot.counters.nodes} edges=${warm.snapshot.counters.edges} targets=${warm.snapshot.counters.embeddingTargets}`);
+    }, 30_000);
 });
 
 function graphRunRequest(): GraphIndexRunRequest {
@@ -541,6 +583,86 @@ function shortrunEntities(): RegisteredEntity[] {
     ];
 }
 
+function productGateText(): string {
+    const paragraphs = Array.from({ length: 16 }, (_, index) =>
+        `section ${index}\n${'x '.repeat(780).trim()}`,
+    );
+    return paragraphs.join('\n\n').slice(0, 24_999).padEnd(24_999, 'x');
+}
+
+function productGateEntities(): RegisteredEntity[] {
+    return Array.from({ length: 27 }, (_, index) =>
+        entity(`entity-${index}`, `Entity ${index}`, 'CHARACTER'),
+    );
+}
+
+function productGateOccurrences(
+    count: number,
+    seed: number,
+    randomChunks: number,
+    chunkIds: string[],
+): any[] {
+    let state = seed >>> 0;
+    const next = () => {
+        state = (state * 1664525 + 1013904223) >>> 0;
+        return state / 0x100000000;
+    };
+    const rows: any[] = [];
+    let ordinal = 0;
+    for (let chunkIndex = 0; chunkIndex < chunkIds.length; chunkIndex += 1) {
+        const chunkCount = Math.floor(count / chunkIds.length) + (chunkIndex < count % chunkIds.length ? 1 : 0);
+        const sequence = chunkIndex < randomChunks
+            ? Array.from({ length: chunkCount }, () => Math.floor(next() * 27))
+            : Array.from({ length: chunkCount }, (_, local) => (local + chunkIndex) % 27);
+        for (const entityIndex of sequence) {
+            const start = ordinal * 3;
+            rows.push({
+                id: `product-gate-occ:${ordinal}`,
+                noteId: 'shortrun',
+                entityId: `entity-${entityIndex}`,
+                entityLabel: `Entity ${entityIndex}`,
+                entityKind: 'CHARACTER',
+                sourceStart: start,
+                sourceEnd: start + 1,
+                surface: `S${entityIndex}`,
+                source: 'persisted',
+                confidence: 0.9,
+                excerpt: `S${entityIndex}`,
+                generation: 1,
+                createdAt: 1,
+                updatedAt: 1,
+                chunkId: chunkIds[chunkIndex],
+            });
+            ordinal += 1;
+        }
+    }
+    return rows;
+}
+
+function productGateNliJudgments(text: string, chunks: ReturnType<typeof buildAdaptiveGraphRebuildChunks>): any[] {
+    const snapshot = buildGraphRebuildSnapshot({
+        scopeKind: 'note',
+        scopeId: 'note:shortrun',
+        noteIds: ['shortrun'],
+        entities: productGateEntities(),
+        occurrences: productGateOccurrences(415, 16, 2, chunks.map((chunk) => chunk.id)),
+        chunks,
+        noteTexts: { shortrun: text },
+        postProcessMode: 'full',
+        durabilityMode: 'interactive',
+        embeddingStagePolicy: { entityLinkerEnabled: true },
+        builtAt: 1,
+    });
+    return snapshot.relationships.slice(0, 21).map((relationship, index) => ({
+        judgmentId: `product-gate-nli-${index}`,
+        sourceId: relationship.sourceEntityId,
+        targetId: relationship.targetEntityId,
+        edgeType: 'supports',
+        predictedLabel: 'entailment',
+        confidence: 0.95,
+    }));
+}
+
 function entity(id: string, label: string, kind: EntityKind, aliases: string[] = []): RegisteredEntity {
     return {
         id,
@@ -614,24 +736,27 @@ function createRuntimeHarness() {
 
 function rawCapabilityResult(capability: string) {
     if (capability === 'nliAdjudication') {
-        return {
-            inputCount: 2,
-            plannedInputCount: 1,
-            duplicateInputCount: 1,
-            resultCount: 1,
-            stageSummaries: [
-                { stage: 'candidatePlan', status: 'completed', durationMs: 1, counts: { rawInputs: 2, validInputs: 2, plannedInputs: 1, duplicateInputs: 1, uniquePairs: 1 } },
-                { stage: 'classification', status: 'completed', durationMs: 1, counts: { plannedInputs: 1, results: 1, batches: 1, entailment: 1 } },
-                { stage: 'apply', status: 'completed', durationMs: 1, counts: { results: 1, appliedRows: 1 } },
-            ],
-            judgments: [{
+        const judgments = harnessState.nliJudgments.length
+            ? harnessState.nliJudgments
+            : [{
                 judgmentId: 'baseline-nli-1',
                 sourceId: 'entity-ryan',
                 targetId: 'entity-new-rome',
                 edgeType: 'co_occurs_with',
                 predictedLabel: 'entailment',
                 confidence: 0.9,
-            }],
+            }];
+        return {
+            inputCount: judgments.length,
+            plannedInputCount: judgments.length,
+            duplicateInputCount: 0,
+            resultCount: judgments.length,
+            stageSummaries: [
+                { stage: 'candidatePlan', status: 'completed', durationMs: 1, counts: { rawInputs: judgments.length, validInputs: judgments.length, plannedInputs: judgments.length, duplicateInputs: 0, uniquePairs: judgments.length } },
+                { stage: 'classification', status: 'completed', durationMs: 1, counts: { plannedInputs: judgments.length, results: judgments.length, batches: 1, entailment: judgments.length } },
+                { stage: 'apply', status: 'completed', durationMs: 1, counts: { results: judgments.length, appliedRows: judgments.length } },
+            ],
+            judgments,
         };
     }
     return {
@@ -682,6 +807,19 @@ function createMemoryStore() {
                 runtimeReloaded: 0,
             };
         }),
+        upsertScopedDocuments: vi.fn(async (batch: StoreScopedDocument[]): Promise<PhoenixContentMutationTiming> => {
+            for (const document of batch) {
+                const key = scopedDocumentKey(document.scopeFolderId, document.namespace, document.documentKey);
+                documents.set(key, document);
+                upserts.push({ key, payloadChars: document.payload.length });
+            }
+            return {
+                records: batch.length, noteMutations: 0, relationUpserts: batch.length, relationDeletes: 0,
+                scopedDocumentUpserts: batch.length, payloadChars: batch.reduce((sum, row) => sum + row.payload.length, 0),
+                serializedWaitMs: 0, appendWalMs: 0, manifestCommitMs: 0, runtimeApplyMs: 0,
+                runtimeReloadMs: 0, totalMs: 0, checkpointScheduled: 0, runtimeReloaded: 0,
+            };
+        }),
         getScopedDocument: vi.fn(async (scopeId: string, namespace: string, documentKey: string) => {
             const key = scopedDocumentKey(scopeId, namespace, documentKey);
             const document = documents.get(key);
@@ -705,6 +843,16 @@ function createBackendHarness() {
             commands.push({ command, requestChars: JSON.stringify(payload || {}).length });
             if (SHOULD_WRITE_TAXONOMY_AUDIT && command === 'graphRebuild:compileDualWrite') {
                 return compileNativeAuditSidecar(payload);
+            }
+            if (command === 'graphRebuild:compileDualWrite') {
+                const snapshot = (payload as { snapshot: GraphRebuildSnapshot }).snapshot;
+                return { atlasPacket: {
+                    schemaVersion: 'phoenix-atlas-packet/v1', snapshotId: snapshot.id,
+                    scopeKind: snapshot.scopeKind, scopeId: snapshot.scopeId, builtAt: snapshot.builtAt,
+                    sourceContract: { authority: 'warm-force-harness', identityAuthority: 'source-evidence', vectorContract: 'vectors-missing', tsGraphBuilderRole: 'compatibility-only' },
+                    objects: [], manifoldTargets: [],
+                    counters: { objects: 0, manifoldTargets: 0, registryEntities: snapshot.nodes.length, evidenceAnchors: snapshot.entityAnchors.length, modelVectors: 0, families: [] },
+                } };
             }
             return null;
         }),

@@ -102,6 +102,7 @@ fn world_state_region_expands_through_contradictory_support_region_edges() {
         valid_at: None,
         recorded_at: None,
         include_candidate_graph: true,
+        truth_plane: crate::api::GraphTruthPlane::WorldState,
         seed_limit: 6,
         oversample: 12,
         expansion_hops: 2,

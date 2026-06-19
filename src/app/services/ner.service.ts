@@ -30,6 +30,7 @@ import {
     recordSuggestionRejected,
 } from '../lib/entity-learning/entity-feedback';
 import { recordAcceptedEntityAnchor } from '../graph-rebuild/entity-anchor-acceptance';
+import type { EntityOccurrence } from '../lib/dexie/db';
 
 class PhoenixScanEntitySuggestionProvider implements EntitySuggestionProviderApi {
     readonly id = 'dynamic_ner' as const;
@@ -560,12 +561,11 @@ export class NerService {
         });
     }
 
-    async acceptSuggestionForContext(id: string, context: NerSuggestionAcceptanceContext): Promise<boolean> {
+    async acceptSuggestionForContext(id: string, context: NerSuggestionAcceptanceContext): Promise<EntityOccurrence | null> {
         const suggestion = this.suggestions().find((entry) => entry.id === id);
-        if (!suggestion) return false;
-        if (suggestion.requiresReview) return false;
-        await this.acceptResolvedSuggestion(id, suggestion, context);
-        return true;
+        if (!suggestion) return null;
+        if (suggestion.requiresReview) return null;
+        return this.acceptResolvedSuggestion(id, suggestion, context);
     }
 
     async rejectSuggestion(id: string) {
@@ -646,7 +646,7 @@ export class NerService {
         id: string,
         suggestion: NerSuggestion,
         context: NerSuggestionAcceptanceContext,
-    ): Promise<void> {
+    ): Promise<EntityOccurrence | null> {
         const replacement = `[${suggestion.kind}|${suggestion.label}]`;
         console.log('[NerService] Accepting:', replacement);
 
@@ -669,7 +669,7 @@ export class NerService {
                 },
             }
         );
-        await recordAcceptedEntityAnchor({
+        const occurrence = await recordAcceptedEntityAnchor({
             noteId,
             entity: registration.entity,
             surface: suggestion.label,
@@ -679,6 +679,7 @@ export class NerService {
             context: suggestion.context,
         }).catch(error => {
             console.warn('[NerService] Failed to record accepted graph anchor:', error);
+            return null;
         });
         await recordSuggestionAccepted({
             entityId: registration.entity.id,
@@ -692,6 +693,7 @@ export class NerService {
         }).catch(error => {
             console.warn('[NerService] Failed to record accepted suggestion:', error);
         });
+        return occurrence;
     }
 
     private mapProviderSuggestions(

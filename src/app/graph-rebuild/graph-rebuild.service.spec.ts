@@ -4,6 +4,7 @@ import { gzipSync, strFromU8, strToU8 } from 'fflate';
 import {
     GRAPH_MODEL_V2_OVERGRAPH_DOCUMENT_KEY,
     GRAPH_REBUILD_NAMESPACE,
+    authorizeGraphRebuildSnapshotForLoad,
     decodeNativeGraphCompilerSidecar,
     graphModelV2OverGraphExportToScopedDocument,
     graphIndexReceiptToScopedDocument,
@@ -13,8 +14,10 @@ import {
     graphRebuildSnapshotPersistenceView,
     graphRebuildSnapshotToNativeCompilerPayload,
     graphRebuildSnapshotToScopedDocument,
+    filterNativeEmbeddingTargetsForCommittedSources,
     mergeGraphRebuildOccurrences,
     postProcessCacheToScopedDocument,
+    reconcileNativeAtlasPacketForTargets,
     recoverGraphRebuildOccurrences,
     scopedDocumentToGraphModelV2OverGraphExport,
     scopedDocumentToGraphIndexReceipt,
@@ -124,6 +127,126 @@ describe('GraphRebuildService persistence helpers', () => {
         expect(fallback.map((row) => row.entityId).sort()).toEqual(['entity-hazel', 'entity-kai']);
         expect(rebuilt.counters.acceptedAnchors).toBe(2);
         expect(rebuilt.counters.nodes).toBe(2);
+    });
+
+    it('filters native replacement targets that lack committed source rows', () => {
+        const snapshot = buildGraphRebuildSnapshot({
+            scopeKind: 'global',
+            scopeId: 'global',
+            noteIds: ['note-1'],
+            entities: [entity('entity-kai', 'Kai', [])],
+            occurrences: [],
+            chunks: [{ id: 'note-1:chunk:0', noteId: 'note-1', start: 0, end: 26, ordinal: 0, source: 'dynamic-chunking' }],
+            noteTexts: { 'note-1': 'Kai exists in registry only.' },
+            builtAt: 42,
+        });
+        const nativeTargets: GraphRebuildSnapshot['embeddingTargets'] = [
+            {
+                id: 'embed:note:note-1',
+                kind: 'note',
+                sourceId: 'note-1',
+                noteId: 'note-1',
+                label: 'Note note-1',
+                text: 'note',
+                evidenceIds: [],
+            },
+            {
+                id: 'embed:structure-root:note-1:identity',
+                kind: 'structureRoot',
+                sourceId: 'note-1:identity',
+                noteId: 'note-1',
+                label: 'Identity root',
+                text: 'identity',
+                evidenceIds: [],
+                lane: 'entity_anchor',
+            },
+            {
+                id: 'embed:entity:entity-kai',
+                kind: 'entity',
+                sourceId: 'entity-kai',
+                entityId: 'entity-kai',
+                label: 'Kai',
+                text: 'registry-only',
+                evidenceIds: [],
+                lane: 'entity_anchor',
+            },
+            {
+                id: 'embed:atom:documentEvidence:evidence-1',
+                kind: 'evidenceSpan',
+                sourceId: 'evidence-1',
+                label: 'Evidence',
+                text: 'candidate evidence',
+                evidenceIds: ['evidence-1'],
+                lane: 'anchor_evidence',
+            },
+            {
+                id: 'embed:fact:document-hyperedge:candidate',
+                kind: 'graphFact',
+                sourceId: 'fact:document-hyperedge:candidate',
+                label: 'Candidate fact',
+                text: 'candidate-only fact',
+                evidenceIds: ['evidence-1'],
+                lane: 'relationship_fact',
+            },
+        ];
+        const packet = snapshotAtlasPacket({
+            ...snapshot,
+            embeddingTargets: nativeTargets,
+            counters: { ...snapshot.counters, embeddingTargets: nativeTargets.length },
+        });
+        const filtered = filterNativeEmbeddingTargetsForCommittedSources(snapshot, nativeTargets);
+
+        expect(filtered.map((target) => target.id)).toEqual([
+            'embed:note:note-1',
+            'embed:structure-root:note-1:identity',
+        ]);
+        snapshot.embeddingTargets = filtered;
+        snapshot.counters.embeddingTargets = filtered.length;
+        snapshot.atlasPacket = reconcileNativeAtlasPacketForTargets(snapshot, packet);
+        expect(snapshot.atlasPacket.manifoldTargets.map((target) => target.id)).toEqual(
+            filtered.map((target) => target.id),
+        );
+        expect(snapshot.atlasPacket.counters.manifoldTargets).toBe(filtered.length);
+        expect(authorizeGraphRebuildSnapshotForLoad(snapshot)).toBe(snapshot);
+    });
+
+    it('quarantines persisted snapshots that fail target source authority', () => {
+        const snapshot = buildGraphRebuildSnapshot({
+            scopeKind: 'global',
+            scopeId: 'global',
+            noteIds: ['note-1'],
+            entities: [entity('entity-kai', 'Kai', [])],
+            occurrences: [],
+            chunks: [{ id: 'note-1:chunk:0', noteId: 'note-1', start: 0, end: 26, ordinal: 0, source: 'dynamic-chunking' }],
+            noteTexts: { 'note-1': 'Kai exists in registry only.' },
+            builtAt: 42,
+        });
+        snapshot.atlasPacket = snapshotAtlasPacket(snapshot);
+        const invalid: GraphRebuildSnapshot = {
+            ...snapshot,
+            embeddingTargets: [
+                ...snapshot.embeddingTargets,
+                {
+                    id: 'embed:fact:document-hyperedge:candidate',
+                    kind: 'graphFact',
+                    sourceId: 'fact:document-hyperedge:candidate',
+                    label: 'Candidate fact',
+                    text: 'candidate-only fact',
+                    evidenceIds: ['evidence-1'],
+                    lane: 'relationship_fact',
+                },
+            ],
+            counters: {
+                ...snapshot.counters,
+                embeddingTargets: snapshot.counters.embeddingTargets + 1,
+            },
+        };
+        invalid.atlasPacket = snapshotAtlasPacket(invalid);
+        const rejects: unknown[] = [];
+
+        expect(authorizeGraphRebuildSnapshotForLoad(snapshot)).toBe(snapshot);
+        expect(authorizeGraphRebuildSnapshotForLoad(invalid, (error) => rejects.push(error))).toBeNull();
+        expect(String(rejects[0])).toContain('fact target lanes without source fact rows');
     });
 
     it('roundtrips explicit graph snapshots through Overgraph scoped documents', () => {
@@ -334,6 +457,75 @@ describe('GraphRebuildService persistence helpers', () => {
                 text: 'This payload belongs to browser receipts, not the Rust compiler call. '.repeat(12),
             })),
         };
+        (snapshot as any).documentSidecarSummary = {
+            units: Array.from({ length: 128 }, (_, index) => ({
+                id: `unit:${index}`,
+                noteId: 'note-1',
+                kind: 'sentence',
+                label: 'Disposable structure '.repeat(8),
+            })),
+            evidenceSpans: [
+                evidenceSpan('ev-1', 0, 3),
+                evidenceSpan('ev-2', 4, 12),
+                evidenceSpan('ev-3', 13, 18),
+                evidenceSpan('ev-unused', 19, 25),
+            ],
+        };
+        (snapshot as any).documentReviewSummary = {
+            rows: Array.from({ length: 64 }, (_, index) => ({
+                id: `review:${index}`,
+                objectId: `object:${index}`,
+                objectKind: 'document_unit',
+                state: 'proposed',
+                title: 'Disposable review row',
+                noteId: 'note-1',
+                why: ['Review UI only '.repeat(16)],
+            })),
+        };
+        (snapshot as any).documentCompilerSummary = {
+            relationCandidates: Array.from({ length: 64 }, (_, index) => ({
+                id: `candidate:${index}`,
+                predicate: 'candidate payload '.repeat(16),
+            })),
+            hyperedges: [{
+                id: 'hyperedge:approved',
+                predicate: 'approved',
+                frame: 'approved',
+                semanticSituationId: 'situation:approved',
+                compilationBasis: 'semantic_situation_frame',
+                temporalConflictIds: [],
+                roles: [
+                    { id: 'role:agent', role: 'agent', targetId: 'entity-kai', targetKind: 'entity', confidence: 0.9 },
+                    { id: 'role:evidence', role: 'evidence', targetId: 'ev-2', targetKind: 'evidence_span', confidence: 0.8 },
+                ],
+                evidenceSpanIds: ['ev-1'],
+                confidence: 0.92,
+                status: 'pending_commit',
+                provenance: {
+                    sourceObjectId: 'situation:approved',
+                    sourceObjectKind: 'semantic_situation',
+                    noteId: 'note-1',
+                    sourceStart: 0,
+                    sourceEnd: 18,
+                    evidenceSpanIds: ['ev-3'],
+                    lineageUnitIds: [],
+                    reasons: [],
+                },
+            }],
+        };
+        (snapshot as any).discourseSpineSummary = {
+            targets: Array.from({ length: 128 }, (_, index) => ({
+                targetId: `target:${index}`,
+                sourceId: `source:${index}`,
+                kind: 'chunk',
+                label: 'Disposable discourse target '.repeat(8),
+                parentTargetIds: [],
+                entityIds: [],
+            })),
+            labels: [],
+            clusters: [],
+            bridges: [],
+        };
 
         const payload = graphRebuildSnapshotToNativeCompilerPayload(snapshot);
 
@@ -342,9 +534,18 @@ describe('GraphRebuildService persistence helpers', () => {
         expect(payload.entityAnchors).toBe(snapshot.entityAnchors);
         expect(payload.nodes).toBe(snapshot.nodes);
         expect(payload.edges).toBe(snapshot.edges);
-        expect(payload.embeddingTargets).toEqual([]);
+        expect(payload.embeddingTargets).toEqual(
+            snapshot.embeddingTargets.filter((target) => target.admissionStatus === 'admitted'),
+        );
         expect(payload.embeddingVectors).toEqual([]);
         expect(payload.projectionRefs).toEqual([]);
+        expect(payload.documentSidecarSummary?.evidenceSpans.map((span) => span.id).sort())
+            .toEqual(['ev-1', 'ev-2', 'ev-3']);
+        expect((payload.documentSidecarSummary as any).units).toBeUndefined();
+        expect(payload.documentReviewSummary).toBeUndefined();
+        expect((payload.documentCompilerSummary as any).relationCandidates).toBeUndefined();
+        expect(payload.documentCompilerSummary?.hyperedges).toHaveLength(1);
+        expect(payload.discourseSpineSummary).toBeUndefined();
         expect(payload.graphModelV2).toBeUndefined();
         expect(payload.semanticCandidateSummary).toBeUndefined();
         expect(JSON.stringify(payload).length).toBeLessThan(JSON.stringify(snapshot).length / 2);
@@ -381,6 +582,36 @@ describe('GraphRebuildService persistence helpers', () => {
 
         expect(sidecar?.factGraph).toEqual(factGraph);
         expect(sidecar?.projectedUiGraph).toBeUndefined();
+    });
+
+    it('decodes one compressed Atlas seed without a duplicate target array', () => {
+        const snapshot = buildGraphRebuildSnapshot({
+            scopeKind: 'global', scopeId: 'global', noteIds: ['note-1'],
+            entities: [entity('entity-kai', 'Kai', [])],
+            chunks: [{ id: 'note-1:chunk:0', noteId: 'note-1', start: 0, end: 3, ordinal: 0, source: 'dynamic-chunking' }],
+            occurrences: [occurrence('note-1', 'entity-kai', 0, 3)],
+            noteTexts: { 'note-1': 'Kai' }, builtAt: 42,
+        });
+        const seed = {
+            atlasPacket: snapshotAtlasPacket(snapshot),
+            embeddingTargets: snapshot.embeddingTargets.slice(0, 2),
+            originatingFamilies: [{ family: 'document_spine', targets: 2 }],
+        };
+        const raw = JSON.stringify(seed);
+        const compressed = gzipSync(strToU8(raw), { level: 1 });
+        const sidecar = decodeNativeGraphCompilerSidecar({
+            atlasSeedPayload: {
+                schemaVersion: 'phoenix-atlas-seed-payload/gzip-base64/v1',
+                sourceSchemaVersion: 'phoenix-atlas-seed/v1', encoding: 'gzip+base64',
+                rawBytes: strToU8(raw).byteLength, compressedBytes: compressed.byteLength,
+                payload: btoa(strFromU8(compressed, true)),
+            },
+        });
+
+        expect(sidecar?.atlasPacket).toEqual(seed.atlasPacket);
+        expect(sidecar?.embeddingTargets).toEqual(seed.embeddingTargets);
+        expect(sidecar?.originatingFamilies).toEqual(seed.originatingFamilies);
+        expect(sidecar).not.toHaveProperty('atlasSeedPayload');
     });
 
     it('decodes native snake-case compiler sidecars at the Rust boundary', () => {
@@ -457,6 +688,23 @@ describe('GraphRebuildService persistence helpers', () => {
             .toEqual(snapshot.embeddingTargets);
     });
 
+    it('keeps Atlas content addresses stable across snapshot timestamps', () => {
+        const snapshot = buildGraphRebuildSnapshot({
+            scopeKind: 'global', scopeId: 'global', noteIds: ['note-1'],
+            entities: [entity('entity-kai', 'Kai', [])],
+            chunks: [{ id: 'note-1:chunk:0', noteId: 'note-1', start: 0, end: 3, ordinal: 0, source: 'dynamic-chunking' }],
+            occurrences: [occurrence('note-1', 'entity-kai', 0, 3)],
+            noteTexts: { 'note-1': 'Kai' }, builtAt: 42,
+        });
+        snapshot.atlasPacket = snapshotAtlasPacket(snapshot);
+        const next = { ...snapshot, id: 'graph-rebuild:global:global:84', builtAt: 84 };
+        next.atlasPacket = { ...snapshot.atlasPacket, snapshotId: next.id, builtAt: next.builtAt };
+        const atlasKey = (value: GraphRebuildSnapshot) => graphRebuildSnapshotContentBlobDocuments(value)
+            .find((document) => document.documentKey.includes(':atlasPacket:'))?.documentKey;
+
+        expect(atlasKey(next)).toBe(atlasKey(snapshot));
+    });
+
     it('persists the embedding target plan as lane/count receipts, not duplicate target rows', () => {
         const snapshot = buildGraphRebuildSnapshot({
             scopeKind: 'global',
@@ -523,10 +771,12 @@ describe('GraphRebuildService persistence helpers', () => {
         expect(persistedView.semanticRerankSummary).toBeUndefined();
         expect(persistedView.semanticAdjudicationSummary).toBeUndefined();
         expect(persistedView.semanticEvalLedgerSummary).toBeUndefined();
+        expect(persistedView.graphTruthCommitLedger).toBeUndefined();
         expect(persisted?.semanticTaskSummary).toBeUndefined();
         expect(persisted?.semanticRerankSummary).toBeUndefined();
         expect(persisted?.semanticAdjudicationSummary).toBeUndefined();
         expect(persisted?.semanticEvalLedgerSummary).toBeUndefined();
+        expect(persisted?.graphTruthCommitLedger).toBeUndefined();
         expect(persisted?.semanticCandidateSummary).toBeUndefined();
         expect(persisted?.contentManifest?.refs.semanticCandidateSummary?.itemCount)
             .toBe(snapshot.semanticCandidateSummary?.candidates.length);
@@ -759,5 +1009,96 @@ function occurrence(noteId: string, entityId: string, sourceStart: number, sourc
         createdAt: 1,
         updatedAt: 1,
     };
+}
+
+function evidenceSpan(id: string, start: number, end: number) {
+    return {
+        id,
+        noteId: 'note-1',
+        unitId: `unit:${id}`,
+        chunkId: 'note-1:chunk:0',
+        start,
+        end,
+        preview: `preview:${id}`,
+        confidence: { score: 0.9 },
+    };
+}
+
+function snapshotAtlasPacket(snapshot: GraphRebuildSnapshot): NonNullable<GraphRebuildSnapshot['atlasPacket']> {
+    const objects = snapshot.embeddingTargets.map((target) => ({
+        id: `atlas:${target.id}`,
+        family: atlasFamily(target.kind),
+        status: 'accepted' as const,
+        kind: target.kind,
+        label: target.label,
+        styleKey: target.styleKey,
+        lane: target.lane,
+        structuralRole: target.structuralRole,
+        registryEntityId: target.entityId,
+        noteIds: target.noteId ? [target.noteId] : [],
+        chunkIds: target.chunkId ? [target.chunkId] : [],
+        anchorIds: target.kind === 'anchor' ? target.evidenceIds : [],
+        evidenceIds: target.evidenceIds,
+        sourceIds: [target.sourceId],
+        targetIds: [],
+    }));
+    const familyCounts = new Map<string, number>();
+    for (const object of objects) familyCounts.set(object.family, (familyCounts.get(object.family) || 0) + 1);
+    return {
+        schemaVersion: 'phoenix-atlas-packet/v1',
+        snapshotId: snapshot.id,
+        scopeKind: snapshot.scopeKind,
+        scopeId: snapshot.scopeId,
+        builtAt: snapshot.builtAt,
+        sourceContract: {
+            authority: 'typescript-compatibility-containment-test',
+            identityAuthority: 'registry-entities-and-accepted-anchors',
+            vectorContract: 'vectors-missing',
+            tsGraphBuilderRole: 'temporary-containment-authority',
+        },
+        objects,
+        manifoldTargets: snapshot.embeddingTargets.map((target) => ({
+            id: target.id,
+            objectId: `atlas:${target.id}`,
+            family: atlasFamily(target.kind),
+            admission: target.admissionStatus === 'deferred' ? 'deferred' : 'admitted',
+            vectorStatus: 'missing',
+            coordinateSource: 'none',
+            status: 'accepted',
+            kind: target.kind,
+            label: target.label,
+            entityKind: target.entityKind,
+            styleKey: target.styleKey,
+            lane: target.lane,
+            structuralRole: target.structuralRole,
+            sourceId: target.sourceId,
+            registryEntityId: target.entityId,
+            noteId: target.noteId,
+            chunkId: target.chunkId,
+            evidenceIds: target.evidenceIds,
+            parentIds: target.parentIds,
+        })),
+        counters: {
+            objects: objects.length,
+            manifoldTargets: snapshot.embeddingTargets.length,
+            registryEntities: snapshot.nodes.length,
+            evidenceAnchors: snapshot.entityAnchors.length,
+            modelVectors: 0,
+            families: [...familyCounts.entries()]
+                .sort(([left], [right]) => left.localeCompare(right))
+                .map(([family, count]) => ({ family: family as ReturnType<typeof atlasFamily>, count })),
+        },
+    };
+}
+
+function atlasFamily(kind: string): NonNullable<GraphRebuildSnapshot['atlasPacket']>['objects'][number]['family'] {
+    if (kind === 'entity') return 'registry';
+    if (kind === 'note' || kind === 'chunk' || kind === 'structureRoot' || kind === 'documentUnit') return 'structure';
+    if (kind === 'anchor' || kind === 'evidenceSpan') return 'evidence';
+    if (kind === 'temporalFact') return 'temporal';
+    if (kind === 'causalFact') return 'causal';
+    if (kind === 'memoryState') return 'memory';
+    if (kind === 'graphFact' || kind === 'event') return 'fact';
+    return 'unknown';
 }
 

@@ -8,14 +8,15 @@ use phoenix_types::{EntityId, EntityKind, LexiconEntry, ScopeKey, TextRange};
 use serde::Deserialize;
 
 use crate::{
-    build_graph_rebuild_snapshot, compile_dual_write_snapshot, compile_graph_snapshot,
-    compile_legacy_snapshot_strict, verify_graph_compile_output, EvidenceAnchor,
-    EvidenceBundleKind, EvidenceKind, FactLane, FactRole, GraphAtom, GraphAtomKind,
-    GraphCalendarRegistryBridgeCounters, GraphCalendarRegistryBridgeSummary,
-    GraphCalendarRegistryReceipt, GraphChunk, GraphCompileReceipts, GraphCompilerInput,
-    GraphCompilerOutput, GraphDocumentCompilerHyperedge, GraphDocumentCompilerHyperedgeRole,
-    GraphDocumentCompilerSummary, GraphDocumentConfidence, GraphDocumentEvidenceSpan,
-    GraphDocumentSidecarSummary, GraphMention, GraphRebuildInput, GraphScopeKind, RelationFact,
+    build_graph_rebuild_snapshot, build_snapshot_embedding_target_report,
+    compile_dual_write_snapshot, compile_graph_snapshot, compile_legacy_snapshot_strict,
+    verify_graph_compile_output, EvidenceAnchor, EvidenceBundleKind, EvidenceKind, FactLane,
+    FactRole, GraphAtom, GraphAtomKind, GraphCalendarRegistryBridgeCounters,
+    GraphCalendarRegistryBridgeSummary, GraphCalendarRegistryReceipt, GraphChunk,
+    GraphCompileReceipts, GraphCompilerInput, GraphCompilerOutput, GraphDocumentCompilerHyperedge,
+    GraphDocumentCompilerHyperedgeRole, GraphDocumentCompilerSummary, GraphDocumentConfidence,
+    GraphDocumentEvidenceSpan, GraphDocumentSidecarSummary, GraphMention, GraphRebuildInput,
+    GraphScopeKind, RelationFact,
 };
 
 const PARITY_FIXTURE: &str =
@@ -704,6 +705,35 @@ fn situation_hyperedge(
         status: "pending_commit".into(),
         provenance: None,
     }
+}
+
+#[test]
+fn admitted_input_targets_bypass_native_candidate_expansion() {
+    let entities = vec![entry("e-kai", "Kai", &[])];
+    let mut snapshot = build_graph_rebuild_snapshot(GraphRebuildInput {
+        scope_kind: GraphScopeKind::Note,
+        scope_id: "note:admission",
+        note_id: "note-admission",
+        text: "Kai approved the packet.",
+        scope: ScopeKey::default(),
+        entities: &entities,
+        candidate_count: 1,
+        built_at: Some(10),
+    })
+    .expect("snapshot");
+    snapshot.embedding_targets.truncate(2);
+
+    let report = build_snapshot_embedding_target_report(&snapshot);
+
+    assert_eq!(report.targets.len(), 2);
+    assert_eq!(
+        report
+            .originating_families
+            .iter()
+            .map(|row| row.targets)
+            .sum::<usize>(),
+        2
+    );
 }
 
 fn document_hyperedge_role(

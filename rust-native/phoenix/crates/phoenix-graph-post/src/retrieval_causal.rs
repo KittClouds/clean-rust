@@ -2,8 +2,8 @@ use phoenix_graph_kernel::{
     KernelEdge, KernelQuerySurface, KernelRegionProfile, KernelViewRequest,
 };
 use phoenix_store_native_core::{
-    PhoenixGraphPatchStore, PhoenixLexicalQueryStore, PhoenixSemanticGraphPatchStore,
-    PhoenixSemanticIndexStore,
+    PhoenixGraphKernelStoreV2, PhoenixGraphPatchStore, PhoenixLexicalQueryStore,
+    PhoenixSemanticGraphPatchStore, PhoenixSemanticIndexStore,
 };
 use phoenix_types::ScopeKey;
 
@@ -32,6 +32,7 @@ pub(crate) fn retrieved_causal_explanation_impl<S>(
 ) -> Result<Option<GraphRetrievedCausalExplanationAnswer>, GraphQueryError>
 where
     S: PhoenixGraphPatchStore
+        + PhoenixGraphKernelStoreV2
         + PhoenixLexicalQueryStore
         + PhoenixSemanticGraphPatchStore
         + PhoenixSemanticIndexStore,

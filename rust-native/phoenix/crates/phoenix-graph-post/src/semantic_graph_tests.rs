@@ -130,6 +130,42 @@ fn build_prototypes_surfaces_document_semantic_units() {
 }
 
 #[test]
+fn discourse_semantic_units_require_complete_situation_frame() {
+    let proposition = Proposition {
+        proposition_id: "prop:missing".into(),
+        predicate: PredicateFrame {
+            predicate: "moved".into(),
+            trigger_range: SourceRange::new(6, 11),
+            relation_type: "relates_to".into(),
+        },
+        ..Default::default()
+    };
+    let archive = DocumentArchive {
+        manifest: DocumentManifest {
+            document_id: "doc-1".to_owned(),
+            ..Default::default()
+        },
+        causal_substrate: Some(DocumentCausalSubstrate {
+            propositions: vec![proposition],
+            semantic_events: vec![EventRecord {
+                event_id: Some(EventId("event:missing".to_owned())),
+                label: "moved".into(),
+                proposition_id: "prop:missing".into(),
+                ..Default::default()
+            }],
+            ..Default::default()
+        }),
+        ..Default::default()
+    };
+
+    let prototypes = build_prototypes(&[archive], None, None);
+
+    assert!(!prototypes
+        .iter()
+        .any(|prototype| prototype.node_id.starts_with(SEMANTIC_UNIT_PREFIX)));
+}
+
+#[test]
 fn compile_candidate_graph_batch_skips_rejected_edges() {
     let prototypes = vec![
         prototype("entity::alice", ENTITY_KIND, SemanticGraphNodeKind::Entity),

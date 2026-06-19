@@ -2,12 +2,14 @@ import { describe, expect, it } from 'vitest';
 
 import {
     applyGraphOperatorMutationDecisionToSnapshot,
+    graphOperatorMutationJournalFromTruthCommits,
     replayGraphOperatorMutationJournal,
 } from './graph-operator-mutation-journal';
 import { buildGraphRebuildSnapshot } from './graph-rebuild-builder';
 import { buildAdaptiveGraphRebuildChunks } from './graph-rebuild-meaning-frames';
 import type { GraphDocumentSemanticSummary } from './graph-document-semantic';
 import type { GraphRebuildSnapshot } from './graph-rebuild-snapshot';
+import type { GraphTruthCommitLike } from './graph-truth-commit-ledger';
 
 describe('graph operator mutation journal', () => {
     it('replays operator review decisions onto a rebuilt snapshot', () => {
@@ -74,6 +76,29 @@ describe('graph operator mutation journal', () => {
         expect(situationTargets.length).toBe(pendingFactIds.size);
         expect(situationTargets.every((target) => pendingFactIds.has(target.sourceId))).toBe(true);
         expect(situationTargets.every((target) => target.lane === 'relationship_fact')).toBe(true);
+    });
+
+    it('projects operator read-model states from the canonical GraphTruthCommit ledger', () => {
+        const journal = graphOperatorMutationJournalFromTruthCommits('scope-1', graphTruthFixtures(), 100);
+
+        expect(journal.counters).toMatchObject({
+            canonicalAccepted: 2,
+            canonicalReverted: 2,
+            canonicalSuperseded: 2,
+        });
+        expect(journal.intents.find((intent) => intent.targetObjectId === 'receipt-active')).toMatchObject({
+            canonicalState: 'accepted',
+            status: 'applied',
+            requestedState: 'accepted',
+        });
+        expect(journal.intents.find((intent) => intent.targetObjectId === 'receipt-reverted')).toMatchObject({
+            canonicalState: 'reverted',
+            status: 'undone',
+        });
+        expect(journal.receipts.find((receipt) => receipt.targetObjectId === 'source-old')).toMatchObject({
+            canonicalState: 'superseded',
+            canonicalCommitId: 'commit-old',
+        });
     });
 });
 
@@ -248,4 +273,39 @@ function firstFactObjectId(snapshot: GraphRebuildSnapshot): string {
 
 function rowState(snapshot: GraphRebuildSnapshot, objectId: string): string | undefined {
     return snapshot.documentReviewSummary?.rows.find((row) => row.objectId === objectId)?.state;
+}
+
+function graphTruthFixtures(): GraphTruthCommitLike[] {
+    return [
+        truthCommit('commit-reverted', 1, 'assert', [], null, ['receipt-reverted'], ['source-reverted']),
+        truthCommit('commit-old', 2, 'assert', [], null, ['receipt-old'], ['source-old']),
+        truthCommit('commit-active', 3, 'supersede', ['commit-old'], null, ['receipt-active'], ['source-active']),
+        truthCommit('commit-reverter', 4, 'revert', [], 'commit-reverted', ['receipt-reverter'], ['source-reverter'], false),
+    ];
+}
+
+function truthCommit(
+    commitId: string,
+    generation: number,
+    operation: GraphTruthCommitLike['operation'],
+    predecessorCommitIds: string[],
+    reversesCommitId: string | null,
+    receiptIds: string[],
+    sourceIds: string[],
+    withBatch = true,
+): GraphTruthCommitLike {
+    return {
+        commitId,
+        generation,
+        operation,
+        predecessorCommitIds,
+        reversesCommitId,
+        receiptIds,
+        sourceGenerations: sourceIds.map((sourceId) => ({ sourceId, generation })),
+        committedAt: generation * 10,
+        batch: withBatch ? {
+            vertices: [{ id: `vertex:${commitId}` }],
+            edges: [{ sourceId: `vertex:${commitId}`, targetId: 'entity:kai', edgeType: 'supports' }],
+        } : { vertices: [], edges: [] },
+    };
 }

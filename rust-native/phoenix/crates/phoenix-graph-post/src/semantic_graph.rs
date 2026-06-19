@@ -11,14 +11,16 @@ use phoenix_semantic_v2::{
 };
 use phoenix_store_native_core::{
     NativeSemanticNodeVectorRecord, PhoenixArchiveStoreV2, PhoenixEventIdentityPatchStore,
-    PhoenixGraphPatchStore, PhoenixMemoryPatchStore, PhoenixSemanticGraphPatchStore,
-    PhoenixSemanticIndexStore, SEMANTIC_MODEL_ID, SEMANTIC_VECTOR_DIM,
+    PhoenixGraphKernelStoreV2, PhoenixGraphLearningStore, PhoenixGraphPatchStore,
+    PhoenixMemoryPatchStore, PhoenixSemanticGraphPatchStore, PhoenixSemanticIndexStore,
+    SEMANTIC_MODEL_ID, SEMANTIC_VECTOR_DIM,
 };
 use phoenix_types::{ScopeKey, SessionId};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use thiserror::Error;
 
+use crate::promotion_lanes::append_semantic_phase5_promotion_commits;
 use crate::semantic::{semantic_embedder, SemanticEmbedConfig};
 use crate::semantic_graph_causal_gap::collect_missing_intermediate_cause_edges;
 use crate::semantic_graph_contradiction::collect_contradictory_support_region_edges;
@@ -174,8 +176,9 @@ pub fn persist_semantic_graph_patch_sidecar<S>(
     sidecar: &SemanticGraphScopeSidecar,
 ) -> Result<(), SemanticGraphError>
 where
-    S: PhoenixSemanticGraphPatchStore,
+    S: PhoenixSemanticGraphPatchStore + PhoenixGraphKernelStoreV2 + PhoenixGraphLearningStore,
 {
+    append_semantic_phase5_promotion_commits(store, sidecar)?;
     store.persist_semantic_graph_patch_sidecar(sidecar)?;
     Ok(())
 }

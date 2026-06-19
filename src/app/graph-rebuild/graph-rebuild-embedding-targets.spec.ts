@@ -2,7 +2,11 @@ import { describe, expect, it } from 'vitest';
 
 import type { GraphDocumentCompilerSummary, GraphDocumentHyperedge } from './graph-document-compiler-types';
 import { buildGraphRebuildEmbeddingTargetPlan } from './graph-rebuild-embedding-targets';
-import type { BuildGraphRebuildSnapshotInput, GraphRebuildNode } from './graph-rebuild-snapshot';
+import type {
+    BuildGraphRebuildSnapshotInput,
+    GraphRebuildEntityAnchor,
+    GraphRebuildNode,
+} from './graph-rebuild-snapshot';
 
 describe('graph rebuild hypergraph embedding targets', () => {
     it('admits native-eligible situations with their n-ary role endpoints', () => {
@@ -18,7 +22,7 @@ describe('graph rebuild hypergraph embedding targets', () => {
         const plan = buildGraphRebuildEmbeddingTargetPlan(
             input(),
             [],
-            [],
+            [anchor('entity-kai', 'Kai', 0, 3), anchor('entity-hazel', 'Hazel', 9, 14)],
             [entityNode('entity-kai'), entityNode('entity-hazel')],
             [],
             [],
@@ -53,6 +57,24 @@ describe('graph rebuild hypergraph embedding targets', () => {
             expect.objectContaining({ id: 'embed:atom:documentUnit:unit-1', kind: 'documentUnit', lane: 'chunk_spine', admissionStatus: 'admitted' }),
         ]));
     });
+
+    it('keeps native-eligible situation targets shadow-only when source rows are hollow', () => {
+        const plan = buildGraphRebuildEmbeddingTargetPlan(
+            input(),
+            [],
+            [],
+            [entityNode('entity-kai'), entityNode('entity-hazel')],
+            [],
+            [],
+            [],
+            [],
+            [],
+            { hyperedges: [hyperedge('hollow')] } as GraphDocumentCompilerSummary,
+        );
+
+        expect(plan.targets.some((target) => target.id === 'embed:fact:document-hyperedge:hollow')).toBe(false);
+        expect(plan.targets.some((target) => target.id.startsWith('embed:atom:'))).toBe(false);
+    });
 });
 
 function input(): BuildGraphRebuildSnapshotInput {
@@ -74,9 +96,25 @@ function entityNode(id: string): GraphRebuildNode {
         label: id === 'entity-kai' ? 'Kai' : 'Hazel',
         aliases: [],
         kind: 'CHARACTER',
-        anchorIds: [],
+        anchorIds: [`anchor:${id}`],
         noteIds: ['note-1'],
         totalMentions: 1,
+    };
+}
+
+function anchor(entityId: string, surface: string, sourceStart: number, sourceEnd: number): GraphRebuildEntityAnchor {
+    return {
+        id: `anchor:${entityId}`,
+        noteId: 'note-1',
+        chunkId: 'note-1:chunk:0',
+        entityId,
+        surface,
+        sourceStart,
+        sourceEnd,
+        source: 'dynamic-ner',
+        confidence: 0.94,
+        status: 'accepted',
+        generation: 1,
     };
 }
 

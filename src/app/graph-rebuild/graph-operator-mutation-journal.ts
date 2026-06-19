@@ -7,6 +7,12 @@ import {
     type GraphDocumentReviewState,
 } from './graph-document-review';
 import type { GraphRebuildSnapshot } from './graph-rebuild-snapshot';
+import {
+    graphTruthCommitLedgerFor,
+    normalizeGraphTruthCommits,
+    type GraphTruthCommitLike,
+    type GraphTruthUiState,
+} from './graph-truth-commit-ledger';
 
 export const GRAPH_OPERATOR_MUTATION_JOURNAL_SCHEMA_VERSION = 'phoenix-graph-operator-mutation-journal/v1';
 export const GRAPH_OPERATOR_MUTATION_INTENT_SCHEMA_VERSION = 'phoenix-graph-operator-mutation-intent/v1';
@@ -40,6 +46,8 @@ export interface GraphOperatorMutationIntent {
     sourceFingerprint: string;
     sourceReceiptIds: string[];
     status: GraphOperatorMutationIntentStatus;
+    canonicalState?: GraphTruthUiState;
+    canonicalCommitId?: string;
     createdAt: number;
     appliedAt?: number;
     conflictedAt?: number;
@@ -58,6 +66,8 @@ export interface GraphOperatorMutationReceipt {
     reversible: true;
     mutationAllowed: false;
     invariant: 'operator_mutation_journal_replays_review_state_before_topology_commit';
+    canonicalState?: GraphTruthUiState;
+    canonicalCommitId?: string;
     sourceFingerprint: string;
     detail: string;
     createdAt: number;
@@ -70,6 +80,10 @@ export interface GraphOperatorMutationJournalCounters {
     conflicted: number;
     undone: number;
     receipts: number;
+    canonicalAccepted: number;
+    canonicalCommitted: number;
+    canonicalReverted: number;
+    canonicalSuperseded: number;
 }
 
 export interface GraphOperatorMutationJournal {
@@ -116,6 +130,63 @@ export function isGraphOperatorMutationJournal(value: unknown): value is GraphOp
         && typeof candidate.scopeId === 'string'
         && Array.isArray(candidate.intents)
         && Array.isArray(candidate.receipts);
+}
+
+export function graphOperatorMutationJournalFromTruthCommits(
+    scopeId: string,
+    commits: GraphTruthCommitLike[] | unknown,
+    updatedAt = Date.now(),
+): GraphOperatorMutationJournal {
+    const truthLedger = graphTruthCommitLedgerFor(normalizeGraphTruthCommits(commits));
+    const projected = truthLedger.records
+        .filter((record) => record.targetKind !== 'commit')
+        .sort((left, right) => left.generation - right.generation || left.targetId.localeCompare(right.targetId));
+    const intents: GraphOperatorMutationIntent[] = projected.map((record) => ({
+        schemaVersion: GRAPH_OPERATOR_MUTATION_INTENT_SCHEMA_VERSION,
+        id: `operator-mutation:truth:${record.targetKind}:${record.targetId}`,
+        scopeId,
+        sourceSnapshotId: `graph-truth:${record.commitId}`,
+        sourceSnapshotBuiltAt: record.committedAt,
+        targetObjectId: record.targetId,
+        targetObjectKind: 'graph_fact_candidate',
+        actionKind: actionKindForTruthState(record.state),
+        previousState: 'proposed',
+        requestedState: requestedReviewStateForTruthState(record.state),
+        sourceFingerprint: record.commitId,
+        sourceReceiptIds: [record.targetKind === 'receipt' ? record.targetId : record.commitId],
+        status: record.state === 'reverted' ? 'undone' : record.state === 'superseded' ? 'conflicted' : 'applied',
+        canonicalState: record.state,
+        canonicalCommitId: record.commitId,
+        createdAt: record.committedAt,
+        appliedAt: record.state === 'accepted' || record.state === 'committed' ? record.committedAt : undefined,
+        conflictedAt: record.state === 'superseded' ? record.resolvedAt || updatedAt : undefined,
+        conflictReason: record.state === 'superseded' ? 'canonical_commit_superseded' : undefined,
+        undoneAt: record.state === 'reverted' ? record.resolvedAt || updatedAt : undefined,
+    }));
+    const receipts: GraphOperatorMutationReceipt[] = projected.map((record) => ({
+        id: `operator-mutation-receipt:truth:${record.targetKind}:${record.targetId}`,
+        intentId: `operator-mutation:truth:${record.targetKind}:${record.targetId}`,
+        actionKind: actionKindForTruthState(record.state),
+        targetObjectId: record.targetId,
+        targetObjectKind: 'graph_fact_candidate',
+        previousState: 'proposed',
+        nextState: requestedReviewStateForTruthState(record.state),
+        reversible: true,
+        mutationAllowed: false,
+        invariant: 'operator_mutation_journal_replays_review_state_before_topology_commit',
+        canonicalState: record.state,
+        canonicalCommitId: record.commitId,
+        sourceFingerprint: record.commitId,
+        detail: `canonical ${record.state} from ${record.commitId}`,
+        createdAt: record.committedAt,
+    }));
+    return withJournalCounters({
+        schemaVersion: GRAPH_OPERATOR_MUTATION_JOURNAL_SCHEMA_VERSION,
+        scopeId,
+        updatedAt,
+        intents,
+        receipts,
+    });
 }
 
 export function applyGraphOperatorMutationDecisionToSnapshot(
@@ -309,6 +380,20 @@ function reviewActionKind(decision: GraphOperatorMutationDecision): GraphDocumen
     return null;
 }
 
+function actionKindForTruthState(state: GraphTruthUiState): GraphDocumentReviewActionKind {
+    if (state === 'reverted') return 'demote_graph_fact_to_sidecar';
+    if (state === 'superseded') return 'reject_fact';
+    if (state === 'committed') return 'compile_to_graph';
+    return 'accept_fact';
+}
+
+function requestedReviewStateForTruthState(state: GraphTruthUiState): GraphDocumentReviewState {
+    if (state === 'reverted') return 'ledger_only';
+    if (state === 'superseded') return 'rejected';
+    if (state === 'committed') return 'compiled_to_graph';
+    return 'accepted';
+}
+
 function appliedIntent(intent: GraphOperatorMutationIntent, appliedAt: number): GraphOperatorMutationIntent {
     return {
         ...intent,
@@ -452,6 +537,10 @@ function withJournalCounters(
             conflicted: journal.intents.filter((intent) => intent.status === 'conflicted').length,
             undone: journal.intents.filter((intent) => intent.status === 'undone').length,
             receipts: journal.receipts.length,
+            canonicalAccepted: journal.intents.filter((intent) => intent.canonicalState === 'accepted').length,
+            canonicalCommitted: journal.intents.filter((intent) => intent.canonicalState === 'committed').length,
+            canonicalReverted: journal.intents.filter((intent) => intent.canonicalState === 'reverted').length,
+            canonicalSuperseded: journal.intents.filter((intent) => intent.canonicalState === 'superseded').length,
         },
     };
 }

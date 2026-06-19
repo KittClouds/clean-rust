@@ -233,7 +233,9 @@ function receiptFor(
         state,
         reversible: true,
         mutationAllowed: state === 'accepted',
-        invariant: state === 'accepted' ? 'phase5_reversible_topology_commit' : 'phase5_ledger_only_no_topology_commit',
+        invariant: state === 'accepted'
+            ? 'typescript_compatibility_containment_topology_commit'
+            : 'phase5_ledger_only_no_topology_commit',
         evidenceTargetIds: evidenceTargets(candidate),
         affectedGraphAtomIds: state === 'accepted' ? mutation?.affectedGraphAtomIds || [] : [],
         affectedGraphFactIds: state === 'accepted' ? mutation?.affectedGraphFactIds || [] : [],

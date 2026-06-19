@@ -1,6 +1,6 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 
-import { db, type Note } from '../lib/dexie/db';
+import { db, type EntityOccurrence, type Note } from '../lib/dexie/db';
 import * as ops from '../lib/operations';
 import { smartGraphRegistry } from '../lib/registry';
 import type { AtlasCapabilityId } from '../components/search-panel/atlas-capability.model';
@@ -16,7 +16,7 @@ import { embeddingProfileFromModelSelection } from './graph-rebuild-embedding-si
 import { GLINER_LINKER_MODEL_ID } from './graph-rebuild-entity-linking';
 import { GraphRebuildService, snapshotAnchorsToGraphRebuildOccurrences } from './graph-rebuild.service';
 import { buildSiegelBackboneProjectionReceipt } from './graph-rebuild-siegel-backbone';
-import { graphSignalTruthCounters } from './graph-rebuild-signal-truth';
+import { assertGraphSnapshotAuthority } from './graph-snapshot-authority';
 import type {
     GraphIndexModelReadiness,
     GraphIndexPostProcessMode,
@@ -27,6 +27,7 @@ import type {
     GraphIndexRunStatus,
     GraphIndexRunScope,
     GraphIndexStageReceipt,
+    GraphBuildDurabilityMode,
     GraphRebuildCounters,
     GraphRebuildDropReasons,
     GraphRebuildEntityLinkCounters,
@@ -59,6 +60,11 @@ const PROJECTION_CAPABILITIES: Array<{ capability: AtlasCapabilityId; mode: Grap
     { capability: 'lorentzForest', mode: 'lorentz' },
     { capability: 'productManifold', mode: 'product' },
 ];
+
+interface GraphNerDeltaResult {
+    counts: Record<string, number>;
+    acceptedOccurrences: EntityOccurrence[];
+}
 
 type PipelineResult = {
     receipt: GraphIndexRunReceipt;
@@ -153,11 +159,14 @@ export class GraphRebuildPipelineService {
         const stageReceipts: GraphIndexStageReceipt[] = [];
         const snapshotRef: { value?: GraphRebuildSnapshot } = {};
         let resumeContentCheckpoints: (() => void) | null = null;
+        let acceptedNerOccurrences: EntityOccurrence[] = [];
         try {
             const docs = await this.loadScopedDocuments(request.scope.noteIds);
             const scope = expandScopeNoteIds(request.scope, docs);
             const nerStage = await this.runStage('dynamicNer', 'Dynamic NER + Alex Deltas', async () => {
-                const counts = await this.runNerDeltas(docs);
+                const delta = await this.runNerDeltas(docs);
+                acceptedNerOccurrences = delta.acceptedOccurrences;
+                const counts = delta.counts;
                 return {
                     outputCount: counts['acceptedAnchors'] || 0,
                     counters: counts,
@@ -178,8 +187,10 @@ export class GraphRebuildPipelineService {
                     scopeId: scope.scopeId,
                     noteIds: scope.noteIds,
                     entities,
+                    sourceEvidence: { stagedOccurrences: acceptedNerOccurrences },
                     embeddingProfile: embeddingProfileFromModelSelection(request.modelSelection),
                     postProcessMode: 'core',
+                    durabilityMode: request.durabilityMode || 'diagnostic',
                     embeddingStagePolicy: request.embeddingStagePolicy,
                     candidateCount: nerStage.counters['candidates'] || 0,
                     calendarRegistrySnapshot: request.calendarRegistrySnapshot,
@@ -307,6 +318,7 @@ export class GraphRebuildPipelineService {
         if (this.runningState()) {
             throw new Error('Full Atlas Index is already running.');
         }
+        const durabilityMode = request.durabilityMode || 'interactive';
         const modelReadiness = this.modelReadiness(request);
         const graphCold = modelReadiness
             .filter((model) => model.id === 'dynamicNer' || model.id === 'nli')
@@ -324,9 +336,11 @@ export class GraphRebuildPipelineService {
         let relationshipHints: GraphRebuildRelationshipHint[] = [];
         let postProcessFingerprintValue: string | undefined;
         let resumeContentCheckpoints: (() => void) | null = null;
+        let acceptedNerOccurrences: EntityOccurrence[] = [];
         try {
             const docs = await this.loadScopedDocuments(request.scope.noteIds);
             const scope = expandScopeNoteIds(request.scope, docs);
+            const noteTexts = Object.fromEntries(docs.map((doc) => [doc.id, doc.plainText]));
             const options = this.atlasOptions({ ...request, scope, postProcessMode: 'full' });
             const entities = smartGraphRegistry.getAllEntities().length
                 ? smartGraphRegistry.getAllEntities()
@@ -335,7 +349,9 @@ export class GraphRebuildPipelineService {
             postProcessFingerprintValue = fingerprint;
 
             const nerStage = await this.runStage('dynamicNer', 'Dynamic NER + Alex Deltas', async () => {
-                const counts = await this.runNerDeltas(docs);
+                const delta = await this.runNerDeltas(docs);
+                acceptedNerOccurrences = delta.acceptedOccurrences;
+                const counts = delta.counts;
                 return {
                     outputCount: counts['acceptedAnchors'] || 0,
                     counters: counts,
@@ -382,9 +398,12 @@ export class GraphRebuildPipelineService {
                     scopeId: scope.scopeId,
                     noteIds: scope.noteIds,
                     entities,
+                    noteTexts,
+                    sourceEvidence: { stagedOccurrences: acceptedNerOccurrences },
                     relationshipHints,
                     embeddingProfile: embeddingProfileFromModelSelection(request.modelSelection),
                     postProcessMode: 'full',
+                    durabilityMode,
                     embeddingStagePolicy: request.embeddingStagePolicy,
                     candidateCount: nerStage.counters['candidates'] || 0,
                     calendarRegistrySnapshot: request.calendarRegistrySnapshot,
@@ -427,13 +446,15 @@ export class GraphRebuildPipelineService {
             appendEntityLinkerPlanStage(stageReceipts, completedSnapshot, request.embeddingStagePolicy?.entityLinkerEnabled !== false);
             appendEdgeJudgmentPlanStage(stageReceipts, completedSnapshot);
             appendSemanticRerankStage(stageReceipts, completedSnapshot);
-            appendMemoryGraphRagBridgeStage(stageReceipts, completedSnapshot);
-            appendDiscourseSpineStage(stageReceipts, completedSnapshot);
-            appendDiscourseBridgeCandidateStage(stageReceipts, completedSnapshot);
-            appendDiscourseBridgeAdjudicationStage(stageReceipts, completedSnapshot);
-            appendDiscourseEvalLedgerStage(stageReceipts, completedSnapshot);
-            appendDiscoursePromotionSurfaceStage(stageReceipts, completedSnapshot);
-            appendDiscourseCompilerOverlayStage(stageReceipts, completedSnapshot);
+            if (durabilityMode !== 'interactive') {
+                appendMemoryGraphRagBridgeStage(stageReceipts, completedSnapshot);
+                appendDiscourseSpineStage(stageReceipts, completedSnapshot);
+                appendDiscourseBridgeCandidateStage(stageReceipts, completedSnapshot);
+                appendDiscourseBridgeAdjudicationStage(stageReceipts, completedSnapshot);
+                appendDiscourseEvalLedgerStage(stageReceipts, completedSnapshot);
+                appendDiscoursePromotionSurfaceStage(stageReceipts, completedSnapshot);
+                appendDiscourseCompilerOverlayStage(stageReceipts, completedSnapshot);
+            }
             appendCalendarRegistryStage(stageReceipts, completedSnapshot);
             appendSnapshotTimingStages(stageReceipts, completedSnapshot);
             appendStagedNativeScenePacketSkippedStage(stageReceipts, completedSnapshot);
@@ -450,6 +471,7 @@ export class GraphRebuildPipelineService {
                 scope,
                 policy: request.policy,
                 postProcessMode: 'full',
+                durabilityMode,
                 postProcessFingerprint: fingerprint,
                 postProcessCacheHit: false,
                 modelSelection: request.modelSelection,
@@ -462,7 +484,20 @@ export class GraphRebuildPipelineService {
                 message: `Build Graph produced ${completedSnapshot.counters.nodes} nodes, ${completedSnapshot.counters.edges} edges, and ${completedSnapshot.counters.embeddingTargets} targets.`,
             });
             await this.publishRunReceipt(receipt, completedSnapshot);
+            if (durabilityMode === 'interactive') {
+                appendInteractivePostCommitStage(stageReceipts, completedSnapshot);
+            }
             await this.persistRunReceiptWithTiming(receipt);
+            if (durabilityMode === 'interactive') {
+                this.scheduleInteractivePostCommitWork({
+                    scope,
+                    entities,
+                    acceptedNerOccurrences,
+                    relationshipHints,
+                    request,
+                    nerCandidates: nerStage.counters['candidates'] || 0,
+                });
+            }
             resumeContentCheckpoints();
             return { receipt, snapshot: completedSnapshot };
         } catch (error) {
@@ -473,6 +508,7 @@ export class GraphRebuildPipelineService {
                 scope: request.scope,
                 policy: request.policy,
                 postProcessMode: 'full',
+                durabilityMode,
                 postProcessFingerprint: snapshot ? postProcessFingerprintValue : undefined,
                 modelSelection: request.modelSelection,
                 modelReadiness,
@@ -511,17 +547,27 @@ export class GraphRebuildPipelineService {
         let snapshot: GraphRebuildSnapshot | null = null;
         let relationshipHints: GraphRebuildRelationshipHint[] = [];
         let resumeContentCheckpoints: (() => void) | null = null;
+        let acceptedNerOccurrences: EntityOccurrence[] = [];
 
         try {
             const docs = await this.loadScopedDocuments(request.scope.noteIds);
             const scope = expandScopeNoteIds(request.scope, docs);
+            const cachedSnapshot = await this.safeLoadSnapshot(scope.scopeId);
+            const scopedNoteTexts = Object.fromEntries(docs.map((doc) => [doc.id, doc.plainText]));
+            const cachedSnapshotOccurrences = snapshotAnchorsToGraphRebuildOccurrences(
+                cachedSnapshot,
+                Date.now(),
+                scopedNoteTexts,
+            );
             const options = this.atlasOptions({ ...request, scope });
             const entities = smartGraphRegistry.getAllEntities().length
                 ? smartGraphRegistry.getAllEntities()
                 : request.entities;
             const fingerprint = postProcessFingerprint(scope, docs, entities, request.modelSelection, request.embeddingStagePolicy);
             const nerStage = await this.runStage('dynamicNer', 'Dynamic NER + Alex Deltas', async () => {
-                const counts = await this.runNerDeltas(docs);
+                const delta = await this.runNerDeltas(docs);
+                acceptedNerOccurrences = delta.acceptedOccurrences;
+                const counts = delta.counts;
                 return {
                     outputCount: counts['acceptedAnchors'] || 0,
                     counters: counts,
@@ -553,9 +599,11 @@ export class GraphRebuildPipelineService {
                     scopeId: scope.scopeId,
                     noteIds: scope.noteIds,
                     entities,
+                    sourceEvidence: { stagedOccurrences: acceptedNerOccurrences, cachedSnapshotOccurrences },
                     relationshipHints,
                     embeddingProfile: embeddingProfileFromModelSelection(request.modelSelection),
                     postProcessMode: 'full',
+                    durabilityMode: request.durabilityMode || 'diagnostic',
                     embeddingStagePolicy: request.embeddingStagePolicy,
                     candidateCount: nerStage.counters['candidates'] || 0,
                     calendarRegistrySnapshot: request.calendarRegistrySnapshot,
@@ -707,7 +755,7 @@ export class GraphRebuildPipelineService {
             const cachedSnapshot = postProcessCache?.snapshot || await this.safeLoadSnapshot(scope.scopeId);
             const cacheReceipt = postProcessCache?.receipt || cachedReceipt;
             const scopedNoteTexts = Object.fromEntries(docs.map((doc) => [doc.id, doc.plainText]));
-            const fallbackOccurrences = snapshotAnchorsToGraphRebuildOccurrences(cachedSnapshot, Date.now(), scopedNoteTexts);
+            const cachedSnapshotOccurrences = snapshotAnchorsToGraphRebuildOccurrences(cachedSnapshot, Date.now(), scopedNoteTexts);
             const fingerprintMatched = Boolean(postProcessCache)
                 || (
                     cacheReceipt?.postProcessMode === 'full'
@@ -721,6 +769,7 @@ export class GraphRebuildPipelineService {
                 fingerprintMatched,
             });
             if (request.policy !== 'force' && cachedSnapshot?.embeddingGraphPostProcess && deltaPlan.route === 'projection_only') {
+                appendGraphTruthContractStage(stageReceipts, cachedSnapshot);
                 for (const projection of PROJECTION_CAPABILITIES) {
                     projectionReceipts.push(await this.runProjectionStage(projection.capability, projection.mode, options, cachedSnapshot));
                 }
@@ -761,7 +810,7 @@ export class GraphRebuildPipelineService {
                 docs,
                 entities,
                 cachedSnapshot,
-                fallbackOccurrences,
+                sourceEvidenceOccurrences: cachedSnapshotOccurrences,
             }));
 
             for (const capability of POSTPROCESS_FACT_CAPABILITIES) {
@@ -787,10 +836,11 @@ export class GraphRebuildPipelineService {
                     scopeId: scope.scopeId,
                     noteIds: scope.noteIds,
                     entities,
-                    fallbackOccurrences,
+                    sourceEvidence: { cachedSnapshotOccurrences },
                     relationshipHints,
                     embeddingProfile: embeddingProfileFromModelSelection(request.modelSelection),
                     postProcessMode: 'full',
+                    durabilityMode: request.durabilityMode || 'diagnostic',
                     embeddingStagePolicy: request.embeddingStagePolicy,
                     candidateCount: cachedSnapshot?.counters.candidates || 0,
                     calendarRegistrySnapshot: request.calendarRegistrySnapshot,
@@ -896,6 +946,7 @@ export class GraphRebuildPipelineService {
         scope: GraphIndexRunScope;
         policy: GraphIndexRunRequest['policy'];
         postProcessMode?: GraphIndexPostProcessMode;
+        durabilityMode?: GraphBuildDurabilityMode;
         postProcessFingerprint?: string;
         postProcessDiscoveryFingerprint?: string;
         postProcessCacheHit?: boolean;
@@ -918,6 +969,7 @@ export class GraphRebuildPipelineService {
             status: input.status || 'completed',
             modelSelection: input.modelSelection,
             postProcessMode: input.postProcessMode,
+            durabilityMode: input.durabilityMode,
             postProcessFingerprint: input.postProcessFingerprint,
             postProcessDiscoveryFingerprint: input.postProcessDiscoveryFingerprint,
             postProcessCacheHit: input.postProcessCacheHit,
@@ -928,6 +980,7 @@ export class GraphRebuildPipelineService {
             stageReceipts: input.stageReceipts,
             projectionReceipts: input.projectionReceipts,
             snapshotId: input.snapshot?.id,
+            authorityContract: input.snapshot?.authorityContract,
             counters: input.snapshot?.counters || emptyCounters(),
             dropReasons: input.snapshot?.counters.dropReasons || emptyDropReasons(),
             message: input.message,
@@ -938,6 +991,7 @@ export class GraphRebuildPipelineService {
         receipt: GraphIndexRunReceipt,
         snapshot: GraphRebuildSnapshot | null,
     ): Promise<void> {
+        if (snapshot) assertRunReceiptParity(receipt, snapshot);
         const startedAt = Date.now();
         const uiStage: GraphIndexStageReceipt = {
             id: 'uiCommit',
@@ -968,6 +1022,35 @@ export class GraphRebuildPipelineService {
         receipt.completedAt = Math.max(receipt.completedAt, completedAt);
         receipt.durationMs = receipt.completedAt - receipt.startedAt;
         this.lastReceiptState.set({ ...receipt, stageReceipts: [...receipt.stageReceipts] });
+    }
+
+    private scheduleInteractivePostCommitWork(input: {
+        scope: GraphIndexRunScope;
+        entities: GraphIndexRunRequest['entities'];
+        acceptedNerOccurrences: EntityOccurrence[];
+        relationshipHints: GraphRebuildRelationshipHint[];
+        request: GraphIndexRunRequest;
+        nerCandidates: number;
+    }): void {
+        if (typeof window === 'undefined') return;
+        window.setTimeout(() => {
+            void this.graphRebuild.buildAndPersistSnapshot({
+                scopeKind: input.scope.kind,
+                scopeId: input.scope.scopeId,
+                noteIds: input.scope.noteIds,
+                entities: input.entities,
+                sourceEvidence: { stagedOccurrences: input.acceptedNerOccurrences },
+                relationshipHints: input.relationshipHints,
+                embeddingProfile: embeddingProfileFromModelSelection(input.request.modelSelection),
+                postProcessMode: 'full',
+                durabilityMode: 'diagnostic',
+                embeddingStagePolicy: input.request.embeddingStagePolicy,
+                candidateCount: input.nerCandidates,
+                calendarRegistrySnapshot: input.request.calendarRegistrySnapshot,
+            }).catch((error) => {
+                console.warn('[GraphRebuildPipeline] Post-commit graph enrichment failed', error);
+            });
+        }, 0);
     }
 
     private deferContentCheckpoints(): () => void {
@@ -1041,10 +1124,11 @@ export class GraphRebuildPipelineService {
         }
     }
 
-    private async runNerDeltas(docs: ScopedDocument[]): Promise<Record<string, number>> {
+    private async runNerDeltas(docs: ScopedDocument[]): Promise<GraphNerDeltaResult> {
         let candidates = 0;
         let acceptedAnchors = 0;
         let dropped = 0;
+        const acceptedOccurrences: EntityOccurrence[] = [];
         for (const doc of docs) {
             if (!doc.plainText.trim()) continue;
             await this.ner.runDynamicScan({
@@ -1064,9 +1148,13 @@ export class GraphRebuildPipelineService {
                 });
                 acceptedAnchors += accepted ? 1 : 0;
                 dropped += accepted ? 0 : 1;
+                if (isEntityOccurrence(accepted)) acceptedOccurrences.push(accepted);
             }
         }
-        return { documents: docs.length, candidates, acceptedAnchors, dropped };
+        return {
+            counts: { documents: docs.length, candidates, acceptedAnchors, dropped },
+            acceptedOccurrences,
+        };
     }
 
     private async runCapabilityStage(
@@ -1231,6 +1319,18 @@ export class GraphRebuildPipelineService {
     }
 }
 
+function isEntityOccurrence(value: unknown): value is EntityOccurrence {
+    const row = value && typeof value === 'object'
+        ? value as Partial<EntityOccurrence>
+        : null;
+    return typeof row?.id === 'string'
+        && typeof row.noteId === 'string'
+        && typeof row.entityId === 'string'
+        && typeof row.sourceStart === 'number'
+        && typeof row.sourceEnd === 'number'
+        && typeof row.surface === 'string';
+}
+
 function expandScopeNoteIds(scope: GraphIndexRunScope, docs: ScopedDocument[]): GraphIndexRunScope {
     const loadedNoteIds = docs.map((doc) => doc.id);
     if (scope.kind === 'global') return { ...scope, noteIds: loadedNoteIds };
@@ -1255,9 +1355,17 @@ function appendSnapshotTimingStages(
             snapshotStoreMs: timings.snapshotStoreMs || 0,
             snapshotPrimaryStoreMs: timings.snapshotPrimaryStoreMs || 0,
             snapshotOverGraphStoreMs: timings.snapshotOverGraphStoreMs || 0,
+            snapshotStoreDocuments: timings.snapshotStoreDocuments || 0,
+            snapshotContentBlobReads: timings.snapshotContentBlobReads || 0,
+            snapshotContentBlobManifestTrusted: timings.snapshotContentBlobManifestTrusted || 0,
+            snapshotContentBlobManifestMatches: timings.snapshotContentBlobManifestMatches || 0,
+            snapshotContentBlobManifestMisses: timings.snapshotContentBlobManifestMisses || 0,
+            snapshotWrittenContentBlobs: timings.snapshotWrittenContentBlobs || 0,
+            snapshotReusedContentBlobs: timings.snapshotReusedContentBlobs || 0,
             snapshotSerializeMs: timings.snapshotSerializeMs || 0,
             snapshotPrimaryEncodeMs: timings.snapshotPrimaryEncodeMs || 0,
             snapshotOverGraphEncodeMs: timings.snapshotOverGraphEncodeMs || 0,
+            snapshotOverGraphSkipped: timings.snapshotOverGraphSkipped || 0,
             snapshotPayloadProfileMs: timings.snapshotPayloadProfileMs || 0,
             snapshotPayloadChars: timings.snapshotPayloadChars || 0,
             snapshotPrimaryRawPayloadChars: timings.snapshotPrimaryRawPayloadChars || 0,
@@ -1272,6 +1380,10 @@ function appendSnapshotTimingStages(
             occurrenceLoadMs: timings.occurrenceLoadMs,
             chunkLoadMs: timings.chunkLoadMs,
             noteTextLoadMs: timings.noteTextLoadMs,
+            noteFolderLoadMs: timings.noteFolderLoadMs,
+            previousSnapshotHydrationSkipped: timings.previousSnapshotHydrationSkipped || 0,
+            documentSemanticSkipped: timings.documentSemanticSkipped || 0,
+            nativeChunkerSkipped: timings.nativeChunkerSkipped || 0,
         },
         'Snapshot DB reads and persist timing',
     ));
@@ -1288,15 +1400,47 @@ function appendSnapshotTimingStages(
     stageReceipts.push(instrumentationStage(
         'snapshotCpu',
         'Snapshot CPU',
-        Math.round((timings.nativeCompilerMs || 0) + timings.occurrenceRecoverMs + timings.snapshotBuildMs),
+        Math.round(
+            (timings.nativeCompilerMs || 0)
+            + timings.occurrenceRecoverMs
+            + timings.snapshotBuildMs
+            + (timings.authoritySealMs || 0)
+            + (timings.authorityAssertMs || 0),
+        ),
         {
             occurrenceRecoverMs: timings.occurrenceRecoverMs,
             snapshotBuildMs: timings.snapshotBuildMs,
             nativeCompilerMs: timings.nativeCompilerMs || 0,
+            nativeCompilerSkipped: timings.nativeCompilerSkipped || 0,
+            tsAtlasPacketParity: timings.tsAtlasPacketParity || 0,
+            authoritySealMs: timings.authoritySealMs || 0,
+            authorityAssertMs: timings.authorityAssertMs || 0,
             serviceStateCommitMs: timings.stateCommitMs,
             totalBuildMs: timings.totalMs,
         },
         'Graph rebuild CPU and service state timing',
+    ));
+    const inputFamilies = timings.nativeCompilerInputBytesByFamily || {};
+    const targetFamilies = timings.nativeTargetsByOriginatingFamily || {};
+    stageReceipts.push(instrumentationStage(
+        'nativeCompilerBoundary',
+        'Native Compiler Boundary',
+        Math.round(timings.nativeCompilerMs || 0),
+        {
+            nativeCompilerInputBytes: Object.values(inputFamilies).reduce((sum, value) => sum + value, 0),
+            nativeCompilerSkipped: timings.nativeCompilerSkipped || 0,
+            tsAtlasPacketParity: timings.tsAtlasPacketParity || 0,
+            nativeAtlasSeedRawBytes: timings.nativeAtlasSeedRawBytes || 0,
+            nativeAtlasSeedCompressedBytes: timings.nativeAtlasSeedCompressedBytes || 0,
+            nativeTargets: Object.values(targetFamilies).reduce((sum, value) => sum + value, 0),
+            ...Object.fromEntries(Object.entries(inputFamilies).map(([family, bytes]) =>
+                [`compilerInput.${family}.bytes`, bytes],
+            )),
+            ...Object.fromEntries(Object.entries(targetFamilies).map(([family, count]) =>
+                [`nativeTargets.${family}`, count],
+            )),
+        },
+        'Compiler request bytes and admitted native targets by originating family',
     ));
 }
 
@@ -1604,12 +1748,30 @@ function appendSignalCoverageStages(
 }
 
 function appendGraphTruthContractStage(stageReceipts: GraphIndexStageReceipt[], snapshot: GraphRebuildSnapshot): void {
+    const contract = assertGraphSnapshotAuthority(snapshot);
+    const counts = contract.counts;
     stageReceipts.push(instrumentationStage(
-        'graphTruthContract',
-        'Graph Truth Contract',
+        'snapshotAuthorityContract',
+        'Snapshot Authority Contract',
         0,
-        graphSignalTruthCounters(snapshot),
-        'Canonical graph signal status contract shared by every projection',
+        {
+            authorityParity: 1,
+            chunks: counts.chunks,
+            mentions: counts.mentions,
+            anchors: counts.anchors,
+            relationships: counts.relationships,
+            temporalEdges: counts.temporalEdges,
+            causalEdges: counts.causalEdges,
+            coreferenceRecoveries: counts.coreferenceRecoveries,
+            nodes: counts.nodes,
+            edges: counts.edges,
+            embeddingTargets: counts.embeddingTargets,
+            admittedEmbeddingTargets: counts.admittedEmbeddingTargets,
+            packetObjects: counts.packetObjects,
+            packetTargets: counts.packetTargets,
+            packetParentLinks: counts.packetParentLinks,
+        },
+        `${contract.authority} / ${contract.contentHash}`,
     ));
 }
 
@@ -1702,7 +1864,7 @@ function appendSemanticAdjudicationStage(stageReceipts: GraphIndexStageReceipt[]
     stageReceipts.push(instrumentationStage(
         'semanticAdjudicationDag',
         'Semantic Adjudication DAG',
-        summary.counters.appliedMutationCount,
+        summary.counters.mutationCount,
         {
             decisions: summary.counters.decisionCount,
             mutations: summary.counters.mutationCount,
@@ -1716,7 +1878,7 @@ function appendSemanticAdjudicationStage(stageReceipts: GraphIndexStageReceipt[]
             invalidated: summary.counters.byState['invalidated'] || 0,
             superseded: summary.counters.byState['superseded'] || 0,
         },
-        'Phase 5 reversible adjudication DAG committed accepted safe topology mutations; ledger-only rows did not poison the graph',
+        'Accepted semantic topology is applied by the explicit TypeScript compatibility containment lane until the desktop GraphTruthCommit bridge is available',
     ));
 }
 
@@ -1994,7 +2156,7 @@ function signalCandidatePlanStage(input: {
     docs: ScopedDocument[];
     entities: Array<{ id: string }>;
     cachedSnapshot: GraphRebuildSnapshot | null | undefined;
-    fallbackOccurrences?: unknown[];
+    sourceEvidenceOccurrences?: unknown[];
 }): GraphIndexStageReceipt {
     const discovery = input.discoveryStage.counters || {};
     const discoveryCandidates = discovery['candidateSuggestions'] || discovery['suggestions'] || discovery['candidates'] || 0;
@@ -2018,7 +2180,7 @@ function signalCandidatePlanStage(input: {
             priorAnchors: prior?.counters.acceptedAnchors || 0,
             priorGraphLinks: prior?.counters.graphAwareLinkSuggestions || 0,
             priorEntityLinks: prior?.counters.entityLinkSuggestions || 0,
-            fallbackAnchors: input.fallbackOccurrences?.length || 0,
+            sourceEvidenceAnchors: input.sourceEvidenceOccurrences?.length || 0,
             plannedModelCalls: 0,
         },
         'Candidate ledger ready for label-conditioned signal adjudication',
@@ -2081,6 +2243,7 @@ function snapshotOwnedProjectionReceipt(
 ): GraphIndexProjectionReceipt {
     const now = Date.now();
     const targetCount = snapshot?.counters.embeddingTargets || 0;
+    const contract = snapshot ? assertGraphSnapshotAuthority(snapshot) : undefined;
     return {
         mode,
         status: 'synced',
@@ -2089,6 +2252,8 @@ function snapshotOwnedProjectionReceipt(
         durationMs: 0,
         targetCount,
         vectorCount: targetCount,
+        snapshotId: contract?.snapshotId,
+        snapshotHash: contract?.contentHash,
         counters: {
             graphRebuildTargets: targetCount,
             graphRebuildReadModelProjection: 1,
@@ -2096,6 +2261,43 @@ function snapshotOwnedProjectionReceipt(
         },
         message: 'Graph-rebuild snapshot projection synced; native Semantic Atlas sidecar bypassed because the snapshot owns postprocess topology',
     };
+}
+
+export function assertRunReceiptParity(receipt: GraphIndexRunReceipt, snapshot: GraphRebuildSnapshot): void {
+    const contract = assertGraphSnapshotAuthority(snapshot);
+    const issues: string[] = [];
+    if (receipt.snapshotId !== contract.snapshotId) issues.push('snapshot id');
+    const receiptCounts = receipt.counters;
+    const expected = contract.counts;
+    const countPairs: Array<[string, number, number]> = [
+        ['chunks', receiptCounts.chunks, expected.chunks],
+        ['mentions', receiptCounts.mentions, expected.mentions],
+        ['anchors', receiptCounts.acceptedAnchors, expected.anchors],
+        ['relationships', receiptCounts.relationships, expected.relationships],
+        ['temporal edges', receiptCounts.temporalEdges, expected.temporalEdges],
+        ['causal edges', receiptCounts.causalEdges, expected.causalEdges],
+        ['nodes', receiptCounts.nodes, expected.nodes],
+        ['edges', receiptCounts.edges, expected.edges],
+        ['embedding targets', receiptCounts.embeddingTargets, expected.embeddingTargets],
+    ];
+    for (const [label, actual, required] of countPairs) {
+        if (actual !== required) issues.push(`${label} ${actual} != ${required}`);
+    }
+    const authorityStage = receipt.stageReceipts.find((stage) => stage.id === 'snapshotAuthorityContract');
+    if (!authorityStage || authorityStage.status !== 'completed' || authorityStage.counters['authorityParity'] !== 1) {
+        issues.push('snapshot authority stage');
+    }
+    for (const projection of receipt.projectionReceipts) {
+        if (projection.targetCount !== expected.embeddingTargets) {
+            issues.push(`${projection.mode} targets ${projection.targetCount} != ${expected.embeddingTargets}`);
+        }
+        projection.snapshotId = contract.snapshotId;
+        projection.snapshotHash = contract.contentHash;
+    }
+    if (issues.length) {
+        throw new Error(`Graph run receipt parity failed for ${snapshot.id}: ${issues.join(', ')}`);
+    }
+    receipt.authorityContract = contract;
 }
 
 function atlasScopeFromGraphScope(scope: GraphIndexRunScope): AtlasBuildScope {
@@ -2124,6 +2326,26 @@ function appendStagedNativeScenePacketSkippedStage(
             cleanGraphEdges: snapshot.counters.edges || 0,
         },
         'Skipped during postprocess; native scene-packet benchmarks must not block UI commit',
+    ));
+}
+
+function appendInteractivePostCommitStage(
+    stageReceipts: GraphIndexStageReceipt[],
+    snapshot: GraphRebuildSnapshot,
+): void {
+    stageReceipts.push(instrumentationStage(
+        'interactivePostCommitEnrichment',
+        'Post-Commit Enrichment',
+        0,
+        {
+            scheduledAfterUiCommit: 1,
+            nativeCompilerDeferred: snapshot.buildTimings?.nativeCompilerSkipped ? 1 : 0,
+            diagnosticArmsDeferred: 1,
+            packetObjects: snapshot.atlasPacket?.objects.length || 0,
+            packetTargets: snapshot.atlasPacket?.manifoldTargets.length || 0,
+            tsPacketParity: snapshot.buildTimings?.tsAtlasPacketParity || 0,
+        },
+        'Native enrichment plus MemoryGraphRAG/discourse diagnostics are scheduled outside the interactive UI path',
     ));
 }
 

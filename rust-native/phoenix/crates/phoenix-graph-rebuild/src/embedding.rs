@@ -8,7 +8,10 @@ use crate::types::{
 };
 
 mod snapshot_targets;
-pub use snapshot_targets::build_snapshot_embedding_targets;
+pub use snapshot_targets::{
+    build_snapshot_embedding_target_report, build_snapshot_embedding_targets,
+    GraphEmbeddingTargetBuild, GraphEmbeddingTargetOriginCount,
+};
 
 pub fn build_embedding_targets(
     note_id: &str,

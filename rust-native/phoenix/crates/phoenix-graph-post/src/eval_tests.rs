@@ -138,6 +138,7 @@ fn no_soft_ablation_removes_same_slot_family_region_widening() {
         valid_at: None,
         recorded_at: None,
         include_candidate_graph: true,
+        truth_plane: crate::api::GraphTruthPlane::WorldState,
         seed_limit: 4,
         oversample: 8,
         expansion_hops: 2,

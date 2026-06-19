@@ -9,9 +9,10 @@ use phoenix_alex::Lexicon;
 use phoenix_causality::{CausalityLowerer, CausalityRequest, SemanticLowerer};
 use phoenix_chunker_native::{build_chunks, ChunkerConfig};
 use phoenix_kernel::{
-    entity_sidecar_from_snapshot, KernelEdge, KernelEdgeType, KernelEntityFacet,
-    KernelEntitySidecar, KernelGraphLayer, KernelGraphSnapshot, KernelMutationBatch,
-    KernelMutationScope, KernelProvenance, KernelResolutionFacet, KernelVertex, KernelVertexId,
+    entity_sidecar_from_snapshot, GraphTruthCommit, KernelEdge, KernelEdgeType, KernelEntityFacet,
+    KernelEntitySidecar, KernelGraphLayer, KernelGraphSnapshot, KernelJournalEntry,
+    KernelMutationBatch, KernelMutationScope, KernelProvenance, KernelRelationClass,
+    KernelResolutionFacet, KernelVertex, KernelVertexClass, KernelVertexId,
 };
 use phoenix_machine::{
     MachineConfig, MachineExtractionConfig, SurfaceCompileArtifacts, SurfaceCompiler,
@@ -35,17 +36,20 @@ use phoenix_semantic_v2::{
     TemporalTruthStatus, TemporalWorldlineId,
 };
 use phoenix_store_native_core::{
-    BundleHeader, BundleKey, BundleKind, PhoenixArchiveStoreV2, PhoenixBundleStoreV2, StoreError,
+    BundleHeader, BundleKey, BundleKind, PhoenixArchiveStoreV2, PhoenixBundleStoreV2,
+    PhoenixGraphKernelStoreV2, PreparedDocumentPersistTelemetry, StoreError,
 };
 use phoenix_time::TimeKernel;
 use phoenix_types::{
     BiTemporalWindow, BoundaryKind, ChunkSpan, Diagnostic, DocumentId, EntityId, EntityKind,
-    EvidenceSpan, FrameSlot, IndexedSpan, IndexedTextField, IngestDocument, IngestDocumentSummary,
-    IngestResult, KnownMatch, KnownMatchSource, LexicalField, LexiconEntry, MentionEntityRef,
-    MentionSource, MentionSpan, NarrativeVerbHit, PosTag, RelationCandidate, ResolverEntitySeed,
-    ResolverLink, ResolverLinkKind, ScanArtifact, ScopeKey, SemanticNodeRef, SentenceFrame,
-    SentenceSpan, SessionDocumentState, SessionId, StructureArtifact, TextRange, TokenClass,
-    TokenSpan, VerbFrame,
+    EvidenceSpan, FrameSlot, GraphTruthCommitHeader, GraphTruthCompilerPolicy,
+    GraphTruthDescriptor, GraphTruthDigest, GraphTruthKind, GraphTruthOperation,
+    GraphTruthSourceGenerationRef, IndexedSpan, IndexedTextField, IngestDocument,
+    IngestDocumentSummary, IngestResult, KnownMatch, KnownMatchSource, LexicalField, LexiconEntry,
+    MentionEntityRef, MentionSource, MentionSpan, NarrativeVerbHit, PosTag, RelationCandidate,
+    ResolverEntitySeed, ResolverLink, ResolverLinkKind, ScanArtifact, ScopeKey, SemanticNodeRef,
+    SentenceFrame, SentenceSpan, SessionDocumentState, SessionId, StructureArtifact, TextRange,
+    TokenClass, TokenSpan, VerbFrame,
 };
 use rayon::prelude::*;
 use rustc_hash::{FxHashMap, FxHashSet};
@@ -66,7 +70,10 @@ use thiserror::Error;
 
 mod bench;
 
-pub use bench::{IngestBenchmarkCounts, IngestBenchmarkReport};
+pub use bench::{
+    IngestBenchmarkCounts, IngestBenchmarkReport, NativeGraphTruthAuditBytes,
+    NativeGraphTruthAuditCounts, NativeGraphTruthAuditReport, NativeGraphTruthAuditTimings,
+};
 
 #[cfg(feature = "background-verifier")]
 use gliner::model::input::text::TextInput;
@@ -201,6 +208,30 @@ fn encode_segment_payload<T: Serialize>(value: &T) -> Result<(Vec<u8>, usize), S
         rmp_serde::to_vec_named(value).map_err(|error| StoreError::Query(error.to_string()))?;
     let uncompressed_len = payload.len();
     Ok((compress_prepend_size(&payload), uncompressed_len))
+}
+
+struct EncodedPreparedSegment {
+    kind: DocumentSegmentKind,
+    row_count: usize,
+    payload: Vec<u8>,
+    uncompressed_len: usize,
+    wall_ms: u128,
+}
+
+fn encode_prepared_segment<T: Serialize>(
+    kind: DocumentSegmentKind,
+    row_count: usize,
+    value: &T,
+) -> Result<EncodedPreparedSegment, StoreError> {
+    let started = Instant::now();
+    let (payload, uncompressed_len) = encode_segment_payload(value)?;
+    Ok(EncodedPreparedSegment {
+        kind,
+        row_count,
+        payload,
+        uncompressed_len,
+        wall_ms: started.elapsed().as_millis(),
+    })
 }
 
 fn document_archive_header(
@@ -1697,7 +1728,9 @@ fn build_native_structure_rows(
     scan: &NativeScanRows,
     chunks: &[ChunkRecord],
 ) -> NativeStructureRows {
+    let progress = native_progress_enabled();
     let relation_canonical_mentions = build_relation_canonical_mentions(scan);
+    let structure_started = Instant::now();
     let structure = SurfaceCompiler::default().compatibility_structure_parts(
         text,
         &ScanArtifact {
@@ -1711,17 +1744,34 @@ fn build_native_structure_rows(
             diagnostics: Vec::new(),
         },
     );
+    if progress {
+        eprintln!(
+            "[runtime-ingest] structure_subphase=machine_structure wall_ms={} relations={} sentences={} mentions={}",
+            structure_started.elapsed().as_millis(),
+            structure.relations.len(),
+            scan.sentences.len(),
+            scan.mentions.len(),
+        );
+    }
+    let mention_indexes = mention_indexes_by_sentence(scan.sentences.len(), &scan.mentions);
+    let seed_started = Instant::now();
     let mut relation_seeds = Vec::with_capacity(structure.relations.len());
-    for relation in &structure.relations {
-        let mut subject_mention_ix = relation
-            .subject
-            .as_ref()
-            .and_then(|slot| native_slot_mention_index(scan, relation.sentence_index, slot));
+    for (relation_ix, relation) in structure.relations.iter().enumerate() {
+        let hit_index = scan
+            .narrative_hits
+            .get(relation_ix)
+            .filter(|hit| native_relation_hit_matches_candidate(hit, relation))
+            .map(|_| relation_ix);
+        let mut subject_mention_ix = relation.subject.as_ref().and_then(|slot| {
+            native_slot_mention_index(scan, &mention_indexes, relation.sentence_index, slot)
+        });
         let mut object_mention_ix = relation
             .object
             .as_ref()
             .or(relation.recipient.as_ref())
-            .and_then(|slot| native_slot_mention_index(scan, relation.sentence_index, slot));
+            .and_then(|slot| {
+                native_slot_mention_index(scan, &mention_indexes, relation.sentence_index, slot)
+            });
         if let (Some(subject_ix), Some(object_ix)) = (subject_mention_ix, object_mention_ix) {
             if relation_mentions_collapse_to_same_entity(
                 scan,
@@ -1736,26 +1786,63 @@ fn build_native_structure_rows(
         relation_seeds.push(NativeRelationSeed {
             sentence_index: relation.sentence_index,
             relation_type: relation.relation_type.clone(),
+            hit_index,
             subject_mention_ix,
             object_mention_ix,
         });
     }
+    if progress {
+        eprintln!(
+            "[runtime-ingest] structure_subphase=relation_seed_rows wall_ms={} relation_seeds={}",
+            seed_started.elapsed().as_millis(),
+            relation_seeds.len(),
+        );
+    }
 
+    let chunk_index_started = Instant::now();
+    let sentence_chunk_indexes = sentence_chunk_indexes(&scan.sentences, chunks);
+    if progress {
+        eprintln!(
+            "[runtime-ingest] structure_subphase=sentence_chunk_indexes wall_ms={} sentences={} chunks={}",
+            chunk_index_started.elapsed().as_millis(),
+            scan.sentences.len(),
+            chunks.len(),
+        );
+    }
     NativeStructureRows {
         relation_seeds,
-        sentence_chunk_indexes: sentence_chunk_indexes(&scan.sentences, chunks),
+        sentence_chunk_indexes,
     }
+}
+
+fn mention_indexes_by_sentence(
+    sentence_count: usize,
+    mentions: &[MentionSpan],
+) -> Vec<SmallVec<[usize; 4]>> {
+    let mut indexes = vec![SmallVec::<[usize; 4]>::new(); sentence_count];
+    for (mention_ix, mention) in mentions.iter().enumerate() {
+        if let Some(sentence_indexes) = indexes.get_mut(mention.sentence_index) {
+            sentence_indexes.push(mention_ix);
+        }
+    }
+    indexes
 }
 
 fn native_slot_mention_index(
     scan: &NativeScanRows,
+    mention_indexes: &[SmallVec<[usize; 4]>],
     sentence_index: usize,
     slot: &FrameSlot,
 ) -> Option<usize> {
-    scan.mentions
+    mention_indexes
+        .get(sentence_index)?
         .iter()
-        .enumerate()
-        .filter(|(_, mention)| mention.sentence_index == sentence_index)
+        .copied()
+        .filter_map(|mention_ix| {
+            scan.mentions
+                .get(mention_ix)
+                .map(|mention| (mention_ix, mention))
+        })
         .filter(|(_, mention)| ranges_overlap(mention.range, slot.range))
         .max_by_key(|(_, mention)| {
             (
@@ -4807,7 +4894,7 @@ fn build_semantic_records_native(
         diagnostics.push(Diagnostic {
             code: "er_relation_skipped_unresolved_entity".to_owned(),
             message: format!(
-                "Skipped {} asserted relations because one or more arguments stayed unresolved.",
+                "Skipped {} semantic relation candidates because one or more arguments stayed unresolved.",
                 unresolved_relation_count
             ),
         });
@@ -4816,7 +4903,7 @@ fn build_semantic_records_native(
         diagnostics.push(Diagnostic {
             code: "er_relation_skipped_same_entity".to_owned(),
             message: format!(
-                "Skipped {} asserted relations because both arguments resolved to the same entity.",
+                "Skipped {} semantic relation candidates because both arguments resolved to the same entity.",
                 self_relation_count
             ),
         });
@@ -4825,7 +4912,7 @@ fn build_semantic_records_native(
         diagnostics.push(Diagnostic {
             code: "er_relation_skipped_low_quality_relates_to".to_owned(),
             message: format!(
-                "Skipped {} asserted relates_to edges because one or more arguments were too weak to promote into archive truth.",
+                "Skipped {} relates_to candidates because one or more arguments were too weak for semantic candidate materialization.",
                 low_quality_relates_count
             ),
         });
@@ -5131,6 +5218,86 @@ fn build_coref_candidate_batch(
     })
 }
 
+fn build_semantic_relation_candidate_batch(
+    document: &IngestDocument,
+    relations: &[SemanticRelationRecord],
+) -> Option<KernelMutationBatch> {
+    if relations.is_empty() {
+        return None;
+    }
+    let scope_key = scope_storage_key(&document.scope);
+    let note_id = document.note_id.as_ref().map(|note_id| note_id.0.clone());
+    let mut edges = Vec::with_capacity(relations.len());
+    for relation in relations {
+        let mut evidence_refs = Vec::new();
+        if let Some(chunk_id) = relation.chunk_id.clone() {
+            evidence_refs.push(chunk_id);
+        }
+        edges.push(KernelEdge {
+            source_id: KernelVertexId(format!("entity::{}", relation.source_entity_id.0)),
+            target_id: KernelVertexId(format!("entity::{}", relation.target_entity_id.0)),
+            edge_type: KernelEdgeType(relation.edge_type.clone()),
+            relation_class: KernelRelationClass::Semantic,
+            weight: 1,
+            attributes: json!({
+                "documentId": document.document_id.0,
+                "sentenceIndex": relation.sentence_index,
+                "scopeKey": scope_key,
+                "truthStatus": "candidate",
+            }),
+            document_id: Some(document.document_id.0.clone()),
+            note_id: note_id.clone(),
+            narrative_id: document.scope.narrative_id.clone(),
+            folder_id: document.scope.folder_id.clone(),
+            folder_path: document.scope.folder_path.clone(),
+            provenance: KernelProvenance {
+                resolver: Some("native_relation_extractor".to_owned()),
+                source: Some("semantic_relation_candidate".to_owned()),
+                confidence: Some(0.5),
+                evidence_refs,
+            },
+            layer: KernelGraphLayer::Candidate,
+            ..KernelEdge::default()
+        });
+    }
+    edges.sort_by(|left, right| {
+        left.source_id
+            .0
+            .cmp(&right.source_id.0)
+            .then_with(|| left.target_id.0.cmp(&right.target_id.0))
+            .then_with(|| left.edge_type.0.cmp(&right.edge_type.0))
+    });
+    Some(KernelMutationBatch {
+        layer: KernelGraphLayer::Candidate,
+        scope: KernelMutationScope::Candidate { scope_key },
+        recorded_at: None,
+        vertices: Vec::new(),
+        edges,
+    })
+}
+
+fn merge_candidate_batches(
+    left: Option<KernelMutationBatch>,
+    right: Option<KernelMutationBatch>,
+) -> Option<KernelMutationBatch> {
+    match (left, right) {
+        (None, None) => None,
+        (Some(batch), None) | (None, Some(batch)) => Some(batch),
+        (Some(mut left), Some(right)) => {
+            left.vertices.extend(right.vertices);
+            left.edges.extend(right.edges);
+            left.edges.sort_by(|a, b| {
+                a.source_id
+                    .0
+                    .cmp(&b.source_id.0)
+                    .then_with(|| a.target_id.0.cmp(&b.target_id.0))
+                    .then_with(|| a.edge_type.0.cmp(&b.edge_type.0))
+            });
+            Some(left)
+        }
+    }
+}
+
 #[cfg(feature = "background-verifier")]
 fn expected_kind_from_label(label: &str) -> Option<EntityKind> {
     match label {
@@ -5381,8 +5548,8 @@ fn build_kernel_batch(
     document: &IngestDocument,
     chunks: &[ChunkRecord],
     entities: &[SemanticEntityRecord],
-    relations: &[SemanticRelationRecord],
     alias_confirmations: &[AliasConfirmation],
+    created_at: i64,
 ) -> KernelMutationBatch {
     let mut vertices = Vec::new();
     let mut edges = Vec::new();
@@ -5395,6 +5562,7 @@ fn build_kernel_batch(
     vertices.push(KernelVertex {
         id: KernelVertexId(document_vertex_id.clone()),
         kind: "document".to_owned(),
+        class: KernelVertexClass::Document,
         labels: vec!["document".to_owned()],
         weight: 1,
         value: json!({ "title": document.title }),
@@ -5417,6 +5585,7 @@ fn build_kernel_batch(
         vertices.push(KernelVertex {
             id: KernelVertexId(chunk.chunk_id.0.clone()),
             kind: "chunk".to_owned(),
+            class: KernelVertexClass::Chunk,
             labels: vec!["chunk".to_owned()],
             weight: 1,
             value: json!({ "text": chunk.text }),
@@ -5442,6 +5611,7 @@ fn build_kernel_batch(
             source_id: KernelVertexId(document_vertex_id.clone()),
             target_id: KernelVertexId(chunk.chunk_id.0.clone()),
             edge_type: KernelEdgeType("contains".to_owned()),
+            relation_class: KernelRelationClass::Structural,
             weight: 1,
             attributes: json!({ "documentId": document.document_id.0, "scopeKey": scope_key }),
             document_id: Some(document.document_id.0.clone()),
@@ -5459,6 +5629,7 @@ fn build_kernel_batch(
         vertices.push(KernelVertex {
             id: KernelVertexId(entity_vertex_id.clone()),
             kind: "entity".to_owned(),
+            class: KernelVertexClass::Entity,
             labels: vec!["entity".to_owned()],
             weight: entity.mention_count.max(1) as i64,
             value: json!({ "name": entity.canonical_name, "aliases": entity.aliases }),
@@ -5475,12 +5646,18 @@ fn build_kernel_batch(
             folder_path: folder_path.clone(),
             chapter_id: Some(0),
             chapters: vec![0],
+            entity_facet: Some(KernelEntityFacet {
+                canonical_entity_id: Some(entity.entity_id.0.clone()),
+                surface: Some(entity.canonical_name.clone()),
+                entity_kind: entity.kind.as_ref().map(|kind| format!("{kind:?}")),
+            }),
             ..KernelVertex::default()
         });
         edges.push(KernelEdge {
             source_id: KernelVertexId(document_vertex_id.clone()),
             target_id: KernelVertexId(entity_vertex_id.clone()),
             edge_type: KernelEdgeType("entity".to_owned()),
+            relation_class: KernelRelationClass::Identity,
             weight: entity.mention_count.max(1) as i64,
             attributes: json!({ "documentId": document.document_id.0, "scopeKey": scope_key }),
             document_id: Some(document.document_id.0.clone()),
@@ -5501,6 +5678,7 @@ fn build_kernel_batch(
         vertices.push(KernelVertex {
             id: KernelVertexId(alias_vertex_id.clone()),
             kind: "alias".to_owned(),
+            class: KernelVertexClass::Alias,
             labels: vec!["alias".to_owned()],
             weight: 1,
             value: json!({ "name": confirmation.alias_surface }),
@@ -5521,6 +5699,7 @@ fn build_kernel_batch(
             source_id: KernelVertexId(alias_vertex_id),
             target_id: KernelVertexId(format!("entity::{}", confirmation.entity_id.0)),
             edge_type: KernelEdgeType("alias_of".to_owned()),
+            relation_class: KernelRelationClass::Identity,
             weight: confirmation.confidence_millis.max(1) as i64,
             attributes: json!({ "documentId": document.document_id.0, "scopeKey": scope_key }),
             document_id: Some(document.document_id.0.clone()),
@@ -5545,33 +5724,12 @@ fn build_kernel_batch(
         });
     }
 
-    for relation in relations {
-        edges.push(KernelEdge {
-            source_id: KernelVertexId(format!("entity::{}", relation.source_entity_id.0)),
-            target_id: KernelVertexId(format!("entity::{}", relation.target_entity_id.0)),
-            edge_type: KernelEdgeType(relation.edge_type.clone()),
-            weight: 1,
-            attributes: json!({
-                "documentId": document.document_id.0,
-                "sentenceIndex": relation.sentence_index,
-                "scopeKey": scope_key,
-            }),
-            document_id: Some(document.document_id.0.clone()),
-            note_id: note_id.clone(),
-            narrative_id: narrative_id.clone(),
-            folder_id: folder_id.clone(),
-            folder_path: folder_path.clone(),
-            layer: KernelGraphLayer::Asserted,
-            ..KernelEdge::default()
-        });
-    }
-
     KernelMutationBatch {
         layer: KernelGraphLayer::Asserted,
         scope: KernelMutationScope::Document {
             document_id: document.document_id.0.clone(),
         },
-        recorded_at: None,
+        recorded_at: Some(created_at),
         vertices,
         edges,
     }
@@ -5837,7 +5995,7 @@ fn is_front_matter_label(label: &str) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use phoenix_kernel::KernelVertexClass;
+    use phoenix_kernel::{DeterministicKernel, KernelVertexClass};
     use phoenix_machine::SurfaceCompiler;
     use phoenix_store_native_core::PhoenixGraphKernelStoreV2;
     use phoenix_store_overgraph::PhoenixOvergraphStore;
@@ -5853,6 +6011,56 @@ mod tests {
                 .expect("time")
                 .as_nanos()
         ))
+    }
+
+    fn asserted_atlas_hash(snapshot: &KernelGraphSnapshot) -> GraphTruthDigest {
+        let mut lanes = [
+            0x243f_6a88_85a3_08d3_u64,
+            0x1319_8a2e_0370_7344_u64,
+            0xa409_3822_299f_31d0_u64,
+            0x082e_fa98_ec4e_6c89_u64,
+        ];
+        let mut vertices = snapshot.vertices.iter().collect::<Vec<_>>();
+        vertices.sort_by(|left, right| left.id.0.cmp(&right.id.0));
+        for vertex in vertices {
+            mix_digest(&mut lanes, vertex.id.0.as_bytes());
+            mix_digest(&mut lanes, vertex.kind.as_bytes());
+            mix_digest(&mut lanes, format!("{:?}", vertex.class).as_bytes());
+            if let Some(entity_id) = vertex.entity_id.as_deref() {
+                mix_digest(&mut lanes, entity_id.as_bytes());
+            }
+            if let Some(chunk_id) = vertex.search_chunk_id.as_deref() {
+                mix_digest(&mut lanes, chunk_id.as_bytes());
+            }
+        }
+        let mut edges = snapshot.asserted_edges.iter().collect::<Vec<_>>();
+        edges.sort_by(|left, right| {
+            left.source_id
+                .0
+                .cmp(&right.source_id.0)
+                .then_with(|| left.target_id.0.cmp(&right.target_id.0))
+                .then_with(|| left.edge_type.0.cmp(&right.edge_type.0))
+        });
+        for edge in edges {
+            mix_digest(&mut lanes, edge.source_id.0.as_bytes());
+            mix_digest(&mut lanes, edge.target_id.0.as_bytes());
+            mix_digest(&mut lanes, edge.edge_type.0.as_bytes());
+            mix_digest(&mut lanes, format!("{:?}", edge.relation_class).as_bytes());
+        }
+        let mut bytes = [0u8; 32];
+        for (index, value) in lanes.into_iter().enumerate() {
+            bytes[index * 8..(index + 1) * 8].copy_from_slice(&value.to_le_bytes());
+        }
+        GraphTruthDigest(bytes)
+    }
+
+    fn replay_journal_hash(entries: Vec<phoenix_kernel::KernelJournalEntry>) -> GraphTruthDigest {
+        let kernel = DeterministicKernel::default();
+        for entry in entries {
+            let batch = entry.batch.expect("hydrated truth commit batch");
+            kernel.apply_batch(batch).expect("replay batch");
+        }
+        asserted_atlas_hash(&kernel.snapshot())
     }
 
     fn native_relation_outputs(
@@ -6357,7 +6565,8 @@ mod tests {
 
     #[test]
     fn ingest_native_round_trips_overgraph_store() {
-        let store = PhoenixOvergraphStore::open(temp_path("native-archives")).expect("store");
+        let store_path = temp_path("native-archives");
+        let store = PhoenixOvergraphStore::open(store_path.clone()).expect("store");
         store.init_archive_schema().expect("archive schema");
         store.init_graph_kernel_schema().expect("kernel schema");
         store
@@ -6375,12 +6584,12 @@ mod tests {
             document_id: DocumentId("doc-native-1".to_owned()),
             note_id: Some(NoteId("note-native-1".to_owned())),
             title: "Native Harbor".to_owned(),
-            text: "Ryan met Len at the harbor.".to_owned(),
+            text: "Luffy attacked Zoro at the harbor.".to_owned(),
             scope: ScopeKey::default(),
         };
 
         let context = store
-            .prepare_ingest_context(Some(&session_id), &[document.clone()], 0)
+            .prepare_ingest_context(Some(&session_id), std::slice::from_ref(&document), 0)
             .expect("prepare context");
         assert!(context.kernel_snapshot.is_some());
         assert_eq!(context.assignments.len(), 1);
@@ -6391,6 +6600,40 @@ mod tests {
         assert_eq!(ingest.document_count, 1);
         assert_eq!(artifacts.document_refs.len(), 1);
         assert_eq!(store.list_dirty_scopes().expect("dirty scopes").len(), 1);
+        assert!(artifacts.kernel_batches.iter().any(|batch| {
+            batch.layer == KernelGraphLayer::Candidate
+                && batch.edges.iter().any(|edge| {
+                    edge.relation_class == KernelRelationClass::Semantic
+                        && edge.edge_type.0 == "attacks"
+                })
+        }));
+
+        let commits = store.load_graph_truth_commits().expect("truth commits");
+        assert_eq!(commits.len(), 2);
+        assert!(commits
+            .iter()
+            .any(|commit| commit.header.truth.kind == GraphTruthKind::Structural));
+        assert!(commits
+            .iter()
+            .any(|commit| commit.header.truth.kind == GraphTruthKind::Identity));
+        assert_eq!(store.kernel_current_generation().expect("generation"), 3);
+
+        let live_snapshot = store
+            .prepare_ingest_context(None, &[], 1)
+            .expect("live context")
+            .kernel_snapshot
+            .expect("live snapshot");
+        assert!(live_snapshot.asserted_edges.iter().any(|edge| {
+            edge.relation_class == KernelRelationClass::Structural && edge.edge_type.0 == "contains"
+        }));
+        assert!(live_snapshot.asserted_edges.iter().any(|edge| {
+            edge.relation_class == KernelRelationClass::Identity && edge.edge_type.0 == "entity"
+        }));
+        assert!(!live_snapshot
+            .asserted_edges
+            .iter()
+            .any(|edge| edge.relation_class == KernelRelationClass::Semantic));
+        let live_hash = asserted_atlas_hash(&live_snapshot);
 
         let manifest = store
             .load_document_manifest(&artifacts.document_refs[0])
@@ -6440,6 +6683,46 @@ mod tests {
             .expect("session present");
         assert_eq!(loaded_session.documents.len(), 1);
         assert_eq!(loaded_session.document_refs.len(), 1);
+        drop(store);
+
+        let reopened = PhoenixOvergraphStore::open(store_path.clone()).expect("reopen store");
+        reopened
+            .init_graph_kernel_schema()
+            .expect("reopen kernel schema");
+        let replay_entries = reopened
+            .load_kernel_journal_after(1)
+            .expect("journal after seed");
+        assert_eq!(replay_entries.len(), 2);
+        assert_eq!(replay_journal_hash(replay_entries), live_hash);
+
+        let checkpoint_snapshot = reopened
+            .prepare_ingest_context(None, &[], 1)
+            .expect("checkpoint context")
+            .kernel_snapshot
+            .expect("checkpoint snapshot");
+        let checkpoint_generation = reopened
+            .kernel_current_generation()
+            .expect("checkpoint generation");
+        reopened
+            .write_kernel_checkpoint(
+                checkpoint_generation,
+                "native-ingest-truth",
+                &checkpoint_snapshot,
+            )
+            .expect("write checkpoint");
+        drop(reopened);
+
+        let checkpointed = PhoenixOvergraphStore::open(store_path).expect("checkpoint reopen");
+        let checkpoint = checkpointed
+            .load_kernel_checkpoint()
+            .expect("load checkpoint")
+            .expect("checkpoint present");
+        assert_eq!(checkpoint.meta.generation, checkpoint_generation);
+        assert_eq!(asserted_atlas_hash(&checkpoint.snapshot), live_hash);
+        assert!(checkpointed
+            .load_kernel_journal_after(checkpoint_generation)
+            .expect("journal after checkpoint")
+            .is_empty());
     }
 
     #[test]
@@ -7063,6 +7346,7 @@ struct NativeScanRows {
 struct NativeRelationSeed {
     sentence_index: usize,
     relation_type: String,
+    hit_index: Option<usize>,
     subject_mention_ix: Option<usize>,
     object_mention_ix: Option<usize>,
 }
@@ -7446,6 +7730,232 @@ struct IngestedDocumentOutcome {
     candidate_kernel_batch: Option<KernelMutationBatch>,
 }
 
+#[derive(Clone, Copy, Debug)]
+enum NativeTruthLane {
+    Structural,
+    Identity,
+}
+
+impl NativeTruthLane {
+    const ALL: [Self; 2] = [Self::Structural, Self::Identity];
+
+    const fn label(self) -> &'static str {
+        match self {
+            Self::Structural => "structural",
+            Self::Identity => "identity",
+        }
+    }
+
+    const fn truth_kind(self) -> GraphTruthKind {
+        match self {
+            Self::Structural => GraphTruthKind::Structural,
+            Self::Identity => GraphTruthKind::Identity,
+        }
+    }
+
+    const fn policy_id(self) -> &'static str {
+        match self {
+            Self::Structural => "native-structural-ingest",
+            Self::Identity => "native-identity-ingest",
+        }
+    }
+}
+
+fn persist_prepared_graph_truth_commits<S>(
+    store: &S,
+    prepared: &[PreparedDocument],
+    committed_at: i64,
+) -> Result<usize, StoreError>
+where
+    S: PhoenixGraphKernelStoreV2 + ?Sized,
+{
+    let mut appended = 0usize;
+    let mut next_generation = store.kernel_current_generation()?;
+    for document in prepared {
+        for lane in NativeTruthLane::ALL {
+            let batch = graph_truth_batch_for_document(document, lane);
+            if batch.vertices.is_empty() && batch.edges.is_empty() {
+                continue;
+            }
+            let digest = graph_truth_idempotency_hash(document, lane, &batch)?;
+            let commit_id = graph_truth_commit_id(lane, digest);
+            if let Some(existing) = store.load_graph_truth_commit(&commit_id)? {
+                let generation = existing.header.generation;
+                store.append_graph_truth_commit(&existing)?;
+                next_generation = next_generation.max(generation);
+                continue;
+            }
+            next_generation = next_generation
+                .checked_add(1)
+                .ok_or_else(|| StoreError::Query("graph truth generation overflow".to_owned()))?;
+            let commit = build_graph_truth_commit(
+                document,
+                lane,
+                batch,
+                commit_id,
+                digest,
+                next_generation,
+                committed_at,
+            )?;
+            store.append_graph_truth_commit(&commit)?;
+            appended += 1;
+        }
+    }
+    Ok(appended)
+}
+
+fn graph_truth_batch_for_document(
+    document: &PreparedDocument,
+    lane: NativeTruthLane,
+) -> KernelMutationBatch {
+    let vertices = document
+        .kernel_batch
+        .vertices
+        .iter()
+        .filter(|vertex| graph_truth_lane_for_vertex(vertex) == Some(lane.truth_kind()))
+        .cloned()
+        .collect::<Vec<_>>();
+    let edges = document
+        .kernel_batch
+        .edges
+        .iter()
+        .filter(|edge| graph_truth_lane_for_edge(edge) == Some(lane.truth_kind()))
+        .cloned()
+        .collect::<Vec<_>>();
+    KernelMutationBatch {
+        layer: KernelGraphLayer::Asserted,
+        scope: KernelMutationScope::Projection {
+            scope_key: format!(
+                "native-ingest:{}:{}:{}",
+                document.manifest.document_id,
+                document.manifest.revision,
+                lane.label()
+            ),
+        },
+        recorded_at: document.kernel_batch.recorded_at,
+        vertices,
+        edges,
+    }
+}
+
+fn graph_truth_lane_for_vertex(vertex: &KernelVertex) -> Option<GraphTruthKind> {
+    match &vertex.class {
+        KernelVertexClass::Document | KernelVertexClass::Chunk => Some(GraphTruthKind::Structural),
+        KernelVertexClass::Entity | KernelVertexClass::Alias => Some(GraphTruthKind::Identity),
+        _ => None,
+    }
+}
+
+fn graph_truth_lane_for_edge(edge: &KernelEdge) -> Option<GraphTruthKind> {
+    match &edge.relation_class {
+        KernelRelationClass::Structural => Some(GraphTruthKind::Structural),
+        KernelRelationClass::Identity | KernelRelationClass::Resolution => {
+            Some(GraphTruthKind::Identity)
+        }
+        _ => None,
+    }
+}
+
+fn build_graph_truth_commit(
+    document: &PreparedDocument,
+    lane: NativeTruthLane,
+    batch: KernelMutationBatch,
+    commit_id: String,
+    idempotency_hash: GraphTruthDigest,
+    generation: u64,
+    committed_at: i64,
+) -> Result<GraphTruthCommit, StoreError> {
+    let mut source_generations = SmallVec::<[GraphTruthSourceGenerationRef; 4]>::new();
+    source_generations.push(GraphTruthSourceGenerationRef {
+        source_id: format!(
+            "document:{}:{}",
+            document.manifest.document_id, document.manifest.revision
+        )
+        .into(),
+        generation: document.manifest.revision,
+    });
+    let commit = GraphTruthCommit {
+        header: GraphTruthCommitHeader {
+            commit_id: commit_id.into(),
+            generation,
+            operation: GraphTruthOperation::Assert,
+            truth: GraphTruthDescriptor {
+                kind: lane.truth_kind(),
+                plane: None,
+            },
+            source_generations,
+            compiler_policy: GraphTruthCompilerPolicy {
+                compiler_id: "phoenix-ingest-overgraph".into(),
+                compiler_version: env!("CARGO_PKG_VERSION").into(),
+                policy_id: lane.policy_id().into(),
+                policy_version: "1".into(),
+            },
+            idempotency_hash,
+            committed_at,
+            ..GraphTruthCommitHeader::default()
+        },
+        batch,
+    };
+    commit
+        .validate()
+        .map_err(|error| StoreError::Schema(error.to_string()))?;
+    Ok(commit)
+}
+
+fn graph_truth_idempotency_hash(
+    document: &PreparedDocument,
+    lane: NativeTruthLane,
+    batch: &KernelMutationBatch,
+) -> Result<GraphTruthDigest, StoreError> {
+    let encoded = rmp_serde::to_vec_named(batch)
+        .map_err(|error| StoreError::Snapshot(format!("graph truth digest encode: {error}")))?;
+    let mut lanes = [
+        0x9ae1_6a3b_2f90_4c11_u64,
+        0xc2b2_ae35_27d4_eb4f_u64,
+        0x1656_67b1_9e37_79f9_u64,
+        0x85eb_ca77_c2b2_ae63_u64,
+    ];
+    mix_digest(&mut lanes, document.manifest.document_id.as_bytes());
+    mix_digest(&mut lanes, &document.manifest.revision.to_le_bytes());
+    mix_digest(&mut lanes, lane.label().as_bytes());
+    mix_digest(&mut lanes, &encoded);
+    let mut bytes = [0u8; 32];
+    for (index, value) in lanes.into_iter().enumerate() {
+        bytes[index * 8..(index + 1) * 8].copy_from_slice(&value.to_le_bytes());
+    }
+    Ok(GraphTruthDigest(bytes))
+}
+
+fn mix_digest(lanes: &mut [u64; 4], bytes: &[u8]) {
+    for (index, byte) in bytes.iter().copied().enumerate() {
+        let lane = index & 3;
+        lanes[lane] ^= byte as u64 + ((index as u64) << 8);
+        lanes[lane] =
+            lanes[lane].wrapping_mul(0x1000_0000_01b3).rotate_left(13) ^ 0x9e37_79b9_7f4a_7c15;
+    }
+    for lane in lanes {
+        *lane ^= bytes.len() as u64;
+        *lane = lane.rotate_left(17).wrapping_mul(0xff51_afd7_ed55_8ccd);
+    }
+}
+
+fn graph_truth_commit_id(lane: NativeTruthLane, digest: GraphTruthDigest) -> String {
+    let mut value = String::with_capacity(93);
+    value.push_str("graph-truth:native-ingest:");
+    value.push_str(lane.label());
+    value.push(':');
+    push_hex_digest(&mut value, digest.0);
+    value
+}
+
+fn push_hex_digest(output: &mut String, digest: [u8; 32]) {
+    const HEX: &[u8; 16] = b"0123456789abcdef";
+    for byte in digest {
+        output.push(HEX[(byte >> 4) as usize] as char);
+        output.push(HEX[(byte & 0x0f) as usize] as char);
+    }
+}
+
 impl PhoenixInvarantV3 {
     pub fn new(config: InvarantV3Config) -> Self {
         let compiler = machine_compiler_for_extraction(&config.extraction);
@@ -7737,14 +8247,17 @@ impl PhoenixInvarantV3 {
         ))
     }
 
-    pub fn ingest_documents_native(
+    pub fn ingest_documents_native<S>(
         &self,
-        store: &dyn PhoenixArchiveStoreV2,
+        store: &S,
         session_id: Option<&SessionId>,
         documents: &[IngestDocument],
         revision: u64,
         created_at: i64,
-    ) -> Result<(IngestResult, V2IngestArtifacts), StoreError> {
+    ) -> Result<(IngestResult, V2IngestArtifacts), StoreError>
+    where
+        S: PhoenixArchiveStoreV2 + PhoenixGraphKernelStoreV2 + ?Sized,
+    {
         let progress = native_progress_enabled();
         let started = Instant::now();
         if progress {
@@ -7834,6 +8347,22 @@ impl PhoenixInvarantV3 {
                 started.elapsed().as_millis()
             );
         }
+        let started = Instant::now();
+        if progress {
+            eprintln!(
+                "[runtime-ingest] subphase=append_graph_truth_commits start documents={}",
+                prepared.len()
+            );
+        }
+        let graph_truth_commit_count =
+            persist_prepared_graph_truth_commits(store, &prepared, created_at)?;
+        if progress {
+            eprintln!(
+                "[runtime-ingest] subphase=append_graph_truth_commits finish commits={} wall_ms={}",
+                graph_truth_commit_count,
+                started.elapsed().as_millis()
+            );
+        }
 
         let total_entities = outcomes
             .iter()
@@ -7892,6 +8421,13 @@ impl PhoenixInvarantV3 {
                     outcomes.len(),
                     prepared.len(),
                     dirty_scopes.len()
+                ),
+            },
+            Diagnostic {
+                code: "PX_INGEST_GRAPH_TRUTH_COMMIT".to_owned(),
+                message: format!(
+                    "Native V2 appended {} structural/identity graph truth commits.",
+                    graph_truth_commit_count
                 ),
             },
         ];
@@ -8443,6 +8979,7 @@ impl PhoenixInvarantV3 {
         document: &IngestDocument,
         scan_bundle: &NativeScanBundle,
         entity_memory: &NativeEntityMemory,
+        created_at: i64,
     ) -> Result<NativeResolutionBundle, StoreError> {
         let progress = native_progress_enabled();
 
@@ -8527,8 +9064,8 @@ impl PhoenixInvarantV3 {
             document,
             &scan_bundle.chunks,
             &entities,
-            &relations,
             &alias_confirmations,
+            created_at,
         );
         if progress {
             eprintln!(
@@ -8539,8 +9076,10 @@ impl PhoenixInvarantV3 {
                 kernel_batch.edges.len(),
             );
         }
-        let candidate_kernel_batch =
-            build_coref_candidate_batch(document, &coref_clusters, &self.config.coref);
+        let candidate_kernel_batch = merge_candidate_batches(
+            build_coref_candidate_batch(document, &coref_clusters, &self.config.coref),
+            build_semantic_relation_candidate_batch(document, &relations),
+        );
 
         Ok(NativeResolutionBundle {
             alias_confirmations,
@@ -8673,17 +9212,54 @@ impl PhoenixInvarantV3 {
             resolution_bundle.discovery_count,
             mention_count,
         );
+        let subphase_started = Instant::now();
         let semantic_substrate =
             build_document_semantic_substrate(document, &scan_bundle, created_at);
+        if progress {
+            eprintln!(
+                "[runtime-ingest] prepare_subphase=build_semantic_substrate wall_ms={} propositions={} relations={}",
+                subphase_started.elapsed().as_millis(),
+                semantic_substrate.propositions.len(),
+                semantic_substrate.semantics.relations.len(),
+            );
+        }
+        let subphase_started = Instant::now();
         let causal_substrate = build_document_causal_substrate(document, &semantic_substrate);
+        if progress {
+            eprintln!(
+                "[runtime-ingest] prepare_subphase=build_causal_substrate wall_ms={} propositions={} candidates={} links={}",
+                subphase_started.elapsed().as_millis(),
+                causal_substrate.propositions.len(),
+                causal_substrate.causal_candidates.len(),
+                causal_substrate.causal_links.len(),
+            );
+        }
+        let subphase_started = Instant::now();
         let temporal_substrate =
             build_document_temporal_substrate(document, &semantic_substrate, created_at);
+        if progress {
+            eprintln!(
+                "[runtime-ingest] prepare_subphase=build_temporal_substrate wall_ms={} propositions={} timex={} anchors={}",
+                subphase_started.elapsed().as_millis(),
+                temporal_substrate.propositions.len(),
+                temporal_substrate.timex_records.len(),
+                temporal_substrate.anchor_candidates.len(),
+            );
+        }
+        let subphase_started = Instant::now();
         let event_identity_substrate = build_document_event_identity_substrate(
             document,
             manifest.revision,
             &causal_substrate,
             &temporal_substrate,
         );
+        if progress {
+            eprintln!(
+                "[runtime-ingest] prepare_subphase=build_event_identity_substrate wall_ms={} mention_seeds={}",
+                subphase_started.elapsed().as_millis(),
+                event_identity_substrate.mention_seeds.len(),
+            );
+        }
 
         let mut segments = Vec::<PreparedDocumentSegment>::new();
         let mut segment_refs = Vec::<DocumentSegmentRef>::new();
@@ -8725,48 +9301,68 @@ impl PhoenixInvarantV3 {
             resolution_bundle.relations.len(),
             &resolution_bundle.relations,
         )?;
-        self.push_segment(
-            &mut segments,
-            &mut segment_refs,
-            DocumentSegmentKind::CausalSubstrateTable,
-            causal_substrate.propositions.len()
-                + causal_substrate.semantic_events.len()
-                + causal_substrate.semantic_states.len()
-                + causal_substrate.semantic_claims.len()
-                + causal_substrate.semantic_relations.len()
-                + causal_substrate.temporal_bindings.len()
-                + causal_substrate.causal_candidates.len()
-                + causal_substrate.causal_links.len()
-                + causal_substrate.causal_diagnostics.len(),
-            &causal_substrate,
-        )?;
-        self.push_segment(
-            &mut segments,
-            &mut segment_refs,
-            DocumentSegmentKind::TemporalSubstrateTable,
-            temporal_substrate.propositions.len()
-                + temporal_substrate.semantic_events.len()
-                + temporal_substrate.semantic_states.len()
-                + temporal_substrate.semantic_claims.len()
-                + temporal_substrate.surface_temporal_cues.len()
-                + temporal_substrate.timex_records.len()
-                + temporal_substrate.anchor_candidates.len()
-                + temporal_substrate.axis_records.len()
-                + temporal_substrate.reference_timex_edges.len()
-                + temporal_substrate.reference_event_edges.len()
-                + temporal_substrate.temporal_claims.len()
-                + temporal_substrate.temporal_constraints.len()
-                + temporal_substrate.temporal_diagnostics.len(),
-            &temporal_substrate,
-        )?;
-        self.push_segment(
-            &mut segments,
-            &mut segment_refs,
-            DocumentSegmentKind::EventIdentitySubstrateTable,
-            event_identity_substrate.mention_seeds.len()
-                + event_identity_substrate.diagnostics.len(),
-            &event_identity_substrate,
-        )?;
+        let causal_rows = causal_substrate.propositions.len()
+            + causal_substrate.semantic_events.len()
+            + causal_substrate.semantic_states.len()
+            + causal_substrate.semantic_claims.len()
+            + causal_substrate.semantic_relations.len()
+            + causal_substrate.temporal_bindings.len()
+            + causal_substrate.causal_candidates.len()
+            + causal_substrate.causal_links.len()
+            + causal_substrate.causal_diagnostics.len();
+        let temporal_rows = temporal_substrate.propositions.len()
+            + temporal_substrate.semantic_events.len()
+            + temporal_substrate.semantic_states.len()
+            + temporal_substrate.semantic_claims.len()
+            + temporal_substrate.surface_temporal_cues.len()
+            + temporal_substrate.timex_records.len()
+            + temporal_substrate.anchor_candidates.len()
+            + temporal_substrate.axis_records.len()
+            + temporal_substrate.reference_timex_edges.len()
+            + temporal_substrate.reference_event_edges.len()
+            + temporal_substrate.temporal_claims.len()
+            + temporal_substrate.temporal_constraints.len()
+            + temporal_substrate.temporal_diagnostics.len();
+        let event_identity_rows = event_identity_substrate.mention_seeds.len()
+            + event_identity_substrate.diagnostics.len();
+        let encode_started = Instant::now();
+        let (causal_segment, (temporal_segment, event_identity_segment)) = rayon::join(
+            || {
+                encode_prepared_segment(
+                    DocumentSegmentKind::CausalSubstrateTable,
+                    causal_rows,
+                    &causal_substrate,
+                )
+            },
+            || {
+                rayon::join(
+                    || {
+                        encode_prepared_segment(
+                            DocumentSegmentKind::TemporalSubstrateTable,
+                            temporal_rows,
+                            &temporal_substrate,
+                        )
+                    },
+                    || {
+                        encode_prepared_segment(
+                            DocumentSegmentKind::EventIdentitySubstrateTable,
+                            event_identity_rows,
+                            &event_identity_substrate,
+                        )
+                    },
+                )
+            },
+        );
+        self.push_encoded_segment(&mut segments, &mut segment_refs, causal_segment?)?;
+        self.push_encoded_segment(&mut segments, &mut segment_refs, temporal_segment?)?;
+        self.push_encoded_segment(&mut segments, &mut segment_refs, event_identity_segment?)?;
+        if progress {
+            eprintln!(
+                "[runtime-ingest] prepare_subphase=encode_substrate_segments_parallel wall_ms={} rows={}",
+                encode_started.elapsed().as_millis(),
+                causal_rows + temporal_rows + event_identity_rows,
+            );
+        }
 
         let lexical_started = Instant::now();
         let lexical = build_lexical_postings_segment(
@@ -8826,30 +9422,46 @@ impl PhoenixInvarantV3 {
         row_count: usize,
         value: &T,
     ) -> Result<(), StoreError> {
-        let started = Instant::now();
-        let (payload, uncompressed_len) = encode_segment_payload(value)?;
+        let encoded = encode_prepared_segment(kind, row_count, value)?;
+        self.push_encoded_segment(segments, refs, encoded)
+    }
+
+    fn push_encoded_segment(
+        &self,
+        segments: &mut Vec<PreparedDocumentSegment>,
+        refs: &mut Vec<DocumentSegmentRef>,
+        encoded: EncodedPreparedSegment,
+    ) -> Result<(), StoreError> {
         let ordinal = segments.len() as u32;
+        let kind = encoded.kind;
+        let row_count = encoded.row_count;
+        let uncompressed_len = encoded.uncompressed_len;
+        let compressed_len = encoded.payload.len();
+        let wall_ms = encoded.wall_ms;
         let header = DocumentSegmentHeader::new(
             kind,
             ordinal,
             row_count as u32,
             uncompressed_len,
-            payload.len(),
+            compressed_len,
         );
         refs.push(DocumentSegmentRef {
             kind,
             ordinal,
             row_count: row_count as u32,
-            byte_len: payload.len() as u32,
+            byte_len: compressed_len as u32,
             uncompressed_len: uncompressed_len as u32,
         });
-        segments.push(PreparedDocumentSegment { header, payload });
+        segments.push(PreparedDocumentSegment {
+            header,
+            payload: encoded.payload,
+        });
         if native_progress_enabled() {
             eprintln!(
                 "[runtime-ingest] prepare_segment kind={kind:?} ordinal={} rows={} wall_ms={} uncompressed_bytes={} compressed_bytes={}",
                 ordinal,
                 row_count,
-                started.elapsed().as_millis(),
+                wall_ms,
                 uncompressed_len,
                 refs.last().map(|segment_ref| segment_ref.byte_len).unwrap_or_default(),
             );
@@ -8899,7 +9511,7 @@ impl PhoenixInvarantV3 {
     ) -> Result<PreparedDocumentDraft, StoreError> {
         let scan_bundle = self.scan_document_bundle(document)?;
         let resolution_bundle =
-            self.resolve_document_bundle(document, &scan_bundle, entity_memory)?;
+            self.resolve_document_bundle(document, &scan_bundle, entity_memory, created_at)?;
         self.build_prepared_document(
             document,
             session_id,
@@ -8922,7 +9534,7 @@ impl PhoenixInvarantV3 {
         let document_started = Instant::now();
         let scan_bundle = self.scan_document_bundle(document)?;
         let resolution_bundle =
-            self.resolve_document_bundle(document, &scan_bundle, entity_memory)?;
+            self.resolve_document_bundle(document, &scan_bundle, entity_memory, created_at)?;
         let mention_count = scan_bundle.scan.mentions.len();
         let (document_summary, session_document, manifest) = self.build_document_state(
             document,
@@ -8936,17 +9548,54 @@ impl PhoenixInvarantV3 {
             resolution_bundle.discovery_count,
             mention_count,
         );
+        let subphase_started = Instant::now();
         let semantic_substrate =
             build_document_semantic_substrate(document, &scan_bundle, created_at);
+        if progress {
+            eprintln!(
+                "[runtime-ingest] archive_subphase=build_semantic_substrate wall_ms={} propositions={} relations={}",
+                subphase_started.elapsed().as_millis(),
+                semantic_substrate.propositions.len(),
+                semantic_substrate.semantics.relations.len(),
+            );
+        }
+        let subphase_started = Instant::now();
         let causal_substrate = build_document_causal_substrate(document, &semantic_substrate);
+        if progress {
+            eprintln!(
+                "[runtime-ingest] archive_subphase=build_causal_substrate wall_ms={} propositions={} candidates={} links={}",
+                subphase_started.elapsed().as_millis(),
+                causal_substrate.propositions.len(),
+                causal_substrate.causal_candidates.len(),
+                causal_substrate.causal_links.len(),
+            );
+        }
+        let subphase_started = Instant::now();
         let temporal_substrate =
             build_document_temporal_substrate(document, &semantic_substrate, created_at);
+        if progress {
+            eprintln!(
+                "[runtime-ingest] archive_subphase=build_temporal_substrate wall_ms={} propositions={} timex={} anchors={}",
+                subphase_started.elapsed().as_millis(),
+                temporal_substrate.propositions.len(),
+                temporal_substrate.timex_records.len(),
+                temporal_substrate.anchor_candidates.len(),
+            );
+        }
+        let subphase_started = Instant::now();
         let event_identity_substrate = build_document_event_identity_substrate(
             document,
             manifest.revision,
             &causal_substrate,
             &temporal_substrate,
         );
+        if progress {
+            eprintln!(
+                "[runtime-ingest] archive_subphase=build_event_identity_substrate wall_ms={} mention_seeds={}",
+                subphase_started.elapsed().as_millis(),
+                event_identity_substrate.mention_seeds.len(),
+            );
+        }
         let relation_candidates = build_native_relation_candidates(document, &scan_bundle);
         let phase_started = Instant::now();
         let archive = DocumentArchive {
@@ -9096,11 +9745,27 @@ fn build_native_relation_candidates(
     document: &IngestDocument,
     scan_bundle: &NativeScanBundle,
 ) -> Vec<RelationCandidate> {
-    let mut relations = Vec::with_capacity(scan_bundle.structure.relation_seeds.len());
+    build_native_relation_candidate_rows(document, scan_bundle)
+        .into_iter()
+        .map(|row| row.candidate)
+        .collect()
+}
+
+struct NativeRelationCandidateRow {
+    candidate: RelationCandidate,
+    hit_index: usize,
+}
+
+fn build_native_relation_candidate_rows(
+    document: &IngestDocument,
+    scan_bundle: &NativeScanBundle,
+) -> Vec<NativeRelationCandidateRow> {
+    let mut rows = Vec::with_capacity(scan_bundle.structure.relation_seeds.len());
     for seed in &scan_bundle.structure.relation_seeds {
-        let Some(hit) = scan_bundle.scan.narrative_hits.iter().find(|hit| {
-            hit.sentence_index == seed.sentence_index && hit.relation_type == seed.relation_type
-        }) else {
+        let Some(hit_index) = native_relation_hit_index_for_seed(scan_bundle, seed) else {
+            continue;
+        };
+        let Some(hit) = scan_bundle.scan.narrative_hits.get(hit_index) else {
             continue;
         };
         let Some(sentence) = scan_bundle.scan.sentences.get(seed.sentence_index) else {
@@ -9118,26 +9783,63 @@ fn build_native_relation_candidates(
             kind: Some("sentence".to_owned()),
             range: sentence.range,
         }];
-        relations.push(RelationCandidate {
-            sentence_index: seed.sentence_index,
-            verb_range: hit.range,
-            lemma: hit.lemma.clone(),
-            event_class: hit.event_class.clone(),
-            relation_type: hit.relation_type.clone(),
-            subject: seed
-                .subject_mention_ix
-                .and_then(|index| scan_bundle.scan.mentions.get(index))
-                .map(frame_slot_from_native_mention),
-            object: seed
-                .object_mention_ix
-                .and_then(|index| scan_bundle.scan.mentions.get(index))
-                .map(frame_slot_from_native_mention),
-            recipient: None,
-            attachments: Vec::new(),
-            evidence,
+        rows.push(NativeRelationCandidateRow {
+            candidate: RelationCandidate {
+                sentence_index: seed.sentence_index,
+                verb_range: hit.range,
+                lemma: hit.lemma.clone(),
+                event_class: hit.event_class.clone(),
+                relation_type: hit.relation_type.clone(),
+                subject: seed
+                    .subject_mention_ix
+                    .and_then(|index| scan_bundle.scan.mentions.get(index))
+                    .map(frame_slot_from_native_mention),
+                object: seed
+                    .object_mention_ix
+                    .and_then(|index| scan_bundle.scan.mentions.get(index))
+                    .map(frame_slot_from_native_mention),
+                recipient: None,
+                attachments: Vec::new(),
+                evidence,
+            },
+            hit_index,
         });
     }
-    relations
+    rows
+}
+
+fn native_relation_hit_index_for_seed(
+    scan_bundle: &NativeScanBundle,
+    seed: &NativeRelationSeed,
+) -> Option<usize> {
+    if let Some(hit_index) = seed.hit_index {
+        if scan_bundle
+            .scan
+            .narrative_hits
+            .get(hit_index)
+            .is_some_and(|hit| native_relation_hit_matches_seed(hit, seed))
+        {
+            return Some(hit_index);
+        }
+    }
+    scan_bundle
+        .scan
+        .narrative_hits
+        .iter()
+        .position(|hit| native_relation_hit_matches_seed(hit, seed))
+}
+
+fn native_relation_hit_matches_seed(hit: &NarrativeVerbHit, seed: &NativeRelationSeed) -> bool {
+    hit.sentence_index == seed.sentence_index && hit.relation_type == seed.relation_type
+}
+
+fn native_relation_hit_matches_candidate(
+    hit: &NarrativeVerbHit,
+    relation: &RelationCandidate,
+) -> bool {
+    hit.sentence_index == relation.sentence_index
+        && hit.range == relation.verb_range
+        && hit.relation_type == relation.relation_type
 }
 
 fn build_document_temporal_substrate(
@@ -10185,19 +10887,25 @@ fn build_causal_structure_artifact(
     document: &IngestDocument,
     scan_bundle: &NativeScanBundle,
 ) -> StructureArtifact {
+    let progress = native_progress_enabled();
+    let frame_started = Instant::now();
+    let mention_indexes =
+        mention_indexes_by_sentence(scan_bundle.scan.sentences.len(), &scan_bundle.scan.mentions);
     let mut sentence_frames = scan_bundle
         .scan
         .sentences
         .iter()
         .map(|sentence| SentenceFrame {
             sentence: sentence.clone(),
-            mentions: scan_bundle
-                .scan
-                .mentions
-                .iter()
-                .filter(|mention| mention.sentence_index == sentence.index)
-                .cloned()
-                .collect(),
+            mentions: mention_indexes
+                .get(sentence.index)
+                .map(|indexes| {
+                    indexes
+                        .iter()
+                        .filter_map(|&index| scan_bundle.scan.mentions.get(index).cloned())
+                        .collect()
+                })
+                .unwrap_or_default(),
             chunks: scan_bundle
                 .chunks
                 .iter()
@@ -10218,14 +10926,30 @@ fn build_causal_structure_artifact(
             diagnostics: Vec::new(),
         })
         .collect::<Vec<_>>();
+    if progress {
+        eprintln!(
+            "[runtime-ingest] prepare_subphase=build_causal_structure_frames wall_ms={} sentences={} mentions={}",
+            frame_started.elapsed().as_millis(),
+            sentence_frames.len(),
+            scan_bundle.scan.mentions.len(),
+        );
+    }
 
-    let relations = build_native_relation_candidates(document, scan_bundle);
+    let candidate_started = Instant::now();
+    let relation_rows = build_native_relation_candidate_rows(document, scan_bundle);
+    if progress {
+        eprintln!(
+            "[runtime-ingest] prepare_subphase=build_native_relation_candidates wall_ms={} relation_candidates={} narrative_hits={}",
+            candidate_started.elapsed().as_millis(),
+            relation_rows.len(),
+            scan_bundle.scan.narrative_hits.len(),
+        );
+    }
+    let mut relations = Vec::with_capacity(relation_rows.len());
     let mut evidence_spans = Vec::new();
-    for relation in &relations {
-        let Some(hit) = scan_bundle.scan.narrative_hits.iter().find(|hit| {
-            hit.sentence_index == relation.sentence_index
-                && hit.relation_type == relation.relation_type
-        }) else {
+    for row in relation_rows {
+        let relation = row.candidate;
+        let Some(hit) = scan_bundle.scan.narrative_hits.get(row.hit_index) else {
             continue;
         };
         let sentence = match scan_bundle.scan.sentences.get(relation.sentence_index) {
@@ -10248,6 +10972,7 @@ fn build_causal_structure_artifact(
             });
         }
         evidence_spans.extend(relation.evidence.iter().cloned());
+        relations.push(relation);
     }
 
     StructureArtifact {

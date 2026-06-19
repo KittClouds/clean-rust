@@ -1,5 +1,6 @@
 import { spawnSync } from 'node:child_process';
 
+const baselineMode = process.env.GRAPH_BUILD_BASELINE_MODE || 'zeroshot';
 const command = process.execPath;
 const args = [
   'node_modules/vitest/vitest.mjs',
@@ -13,7 +14,7 @@ const result = spawnSync(command, args, {
   env: {
     ...process.env,
     GRAPH_BUILD_BASELINE: '1',
-    GRAPH_BUILD_BASELINE_MODE: 'bifurcated',
+    GRAPH_BUILD_BASELINE_MODE: baselineMode,
   },
   stdio: 'inherit',
 });

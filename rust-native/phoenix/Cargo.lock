@@ -2537,6 +2537,7 @@ dependencies = [
  "phoenix-store-overgraph",
  "phoenix-temporal-post",
  "phoenix-types",
+ "rmp-serde",
  "serde",
  "serde_json",
  "thiserror 1.0.69",
@@ -2708,6 +2709,7 @@ dependencies = [
 name = "phoenix-graph-kernel"
 version = "0.1.1"
 dependencies = [
+ "compact_str 0.8.1",
  "hashbrown 0.15.5",
  "phoenix-graph",
  "phoenix-types",
@@ -2715,6 +2717,7 @@ dependencies = [
  "scirs2-graph",
  "serde",
  "serde_json",
+ "smallvec",
  "zerocopy 0.7.35",
 ]
 
@@ -2723,7 +2726,9 @@ name = "phoenix-graph-post"
 version = "0.1.1"
 dependencies = [
  "bm25_turbo",
+ "compact_str 0.8.1",
  "hashbrown 0.15.5",
+ "memmap2",
  "phoenix-chunker",
  "phoenix-embed",
  "phoenix-graph",
@@ -2735,10 +2740,13 @@ dependencies = [
  "phoenix-store-native-core",
  "phoenix-store-overgraph",
  "phoenix-types",
+ "rmp-serde",
  "rustc-hash 1.1.0",
  "serde",
  "serde_json",
  "thiserror 1.0.69",
+ "wide 0.7.33",
+ "zerocopy 0.7.35",
 ]
 
 [[package]]
@@ -2980,8 +2988,12 @@ version = "0.1.1"
 dependencies = [
  "arc-swap",
  "bm25_turbo",
+ "compact_str 0.8.1",
+ "hashbrown 0.15.5",
  "lz4_flex",
+ "memmap2",
  "overgraph",
+ "phoenix-graph-kernel",
  "phoenix-hyperbolic",
  "phoenix-kernel",
  "phoenix-semantic-v2",
@@ -2990,6 +3002,8 @@ dependencies = [
  "rmp-serde",
  "serde",
  "serde_json",
+ "smallvec",
+ "zerocopy 0.7.35",
 ]
 
 [[package]]

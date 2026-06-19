@@ -260,6 +260,53 @@ fn scope_runtime_image_prefers_dirty_ords_and_masks_archive_segments() {
 }
 
 #[test]
+fn prepared_document_segments_reopen_from_external_payloads() {
+    let store = temp_store("external-segment-restart");
+    store.init_archive_schema().expect("init archive schema");
+
+    let scope = phoenix_types::ScopeKey::default();
+    let scope_ord = ScopeOrd(17);
+    let dirty = DirtyScopeRecord {
+        scope: scope.clone(),
+        scope_key: scope_storage_key(&scope),
+        scope_ord,
+        document_ords: vec![DocumentOrd(3)],
+        updated_at: 79,
+    };
+    let doc = sample_document(&scope, scope_ord, DocumentOrd(3), "doc-external", 12);
+    let expected_segment_bytes = doc
+        .segments
+        .iter()
+        .map(|segment| segment.payload.len())
+        .sum::<usize>();
+    let telemetry = store
+        .persist_prepared_documents_with_telemetry(&[doc], None, std::slice::from_ref(&dirty), 79)
+        .expect("persist external prepared document");
+    assert_eq!(telemetry.segment_external_bytes, expected_segment_bytes);
+    assert_eq!(telemetry.segment_inline_bytes, 0);
+    assert!(telemetry
+        .segments
+        .iter()
+        .all(|segment| segment.storage == "external"));
+
+    let path = store.path.clone();
+    drop(store);
+    let reopened = PhoenixOvergraphStore::open(path).expect("reopen overgraph store");
+    let archives = reopened
+        .load_latest_document_archives(Some(&scope))
+        .expect("load mmap-backed document archive");
+    assert_eq!(archives.len(), 1);
+    assert_eq!(archives[0].manifest.document_id, "doc-external");
+    assert_eq!(archives[0].sentences.len(), 1);
+    assert_eq!(archives[0].mentions.len(), 1);
+    assert_eq!(archives[0].resolved_mentions.len(), 1);
+    assert_eq!(archives[0].chunks.len(), 1);
+    assert_eq!(archives[0].entities.len(), 1);
+    assert_eq!(archives[0].relations.len(), 1);
+    assert_eq!(archives[0].relation_candidates.len(), 1);
+}
+
+#[test]
 fn scope_runtime_image_bundles_requested_sidecars() {
     let store = temp_store("runtime-sidecars");
     store.init_archive_schema().expect("init archive schema");

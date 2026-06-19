@@ -147,6 +147,7 @@ export function buildGraphRebuildSnapshot(input: BuildGraphRebuildSnapshotInput)
         queuedTargetIds.size ? queuedTargetIds.has(target.id) : target.admissionStatus === 'admitted',
     );
     const postProcessMode = input.postProcessMode || 'full';
+    const includeDiagnosticArms = input.durabilityMode !== 'interactive';
     const embeddingGraphPostProcess = postProcessMode === 'full'
         ? buildGraphRebuildEmbeddingGraphPostProcess(
             embeddingWorkTargets,
@@ -446,73 +447,75 @@ export function buildGraphRebuildSnapshot(input: BuildGraphRebuildSnapshotInput)
     snapshot.counters.semanticEvalModelDisagreements = semanticEvalLedgerSummary.counters.modelDisagreements;
     snapshot.counters.semanticEvalManifoldDisagreements = semanticEvalLedgerSummary.counters.manifoldDisagreements;
     snapshot.counters.semanticEvalGraphChangeRows = semanticEvalLedgerSummary.counters.graphChangeRows;
-    const memoryGraphRagBridgeSummary = buildGraphMemoryGraphRagBridgeSummary(snapshot, builtAt);
-    snapshot.memoryGraphRagBridgeSummary = memoryGraphRagBridgeSummary;
-    snapshot.counters.memoryGraphRagRecords = memoryGraphRagBridgeSummary.counters.recordCount;
-    snapshot.counters.memoryGraphRagSchemaRecords = memoryGraphRagBridgeSummary.counters.schemaRecords;
-    snapshot.counters.memoryGraphRagFactRecords = memoryGraphRagBridgeSummary.counters.factRecords;
-    snapshot.counters.memoryGraphRagPassageRecords = memoryGraphRagBridgeSummary.counters.passageRecords;
-    snapshot.counters.memoryGraphRagEvalRows = memoryGraphRagBridgeSummary.counters.evalRowCount;
-    snapshot.counters.memoryGraphRagPassedEvalRows = memoryGraphRagBridgeSummary.counters.passedEvalRows;
-    snapshot.counters.memoryGraphRagReceipts = memoryGraphRagBridgeSummary.counters.receiptCount;
-    snapshot.counters.memoryGraphRagMutationAllowed = memoryGraphRagBridgeSummary.counters.mutationAllowedCount;
-    const discourseSpineSummary = buildGraphDiscourseSpineSummary(snapshot, builtAt);
-    snapshot.discourseSpineSummary = discourseSpineSummary;
-    snapshot.counters.discourseSpineTargets = discourseSpineSummary.counters.targetCount;
-    snapshot.counters.discourseSpineLabels = discourseSpineSummary.counters.labelCount;
-    snapshot.counters.discourseSpineClusters = discourseSpineSummary.counters.clusterCount;
-    snapshot.counters.discourseSpineBridges = discourseSpineSummary.counters.bridgeCount;
-    snapshot.counters.discourseSpineResonance = discourseSpineSummary.counters.resonanceCandidates;
-    snapshot.counters.discourseSpineResolution = discourseSpineSummary.counters.resolutionCandidates;
-    snapshot.counters.discourseSpineReceipts = discourseSpineSummary.counters.receiptCount;
-    snapshot.counters.discourseSpineMutationAllowed = discourseSpineSummary.counters.mutationAllowedCount;
-    const discourseBridgeCandidateSummary = buildGraphDiscourseBridgeCandidateSummary(snapshot, discourseSpineSummary, builtAt);
-    snapshot.discourseBridgeCandidateSummary = discourseBridgeCandidateSummary;
-    snapshot.counters.discourseBridgeCandidates = discourseBridgeCandidateSummary.counters.candidateCount;
-    snapshot.counters.discourseBridgeInputs = discourseBridgeCandidateSummary.counters.inputCount;
-    snapshot.counters.discourseBridgeJudgments = discourseBridgeCandidateSummary.counters.judgmentCount;
-    snapshot.counters.discourseBridgeEvalRows = discourseBridgeCandidateSummary.counters.evalRowCount;
-    snapshot.counters.discourseBridgeReceipts = discourseBridgeCandidateSummary.counters.receiptCount;
-    snapshot.counters.discourseBridgePlannedModelCalls = discourseBridgeCandidateSummary.counters.plannedModelCalls;
-    snapshot.counters.discourseBridgeMutationAllowed = discourseBridgeCandidateSummary.counters.mutationAllowedCount;
-    const discourseBridgeAdjudicationSummary = buildGraphDiscourseBridgeAdjudicationSummary(snapshot, discourseBridgeCandidateSummary, builtAt);
-    snapshot.discourseBridgeAdjudicationSummary = discourseBridgeAdjudicationSummary;
-    snapshot.counters.discourseBridgeAdjudicationDecisions = discourseBridgeAdjudicationSummary.counters.decisionCount;
-    snapshot.counters.discourseBridgeAdjudicationAccepted = discourseBridgeAdjudicationSummary.counters.acceptedCount;
-    snapshot.counters.discourseBridgeAdjudicationSupported = discourseBridgeAdjudicationSummary.counters.supportedCount;
-    snapshot.counters.discourseBridgeAdjudicationDeferred = discourseBridgeAdjudicationSummary.counters.deferredCount;
-    snapshot.counters.discourseBridgeAdjudicationRejected = discourseBridgeAdjudicationSummary.counters.rejectedCount;
-    snapshot.counters.discourseBridgeAdjudicationReceipts = discourseBridgeAdjudicationSummary.counters.receiptCount;
-    snapshot.counters.discourseBridgeAdjudicationLedgerOnly = discourseBridgeAdjudicationSummary.counters.ledgerOnlyCount;
-    snapshot.counters.discourseBridgeAdjudicationTopologyCommits = discourseBridgeAdjudicationSummary.counters.topologyCommitCount;
-    snapshot.counters.discourseBridgeAdjudicationMutationAllowed = discourseBridgeAdjudicationSummary.counters.mutationAllowedCount;
-    const discourseEvalLedgerSummary = buildGraphDiscourseEvalLedgerSummary(snapshot, builtAt);
-    snapshot.discourseEvalLedgerSummary = discourseEvalLedgerSummary;
-    snapshot.counters.discourseEvalLedgerRows = discourseEvalLedgerSummary.counters.rowCount;
-    snapshot.counters.discourseEvalAcceptedCandidates = discourseEvalLedgerSummary.counters.acceptedCandidates;
-    snapshot.counters.discourseEvalRejectedCandidates = discourseEvalLedgerSummary.counters.rejectedCandidates;
-    snapshot.counters.discourseEvalAmbiguousCases = discourseEvalLedgerSummary.counters.ambiguousCases;
-    snapshot.counters.discourseEvalModelDisagreements = discourseEvalLedgerSummary.counters.modelDisagreements;
-    snapshot.counters.discourseEvalManifoldDisagreements = discourseEvalLedgerSummary.counters.manifoldDisagreements;
-    snapshot.counters.discourseEvalGraphChangeRows = discourseEvalLedgerSummary.counters.graphChangeRows;
-    const discoursePromotionSurfaceSummary = buildGraphDiscoursePromotionSurfaceSummary(snapshot, builtAt);
-    snapshot.discoursePromotionSurfaceSummary = discoursePromotionSurfaceSummary;
-    snapshot.counters.discoursePromotionChunkWormholes = discoursePromotionSurfaceSummary.counters.chunkWormholeCount;
-    snapshot.counters.discoursePromotionDocumentClusters = discoursePromotionSurfaceSummary.counters.documentClusterCount;
-    snapshot.counters.discoursePromotionResolverCandidates = discoursePromotionSurfaceSummary.counters.resolverCandidateCount;
-    snapshot.counters.discoursePromotionCompilerHints = discoursePromotionSurfaceSummary.counters.compilerHintCount;
-    snapshot.counters.discoursePromotionReceipts = discoursePromotionSurfaceSummary.counters.receiptCount;
-    snapshot.counters.discoursePromotionGraphPatches = discoursePromotionSurfaceSummary.counters.graphPatchCount;
-    snapshot.counters.discoursePromotionMutationAllowed = discoursePromotionSurfaceSummary.counters.mutationAllowedCount;
-    const discourseCompilerOverlaySummary = buildGraphDiscourseCompilerOverlaySummary(snapshot, builtAt);
-    snapshot.discourseCompilerOverlaySummary = discourseCompilerOverlaySummary;
-    snapshot.counters.discourseCompilerOverlayEdges = discourseCompilerOverlaySummary.counters.overlayEdgeCount;
-    snapshot.counters.discourseCompilerOverlayChunkWormholes = discourseCompilerOverlaySummary.counters.chunkWormholeEdges;
-    snapshot.counters.discourseCompilerOverlayDocumentClusters = discourseCompilerOverlaySummary.counters.documentClusterEdges;
-    snapshot.counters.discourseCompilerOverlayResolvers = discourseCompilerOverlaySummary.counters.resolverEdges;
-    snapshot.counters.discourseCompilerOverlayReceipts = discourseCompilerOverlaySummary.counters.receiptCount;
-    snapshot.counters.discourseCompilerOverlayGraphPatches = discourseCompilerOverlaySummary.counters.graphPatchCount;
-    snapshot.counters.discourseCompilerOverlayMutationAllowed = discourseCompilerOverlaySummary.counters.mutationAllowedCount;
+    if (includeDiagnosticArms) {
+        const memoryGraphRagBridgeSummary = buildGraphMemoryGraphRagBridgeSummary(snapshot, builtAt);
+        snapshot.memoryGraphRagBridgeSummary = memoryGraphRagBridgeSummary;
+        snapshot.counters.memoryGraphRagRecords = memoryGraphRagBridgeSummary.counters.recordCount;
+        snapshot.counters.memoryGraphRagSchemaRecords = memoryGraphRagBridgeSummary.counters.schemaRecords;
+        snapshot.counters.memoryGraphRagFactRecords = memoryGraphRagBridgeSummary.counters.factRecords;
+        snapshot.counters.memoryGraphRagPassageRecords = memoryGraphRagBridgeSummary.counters.passageRecords;
+        snapshot.counters.memoryGraphRagEvalRows = memoryGraphRagBridgeSummary.counters.evalRowCount;
+        snapshot.counters.memoryGraphRagPassedEvalRows = memoryGraphRagBridgeSummary.counters.passedEvalRows;
+        snapshot.counters.memoryGraphRagReceipts = memoryGraphRagBridgeSummary.counters.receiptCount;
+        snapshot.counters.memoryGraphRagMutationAllowed = memoryGraphRagBridgeSummary.counters.mutationAllowedCount;
+        const discourseSpineSummary = buildGraphDiscourseSpineSummary(snapshot, builtAt);
+        snapshot.discourseSpineSummary = discourseSpineSummary;
+        snapshot.counters.discourseSpineTargets = discourseSpineSummary.counters.targetCount;
+        snapshot.counters.discourseSpineLabels = discourseSpineSummary.counters.labelCount;
+        snapshot.counters.discourseSpineClusters = discourseSpineSummary.counters.clusterCount;
+        snapshot.counters.discourseSpineBridges = discourseSpineSummary.counters.bridgeCount;
+        snapshot.counters.discourseSpineResonance = discourseSpineSummary.counters.resonanceCandidates;
+        snapshot.counters.discourseSpineResolution = discourseSpineSummary.counters.resolutionCandidates;
+        snapshot.counters.discourseSpineReceipts = discourseSpineSummary.counters.receiptCount;
+        snapshot.counters.discourseSpineMutationAllowed = discourseSpineSummary.counters.mutationAllowedCount;
+        const discourseBridgeCandidateSummary = buildGraphDiscourseBridgeCandidateSummary(snapshot, discourseSpineSummary, builtAt);
+        snapshot.discourseBridgeCandidateSummary = discourseBridgeCandidateSummary;
+        snapshot.counters.discourseBridgeCandidates = discourseBridgeCandidateSummary.counters.candidateCount;
+        snapshot.counters.discourseBridgeInputs = discourseBridgeCandidateSummary.counters.inputCount;
+        snapshot.counters.discourseBridgeJudgments = discourseBridgeCandidateSummary.counters.judgmentCount;
+        snapshot.counters.discourseBridgeEvalRows = discourseBridgeCandidateSummary.counters.evalRowCount;
+        snapshot.counters.discourseBridgeReceipts = discourseBridgeCandidateSummary.counters.receiptCount;
+        snapshot.counters.discourseBridgePlannedModelCalls = discourseBridgeCandidateSummary.counters.plannedModelCalls;
+        snapshot.counters.discourseBridgeMutationAllowed = discourseBridgeCandidateSummary.counters.mutationAllowedCount;
+        const discourseBridgeAdjudicationSummary = buildGraphDiscourseBridgeAdjudicationSummary(snapshot, discourseBridgeCandidateSummary, builtAt);
+        snapshot.discourseBridgeAdjudicationSummary = discourseBridgeAdjudicationSummary;
+        snapshot.counters.discourseBridgeAdjudicationDecisions = discourseBridgeAdjudicationSummary.counters.decisionCount;
+        snapshot.counters.discourseBridgeAdjudicationAccepted = discourseBridgeAdjudicationSummary.counters.acceptedCount;
+        snapshot.counters.discourseBridgeAdjudicationSupported = discourseBridgeAdjudicationSummary.counters.supportedCount;
+        snapshot.counters.discourseBridgeAdjudicationDeferred = discourseBridgeAdjudicationSummary.counters.deferredCount;
+        snapshot.counters.discourseBridgeAdjudicationRejected = discourseBridgeAdjudicationSummary.counters.rejectedCount;
+        snapshot.counters.discourseBridgeAdjudicationReceipts = discourseBridgeAdjudicationSummary.counters.receiptCount;
+        snapshot.counters.discourseBridgeAdjudicationLedgerOnly = discourseBridgeAdjudicationSummary.counters.ledgerOnlyCount;
+        snapshot.counters.discourseBridgeAdjudicationTopologyCommits = discourseBridgeAdjudicationSummary.counters.topologyCommitCount;
+        snapshot.counters.discourseBridgeAdjudicationMutationAllowed = discourseBridgeAdjudicationSummary.counters.mutationAllowedCount;
+        const discourseEvalLedgerSummary = buildGraphDiscourseEvalLedgerSummary(snapshot, builtAt);
+        snapshot.discourseEvalLedgerSummary = discourseEvalLedgerSummary;
+        snapshot.counters.discourseEvalLedgerRows = discourseEvalLedgerSummary.counters.rowCount;
+        snapshot.counters.discourseEvalAcceptedCandidates = discourseEvalLedgerSummary.counters.acceptedCandidates;
+        snapshot.counters.discourseEvalRejectedCandidates = discourseEvalLedgerSummary.counters.rejectedCandidates;
+        snapshot.counters.discourseEvalAmbiguousCases = discourseEvalLedgerSummary.counters.ambiguousCases;
+        snapshot.counters.discourseEvalModelDisagreements = discourseEvalLedgerSummary.counters.modelDisagreements;
+        snapshot.counters.discourseEvalManifoldDisagreements = discourseEvalLedgerSummary.counters.manifoldDisagreements;
+        snapshot.counters.discourseEvalGraphChangeRows = discourseEvalLedgerSummary.counters.graphChangeRows;
+        const discoursePromotionSurfaceSummary = buildGraphDiscoursePromotionSurfaceSummary(snapshot, builtAt);
+        snapshot.discoursePromotionSurfaceSummary = discoursePromotionSurfaceSummary;
+        snapshot.counters.discoursePromotionChunkWormholes = discoursePromotionSurfaceSummary.counters.chunkWormholeCount;
+        snapshot.counters.discoursePromotionDocumentClusters = discoursePromotionSurfaceSummary.counters.documentClusterCount;
+        snapshot.counters.discoursePromotionResolverCandidates = discoursePromotionSurfaceSummary.counters.resolverCandidateCount;
+        snapshot.counters.discoursePromotionCompilerHints = discoursePromotionSurfaceSummary.counters.compilerHintCount;
+        snapshot.counters.discoursePromotionReceipts = discoursePromotionSurfaceSummary.counters.receiptCount;
+        snapshot.counters.discoursePromotionGraphPatches = discoursePromotionSurfaceSummary.counters.graphPatchCount;
+        snapshot.counters.discoursePromotionMutationAllowed = discoursePromotionSurfaceSummary.counters.mutationAllowedCount;
+        const discourseCompilerOverlaySummary = buildGraphDiscourseCompilerOverlaySummary(snapshot, builtAt);
+        snapshot.discourseCompilerOverlaySummary = discourseCompilerOverlaySummary;
+        snapshot.counters.discourseCompilerOverlayEdges = discourseCompilerOverlaySummary.counters.overlayEdgeCount;
+        snapshot.counters.discourseCompilerOverlayChunkWormholes = discourseCompilerOverlaySummary.counters.chunkWormholeEdges;
+        snapshot.counters.discourseCompilerOverlayDocumentClusters = discourseCompilerOverlaySummary.counters.documentClusterEdges;
+        snapshot.counters.discourseCompilerOverlayResolvers = discourseCompilerOverlaySummary.counters.resolverEdges;
+        snapshot.counters.discourseCompilerOverlayReceipts = discourseCompilerOverlaySummary.counters.receiptCount;
+        snapshot.counters.discourseCompilerOverlayGraphPatches = discourseCompilerOverlaySummary.counters.graphPatchCount;
+        snapshot.counters.discourseCompilerOverlayMutationAllowed = discourseCompilerOverlaySummary.counters.mutationAllowedCount;
+    }
     const calendarRegistrySummary = buildGraphCalendarRegistryBridgeSummary({
         calendarRegistry: input.calendarRegistrySnapshot,
         sourceSnapshotId: snapshot.id,
@@ -542,19 +545,6 @@ function planLaneCandidates(
 
 function buildNodes(anchors: GraphRebuildEntityAnchor[], entitiesById: Map<string, RegisteredEntity>): GraphRebuildNode[] {
     const byEntity = new Map<string, GraphRebuildNode>();
-    for (const entity of entitiesById.values()) {
-        if (!entity.id || !entity.label) continue;
-        byEntity.set(entity.id, {
-            id: entity.id,
-            entityId: entity.id,
-            label: entity.label,
-            kind: entity.kind,
-            aliases: [...(entity.aliases || [])],
-            anchorIds: [],
-            noteIds: [],
-            totalMentions: 0,
-        });
-    }
     for (const anchor of anchors) {
         const entity = entitiesById.get(anchor.entityId);
         if (!entity) continue;

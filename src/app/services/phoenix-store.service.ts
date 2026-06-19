@@ -658,6 +658,13 @@ export class PhoenixStoreService {
         return this.runContentRelationUpsert('scoped_documents', scopedDocumentToRow(document));
     }
 
+    async upsertScopedDocuments(documents: StoreScopedDocument[]): Promise<PhoenixContentMutationTiming> {
+        return this.runContentMutation(documents.map((document) => ({
+            command: 'relation:upsert',
+            payload: { relation: 'scoped_documents', row: scopedDocumentToRow(document) },
+        })));
+    }
+
     async getScopedDocument(
         scopeFolderId: string,
         namespace: string,

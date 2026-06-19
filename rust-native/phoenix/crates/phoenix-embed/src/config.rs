@@ -5,8 +5,7 @@ use crate::default_embedding_model_root;
 const PASSAGE_PREFIX: &str = "passage: ";
 const JINA_QUERY_PREFIX: &str = "Query: ";
 const JINA_DOCUMENT_PREFIX: &str = "Document: ";
-const MDBR_LEAF_QUERY_PREFIX: &str =
-    "Represent this sentence for searching relevant passages: ";
+const MDBR_LEAF_QUERY_PREFIX: &str = "Represent this sentence for searching relevant passages: ";
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum TextEmbeddingProfile {

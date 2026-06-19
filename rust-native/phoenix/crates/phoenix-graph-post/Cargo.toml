@@ -8,9 +8,14 @@ authors.workspace = true
 [dependencies]
 serde.workspace = true
 serde_json.workspace = true
+rmp-serde.workspace = true
 rustc-hash.workspace = true
 hashbrown.workspace = true
+compact_str.workspace = true
+memmap2.workspace = true
 thiserror.workspace = true
+wide.workspace = true
+zerocopy.workspace = true
 phoenix-chunker = { path = "../phoenix-chunker" }
 phoenix-embed = { path = "../phoenix-embed" }
 phoenix-graph = { path = "../phoenix-graph" }

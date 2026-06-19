@@ -18,11 +18,13 @@ mod causal;
 mod causal_view;
 mod chrono_region;
 mod galaxy;
+mod learning;
 mod pcst_region;
 mod query_view;
 mod region;
 mod snapshot_query;
 mod structural;
+mod truth_commit;
 
 pub use borrowed::{KernelCsrRef, KernelGraphRef};
 pub use bounded_walk::{
@@ -39,6 +41,12 @@ pub use galaxy::{
     galaxy_graph_from_snapshot, GalaxyBuildOptions, GalaxyEdgeRecord, GalaxyGraphPack,
     GalaxyNodeRecord, GalaxyPackStats,
 };
+pub use learning::{
+    project_graph_proposal_outcomes, GraphProposalBatchReceipt, GraphProposalFeatures,
+    GraphProposalObservation, GraphProposalOutcome, GraphProposalOutcomeKind,
+    GraphProposalReceiptError, GraphProposalStatus, GRAPH_PROPOSAL_FEATURE_DIM,
+    GRAPH_PROPOSAL_RECEIPT_SCHEMA_VERSION,
+};
 pub use query_view::{KernelQuerySurface, KernelQueryView};
 pub use region::{expand_snapshot_region, KernelExpandedRegion};
 pub use snapshot_query::{
@@ -49,11 +57,17 @@ pub use structural::{
     KernelLocalDiffusionKind, KernelStructuralAnalytics, KernelStructuralProfile,
     KernelStructuralScore,
 };
+pub use truth_commit::{
+    GraphTruthAtomKey, GraphTruthCommit, GraphTruthCommitError, GraphTruthLineage,
+    GraphTruthLineageError,
+};
 
 #[cfg(test)]
 mod causal_view_tests;
 #[cfg(test)]
 mod galaxy_tests;
+#[cfg(test)]
+mod learning_tests;
 
 #[derive(Clone, Debug, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(transparent)]

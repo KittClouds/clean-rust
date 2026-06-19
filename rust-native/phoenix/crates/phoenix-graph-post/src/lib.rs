@@ -9,6 +9,17 @@ mod phase4_scoring;
 mod phase4_scoring_support;
 mod phase4_scoring_text;
 mod phase5_path_rerank;
+mod promotion_lane_policy;
+mod promotion_lanes;
+#[cfg(test)]
+mod promotion_lanes_tests;
+pub mod promotion_learner;
+#[cfg(test)]
+mod promotion_learner_tests;
+mod promotion_receipts;
+pub mod promotion_training;
+#[cfg(test)]
+mod promotion_training_tests;
 mod query_session;
 mod query_units;
 mod retrieval;

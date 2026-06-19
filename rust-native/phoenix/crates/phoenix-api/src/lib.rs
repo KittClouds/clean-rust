@@ -10,16 +10,17 @@ use phoenix_alex::{api as alex_api, AlexError, Lexicon};
 use phoenix_causal_post::api as causal_api;
 use phoenix_er_post::api as er_api;
 use phoenix_event_identity_post::api as event_identity_api;
+use phoenix_graph_kernel::{project_graph_proposal_outcomes, GraphProposalOutcome};
 use phoenix_graph_post::api as graph_api;
 use phoenix_memory_post::api as memory_api;
 use phoenix_rel_post::api as rel_api;
 use phoenix_state_schema_post::api as state_schema_api;
 use phoenix_store_native_core::{
     PhoenixArchiveStoreV2, PhoenixCausalPatchStore, PhoenixErPatchStore,
-    PhoenixEventIdentityPatchStore, PhoenixGraphPatchStore, PhoenixLexicalQueryStore,
-    PhoenixMemoryPatchStore, PhoenixRelationPatchStore, PhoenixScopeRuntimeStore,
-    PhoenixSemanticGraphPatchStore, PhoenixSemanticIndexStore, PhoenixStateSchemaPatchStore,
-    PhoenixTemporalPatchStore, StoreError,
+    PhoenixEventIdentityPatchStore, PhoenixGraphKernelStoreV2, PhoenixGraphLearningStore,
+    PhoenixGraphPatchStore, PhoenixLexicalQueryStore, PhoenixMemoryPatchStore,
+    PhoenixRelationPatchStore, PhoenixScopeRuntimeStore, PhoenixSemanticGraphPatchStore,
+    PhoenixSemanticIndexStore, PhoenixStateSchemaPatchStore, PhoenixTemporalPatchStore, StoreError,
 };
 use phoenix_temporal_post::api as temporal_api;
 use phoenix_types::{LexiconEntry, ScopeKey, SessionId};
@@ -316,7 +317,10 @@ where
         created_at: i64,
     ) -> Result<GraphRunReport, PipelineApiError>
     where
-        S: PhoenixGraphPatchStore + PhoenixSemanticGraphPatchStore,
+        S: PhoenixGraphPatchStore
+            + PhoenixGraphKernelStoreV2
+            + PhoenixGraphLearningStore
+            + PhoenixSemanticGraphPatchStore,
     {
         pipeline_scheduler::run_graph_pipeline(
             &self.store,
@@ -331,7 +335,10 @@ where
         created_at: i64,
     ) -> Result<SidecarContinuityRunReport, PipelineApiError>
     where
-        S: PhoenixGraphPatchStore + PhoenixSemanticGraphPatchStore,
+        S: PhoenixGraphPatchStore
+            + PhoenixGraphKernelStoreV2
+            + PhoenixGraphLearningStore
+            + PhoenixSemanticGraphPatchStore,
     {
         pipeline_scheduler::run_sidecar_continuity_pipeline(
             &self.store,
@@ -580,6 +587,7 @@ where
     S: PhoenixArchiveStoreV2
         + PhoenixCausalPatchStore
         + PhoenixEventIdentityPatchStore
+        + PhoenixGraphKernelStoreV2
         + PhoenixGraphPatchStore
         + PhoenixLexicalQueryStore
         + PhoenixMemoryPatchStore
@@ -593,6 +601,16 @@ where
         session_id: Option<&SessionId>,
     ) -> Result<Vec<phoenix_graph_post::GraphScopeReviewBatch>, StoreError> {
         graph_api::derive_batches(self.store, session_id)
+    }
+
+    pub fn proposal_outcomes(&self) -> Result<Vec<GraphProposalOutcome>, StoreError>
+    where
+        S: PhoenixGraphLearningStore,
+    {
+        let receipts = self.store.load_graph_proposal_receipts()?;
+        let commits = self.store.load_graph_truth_commits()?;
+        project_graph_proposal_outcomes(&receipts, &commits)
+            .map_err(|error| StoreError::Schema(error.to_string()))
     }
 
     pub fn current_slot(
