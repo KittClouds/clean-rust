@@ -1,3 +1,4 @@
+mod document_index_read;
 mod graph_galaxy;
 mod graph_scene_packet;
 mod phoenix_rpc;

@@ -20,6 +20,10 @@ import type {
     PhoenixGraphScenePacket,
     PhoenixGraphScenePacketRequest,
 } from './phoenix-graph-scene-packet.model';
+import type {
+    PhoenixDocumentIndexReadRequest,
+    PhoenixDocumentIndexReadResponse,
+} from './phoenix-document-index.model';
 
 type PhoenixTransportMethodName =
     | 'onReady'
@@ -335,6 +339,12 @@ export class PhoenixBackendService {
         return this.target === 'native'
             ? this.requireNativeBridge().storeCommand(command, payload)
             : this.wasm.storeCommand(command, payload);
+    }
+
+    async readDocumentIndex(
+        request: PhoenixDocumentIndexReadRequest,
+    ): Promise<PhoenixDocumentIndexReadResponse> {
+        return this.storeCommand('documentIndex:read', request as unknown as Record<string, unknown>);
     }
 
     async chatInit(config: Record<string, unknown>): Promise<any> {

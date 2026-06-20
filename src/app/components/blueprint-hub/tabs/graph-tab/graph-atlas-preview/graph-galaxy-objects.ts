@@ -1,13 +1,13 @@
 import * as THREE from 'three';
 
-import type { GalaxyRenderSettings } from './graph-galaxy-engine';
+import type { GalaxyRenderSettings, GalaxySphereSurfaceMode } from './graph-galaxy-engine';
 import type { GalaxySceneV2 } from './graph-galaxy-scene-v2';
 
 export type GalaxyNodeObject = THREE.Sprite | THREE.Mesh;
 export type GalaxyNodeMaterial = THREE.SpriteMaterial | THREE.MeshBasicMaterial | THREE.MeshPhysicalMaterial;
-export type GalaxyGlassNodeState = 'dimmed' | 'normal' | 'neighbor' | 'active';
+export type GalaxySphereNodeState = 'dimmed' | 'normal' | 'neighbor' | 'active';
 
-export interface GalaxyGlassNodeBatch {
+export interface GalaxySphereNodeBatch {
     meshes: readonly THREE.InstancedMesh[];
 }
 
@@ -21,7 +21,7 @@ export interface GalaxyGlowBatch {
 
 export const SPHERE_NODE_RENDER_SCALE = 0.45;
 
-const GLASS_NODE_STATES: readonly { state: GalaxyGlassNodeState; opacity: number; rimStrength: number; innerStrength: number; sheen: number }[] = [
+const SPHERE_NODE_STATES: readonly { state: GalaxySphereNodeState; opacity: number; rimStrength: number; innerStrength: number; sheen: number }[] = [
     { state: 'dimmed', opacity: 0.5, rimStrength: 0.66, innerStrength: 0.5, sheen: 0.012 },
     { state: 'normal', opacity: 0.78, rimStrength: 0.86, innerStrength: 0.78, sheen: 0.024 },
     { state: 'neighbor', opacity: 0.84, rimStrength: 0.94, innerStrength: 0.84, sheen: 0.032 },
@@ -48,14 +48,14 @@ export function galaxyNodePickShapeBoost(shape: GalaxyRenderSettings['nodeShape'
     return shape === 'sphere' ? 2 : shape === 'atom' ? 1 : 2;
 }
 
-export function galaxyGlassNodeStateIndex(active: boolean, hovered: boolean, neighbor: boolean, dimmed: boolean): number {
+export function galaxySphereNodeStateIndex(active: boolean, hovered: boolean, neighbor: boolean, dimmed: boolean): number {
     if (dimmed) return 0;
     if (hovered || active) return 3;
     return neighbor ? 2 : 1;
 }
 
-export function galaxyGlassNodeBatch(group: THREE.Group | null): GalaxyGlassNodeBatch | null {
-    return group?.userData['glassNodeBatch'] as GalaxyGlassNodeBatch | undefined || null;
+export function galaxySphereNodeBatch(group: THREE.Group | null): GalaxySphereNodeBatch | null {
+    return group?.userData['sphereNodeBatch'] as GalaxySphereNodeBatch | undefined || null;
 }
 
 export function galaxyGlowBatch(group: THREE.Group | null): GalaxyGlowBatch | null {
@@ -64,8 +64,9 @@ export function galaxyGlowBatch(group: THREE.Group | null): GalaxyGlowBatch | nu
 
 export function buildGalaxyNodes(scene: GalaxySceneV2, settings: GalaxyRenderSettings, nodeTexture: THREE.Texture, atomTexture: THREE.Texture): THREE.Group | null {
     if (!scene.ids.length) return null;
-    if (settings.nodeShape === 'sphere' && settings.sphereSurface === 'glass') {
-        return buildGlassSphereNodes(scene);
+    const sphereSurface = settings.sphereSurface || 'solid';
+    if (settings.nodeShape === 'sphere' && sphereSurface !== 'solid') {
+        return buildStyledSphereNodes(scene, sphereSurface);
     }
     const group = new THREE.Group();
     const productAtom = settings.nodeShape === 'atom' && scene.layoutMode === 'productManifold';
@@ -99,25 +100,26 @@ export function buildGalaxyNodes(scene: GalaxySceneV2, settings: GalaxyRenderSet
     return group;
 }
 
-function buildGlassSphereNodes(scene: GalaxySceneV2): THREE.Group {
+function buildStyledSphereNodes(scene: GalaxySceneV2, surface: Exclude<GalaxySphereSurfaceMode, 'solid'>): THREE.Group {
     const group = new THREE.Group();
     const hidden = new THREE.Matrix4().makeScale(0, 0, 0);
-    const batch: GalaxyGlassNodeBatch = {
-        meshes: GLASS_NODE_STATES.map((state, stateIndex) => {
+    const batch: GalaxySphereNodeBatch = {
+        meshes: SPHERE_NODE_STATES.map((state, stateIndex) => {
             const geometry = new THREE.SphereGeometry(1, 16, 10);
-            const material = glassSphereMaterial(state);
+            const material = sphereSurfaceMaterial(surface, state);
             const mesh = new THREE.InstancedMesh(geometry, material, scene.ids.length);
             mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
             mesh.instanceColor = glassInstanceColors(scene.ids.length);
             mesh.frustumCulled = false;
             mesh.renderOrder = 8 + stateIndex;
-            mesh.userData['glassNodeState'] = state.state;
+            mesh.userData['sphereNodeState'] = state.state;
             for (let index = 0; index < scene.ids.length; index++) mesh.setMatrixAt(index, hidden);
             group.add(mesh);
             return mesh;
         }),
     };
-    group.userData['glassNodeBatch'] = batch;
+    group.userData['sphereNodeBatch'] = batch;
+    group.userData['sphereSurface'] = surface;
     return group;
 }
 
@@ -127,7 +129,17 @@ function glassInstanceColors(count: number): THREE.InstancedBufferAttribute {
     return new THREE.InstancedBufferAttribute(colors, 3).setUsage(THREE.DynamicDrawUsage);
 }
 
-function glassSphereMaterial(state: (typeof GLASS_NODE_STATES)[number]): THREE.ShaderMaterial {
+function sphereSurfaceMaterial(
+    surface: Exclude<GalaxySphereSurfaceMode, 'solid'>,
+    state: (typeof SPHERE_NODE_STATES)[number],
+): THREE.ShaderMaterial {
+    if (surface === 'spellglass') return spellglassSphereMaterial(state);
+    if (surface === 'obsidian') return obsidianSphereMaterial(state);
+    if (surface === 'starcore') return starcoreSphereMaterial(state);
+    return glassSphereMaterial(state);
+}
+
+function glassSphereMaterial(state: (typeof SPHERE_NODE_STATES)[number]): THREE.ShaderMaterial {
     const material = new THREE.ShaderMaterial({
         name: 'BGlassInstancedMarble',
         uniforms: {
@@ -210,7 +222,168 @@ function glassSphereMaterial(state: (typeof GLASS_NODE_STATES)[number]): THREE.S
         toneMapped: false,
     });
     material.userData['glassSurface'] = 'b-glass-marble';
+    material.userData['sphereSurface'] = 'glass';
     material.userData['glassState'] = state.state;
+    material.userData['sphereState'] = state.state;
+    return material;
+}
+
+const STYLED_SPHERE_VERTEX_SHADER = `
+    varying vec3 vSphereColor;
+    varying vec3 vSphereNormal;
+    varying vec3 vSphereView;
+    varying vec3 vSphereLocal;
+
+    void main() {
+        vec4 instancedPosition = vec4(position, 1.0);
+        vec3 instancedNormal = normal;
+
+        #ifdef USE_INSTANCING
+            instancedPosition = instanceMatrix * instancedPosition;
+            instancedNormal = mat3(instanceMatrix) * instancedNormal;
+        #endif
+
+        vec4 worldPosition = modelMatrix * instancedPosition;
+        vSphereNormal = normalize(mat3(modelMatrix) * instancedNormal);
+        vSphereView = normalize(cameraPosition - worldPosition.xyz);
+        vSphereLocal = position;
+
+        #ifdef USE_INSTANCING_COLOR
+            vSphereColor = instanceColor;
+        #else
+            vSphereColor = vec3(0.42, 1.0, 0.92);
+        #endif
+
+        gl_Position = projectionMatrix * viewMatrix * worldPosition;
+    }
+`;
+
+function spellglassSphereMaterial(state: (typeof SPHERE_NODE_STATES)[number]): THREE.ShaderMaterial {
+    return styledSphereMaterial('CSpellglassMarble', 'spellglass', state, `
+        uniform float opacity;
+        uniform float rimStrength;
+        uniform float innerStrength;
+        uniform float sheen;
+        varying vec3 vSphereColor;
+        varying vec3 vSphereNormal;
+        varying vec3 vSphereView;
+        varying vec3 vSphereLocal;
+
+        void main() {
+            vec3 normal = normalize(vSphereNormal);
+            vec3 view = normalize(vSphereView);
+            vec3 source = max(vSphereColor, vec3(0.035));
+            float fresnel = pow(1.0 - clamp(abs(dot(normal, view)), 0.0, 1.0), 2.15);
+            float radial = length(vSphereLocal.xz);
+            float shellBand = pow(1.0 - abs(sin((radial * 7.2 + vSphereLocal.y * 1.7) * 3.14159265)), 12.0);
+            float spiral = pow(1.0 - abs(sin(atan(vSphereLocal.z, vSphereLocal.x) * 2.0 + vSphereLocal.y * 8.4)), 16.0);
+            float caustic = clamp(shellBand * 0.72 + spiral * 0.48, 0.0, 1.0);
+            float phase = vSphereLocal.x * 4.2 - vSphereLocal.y * 5.6 + vSphereLocal.z * 3.4;
+            vec3 prism = mix(source, source.gbr, 0.48 + sin(phase) * 0.28);
+            vec3 deep = mix(vec3(0.008, 0.018, 0.035), source * 0.42, 0.54 + innerStrength * 0.22);
+            vec3 hue = deep + prism * caustic * (0.42 + innerStrength * 0.58);
+            hue += mix(source.brg, vec3(0.72, 0.94, 1.0), 0.28) * fresnel * rimStrength * 0.74;
+            hue += vec3(1.0, 0.82, 0.56) * pow(max(dot(normal, normalize(vec3(-0.4, 0.5, 0.76))), 0.0), 28.0) * (0.18 + sheen);
+            float alpha = opacity * (0.2 + fresnel * 0.58 + caustic * 0.24);
+            if (alpha <= 0.008) discard;
+            gl_FragColor = vec4(hue, alpha);
+        }
+    `);
+}
+
+function obsidianSphereMaterial(state: (typeof SPHERE_NODE_STATES)[number]): THREE.ShaderMaterial {
+    return styledSphereMaterial('DObsidianCrescent', 'obsidian', state, `
+        uniform float opacity;
+        uniform float rimStrength;
+        uniform float innerStrength;
+        uniform float sheen;
+        varying vec3 vSphereColor;
+        varying vec3 vSphereNormal;
+        varying vec3 vSphereView;
+        varying vec3 vSphereLocal;
+
+        void main() {
+            vec3 normal = normalize(vSphereNormal);
+            vec3 view = normalize(vSphereView);
+            vec3 source = max(vSphereColor, vec3(0.028));
+            vec3 lightDir = normalize(vec3(-0.58, 0.42, 0.7));
+            float facing = clamp(dot(normal, lightDir), -1.0, 1.0);
+            float crescent = smoothstep(-0.12, 0.58, facing) * (1.0 - smoothstep(0.64, 0.96, facing));
+            float rim = pow(1.0 - clamp(abs(dot(normal, view)), 0.0, 1.0), 3.1);
+            float mineral = 0.5 + 0.5 * sin(dot(vSphereLocal, vec3(17.0, 11.0, 23.0)) + vSphereLocal.y * 9.0);
+            vec3 blackGlass = vec3(0.004, 0.007, 0.013) + source * (0.045 + mineral * 0.035);
+            vec3 colorCrescent = mix(source * 1.18, vec3(1.0, 0.9, 0.7), 0.18) * crescent;
+            vec3 hue = blackGlass + colorCrescent * (0.7 + innerStrength * 0.42);
+            hue += mix(source, vec3(0.72, 0.88, 1.0), 0.42) * rim * rimStrength * 0.48;
+            hue += vec3(1.0) * pow(max(facing, 0.0), 48.0) * (0.2 + sheen * 2.0);
+            float alpha = opacity * (0.72 + crescent * 0.16 + rim * 0.12);
+            if (alpha <= 0.008) discard;
+            gl_FragColor = vec4(hue, alpha);
+        }
+    `);
+}
+
+function starcoreSphereMaterial(state: (typeof SPHERE_NODE_STATES)[number]): THREE.ShaderMaterial {
+    return styledSphereMaterial('EStarcore', 'starcore', state, `
+        uniform float opacity;
+        uniform float rimStrength;
+        uniform float innerStrength;
+        uniform float sheen;
+        varying vec3 vSphereColor;
+        varying vec3 vSphereNormal;
+        varying vec3 vSphereView;
+        varying vec3 vSphereLocal;
+
+        void main() {
+            vec3 normal = normalize(vSphereNormal);
+            vec3 view = normalize(vSphereView);
+            vec3 source = max(vSphereColor, vec3(0.04));
+            vec3 lightDir = normalize(vec3(-0.46, 0.58, 0.68));
+            float diffuse = 0.5 + 0.5 * max(dot(normal, lightDir), 0.0);
+            float facing = clamp(dot(normal, view), 0.0, 1.0);
+            float rim = pow(1.0 - facing, 2.65);
+            float equator = pow(1.0 - abs(vSphereLocal.y), 7.0);
+            float hotCore = pow(facing, 3.2) * (0.72 + 0.28 * max(dot(normal, lightDir), 0.0));
+            float hemisphere = smoothstep(-0.72, 0.78, vSphereLocal.x - vSphereLocal.z * 0.32);
+            vec3 body = mix(source * 0.54, source.brg * 0.78, hemisphere * 0.38);
+            body *= 0.72 + diffuse * 0.48 + innerStrength * 0.12;
+            vec3 seam = mix(source * 1.28, vec3(1.0, 0.72, 0.34), 0.32) * equator * 0.68;
+            vec3 core = mix(source, vec3(1.0, 0.9, 0.7), 0.36) * hotCore * (0.34 + sheen * 2.0);
+            vec3 hue = body + seam + core;
+            hue += mix(source.brg, vec3(0.68, 0.94, 1.0), 0.36) * rim * rimStrength * 0.52;
+            float alpha = opacity * (0.84 + rim * 0.12 + equator * 0.04);
+            if (alpha <= 0.008) discard;
+            gl_FragColor = vec4(hue, alpha);
+        }
+    `);
+}
+
+function styledSphereMaterial(
+    name: string,
+    surface: Exclude<GalaxySphereSurfaceMode, 'solid' | 'glass'>,
+    state: (typeof SPHERE_NODE_STATES)[number],
+    fragmentShader: string,
+    blending: THREE.Blending = THREE.NormalBlending,
+): THREE.ShaderMaterial {
+    const material = new THREE.ShaderMaterial({
+        name,
+        uniforms: {
+            opacity: { value: state.opacity },
+            rimStrength: { value: state.rimStrength },
+            innerStrength: { value: state.innerStrength },
+            sheen: { value: state.sheen },
+        },
+        vertexShader: STYLED_SPHERE_VERTEX_SHADER,
+        fragmentShader,
+        transparent: true,
+        depthWrite: false,
+        depthTest: true,
+        blending,
+        side: THREE.FrontSide,
+        toneMapped: false,
+    });
+    material.userData['sphereSurface'] = surface;
+    material.userData['sphereState'] = state.state;
     return material;
 }
 

@@ -3,11 +3,11 @@ import { describe, expect, it } from 'vitest';
 import {
     SPHERE_NODE_RENDER_SCALE,
     buildGalaxyNodes,
-    galaxyGlassNodeBatch,
     galaxyNodePickShapeBoost,
     galaxyNodeShapeScale,
+    galaxySphereNodeBatch,
 } from './graph-galaxy-objects';
-import { mergeGalaxySettings } from './graph-galaxy-engine';
+import { mergeGalaxySettings, type GalaxySphereSurfaceMode } from './graph-galaxy-engine';
 import type { GalaxySceneV2 } from './graph-galaxy-scene-v2';
 import * as THREE from 'three';
 
@@ -39,12 +39,13 @@ describe('galaxy node shape rendering', () => {
         const texture = new THREE.Texture();
         const solid = buildGalaxyNodes(scene, mergeGalaxySettings({ nodeShape: 'sphere', sphereSurface: 'solid' }), texture, texture);
         const glass = buildGalaxyNodes(scene, mergeGalaxySettings({ nodeShape: 'sphere', sphereSurface: 'glass' }), texture, texture);
-        const batch = galaxyGlassNodeBatch(glass);
+        const batch = galaxySphereNodeBatch(glass);
 
         expect((solid?.children[0] as THREE.Mesh).material).toBeInstanceOf(THREE.MeshBasicMaterial);
         expect(batch?.meshes[1].material).toBeInstanceOf(THREE.ShaderMaterial);
         const material = batch?.meshes[1].material as THREE.ShaderMaterial | undefined;
         expect(material?.userData['glassSurface']).toBe('b-glass-marble');
+        expect(material?.userData['sphereSurface']).toBe('glass');
         expect(material?.vertexShader).toContain('instanceColor');
         expect(material?.fragmentShader).toContain('rimStrength');
         expect(material?.fragmentShader).toContain('sheen');
@@ -61,7 +62,7 @@ describe('galaxy node shape rendering', () => {
         const scene = { ids: ['node:a', 'node:b', 'node:c'] } as GalaxySceneV2;
         const texture = new THREE.Texture();
         const glass = buildGalaxyNodes(scene, mergeGalaxySettings({ nodeShape: 'sphere', sphereSurface: 'glass' }), texture, texture);
-        const batch = galaxyGlassNodeBatch(glass);
+        const batch = galaxySphereNodeBatch(glass);
 
         expect(batch?.meshes).toHaveLength(4);
         expect(glass?.children).toHaveLength(4);
@@ -70,7 +71,44 @@ describe('galaxy node shape rendering', () => {
         expect(batch?.meshes.every((mesh) => mesh.material instanceof THREE.ShaderMaterial)).toBe(true);
         expect(batch?.meshes.every((mesh) => mesh.instanceColor?.count === scene.ids.length)).toBe(true);
         expect(batch?.meshes.every((mesh) => mesh.instanceColor?.usage === THREE.DynamicDrawUsage)).toBe(true);
-        expect((batch?.meshes[1].material as THREE.ShaderMaterial | undefined)?.userData['glassState']).toBe('normal');
+        expect((batch?.meshes[1].material as THREE.ShaderMaterial | undefined)?.userData['sphereState']).toBe('normal');
+
+        texture.dispose();
+    });
+
+    it('keeps C, D, and E visually distinct inside the shared instanced sphere contract', () => {
+        const scene = { ids: ['node:a', 'node:b'] } as GalaxySceneV2;
+        const texture = new THREE.Texture();
+        const recipes = [
+            { surface: 'spellglass' as const, name: 'CSpellglassMarble', token: 'shellBand', blending: THREE.NormalBlending },
+            { surface: 'obsidian' as const, name: 'DObsidianCrescent', token: 'crescent', blending: THREE.NormalBlending },
+            { surface: 'starcore' as const, name: 'EStarcore', token: 'equator', blending: THREE.NormalBlending },
+        ];
+
+        for (const recipe of recipes) {
+            const group = buildGalaxyNodes(
+                scene,
+                mergeGalaxySettings({ nodeShape: 'sphere', sphereSurface: recipe.surface }),
+                texture,
+                texture,
+            );
+            const batch = galaxySphereNodeBatch(group);
+            const material = batch?.meshes[1].material as THREE.ShaderMaterial | undefined;
+            expect(batch?.meshes).toHaveLength(4);
+            expect(batch?.meshes.every((mesh) => mesh instanceof THREE.InstancedMesh)).toBe(true);
+            expect(batch?.meshes.every((mesh) => mesh.count === scene.ids.length)).toBe(true);
+            expect(material?.name).toBe(recipe.name);
+            expect(material?.userData['sphereSurface']).toBe(recipe.surface);
+            expect(material?.fragmentShader).toContain(recipe.token);
+            expect(material?.blending).toBe(recipe.blending);
+            expect(material?.depthWrite).toBe(false);
+        }
+
+        expect(mergeGalaxySettings({ sphereSurface: 'spellglass' }).sphereSurface).toBe('spellglass');
+        expect(mergeGalaxySettings({ sphereSurface: 'obsidian' }).sphereSurface).toBe('obsidian');
+        expect(mergeGalaxySettings({ sphereSurface: 'starcore' }).sphereSurface).toBe('starcore');
+        expect(mergeGalaxySettings({ sphereSurface: 'lattice' as GalaxySphereSurfaceMode }).sphereSurface).toBe('starcore');
+        expect(mergeGalaxySettings({ sphereSurface: 'retired' as GalaxySphereSurfaceMode }).sphereSurface).toBe('solid');
 
         texture.dispose();
     });

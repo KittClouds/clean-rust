@@ -416,3 +416,63 @@ pub trait PhoenixScopeRuntimeStore {
         spec: ScopeImageSpec,
     ) -> Result<Vec<ScopeRuntimeImage>, StoreError>;
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn continuity_runtime_routes_outline_ready_document_inputs() {
+        let spec = ScopeImageSpec::continuity();
+
+        for kind in [
+            DocumentSegmentKind::SentenceTable,
+            DocumentSegmentKind::MentionTable,
+            DocumentSegmentKind::ResolvedMentionTable,
+            DocumentSegmentKind::ChunkTable,
+            DocumentSegmentKind::EntityTable,
+            DocumentSegmentKind::RelationTable,
+            DocumentSegmentKind::NarrativeHitTable,
+            DocumentSegmentKind::EventIdentitySubstrateTable,
+            DocumentSegmentKind::TemporalSubstrateTable,
+            DocumentSegmentKind::CausalSubstrateTable,
+        ] {
+            assert!(
+                spec.archive_segments.contains(kind),
+                "continuity should load {kind:?}"
+            );
+        }
+        assert!(spec.sidecars.includes_lexical());
+        assert!(spec.sidecars.includes_er());
+        assert!(spec.sidecars.includes_relation());
+        assert!(spec.sidecars.includes_state_schema());
+        assert!(spec.sidecars.includes_memory());
+        assert!(spec.sidecars.includes_event_identity());
+        assert!(spec.sidecars.includes_temporal());
+        assert!(spec.sidecars.includes_causal());
+        assert!(!spec.sidecars.includes_graph());
+        assert!(!spec.sidecars.includes_semantic_graph());
+    }
+
+    #[test]
+    fn sidecar_continuity_adds_graph_without_dropping_continuity_inputs() {
+        let continuity = ScopeImageSpec::continuity();
+        let sidecar_continuity = ScopeImageSpec::sidecar_continuity();
+
+        assert!(sidecar_continuity
+            .archive_segments
+            .contains_all(continuity.archive_segments));
+        assert_eq!(
+            sidecar_continuity.archive_segments.raw_bits()
+                & !continuity.archive_segments.raw_bits(),
+            ArchiveSegmentMask::graph_runtime().raw_bits()
+                & !continuity.archive_segments.raw_bits()
+        );
+        assert_eq!(
+            sidecar_continuity.sidecars.raw_bits() & continuity.sidecars.raw_bits(),
+            continuity.sidecars.raw_bits()
+        );
+        assert!(sidecar_continuity.sidecars.includes_graph());
+        assert!(!sidecar_continuity.sidecars.includes_semantic_graph());
+    }
+}

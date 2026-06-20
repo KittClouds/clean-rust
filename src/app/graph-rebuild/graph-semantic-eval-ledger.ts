@@ -94,7 +94,7 @@ function entryFor(
             decision.state === 'accepted' ? 'accepted_candidate' : '',
             decision.state === 'rejected' || decision.state === 'invalidated' ? 'rejected_candidate' : '',
             mutation ? 'before_after_graph_change' : '',
-            mutation ? 'typescript_compatibility_containment_graph_change' : '',
+            mutation ? 'graph_rebuild_live_contract_graph_change' : '',
             userCorrectionFlag(snapshot, candidate),
         ]),
         beforeGraph: {

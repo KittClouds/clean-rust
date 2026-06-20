@@ -29,7 +29,7 @@ describe('graph galaxy hierarchy contract', () => {
         expect(byId.get('embed:structure-root:note-1:identity')!).toBeGreaterThan(byId.get('embed:chunk:chunk-1')!);
         expect(byId.get('embed:chunk:chunk-1')!).toBeGreaterThan(byId.get('embed:anchor:mention-1')!);
         expect(byId.get('embed:anchor:mention-1')!).toBeGreaterThan(byId.get('embed:entity:kai')!);
-        expect(byId.get('embed:entity:kai')!).toBeGreaterThan(byId.get('embed:event:trust')!);
+        expect(byId.get('embed:event:trust')!).toBeGreaterThan(byId.get('embed:entity:kai')!);
     });
 
     it('preserves document-root-chunk-entity order for graph rebuild Caps snapshots', () => {
@@ -81,7 +81,7 @@ describe('graph galaxy hierarchy contract', () => {
         expect(byId.get('embed:chunk:note-a:chunk-1:evidence:a1')!).toBeGreaterThan(byId.get('embed:entity:kai')!);
         expect(byId.get('embed:entity:kai')!).toBeGreaterThan(byId.get('embed:entity:kai:rank-state')!);
         expect(runtime.hierarchyShellRadii?.[indexById.get('embed:chunk:note-a:chunk-1:evidence:a1')!]).toBeCloseTo(1.14, 3);
-        expect(runtime.hierarchyShellRadii?.[indexById.get('embed:entity:kai:rank-state')!]).toBeCloseTo(0.52, 3);
+        expect(runtime.hierarchyShellRadii?.[indexById.get('embed:entity:kai:rank-state')!]).toBeCloseTo(0.58, 3);
     });
 
     it('does not cap graph rebuild atlas visibility before the document spine', () => {
@@ -121,7 +121,7 @@ describe('graph galaxy hierarchy contract', () => {
 
         expect(scene.nodes).toHaveLength(atlas.nodes.length);
         expect(new Set(scene.nodes.map((node) => node.entity.id)).has('embed:graph-fact:signal-0')).toBe(true);
-        expect(byId.get('embed:entity:kai')!).toBeGreaterThan(byId.get('embed:graph-fact:signal-0')!);
+        expect(byId.get('embed:graph-fact:signal-0')!).toBeGreaterThan(byId.get('embed:entity:kai')!);
     });
 
     it('keeps dense Embed Caps children distributed around their hierarchy shell', () => {
@@ -136,7 +136,7 @@ describe('graph galaxy hierarchy contract', () => {
         expect(validateHierarchyShellContract(scene.nodes)).toEqual([]);
         expect(factNodes).toHaveLength(32);
         for (const node of factNodes) {
-            expect(radius(node)).toBeCloseTo(0.66, 2);
+            expect(radius(node)).toBeCloseTo(0.98, 2);
         }
         expect(maxPairwiseDistance(factNodes)).toBeGreaterThan(0.5);
     });

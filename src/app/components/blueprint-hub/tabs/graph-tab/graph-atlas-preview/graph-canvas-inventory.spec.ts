@@ -8,7 +8,7 @@ describe('graph canvas inventory', () => {
     it('renders Rust Atlas packet families and status as the graph canvas contract', () => {
         const inventory = buildGraphCanvasInventory(snapshot());
 
-        expect(inventory.sourceLabel).toBe('rust atlas packet / no model vectors persisted');
+        expect(inventory.sourceLabel).toBe('rust-atlas-packet / no model vectors persisted');
         expect(inventory.kindCounts).toEqual([
             { kind: 'structure', count: 2 },
             { kind: 'entity', count: 1 },
@@ -39,6 +39,34 @@ describe('graph canvas inventory', () => {
             targetId: 'chunk:note-1:0',
             type: 'manifold_parent',
         });
+        for (const node of inventory.nodes) {
+            expect(node.metadata).toMatchObject({
+                sourceContract: 'rust-atlas-packet',
+                packetSnapshotId: 'snapshot-1',
+                packetScopeId: 'scope-1',
+                visualTrace: expect.objectContaining({
+                    source: 'rust_atlas_packet',
+                    family: node.kind,
+                    packetSnapshotId: 'snapshot-1',
+                    sourceContract: 'rust-atlas-packet',
+                }),
+            });
+            expect(String(node.metadata?.['visualSourceId'] || '')).not.toBe('');
+        }
+        for (const edge of inventory.edges) {
+            expect(edge.metadata).toMatchObject({
+                sourceContract: 'rust-atlas-packet',
+                packetSnapshotId: 'snapshot-1',
+                packetScopeId: 'scope-1',
+                visualTrace: expect.objectContaining({
+                    source: 'rust_atlas_packet',
+                    family: edge.metadata?.['graphFamily'],
+                    packetSnapshotId: 'snapshot-1',
+                    sourceContract: 'rust-atlas-packet',
+                }),
+            });
+            expect(String(edge.metadata?.['visualSourceId'] || '')).not.toBe('');
+        }
 
         const factLens = filterGraphForCanvasLens(inventory.nodes, inventory.edges, 'facts');
         expect(factLens.nodes.map((node) => node.id).sort()).toEqual([
@@ -99,10 +127,10 @@ function snapshot(): GraphRebuildSnapshot {
             scopeId: 'scope-1',
             builtAt: 1,
             sourceContract: {
-                authority: 'rust atlas packet',
-                identityAuthority: 'registry',
+                authority: 'rust-atlas-packet',
+                identityAuthority: 'registry-entities-and-accepted-anchors',
                 vectorContract: 'no model vectors persisted',
-                tsGraphBuilderRole: 'compatibility-only',
+                tsGraphBuilderRole: 'native-atlas-packet-authority',
             },
             objects: [
                 {

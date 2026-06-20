@@ -46,6 +46,7 @@ import {
     type GalaxyNodeShapeMode,
     type GalaxyRenderableNode,
     type GalaxyRenderSettings,
+    type GalaxySphereSurfaceMode,
 } from './graph-galaxy-engine';
 import type { GraphLensMode, GraphLensState } from '../graph-lens';
 import { buildGraphAtlasReadContext, graphLensState, type GraphAtlasReadContext } from './graph-atlas-read-context';
@@ -53,6 +54,21 @@ import { projectionSummaryRequestsRefresh } from './graph-atlas-refresh-summary'
 import { getSetting, setSetting } from '../../../../../lib/dexie/settings.service';
 
 export interface AtlasPreviewEdge extends GalaxyInputEdge {}
+
+const SPHERE_SURFACE_CYCLE: readonly GalaxySphereSurfaceMode[] = [
+    'solid',
+    'glass',
+    'spellglass',
+    'obsidian',
+    'starcore',
+];
+const SPHERE_SURFACE_LABELS: Record<GalaxySphereSurfaceMode, string> = {
+    solid: 'A - solid',
+    glass: 'B - glass',
+    spellglass: 'C - spellglass',
+    obsidian: 'D - obsidian',
+    starcore: 'E - starcore',
+};
 
 interface ActiveAtlasGraph {
     mode: AtlasMode;
@@ -413,7 +429,7 @@ function readPersistedAtlasViewState(): PersistedAtlasViewState {
                             <button type="button" class="galaxy-control-button" (click)="toggleClickFocus()">Dbl Focus<span>{{ settings.clickFocus ? 'on' : 'off' }}</span></button>
                             <button type="button" class="galaxy-control-button" (click)="cycleNodeShape()">Shape<span>{{ settings.nodeShape }}</span></button>
                             @if (settings.nodeShape === 'sphere') {
-                            <button type="button" class="galaxy-control-button" (click)="toggleSphereSurface()">Marble<span>{{ settings.sphereSurface === 'glass' ? 'B · glass' : 'A · solid' }}</span></button>
+                            <button type="button" class="galaxy-control-button" (click)="cycleSphereSurface()">Sphere<span>{{ sphereSurfaceLabel() }}</span></button>
                             }
                             <button type="button" class="galaxy-control-button" (click)="toggleAutoRotate()">Rotate<span>{{ settings.autoRotate ? 'on' : 'off' }}</span></button>
                             <button type="button" class="galaxy-control-button" (click)="cycleBackgroundMode()">Backdrop<span>{{ backgroundLabel() }}</span></button>
@@ -1841,8 +1857,14 @@ export class GraphAtlasPreviewComponent implements OnInit {
         return [...atlas.nodes, ...anchors];
     }
 
-    toggleSphereSurface(): void {
-        this.updateSettings({ sphereSurface: this.settings.sphereSurface === 'glass' ? 'solid' : 'glass' });
+    cycleSphereSurface(): void {
+        const current = this.settings.sphereSurface || 'solid';
+        const index = SPHERE_SURFACE_CYCLE.indexOf(current);
+        this.updateSettings({ sphereSurface: SPHERE_SURFACE_CYCLE[(index + 1) % SPHERE_SURFACE_CYCLE.length] });
+    }
+
+    sphereSurfaceLabel(): string {
+        return SPHERE_SURFACE_LABELS[this.settings.sphereSurface || 'solid'];
     }
 
     private registryEntityProjectionNode(

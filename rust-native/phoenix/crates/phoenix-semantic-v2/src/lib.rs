@@ -1,3 +1,4 @@
+use phoenix_document_index::PreparedDocumentIndexShard;
 use phoenix_graph_kernel::KernelMutationBatch;
 use phoenix_types::{
     BiTemporalWindow, CausalCandidate, CausalDiagnostic, CausalKind, CausalLink, ClaimRecord,
@@ -916,6 +917,8 @@ pub struct PreparedDocument {
     pub manifest: DocumentManifest,
     #[serde(default)]
     pub segments: Vec<PreparedDocumentSegment>,
+    #[serde(skip)]
+    pub document_index_shard: Option<PreparedDocumentIndexShard>,
     pub kernel_batch: KernelMutationBatch,
 }
 

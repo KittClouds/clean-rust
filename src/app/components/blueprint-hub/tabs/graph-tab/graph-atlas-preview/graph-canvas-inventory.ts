@@ -75,6 +75,7 @@ function buildAtlasPacketInventory(packet: GraphAtlasPacket): GraphInventory {
             if (!resolvedTargetId || resolvedTargetId === object.id) continue;
             const objectStatus = object.status || 'unknown';
             pushAtlasPacketEdge(edges, edgeIds, {
+                packet,
                 sourceId: object.id,
                 targetId: resolvedTargetId,
                 family: object.family,
@@ -92,6 +93,7 @@ function buildAtlasPacketInventory(packet: GraphAtlasPacket): GraphInventory {
             const parentObjectId = resolveAtlasObjectId(parentId, nodeIds, targetObjectById, objectIdBySourceId);
             if (!parentObjectId || parentObjectId === target.objectId) continue;
             pushAtlasPacketEdge(edges, edgeIds, {
+                packet,
                 sourceId: parentObjectId,
                 targetId: target.objectId,
                 family: target.family,
@@ -131,6 +133,7 @@ function atlasObjectNode(
         object.styleKey,
         object.stateContextKind,
     );
+    const visualTrace = atlasObjectVisualTrace(packet, object, target, family);
     return {
         id: object.id,
         label: object.label || object.id,
@@ -142,6 +145,11 @@ function atlasObjectNode(
             sourceType: 'rust-atlas-packet-object',
             sourceSystem: 'rust',
             sourceId: object.sourceIds[0] || target?.sourceId || object.id,
+            visualTrace,
+            visualSourceId: visualTrace.sourceId,
+            visualFamily: visualTrace.family,
+            packetSnapshotId: visualTrace.packetSnapshotId,
+            packetScopeId: visualTrace.packetScopeId,
             snapshotId: packet.snapshotId,
             scopeId: packet.scopeId,
             builtAt: packet.builtAt,
@@ -177,7 +185,7 @@ function atlasObjectNode(
             anchorIds: object.anchorIds,
             evidenceIds: object.evidenceIds,
             memberIds: object.targetIds,
-            graphImpact: 'Rust Atlas object rendered by family/status filtering; TS graph builders are compatibility only.',
+            graphImpact: 'Rust Atlas object rendered by family/status filtering.',
         },
     };
 }
@@ -193,6 +201,7 @@ function atlasTargetNode(packet: GraphAtlasPacket, target: GraphAtlasManifoldTar
         target.styleKey,
         target.stateContextKind,
     );
+    const visualTrace = atlasTargetVisualTrace(packet, target, family);
     return {
         id: target.objectId,
         label: target.label || target.objectId,
@@ -204,6 +213,11 @@ function atlasTargetNode(packet: GraphAtlasPacket, target: GraphAtlasManifoldTar
             sourceType: 'rust-atlas-packet-target',
             sourceSystem: 'rust',
             sourceId: target.sourceId,
+            visualTrace,
+            visualSourceId: visualTrace.sourceId,
+            visualFamily: visualTrace.family,
+            packetSnapshotId: visualTrace.packetSnapshotId,
+            packetScopeId: visualTrace.packetScopeId,
             snapshotId: packet.snapshotId,
             scopeId: packet.scopeId,
             builtAt: packet.builtAt,
@@ -246,6 +260,7 @@ function pushAtlasPacketEdge(
     edges: GalaxyInputEdge[],
     seen: Set<string>,
     input: {
+        packet: GraphAtlasPacket;
         sourceId: string;
         targetId: string;
         family: GraphAtlasFamily;
@@ -261,6 +276,7 @@ function pushAtlasPacketEdge(
     seen.add(id);
     const status = normalizeReviewState(input.status);
     const style = atlasVisualStyle(input.family, input.label, input.type, [input.sourceId, input.targetId]);
+    const visualTrace = atlasEdgeVisualTrace(input.packet, input);
     edges.push({
         id,
         sourceId: input.sourceId,
@@ -270,6 +286,16 @@ function pushAtlasPacketEdge(
         metadata: {
             sourceType: 'rust-atlas-packet-edge',
             sourceSystem: 'rust',
+            sourceId: input.sourceId,
+            visualTrace,
+            visualSourceId: visualTrace.sourceId,
+            visualFamily: visualTrace.family,
+            packetSnapshotId: visualTrace.packetSnapshotId,
+            packetScopeId: visualTrace.packetScopeId,
+            sourceContract: visualTrace.sourceContract,
+            vectorContract: visualTrace.vectorContract,
+            atlasSourceObjectId: input.sourceId,
+            atlasTargetObjectId: input.targetId,
             graphFamily: input.family,
             graphKind: input.label || input.family,
             graphRelationFamily: style.relationFamily,
@@ -282,6 +308,80 @@ function pushAtlasPacketEdge(
             graphImpact: 'Rust packet topology edge shared by Graph and Embed views.',
         },
     });
+}
+
+function atlasObjectVisualTrace(
+    packet: GraphAtlasPacket,
+    object: GraphAtlasObject,
+    target: GraphAtlasManifoldTarget | undefined,
+    family: string,
+) {
+    return {
+        source: 'rust_atlas_packet',
+        sourceId: object.sourceIds[0] || target?.sourceId || object.id,
+        family,
+        packetSnapshotId: packet.snapshotId,
+        packetScopeId: packet.scopeId,
+        sourceContract: packet.sourceContract.authority,
+        vectorContract: packet.sourceContract.vectorContract,
+        identityAuthority: packet.sourceContract.identityAuthority,
+        packetObjectId: object.id,
+        packetTargetId: target?.id || '',
+        objectKind: object.kind,
+        targetKind: target?.kind || '',
+        noteIds: object.noteIds,
+        chunkIds: object.chunkIds,
+        evidenceIds: object.evidenceIds,
+    };
+}
+
+function atlasTargetVisualTrace(packet: GraphAtlasPacket, target: GraphAtlasManifoldTarget, family: string) {
+    return {
+        source: 'rust_atlas_packet',
+        sourceId: target.sourceId || target.objectId,
+        family,
+        packetSnapshotId: packet.snapshotId,
+        packetScopeId: packet.scopeId,
+        sourceContract: packet.sourceContract.authority,
+        vectorContract: packet.sourceContract.vectorContract,
+        identityAuthority: packet.sourceContract.identityAuthority,
+        packetObjectId: target.objectId,
+        packetTargetId: target.id,
+        objectKind: '',
+        targetKind: target.kind,
+        noteIds: target.noteId ? [target.noteId] : [],
+        chunkIds: target.chunkId ? [target.chunkId] : [],
+        evidenceIds: target.evidenceIds,
+    };
+}
+
+function atlasEdgeVisualTrace(
+    packet: GraphAtlasPacket,
+    input: {
+        sourceId: string;
+        targetId: string;
+        family: GraphAtlasFamily;
+        type: string;
+        evidenceIds: string[];
+    },
+) {
+    return {
+        source: 'rust_atlas_packet',
+        sourceId: input.sourceId,
+        family: input.family,
+        packetSnapshotId: packet.snapshotId,
+        packetScopeId: packet.scopeId,
+        sourceContract: packet.sourceContract.authority,
+        vectorContract: packet.sourceContract.vectorContract,
+        identityAuthority: packet.sourceContract.identityAuthority,
+        packetObjectId: input.sourceId,
+        packetTargetId: input.targetId,
+        objectKind: input.type,
+        targetKind: input.type,
+        noteIds: [],
+        chunkIds: [],
+        evidenceIds: input.evidenceIds,
+    };
 }
 
 function resolveAtlasObjectId(

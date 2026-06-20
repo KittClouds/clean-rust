@@ -6,9 +6,15 @@ import type {
     GraphSnapshotAuthorityContract,
     GraphSnapshotAuthorityCounts,
 } from './graph-rebuild-snapshot';
+import { GRAPH_SNAPSHOT_LIVE_AUTHORITY } from './graph-rebuild-snapshot';
+import {
+    GRAPH_ATLAS_BUILDER_ROLE,
+    GRAPH_ATLAS_IDENTITY_AUTHORITY,
+    GRAPH_ATLAS_PACKET_AUTHORITY,
+    GRAPH_ATLAS_VECTOR_CONTRACTS,
+} from './graph-atlas-packet';
 
-export const GRAPH_SNAPSHOT_CONTAINMENT_AUTHORITY: GraphSnapshotAuthority =
-    'typescript_compatibility_containment';
+export const GRAPH_SNAPSHOT_AUTHORITY: GraphSnapshotAuthority = GRAPH_SNAPSHOT_LIVE_AUTHORITY;
 
 export interface GraphSnapshotHydrationBlob {
     scopeId: string;
@@ -19,7 +25,7 @@ export interface GraphSnapshotHydrationBlob {
 
 export function sealGraphSnapshotAuthority(
     snapshot: GraphRebuildSnapshot,
-    authority: GraphSnapshotAuthority = GRAPH_SNAPSHOT_CONTAINMENT_AUTHORITY,
+    authority: GraphSnapshotAuthority = GRAPH_SNAPSHOT_AUTHORITY,
 ): GraphSnapshotAuthorityContract {
     assertGraphSnapshotParity(snapshot, true);
     const contract = buildGraphSnapshotAuthorityContract(snapshot, authority);
@@ -36,6 +42,7 @@ export function assertGraphSnapshotAuthority(snapshot: GraphRebuildSnapshot): Gr
     const actual = buildGraphSnapshotAuthorityContract(snapshot, contract.authority);
     const issues: string[] = [];
     if (contract.schemaVersion !== actual.schemaVersion) issues.push('schema version');
+    if (contract.authority !== GRAPH_SNAPSHOT_AUTHORITY) issues.push(`legacy authority ${contract.authority}`);
     if (contract.snapshotId !== actual.snapshotId) issues.push('snapshot id');
     if (contract.scopeId !== actual.scopeId) issues.push('scope id');
     if (contract.contentHash !== actual.contentHash) issues.push('content hash');
@@ -150,6 +157,7 @@ function assertGraphSnapshotParity(snapshot: GraphRebuildSnapshot, requirePacket
     const packet = snapshot.atlasPacket;
     if (requirePacket && !packet) issues.push('Atlas packet missing');
     if (packet) {
+        assertAtlasPacketSourceContract(issues, packet.sourceContract);
         if (packet.snapshotId !== snapshot.id) issues.push('Atlas packet snapshot id');
         if (packet.scopeId !== snapshot.scopeId) issues.push('Atlas packet scope id');
         compare(issues, 'packet objects', packet.counters.objects, counts.packetObjects);
@@ -172,6 +180,24 @@ function assertGraphSnapshotParity(snapshot: GraphRebuildSnapshot, requirePacket
     }
     if (issues.length) {
         throw new Error(`Graph snapshot parity failed for ${snapshot.id}: ${issues.join(', ')}`);
+    }
+}
+
+function assertAtlasPacketSourceContract(
+    issues: string[],
+    contract: NonNullable<GraphRebuildSnapshot['atlasPacket']>['sourceContract'],
+): void {
+    if (contract.authority !== GRAPH_ATLAS_PACKET_AUTHORITY) {
+        issues.push(`Atlas packet authority ${contract.authority}`);
+    }
+    if (contract.identityAuthority !== GRAPH_ATLAS_IDENTITY_AUTHORITY) {
+        issues.push(`Atlas identity authority ${contract.identityAuthority}`);
+    }
+    if (!(GRAPH_ATLAS_VECTOR_CONTRACTS as readonly string[]).includes(contract.vectorContract)) {
+        issues.push(`Atlas vector contract ${contract.vectorContract}`);
+    }
+    if (contract.tsGraphBuilderRole !== GRAPH_ATLAS_BUILDER_ROLE) {
+        issues.push(`Atlas builder role ${contract.tsGraphBuilderRole}`);
     }
 }
 

@@ -41,7 +41,7 @@ import { AtlasCapabilityRuntimeService } from '../services/atlas-capability-runt
 import { NerService } from '../services/ner.service';
 import { PhoenixStoreService } from '../services/phoenix-store.service';
 import { PhoenixUiApiService } from '../services/phoenix-ui-api.service';
-import type { GraphIndexRunRequest, GraphRebuildSnapshot } from './graph-rebuild-snapshot';
+import type { GraphIndexRunReceipt, GraphIndexRunRequest, GraphRebuildSnapshot } from './graph-rebuild-snapshot';
 import { sealGraphSnapshotAuthority } from './graph-snapshot-authority';
 import type { CalendarRegistrySnapshot } from '../lib/fantasy-calendar/calendar-registry-snapshot';
 import type { GraphCalendarRegistryBridgeSummary } from './graph-calendar-registry-bridge';
@@ -52,6 +52,11 @@ import type { GraphDiscourseBridgeAdjudicationSummary } from './graph-discourse-
 import type { GraphDiscourseEvalLedgerSummary } from './graph-discourse-eval-ledger';
 import type { GraphDiscoursePromotionSurfaceSummary } from './graph-discourse-promotion-surface';
 import type { GraphDiscourseCompilerOverlaySummary } from './graph-discourse-compiler-overlay';
+import {
+    GRAPH_ATLAS_BUILDER_ROLE,
+    GRAPH_ATLAS_IDENTITY_AUTHORITY,
+    GRAPH_ATLAS_PACKET_AUTHORITY,
+} from './graph-atlas-packet';
 
 describe('GraphRebuildPipelineService', () => {
     let injector: EnvironmentInjector;
@@ -96,8 +101,11 @@ describe('GraphRebuildPipelineService', () => {
         service = runInInjectionContext(injector, () => new GraphRebuildPipelineService());
     });
 
-    afterEach(() => {
+    afterEach(async () => {
+        await flushPostCommitDiagnostics(service);
+        await flushReceiptPersistence(service);
         injector.destroy();
+        vi.unstubAllGlobals();
         vi.clearAllMocks();
     });
 
@@ -164,6 +172,84 @@ describe('GraphRebuildPipelineService', () => {
                 }),
             }),
         ]));
+        expect(result.receipt.layerReceipts.map((layer) => layer.id)).toEqual(expect.arrayContaining([
+            'input-signals',
+            'snapshot-truth',
+            'native-atlas-packet',
+            'authority-seal',
+            'persistence-payload',
+            'projection-lenses',
+            'diagnostic-ledgers',
+            'transport-boundary',
+            'ui-commit',
+        ]));
+        expect(result.receipt.layerReceipts).toEqual(expect.arrayContaining([
+            expect.objectContaining({
+                id: 'authority-seal',
+                status: 'complete',
+                contentHash: result.snapshot.authorityContract?.contentHash,
+            }),
+            expect.objectContaining({
+                id: 'projection-lenses',
+                status: 'complete',
+                projectionModes: expect.arrayContaining(['hybrid', 'hopf', 'lorentz', 'product', 'siegel']),
+            }),
+        ]));
+    });
+
+    it('debounces post-commit work and cancels stale diagnostics before they start', async () => {
+        const timers: ScheduledCallback[] = [];
+        const idleCallbacks: ScheduledCallback[] = [];
+        vi.stubGlobal('window', {
+            setTimeout: (callback: () => void) => {
+                const row = scheduledCallback(timers, callback);
+                return row.id;
+            },
+            clearTimeout: (id: number) => {
+                const row = timers.find((timer) => timer.id === id);
+                if (row) row.cancelled = true;
+            },
+            requestIdleCallback: (callback: () => void) => {
+                const row = scheduledCallback(idleCallbacks, callback);
+                return row.id;
+            },
+            cancelIdleCallback: (id: number) => {
+                const row = idleCallbacks.find((callback) => callback.id === id);
+                if (row) row.cancelled = true;
+            },
+        });
+        const internal = service as any;
+        internal.lastSnapshotState.set({ id: 'snapshot-current' });
+        const input = {
+            scope: request().scope,
+            entities: request().entities,
+            acceptedNerOccurrences: [],
+            relationshipHints: [],
+            request: request(),
+            nerCandidates: 0,
+            baseRunSerial: 7,
+        };
+
+        internal.scheduleInteractivePostCommitWork({ ...input, snapshotId: 'snapshot-stale' });
+        internal.scheduleInteractivePostCommitWork({ ...input, snapshotId: 'snapshot-current' });
+        runScheduledCallbacks(timers);
+        expect(idleCallbacks).toHaveLength(1);
+
+        internal.lastSnapshotState.set({ id: 'snapshot-new' });
+        internal.scheduleInteractivePostCommitWork({ ...input, snapshotId: 'snapshot-new', baseRunSerial: 8 });
+        runScheduledCallbacks(idleCallbacks);
+        await flushPostCommitDiagnostics(service);
+        expect(graphRebuild.buildAndPersistSnapshot).not.toHaveBeenCalled();
+
+        runScheduledCallbacks(timers);
+        runScheduledCallbacks(idleCallbacks);
+        await flushPostCommitDiagnostics(service);
+        expect(graphRebuild.buildAndPersistSnapshot).toHaveBeenCalledWith(expect.objectContaining({
+            durabilityMode: 'diagnostic',
+            diagnosticBaseSnapshotId: 'snapshot-new',
+            diagnosticBaseSnapshotRunSerial: 8,
+        }));
+        expect(graphRebuild.buildAndPersistSnapshot).toHaveBeenCalledTimes(1);
     });
 
     it('expands global graph rebuilds to loaded note ids for deterministic chunking', async () => {
@@ -193,6 +279,7 @@ describe('GraphRebuildPipelineService', () => {
             scope: { kind: 'global', scopeId: 'global', label: 'Global', noteIds: [] },
             policy: 'force',
         });
+        await flushReceiptPersistence(service);
 
         expect(notesMock.toArray).toHaveBeenCalled();
         expect(ner.runDynamicScan).toHaveBeenCalledTimes(2);
@@ -242,6 +329,7 @@ describe('GraphRebuildPipelineService', () => {
             },
             policy: 'force',
         });
+        await flushReceiptPersistence(service);
 
         expect(notesMock.bulkGet).toHaveBeenCalledWith(['note-1', 'deleted-note', 'note-2']);
         expect(ner.runDynamicScan).toHaveBeenCalledTimes(2);
@@ -313,17 +401,119 @@ describe('GraphRebuildPipelineService', () => {
         }));
     });
 
-    it('defers content checkpoints until the clean graph receipt is persisted', async () => {
+    it('resumes content checkpoints once clean graph receipt persistence is queued', async () => {
         await service.buildGraph(request());
+        await flushReceiptPersistence(service);
 
         expect(store.pauseSnapshots).toHaveBeenCalledTimes(1);
         expect(store.resumeSnapshots).toHaveBeenCalledTimes(1);
         expect(store.pauseSnapshots.mock.invocationCallOrder[0])
             .toBeLessThan(graphRebuild.buildAndPersistSnapshot.mock.invocationCallOrder[0]);
         expect(graphRebuild.buildAndPersistSnapshot.mock.invocationCallOrder[0])
-            .toBeLessThan(graphRebuild.persistRunReceipt.mock.invocationCallOrder[0]);
-        expect(graphRebuild.persistRunReceipt.mock.invocationCallOrder[0])
             .toBeLessThan(store.resumeSnapshots.mock.invocationCallOrder[0]);
+        expect(store.resumeSnapshots.mock.invocationCallOrder[0])
+            .toBeLessThan(graphRebuild.persistRunReceipt.mock.invocationCallOrder[0]);
+    });
+
+    it('returns buildGraph before the queued run receipt write completes', async () => {
+        const persistGate = deferred<void>();
+        graphRebuild.persistRunReceipt.mockImplementationOnce(async () => {
+            await persistGate.promise;
+            return receiptStoreTiming();
+        });
+
+        const result = await service.buildGraph(request());
+        const receiptDbOps = result.receipt.stageReceipts.find((stage) => stage.id === 'receiptDbOps');
+
+        expect(receiptDbOps).toEqual(expect.objectContaining({
+            status: 'running',
+            counters: expect.objectContaining({
+                receiptPersistenceQueued: 1,
+                receiptPersistenceAsync: 1,
+            }),
+        }));
+        expect(store.resumeSnapshots).toHaveBeenCalledTimes(1);
+        expect(graphRebuild.persistRunReceipt).not.toHaveBeenCalled();
+        expect(result.receipt.stageReceipts.find((stage) => stage.id === 'receiptDbOps')?.status).toBe('running');
+
+        try {
+            await waitForReceiptPersistenceStart();
+            expect(graphRebuild.persistRunReceipt).toHaveBeenCalledTimes(1);
+            expect(store.resumeSnapshots.mock.invocationCallOrder[0])
+                .toBeLessThan(graphRebuild.persistRunReceipt.mock.invocationCallOrder[0]);
+        } finally {
+            persistGate.resolve();
+        }
+        await flushReceiptPersistence(service);
+
+        expect(service.lastReceipt()?.stageReceipts.find((stage) => stage.id === 'receiptDbOps'))
+            .toEqual(expect.objectContaining({
+                status: 'completed',
+                counters: expect.objectContaining({
+                    receiptPersistenceAsync: 1,
+                    receiptStoreScopedDocuments: 1,
+                }),
+            }));
+    });
+
+    it('coalesces queued run receipt writes by scope before persistence starts', async () => {
+        const internal = service as any;
+        const first = receiptForPersistenceTest('receipt:first', 'note:note-1', 'delta');
+        const second = receiptForPersistenceTest('receipt:second', 'note:note-1', 'force');
+
+        internal.enqueueRunReceiptPersistence(first);
+        internal.enqueueRunReceiptPersistence(second);
+        await flushReceiptPersistence(service);
+
+        expect(graphRebuild.persistRunReceipt).toHaveBeenCalledTimes(1);
+        const persisted = graphRebuild.persistRunReceipt.mock.calls[0][0] as GraphIndexRunReceipt;
+        expect(persisted.id).toBe(second.id);
+        expect(persisted.policy).toBe('force');
+        expect(persisted.stageReceipts.some((stage) => stage.id === 'receiptDbOps')).toBe(false);
+    });
+
+    it('keeps queued receipt writes for different scopes', async () => {
+        const internal = service as any;
+        const first = receiptForPersistenceTest('receipt:first', 'note:note-1', 'delta');
+        const second = receiptForPersistenceTest('receipt:second', 'note:note-2', 'force');
+
+        internal.enqueueRunReceiptPersistence(first);
+        internal.enqueueRunReceiptPersistence(second);
+        await flushReceiptPersistence(service);
+
+        expect(graphRebuild.persistRunReceipt).toHaveBeenCalledTimes(2);
+        expect(graphRebuild.persistRunReceipt.mock.calls.map((call) => call[0].id))
+            .toEqual(['receipt:first', 'receipt:second']);
+    });
+
+    it('runs post-commit diagnostics after queued receipt persistence', async () => {
+        const receiptGate = deferred<void>();
+        const internal = service as any;
+        internal.receiptPersistenceQueue = receiptGate.promise;
+        internal.postCommitDiagnosticToken = 1;
+        internal.lastSnapshotState.set({ id: 'snapshot-current' });
+        const input = {
+            scope: request().scope,
+            snapshotId: 'snapshot-current',
+            entities: request().entities,
+            acceptedNerOccurrences: [],
+            relationshipHints: [],
+            request: request(),
+            nerCandidates: 0,
+            baseRunSerial: 9,
+        };
+
+        const work = internal.runPostCommitDiagnosticWork(input, 1) as Promise<void>;
+        await Promise.resolve();
+        expect(graphRebuild.buildAndPersistSnapshot).not.toHaveBeenCalled();
+        receiptGate.resolve();
+        await work;
+
+        expect(graphRebuild.buildAndPersistSnapshot).toHaveBeenCalledWith(expect.objectContaining({
+            durabilityMode: 'diagnostic',
+            diagnosticBaseSnapshotId: 'snapshot-current',
+            diagnosticBaseSnapshotRunSerial: 9,
+        }));
     });
 
     it('resumes deferred content checkpoints after graph snapshot failures', async () => {
@@ -699,6 +889,66 @@ function discourseCompilerOverlaySummary(): GraphDiscourseCompilerOverlaySummary
     };
 }
 
+function receiptForPersistenceTest(
+    id: string,
+    scopeId: string,
+    policy: 'delta' | 'force',
+): GraphIndexRunReceipt {
+    const startedAt = Date.now();
+    return {
+        schemaVersion: 'phoenix-graph-index-run/v1',
+        id,
+        scope: { kind: 'note', scopeId, label: scopeId, noteIds: [scopeId.replace('note:', '')] },
+        policy,
+        delta: policy !== 'force',
+        status: 'completed',
+        modelSelection: request().modelSelection,
+        postProcessMode: 'full',
+        durabilityMode: 'interactive',
+        modelReadiness: [],
+        startedAt,
+        completedAt: startedAt,
+        durationMs: 0,
+        stageReceipts: [{
+            id: 'buildGraphSnapshot',
+            label: 'Build Graph Snapshot',
+            status: 'completed',
+            startedAt,
+            completedAt: startedAt,
+            durationMs: 0,
+            outputCount: 1,
+            counters: { nodes: 1 },
+            message: 'snapshot built',
+        }],
+        projectionReceipts: [],
+        layerReceipts: [],
+        snapshotId: 'snapshot-1',
+        counters: {
+            nodes: 1,
+            edges: 0,
+            chunks: 0,
+            acceptedAnchors: 0,
+            embeddingTargets: 0,
+            graphAwareLinkSuggestions: 0,
+            dropReasons: {
+                missingEntity: 0,
+                invalidSpan: 0,
+                duplicateAnchor: 0,
+                singletonBucket: 0,
+                missingChunk: 0,
+            },
+        },
+        dropReasons: {
+            missingEntity: 0,
+            invalidSpan: 0,
+            duplicateAnchor: 0,
+            singletonBucket: 0,
+            missingChunk: 0,
+        },
+        message: 'test receipt',
+    };
+}
+
 function createGraphRebuildMock() {
     return {
         buildAndPersistSnapshot: vi.fn(async () => authorityReadySnapshot({
@@ -826,25 +1076,80 @@ function createGraphRebuildMock() {
         loadPersistedSnapshot: vi.fn(async () => null),
         loadPersistedRunReceipt: vi.fn(async () => null),
         loadPostProcessCache: vi.fn(async () => null),
-        persistRunReceipt: vi.fn(async () => ({
-            records: 1,
-            noteMutations: 0,
-            relationUpserts: 1,
-            relationDeletes: 0,
-            scopedDocumentUpserts: 1,
-            payloadChars: 4096,
-            serializedWaitMs: 2,
-            appendWalMs: 3,
-            manifestCommitMs: 1,
-            runtimeApplyMs: 4,
-            runtimeReloadMs: 0,
-            totalMs: 10,
-            checkpointScheduled: 1,
-            runtimeReloaded: 0,
-        })),
+        persistRunReceipt: vi.fn(async () => receiptStoreTiming()),
         persistPostProcessCache: vi.fn(async () => undefined),
         restorePersistedSnapshot: vi.fn(async () => undefined),
     };
+}
+
+function receiptStoreTiming() {
+    return {
+        records: 1,
+        noteMutations: 0,
+        relationUpserts: 1,
+        relationDeletes: 0,
+        scopedDocumentUpserts: 1,
+        payloadChars: 4096,
+        serializedWaitMs: 2,
+        appendWalMs: 3,
+        manifestCommitMs: 1,
+        runtimeApplyMs: 4,
+        runtimeReloadMs: 0,
+        totalMs: 10,
+        checkpointScheduled: 1,
+        runtimeReloaded: 0,
+    };
+}
+
+function deferred<T>() {
+    let resolve!: (value: T | PromiseLike<T>) => void;
+    let reject!: (reason?: unknown) => void;
+    const promise = new Promise<T>((resolvePromise, rejectPromise) => {
+        resolve = resolvePromise;
+        reject = rejectPromise;
+    });
+    return { promise, resolve, reject };
+}
+
+async function flushReceiptPersistence(service: GraphRebuildPipelineService): Promise<void> {
+    const queue = (service as any)?.receiptPersistenceQueue as Promise<void> | undefined;
+    await queue;
+}
+
+async function flushPostCommitDiagnostics(service: GraphRebuildPipelineService): Promise<void> {
+    const queue = (service as any)?.postCommitDiagnosticQueue as Promise<void> | undefined;
+    await queue;
+}
+
+async function waitForReceiptPersistenceStart(): Promise<void> {
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    await Promise.resolve();
+}
+
+type ScheduledCallback = {
+    id: number;
+    callback: () => void;
+    cancelled: boolean;
+    ran: boolean;
+};
+
+function scheduledCallback(rows: ScheduledCallback[], callback: () => void): ScheduledCallback {
+    const row = {
+        id: rows.length + 1,
+        callback,
+        cancelled: false,
+        ran: false,
+    };
+    rows.push(row);
+    return row;
+}
+
+function runScheduledCallbacks(rows: ScheduledCallback[]): void {
+    for (const row of rows) {
+        if (row.cancelled || row.ran) continue;
+        row.ran = true;
+        row.callback();
+    }
 }
 
 function authorityReadySnapshot(input: Partial<GraphRebuildSnapshot>): GraphRebuildSnapshot {
@@ -911,7 +1216,12 @@ function authorityReadySnapshot(input: Partial<GraphRebuildSnapshot>): GraphRebu
         scopeKind: snapshot.scopeKind,
         scopeId: snapshot.scopeId,
         builtAt: snapshot.builtAt,
-        sourceContract: { authority: 'test', identityAuthority: 'test', vectorContract: 'vectors-missing', tsGraphBuilderRole: 'containment' },
+        sourceContract: {
+            authority: GRAPH_ATLAS_PACKET_AUTHORITY,
+            identityAuthority: GRAPH_ATLAS_IDENTITY_AUTHORITY,
+            vectorContract: 'vectors-missing',
+            tsGraphBuilderRole: GRAPH_ATLAS_BUILDER_ROLE,
+        },
         objects,
         manifoldTargets: targets.map((target) => ({
             id: target.id,

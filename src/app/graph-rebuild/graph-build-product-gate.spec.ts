@@ -59,7 +59,12 @@ vi.mock('../lib/registry', () => ({
 }));
 
 import { GraphRebuildPipelineService } from './graph-rebuild-pipeline.service';
-import { GraphRebuildService } from './graph-rebuild.service';
+import {
+    DIAGNOSTIC_SNAPSHOT_DOCUMENT_KEY,
+    GRAPH_REBUILD_NAMESPACE,
+    GraphRebuildService,
+    scopedDocumentToGraphRebuildSnapshot,
+} from './graph-rebuild.service';
 import { buildGraphRebuildSnapshot } from './graph-rebuild-builder';
 import { buildAdaptiveGraphRebuildChunks } from './graph-rebuild-meaning-frames';
 import { AtlasCapabilityRuntimeService } from '../services/atlas-capability-runtime.service';
@@ -93,6 +98,7 @@ const itZeroShot = SHOULD_RUN ? it : it.skip;
 describeBaseline('product graph build gate', () => {
     let injector: EnvironmentInjector;
     let pipeline: GraphRebuildPipelineService;
+    let graphRebuild: GraphRebuildService;
     let store: ReturnType<typeof createMemoryStore>;
     let runtime: ReturnType<typeof createRuntimeHarness>;
     let backend: ReturnType<typeof createBackendHarness>;
@@ -116,9 +122,11 @@ describeBaseline('product graph build gate', () => {
             { provide: PhoenixUiApiService, useValue: createPhoenixUiApiHarness() },
         ], Injector.create({ providers: [] }) as unknown as EnvironmentInjector);
         pipeline = runInInjectionContext(injector, () => injector.get(GraphRebuildPipelineService));
+        graphRebuild = runInInjectionContext(injector, () => injector.get(GraphRebuildService));
     });
 
-    afterEach(() => {
+    afterEach(async () => {
+        await flushReceiptPersistence(pipeline);
         injector.destroy();
         vi.clearAllMocks();
     });
@@ -175,32 +183,127 @@ describeBaseline('product graph build gate', () => {
         expect(chars).toBeGreaterThanOrEqual(24_000);
         expect(chars).toBeLessThanOrEqual(26_000);
         const cold = await pipeline.buildGraph(request);
+        await flushReceiptPersistence(pipeline);
         const upsertsBeforeWarm = store.upserts.length;
+        const operatorJournalReadsBeforeWarm = operatorJournalReadCount(store);
         const started = performance.now();
         const warm = await pipeline.buildGraph(request);
         const warmWallMs = elapsed(started);
         const warmScopedWrites = store.upserts.length - upsertsBeforeWarm;
+        const warmOperatorJournalReads = operatorJournalReadCount(store) - operatorJournalReadsBeforeWarm;
+        await flushReceiptPersistence(pipeline);
+        const warmScopedWritesAfterReceipt = store.upserts.length - upsertsBeforeWarm;
         const keys = ['mentions', 'acceptedAnchors', 'nodes', 'edges', 'embeddingTargets'] as const;
         for (const key of keys) expect(warm.snapshot.counters[key]).toBe(cold.snapshot.counters[key]);
+        expect(warm.snapshot.id).toBe(cold.snapshot.id);
+        expect(warm.snapshot.authorityContract?.snapshotId).toBe(cold.snapshot.id);
         expect(warm.snapshot.counters.nodes).toBe(27);
         expect(warm.snapshot.counters.edges).toBe(233);
         expect(warm.snapshot.counters.embeddingTargets).toBe(666);
         expect(warm.snapshot.atlasPacket?.objects.length).toBe(cold.snapshot.atlasPacket?.objects.length);
         expect(warm.snapshot.atlasPacket?.manifoldTargets.length)
             .toBe(cold.snapshot.atlasPacket?.manifoldTargets.length);
+        expect(warm.snapshot.atlasPacket?.sourceContract.authority).toBe('rust-atlas-packet');
+        expect(warm.snapshot.atlasPacket?.sourceContract.authority).not.toContain('typescript');
+        expect(warm.snapshot.buildTimings?.nativeCompilerSkipped).toBe(1);
         expect(warm.snapshot.buildTimings?.snapshotReusedContentBlobs).toBeGreaterThan(0);
         expect(warm.snapshot.buildTimings?.snapshotWrittenContentBlobs).toBe(0);
         expect(warm.snapshot.buildTimings?.snapshotContentBlobReads).toBe(0);
         expect(warm.snapshot.buildTimings?.snapshotContentBlobManifestTrusted).toBe(1);
+        expect(warm.snapshot.buildTimings?.snapshotPrimaryIdentityReused).toBe(1);
+        expect(warm.snapshot.buildTimings?.snapshotPrimaryWriteSkipped).toBe(1);
+        expect(warm.snapshot.buildTimings?.snapshotStoreDocuments).toBe(0);
         expect(warm.snapshot.buildTimings?.previousSnapshotHydrationSkipped).toBe(1);
         expect(warm.snapshot.buildTimings?.nativeChunkerSkipped).toBe(1);
         expect(warm.snapshot.buildTimings?.documentSemanticSkipped).toBe(1);
-        expect(warmScopedWrites).toBeLessThanOrEqual(3);
+        expect(warmScopedWrites).toBe(0);
+        expect(warmScopedWritesAfterReceipt).toBe(1);
+        expect(warmOperatorJournalReads).toBe(0);
         expect(warmWallMs).toBeLessThanOrEqual(1_000);
-        expect(store.upsertScopedDocuments).toHaveBeenCalledTimes(2);
-        console.log(`[graph-product-gate] warmMs=${warmWallMs} scopedWrites=${warmScopedWrites} blobsWritten=${warm.snapshot.buildTimings?.snapshotWrittenContentBlobs || 0} nodes=${warm.snapshot.counters.nodes} edges=${warm.snapshot.counters.edges} targets=${warm.snapshot.counters.embeddingTargets}`);
+        expect(warm.receipt.layerReceipts.map((layer) => layer.id)).toEqual(expect.arrayContaining([
+            'input-signals',
+            'snapshot-truth',
+            'native-atlas-packet',
+            'authority-seal',
+            'persistence-payload',
+            'projection-lenses',
+            'diagnostic-ledgers',
+            'transport-boundary',
+            'ui-commit',
+        ]));
+        expect(warm.receipt.layerReceipts.every((layer) =>
+            layer.owner && layer.source && layer.message && Array.isArray(layer.consumes) && Array.isArray(layer.produces),
+        )).toBe(true);
+        expect(warm.receipt.layerReceipts.find((layer) => layer.id === 'authority-seal')?.contentHash)
+            .toBe(warm.snapshot.authorityContract?.contentHash);
+        expect(backend.commands.filter((row) => row.command === 'graphRebuild:compileDualWrite').length)
+            .toBe(0);
+        expect(store.upsertScopedDocuments).toHaveBeenCalledTimes(1);
+        console.log(`[graph-product-gate] warmMs=${warmWallMs} scopedWrites=${warmScopedWrites} receiptWritesAfterReturn=${warmScopedWritesAfterReceipt} operatorJournalReads=${warmOperatorJournalReads} blobsWritten=${warm.snapshot.buildTimings?.snapshotWrittenContentBlobs || 0} nodes=${warm.snapshot.counters.nodes} edges=${warm.snapshot.counters.edges} targets=${warm.snapshot.counters.embeddingTargets}`);
+    }, 30_000);
+
+    it('keeps post-commit diagnostics from replacing the interactive snapshot', async () => {
+        const text = 'Ryan entered New Rome. Ryan remembered the Allied Table before dawn.';
+        harnessState.notes = [shortrunNote(text)];
+        harnessState.entities = shortrunEntities();
+        harnessState.occurrences = [];
+        const buildRequest = {
+            scopeKind: 'note' as const,
+            scopeId: 'note:shortrun',
+            noteIds: ['shortrun'],
+            noteTexts: { shortrun: text },
+            chunks: buildAdaptiveGraphRebuildChunks('shortrun', text),
+            entities: harnessState.entities,
+            postProcessMode: 'full' as const,
+        };
+
+        const firstInteractive = await graphRebuild.buildAndPersistSnapshot({
+            ...buildRequest,
+            durabilityMode: 'interactive',
+        });
+        const firstInteractiveRunSerial = graphRebuild.currentSnapshotRunSerial();
+        const diagnostic = await graphRebuild.buildAndPersistSnapshot({
+            ...buildRequest,
+            durabilityMode: 'diagnostic',
+            diagnosticBaseSnapshotId: firstInteractive.id,
+            diagnosticBaseSnapshotRunSerial: firstInteractiveRunSerial,
+        });
+
+        expect(diagnostic.id).not.toBe(firstInteractive.id);
+        expect(graphRebuild.snapshot()?.id).toBe(firstInteractive.id);
+        expect(persistedSnapshotId(store, 'snapshot')).toBe(firstInteractive.id);
+        expect(persistedSnapshotId(store, DIAGNOSTIC_SNAPSHOT_DOCUMENT_KEY)).toBe(diagnostic.id);
+
+        await new Promise((resolve) => setTimeout(resolve, 2));
+        const secondInteractive = await graphRebuild.buildAndPersistSnapshot({
+            ...buildRequest,
+            durabilityMode: 'interactive',
+        });
+        const diagnosticIdBeforeStaleRun = persistedSnapshotId(store, DIAGNOSTIC_SNAPSHOT_DOCUMENT_KEY);
+        await graphRebuild.buildAndPersistSnapshot({
+            ...buildRequest,
+            durabilityMode: 'diagnostic',
+            diagnosticBaseSnapshotId: firstInteractive.id,
+            diagnosticBaseSnapshotRunSerial: firstInteractiveRunSerial,
+        });
+
+        expect(graphRebuild.snapshot()?.id).toBe(secondInteractive.id);
+        expect(persistedSnapshotId(store, 'snapshot')).toBe(secondInteractive.id);
+        expect(persistedSnapshotId(store, DIAGNOSTIC_SNAPSHOT_DOCUMENT_KEY)).toBe(diagnosticIdBeforeStaleRun);
     }, 30_000);
 });
+
+function persistedSnapshotId(
+    store: ReturnType<typeof createMemoryStore>,
+    documentKey: string,
+): string | undefined {
+    const document = store.documents.get(scopedDocumentKey('note:shortrun', GRAPH_REBUILD_NAMESPACE, documentKey));
+    return document ? scopedDocumentToGraphRebuildSnapshot(document)?.id : undefined;
+}
+
+function operatorJournalReadCount(store: ReturnType<typeof createMemoryStore>): number {
+    return store.reads.filter((row) => row.key.endsWith('/operator-mutation-journal')).length;
+}
 
 function graphRunRequest(): GraphIndexRunRequest {
     return {
@@ -299,6 +402,21 @@ function runReport(
                 id: model.id,
                 status: model.status,
                 optional: Boolean(model.optional),
+            })),
+            layers: receipt.layerReceipts.map((layer) => ({
+                id: layer.id,
+                kind: layer.kind,
+                status: layer.status,
+                owner: layer.owner,
+                source: layer.source,
+                consumes: layer.consumes,
+                produces: layer.produces,
+                stageIds: layer.stageIds,
+                projectionModes: layer.projectionModes || [],
+                authority: layer.authority || '',
+                contentHash: layer.contentHash || '',
+                counters: layer.counters,
+                message: layer.message,
             })),
             stages: receipt.stageReceipts.map(stageReport),
             projections: receipt.projectionReceipts.map((projection) => ({
@@ -639,6 +757,7 @@ function createMemoryStore() {
     const upserts: Array<{ key: string; payloadChars: number }> = [];
     const reads: Array<{ key: string; hit: boolean }> = [];
     const store = {
+        documents,
         upserts,
         reads,
         pausedSnapshots: 0,
@@ -712,7 +831,7 @@ function createBackendHarness() {
                 return { atlasPacket: {
                     schemaVersion: 'phoenix-atlas-packet/v1', snapshotId: snapshot.id,
                     scopeKind: snapshot.scopeKind, scopeId: snapshot.scopeId, builtAt: snapshot.builtAt,
-                    sourceContract: { authority: 'warm-force-harness', identityAuthority: 'source-evidence', vectorContract: 'vectors-missing', tsGraphBuilderRole: 'compatibility-only' },
+                    sourceContract: { authority: 'rust-atlas-packet', identityAuthority: 'registry-entities-and-accepted-anchors', vectorContract: 'vectors-missing', tsGraphBuilderRole: 'native-atlas-packet-authority' },
                     objects: [], manifoldTargets: [],
                     counters: { objects: 0, manifoldTargets: 0, registryEntities: snapshot.nodes.length, evidenceAnchors: snapshot.entityAnchors.length, modelVectors: 0, families: [] },
                 } };
@@ -749,6 +868,10 @@ function createPhoenixUiApiHarness() {
     return {
         loadStagedGraphScenePacket: vi.fn(async () => null),
     };
+}
+
+async function flushReceiptPersistence(pipeline: GraphRebuildPipelineService): Promise<void> {
+    await ((pipeline as any).receiptPersistenceQueue as Promise<void>);
 }
 
 function elapsed(started: number): number {

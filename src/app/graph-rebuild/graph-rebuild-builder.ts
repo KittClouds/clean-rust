@@ -52,18 +52,10 @@ import { replayGraphOperatorMutationJournalReview } from './graph-operator-mutat
 
 export { buildGraphRebuildAliasResolver, normalizeGraphRebuildCandidate };
 
-export const GRAPH_REBUILD_TS_BUILDER_AUTHORITY = {
-    role: 'compatibility-only',
-    replacement: 'rust-atlas-object-packet',
-} as const;
-
 const CO_OCCURRENCE_MAX_GAP_CHARS = 720;
 const CO_OCCURRENCE_LINKS_PER_ANCHOR = 4;
 
-/**
- * Compatibility builder retained until the Rust AtlasObject / GraphFamily /
- * ManifoldTarget packet becomes the graph-family authority.
- */
+/** Builds the source-evidence snapshot rows that the Rust Atlas packet seals. */
 export function buildGraphRebuildSnapshot(input: BuildGraphRebuildSnapshotInput): GraphRebuildSnapshot {
     const builtAt = input.builtAt ?? Date.now();
     const chunks = normalizeChunks(input.chunks || []);

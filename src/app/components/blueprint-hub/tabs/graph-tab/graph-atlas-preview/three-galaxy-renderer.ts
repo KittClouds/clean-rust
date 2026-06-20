@@ -7,12 +7,12 @@ import { GraphGalaxyForceController, productManifoldExpansionScale } from './gra
 import {
     buildGalaxyGlows,
     buildGalaxyNodes,
-    galaxyGlassNodeBatch,
-    galaxyGlassNodeStateIndex,
+    galaxySphereNodeBatch,
+    galaxySphereNodeStateIndex,
     galaxyGlowBatch,
     galaxyNodePickShapeBoost,
     galaxyNodeShapeScale,
-    type GalaxyGlassNodeBatch,
+    type GalaxySphereNodeBatch,
     type GalaxyGlowBatch,
     type GalaxyNodeMaterial,
     type GalaxyNodeObject,
@@ -429,7 +429,7 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
             if (!this.sceneData) return null;
             const screenHit = this.screenSpacePick(pointer);
             if (screenHit >= 0) return { kind: 'node', id: this.sceneData.ids[screenHit] };
-            const skipRaycastFallback = this.sceneData.ids.length > 600 || Boolean(galaxyGlassNodeBatch(this.nodes));
+            const skipRaycastFallback = this.sceneData.ids.length > 600 || Boolean(galaxySphereNodeBatch(this.nodes));
             if (this.nodes && !skipRaycastFallback) {
                 this.pointer.x = (pointer.x / Math.max(1, pointer.width)) * 2 - 1;
                 this.pointer.y = -(pointer.y / Math.max(1, pointer.height)) * 2 + 1;
@@ -581,7 +581,7 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
     private updateInstances(data: GalaxySceneV2, positions: Float32Array, focus: GalaxyFocusMask): void {
         if (!this.nodes || !this.glows) return;
         const density = this.nodeDensityFactors(data, positions);
-        const glassBatch = galaxyGlassNodeBatch(this.nodes);
+        const sphereBatch = galaxySphereNodeBatch(this.nodes);
         const glowBatch = galaxyGlowBatch(this.glows);
         for (let i = 0; i < data.ids.length; i++) {
             const densityFactor = density[i] ?? 1;
@@ -610,11 +610,11 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
                 productAtom,
             });
             this.nodeColor(data, i, active, hovered, neighbor, dimmed);
-            if (glassBatch) {
-                this.writeGlassNodeInstance(
-                    glassBatch,
+            if (sphereBatch) {
+                this.writeSphereNodeInstance(
+                    sphereBatch,
                     i,
-                    galaxyGlassNodeStateIndex(active, hovered, neighbor, dimmed),
+                    galaxySphereNodeStateIndex(active, hovered, neighbor, dimmed),
                     x,
                     y,
                     z,
@@ -656,12 +656,12 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
                 glow.visible = glowOpacity > 0;
             }
         }
-        if (glassBatch) this.markGlassNodeBatchDirty(glassBatch);
+        if (sphereBatch) this.markSphereNodeBatchDirty(sphereBatch);
         if (glowBatch) this.markGlowBatchDirty(glowBatch);
     }
 
-    private writeGlassNodeInstance(
-        batch: GalaxyGlassNodeBatch,
+    private writeSphereNodeInstance(
+        batch: GalaxySphereNodeBatch,
         index: number,
         stateIndex: number,
         x: number,
@@ -681,7 +681,7 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
         }
     }
 
-    private markGlassNodeBatchDirty(batch: GalaxyGlassNodeBatch): void {
+    private markSphereNodeBatchDirty(batch: GalaxySphereNodeBatch): void {
         for (const mesh of batch.meshes) {
             mesh.instanceMatrix.needsUpdate = true;
             if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;

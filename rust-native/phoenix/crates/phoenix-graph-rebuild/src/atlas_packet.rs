@@ -325,7 +325,7 @@ pub fn build_atlas_packet(snapshot: &GraphRebuildSnapshot) -> AtlasPacket {
             } else {
                 "vectors-missing".into()
             },
-            ts_graph_builder_role: "compatibility-only".into(),
+            ts_graph_builder_role: "native-atlas-packet-authority".into(),
         },
         objects,
         manifold_targets,

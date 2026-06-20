@@ -114,7 +114,13 @@ describe('Lorentz tree galaxy visualization data', () => {
             .map((guide) => guide.id) ?? [];
         const byId = new Map(scene.nodes.map((node) => [node.entity.id, node]));
 
-        expect(boundaryIds).toEqual(['caps:boundary:document:note-1']);
+        expect(new Set(boundaryIds)).toEqual(new Set([
+            'caps:boundary:document:note-1',
+            'caps:boundary:document:note-1:root:document',
+            'caps:boundary:document:note-1:chunk:chunk-1',
+            'caps:boundary:document:note-1:chunk:chunk-1:evidence',
+            'caps:boundary:identity:kai',
+        ]));
         expect(radiusOf(byId.get('doc')!)).toBeGreaterThan(radiusOf(byId.get('root')!));
         expect(radiusOf(byId.get('root')!)).toBeGreaterThan(radiusOf(byId.get('chunk')!));
         expect(radiusOf(byId.get('chunk')!)).toBeGreaterThan(radiusOf(byId.get('evidence')!));

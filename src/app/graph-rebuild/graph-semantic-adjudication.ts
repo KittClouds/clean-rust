@@ -234,7 +234,7 @@ function receiptFor(
         reversible: true,
         mutationAllowed: state === 'accepted',
         invariant: state === 'accepted'
-            ? 'typescript_compatibility_containment_topology_commit'
+            ? 'graph_rebuild_live_contract_topology_commit'
             : 'phase5_ledger_only_no_topology_commit',
         evidenceTargetIds: evidenceTargets(candidate),
         affectedGraphAtomIds: state === 'accepted' ? mutation?.affectedGraphAtomIds || [] : [],

@@ -25,7 +25,7 @@ export type GalaxyEdgeColorMode = 'aqua' | 'orchid' | 'gold' | 'entityBlend' | '
 export type GalaxyBackgroundMode = 'nebula' | 'grid' | 'quiet' | 'void';
 export type GalaxyNodeDragMode = 'stretch' | 'force' | 'pin' | 'camera';
 export type GalaxyNodeShapeMode = 'atom' | 'halo' | 'sphere';
-export type GalaxySphereSurfaceMode = 'solid' | 'glass';
+export type GalaxySphereSurfaceMode = 'solid' | 'glass' | 'spellglass' | 'obsidian' | 'starcore';
 export type GalaxyLayoutMode = 'single' | 'multiGalaxy' | 'hybridSpace' | 'hopfProjection' | 'lorentzTree' | 'productManifold' | 'siegelFinsler';
 export type GalaxyEmbeddingTopologyMode = 'off' | 'clusters' | 'regions' | 'lanes' | 'medoids' | 'outliers' | 'backbone' | 'bridges';
 export type GalaxyRenderSourceMode = 'entities' | 'graph' | 'embeddings';
@@ -394,7 +394,10 @@ export const DEFAULT_GALAXY_SETTINGS: GalaxyRenderSettings = {
 export function mergeGalaxySettings(settings?: Partial<GalaxyRenderSettings> | null): GalaxyRenderSettings {
     const merged = { ...DEFAULT_GALAXY_SETTINGS, ...settings };
     if (merged.particleFlowMode !== 'walk') merged.particleFlowMode = 'swarm';
-    if (merged.sphereSurface !== 'glass') merged.sphereSurface = 'solid';
+    if ((merged.sphereSurface as string) === 'lattice') merged.sphereSurface = 'starcore';
+    if (!['solid', 'glass', 'spellglass', 'obsidian', 'starcore'].includes(merged.sphereSurface || '')) {
+        merged.sphereSurface = 'solid';
+    }
     if (merged.edgeColorMode === 'cyan') merged.edgeColorMode = 'aqua';
     merged.edgeCurveStrength = Math.min(1.2, Math.max(0.25, merged.edgeCurveStrength));
     merged.edgeWidth = Math.min(1.1, Math.max(0.15, merged.edgeWidth));

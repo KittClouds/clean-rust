@@ -589,10 +589,10 @@ function hierarchyContractRadius(node: GalaxyNode, lane: string): number {
     if (/structure.?root|root:/.test(text) || structuralRole === 'root') return 1.78;
     if (/anchor|mention|evidence/.test(text) || structuralRole === 'evidence') return 1.14;
     if (/chunk|leaf|claim|action.?block|contrast|looked|glanced/.test(text)) return 1.46;
-    if (/memory|state|context|decision|rank.?status|service|affiliation|family.?context/.test(text)) return 0.52;
+    if (/memory|state|context|decision|rank.?status|service|affiliation|family.?context/.test(text)) return 0.58;
+    if (/event|temporal|causal/.test(text)) return 1.06;
+    if (/graph.?fact|relationship|relation/.test(text)) return 0.98;
     if (/entity|character|location|creature|npc|item|network|group/.test(text)) return 0.86;
-    if (/event|temporal|causal/.test(text)) return 0.7;
-    if (/graph.?fact|relationship|relation/.test(text)) return 0.66;
     return NaN;
 }
 

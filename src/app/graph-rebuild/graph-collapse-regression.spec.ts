@@ -8,8 +8,13 @@ import {
     recordGraphCollapseBoundary,
     recordGraphCollapseSnapshotBoundary,
 } from './graph-collapse-trace';
-import type { GraphAtlasFamily, GraphAtlasPacket } from './graph-atlas-packet';
+import {
+    GRAPH_ATLAS_FAMILIES,
+    type GraphAtlasFamily,
+    type GraphAtlasPacket,
+} from './graph-atlas-packet';
 import type { GraphRebuildSnapshot } from './graph-rebuild-snapshot';
+import type { PhoenixDocumentFamilyName } from '../services/phoenix-document-index.model';
 import {
     reconcileNativeAtlasPacketForTargets,
     recoverGraphRebuildOccurrences,
@@ -47,14 +52,20 @@ describe('graph collapse audit regressions', () => {
 
     it('carries validated prior anchors into the same-note rebuild when occurrence storage is cold', () => {
         const noteTexts = { 'note-1': 'Kai met Hazel. Hazel answered Kai.' };
-        const entities = [
-            entity('entity-kai', 'Kai'),
-            entity('entity-hazel', 'Hazel'),
-        ];
+        const entities = [entity('entity-kai', 'Kai'), entity('entity-hazel', 'Hazel')];
         const first = buildSnapshotFromRecoveredText(noteTexts, entities, 10);
-        const cachedSnapshotOccurrences = snapshotAnchorsToGraphRebuildOccurrences(first, 20, noteTexts);
+        const cachedSnapshotOccurrences = snapshotAnchorsToGraphRebuildOccurrences(
+            first,
+            20,
+            noteTexts,
+        );
         const sourceEvidence = buildGraphSnapshotSourceEvidence({ cachedSnapshotOccurrences });
-        const second = buildSnapshotFromOccurrences(noteTexts, entities, sourceEvidence.allOccurrences, 20);
+        const second = buildSnapshotFromOccurrences(
+            noteTexts,
+            entities,
+            sourceEvidence.allOccurrences,
+            20,
+        );
 
         expect(sourceEvidence.counters.cachedSnapshot).toBeGreaterThan(0);
         expect(second.counters.mentions).toBe(first.counters.mentions);
@@ -64,9 +75,11 @@ describe('graph collapse audit regressions', () => {
         expect(second.entityAnchors.map((anchor) => anchor.id)).toEqual(
             first.entityAnchors.map((anchor) => anchor.id),
         );
-        expect(snapshotAnchorsToGraphRebuildOccurrences(first, 30, {
-            'note-1': 'Mia met Rowan. Rowan answered Mia.',
-        })).toEqual([]);
+        expect(
+            snapshotAnchorsToGraphRebuildOccurrences(first, 30, {
+                'note-1': 'Mia met Rowan. Rowan answered Mia.',
+            }),
+        ).toEqual([]);
     });
 
     it('preserves native Atlas objects that do not require manifold targets', () => {
@@ -78,33 +91,39 @@ describe('graph collapse audit regressions', () => {
         expect(packet.objects.length).toBeGreaterThan(packet.manifoldTargets.length);
         expect(reconciled.objects.length).toBe(packet.objects.length);
         expect(reconciled.counters.objects).toBe(packet.counters.objects);
-        expect(Object.fromEntries(reconciled.counters.families.map((row) => [row.family, row.count])))
-            .toEqual(Object.fromEntries(packet.counters.families.map((row) => [row.family, row.count])));
-        expect(reconciled.objects.map((object) => object.id)).toEqual(expect.arrayContaining([
-            'atlas:review:pending',
-            'atlas:hypergraph:pending',
-        ]));
+        expect(
+            Object.fromEntries(reconciled.counters.families.map((row) => [row.family, row.count])),
+        ).toEqual(
+            Object.fromEntries(packet.counters.families.map((row) => [row.family, row.count])),
+        );
+        expect(reconciled.objects.map((object) => object.id)).toEqual(
+            expect.arrayContaining(['atlas:review:pending', 'atlas:hypergraph:pending']),
+        );
     });
 
     it('keeps candidate and review objects visible without mutating committed topology', () => {
         const snapshot = rootsOnlySnapshot();
-        snapshot.atlasPacket = reconcileNativeAtlasPacketForTargets(snapshot, realisticPacket(snapshot));
+        snapshot.atlasPacket = reconcileNativeAtlasPacketForTargets(
+            snapshot,
+            realisticPacket(snapshot),
+        );
 
         const inventory = buildGraphCanvasInventory(snapshot);
 
         expect(snapshot.nodes).toEqual([]);
         expect(snapshot.edges).toEqual([]);
-        expect(inventory.nodes.map((node) => node.id)).toEqual(expect.arrayContaining([
-            'atlas:review:pending',
-            'atlas:hypergraph:pending',
-        ]));
+        expect(inventory.nodes.map((node) => node.id)).toEqual(
+            expect.arrayContaining(['atlas:review:pending', 'atlas:hypergraph:pending']),
+        );
     });
 
     it('binds entity targets to registry objects when hypergraph roles share their source ids', () => {
         const snapshot = anchoredSnapshot(20);
         const packet = packetForTargets(snapshot);
         const entityTarget = snapshot.embeddingTargets.find((target) => target.kind === 'entity')!;
-        const registryObject = packet.objects.find((object) => object.sourceIds.includes(entityTarget.sourceId))!;
+        const registryObject = packet.objects.find((object) =>
+            object.sourceIds.includes(entityTarget.sourceId),
+        )!;
         packet.objects.push({
             ...registryObject,
             id: 'atlas:hypergraph-role:collision',
@@ -119,7 +138,9 @@ describe('graph collapse audit regressions', () => {
 
         expect(target.objectId).toBe(registryObject.id);
         expect(target.family).toBe('registry');
-        expect(reconciled.objects).toContainEqual(expect.objectContaining({ id: 'atlas:hypergraph-role:collision' }));
+        expect(reconciled.objects).toContainEqual(
+            expect.objectContaining({ id: 'atlas:hypergraph-role:collision' }),
+        );
     });
 
     it('refuses to replace a previously anchored nonempty scope with roots-only', () => {
@@ -128,13 +149,25 @@ describe('graph collapse audit regressions', () => {
         snapshot.atlasPacket = packetForTargets(snapshot);
         const sourceEvidence = buildGraphSnapshotSourceEvidence({});
 
-        expect(() => finalizeGraphRebuildSnapshot({
-            snapshot,
-            sourceEvidence,
-            previousSnapshot,
-            hasNonemptySourceText: true,
-        }))
-            .toThrow(/source-empty|roots-only|accepted source/i);
+        expect(() =>
+            finalizeGraphRebuildSnapshot({
+                snapshot,
+                sourceEvidence,
+                previousSnapshot,
+                hasNonemptySourceText: true,
+            }),
+        ).toThrow(/source-empty|roots-only|accepted source/i);
+    });
+
+    it('keeps tension routing out of Atlas truth families', () => {
+        const documentFamilies: PhoenixDocumentFamilyName[] = [
+            'entityState',
+            'timeline',
+            'tension',
+        ];
+
+        expect(documentFamilies).toContain('tension');
+        expect(GRAPH_ATLAS_FAMILIES).not.toContain('tension');
     });
 });
 
@@ -163,7 +196,16 @@ function buildSnapshotFromOccurrences(
         noteIds: ['note-1'],
         entities,
         occurrences,
-        chunks: [{ id: 'note-1:chunk:0', noteId: 'note-1', start: 0, end: noteTexts['note-1'].length, ordinal: 0, source: 'dynamic-chunking' }],
+        chunks: [
+            {
+                id: 'note-1:chunk:0',
+                noteId: 'note-1',
+                start: 0,
+                end: noteTexts['note-1'].length,
+                ordinal: 0,
+                source: 'dynamic-chunking',
+            },
+        ],
         noteTexts,
         builtAt,
     });
@@ -185,7 +227,16 @@ function rootsOnlySnapshot(
         noteIds: ['note-1'],
         entities: [entity('entity-kai', 'Kai')],
         occurrences: [],
-        chunks: [{ id: 'note-1:chunk:0', noteId: 'note-1', start: 0, end: 18, ordinal: 0, source: 'dynamic-chunking' }],
+        chunks: [
+            {
+                id: 'note-1:chunk:0',
+                noteId: 'note-1',
+                start: 0,
+                end: 18,
+                ordinal: 0,
+                source: 'dynamic-chunking',
+            },
+        ],
         noteTexts: { 'note-1': 'Kai crossed the gate.' },
         builtAt: 30,
     });
@@ -254,7 +305,7 @@ function packetForTargets(snapshot: GraphRebuildSnapshot): GraphAtlasPacket {
             authority: 'rust-atlas-packet',
             identityAuthority: 'registry-entities-and-accepted-anchors',
             vectorContract: 'vectors-missing',
-            tsGraphBuilderRole: 'compatibility-only',
+            tsGraphBuilderRole: 'native-atlas-packet-authority',
         },
         objects,
         manifoldTargets: snapshot.embeddingTargets.map((target) => ({
@@ -293,7 +344,8 @@ function packetForTargets(snapshot: GraphRebuildSnapshot): GraphAtlasPacket {
 
 function familyRows(packet: GraphAtlasPacket): Array<{ family: GraphAtlasFamily; count: number }> {
     const counts = new Map<GraphAtlasFamily, number>();
-    for (const object of packet.objects) counts.set(object.family, (counts.get(object.family) || 0) + 1);
+    for (const object of packet.objects)
+        counts.set(object.family, (counts.get(object.family) || 0) + 1);
     return [...counts.entries()].map(([family, count]) => ({ family, count }));
 }
 

@@ -19,6 +19,7 @@ smallvec.workspace = true
 zerocopy.workspace = true
 phoenix-hyperbolic = { path = "../phoenix-hyperbolic" }
 phoenix-graph-kernel = { path = "../phoenix-graph-kernel" }
+phoenix-document-index = { path = "../phoenix-document-index" }
 phoenix-kernel = { path = "../phoenix-kernel" }
 phoenix-semantic-v2 = { path = "../phoenix-semantic-v2" }
 phoenix-store-native-core = { path = "../phoenix-store-native-core" }

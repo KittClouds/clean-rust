@@ -9,7 +9,7 @@ fn packet_binds_entity_targets_to_registry_objects() {
     assert_eq!(packet.source_contract.authority, "rust-atlas-packet");
     assert_eq!(
         packet.source_contract.ts_graph_builder_role,
-        "compatibility-only"
+        "native-atlas-packet-authority"
     );
     assert!(packet
         .objects

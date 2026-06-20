@@ -2581,7 +2581,9 @@ function receiptDbOpsDetail(
     if (includeZero || value > 0) parts.push(`${label} ${formatDuration(value)}`);
   };
 
+  if (counterValue(counters, 'receiptPersistenceQueued') > 0) parts.push('queued');
   addMs('persist', 'receiptPersistMs');
+  addMs('async queue', 'receiptPersistenceQueueWaitMs');
   if (storeCountersPresent) {
     addMs('store', 'receiptStoreTotalMs', true);
     addMs('queue', 'receiptStoreQueueWaitMs', true);

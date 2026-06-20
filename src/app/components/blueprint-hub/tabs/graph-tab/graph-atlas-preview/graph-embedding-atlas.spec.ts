@@ -5,6 +5,7 @@ import { buildGraphAtlasTaxonomyAudit } from '../../../../../graph-rebuild/graph
 import { buildGraphModelV2Snapshot } from '../../../../../graph-rebuild/graph-model-v2';
 import { buildLeafEmbeddingAtlas } from './graph-embedding-atlas';
 import { buildGraphRebuildEmbeddingAtlas, graphRebuildEmbeddingTargetCount } from './graph-rebuild-embedding-atlas';
+import { buildGalaxyScene, mergeGalaxySettings } from './graph-galaxy-engine';
 
 function block(id: string, text: string, ordinal: number): NoteBlockProjection {
     return {
@@ -186,7 +187,10 @@ describe('embedding atlas projection', () => {
         const styleLabDefaults = new Set(Object.values(DEFAULT_ENTITY_COLORS));
         expect(nodes.has('embed:anchor:anchor-1')).toBe(false);
         expect(nodes.has('embed:anchor:anchor-location')).toBe(false);
-        expect(nodes.get('embed:entity:baton')?.kind).toBe('location');
+        expect(nodes.get('embed:entity:baton')).toMatchObject({
+            kind: 'entity',
+            metadata: expect.objectContaining({ graphColorKind: 'location' }),
+        });
         expect(nodes.get('embed:chunk:chunk-1')?.metadata).toEqual(expect.objectContaining({
             signalLane: 'chunk_spine',
             signalStructuralRole: 'spine',
@@ -250,9 +254,9 @@ describe('embedding atlas projection', () => {
                 builtAt: 1,
                 sourceContract: {
                     authority: 'rust-atlas-packet',
-                    identityAuthority: 'registry',
+                    identityAuthority: 'registry-entities-and-accepted-anchors',
                     vectorContract: 'vectors missing',
-                    tsGraphBuilderRole: 'compatibility-only',
+                    tsGraphBuilderRole: 'native-atlas-packet-authority',
                 },
                 objects: [],
                 manifoldTargets: [
@@ -345,9 +349,9 @@ describe('embedding atlas projection', () => {
                 builtAt: 1,
                 sourceContract: {
                     authority: 'rust-atlas-packet',
-                    identityAuthority: 'registry',
+                    identityAuthority: 'registry-entities-and-accepted-anchors',
                     vectorContract: 'vectors missing',
-                    tsGraphBuilderRole: 'compatibility-only',
+                    tsGraphBuilderRole: 'native-atlas-packet-authority',
                 },
                 objects: [],
                 manifoldTargets: [
@@ -506,9 +510,9 @@ describe('embedding atlas projection', () => {
                 builtAt: 1,
                 sourceContract: {
                     authority: 'rust-atlas-packet',
-                    identityAuthority: 'registry',
+                    identityAuthority: 'registry-entities-and-accepted-anchors',
                     vectorContract: 'vectors missing',
-                    tsGraphBuilderRole: 'compatibility-only',
+                    tsGraphBuilderRole: 'native-atlas-packet-authority',
                 },
                 objects: [],
                 manifoldTargets: [
@@ -642,6 +646,127 @@ describe('embedding atlas projection', () => {
         )).toBe(false);
     });
 
+    it('preserves canonical graph families through every Embed manifold', () => {
+        const targets = [
+            packetTarget('embed:note:note-1', 'structure', 'note', 'document', 'note-1'),
+            packetTarget('embed:structure-root:note-1:identity', 'structure', 'structureRoot', 'document', 'note-1:identity', {
+                noteId: 'note-1', lane: 'document_spine', parentIds: ['embed:note:note-1'],
+            }),
+            packetTarget('embed:chunk:chunk-1', 'structure', 'chunk', 'chunk', 'chunk-1', {
+                noteId: 'note-1', chunkId: 'chunk-1', lane: 'chunk_spine', parentIds: ['embed:structure-root:note-1:identity'],
+            }),
+            packetTarget('embed:event:event-1', 'fact', 'event', 'eventNode', 'event-1', {
+                noteId: 'note-1', chunkId: 'chunk-1', lane: 'event_identity', parentIds: ['embed:chunk:chunk-1'],
+            }),
+            packetTarget('embed:entity:kai', 'registry', 'entity', 'character', 'kai', {
+                registryEntityId: 'kai', entityKind: 'CHARACTER', lane: 'entity_anchor', parentIds: ['embed:chunk:chunk-1'],
+            }),
+            packetTarget('embed:memory:rank-kai', 'memory', 'memoryState', 'rankStatus', 'rank-kai', {
+                registryEntityId: 'kai', stateContextKind: 'rankStatus', lane: 'memory_state', parentIds: ['embed:entity:kai'],
+            }),
+        ];
+        const snapshot = packetSnapshot('snapshot-cross-manifold-families', targets);
+        const layouts = {
+            hybrid: 'hybridSpace', hopf: 'hopfProjection', lorentz: 'lorentzTree',
+            product: 'productManifold', siegel: 'siegelFinsler',
+        } as const;
+        const expectedKinds = new Map([
+            ['embed:note:note-1', 'note'],
+            ['embed:structure-root:note-1:identity', 'structure-root'],
+            ['embed:chunk:chunk-1', 'chunk'],
+            ['embed:event:event-1', 'event'],
+            ['embed:entity:kai', 'entity'],
+            ['embed:memory:rank-kai', 'memory-state'],
+        ]);
+
+        for (const mode of ['hybrid', 'hopf', 'lorentz', 'product', 'siegel'] as const) {
+            const atlas = buildGraphRebuildEmbeddingAtlas(snapshot, mode);
+            const scene = buildGalaxyScene(atlas.nodes, atlas.edges, mergeGalaxySettings({
+                layoutMode: layouts[mode], sourceMode: 'embeddings',
+            }));
+            expect(new Map(atlas.nodes.map((node) => [node.id, node.kind]))).toEqual(expectedKinds);
+            expect(new Map(scene.nodes.map((node) => [node.entity.id, node.entity.kind]))).toEqual(expectedKinds);
+            expect(atlas.nodes.find((node) => node.id.includes('structure-root'))?.metadata?.['graphColorKind']).toBe('document');
+            expect(atlas.nodes.find((node) => node.id.startsWith('embed:event:'))?.metadata?.['graphColorKind']).toBe('event-node');
+            expect(atlas.nodes.find((node) => node.id === 'embed:entity:kai')?.metadata?.['graphColorKind']).toBe('character');
+            expect(atlas.nodes.find((node) => node.id.startsWith('embed:memory:'))?.metadata?.['graphColorKind']).toBe('rank-status');
+            for (const node of atlas.nodes) {
+                const trace = node.metadata?.['visualTrace'] as Record<string, unknown> | undefined;
+                expect(node.metadata).toMatchObject({
+                    sourceContract: 'rust-atlas-packet',
+                    packetSnapshotId: 'snapshot-cross-manifold-families',
+                    visualTrace: expect.objectContaining({
+                        source: 'rust_atlas_packet',
+                        family: node.metadata?.['atlasFamily'],
+                        packetSnapshotId: 'snapshot-cross-manifold-families',
+                        sourceContract: 'rust-atlas-packet',
+                    }),
+                });
+                expect(String(trace?.['sourceId'] || '')).not.toBe('');
+                expect(String(trace?.['packetTargetId'] || '')).not.toBe('');
+            }
+            expect(atlas.edges.length).toBeGreaterThan(0);
+            for (const edge of atlas.edges) {
+                expect(edge.metadata).toMatchObject({
+                    sourceContract: 'rust-atlas-packet',
+                    packetSnapshotId: 'snapshot-cross-manifold-families',
+                    sourceVisualTrace: expect.objectContaining({
+                        source: 'rust_atlas_packet',
+                        packetSnapshotId: 'snapshot-cross-manifold-families',
+                    }),
+                    targetVisualTrace: expect.objectContaining({
+                        source: 'rust_atlas_packet',
+                        packetSnapshotId: 'snapshot-cross-manifold-families',
+                    }),
+                    visualTrace: expect.objectContaining({
+                        source: 'rust_atlas_packet',
+                        packetSnapshotId: 'snapshot-cross-manifold-families',
+                    }),
+                });
+            }
+            expect(scene.nodes.every((node) => Boolean(node.entity.metadata?.['visualTrace']))).toBe(true);
+            expect(scene.links.every((edge) => Boolean(edge.metadata?.['visualTrace']))).toBe(true);
+        }
+    });
+
+    it('resolves shared packet source ids by family instead of object order', () => {
+        const objects = [
+            packetObject('hypergraph:kai-role', 'hypergraph', 'agentRole', 'relationship', ['kai'], { registryEntityId: 'kai' }),
+            packetObject('causal:event-1', 'causal', 'causalFact', 'causalFact', ['event-1']),
+            packetObject('registry:kai', 'registry', 'character', 'character', ['kai'], { registryEntityId: 'kai' }),
+            packetObject('event:event-1', 'fact', 'event', 'eventNode', ['event-1']),
+            packetObject('memory:rank-kai', 'memory', 'memoryState', 'rankStatus', ['rank-kai'], {
+                registryEntityId: 'kai', stateContextKind: 'rankStatus',
+            }),
+        ];
+        const targets = [
+            packetTarget('embed:entity:kai', 'registry', 'entity', '', 'kai', {
+                objectId: 'hypergraph:kai-role', registryEntityId: 'kai',
+            }),
+            packetTarget('embed:event:event-1', 'fact', 'event', '', 'event-1', {
+                objectId: 'causal:event-1',
+            }),
+            packetTarget('embed:memory:rank-kai', 'memory', 'memoryState', '', 'rank-kai', {
+                objectId: 'registry:kai', registryEntityId: 'kai',
+            }),
+        ];
+        const atlas = buildGraphRebuildEmbeddingAtlas(packetSnapshot('snapshot-family-collisions', targets, objects), 'hybrid');
+        const byId = new Map(atlas.nodes.map((node) => [node.id, node]));
+
+        expect(byId.get('embed:entity:kai')).toMatchObject({
+            kind: 'entity',
+            metadata: expect.objectContaining({ entityKind: 'character', graphColorKind: 'character' }),
+        });
+        expect(byId.get('embed:event:event-1')).toMatchObject({
+            kind: 'event',
+            metadata: expect.objectContaining({ graphColorKind: 'event-node' }),
+        });
+        expect(byId.get('embed:memory:rank-kai')).toMatchObject({
+            kind: 'memory-state',
+            metadata: expect.objectContaining({ graphColorKind: 'rank-status' }),
+        });
+    });
+
     it('renders accepted Rust packet objects in embed when no manifold target row exists yet', () => {
         const snapshot = {
             schemaVersion: 'phoenix-graph-rebuild/v1',
@@ -674,9 +799,9 @@ describe('embedding atlas projection', () => {
                 builtAt: 1,
                 sourceContract: {
                     authority: 'rust-atlas-packet',
-                    identityAuthority: 'registry',
+                    identityAuthority: 'registry-entities-and-accepted-anchors',
                     vectorContract: 'vectors missing',
-                    tsGraphBuilderRole: 'compatibility-only',
+                    tsGraphBuilderRole: 'native-atlas-packet-authority',
                 },
                 objects: [
                     {
@@ -734,7 +859,8 @@ describe('embedding atlas projection', () => {
         expect(graphRebuildEmbeddingTargetCount(snapshot)).toBe(2);
         expect(ids.has('embed:entity:kai')).toBe(true);
         expect(ids.has('embed:memory:rank-1')).toBe(true);
-        expect(memory?.kind).toBe('rank-status');
+        expect(memory?.kind).toBe('memory-state');
+        expect(memory?.metadata?.['graphColorKind']).toBe('rank-status');
         expect(memory?.metadata?.['graphMemoryStateKind']).toBe('rankStatus');
         expect(atlas.edges).toEqual(expect.arrayContaining([
             expect.objectContaining({
@@ -777,9 +903,9 @@ describe('embedding atlas projection', () => {
                 builtAt: 1,
                 sourceContract: {
                     authority: 'rust-atlas-packet',
-                    identityAuthority: 'registry',
+                    identityAuthority: 'registry-entities-and-accepted-anchors',
                     vectorContract: 'vectors missing',
-                    tsGraphBuilderRole: 'compatibility-only',
+                    tsGraphBuilderRole: 'native-atlas-packet-authority',
                 },
                 objects: [
                     {
@@ -863,10 +989,12 @@ describe('embedding atlas projection', () => {
         const arcadia = atlas.nodes.find((node) => node.id === 'embed:entity:arcadia');
 
         expect(graphRebuildEmbeddingTargetCount(snapshot)).toBe(2);
-        expect(amara?.kind).toBe('character');
+        expect(amara?.kind).toBe('entity');
         expect(amara?.metadata?.['entityKind']).toBe('character');
-        expect(arcadia?.kind).toBe('location');
+        expect(amara?.metadata?.['graphColorKind']).toBe('character');
+        expect(arcadia?.kind).toBe('entity');
         expect(arcadia?.metadata?.['entityKind']).toBe('location');
+        expect(arcadia?.metadata?.['graphColorKind']).toBe('location');
         expect(atlas.nodes.filter((node) => node.id.startsWith('embed:entity:'))).toHaveLength(2);
     });
 
@@ -914,9 +1042,9 @@ describe('embedding atlas projection', () => {
                 builtAt: 1,
                 sourceContract: {
                     authority: 'rust-atlas-packet',
-                    identityAuthority: 'registry',
+                    identityAuthority: 'registry-entities-and-accepted-anchors',
                     vectorContract: 'vectors missing',
-                    tsGraphBuilderRole: 'compatibility-only',
+                    tsGraphBuilderRole: 'native-atlas-packet-authority',
                 },
                 objects: [
                     {
@@ -1035,7 +1163,8 @@ describe('embedding atlas projection', () => {
         expect(ids.has('embed:anchor:anchor-kai')).toBe(false);
         expect(ids.has('embed:memory:rank-kai')).toBe(true);
         expect(atlas.nodes.filter((node) => node.id.startsWith('embed:entity:'))).toHaveLength(1);
-        expect(memory?.kind).toBe('rank-status');
+        expect(memory?.kind).toBe('memory-state');
+        expect(memory?.metadata?.['graphColorKind']).toBe('rank-status');
         expect(memory?.metadata?.['graphMemoryStateKind']).toBe('rankStatus');
         expect(atlas.nodes.find((node) => node.id === 'embed:entity:kai')?.metadata?.mentionCompaction).toMatchObject({
             anchorCount: 1,
@@ -1498,7 +1627,7 @@ describe('embedding atlas projection', () => {
             }),
         });
         expect(kai.metadata?.lorentz).toMatchObject({
-            level: 4,
+            level: 6,
             primaryTreeKind: 'identity',
             regionRole: 'core',
             dominantLane: 'entity',
@@ -1846,7 +1975,7 @@ describe('embedding atlas projection', () => {
         expect(Number(noteOne['shellRadius'])).toBeGreaterThan(Number(rootOne['shellRadius']));
         expect(Number(rootOne['shellRadius'])).toBeGreaterThan(Number(chunkOne['shellRadius']));
         expect(Number(chunkOne['shellRadius'])).toBeGreaterThan(Number(entity['shellRadius']));
-        expect(Number(entity['shellRadius'])).toBeGreaterThan(Number(fact['shellRadius']));
+        expect(Number(fact['shellRadius'])).toBeGreaterThan(Number(entity['shellRadius']));
     });
 
     it('carries graph-rebuild targets into Siegel-Finsler metadata', () => {
@@ -1898,7 +2027,7 @@ describe('embedding atlas projection', () => {
             parentIds: ['embed:chunk:chunk-1'],
             directed: true,
         });
-        expect(status).toMatchObject({ kind: 'rank-status' });
+        expect(status).toMatchObject({ kind: 'memory-state' });
         expect(status.metadata).toMatchObject({
             graphColorKind: 'rank-status',
             graphMemoryStateKind: 'rankStatus',
@@ -2285,3 +2414,103 @@ describe('embedding atlas projection', () => {
         expect(atlas.edges.map((edge) => edge.type)).toEqual(expect.arrayContaining(['co_occurs_with', 'before', 'causes_or_explains']));
     });
 });
+
+function packetTarget(
+    id: string,
+    family: string,
+    kind: string,
+    styleKey: string,
+    sourceId: string,
+    overrides: Record<string, unknown> = {},
+) {
+    return {
+        id,
+        objectId: `object:${sourceId}`,
+        family,
+        admission: 'admitted',
+        status: 'accepted',
+        vectorStatus: 'missing',
+        coordinateSource: 'deterministic-signature',
+        kind,
+        label: id,
+        styleKey,
+        sourceId,
+        evidenceIds: [],
+        ...overrides,
+    };
+}
+
+function packetObject(
+    id: string,
+    family: string,
+    kind: string,
+    styleKey: string,
+    sourceIds: string[],
+    overrides: Record<string, unknown> = {},
+) {
+    return {
+        id,
+        family,
+        status: 'accepted',
+        kind,
+        label: id,
+        styleKey,
+        noteIds: [],
+        chunkIds: [],
+        anchorIds: [],
+        evidenceIds: [],
+        sourceIds,
+        targetIds: [],
+        ...overrides,
+    };
+}
+
+function packetSnapshot(id: string, targets: unknown[], objects: unknown[] = []) {
+    return {
+        schemaVersion: 'phoenix-graph-rebuild/v1',
+        id,
+        source: 'phoenix-graph-rebuild',
+        scopeKind: 'global',
+        scopeId: 'global',
+        noteIds: ['note-1'],
+        builtAt: 1,
+        chunks: [],
+        mentions: [],
+        entityAnchors: [],
+        relationships: [],
+        events: [],
+        episodes: [],
+        temporalEdges: [],
+        causalEdges: [],
+        memoryState: [],
+        embeddingTargets: [],
+        embeddingVectors: [],
+        projectionRefs: [],
+        nodes: [],
+        edges: [],
+        counters: { embeddingTargets: targets.length },
+        atlasPacket: {
+            schemaVersion: 'phoenix-atlas-packet/v1',
+            snapshotId: id,
+            scopeKind: 'global',
+            scopeId: 'global',
+            builtAt: 1,
+            sourceContract: {
+                authority: 'rust-atlas-packet',
+                identityAuthority: 'registry-entities-and-accepted-anchors',
+                vectorContract: 'vectors missing',
+                tsGraphBuilderRole: 'native-atlas-packet-authority',
+            },
+            objects,
+            manifoldTargets: targets,
+            counters: {
+                objects: objects.length,
+                manifoldTargets: targets.length,
+                registryEntities: 0,
+                evidenceAnchors: 0,
+                modelVectors: 0,
+                families: [],
+            },
+        },
+    } as any;
+}

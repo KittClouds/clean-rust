@@ -2616,6 +2616,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "phoenix-document-index"
+version = "0.1.1"
+dependencies = [
+ "hashbrown 0.15.5",
+ "memchr",
+ "memmap2",
+ "serde",
+ "serde_json",
+ "thiserror 1.0.69",
+ "xxhash-rust",
+ "zerocopy 0.7.35",
+]
+
+[[package]]
 name = "phoenix-dynamic-ner"
 version = "0.1.1"
 dependencies = [
@@ -2796,6 +2810,7 @@ dependencies = [
  "phoenix-alex",
  "phoenix-causality",
  "phoenix-chunker",
+ "phoenix-document-index",
  "phoenix-graph",
  "phoenix-kernel",
  "phoenix-machine",
@@ -2946,6 +2961,7 @@ dependencies = [
 name = "phoenix-semantic-v2"
 version = "0.1.1"
 dependencies = [
+ "phoenix-document-index",
  "phoenix-graph-kernel",
  "phoenix-types",
  "serde",
@@ -2993,6 +3009,7 @@ dependencies = [
  "lz4_flex",
  "memmap2",
  "overgraph",
+ "phoenix-document-index",
  "phoenix-graph-kernel",
  "phoenix-hyperbolic",
  "phoenix-kernel",

@@ -18,6 +18,7 @@ import type {
     GraphRebuildProductLaneKind,
     GraphRebuildProductTopologyRegion,
     GraphRebuildSnapshot,
+    GraphRebuildVisualTrace,
 } from '../../../../../graph-rebuild/graph-rebuild-snapshot';
 import type { GraphAtlasManifoldTarget, GraphAtlasObject, GraphAtlasPacket } from '../../../../../graph-rebuild/graph-atlas-packet';
 import {
@@ -142,7 +143,10 @@ export function buildGraphRebuildEmbeddingAtlas(
         targetNode(target, vectors[index], index, selected.length, manifold, postByTarget.get(target.id), hopfBasePlan?.get(target.id), hierarchyByTarget.get(target.id), truthByTarget.get(target.id), commitmentBySourceId.get(target.sourceId) || commitmentBySourceId.get(target.id), mentionCompaction.receiptsByEntityTargetId.get(target.id), capsDocumentDirections),
     );
     const nodeIds = new Set(rawNodes.map((node) => node.id));
-    const rawEdges = buildTargetEdges(atlasSnapshot).filter((edge) => nodeIds.has(edge.sourceId) && nodeIds.has(edge.targetId));
+    const traceByTargetId = new Map(selected.map((target) => [target.id, embeddingTargetVisualTrace(target)]));
+    const rawEdges = buildTargetEdges(atlasSnapshot)
+        .filter((edge) => nodeIds.has(edge.sourceId) && nodeIds.has(edge.targetId))
+        .map((edge) => edgeWithVisualTrace(edge, traceByTargetId));
     const traversal = manifold === 'product' ? buildGraphRebuildProductTraversal(selected, rawEdges) : emptyProductTraversal();
     const nodes = rawNodes.map((node) => {
         const productTraversal = traversal.nodeMetadata.get(node.id);
@@ -214,12 +218,12 @@ function atlasPacketEmbeddingTargets(
 ): GraphRebuildEmbeddingTarget[] {
     const byId = new Map(displayTargets.map((target) => [target.id, target]));
     const objectById = new Map(packet.objects.map((object) => [object.id, object]));
-    const objectBySourceId = atlasPacketObjectBySourceId(packet.objects);
-    const representedObjectIds = atlasPacketRepresentedObjectIds(packet, objectById, objectBySourceId);
+    const objectsBySourceRef = atlasPacketObjectsBySourceRef(packet.objects);
+    const representedObjectIds = atlasPacketRepresentedObjectIds(packet, objectById, objectsBySourceRef);
     const targetIdByObjectRef = atlasPacketTargetIdByObjectRef(packet);
     const targets = packet.manifoldTargets.map((target): GraphRebuildEmbeddingTarget => {
         const display = byId.get(target.id);
-        const object = atlasPacketObjectForTarget(target, objectById, objectBySourceId);
+        const object = atlasPacketObjectForTarget(target, objectById, objectsBySourceRef);
         return {
             ...display,
             id: target.id,
@@ -240,6 +244,7 @@ function atlasPacketEmbeddingTargets(
             stateContextKind: target.stateContextKind || object?.stateContextKind || display?.stateContextKind,
             atlasFamily: target.family,
             atlasStatus: target.status,
+            visualTrace: atlasPacketTargetVisualTrace(packet, target, object),
             parentIds: target.parentIds?.length
                 ? target.parentIds
                 : atlasPacketObjectParentIds(object, targetIdByObjectRef, target.id) || display?.parentIds || [],
@@ -247,7 +252,7 @@ function atlasPacketEmbeddingTargets(
     });
     for (const object of packet.objects) {
         if (representedObjectIds.has(object.id)) continue;
-        const target = atlasPacketObjectEmbeddingTarget(object, byId, targetIdByObjectRef);
+        const target = atlasPacketObjectEmbeddingTarget(packet, object, byId, targetIdByObjectRef);
         if (target) targets.push(target);
     }
     return targets;
@@ -255,8 +260,8 @@ function atlasPacketEmbeddingTargets(
 
 function atlasPacketEmbeddingTargetCount(packet: GraphAtlasPacket): number {
     const objectById = new Map(packet.objects.map((object) => [object.id, object]));
-    const objectBySourceId = atlasPacketObjectBySourceId(packet.objects);
-    const representedObjectIds = atlasPacketRepresentedObjectIds(packet, objectById, objectBySourceId);
+    const objectsBySourceRef = atlasPacketObjectsBySourceRef(packet.objects);
+    const representedObjectIds = atlasPacketRepresentedObjectIds(packet, objectById, objectsBySourceRef);
     return packet.manifoldTargets.length
         + packet.objects.filter((object) => !representedObjectIds.has(object.id)).length;
 }
@@ -264,18 +269,20 @@ function atlasPacketEmbeddingTargetCount(packet: GraphAtlasPacket): number {
 function atlasPacketRepresentedObjectIds(
     packet: GraphAtlasPacket,
     objectById: Map<string, GraphAtlasObject>,
-    objectBySourceId: Map<string, GraphAtlasObject>,
+    objectsBySourceRef: Map<string, GraphAtlasObject[]>,
 ): Set<string> {
     return new Set(packet.manifoldTargets
-        .map((target) => atlasPacketObjectForTarget(target, objectById, objectBySourceId)?.id || target.objectId)
+        .map((target) => atlasPacketObjectForTarget(target, objectById, objectsBySourceRef)?.id || target.objectId)
         .filter(Boolean));
 }
 
-function atlasPacketObjectBySourceId(objects: GraphAtlasObject[]): Map<string, GraphAtlasObject> {
-    const refs = new Map<string, GraphAtlasObject>();
+function atlasPacketObjectsBySourceRef(objects: GraphAtlasObject[]): Map<string, GraphAtlasObject[]> {
+    const refs = new Map<string, GraphAtlasObject[]>();
     const add = (ref: string | undefined, object: GraphAtlasObject) => {
-        if (!ref || refs.has(ref)) return;
-        refs.set(ref, object);
+        if (!ref) return;
+        const candidates = refs.get(ref) || [];
+        if (!candidates.some((candidate) => candidate.id === object.id)) candidates.push(object);
+        refs.set(ref, candidates);
     };
     for (const object of objects) {
         add(object.id, object);
@@ -292,9 +299,35 @@ function atlasPacketObjectBySourceId(objects: GraphAtlasObject[]): Map<string, G
 function atlasPacketObjectForTarget(
     target: GraphAtlasManifoldTarget,
     objectById: Map<string, GraphAtlasObject>,
-    objectBySourceId: Map<string, GraphAtlasObject>,
+    objectsBySourceRef: Map<string, GraphAtlasObject[]>,
 ): GraphAtlasObject | undefined {
-    return objectBySourceId.get(target.sourceId) || objectById.get(target.objectId);
+    const candidates = new Map<string, GraphAtlasObject>();
+    const exact = objectById.get(target.objectId);
+    if (exact) candidates.set(exact.id, exact);
+    for (const object of objectsBySourceRef.get(target.sourceId) || []) candidates.set(object.id, object);
+    if (target.registryEntityId) {
+        for (const object of objectsBySourceRef.get(target.registryEntityId) || []) candidates.set(object.id, object);
+    }
+    return [...candidates.values()].sort((left, right) =>
+        atlasPacketObjectMatchScore(target, right) - atlasPacketObjectMatchScore(target, left)
+        || left.id.localeCompare(right.id))[0];
+}
+
+function atlasPacketObjectMatchScore(target: GraphAtlasManifoldTarget, object: GraphAtlasObject): number {
+    let score = atlasFamiliesCompatible(target.family, object.family) ? 100 : 0;
+    if (object.id === target.objectId) score += 30;
+    if (displayKind(object.kind) === displayKind(target.kind)) score += 24;
+    if (object.sourceIds.includes(target.sourceId)) score += 16;
+    if (target.registryEntityId && object.registryEntityId === target.registryEntityId) score += 12;
+    if (target.noteId && object.noteIds.includes(target.noteId)) score += 4;
+    if (target.chunkId && object.chunkIds.includes(target.chunkId)) score += 4;
+    return score;
+}
+
+function atlasFamiliesCompatible(targetFamily: GraphAtlasManifoldTarget['family'], objectFamily: GraphAtlasObject['family']): boolean {
+    if (targetFamily === objectFamily) return true;
+    return (targetFamily === 'registry' || targetFamily === 'entity')
+        && (objectFamily === 'registry' || objectFamily === 'entity');
 }
 
 function atlasPacketTargetIdByObjectRef(packet: GraphAtlasPacket): Map<string, string> {
@@ -325,6 +358,7 @@ function atlasPacketTargetIdByObjectRef(packet: GraphAtlasPacket): Map<string, s
 }
 
 function atlasPacketObjectEmbeddingTarget(
+    packet: GraphAtlasPacket,
     object: GraphAtlasObject,
     displayTargets: Map<string, GraphRebuildEmbeddingTarget>,
     targetIdByObjectRef: Map<string, string>,
@@ -353,7 +387,56 @@ function atlasPacketObjectEmbeddingTarget(
         stateContextKind: object.stateContextKind || display?.stateContextKind,
         atlasFamily: object.family,
         atlasStatus: object.status,
+        visualTrace: atlasPacketObjectVisualTrace(packet, object, id),
         parentIds: parentIds?.length ? parentIds : display?.parentIds || [],
+    };
+}
+
+function atlasPacketTargetVisualTrace(
+    packet: GraphAtlasPacket,
+    target: GraphAtlasManifoldTarget,
+    object: GraphAtlasObject | undefined,
+): GraphRebuildVisualTrace {
+    return {
+        source: 'rust_atlas_packet',
+        sourceId: target.sourceId || atlasPacketObjectSourceId(object) || target.objectId,
+        family: target.family,
+        packetSnapshotId: packet.snapshotId,
+        packetScopeId: packet.scopeId,
+        sourceContract: packet.sourceContract.authority,
+        vectorContract: packet.sourceContract.vectorContract,
+        identityAuthority: packet.sourceContract.identityAuthority,
+        packetObjectId: target.objectId,
+        packetTargetId: target.id,
+        objectKind: object?.kind || '',
+        targetKind: target.kind,
+        noteIds: target.noteId ? [target.noteId] : object?.noteIds,
+        chunkIds: target.chunkId ? [target.chunkId] : object?.chunkIds,
+        evidenceIds: target.evidenceIds.length ? target.evidenceIds : object?.evidenceIds,
+    };
+}
+
+function atlasPacketObjectVisualTrace(
+    packet: GraphAtlasPacket,
+    object: GraphAtlasObject,
+    packetTargetId: string,
+): GraphRebuildVisualTrace {
+    return {
+        source: 'rust_atlas_packet',
+        sourceId: atlasPacketObjectSourceId(object) || object.id,
+        family: object.family,
+        packetSnapshotId: packet.snapshotId,
+        packetScopeId: packet.scopeId,
+        sourceContract: packet.sourceContract.authority,
+        vectorContract: packet.sourceContract.vectorContract,
+        identityAuthority: packet.sourceContract.identityAuthority,
+        packetObjectId: object.id,
+        packetTargetId,
+        objectKind: object.kind,
+        targetKind: atlasPacketObjectKind(object),
+        noteIds: object.noteIds,
+        chunkIds: object.chunkIds,
+        evidenceIds: object.evidenceIds,
     };
 }
 
@@ -1224,13 +1307,16 @@ function targetNode(
     const lorentzMetadata = manifold === 'lorentz' || post
         ? productLorentzMetadata(target, point, post, hierarchyContext, capsDocumentDirections)
         : undefined;
+    const visualTrace = embeddingTargetVisualTrace(target);
     const capsHierarchyRole = typeof lorentzMetadata?.['capsHierarchyRole'] === 'string'
         ? lorentzMetadata['capsHierarchyRole']
         : undefined;
+    const canonicalKind = displayKind(target.kind);
+    const styleKind = targetRenderStyleKind(target);
     return {
         id: target.id,
         label: target.label || target.id,
-        kind: targetRenderKind(target),
+        kind: canonicalKind,
         totalMentions: Math.max(1, totalMentions),
         atlasX: point.x,
         atlasY: point.y,
@@ -1239,10 +1325,26 @@ function targetNode(
         metadata: {
             sourceType: target.kind,
             sourceId: target.sourceId,
+            sourceContract: visualTrace.sourceContract,
+            vectorContract: visualTrace.vectorContract,
+            visualTrace,
+            visualSourceId: visualTrace.sourceId,
+            visualFamily: visualTrace.family,
+            packetSnapshotId: visualTrace.packetSnapshotId,
+            packetScopeId: visualTrace.packetScopeId,
             entityKind: target.entityKind,
-            graphColorKind: relationFamily || targetRenderKind(target),
+            graphColorKind: relationFamily || styleKind,
+            graphFamily: visualTrace.family,
             graphRelationFamily: relationFamily || undefined,
             graphMemoryStateKind: displayKind(target.kind) === 'memory-state' ? memoryStateGraphColorKind(target) : undefined,
+            atlasKind: canonicalKind,
+            atlasFamily: target.atlasFamily,
+            atlasStructuralRole: target.structuralRole,
+            atlasDocumentUnitKind: target.documentUnitKind,
+            atlasStateContextKind: target.stateContextKind,
+            atlasObjectId: visualTrace.packetObjectId,
+            atlasTargetId: visualTrace.packetTargetId || target.id,
+            styleKey: target.styleKey,
             capsHierarchyRole,
             signalLane: target.lane,
             signalStructuralRole: target.structuralRole,
@@ -1298,7 +1400,7 @@ function targetNode(
             hopf: manifold === 'hopf'
                 ? graphRebuildHopfMetadata(target, post, manifold, hopfBase)
                 : post ? graphRebuildHopfMetadata(target, post, manifold) : undefined,
-            graphKind: targetRenderKind(target),
+            graphKind: styleKind,
             graphRebuildEmbeddingTarget: true,
             manifold,
             preview: target.text || target.label,
@@ -1986,7 +2088,7 @@ function dominantHopfFiberKind(entries: HopfResonanceEntry[], memberIndexes: num
 }
 
 function hopfResonanceKind(target: GraphRebuildEmbeddingTarget, post?: GraphRebuildEmbeddingTargetPostProcess): string {
-    const kind = targetRenderKind(target);
+    const kind = displayKind(target.kind);
     if (kind === 'graph-fact') return relationFamilyFromText(target.label, target.text, target.sourceId) || 'relationship';
     if (target.kind === 'entity') return normalizeHopfToken(target.entityKind || 'identity');
     if (target.kind === 'chunk' || kind === 'note' || kind === 'structure-root') return 'document-echo';
@@ -2730,6 +2832,76 @@ function buildTargetEdges(snapshot: GraphRebuildSnapshot): GalaxyInputEdge[] {
     return dedupeEdges(edges);
 }
 
+function edgeWithVisualTrace(
+    edge: GalaxyInputEdge,
+    traceByTargetId: Map<string, GraphRebuildVisualTrace>,
+): GalaxyInputEdge {
+    const sourceTrace = traceByTargetId.get(edge.sourceId) || fallbackVisualTrace(edge.sourceId);
+    const targetTrace = traceByTargetId.get(edge.targetId) || fallbackVisualTrace(edge.targetId);
+    const packetOwned = sourceTrace.source === 'rust_atlas_packet' || targetTrace.source === 'rust_atlas_packet';
+    const packetSnapshotId = sourceTrace.packetSnapshotId || targetTrace.packetSnapshotId;
+    const packetScopeId = sourceTrace.packetScopeId || targetTrace.packetScopeId;
+    const sourceContract = sourceTrace.sourceContract || targetTrace.sourceContract;
+    const vectorContract = sourceTrace.vectorContract || targetTrace.vectorContract;
+    const visualTrace: GraphRebuildVisualTrace = {
+        source: packetOwned ? 'rust_atlas_packet' : 'graph_rebuild_embedding_target',
+        sourceId: sourceTrace.sourceId || edge.sourceId,
+        family: targetTrace.family || sourceTrace.family || 'unknown',
+        packetSnapshotId,
+        packetScopeId,
+        sourceContract,
+        vectorContract,
+        identityAuthority: sourceTrace.identityAuthority || targetTrace.identityAuthority,
+        packetObjectId: sourceTrace.packetObjectId || edge.sourceId,
+        packetTargetId: targetTrace.packetTargetId || edge.targetId,
+        objectKind: sourceTrace.targetKind || sourceTrace.objectKind,
+        targetKind: targetTrace.targetKind || targetTrace.objectKind,
+        noteIds: uniqueVisualTraceIds(sourceTrace.noteIds, targetTrace.noteIds),
+        chunkIds: uniqueVisualTraceIds(sourceTrace.chunkIds, targetTrace.chunkIds),
+        evidenceIds: uniqueVisualTraceIds(sourceTrace.evidenceIds, targetTrace.evidenceIds),
+    };
+    return {
+        ...edge,
+        metadata: {
+            ...(edge.metadata || {}),
+            sourceId: visualTrace.sourceId,
+            sourceContract,
+            vectorContract,
+            visualTrace,
+            sourceVisualTrace: sourceTrace,
+            targetVisualTrace: targetTrace,
+            visualSourceId: visualTrace.sourceId,
+            visualFamily: visualTrace.family,
+            graphFamily: visualTrace.family,
+            packetSnapshotId,
+            packetScopeId,
+        },
+    };
+}
+
+function embeddingTargetVisualTrace(target: GraphRebuildEmbeddingTarget): GraphRebuildVisualTrace {
+    return target.visualTrace || fallbackVisualTrace(target.id, target.sourceId, target.atlasFamily || target.styleKey || target.kind, target.evidenceIds);
+}
+
+function fallbackVisualTrace(
+    targetId: string,
+    sourceId = targetId,
+    family = 'unknown',
+    evidenceIds: string[] = [],
+): GraphRebuildVisualTrace {
+    return {
+        source: 'graph_rebuild_embedding_target',
+        sourceId,
+        family,
+        packetTargetId: targetId,
+        evidenceIds,
+    };
+}
+
+function uniqueVisualTraceIds(...values: Array<string[] | undefined>): string[] {
+    return [...new Set(values.flatMap((ids) => ids || []).filter(Boolean))];
+}
+
 function addGraphModelV2ProjectionEdges(
     snapshot: GraphRebuildSnapshot,
     add: (id: string, sourceId: string, targetId: string, type: string, confidence: number) => void,
@@ -2877,7 +3049,7 @@ function normalizeHopfToken(value: string): string {
     return String(value || 'unknown').trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'unknown';
 }
 
-function targetRenderKind(target: GraphRebuildEmbeddingTarget): string {
+function targetRenderStyleKind(target: GraphRebuildEmbeddingTarget): string {
     if (target.styleKey) {
         return displayKind(target.styleKey);
     }

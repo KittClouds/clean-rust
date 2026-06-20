@@ -1,6 +1,7 @@
 use lz4_flex::compress_prepend_size;
 use std::sync::Arc;
 
+use phoenix_document_index::{build_document_index_shard, DocumentIndexInput};
 use phoenix_semantic_v2::{
     scope_storage_key, DirtyScopeRecord, DocumentManifest, DocumentOrd, DocumentOrdinalAssignment,
     DocumentSegmentHeader, DocumentSegmentKind, DocumentSegmentRef, DocumentVersionId,
@@ -204,8 +205,66 @@ fn sample_document(
         },
         manifest,
         segments,
+        document_index_shard: None,
         kernel_batch: Default::default(),
     }
+}
+
+#[test]
+fn prepared_document_index_shards_publish_once_and_reuse_by_hash() {
+    let store = temp_store("document-index-shard");
+    store.init_archive_schema().expect("init archive schema");
+    let scope = phoenix_types::ScopeKey::default();
+    let scope_ord = ScopeOrd(6);
+    let document_ord = DocumentOrd(1);
+    let mut document = sample_document(&scope, scope_ord, document_ord, "doc-index", 10);
+    document.document_index_shard = Some(
+        build_document_index_shard(DocumentIndexInput {
+            document_id: "doc-index",
+            note_id: Some("note-index"),
+            title: "Index",
+            text: "# Index\n\nMapped paragraph.",
+        })
+        .expect("build document index"),
+    );
+    let dirty = DirtyScopeRecord {
+        scope: scope.clone(),
+        scope_key: scope_storage_key(&scope),
+        scope_ord,
+        document_ords: vec![document_ord],
+        updated_at: 10,
+    };
+
+    let first = store
+        .persist_prepared_documents_with_telemetry(
+            std::slice::from_ref(&document),
+            None,
+            std::slice::from_ref(&dirty),
+            10,
+        )
+        .expect("first persist");
+    assert_eq!(first.document_index_shard_count, 1);
+    assert_eq!(first.document_index_shards_written, 1);
+    assert_eq!(first.document_index_shards_reused, 0);
+
+    let warm = store
+        .persist_prepared_documents_with_telemetry(
+            std::slice::from_ref(&document),
+            None,
+            std::slice::from_ref(&dirty),
+            20,
+        )
+        .expect("warm persist");
+    assert_eq!(warm.document_index_shards_written, 0);
+    assert_eq!(warm.document_index_shards_reused, 1);
+    let reference = store
+        .load_latest_document_index_ref(scope_ord, document_ord)
+        .expect("load latest ref")
+        .expect("latest ref");
+    let mapped = store
+        .open_document_index_shard(&reference)
+        .expect("mmap latest shard");
+    assert_eq!(mapped.note_id().expect("note id"), Some("note-index"));
 }
 
 #[test]

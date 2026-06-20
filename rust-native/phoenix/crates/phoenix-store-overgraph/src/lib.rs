@@ -9,6 +9,10 @@ use overgraph::{
     DatabaseEngine, DbOptions, EngineError, NodeInput, NodeRecord, PropValue, UpsertNodeOptions,
     WalSyncMode,
 };
+use phoenix_document_index::{
+    document_index_shard_path, persist_document_index_shard, DocumentIndexShardRef,
+    MmapDocumentIndex,
+};
 use phoenix_graph_kernel::GraphTruthCommit;
 use phoenix_hyperbolic::hybrid_space::{HybridPoint, HybridSpaceConfig};
 use phoenix_hyperbolic::{
@@ -104,6 +108,9 @@ const TYPE_SEMANTIC_GRAPH_PATCH_SIDECAR: u32 = 32;
 const TYPE_NATIVE_ROW: u32 = 33;
 const TYPE_KERNEL_TOPOLOGY_VERTEX: u32 = 34;
 const TYPE_CHUNK_MANIFEST: u32 = 35;
+// Type 36 is reserved by graph_truth_persistence.
+const TYPE_DOCUMENT_INDEX_SHARD: u32 = 37;
+const TYPE_DOCUMENT_INDEX_LATEST: u32 = 38;
 const EDGE_KERNEL_TOPOLOGY_ASSERTED: u32 = 1001;
 const EDGE_KERNEL_TOPOLOGY_CANDIDATE: u32 = 1002;
 
@@ -347,6 +354,33 @@ impl PhoenixOvergraphStore {
 
     pub fn path(&self) -> &Path {
         &self.path
+    }
+
+    pub fn open_document_index_shard(
+        &self,
+        reference: &DocumentIndexShardRef,
+    ) -> Result<MmapDocumentIndex, StoreError> {
+        let path = document_index_shard_path(&self.path, reference)
+            .map_err(|error| StoreError::Snapshot(error.to_string()))?;
+        MmapDocumentIndex::open_verified(path, reference)
+            .map_err(|error| StoreError::Snapshot(error.to_string()))
+    }
+
+    pub fn load_latest_document_index_ref(
+        &self,
+        scope_ord: ScopeOrd,
+        document_ord: DocumentOrd,
+    ) -> Result<Option<DocumentIndexShardRef>, StoreError> {
+        self.with_engine(|engine| {
+            engine
+                .get_node_by_key(
+                    TYPE_DOCUMENT_INDEX_LATEST,
+                    &document_latest_key(scope_ord, document_ord),
+                )
+                .map_err(store_query_error)?
+                .map(|node| decode_record_prop_required(&node, PROP_RECORD))
+                .transpose()
+        })
     }
 
     pub fn tuning(&self) -> &OvergraphTuning {
@@ -3092,6 +3126,22 @@ impl PhoenixOvergraphStore {
             dirty_scope_count: touched_scopes.len(),
             ..PreparedDocumentPersistTelemetry::default()
         };
+        for document in prepared {
+            let Some(shard) = document.document_index_shard.as_ref() else {
+                continue;
+            };
+            let started = std::time::Instant::now();
+            let write = persist_document_index_shard(&self.path, shard)
+                .map_err(|error| StoreError::Snapshot(error.to_string()))?;
+            telemetry.document_index_shard_count += 1;
+            telemetry.document_index_bytes += write.bytes;
+            telemetry.document_index_write_us += started.elapsed().as_micros() as u64;
+            if write.wrote {
+                telemetry.document_index_shards_written += 1;
+            } else {
+                telemetry.document_index_shards_reused += 1;
+            }
+        }
         self.with_engine(|engine| {
             let mut batch = Vec::<NodeInput>::new();
             for document in prepared {
@@ -3153,6 +3203,45 @@ impl PhoenixOvergraphStore {
                     dense_vector: None,
                     sparse_vector: None,
                 });
+                if let Some(shard) = document.document_index_shard.as_ref() {
+                    let reference_bytes = encode_record(&shard.reference)?;
+                    let reference_props = btree_props([
+                        (
+                            PROP_DOCUMENT_ID,
+                            PropValue::String(document.manifest.document_id.clone()),
+                        ),
+                        (
+                            PROP_SCOPE_ORD,
+                            PropValue::UInt(document.manifest.scope_ord.0),
+                        ),
+                        (
+                            PROP_DOCUMENT_ORD,
+                            PropValue::UInt(document.manifest.document_ord.0),
+                        ),
+                        (PROP_REVISION, PropValue::UInt(document.manifest.revision)),
+                        (PROP_BYTE_LEN, PropValue::UInt(shard.reference.byte_len)),
+                        (PROP_RECORD, PropValue::Bytes(reference_bytes)),
+                    ]);
+                    batch.push(NodeInput {
+                        type_id: TYPE_DOCUMENT_INDEX_SHARD,
+                        key: shard.reference.content_hash.clone(),
+                        props: reference_props.clone(),
+                        weight: 1.0,
+                        dense_vector: None,
+                        sparse_vector: None,
+                    });
+                    batch.push(NodeInput {
+                        type_id: TYPE_DOCUMENT_INDEX_LATEST,
+                        key: document_latest_key(
+                            document.manifest.scope_ord,
+                            document.manifest.document_ord,
+                        ),
+                        props: reference_props,
+                        weight: 1.0,
+                        dense_vector: None,
+                        sparse_vector: None,
+                    });
+                }
                 telemetry.manifest_prepare_us += started.elapsed().as_micros() as u64;
 
                 for segment in &document.segments {

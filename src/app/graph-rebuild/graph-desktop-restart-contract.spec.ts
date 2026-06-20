@@ -317,10 +317,10 @@ function atlasPacket(snapshot: GraphRebuildSnapshot): NonNullable<GraphRebuildSn
         scopeId: snapshot.scopeId,
         builtAt: snapshot.builtAt,
         sourceContract: {
-            authority: 'typescript-compatibility-containment-test',
+            authority: 'rust-atlas-packet',
             identityAuthority: 'registry-entities-and-accepted-anchors',
             vectorContract: 'vectors-missing',
-            tsGraphBuilderRole: 'temporary-containment-authority',
+            tsGraphBuilderRole: 'native-atlas-packet-authority',
         },
         objects,
         manifoldTargets: snapshot.embeddingTargets.map((target) => ({

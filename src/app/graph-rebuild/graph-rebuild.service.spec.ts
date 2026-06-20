@@ -14,6 +14,7 @@ import {
     graphRebuildSnapshotPersistenceView,
     graphRebuildSnapshotToNativeCompilerPayload,
     graphRebuildSnapshotToScopedDocument,
+    attachInteractiveAtlasPacketForSnapshotTargets,
     filterNativeEmbeddingTargetsForCommittedSources,
     mergeGraphRebuildOccurrences,
     postProcessCacheToScopedDocument,
@@ -208,6 +209,43 @@ describe('GraphRebuildService persistence helpers', () => {
         );
         expect(snapshot.atlasPacket.counters.manifoldTargets).toBe(filtered.length);
         expect(authorizeGraphRebuildSnapshotForLoad(snapshot)).toBe(snapshot);
+    });
+
+    it('builds interactive Atlas packets from committed targets without dropping visual metadata', () => {
+        const snapshot = buildGraphRebuildSnapshot({
+            scopeKind: 'global',
+            scopeId: 'global',
+            noteIds: ['note-1'],
+            entities: [],
+            occurrences: [],
+            chunks: [{ id: 'note-1:chunk:0', noteId: 'note-1', start: 0, end: 26, ordinal: 0, source: 'dynamic-chunking' }],
+            noteTexts: { 'note-1': 'A paragraph sits under a known document root.' },
+            builtAt: 42,
+        });
+        const chunkTarget = snapshot.embeddingTargets.find((target) => target.kind === 'chunk');
+        expect(chunkTarget).toBeTruthy();
+        Object.assign(chunkTarget!, {
+            documentUnitKind: 'chunk',
+            stateContextKind: 'memory-state',
+        });
+
+        expect(attachInteractiveAtlasPacketForSnapshotTargets(snapshot)).toBe(true);
+        const packetTarget = snapshot.atlasPacket?.manifoldTargets.find((target) => target.id === chunkTarget?.id);
+        const packetObject = snapshot.atlasPacket?.objects.find((object) => object.targetIds.includes(chunkTarget!.id));
+
+        expect(snapshot.atlasPacket?.sourceContract).toMatchObject({
+            authority: 'rust-atlas-packet',
+            identityAuthority: 'registry-entities-and-accepted-anchors',
+            tsGraphBuilderRole: 'native-atlas-packet-authority',
+        });
+        expect(packetTarget).toMatchObject({
+            documentUnitKind: 'chunk',
+            stateContextKind: 'memory-state',
+        });
+        expect(packetObject).toMatchObject({
+            documentUnitKind: 'chunk',
+            stateContextKind: 'memory-state',
+        });
     });
 
     it('quarantines persisted snapshots that fail target source authority', () => {
@@ -612,6 +650,45 @@ describe('GraphRebuildService persistence helpers', () => {
         expect(sidecar?.embeddingTargets).toEqual(seed.embeddingTargets);
         expect(sidecar?.originatingFamilies).toEqual(seed.originatingFamilies);
         expect(sidecar).not.toHaveProperty('atlasSeedPayload');
+    });
+
+    it('normalizes legacy compatibility-only Atlas builder roles from native seeds', () => {
+        const snapshot = buildGraphRebuildSnapshot({
+            scopeKind: 'global', scopeId: 'global', noteIds: ['note-1'],
+            entities: [entity('entity-kai', 'Kai', [])],
+            chunks: [{ id: 'note-1:chunk:0', noteId: 'note-1', start: 0, end: 3, ordinal: 0, source: 'dynamic-chunking' }],
+            occurrences: [occurrence('note-1', 'entity-kai', 0, 3)],
+            noteTexts: { 'note-1': 'Kai' }, builtAt: 42,
+        });
+        const atlasPacket = {
+            ...snapshotAtlasPacket(snapshot),
+            sourceContract: {
+                ...snapshotAtlasPacket(snapshot).sourceContract,
+                tsGraphBuilderRole: 'compatibility-only',
+            },
+        } as ReturnType<typeof snapshotAtlasPacket>;
+        const seed = {
+            atlasPacket,
+            embeddingTargets: snapshot.embeddingTargets.slice(0, 2),
+            originatingFamilies: [{ family: 'document_spine', targets: 2 }],
+        };
+        const raw = JSON.stringify(seed);
+        const compressed = gzipSync(strToU8(raw), { level: 1 });
+
+        const sidecar = decodeNativeGraphCompilerSidecar({
+            atlasSeedPayload: {
+                schemaVersion: 'phoenix-atlas-seed-payload/gzip-base64/v1',
+                sourceSchemaVersion: 'phoenix-atlas-seed/v1', encoding: 'gzip+base64',
+                rawBytes: strToU8(raw).byteLength, compressedBytes: compressed.byteLength,
+                payload: btoa(strFromU8(compressed, true)),
+            },
+        });
+
+        expect(sidecar?.atlasPacket?.sourceContract).toMatchObject({
+            authority: 'rust-atlas-packet',
+            identityAuthority: 'registry-entities-and-accepted-anchors',
+            tsGraphBuilderRole: 'native-atlas-packet-authority',
+        });
     });
 
     it('decodes native snake-case compiler sidecars at the Rust boundary', () => {
@@ -1051,10 +1128,10 @@ function snapshotAtlasPacket(snapshot: GraphRebuildSnapshot): NonNullable<GraphR
         scopeId: snapshot.scopeId,
         builtAt: snapshot.builtAt,
         sourceContract: {
-            authority: 'typescript-compatibility-containment-test',
+            authority: 'rust-atlas-packet',
             identityAuthority: 'registry-entities-and-accepted-anchors',
             vectorContract: 'vectors-missing',
-            tsGraphBuilderRole: 'temporary-containment-authority',
+            tsGraphBuilderRole: 'native-atlas-packet-authority',
         },
         objects,
         manifoldTargets: snapshot.embeddingTargets.map((target) => ({

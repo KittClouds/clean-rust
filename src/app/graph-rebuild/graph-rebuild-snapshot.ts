@@ -340,6 +340,24 @@ export interface GraphRebuildMemoryState {
     evidenceIds: string[];
 }
 
+export interface GraphRebuildVisualTrace {
+    source: 'rust_atlas_packet' | 'graph_rebuild_embedding_target';
+    sourceId: string;
+    family: string;
+    packetSnapshotId?: string;
+    packetScopeId?: string;
+    sourceContract?: string;
+    vectorContract?: string;
+    identityAuthority?: string;
+    packetObjectId?: string;
+    packetTargetId?: string;
+    objectKind?: string;
+    targetKind?: string;
+    noteIds?: string[];
+    chunkIds?: string[];
+    evidenceIds?: string[];
+}
+
 export interface GraphRebuildEmbeddingTarget {
     id: string;
     kind: GraphRebuildEmbeddingTargetKind;
@@ -368,6 +386,7 @@ export interface GraphRebuildEmbeddingTarget {
     admissionReason?: string;
     deferReason?: string;
     parentIds?: string[];
+    visualTrace?: GraphRebuildVisualTrace;
 }
 
 export type GraphRebuildSignalTargetLane =
@@ -2203,7 +2222,6 @@ export interface GraphRebuildBuildTimings {
     stateCommitMs: number;
     nativeCompilerMs?: number;
     nativeCompilerSkipped?: number;
-    tsAtlasPacketParity?: number;
     nativeCompilerInputBytesByFamily?: Record<string, number>;
     nativeTargetsByOriginatingFamily?: Record<string, number>;
     nativeAtlasSeedRawBytes?: number;
@@ -2213,6 +2231,8 @@ export interface GraphRebuildBuildTimings {
     snapshotPersistMs: number;
     snapshotSerializeMs: number;
     snapshotPrimaryEncodeMs?: number;
+    snapshotPrimaryWriteSkipped?: number;
+    snapshotPrimaryIdentityReused?: number;
     snapshotOverGraphEncodeMs?: number;
     snapshotOverGraphSkipped?: number;
     snapshotStoreMs: number;
@@ -2279,9 +2299,9 @@ export interface GraphRebuildContentManifest {
     refs: Partial<Record<GraphRebuildContentBlobField, GraphRebuildContentBlobRef>>;
 }
 
-export type GraphSnapshotAuthority =
-    | 'typescript_compatibility_containment'
-    | 'native_graph_truth_commit';
+export const GRAPH_SNAPSHOT_LIVE_AUTHORITY = 'graph_rebuild_live_contract' as const;
+
+export type GraphSnapshotAuthority = typeof GRAPH_SNAPSHOT_LIVE_AUTHORITY;
 
 export interface GraphSnapshotAuthorityCounts {
     notes: number;
@@ -2451,6 +2471,37 @@ export interface GraphIndexProjectionReceipt {
     message: string;
 }
 
+export type GraphIndexLayerKind =
+    | 'input'
+    | 'model'
+    | 'truth'
+    | 'native'
+    | 'authority'
+    | 'persistence'
+    | 'projection'
+    | 'diagnostic'
+    | 'transport'
+    | 'ui';
+
+export type GraphIndexLayerStatus = 'complete' | 'partial' | 'skipped' | 'failed';
+
+export interface GraphIndexLayerReceipt {
+    id: string;
+    label: string;
+    kind: GraphIndexLayerKind;
+    status: GraphIndexLayerStatus;
+    owner: string;
+    source: string;
+    consumes: string[];
+    produces: string[];
+    stageIds: string[];
+    projectionModes?: GraphIndexProjectionMode[];
+    authority?: string;
+    contentHash?: string;
+    counters: Record<string, number>;
+    message: string;
+}
+
 export interface GraphIndexRunReceipt {
     schemaVersion: 'phoenix-graph-index-run/v1';
     id: string;
@@ -2470,6 +2521,7 @@ export interface GraphIndexRunReceipt {
     durationMs: number;
     stageReceipts: GraphIndexStageReceipt[];
     projectionReceipts: GraphIndexProjectionReceipt[];
+    layerReceipts: GraphIndexLayerReceipt[];
     snapshotId?: string;
     authorityContract?: GraphSnapshotAuthorityContract;
     counters: GraphRebuildCounters;

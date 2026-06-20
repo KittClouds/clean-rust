@@ -247,6 +247,13 @@ interface ParagraphSpan {
     text: string;
 }
 
+interface HeadingSpan {
+    start: number;
+    end: number;
+    level: number;
+    label: string;
+}
+
 interface GraphFactProposal {
     kind: GraphBearingUnitKind;
     paragraph: ParagraphSpan;
@@ -317,6 +324,7 @@ export function buildGraphDocumentSidecar(input: BuildGraphDocumentSidecarInput)
     }
     buildCrossDocPackets(context, input.noteIds, input.chunks);
     for (const unit of context.units) unit.childIds = context.childIdsByParent.get(unit.id) || [];
+    for (const section of context.sections) section.childIds = context.childIdsByParent.get(section.id) || [];
     return {
         schemaVersion: 'phoenix-document-sidecar/v1',
         anchorPolicy: 'sidecar_never_promotes_anchors',
@@ -341,22 +349,7 @@ export function buildGraphDocumentSidecar(input: BuildGraphDocumentSidecarInput)
 function buildNoteSidecar(context: BuildContext, noteId: string, text: string, chunks: GraphRebuildChunk[], semantics?: GraphDocumentSemanticDocument): void {
     const doc = addSection(context, noteId, 'document', 'Document', 0, text.length, 0, undefined, 0, confidence('surface', 0.98, ['note_root']));
     const headings = headingSpans(text);
-    const sections = headings.length ? headings.map((heading, index) => {
-        const next = headings[index + 1];
-        return addSection(
-            context,
-            noteId,
-            heading.level === 1 ? 'section' : 'subsection',
-            heading.label,
-            heading.start,
-            next ? next.start : text.length,
-            heading.level,
-            doc.id,
-            index,
-            confidence('surface', 0.92, ['markdown_heading']),
-            heading.label,
-        );
-    }) : [
+    const sections = headings.length ? buildHeadingSections(context, noteId, text.length, doc, headings) : [
         addSection(context, noteId, 'section', 'Document body', 0, text.length, 1, doc.id, 0, confidence('surface', 0.56, ['implicit_section'])),
     ];
     const paragraphs = paragraphSpans(text);
@@ -384,6 +377,48 @@ function buildNoteSidecar(context: BuildContext, noteId: string, text: string, c
         appendSemanticContinuity(context, semantics);
         buildSemanticFactUnits(context, noteId, paragraphs, paragraphUnits, chunks, semantics.propositions);
     }
+}
+
+function buildHeadingSections(
+    context: BuildContext,
+    noteId: string,
+    textEnd: number,
+    document: DocumentSection,
+    headings: HeadingSpan[],
+): DocumentSection[] {
+    const sectionEnds = headingSectionEnds(headings, textEnd);
+    const open: Array<{ level: number; section: DocumentSection }> = [];
+    return headings.map((heading, index) => {
+        while (open.length && open[open.length - 1].level >= heading.level) open.pop();
+        const parent = open.length ? open[open.length - 1].section : document;
+        const section = addSection(
+            context,
+            noteId,
+            heading.level === 1 ? 'section' : 'subsection',
+            heading.label,
+            heading.start,
+            sectionEnds[index],
+            heading.level,
+            parent.id,
+            index,
+            confidence('surface', 0.92, ['markdown_heading']),
+            heading.label,
+        );
+        open.push({ level: heading.level, section });
+        return section;
+    });
+}
+
+function headingSectionEnds(headings: HeadingSpan[], textEnd: number): number[] {
+    const ends = headings.map(() => textEnd);
+    const open: number[] = [];
+    for (let index = 0; index < headings.length; index += 1) {
+        while (open.length && headings[open[open.length - 1]].level >= headings[index].level) {
+            ends[open.pop() as number] = headings[index].start;
+        }
+        open.push(index);
+    }
+    return ends;
 }
 
 function appendSemanticContinuity(context: BuildContext, semantics: GraphDocumentSemanticDocument): void {
@@ -1060,8 +1095,8 @@ function pushSentence(spans: ParagraphSpan[], paragraph: ParagraphSpan, start: n
     if (end > start) spans.push({ start, end, text: paragraph.text.slice(start - paragraph.start, end - paragraph.start) });
 }
 
-function headingSpans(text: string): Array<{ start: number; end: number; level: number; label: string }> {
-    const out: Array<{ start: number; end: number; level: number; label: string }> = [];
+function headingSpans(text: string): HeadingSpan[] {
+    const out: HeadingSpan[] = [];
     const regex = /^(#{1,6})\s+(.+)$/gm;
     let match: RegExpExecArray | null;
     while ((match = regex.exec(text)) !== null) out.push({ start: match.index, end: match.index + match[0].length, level: match[1].length, label: match[2].trim() });

@@ -8,6 +8,9 @@ use lz4_flex::{compress_prepend_size, decompress_size_prepended};
 use phoenix_alex::Lexicon;
 use phoenix_causality::{CausalityLowerer, CausalityRequest, SemanticLowerer};
 use phoenix_chunker_native::{build_chunks, ChunkerConfig};
+use phoenix_document_index::{
+    build_document_index_shard, DocumentIndexInput, DocumentIndexShardRef,
+};
 use phoenix_kernel::{
     entity_sidecar_from_snapshot, GraphTruthCommit, KernelEdge, KernelEdgeType, KernelEntityFacet,
     KernelEntitySidecar, KernelGraphLayer, KernelGraphSnapshot, KernelJournalEntry,
@@ -6599,6 +6602,28 @@ mod tests {
             .expect("native ingest");
         assert_eq!(ingest.document_count, 1);
         assert_eq!(artifacts.document_refs.len(), 1);
+        assert_eq!(artifacts.document_index_shards.len(), 1);
+        let document_index_ref = &artifacts.document_index_shards[0];
+        let document_index = store
+            .open_document_index_shard(document_index_ref)
+            .expect("mapped document index");
+        assert_eq!(
+            document_index.document_id().expect("document id"),
+            "doc-native-1"
+        );
+        assert_eq!(
+            document_index.note_id().expect("note id"),
+            Some("note-native-1")
+        );
+        assert!(document_index.unit_count() >= 3);
+        let stored_index_ref = store
+            .load_latest_document_index_ref(
+                artifacts.document_refs[0].scope_ord,
+                artifacts.document_refs[0].document_ord,
+            )
+            .expect("latest document index ref")
+            .expect("document index ref present");
+        assert_eq!(&stored_index_ref, document_index_ref);
         assert_eq!(store.list_dirty_scopes().expect("dirty scopes").len(), 1);
         assert!(artifacts.kernel_batches.iter().any(|batch| {
             batch.layer == KernelGraphLayer::Candidate
@@ -6723,6 +6748,53 @@ mod tests {
             .load_kernel_journal_after(checkpoint_generation)
             .expect("journal after checkpoint")
             .is_empty());
+    }
+
+    #[test]
+    fn ingest_native_reuses_timestamp_free_document_index_shards() {
+        let store = PhoenixOvergraphStore::open(temp_path("document-index-reuse")).expect("store");
+        store.init_archive_schema().expect("archive schema");
+        store.init_graph_kernel_schema().expect("kernel schema");
+        store
+            .write_kernel_checkpoint(1, "seed", &KernelGraphSnapshot::default())
+            .expect("checkpoint");
+        let engine = PhoenixInvarantV3::default();
+        let mut document = IngestDocument {
+            document_id: DocumentId("doc-index-reuse".to_owned()),
+            note_id: Some(NoteId("note-index-reuse".to_owned())),
+            title: "Book".to_owned(),
+            text: "# Book\n\n## Chapter\n\nOpening paragraph.".to_owned(),
+            scope: ScopeKey::default(),
+        };
+
+        let (_, first) = engine
+            .ingest_documents_native(&store, None, std::slice::from_ref(&document), 0, 10)
+            .expect("first ingest");
+        let (_, warm) = engine
+            .ingest_documents_native(&store, None, std::slice::from_ref(&document), 1, 20)
+            .expect("warm ingest");
+        assert_eq!(first.document_index_shards, warm.document_index_shards);
+
+        document.text.push_str("\n\nChanged paragraph.");
+        let (_, changed) = engine
+            .ingest_documents_native(&store, None, std::slice::from_ref(&document), 2, 30)
+            .expect("changed ingest");
+        assert_ne!(
+            warm.document_index_shards[0].content_hash,
+            changed.document_index_shards[0].content_hash
+        );
+        let latest = store
+            .load_latest_document_index_ref(
+                changed.document_refs[0].scope_ord,
+                changed.document_refs[0].document_ord,
+            )
+            .expect("latest index ref")
+            .expect("latest index ref present");
+        assert_eq!(latest, changed.document_index_shards[0]);
+        let mapped = store
+            .open_document_index_shard(&latest)
+            .expect("changed mapped index");
+        assert_eq!(mapped.text_len() as usize, document.text.len());
     }
 
     #[test]
@@ -7225,6 +7297,7 @@ pub struct V2IngestArtifacts {
     pub session_documents: Vec<SessionDocumentState>,
     pub document_refs: Vec<DocumentRevisionRef>,
     pub document_manifests: Vec<DocumentManifest>,
+    pub document_index_shards: Vec<DocumentIndexShardRef>,
     pub manifest_namespaces: Vec<String>,
     pub span_count: usize,
     pub discovery_candidate_count: usize,
@@ -8235,6 +8308,7 @@ impl PhoenixInvarantV3 {
                     .iter()
                     .map(|outcome| outcome.archive.manifest.clone())
                     .collect(),
+                document_index_shards: Vec::new(),
                 manifest_namespaces: vec![
                     "invarant-v2.document".to_owned(),
                     "invarant-v2.session".to_owned(),
@@ -8497,8 +8571,12 @@ impl PhoenixInvarantV3 {
                 let mut kernel_batches = Vec::new();
                 let mut document_refs = Vec::new();
                 let mut document_manifests = Vec::new();
+                let mut document_index_shards = Vec::new();
 
                 for (document, outcome) in prepared.into_iter().zip(outcomes.into_iter()) {
+                    if let Some(shard) = document.document_index_shard.as_ref() {
+                        document_index_shards.push(shard.reference.clone());
+                    }
                     let manifest = document.manifest;
                     document_refs.push(DocumentRevisionRef {
                         document_id: manifest.document_id.clone(),
@@ -8519,8 +8597,10 @@ impl PhoenixInvarantV3 {
                     session_documents,
                     document_refs,
                     document_manifests,
+                    document_index_shards,
                     manifest_namespaces: vec![
                         "invarant-v2.document".to_owned(),
+                        "invarant-v2.document-index".to_owned(),
                         "invarant-v2.session".to_owned(),
                         "invarant-v2.scope_lex".to_owned(),
                     ],
@@ -9212,6 +9292,22 @@ impl PhoenixInvarantV3 {
             resolution_bundle.discovery_count,
             mention_count,
         );
+        let document_index_started = Instant::now();
+        let document_index_shard = build_document_index_shard(DocumentIndexInput {
+            document_id: &document.document_id.0,
+            note_id: document.note_id.as_ref().map(|note_id| note_id.0.as_str()),
+            title: &document.title,
+            text: &document.text,
+        })
+        .map_err(|error| StoreError::Schema(error.to_string()))?;
+        if progress {
+            eprintln!(
+                "[runtime-ingest] prepare_subphase=build_document_index wall_ms={} units={} bytes={}",
+                document_index_started.elapsed().as_millis(),
+                document_index_shard.reference.unit_count,
+                document_index_shard.reference.byte_len,
+            );
+        }
         let subphase_started = Instant::now();
         let semantic_substrate =
             build_document_semantic_substrate(document, &scan_bundle, created_at);
@@ -9403,6 +9499,7 @@ impl PhoenixInvarantV3 {
                 assignment: assignment.clone(),
                 manifest,
                 segments,
+                document_index_shard: Some(document_index_shard),
                 kernel_batch: resolution_bundle.kernel_batch,
             },
             document_summary,

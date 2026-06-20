@@ -38,6 +38,11 @@ import type {
     GraphAtlasObject,
     GraphAtlasPacket,
 } from './graph-atlas-packet';
+import {
+    GRAPH_ATLAS_BUILDER_ROLE,
+    GRAPH_ATLAS_IDENTITY_AUTHORITY,
+    GRAPH_ATLAS_PACKET_AUTHORITY,
+} from './graph-atlas-packet';
 import { buildGraphRebuildSnapshot } from './graph-rebuild-builder';
 import { finalizeGraphRebuildSnapshot } from './graph-snapshot-finalizer';
 import {
@@ -91,6 +96,7 @@ import {
     graphSnapshotContentHash,
     graphSnapshotStableContentValue,
     hydrateGraphSnapshotContent,
+    sealGraphSnapshotAuthority,
     type GraphSnapshotHydrationBlob,
 } from './graph-snapshot-authority';
 import {
@@ -104,6 +110,7 @@ export { mergeGraphRebuildOccurrences } from './graph-snapshot-source-evidence';
 
 export const GRAPH_REBUILD_NAMESPACE = 'phoenix_graph_rebuild_v1';
 const SNAPSHOT_DOCUMENT_KEY = 'snapshot';
+export const DIAGNOSTIC_SNAPSHOT_DOCUMENT_KEY = 'snapshot:diagnostic';
 const RECEIPT_DOCUMENT_KEY = 'receipt';
 const OPERATOR_MUTATION_JOURNAL_DOCUMENT_KEY = 'operator-mutation-journal';
 export const GRAPH_MODEL_V2_OVERGRAPH_DOCUMENT_KEY = 'graph-model-v2-overgraph';
@@ -248,6 +255,8 @@ export interface GraphRebuildBuildRequest {
     postProcessMode?: GraphIndexPostProcessMode;
     embeddingStagePolicy?: GraphIndexEmbeddingStagePolicy;
     durabilityMode?: GraphBuildDurabilityMode;
+    diagnosticBaseSnapshotId?: string;
+    diagnosticBaseSnapshotRunSerial?: number;
     candidateCount?: number;
     calendarRegistrySnapshot?: CalendarRegistrySnapshot;
 }
@@ -264,17 +273,24 @@ export class GraphRebuildService {
     private readonly buildingState = signal(false);
     private readonly errorState = signal<string | null>(null);
     private readonly lastBuildTimingsState = signal<GraphRebuildBuildTimings | null>(null);
+    private readonly absentOperatorMutationJournalScopes = new Set<string>();
+    private primarySnapshotRunSerial = 0;
 
     readonly snapshot = computed(() => this.snapshotState());
     readonly isBuilding = computed(() => this.buildingState());
     readonly error = computed(() => this.errorState());
     readonly lastBuildTimings = computed(() => this.lastBuildTimingsState());
 
+    currentSnapshotRunSerial(): number {
+        return this.primarySnapshotRunSerial;
+    }
+
     async buildAndPersistSnapshot(request: GraphRebuildBuildRequest): Promise<GraphRebuildSnapshot> {
-        this.buildingState.set(true);
+        const durabilityMode = request.durabilityMode || 'durable';
+        const commitsPrimarySnapshot = durabilityMode !== 'diagnostic';
+        if (commitsPrimarySnapshot) this.buildingState.set(true);
         const totalStarted = performance.now();
         const builtAt = Date.now();
-        const durabilityMode = request.durabilityMode || 'durable';
         const timings = emptyBuildTimings();
         const currentSnapshot = this.snapshotState();
         const previousContentManifest = request.previousContentManifest
@@ -380,12 +396,25 @@ export class GraphRebuildService {
             });
             recordGraphCollapseSnapshotBoundary(snapshot, 'typescript_snapshot');
             snapshot = await this.reconcileDocumentGraphMutations(snapshot);
-            const nativeNeeded = durabilityMode !== 'interactive'
-                || !this.attachTsAtlasPacketIfComplete(snapshot, timings);
-            if (nativeNeeded) {
-                await this.attachNativeGraphCompilerSidecar(snapshot, timings, request);
-            } else {
+            const interactivePacketAttached = durabilityMode === 'interactive'
+                && attachInteractiveAtlasPacketForSnapshotTargets(
+                    snapshot,
+                    currentSnapshot?.scopeId === snapshot.scopeId ? currentSnapshot : previousSnapshot,
+                );
+            if (interactivePacketAttached) {
                 timings.nativeCompilerSkipped = 1;
+                timings.nativeCompilerInputBytesByFamily = {};
+                timings.nativeTargetsByOriginatingFamily = {
+                    interactivePacket: snapshot.embeddingTargets.length,
+                };
+                recordGraphCollapseBoundary(snapshot.id, snapshot.scopeId, 'native_response', {
+                    nativeResponseAvailable: 0,
+                    nativeCompilerSkipped: 1,
+                    packetObjects: snapshot.atlasPacket?.objects.length || 0,
+                    packetTargets: snapshot.atlasPacket?.manifoldTargets.length || 0,
+                });
+            } else {
+                await this.attachNativeGraphCompilerSidecar(snapshot, timings, request);
             }
             const authoritySealStarted = performance.now();
             finalizeGraphRebuildSnapshot({
@@ -394,56 +423,55 @@ export class GraphRebuildService {
                 previousSnapshot,
                 hasNonemptySourceText: Object.values(noteTexts).some((text) => text.trim().length > 0),
             });
+            const primaryNoOpSnapshot = currentSnapshot?.scopeId === snapshot.scopeId
+                ? currentSnapshot
+                : previousSnapshot;
+            const skipPrimarySnapshotWrite = durabilityMode === 'interactive'
+                && reuseInteractivePrimarySnapshotIdentity(snapshot, primaryNoOpSnapshot);
+            timings.snapshotPrimaryIdentityReused = skipPrimarySnapshotWrite ? 1 : 0;
             timings.authoritySealMs = elapsedMs(authoritySealStarted);
             finalizeBuildTimings(timings, totalStarted);
             snapshot.buildTimings = timings;
+            const diagnosticStillCurrent = durabilityMode !== 'diagnostic'
+                || (request.diagnosticBaseSnapshotRunSerial !== undefined
+                    ? this.primarySnapshotRunSerial === request.diagnosticBaseSnapshotRunSerial
+                    : !request.diagnosticBaseSnapshotId
+                        || this.snapshotState()?.id === request.diagnosticBaseSnapshotId);
             const stateStarted = performance.now();
-            this.snapshotState.set(snapshot);
+            if (commitsPrimarySnapshot) {
+                this.primarySnapshotRunSerial += 1;
+                this.snapshotState.set(snapshot);
+            }
             timings.stateCommitMs = elapsedMs(stateStarted);
+            if (!diagnosticStillCurrent) {
+                finalizeBuildTimings(timings, totalStarted);
+                snapshot.buildTimings = timings;
+                return snapshot;
+            }
             const persistStarted = performance.now();
             await this.persistSnapshot(snapshot, timings, false, {
                 durabilityMode,
                 previousContentManifest: previousContentManifest
                     || previousSnapshot?.contentManifest,
+                skipPrimarySnapshotWrite,
             }).then(() => {
-                this.errorState.set(null);
+                if (commitsPrimarySnapshot) this.errorState.set(null);
             }).catch((error) => {
                 const message = error instanceof Error ? error.message : String(error);
-                this.errorState.set(`Overgraph graph-rebuild snapshot persist failed: ${message}`);
+                if (commitsPrimarySnapshot) {
+                    this.errorState.set(`Overgraph graph-rebuild snapshot persist failed: ${message}`);
+                }
                 console.warn('[GraphRebuild] Snapshot persist failed', error);
             }).finally(() => {
                 timings.snapshotPersistMs = elapsedMs(persistStarted);
             });
             finalizeBuildTimings(timings, totalStarted);
             snapshot.buildTimings = timings;
-            this.lastBuildTimingsState.set(timings);
+            if (commitsPrimarySnapshot) this.lastBuildTimingsState.set(timings);
             return snapshot;
         } finally {
-            this.buildingState.set(false);
+            if (commitsPrimarySnapshot) this.buildingState.set(false);
         }
-    }
-
-    private attachTsAtlasPacketIfComplete(
-        snapshot: GraphRebuildSnapshot,
-        timings?: GraphRebuildBuildTimings,
-    ): boolean {
-        const packet = buildCompatibilityAtlasPacketForSnapshot(snapshot);
-        const targetParity = packet.manifoldTargets.length === snapshot.embeddingTargets.length
-            && packet.counters.manifoldTargets === snapshot.counters.embeddingTargets;
-        if (timings) {
-            timings.tsAtlasPacketParity = targetParity ? 1 : 0;
-            timings.nativeTargetsByOriginatingFamily = Object.fromEntries(
-                packet.counters.families.map((row) => [row.family, row.count]),
-            );
-        }
-        if (!targetParity) return false;
-        snapshot.atlasPacket = packet;
-        recordGraphCollapseSnapshotBoundary(snapshot, 'typescript_atlas_packet', {
-            packetObjects: packet.objects.length,
-            packetTargets: packet.manifoldTargets.length,
-            nativeCompilerSkipped: 1,
-        });
-        return true;
     }
 
     private async attachNativeGraphCompilerSidecar(
@@ -733,21 +761,33 @@ export class GraphRebuildService {
         if (current?.scopeId === scopeId && current.operatorMutationJournal) {
             return current.operatorMutationJournal;
         }
+        const allowSnapshotFallback = options.allowSnapshotFallback !== false;
+        if (!allowSnapshotFallback && this.absentOperatorMutationJournalScopes.has(scopeId)) {
+            return null;
+        }
         const journalDocument = await this.store.getScopedDocument(
             scopeId,
             GRAPH_REBUILD_NAMESPACE,
             OPERATOR_MUTATION_JOURNAL_DOCUMENT_KEY,
         );
-        if (journalDocument) return scopedDocumentToGraphOperatorMutationJournal(journalDocument);
-        if (options.allowSnapshotFallback === false) return null;
+        if (journalDocument) {
+            this.absentOperatorMutationJournalScopes.delete(scopeId);
+            return scopedDocumentToGraphOperatorMutationJournal(journalDocument);
+        }
+        if (!allowSnapshotFallback) {
+            this.absentOperatorMutationJournalScopes.add(scopeId);
+            return null;
+        }
         const snapshotDocument = await this.store.getScopedDocument(
             scopeId,
             GRAPH_REBUILD_NAMESPACE,
             SNAPSHOT_DOCUMENT_KEY,
         );
-        return snapshotDocument
+        const snapshotJournal = snapshotDocument
             ? scopedDocumentToGraphRebuildSnapshot(snapshotDocument)?.operatorMutationJournal || null
             : null;
+        if (snapshotJournal) this.absentOperatorMutationJournalScopes.delete(scopeId);
+        return snapshotJournal;
     }
 
     private async persistOperatorMutationJournal(
@@ -755,6 +795,7 @@ export class GraphRebuildService {
         scopeKind: GraphRebuildScopeKind,
     ): Promise<void> {
         await this.store.upsertScopedDocument(graphOperatorMutationJournalToScopedDocument(journal, scopeKind));
+        this.absentOperatorMutationJournalScopes.delete(journal.scopeId);
     }
 
     private async persistSnapshot(
@@ -764,6 +805,7 @@ export class GraphRebuildService {
         options: {
             durabilityMode?: GraphBuildDurabilityMode;
             previousContentManifest?: GraphRebuildContentManifest;
+            skipPrimarySnapshotWrite?: boolean;
         } = {},
     ): Promise<void> {
         const authorityAssertStarted = performance.now();
@@ -773,11 +815,11 @@ export class GraphRebuildService {
         const serializeStarted = performance.now();
         const contentBlobEntries = graphRebuildSnapshotContentBlobEntries(snapshot);
         const persistedSnapshot = graphRebuildSnapshotPersistenceView(snapshot, contentBlobEntries);
+        if (persistedSnapshot.contentManifest) snapshot.contentManifest = persistedSnapshot.contentManifest;
         const contentBlobDocuments = graphRebuildSnapshotContentBlobDocuments(snapshot, contentBlobEntries);
-        const primaryEncodeStarted = performance.now();
-        const document = graphRebuildSnapshotToScopedDocument(persistedSnapshot);
-        if (timings) timings.snapshotPrimaryEncodeMs = elapsedMs(primaryEncodeStarted);
-        const documentPayloadStats = graphRebuildSnapshotDocumentPayloadStats(document.payload);
+        const documentKey = options.durabilityMode === 'diagnostic'
+            ? DIAGNOSTIC_SNAPSHOT_DOCUMENT_KEY
+            : SNAPSHOT_DOCUMENT_KEY;
         const overGraphEncodeStarted = performance.now();
         const overGraphDocument = options.durabilityMode === 'interactive'
             ? null
@@ -789,12 +831,36 @@ export class GraphRebuildService {
         const overGraphDocumentPayloadStats = overGraphDocument
             ? graphRebuildSnapshotDocumentPayloadStats(overGraphDocument.payload)
             : undefined;
+        let previousContentManifest = options.previousContentManifest;
+        let contentBlobReads = 0;
+        let missingContentBlobDocuments: StoreScopedDocument[] | null = null;
+        if (options.durabilityMode === 'interactive' && previousContentManifest) {
+            missingContentBlobDocuments = missingContentBlobDocumentsForManifest(
+                contentBlobDocuments,
+                contentBlobEntries,
+                previousContentManifest,
+            );
+        }
+        const primaryWriteSkipped = options.durabilityMode === 'interactive'
+            && !!options.skipPrimarySnapshotWrite
+            && !!previousContentManifest
+            && missingContentBlobDocuments !== null
+            && missingContentBlobDocuments.length === 0
+            && !overGraphDocument;
+        const primaryEncodeStarted = performance.now();
+        const document = primaryWriteSkipped
+            ? null
+            : graphRebuildSnapshotToScopedDocument(persistedSnapshot, documentKey);
+        if (timings) timings.snapshotPrimaryEncodeMs = primaryWriteSkipped ? 0 : elapsedMs(primaryEncodeStarted);
+        const documentPayloadStats = document
+            ? graphRebuildSnapshotDocumentPayloadStats(document.payload)
+            : undefined;
         if (timings) {
             const profileStarted = performance.now();
             timings.snapshotPayloadBreakdown = {
                 ...graphRebuildSnapshotPayloadCounters(
                     persistedSnapshot,
-                    document.payload.length,
+                    document?.payload.length || 0,
                     overGraphDocument?.payload.length || 0,
                     documentPayloadStats,
                     overGraphDocumentPayloadStats,
@@ -803,34 +869,30 @@ export class GraphRebuildService {
             };
             timings.snapshotPayloadProfileMs = elapsedMs(profileStarted);
             timings.snapshotSerializeMs = elapsedMs(serializeStarted);
-            timings.snapshotPayloadChars = document.payload.length;
-            timings.snapshotPrimaryRawPayloadChars = documentPayloadStats.rawChars;
-            timings.snapshotPrimaryCompressedBytes = documentPayloadStats.compressedBytes;
-            timings.snapshotCompressionSavedChars = documentPayloadStats.savedChars;
-            timings.snapshotCompressionRatioPct = documentPayloadStats.ratioPct;
+            timings.snapshotPayloadChars = document?.payload.length || 0;
+            timings.snapshotPrimaryRawPayloadChars = documentPayloadStats?.rawChars || 0;
+            timings.snapshotPrimaryCompressedBytes = documentPayloadStats?.compressedBytes || 0;
+            timings.snapshotCompressionSavedChars = documentPayloadStats?.savedChars || 0;
+            timings.snapshotCompressionRatioPct = documentPayloadStats?.ratioPct || 0;
             timings.snapshotOverGraphPayloadChars = overGraphDocument?.payload.length || 0;
             timings.snapshotOverGraphRawPayloadChars = overGraphDocumentPayloadStats?.rawChars || 0;
             timings.snapshotOverGraphCompressedBytes = overGraphDocumentPayloadStats?.compressedBytes || 0;
             timings.snapshotOverGraphCompressionSavedChars = overGraphDocumentPayloadStats?.savedChars || 0;
             timings.snapshotOverGraphCompressionRatioPct = overGraphDocumentPayloadStats?.ratioPct || 0;
-            timings.snapshotTotalPayloadChars = document.payload.length
+            timings.snapshotTotalPayloadChars = (document?.payload.length || 0)
                 + (overGraphDocument?.payload.length || 0)
                 + contentBlobDocuments.reduce((sum, blob) => sum + blob.payload.length, 0);
         }
         const storeStarted = performance.now();
-        let previousContentManifest = options.previousContentManifest;
         if (!previousContentManifest && options.durabilityMode === 'interactive') {
             previousContentManifest = await this.loadPersistedSnapshotContentManifest(snapshot.scopeId) || undefined;
         }
-        let contentBlobReads = 0;
-        let missingContentBlobDocuments: StoreScopedDocument[];
         if (options.durabilityMode === 'interactive') {
-            const refs = previousContentManifest?.refs || {};
-            missingContentBlobDocuments = contentBlobDocuments.filter((_, index) => {
-                const entry = contentBlobEntries[index];
-                const ref = refs[entry.field];
-                return !ref || ref.hash !== entry.ref.hash || ref.documentKey !== entry.documentKey;
-            });
+            missingContentBlobDocuments ??= missingContentBlobDocumentsForManifest(
+                contentBlobDocuments,
+                contentBlobEntries,
+                previousContentManifest,
+            );
         } else {
             contentBlobReads = contentBlobDocuments.length;
             const existingContentBlobs = await Promise.all(contentBlobDocuments.map((blobDocument) =>
@@ -842,22 +904,24 @@ export class GraphRebuildService {
             ));
             missingContentBlobDocuments = contentBlobDocuments.filter((_, index) => !existingContentBlobs[index]);
         }
+        const contentBlobDocumentsToWrite = missingContentBlobDocuments || [];
         const documentsToWrite = [
-            ...missingContentBlobDocuments,
-            document,
+            ...contentBlobDocumentsToWrite,
+            ...(document ? [document] : []),
             ...(overGraphDocument ? [overGraphDocument] : []),
         ];
-        await this.store.upsertScopedDocuments(documentsToWrite);
+        if (documentsToWrite.length) await this.store.upsertScopedDocuments(documentsToWrite);
         if (timings) {
             timings.snapshotPrimaryStoreMs = 0;
             timings.snapshotOverGraphStoreMs = 0;
             timings.snapshotStoreDocuments = documentsToWrite.length;
-            timings.snapshotWrittenContentBlobs = missingContentBlobDocuments.length;
-            timings.snapshotReusedContentBlobs = contentBlobDocuments.length - missingContentBlobDocuments.length;
+            timings.snapshotPrimaryWriteSkipped = primaryWriteSkipped ? 1 : 0;
+            timings.snapshotWrittenContentBlobs = contentBlobDocumentsToWrite.length;
+            timings.snapshotReusedContentBlobs = contentBlobDocuments.length - contentBlobDocumentsToWrite.length;
             timings.snapshotContentBlobReads = contentBlobReads;
             timings.snapshotContentBlobManifestTrusted = options.durabilityMode === 'interactive' && previousContentManifest ? 1 : 0;
-            timings.snapshotContentBlobManifestMatches = contentBlobDocuments.length - missingContentBlobDocuments.length;
-            timings.snapshotContentBlobManifestMisses = missingContentBlobDocuments.length;
+            timings.snapshotContentBlobManifestMatches = contentBlobDocuments.length - contentBlobDocumentsToWrite.length;
+            timings.snapshotContentBlobManifestMisses = contentBlobDocumentsToWrite.length;
         }
         if (timings) timings.snapshotStoreMs = elapsedMs(storeStarted);
         if (emitEvent) {
@@ -1161,33 +1225,6 @@ export function mergeNativeEmbeddingTargets(
     return merged;
 }
 
-export function buildCompatibilityAtlasPacketForSnapshot(snapshot: GraphRebuildSnapshot): GraphAtlasPacket {
-    const packet: GraphAtlasPacket = {
-        schemaVersion: 'phoenix-atlas-packet/v1',
-        snapshotId: snapshot.id,
-        scopeKind: snapshot.scopeKind,
-        scopeId: snapshot.scopeId,
-        builtAt: snapshot.builtAt,
-        sourceContract: {
-            authority: 'typescript_compatibility_containment',
-            identityAuthority: 'source_evidence_authority',
-            vectorContract: 'vectors_missing_until_embedding_lane',
-            tsGraphBuilderRole: 'compatibility-packet-parity',
-        },
-        objects: [],
-        manifoldTargets: [],
-        counters: {
-            objects: 0,
-            manifoldTargets: 0,
-            registryEntities: snapshot.nodes.length,
-            evidenceAnchors: snapshot.entityAnchors.length,
-            modelVectors: 0,
-            families: [],
-        },
-    };
-    return reconcileNativeAtlasPacketForTargets(snapshot, packet);
-}
-
 export function reconcileNativeAtlasPacketForTargets(
     snapshot: GraphRebuildSnapshot,
     packet: GraphAtlasPacket,
@@ -1223,6 +1260,8 @@ export function reconcileNativeAtlasPacketForTargets(
             styleKey: target.styleKey,
             lane: target.lane,
             structuralRole: target.structuralRole,
+            documentUnitKind: target.documentUnitKind || existingTarget?.documentUnitKind,
+            stateContextKind: target.stateContextKind || existingTarget?.stateContextKind,
             sourceId: target.sourceId,
             registryEntityId: target.entityId,
             noteId: target.noteId,
@@ -1253,7 +1292,7 @@ export function reconcileNativeAtlasPacketForTargets(
     for (const object of reconciledObjects) {
         families.set(object.family, (families.get(object.family) || 0) + 1);
     }
-    return {
+    const reconciledPacket: GraphAtlasPacket = {
         ...packet,
         objects: reconciledObjects,
         manifoldTargets: reconciledTargets,
@@ -1269,6 +1308,32 @@ export function reconcileNativeAtlasPacketForTargets(
                 .map(([family, count]) => ({ family, count })),
         },
     };
+    return normalizeNativeAtlasPacketSourceContract(reconciledPacket) || reconciledPacket;
+}
+
+function normalizeNativeAtlasPacketSourceContract(packet: GraphAtlasPacket | undefined): GraphAtlasPacket | undefined {
+    if (!packet) return undefined;
+    const contract = packet.sourceContract;
+    if (contract.authority !== GRAPH_ATLAS_PACKET_AUTHORITY
+        || contract.identityAuthority !== GRAPH_ATLAS_IDENTITY_AUTHORITY) {
+        return packet;
+    }
+    if (contract.tsGraphBuilderRole === GRAPH_ATLAS_BUILDER_ROLE) return packet;
+    if (!isLegacyAtlasBuilderRole(contract.tsGraphBuilderRole)) return packet;
+    return {
+        ...packet,
+        sourceContract: {
+            ...contract,
+            tsGraphBuilderRole: GRAPH_ATLAS_BUILDER_ROLE,
+        },
+    };
+}
+
+function isLegacyAtlasBuilderRole(role: string): boolean {
+    return role === 'compatibility-only'
+        || role === 'compatibility_only'
+        || role === 'typescript-compatibility'
+        || role === 'typescript_compatibility';
 }
 
 function pushAtlasObjectLookup(
@@ -1305,8 +1370,8 @@ function atlasObjectForTarget(
         styleKey: target.styleKey,
         lane: target.lane,
         structuralRole: target.structuralRole,
-        documentUnitKind: existing?.documentUnitKind,
-        stateContextKind: existing?.stateContextKind,
+        documentUnitKind: target.documentUnitKind || existing?.documentUnitKind,
+        stateContextKind: target.stateContextKind || existing?.stateContextKind,
         registryEntityId: target.entityId,
         noteIds: target.noteId ? [target.noteId] : existing?.noteIds || [],
         chunkIds: target.chunkId ? [target.chunkId] : existing?.chunkIds || [],
@@ -1403,6 +1468,96 @@ function isNativeFactLane(lane: string): boolean {
         || lane === 'causal_fact'
         || lane === 'memory_state'
         || lane === 'event_identity';
+}
+
+export function attachInteractiveAtlasPacketForSnapshotTargets(
+    snapshot: GraphRebuildSnapshot,
+    previousSnapshot?: GraphRebuildSnapshot | null,
+): boolean {
+    const previousPacket = previousSnapshot?.atlasPacket;
+    const seed = previousPacket && sameEmbeddingTargetIds(previousSnapshot.embeddingTargets, snapshot.embeddingTargets)
+        ? graphAtlasPacketSeedForSnapshot(snapshot, previousPacket)
+        : graphAtlasPacketSeedForSnapshot(snapshot);
+    snapshot.atlasPacket = reconcileNativeAtlasPacketForTargets(snapshot, seed);
+    return atlasPacketMatchesSnapshotTargets(snapshot);
+}
+
+function graphAtlasPacketSeedForSnapshot(
+    snapshot: GraphRebuildSnapshot,
+    packet?: GraphAtlasPacket,
+): GraphAtlasPacket {
+    const normalized = normalizeNativeAtlasPacketSourceContract(packet);
+    return {
+        schemaVersion: 'phoenix-atlas-packet/v1',
+        snapshotId: snapshot.id,
+        scopeKind: snapshot.scopeKind,
+        scopeId: snapshot.scopeId,
+        builtAt: snapshot.builtAt,
+        sourceContract: {
+            authority: GRAPH_ATLAS_PACKET_AUTHORITY,
+            identityAuthority: GRAPH_ATLAS_IDENTITY_AUTHORITY,
+            vectorContract: normalized?.sourceContract.vectorContract || 'vectors-missing',
+            tsGraphBuilderRole: GRAPH_ATLAS_BUILDER_ROLE,
+        },
+        objects: normalized?.objects || [],
+        manifoldTargets: normalized?.manifoldTargets || [],
+        counters: normalized?.counters || {
+            objects: 0,
+            manifoldTargets: 0,
+            registryEntities: snapshot.nodes.length,
+            evidenceAnchors: snapshot.entityAnchors.length,
+            modelVectors: 0,
+            families: [],
+        },
+    };
+}
+
+function sameEmbeddingTargetIds(
+    left: GraphRebuildEmbeddingTarget[] | undefined,
+    right: GraphRebuildEmbeddingTarget[],
+): boolean {
+    if (!left || left.length !== right.length) return false;
+    const ids = new Set(left.map((target) => target.id));
+    return right.every((target) => ids.has(target.id));
+}
+
+function atlasPacketMatchesSnapshotTargets(snapshot: GraphRebuildSnapshot): boolean {
+    const packet = snapshot.atlasPacket;
+    if (!packet || packet.snapshotId !== snapshot.id || packet.scopeId !== snapshot.scopeId) return false;
+    if (packet.sourceContract.authority !== GRAPH_ATLAS_PACKET_AUTHORITY
+        || packet.sourceContract.identityAuthority !== GRAPH_ATLAS_IDENTITY_AUTHORITY
+        || packet.sourceContract.tsGraphBuilderRole !== GRAPH_ATLAS_BUILDER_ROLE) {
+        return false;
+    }
+    if (packet.counters.manifoldTargets !== snapshot.embeddingTargets.length
+        || packet.manifoldTargets.length !== snapshot.embeddingTargets.length) {
+        return false;
+    }
+    const packetTargetIds = new Set(packet.manifoldTargets.map((target) => target.id));
+    return snapshot.embeddingTargets.every((target) => packetTargetIds.has(target.id));
+}
+
+function reuseInteractivePrimarySnapshotIdentity(
+    snapshot: GraphRebuildSnapshot,
+    previousSnapshot?: GraphRebuildSnapshot | null,
+): boolean {
+    if (!previousSnapshot?.authorityContract || !snapshot.authorityContract) return false;
+    if (previousSnapshot.scopeId !== snapshot.scopeId) return false;
+    if (previousSnapshot.authorityContract.contentHash !== snapshot.authorityContract.contentHash) return false;
+    if (JSON.stringify(previousSnapshot.authorityContract.counts) !== JSON.stringify(snapshot.authorityContract.counts)) {
+        return false;
+    }
+    snapshot.id = previousSnapshot.id;
+    snapshot.builtAt = previousSnapshot.builtAt;
+    if (snapshot.atlasPacket) {
+        snapshot.atlasPacket = {
+            ...snapshot.atlasPacket,
+            snapshotId: snapshot.id,
+            builtAt: snapshot.builtAt,
+        };
+    }
+    sealGraphSnapshotAuthority(snapshot);
+    return true;
 }
 
 function normalizeTargetKind(kind: string): string {
@@ -1505,14 +1660,17 @@ function buildGraphRebuildExcerpt(text: string, start: number, end: number): str
     return `${prefix}${text.slice(from, to).replace(/\s+/g, ' ').trim()}${suffix}`;
 }
 
-export function graphRebuildSnapshotToScopedDocument(snapshot: GraphRebuildSnapshot): StoreScopedDocument {
+export function graphRebuildSnapshotToScopedDocument(
+    snapshot: GraphRebuildSnapshot,
+    documentKey = SNAPSHOT_DOCUMENT_KEY,
+): StoreScopedDocument {
     const now = Date.now();
     return {
-        id: `${GRAPH_REBUILD_NAMESPACE}:${snapshot.scopeId}:${SNAPSHOT_DOCUMENT_KEY}`,
+        id: `${GRAPH_REBUILD_NAMESPACE}:${snapshot.scopeId}:${documentKey}`,
         scopeFolderId: snapshot.scopeId,
         narrativeId: snapshot.scopeKind === 'narrative' ? snapshot.scopeId : '',
         namespace: GRAPH_REBUILD_NAMESPACE,
-        documentKey: SNAPSHOT_DOCUMENT_KEY,
+        documentKey,
         payload: encodeGraphRebuildSnapshotPayload(graphRebuildSnapshotPersistenceView(snapshot)),
         createdAt: snapshot.builtAt || now,
         updatedAt: now,
@@ -1553,6 +1711,19 @@ export function graphRebuildSnapshotContentBlobDocuments(
         createdAt: snapshot.builtAt || now,
         updatedAt: now,
     }));
+}
+
+function missingContentBlobDocumentsForManifest(
+    documents: StoreScopedDocument[],
+    entries: GraphRebuildContentBlobEntry[],
+    manifest?: GraphRebuildContentManifest,
+): StoreScopedDocument[] {
+    const refs = manifest?.refs || {};
+    return documents.filter((_, index) => {
+        const entry = entries[index];
+        const ref = refs[entry.field];
+        return !ref || ref.hash !== entry.ref.hash || ref.documentKey !== entry.documentKey;
+    });
 }
 
 export function graphRebuildSnapshotContentManifest(
@@ -1734,7 +1905,7 @@ export function decodeNativeGraphCompilerSidecar(
         ? JSON.parse(strFromU8(gunzipSync(base64ToBytes(compressedAtlasSeed.payload)))) as NativeAtlasSeed
         : undefined;
     const embeddingTargets = atlasSeed?.embeddingTargets || sidecar.embeddingTargets || [];
-    const atlasPacket = atlasSeed?.atlasPacket || sidecar.atlasPacket;
+    const atlasPacket = normalizeNativeAtlasPacketSourceContract(atlasSeed?.atlasPacket || sidecar.atlasPacket);
     const originatingFamilies = atlasSeed?.originatingFamilies
         || sidecar.originatingFamilies
         || raw.originating_families
@@ -2026,7 +2197,6 @@ function emptyBuildTimings(): GraphRebuildBuildTimings {
         stateCommitMs: 0,
         nativeCompilerMs: 0,
         nativeCompilerSkipped: 0,
-        tsAtlasPacketParity: 0,
         nativeCompilerInputBytesByFamily: {},
         nativeTargetsByOriginatingFamily: {},
         nativeAtlasSeedRawBytes: 0,
@@ -2036,6 +2206,8 @@ function emptyBuildTimings(): GraphRebuildBuildTimings {
         snapshotPersistMs: 0,
         snapshotSerializeMs: 0,
         snapshotPrimaryEncodeMs: 0,
+        snapshotPrimaryWriteSkipped: 0,
+        snapshotPrimaryIdentityReused: 0,
         snapshotOverGraphEncodeMs: 0,
         snapshotOverGraphSkipped: 0,
         snapshotStoreMs: 0,

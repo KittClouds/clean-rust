@@ -3884,6 +3884,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "phoenix-document-index"
+version = "0.1.1"
+dependencies = [
+ "hashbrown 0.15.5",
+ "memchr",
+ "memmap2",
+ "serde",
+ "thiserror 1.0.69",
+ "xxhash-rust",
+ "zerocopy 0.7.35",
+]
+
+[[package]]
 name = "phoenix-dynamic-ner"
 version = "0.1.0"
 dependencies = [
@@ -4323,6 +4336,7 @@ dependencies = [
  "hound",
  "ort",
  "ort-sys",
+ "phoenix-document-index",
  "phoenix-graph-rebuild",
  "phoenix-hyperbolic 0.1.0",
  "phoenix-native",
@@ -7897,6 +7911,12 @@ dependencies = [
  "once_cell",
  "pkg-config",
 ]
+
+[[package]]
+name = "xxhash-rust"
+version = "0.8.15"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "fdd20c5420375476fbd4394763288da7eb0cc0b8c11deed431a91562af7335d3"
 
 [[package]]
 name = "yoke"

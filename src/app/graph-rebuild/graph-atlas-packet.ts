@@ -1,18 +1,21 @@
 import type { GraphRebuildScopeKind } from './graph-rebuild-snapshot';
 
-export type GraphAtlasFamily =
-    | 'registry'
-    | 'entity'
-    | 'structure'
-    | 'fact'
-    | 'discourse'
-    | 'review'
-    | 'evidence'
-    | 'temporal'
-    | 'causal'
-    | 'memory'
-    | 'hypergraph'
-    | 'unknown';
+export const GRAPH_ATLAS_FAMILIES = [
+    'registry',
+    'entity',
+    'structure',
+    'fact',
+    'discourse',
+    'review',
+    'evidence',
+    'temporal',
+    'causal',
+    'memory',
+    'hypergraph',
+    'unknown',
+] as const;
+
+export type GraphAtlasFamily = (typeof GRAPH_ATLAS_FAMILIES)[number];
 
 export type GraphAtlasObjectStatus =
     | 'accepted'
@@ -26,11 +29,21 @@ export type GraphAtlasObjectStatus =
     | 'promotedToAnchor'
     | 'unknown';
 
+export const GRAPH_ATLAS_PACKET_AUTHORITY = 'rust-atlas-packet' as const;
+export const GRAPH_ATLAS_IDENTITY_AUTHORITY = 'registry-entities-and-accepted-anchors' as const;
+export const GRAPH_ATLAS_BUILDER_ROLE = 'native-atlas-packet-authority' as const;
+export const GRAPH_ATLAS_VECTOR_CONTRACTS = ['vectors-missing', 'model-vectors'] as const;
+
+export type GraphAtlasPacketAuthority = typeof GRAPH_ATLAS_PACKET_AUTHORITY;
+export type GraphAtlasIdentityAuthority = typeof GRAPH_ATLAS_IDENTITY_AUTHORITY;
+export type GraphAtlasBuilderRole = typeof GRAPH_ATLAS_BUILDER_ROLE;
+export type GraphAtlasVectorContract = (typeof GRAPH_ATLAS_VECTOR_CONTRACTS)[number];
+
 export interface GraphAtlasSourceContract {
-    authority: string;
-    identityAuthority: string;
-    vectorContract: string;
-    tsGraphBuilderRole: string;
+    authority: GraphAtlasPacketAuthority;
+    identityAuthority: GraphAtlasIdentityAuthority;
+    vectorContract: GraphAtlasVectorContract;
+    tsGraphBuilderRole: GraphAtlasBuilderRole;
 }
 
 export interface GraphAtlasObject {

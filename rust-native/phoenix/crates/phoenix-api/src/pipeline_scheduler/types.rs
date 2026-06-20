@@ -285,6 +285,46 @@ mod tests {
     }
 
     #[test]
+    fn continuity_routing_keeps_graph_out_of_the_live_continuity_arm() {
+        let request = PipelineRunRequest::continuity(None);
+
+        for stage in [
+            PipelineStage::EventIdentity,
+            PipelineStage::Temporal,
+            PipelineStage::Causal,
+            PipelineStage::Relation,
+            PipelineStage::StateSchema,
+            PipelineStage::Memory,
+        ] {
+            assert!(request.requests_stage(stage), "missing {stage:?}");
+        }
+        assert!(!request.requests_stage(PipelineStage::Graph));
+    }
+
+    #[test]
+    fn sidecar_continuity_routes_graph_after_temporal_and_memory_sidecars() {
+        let request = PipelineRunRequest::sidecar_continuity(None);
+
+        assert!(request.requests_stage(PipelineStage::EventIdentity));
+        assert!(request.requests_stage(PipelineStage::Temporal));
+        assert!(request.requests_stage(PipelineStage::Causal));
+        assert!(request.requests_stage(PipelineStage::StateSchema));
+        assert!(request.requests_stage(PipelineStage::Memory));
+        assert!(request.requests_stage(PipelineStage::Graph));
+        assert!(!request.requests_stage(PipelineStage::Relation));
+        assert!(
+            request
+                .requested_stages
+                .iter()
+                .position(|stage| *stage == PipelineStage::Graph)
+                > request
+                    .requested_stages
+                    .iter()
+                    .position(|stage| *stage == PipelineStage::Memory)
+        );
+    }
+
+    #[test]
     fn graph_stage_waits_for_sidecar_producers() {
         assert_eq!(
             stage_dependencies(PipelineStage::Graph),

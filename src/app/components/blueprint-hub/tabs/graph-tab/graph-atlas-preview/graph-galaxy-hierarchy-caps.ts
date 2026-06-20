@@ -251,11 +251,11 @@ export function hierarchyShellBandForNode(node: GalaxyNode): HierarchyShellBand 
     const explicit = explicitHierarchyRoleForNode(node);
     if (explicit) return HIERARCHY_SHELL_BANDS[explicit];
     const text = hierarchyKindText(node);
-    if (/embed:note:|source:note|kind:note|document(?!_spine)|source:doc|kind:doc/.test(text)) {
-        return HIERARCHY_SHELL_BANDS.document;
-    }
     if (/embed:structure-root:|structure.?root|document.?root|lane.?root/.test(text)) {
         return HIERARCHY_SHELL_BANDS.documentRoot;
+    }
+    if (/embed:note:|source:note|kind:note|document(?!_spine)|source:doc|kind:doc/.test(text)) {
+        return HIERARCHY_SHELL_BANDS.document;
     }
     if (/embed:anchor:|anchor_evidence|source:anchor|kind:anchor|evidence|mention|provenance/.test(text)) {
         return HIERARCHY_SHELL_BANDS.evidence;
@@ -365,10 +365,10 @@ export const HIERARCHY_SHELL_BANDS: Record<HierarchyShellBand['id'], HierarchySh
     documentRoot: { id: 'documentRoot', rank: 1, radius: 1.78, min: 1.7, max: 1.86 },
     chunk: { id: 'chunk', rank: 2, radius: 1.46, min: 1.38, max: 1.54 },
     evidence: { id: 'evidence', rank: 3, radius: 1.14, min: 1.06, max: 1.22 },
-    entity: { id: 'entity', rank: 4, radius: 0.86, min: 0.76, max: 0.94 },
-    event: { id: 'event', rank: 5, radius: 0.7, min: 0.62, max: 0.78 },
-    fact: { id: 'fact', rank: 6, radius: 0.66, min: 0.58, max: 0.74 },
-    memory: { id: 'memory', rank: 7, radius: 0.52, min: 0.42, max: 0.62 },
+    event: { id: 'event', rank: 4, radius: 1.06, min: 0.98, max: 1.16 },
+    fact: { id: 'fact', rank: 5, radius: 0.98, min: 0.9, max: 1.08 },
+    entity: { id: 'entity', rank: 6, radius: 0.86, min: 0.76, max: 0.94 },
+    memory: { id: 'memory', rank: 7, radius: 0.58, min: 0.46, max: 0.68 },
 };
 
 export const HIERARCHY_SHELL_ORDER: readonly CapsHierarchyRole[] = [
@@ -376,9 +376,9 @@ export const HIERARCHY_SHELL_ORDER: readonly CapsHierarchyRole[] = [
     'documentRoot',
     'chunk',
     'evidence',
-    'entity',
     'event',
     'fact',
+    'entity',
     'memory',
 ];
 

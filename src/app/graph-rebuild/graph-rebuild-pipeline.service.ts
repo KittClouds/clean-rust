@@ -14,6 +14,7 @@ import { buildGraphRebuildDeltaPostProcessPlan, deltaPostProcessPlanCounters, ty
 import { buildGraphRebuildEdgeJudgmentPlan, edgeJudgmentPlanCounters } from './graph-rebuild-edge-type-judgment-plan';
 import { embeddingProfileFromModelSelection } from './graph-rebuild-embedding-signatures';
 import { GLINER_LINKER_MODEL_ID } from './graph-rebuild-entity-linking';
+import { buildGraphIndexLayerReceipts } from './graph-index-layer-receipts';
 import { GraphRebuildService } from './graph-rebuild.service';
 import { buildSiegelBackboneProjectionReceipt } from './graph-rebuild-siegel-backbone';
 import { assertGraphSnapshotAuthority } from './graph-snapshot-authority';
@@ -51,6 +52,24 @@ const PROJECTION_CAPABILITIES: Array<{ capability: AtlasCapabilityId; mode: Grap
     { capability: 'productManifold', mode: 'product' },
 ];
 
+const POST_COMMIT_DIAGNOSTIC_DEBOUNCE_MS = 250;
+const POST_COMMIT_DIAGNOSTIC_IDLE_TIMEOUT_MS = 2_000;
+const INTERACTIVE_PERSISTED_RECEIPT_STAGE_IDS = new Set([
+    'dynamicNer',
+    'nliAdjudication',
+    'graphBuildSnapshot',
+    'signalTargetCoverage',
+    'snapshotAuthorityContract',
+    'snapshotDbOps',
+    'snapshotPayloadProfile',
+    'snapshotCpu',
+    'nativeCompilerBoundary',
+    'stagedNativeScenePacket',
+    'transportOps',
+    'uiCommit',
+    'postCommitEnrichment',
+]);
+
 interface GraphNerDeltaResult {
     counts: Record<string, number>;
     acceptedOccurrences: EntityOccurrence[];
@@ -70,6 +89,31 @@ type ScopedDocument = {
     updatedAt?: number;
 };
 
+type PostCommitDiagnosticInput = {
+    scope: GraphIndexRunScope;
+    snapshotId: string;
+    entities: GraphIndexRunRequest['entities'];
+    acceptedNerOccurrences: EntityOccurrence[];
+    relationshipHints: GraphRebuildRelationshipHint[];
+    request: GraphIndexRunRequest;
+    nerCandidates: number;
+    baseRunSerial: number;
+};
+
+type ReceiptPersistenceJob = {
+    receipt: GraphIndexRunReceipt;
+    persistedReceipt: GraphIndexRunReceipt;
+    receiptStage: GraphIndexStageReceipt;
+};
+
+type PostCommitSchedulerWindow = Window & {
+    requestIdleCallback?: (
+        callback: () => void,
+        options?: { timeout?: number },
+    ) => number;
+    cancelIdleCallback?: (handle: number) => void;
+};
+
 @Injectable({ providedIn: 'root' })
 export class GraphRebuildPipelineService {
     private readonly graphRebuild = inject(GraphRebuildService);
@@ -81,6 +125,12 @@ export class GraphRebuildPipelineService {
     private readonly entityLinkerWarmState = signal(false);
     private readonly lastReceiptState = signal<GraphIndexRunReceipt | null>(null);
     private readonly lastSnapshotState = signal<GraphRebuildSnapshot | null>(null);
+    private receiptPersistenceQueue: Promise<void> = Promise.resolve();
+    private readonly pendingReceiptPersistenceJobs = new Map<string, ReceiptPersistenceJob>();
+    private receiptPersistenceDrainScheduled = false;
+    private postCommitDiagnosticQueue: Promise<void> = Promise.resolve();
+    private postCommitDiagnosticToken = 0;
+    private cancelScheduledPostCommitDiagnostic: (() => void) | null = null;
 
     readonly running = computed(() => this.runningState());
     readonly lastReceipt = computed(() => this.lastReceiptState());
@@ -306,16 +356,21 @@ export class GraphRebuildPipelineService {
             await this.publishRunReceipt(receipt, completedSnapshot);
             if (durabilityMode === 'interactive') {
                 appendInteractivePostCommitStage(stageReceipts, completedSnapshot);
+                this.refreshLayerReceipts(receipt, completedSnapshot);
             }
-            await this.persistRunReceiptWithTiming(receipt);
+            this.enqueueRunReceiptPersistence(receipt);
             if (durabilityMode === 'interactive') {
                 this.scheduleInteractivePostCommitWork({
                     scope,
+                    snapshotId: completedSnapshot.id,
                     entities,
                     acceptedNerOccurrences,
                     relationshipHints,
                     request,
                     nerCandidates: nerStage.counters['candidates'] || 0,
+                    baseRunSerial: typeof this.graphRebuild.currentSnapshotRunSerial === 'function'
+                        ? this.graphRebuild.currentSnapshotRunSerial()
+                        : 0,
                 });
             }
             resumeContentCheckpoints();
@@ -368,7 +423,7 @@ export class GraphRebuildPipelineService {
         status?: GraphIndexRunStatus;
         message: string;
     }): GraphIndexRunReceipt {
-        return {
+        const receipt: GraphIndexRunReceipt = {
             schemaVersion: 'phoenix-graph-index-run/v1',
             id: `${input.idPrefix}:${input.scope.scopeId}:${input.completedAt}`,
             scope: input.scope,
@@ -387,12 +442,19 @@ export class GraphRebuildPipelineService {
             durationMs: input.completedAt - input.startedAt,
             stageReceipts: input.stageReceipts,
             projectionReceipts: input.projectionReceipts,
+            layerReceipts: [],
             snapshotId: input.snapshot?.id,
             authorityContract: input.snapshot?.authorityContract,
             counters: input.snapshot?.counters || emptyCounters(),
             dropReasons: input.snapshot?.counters.dropReasons || emptyDropReasons(),
             message: input.message,
         };
+        this.refreshLayerReceipts(receipt, input.snapshot);
+        return receipt;
+    }
+
+    private refreshLayerReceipts(receipt: GraphIndexRunReceipt, snapshot: GraphRebuildSnapshot | null): void {
+        receipt.layerReceipts = buildGraphIndexLayerReceipts({ receipt, snapshot });
     }
 
     private async publishRunReceipt(
@@ -413,9 +475,10 @@ export class GraphRebuildPipelineService {
             message: 'Receipt and snapshot published to UI signals',
         };
         receipt.stageReceipts.push(uiStage);
+        this.refreshLayerReceipts(receipt, snapshot);
         const signalStarted = performance.now();
         if (snapshot) this.lastSnapshotState.set(snapshot);
-        this.lastReceiptState.set({ ...receipt, stageReceipts: [...receipt.stageReceipts] });
+        this.lastReceiptState.set({ ...receipt, stageReceipts: [...receipt.stageReceipts], layerReceipts: [...receipt.layerReceipts] });
         const signalCommitMs = elapsedTimingMs(signalStarted);
         const frameStarted = performance.now();
         await waitForUiFrame();
@@ -429,20 +492,40 @@ export class GraphRebuildPipelineService {
         };
         receipt.completedAt = Math.max(receipt.completedAt, completedAt);
         receipt.durationMs = receipt.completedAt - receipt.startedAt;
-        this.lastReceiptState.set({ ...receipt, stageReceipts: [...receipt.stageReceipts] });
+        this.refreshLayerReceipts(receipt, snapshot);
+        this.lastReceiptState.set({ ...receipt, stageReceipts: [...receipt.stageReceipts], layerReceipts: [...receipt.layerReceipts] });
     }
 
-    private scheduleInteractivePostCommitWork(input: {
-        scope: GraphIndexRunScope;
-        entities: GraphIndexRunRequest['entities'];
-        acceptedNerOccurrences: EntityOccurrence[];
-        relationshipHints: GraphRebuildRelationshipHint[];
-        request: GraphIndexRunRequest;
-        nerCandidates: number;
-    }): void {
-        if (typeof window === 'undefined') return;
-        window.setTimeout(() => {
-            void this.graphRebuild.buildAndPersistSnapshot({
+    private scheduleInteractivePostCommitWork(input: PostCommitDiagnosticInput): void {
+        const scheduler = postCommitSchedulerWindow();
+        if (!scheduler) return;
+        const token = ++this.postCommitDiagnosticToken;
+        this.cancelScheduledPostCommitDiagnostic?.();
+        this.cancelScheduledPostCommitDiagnostic = null;
+        const debounceHandle = scheduler.setTimeout(() => {
+            if (!this.isCurrentPostCommitDiagnostic(input, token)) return;
+            this.cancelScheduledPostCommitDiagnostic = schedulePostCommitIdleWork(scheduler, () => {
+                this.cancelScheduledPostCommitDiagnostic = null;
+                this.enqueuePostCommitDiagnosticWork(input, token);
+            });
+        }, POST_COMMIT_DIAGNOSTIC_DEBOUNCE_MS);
+        this.cancelScheduledPostCommitDiagnostic = () => scheduler.clearTimeout(debounceHandle);
+    }
+
+    private enqueuePostCommitDiagnosticWork(input: PostCommitDiagnosticInput, token: number): void {
+        this.postCommitDiagnosticQueue = this.postCommitDiagnosticQueue.then(
+            () => this.runPostCommitDiagnosticWork(input, token),
+            () => this.runPostCommitDiagnosticWork(input, token),
+        );
+        void this.postCommitDiagnosticQueue;
+    }
+
+    private async runPostCommitDiagnosticWork(input: PostCommitDiagnosticInput, token: number): Promise<void> {
+        if (!this.isCurrentPostCommitDiagnostic(input, token)) return;
+        try {
+            await this.receiptPersistenceQueue;
+            if (!this.isCurrentPostCommitDiagnostic(input, token)) return;
+            await this.graphRebuild.buildAndPersistSnapshot({
                 scopeKind: input.scope.kind,
                 scopeId: input.scope.scopeId,
                 noteIds: input.scope.noteIds,
@@ -452,13 +535,20 @@ export class GraphRebuildPipelineService {
                 embeddingProfile: embeddingProfileFromModelSelection(input.request.modelSelection),
                 postProcessMode: 'full',
                 durabilityMode: 'diagnostic',
+                diagnosticBaseSnapshotId: input.snapshotId,
+                diagnosticBaseSnapshotRunSerial: input.baseRunSerial,
                 embeddingStagePolicy: input.request.embeddingStagePolicy,
                 candidateCount: input.nerCandidates,
                 calendarRegistrySnapshot: input.request.calendarRegistrySnapshot,
-            }).catch((error) => {
-                console.warn('[GraphRebuildPipeline] Post-commit graph enrichment failed', error);
             });
-        }, 0);
+        } catch (error) {
+            console.warn('[GraphRebuildPipeline] Post-commit graph enrichment failed', error);
+        }
+    }
+
+    private isCurrentPostCommitDiagnostic(input: PostCommitDiagnosticInput, token: number): boolean {
+        return token === this.postCommitDiagnosticToken
+            && this.lastSnapshotState()?.id === input.snapshotId;
     }
 
     private deferContentCheckpoints(): () => void {
@@ -471,37 +561,120 @@ export class GraphRebuildPipelineService {
         };
     }
 
-    private async persistRunReceiptWithTiming(receipt: GraphIndexRunReceipt): Promise<void> {
-        const startedAt = Date.now();
-        const started = performance.now();
-        const receiptPayloadChars = jsonPayloadChars(receipt);
-        const transportStarted = phoenixTransportAudit.snapshot();
-        const storeTiming = await this.graphRebuild.persistRunReceipt(receipt);
-        const transportCounters = prefixedCounters(
-            transportDeltaCounters(transportStarted, phoenixTransportAudit.snapshot()),
-            'receipt',
-        );
-        const durationMs = elapsedTimingMs(started);
-        const completedAt = Date.now();
-        receipt.stageReceipts.push({
+    private enqueueRunReceiptPersistence(receipt: GraphIndexRunReceipt): void {
+        const queuedAt = Date.now();
+        const receiptStage: GraphIndexStageReceipt = {
             id: 'receiptDbOps',
             label: 'Receipt DB Ops',
-            status: 'completed',
-            startedAt,
-            completedAt,
-            durationMs,
+            status: 'running',
+            startedAt: queuedAt,
+            completedAt: queuedAt,
+            durationMs: 0,
             outputCount: 0,
             counters: {
+                receiptPersistenceQueued: 1,
+                receiptPersistenceAsync: 1,
+            },
+            message: 'Run receipt persistence queued after UI commit',
+        };
+        receipt.stageReceipts.push(receiptStage);
+        receipt.completedAt = Math.max(receipt.completedAt, queuedAt);
+        receipt.durationMs = receipt.completedAt - receipt.startedAt;
+        this.refreshLayerReceipts(receipt, this.lastSnapshotState());
+        this.publishReceiptUpdateIfCurrent(receipt);
+        const persistedReceipt = graphIndexReceiptForPersistence(receipt);
+        this.pendingReceiptPersistenceJobs.set(receiptPersistenceKey(receipt), { receipt, persistedReceipt, receiptStage });
+        this.scheduleReceiptPersistenceDrain();
+    }
+
+    private scheduleReceiptPersistenceDrain(): void {
+        if (this.receiptPersistenceDrainScheduled) return;
+        this.receiptPersistenceDrainScheduled = true;
+        this.receiptPersistenceQueue = this.receiptPersistenceQueue.then(
+            () => this.drainReceiptPersistenceQueue(),
+            () => this.drainReceiptPersistenceQueue(),
+        );
+        void this.receiptPersistenceQueue;
+    }
+
+    private async drainReceiptPersistenceQueue(): Promise<void> {
+        try {
+            while (true) {
+                await deferReceiptPersistenceTurn();
+                const jobs = [...this.pendingReceiptPersistenceJobs.values()];
+                if (!jobs.length) return;
+                this.pendingReceiptPersistenceJobs.clear();
+                for (const job of jobs) {
+                    await this.persistRunReceiptWithTiming(job.receipt, job.persistedReceipt, job.receiptStage);
+                }
+            }
+        } finally {
+            this.receiptPersistenceDrainScheduled = false;
+            if (this.pendingReceiptPersistenceJobs.size) this.scheduleReceiptPersistenceDrain();
+        }
+    }
+
+    private async persistRunReceiptWithTiming(
+        receipt: GraphIndexRunReceipt,
+        persistedReceipt: GraphIndexRunReceipt,
+        receiptStage: GraphIndexStageReceipt,
+    ): Promise<void> {
+        const queuedAt = receiptStage.startedAt;
+        const startedAt = Date.now();
+        const started = performance.now();
+        const receiptPayloadChars = jsonPayloadChars(persistedReceipt);
+        const transportStarted = phoenixTransportAudit.snapshot();
+        try {
+            const storeTiming = await this.graphRebuild.persistRunReceipt(persistedReceipt);
+            const durationMs = elapsedTimingMs(started);
+            const completedAt = Date.now();
+            receiptStage.status = 'completed';
+            receiptStage.completedAt = completedAt;
+            receiptStage.durationMs = completedAt - queuedAt;
+            receiptStage.counters = {
                 receiptPersistMs: durationMs,
                 receiptPayloadChars,
+                receiptPersistenceAsync: 1,
+                receiptPersistenceQueueWaitMs: Math.max(0, startedAt - queuedAt),
                 ...contentMutationTimingCounters(storeTiming, 'receiptStore'),
-                ...transportCounters,
-            },
-            message: 'Run receipt persisted to scoped documents',
+                ...prefixedCounters(
+                    transportDeltaCounters(transportStarted, phoenixTransportAudit.snapshot()),
+                    'receipt',
+                ),
+            };
+            receiptStage.message = 'Run receipt persisted to scoped documents';
+        } catch (error) {
+            const durationMs = elapsedTimingMs(started);
+            const completedAt = Date.now();
+            receiptStage.status = 'failed';
+            receiptStage.completedAt = completedAt;
+            receiptStage.durationMs = completedAt - queuedAt;
+            receiptStage.counters = {
+                receiptPersistMs: durationMs,
+                receiptPayloadChars,
+                receiptPersistenceAsync: 1,
+                receiptPersistenceFailed: 1,
+                receiptPersistenceQueueWaitMs: Math.max(0, startedAt - queuedAt),
+                ...prefixedCounters(
+                    transportDeltaCounters(transportStarted, phoenixTransportAudit.snapshot()),
+                    'receipt',
+                ),
+            };
+            receiptStage.message = `Run receipt persistence failed: ${error instanceof Error ? error.message : String(error)}`;
+            console.warn('[GraphRebuildPipeline] Run receipt persistence failed', error);
+        } finally {
+            this.refreshLayerReceipts(receipt, this.lastSnapshotState());
+            this.publishReceiptUpdateIfCurrent(receipt);
+        }
+    }
+
+    private publishReceiptUpdateIfCurrent(receipt: GraphIndexRunReceipt): void {
+        if (this.lastReceiptState()?.id !== receipt.id) return;
+        this.lastReceiptState.set({
+            ...receipt,
+            stageReceipts: [...receipt.stageReceipts],
+            layerReceipts: [...receipt.layerReceipts],
         });
-        receipt.completedAt = Math.max(receipt.completedAt, completedAt);
-        receipt.durationMs = receipt.completedAt - receipt.startedAt;
-        this.lastReceiptState.set({ ...receipt, stageReceipts: [...receipt.stageReceipts] });
     }
 
     private async runNerDeltas(docs: ScopedDocument[]): Promise<GraphNerDeltaResult> {
@@ -696,6 +869,8 @@ function appendSnapshotTimingStages(
             snapshotPrimaryStoreMs: timings.snapshotPrimaryStoreMs || 0,
             snapshotOverGraphStoreMs: timings.snapshotOverGraphStoreMs || 0,
             snapshotStoreDocuments: timings.snapshotStoreDocuments || 0,
+            snapshotPrimaryWriteSkipped: timings.snapshotPrimaryWriteSkipped || 0,
+            snapshotPrimaryIdentityReused: timings.snapshotPrimaryIdentityReused || 0,
             snapshotContentBlobReads: timings.snapshotContentBlobReads || 0,
             snapshotContentBlobManifestTrusted: timings.snapshotContentBlobManifestTrusted || 0,
             snapshotContentBlobManifestMatches: timings.snapshotContentBlobManifestMatches || 0,
@@ -752,7 +927,6 @@ function appendSnapshotTimingStages(
             snapshotBuildMs: timings.snapshotBuildMs,
             nativeCompilerMs: timings.nativeCompilerMs || 0,
             nativeCompilerSkipped: timings.nativeCompilerSkipped || 0,
-            tsAtlasPacketParity: timings.tsAtlasPacketParity || 0,
             authoritySealMs: timings.authoritySealMs || 0,
             authorityAssertMs: timings.authorityAssertMs || 0,
             serviceStateCommitMs: timings.stateCommitMs,
@@ -769,7 +943,6 @@ function appendSnapshotTimingStages(
         {
             nativeCompilerInputBytes: Object.values(inputFamilies).reduce((sum, value) => sum + value, 0),
             nativeCompilerSkipped: timings.nativeCompilerSkipped || 0,
-            tsAtlasPacketParity: timings.tsAtlasPacketParity || 0,
             nativeAtlasSeedRawBytes: timings.nativeAtlasSeedRawBytes || 0,
             nativeAtlasSeedCompressedBytes: timings.nativeAtlasSeedCompressedBytes || 0,
             nativeTargets: Object.values(targetFamilies).reduce((sum, value) => sum + value, 0),
@@ -1218,7 +1391,7 @@ function appendSemanticAdjudicationStage(stageReceipts: GraphIndexStageReceipt[]
             invalidated: summary.counters.byState['invalidated'] || 0,
             superseded: summary.counters.byState['superseded'] || 0,
         },
-        'Accepted semantic topology is applied by the explicit TypeScript compatibility containment lane until the desktop GraphTruthCommit bridge is available',
+        'Accepted semantic topology is applied by the frozen graph-rebuild live contract with reversible receipts',
     ));
 }
 
@@ -1634,6 +1807,32 @@ export function assertRunReceiptParity(receipt: GraphIndexRunReceipt, snapshot: 
         projection.snapshotId = contract.snapshotId;
         projection.snapshotHash = contract.contentHash;
     }
+    const requiredLayerIds = [
+        'input-signals',
+        'snapshot-truth',
+        'native-atlas-packet',
+        'authority-seal',
+        'persistence-payload',
+        'projection-lenses',
+        'diagnostic-ledgers',
+        'transport-boundary',
+        'ui-commit',
+    ];
+    const layerById = new Map((receipt.layerReceipts || []).map((layer) => [layer.id, layer]));
+    for (const id of requiredLayerIds) {
+        const layer = layerById.get(id);
+        if (!layer) {
+            issues.push(`layer receipt ${id}`);
+            continue;
+        }
+        if (!layer.owner || !layer.source || !layer.message) issues.push(`layer explanation ${id}`);
+        if (layer.id === 'authority-seal' && layer.contentHash !== contract.contentHash) {
+            issues.push('authority layer hash');
+        }
+        if (layer.id === 'projection-lenses' && layer.status !== 'complete') {
+            issues.push('projection layer status');
+        }
+    }
     if (issues.length) {
         throw new Error(`Graph run receipt parity failed for ${snapshot.id}: ${issues.join(', ')}`);
     }
@@ -1681,11 +1880,14 @@ function appendInteractivePostCommitStage(
             scheduledAfterUiCommit: 1,
             nativeCompilerDeferred: snapshot.buildTimings?.nativeCompilerSkipped ? 1 : 0,
             diagnosticArmsDeferred: 1,
+            diagnosticIdleScheduled: 1,
+            diagnosticDebounceMs: POST_COMMIT_DIAGNOSTIC_DEBOUNCE_MS,
+            diagnosticOneFlightQueue: 1,
+            diagnosticCancelOnNewerSnapshot: 1,
             packetObjects: snapshot.atlasPacket?.objects.length || 0,
             packetTargets: snapshot.atlasPacket?.manifoldTargets.length || 0,
-            tsPacketParity: snapshot.buildTimings?.tsAtlasPacketParity || 0,
         },
-        'Native enrichment plus MemoryGraphRAG/discourse diagnostics are scheduled outside the interactive UI path',
+        'Native enrichment plus MemoryGraphRAG/discourse diagnostics are debounced, idle-scheduled, and queued outside the interactive UI path',
     ));
 }
 
@@ -1763,9 +1965,126 @@ function jsonPayloadChars(value: unknown): number {
     }
 }
 
+function receiptPersistenceKey(receipt: GraphIndexRunReceipt): string {
+    return `${receipt.scope.kind}:${receipt.scope.scopeId}:${receipt.durabilityMode || 'durable'}`;
+}
+
+function graphIndexReceiptForPersistence(receipt: GraphIndexRunReceipt): GraphIndexRunReceipt {
+    if (receipt.durabilityMode === 'interactive') return compactInteractiveReceiptForPersistence(receipt);
+    return {
+        ...receipt,
+        modelReadiness: receipt.modelReadiness.map((model) => ({ ...model })),
+        stageReceipts: receipt.stageReceipts
+            .filter((stage) => stage.id !== 'receiptDbOps')
+            .map((stage) => ({ ...stage, counters: { ...stage.counters } })),
+        projectionReceipts: receipt.projectionReceipts.map((projection) => ({
+            ...projection,
+            counters: projection.counters ? { ...projection.counters } : undefined,
+        })),
+        layerReceipts: receipt.layerReceipts.map((layer) => ({
+            ...layer,
+            consumes: [...layer.consumes],
+            produces: [...layer.produces],
+            stageIds: [...layer.stageIds],
+            projectionModes: layer.projectionModes ? [...layer.projectionModes] : undefined,
+            counters: { ...layer.counters },
+        })),
+        counters: {
+            ...receipt.counters,
+            dropReasons: { ...receipt.counters.dropReasons },
+        },
+        dropReasons: { ...receipt.dropReasons },
+        authorityContract: receipt.authorityContract ? { ...receipt.authorityContract } : undefined,
+    };
+}
+
+function compactInteractiveReceiptForPersistence(receipt: GraphIndexRunReceipt): GraphIndexRunReceipt {
+    const stages = receipt.stageReceipts
+        .filter((stage) => stage.id !== 'receiptDbOps'
+            && (stage.status === 'failed' || INTERACTIVE_PERSISTED_RECEIPT_STAGE_IDS.has(stage.id)))
+        .map(compactStageReceiptForPersistence);
+    const persistedStageIds = new Set(stages.map((stage) => stage.id));
+    return {
+        ...receipt,
+        modelReadiness: receipt.modelReadiness.map((model) => ({ ...model })),
+        stageReceipts: stages,
+        projectionReceipts: receipt.projectionReceipts.map((projection) => ({
+            mode: projection.mode,
+            status: projection.status,
+            startedAt: projection.startedAt,
+            completedAt: projection.completedAt,
+            durationMs: projection.durationMs,
+            targetCount: projection.targetCount,
+            vectorCount: projection.vectorCount,
+            counters: projection.counters ? { ...projection.counters } : undefined,
+            snapshotId: projection.snapshotId,
+            snapshotHash: projection.snapshotHash,
+            message: projection.message,
+        })),
+        layerReceipts: receipt.layerReceipts.map((layer) => ({
+            id: layer.id,
+            label: layer.label,
+            kind: layer.kind,
+            status: layer.status,
+            owner: layer.owner,
+            source: layer.source,
+            consumes: [...layer.consumes],
+            produces: [...layer.produces],
+            stageIds: layer.stageIds.filter((id) => persistedStageIds.has(id)),
+            projectionModes: layer.projectionModes ? [...layer.projectionModes] : undefined,
+            authority: layer.authority,
+            contentHash: layer.contentHash,
+            counters: { ...layer.counters },
+            message: layer.message,
+        })),
+        counters: {
+            ...receipt.counters,
+            dropReasons: { ...receipt.counters.dropReasons },
+        },
+        dropReasons: { ...receipt.dropReasons },
+        authorityContract: receipt.authorityContract ? { ...receipt.authorityContract } : undefined,
+    };
+}
+
+function compactStageReceiptForPersistence(stage: GraphIndexStageReceipt): GraphIndexStageReceipt {
+    return {
+        id: stage.id,
+        label: stage.label,
+        status: stage.status,
+        startedAt: stage.startedAt,
+        completedAt: stage.completedAt,
+        durationMs: stage.durationMs,
+        outputCount: stage.outputCount,
+        counters: { ...stage.counters },
+        message: stage.message,
+    };
+}
+
 function waitForUiFrame(): Promise<void> {
     if (typeof requestAnimationFrame !== 'function') return Promise.resolve();
     return new Promise((resolve) => requestAnimationFrame(() => resolve()));
+}
+
+function deferReceiptPersistenceTurn(): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve, 0));
+}
+
+function postCommitSchedulerWindow(): PostCommitSchedulerWindow | null {
+    return typeof window === 'undefined' ? null : window as PostCommitSchedulerWindow;
+}
+
+function schedulePostCommitIdleWork(
+    scheduler: PostCommitSchedulerWindow,
+    callback: () => void,
+): () => void {
+    if (typeof scheduler.requestIdleCallback === 'function') {
+        const idleHandle = scheduler.requestIdleCallback(callback, {
+            timeout: POST_COMMIT_DIAGNOSTIC_IDLE_TIMEOUT_MS,
+        });
+        return () => scheduler.cancelIdleCallback?.(idleHandle);
+    }
+    const timeoutHandle = scheduler.setTimeout(callback, 0);
+    return () => scheduler.clearTimeout(timeoutHandle);
 }
 
 function sumOutputCounts(counts: Record<string, number>): number {

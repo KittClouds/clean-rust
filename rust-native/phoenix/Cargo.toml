@@ -10,6 +10,7 @@ members = [
     "crates/phoenix-event-identity-post",
     "crates/phoenix-chunker",
     "crates/phoenix-dynamic-ner",
+    "crates/phoenix-document-index",
     "crates/phoenix-evidence-graph",
     "crates/phoenix-embed",
     "crates/phoenix-er-post",
@@ -97,6 +98,7 @@ bstr = "1.11"
 arc-swap = "1.7"
 overgraph = "0.4.1"
 bm25_turbo = "0.2.0"
+xxhash-rust = { version = "0.8", features = ["xxh3"] }
 
 [profile.release]
 opt-level = 3

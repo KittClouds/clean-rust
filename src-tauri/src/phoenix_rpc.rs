@@ -4,6 +4,7 @@ use std::io::{Read, Write};
 use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
 
+use crate::document_index_read::{read_document_index, DesktopDocumentIndexReadRequest};
 use crate::graph_galaxy::{compile_scene, DesktopGalaxyScene, DesktopGalaxySceneRequest};
 use crate::graph_scene_packet::{
     compile_packet, GraphScenePacket, GraphScenePacketEdgeInput, GraphScenePacketInput,
@@ -967,6 +968,16 @@ impl PhoenixApi for PhoenixApiImpl {
             return serialize_json(&json!({
                 "success": true,
                 "payload": summary,
+                "error": null,
+            }));
+        }
+        if command == "documentIndex:read" {
+            let request = serde_json::from_value::<DesktopDocumentIndexReadRequest>(payload)
+                .map_err(|error| format!("invalid document index read request: {error}"))?;
+            let response = read_document_index(request)?;
+            return serialize_json(&json!({
+                "success": true,
+                "payload": response,
                 "error": null,
             }));
         }

@@ -4,7 +4,6 @@ import type { GraphRebuildEmbeddingTarget, GraphRebuildSnapshot } from './graph-
 export type GraphCollapseBoundary =
     | 'source_evidence'
     | 'typescript_snapshot'
-    | 'typescript_atlas_packet'
     | 'native_response'
     | 'filtered_targets'
     | 'sealed_packet'
@@ -67,7 +66,7 @@ export function recordGraphCollapseBoundary(
 
 export function recordGraphCollapseSnapshotBoundary(
     snapshot: GraphRebuildSnapshot,
-    boundary: Extract<GraphCollapseBoundary, 'typescript_snapshot' | 'typescript_atlas_packet' | 'sealed_packet' | 'persisted_snapshot'>,
+    boundary: Extract<GraphCollapseBoundary, 'typescript_snapshot' | 'sealed_packet' | 'persisted_snapshot'>,
     extra: Record<string, number> = {},
 ): GraphCollapseTrace {
     return recordGraphCollapseBoundary(snapshot.id, snapshot.scopeId, boundary, {

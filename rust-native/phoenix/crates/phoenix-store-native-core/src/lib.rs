@@ -77,6 +77,11 @@ pub struct PreparedDocumentPersistTelemetry {
     pub segment_external_bytes: usize,
     pub segment_inline_bytes: usize,
     pub segment_uncompressed_bytes: usize,
+    pub document_index_shard_count: usize,
+    pub document_index_shards_written: usize,
+    pub document_index_shards_reused: usize,
+    pub document_index_bytes: usize,
+    pub document_index_write_us: u64,
     pub dirty_scope_record_bytes: usize,
     pub segments: Vec<PreparedDocumentSegmentPersistTelemetry>,
 }

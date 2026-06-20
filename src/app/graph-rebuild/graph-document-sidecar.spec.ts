@@ -2,12 +2,46 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 import { buildGraphDocumentSidecar } from './graph-document-sidecar';
+import type { DocumentUnit } from './graph-document-sidecar';
 import type { GraphDocumentSemanticSummary } from './graph-document-semantic';
 import { buildFallbackDocumentProfileSummary } from './graph-document-profile';
 import { buildAdaptiveGraphRebuildChunks } from './graph-rebuild-meaning-frames';
 import { buildGraphRebuildSnapshot } from './graph-rebuild-builder';
 
 describe('graph document sidecar', () => {
+    it.each(loadHierarchyGoldenFixture().cases)('preserves true heading ancestry: $name', (fixture) => {
+        const sidecar = buildGraphDocumentSidecar({
+            noteIds: [fixture.noteId],
+            noteTexts: { [fixture.noteId]: fixture.text },
+            chunks: buildAdaptiveGraphRebuildChunks(fixture.noteId, fixture.text),
+            builtAt: 9,
+        });
+        const sectionsByLabel = new Map(sidecar.sections.map((section) => [section.label, section]));
+
+        for (const expected of fixture.sections) {
+            const section = sectionsByLabel.get(expected.label);
+            const parent = sectionsByLabel.get(expected.parent);
+            expect(section, expected.label).toBeDefined();
+            expect(parent, expected.parent).toBeDefined();
+            expect(section).toMatchObject({
+                kind: expected.kind,
+                depth: expected.depth,
+                parentId: parent?.id,
+                start: fixture.text.indexOf(expected.startsAt),
+                end: expected.endsBefore === null ? fixture.text.length : fixture.text.indexOf(expected.endsBefore),
+            });
+            expect(parent?.childIds).toContain(section?.id);
+        }
+
+        for (const expected of fixture.paragraphs) {
+            const start = fixture.text.indexOf(expected.text);
+            const paragraph = sidecar.units.find((unit) => unit.kind === 'paragraph' && unit.start === start);
+            expect(paragraph, expected.text).toBeDefined();
+            expect(paragraph?.parentId).toBe(sectionsByLabel.get(expected.parent)?.id);
+            expect(ancestorLabels(sidecar.units, paragraph)).toEqual(expected.ancestors);
+        }
+    });
+
     it('models mixed document structure without promoting machine units to anchors', () => {
         const text = [
             '# Release Notes',
@@ -380,6 +414,46 @@ describe('graph document sidecar', () => {
         expect(sidecar.graphFactCandidates.some((candidate) => candidate.predicate === 'sponsored')).toBe(false);
     });
 });
+
+interface HierarchyGoldenFixture {
+    schemaVersion: 'phoenix-document-hierarchy-golden/v1';
+    cases: Array<{
+        name: string;
+        noteId: string;
+        text: string;
+        sections: Array<{
+            label: string;
+            kind: 'section' | 'subsection';
+            depth: number;
+            parent: string;
+            startsAt: string;
+            endsBefore: string | null;
+        }>;
+        paragraphs: Array<{
+            text: string;
+            parent: string;
+            ancestors: string[];
+        }>;
+    }>;
+}
+
+function loadHierarchyGoldenFixture(): HierarchyGoldenFixture {
+    const raw = readFileSync(new URL('./fixtures/document-hierarchy-golden.json', import.meta.url), 'utf8');
+    return JSON.parse(raw) as HierarchyGoldenFixture;
+}
+
+function ancestorLabels(units: DocumentUnit[], unit: DocumentUnit | undefined): string[] {
+    const unitsById = new Map(units.map((candidate) => [candidate.id, candidate]));
+    const labels: string[] = [];
+    let parentId = unit?.parentId;
+    while (parentId) {
+        const parent = unitsById.get(parentId);
+        if (!parent) break;
+        labels.push(parent.label);
+        parentId = parent.parentId;
+    }
+    return labels;
+}
 
 function semanticCounters(propositions: number, frames = 0, recoveries = 0) {
     return {
