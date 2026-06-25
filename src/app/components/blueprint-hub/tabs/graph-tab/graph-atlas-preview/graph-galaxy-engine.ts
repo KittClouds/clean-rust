@@ -18,6 +18,7 @@ import {
     type HopfReceiptBase,
 } from './graph-galaxy-hopf-receipts';
 import { relationFamilyFromText } from './graph-relation-visual-style';
+import { buildTransitPlan, type TransitPlan } from './graph-transit-plan';
 
 export type GalaxyLabelMode = 'hover' | 'selected' | 'important' | 'always' | 'off';
 export type GalaxyEdgeMode = 'curved' | 'straight' | 'tube' | 'hidden';
@@ -364,6 +365,7 @@ export interface GalaxyScene {
     links: GalaxyEdge[];
     layoutMode: GalaxyLayoutMode;
     groups: GalaxyGroup[];
+    transitPlan?: TransitPlan;
     relationControls?: GalaxyRelationControl[];
     hopfRibbons?: GalaxyHopfRibbon[];
     lorentzGuides?: GalaxyLorentzGuide[];
@@ -508,9 +510,10 @@ export function buildGalaxyScene(
     }
 
     if (isTransitLayoutMode(settings.layoutMode)) {
+        const transitPlan = buildTransitPlan(entitiesInput, edges);
         applyGalaxyMetadata(nodes);
         const lorentzGuides = applyTransitConsensusLayout(nodes, links);
-        return attachRelationControls({ nodes, links, layoutMode: 'transitManifold', groups: [], lorentzGuides }, relationPlan.controls);
+        return attachRelationControls({ nodes, links, layoutMode: 'transitManifold', groups: [], transitPlan, lorentzGuides }, relationPlan.controls);
     }
 
     if (settings.layoutMode === 'siegelFinsler') {

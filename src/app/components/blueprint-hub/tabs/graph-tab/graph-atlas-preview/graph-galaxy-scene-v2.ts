@@ -14,6 +14,7 @@ import {
 } from './graph-galaxy-engine';
 import { hierarchyShellBandForNode } from './graph-galaxy-hierarchy-caps';
 import { relationFamilyFromText } from './graph-relation-visual-style';
+import type { TransitPlan } from './graph-transit-plan';
 import type { PhoenixGraphScenePacketHierarchyHint } from '../../../../../services/phoenix-graph-scene-packet.model';
 
 export type GalaxySceneSourceMode = 'entities' | 'graph' | 'embeddings';
@@ -142,6 +143,7 @@ export interface GalaxySceneV2 {
     groups: GalaxySceneGroupView[];
     hopfRibbons: GalaxyHopfRibbonView[];
     lorentzGuides: GalaxyLorentzGuideView[];
+    transitPlan?: TransitPlan;
     relationControls?: GalaxyRelationControlView[];
     busemannHorospheres?: GalaxyBusemannHorosphereView[];
     hybridShellPositions?: Float32Array;
@@ -255,6 +257,7 @@ export function galaxySceneToV2(scene: GalaxyScene, sourceMode: GalaxySceneSourc
         groups: scene.groups.map(groupView),
         hopfRibbons: attachSourceColors((scene.hopfRibbons ?? []).map(hopfRibbonView), ids, colors),
         lorentzGuides: attachSourceColors((scene.lorentzGuides ?? []).map(lorentzGuideView), ids, colors),
+        transitPlan: scene.transitPlan,
         relationControls: scene.relationControls?.map(relationControlView),
         busemannHorospheres: (scene.busemannHorospheres ?? []).map(busemannHorosphereView),
         hybridShellPositions,

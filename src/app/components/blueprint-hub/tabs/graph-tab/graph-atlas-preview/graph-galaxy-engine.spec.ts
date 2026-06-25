@@ -522,6 +522,39 @@ describe('Graph galaxy Siegel-Finsler layout', () => {
 });
 
 describe('Graph galaxy Transit manifold', () => {
+    it('attaches a packet-backed TransitPlan before layout', () => {
+        const nodes = [
+            transitPacketNode('doc', 'Note', 'structure', 'document', 'note-1', { noteIds: ['note-1'] }),
+            transitPacketNode('chunk', 'Chunk', 'structure', 'chunk', 'chunk-1', { noteIds: ['note-1'], chunkIds: ['chunk-1'] }),
+            transitPacketNode('kai', 'Kai', 'registry', 'entity', 'kai', { noteIds: ['note-1'], chunkIds: ['chunk-1'] }),
+        ];
+        const edges = [
+            transitPacketEdge('doc-chunk', 'doc', 'chunk', 'manifold_parent', 'structure'),
+            transitPacketEdge('chunk-kai', 'chunk', 'kai', 'chunk-entity', 'registry'),
+        ];
+
+        const transit = buildGalaxyScene(nodes, edges, mergeGalaxySettings({ layoutMode: 'transitManifold' }));
+        const productCompat = buildGalaxyScene(nodes, edges, mergeGalaxySettings({ layoutMode: 'productManifold' }));
+        const single = buildGalaxyScene(nodes, edges, mergeGalaxySettings({ layoutMode: 'single' }));
+
+        expect(transit.transitPlan?.receipt).toMatchObject({
+            stationCount: 3,
+            routeCount: 2,
+            packetBackedStations: 3,
+            packetBackedRoutes: 2,
+            droppedUntracedNodes: 0,
+            missingEndpointRoutes: 0,
+        });
+        expect(transit.transitPlan?.receipt.laneCounts).toMatchObject({
+            document: 1,
+            chunk: 1,
+            identity: 1,
+        });
+        expect(productCompat.layoutMode).toBe('transitManifold');
+        expect(productCompat.transitPlan?.receipt.stationCount).toBe(3);
+        expect(single.transitPlan).toBeUndefined();
+    });
+
     it('renders route stages, lane guides, and obstructions without Transit-local Hopf ribbons', () => {
         const scene = buildGalaxyScene([
             productNode('evidence', 'Chunk evidence', 'chunk', 'evidence', 'chunk'),
@@ -728,5 +761,86 @@ function productNode(
                 lanes: { laneWeights: { [lane]: 0.92 } },
             },
         },
+    };
+}
+
+function transitPacketNode(
+    id: string,
+    label: string,
+    family: string,
+    kind: string,
+    sourceId: string,
+    refs: { noteIds?: string[]; chunkIds?: string[]; evidenceIds?: string[] } = {},
+): GalaxyRenderableNode {
+    return {
+        id,
+        label,
+        kind: family,
+        totalMentions: 1,
+        metadata: {
+            sourceContract: 'rust-atlas-packet',
+            vectorContract: 'vectors-missing',
+            visualTrace: transitTrace(id, family, kind, sourceId, refs),
+            visualSourceId: sourceId,
+            visualFamily: family,
+            graphFamily: family,
+            atlasFamily: family,
+            atlasKind: kind,
+            packetSnapshotId: 'snapshot-transit-engine',
+            packetScopeId: 'global',
+            noteIds: refs.noteIds || [],
+            chunkIds: refs.chunkIds || [],
+            evidenceIds: refs.evidenceIds || [],
+        },
+    };
+}
+
+function transitPacketEdge(id: string, sourceId: string, targetId: string, type: string, family: string): GalaxyInputEdge {
+    return {
+        id,
+        sourceId,
+        targetId,
+        type,
+        confidence: 0.9,
+        metadata: {
+            sourceContract: 'rust-atlas-packet',
+            graphFamily: family,
+            visualTrace: {
+                source: 'rust_atlas_packet',
+                sourceId,
+                family,
+                packetSnapshotId: 'snapshot-transit-engine',
+                packetScopeId: 'global',
+                sourceContract: 'rust-atlas-packet',
+                vectorContract: 'vectors-missing',
+                packetObjectId: `object:${sourceId}`,
+                packetTargetId: `object:${targetId}`,
+            },
+        },
+    };
+}
+
+function transitTrace(
+    id: string,
+    family: string,
+    kind: string,
+    sourceId: string,
+    refs: { noteIds?: string[]; chunkIds?: string[]; evidenceIds?: string[] },
+) {
+    return {
+        source: 'rust_atlas_packet',
+        sourceId,
+        family,
+        packetSnapshotId: 'snapshot-transit-engine',
+        packetScopeId: 'global',
+        sourceContract: 'rust-atlas-packet',
+        vectorContract: 'vectors-missing',
+        packetObjectId: `object:${id}`,
+        packetTargetId: `target:${id}`,
+        objectKind: kind,
+        targetKind: kind,
+        noteIds: refs.noteIds || [],
+        chunkIds: refs.chunkIds || [],
+        evidenceIds: refs.evidenceIds || [],
     };
 }
