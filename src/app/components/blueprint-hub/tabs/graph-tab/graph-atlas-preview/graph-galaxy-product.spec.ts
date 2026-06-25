@@ -13,21 +13,21 @@ const productEdges: GalaxyInputEdge[] = [
     { id: 'causal:kai:ruby', sourceId: 'kai', targetId: 'ruby', type: 'lorentz-tree:causal', confidence: 0.85 },
 ];
 
-describe('Product manifold galaxy visualization data', () => {
-    it('uses Product traversal positions while adding route guide data', () => {
-        const scene = buildGalaxyScene(productNodes, productEdges, mergeGalaxySettings({ layoutMode: 'productManifold' }));
+describe('Transit manifold galaxy visualization data', () => {
+    it('uses Transit traversal positions while adding route guide data', () => {
+        const scene = buildGalaxyScene(productNodes, productEdges, mergeGalaxySettings({ layoutMode: 'transitManifold' }));
 
-        expect(scene.layoutMode).toBe('productManifold');
+        expect(scene.layoutMode).toBe('transitManifold');
         expect(scene.lorentzGuides?.length).toBe(5);
         expect(scene.hopfRibbons?.length ?? 0).toBe(0);
         expect(scene.nodes.every((node) => Math.hypot(node.x, node.y, node.z) <= 2.4)).toBe(true);
-        expect(scene.lorentzGuides?.some((guide) => guide.id === 'product:lane:identity')).toBe(true);
-        expect(scene.lorentzGuides?.some((guide) => guide.id === 'product:route:identity:kai:echo')).toBe(true);
+        expect(scene.lorentzGuides?.some((guide) => guide.id === 'transit:lane:identity')).toBe(true);
+        expect(scene.lorentzGuides?.some((guide) => guide.id === 'transit:route:identity:kai:echo')).toBe(true);
         expect(new Set(scene.lorentzGuides?.map((guide) => guide.guideKind))).toEqual(new Set(['rootLane', 'membership']));
         expect(scene.lorentzGuides?.some((guide) => guide.id.startsWith('lorentz:'))).toBe(false);
     });
 
-    it('derives Product route guides from evidence context without rendering extra nodes', () => {
+    it('derives Transit route guides from evidence context without rendering extra nodes', () => {
         const nodes: GalaxyRenderableNode[] = [
             graphTargetNode('embed:entity:kai', 'Kai', 'entity', 'kai'),
             graphTargetNode('embed:entity:cael', 'Cael', 'entity', 'cael'),
@@ -57,17 +57,17 @@ describe('Product manifold galaxy visualization data', () => {
             { id: 'fact-target:cm1', sourceId: 'embed:graph-fact:cm1', targetId: 'embed:entity:cael', type: 'target', confidence: 0.64 },
         ];
 
-        const scene = buildGalaxyScene(nodes, edges, mergeGalaxySettings({ layoutMode: 'productManifold' }));
-        const relationGuides = scene.lorentzGuides?.filter((guide) => guide.id.startsWith('product:route:')) ?? [];
+        const scene = buildGalaxyScene(nodes, edges, mergeGalaxySettings({ layoutMode: 'transitManifold' }));
+        const relationGuides = scene.lorentzGuides?.filter((guide) => guide.id.startsWith('transit:route:')) ?? [];
         const relationKinds = new Set(relationGuides.map((guide) => guide.treeKind));
 
         expect(scene.hopfRibbons?.length ?? 0).toBe(0);
-        expect(scene.nodes.some((node) => node.entity.id.startsWith('product:context:'))).toBe(false);
+        expect(scene.nodes.some((node) => node.entity.id.startsWith('transit:context:'))).toBe(false);
         expect(scene.nodes.some((node) => node.entity.id === 'embed:graph-fact:r1')).toBe(false);
         expect(scene.relationControls?.some((control) => control.id === 'embed:graph-fact:r1')).toBe(true);
         expect(relationGuides.length).toBe(8);
-        expect(relationGuides.some((guide) => guide.id === 'product:route:anchor-entity:a1')).toBe(true);
-        expect(relationGuides.some((guide) => guide.id === 'product:route:event-entity:e1:kai')).toBe(true);
+        expect(relationGuides.some((guide) => guide.id === 'transit:route:anchor-entity:a1')).toBe(true);
+        expect(relationGuides.some((guide) => guide.id === 'transit:route:event-entity:e1:kai')).toBe(true);
         expect(relationKinds.has('documentStructure')).toBe(true);
         expect(relationKinds.has('event')).toBe(true);
         expect(relationKinds.has('relationship')).toBe(true);
@@ -79,7 +79,7 @@ describe('Product manifold galaxy visualization data', () => {
         expect(relationGuides.every((guide) => guide.positions3d.length > 0)).toBe(true);
     });
 
-    it('anchors Product routes on medoids without promoting local Hopf clutter', () => {
+    it('anchors Transit routes on medoids without promoting local Hopf clutter', () => {
         const nodes: GalaxyRenderableNode[] = [
             clusteredTargetNode('embed:entity:kai', 'Kai', 'entity', 'embed:entity:kai', 'core'),
             clusteredTargetNode('embed:entity:rowan', 'Rowan', 'entity', 'embed:entity:kai', 'boundary'),
@@ -93,10 +93,10 @@ describe('Product manifold galaxy visualization data', () => {
             { id: 'fact-target:co', sourceId: 'embed:graph-fact:co', targetId: 'embed:entity:rowan', type: 'target', confidence: 0.54 },
         ];
 
-        const scene = buildGalaxyScene(nodes, edges, mergeGalaxySettings({ layoutMode: 'productManifold' }));
+        const scene = buildGalaxyScene(nodes, edges, mergeGalaxySettings({ layoutMode: 'transitManifold' }));
         const byId = new Map(scene.nodes.map((node) => [node.entity.id, node]));
-        const trustRoute = scene.lorentzGuides?.find((guide) => guide.id.startsWith('product:route:relation-control:embed:graph-fact:trust'));
-        const coRoute = scene.lorentzGuides?.find((guide) => guide.id.startsWith('product:route:relation-control:embed:graph-fact:co'));
+        const trustRoute = scene.lorentzGuides?.find((guide) => guide.id.startsWith('transit:route:relation-control:embed:graph-fact:trust'));
+        const coRoute = scene.lorentzGuides?.find((guide) => guide.id.startsWith('transit:route:relation-control:embed:graph-fact:co'));
 
         expect(scene.hopfRibbons?.length ?? 0).toBe(0);
         expect(byId.get('embed:entity:kai')?.radius || 0).toBeGreaterThan(byId.get('embed:entity:rowan')?.radius || 0);
@@ -133,7 +133,7 @@ describe('Product manifold galaxy visualization data', () => {
         expect(new Set(backbone.nodes.map((node) => node.entity.id)).size).toBe(3);
     });
 
-    it('turns Product topology regions into layout pressure', () => {
+    it('turns Transit topology regions into layout pressure', () => {
         const nodes: GalaxyRenderableNode[] = [
             topologyNode('embed:entity:kai', 'Kai', 'embedding-cluster:0', 'embed:entity:kai', 0.1, 0.9),
             topologyNode('embed:entity:rowan', 'Rowan', 'embedding-cluster:0', 'embed:entity:kai', 0.2, 0.4),
@@ -144,8 +144,8 @@ describe('Product manifold galaxy visualization data', () => {
             { id: 'embedding-bridge:rowan:rook', sourceId: 'embed:entity:rowan', targetId: 'embed:entity:rook', type: 'embedding-bridge', confidence: 0.72 },
         ];
 
-        const baseline = buildGalaxyScene(nodes.map(stripTopology), edges, mergeGalaxySettings({ layoutMode: 'productManifold' }));
-        const scene = buildGalaxyScene(nodes, edges, mergeGalaxySettings({ layoutMode: 'productManifold' }));
+        const baseline = buildGalaxyScene(nodes.map(stripTopology), edges, mergeGalaxySettings({ layoutMode: 'transitManifold' }));
+        const scene = buildGalaxyScene(nodes, edges, mergeGalaxySettings({ layoutMode: 'transitManifold' }));
         const core = scene.nodes.find((node) => node.entity.id === 'embed:entity:kai')!;
         const outlier = scene.nodes.find((node) => node.entity.id === 'embed:entity:rook')!;
         const baselineOutlier = baseline.nodes.find((node) => node.entity.id === 'embed:entity:rook')!;
@@ -158,7 +158,7 @@ describe('Product manifold galaxy visualization data', () => {
         expect(backboneEdge.alpha).toBeGreaterThan(bridgeEdge.alpha * 0.7);
     });
 
-    it('lets hierarchy caps own Product basins before embedding clusters', () => {
+    it('lets hierarchy caps own Transit basins before embedding clusters', () => {
         const nodes: GalaxyRenderableNode[] = [
             hierarchyProductNode('embed:note:1', 'Doc', 'note', 'document:1', 0),
             hierarchyProductNode('embed:root:1', 'Identity root', 'structure-root', 'document:1:root:identity', 1, 'embed:note:1'),
@@ -167,18 +167,18 @@ describe('Product manifold galaxy visualization data', () => {
             hierarchyProductNode('embed:event:cause', 'causes_or_explains', 'event', 'event:1:causal', 5, 'embed:entity:kai'),
         ];
 
-        const scene = buildGalaxyScene(nodes, [], mergeGalaxySettings({ layoutMode: 'productManifold' }));
+        const scene = buildGalaxyScene(nodes, [], mergeGalaxySettings({ layoutMode: 'transitManifold' }));
         const byId = new Map(scene.nodes.map((node) => [node.entity.id, node]));
 
         expect(byId.get('embed:note:1')!.x).toBeLessThan(byId.get('embed:root:1')!.x);
         expect(byId.get('embed:root:1')!.x).toBeLessThan(byId.get('embed:chunk:1')!.x);
-        expect(ownershipRegion(scene, 'embed:chunk:1')).toBe('product:story:1:chunk:1');
-        expect(ownershipRegion(scene, 'embed:entity:kai')).toBe('product:story:1:chunk:1');
-        expect(ownershipRegion(scene, 'embed:event:cause')).toBe('product:story:1:chunk:1');
+        expect(ownershipRegion(scene, 'embed:chunk:1')).toBe('transit:story:1:chunk:1');
+        expect(ownershipRegion(scene, 'embed:entity:kai')).toBe('transit:story:1:chunk:1');
+        expect(ownershipRegion(scene, 'embed:event:cause')).toBe('transit:story:1:chunk:1');
         expect(ownershipOwner(scene, 'embed:event:cause')).toBe('kai');
     });
 
-    it('clusters Product children in their owning entity regions', () => {
+    it('clusters Transit children in their owning entity regions', () => {
         const nodes: GalaxyRenderableNode[] = [
             ownedProductNode('embed:note:1', 'Doc', 'note', 'document:1', 0, '', 'document'),
             ownedProductNode('embed:chunk:1', 'Scene chunk', 'chunk', 'document:1:chunk:1', 2, '', 'document'),
@@ -199,19 +199,19 @@ describe('Product manifold galaxy visualization data', () => {
             { id: 'fact-target:rowan-causal', sourceId: 'embed:fact:rowan-causal', targetId: 'embed:anchor:rowan', type: 'evidence', confidence: 0.8 },
         ];
 
-        const scene = buildGalaxyScene(nodes, edges, mergeGalaxySettings({ layoutMode: 'productManifold' }));
+        const scene = buildGalaxyScene(nodes, edges, mergeGalaxySettings({ layoutMode: 'transitManifold' }));
 
         expect(sceneDistance(scene, 'embed:entity:kai', 'embed:anchor:kai')).toBeLessThan(sceneDistance(scene, 'embed:entity:rowan', 'embed:anchor:kai'));
         expect(sceneDistance(scene, 'embed:entity:rowan', 'embed:anchor:rowan')).toBeLessThan(sceneDistance(scene, 'embed:entity:kai', 'embed:anchor:rowan'));
-        expect(ownershipRegion(scene, 'embed:fact:kai')).toBe('product:story:1:chunk:1:owner:kai');
-        expect(ownershipRegion(scene, 'embed:fact:kai-causal')).toBe('product:story:1:chunk:1:owner:kai');
-        expect(ownershipRegion(scene, 'embed:fact:rowan-causal')).toBe('product:story:1:chunk:1:owner:rowan');
+        expect(ownershipRegion(scene, 'embed:fact:kai')).toBe('transit:story:1:chunk:1:owner:kai');
+        expect(ownershipRegion(scene, 'embed:fact:kai-causal')).toBe('transit:story:1:chunk:1:owner:kai');
+        expect(ownershipRegion(scene, 'embed:fact:rowan-causal')).toBe('transit:story:1:chunk:1:owner:rowan');
         expect(ownershipOwner(scene, 'embed:fact:kai')).toBe('kai');
         expect(ownershipOwner(scene, 'embed:fact:kai-causal')).toBe('kai');
         expect(ownershipOwner(scene, 'embed:fact:rowan-causal')).toBe('rowan');
     });
 
-    it('uses story chunks before flat fact lanes in Product regions', () => {
+    it('uses story chunks before flat fact lanes in Transit regions', () => {
         const nodes: GalaxyRenderableNode[] = [
             ownedProductNode('embed:note:1', 'Doc', 'note', 'document:1', 0, '', 'document'),
             ownedProductNode('embed:chunk:1', 'Scene chunk one', 'chunk', 'document:1:chunk:1', 2, '', 'document'),
@@ -227,7 +227,7 @@ describe('Product manifold galaxy visualization data', () => {
             { id: 'fact-target:kai-causal-2', sourceId: 'embed:fact:kai-causal-2', targetId: 'embed:chunk:2', type: 'evidence', confidence: 0.8 },
         ];
 
-        const scene = buildGalaxyScene(nodes, edges, mergeGalaxySettings({ layoutMode: 'productManifold' }));
+        const scene = buildGalaxyScene(nodes, edges, mergeGalaxySettings({ layoutMode: 'transitManifold' }));
         const byId = new Map(scene.nodes.map((node) => [node.entity.id, node]));
         const kaiFactOne = controlPosition(scene, 'embed:fact:kai-causal-1');
         const kaiFactTwo = controlPosition(scene, 'embed:fact:kai-causal-2');
@@ -237,7 +237,7 @@ describe('Product manifold galaxy visualization data', () => {
         expect(Math.abs(kaiFactOne.z - kaiFactTwo.z)).toBeGreaterThan(0.08);
     });
 
-    it('uses target parents instead of fact-family colors for Product ownership', () => {
+    it('uses target parents instead of fact-family colors for Transit ownership', () => {
         const nodes: GalaxyRenderableNode[] = [
             parentedProductNode('embed:note:1', 'Doc', 'note', [], { noteId: '1', productLaneKind: 'document' }),
             parentedProductNode('embed:chunk:1', 'Scene chunk', 'chunk', ['embed:note:1'], { noteId: '1', chunkId: '1', productLaneKind: 'document' }),
@@ -252,17 +252,17 @@ describe('Product manifold galaxy visualization data', () => {
             parentedProductNode('embed:causalFact:rowan', 'Rowan causes route shift', 'causal-fact', ['embed:entity:rowan', 'embed:chunk:1'], { noteId: '1', chunkId: '1', productLaneKind: 'causal' }),
         ];
 
-        const scene = buildGalaxyScene(nodes, [], mergeGalaxySettings({ layoutMode: 'productManifold' }));
+        const scene = buildGalaxyScene(nodes, [], mergeGalaxySettings({ layoutMode: 'transitManifold' }));
 
         for (const id of ['embed:causalFact:kai', 'embed:temporalFact:kai', 'embed:graph-fact:kai', 'embed:memory:kai', 'embed:graph-fact:weak']) {
-            expect(ownershipRegion(scene, id)).toBe(id === 'embed:memory:kai' ? 'product:story:1:chunk:1' : 'product:story:1:chunk:1:owner:kai');
+            expect(ownershipRegion(scene, id)).toBe(id === 'embed:memory:kai' ? 'transit:story:1:chunk:1' : 'transit:story:1:chunk:1:owner:kai');
             expect(ownershipOwner(scene, id)).toBe('kai');
         }
         expect(ownershipOwner(scene, 'embed:causalFact:rowan')).toBe('rowan');
         expect(controlDistance(scene, 'embed:causalFact:kai', 'embed:graph-fact:kai')).toBeLessThan(controlDistance(scene, 'embed:causalFact:kai', 'embed:causalFact:rowan'));
     });
 
-    it('keeps Product topology pressure separate from the Lorentz skeleton', () => {
+    it('keeps Transit topology pressure separate from the Lorentz skeleton', () => {
         const nodes: GalaxyRenderableNode[] = [
             topologyNode('embed:entity:kai', 'Kai', 'embedding-cluster:0', 'embed:entity:kai', 0.1, 0.9),
             topologyNode('embed:entity:rowan', 'Rowan', 'embedding-cluster:0', 'embed:entity:kai', 0.2, 0.4),
@@ -274,30 +274,30 @@ describe('Product manifold galaxy visualization data', () => {
         ];
 
         const lorentz = buildGalaxyScene(nodes, edges, mergeGalaxySettings({ layoutMode: 'lorentzTree' }));
-        const product = buildGalaxyScene(nodes, edges, mergeGalaxySettings({ layoutMode: 'productManifold' }));
-        const productById = new Map(product.nodes.map((node) => [node.entity.id, node]));
+        const transit = buildGalaxyScene(nodes, edges, mergeGalaxySettings({ layoutMode: 'transitManifold' }));
+        const transitById = new Map(transit.nodes.map((node) => [node.entity.id, node]));
         const maxDelta = Math.max(...lorentz.nodes.map((node) => {
-            const other = productById.get(node.entity.id)!;
+            const other = transitById.get(node.entity.id)!;
             return Math.hypot(node.x - other.x, node.y - other.y, node.z - other.z);
         }));
 
         expect(maxDelta).toBeGreaterThan(0.2);
-        expect(product.hopfRibbons?.length ?? 0).toBe(0);
-        expect(product.lorentzGuides?.some((guide) => guide.id.startsWith('product:lane:'))).toBe(true);
-        expect(product.lorentzGuides?.some((guide) => guide.id.startsWith('product:route:'))).toBe(true);
-        expect(product.lorentzGuides?.some((guide) => guide.id.startsWith('lorentz:root-lane:'))).toBe(false);
+        expect(transit.hopfRibbons?.length ?? 0).toBe(0);
+        expect(transit.lorentzGuides?.some((guide) => guide.id.startsWith('transit:lane:'))).toBe(true);
+        expect(transit.lorentzGuides?.some((guide) => guide.id.startsWith('transit:route:'))).toBe(true);
+        expect(transit.lorentzGuides?.some((guide) => guide.id.startsWith('lorentz:root-lane:'))).toBe(false);
     });
 
-    it('keeps Product routes close enough to read as traversal lanes', () => {
+    it('keeps Transit routes close enough to read as traversal lanes', () => {
         const scene = productPhaseScene(0.18, 0.68);
-        const route = scene.lorentzGuides?.find((guide) => guide.id === 'product:route:phase:identity:context');
+        const route = scene.lorentzGuides?.find((guide) => guide.id === 'transit:route:phase:identity:context');
 
         expect(route).toBeTruthy();
         expect((route?.positions3d.length || 0) / 6).toBeGreaterThan(12);
         expect(routeEnvelopeDeviation(route!.positions3d)).toBeLessThan(0.24);
     });
 
-    it('uses Hopf phase agreement as Product layout pressure', () => {
+    it('uses Hopf phase agreement as Transit layout pressure', () => {
         const aligned = productPhaseScene(0.18, 0.2);
         const mismatched = productPhaseScene(0.18, 0.68);
         const alignedDistance = sceneDistance(aligned, 'phase:identity', 'phase:context');
@@ -320,7 +320,7 @@ function productPhaseScene(identityPhase: number, contextPhase: number): ReturnT
         targetId: 'phase:context',
         type: 'embedding-bridge',
         confidence: 0.86,
-    }], mergeGalaxySettings({ layoutMode: 'productManifold' }));
+    }], mergeGalaxySettings({ layoutMode: 'transitManifold' }));
 }
 
 function sceneDistance(scene: ReturnType<typeof buildGalaxyScene>, leftId: string, rightId: string): number {

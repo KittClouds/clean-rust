@@ -973,7 +973,7 @@ export class PhoenixUiApiService {
         if (!payload) return null;
         const isHopf = manifold === 'hopf';
         const isLorentz = manifold === 'lorentz';
-        const isProduct = manifold === 'product';
+        const isTransit = manifold === 'product';
         const isSiegel = manifold === 'siegel';
         return {
             manifold,
@@ -981,8 +981,8 @@ export class PhoenixUiApiService {
                 ? 'hopf_ico_r5_v1'
                 : isLorentz
                   ? 'lorentz_h4_forest_v1'
-                  : isProduct
-                    ? 'product_lorentz_hopf_v1'
+                  : isTransit
+                    ? 'transit_lorentz_hopf_v1'
                     : isSiegel
                       ? 'siegel_finsler_v1'
                   : 'hybrid_semantic_v1',
@@ -990,8 +990,8 @@ export class PhoenixUiApiService {
                 ? 'backend semantic atlas -> hopf adapter'
                 : isLorentz
                   ? 'backend semantic atlas -> lorentz tree adapter'
-                  : isProduct
-                    ? 'backend semantic atlas -> product adapter'
+                  : isTransit
+                    ? 'backend semantic atlas -> transit adapter'
                     : isSiegel
                       ? 'backend semantic atlas -> siegel-finsler adapter'
                   : payload.sourceLabel,
@@ -999,7 +999,7 @@ export class PhoenixUiApiService {
                 ? HOPF_MANIFOLD_CAPABILITIES
                 : isLorentz
                   ? LORENTZ_MANIFOLD_CAPABILITIES
-                  : isProduct
+                  : isTransit
                     ? PRODUCT_MANIFOLD_CAPABILITIES
                     : isSiegel
                       ? SIEGEL_FINSLER_CAPABILITIES

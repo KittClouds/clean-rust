@@ -6,6 +6,7 @@ export type PhoenixGraphSceneLayoutMode =
     | 'hybridSpace'
     | 'hopfProjection'
     | 'lorentzTree'
+    | 'transitManifold'
     | 'productManifold'
     | 'siegelFinsler';
 

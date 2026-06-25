@@ -17,7 +17,7 @@ describe('galaxy node shape rendering', () => {
         hovered: false,
         neighbor: false,
         dimmed: false,
-        productAtom: false,
+        transitAtom: false,
     };
 
     it('renders sphere nodes at 45% of their original scale in every focus state', () => {

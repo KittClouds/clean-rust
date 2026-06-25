@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-import type { GalaxyRenderSettings, GalaxySphereSurfaceMode } from './graph-galaxy-engine';
+import { isTransitLayoutMode, type GalaxyRenderSettings, type GalaxySphereSurfaceMode } from './graph-galaxy-engine';
 import type { GalaxySceneV2 } from './graph-galaxy-scene-v2';
 
 export type GalaxyNodeObject = THREE.Sprite | THREE.Mesh;
@@ -30,12 +30,12 @@ const SPHERE_NODE_STATES: readonly { state: GalaxySphereNodeState; opacity: numb
 
 export function galaxyNodeShapeScale(
     shape: GalaxyRenderSettings['nodeShape'],
-    state: { active: boolean; hovered: boolean; neighbor: boolean; dimmed: boolean; productAtom: boolean },
+    state: { active: boolean; hovered: boolean; neighbor: boolean; dimmed: boolean; transitAtom: boolean },
 ): number {
-    const { active, hovered, neighbor, dimmed, productAtom } = state;
+    const { active, hovered, neighbor, dimmed, transitAtom } = state;
     if (shape === 'atom') {
         return (hovered || active ? 2.38 : neighbor ? 1.84 : dimmed ? 1.15 : 1.6)
-            * (productAtom ? 0.93 : 1);
+            * (transitAtom ? 0.93 : 1);
     }
     if (shape === 'sphere') {
         return (hovered || active ? 0.89 : neighbor ? 0.72 : dimmed ? 0.52 : 0.6)
@@ -69,7 +69,7 @@ export function buildGalaxyNodes(scene: GalaxySceneV2, settings: GalaxyRenderSet
         return buildStyledSphereNodes(scene, sphereSurface);
     }
     const group = new THREE.Group();
-    const productAtom = settings.nodeShape === 'atom' && scene.layoutMode === 'productManifold';
+    const transitAtom = settings.nodeShape === 'atom' && isTransitLayoutMode(scene.layoutMode);
     for (let index = 0; index < scene.ids.length; index++) {
         const material: GalaxyNodeMaterial = settings.nodeShape === 'sphere'
             ? new THREE.MeshBasicMaterial({
@@ -84,8 +84,8 @@ export function buildGalaxyNodes(scene: GalaxySceneV2, settings: GalaxyRenderSet
                 map: settings.nodeShape === 'atom' ? atomTexture : nodeTexture,
                 color: 0xffffff,
                 transparent: true,
-                opacity: productAtom ? 0.98 : 0.96,
-                alphaTest: productAtom ? 0.055 : 0,
+                opacity: transitAtom ? 0.98 : 0.96,
+                alphaTest: transitAtom ? 0.055 : 0,
                 depthWrite: false,
                 depthTest: true,
                 blending: THREE.NormalBlending,
@@ -272,19 +272,24 @@ function spellglassSphereMaterial(state: (typeof SPHERE_NODE_STATES)[number]): T
         void main() {
             vec3 normal = normalize(vSphereNormal);
             vec3 view = normalize(vSphereView);
-            vec3 source = max(vSphereColor, vec3(0.035));
-            float fresnel = pow(1.0 - clamp(abs(dot(normal, view)), 0.0, 1.0), 2.15);
+            vec3 source = max(vSphereColor, vec3(0.06));
+            float fresnel = pow(1.0 - clamp(abs(dot(normal, view)), 0.0, 1.0), 2.2);
             float radial = length(vSphereLocal.xz);
-            float shellBand = pow(1.0 - abs(sin((radial * 7.2 + vSphereLocal.y * 1.7) * 3.14159265)), 12.0);
-            float spiral = pow(1.0 - abs(sin(atan(vSphereLocal.z, vSphereLocal.x) * 2.0 + vSphereLocal.y * 8.4)), 16.0);
-            float caustic = clamp(shellBand * 0.72 + spiral * 0.48, 0.0, 1.0);
+            // Etched meridian + spiral facets. Powers lowered from ^12/^16 to ^5/^6
+            // so the etch web is actually visible instead of a sub-pixel filament.
+            float shellBand = pow(1.0 - abs(sin((radial * 6.0 + vSphereLocal.y * 1.6) * 3.14159265)), 5.0);
+            float spiral = pow(1.0 - abs(sin(atan(vSphereLocal.z, vSphereLocal.x) * 2.0 + vSphereLocal.y * 6.8)), 6.0);
+            float facet = clamp(shellBand * 0.62 + spiral * 0.48, 0.0, 1.0);
             float phase = vSphereLocal.x * 4.2 - vSphereLocal.y * 5.6 + vSphereLocal.z * 3.4;
-            vec3 prism = mix(source, source.gbr, 0.48 + sin(phase) * 0.28);
-            vec3 deep = mix(vec3(0.008, 0.018, 0.035), source * 0.42, 0.54 + innerStrength * 0.22);
-            vec3 hue = deep + prism * caustic * (0.42 + innerStrength * 0.58);
-            hue += mix(source.brg, vec3(0.72, 0.94, 1.0), 0.28) * fresnel * rimStrength * 0.74;
-            hue += vec3(1.0, 0.82, 0.56) * pow(max(dot(normal, normalize(vec3(-0.4, 0.5, 0.76))), 0.0), 28.0) * (0.18 + sheen);
-            float alpha = opacity * (0.2 + fresnel * 0.58 + caustic * 0.24);
+            vec3 prism = mix(source, source.gbr, 0.42 + sin(phase) * 0.26);
+            // Luminous tinted body — no dark center. Source lifted toward ~0.70 so
+            // the marble reads at a glance instead of dissolving into the nebula.
+            vec3 body = source * (0.66 + innerStrength * 0.22);
+            vec3 hue = body + prism * facet * (0.50 + innerStrength * 0.50);
+            hue += mix(source.brg, vec3(0.74, 0.95, 1.0), 0.30) * fresnel * rimStrength * 0.70;
+            hue += vec3(1.0, 0.82, 0.56) * pow(max(dot(normal, normalize(vec3(-0.4, 0.5, 0.76))), 0.0), 26.0) * (0.20 + sheen);
+            // Alpha floor raised so the orb stays visible; fresnel adds a brighter edge.
+            float alpha = opacity * (0.62 + fresnel * 0.30 + facet * 0.08);
             if (alpha <= 0.008) discard;
             gl_FragColor = vec4(hue, alpha);
         }

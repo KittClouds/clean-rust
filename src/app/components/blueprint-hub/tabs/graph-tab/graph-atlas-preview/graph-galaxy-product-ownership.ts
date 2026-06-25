@@ -254,11 +254,11 @@ function collectAncestors(parentId: string, states: OwnershipState[], idToIndex:
 function productRegionId(state: OwnershipState): string {
     const note = firstId(state.noteIds, 'global');
     const chunk = firstId(state.chunkIds);
-    if (state.sourceType === 'note') return `product:story:${note}:document`;
-    if (state.sourceType === 'structure-root') return `product:story:${note}:root:${rootKindFor(state)}`;
-    if (state.sourceType === 'chunk' && chunk) return `product:story:${note}:chunk:${chunk}`;
-    if (chunk) return `product:story:${note}:chunk:${chunk}`;
-    return `product:story:${note}:signals:${state.lane || state.role || 'semantic'}`;
+    if (state.sourceType === 'note') return `transit:story:${note}:document`;
+    if (state.sourceType === 'structure-root') return `transit:story:${note}:root:${rootKindFor(state)}`;
+    if (state.sourceType === 'chunk' && chunk) return `transit:story:${note}:chunk:${chunk}`;
+    if (chunk) return `transit:story:${note}:chunk:${chunk}`;
+    return `transit:story:${note}:signals:${state.lane || state.role || 'semantic'}`;
 }
 
 function addParent(state: OwnershipState, parentId: string, relation: string, confidence: number): void {

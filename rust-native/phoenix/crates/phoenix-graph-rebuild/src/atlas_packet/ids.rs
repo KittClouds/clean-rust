@@ -43,3 +43,15 @@ pub(super) fn hyperedge_role_object_id(
 ) -> CompactString {
     format_compact!("atlas:hyperedge-role:{hyperedge_id}:{role_id}")
 }
+
+pub(super) fn review_object_id(review_id: &CompactString) -> CompactString {
+    format_compact!("atlas:review:{review_id}")
+}
+
+pub(super) fn discourse_cluster_object_id(cluster_id: &CompactString) -> CompactString {
+    format_compact!("atlas:discourse-cluster:{cluster_id}")
+}
+
+pub(super) fn discourse_bridge_object_id(bridge_id: &CompactString) -> CompactString {
+    format_compact!("atlas:discourse-bridge:{bridge_id}")
+}

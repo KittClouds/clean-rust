@@ -217,16 +217,16 @@ describe('GraphGalaxyParticles', () => {
         particles.dispose();
     });
 
-    it('adds flow particles to live Product and Siegel guide lines', () => {
+    it('adds flow particles to live Transit and Siegel guide lines', () => {
         const settings = { ...DEFAULT_GALAXY_SETTINGS, particleFlow: true, particleSpeed: 0, particleOpacity: 1, edgeMode: 'straight' as const };
-        const product = guideParticleScene('productManifold');
+        const transit = guideParticleScene('transitManifold');
         const siegel = guideParticleScene('siegelFinsler');
         const particles = new GraphGalaxyParticles();
         const probe = particles as unknown as { seeds: number[]; flowSources: Array<{ kind: string; index: number }> };
 
-        particles.bind(product, settings);
+        particles.bind(transit, settings);
         probe.seeds[0] = 0.5;
-        particles.update(product, product.positions3d, settings, 0);
+        particles.update(transit, transit.positions3d, settings, 0);
         let position = particles.points.geometry.getAttribute('position') as THREE.BufferAttribute;
         let color = particles.points.geometry.getAttribute('color') as THREE.BufferAttribute;
         expect(probe.flowSources).toEqual([{ kind: 'guide', index: 0 }]);
@@ -235,12 +235,12 @@ describe('GraphGalaxyParticles', () => {
         expect(color.getZ(0)).toBeLessThan(0.9);
         expect(color.getZ(0)).toBeGreaterThan(0.8);
 
-        product.positions3d = new Float32Array([2, 0, 0, 6, 0, 0]);
-        particles.update(product, product.positions3d, settings, 0);
+        transit.positions3d = new Float32Array([2, 0, 0, 6, 0, 0]);
+        particles.update(transit, transit.positions3d, settings, 0);
         expect(position.getX(0)).toBeCloseTo(3);
 
         probe.seeds[0] = 0.95;
-        particles.update(product, product.positions3d, settings, 0);
+        particles.update(transit, transit.positions3d, settings, 0);
         expect(Math.abs(position.getY(0))).toBeLessThan(0.04);
 
         particles.bind(siegel, settings);
@@ -289,7 +289,7 @@ describe('GraphGalaxyParticles', () => {
 function particleScene(): GalaxySceneV2 {
     return {
         sourceMode: 'embeddings',
-        layoutMode: 'productManifold',
+        layoutMode: 'transitManifold',
         ids: ['a', 'b', 'c'],
         labels: ['A', 'B', 'C'],
         kinds: ['character', 'location', 'network'],
@@ -527,7 +527,7 @@ function siegelFocusScene(): GalaxySceneV2 {
     };
 }
 
-function guideParticleScene(layoutMode: 'productManifold' | 'siegelFinsler'): GalaxySceneV2 {
+function guideParticleScene(layoutMode: 'transitManifold' | 'siegelFinsler'): GalaxySceneV2 {
     return {
         ...particleScene(),
         layoutMode,

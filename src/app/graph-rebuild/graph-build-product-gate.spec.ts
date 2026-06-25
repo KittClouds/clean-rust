@@ -82,6 +82,7 @@ import type {
     GraphRebuildSnapshot,
 } from './graph-rebuild-snapshot';
 import { buildGraphAtlasTaxonomyAudit } from './graph-atlas-taxonomy-audit';
+import { buildGraphPacketRowAdapter } from '../components/blueprint-hub/tabs/graph-tab/graph-atlas-preview/graph-packet-row-adapter';
 
 const SHOULD_RUN = process.env['GRAPH_BUILD_BASELINE'] === '1';
 const ZEROSHOT_OUTPUT_URL = new URL('../../../target/graph-build-baselines/zero-shot-shortrun.json', import.meta.url);
@@ -193,6 +194,7 @@ describeBaseline('product graph build gate', () => {
         const warmOperatorJournalReads = operatorJournalReadCount(store) - operatorJournalReadsBeforeWarm;
         await flushReceiptPersistence(pipeline);
         const warmScopedWritesAfterReceipt = store.upserts.length - upsertsBeforeWarm;
+        const parity = productGatePacketParity(warm.snapshot);
         const keys = ['mentions', 'acceptedAnchors', 'nodes', 'edges', 'embeddingTargets'] as const;
         for (const key of keys) expect(warm.snapshot.counters[key]).toBe(cold.snapshot.counters[key]);
         expect(warm.snapshot.id).toBe(cold.snapshot.id);
@@ -216,6 +218,16 @@ describeBaseline('product graph build gate', () => {
         expect(warm.snapshot.buildTimings?.previousSnapshotHydrationSkipped).toBe(1);
         expect(warm.snapshot.buildTimings?.nativeChunkerSkipped).toBe(1);
         expect(warm.snapshot.buildTimings?.documentSemanticSkipped).toBe(1);
+        expect(parity).toMatchObject({
+            graphDiscourse: expect.any(Number),
+            graphProposed: expect.any(Number),
+            embedDiscourse: expect.any(Number),
+            embedProposed: expect.any(Number),
+        });
+        expect(parity.graphDiscourse).toBeGreaterThan(0);
+        expect(parity.graphProposed).toBeGreaterThan(0);
+        expect(parity.embedDiscourse).toBeGreaterThan(0);
+        expect(parity.embedProposed).toBeGreaterThan(0);
         expect(warmScopedWrites).toBe(0);
         expect(warmScopedWritesAfterReceipt).toBe(1);
         expect(warmOperatorJournalReads).toBe(0);
@@ -303,6 +315,28 @@ function persistedSnapshotId(
 
 function operatorJournalReadCount(store: ReturnType<typeof createMemoryStore>): number {
     return store.reads.filter((row) => row.key.endsWith('/operator-mutation-journal')).length;
+}
+
+function productGatePacketParity(snapshot: GraphRebuildSnapshot): {
+    graphDiscourse: number;
+    graphProposed: number;
+    embedDiscourse: number;
+    embedProposed: number;
+} {
+    if (!snapshot.atlasPacket) {
+        return { graphDiscourse: 0, graphProposed: 0, embedDiscourse: 0, embedProposed: 0 };
+    }
+    const rows = buildGraphPacketRowAdapter(snapshot.atlasPacket, snapshot.embeddingTargets);
+    return {
+        graphDiscourse: rows.graphNodes.filter((node) => node.metadata?.['canvasLens'] === 'discourse').length,
+        graphProposed: rows.graphNodes.filter((node) => node.metadata?.['reviewState'] === 'proposed').length,
+        embedDiscourse: rows.embeddingTargets.filter((target) => target.atlasFamily === 'discourse').length,
+        embedProposed: rows.embeddingTargets.filter((target) =>
+            target.atlasStatus === 'review'
+            || target.atlasStatus === 'proposed'
+            || target.admissionStatus !== 'admitted',
+        ).length,
+    };
 }
 
 function graphRunRequest(): GraphIndexRunRequest {

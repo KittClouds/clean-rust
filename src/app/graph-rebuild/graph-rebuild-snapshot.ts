@@ -2275,8 +2275,7 @@ export type GraphRebuildContentBlobField =
     | 'graphModelV2'
     | 'semanticCandidateSummary'
     | 'manifoldSpecializationSummary'
-    | 'atlasPacket'
-    | 'atlasDebugSummaries';
+    | 'atlasPacket';
 
 export interface GraphRebuildContentBlobRef {
     schemaVersion: 'phoenix-graph-rebuild-content-blob-ref/v1';

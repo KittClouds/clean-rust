@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import type { GalaxyEdge, GalaxyNode } from './graph-galaxy-engine';
 import { compileProductOwnership } from './graph-galaxy-product-ownership';
 
-describe('Product graph ownership compiler', () => {
+describe('Transit graph ownership compiler', () => {
     it('cascades every graph-model family through document, chunk, entity, event, and evidence parents', () => {
         const nodes = [
             node('embed:note:n1', 'note', [], { noteId: 'n1' }),
@@ -23,7 +23,7 @@ describe('Product graph ownership compiler', () => {
             node('embed:graph-fact:weak1', 'graph-fact', ['embed:entity:kai', 'embed:chunk:c1'], { noteId: 'n1', chunkId: 'c1', signalLane: 'cooccurrence_weak' }),
         ];
         const records = byId(compileProductOwnership(nodes, []));
-        const chunkRegion = 'product:story:n1:chunk:c1';
+        const chunkRegion = 'transit:story:n1:chunk:c1';
         const ownedIds = [
             'embed:causalFact:cf1',
             'embed:temporalFact:tf1',

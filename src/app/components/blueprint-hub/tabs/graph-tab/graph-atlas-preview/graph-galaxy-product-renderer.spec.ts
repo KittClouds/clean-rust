@@ -42,7 +42,7 @@ type RendererProbe = {
     buildLorentzTubeMesh(guide: Record<string, unknown>, index: number, layer: 'tubeCore' | 'tubeGlow', surface: string): THREE.Mesh | null;
     writeLorentzGuideColor(colors: Float32Array, offset: number, guide: Record<string, unknown>, index: number, phase: number, surface: string, focusScale?: number): void;
     nodeDensityFactors(data: { ids: string[] }, positions: Float32Array): Float32Array;
-    productKleinLayerOpacity(layer: string): number;
+    transitGuideLayerOpacity(layer: string): number;
     tubeEdgeTerminalFlourish(data: { layoutMode: string }, t: number, lift: number, sign: number): number;
     capsSurfaceEdge(data: { layoutMode: string }, ax: number, ay: number, az: number, bx: number, by: number, bz: number): boolean;
     capsSurfacePoint(out: THREE.Vector3, ax: number, ay: number, az: number, bx: number, by: number, bz: number, t: number): boolean;
@@ -102,7 +102,7 @@ describe('Galaxy camera controls', () => {
     });
 });
 
-describe('Product manifold guide styling', () => {
+describe('Transit manifold guide styling', () => {
     it('routes hover and selection through focus refresh instead of full geometry refresh', () => {
         const renderer = new ThreeGalaxyRenderer() as unknown as {
             selectNode(id: string | null): void;
@@ -122,28 +122,28 @@ describe('Product manifold guide styling', () => {
 
     it('keeps evidence fibers visually above scaffold and Lorentz guides', () => {
         const renderer = new ThreeGalaxyRenderer() as unknown as RendererProbe;
-        const productDataWeight = renderer.hopfGuideWeightForKind('dataFiber', 'product');
-        const productScaffoldWeight = renderer.hopfGuideWeightForKind('torusBand', 'product');
+        const transitDataWeight = renderer.hopfGuideWeightForKind('dataFiber', 'transit');
+        const transitScaffoldWeight = renderer.hopfGuideWeightForKind('torusBand', 'transit');
 
-        const productData = renderer.hopfLayerOpacity('line', 'dataFiber', productDataWeight, 'product');
-        const productScaffold = renderer.hopfLayerOpacity('line', 'torusBand', productScaffoldWeight, 'product');
-        const productLorentz = renderer.lorentzLayerOpacity('line', 'membership', 'identity', 1, 'product');
+        const transitData = renderer.hopfLayerOpacity('line', 'dataFiber', transitDataWeight, 'transit');
+        const transitScaffold = renderer.hopfLayerOpacity('line', 'torusBand', transitScaffoldWeight, 'transit');
+        const transitLorentz = renderer.lorentzLayerOpacity('line', 'membership', 'identity', 1, 'transit');
 
-        expect(productData).toBeGreaterThan(productScaffold * 4);
-        expect(productData).toBeGreaterThan(productLorentz);
-        expect(renderer.hopfTubeOpacity('torusBand', false, 'product')).toBe(0);
+        expect(transitData).toBeGreaterThan(transitScaffold * 4);
+        expect(transitData).toBeGreaterThan(transitLorentz);
+        expect(renderer.hopfTubeOpacity('torusBand', false, 'transit')).toBe(0);
         expect(renderer.hopfTubeOpacity('torusBand', false, 'default')).toBeGreaterThan(0);
     });
 
-    it('keeps Product fibers leaner and dimmer while preserving Hopf space control', () => {
+    it('keeps Transit fibers leaner and dimmer while preserving Hopf space control', () => {
         const renderer = new ThreeGalaxyRenderer() as unknown as RendererProbe;
 
-        expect(renderer.hopfTubeRadius('dataFiber', 'tubeCore', 'product')).toBeCloseTo(0.0050625);
-        expect(renderer.hopfTubeRadius('dataFiber', 'tubeGlow', 'product')).toBeCloseTo(0.0162);
-        expect(renderer.hopfTubeOpacity('dataFiber', false, 'product')).toBeCloseTo(0.11424);
+        expect(renderer.hopfTubeRadius('dataFiber', 'tubeCore', 'transit')).toBeCloseTo(0.0050625);
+        expect(renderer.hopfTubeRadius('dataFiber', 'tubeGlow', 'transit')).toBeCloseTo(0.0162);
+        expect(renderer.hopfTubeOpacity('dataFiber', false, 'transit')).toBeCloseTo(0.11424);
 
         renderer.setSettings({ hopfSpaceIntensity: 0 });
-        expect(renderer.hopfTubeOpacity('dataFiber', false, 'product')).toBe(0);
+        expect(renderer.hopfTubeOpacity('dataFiber', false, 'transit')).toBe(0);
     });
 
     it('keeps default Hopf glow sleeves lean while preserving the space slider', () => {
@@ -158,14 +158,14 @@ describe('Product manifold guide styling', () => {
         expect(renderer.hopfLayerOpacity('line', 'dataFiber', renderer.hopfGuideWeightForKind('dataFiber'), 'default')).toBe(0);
     });
 
-    it('makes Lorentz space and Glow sliders affect visible Product geometry', () => {
+    it('makes Lorentz space and Glow sliders affect visible Transit geometry', () => {
         const renderer = new ThreeGalaxyRenderer() as unknown as RendererProbe;
 
-        const baseLorentz = renderer.lorentzLayerOpacity('line', 'membership', 'identity', 1, 'product');
+        const baseLorentz = renderer.lorentzLayerOpacity('line', 'membership', 'identity', 1, 'transit');
         renderer.setSettings({ lorentzSpaceIntensity: 0 });
-        expect(renderer.lorentzLayerOpacity('line', 'membership', 'identity', 1, 'product')).toBe(0);
+        expect(renderer.lorentzLayerOpacity('line', 'membership', 'identity', 1, 'transit')).toBe(0);
         renderer.setSettings({ lorentzSpaceIntensity: 1.4 });
-        expect(renderer.lorentzLayerOpacity('line', 'membership', 'identity', 1, 'product')).toBeGreaterThan(baseLorentz * 1.25);
+        expect(renderer.lorentzLayerOpacity('line', 'membership', 'identity', 1, 'transit')).toBeGreaterThan(baseLorentz * 1.25);
 
         renderer.setSettings({ glow: 0 });
         const lowEdge = renderer.edgeMaterialOpacity();
@@ -237,7 +237,7 @@ describe('Product manifold guide styling', () => {
         expect(color.r).toBeGreaterThan(color.g);
         expect(color.r).toBeGreaterThan(color.b);
 
-        expect(renderer.edgeMaterialBlending({ layoutMode: 'productManifold' })).toBe(THREE.NormalBlending);
+        expect(renderer.edgeMaterialBlending({ layoutMode: 'transitManifold' })).toBe(THREE.NormalBlending);
         expect(renderer.edgeMaterialBlending({ layoutMode: 'siegelFinsler' })).toBe(THREE.NormalBlending);
         expect(renderer.edgeMaterialBlending({ layoutMode: 'single' })).toBe(THREE.NormalBlending);
     });
@@ -245,7 +245,7 @@ describe('Product manifold guide styling', () => {
     it('carries target-side Lorentz styling into tree-space tube edges', () => {
         const renderer = new ThreeGalaxyRenderer() as unknown as RendererProbe;
         const data = {
-            layoutMode: 'productManifold',
+            layoutMode: 'transitManifold',
             edgeAlpha: new Float32Array([1]),
             edgeKinds: new Uint8Array([0]),
         };
@@ -253,7 +253,7 @@ describe('Product manifold guide styling', () => {
 
         expect(renderer.edgeTubeLift(data, 0, 0, 28)).toBeGreaterThan(renderer.edgeTubeLift(genericData, 0, 0, 28));
         expect(renderer.tubeEdgeTerminalFlourish({ layoutMode: 'lorentzTree' }, 0.9, 0.3, 1)).toBeGreaterThan(0);
-        expect(renderer.tubeEdgeTerminalFlourish({ layoutMode: 'productManifold' }, 0.9, 0.3, 1)).toBeGreaterThan(0);
+        expect(renderer.tubeEdgeTerminalFlourish({ layoutMode: 'transitManifold' }, 0.9, 0.3, 1)).toBeGreaterThan(0);
         expect(renderer.tubeEdgeTerminalFlourish({ layoutMode: 'siegelFinsler' }, 0.9, 0.3, 1)).toBeGreaterThan(0);
         expect(renderer.tubeEdgeTerminalFlourish({ layoutMode: 'siegelFinsler' }, 0.5, 0.3, 1)).toBe(0);
         expect(renderer.tubeEdgeTerminalFlourish({ layoutMode: 'siegelFinsler' }, 0.1, 0.3, 1)).toBe(0);
@@ -276,8 +276,8 @@ describe('Product manifold guide styling', () => {
     it('keeps Lorentz structure ten percent leaner', () => {
         const renderer = new ThreeGalaxyRenderer() as unknown as RendererProbe;
 
-        expect(renderer.lorentzTubeRadius({ guideKind: 'membership' }, 'tubeCore', 'product')).toBeCloseTo(0.00396);
-        expect(renderer.lorentzTubeRadius({ guideKind: 'membership' }, 'tubeGlow', 'product')).toBeCloseTo(0.01125);
+        expect(renderer.lorentzTubeRadius({ guideKind: 'membership' }, 'tubeCore', 'transit')).toBeCloseTo(0.00396);
+        expect(renderer.lorentzTubeRadius({ guideKind: 'membership' }, 'tubeGlow', 'transit')).toBeCloseTo(0.01125);
         expect(renderer.lorentzTubeRadius({ guideKind: 'membership' }, 'tubeCore')).toBeCloseTo(0.00432);
     });
 
@@ -311,42 +311,42 @@ describe('Product manifold guide styling', () => {
         (glow?.material as THREE.Material | undefined)?.dispose();
     });
 
-    it('preserves Product Lorentz lane colors instead of washing them to cyan', () => {
+    it('preserves Transit Lorentz lane colors instead of washing them to cyan', () => {
         const renderer = new ThreeGalaxyRenderer() as unknown as RendererProbe;
         const causalGuide = {
-            id: 'lorentz:product-guide:causal',
+            id: 'lorentz:transit-guide:causal',
             guideKind: 'membership',
             treeKind: 'causal',
             level: 2,
             color: { r: 0.92, g: 0.38, b: 0.12 },
         };
         const documentGuide = {
-            id: 'lorentz:product-guide:document',
+            id: 'lorentz:transit-guide:document',
             guideKind: 'membership',
             treeKind: 'documentStructure',
             level: 1,
             color: { r: 0.14, g: 0.46, b: 0.9 },
         };
-        const causalTint = renderer.lorentzGuideTint(causalGuide, 0, 'product');
-        const documentTint = renderer.lorentzGuideTint(documentGuide, 0, 'product');
+        const causalTint = renderer.lorentzGuideTint(causalGuide, 0, 'transit');
+        const documentTint = renderer.lorentzGuideTint(documentGuide, 0, 'transit');
         const causalLine = new Float32Array(3);
 
-        renderer.writeLorentzGuideColor(causalLine, 0, causalGuide, 0, 0.5, 'product');
+        renderer.writeLorentzGuideColor(causalLine, 0, causalGuide, 0, 0.5, 'transit');
 
         expect(causalTint.r).toBeGreaterThan(causalTint.b * 2);
         expect(documentTint.b).toBeGreaterThan(documentTint.r * 2);
         expect(causalLine[0]).toBeGreaterThan(causalLine[2] * 2);
     });
 
-    it('keeps the Product Klein ball as its own toggleable layer', () => {
+    it('keeps the Transit route ball as its own toggleable layer', () => {
         const renderer = new ThreeGalaxyRenderer() as unknown as RendererProbe;
 
-        expect(renderer.productKleinLayerOpacity('boundary')).toBeGreaterThan(0);
-        expect(renderer.productKleinLayerOpacity('chord')).toBeGreaterThan(renderer.productKleinLayerOpacity('boundary'));
+        expect(renderer.transitGuideLayerOpacity('boundary')).toBeGreaterThan(0);
+        expect(renderer.transitGuideLayerOpacity('chord')).toBeGreaterThan(renderer.transitGuideLayerOpacity('boundary'));
 
         renderer.setSettings({ productKleinVisible: false });
-        expect(renderer.productKleinLayerOpacity('boundary')).toBe(0);
-        expect(renderer.productKleinLayerOpacity('chord')).toBe(0);
+        expect(renderer.transitGuideLayerOpacity('boundary')).toBe(0);
+        expect(renderer.transitGuideLayerOpacity('chord')).toBe(0);
     });
 
     it('prevents dense node overlaps from additive halo blowout', () => {
@@ -477,19 +477,19 @@ describe('Product manifold guide styling', () => {
         expect(Array.from(output.slice(output.length - 3))).toEqual([10, 0, 0]);
     });
 
-    it('uses one live guide attachment contract for Product and Siegel spaces', () => {
+    it('uses one live guide attachment contract for Transit and Siegel spaces', () => {
         const renderer = new ThreeGalaxyRenderer() as unknown as RendererProbe;
         renderer.setSettings({ edgeLength: 1.4, nodeDistance: 1.25 });
-        const product = renderer.guideAttachmentContract({ layoutMode: 'productManifold' });
+        const transit = renderer.guideAttachmentContract({ layoutMode: 'transitManifold' });
         const siegel = renderer.guideAttachmentContract({ layoutMode: 'siegelFinsler' });
         const caps = renderer.guideAttachmentContract({ layoutMode: 'lorentzTree' });
         const hybrid = renderer.guideAttachmentContract({ layoutMode: 'hybridSpace' });
         const positions = new Float32Array([2, 0, 0, 4, 0, 0]);
-        const productLocal = renderer.guidePositionsForContract(positions, product);
+        const transitLocal = renderer.guidePositionsForContract(positions, transit);
 
-        expect(product.liveLorentzGuides).toBe(true);
-        expect(product.localScale).toBeGreaterThan(1);
-        expect(productLocal[0]).toBeLessThan(positions[0]);
+        expect(transit.liveLorentzGuides).toBe(true);
+        expect(transit.localScale).toBeGreaterThan(1);
+        expect(transitLocal[0]).toBeLessThan(positions[0]);
         expect(siegel).toEqual({ liveLorentzGuides: true, localScale: 1 });
         expect(caps).toEqual({ liveLorentzGuides: true, localScale: 1 });
         expect(hybrid.liveLorentzGuides).toBe(false);

@@ -20,7 +20,6 @@ import type {
     GraphRebuildSnapshot,
     GraphRebuildVisualTrace,
 } from '../../../../../graph-rebuild/graph-rebuild-snapshot';
-import type { GraphAtlasManifoldTarget, GraphAtlasObject, GraphAtlasPacket } from '../../../../../graph-rebuild/graph-atlas-packet';
 import {
     normalizeEmbeddingProfile,
     sparseEmbeddingSignature,
@@ -36,9 +35,19 @@ import { createGraphModelV2ReadModel } from '../../../../../graph-rebuild/graph-
 import { buildGraphSignalTruthIndex, type GraphSignalTruthRecord } from '../../../../../graph-rebuild/graph-rebuild-signal-truth';
 import type { GalaxyInputEdge, GalaxyRenderableNode } from './graph-galaxy-engine';
 import type { EmbeddingAtlasData, EmbeddingAtlasSearchItem } from './graph-embedding-atlas';
-import { relationFamilyFromText, relationHslFromText } from './graph-relation-visual-style';
+import { relationFamilyFromText } from './graph-relation-visual-style';
 import { entityColorStore } from '../../../../../lib/store/entityColorStore';
 import { HIERARCHY_SHELL_BANDS, type CapsHierarchyRole, type HierarchyShellBand } from './graph-galaxy-hierarchy-caps';
+import {
+    graphTopologyDisplayColorKind,
+    graphTopologyFallbackVisualTrace,
+    graphTopologyStyleForEmbeddingTarget,
+    graphTopologyTraceForEmbeddingTarget,
+} from './graph-topology-style-contract';
+import {
+    buildGraphPacketRowAdapter,
+    graphPacketEmbeddingTargetCount,
+} from './graph-packet-row-adapter';
 
 const HOPF_RESONANCE_DIMS = 96;
 const HOPF_RESONANCE_NEIGHBORS = 8;
@@ -143,7 +152,7 @@ export function buildGraphRebuildEmbeddingAtlas(
         targetNode(target, vectors[index], index, selected.length, manifold, postByTarget.get(target.id), hopfBasePlan?.get(target.id), hierarchyByTarget.get(target.id), truthByTarget.get(target.id), commitmentBySourceId.get(target.sourceId) || commitmentBySourceId.get(target.id), mentionCompaction.receiptsByEntityTargetId.get(target.id), capsDocumentDirections),
     );
     const nodeIds = new Set(rawNodes.map((node) => node.id));
-    const traceByTargetId = new Map(selected.map((target) => [target.id, embeddingTargetVisualTrace(target)]));
+    const traceByTargetId = new Map(selected.map((target) => [target.id, graphTopologyTraceForEmbeddingTarget(target)]));
     const rawEdges = buildTargetEdges(atlasSnapshot)
         .filter((edge) => nodeIds.has(edge.sourceId) && nodeIds.has(edge.targetId))
         .map((edge) => edgeWithVisualTrace(edge, traceByTargetId));
@@ -200,7 +209,7 @@ export function buildGraphRebuildEmbeddingAtlas(
 
 export function graphRebuildEmbeddingTargetCount(snapshot: GraphRebuildSnapshot | null | undefined): number {
     return snapshot?.embeddingTargets.length
-        || (snapshot?.atlasPacket ? atlasPacketEmbeddingTargetCount(snapshot.atlasPacket) : 0)
+        || (snapshot?.atlasPacket ? graphPacketEmbeddingTargetCount(snapshot.atlasPacket) : 0)
         || snapshot?.counters.embeddingTargets
         || 0;
 }
@@ -208,326 +217,9 @@ export function graphRebuildEmbeddingTargetCount(snapshot: GraphRebuildSnapshot 
 function snapshotWithAtlasPacketTargets(snapshot: GraphRebuildSnapshot): GraphRebuildSnapshot {
     const packet = snapshot.atlasPacket;
     if (!packet?.manifoldTargets?.length && !packet?.objects?.length) return snapshot;
-    const targets = normalizeEmbedStructureParents(atlasPacketEmbeddingTargets(packet, snapshot.embeddingTargets));
+    const rows = buildGraphPacketRowAdapter(packet, snapshot.embeddingTargets);
+    const targets = normalizeEmbedStructureParents(rows.embeddingTargets);
     return { ...snapshot, embeddingTargets: targets };
-}
-
-function atlasPacketEmbeddingTargets(
-    packet: GraphAtlasPacket,
-    displayTargets: GraphRebuildEmbeddingTarget[],
-): GraphRebuildEmbeddingTarget[] {
-    const byId = new Map(displayTargets.map((target) => [target.id, target]));
-    const objectById = new Map(packet.objects.map((object) => [object.id, object]));
-    const objectsBySourceRef = atlasPacketObjectsBySourceRef(packet.objects);
-    const representedObjectIds = atlasPacketRepresentedObjectIds(packet, objectById, objectsBySourceRef);
-    const targetIdByObjectRef = atlasPacketTargetIdByObjectRef(packet);
-    const targets = packet.manifoldTargets.map((target): GraphRebuildEmbeddingTarget => {
-        const display = byId.get(target.id);
-        const object = atlasPacketObjectForTarget(target, objectById, objectsBySourceRef);
-        return {
-            ...display,
-            id: target.id,
-            kind: atlasPacketTargetKind(target.kind, object),
-            sourceId: target.sourceId || atlasPacketObjectSourceId(object) || target.objectId,
-            noteId: target.noteId || object?.noteIds[0],
-            chunkId: target.chunkId || object?.chunkIds[0],
-            entityId: target.registryEntityId || object?.registryEntityId,
-            entityKind: display?.entityKind || target.entityKind || atlasPacketObjectEntityKind(object),
-            label: target.label || object?.label || target.id,
-            text: display?.text || atlasPacketTargetSummary(target),
-            evidenceIds: target.evidenceIds?.length ? target.evidenceIds : object?.evidenceIds || [],
-            lane: (target.lane || object?.lane || display?.lane) as GraphRebuildEmbeddingTarget['lane'],
-            structuralRole: (target.structuralRole || object?.structuralRole || display?.structuralRole) as GraphRebuildEmbeddingTarget['structuralRole'],
-            admissionStatus: atlasAdmissionStatus(target.admission) || display?.admissionStatus,
-            styleKey: target.styleKey || object?.styleKey || target.stateContextKind || object?.stateContextKind || display?.styleKey,
-            documentUnitKind: target.documentUnitKind || object?.documentUnitKind || display?.documentUnitKind,
-            stateContextKind: target.stateContextKind || object?.stateContextKind || display?.stateContextKind,
-            atlasFamily: target.family,
-            atlasStatus: target.status,
-            visualTrace: atlasPacketTargetVisualTrace(packet, target, object),
-            parentIds: target.parentIds?.length
-                ? target.parentIds
-                : atlasPacketObjectParentIds(object, targetIdByObjectRef, target.id) || display?.parentIds || [],
-        };
-    });
-    for (const object of packet.objects) {
-        if (representedObjectIds.has(object.id)) continue;
-        const target = atlasPacketObjectEmbeddingTarget(packet, object, byId, targetIdByObjectRef);
-        if (target) targets.push(target);
-    }
-    return targets;
-}
-
-function atlasPacketEmbeddingTargetCount(packet: GraphAtlasPacket): number {
-    const objectById = new Map(packet.objects.map((object) => [object.id, object]));
-    const objectsBySourceRef = atlasPacketObjectsBySourceRef(packet.objects);
-    const representedObjectIds = atlasPacketRepresentedObjectIds(packet, objectById, objectsBySourceRef);
-    return packet.manifoldTargets.length
-        + packet.objects.filter((object) => !representedObjectIds.has(object.id)).length;
-}
-
-function atlasPacketRepresentedObjectIds(
-    packet: GraphAtlasPacket,
-    objectById: Map<string, GraphAtlasObject>,
-    objectsBySourceRef: Map<string, GraphAtlasObject[]>,
-): Set<string> {
-    return new Set(packet.manifoldTargets
-        .map((target) => atlasPacketObjectForTarget(target, objectById, objectsBySourceRef)?.id || target.objectId)
-        .filter(Boolean));
-}
-
-function atlasPacketObjectsBySourceRef(objects: GraphAtlasObject[]): Map<string, GraphAtlasObject[]> {
-    const refs = new Map<string, GraphAtlasObject[]>();
-    const add = (ref: string | undefined, object: GraphAtlasObject) => {
-        if (!ref) return;
-        const candidates = refs.get(ref) || [];
-        if (!candidates.some((candidate) => candidate.id === object.id)) candidates.push(object);
-        refs.set(ref, candidates);
-    };
-    for (const object of objects) {
-        add(object.id, object);
-        add(object.registryEntityId, object);
-        for (const sourceId of object.sourceIds || []) add(sourceId, object);
-        for (const noteId of object.noteIds || []) add(noteId, object);
-        for (const chunkId of object.chunkIds || []) add(chunkId, object);
-        for (const anchorId of object.anchorIds || []) add(anchorId, object);
-        for (const evidenceId of object.evidenceIds || []) add(evidenceId, object);
-    }
-    return refs;
-}
-
-function atlasPacketObjectForTarget(
-    target: GraphAtlasManifoldTarget,
-    objectById: Map<string, GraphAtlasObject>,
-    objectsBySourceRef: Map<string, GraphAtlasObject[]>,
-): GraphAtlasObject | undefined {
-    const candidates = new Map<string, GraphAtlasObject>();
-    const exact = objectById.get(target.objectId);
-    if (exact) candidates.set(exact.id, exact);
-    for (const object of objectsBySourceRef.get(target.sourceId) || []) candidates.set(object.id, object);
-    if (target.registryEntityId) {
-        for (const object of objectsBySourceRef.get(target.registryEntityId) || []) candidates.set(object.id, object);
-    }
-    return [...candidates.values()].sort((left, right) =>
-        atlasPacketObjectMatchScore(target, right) - atlasPacketObjectMatchScore(target, left)
-        || left.id.localeCompare(right.id))[0];
-}
-
-function atlasPacketObjectMatchScore(target: GraphAtlasManifoldTarget, object: GraphAtlasObject): number {
-    let score = atlasFamiliesCompatible(target.family, object.family) ? 100 : 0;
-    if (object.id === target.objectId) score += 30;
-    if (displayKind(object.kind) === displayKind(target.kind)) score += 24;
-    if (object.sourceIds.includes(target.sourceId)) score += 16;
-    if (target.registryEntityId && object.registryEntityId === target.registryEntityId) score += 12;
-    if (target.noteId && object.noteIds.includes(target.noteId)) score += 4;
-    if (target.chunkId && object.chunkIds.includes(target.chunkId)) score += 4;
-    return score;
-}
-
-function atlasFamiliesCompatible(targetFamily: GraphAtlasManifoldTarget['family'], objectFamily: GraphAtlasObject['family']): boolean {
-    if (targetFamily === objectFamily) return true;
-    return (targetFamily === 'registry' || targetFamily === 'entity')
-        && (objectFamily === 'registry' || objectFamily === 'entity');
-}
-
-function atlasPacketTargetIdByObjectRef(packet: GraphAtlasPacket): Map<string, string> {
-    const refs = new Map<string, string>();
-    const add = (ref: string | undefined, targetId: string) => {
-        if (!ref || refs.has(ref)) return;
-        refs.set(ref, targetId);
-    };
-    for (const target of packet.manifoldTargets) {
-        add(target.objectId, target.id);
-        add(target.sourceId, target.id);
-        add(target.registryEntityId, target.id);
-        add(target.noteId, target.id);
-        add(target.chunkId, target.id);
-        for (const evidenceId of target.evidenceIds || []) add(evidenceId, target.id);
-    }
-    for (const object of packet.objects) {
-        const targetId = atlasPacketObjectTargetId(object);
-        add(object.id, targetId);
-        add(object.registryEntityId, targetId);
-        for (const sourceId of object.sourceIds || []) add(sourceId, targetId);
-        for (const noteId of object.noteIds || []) add(noteId, targetId);
-        for (const chunkId of object.chunkIds || []) add(chunkId, targetId);
-        for (const anchorId of object.anchorIds || []) add(anchorId, targetId);
-        for (const evidenceId of object.evidenceIds || []) add(evidenceId, targetId);
-    }
-    return refs;
-}
-
-function atlasPacketObjectEmbeddingTarget(
-    packet: GraphAtlasPacket,
-    object: GraphAtlasObject,
-    displayTargets: Map<string, GraphRebuildEmbeddingTarget>,
-    targetIdByObjectRef: Map<string, string>,
-): GraphRebuildEmbeddingTarget | null {
-    const id = atlasPacketObjectTargetId(object);
-    const display = displayTargets.get(id);
-    const sourceId = object.sourceIds[0] || object.registryEntityId || object.id;
-    const parentIds = atlasPacketObjectParentIds(object, targetIdByObjectRef, id);
-    return {
-        ...display,
-        id,
-        kind: atlasPacketObjectKind(object),
-        sourceId,
-        noteId: object.noteIds[0] || display?.noteId,
-        chunkId: object.chunkIds[0] || display?.chunkId,
-        entityId: object.registryEntityId || display?.entityId,
-        entityKind: display?.entityKind || atlasPacketObjectEntityKind(object),
-        label: object.label || display?.label || object.id,
-        text: display?.text || atlasPacketObjectSummary(object),
-        evidenceIds: object.evidenceIds || [],
-        lane: (object.lane || display?.lane) as GraphRebuildEmbeddingTarget['lane'],
-        structuralRole: (object.structuralRole || display?.structuralRole) as GraphRebuildEmbeddingTarget['structuralRole'],
-        admissionStatus: atlasObjectAdmissionStatus(object.status) || display?.admissionStatus,
-        styleKey: object.styleKey || object.stateContextKind || display?.styleKey,
-        documentUnitKind: object.documentUnitKind || display?.documentUnitKind,
-        stateContextKind: object.stateContextKind || display?.stateContextKind,
-        atlasFamily: object.family,
-        atlasStatus: object.status,
-        visualTrace: atlasPacketObjectVisualTrace(packet, object, id),
-        parentIds: parentIds?.length ? parentIds : display?.parentIds || [],
-    };
-}
-
-function atlasPacketTargetVisualTrace(
-    packet: GraphAtlasPacket,
-    target: GraphAtlasManifoldTarget,
-    object: GraphAtlasObject | undefined,
-): GraphRebuildVisualTrace {
-    return {
-        source: 'rust_atlas_packet',
-        sourceId: target.sourceId || atlasPacketObjectSourceId(object) || target.objectId,
-        family: target.family,
-        packetSnapshotId: packet.snapshotId,
-        packetScopeId: packet.scopeId,
-        sourceContract: packet.sourceContract.authority,
-        vectorContract: packet.sourceContract.vectorContract,
-        identityAuthority: packet.sourceContract.identityAuthority,
-        packetObjectId: target.objectId,
-        packetTargetId: target.id,
-        objectKind: object?.kind || '',
-        targetKind: target.kind,
-        noteIds: target.noteId ? [target.noteId] : object?.noteIds,
-        chunkIds: target.chunkId ? [target.chunkId] : object?.chunkIds,
-        evidenceIds: target.evidenceIds.length ? target.evidenceIds : object?.evidenceIds,
-    };
-}
-
-function atlasPacketObjectVisualTrace(
-    packet: GraphAtlasPacket,
-    object: GraphAtlasObject,
-    packetTargetId: string,
-): GraphRebuildVisualTrace {
-    return {
-        source: 'rust_atlas_packet',
-        sourceId: atlasPacketObjectSourceId(object) || object.id,
-        family: object.family,
-        packetSnapshotId: packet.snapshotId,
-        packetScopeId: packet.scopeId,
-        sourceContract: packet.sourceContract.authority,
-        vectorContract: packet.sourceContract.vectorContract,
-        identityAuthority: packet.sourceContract.identityAuthority,
-        packetObjectId: object.id,
-        packetTargetId,
-        objectKind: object.kind,
-        targetKind: atlasPacketObjectKind(object),
-        noteIds: object.noteIds,
-        chunkIds: object.chunkIds,
-        evidenceIds: object.evidenceIds,
-    };
-}
-
-function atlasPacketTargetKind(kind: string, object: GraphAtlasObject | undefined): string {
-    if (object && (object.family === 'registry' || object.family === 'entity')) return 'entity';
-    return kind || (object ? atlasPacketObjectKind(object) : 'target');
-}
-
-function atlasPacketObjectKind(object: GraphAtlasObject): string {
-    if (object.family === 'registry' || object.family === 'entity') return 'entity';
-    return object.kind;
-}
-
-function atlasPacketObjectEntityKind(object: GraphAtlasObject | undefined): string | undefined {
-    if (!object || (object.family !== 'registry' && object.family !== 'entity')) return undefined;
-    return object.kind;
-}
-
-function atlasPacketObjectSourceId(object: GraphAtlasObject | undefined): string | undefined {
-    if (!object) return undefined;
-    return object.sourceIds[0] || object.registryEntityId || object.id;
-}
-
-function atlasPacketObjectParentIds(
-    object: GraphAtlasObject | undefined,
-    targetIdByObjectRef: Map<string, string>,
-    targetId: string,
-): string[] | undefined {
-    if (!object?.targetIds?.length) return undefined;
-    const parentIds = object.targetIds
-        .map((ref) => targetIdByObjectRef.get(ref) || ref)
-        .filter((ref) => ref && ref !== targetId);
-    return parentIds.length ? parentIds : undefined;
-}
-
-function atlasPacketObjectTargetId(object: GraphAtlasObject): string {
-    const sourceId = object.sourceIds[0];
-    if ((object.family === 'registry' || object.family === 'entity') && object.registryEntityId) {
-        return `embed:entity:${object.registryEntityId}`;
-    }
-    if (object.kind === 'note' && (sourceId || object.noteIds[0])) return `embed:note:${sourceId || object.noteIds[0]}`;
-    if (object.kind === 'chunk' && (sourceId || object.chunkIds[0])) return `embed:chunk:${sourceId || object.chunkIds[0]}`;
-    if (object.kind === 'entityAnchor' && (sourceId || object.anchorIds[0])) return `embed:anchor:${sourceId || object.anchorIds[0]}`;
-    if (object.kind === 'event' && sourceId) return `embed:event:${sourceId}`;
-    if (object.kind === 'memoryState' && sourceId) return `embed:memory:${sourceId}`;
-    if (object.family === 'temporal' && sourceId) return `embed:temporalFact:${sourceId}`;
-    if (object.family === 'causal' && sourceId) return `embed:causalFact:${sourceId}`;
-    if (object.family === 'fact' && sourceId) return `embed:graph-fact:${sourceId}`;
-    return `embed:atlas-object:${object.id}`;
-}
-
-function atlasAdmissionStatus(
-    admission: GraphAtlasManifoldTarget['admission'],
-): GraphRebuildEmbeddingTarget['admissionStatus'] | undefined {
-    if (admission === 'admitted' || admission === 'deferred') return admission;
-    if (admission === 'rejected') return 'deferred';
-    return undefined;
-}
-
-function atlasObjectAdmissionStatus(
-    status: GraphAtlasObject['status'],
-): GraphRebuildEmbeddingTarget['admissionStatus'] | undefined {
-    if (status === 'accepted' || status === 'compiledToGraph' || status === 'promotedToAnchor') return 'admitted';
-    if (status === 'rejected' || status === 'deferred' || status === 'muted') return 'deferred';
-    return undefined;
-}
-
-function atlasPacketObjectSummary(object: GraphAtlasObject): string {
-    return [
-        `family:${object.family}`,
-        `status:${object.status || 'unknown'}`,
-        `style:${object.styleKey || object.stateContextKind || object.kind}`,
-        object.lane ? `lane:${object.lane}` : '',
-        object.structuralRole ? `role:${object.structuralRole}` : '',
-        object.documentUnitKind ? `document_unit:${object.documentUnitKind}` : '',
-        object.stateContextKind ? `state_context:${object.stateContextKind}` : '',
-        object.registryEntityId ? `registry:${object.registryEntityId}` : '',
-        object.sourceIds.length ? `sources:${object.sourceIds.join(',')}` : '',
-    ].filter(Boolean).join('\n');
-}
-
-function atlasPacketTargetSummary(target: GraphAtlasManifoldTarget): string {
-    return [
-        `family:${target.family}`,
-        `style:${target.styleKey || target.stateContextKind || target.kind}`,
-        target.lane ? `lane:${target.lane}` : '',
-        target.structuralRole ? `role:${target.structuralRole}` : '',
-        target.documentUnitKind ? `document_unit:${target.documentUnitKind}` : '',
-        target.stateContextKind ? `state_context:${target.stateContextKind}` : '',
-        `object:${target.objectId}`,
-    ].filter(Boolean).join('\n');
 }
 
 function atlasProjectionSourceLabel(snapshot: GraphRebuildSnapshot): string {
@@ -1300,19 +992,17 @@ function targetNode(
         ? projectSiegelVector(vector, target, index, total, hierarchyContext)
         : projectVector(vector, target.id, index, total, manifold);
     const busemannSignature = graphModelBusemannSignature(commitment);
-    const relationFamily = displayKind(target.kind) === 'graph-fact'
-        ? relationFamilyFromText(target.label, target.text, target.sourceId)
-        : null;
+    const style = graphTopologyStyleForEmbeddingTarget(target);
+    const relationFamily = style.relationFamily || null;
     const totalMentions = mentionCompaction?.anchorCount ?? target.evidenceIds.length;
     const lorentzMetadata = manifold === 'lorentz' || post
         ? productLorentzMetadata(target, point, post, hierarchyContext, capsDocumentDirections)
         : undefined;
-    const visualTrace = embeddingTargetVisualTrace(target);
+    const visualTrace = graphTopologyTraceForEmbeddingTarget(target);
     const capsHierarchyRole = typeof lorentzMetadata?.['capsHierarchyRole'] === 'string'
         ? lorentzMetadata['capsHierarchyRole']
         : undefined;
     const canonicalKind = displayKind(target.kind);
-    const styleKind = targetRenderStyleKind(target);
     return {
         id: target.id,
         label: target.label || target.id,
@@ -1321,7 +1011,7 @@ function targetNode(
         atlasX: point.x,
         atlasY: point.y,
         atlasZ: point.z,
-        colorHsl: targetColorHsl(target),
+        colorHsl: style.colorHsl,
         metadata: {
             sourceType: target.kind,
             sourceId: target.sourceId,
@@ -1333,10 +1023,10 @@ function targetNode(
             packetSnapshotId: visualTrace.packetSnapshotId,
             packetScopeId: visualTrace.packetScopeId,
             entityKind: target.entityKind,
-            graphColorKind: relationFamily || styleKind,
+            graphColorKind: graphTopologyDisplayColorKind(style.colorKind),
             graphFamily: visualTrace.family,
             graphRelationFamily: relationFamily || undefined,
-            graphMemoryStateKind: displayKind(target.kind) === 'memory-state' ? memoryStateGraphColorKind(target) : undefined,
+            graphMemoryStateKind: displayKind(target.kind) === 'memory-state' ? style.colorKind : undefined,
             atlasKind: canonicalKind,
             atlasFamily: target.atlasFamily,
             atlasStructuralRole: target.structuralRole,
@@ -1400,7 +1090,7 @@ function targetNode(
             hopf: manifold === 'hopf'
                 ? graphRebuildHopfMetadata(target, post, manifold, hopfBase)
                 : post ? graphRebuildHopfMetadata(target, post, manifold) : undefined,
-            graphKind: styleKind,
+            graphKind: graphTopologyDisplayColorKind(style.colorKind),
             graphRebuildEmbeddingTarget: true,
             manifold,
             preview: target.text || target.label,
@@ -2836,8 +2526,8 @@ function edgeWithVisualTrace(
     edge: GalaxyInputEdge,
     traceByTargetId: Map<string, GraphRebuildVisualTrace>,
 ): GalaxyInputEdge {
-    const sourceTrace = traceByTargetId.get(edge.sourceId) || fallbackVisualTrace(edge.sourceId);
-    const targetTrace = traceByTargetId.get(edge.targetId) || fallbackVisualTrace(edge.targetId);
+    const sourceTrace = traceByTargetId.get(edge.sourceId) || graphTopologyFallbackVisualTrace(edge.sourceId);
+    const targetTrace = traceByTargetId.get(edge.targetId) || graphTopologyFallbackVisualTrace(edge.targetId);
     const packetOwned = sourceTrace.source === 'rust_atlas_packet' || targetTrace.source === 'rust_atlas_packet';
     const packetSnapshotId = sourceTrace.packetSnapshotId || targetTrace.packetSnapshotId;
     const packetScopeId = sourceTrace.packetScopeId || targetTrace.packetScopeId;
@@ -2876,25 +2566,6 @@ function edgeWithVisualTrace(
             packetSnapshotId,
             packetScopeId,
         },
-    };
-}
-
-function embeddingTargetVisualTrace(target: GraphRebuildEmbeddingTarget): GraphRebuildVisualTrace {
-    return target.visualTrace || fallbackVisualTrace(target.id, target.sourceId, target.atlasFamily || target.styleKey || target.kind, target.evidenceIds);
-}
-
-function fallbackVisualTrace(
-    targetId: string,
-    sourceId = targetId,
-    family = 'unknown',
-    evidenceIds: string[] = [],
-): GraphRebuildVisualTrace {
-    return {
-        source: 'graph_rebuild_embedding_target',
-        sourceId,
-        family,
-        packetTargetId: targetId,
-        evidenceIds,
     };
 }
 
@@ -3049,79 +2720,10 @@ function normalizeHopfToken(value: string): string {
     return String(value || 'unknown').trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'unknown';
 }
 
-function targetRenderStyleKind(target: GraphRebuildEmbeddingTarget): string {
-    if (target.styleKey) {
-        return displayKind(target.styleKey);
-    }
-    if (target.stateContextKind) {
-        return displayKind(target.stateContextKind);
-    }
-    if (displayKind(target.kind) === 'memory-state') {
-        return displayKind(memoryStateGraphColorKind(target));
-    }
-    if (displayKind(target.kind) === 'entity' && target.entityKind) {
-        return displayKind(target.entityKind);
-    }
-    return displayKind(target.kind);
-}
-
-function targetColorHsl(target: GraphRebuildEmbeddingTarget): string {
-    const kind = displayKind(target.kind);
-    if (target.styleKey && kind !== 'entity') {
-        return entityColorStore.getRawGraphNodeHsl(target.styleKey as any) || kindHsl(kind);
-    }
-    if (target.stateContextKind) {
-        return entityColorStore.getRawGraphNodeHsl(target.stateContextKind as any) || kindHsl(kind);
-    }
-    if (kind === 'graph-fact') {
-        return relationHslFromText(target.label, target.text, target.sourceId) || kindHsl(kind);
-    }
-    if (kind === 'entity' && target.entityKind) {
-        return entityColorStore.getRawHsl(target.entityKind.toUpperCase() as any);
-    }
-    if (kind === 'memory-state') {
-        return entityColorStore.getRawGraphNodeHsl(memoryStateGraphColorKind(target));
-    }
-    return kindHsl(kind);
-}
-
-function memoryStateGraphColorKind(target: GraphRebuildEmbeddingTarget): string {
-    if (target.stateContextKind) return target.stateContextKind;
-    if (target.styleKey) return target.styleKey;
-    const token = compactSiegelToken(`${target.label || ''} ${target.text || ''} ${target.sourceId || ''}`);
-    if (token.includes('decisionstate') || token.includes('approved') || token.includes('accepted')) return 'decisionState';
-    if (token.includes('rankorstatus') || token.includes('rankstatus') || token.includes('rank')) return 'rankStatus';
-    if (token.includes('servicecontext') || token.includes('servicerank') || token.includes('service')) return 'serviceContext';
-    if (token.includes('affiliationcontext') || token.includes('affiliatecontext') || token.includes('affiliantcontext') || token.includes('affiliation')) {
-        return 'affiliationContext';
-    }
-    if (token.includes('familycontext') || token.includes('family')) return 'familyContext';
-    return 'memoryState';
-}
-
-function kindHsl(kind: string): string {
-    switch (displayKind(kind)) {
-        case 'note': return entityColorStore.getRawGraphNodeHsl('document');
-        case 'structure-root': return entityColorStore.getRawGraphNodeHsl('document');
-        case 'chunk': return entityColorStore.getRawGraphNodeHsl('chunk');
-        case 'document-unit': return entityColorStore.getRawGraphNodeHsl('chunk');
-        case 'entity': return '282 70% 62%';
-        case 'concept': return entityColorStore.getRawGraphNodeHsl('anchor');
-        case 'anchor': return entityColorStore.getRawGraphNodeHsl('anchor');
-        case 'evidence-span': return entityColorStore.getRawGraphNodeHsl('anchor');
-        case 'graph-fact': return entityColorStore.getRawGraphNodeHsl('graphFact');
-        case 'event': return entityColorStore.getRawGraphNodeHsl('eventNode');
-        case 'temporal-fact': return entityColorStore.getRawGraphNodeHsl('temporalFact');
-        case 'causal-fact': return entityColorStore.getRawGraphNodeHsl('causalFact');
-        case 'memory-state': return entityColorStore.getRawGraphNodeHsl('memoryState');
-        default: return '220 12% 58%';
-    }
-}
-
 function graphRebuildGeometryVersion(manifold: AtlasManifoldMode): string {
     if (manifold === 'hopf') return 'graph_rebuild_hopf_v1';
     if (manifold === 'lorentz') return 'graph_rebuild_hierarchy_caps_v1';
-    if (manifold === 'product') return 'graph_rebuild_product_lorentz_hopf_v1';
+    if (manifold === 'product') return 'graph_rebuild_transit_lorentz_hopf_v1';
     if (manifold === 'siegel') return 'graph_rebuild_siegel_finsler_v1';
     return 'graph_rebuild_hybrid_v1';
 }
@@ -3129,6 +2731,7 @@ function graphRebuildGeometryVersion(manifold: AtlasManifoldMode): string {
 function graphRebuildProjectionLabel(manifold: AtlasManifoldMode): string {
     if (manifold === 'lorentz') return 'hierarchy caps';
     if (manifold === 'siegel') return 'siegel-finsler';
+    if (manifold === 'product') return 'transit';
     return manifold;
 }
 

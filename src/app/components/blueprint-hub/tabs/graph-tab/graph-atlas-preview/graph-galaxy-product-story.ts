@@ -63,7 +63,7 @@ export function applyProductStoryRegions(nodes: GalaxyNode[], links: GalaxyEdge[
 }
 
 export function productStoryBasinCenter(regionId: string, fallbackLane: string, index: number, total: number): ProductStoryVec3 | null {
-    if (!regionId.startsWith('product:story:')) return null;
+    if (!regionId.startsWith('transit:story:') && !regionId.startsWith('product:story:')) return null;
     const tokens = regionId.split(':');
     const role = tokens.includes('document') ? 'document'
         : tokens.includes('root') ? 'root'
@@ -142,14 +142,14 @@ function inheritSourceContext(source: ProductStoryInfo, target: ProductStoryInfo
 function storyRegionId(node: GalaxyNode, info: ProductStoryLayoutInfo, story: ProductStoryInfo): string {
     const type = text(node.entity.metadata?.['sourceType'], node.entity.kind);
     const doc = story.documentId || 'global';
-    if (isDocument(type, info.hierarchyCapId)) return `product:story:${doc}:document`;
-    if (isRoot(type, info.hierarchyCapId)) return `product:story:${doc}:root:${story.rootKind || 'document'}`;
-    if (isChunk(type, info.hierarchyCapId) && story.chunkId) return `product:story:${doc}:chunk:${story.chunkId}`;
+    if (isDocument(type, info.hierarchyCapId)) return `transit:story:${doc}:document`;
+    if (isRoot(type, info.hierarchyCapId)) return `transit:story:${doc}:root:${story.rootKind || 'document'}`;
+    if (isChunk(type, info.hierarchyCapId) && story.chunkId) return `transit:story:${doc}:chunk:${story.chunkId}`;
     if (story.ownerEntityId) {
-        return story.chunkId ? `product:story:${doc}:chunk:${story.chunkId}:owner:${story.ownerEntityId}` : `product:story:${doc}:owner:${story.ownerEntityId}`;
+        return story.chunkId ? `transit:story:${doc}:chunk:${story.chunkId}:owner:${story.ownerEntityId}` : `transit:story:${doc}:owner:${story.ownerEntityId}`;
     }
-    if (story.chunkId) return `product:story:${doc}:chunk:${story.chunkId}:lane:${story.rootKind || info.lane || 'signals'}`;
-    if (story.documentId) return `product:story:${doc}:signals:${story.rootKind || info.lane || 'semantic'}`;
+    if (story.chunkId) return `transit:story:${doc}:chunk:${story.chunkId}:lane:${story.rootKind || info.lane || 'signals'}`;
+    if (story.documentId) return `transit:story:${doc}:signals:${story.rootKind || info.lane || 'semantic'}`;
     return info.clusterId;
 }
 

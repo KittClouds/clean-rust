@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-import type { GalaxyRenderSettings } from './graph-galaxy-engine';
+import { isTransitLayoutMode, type GalaxyRenderSettings } from './graph-galaxy-engine';
 import type { GalaxyFocusMask } from './graph-galaxy-focus';
 import type { GalaxyLorentzGuideView, GalaxySceneV2 } from './graph-galaxy-scene-v2';
 import { buildGalaxyWalkBranches, type GalaxyWalkBranch } from './graph-galaxy-walk-flow';
@@ -13,7 +13,7 @@ const CAPS_SURFACE_EDGE_MAX_RADIUS_DELTA = 0.36;
 const CAPS_SHELL_RADII = [0.54, 0.98, 1.22, 1.34, 1.48, 1.68, 1.92];
 const HYBRID_SURFACE_EDGE_MIN_RADIUS = 2.32 * 0.92;
 const HYBRID_SURFACE_EDGE_MAX_RADIUS_DELTA = 0.42;
-const TREE_FILAMENT_FLOW_LAYOUTS = new Set(['lorentzTree', 'productManifold', 'siegelFinsler']);
+const TREE_FILAMENT_FLOW_LAYOUTS = new Set(['lorentzTree', 'transitManifold', 'productManifold', 'siegelFinsler']);
 type FlowSource = { kind: 'edge'; index: number } | { kind: 'guide'; index: number };
 
 export class GraphGalaxyParticles {
@@ -309,7 +309,7 @@ export class GraphGalaxyParticles {
     }
 
     private liveGuideFlow(data: GalaxySceneV2): boolean {
-        return data.layoutMode === 'lorentzTree' || data.layoutMode === 'productManifold' || data.layoutMode === 'siegelFinsler';
+        return data.layoutMode === 'lorentzTree' || isTransitLayoutMode(data.layoutMode) || data.layoutMode === 'siegelFinsler';
     }
 
     private edgeLift(data: GalaxySceneV2, settings: GalaxyRenderSettings, edge: number, source: number, target: number, hopfCrossBase = false): number {
@@ -450,7 +450,7 @@ export class GraphGalaxyParticles {
 
     private tubeEdgeTerminalFlourish(data: GalaxySceneV2, t: number, lift: number, sign: number): number {
         if (!this.usesTreeFilamentFlow(data)) return 0;
-        const width = data.layoutMode === 'productManifold' ? 0.3 : 0.26;
+        const width = isTransitLayoutMode(data.layoutMode) ? 0.3 : 0.26;
         const end = t > 1 - width ? Math.sin(Math.PI * (1 - t) / width) : 0;
         const style = data.layoutMode === 'siegelFinsler' ? 0.21 : data.layoutMode === 'lorentzTree' ? 0.18 : 0.16;
         return lift * style * sign * end;

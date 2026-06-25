@@ -1,5 +1,9 @@
 use super::*;
-use crate::types::{GraphCounters, GraphDropReasons};
+use crate::types::{
+    GraphCounters, GraphDiscourseSpineBridge, GraphDiscourseSpineCluster,
+    GraphDiscourseSpineSummary, GraphDocumentReviewRow, GraphDocumentReviewSummary,
+    GraphDropReasons,
+};
 
 #[test]
 fn packet_binds_entity_targets_to_registry_objects() {
@@ -52,6 +56,32 @@ fn packet_binds_entity_targets_to_registry_objects() {
         .objects
         .iter()
         .any(|object| object.family == GraphFamily::Evidence && object.kind == "entityAnchor"));
+    assert!(packet
+        .objects
+        .iter()
+        .any(|object| object.id == "atlas:review:review-row-1"
+            && object.family == GraphFamily::Review
+            && object.status == AtlasObjectStatus::Proposed
+            && object.lane.as_deref() == Some("review_state")));
+    assert!(packet
+        .objects
+        .iter()
+        .any(|object| object.id == "atlas:discourse-cluster:cluster-1"
+            && object.family == GraphFamily::Discourse
+            && object.kind == "domain_region"
+            && object.lane.as_deref() == Some("discourse_cluster")));
+    assert!(packet
+        .objects
+        .iter()
+        .any(|object| object.id == "atlas:discourse-bridge:bridge-1"
+            && object.family == GraphFamily::Discourse
+            && object.status == AtlasObjectStatus::Proposed
+            && object
+                .target_ids
+                .iter()
+                .map(|id| id.as_str())
+                .collect::<Vec<_>>()
+                == ["embed:chunk:a", "embed:chunk:b"]));
     assert_eq!(packet.counters.model_vectors, 0);
 }
 
@@ -159,7 +189,7 @@ fn sample_snapshot() -> GraphRebuildSnapshot {
         built_at: 7,
         chunks: vec![chunk],
         mentions: Vec::new(),
-        entity_anchors: vec![anchor],
+        entity_anchors: vec![anchor.clone()],
         relationships: vec![relationship],
         events: Vec::new(),
         episodes: Vec::new(),
@@ -173,9 +203,49 @@ fn sample_snapshot() -> GraphRebuildSnapshot {
         edges: Vec::new(),
         calendar_registry_summary: None,
         document_sidecar_summary: None,
-        document_review_summary: None,
+        document_review_summary: Some(GraphDocumentReviewSummary {
+            rows: vec![GraphDocumentReviewRow {
+                id: "review-row-1".into(),
+                object_id: "fact:candidate-1".into(),
+                object_kind: "graph_fact_candidate".into(),
+                state: "proposed".into(),
+                title: "Candidate needs review".into(),
+                subtitle: "bounded packet row".into(),
+                detail: CompactString::default(),
+                note_id: "note-a".into(),
+                source_start: 0,
+                source_end: 4,
+                confidence: 0.67,
+                detector: "test".into(),
+                parent_unit_ids: vec!["unit-parent".into()],
+                child_unit_ids: Vec::new(),
+                evidence_span_ids: vec![anchor.id.clone()],
+                related_object_ids: vec!["fact:candidate-1".into()],
+                why: Vec::new(),
+            }],
+        }),
         document_compiler_summary: None,
-        discourse_spine_summary: None,
+        discourse_spine_summary: Some(GraphDiscourseSpineSummary {
+            targets: Vec::new(),
+            clusters: vec![GraphDiscourseSpineCluster {
+                id: "cluster-1".into(),
+                kind: "domain_region".into(),
+                label: "Shared domain".into(),
+                target_ids: vec!["embed:chunk:a".into(), "embed:chunk:b".into()],
+                score: 0.88,
+            }],
+            bridges: vec![GraphDiscourseSpineBridge {
+                id: "bridge-1".into(),
+                kind: "resonance".into(),
+                status: "proposed".into(),
+                source_target_id: "embed:chunk:a".into(),
+                target_target_id: "embed:chunk:b".into(),
+                label: "A echoes B".into(),
+                evidence_target_ids: vec!["embed:chunk:a".into(), "embed:chunk:b".into()],
+                shared_label_ids: vec!["label:shared".into()],
+                shared_entity_ids: vec![entity_id.0.as_str().into()],
+            }],
+        }),
         counters: GraphCounters {
             entities: 1,
             accepted_anchors: 1,

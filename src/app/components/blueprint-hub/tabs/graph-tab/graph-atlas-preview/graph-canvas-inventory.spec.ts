@@ -11,6 +11,7 @@ describe('graph canvas inventory', () => {
         expect(inventory.sourceLabel).toBe('rust-atlas-packet / no model vectors persisted');
         expect(inventory.kindCounts).toEqual([
             { kind: 'structure', count: 2 },
+            { kind: 'discourse', count: 1 },
             { kind: 'entity', count: 1 },
             { kind: 'fact', count: 1 },
             { kind: 'review', count: 1 },
@@ -19,6 +20,7 @@ describe('graph canvas inventory', () => {
         const entity = inventory.nodes.find((node) => node.id === 'entity:amara');
         const fact = inventory.nodes.find((node) => node.id === 'fact:rel-1');
         const review = inventory.nodes.find((node) => node.id === 'review:row-1');
+        const discourse = inventory.nodes.find((node) => node.id === 'discourse:bridge-1');
         const chunk = inventory.nodes.find((node) => node.id === 'chunk:note-1:0');
         const parentEdge = inventory.edges.find((edge) => edge.id === 'atlas-packet:manifold_parent:document:note-1->chunk:note-1:0');
 
@@ -33,6 +35,9 @@ describe('graph canvas inventory', () => {
         expect(review?.kind).toBe('review');
         expect(review?.metadata?.['canvasLens']).toBe('facts');
         expect(review?.metadata?.['reviewState']).toBe('proposed');
+        expect(discourse?.kind).toBe('discourse');
+        expect(discourse?.metadata?.['canvasLens']).toBe('discourse');
+        expect(discourse?.metadata?.['graphColorKind']).toBe('communication');
         expect(chunk?.metadata?.['atlasTargetId']).toBe('embed:chunk:note-1:0');
         expect(parentEdge).toMatchObject({
             sourceId: 'document:note-1',
@@ -78,10 +83,14 @@ describe('graph canvas inventory', () => {
         const proposedLens = filterGraphForCanvasLens(inventory.nodes, inventory.edges, 'proposed');
         expect(proposedLens.nodes.map((node) => node.id).sort()).toEqual([
             'chunk:note-1:0',
+            'discourse:bridge-1',
             'document:note-1',
             'fact:rel-1',
             'review:row-1',
         ]);
+
+        const discourseLens = filterGraphForCanvasLens(inventory.nodes, inventory.edges, 'discourse');
+        expect(discourseLens.nodes.map((node) => node.id)).toEqual(['discourse:bridge-1']);
     });
 
     it('derives Style Lab keys from Rust Atlas object kinds', () => {
@@ -199,6 +208,19 @@ function snapshot(): GraphRebuildSnapshot {
                     sourceIds: ['row-1'],
                     targetIds: ['fact:rel-1'],
                 },
+                {
+                    id: 'discourse:bridge-1',
+                    family: 'discourse',
+                    status: 'review',
+                    kind: 'discourseBridge',
+                    label: 'Kai and Rift echo across chunks',
+                    noteIds: ['note-1'],
+                    chunkIds: ['note-1:0'],
+                    anchorIds: [],
+                    evidenceIds: ['embed:chunk:note-1:0'],
+                    sourceIds: ['discourse-bridge:1'],
+                    targetIds: [],
+                },
             ],
             manifoldTargets: [
                 {
@@ -234,7 +256,7 @@ function snapshot(): GraphRebuildSnapshot {
                 },
             ],
             counters: {
-                objects: 5,
+                objects: 6,
                 manifoldTargets: 2,
                 registryEntities: 1,
                 evidenceAnchors: 1,

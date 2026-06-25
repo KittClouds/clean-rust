@@ -80,6 +80,44 @@ describe('buildGraphEvaluationDashboard', () => {
         expect(memory.summary).toContain('Peak process memory is not instrumented');
     });
 
+    it('does not score compact interactive snapshots as degraded for absent diagnostic sidecars', () => {
+        const text = [
+            '# Compact Note',
+            'Amara crossed the bridge because the transit alarm changed the plan.',
+            'Kai recorded the decision and kept the route open.',
+        ].join('\n\n');
+        const snapshot = buildGraphRebuildSnapshot({
+            scopeKind: 'note',
+            scopeId: 'note:compact',
+            noteIds: ['compact'],
+            entities: [],
+            occurrences: [],
+            chunks: buildAdaptiveGraphRebuildChunks('compact', text),
+            noteTexts: { compact: text },
+            builtAt: 300,
+            durabilityMode: 'interactive',
+            postProcessMode: 'core',
+            embeddingStagePolicy: { entityLinkerEnabled: false },
+        });
+        snapshot.buildTimings = timings();
+        snapshot.documentSidecarSummary = undefined;
+        snapshot.documentSemanticSummary = undefined;
+        snapshot.semanticEvalLedgerSummary = undefined;
+        snapshot.discourseEvalLedgerSummary = undefined;
+        snapshot.memoryGraphRagBridgeSummary = undefined;
+
+        const dashboard = buildGraphEvaluationDashboard(snapshot, null);
+
+        expect(dashboard.verdict).not.toBe('Degraded');
+        expect(dashboard.metricsById['hierarchy-depth'].score).toBeNull();
+        expect(dashboard.metricsById['orphan-chunks'].score).toBeNull();
+        expect(dashboard.metricsById['section-coverage'].score).toBeNull();
+        expect(dashboard.metricsById['evidence-density'].score).toBeNull();
+        expect(dashboard.metricsById['proposition-substrate'].score).toBeNull();
+        expect(dashboard.metricsById['predicate-precision'].score).toBeNull();
+        expect(dashboard.metricsById['temporal-continuity'].score).toBeNull();
+    });
+
     it('returns an explicit empty state without manufacturing health', () => {
         const dashboard = buildGraphEvaluationDashboard(null, null);
 

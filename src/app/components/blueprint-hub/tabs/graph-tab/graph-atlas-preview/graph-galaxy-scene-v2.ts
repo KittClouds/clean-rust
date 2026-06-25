@@ -38,6 +38,13 @@ export interface GalaxyHopfRibbonView {
     importance: number;
     guideKind: GalaxyHopfRibbon['guideKind'];
     guideWeight: number;
+    /**
+     * Source-node color resolved from `nodeIds[0]` at scene compile.
+     * Only read when the renderer's `guideColorMode === 'sourceNode'`;
+     * otherwise the guide falls back to its own `color` / hashed palette.
+     * Optional so older persisted scenes merge cleanly.
+     */
+    sourceColor?: { r: number; g: number; b: number };
 }
 
 export interface GalaxyLorentzGuideView {
@@ -52,6 +59,11 @@ export interface GalaxyLorentzGuideView {
     level: number;
     guideKind: GalaxyLorentzGuide['guideKind'];
     guideWeight: number;
+    /**
+     * Source-node color resolved from `nodeIds[0]` at scene compile.
+     * See {@link GalaxyHopfRibbonView.sourceColor}.
+     */
+    sourceColor?: { r: number; g: number; b: number };
 }
 
 export interface GalaxyBusemannHorosphereView {
@@ -241,8 +253,8 @@ export function galaxySceneToV2(scene: GalaxyScene, sourceMode: GalaxySceneSourc
         hopfBaseIds,
         hopfRoles,
         groups: scene.groups.map(groupView),
-        hopfRibbons: (scene.hopfRibbons ?? []).map(hopfRibbonView),
-        lorentzGuides: (scene.lorentzGuides ?? []).map(lorentzGuideView),
+        hopfRibbons: attachSourceColors((scene.hopfRibbons ?? []).map(hopfRibbonView), ids, colors),
+        lorentzGuides: attachSourceColors((scene.lorentzGuides ?? []).map(lorentzGuideView), ids, colors),
         relationControls: scene.relationControls?.map(relationControlView),
         busemannHorospheres: (scene.busemannHorospheres ?? []).map(busemannHorosphereView),
         hybridShellPositions,
@@ -261,6 +273,31 @@ export function galaxySceneToV2(scene: GalaxyScene, sourceMode: GalaxySceneSourc
         edgeAlpha,
         edgeKinds,
     };
+}
+
+/**
+ * Resolves `sourceColor` from each guide/ribbon's `nodeIds[0]` against the
+ * compiled node color buffer. Cheap O(n) pass at compile time only; the
+ * renderer reads `sourceColor` when `guideColorMode === 'sourceNode'`.
+ * If the source node is missing the guide keeps `sourceColor === undefined`
+ * and falls back to its own color/palette.
+ */
+function attachSourceColors<T extends { nodeIds: string[]; sourceColor?: { r: number; g: number; b: number } }>(
+    views: T[],
+    ids: string[],
+    colors: Float32Array,
+): T[] {
+    if (!views.length) return views;
+    const indexById = new Map<string, number>();
+    for (let index = 0; index < ids.length; index++) indexById.set(ids[index], index);
+    for (const view of views) {
+        const sourceId = view.nodeIds[0];
+        const index = sourceId ? indexById.get(sourceId) : undefined;
+        if (index === undefined) continue;
+        const offset = index * 3;
+        view.sourceColor = { r: colors[offset], g: colors[offset + 1], b: colors[offset + 2] };
+    }
+    return views;
 }
 
 function relationControlView(control: GalaxyRelationControl): GalaxyRelationControlView {

@@ -10,7 +10,7 @@ import {
     readBusemannSignature,
 } from './graph-galaxy-hybrid-busemann-layout';
 import { applyLorentzTreeLayout } from './graph-galaxy-lorentz-layout';
-import { applyProductConsensusLayout } from './graph-galaxy-product-layout';
+import { applyTransitConsensusLayout } from './graph-galaxy-product-layout';
 import { applySiegelFinslerLayout } from './graph-galaxy-siegel-layout';
 import {
     buildHopfReceiptRibbons,
@@ -26,7 +26,14 @@ export type GalaxyBackgroundMode = 'nebula' | 'grid' | 'quiet' | 'void';
 export type GalaxyNodeDragMode = 'stretch' | 'force' | 'pin' | 'camera';
 export type GalaxyNodeShapeMode = 'atom' | 'halo' | 'sphere';
 export type GalaxySphereSurfaceMode = 'solid' | 'glass' | 'spellglass' | 'obsidian' | 'starcore';
-export type GalaxyLayoutMode = 'single' | 'multiGalaxy' | 'hybridSpace' | 'hopfProjection' | 'lorentzTree' | 'productManifold' | 'siegelFinsler';
+/**
+ * How guide/route/fiber colors are derived.
+ * - 'auto'      — existing per-kind palette / hashed hue (legacy default).
+ * - 'sourceNode'— each guide adopts the color of its source node (nodeIds[0]).
+ * Fully opt-in; 'auto' preserves all prior behavior.
+ */
+export type GalaxyGuideColorMode = 'auto' | 'sourceNode';
+export type GalaxyLayoutMode = 'single' | 'multiGalaxy' | 'hybridSpace' | 'hopfProjection' | 'lorentzTree' | 'transitManifold' | 'productManifold' | 'siegelFinsler';
 export type GalaxyEmbeddingTopologyMode = 'off' | 'clusters' | 'regions' | 'lanes' | 'medoids' | 'outliers' | 'backbone' | 'bridges';
 export type GalaxyRenderSourceMode = 'entities' | 'graph' | 'embeddings';
 
@@ -197,6 +204,22 @@ export interface GalaxyRenderSettings {
     productKleinVisible: boolean;
     embeddingTopologyMode: GalaxyEmbeddingTopologyMode;
     sourceMode: GalaxyRenderSourceMode;
+
+    /**
+     * Dedicated guide visibility + color controls.
+     *
+     * These are intentionally separate from the legacy {@link hybridShellVisible},
+     * {@link lorentzSpaceVisible}, {@link hopfSpaceVisible}, {@link productKleinVisible}
+     * knobs so that routes / fibers / route-ball can each be turned off on their
+     * own regardless of layout mode, and so shells no longer drag routes with
+     * them. When undefined the renderer falls back to the legacy flag for the
+     * matching family, preserving prior behavior for persisted settings.
+     */
+    guideRoutesVisible?: boolean;
+    guideFibersVisible?: boolean;
+    guideRouteBallVisible?: boolean;
+    /** See {@link GalaxyGuideColorMode}. */
+    guideColorMode?: GalaxyGuideColorMode;
 }
 
 export interface GalaxyInputEdge {
@@ -389,15 +412,24 @@ export const DEFAULT_GALAXY_SETTINGS: GalaxyRenderSettings = {
     productKleinVisible: true,
     embeddingTopologyMode: 'off',
     sourceMode: 'entities',
+    guideRoutesVisible: true,
+    guideFibersVisible: true,
+    guideRouteBallVisible: true,
+    guideColorMode: 'auto',
 };
 
 export function mergeGalaxySettings(settings?: Partial<GalaxyRenderSettings> | null): GalaxyRenderSettings {
     const merged = { ...DEFAULT_GALAXY_SETTINGS, ...settings };
+    if (merged.layoutMode === 'productManifold') merged.layoutMode = 'transitManifold';
     if (merged.particleFlowMode !== 'walk') merged.particleFlowMode = 'swarm';
     if ((merged.sphereSurface as string) === 'lattice') merged.sphereSurface = 'starcore';
     if (!['solid', 'glass', 'spellglass', 'obsidian', 'starcore'].includes(merged.sphereSurface || '')) {
         merged.sphereSurface = 'solid';
     }
+    if (merged.guideColorMode !== 'sourceNode') merged.guideColorMode = 'auto';
+    if (typeof merged.guideRoutesVisible !== 'boolean') merged.guideRoutesVisible = merged.lorentzSpaceVisible !== false;
+    if (typeof merged.guideFibersVisible !== 'boolean') merged.guideFibersVisible = merged.hopfSpaceVisible !== false;
+    if (typeof merged.guideRouteBallVisible !== 'boolean') merged.guideRouteBallVisible = merged.productKleinVisible !== false;
     if (merged.edgeColorMode === 'cyan') merged.edgeColorMode = 'aqua';
     merged.edgeCurveStrength = Math.min(1.2, Math.max(0.25, merged.edgeCurveStrength));
     merged.edgeWidth = Math.min(1.1, Math.max(0.15, merged.edgeWidth));
@@ -408,6 +440,10 @@ export function mergeGalaxySettings(settings?: Partial<GalaxyRenderSettings> | n
     merged.hopfSpaceIntensity = Math.min(1.4, Math.max(0, merged.hopfSpaceIntensity));
     merged.lorentzSpaceIntensity = Math.min(1.4, Math.max(0, merged.lorentzSpaceIntensity));
     return merged;
+}
+
+export function isTransitLayoutMode(mode: GalaxyLayoutMode | string | null | undefined): boolean {
+    return mode === 'transitManifold' || mode === 'productManifold';
 }
 
 export function buildGalaxyScene(
@@ -471,10 +507,10 @@ export function buildGalaxyScene(
         return attachRelationControls({ nodes, links, layoutMode: 'lorentzTree', groups: [], lorentzGuides }, relationPlan.controls);
     }
 
-    if (settings.layoutMode === 'productManifold') {
+    if (isTransitLayoutMode(settings.layoutMode)) {
         applyGalaxyMetadata(nodes);
-        const lorentzGuides = applyProductConsensusLayout(nodes, links);
-        return attachRelationControls({ nodes, links, layoutMode: 'productManifold', groups: [], lorentzGuides }, relationPlan.controls);
+        const lorentzGuides = applyTransitConsensusLayout(nodes, links);
+        return attachRelationControls({ nodes, links, layoutMode: 'transitManifold', groups: [], lorentzGuides }, relationPlan.controls);
     }
 
     if (settings.layoutMode === 'siegelFinsler') {
@@ -745,10 +781,10 @@ function materializeRelationContext(
     const chunk = uniqueControlIds(chunkIds)[0] || '';
     const owner = ownerEntityId || uniqueControlIds(entityIds)[0] || '';
     const regionId = chunk
-        ? `product:story:${note}:chunk:${chunk}${owner ? `:owner:${owner}` : ''}`
+        ? `transit:story:${note}:chunk:${chunk}${owner ? `:owner:${owner}` : ''}`
         : owner
-            ? `product:story:${note}:owner:${owner}`
-            : `product:story:${note}:signals:${draft.family || draft.kind || 'relationship'}`;
+            ? `transit:story:${note}:owner:${owner}`
+            : `transit:story:${note}:signals:${draft.family || draft.kind || 'relationship'}`;
     return {
         noteIds: uniqueControlIds(noteIds),
         chunkIds: uniqueControlIds(chunkIds),

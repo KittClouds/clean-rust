@@ -668,7 +668,7 @@ describe('embedding atlas projection', () => {
         const snapshot = packetSnapshot('snapshot-cross-manifold-families', targets);
         const layouts = {
             hybrid: 'hybridSpace', hopf: 'hopfProjection', lorentz: 'lorentzTree',
-            product: 'productManifold', siegel: 'siegelFinsler',
+            product: 'transitManifold', siegel: 'siegelFinsler',
         } as const;
         const expectedKinds = new Map([
             ['embed:note:note-1', 'note'],
@@ -1473,7 +1473,7 @@ describe('embedding atlas projection', () => {
         expect(atlas.edges.some((edge) => edge.type === 'target-parent' && edge.targetId === situationId)).toBe(false);
     });
 
-    it('carries embedding topology into Product manifold metadata without linking identities', () => {
+    it('carries embedding topology into Transit metadata without linking identities', () => {
         const atlas = buildGraphRebuildEmbeddingAtlas({
             schemaVersion: 'phoenix-graph-rebuild/v1',
             id: 'snapshot-product',
@@ -1638,7 +1638,7 @@ describe('embedding atlas projection', () => {
         });
     });
 
-    it('feeds Product with ConeProgram pathlets and obstruction trace payloads from graph-rebuild signals', () => {
+    it('feeds Transit with ConeProgram pathlets and obstruction trace payloads from graph-rebuild signals', () => {
         const atlas = buildGraphRebuildEmbeddingAtlas({
             schemaVersion: 'phoenix-graph-rebuild/v1',
             id: 'snapshot-product-traversal',

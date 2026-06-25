@@ -34,6 +34,7 @@ import {
     type GraphCanvasSourceRequest,
 } from './graph-canvas-interaction';
 import {
+    isTransitLayoutMode,
     mergeGalaxySettings,
     type GalaxyBackgroundMode,
     type GalaxyEmbeddingTopologyMode,
@@ -265,7 +266,7 @@ function readPersistedAtlasViewState(): PersistedAtlasViewState {
                                 [class.text-zinc-500]="manifoldMode() !== 'lorentz'" (click)="setManifoldMode('lorentz')">Caps</button>
                             <button type="button" class="px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.1em] transition"
                                 [class.bg-violet-500/20]="manifoldMode() === 'product'" [class.text-violet-100]="manifoldMode() === 'product'"
-                                [class.text-zinc-500]="manifoldMode() !== 'product'" (click)="setManifoldMode('product')">Product</button>
+                                [class.text-zinc-500]="manifoldMode() !== 'product'" (click)="setManifoldMode('product')">Transit</button>
                             <button type="button" class="px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.1em] transition"
                                 [class.bg-violet-500/20]="manifoldMode() === 'siegel'" [class.text-violet-100]="manifoldMode() === 'siegel'"
                                 [class.text-zinc-500]="manifoldMode() !== 'siegel'" (click)="setManifoldMode('siegel')">Siegel</button>
@@ -288,7 +289,7 @@ function readPersistedAtlasViewState(): PersistedAtlasViewState {
                             (click)="setLayoutMode('siegelFinsler')">Finsler</button>
                         } @else {
                         <button type="button" class="bg-cyan-500/15 px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.1em] text-cyan-100 transition"
-                            (click)="setLayoutMode('productManifold')">Transit</button>
+                            (click)="setLayoutMode('transitManifold')">Transit</button>
                         }
                     </div>
                     }
@@ -433,21 +434,25 @@ function readPersistedAtlasViewState(): PersistedAtlasViewState {
                             }
                             <button type="button" class="galaxy-control-button" (click)="toggleAutoRotate()">Rotate<span>{{ settings.autoRotate ? 'on' : 'off' }}</span></button>
                             <button type="button" class="galaxy-control-button" (click)="cycleBackgroundMode()">Backdrop<span>{{ backgroundLabel() }}</span></button>
-                            @if (settings.layoutMode === 'hybridSpace' || settings.layoutMode === 'productManifold') {
+                            @if (settings.layoutMode === 'hybridSpace' || isTransitLayout(settings.layoutMode)) {
                             <button type="button" class="galaxy-control-button" (click)="toggleHybridShell()">Shell<span>{{ settings.hybridShellVisible ? 'on' : 'off' }}</span></button>
                             }
                             @if (settings.layoutMode === 'hybridSpace') {
                             <button type="button" class="galaxy-control-button" (click)="toggleHybridField()">Field<span>{{ settings.hybridHorospheresVisible ? 'on' : 'off' }}</span></button>
                             }
-                            @if (settings.layoutMode === 'hopfProjection') {
-                            <button type="button" class="galaxy-control-button" (click)="toggleHopfSpace()">Hopf Space<span>{{ settings.hopfSpaceVisible ? 'on' : 'off' }}</span></button>
-                            }
-                            @if (settings.layoutMode === 'lorentzTree' || settings.layoutMode === 'productManifold' || settings.layoutMode === 'siegelFinsler') {
-                            <button type="button" class="galaxy-control-button" (click)="toggleLorentzSpace()">{{ settings.layoutMode === 'productManifold' ? 'Routes' : 'Cap Space' }}<span>{{ settings.lorentzSpaceVisible ? 'on' : 'off' }}</span></button>
-                            }
-                            @if (settings.layoutMode === 'productManifold') {
-                            <button type="button" class="galaxy-control-button" (click)="toggleProductKlein()">Klein Ball<span>{{ settings.productKleinVisible ? 'on' : 'off' }}</span></button>
-                            }
+                        </div>
+                        <div class="mt-3 rounded-lg border border-zinc-700/40 bg-zinc-900/40 p-2.5">
+                            <div class="mb-2 flex items-center justify-between">
+                                <span class="text-[10px] font-semibold uppercase tracking-[0.16em] text-zinc-400">Guides</span>
+                                <span class="text-[9px] uppercase tracking-[0.14em] text-zinc-600">per-family</span>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button type="button" class="galaxy-control-button" (click)="toggleGuideRoutes()">Routes<span>{{ settings.guideRoutesVisible ? 'on' : 'off' }}</span></button>
+                                <button type="button" class="galaxy-control-button" (click)="toggleGuideFibers()">Fibers<span>{{ settings.guideFibersVisible ? 'on' : 'off' }}</span></button>
+                                <button type="button" class="galaxy-control-button" (click)="toggleGuideRouteBall()">Route Ball<span>{{ settings.guideRouteBallVisible ? 'on' : 'off' }}</span></button>
+                                <button type="button" class="galaxy-control-button" (click)="toggleGuideColorMode()">Color<span>{{ settings.guideColorMode === 'sourceNode' ? 'node' : 'auto' }}</span></button>
+                            </div>
+                            <p class="mt-2 text-[9px] leading-snug text-zinc-600">Each guide family toggles independently of shells. Color = node adopts the color of its source node.</p>
                         </div>
                         <div class="mt-3 grid grid-cols-2 gap-2">
                             <button type="button" class="galaxy-control-button" (click)="styleRequested.emit(currentLensStyleKey())">Style this lens<span>{{ currentLensStyleKey() }}</span></button>
@@ -457,7 +462,7 @@ function readPersistedAtlasViewState(): PersistedAtlasViewState {
                             <button type="button" class="galaxy-control-button" (click)="styleRequested.emit(currentLensStyleKey())">Style selected kind<span>lens default</span></button>
                             }
                         </div>
-                        @if ((settings.layoutMode === 'hybridSpace' || settings.layoutMode === 'productManifold') && settings.hybridShellVisible) {
+                        @if ((settings.layoutMode === 'hybridSpace' || isTransitLayout(settings.layoutMode)) && settings.hybridShellVisible) {
                         <label class="settings-slider-row mt-3">
                             <span class="flex justify-between text-[10px] uppercase tracking-[0.16em] text-zinc-500"><span>Shell opacity</span><span>{{ settings.hybridShellOpacity | number:'1.2-2' }}</span></span>
                             <input type="range" min="0" max="1" step="0.02" [value]="settings.hybridShellOpacity" class="galaxy-slider" (input)="setHybridShellOpacity($any($event.target).value)" />
@@ -469,7 +474,7 @@ function readPersistedAtlasViewState(): PersistedAtlasViewState {
                             <input type="range" min="0" max="1.4" step="0.05" [value]="settings.hopfSpaceIntensity" class="galaxy-slider" (input)="setHopfSpaceIntensity($any($event.target).value)" />
                         </label>
                         }
-                        @if ((settings.layoutMode === 'lorentzTree' || settings.layoutMode === 'productManifold' || settings.layoutMode === 'siegelFinsler') && settings.lorentzSpaceVisible) {
+                        @if ((settings.layoutMode === 'lorentzTree' || isTransitLayout(settings.layoutMode) || settings.layoutMode === 'siegelFinsler') && settings.lorentzSpaceVisible) {
                         <label class="settings-slider-row mt-3">
                             <span class="flex justify-between text-[10px] uppercase tracking-[0.16em] text-zinc-500"><span>Space</span><span>{{ settings.lorentzSpaceIntensity | number:'1.1-1' }}</span></span>
                             <input type="range" min="0" max="1.4" step="0.05" [value]="settings.lorentzSpaceIntensity" class="galaxy-slider" (input)="setLorentzSpaceIntensity($any($event.target).value)" />
@@ -979,7 +984,7 @@ export class GraphAtlasPreviewComponent implements OnInit {
         hybrid: emptyEmbeddingAtlas('hybrid atlas not loaded'),
         hopf: emptyEmbeddingAtlas('hopf atlas not loaded'),
         lorentz: emptyEmbeddingAtlas('lorentz forest not loaded'),
-        product: emptyEmbeddingAtlas('product atlas not loaded'),
+        product: emptyEmbeddingAtlas('transit atlas not loaded'),
         siegel: emptyEmbeddingAtlas('siegel-finsler atlas not loaded'),
     });
     readonly embeddingAtlas = computed(() => this.embeddingAtlasByMode()[this.manifoldMode()]);
@@ -1122,7 +1127,7 @@ export class GraphAtlasPreviewComponent implements OnInit {
             this.machine.setManifoldMode('hopf');
         } else if (mode === 'lorentzTree' && this.manifoldMode() !== 'lorentz') {
             this.machine.setManifoldMode('lorentz');
-        } else if (mode === 'productManifold' && this.manifoldMode() !== 'product') {
+        } else if (isTransitLayoutMode(mode) && this.manifoldMode() !== 'product') {
             this.machine.setManifoldMode('product');
         } else if (mode === 'siegelFinsler' && this.manifoldMode() !== 'siegel') {
             this.machine.setManifoldMode('siegel');
@@ -1243,7 +1248,7 @@ export class GraphAtlasPreviewComponent implements OnInit {
                 : this.manifoldMode() === 'lorentz'
                     ? 'hierarchy_caps_v1'
                     : this.manifoldMode() === 'product'
-                        ? 'product_lorentz_hopf_v1'
+                        ? 'transit_lorentz_hopf_v1'
                         : this.manifoldMode() === 'siegel'
                             ? 'siegel_finsler_v1'
                     : 'hybrid_semantic_v1'
@@ -1436,8 +1441,29 @@ export class GraphAtlasPreviewComponent implements OnInit {
         this.updateSettings({ lorentzSpaceVisible: !this.settings.lorentzSpaceVisible });
     }
 
-    toggleProductKlein(): void {
+    toggleTransitRouteBall(): void {
         this.updateSettings({ productKleinVisible: !this.settings.productKleinVisible });
+    }
+
+    /** Dedicated guide-family toggles. Each flips one family only, independent of shells. */
+    toggleGuideRoutes(): void {
+        this.updateSettings({ guideRoutesVisible: !this.settings.guideRoutesVisible });
+    }
+
+    toggleGuideFibers(): void {
+        this.updateSettings({ guideFibersVisible: !this.settings.guideFibersVisible });
+    }
+
+    toggleGuideRouteBall(): void {
+        this.updateSettings({ guideRouteBallVisible: !this.settings.guideRouteBallVisible });
+    }
+
+    toggleGuideColorMode(): void {
+        this.updateSettings({ guideColorMode: this.settings.guideColorMode === 'sourceNode' ? 'auto' : 'sourceNode' });
+    }
+
+    isTransitLayout(mode: GalaxyLayoutMode | string | null | undefined = this.settings.layoutMode): boolean {
+        return isTransitLayoutMode(mode);
     }
 
     cycleBackgroundMode(): void {
@@ -1537,7 +1563,7 @@ export class GraphAtlasPreviewComponent implements OnInit {
         if (this.usesGraphRebuildEmbeddingAtlas()) return `Graph Rebuild Snapshot -> ${this.currentProjectionLabel()} Space`;
         if (this.manifoldMode() === 'lorentz') return 'Hierarchy Caps Sidecar';
         if (this.manifoldMode() === 'hopf') return 'Semantic Atlas -> Hopf Projection';
-        if (this.manifoldMode() === 'product') return 'Semantic Atlas -> Product Space';
+        if (this.manifoldMode() === 'product') return 'Semantic Atlas -> Transit Space';
         if (this.manifoldMode() === 'siegel') return 'Semantic Atlas -> Siegel-Finsler Space';
         return 'Semantic Atlas -> Hybrid Space';
     }
@@ -1717,7 +1743,7 @@ export class GraphAtlasPreviewComponent implements OnInit {
     }
 
     private layoutForManifold(mode: AtlasManifoldMode): GalaxyLayoutMode {
-        if (mode === 'product') return 'productManifold';
+        if (mode === 'product') return 'transitManifold';
         if (mode === 'hopf') return 'hopfProjection';
         if (mode === 'lorentz') return 'lorentzTree';
         if (mode === 'siegel') return 'siegelFinsler';

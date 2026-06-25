@@ -177,7 +177,7 @@ describe('Graph galaxy canonical colors', () => {
                         graphKind: 'item',
                     },
                 },
-            ], [], mergeGalaxySettings({ layoutMode: 'productManifold' }));
+            ], [], mergeGalaxySettings({ layoutMode: 'transitManifold' }));
 
             expect(scene.nodes[0].r).toBe(255);
             expect(scene.nodes[0].g).toBe(0);
@@ -221,7 +221,7 @@ describe('Graph galaxy canonical colors', () => {
             ], [
                 { id: 'co1:source', sourceId: 'embed:graph-fact:co1', targetId: 'embed:entity:kai', type: 'source', confidence: 0.8 },
                 { id: 'co1:target', sourceId: 'embed:graph-fact:co1', targetId: 'embed:entity:hazel', type: 'target', confidence: 0.8 },
-            ], mergeGalaxySettings({ layoutMode: 'productManifold' }));
+            ], mergeGalaxySettings({ layoutMode: 'transitManifold' }));
 
             expect(scene.nodes.find((node) => node.entity.id === 'embed:event:e1')).toMatchObject({ r: 0, g: 255, b: 0 });
             expect(scene.nodes.find((node) => node.entity.id === 'embed:graph-fact:co1')).toBeUndefined();
@@ -521,8 +521,8 @@ describe('Graph galaxy Siegel-Finsler layout', () => {
     });
 });
 
-describe('Graph galaxy Product traversal manifold', () => {
-    it('renders route stages, lane guides, and obstructions without Product-local Hopf ribbons', () => {
+describe('Graph galaxy Transit manifold', () => {
+    it('renders route stages, lane guides, and obstructions without Transit-local Hopf ribbons', () => {
         const scene = buildGalaxyScene([
             productNode('evidence', 'Chunk evidence', 'chunk', 'evidence', 'chunk'),
             productNode('entity', 'Kai', 'entity', 'identity', 'entity'),
@@ -532,16 +532,16 @@ describe('Graph galaxy Product traversal manifold', () => {
             { id: 'evidence-entity', sourceId: 'evidence', targetId: 'entity', type: 'evidence_anchor', confidence: 0.9 },
             { id: 'entity-causal', sourceId: 'entity', targetId: 'causal', type: 'causal', confidence: 0.82 },
             { id: 'causal-dead-end', sourceId: 'causal', targetId: 'dead-end', type: 'embedding-bridge', confidence: 0.18 },
-        ], mergeGalaxySettings({ layoutMode: 'productManifold' }));
+        ], mergeGalaxySettings({ layoutMode: 'transitManifold' }));
         const byId = new Map(scene.nodes.map((node) => [node.entity.id, node]));
 
-        expect(scene.layoutMode).toBe('productManifold');
+        expect(scene.layoutMode).toBe('transitManifold');
         expect(scene.hopfRibbons?.length ?? 0).toBe(0);
         expect(byId.get('evidence')!.x).toBeLessThan(byId.get('entity')!.x);
         expect(byId.get('entity')!.x).toBeLessThan(byId.get('causal')!.x);
         expect(byId.get('dead-end')).toBeTruthy();
-        expect(scene.lorentzGuides?.some((guide) => guide.id === 'product:lane:evidence' && guide.guideKind === 'rootLane')).toBe(true);
-        expect(scene.lorentzGuides?.some((guide) => guide.id === 'product:route:causal-dead-end' && /unsupported|mismatch|missing/i.test(guide.treeKind))).toBe(true);
+        expect(scene.lorentzGuides?.some((guide) => guide.id === 'transit:lane:evidence' && guide.guideKind === 'rootLane')).toBe(true);
+        expect(scene.lorentzGuides?.some((guide) => guide.id === 'transit:route:causal-dead-end' && /unsupported|mismatch|missing/i.test(guide.treeKind))).toBe(true);
     });
 });
 

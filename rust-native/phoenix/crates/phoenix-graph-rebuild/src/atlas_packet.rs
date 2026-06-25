@@ -4,7 +4,8 @@ use phoenix_types::EntityId;
 use serde::{Deserialize, Serialize};
 
 use crate::types::{
-    GraphAnchor, GraphChunk, GraphDocumentCompilerHyperedge, GraphDocumentCompilerHyperedgeRole,
+    GraphAnchor, GraphChunk, GraphDiscourseSpineBridge, GraphDiscourseSpineCluster,
+    GraphDocumentCompilerHyperedge, GraphDocumentCompilerHyperedgeRole, GraphDocumentReviewRow,
     GraphEmbeddingTarget, GraphEvent, GraphMemoryState, GraphNode, GraphRebuildSnapshot,
     GraphRelationship, GraphScopeKind, GraphTemporalEdge,
 };
@@ -13,8 +14,9 @@ mod ids;
 mod taxonomy;
 
 use ids::{
-    anchor_object_id, chunk_object_id, entity_object_id, event_object_id, fact_object_id,
-    hyperedge_object_id, hyperedge_role_object_id, memory_object_id, note_object_id,
+    anchor_object_id, chunk_object_id, discourse_bridge_object_id, discourse_cluster_object_id,
+    entity_object_id, event_object_id, fact_object_id, hyperedge_object_id,
+    hyperedge_role_object_id, memory_object_id, note_object_id, review_object_id,
     story_edge_object_id,
 };
 use taxonomy::{
@@ -196,6 +198,16 @@ pub fn build_atlas_packet(snapshot: &GraphRebuildSnapshot) -> AtlasPacket {
             + snapshot.causal_edges.len()
             + snapshot.memory_state.len()
             + snapshot
+                .document_review_summary
+                .as_ref()
+                .map(|summary| summary.rows.len())
+                .unwrap_or(0)
+            + snapshot
+                .discourse_spine_summary
+                .as_ref()
+                .map(|summary| summary.clusters.len() + summary.bridges.len())
+                .unwrap_or(0)
+            + snapshot
                 .document_compiler_summary
                 .as_ref()
                 .map(|summary| {
@@ -283,6 +295,16 @@ pub fn build_atlas_packet(snapshot: &GraphRebuildSnapshot) -> AtlasPacket {
             memory_object(state),
         );
     }
+    if let Some(review) = &snapshot.document_review_summary {
+        for row in &review.rows {
+            push_object(
+                &mut objects,
+                &mut seen,
+                &mut source_to_object,
+                review_object(row),
+            );
+        }
+    }
     if let Some(compiler) = &snapshot.document_compiler_summary {
         for hyperedge in &compiler.hyperedges {
             push_object(
@@ -299,6 +321,24 @@ pub fn build_atlas_packet(snapshot: &GraphRebuildSnapshot) -> AtlasPacket {
                     hyperedge_role_object(hyperedge, role),
                 );
             }
+        }
+    }
+    if let Some(discourse) = &snapshot.discourse_spine_summary {
+        for cluster in &discourse.clusters {
+            push_object(
+                &mut objects,
+                &mut seen,
+                &mut source_to_object,
+                discourse_cluster_object(cluster),
+            );
+        }
+        for bridge in &discourse.bridges {
+            push_object(
+                &mut objects,
+                &mut seen,
+                &mut source_to_object,
+                discourse_bridge_object(bridge),
+            );
         }
     }
 
@@ -522,6 +562,101 @@ fn memory_object(state: &GraphMemoryState) -> AtlasObject {
         source_ids: vec![state.id.clone()],
         target_ids: vec![entity_object_id(&state.entity_id)],
     }
+}
+
+fn review_object(row: &GraphDocumentReviewRow) -> AtlasObject {
+    AtlasObject {
+        id: review_object_id(&row.id),
+        family: GraphFamily::Review,
+        status: status_from_text(row.state.as_str()),
+        kind: row.object_kind.clone(),
+        label: row.title.clone(),
+        style_key: Some("rankStatus".into()),
+        lane: Some("review_state".into()),
+        structural_role: Some("proposal".into()),
+        document_unit_kind: review_document_unit_kind(row.object_kind.as_str()),
+        state_context_kind: Some("rankStatus".into()),
+        registry_entity_id: None,
+        note_ids: vec![row.note_id.clone()],
+        chunk_ids: Vec::new(),
+        anchor_ids: Vec::new(),
+        evidence_ids: row.evidence_span_ids.clone(),
+        source_ids: vec![
+            row.id.clone(),
+            row.object_id.clone(),
+            format_compact!("review:{}", row.object_id),
+        ],
+        target_ids: review_target_ids(row),
+    }
+}
+
+fn discourse_cluster_object(cluster: &GraphDiscourseSpineCluster) -> AtlasObject {
+    AtlasObject {
+        id: discourse_cluster_object_id(&cluster.id),
+        family: GraphFamily::Discourse,
+        status: AtlasObjectStatus::Proposed,
+        kind: cluster.kind.clone(),
+        label: cluster.label.clone(),
+        style_key: Some("communication".into()),
+        lane: Some("discourse_cluster".into()),
+        structural_role: Some("cluster".into()),
+        document_unit_kind: None,
+        state_context_kind: None,
+        registry_entity_id: None,
+        note_ids: Vec::new(),
+        chunk_ids: Vec::new(),
+        anchor_ids: Vec::new(),
+        evidence_ids: cluster.target_ids.clone(),
+        source_ids: vec![cluster.id.clone()],
+        target_ids: cluster.target_ids.clone(),
+    }
+}
+
+fn discourse_bridge_object(bridge: &GraphDiscourseSpineBridge) -> AtlasObject {
+    AtlasObject {
+        id: discourse_bridge_object_id(&bridge.id),
+        family: GraphFamily::Discourse,
+        status: status_from_text(bridge.status.as_str()),
+        kind: bridge.kind.clone(),
+        label: bridge.label.clone(),
+        style_key: Some("communication".into()),
+        lane: Some("discourse_bridge".into()),
+        structural_role: Some("bridge".into()),
+        document_unit_kind: None,
+        state_context_kind: None,
+        registry_entity_id: None,
+        note_ids: Vec::new(),
+        chunk_ids: Vec::new(),
+        anchor_ids: Vec::new(),
+        evidence_ids: bridge.evidence_target_ids.clone(),
+        source_ids: vec![
+            bridge.id.clone(),
+            bridge.source_target_id.clone(),
+            bridge.target_target_id.clone(),
+        ],
+        target_ids: vec![
+            bridge.source_target_id.clone(),
+            bridge.target_target_id.clone(),
+        ],
+    }
+}
+
+fn review_document_unit_kind(object_kind: &str) -> Option<CompactString> {
+    match object_kind {
+        "document_unit" | "document_region" | "rhetorical_unit" | "retrieval_unit" => {
+            Some(object_kind.into())
+        }
+        _ => None,
+    }
+}
+
+fn review_target_ids(row: &GraphDocumentReviewRow) -> Vec<CompactString> {
+    row.parent_unit_ids
+        .iter()
+        .chain(row.child_unit_ids.iter())
+        .chain(row.related_object_ids.iter())
+        .cloned()
+        .collect()
 }
 
 fn hyperedge_object(hyperedge: &GraphDocumentCompilerHyperedge) -> AtlasObject {

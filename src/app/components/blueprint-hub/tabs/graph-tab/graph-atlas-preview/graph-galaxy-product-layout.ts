@@ -144,7 +144,7 @@ export function applyProductConsensusLayout(nodes: GalaxyNode[], links: GalaxyEd
     relaxConsensus(nodes, links, infos, activity);
     normalizeProductVolume(nodes);
     tuneProductLinks(nodes, links, infos);
-    return buildProductGuides(nodes, links, infos, basinIndexByNode);
+    return buildTransitGuides(nodes, links, infos, basinIndexByNode);
 }
 
 function buildBasins(nodes: GalaxyNode[], infos: ProductInfo[]): ProductBasin[] {
@@ -251,6 +251,10 @@ function productTraversalTarget(
     return placed;
 }
 
+export function applyTransitConsensusLayout(nodes: GalaxyNode[], links: GalaxyEdge[]): GalaxyLorentzGuide[] {
+    return applyProductConsensusLayout(nodes, links);
+}
+
 function relaxConsensus(
     nodes: GalaxyNode[],
     links: GalaxyEdge[],
@@ -339,7 +343,7 @@ function tuneProductLinks(nodes: GalaxyNode[], links: GalaxyEdge[], infos: Produ
     }
 }
 
-function buildProductGuides(
+function buildTransitGuides(
     nodes: GalaxyNode[],
     links: GalaxyEdge[],
     infos: ProductInfo[],
@@ -358,11 +362,11 @@ function buildProductGuides(
         const support = productSupportScore(link, sourceInfo, targetInfo);
         const level = obstruction > 0.55 ? 5 : sameBasin ? 2 : 3;
         guides.push({
-            id: `product:route:${link.id}`,
+            id: `transit:route:${link.id}`,
             nodeIds: [source.entity.id, target.entity.id],
             positions3d: guideSegments(source, target, link, treeKind, sameBasin, support, sourceInfo, targetInfo, basinByNode.get(link.source), basinByNode.get(link.target)),
             importance: Math.max(source.radius, target.radius) * 0.54 + support + link.confidence + obstruction * 0.42,
-            treeId: obstruction > 0.55 ? 'product:obstructions' : sameBasin ? `product:chart:${sourceInfo.clusterId}` : 'product:stitches',
+            treeId: obstruction > 0.55 ? 'transit:obstructions' : sameBasin ? `transit:chart:${sourceInfo.clusterId}` : 'transit:stitches',
             treeKind,
             level,
             guideKind: 'membership',
@@ -395,11 +399,11 @@ function buildRouteLaneGuides(nodes: GalaxyNode[], infos: ProductInfo[]): Galaxy
             writeQuadratic(positions, index * 6 + 3, { x: -1.52, y: laneY, z }, { x: 0, y: laneY + 0.04, z: z + 0.08 }, { x: 1.56, y: laneY, z }, right);
         }
         guides.push({
-            id: `product:lane:${lane}`,
+            id: `transit:lane:${lane}`,
             nodeIds,
             positions3d: positions,
             importance: 2 + nodeIds.length / Math.max(1, nodes.length),
-            treeId: 'product:cone-field-lanes',
+            treeId: 'transit:cone-field-lanes',
             treeKind: lane,
             level: 0,
             guideKind: 'rootLane',

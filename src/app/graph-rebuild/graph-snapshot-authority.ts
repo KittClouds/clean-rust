@@ -362,12 +362,6 @@ function applyHydratedField(
             snapshotId: snapshot.id,
             builtAt: snapshot.builtAt,
         } : undefined;
-    } else if (field === 'atlasDebugSummaries') {
-        assignKnown(snapshot, value, [
-            'graphAwareLinkSuggestions', 'entityLinkSuggestions', 'shadowLinkSuggestions',
-            'finalLinkPatchLog', 'documentSidecarSummary', 'documentSemanticSummary',
-            'documentReviewSummary', 'documentCompilerSummary', 'calendarRegistrySummary',
-        ]);
     } else {
         (snapshot as unknown as Record<string, unknown>)[field] = value;
     }

@@ -510,13 +510,23 @@ describe('GraphRebuildService persistence helpers', () => {
             ],
         };
         (snapshot as any).documentReviewSummary = {
-            rows: Array.from({ length: 64 }, (_, index) => ({
+            rows: Array.from({ length: 160 }, (_, index) => ({
                 id: `review:${index}`,
                 objectId: `object:${index}`,
                 objectKind: 'document_unit',
                 state: 'proposed',
                 title: 'Disposable review row',
+                subtitle: 'Slim packet subtitle',
+                detail: 'This should not be sent to native. '.repeat(32),
                 noteId: 'note-1',
+                sourceStart: 0,
+                sourceEnd: 12,
+                confidence: 0.5,
+                detector: 'test-detector',
+                parentUnitIds: [`parent:${index}`],
+                childUnitIds: [`child:${index}`],
+                evidenceSpanIds: ['ev-1'],
+                relatedObjectIds: [`related:${index}`],
                 why: ['Review UI only '.repeat(16)],
             })),
         };
@@ -561,8 +571,35 @@ describe('GraphRebuildService persistence helpers', () => {
                 entityIds: [],
             })),
             labels: [],
-            clusters: [],
-            bridges: [],
+            clusters: [{
+                id: 'cluster:1',
+                kind: 'domain_region',
+                label: 'Disposable discourse cluster '.repeat(8),
+                targetIds: ['target:1', 'target:2'],
+                medoidTargetId: 'target:1',
+                score: 0.9,
+                rationale: ['debug-only cluster rationale'],
+                receiptId: 'receipt:cluster:1',
+            }],
+            bridges: [{
+                id: 'bridge:1',
+                kind: 'resonance',
+                status: 'proposed',
+                sourceTargetId: 'target:1',
+                targetTargetId: 'target:2',
+                sourceKind: 'chunk',
+                targetKind: 'chunk',
+                label: 'Disposable discourse bridge '.repeat(8),
+                evidenceTargetIds: ['target:1', 'target:2'],
+                sharedLabelIds: ['label:1'],
+                sharedEntityIds: ['entity-kai'],
+                scoringBundle: { finalScore: 0.92 },
+                rationale: ['debug-only bridge rationale'],
+                adjudicationState: 'proposed',
+                mutationAllowed: false,
+                receiptId: 'receipt:bridge:1',
+                createdAt: 42,
+            }],
         };
 
         const payload = graphRebuildSnapshotToNativeCompilerPayload(snapshot);
@@ -580,10 +617,25 @@ describe('GraphRebuildService persistence helpers', () => {
         expect(payload.documentSidecarSummary?.evidenceSpans.map((span) => span.id).sort())
             .toEqual(['ev-1', 'ev-2', 'ev-3']);
         expect((payload.documentSidecarSummary as any).units).toBeUndefined();
-        expect(payload.documentReviewSummary).toBeUndefined();
+        expect(payload.documentReviewSummary?.rows).toHaveLength(128);
+        expect(payload.documentReviewSummary?.rows[0]).toMatchObject({
+            id: 'review:0',
+            objectId: 'object:0',
+            state: 'proposed',
+            detail: '',
+            why: [],
+            evidenceSpanIds: ['ev-1'],
+        });
+        expect((payload.documentReviewSummary as any).receipts).toBeUndefined();
+        expect((payload.documentReviewSummary as any).counters).toBeUndefined();
         expect((payload.documentCompilerSummary as any).relationCandidates).toBeUndefined();
         expect(payload.documentCompilerSummary?.hyperedges).toHaveLength(1);
-        expect(payload.discourseSpineSummary).toBeUndefined();
+        expect(payload.discourseSpineSummary?.clusters).toHaveLength(1);
+        expect(payload.discourseSpineSummary?.bridges).toHaveLength(1);
+        expect((payload.discourseSpineSummary as any).targets).toBeUndefined();
+        expect((payload.discourseSpineSummary as any).labels).toBeUndefined();
+        expect((payload.discourseSpineSummary as any).receipts).toBeUndefined();
+        expect((payload.discourseSpineSummary as any).counters).toBeUndefined();
         expect(payload.graphModelV2).toBeUndefined();
         expect(payload.semanticCandidateSummary).toBeUndefined();
         expect(JSON.stringify(payload).length).toBeLessThan(JSON.stringify(snapshot).length / 2);
@@ -885,7 +937,7 @@ describe('GraphRebuildService persistence helpers', () => {
         expect(persisted?.embeddingTargets).toEqual([]);
     });
 
-    it('does not hydrate discourse summaries when they are absent from compact payloads', () => {
+    it('keeps heavy diagnostic summaries out of compact snapshot persistence', () => {
         const snapshot = buildGraphRebuildSnapshot({
             scopeKind: 'global',
             scopeId: 'global',
@@ -899,26 +951,62 @@ describe('GraphRebuildService persistence helpers', () => {
             noteTexts: { 'note-1': 'Kai approved Hazel.' },
             builtAt: 42,
         });
+        (snapshot as GraphRebuildSnapshot & { atlasDebugSummaries?: unknown }).atlasDebugSummaries = {
+            sentinel: 'debug-summary-must-not-persist',
+            rows: Array.from({ length: 8 }, (_, index) => ({
+                id: `debug:${index}`,
+                detail: 'large debug payload '.repeat(64),
+            })),
+        };
+        (snapshot as any).documentCompilerSummary = {
+            ...(snapshot as any).documentCompilerSummary,
+            hyperedges: [{
+                id: 'diagnostic-hyperedge-must-not-persist',
+                predicate: 'diagnostic',
+                roles: [],
+                evidenceSpanIds: [],
+                confidence: 1,
+                status: 'pending_commit',
+            }],
+        };
 
+        expect(snapshot.documentReviewSummary?.rows.length).toBeGreaterThan(0);
+        expect(snapshot.documentCompilerSummary?.hyperedges.length).toBeGreaterThan(0);
         expect(snapshot.discourseSpineSummary?.targets.length).toBeGreaterThan(0);
         expect(snapshot.discourseSpineSummary?.labels.length).toBeGreaterThan(0);
 
         const persistedView = graphRebuildSnapshotPersistenceView(snapshot);
         const document = graphRebuildSnapshotToScopedDocument(snapshot);
         const persisted = scopedDocumentToGraphRebuildSnapshot(document);
+        const blobDocuments = graphRebuildSnapshotContentBlobDocuments(snapshot);
+        const blobPayloadText = JSON.stringify(blobDocuments
+            .map((blob) => scopedDocumentToGraphRebuildContentBlob(blob)?.value)
+            .filter(Boolean));
 
+        expect(persistedView.documentReviewSummary).toBeUndefined();
+        expect(persistedView.documentCompilerSummary).toBeUndefined();
+        expect((persistedView as GraphRebuildSnapshot & { atlasDebugSummaries?: unknown }).atlasDebugSummaries).toBeUndefined();
         expect(persistedView.discourseSpineSummary).toBeUndefined();
         expect(persistedView.discourseBridgeCandidateSummary).toBeUndefined();
         expect(persistedView.discourseBridgeAdjudicationSummary).toBeUndefined();
         expect(persistedView.discourseEvalLedgerSummary).toBeUndefined();
         expect(persistedView.discoursePromotionSurfaceSummary).toBeUndefined();
         expect(persistedView.discourseCompilerOverlaySummary).toBeUndefined();
+        expect(persisted?.documentReviewSummary).toBeUndefined();
+        expect(persisted?.documentCompilerSummary).toBeUndefined();
+        expect((persisted as (GraphRebuildSnapshot & { atlasDebugSummaries?: unknown }) | null)?.atlasDebugSummaries).toBeUndefined();
         expect(persisted?.discourseSpineSummary).toBeUndefined();
         expect(persisted?.discourseBridgeCandidateSummary).toBeUndefined();
         expect(persisted?.discourseBridgeAdjudicationSummary).toBeUndefined();
         expect(persisted?.discourseEvalLedgerSummary).toBeUndefined();
         expect(persisted?.discoursePromotionSurfaceSummary).toBeUndefined();
         expect(persisted?.discourseCompilerOverlaySummary).toBeUndefined();
+        expect((persisted?.contentManifest?.refs as Record<string, unknown> | undefined)?.['atlasDebugSummaries']).toBeUndefined();
+        expect(blobDocuments.some((blob) => blob.documentKey.includes('atlasDebugSummaries'))).toBe(false);
+        expect(blobPayloadText).not.toContain('debug-summary-must-not-persist');
+        expect(blobPayloadText).not.toContain('diagnostic-hyperedge-must-not-persist');
+        expect(blobPayloadText).not.toContain('documentReviewSummary');
+        expect(blobPayloadText).not.toContain('documentCompilerSummary');
     });
 
     it('does not hydrate MemoryGraphRAG bridge when it is absent from compact payloads', () => {

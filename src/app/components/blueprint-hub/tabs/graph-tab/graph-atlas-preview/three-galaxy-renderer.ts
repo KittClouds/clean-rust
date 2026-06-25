@@ -2,8 +2,8 @@ import * as THREE from 'three';
 
 import type { GalaxyBusemannHorosphereView, GalaxyHopfRibbonView, GalaxyLorentzGuideView, GalaxySceneGroupView, GalaxySceneV2 } from './graph-galaxy-scene-v2';
 import { buildGalaxyFocusMask, type GalaxyFocusMask } from './graph-galaxy-focus';
-import { mergeGalaxySettings, type GalaxyRenderSettings } from './graph-galaxy-engine';
-import { GraphGalaxyForceController, productManifoldExpansionScale } from './graph-galaxy-force-controller';
+import { isTransitLayoutMode, mergeGalaxySettings, type GalaxyRenderSettings } from './graph-galaxy-engine';
+import { GraphGalaxyForceController, transitManifoldExpansionScale } from './graph-galaxy-force-controller';
 import {
     buildGalaxyGlows,
     buildGalaxyNodes,
@@ -44,17 +44,17 @@ const MAX_LORENTZ_GUIDES = 260;
 const MAX_LORENTZ_TUBES = 40;
 const LORENTZ_TUBE_SEGMENTS = 64;
 const LORENTZ_TUBE_RADIAL_SEGMENTS = 5;
-const PRODUCT_KLEIN_RADIUS = 2.18;
-const PRODUCT_KLEIN_RING_SEGMENTS = 96;
-const PRODUCT_HOPF_TUBE_SCALE = 0.75;
+const TRANSIT_GUIDE_RADIUS = 2.18;
+const TRANSIT_GUIDE_RING_SEGMENTS = 96;
+const TRANSIT_HOPF_TUBE_SCALE = 0.75;
 const CAPS_SURFACE_EDGE_MIN_RADIUS = 0.34;
 const CAPS_SURFACE_EDGE_MAX_RADIUS_DELTA = 0.36;
 const CAPS_SHELL_RADII = [0.54, 0.98, 1.22, 1.34, 1.48, 1.68, 1.92];
 const HYBRID_SURFACE_EDGE_MIN_RADIUS = 2.32 * 0.92;
 const HYBRID_SURFACE_EDGE_MAX_RADIUS_DELTA = 0.42;
 const MAX_CAMERA_VIEW_SHIFT = 2.6;
-const TREE_FILAMENT_EDGE_LAYOUTS = new Set(['lorentzTree', 'productManifold', 'siegelFinsler']);
-type GuideSurface = 'default' | 'product';
+const TREE_FILAMENT_EDGE_LAYOUTS = new Set(['lorentzTree', 'transitManifold', 'productManifold', 'siegelFinsler']);
+type GuideSurface = 'default' | 'transit';
 type EdgeStyleData = Pick<GalaxySceneV2, 'edgeAlpha' | 'edgeKinds'> & Partial<Pick<GalaxySceneV2, 'edgePairs' | 'layoutMode'>>;
 interface GuideAttachmentContract {
     liveLorentzGuides: boolean;
@@ -218,11 +218,18 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
         const previousShape = this.settings.nodeShape;
         const previousSphereSurface = this.settings.sphereSurface;
         const previousHybridField = `${this.settings.hybridHorospheresVisible}:${this.settings.hybridPrototypeRaysVisible}`;
+        const previousGuideColorMode = this.settings.guideColorMode;
         this.settings = mergeGalaxySettings(settings);
         this.force.setSettings(this.settings);
         if (this.sceneData) this.particles.bind(this.sceneData, this.settings);
         const nextHybridField = `${this.settings.hybridHorospheresVisible}:${this.settings.hybridPrototypeRaysVisible}`;
         if (this.sceneData?.layoutMode === 'hybridSpace' && previousHybridField !== nextHybridField) {
+            this.rebuildShellObjects(this.sceneData);
+        }
+        // Color mode change rewrites guide color attributes, which the cheap
+        // opacity pass can't do. Rebuild shells once (positions/geometry come
+        // from the cached scene — no hot-path impact, fires only on toggle).
+        if (this.sceneData && previousGuideColorMode !== this.settings.guideColorMode) {
             this.rebuildShellObjects(this.sceneData);
         }
         if (this.sceneData && (previousShape !== this.settings.nodeShape
@@ -594,7 +601,7 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
             const core = Math.max(0.038, data.radii[i] * 0.021) * pulse;
             const sphere = this.nodeShape === 'sphere';
             const atom = this.nodeShape === 'atom';
-            const productAtom = atom && data.layoutMode === 'productManifold';
+            const transitAtom = atom && isTransitLayoutMode(data.layoutMode);
             const halo = atom ? 0 : core * this.settings.glow * (sphere
                     ? (hovered ? 1.94 : active ? 2.12 : neighbor ? 1.28 : dimmed ? 0.52 : 0.94)
                     : (hovered ? 4.9 : active ? 5.05 : neighbor ? 3.1 : dimmed ? 1.15 : 2.45));
@@ -607,7 +614,7 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
                 hovered,
                 neighbor,
                 dimmed,
-                productAtom,
+                transitAtom,
             });
             this.nodeColor(data, i, active, hovered, neighbor, dimmed);
             if (sphereBatch) {
@@ -627,7 +634,7 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
                 node.scale.setScalar(nodeScale);
                 const material = node.material as GalaxyNodeMaterial;
                 material.color.copy(this.color);
-                const baseOpacity = productAtom
+                const baseOpacity = transitAtom
                     ? (dimmed ? 0.16 : neighbor ? 0.86 : hovered || active ? 1 : 0.98)
                     : (dimmed ? 0.18 : neighbor ? 0.82 : hovered || active ? 1 : 0.94);
                 material.opacity = material instanceof THREE.MeshPhysicalMaterial
@@ -1060,14 +1067,21 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
                 const treeKind = String(child.userData['treeKind'] ?? '');
                 const surface = this.guideSurface(child);
                 this.setGuideOpacity(material, this.lorentzLayerOpacity(layer, lorentzGuideKind, treeKind, weight, surface));
+            } else if (guideKind === 'transit-route-ball') {
+                // Dedicated branch: route-ball no longer falls through to the
+                // shell opacity path, so toggling Shell stops hiding it.
+                const layer = String(child.userData['transitGuideLayer'] ?? 'ring');
+                this.setGuideOpacity(material, this.transitRouteBallLayerOpacity(layer));
             } else if (guideKind === 'klein') {
                 const layer = String(child.userData['kleinLayer'] ?? 'boundary');
-                this.setGuideOpacity(material, this.productKleinLayerOpacity(layer));
+                this.setGuideOpacity(material, this.transitGuideLayerOpacity(layer));
             } else if (guideKind === 'multi') {
                 this.setGuideOpacity(material, this.multiShellOpacity());
             } else if (guideKind === 'hybrid-field') {
                 // Field guides carry per-object opacity from Busemann receipts.
             } else {
+                // True shell surfaces only (hybrid outer sphere). The route-ball
+                // now has its own branch above, so it is never absorbed here.
                 this.setGuideOpacity(material, this.hybridShellOpacity());
             }
             material.needsUpdate = true;
@@ -1125,10 +1139,10 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
     }
 
     private guideAttachmentContract(data: GalaxySceneV2): GuideAttachmentContract {
-        if (data.layoutMode === 'productManifold') {
+        if (isTransitLayoutMode(data.layoutMode)) {
             return {
                 liveLorentzGuides: true,
-                localScale: productManifoldExpansionScale(this.settings),
+                localScale: transitManifoldExpansionScale(this.settings),
             };
         }
         if (data.layoutMode === 'lorentzTree' || data.layoutMode === 'siegelFinsler') {
@@ -1300,7 +1314,8 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
     }
 
     private guideSurface(object: THREE.Object3D): GuideSurface {
-        return object.userData['guideSurface'] === 'product' ? 'product' : 'default';
+        const surface = object.userData['guideSurface'];
+        return surface === 'transit' || surface === 'product' ? 'transit' : 'default';
     }
 
     private hybridShellOpacity(): number {
@@ -1317,8 +1332,24 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
         return THREE.MathUtils.clamp(0.014 + glow * 0.003, 0.01, 0.026) * shellOpacity;
     }
 
-    private productKleinLayerOpacity(layer: string): number {
+    private transitGuideLayerOpacity(layer: string): number {
         if (!this.settings.productKleinVisible) return 0;
+        const glow = THREE.MathUtils.clamp(this.settings.glow, 0, 1.8);
+        if (layer === 'boundary') return THREE.MathUtils.clamp(0.012 + glow * 0.002, 0, 0.018);
+        if (layer === 'chord') return THREE.MathUtils.clamp(0.035 + glow * 0.006, 0, 0.052);
+        return THREE.MathUtils.clamp(0.028 + glow * 0.004, 0, 0.04);
+    }
+
+    /**
+     * Dedicated opacity path for the transit route-ball boundary/rings/chords.
+     * Reads {@link GalaxyRenderSettings.guideRouteBallVisible} with a fallback to
+     * the legacy {@link GalaxyRenderSettings.productKleinVisible} so persisted
+     * settings keep working.
+     */
+    private transitRouteBallLayerOpacity(layer: string): number {
+        const visible = this.settings.guideRouteBallVisible !== false
+            && this.settings.productKleinVisible !== false;
+        if (!visible) return 0;
         const glow = THREE.MathUtils.clamp(this.settings.glow, 0, 1.8);
         if (layer === 'boundary') return THREE.MathUtils.clamp(0.012 + glow * 0.002, 0, 0.018);
         if (layer === 'chord') return THREE.MathUtils.clamp(0.035 + glow * 0.006, 0, 0.052);
@@ -1441,7 +1472,7 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
         if (scene.layoutMode === 'hopfProjection') return this.buildHopfGuides(scene);
         if (scene.layoutMode === 'lorentzTree') return this.buildLorentzGuides(scene);
         if (scene.layoutMode === 'siegelFinsler') return this.buildLorentzGuides(scene);
-        if (scene.layoutMode === 'productManifold') return this.buildProductGuides(scene);
+        if (isTransitLayoutMode(scene.layoutMode)) return this.buildTransitGuides(scene);
         if (scene.layoutMode !== 'multiGalaxy' || scene.groups.length < 2) return null;
         const group = new THREE.Group();
         for (const shell of scene.groups) {
@@ -1587,45 +1618,45 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
         return rays;
     }
 
-    private buildProductGuides(scene: GalaxySceneV2): THREE.Group {
+    private buildTransitGuides(scene: GalaxySceneV2): THREE.Group {
         const group = new THREE.Group();
         const shell = this.buildHybridGuides(scene);
         if (shell.children.length) group.add(shell);
-        const klein = this.buildProductKleinGuides();
-        if (klein.children.length) group.add(klein);
-        const lorentz = this.buildLorentzGuides(scene, 'product');
+        const routeBall = this.buildTransitRouteBallGuides();
+        if (routeBall.children.length) group.add(routeBall);
+        const lorentz = this.buildLorentzGuides(scene, 'transit');
         if (lorentz.children.length) group.add(lorentz);
-        const hopf = this.buildHopfGuides(scene, 'product');
+        const hopf = this.buildHopfGuides(scene, 'transit');
         if (hopf.children.length) group.add(hopf);
         return group;
     }
 
-    private buildProductKleinGuides(): THREE.Group {
+    private buildTransitRouteBallGuides(): THREE.Group {
         const group = new THREE.Group();
-        const boundary = new THREE.Mesh(new THREE.SphereGeometry(PRODUCT_KLEIN_RADIUS, 48, 24), this.productKleinBoundaryMaterial());
-        boundary.userData['guideKind'] = 'klein';
-        boundary.userData['kleinLayer'] = 'boundary';
+        const boundary = new THREE.Mesh(new THREE.SphereGeometry(TRANSIT_GUIDE_RADIUS, 48, 24), this.transitRouteBallBoundaryMaterial());
+        boundary.userData['guideKind'] = 'transit-route-ball';
+        boundary.userData['transitGuideLayer'] = 'boundary';
         boundary.userData['pickable'] = false;
         group.add(boundary);
 
-        const rings = new THREE.LineSegments(this.productKleinRingGeometry(), this.productKleinLineMaterial('ring'));
-        rings.userData['guideKind'] = 'klein';
-        rings.userData['kleinLayer'] = 'ring';
+        const rings = new THREE.LineSegments(this.transitRouteBallRingGeometry(), this.transitRouteBallLineMaterial('ring'));
+        rings.userData['guideKind'] = 'transit-route-ball';
+        rings.userData['transitGuideLayer'] = 'ring';
         rings.userData['pickable'] = false;
         group.add(rings);
 
-        const chords = new THREE.LineSegments(this.productKleinChordGeometry(), this.productKleinLineMaterial('chord'));
-        chords.userData['guideKind'] = 'klein';
-        chords.userData['kleinLayer'] = 'chord';
+        const chords = new THREE.LineSegments(this.transitRouteBallChordGeometry(), this.transitRouteBallLineMaterial('chord'));
+        chords.userData['guideKind'] = 'transit-route-ball';
+        chords.userData['transitGuideLayer'] = 'chord';
         chords.userData['pickable'] = false;
         group.add(chords);
         return group;
     }
 
-    private productKleinBoundaryMaterial(): THREE.ShaderMaterial {
+    private transitRouteBallBoundaryMaterial(): THREE.ShaderMaterial {
         return new THREE.ShaderMaterial({
             uniforms: {
-                opacity: { value: this.productKleinLayerOpacity('boundary') },
+                opacity: { value: this.transitGuideLayerOpacity('boundary') },
                 rimColor: { value: new THREE.Color(0.44, 1.0, 0.92) },
                 depthColor: { value: new THREE.Color(0.18, 0.36, 0.58) },
             },
@@ -1664,32 +1695,32 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
         });
     }
 
-    private productKleinLineMaterial(layer: 'ring' | 'chord'): THREE.LineBasicMaterial {
+    private transitRouteBallLineMaterial(layer: 'ring' | 'chord'): THREE.LineBasicMaterial {
         return new THREE.LineBasicMaterial({
             color: layer === 'chord' ? new THREE.Color(0.26, 0.88, 0.96) : new THREE.Color(0.38, 1, 0.88),
             transparent: true,
-            opacity: this.productKleinLayerOpacity(layer),
+            opacity: this.transitGuideLayerOpacity(layer),
             depthWrite: false,
             blending: THREE.NormalBlending,
             toneMapped: false,
         });
     }
 
-    private productKleinRingGeometry(): THREE.BufferGeometry {
+    private transitRouteBallRingGeometry(): THREE.BufferGeometry {
         const rings = [
-            { radius: PRODUCT_KLEIN_RADIUS, plane: 0 },
-            { radius: PRODUCT_KLEIN_RADIUS, plane: 1 },
-            { radius: PRODUCT_KLEIN_RADIUS, plane: 2 },
-            { radius: PRODUCT_KLEIN_RADIUS * 0.68, plane: 0 },
-            { radius: PRODUCT_KLEIN_RADIUS * 0.68, plane: 1 },
-            { radius: PRODUCT_KLEIN_RADIUS * 0.42, plane: 2 },
+            { radius: TRANSIT_GUIDE_RADIUS, plane: 0 },
+            { radius: TRANSIT_GUIDE_RADIUS, plane: 1 },
+            { radius: TRANSIT_GUIDE_RADIUS, plane: 2 },
+            { radius: TRANSIT_GUIDE_RADIUS * 0.68, plane: 0 },
+            { radius: TRANSIT_GUIDE_RADIUS * 0.68, plane: 1 },
+            { radius: TRANSIT_GUIDE_RADIUS * 0.42, plane: 2 },
         ];
-        const positions = new Float32Array(rings.length * PRODUCT_KLEIN_RING_SEGMENTS * 2 * 3);
+        const positions = new Float32Array(rings.length * TRANSIT_GUIDE_RING_SEGMENTS * 2 * 3);
         let cursor = 0;
         for (const ring of rings) {
-            for (let index = 0; index < PRODUCT_KLEIN_RING_SEGMENTS; index++) {
-                const a = (index / PRODUCT_KLEIN_RING_SEGMENTS) * Math.PI * 2;
-                const b = ((index + 1) / PRODUCT_KLEIN_RING_SEGMENTS) * Math.PI * 2;
+            for (let index = 0; index < TRANSIT_GUIDE_RING_SEGMENTS; index++) {
+                const a = (index / TRANSIT_GUIDE_RING_SEGMENTS) * Math.PI * 2;
+                const b = ((index + 1) / TRANSIT_GUIDE_RING_SEGMENTS) * Math.PI * 2;
                 cursor = this.writeKleinRingPoint(positions, cursor, ring.plane, ring.radius, a);
                 cursor = this.writeKleinRingPoint(positions, cursor, ring.plane, ring.radius, b);
             }
@@ -1699,7 +1730,7 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
         return geometry;
     }
 
-    private productKleinChordGeometry(): THREE.BufferGeometry {
+    private transitRouteBallChordGeometry(): THREE.BufferGeometry {
         const directions = [
             [1, 0.18, 0.32],
             [-0.72, 0.54, 0.43],
@@ -1712,9 +1743,9 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
         let cursor = 0;
         for (const raw of directions) {
             const length = Math.hypot(raw[0], raw[1], raw[2]) || 1;
-            const x = raw[0] / length * PRODUCT_KLEIN_RADIUS * 0.96;
-            const y = raw[1] / length * PRODUCT_KLEIN_RADIUS * 0.96;
-            const z = raw[2] / length * PRODUCT_KLEIN_RADIUS * 0.96;
+            const x = raw[0] / length * TRANSIT_GUIDE_RADIUS * 0.96;
+            const y = raw[1] / length * TRANSIT_GUIDE_RADIUS * 0.96;
+            const z = raw[2] / length * TRANSIT_GUIDE_RADIUS * 0.96;
             positions[cursor++] = -x;
             positions[cursor++] = -y;
             positions[cursor++] = -z;
@@ -2006,7 +2037,7 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
             opacity: this.hopfLayerOpacity(layer, ribbon.guideKind, this.hopfGuideWeightForKind(ribbon.guideKind, surface), surface),
             depthWrite: false,
             depthTest: true,
-            blending: surface === 'product' ? THREE.NormalBlending : THREE.AdditiveBlending,
+            blending: surface === 'transit' ? THREE.NormalBlending : THREE.AdditiveBlending,
             toneMapped: false,
         });
         const mesh = new THREE.Mesh(geometry, material);
@@ -2110,7 +2141,7 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
             opacity: this.hopfGuideOpacity(this.hopfGuideWeightForKind(guideKind, surface), guideKind, surface),
             depthWrite: false,
             depthTest: true,
-            blending: surface === 'product' ? THREE.NormalBlending : THREE.AdditiveBlending,
+            blending: surface === 'transit' ? THREE.NormalBlending : THREE.AdditiveBlending,
             toneMapped: false,
         });
         const line = new THREE.LineSegments(geometry, material);
@@ -2130,15 +2161,26 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
     }
 
     private hopfRibbonTint(ribbon: GalaxyHopfRibbonView, index: number, surface: GuideSurface): { r: number; g: number; b: number } {
+        const sourceColor = this.guideSourceColor(ribbon);
+        if (sourceColor) return sourceColor;
         const palette = this.hopfRibbonPalette(ribbon, index, 0.35, surface);
         return this.hslColor(palette.h, palette.s, palette.l);
     }
 
     private writeHopfRibbonColor(colors: Float32Array, offset: number, ribbon: GalaxyHopfRibbonView, index: number, phase: number, surface: GuideSurface): void {
+        const sourceColor = this.guideSourceColor(ribbon);
+        if (sourceColor) {
+            // sourceNode mode: bypass the hashed palette and emit the source-node
+            // color directly for every ribbon kind (dataFiber/braid/torus/space/axis).
+            colors[offset] = sourceColor.r;
+            colors[offset + 1] = sourceColor.g;
+            colors[offset + 2] = sourceColor.b;
+            return;
+        }
         const palette = this.hopfRibbonPalette(ribbon, index, phase, surface);
         this.writeHslColor(colors, offset, palette.h, palette.s, palette.l);
         if (ribbon.guideKind === 'dataFiber' || ribbon.guideKind === 'crossFiberBraid') {
-            const mix = surface === 'product' ? 0.44 : 0.2;
+            const mix = surface === 'transit' ? 0.44 : 0.2;
             colors[offset] = THREE.MathUtils.lerp(colors[offset], ribbon.color.r, mix);
             colors[offset + 1] = THREE.MathUtils.lerp(colors[offset + 1], ribbon.color.g, mix);
             colors[offset + 2] = THREE.MathUtils.lerp(colors[offset + 2], ribbon.color.b, mix);
@@ -2147,7 +2189,7 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
 
     private hopfRibbonPalette(ribbon: GalaxyHopfRibbonView, index: number, phase: number, surface: GuideSurface): { h: number; s: number; l: number } {
         const seed = this.stableUnit(ribbon.id);
-        if (surface === 'product') {
+        if (surface === 'transit') {
             switch (ribbon.guideKind) {
                 case 'dataFiber':
                     return { h: 0.48 + seed * 0.26 + phase * 0.04, s: 0.8, l: 0.52 + Math.sin(phase * Math.PI) * 0.047 };
@@ -2180,9 +2222,12 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
     }
 
     private hopfGuideOpacity(weight = 1, kind?: GalaxyHopfRibbonView['guideKind'], surface: GuideSurface = 'default'): number {
+        // Legacy hopfSpaceVisible stays as the master switch; guideFibersVisible
+        // is the dedicated per-family override (defaults visible via mergeGalaxySettings).
         if (!this.settings.hopfSpaceVisible) return 0;
+        if (this.settings.guideFibersVisible === false) return 0;
         const intensity = THREE.MathUtils.clamp(this.settings.hopfSpaceIntensity, 0, 1.4);
-        if (surface === 'product') {
+        if (surface === 'transit') {
             const data = kind === 'dataFiber';
             const braid = kind === 'crossFiberBraid';
             if (braid) return THREE.MathUtils.clamp((0.018 + this.settings.glow * 0.007) * weight * intensity, 0, 0.052);
@@ -2203,7 +2248,7 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
     private hopfTubeOpacity(kind: GalaxyHopfRibbonView['guideKind'] | undefined, glow: boolean, surface: GuideSurface): number {
         const intensity = THREE.MathUtils.clamp(this.settings.hopfSpaceIntensity, 0, 1.4);
         const globalGlow = THREE.MathUtils.clamp(this.settings.glow, 0, 1.8);
-        if (surface === 'product') {
+        if (surface === 'transit') {
             if (kind === 'dataFiber') {
                 return THREE.MathUtils.clamp((glow ? 0.0325 : 0.112) * intensity * (0.78 + globalGlow * 0.24), 0, glow ? 0.052 : 0.168);
             }
@@ -2220,8 +2265,8 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
     }
 
     private hopfTubeRadius(kind: GalaxyHopfRibbonView['guideKind'], layer: 'tubeCore' | 'tubeGlow', surface: GuideSurface): number {
-        if (surface === 'product') {
-            if (kind === 'dataFiber') return (layer === 'tubeGlow' ? 0.0216 : 0.00675) * PRODUCT_HOPF_TUBE_SCALE;
+        if (surface === 'transit') {
+            if (kind === 'dataFiber') return (layer === 'tubeGlow' ? 0.0216 : 0.00675) * TRANSIT_HOPF_TUBE_SCALE;
             return 0.002;
         }
         if (kind === 'dataFiber') return layer === 'tubeGlow' ? 0.012 : 0.0055;
@@ -2230,7 +2275,7 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
     }
 
     private hopfGuideWeightForKind(kind: GalaxyHopfRibbonView['guideKind'], surface: GuideSurface = 'default'): number {
-        if (surface === 'product') {
+        if (surface === 'transit') {
             switch (kind) {
                 case 'dataFiber':
                     return 1.58;
@@ -2308,10 +2353,11 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
         const pulse = Math.sin((phase + this.stableUnit(guide.id)) * Math.PI) * 0.08;
         const level = Number.isFinite(guide.level) ? guide.level : 0;
         const levelShade = THREE.MathUtils.clamp(0.08 - level * 0.012, -0.04, 0.08);
-        colors[offset] = THREE.MathUtils.clamp(guide.color.r * (0.58 + pulse + levelShade), 0, 0.78);
-        colors[offset + 1] = THREE.MathUtils.clamp(guide.color.g * (0.62 + pulse + levelShade), 0, 0.84);
-        colors[offset + 2] = THREE.MathUtils.clamp(guide.color.b * (0.66 + pulse + levelShade), 0, 0.86);
-        if (surface === 'product') {
+        const base = this.guideSourceColor(guide) ?? guide.color;
+        colors[offset] = THREE.MathUtils.clamp(base.r * (0.58 + pulse + levelShade), 0, 0.78);
+        colors[offset + 1] = THREE.MathUtils.clamp(base.g * (0.62 + pulse + levelShade), 0, 0.84);
+        colors[offset + 2] = THREE.MathUtils.clamp(base.b * (0.66 + pulse + levelShade), 0, 0.86);
+        if (surface === 'transit') {
             const root = guide.guideKind === 'rootLane';
             const colorBlend = guide.guideKind === 'membership' ? 0.04 : root ? 0.18 : 0.3;
             colors[offset] = THREE.MathUtils.lerp(colors[offset], root ? 0.22 : 0.16, colorBlend);
@@ -2330,14 +2376,27 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
         }
     }
 
+    /**
+     * Returns the source-node color for a guide when `guideColorMode === 'sourceNode'`,
+     * otherwise `undefined` so callers keep their legacy palette. Centralizing this
+     * keeps every color/tint writer in sync with a single toggle.
+     */
+    private guideSourceColor(guide: { sourceColor?: { r: number; g: number; b: number } }): { r: number; g: number; b: number } | undefined {
+        if (this.settings.guideColorMode !== 'sourceNode') return undefined;
+        return guide.sourceColor;
+    }
+
     private lorentzGuideTint(guide: GalaxyLorentzGuideView, index: number, surface: GuideSurface = 'default'): { r: number; g: number; b: number } {
+        const sourceColor = this.guideSourceColor(guide);
+        const tintBase = sourceColor ?? guide.color;
         const offset = this.stableUnit(`${guide.id}:${index}`) * 0.08;
         const tint = {
-            r: THREE.MathUtils.clamp(guide.color.r + offset, 0, 1),
-            g: THREE.MathUtils.clamp(guide.color.g + offset * 0.45, 0, 1),
-            b: THREE.MathUtils.clamp(guide.color.b + offset * 0.72, 0, 1),
+            r: THREE.MathUtils.clamp(tintBase.r + offset, 0, 1),
+            g: THREE.MathUtils.clamp(tintBase.g + offset * 0.45, 0, 1),
+            b: THREE.MathUtils.clamp(tintBase.b + offset * 0.72, 0, 1),
         };
-        if (surface !== 'product') return tint;
+        if (sourceColor) return tint;
+        if (surface !== 'transit') return tint;
         if (guide.guideKind === 'wAxis') return {
             r: 0.18,
             g: 0.82,
@@ -2352,11 +2411,14 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
     }
 
     private lorentzLayerOpacity(layer: string, guideKind: GalaxyLorentzGuideView['guideKind'] | undefined, treeKind = '', weight = 1, surface: GuideSurface = 'default'): number {
+        // Legacy lorentzSpaceVisible stays as the master switch; guideRoutesVisible
+        // is the dedicated per-family override (defaults visible via mergeGalaxySettings).
         if (!this.settings.lorentzSpaceVisible) return 0;
+        if (this.settings.guideRoutesVisible === false) return 0;
         const intensity = THREE.MathUtils.clamp(this.settings.lorentzSpaceIntensity, 0, 1.4);
         const globalGlow = THREE.MathUtils.clamp(this.settings.glow, 0, 1.8);
         const treeBoost = treeKind === 'evidence' || treeKind === 'causal' ? 1.05 : 1;
-        if (surface === 'product') {
+        if (surface === 'transit') {
             const rootBoost = guideKind === 'rootLane' ? 1.12 : 1;
             if (layer === 'tubeCore') return THREE.MathUtils.clamp(0.072 * intensity * treeBoost * rootBoost * weight, 0, 0.14);
             if (layer === 'tubeGlow') return THREE.MathUtils.clamp(0.014 * intensity * (0.72 + globalGlow * 0.12) * weight, 0, 0.034);
@@ -2372,8 +2434,8 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
     private lorentzTubeRadius(guide: GalaxyLorentzGuideView, layer: 'tubeCore' | 'tubeGlow', surface: GuideSurface = 'default'): number {
         const rootBoost = guide.guideKind === 'rootLane' ? 1.2 : 1;
         const weightBoost = THREE.MathUtils.clamp(0.78 + Math.sqrt(Math.max(0.08, guide.guideWeight || 0.7)) * 0.32, 0.88, 1.22);
-        const core = surface === 'product' ? 0.00372 : 0.00405;
-        const glow = surface === 'product' ? 0.0084 : 0.0096;
+        const core = surface === 'transit' ? 0.00372 : 0.00405;
+        const glow = surface === 'transit' ? 0.0084 : 0.0096;
         return (layer === 'tubeGlow' ? glow : core) * rootBoost * weightBoost;
     }
 
@@ -2444,8 +2506,8 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
 
     private updateGroupShells(data: GalaxySceneV2): void {
         if (!this.shells) return;
-        if (data.layoutMode === 'productManifold') {
-            const scale = productManifoldExpansionScale(this.settings);
+        if (isTransitLayoutMode(data.layoutMode)) {
+            const scale = transitManifoldExpansionScale(this.settings);
             this.shells.scale.set(scale, scale, this.mode === '2d' ? 0.08 : scale);
             return;
         }
@@ -2706,7 +2768,7 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
 
     private tubeEdgeTerminalFlourish(data: GalaxySceneV2, t: number, lift: number, sign: number): number {
         if (!TREE_FILAMENT_EDGE_LAYOUTS.has(data.layoutMode)) return 0;
-        const width = data.layoutMode === 'productManifold' ? 0.3 : 0.26;
+        const width = isTransitLayoutMode(data.layoutMode) ? 0.3 : 0.26;
         const end = t > 1 - width ? Math.sin(Math.PI * (1 - t) / width) : 0;
         const style = data.layoutMode === 'siegelFinsler' ? 0.21 : data.layoutMode === 'lorentzTree' ? 0.18 : 0.16;
         return lift * style * sign * end;

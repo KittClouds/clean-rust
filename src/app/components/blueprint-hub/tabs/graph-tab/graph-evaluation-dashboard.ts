@@ -121,15 +121,18 @@ function buildMetrics(snapshot: GraphRebuildSnapshot, receipt: GraphIndexRunRece
     const profileScore = profileSummary
         ? clampScore(profileCoverage * 90 + (profileSummary.source === 'native_rust' ? 10 : 4))
         : null;
+    const sidecarAvailable = !!sidecar;
     const units = sidecar?.units || [];
     const maxDepth = units.reduce((depth, unit) => Math.max(depth, unit.depth), 0);
-    const hierarchyScore = !units.length ? 35 : maxDepth >= 3 && maxDepth <= 8 ? 100 : maxDepth >= 2 ? 72 : 45;
+    const hierarchyScore = !sidecarAvailable
+        ? null
+        : !units.length ? 35 : maxDepth >= 3 && maxDepth <= 8 ? 100 : maxDepth >= 2 ? 72 : 45;
     const coveredChunkIds = new Set<string>();
     for (const unit of units) if (unit.lineage.chunkId) coveredChunkIds.add(unit.lineage.chunkId);
     for (const unit of sidecar?.retrievalUnits || []) for (const id of unit.targetChunkIds) coveredChunkIds.add(id);
     const orphanChunks = chunks.filter((chunk) => !coveredChunkIds.has(chunk.id));
-    const coverage = chunks.length ? (chunks.length - orphanChunks.length) / chunks.length : 0;
-    const evidenceDensity = chunks.length ? (sidecar?.evidenceSpans.length || 0) / chunks.length : 0;
+    const coverage = sidecarAvailable && chunks.length ? (chunks.length - orphanChunks.length) / chunks.length : 0;
+    const evidenceDensity = sidecarAvailable && chunks.length ? (sidecar?.evidenceSpans.length || 0) / chunks.length : 0;
     const unresolvedPriors = unresolvedEntityPriors(snapshot);
     const priorCount = chunks.reduce((sum, chunk) => sum + (chunk.meaningFrame?.entityPriors.length || 0), 0);
     const priorNoise = priorCount ? unresolvedPriors.length / priorCount : 0;
@@ -155,9 +158,11 @@ function buildMetrics(snapshot: GraphRebuildSnapshot, receipt: GraphIndexRunRece
     const eventOrderingCount = propositionSemantics?.counters.eventOrderings || 0;
     const explicitOrderingCount = propositionSemantics?.counters.explicitEventOrderings || 0;
     const temporalConflictCount = propositionSemantics?.counters.temporalConflicts || 0;
-    const continuityScore = situationCount
-        ? clampScore(92 - (temporalConflictCount / situationCount) * 500 + Math.min(8, explicitOrderingCount / Math.max(1, eventOrderingCount) * 8))
-        : 35;
+    const continuityScore = !propositionSemantics
+        ? null
+        : situationCount
+            ? clampScore(92 - (temporalConflictCount / situationCount) * 500 + Math.min(8, explicitOrderingCount / Math.max(1, eventOrderingCount) * 8))
+            : 35;
     const scopeRate = propositionCount ? Math.min(1, scopeCount / propositionCount) : 0;
     const predicatePrecisionRate = propositionCount ? reviewablePropositions / propositionCount : 0;
     const discourse = snapshot.discourseEvalLedgerSummary?.counters;
@@ -191,13 +196,19 @@ function buildMetrics(snapshot: GraphRebuildSnapshot, receipt: GraphIndexRunRece
             overlaps.length ? `${overlaps.length} adjacent chunk pairs overlap.` : 'Chunk boundaries do not duplicate source ranges.',
             [`${formatNumber(overlapChars)} overlapping characters across ${formatNumber(total(sizes))} indexed characters.`], overlaps),
         metric('hierarchy-depth', 'structure', 'Hierarchy depth', `${maxDepth} levels`, hierarchyScore,
-            units.length ? `The deepest document path reaches level ${maxDepth}.` : 'No document hierarchy was emitted.',
+            !sidecarAvailable
+                ? 'Document hierarchy metrics are not attached to this snapshot.'
+                : units.length ? `The deepest document path reaches level ${maxDepth}.` : 'No document hierarchy was emitted.',
             [`${units.length} typed units and ${sidecar?.counters.parentChunks || 0} parent chunks were produced.`], deepestUnitRecords(units)),
-        metric('orphan-chunks', 'structure', 'Orphan chunks', String(orphanChunks.length), orphanChunks.length ? clampScore(100 - orphanChunks.length / Math.max(1, chunks.length) * 180) : 100,
-            orphanChunks.length ? 'Some leaf chunks have no sidecar lineage.' : 'Every leaf chunk participates in the document hierarchy.',
+        metric('orphan-chunks', 'structure', 'Orphan chunks', sidecarAvailable ? String(orphanChunks.length) : 'Not attached',
+            !sidecarAvailable ? null : orphanChunks.length ? clampScore(100 - orphanChunks.length / Math.max(1, chunks.length) * 180) : 100,
+            !sidecarAvailable ? 'Chunk lineage metrics are not attached to this snapshot.' : orphanChunks.length ? 'Some leaf chunks have no sidecar lineage.' : 'Every leaf chunk participates in the document hierarchy.',
             [`${coveredChunkIds.size} chunk IDs are referenced by hierarchy or retrieval units.`], chunkRecords(orphanChunks, 'Missing hierarchy lineage')),
-        metric('section-coverage', 'structure', 'Section coverage', percent(coverage), coverage * 100,
-            `${chunks.length - orphanChunks.length} of ${chunks.length} chunks are reachable through typed document context.`,
+        metric('section-coverage', 'structure', 'Section coverage', sidecarAvailable ? percent(coverage) : 'Not attached',
+            sidecarAvailable ? coverage * 100 : null,
+            sidecarAvailable
+                ? `${chunks.length - orphanChunks.length} of ${chunks.length} chunks are reachable through typed document context.`
+                : 'Typed document context metrics are not attached to this snapshot.',
             [`${sidecar?.counters.sections || 0} sections and ${sidecar?.counters.paragraphGroups || 0} paragraph groups contribute context.`], chunkRecords(orphanChunks, 'Uncovered chunk')),
         metric('document-adaptation', 'structure', 'Document adaptation', profileSummary?.profiles.length
             ? `${profileLabel(profileSummary.profiles[0].dominantProfile)} / ${percent(profileSummary.profiles[0].confidence)}`
@@ -208,15 +219,18 @@ function buildMetrics(snapshot: GraphRebuildSnapshot, receipt: GraphIndexRunRece
             profileSummary
                 ? [`${profileSummary.counters.signals} evidence signals explain the weighting.`, 'Profiles alter detector ranking and confidence, never the ontology or anchor registry.']
                 : ['Run Full Atlas to generate document and region profiles.'], profileRecords(snapshot)),
-        metric('evidence-density', 'semantic', 'Evidence density', `${evidenceDensity.toFixed(2)} spans/chunk`, clampScore(evidenceDensity * 82),
-            `${sidecar?.evidenceSpans.length || 0} evidence spans support ${chunks.length} chunks.`,
+        metric('evidence-density', 'semantic', 'Evidence density', sidecarAvailable ? `${evidenceDensity.toFixed(2)} spans/chunk` : 'Not attached',
+            sidecarAvailable ? clampScore(evidenceDensity * 82) : null,
+            sidecarAvailable
+                ? `${sidecar?.evidenceSpans.length || 0} evidence spans support ${chunks.length} chunks.`
+                : 'Evidence-span density is not attached to this snapshot.',
             [`${sidecar?.counters.rhetoricalUnits || 0} rhetorical units and ${sidecar?.counters.graphFactCandidates || 0} graph-fact candidates can cite them.`], evidenceRecords(sidecar?.evidenceSpans || [])),
         metric('entity-prior-noise', 'semantic', 'Entity-prior noise', percent(priorNoise), clampScore(100 - priorNoise * 130),
             priorCount ? `${unresolvedPriors.length} of ${priorCount} entity priors lack a matching mention in their chunk.` : 'No entity priors were emitted.',
             ['Lower is better. A noisy prior can bias relation and event extraction before linking.'], unresolvedPriors),
         metric('proposition-substrate', 'semantic', 'Proposition substrate', propositionCount
             ? `${formatNumber(reviewablePropositions)} / ${formatNumber(propositionCount)} reviewable`
-            : 'Not attached', propositionCount ? clampScore(72 + scopeRate * 28) : 35,
+            : 'Not attached', propositionSemantics ? propositionCount ? clampScore(72 + scopeRate * 28) : 35 : null,
             propositionCount
                 ? `${formatNumber(propositionSemantics?.counters.arguments || 0)} typed arguments feed reviewable facts, temporal axes, and causal analysis.`
                 : 'The native proposition substrate did not run for this snapshot.',
@@ -233,7 +247,7 @@ function buildMetrics(snapshot: GraphRebuildSnapshot, receipt: GraphIndexRunRece
             semanticPropositionRecords(snapshot)),
         metric('predicate-precision', 'semantic', 'Predicate precision gate', propositionCount
             ? percent(predicatePrecisionRate)
-            : 'Not attached', propositionCount ? clampScore(58 + predicatePrecisionRate * 34 - (modifierPropositions / Math.max(1, propositionCount)) * 18) : 35,
+            : 'Not attached', propositionSemantics ? propositionCount ? clampScore(58 + predicatePrecisionRate * 34 - (modifierPropositions / Math.max(1, propositionCount)) * 18) : 35 : null,
             propositionCount
                 ? `${formatNumber(reviewablePropositions)} propositions can enter review; ${formatNumber(ledgerOnlyPropositions)} remain inspectable ledger rows.`
                 : 'No predicate admission ledger is attached.',

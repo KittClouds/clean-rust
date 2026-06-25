@@ -109,7 +109,7 @@ export const LORENTZ_MANIFOLD_ADAPTER: ManifoldAtlasAdapter = {
 
 export const PRODUCT_MANIFOLD_ADAPTER: ManifoldAtlasAdapter = {
     mode: 'product',
-    label: 'Traversal',
+    label: 'Transit',
     traceLabel: 'Trace route',
     async load(phoenixUiApi, scope) {
         const snapshot = await phoenixUiApi.loadManifoldAtlasSnapshot('product', scope);
@@ -117,11 +117,11 @@ export const PRODUCT_MANIFOLD_ADAPTER: ManifoldAtlasAdapter = {
             return withManifoldMetadata(snapshot, buildProductAtlas(snapshot));
         }
         return {
-            ...emptyBackendAtlas('product semantic atlas unavailable'),
+            ...emptyBackendAtlas('transit semantic atlas unavailable'),
             manifold: {
                 mode: 'product',
-                geometryVersion: 'product_lorentz_hopf_v1',
-                sourceLabel: 'product semantic atlas unavailable',
+                geometryVersion: 'transit_lorentz_hopf_v1',
+                sourceLabel: 'transit semantic atlas unavailable',
                 capabilities: PRODUCT_MANIFOLD_CAPABILITIES,
                 projectionSource: 'semantic_atlas_rows',
                 cells: [],
@@ -279,7 +279,7 @@ function buildProductAtlas(snapshot: ManifoldAtlasSnapshot<SemanticAtlasEmbeddin
         ...lorentzAtlas,
         nodes,
         edges,
-        sourceLabel: snapshot.sourceLabel || 'product Lorentz-Hopf atlas',
+        sourceLabel: snapshot.sourceLabel || 'transit Lorentz-Hopf atlas',
     };
 }
 

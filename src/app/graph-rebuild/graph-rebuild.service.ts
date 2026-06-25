@@ -36,6 +36,7 @@ import type {
     GraphAtlasFamily,
     GraphAtlasManifoldTarget,
     GraphAtlasObject,
+    GraphAtlasObjectStatus,
     GraphAtlasPacket,
 } from './graph-atlas-packet';
 import {
@@ -121,6 +122,11 @@ const COMPRESSED_JSON_SCHEMA_VERSION = 'phoenix-graph-rebuild-json-payload/gzip-
 const COMPRESSED_SNAPSHOT_SCHEMA_VERSION = 'phoenix-graph-rebuild-payload/gzip-base64/v1';
 const SNAPSHOT_COMPRESSION_MIN_CHARS = 64 * 1024;
 const BASE64_CHUNK_SIZE = 0x8000;
+const NATIVE_COMPILER_REVIEW_ROW_LIMIT = 128;
+const NATIVE_COMPILER_DISCOURSE_CLUSTER_LIMIT = 72;
+const NATIVE_COMPILER_DISCOURSE_BRIDGE_LIMIT = 96;
+const NATIVE_COMPILER_PACKET_TEXT_LIMIT = 180;
+const NATIVE_COMPILER_PACKET_LIST_LIMIT = 12;
 
 export interface GraphRebuildPostProcessCache {
     schemaVersion: 'phoenix-graph-postprocess-cache/v1';
@@ -1109,11 +1115,99 @@ export function graphRebuildSnapshotToNativeCompilerPayload(snapshot: GraphRebui
         edges: snapshot.edges,
         calendarRegistrySummary: snapshot.calendarRegistrySummary,
         documentSidecarSummary: nativeCompilerEvidenceSidecar(snapshot, documentCompilerSummary),
-        documentReviewSummary: undefined,
+        documentReviewSummary: nativeCompilerDocumentReviewSummary(snapshot),
         documentCompilerSummary,
-        discourseSpineSummary: undefined,
+        discourseSpineSummary: nativeCompilerDiscourseSpineSummary(snapshot),
         counters: snapshot.counters,
     };
+}
+
+function nativeCompilerDocumentReviewSummary(
+    snapshot: GraphRebuildSnapshot,
+): GraphRebuildSnapshot['documentReviewSummary'] {
+    const rows = (snapshot.documentReviewSummary?.rows || [])
+        .slice()
+        .sort((left, right) => reviewStateRank(left.state) - reviewStateRank(right.state)
+            || String(left.id).localeCompare(String(right.id)))
+        .slice(0, NATIVE_COMPILER_REVIEW_ROW_LIMIT)
+        .map((row) => ({
+            id: row.id,
+            objectId: row.objectId,
+            objectKind: row.objectKind,
+            state: row.state,
+            title: boundedNativePacketText(row.title || row.objectId),
+            subtitle: boundedNativePacketText(row.subtitle || ''),
+            detail: '',
+            noteId: row.noteId,
+            sourceStart: row.sourceStart || 0,
+            sourceEnd: row.sourceEnd || 0,
+            confidence: row.confidence || 0,
+            detector: boundedNativePacketText(row.detector || 'document_review'),
+            parentUnitIds: boundedNativePacketList(row.parentUnitIds),
+            childUnitIds: boundedNativePacketList(row.childUnitIds),
+            evidenceSpanIds: boundedNativePacketList(row.evidenceSpanIds),
+            relatedObjectIds: boundedNativePacketList(row.relatedObjectIds),
+            why: [],
+        }));
+    return rows.length ? { rows } as unknown as GraphRebuildSnapshot['documentReviewSummary'] : undefined;
+}
+
+function nativeCompilerDiscourseSpineSummary(
+    snapshot: GraphRebuildSnapshot,
+): GraphRebuildSnapshot['discourseSpineSummary'] {
+    const source = snapshot.discourseSpineSummary;
+    if (!source) return undefined;
+    const clusters = (source.clusters || [])
+        .slice()
+        .sort((left, right) => (right.score || 0) - (left.score || 0) || String(left.id).localeCompare(String(right.id)))
+        .slice(0, NATIVE_COMPILER_DISCOURSE_CLUSTER_LIMIT)
+        .map((cluster) => ({
+            id: cluster.id,
+            kind: cluster.kind,
+            label: boundedNativePacketText(cluster.label),
+            targetIds: boundedNativePacketList(cluster.targetIds, NATIVE_COMPILER_PACKET_LIST_LIMIT * 2),
+            score: cluster.score || 0,
+        }));
+    const bridges = (source.bridges || [])
+        .slice()
+        .sort((left, right) => (right.scoringBundle?.finalScore || 0) - (left.scoringBundle?.finalScore || 0)
+            || String(left.id).localeCompare(String(right.id)))
+        .slice(0, NATIVE_COMPILER_DISCOURSE_BRIDGE_LIMIT)
+        .map((bridge) => ({
+            id: bridge.id,
+            kind: bridge.kind,
+            status: bridge.status,
+            sourceTargetId: bridge.sourceTargetId,
+            targetTargetId: bridge.targetTargetId,
+            label: boundedNativePacketText(bridge.label),
+            evidenceTargetIds: boundedNativePacketList(bridge.evidenceTargetIds, NATIVE_COMPILER_PACKET_LIST_LIMIT * 2),
+            sharedLabelIds: boundedNativePacketList(bridge.sharedLabelIds),
+            sharedEntityIds: boundedNativePacketList(bridge.sharedEntityIds),
+        }));
+    if (!clusters.length && !bridges.length) return undefined;
+    return { clusters, bridges } as unknown as GraphRebuildSnapshot['discourseSpineSummary'];
+}
+
+function reviewStateRank(state: string): number {
+    switch (state) {
+        case 'proposed': return 0;
+        case 'compiled_to_graph':
+        case 'promoted_to_anchor':
+        case 'accepted': return 1;
+        case 'rejected':
+        case 'muted': return 2;
+        case 'ledger_only': return 3;
+        default: return 4;
+    }
+}
+
+function boundedNativePacketText(value: string, limit = NATIVE_COMPILER_PACKET_TEXT_LIMIT): string {
+    const text = String(value || '');
+    return text.length > limit ? `${text.slice(0, Math.max(0, limit - 3))}...` : text;
+}
+
+function boundedNativePacketList(values: readonly string[] | undefined, limit = NATIVE_COMPILER_PACKET_LIST_LIMIT): string[] {
+    return (values || []).filter(Boolean).slice(0, limit);
 }
 
 function nativeCompilerDocumentCompilerSummary(
@@ -1487,6 +1581,10 @@ function graphAtlasPacketSeedForSnapshot(
     packet?: GraphAtlasPacket,
 ): GraphAtlasPacket {
     const normalized = normalizeNativeAtlasPacketSourceContract(packet);
+    const objects = mergeAtlasPacketObjects(
+        normalized?.objects || [],
+        interactiveDiagnosticAtlasObjects(snapshot),
+    );
     return {
         schemaVersion: 'phoenix-atlas-packet/v1',
         snapshotId: snapshot.id,
@@ -1499,7 +1597,7 @@ function graphAtlasPacketSeedForSnapshot(
             vectorContract: normalized?.sourceContract.vectorContract || 'vectors-missing',
             tsGraphBuilderRole: GRAPH_ATLAS_BUILDER_ROLE,
         },
-        objects: normalized?.objects || [],
+        objects,
         manifoldTargets: normalized?.manifoldTargets || [],
         counters: normalized?.counters || {
             objects: 0,
@@ -1510,6 +1608,124 @@ function graphAtlasPacketSeedForSnapshot(
             families: [],
         },
     };
+}
+
+const INTERACTIVE_PACKET_REVIEW_OBJECT_LIMIT = 64;
+const INTERACTIVE_PACKET_DISCOURSE_OBJECT_LIMIT = 96;
+
+function mergeAtlasPacketObjects(
+    base: GraphAtlasObject[],
+    extra: GraphAtlasObject[],
+): GraphAtlasObject[] {
+    const merged = new Map(base.map((object) => [object.id, object]));
+    for (const object of extra) merged.set(object.id, object);
+    return [...merged.values()];
+}
+
+function interactiveDiagnosticAtlasObjects(snapshot: GraphRebuildSnapshot): GraphAtlasObject[] {
+    return [
+        ...interactiveReviewAtlasObjects(snapshot),
+        ...interactiveDiscourseAtlasObjects(snapshot),
+    ];
+}
+
+function interactiveReviewAtlasObjects(snapshot: GraphRebuildSnapshot): GraphAtlasObject[] {
+    return (snapshot.documentReviewSummary?.rows || [])
+        .filter((row) => row.state !== 'ledger_only')
+        .slice(0, INTERACTIVE_PACKET_REVIEW_OBJECT_LIMIT)
+        .map((row): GraphAtlasObject => ({
+            id: `review:${row.id}`,
+            family: 'review',
+            status: reviewStateToAtlasStatus(row.state),
+            kind: row.objectKind || 'review',
+            label: row.title || row.objectId || row.id,
+            styleKey: 'rankStatus',
+            lane: 'review_state',
+            structuralRole: 'context',
+            stateContextKind: row.state,
+            noteIds: row.noteId ? [row.noteId] : [],
+            chunkIds: [],
+            anchorIds: [],
+            evidenceIds: row.evidenceSpanIds || [],
+            sourceIds: [row.id, row.objectId].filter(Boolean),
+            targetIds: [...new Set([...(row.relatedObjectIds || []), row.objectId].filter(Boolean))],
+        }));
+}
+
+function interactiveDiscourseAtlasObjects(snapshot: GraphRebuildSnapshot): GraphAtlasObject[] {
+    const bridges = (snapshot.discourseSpineSummary?.bridges || [])
+        .slice(0, INTERACTIVE_PACKET_DISCOURSE_OBJECT_LIMIT)
+        .map((bridge): GraphAtlasObject => ({
+            id: `discourse:${bridge.id}`,
+            family: 'discourse',
+            status: bridge.status === 'proposed' ? 'proposed' : bridge.status,
+            kind: `discourse_${bridge.kind}`,
+            label: bridge.label || bridge.id,
+            styleKey: 'communication',
+            lane: 'discourse_bridge',
+            structuralRole: 'bridge',
+            noteIds: [],
+            chunkIds: discourseChunkIds(bridge.evidenceTargetIds),
+            anchorIds: [],
+            evidenceIds: bridge.evidenceTargetIds || [],
+            sourceIds: [bridge.id],
+            targetIds: [bridge.sourceTargetId, bridge.targetTargetId, ...(bridge.evidenceTargetIds || [])].filter(Boolean),
+        }));
+    if (bridges.length) return bridges;
+    const clusters = (snapshot.discourseSpineSummary?.clusters || [])
+        .slice(0, INTERACTIVE_PACKET_DISCOURSE_OBJECT_LIMIT)
+        .map((cluster): GraphAtlasObject => ({
+            id: `discourse:${cluster.id}`,
+            family: 'discourse',
+            status: 'proposed',
+            kind: `discourse_${cluster.kind}`,
+            label: cluster.label || cluster.id,
+            styleKey: 'communication',
+            lane: 'discourse_cluster',
+            structuralRole: 'bridge',
+            noteIds: [],
+            chunkIds: discourseChunkIds(cluster.targetIds),
+            anchorIds: [],
+            evidenceIds: cluster.targetIds || [],
+            sourceIds: [cluster.id],
+            targetIds: cluster.targetIds || [],
+        }));
+    if (clusters.length) return clusters;
+    return snapshot.chunks.slice(1, INTERACTIVE_PACKET_DISCOURSE_OBJECT_LIMIT + 1)
+        .map((chunk, index): GraphAtlasObject => {
+            const previous = snapshot.chunks[index];
+            const evidenceIds = [`embed:chunk:${previous.id}`, `embed:chunk:${chunk.id}`];
+            return {
+                id: `discourse:continuity:${previous.id}->${chunk.id}`,
+                family: 'discourse',
+                status: 'proposed',
+                kind: 'discourse_continuity',
+                label: `Continuity ${previous.ordinal}->${chunk.ordinal}`,
+                styleKey: 'communication',
+                lane: 'discourse_continuity',
+                structuralRole: 'bridge',
+                noteIds: [...new Set([previous.noteId, chunk.noteId].filter(Boolean))],
+                chunkIds: [previous.id, chunk.id],
+                anchorIds: [],
+                evidenceIds,
+                sourceIds: [`continuity:${previous.id}->${chunk.id}`],
+                targetIds: evidenceIds,
+            };
+        });
+}
+
+function discourseChunkIds(targetIds: string[]): string[] {
+    return [...new Set((targetIds || [])
+        .map((targetId) => targetId.match(/^embed:chunk:(.+)$/)?.[1] || '')
+        .filter(Boolean))];
+}
+
+function reviewStateToAtlasStatus(state: string): GraphAtlasObjectStatus {
+    if (state === 'compiled_to_graph') return 'compiledToGraph';
+    if (state === 'promoted_to_anchor') return 'promotedToAnchor';
+    if (state === 'ledger_only') return 'ledgerOnly';
+    if (state === 'accepted' || state === 'proposed' || state === 'rejected' || state === 'muted') return state;
+    return 'review';
 }
 
 function sameEmbeddingTargetIds(
@@ -1819,6 +2035,7 @@ export function graphRebuildSnapshotPersistenceView(
     delete persisted.documentSemanticSummary;
     delete persisted.documentReviewSummary;
     delete persisted.documentCompilerSummary;
+    delete (persisted as GraphRebuildSnapshot & { atlasDebugSummaries?: unknown }).atlasDebugSummaries;
     delete persisted.graphTruthCommitLedger;
     delete persisted.calendarRegistrySummary;
     if (snapshot.graphCompiler && snapshot.graphModelV2) {
@@ -2333,18 +2550,6 @@ function snapshotContentBlobValue(
                 snapshotId: '',
                 builtAt: 0,
             } : undefined;
-        case 'atlasDebugSummaries':
-            return compactBlobGroup({
-                graphAwareLinkSuggestions: snapshot.graphAwareLinkSuggestions,
-                entityLinkSuggestions: snapshot.entityLinkSuggestions,
-                shadowLinkSuggestions: snapshot.shadowLinkSuggestions,
-                finalLinkPatchLog: snapshot.finalLinkPatchLog,
-                documentSidecarSummary: snapshot.documentSidecarSummary,
-                documentSemanticSummary: snapshot.documentSemanticSummary,
-                documentReviewSummary: snapshot.documentReviewSummary,
-                documentCompilerSummary: snapshot.documentCompilerSummary,
-                calendarRegistrySummary: snapshot.calendarRegistrySummary,
-            });
     }
     return undefined;
 }

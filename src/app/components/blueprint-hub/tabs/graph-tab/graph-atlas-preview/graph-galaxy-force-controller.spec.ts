@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 
-import { GraphGalaxyForceController, productManifoldExpansionScale } from './graph-galaxy-force-controller';
+import { GraphGalaxyForceController, transitManifoldExpansionScale } from './graph-galaxy-force-controller';
 import type { GalaxySceneV2 } from './graph-galaxy-scene-v2';
 
 describe('GraphGalaxyForceController Hybrid constraints', () => {
@@ -98,7 +98,7 @@ describe('GraphGalaxyForceController Hybrid constraints', () => {
         expect(scene.positions3d[3]).toBeLessThan(0.14);
     });
 
-    it('expands Product positions volumetrically from the canonical shape', () => {
+    it('expands Transit positions volumetrically from the canonical shape', () => {
         const scene = productScene([
             [1, 0.25, 0.5],
             [-0.5, 0.2, -0.4],
@@ -106,16 +106,16 @@ describe('GraphGalaxyForceController Hybrid constraints', () => {
         const controller = new GraphGalaxyForceController();
         controller.bind(scene);
 
-        controller.setSettings({ layoutMode: 'productManifold', nodeDistance: 2.2, edgeLength: 1.7 });
+        controller.setSettings({ layoutMode: 'transitManifold', nodeDistance: 2.2, edgeLength: 1.7 });
 
-        const scale = productManifoldExpansionScale({ nodeDistance: 2.2, edgeLength: 1.7 });
+        const scale = transitManifoldExpansionScale({ nodeDistance: 2.2, edgeLength: 1.7 });
         expect(scene.positions3d[0]).toBeCloseTo(1 * scale, 5);
         expect(scene.positions3d[1]).toBeCloseTo(0.25 * scale, 5);
         expect(scene.positions3d[2]).toBeCloseTo(0.5 * scale, 5);
         expect(radius3d(scene.positions3d, 1)).toBeCloseTo(Math.hypot(-0.5, 0.2, -0.4) * scale, 5);
     });
 
-    it('keeps Product force mode bounded instead of starting raw graph physics', () => {
+    it('keeps Transit force mode bounded instead of starting raw graph physics', () => {
         const scene = productScene([
             [1.2, 0.1, 0.05],
             [0.45, -0.25, 0.2],
@@ -145,7 +145,7 @@ function hopfScene(points: Array<[number, number, number]>, hopfRoles?: Uint8Arr
 }
 
 function productScene(points: Array<[number, number, number]>): GalaxySceneV2 {
-    return projectedScene('productManifold', points);
+    return projectedScene('transitManifold', points);
 }
 
 function capsScene(points: Array<[number, number, number]>, hierarchyShellRadii?: Float32Array): GalaxySceneV2 {
