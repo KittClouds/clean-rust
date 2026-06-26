@@ -673,8 +673,21 @@ function productGateNliJudgments(text: string, chunks: ReturnType<typeof buildAd
         sourceId: relationship.sourceEntityId,
         targetId: relationship.targetEntityId,
         edgeType: 'supports',
-        predictedLabel: 'entailment',
-        confidence: 0.95,
+        nliVote: {
+            source: 'modernBertNli',
+            role: 'canonFactAdjudication',
+            decision: 'supported',
+            confidenceMillis: 950,
+            entailmentMillis: 950,
+            contradictionMillis: 20,
+            neutralMillis: 30,
+        },
+        classificationVote: {
+            source: 'gliclass',
+            role: 'relationFrameClassification',
+            label: 'supports',
+            scoreMillis: 900,
+        },
     }));
 }
 
@@ -758,8 +771,21 @@ function rawCapabilityResult(capability: string) {
                 sourceId: 'entity-ryan',
                 targetId: 'entity-new-rome',
                 edgeType: 'co_occurs_with',
-                predictedLabel: 'entailment',
-                confidence: 0.9,
+                nliVote: {
+                    source: 'modernBertNli',
+                    role: 'canonFactAdjudication',
+                    decision: 'supported',
+                    confidenceMillis: 900,
+                    entailmentMillis: 900,
+                    contradictionMillis: 30,
+                    neutralMillis: 70,
+                },
+                classificationVote: {
+                    source: 'gliclass',
+                    role: 'relationFrameClassification',
+                    label: 'co_occurs_with',
+                    scoreMillis: 820,
+                },
             }];
         return {
             inputCount: judgments.length,

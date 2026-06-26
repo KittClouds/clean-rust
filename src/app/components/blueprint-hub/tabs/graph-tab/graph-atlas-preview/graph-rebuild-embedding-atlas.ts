@@ -2450,9 +2450,9 @@ function productFiberKind(role: string, laneKind?: string): string {
 
 function buildTargetEdges(snapshot: GraphRebuildSnapshot): GalaxyInputEdge[] {
     const edges: GalaxyInputEdge[] = [];
-    const add = (id: string, sourceId: string, targetId: string, type: string, confidence: number) => {
+    const add = (id: string, sourceId: string, targetId: string, type: string, confidence: number, metadata?: Record<string, unknown>) => {
         if (sourceId === targetId) return;
-        edges.push({ id, sourceId, targetId, type, confidence });
+        edges.push({ id, sourceId, targetId, type, confidence, metadata });
     };
 
     for (const chunk of snapshot.chunks) {
@@ -2519,7 +2519,57 @@ function buildTargetEdges(snapshot: GraphRebuildSnapshot): GalaxyInputEdge[] {
     for (const edge of snapshot.embeddingGraphPostProcess?.backboneEdges || []) {
         add(edge.id, edge.sourceTargetId, edge.targetTargetId, `embedding-${edge.role}`, edge.score);
     }
+    addDiscourseOverlayEdges(snapshot, add);
     return dedupeEdges(edges);
+}
+
+function addDiscourseOverlayEdges(
+    snapshot: GraphRebuildSnapshot,
+    add: (id: string, sourceId: string, targetId: string, type: string, confidence: number, metadata?: Record<string, unknown>) => void,
+): void {
+    for (const edge of snapshot.discourseCompilerOverlaySummary?.overlayEdges || []) {
+        const type = edge.proposedEdgeType || edge.kind;
+        const metadata = discourseOverlayEdgeMetadata(edge);
+        if (edge.kind === 'document_cluster') {
+            const members = [...new Set([edge.sourceTargetId, edge.targetTargetId || '', ...edge.memberTargetIds].filter(Boolean))];
+            const medoid = edge.sourceTargetId || members[0];
+            for (const memberId of members) {
+                if (!medoid || memberId === medoid) continue;
+                add(`${edge.id}:member:${memberId}`, medoid, memberId, type, edge.confidence, {
+                    ...metadata,
+                    clusterMedoidTargetId: medoid,
+                    clusterMemberTargetId: memberId,
+                });
+            }
+            continue;
+        }
+        if (!edge.targetTargetId) continue;
+        add(edge.id, edge.sourceTargetId, edge.targetTargetId, type, edge.confidence, metadata);
+    }
+}
+
+function discourseOverlayEdgeMetadata(edge: NonNullable<GraphRebuildSnapshot['discourseCompilerOverlaySummary']>['overlayEdges'][number]): Record<string, unknown> {
+    const interactionKind = edge.kind === 'chunk_wormhole' ? 'wormhole' : edge.kind;
+    return {
+        interactionKind,
+        overlayEdgeId: edge.id,
+        sourceHintId: edge.sourceHintId,
+        sourceLedgerEntryId: edge.sourceLedgerEntryId,
+        candidateId: edge.candidateId,
+        decisionId: edge.decisionId,
+        projectionKind: edge.projectionKind,
+        status: edge.status,
+        reviewState: edge.status,
+        graphPatch: false,
+        mutationAllowed: false,
+        graphImpact: 'Read-only discourse overlay; no graph patch or topology commit exists.',
+        detector: 'discourseCompilerOverlay',
+        reasons: edge.rationale,
+        evidenceIds: edge.evidenceTargetIds,
+        memberTargetIds: edge.memberTargetIds,
+        proposedEdgeType: edge.proposedEdgeType,
+        graphRelationFamily: edge.kind === 'document_cluster' ? 'documentStructure' : 'relationship',
+    };
 }
 
 function edgeWithVisualTrace(

@@ -172,6 +172,10 @@ class PhoenixTaurpcBridge implements PhoenixNativeBridge {
         return this.callJson('graph_scene_packet_json', request);
     }
 
+    async nliAdjudicateClaims(request: Record<string, unknown>): Promise<any> {
+        return this.callJson('nli_adjudicate_claims_json', request);
+    }
+
     async lorentzForestCache(request: Record<string, unknown>): Promise<any> {
         return this.callJson('lorentz_forest_cache_json', request);
     }

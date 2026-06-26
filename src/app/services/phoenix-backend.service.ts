@@ -90,6 +90,7 @@ export type PhoenixNativeBridge = Pick<PhoenixWasmService, 'isReady' | PhoenixNa
     bootSnapshot(): Promise<PhoenixBootSnapshotPayload>;
     compileGalaxyScene(request: PhoenixGalaxySceneRequest): Promise<PhoenixGalaxyScene>;
     graphScenePacket?(request: PhoenixGraphScenePacketRequest): Promise<PhoenixGraphScenePacket>;
+    nliAdjudicateClaims?(request: Record<string, unknown>): Promise<any>;
     siegelFinslerReceipt?(request: Record<string, unknown>): Promise<any>;
 };
 
@@ -333,6 +334,17 @@ export class PhoenixBackendService {
             throw new Error('Phoenix native graph scene packet compiler is unavailable.');
         }
         return bridge.graphScenePacket(request);
+    }
+
+    async nliAdjudicateClaims(request: Record<string, unknown>): Promise<any> {
+        if (this.target !== 'native') {
+            throw new Error('Phoenix NLI claim adjudication is only available on native desktop.');
+        }
+        const bridge = this.requireNativeBridge();
+        if (!bridge.nliAdjudicateClaims) {
+            throw new Error('Phoenix native NLI claim adjudication is unavailable.');
+        }
+        return bridge.nliAdjudicateClaims(request);
     }
 
     async storeCommand(command: string, payload: Record<string, unknown> = {}): Promise<any> {

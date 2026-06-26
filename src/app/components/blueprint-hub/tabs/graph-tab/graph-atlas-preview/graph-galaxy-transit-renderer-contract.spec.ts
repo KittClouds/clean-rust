@@ -7,6 +7,10 @@ import {
     type GalaxyRenderableNode,
 } from './graph-galaxy-engine';
 import { galaxySceneToV2 } from './graph-galaxy-scene-v2';
+import {
+    transitStationLaneOffset,
+    transitVisualLanePoint,
+} from './graph-transit-backbone-guides';
 
 describe('Graph galaxy Transit renderer contract', () => {
     it('attaches a packet-backed TransitPlan before layout', () => {
@@ -18,20 +22,21 @@ describe('Graph galaxy Transit renderer contract', () => {
         const single = buildGalaxyScene(nodes, edges, mergeGalaxySettings({ layoutMode: 'single' }));
 
         expect(transit.transitPlan?.receipt).toMatchObject({
-            stationCount: 3,
-            routeCount: 2,
-            packetBackedStations: 3,
-            packetBackedRoutes: 2,
+            stationCount: 4,
+            routeCount: 3,
+            packetBackedStations: 4,
+            packetBackedRoutes: 3,
             droppedUntracedNodes: 0,
             missingEndpointRoutes: 0,
         });
         expect(transit.transitPlan?.receipt.laneCounts).toMatchObject({
             document: 1,
+            root: 1,
             chunk: 1,
             identity: 1,
         });
         expect(productCompat.layoutMode).toBe('transitManifold');
-        expect(productCompat.transitPlan?.receipt.stationCount).toBe(3);
+        expect(productCompat.transitPlan?.receipt.stationCount).toBe(4);
         expect(single.transitPlan).toBeUndefined();
     });
 
@@ -42,10 +47,10 @@ describe('Graph galaxy Transit renderer contract', () => {
         expect(rendererScene.layoutMode).toBe('transitManifold');
         expect(rendererScene.transitPlan).toBe(scene.transitPlan);
         expect(rendererScene.transitPlan?.receipt).toMatchObject({
-            stationCount: 3,
-            routeCount: 2,
-            packetBackedStations: 3,
-            packetBackedRoutes: 2,
+            stationCount: 4,
+            routeCount: 3,
+            packetBackedStations: 4,
+            packetBackedRoutes: 3,
         });
         expect(rendererScene.transitPlan?.stations.every((station) => station.packetBacked)).toBe(true);
         expect(rendererScene.transitPlan?.routes.every((route) => route.packetBacked)).toBe(true);
@@ -68,7 +73,111 @@ describe('Graph galaxy Transit renderer contract', () => {
         });
     });
 
-    it('renders route stages, lane guides, and obstructions without Transit-local Hopf ribbons', () => {
+    it('renders the packet-native document/root/chunk backbone as guide structure first', () => {
+        const scene = buildGalaxyScene(packetNodes(), packetEdges(), mergeGalaxySettings({ layoutMode: 'productManifold' }));
+        const rendererScene = galaxySceneToV2(scene, 'embeddings');
+        const guides = rendererScene.lorentzGuides.filter((guide) => guide.treeId === 'transit:backbone');
+
+        expect(guides.map((guide) => guide.id)).toEqual(expect.arrayContaining([
+            'transit:backbone:lane:document',
+            'transit:backbone:lane:root',
+            'transit:backbone:lane:chunk',
+            'transit:backbone:route:doc-root',
+            'transit:backbone:route:root-chunk',
+        ]));
+        expect(guides.filter((guide) => guide.guideKind === 'rootLane').map((guide) => guide.treeKind)).toEqual([
+            'backbone:document',
+            'backbone:root',
+            'backbone:chunk',
+        ]);
+        expect(guides.find((guide) => guide.id === 'transit:backbone:lane:document')).toMatchObject({
+            nodeIds: ['doc'],
+            guideWeight: expect.any(Number),
+        });
+        expect(guides.find((guide) => guide.id === 'transit:backbone:route:root-chunk')).toMatchObject({
+            nodeIds: ['root', 'chunk'],
+            guideKind: 'membership',
+            treeKind: 'backbone:root>chunk',
+        });
+    });
+
+    it('adds packet-native evidence, identity, route, side-band, and review lanes', () => {
+        const scene = buildGalaxyScene(lanePacketNodes(), lanePacketEdges(), mergeGalaxySettings({ layoutMode: 'productManifold' }));
+        const rendererScene = galaxySceneToV2(scene, 'embeddings');
+        const guideById = new Map(rendererScene.lorentzGuides.map((guide) => [guide.id, guide]));
+
+        expect([...guideById.keys()]).toEqual(expect.arrayContaining([
+            'transit:plan:lane:evidence',
+            'transit:plan:lane:identity',
+            'transit:plan:lane:event',
+            'transit:plan:lane:timeline',
+            'transit:plan:lane:causal',
+            'transit:plan:lane:state',
+            'transit:plan:lane:context',
+            'transit:plan:lane:discourse',
+            'transit:plan:lane:review',
+            'transit:plan:lane:proposed',
+            'transit:plan:stop:evidence',
+            'transit:plan:hub:kai',
+            'transit:plan:route:kai-event',
+            'transit:plan:route:event-timeline',
+            'transit:plan:route:event-causal',
+        ]));
+        expect(guideById.get('transit:plan:lane:state')).toMatchObject({
+            treeId: 'transit:plan-side-bands',
+            treeKind: 'side-band:state',
+            nodeIds: ['state'],
+        });
+        expect(guideById.get('transit:plan:lane:proposed')).toMatchObject({
+            treeId: 'transit:plan-lanes',
+            treeKind: 'lane:proposed',
+            nodeIds: ['proposed'],
+        });
+        expect(guideById.get('transit:plan:route:event-causal')).toMatchObject({
+            guideKind: 'membership',
+            treeKind: 'route:causal',
+            nodeIds: ['event', 'causal'],
+        });
+    });
+
+    it('uses TransitPlan as layout authority instead of anchoring over Product layout', () => {
+        const scene = buildGalaxyScene(lanePacketNodes(), lanePacketEdges(), mergeGalaxySettings({ layoutMode: 'productManifold' }));
+        const rendererScene = galaxySceneToV2(scene, 'embeddings');
+
+        for (const id of ['doc', 'root', 'chunk', 'evidence', 'kai', 'event', 'timeline', 'causal', 'state', 'context', 'discourse', 'review', 'proposed']) {
+            expect(distanceToStationTarget(rendererScene, id)).toBeLessThan(0.22);
+        }
+        expect(rendererScene.lorentzGuides.some((guide) => guide.id.startsWith('transit:lane:'))).toBe(false);
+        expect(rendererScene.lorentzGuides.some((guide) => guide.id.startsWith('transit:route:'))).toBe(false);
+    });
+
+    it('fans out packet chunk stations that share the same Transit stop', () => {
+        const ids = ['chunk-a', 'chunk-b', 'chunk-c', 'chunk-d', 'chunk-e', 'chunk-f'];
+        const scene = buildGalaxyScene(
+            ids.map((id) => sharedChunkStopNode(id)),
+            [],
+            mergeGalaxySettings({ layoutMode: 'productManifold' }),
+        );
+        const rendererScene = galaxySceneToV2(scene, 'embeddings');
+
+        expect(minPairwiseDistance(rendererScene, ids)).toBeGreaterThan(0.09);
+        expect(axisSpan(rendererScene, ids, 0)).toBeGreaterThan(0.28);
+        expect(axisSpan(rendererScene, ids, 1)).toBeGreaterThan(0.04);
+    });
+
+    it('keeps non-chunk Transit rings on their independent offsets', () => {
+        const ids = ['kai', 'hazel', 'rift', 'borrik', 'nara', 'orrin'];
+        const scene = buildGalaxyScene(
+            ids.map((id) => sharedIdentityRingNode(id)),
+            [],
+            mergeGalaxySettings({ layoutMode: 'productManifold' }),
+        );
+        const rendererScene = galaxySceneToV2(scene, 'embeddings');
+
+        expect(axisSpan(rendererScene, ids, 0)).toBeGreaterThan(0.5);
+    });
+
+    it('does not resurrect Product route-stage guides for untraced compatibility rows', () => {
         const scene = buildGalaxyScene([
             productNode('evidence', 'Chunk evidence', 'chunk', 'evidence', 'chunk'),
             productNode('entity', 'Kai', 'entity', 'identity', 'entity'),
@@ -79,21 +188,19 @@ describe('Graph galaxy Transit renderer contract', () => {
             { id: 'entity-causal', sourceId: 'entity', targetId: 'causal', type: 'causal', confidence: 0.82 },
             { id: 'causal-dead-end', sourceId: 'causal', targetId: 'dead-end', type: 'embedding-bridge', confidence: 0.18 },
         ], mergeGalaxySettings({ layoutMode: 'transitManifold' }));
-        const byId = new Map(scene.nodes.map((node) => [node.entity.id, node]));
 
         expect(scene.layoutMode).toBe('transitManifold');
         expect(scene.hopfRibbons?.length ?? 0).toBe(0);
-        expect(byId.get('evidence')!.x).toBeLessThan(byId.get('entity')!.x);
-        expect(byId.get('entity')!.x).toBeLessThan(byId.get('causal')!.x);
-        expect(byId.get('dead-end')).toBeTruthy();
-        expect(scene.lorentzGuides?.some((guide) => guide.id === 'transit:lane:evidence' && guide.guideKind === 'rootLane')).toBe(true);
-        expect(scene.lorentzGuides?.some((guide) => guide.id === 'transit:route:causal-dead-end' && /unsupported|mismatch|missing/i.test(guide.treeKind))).toBe(true);
+        expect(scene.transitPlan?.receipt.droppedUntracedNodes).toBe(4);
+        expect(scene.lorentzGuides?.some((guide) => guide.id.startsWith('transit:lane:'))).toBe(false);
+        expect(scene.lorentzGuides?.some((guide) => guide.id.startsWith('transit:route:'))).toBe(false);
     });
 });
 
 function packetNodes(): GalaxyRenderableNode[] {
     return [
         transitPacketNode('doc', 'Note', 'structure', 'document', 'note-1', { noteIds: ['note-1'] }),
+        transitPacketNode('root', 'Root', 'structure', 'structureRoot', 'root-1', { noteIds: ['note-1'] }),
         transitPacketNode('chunk', 'Chunk', 'structure', 'chunk', 'chunk-1', { noteIds: ['note-1'], chunkIds: ['chunk-1'] }),
         transitPacketNode('kai', 'Kai', 'registry', 'entity', 'kai', { noteIds: ['note-1'], chunkIds: ['chunk-1'] }),
     ];
@@ -101,9 +208,88 @@ function packetNodes(): GalaxyRenderableNode[] {
 
 function packetEdges(): GalaxyInputEdge[] {
     return [
-        transitPacketEdge('doc-chunk', 'doc', 'chunk', 'manifold_parent', 'structure'),
+        transitPacketEdge('doc-root', 'doc', 'root', 'manifold_parent', 'structure'),
+        transitPacketEdge('root-chunk', 'root', 'chunk', 'manifold_parent', 'structure'),
         transitPacketEdge('chunk-kai', 'chunk', 'kai', 'chunk-entity', 'registry'),
     ];
+}
+
+function lanePacketNodes(): GalaxyRenderableNode[] {
+    return [
+        ...packetNodes(),
+        transitPacketNode('evidence', 'Evidence span', 'evidence', 'evidenceSpan', 'evidence-1', { noteIds: ['note-1'], chunkIds: ['chunk-1'], evidenceIds: ['evidence-1'] }),
+        transitPacketNode('event', 'Door opens', 'fact', 'event', 'event-1', { noteIds: ['note-1'], chunkIds: ['chunk-1'], evidenceIds: ['evidence-1'] }),
+        transitPacketNode('timeline', 'Before alarm', 'temporal', 'temporalFact', 'temporal-1', { noteIds: ['note-1'], chunkIds: ['chunk-1'], evidenceIds: ['evidence-1'] }),
+        transitPacketNode('causal', 'Door causes alarm', 'causal', 'causalFact', 'causal-1', { noteIds: ['note-1'], chunkIds: ['chunk-1'], evidenceIds: ['evidence-1'] }),
+        transitPacketNode('state', 'Kai cautious', 'memory', 'memoryState', 'state-1', { noteIds: ['note-1'], chunkIds: ['chunk-1'], evidenceIds: ['evidence-1'] }),
+        transitPacketNode('context', 'Service context', 'context', 'serviceContext', 'context-1', { noteIds: ['note-1'], chunkIds: ['chunk-1'] }),
+        transitPacketNode('discourse', 'Discourse bridge', 'discourse', 'discourseBridge', 'discourse-1', { noteIds: ['note-1'], chunkIds: ['chunk-1'] }),
+        transitPacketNode('review', 'Review row', 'review', 'reviewCandidate', 'review-1', { noteIds: ['note-1'], chunkIds: ['chunk-1'], evidenceIds: ['evidence-1'] }),
+        transitPacketNode('proposed', 'Proposed relation', 'proposed', 'proposedRelationship', 'proposed-1', { noteIds: ['note-1'], chunkIds: ['chunk-1'], evidenceIds: ['evidence-1'] }),
+    ];
+}
+
+function lanePacketEdges(): GalaxyInputEdge[] {
+    return [
+        ...packetEdges(),
+        transitPacketEdge('chunk-evidence', 'chunk', 'evidence', 'evidence_anchor', 'evidence'),
+        transitPacketEdge('evidence-kai', 'evidence', 'kai', 'identity_anchor', 'registry'),
+        transitPacketEdge('kai-event', 'kai', 'event', 'event_identity', 'fact'),
+        transitPacketEdge('event-timeline', 'event', 'timeline', 'temporal_before', 'temporal'),
+        transitPacketEdge('event-causal', 'event', 'causal', 'causal_effect', 'causal'),
+        transitPacketEdge('kai-state', 'kai', 'state', 'memory_state', 'memory'),
+        transitPacketEdge('kai-context', 'kai', 'context', 'service_context', 'context'),
+        transitPacketEdge('chunk-discourse', 'chunk', 'discourse', 'discourse_bridge', 'discourse'),
+        transitPacketEdge('review-proposed', 'review', 'proposed', 'proposed_candidate', 'proposed'),
+    ];
+}
+
+function distanceToStationTarget(
+    scene: ReturnType<typeof galaxySceneToV2>,
+    nodeId: string,
+): number {
+    const station = scene.transitPlan?.stations.find((item) => item.nodeId === nodeId);
+    if (!station) return Number.POSITIVE_INFINITY;
+    const target = transitVisualLanePoint(station.lane, transitStationLaneOffset(station));
+    const index = scene.ids.indexOf(nodeId);
+    if (!target || index < 0) return Number.POSITIVE_INFINITY;
+    const offset = index * 3;
+    return Math.hypot(
+        scene.positions3d[offset] - target.x,
+        scene.positions3d[offset + 1] - target.y,
+        scene.positions3d[offset + 2] - target.z,
+    );
+}
+
+function minPairwiseDistance(scene: ReturnType<typeof galaxySceneToV2>, ids: string[]): number {
+    let best = Number.POSITIVE_INFINITY;
+    for (let left = 0; left < ids.length; left++) {
+        for (let right = left + 1; right < ids.length; right++) {
+            best = Math.min(best, pointDistance(scene, ids[left], ids[right]));
+        }
+    }
+    return best;
+}
+
+function pointDistance(scene: ReturnType<typeof galaxySceneToV2>, leftId: string, rightId: string): number {
+    const left = scene.ids.indexOf(leftId);
+    const right = scene.ids.indexOf(rightId);
+    if (left < 0 || right < 0) return 0;
+    const leftOffset = left * 3;
+    const rightOffset = right * 3;
+    return Math.hypot(
+        scene.positions3d[leftOffset] - scene.positions3d[rightOffset],
+        scene.positions3d[leftOffset + 1] - scene.positions3d[rightOffset + 1],
+        scene.positions3d[leftOffset + 2] - scene.positions3d[rightOffset + 2],
+    );
+}
+
+function axisSpan(scene: ReturnType<typeof galaxySceneToV2>, ids: string[], axis: 0 | 1 | 2): number {
+    const values = ids
+        .map((id) => scene.ids.indexOf(id))
+        .filter((index) => index >= 0)
+        .map((index) => scene.positions3d[index * 3 + axis]);
+    return Math.max(...values) - Math.min(...values);
 }
 
 function productNode(
@@ -139,6 +325,24 @@ function productNode(
             },
         },
     };
+}
+
+function sharedChunkStopNode(id: string): GalaxyRenderableNode {
+    const node = transitPacketNode(id, id, 'structure', 'chunk', id, { noteIds: ['note-1'], chunkIds: ['chunk-1'] });
+    return {
+        ...node,
+        metadata: {
+            ...node.metadata,
+            visualTrace: {
+                ...(node.metadata?.['visualTrace'] as Record<string, unknown>),
+                packetTargetId: 'target:chunk-1:identity-stop',
+            },
+        },
+    };
+}
+
+function sharedIdentityRingNode(id: string): GalaxyRenderableNode {
+    return transitPacketNode(id, id, 'registry', 'entity', id, { noteIds: ['note-1'], chunkIds: ['chunk-1'] });
 }
 
 function transitPacketNode(

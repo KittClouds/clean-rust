@@ -168,7 +168,7 @@ describe('graph galaxy hierarchy contract', () => {
         expect(causalLorentz?.['supportChunkIds']).toEqual(['note-a:chunk-1']);
     });
 
-    it('keeps explicit Embed Caps groups nested instead of flattening to the document cap', () => {
+    it('keeps explicit Embed Caps groups nested while drawing only coarse containers', () => {
         const scene = buildGalaxyScene([
             capNode('embed:note:note-a', 'note', 'document:note-a', []),
             capNode('embed:structure-root:note-a:identity', 'structureRoot', 'document:note-a:root:identity', ['document:note-a']),
@@ -184,13 +184,15 @@ describe('graph galaxy hierarchy contract', () => {
             edge('entity-state', 'embed:entity:kai', 'embed:memory:kai:rank', 'memory-entity'),
         ], mergeGalaxySettings({ layoutMode: 'lorentzTree', sourceMode: 'embeddings' }));
         const boundaryIds = rootLaneTreeIds(scene);
+        const nestedCapIds = metadataCapIds(scene);
 
-        expect(boundaryIds).toContain('document:note-a');
-        expect(boundaryIds).toContain('document:note-a:root:identity');
-        expect(boundaryIds).toContain('document:note-a:chunk:note-a:chunk-1');
-        expect(boundaryIds).toContain('document:note-a:chunk:note-a:chunk-1:evidence');
-        expect(boundaryIds).toContain('document:note-a:chunk:note-a:chunk-1:evidence:entity:kai');
-        expect(boundaryIds).toContain('document:note-a:chunk:note-a:chunk-1:evidence:entity:kai:memory');
+        expect(boundaryIds).toEqual(['document:note-a']);
+        expect(nestedCapIds).toContain('document:note-a');
+        expect(nestedCapIds).toContain('document:note-a:root:identity');
+        expect(nestedCapIds).toContain('document:note-a:chunk:note-a:chunk-1');
+        expect(nestedCapIds).toContain('document:note-a:chunk:note-a:chunk-1:evidence');
+        expect(nestedCapIds).toContain('document:note-a:chunk:note-a:chunk-1:evidence:entity:kai');
+        expect(nestedCapIds).toContain('document:note-a:chunk:note-a:chunk-1:evidence:entity:kai:memory');
     });
 
     it('synthesizes the Embed Caps hierarchy when embedding post-process vectors are missing', () => {
@@ -204,13 +206,15 @@ describe('graph galaxy hierarchy contract', () => {
         const byId = new Map(atlas.nodes.map((node) => [node.id, node]));
         const entityLorentz = byId.get('embed:entity:kai')?.metadata?.lorentz as Record<string, unknown>;
         const boundaryIds = rootLaneTreeIds(scene);
+        const nestedCapIds = metadataCapIds(scene);
 
         expect(entityLorentz?.['capId']).toBe('document:note-a:chunk:note-a:chunk-1:evidence:entity:kai');
         expect(entityLorentz?.['parentCapIds']).toEqual(['document:note-a:chunk:note-a:chunk-1:evidence']);
-        expect(boundaryIds).toContain('document:note-a:root:identity');
-        expect(boundaryIds).toContain('document:note-a:chunk:note-a:chunk-1');
-        expect(boundaryIds).toContain('document:note-a:chunk:note-a:chunk-1:evidence');
-        expect(boundaryIds).toContain('document:note-a:chunk:note-a:chunk-1:evidence:entity:kai');
+        expect(boundaryIds).toEqual(['document:note-a']);
+        expect(nestedCapIds).toContain('document:note-a:root:identity');
+        expect(nestedCapIds).toContain('document:note-a:chunk:note-a:chunk-1');
+        expect(nestedCapIds).toContain('document:note-a:chunk:note-a:chunk-1:evidence');
+        expect(nestedCapIds).toContain('document:note-a:chunk:note-a:chunk-1:evidence:entity:kai');
     });
 
     it('draws Embed Caps level guides from the hierarchy contract', () => {
@@ -491,6 +495,12 @@ function rootLaneTreeIds(scene: { lorentzGuides?: Array<{ guideKind: string; tre
     return (scene.lorentzGuides || [])
         .filter((guide) => guide.guideKind === 'rootLane')
         .map((guide) => guide.treeId);
+}
+
+function metadataCapIds(scene: { nodes: Array<{ entity: GalaxyRenderableNode }> }): string[] {
+    return scene.nodes
+        .map((node) => String((node.entity.metadata?.lorentz as Record<string, unknown> | undefined)?.['capId'] || ''))
+        .filter(Boolean);
 }
 
 function radius(node: { x: number; y: number; z: number }): number {

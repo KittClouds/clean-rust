@@ -1870,6 +1870,129 @@ describe('embedding atlas projection', () => {
         expect(Number(chunk['shellRadius'])).toBeGreaterThan(Number(entity['shellRadius']));
     });
 
+    it('renders discourse compiler overlays as read-only visual edges', () => {
+        const targets = [
+            { id: 'embed:note:note-a', kind: 'note', sourceId: 'note-a', noteId: 'note-a', label: 'Note A', text: 'first note', evidenceIds: [], lane: 'document_spine', structuralRole: 'root' },
+            { id: 'embed:note:note-b', kind: 'note', sourceId: 'note-b', noteId: 'note-b', label: 'Note B', text: 'second note', evidenceIds: [], lane: 'document_spine', structuralRole: 'root' },
+            { id: 'embed:chunk:note-a:chunk-1', kind: 'chunk', sourceId: 'note-a:chunk-1', noteId: 'note-a', chunkId: 'note-a:chunk-1', label: 'Chunk A', text: 'Kai trusts Hazel.', evidenceIds: [], lane: 'chunk_spine', structuralRole: 'spine', parentIds: ['embed:note:note-a'] },
+            { id: 'embed:chunk:note-b:chunk-1', kind: 'chunk', sourceId: 'note-b:chunk-1', noteId: 'note-b', chunkId: 'note-b:chunk-1', label: 'Chunk B', text: 'Hazel answers Kai.', evidenceIds: [], lane: 'chunk_spine', structuralRole: 'spine', parentIds: ['embed:note:note-b'] },
+        ];
+        const atlas = buildGraphRebuildEmbeddingAtlas({
+            schemaVersion: 'phoenix-graph-rebuild/v1',
+            id: 'snapshot-discourse-overlay',
+            source: 'phoenix-graph-rebuild',
+            scopeKind: 'global',
+            scopeId: 'global',
+            noteIds: ['note-a', 'note-b'],
+            builtAt: 1,
+            chunks: [
+                { id: 'note-a:chunk-1', noteId: 'note-a', start: 0, end: 20, ordinal: 0, source: 'dynamic-chunking' },
+                { id: 'note-b:chunk-1', noteId: 'note-b', start: 0, end: 20, ordinal: 0, source: 'dynamic-chunking' },
+            ],
+            mentions: [],
+            entityAnchors: [],
+            relationships: [],
+            events: [],
+            episodes: [],
+            temporalEdges: [],
+            causalEdges: [],
+            memoryState: [],
+            embeddingTargets: targets,
+            embeddingVectors: [],
+            projectionRefs: [],
+            nodes: [],
+            edges: [],
+            counters: null as any,
+            discourseCompilerOverlaySummary: {
+                schemaVersion: 'phoenix-discourse-compiler-overlay/v1',
+                generatedAt: 2,
+                sourceSnapshotId: 'snapshot-discourse-overlay',
+                sourcePromotionSurfaceId: 'promotion:1',
+                invariant: 'discourse_compiler_overlay_no_topology_commit',
+                overlayEdges: [{
+                    id: 'overlay-wormhole',
+                    kind: 'chunk_wormhole',
+                    sourceHintId: 'hint-wormhole',
+                    sourceLedgerEntryId: 'ledger-wormhole',
+                    candidateId: 'candidate-wormhole',
+                    decisionId: 'decision-wormhole',
+                    sourceTargetId: 'embed:chunk:note-a:chunk-1',
+                    targetTargetId: 'embed:chunk:note-b:chunk-1',
+                    memberTargetIds: [],
+                    evidenceTargetIds: ['evidence:wormhole'],
+                    proposedEdgeType: 'chunk-resonates-with',
+                    confidence: 0.91,
+                    projectionKind: 'discourse_overlay',
+                    status: 'overlay_only',
+                    graphPatch: false,
+                    mutationAllowed: false,
+                    rationale: ['compiler_overlay_only:no_graph_patch'],
+                }, {
+                    id: 'overlay-cluster',
+                    kind: 'document_cluster',
+                    sourceHintId: 'hint-cluster',
+                    sourceLedgerEntryId: 'ledger-cluster',
+                    candidateId: 'candidate-cluster',
+                    decisionId: 'decision-cluster',
+                    sourceTargetId: 'embed:note:note-a',
+                    memberTargetIds: ['embed:note:note-a', 'embed:note:note-b'],
+                    evidenceTargetIds: ['evidence:cluster'],
+                    proposedEdgeType: 'document-cluster-member',
+                    confidence: 0.84,
+                    projectionKind: 'discourse_overlay',
+                    status: 'overlay_only',
+                    graphPatch: false,
+                    mutationAllowed: false,
+                    rationale: ['cluster_overlay_only:no_graph_patch'],
+                }],
+                receipts: [],
+                compactOverlay: { scopeId: 'global', builtAt: 1, rowCount: 2, rows: [] },
+                counters: {
+                    byKind: { chunk_wormhole: 1, document_cluster: 1 },
+                    overlayEdgeCount: 2,
+                    chunkWormholeEdges: 1,
+                    documentClusterEdges: 1,
+                    resolverEdges: 0,
+                    receiptCount: 0,
+                    reversibleReceiptCount: 0,
+                    graphPatchCount: 0,
+                    mutationAllowedCount: 0,
+                },
+            },
+        } as any, 'lorentz');
+        const byId = new Map(atlas.edges.map((edge) => [edge.id, edge]));
+        const wormhole = byId.get('overlay-wormhole');
+        const cluster = byId.get('overlay-cluster:member:embed:note:note-b');
+
+        expect(wormhole).toMatchObject({
+            sourceId: 'embed:chunk:note-a:chunk-1',
+            targetId: 'embed:chunk:note-b:chunk-1',
+            type: 'chunk-resonates-with',
+            confidence: 0.91,
+        });
+        expect(wormhole?.metadata).toMatchObject({
+            interactionKind: 'wormhole',
+            status: 'overlay_only',
+            graphPatch: false,
+            mutationAllowed: false,
+            evidenceIds: ['evidence:wormhole'],
+        });
+        expect(cluster).toMatchObject({
+            sourceId: 'embed:note:note-a',
+            targetId: 'embed:note:note-b',
+            type: 'document-cluster-member',
+            confidence: 0.84,
+        });
+        expect(cluster?.metadata).toMatchObject({
+            interactionKind: 'document_cluster',
+            status: 'overlay_only',
+            graphPatch: false,
+            mutationAllowed: false,
+            clusterMedoidTargetId: 'embed:note:note-a',
+            clusterMemberTargetId: 'embed:note:note-b',
+        });
+    });
+
     it('averages multi-document entity caps between their supporting document spaces', () => {
         const folderFields = { folderId: 'folder-narrative', folderLabel: 'New Narrative', folderKind: 'NARRATIVE' };
         const targets = [

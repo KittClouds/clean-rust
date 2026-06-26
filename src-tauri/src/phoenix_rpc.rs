@@ -658,6 +658,7 @@ pub trait PhoenixApi {
     async fn rebuild_json(request_json: String) -> Result<String, String>;
     async fn scan_json(request_json: String) -> Result<String, String>;
     async fn atlas_rich_scan_json(request_json: String) -> Result<String, String>;
+    async fn nli_adjudicate_claims_json(request_json: String) -> Result<String, String>;
     async fn manifold_snapshot_json(request_json: String) -> Result<String, String>;
     async fn graph_scene_packet_json(request_json: String) -> Result<String, String>;
     async fn lorentz_forest_cache_json(request_json: String) -> Result<String, String>;
@@ -776,6 +777,14 @@ impl PhoenixApi for PhoenixApiImpl {
         self.with_host_json::<AtlasRichScanRequest, _, _>(request_json, |host, request| {
             host.atlas_rich_scan(request)
         })
+    }
+
+    async fn nli_adjudicate_claims_json(self, request_json: String) -> Result<String, String> {
+        tokio::task::spawn_blocking(move || {
+            crate::nli_claim_rpc::adjudicate_claims_json(&request_json)
+        })
+        .await
+        .map_err(|error| format!("native NLI task failed: {error}"))?
     }
 
     async fn manifold_snapshot_json(self, request_json: String) -> Result<String, String> {

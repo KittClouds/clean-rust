@@ -46,7 +46,7 @@ export type NativeTtsSynthResult = { sampleRate: number; sampleCount: number; pc
 
 export type NativeTtsTimings = { conditionMs: number; tokenMs: number; decodeMs: number; totalMs: number }
 
-const ARGS_MAP = { 'phoenix':'{"analyze_text_json":["request_json"],"atlas_rich_scan_json":["request_json"],"boot_snapshot_json":[],"build_structure_json":["request_json"],"close_runtime":[],"commit_json":["request_json"],"compile_galaxy_scene":["request"],"create_session_json":["request_json"],"export_snapshot":["partition"],"graph_delta_json":["request_json"],"graph_scene_packet_json":["request_json"],"import_snapshot":["bytes"],"ingest_json":["request_json"],"init_runtime":["request"],"lorentz_forest_build_json":["request_json"],"lorentz_forest_cache_json":["request_json"],"lorentz_forest_query_json":["request_json"],"manifold_snapshot_json":["request_json"],"query_json":["request_json"],"rebuild_json":["request_json"],"runtime_info":[],"scan_json":["request_json"],"session_state_json":["request_json"],"session_stats_json":["request_json"],"siegel_finsler_receipt_json":["request_json"],"store_command":["command","payload_json"],"tts_load":["request"],"tts_qwen_speak":["request"],"tts_speak":["request"],"tts_status":[],"tts_supertonic_speak":["request"],"tts_unload":[]}' }
+const ARGS_MAP = { 'phoenix':'{"analyze_text_json":["request_json"],"atlas_rich_scan_json":["request_json"],"boot_snapshot_json":[],"build_structure_json":["request_json"],"close_runtime":[],"commit_json":["request_json"],"compile_galaxy_scene":["request"],"create_session_json":["request_json"],"export_snapshot":["partition"],"graph_delta_json":["request_json"],"graph_scene_packet_json":["request_json"],"import_snapshot":["bytes"],"ingest_json":["request_json"],"init_runtime":["request"],"lorentz_forest_build_json":["request_json"],"lorentz_forest_cache_json":["request_json"],"lorentz_forest_query_json":["request_json"],"manifold_snapshot_json":["request_json"],"nli_adjudicate_claims_json":["request_json"],"query_json":["request_json"],"rebuild_json":["request_json"],"runtime_info":[],"scan_json":["request_json"],"session_state_json":["request_json"],"session_stats_json":["request_json"],"siegel_finsler_receipt_json":["request_json"],"store_command":["command","payload_json"],"tts_load":["request"],"tts_qwen_speak":["request"],"tts_speak":["request"],"tts_status":[],"tts_supertonic_speak":["request"],"tts_unload":[]}' }
 export type Router = { "phoenix": {analyze_text_json: (requestJson: string) => Promise<string>, 
 atlas_rich_scan_json: (requestJson: string) => Promise<string>, 
 boot_snapshot_json: () => Promise<string>, 
@@ -65,6 +65,7 @@ lorentz_forest_build_json: (requestJson: string) => Promise<string>,
 lorentz_forest_cache_json: (requestJson: string) => Promise<string>, 
 lorentz_forest_query_json: (requestJson: string) => Promise<string>, 
 manifold_snapshot_json: (requestJson: string) => Promise<string>, 
+nli_adjudicate_claims_json: (requestJson: string) => Promise<string>, 
 query_json: (requestJson: string) => Promise<string>, 
 rebuild_json: (requestJson: string) => Promise<string>, 
 runtime_info: () => Promise<DesktopRuntimeInfo>, 

@@ -73,6 +73,48 @@ describe('buildGraphDiscourseWorkbenchView', () => {
         expect(receipts.recordIds.some((id) => room.recordsById[id]?.receiptIds.includes('compiler-receipt-1'))).toBe(true);
     });
 
+    it('surfaces NLI and GLiClass route votes in the review queue without promotion actions', () => {
+        const snap = snapshot();
+        snap.relationships = [nliRelationship('supported')];
+        snap.counters.relationships = 1;
+        snap.counters.reviewRelationships = 1;
+
+        const workbench = buildGraphDiscourseWorkbenchView(snap, entities());
+        const room = buildGraphOperatingRoomView(workbench, snap, entities());
+        const row = workbench?.recordsById['relations:relationship:relationship-supported'];
+
+        expect(row?.detail).toBe('NLI Supported / GLiClass supports / 94% confidence');
+        expect(row?.tags.slice(0, 3)).toEqual(['nli:supported', 'gliclass:supports', 'review_only']);
+        expect(row?.receiptIds).toEqual(['nli-receipt-1', 'judgment-supported']);
+        expect(row?.actionKinds).toEqual(['inspect']);
+        expect(row?.actionKinds.some((kind) => /accept|apply|compile|promote/.test(kind))).toBe(false);
+        expect(row?.facts).toEqual(expect.arrayContaining([
+            { label: 'NLI confidence', value: '94%' },
+            { label: 'Receipts', value: 'nli-receipt-1 / judgment-supported' },
+            { label: 'Graph impact', value: 'review vote only / no topology commit' },
+        ]));
+        expect(row?.facts.some((fact) => fact.label === 'NLI vote' && fact.value.includes('ModernBERT NLI'))).toBe(true);
+        expect(row?.facts.some((fact) => fact.label === 'GLiClass route' && fact.value.includes('supports / 88%'))).toBe(true);
+        expect(room.recordsByRoom.review.map((record) => record.id)).toContain(row?.id);
+    });
+
+    it('keeps contradicted NLI relationship rows review-visible as danger rows', () => {
+        const snap = snapshot();
+        snap.relationships = [nliRelationship('contradicted')];
+        snap.counters.relationships = 1;
+        snap.counters.reviewRelationships = 1;
+
+        const workbench = buildGraphDiscourseWorkbenchView(snap, entities());
+        const room = buildGraphOperatingRoomView(workbench, snap, entities());
+        const row = workbench?.recordsById['relations:relationship:relationship-contradicted'];
+
+        expect(row?.tone).toBe('danger');
+        expect(row?.status).toBe('rejected');
+        expect(row?.tags).toContain('nli:contradicted');
+        expect(row?.facts.some((fact) => fact.label === 'Graph impact' && fact.value.includes('no topology commit'))).toBe(true);
+        expect(room.recordsByRoom.review.map((record) => record.id)).toContain(row?.id);
+    });
+
     it('adds operating-room inspection facts to document rows', () => {
         const view = buildGraphDiscourseWorkbenchView(snapshot(), entities());
         const row = view?.recordsByTab.relations.find((record) => record.id.includes('document-review'));
@@ -89,6 +131,41 @@ function entities(): RegisteredEntity[] {
         { id: 'kai', label: 'Kai', kind: 'CHARACTER', aliases: [], attributes: {}, createdAt: 1, updatedAt: 1 },
         { id: 'hazel', label: 'Hazel', kind: 'CHARACTER', aliases: [], attributes: {}, createdAt: 1, updatedAt: 1 },
     ] as RegisteredEntity[];
+}
+
+function nliRelationship(decision: 'supported' | 'contradicted') {
+    const supported = decision === 'supported';
+    const confidence = supported ? 940 : 890;
+    return {
+        id: `relationship-${decision}`,
+        sourceEntityId: 'kai',
+        targetEntityId: 'hazel',
+        relationType: 'supports',
+        evidenceAnchorIds: ['anchor-1'],
+        confidence: confidence / 1000,
+        status: supported ? 'accepted' : 'rejected',
+        adjudicationSource: 'nli:modernbert',
+        adjudicationScore: confidence / 1000,
+        rationale: 'ModernBERT NLI review vote',
+        decisionEvidence: [
+            `judgment:judgment-${decision}`,
+            `claim:claim-${decision}`,
+            `evidence:evidence-${decision}`,
+            'receipt:nli-receipt-1',
+            'evidence_ref:evidence-ref-1',
+            `nli_decision:${decision}`,
+            'nli_source:modernBertNli',
+            'nli_role:canonFactAdjudication',
+            `nli_confidence_millis:${confidence}`,
+            `nli_entailment_millis:${supported ? confidence : 40}`,
+            `nli_contradiction_millis:${supported ? 30 : confidence}`,
+            'nli_neutral_millis:30',
+            'classification_source:gliclass',
+            'classification_role:relationFrameClassification',
+            'classification_label:supports',
+            'classification_score_millis:880',
+        ],
+    };
 }
 
 function snapshot(): GraphRebuildSnapshot {

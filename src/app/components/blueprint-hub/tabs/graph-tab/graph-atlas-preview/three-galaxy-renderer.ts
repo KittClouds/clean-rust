@@ -44,8 +44,6 @@ const MAX_LORENTZ_GUIDES = 260;
 const MAX_LORENTZ_TUBES = 40;
 const LORENTZ_TUBE_SEGMENTS = 64;
 const LORENTZ_TUBE_RADIAL_SEGMENTS = 5;
-const TRANSIT_GUIDE_RADIUS = 2.18;
-const TRANSIT_GUIDE_RING_SEGMENTS = 96;
 const TRANSIT_HOPF_TUBE_SCALE = 0.75;
 const CAPS_SURFACE_EDGE_MIN_RADIUS = 0.34;
 const CAPS_SURFACE_EDGE_MAX_RADIUS_DELTA = 0.36;
@@ -1067,21 +1065,11 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
                 const treeKind = String(child.userData['treeKind'] ?? '');
                 const surface = this.guideSurface(child);
                 this.setGuideOpacity(material, this.lorentzLayerOpacity(layer, lorentzGuideKind, treeKind, weight, surface));
-            } else if (guideKind === 'transit-route-ball') {
-                // Dedicated branch: route-ball no longer falls through to the
-                // shell opacity path, so toggling Shell stops hiding it.
-                const layer = String(child.userData['transitGuideLayer'] ?? 'ring');
-                this.setGuideOpacity(material, this.transitRouteBallLayerOpacity(layer));
-            } else if (guideKind === 'klein') {
-                const layer = String(child.userData['kleinLayer'] ?? 'boundary');
-                this.setGuideOpacity(material, this.transitGuideLayerOpacity(layer));
             } else if (guideKind === 'multi') {
                 this.setGuideOpacity(material, this.multiShellOpacity());
             } else if (guideKind === 'hybrid-field') {
                 // Field guides carry per-object opacity from Busemann receipts.
             } else {
-                // True shell surfaces only (hybrid outer sphere). The route-ball
-                // now has its own branch above, so it is never absorbed here.
                 this.setGuideOpacity(material, this.hybridShellOpacity());
             }
             material.needsUpdate = true;
@@ -1330,30 +1318,6 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
         const shellOpacity = THREE.MathUtils.clamp(this.settings.hybridShellOpacity, 0, 1);
         const glow = THREE.MathUtils.clamp(this.settings.glow, 0, 1.8);
         return THREE.MathUtils.clamp(0.014 + glow * 0.003, 0.01, 0.026) * shellOpacity;
-    }
-
-    private transitGuideLayerOpacity(layer: string): number {
-        if (!this.settings.productKleinVisible) return 0;
-        const glow = THREE.MathUtils.clamp(this.settings.glow, 0, 1.8);
-        if (layer === 'boundary') return THREE.MathUtils.clamp(0.012 + glow * 0.002, 0, 0.018);
-        if (layer === 'chord') return THREE.MathUtils.clamp(0.035 + glow * 0.006, 0, 0.052);
-        return THREE.MathUtils.clamp(0.028 + glow * 0.004, 0, 0.04);
-    }
-
-    /**
-     * Dedicated opacity path for the transit route-ball boundary/rings/chords.
-     * Reads {@link GalaxyRenderSettings.guideRouteBallVisible} with a fallback to
-     * the legacy {@link GalaxyRenderSettings.productKleinVisible} so persisted
-     * settings keep working.
-     */
-    private transitRouteBallLayerOpacity(layer: string): number {
-        const visible = this.settings.guideRouteBallVisible !== false
-            && this.settings.productKleinVisible !== false;
-        if (!visible) return 0;
-        const glow = THREE.MathUtils.clamp(this.settings.glow, 0, 1.8);
-        if (layer === 'boundary') return THREE.MathUtils.clamp(0.012 + glow * 0.002, 0, 0.018);
-        if (layer === 'chord') return THREE.MathUtils.clamp(0.035 + glow * 0.006, 0, 0.052);
-        return THREE.MathUtils.clamp(0.028 + glow * 0.004, 0, 0.04);
     }
 
     private edgeMaterialOpacity(): number {
@@ -1620,151 +1584,9 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
 
     private buildTransitGuides(scene: GalaxySceneV2): THREE.Group {
         const group = new THREE.Group();
-        const shell = this.buildHybridGuides(scene);
-        if (shell.children.length) group.add(shell);
-        const routeBall = this.buildTransitRouteBallGuides();
-        if (routeBall.children.length) group.add(routeBall);
         const lorentz = this.buildLorentzGuides(scene, 'transit');
         if (lorentz.children.length) group.add(lorentz);
-        const hopf = this.buildHopfGuides(scene, 'transit');
-        if (hopf.children.length) group.add(hopf);
         return group;
-    }
-
-    private buildTransitRouteBallGuides(): THREE.Group {
-        const group = new THREE.Group();
-        const boundary = new THREE.Mesh(new THREE.SphereGeometry(TRANSIT_GUIDE_RADIUS, 48, 24), this.transitRouteBallBoundaryMaterial());
-        boundary.userData['guideKind'] = 'transit-route-ball';
-        boundary.userData['transitGuideLayer'] = 'boundary';
-        boundary.userData['pickable'] = false;
-        group.add(boundary);
-
-        const rings = new THREE.LineSegments(this.transitRouteBallRingGeometry(), this.transitRouteBallLineMaterial('ring'));
-        rings.userData['guideKind'] = 'transit-route-ball';
-        rings.userData['transitGuideLayer'] = 'ring';
-        rings.userData['pickable'] = false;
-        group.add(rings);
-
-        const chords = new THREE.LineSegments(this.transitRouteBallChordGeometry(), this.transitRouteBallLineMaterial('chord'));
-        chords.userData['guideKind'] = 'transit-route-ball';
-        chords.userData['transitGuideLayer'] = 'chord';
-        chords.userData['pickable'] = false;
-        group.add(chords);
-        return group;
-    }
-
-    private transitRouteBallBoundaryMaterial(): THREE.ShaderMaterial {
-        return new THREE.ShaderMaterial({
-            uniforms: {
-                opacity: { value: this.transitGuideLayerOpacity('boundary') },
-                rimColor: { value: new THREE.Color(0.44, 1.0, 0.92) },
-                depthColor: { value: new THREE.Color(0.18, 0.36, 0.58) },
-            },
-            vertexShader: `
-                varying vec3 vNormal;
-                varying vec3 vView;
-                varying vec3 vWorld;
-                void main() {
-                    vec4 worldPosition = modelMatrix * vec4(position, 1.0);
-                    vNormal = normalize(normalMatrix * normal);
-                    vView = normalize(cameraPosition - worldPosition.xyz);
-                    vWorld = worldPosition.xyz;
-                    gl_Position = projectionMatrix * viewMatrix * worldPosition;
-                }
-            `,
-            fragmentShader: `
-                uniform float opacity;
-                uniform vec3 rimColor;
-                uniform vec3 depthColor;
-                varying vec3 vNormal;
-                varying vec3 vView;
-                varying vec3 vWorld;
-                void main() {
-                    float rim = pow(1.0 - abs(dot(normalize(vNormal), normalize(vView))), 3.1);
-                    float latitude = 0.5 + 0.5 * sin(vWorld.y * 2.8);
-                    vec3 hue = mix(depthColor, rimColor, 0.34 + latitude * 0.18);
-                    float alpha = opacity * (0.08 + smoothstep(0.36, 0.98, rim) * 0.92);
-                    gl_FragColor = vec4(hue, alpha);
-                }
-            `,
-            transparent: true,
-            side: THREE.BackSide,
-            depthWrite: false,
-            blending: THREE.NormalBlending,
-            toneMapped: false,
-        });
-    }
-
-    private transitRouteBallLineMaterial(layer: 'ring' | 'chord'): THREE.LineBasicMaterial {
-        return new THREE.LineBasicMaterial({
-            color: layer === 'chord' ? new THREE.Color(0.26, 0.88, 0.96) : new THREE.Color(0.38, 1, 0.88),
-            transparent: true,
-            opacity: this.transitGuideLayerOpacity(layer),
-            depthWrite: false,
-            blending: THREE.NormalBlending,
-            toneMapped: false,
-        });
-    }
-
-    private transitRouteBallRingGeometry(): THREE.BufferGeometry {
-        const rings = [
-            { radius: TRANSIT_GUIDE_RADIUS, plane: 0 },
-            { radius: TRANSIT_GUIDE_RADIUS, plane: 1 },
-            { radius: TRANSIT_GUIDE_RADIUS, plane: 2 },
-            { radius: TRANSIT_GUIDE_RADIUS * 0.68, plane: 0 },
-            { radius: TRANSIT_GUIDE_RADIUS * 0.68, plane: 1 },
-            { radius: TRANSIT_GUIDE_RADIUS * 0.42, plane: 2 },
-        ];
-        const positions = new Float32Array(rings.length * TRANSIT_GUIDE_RING_SEGMENTS * 2 * 3);
-        let cursor = 0;
-        for (const ring of rings) {
-            for (let index = 0; index < TRANSIT_GUIDE_RING_SEGMENTS; index++) {
-                const a = (index / TRANSIT_GUIDE_RING_SEGMENTS) * Math.PI * 2;
-                const b = ((index + 1) / TRANSIT_GUIDE_RING_SEGMENTS) * Math.PI * 2;
-                cursor = this.writeKleinRingPoint(positions, cursor, ring.plane, ring.radius, a);
-                cursor = this.writeKleinRingPoint(positions, cursor, ring.plane, ring.radius, b);
-            }
-        }
-        const geometry = new THREE.BufferGeometry();
-        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-        return geometry;
-    }
-
-    private transitRouteBallChordGeometry(): THREE.BufferGeometry {
-        const directions = [
-            [1, 0.18, 0.32],
-            [-0.72, 0.54, 0.43],
-            [0.34, -0.64, 0.69],
-            [-0.12, -0.3, 0.95],
-            [0.82, 0.42, -0.38],
-            [-0.46, 0.78, -0.42],
-        ];
-        const positions = new Float32Array(directions.length * 2 * 3);
-        let cursor = 0;
-        for (const raw of directions) {
-            const length = Math.hypot(raw[0], raw[1], raw[2]) || 1;
-            const x = raw[0] / length * TRANSIT_GUIDE_RADIUS * 0.96;
-            const y = raw[1] / length * TRANSIT_GUIDE_RADIUS * 0.96;
-            const z = raw[2] / length * TRANSIT_GUIDE_RADIUS * 0.96;
-            positions[cursor++] = -x;
-            positions[cursor++] = -y;
-            positions[cursor++] = -z;
-            positions[cursor++] = x;
-            positions[cursor++] = y;
-            positions[cursor++] = z;
-        }
-        const geometry = new THREE.BufferGeometry();
-        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-        return geometry;
-    }
-
-    private writeKleinRingPoint(buffer: Float32Array, cursor: number, plane: number, radius: number, angle: number): number {
-        const x = Math.cos(angle) * radius;
-        const y = Math.sin(angle) * radius;
-        if (plane === 0) buffer.set([x, y, 0], cursor);
-        else if (plane === 1) buffer.set([x, 0, y], cursor);
-        else buffer.set([0, x, y], cursor);
-        return cursor + 3;
     }
 
     private hybridGlassMaterial(): THREE.ShaderMaterial {

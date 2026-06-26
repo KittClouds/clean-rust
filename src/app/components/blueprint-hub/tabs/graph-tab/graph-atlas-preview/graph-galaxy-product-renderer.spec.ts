@@ -17,6 +17,7 @@ import * as THREE from 'three';
 
 import { buildGalaxyFocusMask } from './graph-galaxy-focus';
 import { buildGalaxyGlows, galaxyGlowBatch } from './graph-galaxy-objects';
+import type { GalaxySceneV2 } from './graph-galaxy-scene-v2';
 import { ThreeGalaxyRenderer } from './three-galaxy-renderer';
 
 type RendererProbe = {
@@ -42,13 +43,13 @@ type RendererProbe = {
     buildLorentzTubeMesh(guide: Record<string, unknown>, index: number, layer: 'tubeCore' | 'tubeGlow', surface: string): THREE.Mesh | null;
     writeLorentzGuideColor(colors: Float32Array, offset: number, guide: Record<string, unknown>, index: number, phase: number, surface: string, focusScale?: number): void;
     nodeDensityFactors(data: { ids: string[] }, positions: Float32Array): Float32Array;
-    transitGuideLayerOpacity(layer: string): number;
     tubeEdgeTerminalFlourish(data: { layoutMode: string }, t: number, lift: number, sign: number): number;
     capsSurfaceEdge(data: { layoutMode: string }, ax: number, ay: number, az: number, bx: number, by: number, bz: number): boolean;
     capsSurfacePoint(out: THREE.Vector3, ax: number, ay: number, az: number, bx: number, by: number, bz: number, t: number): boolean;
     writeLorentzGuidePositions(output: Float32Array, cursor: number, guide: Record<string, unknown>, data: { ids: string[]; layoutMode?: string }, positions: Float32Array, indexById: Map<string, number>): number;
     guideAttachmentContract(data: { layoutMode: string }): { liveLorentzGuides: boolean; localScale: number };
     guidePositionsForContract(positions: Float32Array, contract: { liveLorentzGuides: boolean; localScale: number }): Float32Array;
+    buildTransitGuides(scene: GalaxySceneV2): THREE.Group;
     sceneData: unknown;
 };
 
@@ -338,15 +339,15 @@ describe('Transit manifold guide styling', () => {
         expect(causalLine[0]).toBeGreaterThan(causalLine[2] * 2);
     });
 
-    it('keeps the Transit route ball as its own toggleable layer', () => {
+    it('builds Transit guides from packet rows without mounting the old route ball', () => {
         const renderer = new ThreeGalaxyRenderer() as unknown as RendererProbe;
+        const group = renderer.buildTransitGuides(minimalTransitScene());
+        const guideKinds = collectGuideKinds(group);
 
-        expect(renderer.transitGuideLayerOpacity('boundary')).toBeGreaterThan(0);
-        expect(renderer.transitGuideLayerOpacity('chord')).toBeGreaterThan(renderer.transitGuideLayerOpacity('boundary'));
-
-        renderer.setSettings({ productKleinVisible: false });
-        expect(renderer.transitGuideLayerOpacity('boundary')).toBe(0);
-        expect(renderer.transitGuideLayerOpacity('chord')).toBe(0);
+        expect(group.children.length).toBeGreaterThan(0);
+        expect(guideKinds.has('lorentz')).toBe(true);
+        expect(guideKinds.has('transit-route-ball')).toBe(false);
+        expect([...guideKinds].some((kind) => kind.includes('hopf') || kind.includes('hybrid'))).toBe(false);
     });
 
     it('prevents dense node overlaps from additive halo blowout', () => {
@@ -495,3 +496,53 @@ describe('Transit manifold guide styling', () => {
         expect(hybrid.liveLorentzGuides).toBe(false);
     });
 });
+
+function minimalTransitScene(): GalaxySceneV2 {
+    return {
+        sourceMode: 'embeddings',
+        layoutMode: 'transitManifold',
+        ids: [],
+        labels: [],
+        kinds: [],
+        groupIds: [],
+        groups: [],
+        hopfRibbons: [],
+        lorentzGuides: [{
+            id: 'transit:plan:lane:evidence',
+            nodeIds: ['evidence'],
+            positions3d: new Float32Array([
+                -1, 0, 0,
+                0, 0.04, 0.02,
+                0, 0.04, 0.02,
+                1, 0, 0,
+            ]),
+            positions2d: new Float32Array(),
+            color: { r: 0.6, g: 0.36, b: 1 },
+            importance: 7,
+            treeId: 'transit:plan-lanes',
+            treeKind: 'lane:evidence',
+            level: 3,
+            guideKind: 'rootLane',
+            guideWeight: 0.5,
+        }],
+        positions3d: new Float32Array(),
+        positions2d: new Float32Array(),
+        radii: new Float32Array(),
+        colors: new Float32Array(),
+        edgePairs: new Uint32Array(),
+        edgeIds: [],
+        edgeTypes: [],
+        edgeColors: new Float32Array(),
+        edgeAlpha: new Float32Array(),
+        edgeKinds: new Uint8Array(),
+    };
+}
+
+function collectGuideKinds(root: THREE.Object3D): Set<string> {
+    const kinds = new Set<string>();
+    root.traverse((child) => {
+        const kind = child.userData?.['guideKind'];
+        if (typeof kind === 'string') kinds.add(kind);
+    });
+    return kinds;
+}

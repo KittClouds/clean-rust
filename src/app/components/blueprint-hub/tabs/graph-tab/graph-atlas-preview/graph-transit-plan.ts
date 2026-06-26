@@ -14,6 +14,7 @@ export type TransitLane =
     | 'state'
     | 'context'
     | 'review'
+    | 'proposed'
     | 'discourse'
     | 'transfer'
     | 'unknown';
@@ -113,8 +114,9 @@ const LANE_STAGE: Record<TransitLane, number> = {
     state: 9,
     context: 10,
     review: 11,
-    discourse: 12,
-    transfer: 13,
+    proposed: 12,
+    discourse: 13,
+    transfer: 14,
     unknown: 99,
 };
 
@@ -298,6 +300,7 @@ function stationRegionIds(station: TransitStation): string[] {
 
 function transitLane(family: string, kind: string, metadata: Record<string, unknown>): TransitLane {
     const text = `${family} ${kind} ${stringValue(metadata['atlasStructuralRole'])} ${stringValue(metadata['atlasDocumentUnitKind'])} ${stringValue(metadata['atlasStateContextKind'])}`.toLowerCase();
+    if (/proposed/.test(text)) return 'proposed';
     if (/review|candidate/.test(text)) return 'review';
     if (/discourse/.test(text)) return 'discourse';
     if (/causal/.test(text)) return 'causal';
@@ -320,6 +323,7 @@ function routeLane(edge: GalaxyInputEdge, source: TransitStation, target: Transi
     if (/event/.test(text)) return 'event';
     if (/evidence|anchor|chunk|source/.test(text)) return 'evidence';
     if (/identity|entity|alias/.test(text)) return 'identity';
+    if (/proposed/.test(text)) return 'proposed';
     if (/review|candidate/.test(text)) return 'review';
     if (/bridge|transfer|target/.test(text)) return 'transfer';
     if (source.lane === target.lane) return source.lane;

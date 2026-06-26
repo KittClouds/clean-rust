@@ -166,25 +166,27 @@ function readPersistedAtlasViewState(): PersistedAtlasViewState {
                                 [class.bg-cyan-500/15]="atlasMode === 'embeddings'" [class.text-cyan-100]="atlasMode === 'embeddings'"
                                 [class.text-zinc-500]="atlasMode !== 'embeddings'" (click)="setAtlasMode('embeddings')">Embed</button>
                         </div>
-                        <span class="rounded-full border border-cyan-400/15 bg-cyan-500/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-cyan-100">{{ primaryCountLabel() }} {{ activeNodeCount() }}</span>
-                        <span class="rounded-full border border-violet-400/15 bg-violet-500/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-violet-100">{{ secondaryCountLabel() }} {{ activeEdgeCount() }}</span>
-                        <span class="rounded-full border border-amber-300/15 bg-amber-500/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-amber-100">Source: {{ dataSourceLabel() }}</span>
-                        @if (projectionContract(); as contract) {
-                        <span class="projection-contract-chip">Contract: {{ contract.pipelineLabel }} / {{ contract.semanticCoordinatesLabel }} / {{ contract.parityLabel }}</span>
-                        }
-                        @if (atlasMode === 'graph') {
-                        <span class="rounded-full border border-emerald-300/15 bg-emerald-500/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-emerald-100">Anchors {{ graphAnchorCount() }}</span>
-                        <span class="rounded-full border border-sky-300/15 bg-sky-500/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-sky-100">Chunks {{ graphChunkCount() }}</span>
-                        <span class="rounded-full border border-teal-300/15 bg-teal-500/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-teal-100">Accepted {{ graphAcceptedRelationshipCount() }}</span>
-                        <span class="rounded-full border border-fuchsia-300/15 bg-fuchsia-500/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-fuchsia-100">Review {{ graphReviewRelationshipCount() }}</span>
-                        <span class="rounded-full border border-rose-300/15 bg-rose-500/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-rose-100">Drops {{ graphDropCount() }}</span>
-                        }
-                        @if (atlasMode === 'embeddings') {
-                        <span class="rounded-full border border-cyan-400/15 bg-cyan-500/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-cyan-100">Input graph: {{ semanticGraphAvailabilityLabel() }}</span>
-                        }
-                        @if (hopfReceiptSummary(); as hopf) {
-                        <span class="rounded-full border border-sky-300/15 bg-sky-500/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-sky-100">Hopf receipts {{ hopf.assignments }} / {{ hopf.occupiedCells }} cells / {{ hopf.docCharts }} charts / {{ hopf.braids }} braids</span>
-                        }
+                        <div class="atlas-status-rail" aria-label="Atlas status summary">
+                            <span class="atlas-status-token atlas-status-token-strong" [title]="primaryCountLabel() + ' ' + activeNodeCount()">{{ primaryCountLabel() }} {{ activeNodeCount() }}</span>
+                            <span class="atlas-status-token" [title]="secondaryCountLabel() + ' ' + activeEdgeCount()">{{ secondaryCountLabel() }} {{ activeEdgeCount() }}</span>
+                            <span class="atlas-status-token atlas-status-token-source" [title]="'Source: ' + dataSourceLabel()">{{ dataSourceLabel() }}</span>
+                            @if (projectionContract(); as contract) {
+                            <span class="atlas-status-token atlas-status-token-contract" [title]="'Contract: ' + contract.pipelineLabel + ' / ' + contract.semanticCoordinatesLabel + ' / ' + contract.parityLabel">{{ contract.pipelineLabel }} / {{ contract.parityLabel }}</span>
+                            }
+                            @if (atlasMode === 'graph') {
+                            <span class="atlas-status-token" [title]="'Anchors ' + graphAnchorCount()">anchors {{ graphAnchorCount() }}</span>
+                            <span class="atlas-status-token" [title]="'Chunks ' + graphChunkCount()">chunks {{ graphChunkCount() }}</span>
+                            <span class="atlas-status-token" [title]="'Accepted ' + graphAcceptedRelationshipCount()">accepted {{ graphAcceptedRelationshipCount() }}</span>
+                            <span class="atlas-status-token" [title]="'Review ' + graphReviewRelationshipCount()">review {{ graphReviewRelationshipCount() }}</span>
+                            <span class="atlas-status-token" [title]="'Drops ' + graphDropCount()">drops {{ graphDropCount() }}</span>
+                            }
+                            @if (atlasMode === 'embeddings') {
+                            <span class="atlas-status-token" [title]="'Input graph: ' + semanticGraphAvailabilityLabel()">input {{ semanticGraphAvailabilityLabel() }}</span>
+                            }
+                            @if (hopfReceiptSummary(); as hopf) {
+                            <span class="atlas-status-token atlas-status-token-source" [title]="'Hopf receipts ' + hopf.assignments + ' / ' + hopf.occupiedCells + ' cells / ' + hopf.docCharts + ' charts / ' + hopf.braids + ' braids'">hopf {{ hopf.assignments }} / {{ hopf.occupiedCells }}</span>
+                            }
+                        </div>
                         <div class="flex rounded-xl border border-white/10 bg-black/40 p-1">
                             <button type="button" class="rounded-lg px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.1em] transition"
                                 [class.bg-cyan-500/15]="viewMode === '3d'" [class.text-cyan-100]="viewMode === '3d'"
@@ -291,17 +293,6 @@ function readPersistedAtlasViewState(): PersistedAtlasViewState {
                         <button type="button" class="bg-cyan-500/15 px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.1em] text-cyan-100 transition"
                             (click)="setLayoutMode('transitManifold')">Transit</button>
                         }
-                    </div>
-                    }
-                    @if (atlasTruth(); as truth) {
-                    <div class="atlas-truth-strip pointer-events-none absolute right-4 top-16 z-30 flex max-w-[min(620px,calc(100%-2rem))] flex-wrap justify-end gap-1.5 text-[10px] font-semibold uppercase tracking-[0.12em]">
-                        <span>{{ truth.source }}</span>
-                        <span>Scope {{ truth.scopeId }}</span>
-                        <span>Snapshot {{ truth.snapshotId }}</span>
-                        <span>Built {{ truth.builtAt }}</span>
-                        <span>{{ truth.lens }}</span>
-                        <span>{{ truth.layout }}</span>
-                        <span>Vectors {{ truth.vectors }}</span>
                     </div>
                     }
                     @if (activeNodeCount() === 0) {
@@ -418,6 +409,20 @@ function readPersistedAtlasViewState(): PersistedAtlasViewState {
                     }
                     @if (settingsOpen) {
                     <div class="settings-float absolute bottom-4 right-4 top-14 w-[min(360px,calc(100%-2rem))] overflow-y-auto rounded-2xl border border-white/10 p-3 text-xs text-zinc-300">
+                        @if (atlasTruth(); as truth) {
+                        <div class="atlas-truth-panel mb-3">
+                            <div class="atlas-truth-panel-title">Packet trace</div>
+                            <dl>
+                                <div><dt>Source</dt><dd>{{ truth.source }}</dd></div>
+                                <div><dt>Scope</dt><dd>{{ truth.scopeId }}</dd></div>
+                                <div><dt>Snapshot</dt><dd>{{ truth.snapshotId }}</dd></div>
+                                <div><dt>Built</dt><dd>{{ truth.builtAt }}</dd></div>
+                                <div><dt>Lens</dt><dd>{{ truth.lens }}</dd></div>
+                                <div><dt>Layout</dt><dd>{{ truth.layout }}</dd></div>
+                                <div><dt>Vectors</dt><dd>{{ truth.vectors }}</dd></div>
+                            </dl>
+                        </div>
+                        }
                         <div class="settings-toggle-grid">
                             <button type="button" class="galaxy-control-button" (click)="cycleLabelMode()">Labels<span>{{ settings.labelMode }}</span></button>
                             <button type="button" class="galaxy-control-button" (click)="cycleEdgeMode()">Edges<span>{{ settings.edgeMode }}</span></button>
@@ -449,7 +454,6 @@ function readPersistedAtlasViewState(): PersistedAtlasViewState {
                             <div class="grid grid-cols-2 gap-2">
                                 <button type="button" class="galaxy-control-button" (click)="toggleGuideRoutes()">Routes<span>{{ settings.guideRoutesVisible ? 'on' : 'off' }}</span></button>
                                 <button type="button" class="galaxy-control-button" (click)="toggleGuideFibers()">Fibers<span>{{ settings.guideFibersVisible ? 'on' : 'off' }}</span></button>
-                                <button type="button" class="galaxy-control-button" (click)="toggleGuideRouteBall()">Route Ball<span>{{ settings.guideRouteBallVisible ? 'on' : 'off' }}</span></button>
                                 <button type="button" class="galaxy-control-button" (click)="toggleGuideColorMode()">Color<span>{{ settings.guideColorMode === 'sourceNode' ? 'node' : 'auto' }}</span></button>
                             </div>
                             <p class="mt-2 text-[9px] leading-snug text-zinc-600">Each guide family toggles independently of shells. Color = node adopts the color of its source node.</p>
@@ -595,20 +599,44 @@ function readPersistedAtlasViewState(): PersistedAtlasViewState {
         .atlas-canvas-surface { container-type: inline-size; }
         .canvas-lens-rail { max-width: calc(100% - 32px); }
         .canvas-projection-rail { max-width: calc(100% - 32px); scrollbar-width: none; }
-        .projection-contract-chip {
+        .atlas-status-rail {
+            display: flex;
+            min-width: 0;
+            max-width: min(42vw, 640px);
+            align-items: center;
+            gap: 4px;
+            overflow-x: auto;
+            border-left: 1px solid rgba(255, 255, 255, 0.08);
+            padding-left: 6px;
+            scrollbar-width: none;
+        }
+        .atlas-status-rail::-webkit-scrollbar { display: none; }
+        .atlas-status-token {
             display: inline-flex;
+            max-width: 132px;
+            flex: 0 1 auto;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
             border-radius: 999px;
-            border: 1px solid rgba(125, 225, 209, 0.16);
-            background: rgba(13, 148, 136, 0.11);
-            padding: 4px 10px;
-            color: rgb(204 251 241);
-            font-size: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.075);
+            background: rgba(255, 255, 255, 0.032);
+            padding: 2px 6px;
+            color: rgb(161 161 170);
+            font-size: 8.5px;
             font-weight: 800;
-            letter-spacing: 0.1em;
+            letter-spacing: 0.08em;
             text-transform: uppercase;
+            opacity: 0.82;
+        }
+        .atlas-status-token-strong {
+            border-color: rgba(45, 212, 191, 0.18);
+            color: rgb(153 246 228);
+            background: rgba(20, 184, 166, 0.07);
+        }
+        .atlas-status-token-source,
+        .atlas-status-token-contract {
+            max-width: 180px;
         }
         .canvas-projection-rail-top {
             left: 82px;
@@ -621,25 +649,11 @@ function readPersistedAtlasViewState(): PersistedAtlasViewState {
             top: 112px;
             max-width: calc(100% - 32px);
         }
-        .atlas-truth-strip {
-            color: rgb(212 212 216);
-        }
-        .atlas-truth-strip span {
-            max-width: 220px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            border-radius: 999px;
-            border: 1px solid rgba(255, 255, 255, 0.10);
-            background: rgba(0, 0, 0, 0.58);
-            padding: 4px 8px;
-        }
-        .atlas-truth-strip span:first-child {
-            border-color: rgba(45, 212, 191, 0.22);
-            color: rgb(153 246 228);
-        }
         .canvas-projection-rail::-webkit-scrollbar { display: none; }
         @container (max-width: 820px) {
+            .atlas-status-rail {
+                max-width: 32vw;
+            }
             .canvas-projection-rail-top {
                 left: 16px;
                 top: 64px;
@@ -649,12 +663,6 @@ function readPersistedAtlasViewState(): PersistedAtlasViewState {
             }
             .canvas-projection-rail-graph {
                 top: 112px;
-            }
-            .atlas-truth-strip {
-                left: 16px;
-                right: 16px;
-                top: 154px;
-                justify-content: flex-start;
             }
         }
         .canvas-control-rail::-webkit-scrollbar { display: none; }
@@ -717,6 +725,53 @@ function readPersistedAtlasViewState(): PersistedAtlasViewState {
         .settings-float::-webkit-scrollbar-thumb {
             background: rgba(var(--ui-accent-rgb), 0.42);
             border-radius: 999px;
+        }
+
+        .atlas-truth-panel {
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            background: rgba(0, 0, 0, 0.22);
+            padding: 8px;
+        }
+
+        .atlas-truth-panel-title {
+            margin-bottom: 6px;
+            color: rgb(161 161 170);
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+        }
+
+        .atlas-truth-panel dl {
+            display: grid;
+            gap: 4px;
+            margin: 0;
+        }
+
+        .atlas-truth-panel dl > div {
+            display: grid;
+            min-width: 0;
+            grid-template-columns: 68px minmax(0, 1fr);
+            gap: 8px;
+            align-items: baseline;
+        }
+
+        .atlas-truth-panel dt {
+            color: rgb(113 113 122);
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+
+        .atlas-truth-panel dd {
+            margin: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            color: rgb(212 212 216);
+            font-size: 10px;
         }
 
         .canvas-glass-button:hover {
@@ -1441,10 +1496,6 @@ export class GraphAtlasPreviewComponent implements OnInit {
         this.updateSettings({ lorentzSpaceVisible: !this.settings.lorentzSpaceVisible });
     }
 
-    toggleTransitRouteBall(): void {
-        this.updateSettings({ productKleinVisible: !this.settings.productKleinVisible });
-    }
-
     /** Dedicated guide-family toggles. Each flips one family only, independent of shells. */
     toggleGuideRoutes(): void {
         this.updateSettings({ guideRoutesVisible: !this.settings.guideRoutesVisible });
@@ -1452,10 +1503,6 @@ export class GraphAtlasPreviewComponent implements OnInit {
 
     toggleGuideFibers(): void {
         this.updateSettings({ guideFibersVisible: !this.settings.guideFibersVisible });
-    }
-
-    toggleGuideRouteBall(): void {
-        this.updateSettings({ guideRouteBallVisible: !this.settings.guideRouteBallVisible });
     }
 
     toggleGuideColorMode(): void {

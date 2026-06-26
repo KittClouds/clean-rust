@@ -18,7 +18,10 @@ mod gliner_x;
 mod gliner_x_tensors;
 mod glirel;
 mod lens_consumer;
+mod model_split;
 mod nli;
+mod nli_claim;
+mod nli_stage;
 mod ort_runtime;
 mod seed_worker;
 #[cfg(test)]
@@ -73,7 +76,17 @@ pub use glirel::{
     GlirelRelationTypeSpec, GlirelSentenceWindow,
 };
 pub use lens_consumer::RelationshipLensChunkConsumer;
-pub use nli::{NliError, NliModel, NliPairJudgment, NliScores};
+pub use model_split::{
+    default_model_split_contract, model_lane_for_role, PhoenixModelLane, PhoenixModelRole,
+    PhoenixModelSplitRule,
+};
+pub use nli::{NliError, NliModel, NliModelMetadata, NliPairJudgment, NliScorer, NliScores};
+pub use nli_claim::{
+    adjudicate_claims_with_nli, ClassificationVote, NliClaimAdjudication,
+    NliClaimAdjudicationOptions, NliClaimDecisionKind, NliClaimInput, NliClaimPurpose,
+    NliClaimVote,
+};
+pub use nli_stage::NliAdjudicationBatchOptions;
 pub use seed_worker::{
     build_relation_mention_seed_sidecar, build_relation_mention_seed_sidecar_from_store,
     persist_relation_mention_seed_sidecar, RelationSeedConfig, RelationSeedReport,

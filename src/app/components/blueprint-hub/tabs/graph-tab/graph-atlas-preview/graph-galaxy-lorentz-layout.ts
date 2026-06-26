@@ -39,7 +39,8 @@ import {
 } from './graph-galaxy-hierarchy-caps';
 
 const CAP_SCENE_RADIUS = 2.18;
-const MAX_CAP_GUIDES = 40;
+const MAX_CAP_BOUNDARY_GUIDES = 24;
+const MAX_FALLBACK_BOUNDARY_CAPS_PER_LAYER = 2;
 const MAX_MEMBERSHIP_GUIDES = 260;
 
 interface CapInfo extends Rgb {
@@ -419,7 +420,7 @@ function tuneCapLinks(nodes: GalaxyNode[], links: GalaxyEdge[], infos: Hierarchy
 }
 
 function buildCapBoundaryGuides(caps: CapInfo[]): GalaxyLorentzGuide[] {
-    return caps.slice(0, MAX_CAP_GUIDES).map((cap) => {
+    return visibleBoundaryCaps(caps).map((cap) => {
         const count = cap.indexes.length || 1;
         const radius = cap.radiusSum / count;
         const ambiguity = cap.ambiguitySum / count;
@@ -438,6 +439,68 @@ function buildCapBoundaryGuides(caps: CapInfo[]): GalaxyLorentzGuide[] {
             b: cap.b,
         };
     });
+}
+
+function visibleBoundaryCaps(caps: CapInfo[]): CapInfo[] {
+    const containers = sortBoundaryCaps(caps.filter(isFolderOrSharedCap));
+    const documentCaps = sortBoundaryCaps(caps.filter(isDocumentContainerCap));
+    const primary = containers.length ? containers : documentCaps;
+    if (primary.length) return primary.slice(0, MAX_CAP_BOUNDARY_GUIDES);
+    return fallbackBoundaryCaps(caps);
+}
+
+function fallbackBoundaryCaps(caps: CapInfo[]): CapInfo[] {
+    const selected: CapInfo[] = [];
+    const byLayer = new Map<string, number>();
+    for (const cap of sortBoundaryCaps(caps.filter((item) => !isNestedDocumentCap(item)))) {
+        const layer = fallbackBoundaryLayer(cap);
+        const used = byLayer.get(layer) || 0;
+        if (used >= MAX_FALLBACK_BOUNDARY_CAPS_PER_LAYER) continue;
+        selected.push(cap);
+        byLayer.set(layer, used + 1);
+        if (selected.length >= MAX_CAP_BOUNDARY_GUIDES) break;
+    }
+    return selected;
+}
+
+function sortBoundaryCaps(caps: CapInfo[]): CapInfo[] {
+    return [...caps].sort((left, right) =>
+        boundaryPriority(right) - boundaryPriority(left)
+        || right.importance - left.importance
+        || left.id.localeCompare(right.id),
+    );
+}
+
+function boundaryPriority(cap: CapInfo): number {
+    const id = cap.id.toLowerCase();
+    if (id.startsWith('folder:')) return 5;
+    if (isSharedDocumentCapId(id)) return 4;
+    if (isDocumentContainerCap(cap)) return 3;
+    if (!cap.parentIds.length) return 2;
+    return 1;
+}
+
+function isFolderOrSharedCap(cap: CapInfo): boolean {
+    const id = cap.id.toLowerCase();
+    return id.startsWith('folder:') || isSharedDocumentCapId(id);
+}
+
+function isSharedDocumentCapId(id: string): boolean {
+    return /wormhole|document[_:-]?cluster|shared[_:-]?document|linked[_:-]?note/.test(id);
+}
+
+function isDocumentContainerCap(cap: CapInfo): boolean {
+    return /^document:[^:]+$/.test(cap.id.toLowerCase());
+}
+
+function isNestedDocumentCap(cap: CapInfo): boolean {
+    return /^document:[^:]+:/.test(cap.id.toLowerCase());
+}
+
+function fallbackBoundaryLayer(cap: CapInfo): string {
+    const id = cap.id.toLowerCase();
+    if (id.startsWith('cap:')) return id.split(':').slice(0, 2).join(':');
+    return cap.lane || 'semantic';
 }
 
 function buildMembershipGuides(nodes: GalaxyNode[], links: GalaxyEdge[], infos: HierarchyInfo[]): GalaxyLorentzGuide[] {

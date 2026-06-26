@@ -14,13 +14,14 @@ use phoenix_store_native_core::{
 use phoenix_types::SessionId;
 
 use crate::{
-    adjudicate_relation_decisions_with_nli, build_relation_hypotheses,
+    adjudicate_claims_with_nli, adjudicate_relation_decisions_with_nli, build_relation_hypotheses,
     build_relation_patch_sidecar, default_relation_type_specs, derive_dirty_scope_review_batches,
     derive_dirty_scope_review_batches_with_seeder, draft_relation_decisions,
     persist_relation_patch_sidecar, persist_relation_patch_sidecar_with_existing,
-    run_glirel_over_batch, GlirelModel, GlirelRelationTypeSpec, GlirelWorkerError, NliModel,
-    RelationDecision, RelationExecutionPlan, RelationMentionSeeder, RelationModelJob,
-    RelationPreparedStageInput, RelationScopeReviewBatch,
+    run_glirel_over_batch, GlirelModel, GlirelRelationTypeSpec, GlirelWorkerError,
+    NliClaimAdjudication, NliClaimAdjudicationOptions, NliClaimInput, NliModel, RelationDecision,
+    RelationExecutionPlan, RelationMentionSeeder, RelationModelJob, RelationPreparedStageInput,
+    RelationScopeReviewBatch,
 };
 
 /// Canonical Alex-first relation batch derivation. This path does not invoke
@@ -119,6 +120,14 @@ pub fn adjudicate_with_nli(
     nli: &NliModel,
 ) -> Result<Vec<RelationDecision>, GlirelWorkerError> {
     adjudicate_relation_decisions_with_nli(batch, decisions, relation_specs, nli)
+}
+
+pub fn adjudicate_claims(
+    claims: &[NliClaimInput],
+    nli: &NliModel,
+    options: NliClaimAdjudicationOptions,
+) -> Result<Vec<NliClaimAdjudication>, crate::NliError> {
+    adjudicate_claims_with_nli(claims, nli, options)
 }
 
 pub fn build_patch_sidecar(

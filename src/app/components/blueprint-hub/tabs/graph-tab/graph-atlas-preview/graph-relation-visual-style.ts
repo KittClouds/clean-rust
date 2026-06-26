@@ -36,7 +36,7 @@ export function relationFamilyFromText(...parts: unknown[]): GraphNodeColorKind 
     if (/\bintimate\b|\bclose\s+contact\b|\bkiss\b|\bstood\s+beside\b|\bclose\s+enough\b/.test(text)) return 'intimacy';
     if (/\btransfers?\b|\breceives?\b|\bgave\b|\bhanded\b|\btook\s+it\s+from\b/.test(text)) return 'transfer';
     if (/\bscene\s+presence\b|\bentered\b|\barrived\b|\bcame\s+in\b|\bstood\s+near\b/.test(text)) return 'scenePresence';
-    if (/\brelationship\b|\brelation\b|\bgraph\s+fact\b|\bfact\b|\btrusts?\b|\bbond\b|\bfriend\b/.test(text)) return 'relationship';
+    if (/\brelationship\b|\brelation\b|\bgraph\s+fact\b|\bfact\b|\btrusts?\b|\bbond\b|\bfriend\b|\bresonates?\b|\bwormhole\b/.test(text)) return 'relationship';
     return null;
 }
 

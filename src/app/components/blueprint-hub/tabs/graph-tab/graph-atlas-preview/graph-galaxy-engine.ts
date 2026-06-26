@@ -10,7 +10,6 @@ import {
     readBusemannSignature,
 } from './graph-galaxy-hybrid-busemann-layout';
 import { applyLorentzTreeLayout } from './graph-galaxy-lorentz-layout';
-import { applyTransitConsensusLayout } from './graph-galaxy-product-layout';
 import { applySiegelFinslerLayout } from './graph-galaxy-siegel-layout';
 import {
     buildHopfReceiptRibbons,
@@ -18,6 +17,8 @@ import {
     type HopfReceiptBase,
 } from './graph-galaxy-hopf-receipts';
 import { relationFamilyFromText } from './graph-relation-visual-style';
+import { buildTransitBackboneGuides } from './graph-transit-backbone-guides';
+import { applyTransitLayout } from './graph-transit-layout';
 import { buildTransitPlan, type TransitPlan } from './graph-transit-plan';
 
 export type GalaxyLabelMode = 'hover' | 'selected' | 'important' | 'always' | 'off';
@@ -202,23 +203,19 @@ export interface GalaxyRenderSettings {
     hopfSpaceIntensity: number;
     lorentzSpaceVisible: boolean;
     lorentzSpaceIntensity: number;
-    productKleinVisible: boolean;
     embeddingTopologyMode: GalaxyEmbeddingTopologyMode;
     sourceMode: GalaxyRenderSourceMode;
 
     /**
      * Dedicated guide visibility + color controls.
      *
-     * These are intentionally separate from the legacy {@link hybridShellVisible},
-     * {@link lorentzSpaceVisible}, {@link hopfSpaceVisible}, {@link productKleinVisible}
-     * knobs so that routes / fibers / route-ball can each be turned off on their
-     * own regardless of layout mode, and so shells no longer drag routes with
-     * them. When undefined the renderer falls back to the legacy flag for the
-     * matching family, preserving prior behavior for persisted settings.
+     * These are intentionally separate from the space visibility controls so
+     * routes and fibers can each be turned off on their own regardless of layout
+     * mode. When undefined the renderer falls back to the matching space flag,
+     * preserving prior behavior for persisted settings.
      */
     guideRoutesVisible?: boolean;
     guideFibersVisible?: boolean;
-    guideRouteBallVisible?: boolean;
     /** See {@link GalaxyGuideColorMode}. */
     guideColorMode?: GalaxyGuideColorMode;
 }
@@ -411,12 +408,10 @@ export const DEFAULT_GALAXY_SETTINGS: GalaxyRenderSettings = {
     hopfSpaceIntensity: 1,
     lorentzSpaceVisible: true,
     lorentzSpaceIntensity: 1,
-    productKleinVisible: true,
     embeddingTopologyMode: 'off',
     sourceMode: 'entities',
     guideRoutesVisible: true,
     guideFibersVisible: true,
-    guideRouteBallVisible: true,
     guideColorMode: 'auto',
 };
 
@@ -431,7 +426,6 @@ export function mergeGalaxySettings(settings?: Partial<GalaxyRenderSettings> | n
     if (merged.guideColorMode !== 'sourceNode') merged.guideColorMode = 'auto';
     if (typeof merged.guideRoutesVisible !== 'boolean') merged.guideRoutesVisible = merged.lorentzSpaceVisible !== false;
     if (typeof merged.guideFibersVisible !== 'boolean') merged.guideFibersVisible = merged.hopfSpaceVisible !== false;
-    if (typeof merged.guideRouteBallVisible !== 'boolean') merged.guideRouteBallVisible = merged.productKleinVisible !== false;
     if (merged.edgeColorMode === 'cyan') merged.edgeColorMode = 'aqua';
     merged.edgeCurveStrength = Math.min(1.2, Math.max(0.25, merged.edgeCurveStrength));
     merged.edgeWidth = Math.min(1.1, Math.max(0.15, merged.edgeWidth));
@@ -512,7 +506,8 @@ export function buildGalaxyScene(
     if (isTransitLayoutMode(settings.layoutMode)) {
         const transitPlan = buildTransitPlan(entitiesInput, edges);
         applyGalaxyMetadata(nodes);
-        const lorentzGuides = applyTransitConsensusLayout(nodes, links);
+        applyTransitLayout(nodes, links, transitPlan);
+        const lorentzGuides = buildTransitBackboneGuides(transitPlan);
         return attachRelationControls({ nodes, links, layoutMode: 'transitManifold', groups: [], transitPlan, lorentzGuides }, relationPlan.controls);
     }
 

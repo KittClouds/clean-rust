@@ -14,6 +14,7 @@ import { buildGraphRebuildDeltaPostProcessPlan, deltaPostProcessPlanCounters, ty
 import { buildGraphRebuildEdgeJudgmentPlan, edgeJudgmentPlanCounters } from './graph-rebuild-edge-type-judgment-plan';
 import { embeddingProfileFromModelSelection } from './graph-rebuild-embedding-signatures';
 import { GLINER_LINKER_MODEL_ID } from './graph-rebuild-entity-linking';
+import { relationshipHintsFromNliResult } from './graph-nli-adjudication-contract';
 import { buildGraphIndexLayerReceipts } from './graph-index-layer-receipts';
 import { GraphRebuildService } from './graph-rebuild.service';
 import { buildSiegelBackboneProjectionReceipt } from './graph-rebuild-siegel-backbone';
@@ -2095,40 +2096,6 @@ function sumOutputCounts(counts: Record<string, number>): number {
 
 function isOutputCountKey(key: string): boolean {
     return !/(started|completed|duration|elapsed|wall|timestamp|time)/i.test(key);
-}
-
-function relationshipHintsFromNliResult(rawResult: unknown): GraphRebuildRelationshipHint[] {
-    const judgments = arrayField(rawResult, 'judgments');
-    return judgments
-        .map((row): GraphRebuildRelationshipHint | null => {
-            if (!row || typeof row !== 'object') return null;
-            const record = row as Record<string, unknown>;
-            const sourceId = stringField(record, 'sourceId', 'source_id');
-            const targetId = stringField(record, 'targetId', 'target_id');
-            const predictedLabel = stringField(record, 'predictedLabel', 'predicted_label');
-            if (!sourceId || !targetId || !predictedLabel) return null;
-            const hint: GraphRebuildRelationshipHint = {
-                sourceId,
-                targetId,
-                relationType: stringField(record, 'edgeType', 'edge_type') || undefined,
-                status: nliStatus(predictedLabel),
-                confidence: numberField(record, 'confidence'),
-                source: 'nli:modernbert',
-                evidence: [
-                    `judgment:${stringField(record, 'judgmentId', 'judgment_id') || 'unknown'}`,
-                    `label:${predictedLabel}`,
-                ],
-            };
-            return hint;
-        })
-        .filter((row): row is GraphRebuildRelationshipHint => !!row);
-}
-
-function nliStatus(label: string): GraphRebuildRelationshipHint['status'] {
-    const normalized = label.trim().toLowerCase();
-    if (normalized === 'entailment' || normalized === 'entails' || normalized === 'support') return 'accepted';
-    if (normalized === 'contradiction' || normalized === 'contradicts') return 'rejected';
-    return 'review';
 }
 
 function arrayField(value: unknown, key: string): unknown[] {

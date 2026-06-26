@@ -19,6 +19,7 @@ phoenix-native = { path = "../rust/phoenix/crates/phoenix-native" }
 phoenix-graph-rebuild = { path = "../rust-native/phoenix/crates/phoenix-graph-rebuild" }
 phoenix-document-index = { path = "../rust-native/phoenix/crates/phoenix-document-index" }
 phoenix-hyperbolic = { path = "../rust/phoenix/crates/phoenix-hyperbolic" }
+phoenix-rel-post = { path = "../rust-native/phoenix/crates/phoenix-rel-post" }
 phoenix-types = { path = "../rust/phoenix/crates/phoenix-types" }
 half = "2"
 hound = "3.5"

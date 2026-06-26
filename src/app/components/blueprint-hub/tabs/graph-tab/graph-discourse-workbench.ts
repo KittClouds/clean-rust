@@ -14,6 +14,13 @@ import type {
     GraphDocumentTopologyDiff,
 } from '../../../../graph-rebuild/graph-document-compiler';
 import type { GraphDiscourseTabId, GraphDiscourseTone } from './graph-discourse-analytics';
+import {
+    nliReviewDetail,
+    nliReviewExposure,
+    nliReviewFacts,
+    nliRouteTag,
+    nliVoteTag,
+} from './graph-nli-review-exposure';
 
 export type GraphDiscourseWorkbenchDecision =
     | 'accepted'
@@ -325,26 +332,34 @@ function relationshipRecord(
     row: GraphRebuildRelationship,
     labels: Map<string, string>,
 ): GraphDiscourseWorkbenchRecord {
+    const nli = nliReviewExposure(row.decisionEvidence);
     return record({
         id: `relations:relationship:${row.id}`,
         tab: 'relations',
         kind: 'relationship',
         title: titleCase(row.relationType),
         subtitle: route(row.sourceEntityId, row.targetEntityId, labels),
-        detail: row.rationale || titleCase(row.status),
+        detail: nli ? nliReviewDetail(nli) : row.rationale || titleCase(row.status),
         status: row.status,
         score: row.adjudicationScore || row.confidence,
         tone: row.status === 'accepted' ? 'ready' : row.status === 'rejected' ? 'danger' : 'review',
         focusQuery: focus([row.sourceEntityId, row.targetEntityId], labels),
         sourceIds: [row.sourceEntityId],
         targetIds: [row.targetEntityId],
-        evidenceIds: [...row.evidenceAnchorIds, ...row.decisionEvidence],
+        evidenceIds: [...row.evidenceAnchorIds, ...(nli?.evidenceRefs || []), ...row.decisionEvidence],
         entityIds: [row.sourceEntityId, row.targetEntityId],
-        tags: [row.status, row.adjudicationSource],
-        rationale: [row.rationale],
+        receiptIds: nli?.receiptIds || [],
+        actionKinds: nli ? ['inspect'] : [],
+        tags: nli
+            ? [nliVoteTag(nli), nliRouteTag(nli), 'review_only', row.status, row.adjudicationSource]
+            : [row.status, row.adjudicationSource],
+        rationale: nli
+            ? [row.rationale, nliReviewDetail(nli), 'NLI review rows expose votes only; topology promotion stays behind a separate apply contract.']
+            : [row.rationale],
         facts: [
             fact('Source', label(row.sourceEntityId, labels)),
             fact('Target', label(row.targetEntityId, labels)),
+            ...nliReviewFacts(nli),
             fact('Evidence anchors', row.evidenceAnchorIds.join(' / ')),
             fact('Decision evidence', row.decisionEvidence.join(' / ')),
         ],
