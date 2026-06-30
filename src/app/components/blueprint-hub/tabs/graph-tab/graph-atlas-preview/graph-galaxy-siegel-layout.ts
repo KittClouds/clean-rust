@@ -315,23 +315,40 @@ function buildDirectedGuides(nodes: GalaxyNode[], links: GalaxyEdge[], infos: Si
         if (!source || !target) continue;
         const sourceInfo = infos[link.source];
         const targetInfo = infos[link.target];
-        const kind = isStructuralType(link.type) ? 'documentStructure' : sourceInfo.lane === targetInfo.lane ? sourceInfo.lane : 'bridge';
+        const structural = isStructuralType(link.type);
+        const kind = structural ? 'documentStructure' : sourceInfo.lane === targetInfo.lane ? sourceInfo.lane : 'bridge';
         guides.push({
             id: `siegel:directed:${link.id}`,
             nodeIds: [source.entity.id, target.entity.id],
             positions3d: directedCurve(source, target, sourceInfo, targetInfo, link),
-            importance: (isStructuralType(link.type) ? 2.2 : 0.7) + Math.max(source.radius, target.radius) * 0.36 + link.confidence,
+            importance: (structural ? 2.2 : 0.7) + Math.max(source.radius, target.radius) * 0.36 + link.confidence,
             treeId: sourceInfo.lane === targetInfo.lane ? `siegel:lane:${sourceInfo.lane}` : 'siegel:bridge',
             treeKind: kind,
             level: Math.max(sourceInfo.depth, targetInfo.depth),
             guideKind: 'membership',
-            guideWeight: isStructuralType(link.type) ? 0.76 : 0.42 + Math.min(0.26, link.confidence * 0.2),
-            ...rgbForKind(kind),
+            guideWeight: structural ? 0.76 : 0.42 + Math.min(0.26, link.confidence * 0.2),
+            ...directedGuideColor(kind, source, target, sourceInfo, targetInfo),
         });
     }
     return guides
         .sort((left, right) => right.importance - left.importance || left.id.localeCompare(right.id))
         .slice(0, SIEGEL_MAX_GUIDES);
+}
+
+function directedGuideColor(
+    kind: string,
+    source: GalaxyNode,
+    target: GalaxyNode,
+    sourceInfo: SiegelInfo,
+    targetInfo: SiegelInfo,
+): { r: number; g: number; b: number } {
+    if (kind !== 'documentStructure') return rgbForKind(kind);
+    const styled = targetInfo.band === 'chunk' ? target
+        : sourceInfo.band === 'chunk' ? source
+            : targetInfo.band === 'document' || targetInfo.band === 'documentRoot' ? target
+                : sourceInfo.band === 'document' || sourceInfo.band === 'documentRoot' ? source
+                    : null;
+    return styled ? { r: styled.r, g: styled.g, b: styled.b } : rgbForKind(kind);
 }
 
 function buildDirectionGuide(nodes: GalaxyNode[]): GalaxyLorentzGuide {

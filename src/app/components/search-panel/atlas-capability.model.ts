@@ -505,15 +505,15 @@ export const ATLAS_CAPABILITY_REGISTRY: AtlasCapability[] = [
     },
     {
         id: 'hybridManifold',
-        label: 'Hybrid Manifold',
+        label: 'Hybrid Embedding Manifold',
         family: 'manifold',
-        description: 'Hybrid vector topology sidecar for semantic atlas rows and graph projection support.',
+        description: 'Canonical embedding manifold over semantic atlas vectors; owns the declared metric and neighborhood construction for candidate-only semantic topology.',
         cost: 'High',
         subsystems: 6,
         statusSource: 'PhoenixMachineManifoldStatusMap.hybrid',
         backendRoute: 'manifoldSnapshot(hybrid) / phoenix-hyperbolic',
         inputs: ['semantic atlas vectors'],
-        outputs: ['hybrid topology', 'ANN projection hints'],
+        outputs: ['embedding space contract', 'cosine top-k semantic neighborhoods', 'candidate-only topology hints'],
         dependencies: ['semanticAtlas'],
         skips: [],
         mutationPolicy: 'read-only',
@@ -665,7 +665,7 @@ export const ATLAS_CAPABILITY_LAYERS: AtlasCapabilityLayer[] = [
     {
         id: 'manifoldGeometry',
         label: 'Manifold / Geometry',
-        description: 'Hybrid, Hopf, Lorentz, and product projection/forest sidecars.',
+        description: 'Hybrid embedding manifold plus Hopf, Lorentz, and product projection/forest sidecars.',
         capabilityIds: ['hybridManifold', 'hopfProjection', 'lorentzForest', 'productManifold'],
     },
     {

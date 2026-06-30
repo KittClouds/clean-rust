@@ -7,7 +7,15 @@ import type {
     ManifoldProjectionSource,
     ManifoldTopologyPayload,
 } from '../../../../../services/manifold-atlas.types';
+import {
+    normalizeEntityKind,
+    normalizeGraphNodeColorKind,
+} from '../../../../../lib/store/entityColorStore';
 import type { GalaxyInputEdge, GalaxyRenderableNode } from './graph-galaxy-engine';
+import {
+    graphTopologyDisplayColorKind,
+    graphTopologyStyleForPacketRow,
+} from './graph-topology-style-contract';
 
 export interface EmbeddingAtlasData {
     nodes: GalaxyRenderableNode[];
@@ -102,9 +110,84 @@ interface Signature {
 }
 
 const DIMS = 32;
-const COLORS = ['184 78% 58%', '198 78% 60%', '262 70% 62%', '172 68% 52%'];
 const EMBEDDING_SHELL_RADIUS = 1.52;
 const EMBEDDING_SHELL_SMALL_RADIUS = 1.08;
+
+interface EmbeddingAtlasStyle {
+    renderKind: string;
+    colorKind: string;
+    entityKind: string;
+    colorHsl: string;
+    metadata: Record<string, string | undefined>;
+}
+
+function embeddingAtlasStyle(input: {
+    kind?: string;
+    sourceType?: string;
+    label?: string;
+    styleKey?: string;
+}): EmbeddingAtlasStyle {
+    const sourceType = String(input.sourceType || '').trim();
+    const kind = String(input.kind || '').trim();
+    const styleKey = String(input.styleKey || '').trim();
+    const graphKind = normalizeGraphNodeColorKind(styleKey)
+        || normalizeGraphNodeColorKind(kind)
+        || normalizeGraphNodeColorKind(sourceType);
+    const entityKind = graphKind ? null : normalizeEntityKind(styleKey) || normalizeEntityKind(kind) || normalizeEntityKind(sourceType);
+    if (entityKind) {
+        return {
+            renderKind: displayKind(kind || sourceType || entityKind),
+            colorKind: displayKind(entityKind),
+            entityKind,
+            colorHsl: graphTopologyStyleForPacketRow({
+                family: 'entity',
+                kind: entityKind,
+                label: input.label || entityKind,
+                styleKey: entityKind,
+            }).colorHsl,
+            metadata: { entityKind },
+        };
+    }
+
+    const colorKind = graphKind || 'graphFact';
+    const style = graphTopologyStyleForPacketRow({
+        family: graphStructureFamily(colorKind),
+        kind: colorKind,
+        label: input.label || kind || sourceType || colorKind,
+        styleKey: colorKind,
+    });
+    const displayColorKind = graphTopologyDisplayColorKind(style.colorKind);
+    return {
+        renderKind: renderKindForGraphColor(displayColorKind, kind || sourceType),
+        colorKind: displayColorKind,
+        entityKind: '',
+        colorHsl: style.colorHsl,
+        metadata: {
+            graphColorKind: displayColorKind,
+            graphKind: displayColorKind,
+            styleKey: displayColorKind,
+        },
+    };
+}
+
+function graphStructureFamily(colorKind: string): string {
+    if (colorKind === 'document' || colorKind === 'chunk' || colorKind === 'anchor') return 'structure';
+    if (colorKind === 'temporal' || colorKind === 'temporalFact') return 'temporal';
+    if (colorKind === 'causal' || colorKind === 'causalFact') return 'causal';
+    if (colorKind === 'memoryState') return 'memory';
+    return 'fact';
+}
+
+function renderKindForGraphColor(colorKind: string, fallback: string): string {
+    if (colorKind === 'document') return 'note';
+    if (colorKind === 'chunk') return 'chunk';
+    if (colorKind === 'anchor') return 'anchor';
+    return displayKind(fallback || colorKind);
+}
+
+function displayKind(kind: string): string {
+    return String(kind || '').replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+}
 
 export function buildDocEmbeddingAtlas(notes: Note[], limit = 180, topK = 4): EmbeddingAtlasData {
     const selected = notes
@@ -114,16 +197,18 @@ export function buildDocEmbeddingAtlas(notes: Note[], limit = 180, topK = 4): Em
     const nodes = selected.map((note, index) => {
         const signature = signatures[index];
         const point = projectSignature(signature.vector, note.id, index, selected.length);
+        const style = embeddingAtlasStyle({ kind: 'document', sourceType: 'doc', label: note.title });
         return {
             id: `embed:doc:${note.id}`,
             label: note.title || `Doc ${index + 1}`,
-            kind: 'CONCEPT',
+            kind: style.renderKind,
             totalMentions: Math.max(1, Math.round(signature.tokens / 220)),
             atlasX: point.x,
             atlasY: point.y,
             atlasZ: point.z,
-            colorHsl: COLORS[index % COLORS.length],
+            colorHsl: style.colorHsl,
             metadata: {
+                ...style.metadata,
                 sourceType: 'doc',
                 sourceId: note.id,
                 sourceTitle: note.title,
@@ -148,16 +233,18 @@ export function buildLeafEmbeddingAtlas(blocks: NoteBlockProjection[], limit = 2
     const nodes = selected.map((block, index) => {
         const signature = signatures[index];
         const point = projectSignature(signature.vector, block.id, index, selected.length);
+        const style = embeddingAtlasStyle({ kind: 'chunk', sourceType: 'leaf', label: block.path });
         return {
             id: `embed:leaf:${block.id}`,
             label: block.path || `Leaf ${index + 1}`,
-            kind: 'CONCEPT',
+            kind: style.renderKind,
             totalMentions: Math.max(1, Math.round(signature.tokens / 120)),
             atlasX: point.x,
             atlasY: point.y,
             atlasZ: point.z,
-            colorHsl: COLORS[(index + 1) % COLORS.length],
+            colorHsl: style.colorHsl,
             metadata: {
+                ...style.metadata,
                 sourceType: 'leaf',
                 sourceId: block.id,
                 noteId: block.noteId,
@@ -187,16 +274,18 @@ export function buildBackendEmbeddingAtlas(payload: BackendEmbeddingAtlasPayload
         const signature = signatures[index];
         const point = backendAtlasPoint(node, signature.vector, index, selected.length);
         const hopf = backendHopfMetadata(node);
+        const style = embeddingAtlasStyle({ kind: node.kind, sourceType: node.sourceType, label: node.label });
         return {
             id: node.id,
             label: node.label || node.id,
-            kind: node.kind || 'CONCEPT',
+            kind: style.renderKind,
             totalMentions: Math.max(1, signature.tokens),
             atlasX: point.x,
             atlasY: point.y,
             atlasZ: point.z,
-            colorHsl: COLORS[index % COLORS.length],
+            colorHsl: style.colorHsl,
             metadata: {
+                ...style.metadata,
                 sourceType: node.sourceType || 'semantic_atlas',
                 sourceId: node.id,
                 documentId: node.documentId,

@@ -260,7 +260,7 @@ function buildStages(input: AtlasCommandStatusInput, counts: AtlasInventoryCount
 function buildSidecars(input: AtlasCommandStatusInput): AtlasInventoryMetric[] {
     return [
         { label: 'Semantic sidecar', value: null, detail: `${input.vectorStatus} ${input.embeddingDimensionLabel}`, source: input.embeddingModelLabel },
-        { label: 'Hybrid space', value: null, detail: input.manifoldStatuses.hybrid, source: 'Hybrid' },
+        { label: 'Hybrid embedding manifold', value: null, detail: input.manifoldStatuses.hybrid, source: 'Hybrid' },
         { label: 'Hopf projection', value: null, detail: input.manifoldStatuses.hopf, source: 'Hopf' },
         { label: 'Lorentz forest', value: null, detail: input.manifoldStatuses.lorentz, source: 'Lorentz' },
         { label: 'Product manifold', value: null, detail: input.manifoldStatuses.product, source: 'Product' },

@@ -608,7 +608,7 @@ export class AtlasCapabilityRuntimeService {
         try {
             const snapshot = await this.phoenixUiApi.loadManifoldAtlasSnapshot(manifold, this.searchScope(options));
             if (this.machine.isCurrentManifoldLoad(load)) {
-                this.machine.finishManifoldLoad(load, `${manifoldModeLabel(manifold)} projection ready`, manifoldSnapshotDetails(snapshot));
+                this.machine.finishManifoldLoad(load, manifoldReadyLabel(manifold), manifoldSnapshotDetails(snapshot));
             }
             return snapshot;
         } catch (error) {
@@ -950,7 +950,7 @@ export class AtlasCapabilityRuntimeService {
                         expected('embeddingCounts', 'leaf/entity/lens vectors', 'AtlasRichScanResult.embeddingCounts'),
                         expected('graphDeltaCounts.candidateEdges', 'candidate links', 'AtlasRichScanResult.graphDeltaCounts.candidateEdges'),
                         expected('relationCandidateCount', 'relation candidates', 'AtlasRichScanResult.relationCandidateCount'),
-                        expected('manifoldSnapshot.hybrid', 'Hybrid projection', 'PhoenixUiApiService.loadManifoldAtlasSnapshot(hybrid)'),
+                        expected('manifoldSnapshot.hybrid', 'Hybrid embedding manifold', 'PhoenixUiApiService.loadManifoldAtlasSnapshot(hybrid)'),
                         expected('manifoldSnapshot.hopf', 'Hopf projection', 'PhoenixUiApiService.loadManifoldAtlasSnapshot(hopf)'),
                         expected('manifoldSnapshot.lorentz', 'Lorentz forest', 'PhoenixUiApiService.loadManifoldAtlasSnapshot(lorentz)'),
                         expected('manifoldSnapshot.product', 'Product manifold', 'PhoenixUiApiService.loadManifoldAtlasSnapshot(product)'),
@@ -974,7 +974,7 @@ export class AtlasCapabilityRuntimeService {
                         expected('candidateSuggestions', 'entity anchors', 'NerService.suggestions()'),
                         expected('embeddingCounts', 'leaf/entity/lens vectors', 'AtlasRichScanResult.embeddingCounts'),
                         expected('relationCandidateCount', 'candidate relations', 'AtlasRichScanResult.relationCandidateCount'),
-                        expected('manifoldSnapshot.hybrid', 'Hybrid projection', 'PhoenixUiApiService.loadManifoldAtlasSnapshot(hybrid)'),
+                        expected('manifoldSnapshot.hybrid', 'Hybrid embedding manifold', 'PhoenixUiApiService.loadManifoldAtlasSnapshot(hybrid)'),
                         expected('manifoldSnapshot.hopf', 'Hopf projection', 'PhoenixUiApiService.loadManifoldAtlasSnapshot(hopf)'),
                         expected('manifoldSnapshot.lorentz', 'Lorentz forest', 'PhoenixUiApiService.loadManifoldAtlasSnapshot(lorentz)'),
                         expected('manifoldSnapshot.product', 'Product manifold', 'PhoenixUiApiService.loadManifoldAtlasSnapshot(product)'),
@@ -1003,7 +1003,7 @@ export class AtlasCapabilityRuntimeService {
                         { kind: 'nativeStoreProbe', service: 'PhoenixBackendService.storeCommand', policy: 'read-only', args: { capabilityId: 'causalGraph' } },
                     ] as AtlasRuntimeOperation[],
                     expectedOutputs: [
-                        expected('manifoldSnapshot.hybrid', 'Hybrid projection', 'PhoenixUiApiService.loadManifoldAtlasSnapshot(hybrid)'),
+                        expected('manifoldSnapshot.hybrid', 'Hybrid embedding manifold', 'PhoenixUiApiService.loadManifoldAtlasSnapshot(hybrid)'),
                         expected('manifoldSnapshot.hopf', 'Hopf projection', 'PhoenixUiApiService.loadManifoldAtlasSnapshot(hopf)'),
                         expected('manifoldSnapshot.lorentz', 'Lorentz forest', 'PhoenixUiApiService.loadManifoldAtlasSnapshot(lorentz)'),
                         expected('manifoldSnapshot.product', 'Product manifold', 'PhoenixUiApiService.loadManifoldAtlasSnapshot(product)'),
@@ -1539,6 +1539,12 @@ function manifoldModeLabel(mode: AtlasManifoldMode): string {
     if (mode === 'product') return 'Product';
     if (mode === 'siegel') return 'Siegel';
     return 'Hybrid';
+}
+
+function manifoldReadyLabel(mode: AtlasManifoldMode): string {
+    return mode === 'hybrid'
+        ? 'Hybrid embedding manifold ready'
+        : `${manifoldModeLabel(mode)} projection ready`;
 }
 
 function manifoldSnapshotDetails(snapshot: unknown): Record<string, unknown> {

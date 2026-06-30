@@ -13,13 +13,25 @@ import {
     type PhoenixLineSearchScope,
 } from '../lib/search/phoenix-line-search';
 import { PhoenixBackendService } from './phoenix-backend.service';
-import { PhoenixStoreService } from './phoenix-store.service';
+import { PhoenixStoreService, type StoreScopedDocument } from './phoenix-store.service';
+import { buildHybridEmbeddingValidationReceipt } from './hybrid-embedding-validation';
+import {
+    HYBRID_EMBEDDING_ARTIFACT_DOCUMENT_KEY,
+    HYBRID_EMBEDDING_ARTIFACT_NAMESPACE,
+    buildHybridEmbeddingPersistedArtifact,
+    comparableHybridEmbeddingReceipt,
+    hybridEmbeddingArtifactScope,
+    hybridEmbeddingArtifactToScopedDocument,
+    scopedDocumentToHybridEmbeddingArtifact,
+} from './hybrid-embedding-artifact-store';
 import {
     HOPF_MANIFOLD_CAPABILITIES,
     HYBRID_MANIFOLD_CAPABILITIES,
     LORENTZ_MANIFOLD_CAPABILITIES,
     PRODUCT_MANIFOLD_CAPABILITIES,
     SIEGEL_FINSLER_CAPABILITIES,
+    hybridEmbeddingSpaceContract,
+    hybridEmbeddingInputHash,
     type AtlasManifoldMode,
     type LorentzForestBuildRequest,
     type LorentzForestBuildResponse,
@@ -354,6 +366,10 @@ export interface SemanticAtlasEmbeddingNode {
     label: string;
     sourceType: 'leaf' | 'entity' | 'lens' | string;
     vector: number[];
+    modelId?: string;
+    modelVersion?: string;
+    executionProvider?: string;
+    runId?: string;
     documentId?: string;
     narrativeId?: string;
     folderId?: string;
@@ -958,7 +974,12 @@ export class PhoenixUiApiService {
             const nativeStarted = performance.now();
             const nativeSnapshot = await this.phoenix.manifoldSnapshot({ manifold, scope: this.toPhoenixScope(scope), limit: 360 });
             if (nativeSnapshot?.payload?.nodes?.length) {
-                return withManifoldLoadTimings(nativeSnapshot as ManifoldAtlasSnapshot<SemanticAtlasEmbeddingAtlas>, {
+                const contracted = await this.withPersistentHybridEmbeddingSpaceContract(
+                    nativeSnapshot as ManifoldAtlasSnapshot<SemanticAtlasEmbeddingAtlas>,
+                    scope,
+                    'native',
+                );
+                return withManifoldLoadTimings(contracted, {
                     runtimeLoadMs,
                     nativeSnapshotMs: elapsedMs(nativeStarted),
                     totalMs: elapsedMs(totalStarted),
@@ -975,7 +996,7 @@ export class PhoenixUiApiService {
         const isLorentz = manifold === 'lorentz';
         const isTransit = manifold === 'product';
         const isSiegel = manifold === 'siegel';
-        return {
+        const snapshot: ManifoldAtlasSnapshot<SemanticAtlasEmbeddingAtlas> = {
             manifold,
             geometryVersion: isHopf
                 ? 'hopf_ico_r5_v1'
@@ -1008,13 +1029,14 @@ export class PhoenixUiApiService {
                 ...payload,
                 projectionSource: 'semantic_atlas_rows',
             },
-            timings: {
-                runtimeLoadMs,
-                fallbackLoadMs: elapsedMs(fallbackStarted),
-                totalMs: elapsedMs(totalStarted),
-                source: 'fallback',
-            },
         };
+        const contracted = await this.withPersistentHybridEmbeddingSpaceContract(snapshot, scope, 'fallback');
+        return withManifoldLoadTimings(contracted, {
+            runtimeLoadMs,
+            fallbackLoadMs: elapsedMs(fallbackStarted),
+            totalMs: elapsedMs(totalStarted),
+            source: 'fallback',
+        });
     }
 
     async loadStagedGraphScenePacket(request: PhoenixGraphScenePacketRequest): Promise<PhoenixGraphScenePacket | null> {
@@ -1281,6 +1303,46 @@ export class PhoenixUiApiService {
             ...request,
             scope: this.toPhoenixScope(request.scope),
         };
+    }
+
+    private async withPersistentHybridEmbeddingSpaceContract(
+        snapshot: ManifoldAtlasSnapshot<SemanticAtlasEmbeddingAtlas>,
+        scope: SearchScope | undefined,
+        source: 'native' | 'fallback',
+    ): Promise<ManifoldAtlasSnapshot<SemanticAtlasEmbeddingAtlas>> {
+        if (snapshot.manifold !== 'hybrid') return snapshot;
+        const artifactScope = hybridEmbeddingArtifactScope(scope);
+        let previousDocument: StoreScopedDocument | null = null;
+        let previousArtifact: ReturnType<typeof scopedDocumentToHybridEmbeddingArtifact> = null;
+        try {
+            previousDocument = await this.store.getScopedDocument(
+                artifactScope.scopeId,
+                HYBRID_EMBEDDING_ARTIFACT_NAMESPACE,
+                HYBRID_EMBEDDING_ARTIFACT_DOCUMENT_KEY,
+            );
+            previousArtifact = scopedDocumentToHybridEmbeddingArtifact(previousDocument);
+        } catch (error) {
+            console.warn('[PhoenixUiApi] Hybrid embedding artifact receipt unavailable.', error);
+        }
+
+        const provisional = payloadEmbeddingSpaceContract(snapshot.payload);
+        const previousReceipt = comparableHybridEmbeddingReceipt(provisional, previousArtifact);
+        const contracted = withHybridEmbeddingSpaceContract(snapshot, previousReceipt);
+        const embeddingSpace = contracted.payload.embeddingSpace;
+        if (!embeddingSpace) return contracted;
+
+        try {
+            const artifact = buildHybridEmbeddingPersistedArtifact(
+                artifactScope,
+                embeddingSpace,
+                contracted.payload,
+                source,
+            );
+            await this.store.upsertScopedDocument(hybridEmbeddingArtifactToScopedDocument(artifact, previousDocument));
+        } catch (error) {
+            console.warn('[PhoenixUiApi] Hybrid embedding artifact persistence unavailable.', error);
+        }
+        return contracted;
     }
 
     private toLineSearchScope(scope?: SearchScope | Record<string, unknown>): PhoenixLineSearchScope | undefined {
@@ -1670,6 +1732,10 @@ function semanticAtlasRowsToPayload(
             continue;
         }
         const id = `doc::${documentId}`;
+        const modelId = stringField(row, 'model_id', 'modelId');
+        const modelVersion = stringField(row, 'model_version', 'modelVersion');
+        const executionProvider = stringField(row, 'execution_provider', 'executionProvider');
+        const runId = stringField(row, 'run_id', 'runId');
         seen.add(id);
         nodes.push({
             id,
@@ -1677,6 +1743,10 @@ function semanticAtlasRowsToPayload(
             sourceType: 'leaf',
             vector,
             documentId,
+            modelId: modelId || undefined,
+            modelVersion: modelVersion || undefined,
+            executionProvider: executionProvider || undefined,
+            runId: runId || undefined,
             preview: evidencePreview(row),
             kind: 'CONCEPT',
         });
@@ -1695,6 +1765,10 @@ function semanticAtlasRowsToPayload(
             continue;
         }
         const nodeKind = stringField(row, 'node_kind', 'nodeKind') || 'entity';
+        const modelId = stringField(row, 'model_id', 'modelId');
+        const modelVersion = stringField(row, 'model_version', 'modelVersion');
+        const executionProvider = stringField(row, 'execution_provider', 'executionProvider');
+        const runId = stringField(row, 'run_id', 'runId');
         seen.add(id);
         nodes.push({
             id,
@@ -1704,6 +1778,10 @@ function semanticAtlasRowsToPayload(
             documentId,
             narrativeId,
             folderId,
+            modelId: modelId || undefined,
+            modelVersion: modelVersion || undefined,
+            executionProvider: executionProvider || undefined,
+            runId: runId || undefined,
             preview: evidencePreview(row),
             kind: nodeKind.includes('event') ? 'EVENT' : 'CONCEPT',
         });
@@ -1827,6 +1905,68 @@ function withManifoldLoadTimings<TPayload>(
             ...timings,
         },
     };
+}
+
+function withHybridEmbeddingSpaceContract(
+    snapshot: ManifoldAtlasSnapshot<SemanticAtlasEmbeddingAtlas>,
+    previousReceipt?: ReturnType<typeof payloadEmbeddingSpaceContract>['validationReceipt'] | null,
+): ManifoldAtlasSnapshot<SemanticAtlasEmbeddingAtlas> {
+    if (snapshot.manifold !== 'hybrid') return snapshot;
+    return {
+        ...snapshot,
+        payload: {
+            ...snapshot.payload,
+            embeddingSpace: payloadEmbeddingSpaceContract(snapshot.payload, previousReceipt),
+        },
+    };
+}
+
+function payloadEmbeddingSpaceContract(
+    payload: SemanticAtlasEmbeddingAtlas,
+    previousReceipt?: ReturnType<typeof hybridEmbeddingSpaceContract>['validationReceipt'] | null,
+) {
+    const existing = payload.embeddingSpace;
+    const contract = hybridEmbeddingSpaceContract({
+        ...existing,
+        modelId: existing?.modelId ?? payloadModelId(payload),
+        modelVersion: existing?.modelVersion ?? payloadModelVersion(payload),
+        dimensions: existing?.dimensions ?? payloadDimensions(payload),
+        executionProvider: existing?.executionProvider ?? payloadExecutionProvider(payload),
+        runId: existing?.runId ?? payloadRunId(payload),
+        inputHash: existing?.inputHash ?? hybridEmbeddingInputHash(payload.nodes),
+    });
+    if (existing?.validationReceipt?.generatedBy === 'native-runtime') {
+        return contract;
+    }
+    return {
+        ...contract,
+        validationReceipt: buildHybridEmbeddingValidationReceipt(
+            contract,
+            payload,
+            previousReceipt || existing?.validationReceipt,
+        ),
+    };
+}
+
+function payloadDimensions(payload: SemanticAtlasEmbeddingAtlas): number | null {
+    const node = payload.nodes.find((candidate) => Array.isArray(candidate.vector) && candidate.vector.length > 0);
+    return node?.vector.length || null;
+}
+
+function payloadModelId(payload: SemanticAtlasEmbeddingAtlas): string | null {
+    return payload.nodes.map((node) => node.modelId).find((modelId): modelId is string => !!modelId) || null;
+}
+
+function payloadModelVersion(payload: SemanticAtlasEmbeddingAtlas): string | null {
+    return payload.nodes.map((node) => node.modelVersion).find((modelVersion): modelVersion is string => !!modelVersion) || null;
+}
+
+function payloadExecutionProvider(payload: SemanticAtlasEmbeddingAtlas): string | null {
+    return payload.nodes.map((node) => node.executionProvider).find((provider): provider is string => !!provider) || null;
+}
+
+function payloadRunId(payload: SemanticAtlasEmbeddingAtlas): string | null {
+    return payload.nodes.map((node) => node.runId).find((runId): runId is string => !!runId) || null;
 }
 
 function elapsedMs(started: number): number {

@@ -37,6 +37,7 @@ import {
     hierarchyShellBandsInOrder,
     type Vec3,
 } from './graph-galaxy-hierarchy-caps';
+import { arrangeEmbeddingShellRings } from './graph-galaxy-caps-rings';
 
 const CAP_SCENE_RADIUS = 2.18;
 const MAX_CAP_BOUNDARY_GUIDES = 24;
@@ -286,53 +287,6 @@ function limitDirectionToCap(direction: Vec3, center: Vec3, aperture: number): V
     const tangent = normalize(add(normalizedDirection, scale(normalizedCenter, -dot)), tangentFrame(normalizedCenter).a);
     const sin = Math.sin(aperture);
     return normalize(add(scale(normalizedCenter, minDot), scale(tangent, sin)), normalizedCenter);
-}
-
-function arrangeEmbeddingShellRings(nodes: GalaxyNode[], infos: HierarchyInfo[], capById: Map<string, CapInfo>): void {
-    const groups = new Map<string, number[]>();
-    for (let index = 0; index < nodes.length; index++) {
-        const band = hierarchyShellBandForNode(nodes[index]);
-        if (!band) continue;
-        const info = infos[index];
-        const parentKey = info.parentCapIds[0] || info.capId;
-        const key = `${band.id}:${parentKey}`;
-        const group = groups.get(key) ?? [];
-        group.push(index);
-        groups.set(key, group);
-    }
-
-    for (const indexes of groups.values()) {
-        if (indexes.length < 2) continue;
-        indexes.sort((left, right) => infos[left].phase - infos[right].phase || infos[left].id.localeCompare(infos[right].id));
-        const firstInfo = infos[indexes[0]];
-        const cap = capById.get(firstInfo.parentCapIds[0] || '') ?? capById.get(firstInfo.capId);
-        const center = cap?.center ?? normalize(vectorOf(nodes[indexes[0]]), firstInfo.direction);
-        const frame = tangentFrame(center);
-        const aperture = shellRingAperture(indexes.length, firstInfo.level);
-        const centerWeight = Math.cos(aperture);
-        const ringWeight = Math.sin(aperture);
-        const phaseOffset = stableUnit(`${firstInfo.capId}:shell-ring`);
-        for (let ordinal = 0; ordinal < indexes.length; ordinal++) {
-            const index = indexes[ordinal];
-            const info = infos[index];
-            const phase = (ordinal / indexes.length + phaseOffset + info.phase * 0.04) % 1;
-            const orbit = add(
-                scale(frame.a, Math.cos(phase * TAU) * ringWeight),
-                scale(frame.b, Math.sin(phase * TAU) * ringWeight),
-            );
-            const lanePull = scale(laneDirection(info.lane), 0.035);
-            const direction = normalize(add(add(scale(center, centerWeight), orbit), lanePull), center);
-            nodes[index].x = direction.x * info.targetRadius;
-            nodes[index].y = direction.y * info.targetRadius;
-            nodes[index].z = direction.z * info.targetRadius;
-        }
-    }
-}
-
-function shellRingAperture(count: number, level: number): number {
-    const load = Math.min(1, Math.log2(Math.max(3, count)) / 6);
-    const base = level <= 1 ? 0.3 : level === 2 ? 0.34 : level === 3 ? 0.4 : 0.46;
-    return clamp(base + load * 0.18, 0.28, 0.68);
 }
 
 function relaxCapLinks(nodes: GalaxyNode[], links: GalaxyEdge[], infos: HierarchyInfo[]): void {

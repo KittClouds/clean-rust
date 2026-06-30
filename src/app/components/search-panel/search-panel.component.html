@@ -116,6 +116,31 @@
         </span>
       </div>
 
+      <div class="stage8-truth-review" [ngClass]="'stage8-tone-' + stage8.truthReview.tone">
+        <div class="stage8-truth-review-head">
+          <span>Truth Review</span>
+          <strong>{{ stage8.truthReview.status }}</strong>
+        </div>
+        <div class="stage8-truth-review-main">
+          <span>
+            <strong>{{ stage8.truthReview.modelLabel }}</strong>
+            <small>{{ stage8.truthReview.dimensionLabel }} / {{ stage8.truthReview.contractDetail }}</small>
+          </span>
+          <button type="button" class="stage8-truth-review-action" (click)="runTruthReviewLane()"
+            [disabled]="isTruthReviewLaneDisabled()">
+            <ng-icon [name]="truthReviewLaneBusy() ? 'lucideLoader2' : 'lucideSearch'" class="h-3.5 w-3.5"
+              [class.animate-spin]="truthReviewLaneBusy()"></ng-icon>
+            {{ truthReviewLaneButtonLabel() }}
+          </button>
+        </div>
+        <div class="stage8-truth-review-ledger">
+          <span>{{ stage8.truthReview.cacheDetail }}</span>
+          <span>{{ stage8.truthReview.timingDetail }}</span>
+          <span>{{ stage8.truthReview.candidateDetail }}</span>
+        </div>
+        <small class="stage8-truth-review-error" *ngIf="stage8.truthReview.error">{{ stage8.truthReview.error }}</small>
+      </div>
+
       <div class="stage8-contract" [ngClass]="'stage8-tone-' + stage8.contract.status">
         <div class="stage8-contract-main">
           <span>Projection contract</span>

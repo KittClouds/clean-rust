@@ -105,12 +105,13 @@ function graphPacketNodes(packet: GraphAtlasPacket, maps: GraphPacketRowMaps): G
     const nodes: GalaxyRenderableNode[] = [];
     const nodeIds = new Set<string>();
     for (const [index, object] of packet.objects.entries()) {
-        nodes.push(graphPacketObjectNode(packet, object, maps.targetByObjectId.get(object.id), index));
+        const target = maps.targetByObjectId.get(object.id);
+        nodes.push(graphPacketObjectNode(packet, object, target, graphPacketDisplayTargetForObject(object, target, maps), index));
         nodeIds.add(object.id);
     }
     for (const target of packet.manifoldTargets) {
         if (nodeIds.has(target.objectId)) continue;
-        nodes.push(graphPacketTargetNode(packet, target, nodes.length));
+        nodes.push(graphPacketTargetNode(packet, target, graphPacketDisplayTargetForTarget(target, maps), nodes.length));
         nodeIds.add(target.objectId);
     }
     return nodes;
@@ -168,14 +169,7 @@ function graphPacketEmbeddingTargets(
     const targets = packet.manifoldTargets.map((target): GraphRebuildEmbeddingTarget => {
         const display = maps.displayById.get(target.id);
         const object = graphPacketObjectForTarget(target, maps.objectById, maps.objectsBySourceRef);
-        const style = graphTopologyStyleForPacketRow({
-            family: target.family,
-            kind: target.kind,
-            label: target.label,
-            extraParts: [target.sourceId, target.coordinateSource],
-            styleKey: target.styleKey || object?.styleKey,
-            stateContextKind: target.stateContextKind || object?.stateContextKind,
-        });
+        const style = graphPacketStyleForTarget(target, object, display);
         return {
             ...display,
             id: target.id,
@@ -210,10 +204,79 @@ function graphPacketEmbeddingTargets(
     return targets;
 }
 
+function graphPacketDisplayTargetForObject(
+    object: GraphAtlasObject,
+    target: GraphAtlasManifoldTarget | undefined,
+    maps: GraphPacketRowMaps,
+): GraphRebuildEmbeddingTarget | undefined {
+    const ids = [
+        target?.id,
+        graphPacketObjectTargetId(object),
+        object.id,
+        object.registryEntityId,
+        ...object.sourceIds,
+    ].filter((id): id is string => !!id);
+    for (const id of ids) {
+        const display = maps.displayById.get(id);
+        if (display) return display;
+    }
+    return undefined;
+}
+
+function graphPacketDisplayTargetForTarget(
+    target: GraphAtlasManifoldTarget,
+    maps: GraphPacketRowMaps,
+): GraphRebuildEmbeddingTarget | undefined {
+    const ids = [target.id, target.objectId, target.sourceId, target.registryEntityId].filter((id): id is string => !!id);
+    for (const id of ids) {
+        const display = maps.displayById.get(id);
+        if (display) return display;
+    }
+    return undefined;
+}
+
+function graphPacketStyleForObject(
+    object: GraphAtlasObject,
+    target: GraphAtlasManifoldTarget | undefined,
+    display: GraphRebuildEmbeddingTarget | undefined,
+) {
+    const family = target?.family || display?.atlasFamily || object.family;
+    const entityKind = target?.entityKind || display?.entityKind || graphPacketObjectEntityKind(object);
+    return graphTopologyStyleForPacketRow({
+        family,
+        kind: target?.kind || display?.kind || object.kind,
+        label: target?.label || display?.label || object.label,
+        extraParts: styleParts(object.kind, ...object.sourceIds, target?.sourceId, target?.coordinateSource),
+        styleKey: target?.styleKey || object.styleKey || display?.styleKey || entityKind,
+        stateContextKind: target?.stateContextKind || object.stateContextKind || display?.stateContextKind,
+    });
+}
+
+function graphPacketStyleForTarget(
+    target: GraphAtlasManifoldTarget,
+    object: GraphAtlasObject | undefined,
+    display: GraphRebuildEmbeddingTarget | undefined,
+) {
+    const entityKind = target.entityKind || display?.entityKind || graphPacketObjectEntityKind(object);
+    return graphTopologyStyleForPacketRow({
+        family: target.family,
+        kind: target.kind || display?.kind || object?.kind || '',
+        label: target.label || display?.label || object?.label || '',
+        extraParts: styleParts(object?.kind, target.sourceId, target.coordinateSource, ...(object?.sourceIds || [])),
+        styleKey: target.styleKey || object?.styleKey || display?.styleKey || entityKind,
+        stateContextKind: target.stateContextKind || object?.stateContextKind || display?.stateContextKind,
+    });
+}
+
+function styleParts(...parts: Array<string | undefined>): string[] {
+    return parts.filter((part): part is string => !!part);
+}
+
 function graphPacketObjectNode(
     packet: GraphAtlasPacket,
     object: GraphAtlasObject,
     target: GraphAtlasManifoldTarget | undefined,
+    display: GraphRebuildEmbeddingTarget | undefined,
     index: number,
 ): GalaxyRenderableNode {
     const family = object.family || 'unknown';
@@ -221,14 +284,7 @@ function graphPacketObjectNode(
     const status = graphTopologyReviewStateForStatus(objectStatus);
     const noteId = object.noteIds[0] || target?.noteId || '';
     const chunkId = object.chunkIds[0] || target?.chunkId || '';
-    const style = graphTopologyStyleForPacketRow({
-        family,
-        kind: object.kind,
-        label: object.label,
-        extraParts: object.sourceIds,
-        styleKey: object.styleKey,
-        stateContextKind: object.stateContextKind,
-    });
+    const style = graphPacketStyleForObject(object, target, display);
     const visualTrace = graphTopologyTraceForAtlasObject(packet, object, target, family);
     return {
         id: object.id,
@@ -286,17 +342,15 @@ function graphPacketObjectNode(
     };
 }
 
-function graphPacketTargetNode(packet: GraphAtlasPacket, target: GraphAtlasManifoldTarget, index: number): GalaxyRenderableNode {
+function graphPacketTargetNode(
+    packet: GraphAtlasPacket,
+    target: GraphAtlasManifoldTarget,
+    display: GraphRebuildEmbeddingTarget | undefined,
+    index: number,
+): GalaxyRenderableNode {
     const family = target.family || 'unknown';
     const status = graphTopologyReviewStateForAdmission(target.admission);
-    const style = graphTopologyStyleForPacketRow({
-        family,
-        kind: target.kind,
-        label: target.label,
-        extraParts: [target.sourceId, target.coordinateSource],
-        styleKey: target.styleKey,
-        stateContextKind: target.stateContextKind,
-    });
+    const style = graphPacketStyleForTarget(target, undefined, display);
     const visualTrace = graphTopologyTraceForAtlasTarget(packet, target, family);
     return {
         id: target.objectId,
@@ -347,7 +401,7 @@ function graphPacketTargetNode(packet: GraphAtlasPacket, target: GraphAtlasManif
             chunkId: target.chunkId || '',
             evidenceIds: target.evidenceIds,
             parentIds: target.parentIds || [],
-            graphImpact: 'Rust manifold target admitted as an Atlas object fallback.',
+            graphImpact: 'Rust manifold target admitted as an Atlas object projection.',
         },
     };
 }
@@ -512,14 +566,7 @@ function graphPacketObjectEmbeddingTarget(
     const display = displayTargets.get(id);
     const sourceId = graphPacketObjectSourceId(object) || object.id;
     const parentIds = graphPacketObjectParentIds(object, targetIdByObjectRef, id);
-    const style = graphTopologyStyleForPacketRow({
-        family: object.family,
-        kind: object.kind,
-        label: object.label,
-        extraParts: object.sourceIds,
-        styleKey: object.styleKey,
-        stateContextKind: object.stateContextKind,
-    });
+    const style = graphPacketStyleForObject(object, undefined, display);
     return {
         ...display,
         id,

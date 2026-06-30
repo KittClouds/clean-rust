@@ -3,9 +3,12 @@ import {
     LORENTZ_MANIFOLD_CAPABILITIES,
     PRODUCT_MANIFOLD_CAPABILITIES,
     SIEGEL_FINSLER_CAPABILITIES,
+    hybridEmbeddingSpaceContract,
+    hybridEmbeddingInputHash,
     type AtlasManifoldMode,
     type ManifoldAtlasSnapshot,
 } from '../../../../../services/manifold-atlas.types';
+import { buildHybridEmbeddingValidationReceipt } from '../../../../../services/hybrid-embedding-validation';
 import type { PhoenixUiApiService, SearchScope, SemanticAtlasEmbeddingAtlas, SemanticAtlasEmbeddingNode } from '../../../../../services/phoenix-ui-api.service';
 import {
     buildBackendEmbeddingAtlas,
@@ -217,6 +220,9 @@ function withManifoldMetadata(snapshot: ManifoldAtlasSnapshot<SemanticAtlasEmbed
             sourceLabel: snapshot.sourceLabel,
             capabilities: snapshot.capabilities,
             projectionSource: snapshot.payload.projectionSource,
+            ...(snapshot.manifold === 'hybrid' ? {
+                embeddingSpace: payloadEmbeddingSpaceContract(snapshot.payload),
+            } : {}),
             cells: snapshot.payload.cells || [],
             charts: snapshot.payload.charts || [],
             seams: snapshot.payload.seams || [],
@@ -232,6 +238,47 @@ function withManifoldMetadata(snapshot: ManifoldAtlasSnapshot<SemanticAtlasEmbed
             lorentzCache: snapshot.payload.lorentzCache || null,
         },
     };
+}
+
+function payloadEmbeddingSpaceContract(payload: SemanticAtlasEmbeddingAtlas) {
+    const existing = payload.embeddingSpace;
+    const contract = hybridEmbeddingSpaceContract({
+        ...existing,
+        modelId: existing?.modelId ?? payloadModelId(payload),
+        modelVersion: existing?.modelVersion ?? payloadModelVersion(payload),
+        dimensions: existing?.dimensions ?? payloadDimensions(payload),
+        executionProvider: existing?.executionProvider ?? payloadExecutionProvider(payload),
+        runId: existing?.runId ?? payloadRunId(payload),
+        inputHash: existing?.inputHash ?? hybridEmbeddingInputHash(payload.nodes),
+    });
+    if (existing?.validationReceipt?.generatedBy === 'native-runtime') {
+        return contract;
+    }
+    return {
+        ...contract,
+        validationReceipt: buildHybridEmbeddingValidationReceipt(contract, payload, existing?.validationReceipt),
+    };
+}
+
+function payloadDimensions(payload: SemanticAtlasEmbeddingAtlas): number | null {
+    const node = payload.nodes.find((candidate) => Array.isArray(candidate.vector) && candidate.vector.length > 0);
+    return node?.vector.length || null;
+}
+
+function payloadModelId(payload: SemanticAtlasEmbeddingAtlas): string | null {
+    return payload.nodes.map((node) => node.modelId).find((modelId): modelId is string => !!modelId) || null;
+}
+
+function payloadModelVersion(payload: SemanticAtlasEmbeddingAtlas): string | null {
+    return payload.nodes.map((node) => node.modelVersion).find((modelVersion): modelVersion is string => !!modelVersion) || null;
+}
+
+function payloadExecutionProvider(payload: SemanticAtlasEmbeddingAtlas): string | null {
+    return payload.nodes.map((node) => node.executionProvider).find((provider): provider is string => !!provider) || null;
+}
+
+function payloadRunId(payload: SemanticAtlasEmbeddingAtlas): string | null {
+    return payload.nodes.map((node) => node.runId).find((runId): runId is string => !!runId) || null;
 }
 
 function buildProductAtlas(snapshot: ManifoldAtlasSnapshot<SemanticAtlasEmbeddingAtlas>): EmbeddingAtlasData {

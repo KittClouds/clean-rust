@@ -124,6 +124,11 @@ describe('Graph galaxy scene prioritization', () => {
 });
 
 describe('Graph galaxy canonical colors', () => {
+    it('normalizes persisted guide palettes back to source-node Style Lab colors', () => {
+        expect(mergeGalaxySettings({ guideColorMode: 'auto' as any }).guideColorMode).toBe('sourceNode');
+        expect(mergeGalaxySettings({}).guideColorMode).toBe('sourceNode');
+    });
+
     it('resolves entity node colors from Style Lab even when nodes carry stale HSL snapshots', () => {
         entityColorStore.setColor('LOCATION', '0 100% 50%');
         try {
@@ -284,6 +289,105 @@ describe('Graph galaxy canonical colors', () => {
             const v2 = galaxySceneToV2(scene, 'embeddings');
 
             expect([...v2.edgeColors.slice(0, 6)]).toEqual([0, 0, 1, 0, 0, 1]);
+        } finally {
+            entityColorStore.reset();
+        }
+    });
+
+    it('uses packet edge Style Lab metadata before relation text heuristics', () => {
+        entityColorStore.setColor('CHARACTER', '0 100% 50%');
+        entityColorStore.setGraphNodeColor('approval', '120 100% 50%');
+        entityColorStore.setGraphNodeColor('cooccurrence', '240 100% 50%');
+        try {
+            const scene = buildGalaxyScene([
+                { id: 'embed:entity:kai', label: 'Kai', kind: 'entity', metadata: { entityKind: 'CHARACTER' } },
+                { id: 'embed:entity:hazel', label: 'Hazel', kind: 'entity', metadata: { entityKind: 'CHARACTER' } },
+            ], [
+                {
+                    id: 'approved-edge',
+                    sourceId: 'embed:entity:kai',
+                    targetId: 'embed:entity:hazel',
+                    type: 'co_occurs_with',
+                    confidence: 0.68,
+                    metadata: {
+                        graphColorKind: 'approval',
+                        graphRelationFamily: 'approval',
+                    },
+                },
+            ], mergeGalaxySettings({ layoutMode: 'hybridSpace' }));
+
+            const v2 = galaxySceneToV2(scene, 'graph');
+
+            expect([...v2.edgeColors.slice(0, 6)]).toEqual([0, 1, 0, 0, 1, 0]);
+        } finally {
+            entityColorStore.reset();
+        }
+    });
+
+    it('keeps chunk Style Lab colors through embedding topology lenses', () => {
+        entityColorStore.setGraphNodeColor('chunk', '0 100% 50%');
+        try {
+            const chunk: GalaxyRenderableNode = {
+                id: 'embed:chunk:chunk-1',
+                label: 'Chunk 1',
+                kind: 'chunk',
+                colorHsl: '176 70% 46%',
+                metadata: {
+                    graphColorKind: 'chunk',
+                    graphKind: 'chunk',
+                    productLaneKind: 'document',
+                    embeddingClusterId: 'cluster-a',
+                },
+            };
+            const scene = buildGalaxyScene([chunk], [], mergeGalaxySettings({
+                layoutMode: 'single',
+                embeddingTopologyMode: 'lanes',
+            }));
+            const v2 = galaxySceneToV2(scene, 'embeddings');
+
+            expect(resolveGalaxyNodeColorHsl(chunk)).toBe('0 100% 50%');
+            expect(scene.nodes[0]).toMatchObject({ r: 255, g: 0, b: 0 });
+            expect([...v2.colors.slice(0, 3)]).toEqual([1, 0, 0]);
+        } finally {
+            entityColorStore.reset();
+        }
+    });
+
+    it('keeps chunk Style Lab colors on Siegel structural guides', () => {
+        entityColorStore.setGraphNodeColor('chunk', '0 100% 50%');
+        entityColorStore.setGraphNodeColor('document', '240 100% 50%');
+        try {
+            const scene = buildGalaxyScene([
+                {
+                    id: 'embed:note:note-1',
+                    label: 'Note',
+                    kind: 'note',
+                    metadata: {
+                        graphColorKind: 'document',
+                        graphKind: 'note',
+                        sourceType: 'note',
+                    },
+                },
+                {
+                    id: 'embed:chunk:chunk-1',
+                    label: 'Chunk 1',
+                    kind: 'chunk',
+                    metadata: {
+                        graphColorKind: 'chunk',
+                        graphKind: 'chunk',
+                        sourceType: 'chunk',
+                        signalParentIds: ['embed:note:note-1'],
+                    },
+                },
+            ], [
+                { id: 'note-chunk', sourceId: 'embed:note:note-1', targetId: 'embed:chunk:chunk-1', type: 'target-parent', confidence: 0.9 },
+            ], mergeGalaxySettings({ layoutMode: 'siegelFinsler' }));
+
+            const chunk = scene.nodes.find((node) => node.entity.id === 'embed:chunk:chunk-1');
+            const guide = scene.lorentzGuides?.find((item) => item.id === 'siegel:directed:note-chunk');
+
+            expect(chunk).toMatchObject({ r: 255, g: 0, b: 0 });
+            expect(guide).toMatchObject({ r: 255, g: 0, b: 0 });
         } finally {
             entityColorStore.reset();
         }

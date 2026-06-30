@@ -33,11 +33,12 @@ use phoenix_semantic_v2::{
     TemporalScopeSidecar,
 };
 use phoenix_store_native_core::{
-    relation_spec, snapshot_relations_for_partition, AnnGenerationId, AnnIndexFamily, AnnIndexKey,
-    AnnManifest, AnnPackedSegments, BundleHeader, BundleKey, BundleKind, ChunkManifest,
-    GraphTruthCommitAppend, IngestMode, NativeSemanticDocumentVectorRecord,
-    NativeSemanticLeafVectorRecord, NativeSemanticNodeVectorRecord, PhoenixArchiveStoreV2,
-    PhoenixBundleStoreV2, PhoenixCausalPatchStore, PhoenixChunkManifestStore, PhoenixErPatchStore,
+    default_semantic_model_id, relation_spec, snapshot_relations_for_partition, AnnGenerationId,
+    AnnIndexFamily, AnnIndexKey, AnnManifest, AnnPackedSegments, BundleHeader, BundleKey,
+    BundleKind, ChunkManifest, GraphTruthCommitAppend, IngestMode,
+    NativeSemanticDocumentVectorRecord, NativeSemanticLeafVectorRecord,
+    NativeSemanticNodeVectorRecord, PhoenixArchiveStoreV2, PhoenixBundleStoreV2,
+    PhoenixCausalPatchStore, PhoenixChunkManifestStore, PhoenixErPatchStore,
     PhoenixEventIdentityPatchStore, PhoenixGraphKernelStoreV2, PhoenixGraphPatchStore,
     PhoenixMemoryPatchStore, PhoenixNativeRowStore, PhoenixRelationMentionSeedStore,
     PhoenixRelationPatchStore, PhoenixSemanticGraphPatchStore, PhoenixSemanticIndexStore,
@@ -138,6 +139,8 @@ const PROP_SOURCE_REVISION: &str = "source_revision";
 const PROP_CREATED_AT: &str = "created_at";
 const PROP_UPDATED_AT: &str = "updated_at";
 const PROP_KIND: &str = "kind";
+const PROP_MODEL_ID: &str = "model_id";
+const PROP_DIMENSION: &str = "dimension";
 const PROP_ENTITY_KEY: &str = "entity_key";
 const PROP_BYTE_LEN: &str = "byte_len";
 const PROP_PAYLOAD: &str = "payload";
@@ -182,6 +185,8 @@ enum AnnPayload {
 struct AnnSourceLeafRecord {
     scope: ScopeKey,
     scope_key: String,
+    #[serde(default = "default_semantic_model_id")]
+    model_id: String,
     span_id: String,
     document_id: String,
     values: Vec<f32>,
@@ -193,6 +198,8 @@ struct AnnSourceLeafRecord {
 struct AnnSourceDocumentRecord {
     scope: ScopeKey,
     scope_key: String,
+    #[serde(default = "default_semantic_model_id")]
+    model_id: String,
     document_id: String,
     values: Vec<f32>,
     leaf_count: usize,
@@ -205,6 +212,8 @@ struct AnnSourceDocumentRecord {
 struct AnnSourceNodeRecord {
     scope: ScopeKey,
     scope_key: String,
+    #[serde(default = "default_semantic_model_id")]
+    model_id: String,
     node_id: String,
     node_kind: String,
     document_id: Option<String>,
@@ -467,15 +476,54 @@ impl PhoenixOvergraphStore {
             .map(|node| ScopeOrd(required_u64_prop(&node, PROP_ORD).unwrap_or_default())))
     }
 
-    fn validate_semantic_vector(values: &[f32], label: &str) -> Result<(), StoreError> {
-        if values.len() != SEMANTIC_VECTOR_DIM {
+    fn normalize_semantic_model_id(model_id: &str) -> String {
+        let trimmed = model_id.trim();
+        if trimmed.is_empty() {
+            SEMANTIC_MODEL_ID.to_owned()
+        } else {
+            trimmed.to_owned()
+        }
+    }
+
+    fn ann_index_key(
+        scope_ord: ScopeOrd,
+        family: AnnIndexFamily,
+        kind: Option<String>,
+        model_id: &str,
+        dimension: usize,
+    ) -> Result<AnnIndexKey, StoreError> {
+        if dimension == 0 {
+            return Err(StoreError::Query(format!(
+                "semantic vector dimension mismatch for {}: expected positive dimension, got 0",
+                ann_family_name(family)
+            )));
+        }
+        Ok(AnnIndexKey {
+            scope_ord,
+            family,
+            kind,
+            model_id: Self::normalize_semantic_model_id(model_id),
+            dimension,
+        })
+    }
+
+    fn validate_semantic_vector_dim(
+        values: &[f32],
+        expected_dim: usize,
+        label: &str,
+    ) -> Result<(), StoreError> {
+        if expected_dim == 0 || values.len() != expected_dim {
             return Err(StoreError::Query(format!(
                 "semantic vector dimension mismatch for {label}: expected {}, got {}",
-                SEMANTIC_VECTOR_DIM,
+                expected_dim,
                 values.len()
             )));
         }
         Ok(())
+    }
+
+    fn validate_semantic_vector(values: &[f32], label: &str) -> Result<(), StoreError> {
+        Self::validate_semantic_vector_dim(values, SEMANTIC_VECTOR_DIM, label)
     }
 
     fn load_cached_ann_query_state(
@@ -528,6 +576,8 @@ impl PhoenixOvergraphStore {
                             PROP_KIND,
                             PropValue::String(index.kind.clone().unwrap_or_default()),
                         ),
+                        (PROP_MODEL_ID, PropValue::String(index.model_id.clone())),
+                        (PROP_DIMENSION, PropValue::UInt(index.dimension as u64)),
                         (PROP_UPDATED_AT, PropValue::Int(dirty_at)),
                     ]),
                     ..Default::default()
@@ -571,11 +621,18 @@ impl PhoenixOvergraphStore {
             return Ok(());
         }
 
+        for (offset, vector) in vectors.iter().enumerate() {
+            Self::validate_semantic_vector_dim(
+                vector,
+                index.dimension,
+                &format!("ann source vector {offset}"),
+            )?;
+        }
         let metric = Self::ann_metric_for_index(index);
         let metric_label = metric.label();
         let depth = Self::ann_hybrid_depth_for_index(index);
         let mut builder =
-            HyperbolicHnswBuilder::new(SEMANTIC_VECTOR_DIM, metric, HnswBuildParams::default());
+            HyperbolicHnswBuilder::new(index.dimension, metric, HnswBuildParams::default());
         for vector in vectors {
             builder.insert(Self::project_ann_vector(
                 index,
@@ -598,7 +655,7 @@ impl PhoenixOvergraphStore {
             generation_id: generation,
             built_at,
             dimension: packed.metadata.dim(),
-            model_id: SEMANTIC_MODEL_ID.to_owned(),
+            model_id: index.model_id.clone(),
             count: packed.metadata.num_vectors(),
             entry_point: packed.metadata.entry_point(),
             max_level: packed.metadata.max_level(),
@@ -630,6 +687,8 @@ impl PhoenixOvergraphStore {
                             PROP_KIND,
                             PropValue::String(index.kind.clone().unwrap_or_default()),
                         ),
+                        (PROP_MODEL_ID, PropValue::String(index.model_id.clone())),
+                        (PROP_DIMENSION, PropValue::UInt(index.dimension as u64)),
                         (PROP_GENERATION, PropValue::UInt(generation.0)),
                         (PROP_UPDATED_AT, PropValue::Int(built_at)),
                         (PROP_RECORD, PropValue::Bytes(encode_record(&manifest)?)),
@@ -655,6 +714,8 @@ impl PhoenixOvergraphStore {
                             PROP_KIND,
                             PropValue::String(index.kind.clone().unwrap_or_default()),
                         ),
+                        (PROP_MODEL_ID, PropValue::String(index.model_id.clone())),
+                        (PROP_DIMENSION, PropValue::UInt(index.dimension as u64)),
                         (PROP_GENERATION, PropValue::UInt(generation.0)),
                         (PROP_UPDATED_AT, PropValue::Int(built_at)),
                     ]),
@@ -686,6 +747,9 @@ impl PhoenixOvergraphStore {
                 decode_record_prop::<AnnSourceDocumentRecord>(&node, PROP_RECORD).transpose()
             })
             .collect::<Result<Vec<_>, _>>()?;
+        records.retain(|record| {
+            record.model_id == index.model_id && record.values.len() == index.dimension
+        });
         records.sort_by(|left, right| left.document_id.cmp(&right.document_id));
         let vectors = records
             .iter()
@@ -717,6 +781,9 @@ impl PhoenixOvergraphStore {
                 decode_record_prop::<AnnSourceLeafRecord>(&node, PROP_RECORD).transpose()
             })
             .collect::<Result<Vec<_>, _>>()?;
+        records.retain(|record| {
+            record.model_id == index.model_id && record.values.len() == index.dimension
+        });
         records.sort_by(|left, right| left.span_id.cmp(&right.span_id));
         let vectors = records
             .iter()
@@ -752,6 +819,9 @@ impl PhoenixOvergraphStore {
                 decode_record_prop::<AnnSourceNodeRecord>(&node, PROP_RECORD).transpose()
             })
             .collect::<Result<Vec<_>, _>>()?;
+        records.retain(|record| {
+            record.model_id == index.model_id && record.values.len() == index.dimension
+        });
         if index.kind.is_some() {
             if let Some(latest_updated_at) = records.iter().map(|record| record.updated_at).max() {
                 records.retain(|record| record.updated_at == latest_updated_at);
@@ -836,7 +906,8 @@ impl PhoenixOvergraphStore {
 
     #[inline]
     fn ann_manifest_uses_current_space(index: &AnnIndexKey, manifest: &AnnManifest) -> bool {
-        manifest.dimension == SEMANTIC_VECTOR_DIM
+        manifest.dimension == index.dimension
+            && manifest.model_id == index.model_id
             && manifest.metric == Self::ann_metric_for_index(index).label()
     }
 
@@ -846,7 +917,7 @@ impl PhoenixOvergraphStore {
         depth: f32,
         vector: &[f32],
     ) -> Result<Vec<f32>, StoreError> {
-        Self::validate_semantic_vector(vector, "ann vector")?;
+        Self::validate_semantic_vector_dim(vector, index.dimension, "ann vector")?;
         let metric = AnnMetric::from_label_or_default(metric_label);
         if metric.label() != AnnMetric::LABEL_HYBRID_INTERIOR {
             return Ok(vector.to_vec());
@@ -883,11 +954,14 @@ impl PhoenixOvergraphStore {
         generation: AnnGenerationId,
     ) -> PathBuf {
         let kind = sanitize_ann_kind(index.kind.as_deref().unwrap_or("all"));
+        let model = sanitize_ann_kind(index.model_id.as_str());
         self.ann_cache_dir().join(format!(
-            "scope-{}-{}-{}-g{}.bin",
+            "scope-{}-{}-{}-{}d-{}-g{}.bin",
             index.scope_ord.0,
             ann_family_name(index.family),
             kind,
+            index.dimension,
+            model,
             generation.0
         ))
     }
@@ -928,8 +1002,25 @@ impl PhoenixOvergraphStore {
         family: AnnIndexFamily,
         kind: Option<&str>,
     ) -> Result<Option<AnnManifest>, StoreError> {
+        self.load_ann_manifest_for_model(
+            SEMANTIC_MODEL_ID,
+            SEMANTIC_VECTOR_DIM,
+            scope,
+            family,
+            kind,
+        )
+    }
+
+    pub fn load_ann_manifest_for_model(
+        &self,
+        model_id: &str,
+        dimension: usize,
+        scope: &ScopeKey,
+        family: AnnIndexFamily,
+        kind: Option<&str>,
+    ) -> Result<Option<AnnManifest>, StoreError> {
         Ok(self
-            .load_ann_query_state(scope, family, kind)?
+            .load_ann_query_state_for_model(model_id, dimension, scope, family, kind)?
             .map(|state| state.manifest.clone()))
     }
 
@@ -939,27 +1030,57 @@ impl PhoenixOvergraphStore {
         family: AnnIndexFamily,
         kind: Option<&str>,
     ) -> Result<Option<Arc<CachedAnnQueryState>>, StoreError> {
-        let Some(cache_key) = self.load_ann_query_generation(scope, family, kind, false)? else {
+        self.load_ann_query_state_for_model(
+            SEMANTIC_MODEL_ID,
+            SEMANTIC_VECTOR_DIM,
+            scope,
+            family,
+            kind,
+        )
+    }
+
+    fn load_ann_query_state_for_model(
+        &self,
+        model_id: &str,
+        dimension: usize,
+        scope: &ScopeKey,
+        family: AnnIndexFamily,
+        kind: Option<&str>,
+    ) -> Result<Option<Arc<CachedAnnQueryState>>, StoreError> {
+        let Some(cache_key) = self
+            .load_ann_query_generation_for_model(model_id, dimension, scope, family, kind, false)?
+        else {
             return Ok(None);
         };
         if let Some(state) = self.load_cached_ann_query_state(&cache_key) {
             return Ok(Some(state));
         }
-        match self.load_and_cache_ann_query_state(scope, family, kind, false)? {
+        match self.load_and_cache_ann_query_state_for_model(
+            model_id, dimension, scope, family, kind, false,
+        )? {
             Some(state) => Ok(Some(state)),
             None => Ok(None),
         }
     }
 
-    fn load_and_cache_ann_query_state(
+    fn load_and_cache_ann_query_state_for_model(
         &self,
+        model_id: &str,
+        dimension: usize,
         scope: &ScopeKey,
         family: AnnIndexFamily,
         kind: Option<&str>,
         force_rebuild: bool,
     ) -> Result<Option<Arc<CachedAnnQueryState>>, StoreError> {
-        let Some((index, manifest, payloads, cache_path)) =
-            self.load_ann_query_components(scope, family, kind, force_rebuild)?
+        let Some((index, manifest, payloads, cache_path)) = self
+            .load_ann_query_components_for_model(
+                model_id,
+                dimension,
+                scope,
+                family,
+                kind,
+                force_rebuild,
+            )?
         else {
             return Ok(None);
         };
@@ -980,15 +1101,17 @@ impl PhoenixOvergraphStore {
                 });
                 Ok(Some(self.cache_ann_query_state(state)))
             }
-            Err(_) if !force_rebuild => {
-                self.load_and_cache_ann_query_state(scope, family, kind, true)
-            }
+            Err(_) if !force_rebuild => self.load_and_cache_ann_query_state_for_model(
+                model_id, dimension, scope, family, kind, true,
+            ),
             Err(error) => Err(error),
         }
     }
 
-    fn load_ann_query_generation(
+    fn load_ann_query_generation_for_model(
         &self,
+        model_id: &str,
+        dimension: usize,
         scope: &ScopeKey,
         family: AnnIndexFamily,
         kind: Option<&str>,
@@ -998,11 +1121,13 @@ impl PhoenixOvergraphStore {
             let Some(scope_ord) = self.lookup_scope_ord_with_engine(engine, scope)? else {
                 return Ok(None);
             };
-            let index = AnnIndexKey {
+            let index = Self::ann_index_key(
                 scope_ord,
                 family,
-                kind: kind.map(str::to_owned),
-            };
+                kind.map(str::to_owned),
+                model_id,
+                dimension,
+            )?;
             if force_rebuild {
                 self.rebuild_ann_index_with_engine(engine, &index, now_ms())?;
             } else {
@@ -1097,8 +1222,10 @@ impl PhoenixOvergraphStore {
         Ok(Some((manifest, payloads, cache_path)))
     }
 
-    fn load_ann_query_components(
+    fn load_ann_query_components_for_model(
         &self,
+        model_id: &str,
+        dimension: usize,
         scope: &ScopeKey,
         family: AnnIndexFamily,
         kind: Option<&str>,
@@ -1108,11 +1235,13 @@ impl PhoenixOvergraphStore {
             let Some(scope_ord) = self.lookup_scope_ord_with_engine(engine, scope)? else {
                 return Ok(None);
             };
-            let index = AnnIndexKey {
+            let index = Self::ann_index_key(
                 scope_ord,
                 family,
-                kind: kind.map(str::to_owned),
-            };
+                kind.map(str::to_owned),
+                model_id,
+                dimension,
+            )?;
             if force_rebuild {
                 self.rebuild_ann_index_with_engine(engine, &index, now_ms())?;
             } else {
@@ -1162,11 +1291,36 @@ impl PhoenixOvergraphStore {
         limit: usize,
         oversample: usize,
     ) -> Result<Vec<(HnswCandidate, AnnPayload)>, StoreError> {
+        self.search_ann_payloads_for_model(
+            SEMANTIC_MODEL_ID,
+            SEMANTIC_VECTOR_DIM,
+            scope,
+            family,
+            kind,
+            query_vector,
+            limit,
+            oversample,
+        )
+    }
+
+    fn search_ann_payloads_for_model(
+        &self,
+        model_id: &str,
+        dimension: usize,
+        scope: &ScopeKey,
+        family: AnnIndexFamily,
+        kind: Option<&str>,
+        query_vector: &[f32],
+        limit: usize,
+        oversample: usize,
+    ) -> Result<Vec<(HnswCandidate, AnnPayload)>, StoreError> {
         if limit == 0 {
             return Ok(Vec::new());
         }
-        Self::validate_semantic_vector(query_vector, "query")?;
-        let Some(state) = self.load_ann_query_state(scope, family, kind)? else {
+        Self::validate_semantic_vector_dim(query_vector, dimension, "query")?;
+        let Some(state) =
+            self.load_ann_query_state_for_model(model_id, dimension, scope, family, kind)?
+        else {
             return Ok(Vec::new());
         };
         let query_vector = Self::project_ann_query_vector(&state.manifest, query_vector)?;
@@ -3960,25 +4114,38 @@ impl PhoenixSemanticIndexStore for PhoenixOvergraphStore {
         &self,
         rows: &[NativeSemanticLeafVectorRecord],
     ) -> Result<(), StoreError> {
+        self.upsert_semantic_leaf_vectors_for_model(SEMANTIC_MODEL_ID, rows)
+    }
+
+    fn upsert_semantic_leaf_vectors_for_model(
+        &self,
+        model_id: &str,
+        rows: &[NativeSemanticLeafVectorRecord],
+    ) -> Result<(), StoreError> {
         if rows.is_empty() {
             return Ok(());
         }
+        let model_id = Self::normalize_semantic_model_id(model_id);
         self.with_engine(|engine| {
             let mut batch = Vec::with_capacity(rows.len());
             let mut affected = HashSet::new();
             let dirty_at = now_ms();
             for row in rows {
-                Self::validate_semantic_vector(&row.values, &row.span_id)?;
+                let dimension = row.values.len();
+                Self::validate_semantic_vector_dim(&row.values, dimension, &row.span_id)?;
                 let scope_ord = self.ensure_scope_ord(engine, &scope_storage_key(&row.scope))?;
-                let index = AnnIndexKey {
+                let index = Self::ann_index_key(
                     scope_ord,
-                    family: AnnIndexFamily::Leaf,
-                    kind: None,
-                };
+                    AnnIndexFamily::Leaf,
+                    None,
+                    &model_id,
+                    dimension,
+                )?;
                 affected.insert(index);
                 let record = AnnSourceLeafRecord {
                     scope: row.scope.clone(),
                     scope_key: scope_storage_key(&row.scope),
+                    model_id: model_id.clone(),
                     span_id: row.span_id.clone(),
                     document_id: row.document_id.clone(),
                     values: row.values.clone(),
@@ -3986,10 +4153,19 @@ impl PhoenixSemanticIndexStore for PhoenixOvergraphStore {
                 };
                 batch.push(NodeInput {
                     type_id: TYPE_ANN_SOURCE_LEAF,
-                    key: ann_source_row_key(scope_ord, AnnIndexFamily::Leaf, None, &row.span_id),
+                    key: ann_source_row_key(
+                        scope_ord,
+                        AnnIndexFamily::Leaf,
+                        None,
+                        &model_id,
+                        dimension,
+                        &row.span_id,
+                    ),
                     props: btree_props([
                         (PROP_SCOPE_KEY, PropValue::String(record.scope_key.clone())),
                         (PROP_SCOPE_ORD, PropValue::UInt(scope_ord.0)),
+                        (PROP_MODEL_ID, PropValue::String(model_id.clone())),
+                        (PROP_DIMENSION, PropValue::UInt(dimension as u64)),
                         (PROP_SPAN_ID, PropValue::String(row.span_id.clone())),
                         (PROP_DOCUMENT_ID, PropValue::String(row.document_id.clone())),
                         (PROP_UPDATED_AT, PropValue::Int(row.updated_at)),
@@ -4012,25 +4188,38 @@ impl PhoenixSemanticIndexStore for PhoenixOvergraphStore {
         &self,
         rows: &[NativeSemanticDocumentVectorRecord],
     ) -> Result<(), StoreError> {
+        self.upsert_semantic_document_vectors_native_for_model(SEMANTIC_MODEL_ID, rows)
+    }
+
+    fn upsert_semantic_document_vectors_native_for_model(
+        &self,
+        model_id: &str,
+        rows: &[NativeSemanticDocumentVectorRecord],
+    ) -> Result<(), StoreError> {
         if rows.is_empty() {
             return Ok(());
         }
+        let model_id = Self::normalize_semantic_model_id(model_id);
         self.with_engine(|engine| {
             let mut batch = Vec::with_capacity(rows.len());
             let mut affected = HashSet::new();
             let dirty_at = now_ms();
             for row in rows {
-                Self::validate_semantic_vector(&row.values, &row.document_id)?;
+                let dimension = row.values.len();
+                Self::validate_semantic_vector_dim(&row.values, dimension, &row.document_id)?;
                 let scope_ord = self.ensure_scope_ord(engine, &scope_storage_key(&row.scope))?;
-                let index = AnnIndexKey {
+                let index = Self::ann_index_key(
                     scope_ord,
-                    family: AnnIndexFamily::Document,
-                    kind: None,
-                };
+                    AnnIndexFamily::Document,
+                    None,
+                    &model_id,
+                    dimension,
+                )?;
                 affected.insert(index);
                 let record = AnnSourceDocumentRecord {
                     scope: row.scope.clone(),
                     scope_key: scope_storage_key(&row.scope),
+                    model_id: model_id.clone(),
                     document_id: row.document_id.clone(),
                     values: row.values.clone(),
                     leaf_count: row.leaf_count,
@@ -4043,11 +4232,15 @@ impl PhoenixSemanticIndexStore for PhoenixOvergraphStore {
                         scope_ord,
                         AnnIndexFamily::Document,
                         None,
+                        &model_id,
+                        dimension,
                         &row.document_id,
                     ),
                     props: btree_props([
                         (PROP_SCOPE_KEY, PropValue::String(record.scope_key.clone())),
                         (PROP_SCOPE_ORD, PropValue::UInt(scope_ord.0)),
+                        (PROP_MODEL_ID, PropValue::String(model_id.clone())),
+                        (PROP_DIMENSION, PropValue::UInt(dimension as u64)),
                         (PROP_DOCUMENT_ID, PropValue::String(row.document_id.clone())),
                         (PROP_LEAF_COUNT, PropValue::UInt(row.leaf_count as u64)),
                         (PROP_UPDATED_AT, PropValue::Int(row.updated_at)),
@@ -4073,22 +4266,43 @@ impl PhoenixSemanticIndexStore for PhoenixOvergraphStore {
         if rows.is_empty() {
             return Ok(());
         }
-        self.upsert_semantic_node_vectors_native_owned(rows.to_vec())
+        self.upsert_semantic_node_vectors_native_for_model(SEMANTIC_MODEL_ID, rows)
+    }
+
+    fn upsert_semantic_node_vectors_native_for_model(
+        &self,
+        model_id: &str,
+        rows: &[NativeSemanticNodeVectorRecord],
+    ) -> Result<(), StoreError> {
+        if rows.is_empty() {
+            return Ok(());
+        }
+        self.upsert_semantic_node_vectors_native_owned_for_model(model_id, rows.to_vec())
     }
 
     fn upsert_semantic_node_vectors_native_owned(
         &self,
         rows: Vec<NativeSemanticNodeVectorRecord>,
     ) -> Result<(), StoreError> {
+        self.upsert_semantic_node_vectors_native_owned_for_model(SEMANTIC_MODEL_ID, rows)
+    }
+
+    fn upsert_semantic_node_vectors_native_owned_for_model(
+        &self,
+        model_id: &str,
+        rows: Vec<NativeSemanticNodeVectorRecord>,
+    ) -> Result<(), StoreError> {
         if rows.is_empty() {
             return Ok(());
         }
+        let model_id = Self::normalize_semantic_model_id(model_id);
         self.with_engine(|engine| {
             let mut batch = Vec::with_capacity(rows.len());
             let mut affected = HashSet::new();
             let dirty_at = now_ms();
             for row in rows {
-                Self::validate_semantic_vector(&row.values, &row.node_id)?;
+                let dimension = row.values.len();
+                Self::validate_semantic_vector_dim(&row.values, dimension, &row.node_id)?;
                 let scope_ord = self.ensure_scope_ord(engine, &scope_storage_key(&row.scope))?;
                 let scope_key = scope_storage_key(&row.scope);
                 let NativeSemanticNodeVectorRecord {
@@ -4104,20 +4318,25 @@ impl PhoenixSemanticIndexStore for PhoenixOvergraphStore {
                     evidence_refs,
                     updated_at,
                 } = row;
-                let index = AnnIndexKey {
+                let index = Self::ann_index_key(
                     scope_ord,
-                    family: AnnIndexFamily::NodePrototype,
-                    kind: Some(node_kind.clone()),
-                };
+                    AnnIndexFamily::NodePrototype,
+                    Some(node_kind.clone()),
+                    &model_id,
+                    dimension,
+                )?;
                 affected.insert(index.clone());
-                affected.insert(AnnIndexKey {
+                affected.insert(Self::ann_index_key(
                     scope_ord,
-                    family: AnnIndexFamily::NodePrototype,
-                    kind: None,
-                });
+                    AnnIndexFamily::NodePrototype,
+                    None,
+                    &model_id,
+                    dimension,
+                )?);
                 let record = AnnSourceNodeRecord {
                     scope,
                     scope_key: scope_key.clone(),
+                    model_id: model_id.clone(),
                     node_id: node_id.clone(),
                     node_kind: node_kind.clone(),
                     document_id,
@@ -4135,11 +4354,15 @@ impl PhoenixSemanticIndexStore for PhoenixOvergraphStore {
                         scope_ord,
                         AnnIndexFamily::NodePrototype,
                         Some(&node_kind),
+                        &model_id,
+                        dimension,
                         &node_id,
                     ),
                     props: btree_props([
                         (PROP_SCOPE_KEY, PropValue::String(scope_key)),
                         (PROP_SCOPE_ORD, PropValue::UInt(scope_ord.0)),
+                        (PROP_MODEL_ID, PropValue::String(model_id.clone())),
+                        (PROP_DIMENSION, PropValue::UInt(dimension as u64)),
                         (PROP_NODE_ID, PropValue::String(node_id)),
                         (PROP_KIND, PropValue::String(node_kind)),
                         (PROP_UPDATED_AT, PropValue::Int(updated_at)),
@@ -4324,6 +4547,56 @@ impl PhoenixSemanticIndexStore for PhoenixOvergraphStore {
             .collect())
     }
 
+    fn query_semantic_node_neighbors_for_model(
+        &self,
+        model_id: &str,
+        dimension: usize,
+        query_vector: &[f32],
+        scope: &ScopeKey,
+        kind: &str,
+        exclude_node_id: Option<&str>,
+        limit: usize,
+        oversample: usize,
+    ) -> Result<Vec<SemanticNodeNeighbor>, StoreError> {
+        Ok(self
+            .search_ann_payloads_for_model(
+                model_id,
+                dimension,
+                scope,
+                AnnIndexFamily::NodePrototype,
+                Some(kind),
+                query_vector,
+                limit.saturating_add(exclude_node_id.is_some() as usize),
+                oversample.max(limit),
+            )?
+            .into_iter()
+            .filter_map(|(candidate, payload)| match payload {
+                AnnPayload::Node {
+                    node_id,
+                    node_kind,
+                    document_id,
+                    note_id,
+                    narrative_id,
+                    folder_id,
+                    folder_path,
+                    evidence_refs,
+                } if exclude_node_id != Some(node_id.as_str()) => Some(SemanticNodeNeighbor {
+                    node_id,
+                    node_kind,
+                    distance: candidate.dist as f64,
+                    document_id,
+                    note_id,
+                    narrative_id,
+                    folder_id,
+                    folder_path,
+                    evidence_refs,
+                }),
+                _ => None,
+            })
+            .take(limit)
+            .collect())
+    }
+
     fn query_semantic_node_neighbors_by_kinds(
         &self,
         query_vector: &[f32],
@@ -4420,11 +4693,137 @@ impl PhoenixSemanticIndexStore for PhoenixOvergraphStore {
         }
     }
 
+    fn query_semantic_node_neighbors_by_kinds_for_model(
+        &self,
+        model_id: &str,
+        dimension: usize,
+        query_vector: &[f32],
+        scope: &ScopeKey,
+        kinds: &[&str],
+        exclude_node_id: Option<&str>,
+        limit: usize,
+        oversample: usize,
+    ) -> Result<Vec<SemanticNodeNeighbor>, StoreError> {
+        let mut kinds = kinds
+            .iter()
+            .copied()
+            .filter(|kind| !kind.is_empty())
+            .collect::<Vec<_>>();
+        kinds.sort_unstable();
+        kinds.dedup();
+        if limit == 0 || kinds.is_empty() {
+            return Ok(Vec::new());
+        }
+        if kinds.len() == 1 {
+            return self.query_semantic_node_neighbors_for_model(
+                model_id,
+                dimension,
+                query_vector,
+                scope,
+                kinds[0],
+                exclude_node_id,
+                limit,
+                oversample,
+            );
+        }
+
+        Self::validate_semantic_vector_dim(query_vector, dimension, "query")?;
+        let Some(state) = self.load_ann_query_state_for_model(
+            model_id,
+            dimension,
+            scope,
+            AnnIndexFamily::NodePrototype,
+            None,
+        )?
+        else {
+            return Ok(Vec::new());
+        };
+        let query_vector = Self::project_ann_query_vector(&state.manifest, query_vector)?;
+
+        let allowed = kinds.iter().copied().collect::<BTreeSet<_>>();
+        let target_hits = oversample.max(limit).max(1);
+        let max_search = state.manifest.count.max(limit).max(1);
+        let mut search_k = oversample.max(limit).max(1).max(16).min(max_search);
+
+        loop {
+            let mut hits = Vec::<SemanticNodeNeighbor>::new();
+            for candidate in state
+                .index_handle
+                .search(&query_vector, search_k, search_k.max(16))
+            {
+                let Some(payload) = state.payloads.get(candidate.id as usize) else {
+                    continue;
+                };
+                let AnnPayload::Node {
+                    node_id,
+                    node_kind,
+                    document_id,
+                    note_id,
+                    narrative_id,
+                    folder_id,
+                    folder_path,
+                    evidence_refs,
+                } = payload
+                else {
+                    continue;
+                };
+                if exclude_node_id == Some(node_id.as_str())
+                    || !allowed.contains(node_kind.as_str())
+                {
+                    continue;
+                }
+                hits.push(SemanticNodeNeighbor {
+                    node_id: node_id.clone(),
+                    node_kind: node_kind.clone(),
+                    distance: candidate.dist as f64,
+                    document_id: document_id.clone(),
+                    note_id: note_id.clone(),
+                    narrative_id: narrative_id.clone(),
+                    folder_id: folder_id.clone(),
+                    folder_path: folder_path.clone(),
+                    evidence_refs: evidence_refs.clone(),
+                });
+                if hits.len() >= target_hits {
+                    break;
+                }
+            }
+            if hits.len() >= target_hits || search_k >= max_search {
+                hits.sort_by(|left, right| {
+                    left.distance
+                        .total_cmp(&right.distance)
+                        .then_with(|| left.node_id.cmp(&right.node_id))
+                });
+                return Ok(hits);
+            }
+            search_k = (search_k * 2).min(max_search);
+        }
+    }
+
     fn warm_semantic_node_index(&self, scope: &ScopeKey, kind: &str) -> Result<(), StoreError> {
         if kind.is_empty() {
             return Ok(());
         }
         let _ = self.load_ann_query_state(scope, AnnIndexFamily::NodePrototype, Some(kind))?;
+        Ok(())
+    }
+
+    fn warm_semantic_node_index_for_model(
+        &self,
+        model_id: &str,
+        dimension: usize,
+        scope: &ScopeKey,
+        kind: &str,
+    ) -> Result<(), StoreError> {
+        if kind.is_empty() {
+            return Ok(());
+        }
+        let _ = self.load_ann_query_state_for_model(
+            model_id,
+            dimension,
+            scope,
+            AnnIndexFamily::NodePrototype,
+            Some(kind),
+        )?;
         Ok(())
     }
 
@@ -4447,6 +4846,36 @@ impl PhoenixSemanticIndexStore for PhoenixOvergraphStore {
             return self.warm_semantic_node_index(scope, kinds[0]);
         }
         let _ = self.load_ann_query_state(scope, AnnIndexFamily::NodePrototype, None)?;
+        Ok(())
+    }
+
+    fn warm_semantic_node_indexes_for_model(
+        &self,
+        model_id: &str,
+        dimension: usize,
+        scope: &ScopeKey,
+        kinds: &[&str],
+    ) -> Result<(), StoreError> {
+        let mut kinds = kinds
+            .iter()
+            .copied()
+            .filter(|kind| !kind.is_empty())
+            .collect::<Vec<_>>();
+        kinds.sort_unstable();
+        kinds.dedup();
+        if kinds.is_empty() {
+            return Ok(());
+        }
+        if kinds.len() == 1 {
+            return self.warm_semantic_node_index_for_model(model_id, dimension, scope, kinds[0]);
+        }
+        let _ = self.load_ann_query_state_for_model(
+            model_id,
+            dimension,
+            scope,
+            AnnIndexFamily::NodePrototype,
+            None,
+        )?;
         Ok(())
     }
 
@@ -4831,10 +5260,12 @@ fn sanitize_ann_kind(kind: &str) -> String {
 
 fn ann_index_storage_key(index: &AnnIndexKey) -> String {
     format!(
-        "ann-index:{}:{}:{}",
+        "ann-index:{}:{}:{}:{}:{}",
         index.scope_ord.0,
         ann_family_name(index.family),
-        sanitize_ann_kind(index.kind.as_deref().unwrap_or("all"))
+        sanitize_ann_kind(index.kind.as_deref().unwrap_or("all")),
+        sanitize_ann_kind(index.model_id.as_str()),
+        index.dimension
     )
 }
 
@@ -4846,13 +5277,17 @@ fn ann_source_row_key(
     scope_ord: ScopeOrd,
     family: AnnIndexFamily,
     kind: Option<&str>,
+    model_id: &str,
+    dimension: usize,
     stable_id: &str,
 ) -> String {
     format!(
-        "ann-source:{}:{}:{}:{}",
+        "ann-source:{}:{}:{}:{}:{}:{}",
         scope_ord.0,
         ann_family_name(family),
         sanitize_ann_kind(kind.unwrap_or("all")),
+        sanitize_ann_kind(model_id),
+        dimension,
         stable_id
     )
 }
@@ -5229,9 +5664,13 @@ mod tests {
     }
 
     fn semantic_test_vector(seed: usize) -> Vec<f32> {
-        let mut values = vec![0.0; SEMANTIC_VECTOR_DIM];
-        values[seed % SEMANTIC_VECTOR_DIM] = 1.0;
-        values[(seed + 17) % SEMANTIC_VECTOR_DIM] = 0.5;
+        semantic_test_vector_dim(seed, SEMANTIC_VECTOR_DIM)
+    }
+
+    fn semantic_test_vector_dim(seed: usize, dim: usize) -> Vec<f32> {
+        let mut values = vec![0.0; dim];
+        values[seed % dim] = 1.0;
+        values[(seed + 17) % dim] = 0.5;
         values
     }
 
@@ -5385,6 +5824,8 @@ mod tests {
                 scope_ord,
                 family: AnnIndexFamily::Document,
                 kind: None,
+                model_id: SEMANTIC_MODEL_ID.to_owned(),
+                dimension: SEMANTIC_VECTOR_DIM,
             },
             AnnGenerationId(1),
         );
@@ -5417,6 +5858,89 @@ mod tests {
         assert_eq!(
             updated_hits.first().map(|hit| hit.document_id.as_str()),
             Some("doc-b")
+        );
+    }
+
+    #[test]
+    fn semantic_ann_indexes_are_partitioned_by_model_and_dimension() {
+        let store = temp_store("semantic-ann-model-space");
+        let scope = ScopeKey::default();
+        let model_id = "onnx-community/embeddinggemma-300m-ONNX";
+        let alt_dim = 768;
+
+        store
+            .upsert_semantic_node_vectors_native(&[NativeSemanticNodeVectorRecord {
+                scope: scope.clone(),
+                node_id: "entity::legacy".to_owned(),
+                node_kind: "entity".to_owned(),
+                document_id: Some("doc-legacy".to_owned()),
+                note_id: None,
+                narrative_id: None,
+                folder_id: None,
+                folder_path: None,
+                values: semantic_test_vector(0),
+                evidence_refs: vec!["graph_vertex:entity::legacy".to_owned()],
+                updated_at: 1,
+            }])
+            .expect("upsert legacy vector");
+        store
+            .upsert_semantic_node_vectors_native_for_model(
+                model_id,
+                &[NativeSemanticNodeVectorRecord {
+                    scope: scope.clone(),
+                    node_id: "entity::gemma".to_owned(),
+                    node_kind: "entity".to_owned(),
+                    document_id: Some("doc-gemma".to_owned()),
+                    note_id: None,
+                    narrative_id: None,
+                    folder_id: None,
+                    folder_path: None,
+                    values: semantic_test_vector_dim(4, alt_dim),
+                    evidence_refs: vec!["graph_vertex:entity::gemma".to_owned()],
+                    updated_at: 2,
+                }],
+            )
+            .expect("upsert alternate vector");
+
+        store
+            .warm_semantic_node_index_for_model(model_id, alt_dim, &scope, "entity")
+            .expect("warm alternate model index");
+        let manifest = store
+            .load_ann_manifest_for_model(
+                model_id,
+                alt_dim,
+                &scope,
+                AnnIndexFamily::NodePrototype,
+                Some("entity"),
+            )
+            .expect("load alternate manifest")
+            .expect("alternate manifest");
+        assert_eq!(manifest.model_id, model_id);
+        assert_eq!(manifest.dimension, alt_dim);
+
+        let alt_hits = store
+            .query_semantic_node_neighbors_for_model(
+                model_id,
+                alt_dim,
+                &semantic_test_vector_dim(4, alt_dim),
+                &scope,
+                "entity",
+                None,
+                1,
+                4,
+            )
+            .expect("alternate query");
+        assert_eq!(
+            alt_hits.first().map(|hit| hit.node_id.as_str()),
+            Some("entity::gemma")
+        );
+
+        let legacy_hits = store
+            .query_semantic_node_neighbors(&semantic_test_vector(0), &scope, "entity", None, 1, 4)
+            .expect("legacy query");
+        assert_eq!(
+            legacy_hits.first().map(|hit| hit.node_id.as_str()),
+            Some("entity::legacy")
         );
     }
 
@@ -5699,6 +6223,7 @@ mod tests {
         let record = AnnSourceNodeRecord {
             scope: ScopeKey::default(),
             scope_key: scope_storage_key(&ScopeKey::default()),
+            model_id: SEMANTIC_MODEL_ID.to_owned(),
             node_id: "chunk::a".to_owned(),
             node_kind: "chunk".to_owned(),
             document_id: Some("doc-a".to_owned()),

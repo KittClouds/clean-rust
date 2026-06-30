@@ -1,0 +1,233 @@
+﻿{
+  "corpus": "docs/shortrun.md",
+  "storePath": "rust-native/phoenix/reports/semantic-shortrun-store-codex",
+  "modelPath": "rust-native/phoenix/reports/semantic-shortrun-model-codex.bin",
+  "ingest": {
+    "documentId": "shortrun-full",
+    "timings": {
+      "totalBodyUs": 3100443,
+      "prepareIngestContextUs": 961,
+      "documentOutcomeUs": 2684796,
+      "scanBundleUs": 1203178,
+      "structureRowsUs": 80375,
+      "resolveUs": 56225,
+      "preparedDocumentUs": 1425390,
+      "persistPreparedDocumentsUs": 39651,
+      "graphTruthCommitPrepareUs": 70841,
+      "graphTruthCommitAppendUs": 298281
+    },
+    "bytes": {
+      "preparedManifestBytes": 2059,
+      "preparedSegmentCompressedBytes": 3702992,
+      "preparedSegmentUncompressedBytes": 29264960,
+      "dirtyScopeRecordBytes": 153,
+      "graphTruthCommitRecordBytes": 884739,
+      "graphTruthJournalRecordBytes": 380,
+      "graphTruthBatchRecordBytes": 883694
+    },
+    "counts": {
+      "textBytes": 161490,
+      "sentenceCount": 2361,
+      "mentionCount": 4006,
+      "chunkCount": 358,
+      "relationSeedCount": 4629,
+      "entityCount": 326,
+      "relationCount": 607,
+      "aliasConfirmationCount": 13,
+      "corefClusterCount": 0,
+      "causalPropositionCount": 0,
+      "causalLinkCount": 0,
+      "temporalPropositionCount": 0,
+      "temporalAnchorCount": 0,
+      "eventIdentitySeedCount": 0,
+      "lexicalSpanCount": 358,
+      "lexicalAliasEntryCount": 0,
+      "segmentCount": 0,
+      "segmentBytes": 0,
+      "graphVertexCount": 698,
+      "graphEdgeCount": 697,
+      "dirtyScopeCount": 1,
+      "graphTruthCommitCount": 2
+    },
+    "preparedPersist": {
+      "totalUs": 39651,
+      "documentCount": 1,
+      "segmentCount": 8,
+      "dirtyScopeCount": 1,
+      "nodeCount": 13,
+      "manifestPrepareUs": 130,
+      "segmentPrepareUs": 125,
+      "segmentPayloadWriteUs": 22345,
+      "dirtyScopePrepareUs": 33,
+      "batchUpsertUs": 2196,
+      "sessionArchiveUs": 0,
+      "cacheInvalidateUs": 2,
+      "manifestRecordBytes": 2059,
+      "manifestStoredBytes": 4118,
+      "segmentPayloadBytes": 3702992,
+      "segmentExternalBytes": 3702992,
+      "segmentInlineBytes": 0,
+      "segmentUncompressedBytes": 29264960,
+      "documentIndexShardCount": 1,
+      "documentIndexShardsWritten": 1,
+      "documentIndexShardsReused": 0,
+      "documentIndexBytes": 41668,
+      "documentIndexWriteUs": 14784,
+      "dirtyScopeRecordBytes": 153,
+      "segments": [
+        {
+          "documentId": "shortrun-full",
+          "kind": "alias-confirmation-table",
+          "ordinal": 0,
+          "rowCount": 13,
+          "compressedBytes": 748,
+          "uncompressedBytes": 1883,
+          "prepareUs": 20,
+          "payloadWriteUs": 3329,
+          "storage": "external"
+        },
+        {
+          "documentId": "shortrun-full",
+          "kind": "chunk-table",
+          "ordinal": 1,
+          "rowCount": 358,
+          "compressedBytes": 111776,
+          "uncompressedBytes": 209567,
+          "prepareUs": 15,
+          "payloadWriteUs": 1952,
+          "storage": "external"
+        },
+        {
+          "documentId": "shortrun-full",
+          "kind": "entity-table",
+          "ordinal": 2,
+          "rowCount": 326,
+          "compressedBytes": 14114,
+          "uncompressedBytes": 59885,
+          "prepareUs": 15,
+          "payloadWriteUs": 2205,
+          "storage": "external"
+        },
+        {
+          "documentId": "shortrun-full",
+          "kind": "relation-table",
+          "ordinal": 3,
+          "rowCount": 607,
+          "compressedBytes": 10908,
+          "uncompressedBytes": 81745,
+          "prepareUs": 12,
+          "payloadWriteUs": 2063,
+          "storage": "external"
+        },
+        {
+          "documentId": "shortrun-full",
+          "kind": "causal-substrate-table",
+          "ordinal": 4,
+          "rowCount": 14781,
+          "compressedBytes": 622874,
+          "uncompressedBytes": 4109584,
+          "prepareUs": 18,
+          "payloadWriteUs": 3344,
+          "storage": "external"
+        },
+        {
+          "documentId": "shortrun-full",
+          "kind": "temporal-substrate-table",
+          "ordinal": 5,
+          "rowCount": 47631,
+          "compressedBytes": 2216087,
+          "uncompressedBytes": 20405292,
+          "prepareUs": 15,
+          "payloadWriteUs": 4612,
+          "storage": "external"
+        },
+        {
+          "documentId": "shortrun-full",
+          "kind": "event-identity-substrate-table",
+          "ordinal": 6,
+          "rowCount": 4621,
+          "compressedBytes": 610266,
+          "uncompressedBytes": 4110918,
+          "prepareUs": 15,
+          "payloadWriteUs": 2585,
+          "storage": "external"
+        },
+        {
+          "documentId": "shortrun-full",
+          "kind": "lexical-postings",
+          "ordinal": 7,
+          "rowCount": 603,
+          "compressedBytes": 116219,
+          "uncompressedBytes": 286086,
+          "prepareUs": 15,
+          "payloadWriteUs": 2255,
+          "storage": "external"
+        }
+      ]
+    }
+  },
+  "timings": {
+    "receiptAppendUs": 31606,
+    "trainingUs": 40050,
+    "checkpointWriteUs": 705046,
+    "reopenStoreUs": 784888,
+    "replayUs": 36689,
+    "checkpointReplayUs": 1526623,
+    "atlasQueryHashUs": 2082
+  },
+  "bytes": {
+    "proposalReceiptBytes": 768,
+    "checkpointRecordBytes": 900232,
+    "storeBytesBefore": 252,
+    "storeBytesAfterIngest": 4740326,
+    "storeBytesAfterReceipt": 4741094,
+    "storeBytesAfterCheckpoint": 7019829
+  },
+  "hashes": {
+    "snapshotHashBeforeCheckpoint": 5338775766487667739,
+    "snapshotHashAfterReplay": 5338775766487667739,
+    "atlasQueryHash": 15187792512711420992,
+    "truthHashBeforeModel": 5338775766487667739,
+    "truthHashAfterModel": 5338775766487667739
+  },
+  "replay": {
+    "generation": 2,
+    "cachedHit": false,
+    "checkpointPresent": true,
+    "checkpointFastPath": true,
+    "checkpointGeneration": 2,
+    "journalLen": 0,
+    "journalEntryCount": 0,
+    "hydratedCommitCount": 0,
+    "journalBatchCount": 0,
+    "vertices": 698,
+    "assertedEdges": 697,
+    "candidateEdges": 0,
+    "timings": {
+      "totalUs": 36300,
+      "currentGenerationUs": 12,
+      "cacheLookupUs": 0,
+      "checkpointNodeReadUs": 99,
+      "checkpointDecodeUs": 32566,
+      "journalLenLookupUs": 10,
+      "journalNodeScanUs": 0,
+      "journalDecodeSortUs": 0,
+      "commitLoadUs": 0,
+      "checkpointRebuildUs": 0,
+      "journalRebuildUs": 0,
+      "journalApplyUs": 0,
+      "snapshotMaterializeUs": 0,
+      "cacheStoreUs": 3581
+    }
+  },
+  "training": {
+    "receiptCount": 1,
+    "commitCount": 2,
+    "exampleCount": 1,
+    "outcomeCounts": {
+      "uncommitted": 1
+    },
+    "modelArtifactBytes": 118,
+    "loadedModelScoreMillis": 335
+  }
+}

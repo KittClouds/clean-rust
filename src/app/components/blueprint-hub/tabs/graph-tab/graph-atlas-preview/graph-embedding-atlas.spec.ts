@@ -1,9 +1,14 @@
 import { describe, expect, it } from 'vitest';
-import { DEFAULT_ENTITY_COLORS, DEFAULT_GRAPH_NODE_COLORS } from '../../../../../lib/store/entityColorStore';
+import {
+    DEFAULT_ENTITY_COLORS,
+    DEFAULT_GRAPH_NODE_COLORS,
+    entityColorStore,
+    hexColorToHsl,
+} from '../../../../../lib/store/entityColorStore';
 import type { NoteBlockProjection } from '../../../../../lib/dexie/db';
 import { buildGraphAtlasTaxonomyAudit } from '../../../../../graph-rebuild/graph-atlas-taxonomy-audit';
 import { buildGraphModelV2Snapshot } from '../../../../../graph-rebuild/graph-model-v2';
-import { buildLeafEmbeddingAtlas } from './graph-embedding-atlas';
+import { buildBackendEmbeddingAtlas, buildLeafEmbeddingAtlas } from './graph-embedding-atlas';
 import { buildGraphRebuildEmbeddingAtlas, graphRebuildEmbeddingTargetCount } from './graph-rebuild-embedding-atlas';
 import { buildGalaxyScene, mergeGalaxySettings } from './graph-galaxy-engine';
 
@@ -121,6 +126,58 @@ describe('embedding atlas projection', () => {
             Math.abs(node.atlasZ || 0),
         ]));
         expect(maxAxis).toBeLessThanOrEqual(1.08);
+    });
+
+    it('colors local leaf embedding vectors from the Style Lab chunk swatch', () => {
+        const chunkHsl = hexColorToHsl('#1560c1');
+        const original = entityColorStore.getRawGraphNodeHsl('chunk');
+        entityColorStore.setGraphNodeColor('chunk', chunkHsl);
+        try {
+            const atlas = buildLeafEmbeddingAtlas([block('a', 'Kai crossed the lantern refuge.', 0)]);
+            const leaf = atlas.nodes[0];
+            const scene = buildGalaxyScene(atlas.nodes, atlas.edges, mergeGalaxySettings({ layoutMode: 'single' }));
+
+            expect(leaf.kind).toBe('chunk');
+            expect(leaf.colorHsl).toBe(chunkHsl);
+            expect(leaf.metadata).toEqual(expect.objectContaining({
+                graphColorKind: 'chunk',
+                graphKind: 'chunk',
+                styleKey: 'chunk',
+            }));
+            expect(scene.nodes[0].entity.metadata?.['graphColorKind']).toBe('chunk');
+            expect(scene.nodes[0].entity.colorHsl).toBe(chunkHsl);
+        } finally {
+            entityColorStore.setGraphNodeColor('chunk', original);
+        }
+    });
+
+    it('colors backend leaf embedding vectors from the Style Lab chunk swatch', () => {
+        const chunkHsl = hexColorToHsl('#1560c1');
+        const original = entityColorStore.getRawGraphNodeHsl('chunk');
+        entityColorStore.setGraphNodeColor('chunk', chunkHsl);
+        try {
+            const atlas = buildBackendEmbeddingAtlas({
+                nodes: [{
+                    id: 'backend:leaf:1',
+                    label: 'Leaf 1',
+                    sourceType: 'leaf',
+                    vector: [1, 0.5, 0.25, 0.125],
+                }],
+                edges: [],
+                sourceLabel: 'backend test',
+            });
+            const leaf = atlas.nodes[0];
+
+            expect(leaf.kind).toBe('chunk');
+            expect(leaf.colorHsl).toBe(chunkHsl);
+            expect(leaf.metadata).toEqual(expect.objectContaining({
+                graphColorKind: 'chunk',
+                graphKind: 'chunk',
+                styleKey: 'chunk',
+            }));
+        } finally {
+            entityColorStore.setGraphNodeColor('chunk', original);
+        }
     });
 
     it('renders graph-rebuild embedding targets while compacting entity mention anchors', () => {

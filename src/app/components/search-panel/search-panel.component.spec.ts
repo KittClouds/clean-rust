@@ -55,6 +55,8 @@ describe('SearchPanelComponent model recipe lifecycle', () => {
     let ner: ReturnType<typeof createNerMock>;
     let atlasScan: ReturnType<typeof createAtlasScanMock>;
     let nli: ReturnType<typeof createNliMock>;
+    let phoenix: ReturnType<typeof createPhoenixBackendMock>;
+    let fullAtlasPipeline: ReturnType<typeof createFullAtlasPipelineMock>;
 
     beforeEach(() => {
         dbNotesMock.rows.clear();
@@ -65,6 +67,8 @@ describe('SearchPanelComponent model recipe lifecycle', () => {
         ner = createNerMock();
         atlasScan = createAtlasScanMock();
         nli = createNliMock();
+        phoenix = createPhoenixBackendMock();
+        fullAtlasPipeline = createFullAtlasPipelineMock();
         const parentInjector = Injector.create({ providers: [] }) as unknown as EnvironmentInjector;
         injector = createEnvironmentInjector([
             { provide: NotesService, useValue: createNotesMock() },
@@ -75,8 +79,8 @@ describe('SearchPanelComponent model recipe lifecycle', () => {
             { provide: BlueprintHubService, useValue: { openPage: vi.fn() } },
             { provide: NliWorkerService, useValue: nli },
             { provide: PhoenixUiApiService, useValue: createPhoenixUiApiMock() },
-            { provide: PhoenixBackendService, useValue: createPhoenixBackendMock() },
-            { provide: GraphRebuildPipelineService, useValue: createFullAtlasPipelineMock() },
+            { provide: PhoenixBackendService, useValue: phoenix },
+            { provide: GraphRebuildPipelineService, useValue: fullAtlasPipeline },
             { provide: CalendarService, useValue: createCalendarMock() },
             AtlasCapabilityRuntimeService,
         ], parentInjector);
@@ -108,6 +112,26 @@ describe('SearchPanelComponent model recipe lifecycle', () => {
         }));
         expect(machine.loadSemanticModel.mock.invocationCallOrder[0])
             .toBeLessThan(atlasScan.runRichEmbeddingScan.mock.invocationCallOrder[0]);
+    });
+
+    it('routes EmbeddingGemma through the semantic graph model contract', async () => {
+        component.selectedModel.set('embeddinggemma-300m');
+
+        await component.runAtlasRecipe('semanticGraph');
+
+        expect(component.currentModelLabel()).toBe('EmbeddingGemma 300M');
+        expect(component.activeEmbeddingDimensionLabel()).toBe('768d');
+        expect(machine.loadSemanticModel).toHaveBeenCalledWith(
+            'embeddinggemma-300m',
+            'EmbeddingGemma 300M',
+            '768d',
+        );
+        expect(atlasScan.runRichEmbeddingScan).toHaveBeenCalledWith(expect.objectContaining({
+            includeSemanticAtlas: true,
+            modelId: 'embeddinggemma-300m',
+            modelLabel: 'EmbeddingGemma 300M',
+            dimensionLabel: '768d',
+        }));
     });
 
     it('anchors Text Graph with Dynamic NER while keeping semantic and NLI lanes out', async () => {
@@ -513,6 +537,94 @@ describe('SearchPanelComponent model recipe lifecycle', () => {
         ]);
     });
 
+    it('runs the Stage 8 truth-review bridge as candidate-only cached work', async () => {
+        phoenix.storeCommand.mockResolvedValueOnce({
+            candidateOnly: true,
+            laneMode: 'truth-review',
+            modelId: 'jinaai/jina-embeddings-v5-text-nano-retrieval',
+            embeddingProfile: '768',
+            dimension: 768,
+            executionProvider: 'directml',
+            cache: { hits: 65, misses: 0 },
+            timings: { deriveMs: 1234, totalMs: 1300 },
+            output: {
+                summary: { nodeCount: 24, edgeCount: 213 },
+                candidateNodeCount: 24,
+                candidateEdgeCount: 213,
+                committedTopologyWrites: 0,
+            },
+        });
+
+        await component.runTruthReviewLane();
+
+        expect(phoenix.storeCommand).toHaveBeenCalledWith('semantic:runEmbedderTruthReview', expect.objectContaining({
+            laneMode: 'truth-review',
+            cachePolicy: 'persistent',
+            skipEvents: true,
+            skipChunks: true,
+            skipVectorIndex: true,
+            indexNodeVectors: false,
+            model: expect.objectContaining({
+                modelId: 'jinaai/jina-embeddings-v5-text-nano-retrieval',
+                embeddingProfile: '768',
+                executionProvider: 'directml',
+            }),
+        }));
+        expect(component.truthReviewLane()).toEqual(expect.objectContaining({
+            status: 'ready',
+            candidateOnly: true,
+            committedTopologyWrites: 0,
+            cacheHits: 65,
+            cacheMisses: 0,
+            edgeCount: 213,
+        }));
+        expect(component.stage8Workbench().truthReview.cacheDetail).toBe('65 hits / 0 misses');
+        expect(fullAtlasPipeline.buildGraph).not.toHaveBeenCalled();
+        expect(machine.loadSemanticModel).not.toHaveBeenCalled();
+        expect(machine.indexSemanticDocuments).not.toHaveBeenCalled();
+    });
+
+    it('uses the full EmbeddingGemma ONNX model id in truth-review payloads', async () => {
+        component.selectedModel.set('embeddinggemma-300m');
+        phoenix.storeCommand.mockResolvedValueOnce({
+            candidateOnly: true,
+            laneMode: 'truth-review',
+            modelId: 'onnx-community/embeddinggemma-300m-ONNX',
+            dimension: 768,
+            executionProvider: 'directml',
+            cache: { hits: 3, misses: 1 },
+            timings: { deriveMs: 42, totalMs: 55 },
+            output: {
+                summary: { nodeCount: 7, edgeCount: 11 },
+                committedTopologyWrites: 0,
+            },
+        });
+
+        await component.runTruthReviewLane();
+
+        expect(phoenix.storeCommand).toHaveBeenCalledWith('semantic:runEmbedderTruthReview', expect.objectContaining({
+            laneMode: 'truth-review',
+            cachePolicy: 'persistent',
+            model: expect.objectContaining({
+                uiModelId: 'embeddinggemma-300m',
+                modelId: 'onnx-community/embeddinggemma-300m-ONNX',
+                modelLabel: 'EmbeddingGemma 300M',
+                embeddingProfile: '768',
+                executionProvider: 'directml',
+            }),
+        }));
+        expect(component.truthReviewLane()).toEqual(expect.objectContaining({
+            status: 'ready',
+            modelId: 'onnx-community/embeddinggemma-300m-ONNX',
+            modelLabel: 'EmbeddingGemma 300M',
+            dimensionLabel: '768d',
+            candidateOnly: true,
+            committedTopologyWrites: 0,
+            cacheHits: 3,
+            cacheMisses: 1,
+        }));
+    });
+
     it('surfaces product graph stage and projection timings in the last run panel model', async () => {
         const pipeline = injector.get(GraphRebuildPipelineService) as unknown as ReturnType<typeof createFullAtlasPipelineMock>;
 
@@ -721,9 +833,11 @@ function createCalendarMock() {
 
 function createFullAtlasPipelineMock() {
     const running = signal(false);
+    const lastSnapshot = signal<any>(null);
     const lastReceipt = signal<any>(null);
     return {
         running: computed(() => running()),
+        lastSnapshot: computed(() => lastSnapshot()),
         lastReceipt: computed(() => lastReceipt()),
         modelReadiness: vi.fn(() => [
             { id: 'dynamicNer', label: 'Dynamic NER', status: 'ready', detail: 'ready' },

@@ -1,7 +1,7 @@
 // src/app/components/sidebar/sidebar.component.ts
 // Sidebar with file tree and action buttons - wired to Dexie and document ingestion.
 
-import { Component, inject, signal, computed, OnInit, OnDestroy, HostListener } from '@angular/core';
+import { Component, inject, signal, computed, effect, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { DialogModule } from 'primeng/dialog';
@@ -73,6 +73,9 @@ const ROOT_CREATE_FOLDER_OPTIONS: CreateFolderOption[] = [
     })),
 ];
 
+const SIDEBAR_SNAP_MS = 150;
+const SIDEBAR_CONTENT_READY_MS = 32;
+
 @Component({
     selector: 'app-sidebar',
     standalone: true,
@@ -133,6 +136,10 @@ export class SidebarComponent implements OnInit, OnDestroy {
     isResizing = false;
     private startX = 0;
     private startWidth = 0;
+    sidebarPanelVisible = signal(this.sidebarService.isOpen());
+    sidebarContentReady = signal(this.sidebarService.isOpen());
+    private sidebarCloseTimer: ReturnType<typeof setTimeout> | null = null;
+    private sidebarContentTimer: ReturnType<typeof setTimeout> | null = null;
 
     private folders = signal<DexieFolder[]>([]);
     private notes = signal<Note[]>([]);
@@ -180,6 +187,12 @@ export class SidebarComponent implements OnInit, OnDestroy {
     createFolderError = signal('');
     createFolderInProgress = signal(false);
 
+    constructor() {
+        effect(() => {
+            this.syncSidebarMotion(this.sidebarService.isOpen());
+        });
+    }
+
     private loadSavedViewMode(): 'files' | 'search' {
         const saved = getSetting<string | null>(SidebarComponent.VIEW_STORAGE_KEY, null);
         if (saved === 'files' || saved === 'search') return saved;
@@ -212,8 +225,37 @@ export class SidebarComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
+        this.clearSidebarMotionTimers();
         this.foldersSubscription?.unsubscribe();
         this.notesSubscription?.unsubscribe();
+    }
+
+    private syncSidebarMotion(open: boolean): void {
+        this.clearSidebarMotionTimers();
+        if (open) {
+            this.sidebarPanelVisible.set(true);
+            this.sidebarContentTimer = setTimeout(() => {
+                this.sidebarContentReady.set(true);
+                this.sidebarContentTimer = null;
+            }, SIDEBAR_CONTENT_READY_MS);
+            return;
+        }
+        this.sidebarContentReady.set(false);
+        this.sidebarCloseTimer = setTimeout(() => {
+            this.sidebarPanelVisible.set(false);
+            this.sidebarCloseTimer = null;
+        }, SIDEBAR_SNAP_MS);
+    }
+
+    private clearSidebarMotionTimers(): void {
+        if (this.sidebarCloseTimer) {
+            clearTimeout(this.sidebarCloseTimer);
+            this.sidebarCloseTimer = null;
+        }
+        if (this.sidebarContentTimer) {
+            clearTimeout(this.sidebarContentTimer);
+            this.sidebarContentTimer = null;
+        }
     }
 
     private buildTree(folders: DexieFolder[], notes: Note[]): TreeNode[] {

@@ -1,4 +1,5 @@
 import type { GalaxyLorentzGuide } from './graph-galaxy-engine';
+import { rgbForKind } from './graph-galaxy-hierarchy-caps';
 import type { TransitLane, TransitPlan, TransitRoute, TransitStation } from './graph-transit-plan';
 
 const BACKBONE_LANES = ['document', 'root', 'chunk'] as const;
@@ -146,7 +147,7 @@ function backboneLaneGuide(lane: BackboneLane, stations: TransitStation[], total
         level: lane === 'document' ? 0 : lane === 'root' ? 1 : 2,
         guideKind: 'rootLane',
         guideWeight: 0.76 + Math.min(0.18, stations.length / Math.max(1, totalStations)),
-        ...BACKBONE_RGB[lane],
+        ...backboneColor(lane),
     };
 }
 
@@ -177,8 +178,12 @@ function backboneRouteGuide(route: TransitRoute, source: TransitStation, target:
         level: Math.max(source.stage, target.stage),
         guideKind: 'membership',
         guideWeight: 0.58 + Math.min(0.2, Math.max(0, route.confidence) * 0.18),
-        ...BACKBONE_RGB[lane],
+        ...backboneColor(lane),
     };
+}
+
+function backboneColor(lane: BackboneLane): { r: number; g: number; b: number } {
+    return lane === 'chunk' ? rgbForKind('chunk') : BACKBONE_RGB[lane];
 }
 
 function planLaneGuide(lane: PlanLane, stations: TransitStation[], totalStations: number): GalaxyLorentzGuide {

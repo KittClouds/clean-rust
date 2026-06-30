@@ -181,6 +181,7 @@ function dimensionsFromLabel(label: string | undefined): number {
 function defaultNativeDimensions(modelId: string, modelLabel = ''): number {
     const text = `${modelId} ${modelLabel}`;
     if (/jina.*v5/i.test(text)) return 768;
+    if (/embeddinggemma|embedding.*gemma|gemma.*embedding/i.test(text)) return 768;
     if (/(mdbr|mongodb.*leaf|leaf).*mt|mt.*(mdbr|leaf)/i.test(text)) return 384;
     return 384;
 }
@@ -188,6 +189,7 @@ function defaultNativeDimensions(modelId: string, modelLabel = ''): number {
 function modelFamily(modelId: string, modelLabel = ''): string {
     const text = `${modelId} ${modelLabel}`;
     if (/jina.*v5/i.test(text)) return 'jina-v5';
+    if (/embeddinggemma|embedding.*gemma|gemma.*embedding/i.test(text)) return 'embeddinggemma';
     if (/(mdbr|mongodb.*leaf|leaf).*mt|mt.*(mdbr|leaf)/i.test(text)) return 'mdbr-leaf-mt';
     if (/mdbr|mongodb.*leaf|leaf/i.test(text)) return 'mdbr-leaf';
     if (/bge/i.test(text)) return 'bge';
@@ -198,6 +200,7 @@ function taskProfile(modelId: string, modelLabel = ''): GraphRebuildEmbeddingPro
     const text = `${modelId} ${modelLabel}`;
     if (/(mdbr|mongodb.*leaf|leaf).*mt|mt.*(mdbr|leaf)/i.test(text)) return 'multi_task';
     if (/jina.*v5/i.test(text) && !/retrieval|query|ir/i.test(text)) return 'semantic_topology';
+    if (/embeddinggemma|embedding.*gemma|gemma.*embedding/i.test(text)) return 'semantic_topology';
     if (/mdbr|mongodb.*leaf|leaf/i.test(text)) return 'retrieval';
     if (/ir|retrieval|bge/i.test(text)) return 'retrieval';
     if (/jina.*v5/i.test(text)) return 'semantic_topology';

@@ -216,18 +216,11 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
         const previousShape = this.settings.nodeShape;
         const previousSphereSurface = this.settings.sphereSurface;
         const previousHybridField = `${this.settings.hybridHorospheresVisible}:${this.settings.hybridPrototypeRaysVisible}`;
-        const previousGuideColorMode = this.settings.guideColorMode;
         this.settings = mergeGalaxySettings(settings);
         this.force.setSettings(this.settings);
         if (this.sceneData) this.particles.bind(this.sceneData, this.settings);
         const nextHybridField = `${this.settings.hybridHorospheresVisible}:${this.settings.hybridPrototypeRaysVisible}`;
         if (this.sceneData?.layoutMode === 'hybridSpace' && previousHybridField !== nextHybridField) {
-            this.rebuildShellObjects(this.sceneData);
-        }
-        // Color mode change rewrites guide color attributes, which the cheap
-        // opacity pass can't do. Rebuild shells once (positions/geometry come
-        // from the cached scene — no hot-path impact, fires only on toggle).
-        if (this.sceneData && previousGuideColorMode !== this.settings.guideColorMode) {
             this.rebuildShellObjects(this.sceneData);
         }
         if (this.sceneData && (previousShape !== this.settings.nodeShape
@@ -614,7 +607,7 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
                 dimmed,
                 transitAtom,
             });
-            this.nodeColor(data, i, active, hovered, neighbor, dimmed);
+            this.nodeColor(data, i);
             if (sphereBatch) {
                 this.writeSphereNodeInstance(
                     sphereBatch,
@@ -643,7 +636,7 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
                     material.emissiveIntensity = dimmed ? 0.06 : hovered || active ? 0.34 : neighbor ? 0.22 : 0.16;
                 }
             }
-            this.glowColor(data, i, active, hovered, dimmed);
+            this.glowColor(data, i);
             const glowBase = atom ? 0 : sphere
                     ? (dimmed ? 0.012 : hovered || active ? 0.28 : neighbor ? 0.11 : 0.078)
                     : (dimmed ? 0.04 : hovered || active ? 0.58 : neighbor ? 0.28 : 0.22);
@@ -1010,23 +1003,12 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
         return value;
     }
 
-    private nodeColor(data: GalaxySceneV2, index: number, active: boolean, hovered: boolean, neighbor: boolean, dimmed: boolean): void {
-        if (active) {
-            this.color.setRGB(0.22, 0.86, 0.78);
-            return;
-        }
+    private nodeColor(data: GalaxySceneV2, index: number): void {
         this.color.setRGB(this.colorPart(data, index, 0), this.colorPart(data, index, 1), this.colorPart(data, index, 2));
-        const compact = this.nodeShape === 'atom' || this.nodeShape === 'sphere';
-        this.color.offsetHSL(0, hovered ? 0.2 : neighbor ? 0.14 : compact ? 0.18 : 0.08, hovered ? 0.04 : neighbor ? -0.02 : dimmed ? -0.24 : compact ? -0.08 : -0.06);
     }
 
-    private glowColor(data: GalaxySceneV2, index: number, active: boolean, hovered: boolean, dimmed: boolean): void {
-        if (active) {
-            this.color.setRGB(0.14, 0.8, 0.9);
-            return;
-        }
+    private glowColor(data: GalaxySceneV2, index: number): void {
         this.color.setRGB(this.colorPart(data, index, 0), this.colorPart(data, index, 1), this.colorPart(data, index, 2));
-        this.color.offsetHSL(0, hovered ? 0.2 : this.nodeShape === 'atom' ? 0.18 : 0.16, hovered ? 0.02 : dimmed ? -0.25 : -0.14);
     }
 
     private applyMaterialSettings(): void {
@@ -1992,8 +1974,7 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
     private writeHopfRibbonColor(colors: Float32Array, offset: number, ribbon: GalaxyHopfRibbonView, index: number, phase: number, surface: GuideSurface): void {
         const sourceColor = this.guideSourceColor(ribbon);
         if (sourceColor) {
-            // sourceNode mode: bypass the hashed palette and emit the source-node
-            // color directly for every ribbon kind (dataFiber/braid/torus/space/axis).
+            // Source-node contract: emit the node color for every ribbon kind.
             colors[offset] = sourceColor.r;
             colors[offset + 1] = sourceColor.g;
             colors[offset + 2] = sourceColor.b;
@@ -2172,10 +2153,17 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
         surface: GuideSurface,
         focusScale = 1,
     ): void {
+        const sourceColor = this.guideSourceColor(guide);
+        if (sourceColor) {
+            colors[offset] = sourceColor.r;
+            colors[offset + 1] = sourceColor.g;
+            colors[offset + 2] = sourceColor.b;
+            return;
+        }
         const pulse = Math.sin((phase + this.stableUnit(guide.id)) * Math.PI) * 0.08;
         const level = Number.isFinite(guide.level) ? guide.level : 0;
         const levelShade = THREE.MathUtils.clamp(0.08 - level * 0.012, -0.04, 0.08);
-        const base = this.guideSourceColor(guide) ?? guide.color;
+        const base = guide.color;
         colors[offset] = THREE.MathUtils.clamp(base.r * (0.58 + pulse + levelShade), 0, 0.78);
         colors[offset + 1] = THREE.MathUtils.clamp(base.g * (0.62 + pulse + levelShade), 0, 0.84);
         colors[offset + 2] = THREE.MathUtils.clamp(base.b * (0.66 + pulse + levelShade), 0, 0.86);
@@ -2198,26 +2186,20 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
         }
     }
 
-    /**
-     * Returns the source-node color for a guide when `guideColorMode === 'sourceNode'`,
-     * otherwise `undefined` so callers keep their legacy palette. Centralizing this
-     * keeps every color/tint writer in sync with a single toggle.
-     */
     private guideSourceColor(guide: { sourceColor?: { r: number; g: number; b: number } }): { r: number; g: number; b: number } | undefined {
-        if (this.settings.guideColorMode !== 'sourceNode') return undefined;
         return guide.sourceColor;
     }
 
     private lorentzGuideTint(guide: GalaxyLorentzGuideView, index: number, surface: GuideSurface = 'default'): { r: number; g: number; b: number } {
         const sourceColor = this.guideSourceColor(guide);
-        const tintBase = sourceColor ?? guide.color;
+        if (sourceColor) return sourceColor;
+        const tintBase = guide.color;
         const offset = this.stableUnit(`${guide.id}:${index}`) * 0.08;
         const tint = {
             r: THREE.MathUtils.clamp(tintBase.r + offset, 0, 1),
             g: THREE.MathUtils.clamp(tintBase.g + offset * 0.45, 0, 1),
             b: THREE.MathUtils.clamp(tintBase.b + offset * 0.72, 0, 1),
         };
-        if (sourceColor) return tint;
         if (surface !== 'transit') return tint;
         if (guide.guideKind === 'wAxis') return {
             r: 0.18,

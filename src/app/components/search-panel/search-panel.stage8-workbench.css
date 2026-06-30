@@ -161,6 +161,115 @@
   gap: 4px;
 }
 
+.stage8-truth-review {
+  display: grid;
+  gap: 6px;
+  padding: 7px;
+  border: 1px solid rgba(148, 163, 184, 0.13);
+  border-radius: 7px;
+  background:
+    linear-gradient(90deg, rgba(6, 78, 59, 0.14), rgba(30, 41, 59, 0.14)),
+    rgba(0, 0, 0, 0.24);
+}
+
+.stage8-truth-review-head,
+.stage8-truth-review-main {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 7px;
+}
+
+.stage8-truth-review-head span {
+  color: #a7f3d0;
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.stage8-truth-review-head strong {
+  color: var(--phthalo-bright);
+  font-size: 8px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.stage8-truth-review-main > span {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+
+.stage8-truth-review-main strong,
+.stage8-truth-review-main small,
+.stage8-truth-review-ledger span,
+.stage8-truth-review-error {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.stage8-truth-review-main strong {
+  color: #f8fafc;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.stage8-truth-review-main small,
+.stage8-truth-review-error {
+  color: #8aa2c4;
+  font-size: 8px;
+}
+
+.stage8-truth-review-action {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-width: 86px;
+  min-height: 28px;
+  padding: 5px 8px;
+  border: 1px solid rgba(125, 225, 209, 0.24);
+  border-radius: 7px;
+  color: var(--phthalo-bright);
+  background: rgba(var(--phthalo-rgb), 0.12);
+  font-size: 8px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.stage8-truth-review-action:disabled {
+  cursor: default;
+  opacity: 0.55;
+}
+
+.stage8-truth-review-ledger {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.stage8-truth-review-ledger span {
+  display: inline-flex;
+  max-width: 100%;
+  padding: 3px 6px;
+  border: 1px solid rgba(125, 225, 209, 0.14);
+  border-radius: 999px;
+  color: #dbeafe;
+  background: rgba(15, 23, 42, 0.36);
+  font-size: 8px;
+  font-weight: 900;
+}
+
+.stage8-truth-review-error {
+  color: #fca5a5;
+}
+
 .stage8-contract {
   display: grid;
   gap: 6px;

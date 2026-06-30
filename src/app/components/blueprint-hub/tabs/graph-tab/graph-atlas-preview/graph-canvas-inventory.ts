@@ -15,7 +15,7 @@ export function buildGraphCanvasInventory(snapshot: GraphRebuildSnapshot | null)
     if (!packet) {
         return { nodes: [], edges: [], kindCounts: [], sourceLabel: EMPTY_PACKET_LABEL };
     }
-    const rows = buildGraphPacketRowAdapter(packet);
+    const rows = buildGraphPacketRowAdapter(packet, snapshot.embeddingTargets || []);
     const inventory: GraphInventory = {
         nodes: rows.graphNodes,
         edges: rows.graphEdges,

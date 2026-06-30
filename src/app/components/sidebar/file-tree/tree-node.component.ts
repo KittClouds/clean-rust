@@ -23,9 +23,7 @@ import type { FlatTreeNode } from '../../../lib/arborist/types';
             [style.paddingLeft.px]="node.level * 16"
             [draggable]="!isReorderMode && node.type === 'note'"
             (click)="onNodeClick()"
-            (dragstart)="onNoteDragStart($event)"
-            (mouseenter)="isHovered = true"
-            (mouseleave)="isHovered = false">
+            (dragstart)="onNoteDragStart($event)">
 
             <!-- Drag Handle (reorder mode only) -->
             <div
@@ -109,7 +107,7 @@ import type { FlatTreeNode } from '../../../lib/arborist/types';
             <!-- Name (normal mode) -->
             <span
                 *ngIf="!isEditing"
-                class="truncate text-xs flex-1 z-10"
+                class="min-w-0 truncate text-xs flex-1 z-10"
                 [class.font-semibold]="node.isNarrativeRoot"
                 [style.color]="(node.type === 'folder' && (node.isTypedRoot || node.isNarrativeRoot)) ? node.effectiveColor : null"
                 (dblclick)="startEditing($event)">
@@ -122,7 +120,7 @@ import type { FlatTreeNode } from '../../../lib/arborist/types';
                 *ngIf="isEditing"
                 #editInput
                 type="text"
-                class="flex-1 z-10 text-xs bg-background border border-ring rounded px-1 py-0.5 outline-none focus:ring-1 focus:ring-ring"
+                class="min-w-0 flex-1 z-10 text-xs bg-background border border-ring rounded px-1 py-0.5 outline-none focus:ring-1 focus:ring-ring"
                 [value]="editValue"
                 (input)="editValue = $any($event.target).value"
                 (blur)="finishEditing()"
@@ -155,12 +153,13 @@ import type { FlatTreeNode } from '../../../lib/arborist/types';
                 class="shrink-0 z-10 fill-yellow-400 text-yellow-400">
             </lucide-icon>
 
-            <!-- Kebab Menu (appears on hover) -->
+            <!-- Kebab Menu -->
             <button
                 *ngIf="!isEditing"
-                class="kebab-menu shrink-0 z-10 p-0.5 rounded transition-opacity hover:bg-accent"
-                [class.opacity-0]="!isHovered"
-                [class.opacity-100]="isHovered"
+                type="button"
+                class="kebab-menu shrink-0 z-10 flex h-6 w-6 items-center justify-center rounded transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                [attr.aria-label]="'Actions for ' + (node.name || (node.type === 'folder' ? 'folder' : 'note'))"
+                title="Actions"
                 (click)="onMenuClick($event)">
                 <lucide-icon [img]="MoreVertical" size="14" class="text-muted-foreground"></lucide-icon>
             </button>
@@ -173,7 +172,13 @@ import type { FlatTreeNode } from '../../../lib/arborist/types';
         .narrative-root {
             background: linear-gradient(90deg, hsl(270, 70%, 60%, 0.05) 0%, transparent 100%);
         }
+        .kebab-menu {
+            opacity: 0.72;
+        }
         .tree-node:hover .kebab-menu {
+            opacity: 1;
+        }
+        .tree-node:focus-within .kebab-menu {
             opacity: 1;
         }
     `]
@@ -184,8 +189,6 @@ export class TreeNodeComponent implements AfterViewChecked {
     @Input() isEditing = false;
     @Input() isReorderMode = false;
     @Input() isBeingDragged = false;
-
-    isHovered = false;
 
     @Output() toggle = new EventEmitter<string>();
     @Output() select = new EventEmitter<FlatTreeNode>();

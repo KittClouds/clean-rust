@@ -28,13 +28,8 @@ export type GalaxyBackgroundMode = 'nebula' | 'grid' | 'quiet' | 'void';
 export type GalaxyNodeDragMode = 'stretch' | 'force' | 'pin' | 'camera';
 export type GalaxyNodeShapeMode = 'atom' | 'halo' | 'sphere';
 export type GalaxySphereSurfaceMode = 'solid' | 'glass' | 'spellglass' | 'obsidian' | 'starcore';
-/**
- * How guide/route/fiber colors are derived.
- * - 'auto'      — existing per-kind palette / hashed hue (legacy default).
- * - 'sourceNode'— each guide adopts the color of its source node (nodeIds[0]).
- * Fully opt-in; 'auto' preserves all prior behavior.
- */
-export type GalaxyGuideColorMode = 'auto' | 'sourceNode';
+// Guides adopt the Style Lab color of their source node.
+export type GalaxyGuideColorMode = 'sourceNode';
 export type GalaxyLayoutMode = 'single' | 'multiGalaxy' | 'hybridSpace' | 'hopfProjection' | 'lorentzTree' | 'transitManifold' | 'productManifold' | 'siegelFinsler';
 export type GalaxyEmbeddingTopologyMode = 'off' | 'clusters' | 'regions' | 'lanes' | 'medoids' | 'outliers' | 'backbone' | 'bridges';
 export type GalaxyRenderSourceMode = 'entities' | 'graph' | 'embeddings';
@@ -412,7 +407,7 @@ export const DEFAULT_GALAXY_SETTINGS: GalaxyRenderSettings = {
     sourceMode: 'entities',
     guideRoutesVisible: true,
     guideFibersVisible: true,
-    guideColorMode: 'auto',
+    guideColorMode: 'sourceNode',
 };
 
 export function mergeGalaxySettings(settings?: Partial<GalaxyRenderSettings> | null): GalaxyRenderSettings {
@@ -423,7 +418,7 @@ export function mergeGalaxySettings(settings?: Partial<GalaxyRenderSettings> | n
     if (!['solid', 'glass', 'spellglass', 'obsidian', 'starcore'].includes(merged.sphereSurface || '')) {
         merged.sphereSurface = 'solid';
     }
-    if (merged.guideColorMode !== 'sourceNode') merged.guideColorMode = 'auto';
+    merged.guideColorMode = 'sourceNode';
     if (typeof merged.guideRoutesVisible !== 'boolean') merged.guideRoutesVisible = merged.lorentzSpaceVisible !== false;
     if (typeof merged.guideFibersVisible !== 'boolean') merged.guideFibersVisible = merged.hopfSpaceVisible !== false;
     if (merged.edgeColorMode === 'cyan') merged.edgeColorMode = 'aqua';
@@ -922,15 +917,17 @@ function applyEmbeddingTopologyLens(
         else if (mode === 'lanes') boost = 0.72 + productLaneWeight(meta) * 0.58;
         else if (incident.has(index)) boost = 1.32;
         node.radius *= boost;
-        if (mode === 'clusters' && meta['embeddingClusterId']) {
-            const color = hslToRgb(clusterLensHsl(String(meta['embeddingClusterId'])));
-            node.r = Math.round(node.r * 0.58 + color.r * 0.42);
-            node.g = Math.round(node.g * 0.58 + color.g * 0.42);
-            node.b = Math.round(node.b * 0.58 + color.b * 0.42);
-        } else if (mode === 'regions' && meta['productRegionRole']) {
-            mixNodeColor(node, productRegionHsl(String(meta['productRegionRole'])), 0.48);
-        } else if (mode === 'lanes' && meta['productLaneKind']) {
-            mixNodeColor(node, productLaneHsl(String(meta['productLaneKind'])), 0.5);
+        if (embeddingLensMayRecolor(node)) {
+            if (mode === 'clusters' && meta['embeddingClusterId']) {
+                const color = hslToRgb(clusterLensHsl(String(meta['embeddingClusterId'])));
+                node.r = Math.round(node.r * 0.58 + color.r * 0.42);
+                node.g = Math.round(node.g * 0.58 + color.g * 0.42);
+                node.b = Math.round(node.b * 0.58 + color.b * 0.42);
+            } else if (mode === 'regions' && meta['productRegionRole']) {
+                mixNodeColor(node, productRegionHsl(String(meta['productRegionRole'])), 0.48);
+            } else if (mode === 'lanes' && meta['productLaneKind']) {
+                mixNodeColor(node, productLaneHsl(String(meta['productLaneKind'])), 0.5);
+            }
         }
     }
     for (const link of links) {
@@ -971,6 +968,17 @@ function embeddingEdgeRole(link: GalaxyEdge): 'local' | 'backbone' | 'bridge' | 
     if (type === 'embedding-bridge') return 'bridge';
     if (type === 'embedding-local') return 'local';
     return '';
+}
+
+function embeddingLensMayRecolor(node: GalaxyNode): boolean {
+    return firstGraphNodeColorKind(
+        stringValue(node.entity.metadata?.['graphColorKind']),
+        stringValue(node.entity.metadata?.['graphKind']),
+        stringValue(node.entity.metadata?.['styleKey']),
+        stringValue(node.entity.metadata?.['atlasKind']),
+        stringValue(node.entity.metadata?.['sourceType']),
+        node.entity.kind,
+    ) !== 'chunk';
 }
 
 function clusterLensHsl(clusterId: string): string {
@@ -2206,6 +2214,15 @@ function normalizeRenderKind(kind: string): string {
 
 export function resolveGalaxyNodeColorHsl(entity: GalaxyRenderableNode): string {
     const metadata = entity.metadata || {};
+    const structuralColorKind = firstGraphNodeColorKind(
+        stringValue(metadata['styleKey']),
+        stringValue(metadata['atlasKind']),
+        stringValue(metadata['sourceType']),
+        stringValue(metadata['graphKind']),
+        entity.kind,
+    );
+    if (structuralColorKind === 'chunk') return entityColorStore.getRawGraphNodeHsl('chunk');
+
     const graphColorKind = firstGraphNodeColorKind(
         stringValue(metadata['graphColorKind']),
         stringValue(metadata['graphRelationFamily']),
@@ -2220,12 +2237,6 @@ export function resolveGalaxyNodeColorHsl(entity: GalaxyRenderableNode): string 
         entity.kind,
     );
     if (entityKind) return entityColorStore.getRawHsl(entityKind);
-
-    const fallbackGraphColorKind = firstGraphNodeColorKind(
-        stringValue(metadata['sourceType']),
-        entity.kind,
-    );
-    if (fallbackGraphColorKind) return entityColorStore.getRawGraphNodeHsl(fallbackGraphColorKind);
 
     return entity.colorHsl || entityColorStore.getRawHsl(entity.kind);
 }

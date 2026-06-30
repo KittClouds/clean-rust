@@ -11,6 +11,7 @@ import {
     transitStationLaneOffset,
     transitVisualLanePoint,
 } from './graph-transit-backbone-guides';
+import { entityColorStore } from '../../../../../lib/store/entityColorStore';
 
 describe('Graph galaxy Transit renderer contract', () => {
     it('attaches a packet-backed TransitPlan before layout', () => {
@@ -101,6 +102,22 @@ describe('Graph galaxy Transit renderer contract', () => {
         });
     });
 
+    it('uses Style Lab chunk color for Transit chunk nodes and backbone guides', () => {
+        entityColorStore.setGraphNodeColor('chunk', '0 100% 50%');
+        try {
+            const scene = buildGalaxyScene(packetNodes(), packetEdges(), mergeGalaxySettings({ layoutMode: 'productManifold' }));
+            const chunk = scene.nodes.find((node) => node.entity.id === 'chunk');
+            const chunkLane = scene.lorentzGuides.find((guide) => guide.id === 'transit:backbone:lane:chunk');
+            const rootChunk = scene.lorentzGuides.find((guide) => guide.id === 'transit:backbone:route:root-chunk');
+
+            expect(chunk).toMatchObject({ r: 255, g: 0, b: 0 });
+            expect(chunkLane).toMatchObject({ r: 255, g: 0, b: 0 });
+            expect(rootChunk).toMatchObject({ r: 255, g: 0, b: 0 });
+        } finally {
+            entityColorStore.reset();
+        }
+    });
+
     it('adds packet-native evidence, identity, route, side-band, and review lanes', () => {
         const scene = buildGalaxyScene(lanePacketNodes(), lanePacketEdges(), mergeGalaxySettings({ layoutMode: 'productManifold' }));
         const rendererScene = galaxySceneToV2(scene, 'embeddings');
@@ -151,7 +168,7 @@ describe('Graph galaxy Transit renderer contract', () => {
         expect(rendererScene.lorentzGuides.some((guide) => guide.id.startsWith('transit:route:'))).toBe(false);
     });
 
-    it('fans out packet chunk stations that share the same Transit stop', () => {
+    it('keeps packet chunk stations on their lane when they share a Transit stop', () => {
         const ids = ['chunk-a', 'chunk-b', 'chunk-c', 'chunk-d', 'chunk-e', 'chunk-f'];
         const scene = buildGalaxyScene(
             ids.map((id) => sharedChunkStopNode(id)),
@@ -160,9 +177,9 @@ describe('Graph galaxy Transit renderer contract', () => {
         );
         const rendererScene = galaxySceneToV2(scene, 'embeddings');
 
-        expect(minPairwiseDistance(rendererScene, ids)).toBeGreaterThan(0.09);
-        expect(axisSpan(rendererScene, ids, 0)).toBeGreaterThan(0.28);
-        expect(axisSpan(rendererScene, ids, 1)).toBeGreaterThan(0.04);
+        for (const id of ids) expect(distanceToStationTarget(rendererScene, id)).toBeLessThan(0.01);
+        expect(axisSpan(rendererScene, ids, 0)).toBeGreaterThan(0.18);
+        expect(axisSpan(rendererScene, ids, 1)).toBeLessThan(0.001);
     });
 
     it('keeps non-chunk Transit rings on their independent offsets', () => {
@@ -258,29 +275,6 @@ function distanceToStationTarget(
         scene.positions3d[offset] - target.x,
         scene.positions3d[offset + 1] - target.y,
         scene.positions3d[offset + 2] - target.z,
-    );
-}
-
-function minPairwiseDistance(scene: ReturnType<typeof galaxySceneToV2>, ids: string[]): number {
-    let best = Number.POSITIVE_INFINITY;
-    for (let left = 0; left < ids.length; left++) {
-        for (let right = left + 1; right < ids.length; right++) {
-            best = Math.min(best, pointDistance(scene, ids[left], ids[right]));
-        }
-    }
-    return best;
-}
-
-function pointDistance(scene: ReturnType<typeof galaxySceneToV2>, leftId: string, rightId: string): number {
-    const left = scene.ids.indexOf(leftId);
-    const right = scene.ids.indexOf(rightId);
-    if (left < 0 || right < 0) return 0;
-    const leftOffset = left * 3;
-    const rightOffset = right * 3;
-    return Math.hypot(
-        scene.positions3d[leftOffset] - scene.positions3d[rightOffset],
-        scene.positions3d[leftOffset + 1] - scene.positions3d[rightOffset + 1],
-        scene.positions3d[leftOffset + 2] - scene.positions3d[rightOffset + 2],
     );
 }
 

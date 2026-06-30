@@ -5748,9 +5748,7 @@ impl PhoenixRuntime {
     ) -> Result<StoreCommandResult, StoreError> {
         if self.native_graph_enabled()
             && request.command != "runtime:capabilities"
-            && ["chat:", "om:"]
-                .iter()
-                .any(|prefix| request.command.starts_with(prefix))
+            && request.command.starts_with("om:")
         {
             return Ok(StoreCommandResult {
                 success: false,
@@ -13239,10 +13237,10 @@ mod tests {
         }
     }
     use phoenix_types::{
-        AtlasAliasProposalTarget, AtlasAliasRelation, ChatRunStatus, CreateSessionRequest,
-        DocumentId, EntityId, EntityKind, GenderHint, GraphDeltaRequest, MentionEntityRef, NoteId,
-        QueryResultHeader, QueryTarget, RunOptions, ScopeKey, SessionStateResultHeader,
-        SessionStatsResultHeader, TextRange,
+        AtlasAliasProposalTarget, AtlasAliasRelation, ChatRunStatus, ChatRuntimeConfig,
+        CreateSessionRequest, DocumentId, EntityId, EntityKind, GenderHint, GraphDeltaRequest,
+        MentionEntityRef, NoteId, QueryResultHeader, QueryTarget, RunOptions, ScopeKey,
+        SessionStateResultHeader, SessionStatsResultHeader, TextRange,
     };
     use serde_json::{json, Value};
 
@@ -13458,22 +13456,28 @@ mod tests {
     }
 
     #[test]
-    fn native_store_command_rejects_legacy_namespaces() {
+    fn native_store_command_accepts_chat_namespace() {
         let runtime = native_test_runtime();
         runtime.init().expect("init");
 
-        let result = runtime
+        let init = runtime
+            .store_command(StoreCommandRequest {
+                command: "chat:init".to_owned(),
+                payload: json!({ "config": ChatRuntimeConfig::default() }),
+            })
+            .expect("chat init");
+
+        assert!(init.success);
+
+        let threads = runtime
             .store_command(StoreCommandRequest {
                 command: "chat:listThreads".to_owned(),
                 payload: json!({}),
             })
-            .expect("store command");
+            .expect("list threads");
 
-        assert!(!result.success);
-        assert_eq!(
-            result.error.as_deref(),
-            Some("chat:listThreads is unavailable on the native runtime path")
-        );
+        assert!(threads.success);
+        assert_eq!(threads.payload, Some(json!([])));
     }
 
     #[test]

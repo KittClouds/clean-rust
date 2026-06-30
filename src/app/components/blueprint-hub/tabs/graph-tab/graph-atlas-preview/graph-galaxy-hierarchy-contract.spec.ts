@@ -4,7 +4,7 @@ import type { GraphRebuildSnapshot } from '../../../../../graph-rebuild/graph-re
 import { buildGalaxyScene, mergeGalaxySettings, type GalaxyRenderableNode } from './graph-galaxy-engine';
 import { galaxySceneToV2 } from './graph-galaxy-scene-v2';
 import { buildGraphRebuildEmbeddingAtlas } from './graph-rebuild-embedding-atlas';
-import { hierarchyShellBandsInOrder, validateHierarchyShellContract } from './graph-galaxy-hierarchy-caps';
+import { hierarchyShellBandsInOrder, laneDirection, validateHierarchyShellContract } from './graph-galaxy-hierarchy-caps';
 
 describe('graph galaxy hierarchy contract', () => {
     it('cannot render inverted Caps shells even when metadata lies', () => {
@@ -139,6 +139,27 @@ describe('graph galaxy hierarchy contract', () => {
             expect(radius(node)).toBeCloseTo(0.98, 2);
         }
         expect(maxPairwiseDistance(factNodes)).toBeGreaterThan(0.5);
+    });
+
+    it('splits dense non-chunk Caps shells into concentric rings', () => {
+        const center = laneDirection('entity');
+        const scene = buildGalaxyScene(Array.from({ length: 72 }, (_, index) =>
+            shellRingNode(
+                `embed:entity:ring-${index}`,
+                'entity',
+                `document:note-a:entity-ring:${index}`,
+                [`document:note-a:parent-ring:${index}`],
+                center,
+            ),
+        ), [], mergeGalaxySettings({ layoutMode: 'lorentzTree', sourceMode: 'embeddings' }));
+        const ringNodes = scene.nodes.filter((node) => node.entity.id.startsWith('embed:entity:ring-'));
+        const apertures = uniqueRoundedApertures(ringNodes, center);
+
+        expect(validateHierarchyShellContract(scene.nodes)).toEqual([]);
+        expect(ringNodes).toHaveLength(72);
+        expect(apertures.length).toBeGreaterThan(1);
+        expect(apertures.length).toBeLessThanOrEqual(4);
+        expect(minPairwiseDistance(ringNodes)).toBeGreaterThan(0.04);
     });
 
     it('uses structural forest ownership instead of flat type caps', () => {
@@ -477,6 +498,36 @@ function capNode(
     };
 }
 
+function shellRingNode(
+    id: string,
+    sourceType: string,
+    capId: string,
+    parentCapIds: string[],
+    direction: { x: number; y: number; z: number },
+): GalaxyRenderableNode {
+    return {
+        id,
+        label: id,
+        kind: sourceType,
+        atlasX: direction.x,
+        atlasY: direction.y,
+        atlasZ: direction.z,
+        totalMentions: 2,
+        metadata: {
+            sourceType,
+            noteId: 'note-a',
+            targetConfidence: 0.9,
+            lorentz: {
+                capId,
+                parentCapIds,
+                capDirection: [direction.x, direction.y, direction.z],
+                shellRadius: 0.86,
+                primaryTreeKind: 'entity',
+            },
+        },
+    };
+}
+
 function singleDocumentContractSnapshot(): GraphRebuildSnapshot {
     const snapshot = contractSnapshot();
     snapshot.noteIds = ['note-a'];
@@ -522,4 +573,29 @@ function maxPairwiseDistance(nodes: Array<{ x: number; y: number; z: number }>):
         }
     }
     return Number(maxDistance.toFixed(4));
+}
+
+function minPairwiseDistance(nodes: Array<{ x: number; y: number; z: number }>): number {
+    let minDistance = Number.POSITIVE_INFINITY;
+    for (let left = 0; left < nodes.length; left++) {
+        for (let right = left + 1; right < nodes.length; right++) {
+            const dx = nodes[left].x - nodes[right].x;
+            const dy = nodes[left].y - nodes[right].y;
+            const dz = nodes[left].z - nodes[right].z;
+            minDistance = Math.min(minDistance, Math.hypot(dx, dy, dz));
+        }
+    }
+    return Number(minDistance.toFixed(4));
+}
+
+function uniqueRoundedApertures(
+    nodes: Array<{ x: number; y: number; z: number }>,
+    center: { x: number; y: number; z: number },
+): number[] {
+    const values = nodes.map((node) => {
+        const radius = Math.max(0.0001, Math.hypot(node.x, node.y, node.z));
+        const dot = (node.x / radius) * center.x + (node.y / radius) * center.y + (node.z / radius) * center.z;
+        return Math.round(Math.acos(Math.max(-1, Math.min(1, dot))) / 0.02) * 0.02;
+    });
+    return [...new Set(values)].sort((left, right) => left - right);
 }

@@ -1,4 +1,4 @@
-import { entityColorStore } from '../../../../../lib/store/entityColorStore';
+import { entityColorStore, normalizeGraphNodeColorKind } from '../../../../../lib/store/entityColorStore';
 import {
     hslToRgb,
     type GalaxyGroup,
@@ -41,9 +41,8 @@ export interface GalaxyHopfRibbonView {
     guideWeight: number;
     /**
      * Source-node color resolved from `nodeIds[0]` at scene compile.
-     * Only read when the renderer's `guideColorMode === 'sourceNode'`;
-     * otherwise the guide falls back to its own `color` / hashed palette.
-     * Optional so older persisted scenes merge cleanly.
+     * Source-node color is the guide color contract; optional only for older
+     * persisted scenes whose guide source is missing.
      */
     sourceColor?: { r: number; g: number; b: number };
 }
@@ -62,7 +61,6 @@ export interface GalaxyLorentzGuideView {
     guideWeight: number;
     /**
      * Source-node color resolved from `nodeIds[0]` at scene compile.
-     * See {@link GalaxyHopfRibbonView.sourceColor}.
      */
     sourceColor?: { r: number; g: number; b: number };
 }
@@ -233,7 +231,7 @@ export function galaxySceneToV2(scene: GalaxyScene, sourceMode: GalaxySceneSourc
         edgePairs[index * 2 + 1] = edge.target;
         edgeIds[index] = edge.id;
         edgeTypes[index] = edge.type;
-        const relationColor = relationEdgeColor(edge.type, source, target);
+        const relationColor = relationEdgeColor(edge, source, target);
         if (relationColor) {
             writeRgbColor(edgeColors, index * 2, relationColor);
             writeRgbColor(edgeColors, index * 2 + 1, relationColor);
@@ -281,9 +279,7 @@ export function galaxySceneToV2(scene: GalaxyScene, sourceMode: GalaxySceneSourc
 /**
  * Resolves `sourceColor` from each guide/ribbon's `nodeIds[0]` against the
  * compiled node color buffer. Cheap O(n) pass at compile time only; the
- * renderer reads `sourceColor` when `guideColorMode === 'sourceNode'`.
- * If the source node is missing the guide keeps `sourceColor === undefined`
- * and falls back to its own color/palette.
+ * renderer uses `sourceColor` as the guide color contract.
  */
 function attachSourceColors<T extends { nodeIds: string[]; sourceColor?: { r: number; g: number; b: number } }>(
     views: T[],
@@ -387,8 +383,14 @@ function hierarchyEdgeKind(type: string): number {
     return /target-parent|note-chunk|chunk-anchor|chunk-entity|anchor-entity|event-chunk|event-entity|memory-entity/i.test(type) ? 2 : 0;
 }
 
-function relationEdgeColor(type: string, source: GalaxyNode, target: GalaxyNode): { r: number; g: number; b: number } | null {
+function relationEdgeColor(edge: GalaxyScene['links'][number], source: GalaxyNode, target: GalaxyNode): { r: number; g: number; b: number } | null {
+    const type = edge.type;
     if (hierarchyEdgeKind(type) !== 0) return null;
+    const metadata = edge.metadata || {};
+    const explicit = normalizeGraphNodeColorKind(
+        String(metadata['graphColorKind'] || metadata['graphRelationFamily'] || metadata['relationFamily'] || ''),
+    );
+    if (explicit) return hslToRgb(entityColorStore.getRawGraphNodeHsl(explicit));
     const family = relationFamilyFromText(
         type,
         source.entity.label,

@@ -32,6 +32,14 @@ pub use scope_runtime::{
 pub const SEMANTIC_VECTOR_DIM: usize = 384;
 pub const SEMANTIC_MODEL_ID: &str = "MongoDB/mdbr-leaf-mt";
 
+pub fn default_semantic_model_id() -> String {
+    SEMANTIC_MODEL_ID.to_owned()
+}
+
+pub const fn default_semantic_vector_dim() -> usize {
+    SEMANTIC_VECTOR_DIM
+}
+
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SnapshotEnvelope {
@@ -465,6 +473,10 @@ pub struct AnnIndexKey {
     pub scope_ord: ScopeOrd,
     pub family: AnnIndexFamily,
     pub kind: Option<String>,
+    #[serde(default = "default_semantic_model_id")]
+    pub model_id: String,
+    #[serde(default = "default_semantic_vector_dim")]
+    pub dimension: usize,
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
@@ -843,19 +855,50 @@ pub trait PhoenixSemanticIndexStore {
         &self,
         rows: &[NativeSemanticLeafVectorRecord],
     ) -> Result<(), StoreError>;
+    fn upsert_semantic_leaf_vectors_for_model(
+        &self,
+        model_id: &str,
+        rows: &[NativeSemanticLeafVectorRecord],
+    ) -> Result<(), StoreError> {
+        let _ = model_id;
+        self.upsert_semantic_leaf_vectors(rows)
+    }
     fn upsert_semantic_document_vectors_native(
         &self,
         rows: &[NativeSemanticDocumentVectorRecord],
     ) -> Result<(), StoreError>;
+    fn upsert_semantic_document_vectors_native_for_model(
+        &self,
+        model_id: &str,
+        rows: &[NativeSemanticDocumentVectorRecord],
+    ) -> Result<(), StoreError> {
+        let _ = model_id;
+        self.upsert_semantic_document_vectors_native(rows)
+    }
     fn upsert_semantic_node_vectors_native(
         &self,
         rows: &[NativeSemanticNodeVectorRecord],
     ) -> Result<(), StoreError>;
+    fn upsert_semantic_node_vectors_native_for_model(
+        &self,
+        model_id: &str,
+        rows: &[NativeSemanticNodeVectorRecord],
+    ) -> Result<(), StoreError> {
+        let _ = model_id;
+        self.upsert_semantic_node_vectors_native(rows)
+    }
     fn upsert_semantic_node_vectors_native_owned(
         &self,
         rows: Vec<NativeSemanticNodeVectorRecord>,
     ) -> Result<(), StoreError> {
         self.upsert_semantic_node_vectors_native(&rows)
+    }
+    fn upsert_semantic_node_vectors_native_owned_for_model(
+        &self,
+        model_id: &str,
+        rows: Vec<NativeSemanticNodeVectorRecord>,
+    ) -> Result<(), StoreError> {
+        self.upsert_semantic_node_vectors_native_for_model(model_id, &rows)
     }
     fn query_semantic_neighbors(
         &self,
@@ -888,6 +931,27 @@ pub trait PhoenixSemanticIndexStore {
         limit: usize,
         oversample: usize,
     ) -> Result<Vec<SemanticNodeNeighbor>, StoreError>;
+    fn query_semantic_node_neighbors_for_model(
+        &self,
+        model_id: &str,
+        dimension: usize,
+        query_vector: &[f32],
+        scope: &ScopeKey,
+        kind: &str,
+        exclude_node_id: Option<&str>,
+        limit: usize,
+        oversample: usize,
+    ) -> Result<Vec<SemanticNodeNeighbor>, StoreError> {
+        let _ = (model_id, dimension);
+        self.query_semantic_node_neighbors(
+            query_vector,
+            scope,
+            kind,
+            exclude_node_id,
+            limit,
+            oversample,
+        )
+    }
     /// Query semantic node neighbors across multiple kinds using one merged ranking.
     ///
     /// Implementations must return a single globally ranked result set across the
@@ -905,7 +969,38 @@ pub trait PhoenixSemanticIndexStore {
         limit: usize,
         oversample: usize,
     ) -> Result<Vec<SemanticNodeNeighbor>, StoreError>;
+    fn query_semantic_node_neighbors_by_kinds_for_model(
+        &self,
+        model_id: &str,
+        dimension: usize,
+        query_vector: &[f32],
+        scope: &ScopeKey,
+        kinds: &[&str],
+        exclude_node_id: Option<&str>,
+        limit: usize,
+        oversample: usize,
+    ) -> Result<Vec<SemanticNodeNeighbor>, StoreError> {
+        let _ = (model_id, dimension);
+        self.query_semantic_node_neighbors_by_kinds(
+            query_vector,
+            scope,
+            kinds,
+            exclude_node_id,
+            limit,
+            oversample,
+        )
+    }
     fn warm_semantic_node_index(&self, scope: &ScopeKey, kind: &str) -> Result<(), StoreError>;
+    fn warm_semantic_node_index_for_model(
+        &self,
+        model_id: &str,
+        dimension: usize,
+        scope: &ScopeKey,
+        kind: &str,
+    ) -> Result<(), StoreError> {
+        let _ = (model_id, dimension);
+        self.warm_semantic_node_index(scope, kind)
+    }
     fn warm_semantic_node_indexes(
         &self,
         scope: &ScopeKey,
@@ -913,6 +1008,18 @@ pub trait PhoenixSemanticIndexStore {
     ) -> Result<(), StoreError> {
         for kind in normalized_semantic_node_kinds(kinds) {
             self.warm_semantic_node_index(scope, kind)?;
+        }
+        Ok(())
+    }
+    fn warm_semantic_node_indexes_for_model(
+        &self,
+        model_id: &str,
+        dimension: usize,
+        scope: &ScopeKey,
+        kinds: &[&str],
+    ) -> Result<(), StoreError> {
+        for kind in normalized_semantic_node_kinds(kinds) {
+            self.warm_semantic_node_index_for_model(model_id, dimension, scope, kind)?;
         }
         Ok(())
     }

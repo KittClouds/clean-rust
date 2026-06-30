@@ -2522,6 +2522,7 @@ dependencies = [
  "phoenix-causal-post",
  "phoenix-chunker",
  "phoenix-dynamic-ner",
+ "phoenix-embed",
  "phoenix-er-post",
  "phoenix-event-identity-post",
  "phoenix-evidence-graph",

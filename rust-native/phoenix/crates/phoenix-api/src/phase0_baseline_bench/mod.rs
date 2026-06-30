@@ -600,10 +600,7 @@ fn load_cases(
 }
 
 fn extract_chapter_case(text: &str, chapter: usize) -> Result<CaseInput, String> {
-    let mut headings = text
-        .match_indices("## Chapter ")
-        .map(|(offset, _)| offset)
-        .collect::<Vec<_>>();
+    let mut headings = chapter_heading_offsets(text);
     if headings.is_empty() {
         return Err("no chapter headings found in shortrun.md".to_owned());
     }
@@ -629,6 +626,34 @@ fn extract_chapter_case(text: &str, chapter: usize) -> Result<CaseInput, String>
         source_path: format!("docs/shortrun.md#chapter-{chapter}"),
         text: slice,
     })
+}
+
+fn chapter_heading_offsets(text: &str) -> Vec<usize> {
+    let mut headings = text
+        .match_indices("## Chapter ")
+        .map(|(offset, _)| offset)
+        .collect::<Vec<_>>();
+    if !headings.is_empty() {
+        headings.sort_unstable();
+        return headings;
+    }
+    let mut offset = 0usize;
+    for line in text.split_inclusive('\n') {
+        let trimmed = line.trim_start();
+        let heading_offset = offset + line.len().saturating_sub(trimmed.len());
+        offset += line.len();
+        let Some(rest) = trimmed.strip_prefix("Chapter ") else {
+            continue;
+        };
+        let Some((number, _)) = rest.split_once(':') else {
+            continue;
+        };
+        if !number.is_empty() && number.bytes().all(|byte| byte.is_ascii_digit()) {
+            headings.push(heading_offset);
+        }
+    }
+    headings.sort_unstable();
+    headings
 }
 
 fn story_lexicon() -> Result<Lexicon, String> {

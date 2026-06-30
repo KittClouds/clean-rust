@@ -31,7 +31,9 @@ pub mod retrieval_receipts;
 mod retrieval_world;
 mod runtime_telemetry;
 pub mod semantic;
+mod semantic_embedding_runtime;
 pub mod semantic_graph;
+pub mod semantic_service;
 mod signal_quality;
 pub mod smoke_support;
 
@@ -86,6 +88,7 @@ pub use worker::{
 
 pub fn clear_graph_thread_local_caches() {
     retrieval_common::clear_query_embedder_cache();
+    semantic_embedding_runtime::clear_semantic_embedder_cache();
     phase4_scoring_support::clear_phase4_scorer_cache();
 }
 

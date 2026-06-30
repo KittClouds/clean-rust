@@ -108,7 +108,7 @@ describe('atlas command status model', () => {
 
         expect(status.sidecars.map((sidecar) => [sidecar.label, sidecar.detail])).toEqual([
             ['Semantic sidecar', 'idle 384d'],
-            ['Hybrid space', 'ready'],
+            ['Hybrid embedding manifold', 'ready'],
             ['Hopf projection', 'stale'],
             ['Lorentz forest', 'loading'],
             ['Product manifold', 'idle'],

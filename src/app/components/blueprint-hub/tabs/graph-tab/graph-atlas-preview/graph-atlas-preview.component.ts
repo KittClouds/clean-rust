@@ -1,10 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild, computed, effect, inject, signal, untracked } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild, computed, effect, inject, signal, untracked } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Plus, ScanSearch, Search, Settings2, SlidersHorizontal, Zap } from 'lucide-angular';
 import { LucideAngularModule } from 'lucide-angular';
 
 import { entitySourceSystem, type RegisteredEntity } from '../../../../../lib/registry';
+import { entityColorStore } from '../../../../../lib/store/entityColorStore';
 import type { EntitySuggestionProviderId } from '../../../../../lib/entity-suggestions/entity-suggestion.types';
 import { PhoenixUiApiService } from '../../../../../services/phoenix-ui-api.service';
 import { PhoenixMachineControlService } from '../../../../../services/phoenix-machine-control.service';
@@ -53,6 +54,7 @@ import type { GraphLensMode, GraphLensState } from '../graph-lens';
 import { buildGraphAtlasReadContext, graphLensState, type GraphAtlasReadContext } from './graph-atlas-read-context';
 import { projectionSummaryRequestsRefresh } from './graph-atlas-refresh-summary';
 import { getSetting, setSetting } from '../../../../../lib/dexie/settings.service';
+import { buildGraphCanvasInventory } from './graph-canvas-inventory';
 
 export interface AtlasPreviewEdge extends GalaxyInputEdge {}
 
@@ -454,7 +456,6 @@ function readPersistedAtlasViewState(): PersistedAtlasViewState {
                             <div class="grid grid-cols-2 gap-2">
                                 <button type="button" class="galaxy-control-button" (click)="toggleGuideRoutes()">Routes<span>{{ settings.guideRoutesVisible ? 'on' : 'off' }}</span></button>
                                 <button type="button" class="galaxy-control-button" (click)="toggleGuideFibers()">Fibers<span>{{ settings.guideFibersVisible ? 'on' : 'off' }}</span></button>
-                                <button type="button" class="galaxy-control-button" (click)="toggleGuideColorMode()">Color<span>{{ settings.guideColorMode === 'sourceNode' ? 'node' : 'auto' }}</span></button>
                             </div>
                             <p class="mt-2 text-[9px] leading-snug text-zinc-600">Each guide family toggles independently of shells. Color = node adopts the color of its source node.</p>
                         </div>
@@ -961,7 +962,7 @@ function readPersistedAtlasViewState(): PersistedAtlasViewState {
         }
     `],
 })
-export class GraphAtlasPreviewComponent implements OnInit {
+export class GraphAtlasPreviewComponent implements OnInit, OnDestroy {
     private readonly phoenixUiApi = inject(PhoenixUiApiService);
     private readonly machine = inject(PhoenixMachineControlService);
     private readonly hubService = inject(BlueprintHubService);
@@ -973,6 +974,7 @@ export class GraphAtlasPreviewComponent implements OnInit {
     private _selectedNoteIds: string[] = [];
     private readonly readContextEpoch = signal(0);
     private readonly graphSnapshotSignal = signal<GraphRebuildSnapshot | null>(null);
+    private readonly unsubscribeColors = entityColorStore.subscribe(() => this.refreshGraphInventoryFromSnapshot());
 
     @Input() entities: GalaxyRenderableNode[] = [];
     @Input() edges: AtlasPreviewEdge[] = [];
@@ -980,10 +982,11 @@ export class GraphAtlasPreviewComponent implements OnInit {
     @Input() graphCounters: GraphRebuildCounters | null = null;
     @Input() set graphSnapshot(value: GraphRebuildSnapshot | null | undefined) {
         this.graphSnapshotSignal.set(value ?? null);
+        this.refreshGraphInventoryFromSnapshot();
         this.activeGraphCache = null;
     }
     @Input() set committedGraphInventory(value: GraphInventory | null | undefined) {
-        this.graphInventory.set(value ?? EMPTY_GRAPH_INVENTORY);
+        if (!this.graphSnapshotSignal()) this.graphInventory.set(value ?? EMPTY_GRAPH_INVENTORY);
         this.activeGraphCache = null;
     }
     @Input() set lensMode(value: GraphLensMode | null | undefined) {
@@ -1126,6 +1129,17 @@ export class GraphAtlasPreviewComponent implements OnInit {
             });
         }
         this.atlasModeChange.emit(this.atlasMode);
+    }
+
+    ngOnDestroy(): void {
+        this.unsubscribeColors();
+    }
+
+    private refreshGraphInventoryFromSnapshot(): void {
+        const snapshot = this.graphSnapshotSignal();
+        if (!snapshot) return;
+        this.graphInventory.set(buildGraphCanvasInventory(snapshot));
+        this.activeGraphCache = null;
     }
 
     setViewMode(mode: AtlasViewMode): void {
@@ -1503,10 +1517,6 @@ export class GraphAtlasPreviewComponent implements OnInit {
 
     toggleGuideFibers(): void {
         this.updateSettings({ guideFibersVisible: !this.settings.guideFibersVisible });
-    }
-
-    toggleGuideColorMode(): void {
-        this.updateSettings({ guideColorMode: this.settings.guideColorMode === 'sourceNode' ? 'auto' : 'sourceNode' });
     }
 
     isTransitLayout(mode: GalaxyLayoutMode | string | null | undefined = this.settings.layoutMode): boolean {

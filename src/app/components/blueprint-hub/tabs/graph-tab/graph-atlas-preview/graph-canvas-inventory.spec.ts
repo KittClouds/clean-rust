@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import type { GraphRebuildSnapshot } from '../../../../../graph-rebuild/graph-rebuild-snapshot';
+import { DEFAULT_GRAPH_NODE_COLORS, entityColorStore, hexColorToHsl } from '../../../../../lib/store/entityColorStore';
 import { filterGraphForCanvasLens } from './graph-canvas-interaction';
 import { buildGraphCanvasInventory } from './graph-canvas-inventory';
 
@@ -116,6 +117,58 @@ describe('graph canvas inventory', () => {
         expect(styleKey('temporal:1')).toBe('temporalFact');
         expect(styleKey('causal:1')).toBe('causalFact');
         expect(styleKey('memory:1')).toBe('decisionState');
+    });
+
+    it('keeps Graph mode tied to the embedding-target Style Lab contract', () => {
+        const next = snapshot();
+        next.embeddingTargets = [{
+            id: 'embed:graph-fact:rel-1',
+            kind: 'graphFact',
+            sourceId: 'rel-1',
+            label: 'Amara agrees',
+            text: 'approval relation promoted by the embedding target contract',
+            evidenceIds: ['evidence-1'],
+            styleKey: 'approval',
+            atlasFamily: 'fact',
+        } as any];
+        next.atlasPacket!.manifoldTargets.push({
+            id: 'embed:graph-fact:rel-1',
+            objectId: 'fact:rel-1',
+            family: 'fact',
+            admission: 'admitted',
+            status: 'compiledToGraph',
+            vectorStatus: 'modelVector',
+            coordinateSource: 'packet-row',
+            kind: 'graphFact',
+            label: 'Amara agrees',
+            sourceId: 'rel-1',
+            noteId: 'note-1',
+            chunkId: 'note-1:0',
+            evidenceIds: ['evidence-1'],
+            parentIds: [],
+        });
+
+        const inventory = buildGraphCanvasInventory(next);
+        const fact = inventory.nodes.find((node) => node.id === 'fact:rel-1');
+
+        expect(fact?.metadata?.['graphColorKind']).toBe('approval');
+        expect(fact?.metadata?.['styleKey']).toBe('approval');
+        expect(fact?.colorHsl).toBe(DEFAULT_GRAPH_NODE_COLORS.approval);
+    });
+
+    it('rebuilds graph chunk rows from the current Style Lab chunk swatch', () => {
+        const chunkHsl = hexColorToHsl('#1560c1');
+        const original = entityColorStore.getRawGraphNodeHsl('chunk');
+        entityColorStore.setGraphNodeColor('chunk', chunkHsl);
+        try {
+            const inventory = buildGraphCanvasInventory(snapshot());
+            const chunk = inventory.nodes.find((node) => node.id === 'chunk:note-1:0');
+
+            expect(chunk?.metadata?.['graphColorKind']).toBe('chunk');
+            expect(chunk?.colorHsl).toBe(chunkHsl);
+        } finally {
+            entityColorStore.setGraphNodeColor('chunk', original);
+        }
     });
 
     it('does not synthesize TS graph rows when the Rust packet is absent', () => {

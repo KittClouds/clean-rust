@@ -38,6 +38,8 @@ import { NliWorkerService } from '../../lib/services/nli-worker.service';
 import { AtlasCapabilityRuntimeService } from '../../services/atlas-capability-runtime.service';
 import { GraphRebuildPipelineService } from '../../graph-rebuild/graph-rebuild-pipeline.service';
 import { CalendarService } from '../../services/calendar.service';
+import { PhoenixBackendService } from '../../services/phoenix-backend.service';
+import { EmbeddingModelRegistry } from '../../lib/embeddings/models/ModelRegistry';
 import type {
   GraphIndexProjectionReceipt,
   GraphIndexModelReadiness,
@@ -220,6 +222,34 @@ interface Stage8RouterView {
   tone: CompilerTone;
 }
 
+type SemanticTruthReviewStatus = 'idle' | 'running' | 'ready' | 'error';
+
+interface SemanticTruthReviewLaneState {
+  status: SemanticTruthReviewStatus;
+  tone: CompilerTone;
+  modelId: string;
+  modelLabel: string;
+  dimensionLabel: string;
+  executionProvider: string;
+  candidateOnly: boolean;
+  committedTopologyWrites: number;
+  nodeCount: number;
+  edgeCount: number;
+  cacheHits: number;
+  cacheMisses: number;
+  deriveMs: number;
+  totalMs: number;
+  detail: string;
+  error?: string;
+}
+
+interface Stage8TruthReviewView extends SemanticTruthReviewLaneState {
+  cacheDetail: string;
+  timingDetail: string;
+  candidateDetail: string;
+  contractDetail: string;
+}
+
 interface Stage8LaneView {
   id: Stage8LaneId;
   label: string;
@@ -245,6 +275,7 @@ interface Stage8WorkbenchView {
   label: string;
   detail: string;
   router: Stage8RouterView;
+  truthReview: Stage8TruthReviewView;
   contract: GraphProjectionContractReport;
   lanes: Stage8LaneView[];
   reviewItems: Stage8ReviewItemView[];
@@ -263,6 +294,9 @@ const EMBEDDING_STAGE_LANES: Array<{ id: GraphRebuildSignalTargetLane; label: st
   { id: 'anchor_evidence', label: 'Anchor evidence' },
   { id: 'cooccurrence_weak', label: 'Co-occurrence' },
 ];
+
+const SEMANTIC_TRUTH_REVIEW_COMMAND = 'semantic:runEmbedderTruthReview';
+const SEMANTIC_TRUTH_REVIEW_EXECUTION_PROVIDER = 'directml';
 
 @Component({
   selector: 'app-search-panel',
@@ -319,6 +353,7 @@ export class SearchPanelComponent implements OnInit {
   private readonly atlasRuntime = inject(AtlasCapabilityRuntimeService);
   private readonly fullAtlasPipeline = inject(GraphRebuildPipelineService);
   private readonly calendar = inject(CalendarService);
+  private readonly phoenix = inject(PhoenixBackendService);
 
   readonly query = this.machine.query;
   readonly indexScope = this.machine.scope;
@@ -361,6 +396,8 @@ export class SearchPanelComponent implements OnInit {
   readonly linkSuggestionDecisions = signal<Record<string, 'accepted' | 'rejected'>>({});
   readonly activeCompilerQueue = signal<CompilerQueueId>('lanes');
   readonly compilerQueueDecisions = signal<Record<string, CompilerQueueDecision>>({});
+  readonly truthReviewLane = signal<SemanticTruthReviewLaneState>(semanticTruthReviewIdleState());
+  readonly truthReviewLaneBusy = computed(() => this.truthReviewLane().status === 'running');
 
   readonly laneOptions = RETRIEVAL_LANE_OPTIONS;
   readonly models = EMBEDDING_MODELS;
@@ -613,6 +650,7 @@ export class SearchPanelComponent implements OnInit {
       this.activeEmbeddingDimensionLabel(),
       this.vectorStatus(),
       this.dynamicNerLabel(),
+      this.truthReviewLane(),
       this.reviewClusters(),
       this.graphAwareLinkSuggestions(),
     )
@@ -913,6 +951,32 @@ export class SearchPanelComponent implements OnInit {
     }
   }
 
+  async runTruthReviewLane(): Promise<void> {
+    if (this.isTruthReviewLaneDisabled()) return;
+    this.error.set(null);
+    const started = performance.now();
+    const fallback = this.semanticTruthReviewFallback();
+    this.truthReviewLane.set(runningSemanticTruthReviewLaneState(fallback));
+    try {
+      const raw = await this.phoenix.storeCommand(
+        SEMANTIC_TRUTH_REVIEW_COMMAND,
+        this.semanticTruthReviewPayload(),
+      );
+      const elapsedMs = Math.round(performance.now() - started);
+      const state = normalizeSemanticTruthReviewResponse(raw, fallback, elapsedMs);
+      this.truthReviewLane.set(state);
+      this.notice.set(
+        `Truth review lane complete: ${formatCount(state.edgeCount)} candidate edges, `
+        + `${formatCount(state.cacheHits)} cache hits, 0 topology writes.`,
+      );
+    } catch (err) {
+      const elapsedMs = Math.round(performance.now() - started);
+      const message = this.toErrorMessage(err);
+      this.truthReviewLane.set(failedSemanticTruthReviewLaneState(fallback, message, elapsedMs));
+      this.error.set(message);
+    }
+  }
+
   isGraphBuildDisabled(): boolean {
     return this.fullAtlasBusy() || !this.graphModelsReady() || !this.hasRunnableBuildScope();
   }
@@ -921,6 +985,10 @@ export class SearchPanelComponent implements OnInit {
     return this.fullAtlasBusy() || !this.hasRunnableBuildScope()
       || this.vectorStatus() === 'loading'
       || this.vectorStatus() === 'indexing';
+  }
+
+  isTruthReviewLaneDisabled(): boolean {
+    return this.truthReviewLaneBusy() || this.fullAtlasBusy() || !this.hasRunnableBuildScope();
   }
 
   fullAtlasBuildButtonLabel(): string {
@@ -938,6 +1006,15 @@ export class SearchPanelComponent implements OnInit {
     if (this.vectorStatus() === 'indexing') return 'Embedding Atlas';
     if (!this.embeddingModelReady()) return 'Load Jina + Embed';
     return 'Embed Atlas';
+  }
+
+  truthReviewLaneButtonLabel(): string {
+    if (this.truthReviewLaneBusy()) return 'Reviewing';
+    if (!this.hasRunnableBuildScope()) return 'Pick Scope';
+    const status = this.truthReviewLane().status;
+    if (status === 'ready') return 'Refresh Review';
+    if (status === 'error') return 'Retry Review';
+    return 'Run Review';
   }
 
   async runEntitySuggestionStage(): Promise<void> {
@@ -1569,6 +1646,56 @@ export class SearchPanelComponent implements OnInit {
     };
   }
 
+  private semanticTruthReviewPayload(): Record<string, unknown> {
+    const graphScope = this.graphIndexScope();
+    const fallback = this.semanticTruthReviewFallback();
+    return {
+      laneMode: 'truth-review',
+      cachePolicy: 'persistent',
+      skipEvents: true,
+      skipChunks: true,
+      skipVectorIndex: true,
+      indexNodeVectors: false,
+      edgePreviewLimit: 8,
+      scope: this.semanticTruthReviewScopeKey(),
+      scopeHint: {
+        kind: graphScope.kind,
+        scopeId: graphScope.scopeId,
+        label: graphScope.label,
+        noteIds: graphScope.noteIds,
+      },
+      documentIds: graphScope.noteIds,
+      model: {
+        uiModelId: this.selectedModel(),
+        modelId: fallback.modelId,
+        modelLabel: fallback.modelLabel,
+        embeddingProfile: embeddingProfileFromDimensionLabel(fallback.dimensionLabel),
+        executionProvider: fallback.executionProvider,
+      },
+    };
+  }
+
+  private semanticTruthReviewFallback(): Pick<
+    SemanticTruthReviewLaneState,
+    'modelId' | 'modelLabel' | 'dimensionLabel' | 'executionProvider'
+  > {
+    const model = EmbeddingModelRegistry.getModel(this.selectedModel());
+    return {
+      modelId: model?.localModel?.modelId || this.selectedModel(),
+      modelLabel: this.currentModelLabel(),
+      dimensionLabel: this.activeEmbeddingDimensionLabel(),
+      executionProvider: SEMANTIC_TRUTH_REVIEW_EXECUTION_PROVIDER,
+    };
+  }
+
+  private semanticTruthReviewScopeKey(): Record<string, string> {
+    const scope = this.selectedBuildScope();
+    if (scope.mode === 'folder' && scope.folderId) {
+      return { folderId: scope.folderId, folderPath: scope.folderId };
+    }
+    return {};
+  }
+
   private graphIndexScope(): GraphIndexRunScope {
     const scope = this.selectedBuildScope();
     if (scope.mode === 'global') {
@@ -1897,6 +2024,7 @@ function buildStage8WorkbenchView(
   dimensionLabel: string,
   vectorStatus: string,
   dynamicNerStatus: string,
+  truthReview: SemanticTruthReviewLaneState,
   reviewClusters: ProductDiagnosticsReviewCluster[],
   graphLinks: GraphRebuildLinkSuggestion[],
 ): Stage8WorkbenchView {
@@ -1952,6 +2080,7 @@ function buildStage8WorkbenchView(
       timing: routerStage ? `${routerStage.durationMs.toLocaleString()} ms` : 'pending',
       tone: routerTone,
     },
+    truthReview: buildStage8TruthReviewView(truthReview, modelLabel, dimensionLabel),
     contract,
     lanes: [
       stage8Lane('identity', 'Identity', identityReviews, `${entityLinking?.sameEntity || 0} same / ${entityLinking?.ambiguous || 0} ambiguous`, identityReviews ? 'review' : 'quiet', 'identity'),
@@ -1966,6 +2095,108 @@ function buildStage8WorkbenchView(
     ],
     reviewItems: buildStage8ReviewItems(snapshot, reviewClusters, graphLinks),
     receipts: buildLastRunReceiptRows(receipt).slice(0, 4),
+  };
+}
+
+function semanticTruthReviewIdleState(): SemanticTruthReviewLaneState {
+  return {
+    status: 'idle',
+    tone: 'quiet',
+    modelId: '',
+    modelLabel: '',
+    dimensionLabel: '',
+    executionProvider: SEMANTIC_TRUTH_REVIEW_EXECUTION_PROVIDER,
+    candidateOnly: true,
+    committedTopologyWrites: 0,
+    nodeCount: 0,
+    edgeCount: 0,
+    cacheHits: 0,
+    cacheMisses: 0,
+    deriveMs: 0,
+    totalMs: 0,
+    detail: 'truth-review lane idle',
+  };
+}
+
+function runningSemanticTruthReviewLaneState(
+  fallback: Pick<SemanticTruthReviewLaneState, 'modelId' | 'modelLabel' | 'dimensionLabel' | 'executionProvider'>,
+): SemanticTruthReviewLaneState {
+  return {
+    ...semanticTruthReviewIdleState(),
+    ...fallback,
+    status: 'running',
+    tone: 'review',
+    detail: 'truth-review lane running',
+  };
+}
+
+function failedSemanticTruthReviewLaneState(
+  fallback: Pick<SemanticTruthReviewLaneState, 'modelId' | 'modelLabel' | 'dimensionLabel' | 'executionProvider'>,
+  message: string,
+  elapsedMs: number,
+): SemanticTruthReviewLaneState {
+  return {
+    ...semanticTruthReviewIdleState(),
+    ...fallback,
+    status: 'error',
+    tone: 'danger',
+    totalMs: elapsedMs,
+    detail: 'truth-review lane unavailable',
+    error: message,
+  };
+}
+
+function buildStage8TruthReviewView(
+  state: SemanticTruthReviewLaneState,
+  modelLabel: string,
+  dimensionLabel: string,
+): Stage8TruthReviewView {
+  const view = {
+    ...state,
+    modelLabel: state.modelLabel || modelLabel,
+    dimensionLabel: state.dimensionLabel || dimensionLabel,
+    executionProvider: state.executionProvider || SEMANTIC_TRUTH_REVIEW_EXECUTION_PROVIDER,
+  };
+  const cacheDetail = `${formatCount(view.cacheHits)} hits / ${formatCount(view.cacheMisses)} misses`;
+  const timingDetail = view.status === 'running'
+    ? 'running'
+    : `${formatDuration(view.deriveMs)} derive / ${formatDuration(view.totalMs)} total`;
+  const candidateDetail = view.candidateOnly
+    ? `${formatCount(view.nodeCount)} nodes / ${formatCount(view.edgeCount)} candidate edges`
+    : 'candidate-only contract missing';
+  const contractDetail = `${view.executionProvider} / persistent cache / `
+    + `${formatCount(view.committedTopologyWrites)} topology writes`;
+  return { ...view, cacheDetail, timingDetail, candidateDetail, contractDetail };
+}
+
+function normalizeSemanticTruthReviewResponse(
+  raw: unknown,
+  fallback: Pick<SemanticTruthReviewLaneState, 'modelId' | 'modelLabel' | 'dimensionLabel' | 'executionProvider'>,
+  elapsedMs: number,
+): SemanticTruthReviewLaneState {
+  const response = asRecord(raw);
+  const cache = asRecord(response['cache']);
+  const timings = asRecord(response['timings']);
+  const output = asRecord(response['output']);
+  const summary = asRecord(output['summary']);
+  const committedTopologyWrites = numericField(output, 0, 'committedTopologyWrites', 'committed_topology_writes');
+  const candidateOnly = booleanField(response, true, 'candidateOnly', 'candidate_only');
+  return {
+    status: candidateOnly && committedTopologyWrites === 0 ? 'ready' : 'error',
+    tone: candidateOnly && committedTopologyWrites === 0 ? 'ready' : 'danger',
+    modelId: stringField(response, fallback.modelId, 'modelId', 'model_id'),
+    modelLabel: fallback.modelLabel,
+    dimensionLabel: `${numericField(response, numericFromDimensionLabel(fallback.dimensionLabel), 'dimension')}d`,
+    executionProvider: stringField(response, fallback.executionProvider, 'executionProvider', 'execution_provider'),
+    candidateOnly,
+    committedTopologyWrites,
+    nodeCount: numericField(output, numericField(summary, 0, 'nodeCount', 'nodes'), 'candidateNodeCount', 'candidate_node_count'),
+    edgeCount: numericField(output, numericField(summary, 0, 'edgeCount', 'edges'), 'candidateEdgeCount', 'candidate_edge_count'),
+    cacheHits: numericField(cache, 0, 'hits'),
+    cacheMisses: numericField(cache, 0, 'misses'),
+    deriveMs: numericField(timings, 0, 'deriveMs', 'derive_ms'),
+    totalMs: numericField(timings, elapsedMs, 'totalMs', 'total_ms'),
+    detail: stringField(response, 'truth-review lane complete', 'message', 'detail'),
   };
 }
 
@@ -2448,6 +2679,46 @@ function queue(
 function counterValue(counters: Record<string, number> | undefined, key: string): number {
   const value = counters?.[key];
   return Number.isFinite(value) ? Number(value) : 0;
+}
+
+function asRecord(value: unknown): Record<string, unknown> {
+  return value && typeof value === 'object' && !Array.isArray(value)
+    ? value as Record<string, unknown>
+    : {};
+}
+
+function numericField(record: Record<string, unknown>, fallback: number, ...keys: string[]): number {
+  for (const key of keys) {
+    const value = Number(record[key]);
+    if (Number.isFinite(value)) return value;
+  }
+  return fallback;
+}
+
+function stringField(record: Record<string, unknown>, fallback: string, ...keys: string[]): string {
+  for (const key of keys) {
+    const value = record[key];
+    if (typeof value === 'string' && value.trim()) return value;
+  }
+  return fallback;
+}
+
+function booleanField(record: Record<string, unknown>, fallback: boolean, ...keys: string[]): boolean {
+  for (const key of keys) {
+    const value = record[key];
+    if (typeof value === 'boolean') return value;
+  }
+  return fallback;
+}
+
+function numericFromDimensionLabel(label: string): number {
+  const match = label.match(/\d+/);
+  return match ? Number(match[0]) : 0;
+}
+
+function embeddingProfileFromDimensionLabel(label: string): string {
+  const numeric = numericFromDimensionLabel(label);
+  return numeric > 0 ? String(numeric) : '768';
 }
 
 function zeroVisiblePostprocessLane(id: string): boolean {
