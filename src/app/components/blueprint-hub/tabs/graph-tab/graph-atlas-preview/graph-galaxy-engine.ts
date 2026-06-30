@@ -971,6 +971,7 @@ function embeddingEdgeRole(link: GalaxyEdge): 'local' | 'backbone' | 'bridge' | 
 }
 
 function embeddingLensMayRecolor(node: GalaxyNode): boolean {
+    if (isAtlasChunkRenderableNode(node.entity)) return false;
     return firstGraphNodeColorKind(
         stringValue(node.entity.metadata?.['graphColorKind']),
         stringValue(node.entity.metadata?.['graphKind']),
@@ -2213,6 +2214,8 @@ function normalizeRenderKind(kind: string): string {
 }
 
 export function resolveGalaxyNodeColorHsl(entity: GalaxyRenderableNode): string {
+    if (isAtlasChunkRenderableNode(entity)) return entityColorStore.getRawGraphNodeHsl('chunk');
+
     const metadata = entity.metadata || {};
     const structuralColorKind = firstGraphNodeColorKind(
         stringValue(metadata['styleKey']),
@@ -2239,6 +2242,53 @@ export function resolveGalaxyNodeColorHsl(entity: GalaxyRenderableNode): string 
     if (entityKind) return entityColorStore.getRawHsl(entityKind);
 
     return entity.colorHsl || entityColorStore.getRawHsl(entity.kind);
+}
+
+export function isAtlasChunkRenderableNode(entity: Pick<GalaxyRenderableNode, 'id' | 'kind' | 'metadata'>): boolean {
+    const metadata = entity.metadata || {};
+    const trace = chunkRecordValue(metadata['visualTrace']);
+    const directKind = firstGraphNodeColorKind(
+        stringValue(metadata['graphColorKind']),
+        stringValue(metadata['styleKey']),
+        stringValue(metadata['atlasKind']),
+        stringValue(metadata['sourceType']),
+        stringValue(metadata['graphKind']),
+        entity.kind,
+    );
+    if (directKind === 'chunk') return true;
+    return [
+        entity.id,
+        entity.kind,
+        stringValue(metadata['atlasDocumentUnitKind']),
+        stringValue(metadata['atlasStructuralRole']),
+        stringValue(metadata['signalLane']),
+        stringValue(metadata['signalStructuralRole']),
+        stringValue(metadata['productLaneKind']),
+        stringValue(metadata['atlasObjectId']),
+        stringValue(metadata['atlasTargetId']),
+        stringValue(metadata['visualSourceId']),
+        stringValue(trace['objectKind']),
+        stringValue(trace['targetKind']),
+        stringValue(trace['packetTargetId']),
+        stringValue(trace['packetObjectId']),
+    ].some(isChunkRenderToken);
+}
+
+function chunkRecordValue(value: unknown): Record<string, unknown> {
+    return value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : {};
+}
+
+function isChunkRenderToken(value: string): boolean {
+    const raw = value.trim().toLowerCase();
+    if (!raw) return false;
+    if (/^(embed|target|source)[:_]chunk[:_-]/.test(raw) || /^chunk[:_]/.test(raw)) return true;
+    const token = raw.replace(/[^a-z0-9]+/g, '');
+    return token === 'chunk'
+        || token === 'leaf'
+        || token === 'leafchunk'
+        || token === 'chunkatom'
+        || token === 'documentunit'
+        || token === 'documentchunk';
 }
 
 function firstGraphNodeColorKind(...values: Array<string | null | undefined>) {

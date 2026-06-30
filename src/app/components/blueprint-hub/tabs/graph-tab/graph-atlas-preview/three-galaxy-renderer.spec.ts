@@ -96,23 +96,57 @@ describe('ThreeGalaxyRenderer Style Lab node colors', () => {
         }
     });
 
-    it('does not recolor source-node Transit guides away from the Style Lab chunk color', () => {
-        const renderer = Object.create(ThreeGalaxyRenderer.prototype) as RendererColorHarness;
+    it('uses Transit guide colors even when sourceColor belongs to another node', () => {
+        const renderer = Object.create(ThreeGalaxyRenderer.prototype) as RendererColorHarness & { stableUnit: () => number };
+        renderer.stableUnit = () => 0;
         const expected = sceneWithStyleLabColor('#1560c1').expected;
-        const sourceColor = { r: expected.r, g: expected.g, b: expected.b };
-        const guide = {
+        const sourceColor = { r: 0.14, g: 0.78, b: 0.74 };
+        const laneGuide = {
             id: 'transit:backbone:lane:chunk',
             guideKind: 'rootLane',
+            level: 0,
+            color: { r: expected.r, g: expected.g, b: expected.b },
+            sourceColor,
+        };
+        const laneColors = new Float32Array(3);
+        const guide = {
+            id: 'transit:backbone:route:root-chunk',
+            guideKind: 'membership',
             level: 2,
-            color: { r: 0.1, g: 0.9, b: 0.85 },
+            color: { r: expected.r, g: expected.g, b: expected.b },
             sourceColor,
         };
         const colors = new Float32Array(3);
 
+        renderer.writeLorentzGuideColor(laneColors, 0, laneGuide, 0, 0, 'transit');
+        expect(laneColors[0]).toBeCloseTo(expected.r * 0.66, 6);
+        expect(laneColors[1]).toBeCloseTo(expected.g * 0.7, 6);
+        expect(laneColors[2]).toBeCloseTo(expected.b * 0.74, 6);
+
+        const laneTint = renderer.lorentzGuideTint(laneGuide, 0, 'transit');
+        expectRendererColor(new THREE.Color(laneTint.r, laneTint.g, laneTint.b), expected);
+
         renderer.writeLorentzGuideColor(colors, 0, guide, 0, 0.25, 'transit');
-        expectRendererColor(new THREE.Color(colors[0], colors[1], colors[2]), expected);
+        expect(colors[2]).toBeGreaterThan(colors[1]);
+        expect(colors[1]).toBeLessThan(sourceColor.g * 0.6);
 
         const tint = renderer.lorentzGuideTint(guide, 3, 'transit');
-        expectRendererColor(new THREE.Color(tint.r, tint.g, tint.b), expected);
+        expect(tint.b).toBeGreaterThan(tint.g);
+        expect(tint.g).toBeLessThan(sourceColor.g * 0.8);
+
+        const hubGuide = {
+            id: 'transit:plan:hub:kai',
+            guideKind: 'rootLane',
+            level: 2,
+            color: { r: 0.2, g: 0.2, b: 0.2 },
+            sourceColor,
+        };
+        const hubColors = new Float32Array(3);
+
+        renderer.writeLorentzGuideColor(hubColors, 0, hubGuide, 0, 0.25, 'transit');
+        expectRendererColor(new THREE.Color(hubColors[0], hubColors[1], hubColors[2]), new THREE.Color(sourceColor.r, sourceColor.g, sourceColor.b));
+
+        const hubTint = renderer.lorentzGuideTint(hubGuide, 3, 'transit');
+        expectRendererColor(new THREE.Color(hubTint.r, hubTint.g, hubTint.b), new THREE.Color(sourceColor.r, sourceColor.g, sourceColor.b));
     });
 });

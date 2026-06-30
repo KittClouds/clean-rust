@@ -1,6 +1,7 @@
 import { entityColorStore, normalizeGraphNodeColorKind } from '../../../../../lib/store/entityColorStore';
 import {
     hslToRgb,
+    isAtlasChunkRenderableNode,
     type GalaxyGroup,
     type GalaxyHopfRibbon,
     type GalaxyLayoutMode,
@@ -254,7 +255,9 @@ export function galaxySceneToV2(scene: GalaxyScene, sourceMode: GalaxySceneSourc
         hopfRoles,
         groups: scene.groups.map(groupView),
         hopfRibbons: attachSourceColors((scene.hopfRibbons ?? []).map(hopfRibbonView), ids, colors),
-        lorentzGuides: attachSourceColors((scene.lorentzGuides ?? []).map(lorentzGuideView), ids, colors),
+        lorentzGuides: attachSourceColors((scene.lorentzGuides ?? []).map(lorentzGuideView), ids, colors, {
+            skip: isTransitLaneOrRouteGuideView,
+        }),
         transitPlan: scene.transitPlan,
         relationControls: scene.relationControls?.map(relationControlView),
         busemannHorospheres: (scene.busemannHorospheres ?? []).map(busemannHorosphereView),
@@ -278,18 +281,23 @@ export function galaxySceneToV2(scene: GalaxyScene, sourceMode: GalaxySceneSourc
 
 /**
  * Resolves `sourceColor` from each guide/ribbon's `nodeIds[0]` against the
- * compiled node color buffer. Cheap O(n) pass at compile time only; the
- * renderer uses `sourceColor` as the guide color contract.
+ * compiled node color buffer. Transit lane/route guides already carry Style
+ * Lab colors, while per-station hub/stop guides still inherit node color.
  */
-function attachSourceColors<T extends { nodeIds: string[]; sourceColor?: { r: number; g: number; b: number } }>(
+function attachSourceColors<T extends { id?: string; treeId?: string; nodeIds: string[]; sourceColor?: { r: number; g: number; b: number } }>(
     views: T[],
     ids: string[],
     colors: Float32Array,
+    options: { skip?: (view: T) => boolean } = {},
 ): T[] {
     if (!views.length) return views;
     const indexById = new Map<string, number>();
     for (let index = 0; index < ids.length; index++) indexById.set(ids[index], index);
     for (const view of views) {
+        if (options.skip?.(view)) {
+            delete view.sourceColor;
+            continue;
+        }
         const sourceId = view.nodeIds[0];
         const index = sourceId ? indexById.get(sourceId) : undefined;
         if (index === undefined) continue;
@@ -297,6 +305,14 @@ function attachSourceColors<T extends { nodeIds: string[]; sourceColor?: { r: nu
         view.sourceColor = { r: colors[offset], g: colors[offset + 1], b: colors[offset + 2] };
     }
     return views;
+}
+
+function isTransitLaneOrRouteGuideView(view: { id?: string; treeId?: string }): boolean {
+    const id = String(view.id || '');
+    return id.startsWith('transit:backbone:lane:')
+        || id.startsWith('transit:backbone:route:')
+        || id.startsWith('transit:plan:lane:')
+        || id.startsWith('transit:plan:route:');
 }
 
 function relationControlView(control: GalaxyRelationControl): GalaxyRelationControlView {
@@ -461,6 +477,13 @@ function writePosition(buffer: Float32Array, index: number, x: number, y: number
 
 function writeColor(buffer: Float32Array, index: number, node: GalaxyNode): void {
     const offset = index * 3;
+    if (isAtlasChunkRenderableNode(node.entity)) {
+        const color = hslToRgb(entityColorStore.getRawGraphNodeHsl('chunk'));
+        buffer[offset] = color.r / 255;
+        buffer[offset + 1] = color.g / 255;
+        buffer[offset + 2] = color.b / 255;
+        return;
+    }
     buffer[offset] = node.r / 255;
     buffer[offset + 1] = node.g / 255;
     buffer[offset + 2] = node.b / 255;

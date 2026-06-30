@@ -106,15 +106,39 @@ describe('Graph galaxy Transit renderer contract', () => {
         entityColorStore.setGraphNodeColor('chunk', '0 100% 50%');
         try {
             const scene = buildGalaxyScene(packetNodes(), packetEdges(), mergeGalaxySettings({ layoutMode: 'productManifold' }));
+            const rendererScene = galaxySceneToV2(scene, 'embeddings');
             const chunk = scene.nodes.find((node) => node.entity.id === 'chunk');
             const chunkLane = scene.lorentzGuides.find((guide) => guide.id === 'transit:backbone:lane:chunk');
             const rootChunk = scene.lorentzGuides.find((guide) => guide.id === 'transit:backbone:route:root-chunk');
+            const rendererRootChunk = rendererScene.lorentzGuides.find((guide) => guide.id === 'transit:backbone:route:root-chunk');
 
             expect(chunk).toMatchObject({ r: 255, g: 0, b: 0 });
             expect(chunkLane).toMatchObject({ r: 255, g: 0, b: 0 });
             expect(rootChunk).toMatchObject({ r: 255, g: 0, b: 0 });
+            expect(rendererRootChunk?.color).toEqual({ r: 1, g: 0, b: 0 });
+            expect(rendererRootChunk?.sourceColor).toBeUndefined();
         } finally {
             entityColorStore.reset();
+        }
+    });
+
+    it('uses Style Lab graph-node colors for Transit plan lane guides', () => {
+        const originalAnchor = entityColorStore.getRawGraphNodeHsl('anchor');
+        const originalEvent = entityColorStore.getRawGraphNodeHsl('eventNode');
+        entityColorStore.setGraphNodeColor('anchor', '0 100% 50%');
+        entityColorStore.setGraphNodeColor('eventNode', '120 100% 50%');
+        try {
+            const scene = buildGalaxyScene(lanePacketNodes(), lanePacketEdges(), mergeGalaxySettings({ layoutMode: 'productManifold' }));
+            const rendererScene = galaxySceneToV2(scene, 'embeddings');
+            const guideById = new Map(rendererScene.lorentzGuides.map((guide) => [guide.id, guide]));
+
+            expect(guideById.get('transit:plan:lane:evidence')?.color).toEqual({ r: 1, g: 0, b: 0 });
+            expect(guideById.get('transit:plan:lane:event')?.color).toEqual({ r: 0, g: 1, b: 0 });
+            expect(guideById.get('transit:plan:lane:evidence')?.sourceColor).toBeUndefined();
+            expect(guideById.get('transit:plan:hub:kai')?.sourceColor).toEqual(rendererNodeColor(rendererScene, 'kai'));
+        } finally {
+            entityColorStore.setGraphNodeColor('anchor', originalAnchor);
+            entityColorStore.setGraphNodeColor('eventNode', originalEvent);
         }
     });
 
@@ -284,6 +308,17 @@ function axisSpan(scene: ReturnType<typeof galaxySceneToV2>, ids: string[], axis
         .filter((index) => index >= 0)
         .map((index) => scene.positions3d[index * 3 + axis]);
     return Math.max(...values) - Math.min(...values);
+}
+
+function rendererNodeColor(scene: ReturnType<typeof galaxySceneToV2>, nodeId: string): { r: number; g: number; b: number } | undefined {
+    const index = scene.ids.indexOf(nodeId);
+    if (index < 0) return undefined;
+    const offset = index * 3;
+    return {
+        r: scene.colors[offset],
+        g: scene.colors[offset + 1],
+        b: scene.colors[offset + 2],
+    };
 }
 
 function productNode(

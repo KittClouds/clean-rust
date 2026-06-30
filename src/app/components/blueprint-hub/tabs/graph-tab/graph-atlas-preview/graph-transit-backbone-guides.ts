@@ -1,6 +1,7 @@
 import type { GalaxyLorentzGuide } from './graph-galaxy-engine';
 import { rgbForKind } from './graph-galaxy-hierarchy-caps';
 import type { TransitLane, TransitPlan, TransitRoute, TransitStation } from './graph-transit-plan';
+import type { GraphNodeColorKind } from '../../../../../lib/store/entityColorStore';
 
 const BACKBONE_LANES = ['document', 'root', 'chunk'] as const;
 type BackboneLane = typeof BACKBONE_LANES[number];
@@ -21,10 +22,10 @@ const BACKBONE_LANE_Z: Record<BackboneLane, number> = {
     chunk: -0.34,
 };
 
-const BACKBONE_RGB: Record<BackboneLane, { r: number; g: number; b: number }> = {
-    document: { r: 255, g: 32, b: 34 },
-    root: { r: 255, g: 166, b: 36 },
-    chunk: { r: 230, g: 62, b: 0 },
+const BACKBONE_COLOR_KIND: Record<BackboneLane, GraphNodeColorKind> = {
+    document: 'document',
+    root: 'document',
+    chunk: 'chunk',
 };
 
 const PLAN_LANE_Y: Record<PlanLane, number> = {
@@ -53,17 +54,17 @@ const PLAN_LANE_Z: Record<PlanLane, number> = {
     proposed: 0.86,
 };
 
-const PLAN_RGB: Record<PlanLane, { r: number; g: number; b: number }> = {
-    evidence: { r: 150, g: 92, b: 255 },
-    identity: { r: 52, g: 190, b: 245 },
-    event: { r: 255, g: 226, b: 48 },
-    timeline: { r: 50, g: 180, b: 240 },
-    causal: { r: 255, g: 102, b: 110 },
-    state: { r: 0, g: 245, b: 78 },
-    context: { r: 238, g: 80, b: 166 },
-    discourse: { r: 214, g: 76, b: 255 },
-    review: { r: 255, g: 88, b: 144 },
-    proposed: { r: 255, g: 194, b: 64 },
+const PLAN_COLOR_KIND: Record<PlanLane, GraphNodeColorKind> = {
+    evidence: 'anchor',
+    identity: 'relationship',
+    event: 'eventNode',
+    timeline: 'temporalFact',
+    causal: 'causalFact',
+    state: 'memoryState',
+    context: 'serviceContext',
+    discourse: 'communication',
+    review: 'rankStatus',
+    proposed: 'rankStatus',
 };
 
 const BACKBONE_ROUTE_LIMIT = 96;
@@ -183,7 +184,11 @@ function backboneRouteGuide(route: TransitRoute, source: TransitStation, target:
 }
 
 function backboneColor(lane: BackboneLane): { r: number; g: number; b: number } {
-    return lane === 'chunk' ? rgbForKind('chunk') : BACKBONE_RGB[lane];
+    return rgbForKind(BACKBONE_COLOR_KIND[lane]);
+}
+
+function planColor(lane: PlanLane): { r: number; g: number; b: number } {
+    return rgbForKind(PLAN_COLOR_KIND[lane]);
 }
 
 function planLaneGuide(lane: PlanLane, stations: TransitStation[], totalStations: number): GalaxyLorentzGuide {
@@ -207,7 +212,7 @@ function planLaneGuide(lane: PlanLane, stations: TransitStation[], totalStations
         level: stations[0]?.stage ?? 0,
         guideKind: 'rootLane',
         guideWeight: 0.42 + Math.min(0.2, stations.length / Math.max(1, totalStations) * 0.5),
-        ...PLAN_RGB[lane],
+        ...planColor(lane),
     };
 }
 
@@ -235,7 +240,7 @@ function stationGlyphGuide(station: TransitStation, kind: 'stop' | 'hub', radius
         level: station.stage,
         guideKind: 'rootLane',
         guideWeight: kind === 'hub' ? 0.62 : 0.54,
-        ...PLAN_RGB[lane],
+        ...planColor(lane),
     };
 }
 
@@ -278,7 +283,7 @@ function routeGuide(route: TransitRoute, source: TransitStation, target: Transit
         level: Math.max(source.stage, target.stage),
         guideKind: 'membership',
         guideWeight: 0.5 + Math.min(0.24, Math.max(0, route.confidence) * 0.24),
-        ...PLAN_RGB[lane],
+        ...planColor(lane),
     };
 }
 

@@ -1965,16 +1965,16 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
     }
 
     private hopfRibbonTint(ribbon: GalaxyHopfRibbonView, index: number, surface: GuideSurface): { r: number; g: number; b: number } {
-        const sourceColor = this.guideSourceColor(ribbon);
+        const sourceColor = this.guideSourceColor(ribbon, surface);
         if (sourceColor) return sourceColor;
         const palette = this.hopfRibbonPalette(ribbon, index, 0.35, surface);
         return this.hslColor(palette.h, palette.s, palette.l);
     }
 
     private writeHopfRibbonColor(colors: Float32Array, offset: number, ribbon: GalaxyHopfRibbonView, index: number, phase: number, surface: GuideSurface): void {
-        const sourceColor = this.guideSourceColor(ribbon);
+        const sourceColor = this.guideSourceColor(ribbon, surface);
         if (sourceColor) {
-            // Source-node contract: emit the node color for every ribbon kind.
+            // Lane/route guides keep their own style color; per-node guides may inherit source color.
             colors[offset] = sourceColor.r;
             colors[offset + 1] = sourceColor.g;
             colors[offset + 2] = sourceColor.b;
@@ -2153,7 +2153,7 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
         surface: GuideSurface,
         focusScale = 1,
     ): void {
-        const sourceColor = this.guideSourceColor(guide);
+        const sourceColor = this.guideSourceColor(guide, surface);
         if (sourceColor) {
             colors[offset] = sourceColor.r;
             colors[offset + 1] = sourceColor.g;
@@ -2167,13 +2167,6 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
         colors[offset] = THREE.MathUtils.clamp(base.r * (0.58 + pulse + levelShade), 0, 0.78);
         colors[offset + 1] = THREE.MathUtils.clamp(base.g * (0.62 + pulse + levelShade), 0, 0.84);
         colors[offset + 2] = THREE.MathUtils.clamp(base.b * (0.66 + pulse + levelShade), 0, 0.86);
-        if (surface === 'transit') {
-            const root = guide.guideKind === 'rootLane';
-            const colorBlend = guide.guideKind === 'membership' ? 0.04 : root ? 0.18 : 0.3;
-            colors[offset] = THREE.MathUtils.lerp(colors[offset], root ? 0.22 : 0.16, colorBlend);
-            colors[offset + 1] = THREE.MathUtils.lerp(colors[offset + 1], root ? 0.72 : 0.56, colorBlend);
-            colors[offset + 2] = THREE.MathUtils.lerp(colors[offset + 2], root ? 0.96 : 0.88, colorBlend);
-        }
         if (guide.guideKind === 'wAxis') {
             colors[offset] = THREE.MathUtils.clamp(0.16 + index * 0.002, 0, 0.42);
             colors[offset + 1] = 0.74;
@@ -2186,12 +2179,21 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
         }
     }
 
-    private guideSourceColor(guide: { sourceColor?: { r: number; g: number; b: number } }): { r: number; g: number; b: number } | undefined {
+    private guideSourceColor(guide: { id?: string; sourceColor?: { r: number; g: number; b: number } }, surface: GuideSurface = 'default'): { r: number; g: number; b: number } | undefined {
+        if (surface === 'transit' && this.isTransitLaneOrRouteGuide(guide)) return undefined;
         return guide.sourceColor;
     }
 
+    private isTransitLaneOrRouteGuide(guide: { id?: string }): boolean {
+        const id = String(guide.id || '');
+        return id.startsWith('transit:backbone:lane:')
+            || id.startsWith('transit:backbone:route:')
+            || id.startsWith('transit:plan:lane:')
+            || id.startsWith('transit:plan:route:');
+    }
+
     private lorentzGuideTint(guide: GalaxyLorentzGuideView, index: number, surface: GuideSurface = 'default'): { r: number; g: number; b: number } {
-        const sourceColor = this.guideSourceColor(guide);
+        const sourceColor = this.guideSourceColor(guide, surface);
         if (sourceColor) return sourceColor;
         const tintBase = guide.color;
         const offset = this.stableUnit(`${guide.id}:${index}`) * 0.08;
@@ -2206,12 +2208,7 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
             g: 0.82,
             b: 0.94,
         };
-        const colorBlend = guide.guideKind === 'membership' ? 0.08 : guide.guideKind === 'rootLane' ? 0.16 : 0.3;
-        return {
-            r: THREE.MathUtils.lerp(tint.r, 0.18, colorBlend),
-            g: THREE.MathUtils.lerp(tint.g, 0.62, colorBlend),
-            b: THREE.MathUtils.lerp(tint.b, 0.92, colorBlend),
-        };
+        return tint;
     }
 
     private lorentzLayerOpacity(layer: string, guideKind: GalaxyLorentzGuideView['guideKind'] | undefined, treeKind = '', weight = 1, surface: GuideSurface = 'default'): number {

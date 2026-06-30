@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
     buildGalaxyScene,
+    isAtlasChunkRenderableNode,
     mergeGalaxySettings,
     resolveGalaxyNodeColorHsl,
     type GalaxyInputEdge,
@@ -347,6 +348,42 @@ describe('Graph galaxy canonical colors', () => {
 
             expect(resolveGalaxyNodeColorHsl(chunk)).toBe('0 100% 50%');
             expect(scene.nodes[0]).toMatchObject({ r: 255, g: 0, b: 0 });
+            expect([...v2.colors.slice(0, 3)]).toEqual([1, 0, 0]);
+        } finally {
+            entityColorStore.reset();
+        }
+    });
+
+    it('rebuilds Atlas chunk color from chunk identity when cached RGB is stale', () => {
+        entityColorStore.setGraphNodeColor('chunk', '0 100% 50%');
+        try {
+            const chunk: GalaxyRenderableNode = {
+                id: 'target:chunk:note-1:0',
+                label: 'Chunk 0',
+                kind: 'structure',
+                colorHsl: '176 70% 46%',
+                metadata: {
+                    sourceType: 'document-unit',
+                    productLaneKind: 'unknown-lane',
+                    visualTrace: {
+                        objectKind: 'leaf_chunk',
+                        targetKind: 'documentUnit',
+                        packetTargetId: 'target:chunk:note-1:0',
+                    },
+                },
+            };
+            const scene = buildGalaxyScene([chunk], [], mergeGalaxySettings({
+                layoutMode: 'productManifold',
+                embeddingTopologyMode: 'lanes',
+            }));
+            scene.nodes[0].r = 35;
+            scene.nodes[0].g = 199;
+            scene.nodes[0].b = 189;
+
+            const v2 = galaxySceneToV2(scene, 'embeddings');
+
+            expect(isAtlasChunkRenderableNode(chunk)).toBe(true);
+            expect(resolveGalaxyNodeColorHsl(chunk)).toBe('0 100% 50%');
             expect([...v2.colors.slice(0, 3)]).toEqual([1, 0, 0]);
         } finally {
             entityColorStore.reset();
