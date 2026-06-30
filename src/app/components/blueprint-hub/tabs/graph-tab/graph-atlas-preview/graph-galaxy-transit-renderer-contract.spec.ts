@@ -192,6 +192,23 @@ describe('Graph galaxy Transit renderer contract', () => {
         expect(rendererScene.lorentzGuides.some((guide) => guide.id.startsWith('transit:route:'))).toBe(false);
     });
 
+    it('keeps clustered Transit rails above the entity rail in graph and embedding views', () => {
+        const scene = buildGalaxyScene(lanePacketNodes(), lanePacketEdges(), mergeGalaxySettings({ layoutMode: 'productManifold' }));
+        const graphScene = galaxySceneToV2(scene, 'graph');
+        const embeddingScene = galaxySceneToV2(scene, 'embeddings');
+
+        for (const rendererScene of [graphScene, embeddingScene]) {
+            const identityY = laneGuideY(rendererScene, 'identity');
+
+            expect(laneGuideY(rendererScene, 'discourse')).toBeGreaterThan(identityY);
+            expect(laneGuideY(rendererScene, 'review')).toBeGreaterThan(identityY);
+            expect(laneGuideY(rendererScene, 'proposed')).toBeGreaterThan(identityY);
+            expect(nodeY(rendererScene, 'discourse')).toBeGreaterThan(nodeY(rendererScene, 'kai'));
+            expect(nodeY(rendererScene, 'review')).toBeGreaterThan(nodeY(rendererScene, 'kai'));
+            expect(nodeY(rendererScene, 'proposed')).toBeGreaterThan(nodeY(rendererScene, 'kai'));
+        }
+    });
+
     it('keeps packet chunk stations on their lane when they share a Transit stop', () => {
         const ids = ['chunk-a', 'chunk-b', 'chunk-c', 'chunk-d', 'chunk-e', 'chunk-f'];
         const scene = buildGalaxyScene(
@@ -308,6 +325,17 @@ function axisSpan(scene: ReturnType<typeof galaxySceneToV2>, ids: string[], axis
         .filter((index) => index >= 0)
         .map((index) => scene.positions3d[index * 3 + axis]);
     return Math.max(...values) - Math.min(...values);
+}
+
+function laneGuideY(scene: ReturnType<typeof galaxySceneToV2>, lane: string): number {
+    const guide = scene.lorentzGuides.find((item) => item.id === `transit:plan:lane:${lane}`);
+    if (!guide) return Number.NEGATIVE_INFINITY;
+    return guide.positions3d[1];
+}
+
+function nodeY(scene: ReturnType<typeof galaxySceneToV2>, id: string): number {
+    const index = scene.ids.indexOf(id);
+    return index >= 0 ? scene.positions3d[index * 3 + 1] : Number.NEGATIVE_INFINITY;
 }
 
 function rendererNodeColor(scene: ReturnType<typeof galaxySceneToV2>, nodeId: string): { r: number; g: number; b: number } | undefined {

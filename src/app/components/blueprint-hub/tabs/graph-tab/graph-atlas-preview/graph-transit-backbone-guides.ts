@@ -30,28 +30,28 @@ const BACKBONE_COLOR_KIND: Record<BackboneLane, GraphNodeColorKind> = {
 
 const PLAN_LANE_Y: Record<PlanLane, number> = {
     evidence: 0.08,
-    identity: -0.2,
-    event: -0.5,
-    timeline: -0.76,
-    causal: -1,
+    discourse: -0.04,
+    review: -0.11,
+    proposed: -0.18,
+    identity: -0.32,
+    event: -0.58,
+    timeline: -0.84,
+    causal: -1.08,
     state: 0.92,
     context: 0.66,
-    discourse: -1.22,
-    review: -1.42,
-    proposed: -1.62,
 };
 
 const PLAN_LANE_Z: Record<PlanLane, number> = {
     evidence: -0.2,
-    identity: -0.04,
-    event: 0.16,
-    timeline: 0.32,
-    causal: 0.48,
+    discourse: -0.12,
+    review: -0.06,
+    proposed: 0,
+    identity: 0.08,
+    event: 0.22,
+    timeline: 0.38,
+    causal: 0.54,
     state: 0.72,
     context: 0.88,
-    discourse: 0.62,
-    review: 0.74,
-    proposed: 0.86,
 };
 
 const PLAN_COLOR_KIND: Record<PlanLane, GraphNodeColorKind> = {
