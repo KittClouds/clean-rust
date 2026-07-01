@@ -55,6 +55,7 @@ import { buildGraphAtlasReadContext, graphLensState, type GraphAtlasReadContext 
 import { projectionSummaryRequestsRefresh } from './graph-atlas-refresh-summary';
 import { getSetting, setSetting } from '../../../../../lib/dexie/settings.service';
 import { buildGraphCanvasInventory } from './graph-canvas-inventory';
+import { graphProjectionParityApplies, graphProjectionParitySlice } from './graph-projection-parity';
 
 export interface AtlasPreviewEdge extends GalaxyInputEdge {}
 
@@ -1866,6 +1867,23 @@ export class GraphAtlasPreviewComponent implements OnInit, OnDestroy {
         }
 
         if (this.atlasMode === 'graph') {
+            const projectionAtlas = this.graphModeProjectionAtlas();
+            if (projectionAtlas) {
+                const projectionSlice = graphProjectionParitySlice(projectionAtlas, canvasLens, graphKindFilter);
+                this.activeGraphCache = {
+                    mode: this.atlasMode,
+                    entities: this.entities,
+                    edges: this.edges,
+                    atlas,
+                    trace,
+                    graphInventory,
+                    graphKindFilter,
+                    canvasLens,
+                    nodes: projectionSlice.nodes,
+                    graphEdges: projectionSlice.edges,
+                };
+                return this.activeGraphCache;
+            }
             const lensSlice = filterGraphForCanvasLens(graphInventory.nodes, graphInventory.edges, canvasLens);
             const allowed = graphKindFilter === 'all' ? null : new Set(
                 lensSlice.nodes.filter((node) => normalizeGraphKind(node.kind) === graphKindFilter).map((node) => node.id),
@@ -1904,6 +1922,11 @@ export class GraphAtlasPreviewComponent implements OnInit, OnDestroy {
             graphEdges: trace ? [...trace.edges, ...embeddingEdges] : embeddingEdges,
         };
         return this.activeGraphCache;
+    }
+
+    private graphModeProjectionAtlas(): EmbeddingAtlasData | null {
+        if (!graphProjectionParityApplies(this.settings.layoutMode, this.manifoldMode())) return null;
+        return this.graphRebuildEmbeddingAtlas();
     }
 
     private embeddingNodesWithEntityAnchors(): GalaxyRenderableNode[] {
