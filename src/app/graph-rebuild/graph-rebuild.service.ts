@@ -45,6 +45,7 @@ import {
     GRAPH_ATLAS_PACKET_AUTHORITY,
 } from './graph-atlas-packet';
 import { buildGraphRebuildSnapshot } from './graph-rebuild-builder';
+import { applyNativeChunkSemanticBridgeCandidates } from './graph-rebuild-derived-facts';
 import { finalizeGraphRebuildSnapshot } from './graph-snapshot-finalizer';
 import {
     buildGraphSnapshotSourceEvidence,
@@ -80,6 +81,7 @@ import type {
     GraphBuildDurabilityMode,
     GraphRebuildBuildTimings,
     GraphRebuildChunk,
+    GraphRebuildChunkSemanticBridge,
     GraphRebuildContentBlobField,
     GraphRebuildContentManifest,
     GraphRebuildEmbeddingTarget,
@@ -187,6 +189,25 @@ interface NativeAtlasSeed {
     atlasPacket: GraphAtlasPacket;
     embeddingTargets: GraphRebuildEmbeddingTarget[];
     originatingFamilies: NativeEmbeddingTargetOriginCount[];
+}
+
+interface NativeChunkSemanticBridgeQualityGate {
+    total: number;
+    accepted: number;
+    demotedSameEntityOnly: number;
+}
+
+interface NativeChunkSemanticBridgeTiming {
+    bridgeBuildMicros: number;
+    totalMicros: number;
+}
+
+interface NativeChunkSemanticBridgeOutput {
+    schemaVersion: 'phoenix-chunk-semantic-bridge-native-output/v1';
+    source: 'rust';
+    candidates: GraphRebuildChunkSemanticBridge[];
+    qualityGate: NativeChunkSemanticBridgeQualityGate;
+    timing: NativeChunkSemanticBridgeTiming;
 }
 
 interface CompressedNativeAtlasSeedPayload {
@@ -402,6 +423,7 @@ export class GraphRebuildService {
             });
             recordGraphCollapseSnapshotBoundary(snapshot, 'typescript_snapshot');
             snapshot = await this.reconcileDocumentGraphMutations(snapshot);
+            await this.attachNativeChunkSemanticBridges(snapshot, noteTexts, timings);
             const interactivePacketAttached = durabilityMode === 'interactive'
                 && attachInteractiveAtlasPacketForSnapshotTargets(
                     snapshot,
@@ -477,6 +499,36 @@ export class GraphRebuildService {
             return snapshot;
         } finally {
             if (commitsPrimarySnapshot) this.buildingState.set(false);
+        }
+    }
+
+    private async attachNativeChunkSemanticBridges(
+        snapshot: GraphRebuildSnapshot,
+        noteTexts: Record<string, string>,
+        timings?: GraphRebuildBuildTimings,
+    ): Promise<void> {
+        const started = performance.now();
+        try {
+            if (this.phoenix.target !== 'native') {
+                applyNativeChunkSemanticBridgeCandidates(snapshot, []);
+                if (timings) timings.nativeChunkSemanticBridgeSkipped = 1;
+                return;
+            }
+            const native = await this.phoenix.storeCommand('graphRebuild:chunkSemanticBridges', {
+                snapshot: graphRebuildSnapshotToNativeChunkBridgePayload(snapshot),
+                documents: snapshot.noteIds.map((noteId) => ({ noteId, text: noteTexts[noteId] || '' })),
+            }) as NativeChunkSemanticBridgeOutput | null;
+            if (!isNativeChunkSemanticBridgeOutput(native)) {
+                throw new Error('Rust chunk semantic bridge command returned an invalid v1 payload.');
+            }
+            applyNativeChunkSemanticBridgeCandidates(snapshot, native.candidates);
+            if (timings) {
+                timings.nativeChunkSemanticBridgeCandidates = native.candidates.length;
+                timings.nativeChunkSemanticBridgeQualityDemotions = native.qualityGate.demotedSameEntityOnly;
+                timings.nativeChunkSemanticBridgeRustMicros = native.timing.bridgeBuildMicros;
+            }
+        } finally {
+            if (timings) timings.nativeChunkSemanticBridgeMs = elapsedMs(started);
         }
     }
 
@@ -1105,6 +1157,8 @@ export function graphRebuildSnapshotToNativeCompilerPayload(snapshot: GraphRebui
         relationships: snapshot.relationships,
         events: snapshot.events,
         episodes: [],
+        chunkSemanticBridges: [],
+        episodeConnections: [],
         temporalEdges: snapshot.temporalEdges,
         causalEdges: snapshot.causalEdges,
         memoryState: snapshot.memoryState,
@@ -1120,6 +1174,45 @@ export function graphRebuildSnapshotToNativeCompilerPayload(snapshot: GraphRebui
         discourseSpineSummary: nativeCompilerDiscourseSpineSummary(snapshot),
         counters: snapshot.counters,
     };
+}
+
+export function graphRebuildSnapshotToNativeChunkBridgePayload(snapshot: GraphRebuildSnapshot): GraphRebuildSnapshot {
+    return {
+        schemaVersion: snapshot.schemaVersion,
+        id: snapshot.id,
+        source: snapshot.source,
+        scopeKind: snapshot.scopeKind,
+        scopeId: snapshot.scopeId,
+        noteIds: snapshot.noteIds,
+        builtAt: snapshot.builtAt,
+        chunks: snapshot.chunks,
+        mentions: [],
+        entityAnchors: snapshot.entityAnchors,
+        relationships: [],
+        events: snapshot.events,
+        episodes: snapshot.episodes,
+        chunkSemanticBridges: [],
+        episodeConnections: [],
+        temporalEdges: snapshot.temporalEdges,
+        causalEdges: snapshot.causalEdges,
+        memoryState: [],
+        embeddingTargets: [],
+        embeddingVectors: [],
+        projectionRefs: [],
+        nodes: snapshot.nodes,
+        edges: [],
+        counters: snapshot.counters,
+    };
+}
+
+function isNativeChunkSemanticBridgeOutput(
+    value: NativeChunkSemanticBridgeOutput | null | undefined,
+): value is NativeChunkSemanticBridgeOutput {
+    return value?.schemaVersion === 'phoenix-chunk-semantic-bridge-native-output/v1'
+        && value.source === 'rust'
+        && Array.isArray(value.candidates)
+        && !!value.qualityGate
+        && !!value.timing;
 }
 
 function nativeCompilerDocumentReviewSummary(
@@ -1479,7 +1572,7 @@ function atlasObjectForTarget(
 function atlasFamilyForTarget(target: GraphRebuildEmbeddingTarget): GraphAtlasFamily {
     const kind = normalizeTargetKind(target.kind);
     if (kind === 'entity') return 'registry';
-    if (kind === 'note' || kind === 'chunk' || kind === 'structureroot' || kind === 'documentunit') return 'structure';
+    if (kind === 'note' || kind === 'chunk' || kind === 'episode' || kind === 'structureroot' || kind === 'documentunit') return 'structure';
     if (kind === 'anchor' || kind === 'evidencespan') return 'evidence';
     if (kind === 'temporalfact') return 'temporal';
     if (kind === 'causalfact') return 'causal';
@@ -1494,7 +1587,7 @@ function nativeTargetHasCommittedSource(
 ): boolean {
     const kind = normalizeTargetKind(target.kind);
     const lane = target.lane || inferredNativeTargetLane(kind);
-    if (kind === 'note' || kind === 'chunk' || kind === 'structureroot' || kind === 'documentunit') return true;
+    if (kind === 'note' || kind === 'chunk' || kind === 'episode' || kind === 'structureroot' || kind === 'documentunit') return true;
     if (lane === 'entity_anchor' || kind === 'entity') {
         return committed.entities.has(target.entityId || target.sourceId);
     }
@@ -1546,6 +1639,7 @@ function targetReferencesAny(target: GraphRebuildEmbeddingTarget, allowed: Set<s
 }
 
 function inferredNativeTargetLane(kind: string): string {
+    if (kind === 'episode') return 'document_spine';
     if (kind === 'entity') return 'entity_anchor';
     if (kind === 'anchor' || kind === 'evidencespan') return 'anchor_evidence';
     if (kind === 'graphfact') return 'relationship_fact';
@@ -1897,6 +1991,7 @@ export interface GraphRebuildContentBlobEntry {
     field: GraphRebuildContentBlobField;
     documentKey: string;
     payload: string;
+    payloadStats: GraphRebuildSnapshotDocumentPayloadStats;
     ref: NonNullable<GraphRebuildContentManifest['refs'][GraphRebuildContentBlobField]>;
 }
 
@@ -1976,12 +2071,12 @@ export function graphRebuildSnapshotContentBlobEntries(
             hash,
             value,
         };
-        const encoded = encodeGraphRebuildJsonPayload(payload, CONTENT_BLOB_SCHEMA_VERSION);
-        const stats = graphRebuildSnapshotDocumentPayloadStats(encoded);
+        const encoded = encodeGraphRebuildJsonPayloadWithStats(payload, CONTENT_BLOB_SCHEMA_VERSION);
         entries.push({
             field,
             documentKey,
-            payload: encoded,
+            payload: encoded.payload,
+            payloadStats: encoded.stats,
             ref: {
                 schemaVersion: 'phoenix-graph-rebuild-content-blob-ref/v1',
                 field,
@@ -1989,8 +2084,8 @@ export function graphRebuildSnapshotContentBlobEntries(
                 documentKey,
                 sourceSchemaVersion: snapshotContentBlobSourceSchemaVersion(field, value),
                 rawChars: raw.length,
-                payloadChars: encoded.length,
-                compressedBytes: stats.compressedBytes,
+                payloadChars: encoded.payload.length,
+                compressedBytes: encoded.stats.compressedBytes,
                 itemCount: snapshotContentBlobItemCount(value),
                 createdAt,
             },
@@ -2012,6 +2107,9 @@ export function graphRebuildSnapshotPersistenceView(
     persisted.entityAnchors = [];
     persisted.relationships = [];
     persisted.events = [];
+    persisted.episodes = [];
+    persisted.chunkSemanticBridges = [];
+    persisted.episodeConnections = [];
     persisted.temporalEdges = [];
     persisted.causalEdges = [];
     persisted.memoryState = [];
@@ -2072,8 +2170,15 @@ function encodeGraphRebuildSnapshotPayload(snapshot: GraphRebuildSnapshot): stri
 }
 
 function encodeGraphRebuildJsonPayload(value: unknown, sourceSchemaVersion: string): string {
+    return encodeGraphRebuildJsonPayloadWithStats(value, sourceSchemaVersion).payload;
+}
+
+function encodeGraphRebuildJsonPayloadWithStats(
+    value: unknown,
+    sourceSchemaVersion: string,
+): { payload: string; stats: GraphRebuildSnapshotDocumentPayloadStats } {
     const raw = JSON.stringify(value);
-    if (raw.length < SNAPSHOT_COMPRESSION_MIN_CHARS) return raw;
+    if (raw.length < SNAPSHOT_COMPRESSION_MIN_CHARS) return rawGraphRebuildPayload(raw);
     try {
         const compressed = gzipSync(strToU8(raw), { level: 1 });
         const payload = bytesToBase64(compressed);
@@ -2086,10 +2191,35 @@ function encodeGraphRebuildJsonPayload(value: unknown, sourceSchemaVersion: stri
             payload,
         };
         const encoded = JSON.stringify(envelope);
-        return encoded.length < raw.length ? encoded : raw;
+        return encoded.length < raw.length
+            ? {
+                payload: encoded,
+                stats: {
+                    rawChars: raw.length,
+                    compressedBytes: compressed.byteLength,
+                    savedChars: Math.max(0, raw.length - encoded.length),
+                    ratioPct: raw.length > 0 ? Math.round((encoded.length / raw.length) * 100) : 100,
+                },
+            }
+            : rawGraphRebuildPayload(raw);
     } catch {
-        return raw;
+        return rawGraphRebuildPayload(raw);
     }
+}
+
+function rawGraphRebuildPayload(payload: string): {
+    payload: string;
+    stats: GraphRebuildSnapshotDocumentPayloadStats;
+} {
+    return {
+        payload,
+        stats: {
+            rawChars: payload.length,
+            compressedBytes: payload.length,
+            savedChars: 0,
+            ratioPct: 100,
+        },
+    };
 }
 
 function decodeGraphRebuildSnapshotPayload(payload: string): GraphRebuildSnapshot | null {
@@ -2288,7 +2418,7 @@ function graphRebuildContentBlobPayloadCounters(entries: GraphRebuildContentBlob
     let rawChars = 0;
     let compressedBytes = 0;
     for (const entry of entries) {
-        const stats = graphRebuildSnapshotDocumentPayloadStats(entry.payload);
+        const stats = entry.payloadStats;
         rawChars += stats.rawChars;
         compressedBytes += stats.compressedBytes;
         counters[`snapshotContentBlob.${entry.field}.payloadChars`] = entry.ref.payloadChars;
@@ -2412,6 +2542,11 @@ function emptyBuildTimings(): GraphRebuildBuildTimings {
         documentSemanticMs: 0,
         snapshotBuildMs: 0,
         stateCommitMs: 0,
+        nativeChunkSemanticBridgeMs: 0,
+        nativeChunkSemanticBridgeSkipped: 0,
+        nativeChunkSemanticBridgeCandidates: 0,
+        nativeChunkSemanticBridgeQualityDemotions: 0,
+        nativeChunkSemanticBridgeRustMicros: 0,
         nativeCompilerMs: 0,
         nativeCompilerSkipped: 0,
         nativeCompilerInputBytesByFamily: {},
@@ -2520,6 +2655,9 @@ function snapshotContentBlobValue(
                 entityAnchors: snapshot.entityAnchors,
                 relationships: snapshot.relationships,
                 events: snapshot.events,
+                episodes: snapshot.episodes,
+                chunkSemanticBridges: snapshot.chunkSemanticBridges,
+                episodeConnections: snapshot.episodeConnections,
                 temporalEdges: snapshot.temporalEdges,
                 causalEdges: snapshot.causalEdges,
                 memoryState: snapshot.memoryState,

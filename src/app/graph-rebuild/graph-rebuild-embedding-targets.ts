@@ -5,6 +5,8 @@ import type {
     GraphRebuildEmbeddingTarget,
     GraphRebuildEmbeddingTargetPlan,
     GraphRebuildEntityAnchor,
+    GraphRebuildEpisode,
+    GraphRebuildEpisodeConnection,
     GraphRebuildEvent,
     GraphRebuildMemoryState,
     GraphRebuildNode,
@@ -36,6 +38,8 @@ export function buildGraphRebuildEmbeddingTargetPlan(
     nodes: GraphRebuildNode[],
     relationships: GraphRebuildRelationship[],
     events: GraphRebuildEvent[],
+    episodes: GraphRebuildEpisode[],
+    _episodeConnections: GraphRebuildEpisodeConnection[],
     temporalEdges: GraphRebuildTemporalEdge[],
     causalEdges: GraphRebuildCausalEdge[],
     memoryState: GraphRebuildMemoryState[],
@@ -47,6 +51,7 @@ export function buildGraphRebuildEmbeddingTargetPlan(
     const anchorsByEntityId = groupAnchorsByEntity(anchors);
     const anchorsByChunkId = groupAnchorsByChunk(anchors);
     const eventById = new Map(events.map((event) => [event.id, event]));
+    const episodeByEventId = groupEpisodesByEvent(episodes);
     const noteIds = input.noteIds?.length ? input.noteIds : unique([...chunks.map((chunk) => chunk.noteId), ...anchors.map((anchor) => anchor.noteId)]);
     for (const noteId of noteIds) targets.push({
         id: `embed:note:${noteId}`,
@@ -84,6 +89,17 @@ export function buildGraphRebuildEmbeddingTargetPlan(
         text: chunkText(input, chunk, anchorsByChunkId.get(chunk.id) || [], nodeByEntityId),
         evidenceIds: [],
         parentIds: [structureRootId(chunk.noteId, 'document-structure')],
+    });
+    for (const episode of episodes) targets.push({
+        id: episodeTargetId(episode.id),
+        kind: 'episode',
+        sourceId: episode.id,
+        noteId: episode.noteId,
+        ...folderFields(input, episode.noteId),
+        label: episode.label,
+        text: episodeText(input, episode, eventById, nodeByEntityId, anchorById),
+        evidenceIds: episodeEvidenceIds(episode, eventById),
+        parentIds: [structureRootId(episode.noteId, 'document-structure')],
     });
     for (const node of nodes) {
         const entityAnchors = anchorsByEntityId.get(node.entityId) || [];
@@ -140,7 +156,7 @@ export function buildGraphRebuildEmbeddingTargetPlan(
         label: event.label,
         text: eventText(input, event, nodeByEntityId, anchorById),
         evidenceIds: event.evidenceAnchorIds,
-        parentIds: eventParentIds(event),
+        parentIds: eventParentIds(event, episodeByEventId),
     });
     for (const edge of temporalEdges) targets.push(temporalTarget(input, edge, 'temporalFact', eventById, anchorById));
     for (const edge of causalEdges) targets.push(temporalTarget(input, edge, 'causalFact', eventById, anchorById));
@@ -190,6 +206,8 @@ export function buildGraphRebuildEmbeddingTargets(
         nodes,
         relationships,
         events,
+        [],
+        [],
         temporalEdges,
         causalEdges,
         memoryState,
@@ -451,6 +469,34 @@ function eventText(
     ].filter(Boolean).join('\n'), 1800);
 }
 
+function episodeText(
+    input: BuildGraphRebuildSnapshotInput,
+    episode: GraphRebuildEpisode,
+    eventById: Map<string, GraphRebuildEvent>,
+    nodeByEntityId: Map<string, GraphRebuildNode>,
+    anchorById: Map<string, GraphRebuildEntityAnchor>,
+): string {
+    const events = episode.eventIds
+        .map((eventId) => eventById.get(eventId))
+        .filter((event): event is GraphRebuildEvent => !!event);
+    const entitySummary = episode.entityIds
+        .map((entityId) => entityLabel(entityId, nodeByEntityId))
+        .slice(0, 16)
+        .join(', ');
+    const eventSummary = events
+        .map((event) => event.label)
+        .slice(0, 8)
+        .join(' | ');
+    const evidenceIds = unique(events.flatMap((event) => event.evidenceAnchorIds));
+    return limitText([
+        `episode:${episode.label}`,
+        `event_count:${events.length}`,
+        entitySummary ? `entities:${entitySummary}` : '',
+        eventSummary ? `events:${eventSummary}` : '',
+        ...evidenceContexts(input, evidenceIds, anchorById, 4).map((context) => `evidence_context:${context}`),
+    ].filter(Boolean).join('\n'), 2200);
+}
+
 function memoryText(
     input: BuildGraphRebuildSnapshotInput,
     state: GraphRebuildMemoryState,
@@ -511,8 +557,27 @@ function groupAnchorsByChunk(anchors: GraphRebuildEntityAnchor[]): Map<string, G
     return groups;
 }
 
+function groupEpisodesByEvent(episodes: GraphRebuildEpisode[]): Map<string, GraphRebuildEpisode> {
+    const out = new Map<string, GraphRebuildEpisode>();
+    for (const episode of episodes) {
+        for (const eventId of episode.eventIds) out.set(eventId, episode);
+    }
+    return out;
+}
+
 function structureRootId(noteId: string, key: StructuralRootKey): string {
     return `embed:structure-root:${noteId}:${key}`;
+}
+
+function episodeTargetId(episodeId: string): string {
+    return `embed:episode:${episodeId}`;
+}
+
+function episodeEvidenceIds(
+    episode: GraphRebuildEpisode,
+    eventById: Map<string, GraphRebuildEvent>,
+): string[] {
+    return unique(episode.eventIds.flatMap((eventId) => eventById.get(eventId)?.evidenceAnchorIds || []));
 }
 
 function entityParentIds(anchors: GraphRebuildEntityAnchor[]): string[] {
@@ -536,8 +601,13 @@ function relationshipParentIds(
     ]);
 }
 
-function eventParentIds(event: GraphRebuildEvent): string[] {
+function eventParentIds(
+    event: GraphRebuildEvent,
+    episodeByEventId: Map<string, GraphRebuildEpisode>,
+): string[] {
+    const episode = episodeByEventId.get(event.id);
     return unique([
+        ...(episode ? [episodeTargetId(episode.id)] : []),
         structureRootId(event.noteId, 'temporal'),
         ...(event.chunkId ? [`embed:chunk:${event.chunkId}`] : []),
         ...event.entityIds.map((entityId) => `embed:entity:${entityId}`),

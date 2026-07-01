@@ -2,6 +2,8 @@ import type { RegisteredEntity } from '../lib/registry';
 import type {
     BuildGraphRebuildSnapshotInput,
     GraphRebuildChunk,
+    GraphRebuildChunkSemanticBridge,
+    GraphRebuildChunkSemanticBridgeType,
     GraphRebuildDropReasons,
     GraphRebuildEdge,
     GraphRebuildEntityAnchor,
@@ -128,6 +130,8 @@ export function buildGraphRebuildSnapshot(input: BuildGraphRebuildSnapshotInput)
         nodes,
         relationships,
         derived.events,
+        derived.episodes,
+        derived.episodeConnections,
         derived.temporalEdges,
         derived.causalEdges,
         derived.memoryState,
@@ -181,6 +185,8 @@ export function buildGraphRebuildSnapshot(input: BuildGraphRebuildSnapshotInput)
         relationships,
         events: derived.events,
         episodes: derived.episodes,
+        chunkSemanticBridges: derived.chunkSemanticBridges,
+        episodeConnections: derived.episodeConnections,
         temporalEdges: derived.temporalEdges,
         causalEdges: derived.causalEdges,
         memoryState: derived.memoryState,
@@ -222,6 +228,19 @@ export function buildGraphRebuildSnapshot(input: BuildGraphRebuildSnapshotInput)
             rejectedRelationships,
             events: derived.events.length,
             episodes: derived.episodes.length,
+            chunkSemanticBridges: derived.chunkSemanticBridges.length,
+            chunkSetupPayoffBridges: countChunkSemanticBridges(derived.chunkSemanticBridges, 'setup_payoff'),
+            chunkCauseEffectBridges: countChunkSemanticBridges(derived.chunkSemanticBridges, 'cause_effect'),
+            chunkStateDeltaBridges: countChunkSemanticBridges(derived.chunkSemanticBridges, 'state_delta'),
+            chunkRelationshipDeltaBridges: countChunkSemanticBridges(derived.chunkSemanticBridges, 'relationship_delta'),
+            chunkTopicContinuationBridges: countChunkSemanticBridges(derived.chunkSemanticBridges, 'topic_continuation'),
+            chunkEvidenceReframeBridges: countChunkSemanticBridges(derived.chunkSemanticBridges, 'evidence_reframe'),
+            chunkMotifEchoBridges: countChunkSemanticBridges(derived.chunkSemanticBridges, 'motif_echo'),
+            chunkRouteContinuityBridges: countChunkSemanticBridges(derived.chunkSemanticBridges, 'route_continuity'),
+            episodeConnections: derived.episodeConnections.length,
+            episodeTemporalConnections: derived.episodeConnections.filter((connection) => connection.kind === 'episode_temporal').length,
+            episodeCausalConnections: derived.episodeConnections.filter((connection) => connection.kind === 'episode_causal').length,
+            episodeWormholeConnections: derived.episodeConnections.filter((connection) => connection.kind === 'episode_wormhole').length,
             temporalEdges: derived.temporalEdges.length,
             causalEdges: derived.causalEdges.length,
             memoryState: derived.memoryState.length,
@@ -533,6 +552,13 @@ function planLaneCandidates(
     lane: GraphRebuildSignalTargetLane,
 ): number {
     return plan.lanes.find((row) => row.lane === lane)?.candidates || 0;
+}
+
+function countChunkSemanticBridges(
+    bridges: GraphRebuildChunkSemanticBridge[],
+    bridgeType: GraphRebuildChunkSemanticBridgeType,
+): number {
+    return bridges.filter((bridge) => bridge.bridgeType === bridgeType).length;
 }
 
 function buildNodes(anchors: GraphRebuildEntityAnchor[], entitiesById: Map<string, RegisteredEntity>): GraphRebuildNode[] {

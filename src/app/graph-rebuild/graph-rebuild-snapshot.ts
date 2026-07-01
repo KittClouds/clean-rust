@@ -188,6 +188,80 @@ export interface GraphRebuildEpisode {
     label: string;
 }
 
+export type GraphRebuildChunkSemanticBridgeType =
+    | 'setup_payoff'
+    | 'cause_effect'
+    | 'state_delta'
+    | 'relationship_delta'
+    | 'topic_continuation'
+    | 'evidence_reframe'
+    | 'motif_echo'
+    | 'route_continuity';
+
+export const GRAPH_REBUILD_CHUNK_SEMANTIC_BRIDGE_SCHEMA_VERSION = 'phoenix-chunk-semantic-bridge/v1' as const;
+export const GRAPH_REBUILD_CHUNK_SEMANTIC_BRIDGE_COMMIT_POLICY = 'no_topology_commit' as const;
+export const GRAPH_REBUILD_CHUNK_SEMANTIC_BRIDGE_NO_TOPOLOGY_COMMIT =
+    'chunk_semantic_bridge_candidate:no_topology_commit' as const;
+
+export type GraphRebuildChunkSemanticBridgeSchemaVersion =
+    typeof GRAPH_REBUILD_CHUNK_SEMANTIC_BRIDGE_SCHEMA_VERSION;
+
+export type GraphRebuildChunkSemanticBridgeCommitPolicy =
+    typeof GRAPH_REBUILD_CHUNK_SEMANTIC_BRIDGE_COMMIT_POLICY;
+
+export type GraphRebuildChunkSemanticBridgeStatus =
+    | 'candidate'
+    | 'overlay_only';
+
+export interface GraphRebuildChunkSemanticBridge {
+    schemaVersion: GraphRebuildChunkSemanticBridgeSchemaVersion;
+    id: string;
+    bridgeType: GraphRebuildChunkSemanticBridgeType;
+    sourceChunkId: string;
+    targetChunkId: string;
+    sourceEventId?: string;
+    targetEventId?: string;
+    sourceEpisodeId?: string;
+    targetEpisodeId?: string;
+    claim: string;
+    evidenceIds: string[];
+    supportingEntityIds: string[];
+    confidence: number;
+    status: GraphRebuildChunkSemanticBridgeStatus;
+    commitPolicy: GraphRebuildChunkSemanticBridgeCommitPolicy;
+    semanticVerbs: string[];
+    sourceCue?: string;
+    targetCue?: string;
+    rationale: string[];
+}
+
+export type GraphRebuildEpisodeConnectionKind =
+    | 'episode_temporal'
+    | 'episode_causal'
+    | 'episode_wormhole';
+
+export type GraphRebuildEpisodeConnectionStatus =
+    | 'derived'
+    | 'overlay_only';
+
+export interface GraphRebuildEpisodeConnection {
+    id: string;
+    kind: GraphRebuildEpisodeConnectionKind;
+    sourceEpisodeId: string;
+    targetEpisodeId: string;
+    relationType: string;
+    eventEdgeIds: string[];
+    chunkBridgeIds?: string[];
+    bridgeType?: GraphRebuildChunkSemanticBridgeType;
+    claim?: string;
+    evidenceIds: string[];
+    sharedEntityIds: string[];
+    confidence: number;
+    status: GraphRebuildEpisodeConnectionStatus;
+    semanticVerbs?: string[];
+    rationale: string[];
+}
+
 export interface GraphRebuildTemporalEdge {
     id: string;
     sourceId: string;
@@ -1968,6 +2042,19 @@ export interface GraphRebuildCounters {
     rejectedRelationships: number;
     events: number;
     episodes: number;
+    chunkSemanticBridges?: number;
+    chunkSetupPayoffBridges?: number;
+    chunkCauseEffectBridges?: number;
+    chunkStateDeltaBridges?: number;
+    chunkRelationshipDeltaBridges?: number;
+    chunkTopicContinuationBridges?: number;
+    chunkEvidenceReframeBridges?: number;
+    chunkMotifEchoBridges?: number;
+    chunkRouteContinuityBridges?: number;
+    episodeConnections?: number;
+    episodeTemporalConnections?: number;
+    episodeCausalConnections?: number;
+    episodeWormholeConnections?: number;
     temporalEdges: number;
     causalEdges: number;
     memoryState: number;
@@ -2220,6 +2307,11 @@ export interface GraphRebuildBuildTimings {
     documentSemanticMs?: number;
     snapshotBuildMs: number;
     stateCommitMs: number;
+    nativeChunkSemanticBridgeMs?: number;
+    nativeChunkSemanticBridgeSkipped?: number;
+    nativeChunkSemanticBridgeCandidates?: number;
+    nativeChunkSemanticBridgeQualityDemotions?: number;
+    nativeChunkSemanticBridgeRustMicros?: number;
     nativeCompilerMs?: number;
     nativeCompilerSkipped?: number;
     nativeCompilerInputBytesByFamily?: Record<string, number>;
@@ -2346,6 +2438,8 @@ export interface GraphRebuildSnapshot {
     relationships: GraphRebuildRelationship[];
     events: GraphRebuildEvent[];
     episodes: GraphRebuildEpisode[];
+    chunkSemanticBridges?: GraphRebuildChunkSemanticBridge[];
+    episodeConnections?: GraphRebuildEpisodeConnection[];
     temporalEdges: GraphRebuildTemporalEdge[];
     causalEdges: GraphRebuildCausalEdge[];
     memoryState: GraphRebuildMemoryState[];

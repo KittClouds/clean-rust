@@ -29,6 +29,8 @@ describe('graph rebuild hypergraph embedding targets', () => {
             [],
             [],
             [],
+            [],
+            [],
             { hyperedges: [valid, conflicted, missingFrame] } as GraphDocumentCompilerSummary,
         );
 
@@ -64,6 +66,8 @@ describe('graph rebuild hypergraph embedding targets', () => {
             [],
             [],
             [entityNode('entity-kai'), entityNode('entity-hazel')],
+            [],
+            [],
             [],
             [],
             [],

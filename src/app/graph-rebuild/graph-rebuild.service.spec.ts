@@ -1258,7 +1258,7 @@ function snapshotAtlasPacket(snapshot: GraphRebuildSnapshot): NonNullable<GraphR
 
 function atlasFamily(kind: string): NonNullable<GraphRebuildSnapshot['atlasPacket']>['objects'][number]['family'] {
     if (kind === 'entity') return 'registry';
-    if (kind === 'note' || kind === 'chunk' || kind === 'structureRoot' || kind === 'documentUnit') return 'structure';
+    if (kind === 'note' || kind === 'chunk' || kind === 'episode' || kind === 'structureRoot' || kind === 'documentUnit') return 'structure';
     if (kind === 'anchor' || kind === 'evidenceSpan') return 'evidence';
     if (kind === 'temporalFact') return 'temporal';
     if (kind === 'causalFact') return 'causal';

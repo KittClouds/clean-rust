@@ -357,7 +357,7 @@ function atlasPacket(snapshot: GraphRebuildSnapshot): NonNullable<GraphRebuildSn
 
 function family(kind: string): 'registry' | 'structure' | 'fact' | 'evidence' | 'temporal' | 'causal' | 'memory' | 'unknown' {
     if (kind === 'entity') return 'registry';
-    if (kind === 'note' || kind === 'chunk' || kind === 'structureRoot' || kind === 'documentUnit') return 'structure';
+    if (kind === 'note' || kind === 'chunk' || kind === 'episode' || kind === 'structureRoot' || kind === 'documentUnit') return 'structure';
     if (kind === 'anchor' || kind === 'evidenceSpan') return 'evidence';
     if (kind === 'temporalFact') return 'temporal';
     if (kind === 'causalFact') return 'causal';

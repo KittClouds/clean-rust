@@ -176,6 +176,7 @@ function targetLane(target: GraphRebuildEmbeddingTarget): GraphRebuildSignalTarg
     if (kind === 'note') return 'document_spine';
     if (kind === 'structureroot') return structureRootLane(target);
     if (kind === 'chunk') return 'chunk_spine';
+    if (kind === 'episode') return 'document_spine';
     if (kind === 'entity') return 'entity_anchor';
     if (kind === 'anchor') return 'anchor_evidence';
     if (kind === 'concept') return 'entity_linker';
@@ -198,7 +199,7 @@ function targetStructuralRole(
 ): GraphRebuildEmbeddingTarget['structuralRole'] {
     if (isStructureRoot(target)) return 'root';
     switch (lane) {
-        case 'document_spine': return 'root';
+        case 'document_spine': return normalizeKind(target.kind) === 'episode' ? 'spine' : 'root';
         case 'chunk_spine': return 'spine';
         case 'entity_anchor': return 'child';
         case 'relationship_fact':
@@ -348,6 +349,7 @@ function coverageWeight(target: GraphRebuildEmbeddingTarget): number {
     if (kind === 'note') return 980;
     if (kind === 'structureroot') return 970;
     if (kind === 'chunk') return 960;
+    if (kind === 'episode') return 950;
     if (kind === 'causalfact') return 940;
     if (kind === 'temporalfact') return 930;
     if (kind === 'event') return 910;
@@ -375,6 +377,7 @@ function targetScore(target: GraphRebuildEmbeddingTarget): number {
         kind === 'causalfact' ? 830 :
         kind === 'temporalfact' ? 810 :
         kind === 'event' ? 780 :
+        kind === 'episode' ? 760 :
         kind === 'memorystate' ? 720 :
         kind === 'note' ? 680 :
         kind === 'chunk' ? 620 :

@@ -81,15 +81,23 @@ import type {
     GraphRebuildCounters,
     GraphRebuildSnapshot,
 } from './graph-rebuild-snapshot';
+import {
+    GRAPH_REBUILD_CHUNK_SEMANTIC_BRIDGE_COMMIT_POLICY,
+    GRAPH_REBUILD_CHUNK_SEMANTIC_BRIDGE_NO_TOPOLOGY_COMMIT,
+    GRAPH_REBUILD_CHUNK_SEMANTIC_BRIDGE_SCHEMA_VERSION,
+} from './graph-rebuild-snapshot';
 import { buildGraphAtlasTaxonomyAudit } from './graph-atlas-taxonomy-audit';
+import { auditChunkSemanticBridgeFalsePositives } from './graph-rebuild-chunk-semantic-bridge-audit';
 import { buildGraphPacketRowAdapter } from '../components/blueprint-hub/tabs/graph-tab/graph-atlas-preview/graph-packet-row-adapter';
 
 const SHOULD_RUN = process.env['GRAPH_BUILD_BASELINE'] === '1';
 const ZEROSHOT_OUTPUT_URL = new URL('../../../target/graph-build-baselines/zero-shot-shortrun.json', import.meta.url);
 const TAXONOMY_AUDIT_OUTPUT_URL = new URL('../../../target/graph-build-baselines/atlas-taxonomy-audit-shortrun.json', import.meta.url);
+const CHUNK_BRIDGE_GOLDEN_URL = new URL('./fixtures/chunk-semantic-bridge-shortrun-golden.json', import.meta.url);
 const SHORTRUN_URL = new URL('../../../docs/shortrun.md', import.meta.url);
 const ZEROSHOT_OUTPUT_PATH = fileURLToPath(ZEROSHOT_OUTPUT_URL);
 const TAXONOMY_AUDIT_OUTPUT_PATH = fileURLToPath(TAXONOMY_AUDIT_OUTPUT_URL);
+const CHUNK_BRIDGE_GOLDEN_PATH = fileURLToPath(CHUNK_BRIDGE_GOLDEN_URL);
 const SHORTRUN_PATH = fileURLToPath(SHORTRUN_URL);
 const SHOULD_WRITE_TAXONOMY_AUDIT = process.env['GRAPH_BUILD_TAXONOMY_AUDIT'] === '1';
 
@@ -133,6 +141,7 @@ describeBaseline('product graph build gate', () => {
     });
 
     itZeroShot('writes the shortrun zero-shot graph build report', async () => {
+        backend.target = 'native';
         const request = graphRunRequest();
         const started = performance.now();
         const graph = await pipeline.buildGraph(request);
@@ -159,6 +168,8 @@ describeBaseline('product graph build gate', () => {
         expect(report.modelCalls.capabilityCalls).not.toContain('semanticAtlas');
         expect(report.finalSnapshot.counters.embeddingVectors).toBe(0);
         expect(report.totals.scopedDocumentUpserts).toBeLessThanOrEqual(12);
+        expectChunkBridgeGolden(report.finalSnapshot.chunkSemanticBridges);
+        expect(report.finalSnapshot.chunkSemanticBridges.falsePositiveAudit.sameEntityOnlySuspectCount).toBe(0);
         if (SHOULD_WRITE_TAXONOMY_AUDIT) {
             expect(report.finalSnapshot.atlasPacket?.objectCount).toBeGreaterThan(0);
             expect(report.finalSnapshot.atlasPacket?.targetCount).toBeGreaterThan(0);
@@ -503,6 +514,8 @@ function snapshotReport(snapshot: GraphRebuildSnapshot) {
         builtAt: snapshot.builtAt,
         counters: pickCounters(snapshot.counters),
         buildTimings: snapshot.buildTimings || {},
+        chunkSemanticBridges: chunkSemanticBridgeReport(snapshot),
+        episodeConnections: episodeConnectionReport(snapshot),
         atlasPacket: snapshot.atlasPacket
             ? {
                 scopeId: snapshot.atlasPacket.scopeId,
@@ -530,6 +543,20 @@ function pickCounters(counters: GraphRebuildCounters): Record<string, number> {
         'acceptedRelationships',
         'reviewRelationships',
         'events',
+        'episodes',
+        'chunkSemanticBridges',
+        'chunkSetupPayoffBridges',
+        'chunkCauseEffectBridges',
+        'chunkStateDeltaBridges',
+        'chunkRelationshipDeltaBridges',
+        'chunkTopicContinuationBridges',
+        'chunkEvidenceReframeBridges',
+        'chunkMotifEchoBridges',
+        'chunkRouteContinuityBridges',
+        'episodeConnections',
+        'episodeTemporalConnections',
+        'episodeCausalConnections',
+        'episodeWormholeConnections',
         'temporalEdges',
         'causalEdges',
         'memoryState',
@@ -543,6 +570,143 @@ function pickCounters(counters: GraphRebuildCounters): Record<string, number> {
         'entityLinkSuggestions',
     ];
     return Object.fromEntries(keys.map((key) => [key, Number(counters[key] || 0)]));
+}
+
+function chunkSemanticBridgeReport(snapshot: GraphRebuildSnapshot) {
+    const chunks = new Map((snapshot.chunks || []).map((chunk) => [chunk.id, chunk]));
+    const entityLabels = new Map((snapshot.nodes || []).map((node) => [node.entityId, node.label]));
+    const byType = new Map<string, number>();
+    for (const bridge of snapshot.chunkSemanticBridges || []) {
+        byType.set(bridge.bridgeType, (byType.get(bridge.bridgeType) || 0) + 1);
+    }
+    return {
+        schemaVersion: GRAPH_REBUILD_CHUNK_SEMANTIC_BRIDGE_SCHEMA_VERSION,
+        commitPolicy: GRAPH_REBUILD_CHUNK_SEMANTIC_BRIDGE_COMMIT_POLICY,
+        noTopologyCommitGuard: GRAPH_REBUILD_CHUNK_SEMANTIC_BRIDGE_NO_TOPOLOGY_COMMIT,
+        contract: {
+            requiredFields: [
+                'schemaVersion',
+                'id',
+                'bridgeType',
+                'sourceChunkId',
+                'targetChunkId',
+                'claim',
+                'evidenceIds',
+                'supportingEntityIds',
+                'confidence',
+                'status',
+                'commitPolicy',
+                'semanticVerbs',
+                'rationale',
+            ],
+            optionalFields: ['sourceEventId', 'targetEventId', 'sourceEpisodeId', 'targetEpisodeId', 'sourceCue', 'targetCue'],
+            candidateOnly: true,
+        },
+        total: snapshot.chunkSemanticBridges?.length || 0,
+        byType: Object.fromEntries([...byType.entries()].sort(([left], [right]) => left.localeCompare(right))),
+        falsePositiveAudit: auditChunkSemanticBridgeFalsePositives(snapshot.chunkSemanticBridges || []),
+        samples: sampleChunkSemanticBridges(snapshot.chunkSemanticBridges || []).map((bridge) => ({
+            schemaVersion: bridge.schemaVersion,
+            id: bridge.id,
+            bridgeType: bridge.bridgeType,
+            status: bridge.status,
+            commitPolicy: bridge.commitPolicy,
+            confidence: Number(bridge.confidence.toFixed(3)),
+            sourceChunkId: bridge.sourceChunkId,
+            sourceChunkLabel: chunkLabel(chunks.get(bridge.sourceChunkId)),
+            targetChunkId: bridge.targetChunkId,
+            targetChunkLabel: chunkLabel(chunks.get(bridge.targetChunkId)),
+            sourceEventId: bridge.sourceEventId,
+            targetEventId: bridge.targetEventId,
+            sourceEpisodeId: bridge.sourceEpisodeId,
+            targetEpisodeId: bridge.targetEpisodeId,
+            claim: bridge.claim,
+            semanticVerbs: bridge.semanticVerbs,
+            sourceCue: bridge.sourceCue,
+            targetCue: bridge.targetCue,
+            supportingEntityIds: bridge.supportingEntityIds,
+            supportingEntityLabels: bridge.supportingEntityIds.map((entityId) => entityLabels.get(entityId) || entityId),
+            evidenceIds: bridge.evidenceIds.slice(0, 8),
+            rationale: bridge.rationale,
+        })),
+    };
+}
+
+function sampleChunkSemanticBridges(
+    bridges: NonNullable<GraphRebuildSnapshot['chunkSemanticBridges']>,
+) {
+    const byType = new Map<string, typeof bridges>();
+    for (const bridge of bridges) {
+        byType.set(bridge.bridgeType, [...(byType.get(bridge.bridgeType) || []), bridge]);
+    }
+    const out: typeof bridges = [];
+    for (const rows of [...byType.entries()].sort(([left], [right]) => left.localeCompare(right)).map((entry) => entry[1])) {
+        out.push(...rows.slice(0, 4));
+    }
+    const seen = new Set(out.map((bridge) => bridge.id));
+    for (const bridge of bridges) {
+        if (out.length >= 32) break;
+        if (seen.has(bridge.id)) continue;
+        seen.add(bridge.id);
+        out.push(bridge);
+    }
+    return out.slice(0, 32);
+}
+
+function expectChunkBridgeGolden(report: ReturnType<typeof chunkSemanticBridgeReport>) {
+    const golden = JSON.parse(readFileSync(CHUNK_BRIDGE_GOLDEN_PATH, 'utf8'));
+    expect(report.schemaVersion).toBe(golden.bridgeContract.schemaVersion);
+    expect(report.commitPolicy).toBe(golden.bridgeContract.commitPolicy);
+    expect(report.noTopologyCommitGuard).toBe(golden.bridgeContract.noTopologyCommitGuard);
+    expect(report.total).toBe(golden.counts.total);
+    expect(report.byType).toEqual(golden.counts.byType);
+    for (const expected of golden.samples) {
+        const actual = report.samples.find((sample) => sample.id === expected.id);
+        expect(actual).toMatchObject(expected);
+    }
+}
+
+function episodeConnectionReport(snapshot: GraphRebuildSnapshot) {
+    const episodes = new Map((snapshot.episodes || []).map((episode) => [episode.id, episode]));
+    const entityLabels = new Map((snapshot.nodes || []).map((node) => [node.entityId, node.label]));
+    const byKind = new Map<string, number>();
+    for (const connection of snapshot.episodeConnections || []) {
+        byKind.set(connection.kind, (byKind.get(connection.kind) || 0) + 1);
+    }
+    return {
+        total: snapshot.episodeConnections?.length || 0,
+        byKind: Object.fromEntries([...byKind.entries()].sort(([left], [right]) => left.localeCompare(right))),
+        episodes: (snapshot.episodes || []).map((episode) => ({
+            id: episode.id,
+            label: episode.label,
+            eventCount: episode.eventIds.length,
+            entityLabels: episode.entityIds.map((entityId) => entityLabels.get(entityId) || entityId).slice(0, 18),
+        })),
+        samples: (snapshot.episodeConnections || []).slice(0, 24).map((connection) => ({
+            id: connection.id,
+            kind: connection.kind,
+            status: connection.status,
+            relationType: connection.relationType,
+            sourceEpisodeId: connection.sourceEpisodeId,
+            sourceEpisodeLabel: episodes.get(connection.sourceEpisodeId)?.label || connection.sourceEpisodeId,
+            targetEpisodeId: connection.targetEpisodeId,
+            targetEpisodeLabel: episodes.get(connection.targetEpisodeId)?.label || connection.targetEpisodeId,
+            confidence: Number(connection.confidence.toFixed(3)),
+            eventEdgeCount: connection.eventEdgeIds.length,
+            chunkBridgeIds: connection.chunkBridgeIds || [],
+            bridgeType: connection.bridgeType,
+            claim: connection.claim,
+            semanticVerbs: connection.semanticVerbs || [],
+            sharedEntityIds: connection.sharedEntityIds,
+            sharedEntityLabels: connection.sharedEntityIds.map((entityId) => entityLabels.get(entityId) || entityId),
+            evidenceIds: connection.evidenceIds.slice(0, 8),
+            rationale: connection.rationale,
+        })),
+    };
+}
+
+function chunkLabel(chunk: GraphRebuildSnapshot['chunks'][number] | undefined): string {
+    return chunk ? `Chunk ${chunk.ordinal + 1}` : '';
 }
 
 function shortrunNote(text: string) {
@@ -883,6 +1047,9 @@ function createBackendHarness() {
         target: SHOULD_WRITE_TAXONOMY_AUDIT ? 'native' : 'web',
         storeCommand: vi.fn(async (command: string, payload: unknown) => {
             commands.push({ command, requestChars: JSON.stringify(payload || {}).length });
+            if (command === 'graphRebuild:chunkSemanticBridges') {
+                return compileNativeChunkBridgeSidecar(payload);
+            }
             if (SHOULD_WRITE_TAXONOMY_AUDIT && command === 'graphRebuild:compileDualWrite') {
                 return compileNativeAuditSidecar(payload);
             }
@@ -920,6 +1087,33 @@ function compileNativeAuditSidecar(payload: unknown): unknown {
     if (result.error) throw result.error;
     if (result.status !== 0) {
         throw new Error(result.stderr || `native audit sidecar exited ${result.status}`);
+    }
+    return JSON.parse(result.stdout);
+}
+
+function compileNativeChunkBridgeSidecar(payload: unknown): unknown {
+    const result = spawnSync('cargo', [
+        'run',
+        '--quiet',
+        '--manifest-path',
+        'rust-native/phoenix/Cargo.toml',
+        '-p',
+        'phoenix-graph-rebuild',
+        '--example',
+        'chunk_bridge_from_snapshot',
+    ], {
+        cwd: process.cwd(),
+        env: {
+            ...process.env,
+            CARGO_TARGET_DIR: process.env['CARGO_TARGET_DIR'] || 'D:\\phoenix-target-overgraph',
+        },
+        input: JSON.stringify(payload || {}),
+        encoding: 'utf8',
+        maxBuffer: 64 * 1024 * 1024,
+    });
+    if (result.error) throw result.error;
+    if (result.status !== 0) {
+        throw new Error(result.stderr || `native chunk bridge sidecar exited ${result.status}`);
     }
     return JSON.parse(result.stdout);
 }

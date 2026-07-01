@@ -3,6 +3,7 @@ use std::hash::{Hash, Hasher};
 use std::io::{Read, Write};
 use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
+use std::time::Instant;
 
 use crate::document_index_read::{read_document_index, DesktopDocumentIndexReadRequest};
 use crate::graph_galaxy::{compile_scene, DesktopGalaxyScene, DesktopGalaxySceneRequest};
@@ -17,10 +18,14 @@ use crate::tts::{
 use base64::{engine::general_purpose::STANDARD as BASE64_STANDARD, Engine as _};
 use flate2::{read::GzDecoder, write::GzEncoder, Compression};
 use phoenix_graph_rebuild::{
-    build_atlas_packet, build_chunks, build_document_semantic_summary,
-    build_snapshot_embedding_target_report, classify_document_profiles, compile_legacy_snapshot,
-    AtlasPacket, Chunk, ChunkerConfig, DocumentProfileRequest, DocumentSemanticRequest,
-    GraphEmbeddingTarget, GraphEmbeddingTargetOriginCount, GraphRebuildSnapshot,
+    assert_chunk_semantic_bridge_candidate_only, audit_chunk_semantic_bridge_quality_gate,
+    build_atlas_packet, build_chunk_semantic_bridge_candidates_from_snapshot, build_chunks,
+    build_document_semantic_summary, build_snapshot_embedding_target_report,
+    classify_document_profiles, compile_legacy_snapshot, promote_chunk_semantic_bridge_candidates,
+    AtlasPacket, Chunk, ChunkSemanticBridgeCandidate, ChunkSemanticBridgePromotionChunk,
+    ChunkSemanticBridgePromotionInput, ChunkSemanticBridgeSnapshotDocument, ChunkerConfig,
+    DocumentProfileRequest, DocumentSemanticRequest, GraphEmbeddingTarget,
+    GraphEmbeddingTargetOriginCount, GraphRebuildSnapshot,
 };
 use phoenix_hyperbolic::lorentz_tree::{
     HyperboloidPoint, LorentzForest, LorentzForestIndex, LorentzNode, LorentzQueryMode,
@@ -77,6 +82,44 @@ struct DocumentChunkRange {
     start: usize,
     end: usize,
     ordinal: usize,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct ChunkSemanticBridgeRequest {
+    snapshot: GraphRebuildSnapshot,
+    documents: Vec<DocumentChunkInput>,
+}
+
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct ChunkSemanticBridgeTiming {
+    bridge_build_micros: u128,
+    total_micros: u128,
+}
+
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct ChunkSemanticBridgeResponse {
+    schema_version: &'static str,
+    source: &'static str,
+    candidates: Vec<ChunkSemanticBridgeCandidate>,
+    quality_gate: phoenix_graph_rebuild::BridgeQualityGateAudit,
+    timing: ChunkSemanticBridgeTiming,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct ChunkSemanticBridgePromotionRequest {
+    candidates: Vec<ChunkSemanticBridgeCandidate>,
+    chunks: Vec<ChunkSemanticBridgePromotionChunkInput>,
+    accepted_evidence_ids: Vec<String>,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct ChunkSemanticBridgePromotionChunkInput {
+    id: String,
 }
 
 fn default_document_chunk_size() -> usize {
@@ -920,6 +963,69 @@ impl PhoenixApi for PhoenixApiImpl {
                     "atlasSeedPayload": atlas_seed_payload,
                     "embeddingTargetSource": "rust-graph-family-targets/v1",
                 },
+                "error": null,
+            }));
+        }
+        if command == "graphRebuild:chunkSemanticBridges" {
+            let started = Instant::now();
+            let request = serde_json::from_value::<ChunkSemanticBridgeRequest>(payload)
+                .map_err(|error| format!("invalid chunk semantic bridge request: {error}"))?;
+            let documents = request
+                .documents
+                .iter()
+                .map(|document| ChunkSemanticBridgeSnapshotDocument {
+                    note_id: document.note_id.as_str(),
+                    text: document.text.as_str(),
+                })
+                .collect::<Vec<_>>();
+            let bridge_started = Instant::now();
+            let candidates =
+                build_chunk_semantic_bridge_candidates_from_snapshot(&request.snapshot, &documents);
+            assert_chunk_semantic_bridge_candidate_only(&candidates)
+                .map_err(|error| error.to_string())?;
+            let bridge_build_micros = bridge_started.elapsed().as_micros();
+            let quality_gate = audit_chunk_semantic_bridge_quality_gate(&candidates);
+            return serialize_json(&json!({
+                "success": true,
+                "payload": ChunkSemanticBridgeResponse {
+                    schema_version: "phoenix-chunk-semantic-bridge-native-output/v1",
+                    source: "rust",
+                    candidates,
+                    quality_gate,
+                    timing: ChunkSemanticBridgeTiming {
+                        bridge_build_micros,
+                        total_micros: started.elapsed().as_micros(),
+                    },
+                },
+                "error": null,
+            }));
+        }
+        if command == "graphRebuild:promoteChunkSemanticBridges" {
+            let request = serde_json::from_value::<ChunkSemanticBridgePromotionRequest>(payload)
+                .map_err(|error| {
+                    format!("invalid chunk semantic bridge promotion request: {error}")
+                })?;
+            let chunks = request
+                .chunks
+                .iter()
+                .map(|chunk| ChunkSemanticBridgePromotionChunk {
+                    id: chunk.id.as_str(),
+                })
+                .collect::<Vec<_>>();
+            let accepted_evidence_ids = request
+                .accepted_evidence_ids
+                .iter()
+                .map(String::as_str)
+                .collect::<Vec<_>>();
+            let promotion =
+                promote_chunk_semantic_bridge_candidates(ChunkSemanticBridgePromotionInput {
+                    candidates: &request.candidates,
+                    chunks: &chunks,
+                    accepted_evidence_ids: &accepted_evidence_ids,
+                });
+            return serialize_json(&json!({
+                "success": true,
+                "payload": promotion,
                 "error": null,
             }));
         }

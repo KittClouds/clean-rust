@@ -608,7 +608,7 @@ function pushLoss(
 function familyForTarget(target: GraphRebuildEmbeddingTarget): string {
     const kind = target.kind;
     if (kind === 'entity') return 'registry';
-    if (kind === 'note' || kind === 'chunk' || kind === 'structureRoot' || kind === 'documentUnit') return 'structure';
+    if (kind === 'note' || kind === 'chunk' || kind === 'episode' || kind === 'structureRoot' || kind === 'documentUnit') return 'structure';
     if (kind === 'anchor' || kind === 'evidenceSpan') return 'evidence';
     if (kind === 'temporalFact') return 'temporal';
     if (kind === 'causalFact') return 'causal';
@@ -618,7 +618,7 @@ function familyForTarget(target: GraphRebuildEmbeddingTarget): string {
 
 function styleKeyForTarget(target: GraphRebuildEmbeddingTarget): string {
     if (target.kind === 'entity') return target.entityKind || 'entity';
-    if (target.kind === 'note' || target.kind === 'structureRoot') return 'document';
+    if (target.kind === 'note' || target.kind === 'episode' || target.kind === 'structureRoot') return 'document';
     if (target.kind === 'chunk' || target.kind === 'documentUnit') return 'chunk';
     if (target.kind === 'anchor' || target.kind === 'evidenceSpan') return 'anchor';
     if (target.kind === 'event') return 'eventNode';

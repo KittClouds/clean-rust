@@ -7,6 +7,7 @@
 mod adjudication;
 mod atlas_packet;
 mod builder;
+mod chunk_semantic_bridge;
 mod compiler;
 mod embedding;
 mod facts;
@@ -22,6 +23,26 @@ pub use atlas_packet::{
 };
 pub use builder::{
     build_graph_rebuild_snapshot, GraphRebuildBuilder, GraphRebuildError, GraphRebuildInput,
+};
+pub use chunk_semantic_bridge::{
+    assert_chunk_semantic_bridge_candidate_only, audit_chunk_semantic_bridge_quality_gate,
+    bridge_quality_gate_decision, build_chunk_semantic_bridge_candidates,
+    build_chunk_semantic_bridge_candidates_from_snapshot,
+    build_chunk_semantic_bridge_shortrun_parity_report, is_same_entity_only_bridge_suspect,
+    promote_chunk_semantic_bridge_candidates, BridgeCandidateOnlyAudit, BridgeCounts,
+    BridgeQualityGateAudit, BridgeQualityGateDecision, BridgeRepresentativeRow,
+    BridgeShortrunParityComparison, BridgeShortrunParityReport, BridgeTimingReport,
+    ChunkSemanticBridgeCandidate, ChunkSemanticBridgeChunk, ChunkSemanticBridgeCommitPolicy,
+    ChunkSemanticBridgeEngineInput, ChunkSemanticBridgeEntity, ChunkSemanticBridgeEvent,
+    ChunkSemanticBridgeEventEdge, ChunkSemanticBridgeEvidence, ChunkSemanticBridgePromotionAudit,
+    ChunkSemanticBridgePromotionChunk, ChunkSemanticBridgePromotionCommitPolicy,
+    ChunkSemanticBridgePromotionInput, ChunkSemanticBridgePromotionOutput,
+    ChunkSemanticBridgePromotionProposal, ChunkSemanticBridgePromotionRejection,
+    ChunkSemanticBridgePromotionStatus, ChunkSemanticBridgeSnapshotDocument,
+    ChunkSemanticBridgeStatus, ChunkSemanticBridgeType, CHUNK_SEMANTIC_BRIDGE_COMMIT_POLICY,
+    CHUNK_SEMANTIC_BRIDGE_NO_TOPOLOGY_COMMIT, CHUNK_SEMANTIC_BRIDGE_PROMOTION_COMMIT_POLICY,
+    CHUNK_SEMANTIC_BRIDGE_PROMOTION_NO_TOPOLOGY_COMMIT,
+    CHUNK_SEMANTIC_BRIDGE_PROMOTION_SCHEMA_VERSION, CHUNK_SEMANTIC_BRIDGE_SCHEMA_VERSION,
 };
 pub use compiler::{
     assert_graph_compile_invariants, compile_dual_write_snapshot, compile_graph_snapshot,
