@@ -1,4 +1,4 @@
-use std::time::{SystemTime, UNIX_EPOCH};
+use std::time::{Instant, SystemTime, UNIX_EPOCH};
 
 use compact_str::{format_compact, CompactString};
 use hashbrown::{HashMap, HashSet};
@@ -152,6 +152,7 @@ pub fn build_graph_rebuild_snapshot(
     let episode_projection_edges =
         build_episode_projection_edges(&episodes, &events, &chunks, &temporal_edges, &causal_edges);
     let memory_state = derived.memory_state;
+    let memory_governance_started = Instant::now();
     let memory_governance_candidates =
         build_memory_governance_candidates(crate::memory_governance::MemoryGovernanceEngineInput {
             chunks: &chunks,
@@ -162,6 +163,7 @@ pub fn build_graph_rebuild_snapshot(
             causal_edges: &causal_edges,
             memory_state: &memory_state,
         });
+    let memory_governance_build_micros = memory_governance_started.elapsed().as_micros() as u64;
     let embedding_targets = build_embedding_targets(
         input.note_id,
         input.text,
@@ -213,6 +215,7 @@ pub fn build_graph_rebuild_snapshot(
         causal_edges: causal_edges.len(),
         memory_state: memory_state.len(),
         memory_governance_candidates: memory_governance_candidates.len(),
+        memory_governance_build_micros,
         memory_governance_retain: count_memory_governance_action(
             &memory_governance_candidates,
             GraphMemoryGovernanceAction::Retain,

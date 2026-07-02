@@ -32,7 +32,11 @@ import {
     graphOperatorMutationJournalFromTruthCommits,
     type GraphOperatorMutationJournal,
 } from './graph-operator-mutation-journal';
-import { applyNativeMemoryGovernanceCandidates } from './graph-memory-governance';
+import {
+    applyNativeMemoryGovernanceCandidates,
+    applyNativeMemoryGovernanceRetrievalExperiment,
+    memoryGovernanceRetrievalCandidatesFromSnapshot,
+} from './graph-memory-governance';
 import type {
     GraphAtlasFamily,
     GraphAtlasManifoldTarget,
@@ -89,6 +93,8 @@ import type {
     GraphRebuildEmbeddingTargetPlan,
     GraphRebuildEmbeddingProfile,
     GraphMemoryGovernanceCandidate,
+    GraphMemoryGovernanceRetrievalCandidate,
+    GraphMemoryGovernanceRetrievalWeightingExperiment,
     GraphRebuildNoteFolderContext,
     GraphRebuildRelationshipHint,
     GraphRebuildScopeKind,
@@ -222,6 +228,19 @@ interface NativeMemoryGovernanceOutput {
     source: 'rust';
     candidates: GraphMemoryGovernanceCandidate[];
     timing: NativeMemoryGovernanceTiming;
+}
+
+interface NativeMemoryGovernanceRetrievalExperimentTiming {
+    governanceBuildMicros: number;
+    experimentBuildMicros: number;
+    totalMicros: number;
+}
+
+interface NativeMemoryGovernanceRetrievalExperimentOutput {
+    schemaVersion: 'phoenix-memory-governance-retrieval-experiment-native-output/v1';
+    source: 'rust';
+    experiment: GraphMemoryGovernanceRetrievalWeightingExperiment;
+    timing: NativeMemoryGovernanceRetrievalExperimentTiming;
 }
 
 interface CompressedNativeAtlasSeedPayload {
@@ -439,6 +458,7 @@ export class GraphRebuildService {
             snapshot = await this.reconcileDocumentGraphMutations(snapshot);
             await this.attachNativeChunkSemanticBridges(snapshot, noteTexts, timings);
             await this.attachNativeMemoryGovernance(snapshot, timings);
+            await this.attachNativeMemoryGovernanceRetrievalExperiment(snapshot, timings);
             const interactivePacketAttached = durabilityMode === 'interactive'
                 && attachInteractiveAtlasPacketForSnapshotTargets(
                     snapshot,
@@ -571,6 +591,35 @@ export class GraphRebuildService {
             }
         } finally {
             if (timings) timings.nativeMemoryGovernanceMs = elapsedMs(started);
+        }
+    }
+
+    private async attachNativeMemoryGovernanceRetrievalExperiment(
+        snapshot: GraphRebuildSnapshot,
+        timings?: GraphRebuildBuildTimings,
+    ): Promise<void> {
+        const started = performance.now();
+        const retrievalCandidates = memoryGovernanceRetrievalCandidatesFromSnapshot(snapshot);
+        if (timings) timings.nativeMemoryGovernanceRetrievalExperimentCandidates = retrievalCandidates.length;
+        try {
+            if (this.phoenix.target !== 'native' || !retrievalCandidates.length) {
+                if (timings) timings.nativeMemoryGovernanceRetrievalExperimentSkipped = 1;
+                return;
+            }
+            const native = await this.phoenix.storeCommand('graphRebuild:memoryGovernanceRetrievalExperiment', {
+                snapshot: graphRebuildSnapshotToNativeMemoryGovernancePayload(snapshot),
+                retrievalCandidates,
+            }) as NativeMemoryGovernanceRetrievalExperimentOutput | null;
+            if (!isNativeMemoryGovernanceRetrievalExperimentOutput(native)) {
+                throw new Error('Rust memory governance retrieval experiment returned an invalid v1 payload.');
+            }
+            applyNativeMemoryGovernanceRetrievalExperiment(snapshot, native.experiment);
+            if (timings) {
+                timings.nativeMemoryGovernanceRetrievalExperimentRustMicros =
+                    native.timing.experimentBuildMicros;
+            }
+        } finally {
+            if (timings) timings.nativeMemoryGovernanceRetrievalExperimentMs = elapsedMs(started);
         }
     }
 
@@ -1296,6 +1345,15 @@ function isNativeMemoryGovernanceOutput(
     return value?.schemaVersion === 'phoenix-memory-governance-native-output/v1'
         && value.source === 'rust'
         && Array.isArray(value.candidates)
+        && !!value.timing;
+}
+
+function isNativeMemoryGovernanceRetrievalExperimentOutput(
+    value: NativeMemoryGovernanceRetrievalExperimentOutput | null | undefined,
+): value is NativeMemoryGovernanceRetrievalExperimentOutput {
+    return value?.schemaVersion === 'phoenix-memory-governance-retrieval-experiment-native-output/v1'
+        && value.source === 'rust'
+        && !!value.experiment
         && !!value.timing;
 }
 
@@ -2637,6 +2695,10 @@ function emptyBuildTimings(): GraphRebuildBuildTimings {
         nativeMemoryGovernanceSkipped: 0,
         nativeMemoryGovernanceCandidates: 0,
         nativeMemoryGovernanceRustMicros: 0,
+        nativeMemoryGovernanceRetrievalExperimentMs: 0,
+        nativeMemoryGovernanceRetrievalExperimentSkipped: 0,
+        nativeMemoryGovernanceRetrievalExperimentCandidates: 0,
+        nativeMemoryGovernanceRetrievalExperimentRustMicros: 0,
         nativeCompilerMs: 0,
         nativeCompilerSkipped: 0,
         nativeCompilerInputBytesByFamily: {},

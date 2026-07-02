@@ -229,6 +229,11 @@ describeBaseline('product graph build gate', () => {
         expect(warm.snapshot.buildTimings?.previousSnapshotHydrationSkipped).toBe(1);
         expect(warm.snapshot.buildTimings?.nativeChunkerSkipped).toBe(1);
         expect(warm.snapshot.buildTimings?.documentSemanticSkipped).toBe(1);
+        expect(warm.snapshot.buildTimings?.nativeMemoryGovernanceRetrievalExperimentCandidates)
+            .toBeGreaterThan(0);
+        expect(warm.snapshot.buildTimings?.nativeMemoryGovernanceRetrievalExperimentCandidates)
+            .toBeLessThan(warm.snapshot.counters.embeddingTargets);
+        expect(warm.snapshot.buildTimings?.nativeMemoryGovernanceRetrievalExperimentSkipped).toBe(1);
         expect(parity).toMatchObject({
             graphDiscourse: expect.any(Number),
             graphProposed: expect.any(Number),

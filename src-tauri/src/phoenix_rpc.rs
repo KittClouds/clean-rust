@@ -22,12 +22,14 @@ use phoenix_graph_rebuild::{
     audit_chunk_semantic_bridge_quality_gate, build_atlas_packet,
     build_chunk_semantic_bridge_candidates_from_snapshot, build_chunks,
     build_document_semantic_summary, build_memory_governance_candidates_from_snapshot,
-    build_snapshot_embedding_target_report, classify_document_profiles, compile_legacy_snapshot,
-    promote_chunk_semantic_bridge_candidates, AtlasPacket, Chunk, ChunkSemanticBridgeCandidate,
-    ChunkSemanticBridgePromotionChunk, ChunkSemanticBridgePromotionInput,
-    ChunkSemanticBridgeSnapshotDocument, ChunkerConfig, DocumentProfileRequest,
-    DocumentSemanticRequest, GraphEmbeddingTarget, GraphEmbeddingTargetOriginCount,
-    GraphMemoryGovernanceCandidate, GraphRebuildSnapshot,
+    build_memory_governance_retrieval_weighting_experiment, build_snapshot_embedding_target_report,
+    classify_document_profiles, compile_legacy_snapshot, promote_chunk_semantic_bridge_candidates,
+    AtlasPacket, Chunk, ChunkSemanticBridgeCandidate, ChunkSemanticBridgePromotionChunk,
+    ChunkSemanticBridgePromotionInput, ChunkSemanticBridgeSnapshotDocument, ChunkerConfig,
+    DocumentProfileRequest, DocumentSemanticRequest, GraphEmbeddingTarget,
+    GraphEmbeddingTargetOriginCount, GraphMemoryGovernanceCandidate, GraphRebuildSnapshot,
+    MemoryGovernanceRetrievalCandidate, MemoryGovernanceRetrievalPreviewInput,
+    MemoryGovernanceRetrievalWeightingExperiment,
 };
 use phoenix_hyperbolic::lorentz_tree::{
     HyperboloidPoint, LorentzForest, LorentzForestIndex, LorentzNode, LorentzQueryMode,
@@ -130,6 +132,30 @@ struct MemoryGovernanceResponse {
     source: &'static str,
     candidates: Vec<GraphMemoryGovernanceCandidate>,
     timing: MemoryGovernanceTiming,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct MemoryGovernanceRetrievalExperimentRequest {
+    snapshot: GraphRebuildSnapshot,
+    retrieval_candidates: Vec<MemoryGovernanceRetrievalCandidate>,
+}
+
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct MemoryGovernanceRetrievalExperimentTiming {
+    governance_build_micros: u128,
+    experiment_build_micros: u128,
+    total_micros: u128,
+}
+
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct MemoryGovernanceRetrievalExperimentResponse {
+    schema_version: &'static str,
+    source: &'static str,
+    experiment: MemoryGovernanceRetrievalWeightingExperiment,
+    timing: MemoryGovernanceRetrievalExperimentTiming,
 }
 
 #[derive(Debug, Deserialize)]
@@ -1041,6 +1067,46 @@ impl PhoenixApi for PhoenixApiImpl {
                     candidates,
                     timing: MemoryGovernanceTiming {
                         governance_build_micros,
+                        total_micros: started.elapsed().as_micros(),
+                    },
+                },
+                "error": null,
+            }));
+        }
+        if command == "graphRebuild:memoryGovernanceRetrievalExperiment" {
+            let started = Instant::now();
+            let request =
+                serde_json::from_value::<MemoryGovernanceRetrievalExperimentRequest>(payload)
+                    .map_err(|error| {
+                        format!("invalid memory governance retrieval experiment request: {error}")
+                    })?;
+            let governance_started = Instant::now();
+            let governance_candidates = if request.snapshot.memory_governance_candidates.is_empty()
+            {
+                build_memory_governance_candidates_from_snapshot(&request.snapshot)
+            } else {
+                request.snapshot.memory_governance_candidates.clone()
+            };
+            assert_memory_governance_candidate_only(&governance_candidates)
+                .map_err(|error| error.to_string())?;
+            let governance_build_micros = governance_started.elapsed().as_micros();
+            let experiment_started = Instant::now();
+            let experiment = build_memory_governance_retrieval_weighting_experiment(
+                MemoryGovernanceRetrievalPreviewInput {
+                    retrieval_candidates: &request.retrieval_candidates,
+                    governance_candidates: &governance_candidates,
+                },
+            );
+            let experiment_build_micros = experiment_started.elapsed().as_micros();
+            return serialize_json(&json!({
+                "success": true,
+                "payload": MemoryGovernanceRetrievalExperimentResponse {
+                    schema_version: "phoenix-memory-governance-retrieval-experiment-native-output/v1",
+                    source: "rust",
+                    experiment,
+                    timing: MemoryGovernanceRetrievalExperimentTiming {
+                        governance_build_micros,
+                        experiment_build_micros,
                         total_micros: started.elapsed().as_micros(),
                     },
                 },

@@ -64,8 +64,20 @@ pub use embedding::{
 };
 pub use memory_governance::{
     assert_memory_governance_candidate_only, build_memory_governance_candidates,
-    build_memory_governance_candidates_from_snapshot, MemoryGovernanceEngineInput,
-    MEMORY_GOVERNANCE_COMMIT_POLICY, MEMORY_GOVERNANCE_NO_TOPOLOGY_COMMIT,
+    build_memory_governance_candidates_from_snapshot, build_memory_governance_retrieval_preview,
+    build_memory_governance_retrieval_preview_with_policy,
+    build_memory_governance_retrieval_weighting_experiment,
+    build_memory_governance_shortrun_golden_report, MemoryGovernanceCandidateOnlyAudit,
+    MemoryGovernanceConfidenceSummary, MemoryGovernanceCounts, MemoryGovernanceEngineInput,
+    MemoryGovernancePerformanceBudget, MemoryGovernanceRepresentativeRow,
+    MemoryGovernanceRetrievalCandidate, MemoryGovernanceRetrievalPreview,
+    MemoryGovernanceRetrievalPreviewInput, MemoryGovernanceRetrievalPreviewRow,
+    MemoryGovernanceRetrievalPreviewSummary, MemoryGovernanceRetrievalWeightPolicy,
+    MemoryGovernanceRetrievalWeightingExperiment, MemoryGovernanceRetrievalWeightingVariant,
+    MemoryGovernanceShortrunComparison, MemoryGovernanceShortrunGoldenReport,
+    MemoryGovernanceTimingReport, MEMORY_GOVERNANCE_COMMIT_POLICY,
+    MEMORY_GOVERNANCE_NO_TOPOLOGY_COMMIT, MEMORY_GOVERNANCE_RETRIEVAL_PREVIEW_SCHEMA_VERSION,
+    MEMORY_GOVERNANCE_RETRIEVAL_WEIGHTING_EXPERIMENT_SCHEMA_VERSION,
     MEMORY_GOVERNANCE_SCHEMA_VERSION,
 };
 pub use phoenix_chunker_native::{

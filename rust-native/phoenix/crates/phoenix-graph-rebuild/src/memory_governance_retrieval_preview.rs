@@ -1,0 +1,372 @@
+use compact_str::{format_compact, CompactString};
+use hashbrown::HashMap;
+use serde::{Deserialize, Serialize};
+
+use crate::types::{
+    GraphMemoryGovernanceAction, GraphMemoryGovernanceCandidate, GraphMemoryGovernanceTargetKind,
+};
+
+pub const MEMORY_GOVERNANCE_RETRIEVAL_PREVIEW_SCHEMA_VERSION: &str =
+    "phoenix-memory-governance-retrieval-preview/v1";
+pub const MEMORY_GOVERNANCE_RETRIEVAL_WEIGHTING_EXPERIMENT_SCHEMA_VERSION: &str =
+    "phoenix-memory-governance-retrieval-weighting-experiment/v1";
+
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct MemoryGovernanceRetrievalCandidate {
+    pub id: CompactString,
+    pub target_id: CompactString,
+    pub target_kind: GraphMemoryGovernanceTargetKind,
+    pub score: f32,
+}
+
+#[derive(Clone, Copy, Debug)]
+pub struct MemoryGovernanceRetrievalPreviewInput<'a> {
+    pub retrieval_candidates: &'a [MemoryGovernanceRetrievalCandidate],
+    pub governance_candidates: &'a [GraphMemoryGovernanceCandidate],
+}
+
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct MemoryGovernanceRetrievalWeightPolicy {
+    pub id: CompactString,
+    pub retain_confidence_boost: f32,
+    pub retain_causal_boost: f32,
+    pub retain_retrieval_boost: f32,
+    pub compress_confidence_boost: f32,
+    pub compress_narrative_boost: f32,
+    pub attenuate_confidence_penalty: f32,
+    pub quarantine_multiplier: f32,
+    pub retire_multiplier: f32,
+}
+
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct MemoryGovernanceRetrievalWeightingExperiment {
+    pub schema_version: CompactString,
+    pub baseline_policy_id: CompactString,
+    pub variants: Vec<MemoryGovernanceRetrievalWeightingVariant>,
+    pub no_topology_commit: bool,
+}
+
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct MemoryGovernanceRetrievalWeightingVariant {
+    pub policy: MemoryGovernanceRetrievalWeightPolicy,
+    pub summary: MemoryGovernanceRetrievalPreviewSummary,
+    pub top_rows: Vec<MemoryGovernanceRetrievalPreviewRow>,
+    pub mean_abs_rank_delta_millis: u32,
+    pub retained_mean_score_delta_millis: i32,
+    pub compressed_mean_score_delta_millis: i32,
+    pub attenuated_mean_score_delta_millis: i32,
+}
+
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct MemoryGovernanceRetrievalPreview {
+    pub schema_version: CompactString,
+    pub rows: Vec<MemoryGovernanceRetrievalPreviewRow>,
+    pub summary: MemoryGovernanceRetrievalPreviewSummary,
+    pub no_topology_commit: bool,
+}
+
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct MemoryGovernanceRetrievalPreviewRow {
+    pub id: CompactString,
+    pub target_id: CompactString,
+    pub target_kind: GraphMemoryGovernanceTargetKind,
+    pub original_rank: usize,
+    pub adjusted_rank: usize,
+    pub original_score: f32,
+    pub adjusted_score: f32,
+    pub score_delta: f32,
+    pub governance_candidate_id: Option<CompactString>,
+    pub governance_action: Option<GraphMemoryGovernanceAction>,
+    pub governance_confidence: Option<f32>,
+    pub reason: Option<CompactString>,
+    pub rationale: Vec<CompactString>,
+    pub no_topology_commit: bool,
+}
+
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct MemoryGovernanceRetrievalPreviewSummary {
+    pub candidate_count: usize,
+    pub governed_count: usize,
+    pub retained_count: usize,
+    pub attenuated_count: usize,
+    pub compressed_count: usize,
+    pub unchanged_count: usize,
+    pub changed_rank_count: usize,
+    pub promoted_count: usize,
+    pub demoted_count: usize,
+}
+
+pub fn build_memory_governance_retrieval_preview(
+    input: MemoryGovernanceRetrievalPreviewInput<'_>,
+) -> MemoryGovernanceRetrievalPreview {
+    build_memory_governance_retrieval_preview_with_policy(
+        input,
+        &balanced_retrieval_weight_policy(),
+    )
+}
+
+pub fn build_memory_governance_retrieval_preview_with_policy(
+    input: MemoryGovernanceRetrievalPreviewInput<'_>,
+    policy: &MemoryGovernanceRetrievalWeightPolicy,
+) -> MemoryGovernanceRetrievalPreview {
+    let governance_by_target = input
+        .governance_candidates
+        .iter()
+        .map(|row| ((row.target_kind, row.target_id.as_str()), row))
+        .collect::<HashMap<_, _>>();
+    let mut rows = Vec::with_capacity(input.retrieval_candidates.len());
+
+    for (index, retrieval) in input.retrieval_candidates.iter().enumerate() {
+        let original_rank = index + 1;
+        let governance =
+            governance_by_target.get(&(retrieval.target_kind, retrieval.target_id.as_str()));
+        let adjusted_score = adjusted_score(retrieval.score, governance.copied(), policy);
+        rows.push(MemoryGovernanceRetrievalPreviewRow {
+            id: format_compact!("memory_governance_retrieval_preview:{}", retrieval.id),
+            target_id: retrieval.target_id.clone(),
+            target_kind: retrieval.target_kind,
+            original_rank,
+            adjusted_rank: original_rank,
+            original_score: round_score(retrieval.score),
+            adjusted_score,
+            score_delta: round_score(adjusted_score - retrieval.score),
+            governance_candidate_id: governance.map(|row| row.id.clone()),
+            governance_action: governance.map(|row| row.action),
+            governance_confidence: governance.map(|row| round_score(row.confidence)),
+            reason: governance.map(|row| row.reason.clone()),
+            rationale: governance
+                .map(|row| row.rationale.clone())
+                .unwrap_or_default(),
+            no_topology_commit: true,
+        });
+    }
+
+    rows.sort_by(|left, right| {
+        right
+            .adjusted_score
+            .total_cmp(&left.adjusted_score)
+            .then_with(|| left.original_rank.cmp(&right.original_rank))
+            .then_with(|| left.target_id.cmp(&right.target_id))
+    });
+    for (index, row) in rows.iter_mut().enumerate() {
+        row.adjusted_rank = index + 1;
+    }
+    let summary = summary_for(&rows);
+    MemoryGovernanceRetrievalPreview {
+        schema_version: MEMORY_GOVERNANCE_RETRIEVAL_PREVIEW_SCHEMA_VERSION.into(),
+        rows,
+        summary,
+        no_topology_commit: true,
+    }
+}
+
+pub fn build_memory_governance_retrieval_weighting_experiment(
+    input: MemoryGovernanceRetrievalPreviewInput<'_>,
+) -> MemoryGovernanceRetrievalWeightingExperiment {
+    let policies = default_retrieval_weight_experiment_policies();
+    let variants = policies
+        .iter()
+        .map(|policy| {
+            let preview = build_memory_governance_retrieval_preview_with_policy(input, policy);
+            weighting_variant(policy.clone(), preview)
+        })
+        .collect();
+    MemoryGovernanceRetrievalWeightingExperiment {
+        schema_version: MEMORY_GOVERNANCE_RETRIEVAL_WEIGHTING_EXPERIMENT_SCHEMA_VERSION.into(),
+        baseline_policy_id: "balanced".into(),
+        variants,
+        no_topology_commit: true,
+    }
+}
+
+pub fn default_retrieval_weight_experiment_policies() -> Vec<MemoryGovernanceRetrievalWeightPolicy>
+{
+    vec![
+        conservative_retrieval_weight_policy(),
+        balanced_retrieval_weight_policy(),
+        episode_anchor_retrieval_weight_policy(),
+        decay_heavy_retrieval_weight_policy(),
+    ]
+}
+
+fn adjusted_score(
+    original_score: f32,
+    governance: Option<&GraphMemoryGovernanceCandidate>,
+    policy: &MemoryGovernanceRetrievalWeightPolicy,
+) -> f32 {
+    let Some(governance) = governance else {
+        return round_score(original_score);
+    };
+    let score = match governance.action {
+        GraphMemoryGovernanceAction::Retain => {
+            original_score
+                + governance.confidence * policy.retain_confidence_boost
+                + governance.signals.causal_importance * policy.retain_causal_boost
+                + governance.signals.retrieval_utility * policy.retain_retrieval_boost
+        }
+        GraphMemoryGovernanceAction::Compress => {
+            original_score
+                + governance.confidence * policy.compress_confidence_boost
+                + governance.signals.narrative_salience * policy.compress_narrative_boost
+        }
+        GraphMemoryGovernanceAction::Attenuate => {
+            original_score * (1.0 - governance.confidence * policy.attenuate_confidence_penalty)
+        }
+        GraphMemoryGovernanceAction::Quarantine => original_score * policy.quarantine_multiplier,
+        GraphMemoryGovernanceAction::Retire => original_score * policy.retire_multiplier,
+    };
+    round_score(score.clamp(0.0, 1.0))
+}
+
+fn summary_for(
+    rows: &[MemoryGovernanceRetrievalPreviewRow],
+) -> MemoryGovernanceRetrievalPreviewSummary {
+    let mut summary = MemoryGovernanceRetrievalPreviewSummary {
+        candidate_count: rows.len(),
+        ..MemoryGovernanceRetrievalPreviewSummary::default()
+    };
+    for row in rows {
+        if let Some(action) = row.governance_action {
+            summary.governed_count += 1;
+            match action {
+                GraphMemoryGovernanceAction::Retain => summary.retained_count += 1,
+                GraphMemoryGovernanceAction::Attenuate => summary.attenuated_count += 1,
+                GraphMemoryGovernanceAction::Compress => summary.compressed_count += 1,
+                GraphMemoryGovernanceAction::Quarantine | GraphMemoryGovernanceAction::Retire => {}
+            }
+        } else {
+            summary.unchanged_count += 1;
+        }
+        if row.adjusted_rank != row.original_rank {
+            summary.changed_rank_count += 1;
+        }
+        if row.adjusted_rank < row.original_rank {
+            summary.promoted_count += 1;
+        } else if row.adjusted_rank > row.original_rank {
+            summary.demoted_count += 1;
+        }
+    }
+    summary
+}
+
+fn round_score(value: f32) -> f32 {
+    (value * 1000.0).round() / 1000.0
+}
+
+fn weighting_variant(
+    policy: MemoryGovernanceRetrievalWeightPolicy,
+    preview: MemoryGovernanceRetrievalPreview,
+) -> MemoryGovernanceRetrievalWeightingVariant {
+    MemoryGovernanceRetrievalWeightingVariant {
+        policy,
+        mean_abs_rank_delta_millis: mean_abs_rank_delta_millis(&preview.rows),
+        retained_mean_score_delta_millis: mean_score_delta_millis(
+            &preview.rows,
+            GraphMemoryGovernanceAction::Retain,
+        ),
+        compressed_mean_score_delta_millis: mean_score_delta_millis(
+            &preview.rows,
+            GraphMemoryGovernanceAction::Compress,
+        ),
+        attenuated_mean_score_delta_millis: mean_score_delta_millis(
+            &preview.rows,
+            GraphMemoryGovernanceAction::Attenuate,
+        ),
+        top_rows: preview.rows.into_iter().take(8).collect(),
+        summary: preview.summary,
+    }
+}
+
+fn mean_abs_rank_delta_millis(rows: &[MemoryGovernanceRetrievalPreviewRow]) -> u32 {
+    if rows.is_empty() {
+        return 0;
+    }
+    let total = rows
+        .iter()
+        .map(|row| row.adjusted_rank.abs_diff(row.original_rank) as u32)
+        .sum::<u32>();
+    total * 1000 / rows.len() as u32
+}
+
+fn mean_score_delta_millis(
+    rows: &[MemoryGovernanceRetrievalPreviewRow],
+    action: GraphMemoryGovernanceAction,
+) -> i32 {
+    let mut count = 0_i32;
+    let mut total = 0_i32;
+    for row in rows
+        .iter()
+        .filter(|row| row.governance_action == Some(action))
+    {
+        count += 1;
+        total += (row.score_delta * 1000.0).round() as i32;
+    }
+    if count == 0 {
+        0
+    } else {
+        total / count
+    }
+}
+
+fn conservative_retrieval_weight_policy() -> MemoryGovernanceRetrievalWeightPolicy {
+    MemoryGovernanceRetrievalWeightPolicy {
+        id: "conservative".into(),
+        retain_confidence_boost: 0.04,
+        retain_causal_boost: 0.015,
+        retain_retrieval_boost: 0.01,
+        compress_confidence_boost: 0.07,
+        compress_narrative_boost: 0.015,
+        attenuate_confidence_penalty: 0.18,
+        quarantine_multiplier: 0.50,
+        retire_multiplier: 0.10,
+    }
+}
+
+fn balanced_retrieval_weight_policy() -> MemoryGovernanceRetrievalWeightPolicy {
+    MemoryGovernanceRetrievalWeightPolicy {
+        id: "balanced".into(),
+        retain_confidence_boost: 0.08,
+        retain_causal_boost: 0.03,
+        retain_retrieval_boost: 0.02,
+        compress_confidence_boost: 0.14,
+        compress_narrative_boost: 0.03,
+        attenuate_confidence_penalty: 0.36,
+        quarantine_multiplier: 0.35,
+        retire_multiplier: 0.05,
+    }
+}
+
+fn episode_anchor_retrieval_weight_policy() -> MemoryGovernanceRetrievalWeightPolicy {
+    MemoryGovernanceRetrievalWeightPolicy {
+        id: "episode_anchor".into(),
+        retain_confidence_boost: 0.06,
+        retain_causal_boost: 0.02,
+        retain_retrieval_boost: 0.015,
+        compress_confidence_boost: 0.22,
+        compress_narrative_boost: 0.05,
+        attenuate_confidence_penalty: 0.30,
+        quarantine_multiplier: 0.35,
+        retire_multiplier: 0.05,
+    }
+}
+
+fn decay_heavy_retrieval_weight_policy() -> MemoryGovernanceRetrievalWeightPolicy {
+    MemoryGovernanceRetrievalWeightPolicy {
+        id: "decay_heavy".into(),
+        retain_confidence_boost: 0.07,
+        retain_causal_boost: 0.025,
+        retain_retrieval_boost: 0.015,
+        compress_confidence_boost: 0.12,
+        compress_narrative_boost: 0.025,
+        attenuate_confidence_penalty: 0.58,
+        quarantine_multiplier: 0.25,
+        retire_multiplier: 0.02,
+    }
+}

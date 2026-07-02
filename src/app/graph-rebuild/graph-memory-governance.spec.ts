@@ -2,13 +2,18 @@ import { describe, expect, it } from 'vitest';
 
 import {
     applyNativeMemoryGovernanceCandidates,
+    applyNativeMemoryGovernanceRetrievalExperiment,
     assertMemoryGovernanceCandidateOnly,
+    assertMemoryGovernanceRetrievalExperimentReportOnly,
+    memoryGovernanceRetrievalCandidatesFromSnapshot,
 } from './graph-memory-governance';
 import {
     GRAPH_MEMORY_GOVERNANCE_COMMIT_POLICY,
     GRAPH_MEMORY_GOVERNANCE_NO_TOPOLOGY_COMMIT,
+    GRAPH_MEMORY_GOVERNANCE_RETRIEVAL_EXPERIMENT_SCHEMA_VERSION,
     GRAPH_MEMORY_GOVERNANCE_SCHEMA_VERSION,
     type GraphMemoryGovernanceCandidate,
+    type GraphMemoryGovernanceRetrievalWeightingExperiment,
     type GraphRebuildSnapshot,
 } from './graph-rebuild-snapshot';
 
@@ -34,6 +39,87 @@ describe('graph memory governance', () => {
         } as unknown as GraphMemoryGovernanceCandidate;
 
         expect(() => assertMemoryGovernanceCandidateOnly([row])).toThrow(/may not mutate topology/);
+    });
+
+    it('feeds real app embedding targets into retrieval experiment rows', () => {
+        const snapshot = minimalSnapshot();
+        snapshot.embeddingTargets = [
+            {
+                id: 'embed:chunk:chunk:1',
+                kind: 'chunk',
+                sourceId: 'chunk:1',
+                chunkId: 'chunk:1',
+                label: 'Chunk 1',
+                text: 'because the route changed after the warning',
+                evidenceIds: ['evidence:1'],
+                admissionStatus: 'admitted',
+                workStatus: 'queued',
+            },
+            {
+                id: 'embed:episode:episode:1',
+                kind: 'episode',
+                sourceId: 'episode:1',
+                label: 'Tower access shifts',
+                text: 'episode with causal continuity',
+                evidenceIds: ['evidence:2', 'evidence:3'],
+                admissionStatus: 'admitted',
+                workStatus: 'queued',
+            },
+            {
+                id: 'embed:document-unit:retrieval:1',
+                kind: 'documentUnit',
+                sourceId: 'retrieval:1',
+                chunkId: 'chunk:2',
+                label: 'Retrieval unit',
+                text: 'document_sidecar:retrieval_unit evidence_context:route',
+                evidenceIds: ['evidence:4'],
+                documentUnitKind: 'retrieval_unit',
+                admissionStatus: 'admitted',
+                workStatus: 'queued',
+            },
+            {
+                id: 'embed:entity:entity:1',
+                kind: 'entity',
+                sourceId: 'entity:1',
+                entityId: 'entity:1',
+                label: 'Kai',
+                text: 'entity anchor',
+                evidenceIds: [],
+                admissionStatus: 'admitted',
+                workStatus: 'queued',
+            },
+        ];
+
+        const rows = memoryGovernanceRetrievalCandidatesFromSnapshot(snapshot);
+
+        expect(rows).toHaveLength(3);
+        expect(rows.map((row) => row.targetKind).sort()).toEqual(['chunk', 'chunk', 'episode']);
+        expect(rows.map((row) => row.targetId)).toContain('chunk:2');
+        expect(rows.every((row) => row.score > 0 && row.score <= 1)).toBe(true);
+        expect(snapshot.embeddingTargets).toHaveLength(4);
+    });
+
+    it('attaches native retrieval experiment reports without ranking or topology mutation', () => {
+        const snapshot = minimalSnapshot();
+        const edges = snapshot.edges;
+        const experiment = retrievalExperiment();
+
+        applyNativeMemoryGovernanceRetrievalExperiment(snapshot, experiment);
+
+        expect(snapshot.edges).toBe(edges);
+        expect(snapshot.memoryGovernanceRetrievalExperiment).toBe(experiment);
+        expect(snapshot.counters.memoryGovernanceRetrievalCandidates).toBe(2);
+        expect(snapshot.counters.memoryGovernanceRetrievalGoverned).toBe(1);
+        expect(snapshot.counters.memoryGovernanceRetrievalChangedRanks).toBe(1);
+        expect(snapshot.counters.memoryGovernanceRetrievalPolicies).toBe(1);
+    });
+
+    it('rejects retrieval experiment rows that can commit topology', () => {
+        const experiment = retrievalExperiment();
+        (experiment.variants[0].topRows[0] as unknown as { noTopologyCommit: boolean }).noTopologyCommit = false;
+
+        expect(() => assertMemoryGovernanceRetrievalExperimentReportOnly(experiment))
+            .toThrow(/may not mutate topology/);
     });
 });
 
@@ -125,5 +211,57 @@ function minimalSnapshot(): GraphRebuildSnapshot {
                 missingChunk: 0,
             },
         },
+    };
+}
+
+function retrievalExperiment(): GraphMemoryGovernanceRetrievalWeightingExperiment {
+    return {
+        schemaVersion: GRAPH_MEMORY_GOVERNANCE_RETRIEVAL_EXPERIMENT_SCHEMA_VERSION,
+        baselinePolicyId: 'balanced',
+        noTopologyCommit: true,
+        variants: [{
+            policy: {
+                id: 'balanced',
+                retainConfidenceBoost: 0.08,
+                retainCausalBoost: 0.03,
+                retainRetrievalBoost: 0.02,
+                compressConfidenceBoost: 0.14,
+                compressNarrativeBoost: 0.03,
+                attenuateConfidencePenalty: 0.36,
+                quarantineMultiplier: 0.35,
+                retireMultiplier: 0.05,
+            },
+            summary: {
+                candidateCount: 2,
+                governedCount: 1,
+                retainedCount: 1,
+                attenuatedCount: 0,
+                compressedCount: 0,
+                unchangedCount: 1,
+                changedRankCount: 1,
+                promotedCount: 1,
+                demotedCount: 0,
+            },
+            topRows: [{
+                id: 'memory_governance_retrieval_preview:app_embedding_target:embed:episode:episode:1',
+                targetId: 'episode:1',
+                targetKind: 'episode',
+                originalRank: 2,
+                adjustedRank: 1,
+                originalScore: 0.7,
+                adjustedScore: 0.8,
+                scoreDelta: 0.1,
+                governanceCandidateId: 'memory_governance:episode:retain:episode:1',
+                governanceAction: 'retain',
+                governanceConfidence: 0.7,
+                reason: 'episode_has_causal_or_temporal_role',
+                rationale: [GRAPH_MEMORY_GOVERNANCE_NO_TOPOLOGY_COMMIT],
+                noTopologyCommit: true,
+            }],
+            meanAbsRankDeltaMillis: 500,
+            retainedMeanScoreDeltaMillis: 100,
+            compressedMeanScoreDeltaMillis: 0,
+            attenuatedMeanScoreDeltaMillis: 0,
+        }],
     };
 }

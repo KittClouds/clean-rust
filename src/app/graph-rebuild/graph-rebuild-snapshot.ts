@@ -345,6 +345,74 @@ export interface GraphMemoryGovernanceCandidate {
     rationale: string[];
 }
 
+export const GRAPH_MEMORY_GOVERNANCE_RETRIEVAL_EXPERIMENT_SCHEMA_VERSION =
+    'phoenix-memory-governance-retrieval-weighting-experiment/v1' as const;
+
+export interface GraphMemoryGovernanceRetrievalCandidate {
+    id: string;
+    targetId: string;
+    targetKind: GraphMemoryGovernanceTargetKind;
+    score: number;
+}
+
+export interface GraphMemoryGovernanceRetrievalPreviewSummary {
+    candidateCount: number;
+    governedCount: number;
+    retainedCount: number;
+    attenuatedCount: number;
+    compressedCount: number;
+    unchangedCount: number;
+    changedRankCount: number;
+    promotedCount: number;
+    demotedCount: number;
+}
+
+export interface GraphMemoryGovernanceRetrievalWeightPolicy {
+    id: string;
+    retainConfidenceBoost: number;
+    retainCausalBoost: number;
+    retainRetrievalBoost: number;
+    compressConfidenceBoost: number;
+    compressNarrativeBoost: number;
+    attenuateConfidencePenalty: number;
+    quarantineMultiplier: number;
+    retireMultiplier: number;
+}
+
+export interface GraphMemoryGovernanceRetrievalPreviewRow {
+    id: string;
+    targetId: string;
+    targetKind: GraphMemoryGovernanceTargetKind;
+    originalRank: number;
+    adjustedRank: number;
+    originalScore: number;
+    adjustedScore: number;
+    scoreDelta: number;
+    governanceCandidateId?: string;
+    governanceAction?: GraphMemoryGovernanceAction;
+    governanceConfidence?: number;
+    reason?: string;
+    rationale: string[];
+    noTopologyCommit: true;
+}
+
+export interface GraphMemoryGovernanceRetrievalWeightingVariant {
+    policy: GraphMemoryGovernanceRetrievalWeightPolicy;
+    summary: GraphMemoryGovernanceRetrievalPreviewSummary;
+    topRows: GraphMemoryGovernanceRetrievalPreviewRow[];
+    meanAbsRankDeltaMillis: number;
+    retainedMeanScoreDeltaMillis: number;
+    compressedMeanScoreDeltaMillis: number;
+    attenuatedMeanScoreDeltaMillis: number;
+}
+
+export interface GraphMemoryGovernanceRetrievalWeightingExperiment {
+    schemaVersion: typeof GRAPH_MEMORY_GOVERNANCE_RETRIEVAL_EXPERIMENT_SCHEMA_VERSION;
+    baselinePolicyId: string;
+    variants: GraphMemoryGovernanceRetrievalWeightingVariant[];
+    noTopologyCommit: true;
+}
+
 export interface GraphRebuildTemporalEdge {
     id: string;
     sourceId: string;
@@ -2146,11 +2214,16 @@ export interface GraphRebuildCounters {
     causalEdges: number;
     memoryState: number;
     memoryGovernanceCandidates?: number;
+    memoryGovernanceBuildMicros?: number;
     memoryGovernanceRetain?: number;
     memoryGovernanceAttenuate?: number;
     memoryGovernanceCompress?: number;
     memoryGovernanceQuarantine?: number;
     memoryGovernanceRetire?: number;
+    memoryGovernanceRetrievalCandidates?: number;
+    memoryGovernanceRetrievalGoverned?: number;
+    memoryGovernanceRetrievalChangedRanks?: number;
+    memoryGovernanceRetrievalPolicies?: number;
     embeddingTargets: number;
     embeddingTargetCandidates?: number;
     embeddingQueuedTargets?: number;
@@ -2409,6 +2482,10 @@ export interface GraphRebuildBuildTimings {
     nativeMemoryGovernanceSkipped?: number;
     nativeMemoryGovernanceCandidates?: number;
     nativeMemoryGovernanceRustMicros?: number;
+    nativeMemoryGovernanceRetrievalExperimentMs?: number;
+    nativeMemoryGovernanceRetrievalExperimentSkipped?: number;
+    nativeMemoryGovernanceRetrievalExperimentCandidates?: number;
+    nativeMemoryGovernanceRetrievalExperimentRustMicros?: number;
     nativeCompilerMs?: number;
     nativeCompilerSkipped?: number;
     nativeCompilerInputBytesByFamily?: Record<string, number>;
@@ -2542,6 +2619,7 @@ export interface GraphRebuildSnapshot {
     causalEdges: GraphRebuildCausalEdge[];
     memoryState: GraphRebuildMemoryState[];
     memoryGovernanceCandidates?: GraphMemoryGovernanceCandidate[];
+    memoryGovernanceRetrievalExperiment?: GraphMemoryGovernanceRetrievalWeightingExperiment;
     embeddingTargets: GraphRebuildEmbeddingTarget[];
     embeddingTargetPlan?: GraphRebuildEmbeddingTargetPlan;
     embeddingVectors: GraphRebuildEmbeddingVector[];

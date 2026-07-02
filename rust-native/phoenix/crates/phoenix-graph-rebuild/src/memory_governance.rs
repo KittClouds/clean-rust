@@ -13,6 +13,27 @@ pub const MEMORY_GOVERNANCE_COMMIT_POLICY: &str = "no_topology_commit";
 pub const MEMORY_GOVERNANCE_NO_TOPOLOGY_COMMIT: &str =
     "memory_governance_candidate:no_topology_commit";
 
+#[path = "memory_governance_retrieval_preview.rs"]
+mod retrieval_preview;
+#[path = "memory_governance_shortrun.rs"]
+mod shortrun;
+pub use retrieval_preview::{
+    build_memory_governance_retrieval_preview,
+    build_memory_governance_retrieval_preview_with_policy,
+    build_memory_governance_retrieval_weighting_experiment, MemoryGovernanceRetrievalCandidate,
+    MemoryGovernanceRetrievalPreview, MemoryGovernanceRetrievalPreviewInput,
+    MemoryGovernanceRetrievalPreviewRow, MemoryGovernanceRetrievalPreviewSummary,
+    MemoryGovernanceRetrievalWeightPolicy, MemoryGovernanceRetrievalWeightingExperiment,
+    MemoryGovernanceRetrievalWeightingVariant, MEMORY_GOVERNANCE_RETRIEVAL_PREVIEW_SCHEMA_VERSION,
+    MEMORY_GOVERNANCE_RETRIEVAL_WEIGHTING_EXPERIMENT_SCHEMA_VERSION,
+};
+pub use shortrun::{
+    build_memory_governance_shortrun_golden_report, MemoryGovernanceCandidateOnlyAudit,
+    MemoryGovernanceConfidenceSummary, MemoryGovernanceCounts, MemoryGovernancePerformanceBudget,
+    MemoryGovernanceRepresentativeRow, MemoryGovernanceShortrunComparison,
+    MemoryGovernanceShortrunGoldenReport, MemoryGovernanceTimingReport,
+};
+
 #[derive(Clone, Copy, Debug, Default)]
 pub struct MemoryGovernanceEngineInput<'a> {
     pub chunks: &'a [GraphChunk],
@@ -71,6 +92,7 @@ pub fn build_memory_governance_candidates(
     out.sort_by(|left, right| {
         governance_rank(left.action)
             .cmp(&governance_rank(right.action))
+            .then_with(|| right.confidence.total_cmp(&left.confidence))
             .then_with(|| left.target_kind.as_str().cmp(right.target_kind.as_str()))
             .then_with(|| left.target_id.cmp(&right.target_id))
     });
@@ -249,18 +271,26 @@ fn chunk_candidate(
 ) -> GraphMemoryGovernanceCandidate {
     let stats = stats.cloned().unwrap_or_default();
     let signals = signals(&stats);
-    let action = if stats.causal_degree > 0 || stats.memory_state_count > 0 {
-        GraphMemoryGovernanceAction::Retain
+    let (action, reason) = if stats.causal_degree > 0 || stats.memory_state_count > 0 {
+        (
+            GraphMemoryGovernanceAction::Retain,
+            "chunk_has_causal_or_memory_state_signal",
+        )
     } else if stats.event_count == 0 && stats.entity_ids.is_empty() {
-        GraphMemoryGovernanceAction::Attenuate
+        (
+            GraphMemoryGovernanceAction::Attenuate,
+            "chunk_has_no_events_or_entity_evidence",
+        )
     } else if stats.event_count == 0 && stats.redundancy >= 0.65 {
-        GraphMemoryGovernanceAction::Attenuate
+        (
+            GraphMemoryGovernanceAction::Attenuate,
+            "chunk_redundant_without_event_evidence",
+        )
     } else {
-        GraphMemoryGovernanceAction::Retain
-    };
-    let reason = match action {
-        GraphMemoryGovernanceAction::Attenuate => "low_signal_or_redundant_chunk",
-        _ => "chunk_has_retrieval_or_story_signal",
+        (
+            GraphMemoryGovernanceAction::Retain,
+            "chunk_has_retrieval_or_story_signal",
+        )
     };
     candidate(
         GraphMemoryGovernanceTargetKind::Chunk,
@@ -308,18 +338,14 @@ fn candidate(
     stats: TargetStats,
     signals: GraphMemoryGovernanceSignals,
 ) -> GraphMemoryGovernanceCandidate {
-    let confidence = match action {
-        GraphMemoryGovernanceAction::Compress => {
-            clamp(0.55 + signals.narrative_salience * 0.25 + signals.retrieval_utility * 0.15)
-        }
-        GraphMemoryGovernanceAction::Attenuate => {
-            clamp(0.52 + signals.redundancy * 0.18 - signals.evidence_strength * 0.12)
-        }
-        GraphMemoryGovernanceAction::Retain => {
-            clamp(0.50 + signals.narrative_salience * 0.22 + signals.causal_importance * 0.16)
-        }
-        GraphMemoryGovernanceAction::Quarantine | GraphMemoryGovernanceAction::Retire => 0.0,
-    };
+    let confidence = governance_confidence(action, &stats, &signals);
+    let mut rationale = vec![
+        MEMORY_GOVERNANCE_NO_TOPOLOGY_COMMIT.into(),
+        "memory_governance:retrieval_policy_overlay".into(),
+        format_compact!("reason:{reason}"),
+    ];
+    rationale.extend(governance_audit_rationale(action, reason, &stats));
+
     GraphMemoryGovernanceCandidate {
         schema_version: MEMORY_GOVERNANCE_SCHEMA_VERSION.into(),
         id: format_compact!(
@@ -341,12 +367,125 @@ fn candidate(
         status: GraphMemoryGovernanceStatus::Candidate,
         commit_policy: GraphMemoryGovernanceCommitPolicy::NoTopologyCommit,
         no_topology_commit: true,
-        rationale: vec![
-            MEMORY_GOVERNANCE_NO_TOPOLOGY_COMMIT.into(),
-            "memory_governance:retrieval_policy_overlay".into(),
-            format_compact!("reason:{reason}"),
-        ],
+        rationale,
     }
+}
+
+fn governance_confidence(
+    action: GraphMemoryGovernanceAction,
+    stats: &TargetStats,
+    signals: &GraphMemoryGovernanceSignals,
+) -> f32 {
+    match action {
+        GraphMemoryGovernanceAction::Compress => compression_confidence(stats),
+        GraphMemoryGovernanceAction::Attenuate => {
+            clamp(0.52 + signals.redundancy * 0.18 - signals.evidence_strength * 0.12)
+        }
+        GraphMemoryGovernanceAction::Retain => {
+            clamp(0.50 + signals.narrative_salience * 0.22 + signals.causal_importance * 0.16)
+        }
+        GraphMemoryGovernanceAction::Quarantine | GraphMemoryGovernanceAction::Retire => 0.0,
+    }
+}
+
+fn compression_confidence(stats: &TargetStats) -> f32 {
+    let event_span = soft_count(stats.event_count, 12.0);
+    let chunk_span = soft_count(stats.chunk_ids.len(), 12.0);
+    let evidence_density = soft_count(stats.evidence_ids.len(), 48.0);
+    let entity_diversity = soft_count(stats.entity_ids.len(), 10.0);
+    let causal_signal = soft_count(stats.causal_degree, 12.0);
+    let temporal_signal = soft_count(stats.temporal_degree, 24.0);
+    let memory_signal = soft_count(stats.memory_state_count, 8.0);
+
+    clamp(
+        0.62 + event_span * 0.10
+            + chunk_span * 0.08
+            + evidence_density * 0.10
+            + entity_diversity * 0.07
+            + causal_signal * 0.05
+            + temporal_signal * 0.03
+            + memory_signal * 0.02
+            - stats.redundancy * 0.04,
+    )
+}
+
+fn governance_audit_rationale(
+    action: GraphMemoryGovernanceAction,
+    reason: &str,
+    stats: &TargetStats,
+) -> Vec<CompactString> {
+    let mut out = Vec::with_capacity(8);
+    match action {
+        GraphMemoryGovernanceAction::Attenuate => {
+            if stats.event_count == 0 {
+                out.push("audit:no_events".into());
+            }
+            if stats.evidence_ids.is_empty() {
+                out.push("audit:no_anchor_or_event_evidence".into());
+            }
+            if stats.entity_ids.is_empty() {
+                out.push("audit:no_supporting_entities".into());
+            }
+            if stats.redundancy >= 0.65 {
+                out.push(format_compact!("audit:redundancy:{:.2}", stats.redundancy));
+            }
+            if stats.causal_degree == 0 {
+                out.push("audit:no_causal_edges".into());
+            }
+            if stats.memory_state_count == 0 {
+                out.push("audit:no_memory_state".into());
+            }
+        }
+        GraphMemoryGovernanceAction::Compress => {
+            out.push(format_compact!(
+                "audit:episode_events:{}",
+                stats.event_count
+            ));
+            out.push(format_compact!(
+                "audit:episode_chunks:{}",
+                stats.chunk_ids.len()
+            ));
+            out.push(format_compact!(
+                "audit:evidence:{}",
+                stats.evidence_ids.len()
+            ));
+            out.push(format_compact!("audit:entities:{}", stats.entity_ids.len()));
+            if stats.causal_degree > 0 {
+                out.push(format_compact!(
+                    "audit:causal_degree:{}",
+                    stats.causal_degree
+                ));
+            }
+            if stats.temporal_degree > 0 {
+                out.push(format_compact!(
+                    "audit:temporal_degree:{}",
+                    stats.temporal_degree
+                ));
+            }
+        }
+        GraphMemoryGovernanceAction::Retain => {
+            if stats.causal_degree > 0 {
+                out.push(format_compact!(
+                    "audit:causal_degree:{}",
+                    stats.causal_degree
+                ));
+            }
+            if stats.memory_state_count > 0 {
+                out.push(format_compact!(
+                    "audit:memory_state_count:{}",
+                    stats.memory_state_count
+                ));
+            }
+            if stats.event_count > 0 {
+                out.push(format_compact!("audit:events:{}", stats.event_count));
+            }
+        }
+        GraphMemoryGovernanceAction::Quarantine | GraphMemoryGovernanceAction::Retire => {}
+    }
+    if out.is_empty() {
+        out.push(format_compact!("audit:{reason}"));
+    }
+    out
 }
 
 fn signals(stats: &TargetStats) -> GraphMemoryGovernanceSignals {
@@ -470,6 +609,15 @@ fn clamp(value: f32) -> f32 {
     value.clamp(0.0, 1.0)
 }
 
+fn soft_count(count: usize, scale: f32) -> f32 {
+    let count = count as f32;
+    if count <= 0.0 {
+        0.0
+    } else {
+        count / (count + scale)
+    }
+}
+
 fn governance_rank(action: GraphMemoryGovernanceAction) -> u8 {
     match action {
         GraphMemoryGovernanceAction::Retain => 0,
@@ -481,150 +629,5 @@ fn governance_rank(action: GraphMemoryGovernanceAction) -> u8 {
 }
 
 #[cfg(test)]
-mod tests {
-    use phoenix_types::EntityId;
-
-    use super::*;
-    use crate::types::{GraphEpisode, GraphMemoryGovernanceAction, GraphScopeKind};
-
-    #[test]
-    fn emits_candidate_only_governance_rows_without_topology_commit() {
-        let snapshot = governance_snapshot();
-        let edge_count = snapshot.edges.len();
-        let candidates = build_memory_governance_candidates_from_snapshot(&snapshot);
-
-        assert_eq!(snapshot.edges.len(), edge_count);
-        assert!(!candidates.is_empty());
-        assert_memory_governance_candidate_only(&candidates).expect("candidate only");
-        assert!(candidates.iter().any(|candidate| {
-            candidate.target_kind == GraphMemoryGovernanceTargetKind::Episode
-                && candidate.action == GraphMemoryGovernanceAction::Compress
-        }));
-        assert!(candidates.iter().any(|candidate| {
-            candidate.target_kind == GraphMemoryGovernanceTargetKind::Chunk
-                && candidate.action == GraphMemoryGovernanceAction::Attenuate
-        }));
-    }
-
-    #[test]
-    fn serializes_to_frontend_memory_governance_contract() {
-        let snapshot = governance_snapshot();
-        let candidates = build_memory_governance_candidates_from_snapshot(&snapshot);
-        let candidate = candidates
-            .iter()
-            .find(|row| row.action == GraphMemoryGovernanceAction::Compress)
-            .expect("compress candidate");
-        let value = serde_json::to_value(candidate).expect("candidate json");
-        let object = value.as_object().expect("candidate object");
-
-        assert_eq!(object["schemaVersion"], MEMORY_GOVERNANCE_SCHEMA_VERSION);
-        assert_eq!(object["targetKind"], "episode");
-        assert_eq!(object["action"], "compress");
-        assert_eq!(object["status"], "candidate");
-        assert_eq!(object["commitPolicy"], MEMORY_GOVERNANCE_COMMIT_POLICY);
-        assert_eq!(object["noTopologyCommit"], true);
-        assert!(!object.contains_key("target_kind"));
-        assert!(!object.contains_key("commit_policy"));
-    }
-
-    fn governance_snapshot() -> GraphRebuildSnapshot {
-        let kai = EntityId("character:kai".to_owned());
-        let hazel = EntityId("character:hazel".to_owned());
-        let chunks = vec![
-            chunk("note:memory:chunk:0", 0),
-            chunk("note:memory:chunk:1", 1),
-            chunk("note:memory:chunk:2", 2),
-        ];
-        let anchors = vec![
-            anchor("anchor:kai:0", &kai, "note:memory:chunk:0"),
-            anchor("anchor:hazel:2", &hazel, "note:memory:chunk:2"),
-        ];
-        let events = vec![
-            event("event:kai:0", "note:memory:chunk:0", &[kai.clone()]),
-            event("event:hazel:2", "note:memory:chunk:2", &[hazel.clone()]),
-        ];
-
-        GraphRebuildSnapshot {
-            schema_version: "phoenix-graph-rebuild/v1".into(),
-            id: "snapshot:memory".into(),
-            source: "test".into(),
-            scope_kind: GraphScopeKind::Note,
-            scope_id: "note:memory".into(),
-            note_ids: vec!["note:memory".into()],
-            built_at: 1,
-            chunks,
-            mentions: Vec::new(),
-            entity_anchors: anchors,
-            relationships: Vec::new(),
-            events,
-            episodes: vec![GraphEpisode {
-                id: "episode:memory:0".into(),
-                note_id: "note:memory".into(),
-                event_ids: vec!["event:kai:0".into(), "event:hazel:2".into()],
-                entity_ids: vec![kai, hazel],
-                label: "Episode 1".into(),
-            }],
-            episode_projection_edges: Vec::new(),
-            temporal_edges: vec![GraphTemporalEdge {
-                id: "temporal:event:kai:event:hazel".into(),
-                source_id: "event:kai:0".into(),
-                target_id: "event:hazel:2".into(),
-                relation_type: "before".into(),
-                evidence_ids: vec!["event:kai:0".into(), "event:hazel:2".into()],
-                confidence: 0.8,
-            }],
-            causal_edges: Vec::new(),
-            memory_state: Vec::new(),
-            memory_governance_candidates: Vec::new(),
-            embedding_targets: Vec::new(),
-            embedding_vectors: Vec::new(),
-            projection_refs: Vec::new(),
-            nodes: Vec::new(),
-            edges: Vec::new(),
-            calendar_registry_summary: None,
-            document_sidecar_summary: None,
-            document_review_summary: None,
-            document_compiler_summary: None,
-            discourse_spine_summary: None,
-            counters: Default::default(),
-        }
-    }
-
-    fn chunk(id: &str, ordinal: u32) -> GraphChunk {
-        GraphChunk {
-            id: id.into(),
-            note_id: "note:memory".into(),
-            start: ordinal * 10,
-            end: ordinal * 10 + 8,
-            ordinal,
-            source: "test".into(),
-        }
-    }
-
-    fn anchor(id: &str, entity_id: &EntityId, chunk_id: &str) -> GraphAnchor {
-        GraphAnchor {
-            id: id.into(),
-            entity_id: entity_id.clone(),
-            note_id: "note:memory".into(),
-            chunk_id: Some(chunk_id.into()),
-            surface: "entity".into(),
-            source_start: 0,
-            source_end: 6,
-            source: "test".into(),
-            confidence: 1.0,
-            generation: 1,
-        }
-    }
-
-    fn event(id: &str, chunk_id: &str, entity_ids: &[EntityId]) -> GraphEvent {
-        GraphEvent {
-            id: id.into(),
-            note_id: "note:memory".into(),
-            chunk_id: Some(chunk_id.into()),
-            label: "event".into(),
-            entity_ids: entity_ids.to_vec(),
-            evidence_anchor_ids: Vec::new(),
-            confidence: 0.8,
-        }
-    }
-}
+#[path = "memory_governance_tests.rs"]
+mod tests;

@@ -217,10 +217,26 @@ pub enum GraphMemoryGovernanceStatus {
     Candidate,
 }
 
+impl GraphMemoryGovernanceStatus {
+    pub const fn as_str(self) -> &'static str {
+        match self {
+            Self::Candidate => "candidate",
+        }
+    }
+}
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum GraphMemoryGovernanceCommitPolicy {
     NoTopologyCommit,
+}
+
+impl GraphMemoryGovernanceCommitPolicy {
+    pub const fn as_str(self) -> &'static str {
+        match self {
+            Self::NoTopologyCommit => "no_topology_commit",
+        }
+    }
 }
 
 #[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
@@ -345,6 +361,8 @@ pub struct GraphCounters {
     pub memory_state: usize,
     #[serde(default)]
     pub memory_governance_candidates: usize,
+    #[serde(default)]
+    pub memory_governance_build_micros: u64,
     #[serde(default)]
     pub memory_governance_retain: usize,
     #[serde(default)]
