@@ -11,12 +11,17 @@ import type {
     GraphRebuildChunkSemanticBridgeType,
     GraphRebuildEpisode,
     GraphRebuildEpisodeConnection,
+    GraphRebuildEpisodeProjectionEdge,
     GraphRebuildEvent,
     GraphRebuildMemoryState,
     GraphRebuildRelationship,
     GraphRebuildSnapshot,
     GraphRebuildTemporalEdge,
 } from './graph-rebuild-snapshot';
+import {
+    buildGraphEpisodeProjectionEdges,
+    episodeProjectionEdgeCounters,
+} from './graph-episode-projection';
 import { buildGraphRebuildCausalEdges } from './graph-rebuild-causal-graph';
 import {
     assertChunkSemanticBridgeCandidateOnly,
@@ -30,6 +35,7 @@ export interface DerivedGraphRebuildFacts {
     episodes: GraphRebuildEpisode[];
     chunkSemanticBridges: GraphRebuildChunkSemanticBridge[];
     episodeConnections: GraphRebuildEpisodeConnection[];
+    episodeProjectionEdges: GraphRebuildEpisodeProjectionEdge[];
     temporalEdges: GraphRebuildTemporalEdge[];
     causalEdges: GraphRebuildCausalEdge[];
     memoryState: GraphRebuildMemoryState[];
@@ -84,7 +90,8 @@ export function deriveGraphRebuildFacts(
     const causalEdges = buildGraphRebuildCausalEdges(events, chunks, noteTexts, causalSidecar);
     const chunkSemanticBridges = assertChunkSemanticBridgeCandidateOnly([]);
     const episodeConnections = buildEpisodeConnections(episodes, events, temporalEdges, causalEdges, chunkSemanticBridges);
-    return { relationships, edges, events, episodes, chunkSemanticBridges, episodeConnections, temporalEdges, causalEdges, memoryState };
+    const episodeProjectionEdges = buildGraphEpisodeProjectionEdges(episodes, events, chunks, episodeConnections);
+    return { relationships, edges, events, episodes, chunkSemanticBridges, episodeConnections, episodeProjectionEdges, temporalEdges, causalEdges, memoryState };
 }
 
 export function applyNativeChunkSemanticBridgeCandidates(
@@ -105,6 +112,12 @@ export function applyNativeChunkSemanticBridgeCandidates(
     );
     snapshot.chunkSemanticBridges = chunkSemanticBridges;
     snapshot.episodeConnections = episodeConnections;
+    snapshot.episodeProjectionEdges = buildGraphEpisodeProjectionEdges(
+        snapshot.episodes || [],
+        snapshot.events || [],
+        snapshot.chunks || [],
+        episodeConnections,
+    );
     snapshot.counters = {
         ...snapshot.counters,
         chunkSemanticBridges: chunkSemanticBridges.length,
@@ -120,6 +133,7 @@ export function applyNativeChunkSemanticBridgeCandidates(
         episodeTemporalConnections: episodeConnections.filter((connection) => connection.kind === 'episode_temporal').length,
         episodeCausalConnections: episodeConnections.filter((connection) => connection.kind === 'episode_causal').length,
         episodeWormholeConnections: episodeConnections.filter((connection) => connection.kind === 'episode_wormhole').length,
+        ...episodeProjectionEdgeCounters(snapshot.episodeProjectionEdges),
     };
 }
 

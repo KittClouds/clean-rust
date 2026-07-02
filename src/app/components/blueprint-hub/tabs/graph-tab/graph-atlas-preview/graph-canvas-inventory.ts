@@ -1,6 +1,7 @@
 import type { GraphRebuildSnapshot } from '../../../../../graph-rebuild/graph-rebuild-snapshot';
 import { recordGraphCollapseRenderedInventory } from '../../../../../graph-rebuild/graph-collapse-trace';
 import type { GraphInventory } from './graph-atlas-preview.component';
+import { buildEpisodeProjectionCanvasEdges } from './graph-episode-projection-canvas';
 import { buildGraphPacketRowAdapter } from './graph-packet-row-adapter';
 
 const EMPTY_PACKET_LABEL = 'rust atlas packet missing';
@@ -16,9 +17,10 @@ export function buildGraphCanvasInventory(snapshot: GraphRebuildSnapshot | null)
         return { nodes: [], edges: [], kindCounts: [], sourceLabel: EMPTY_PACKET_LABEL };
     }
     const rows = buildGraphPacketRowAdapter(packet, snapshot.embeddingTargets || []);
+    const episodeEdges = buildEpisodeProjectionCanvasEdges(snapshot, rows.graphNodes);
     const inventory: GraphInventory = {
         nodes: rows.graphNodes,
-        edges: rows.graphEdges,
+        edges: [...rows.graphEdges, ...episodeEdges],
         kindCounts: rows.kindCounts,
         sourceLabel: rows.sourceLabel,
     };

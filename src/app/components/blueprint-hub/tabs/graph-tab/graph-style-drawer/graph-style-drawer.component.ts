@@ -41,7 +41,7 @@ const ENTITY_CATEGORIES: EntityCategory[] = [
 const GRAPH_NODE_COLOR_CATEGORIES: GraphNodeColorCategory[] = [
     { name: 'Relationship colors', kinds: ['cooccurrence', 'observation', 'communication', 'authority', 'approval', 'relationship'] },
     { name: 'Story relationships', kinds: ['family', 'intimacy', 'transfer', 'causal', 'temporal', 'scenePresence'] },
-    { name: 'Story structure', kinds: ['document', 'chunk', 'anchor', 'graphFact', 'eventNode', 'temporalFact', 'causalFact'] },
+    { name: 'Story structure', kinds: ['document', 'episode', 'chunk', 'anchor', 'graphFact', 'eventNode', 'temporalFact', 'causalFact'] },
     { name: 'State and context', kinds: ['memoryState', 'decisionState', 'rankStatus', 'serviceContext', 'affiliationContext', 'familyContext'] },
 ];
 
@@ -59,6 +59,7 @@ const GRAPH_NODE_COLOR_LABELS: Record<GraphNodeColorKind, string> = {
     temporal: 'Temporal',
     relationship: 'Relationship',
     document: 'Document',
+    episode: 'Episode',
     chunk: 'Chunk',
     anchor: 'Evidence',
     graphFact: 'Relationship midpoint',

@@ -171,7 +171,7 @@ function embeddingAtlasStyle(input: {
 }
 
 function graphStructureFamily(colorKind: string): string {
-    if (colorKind === 'document' || colorKind === 'chunk' || colorKind === 'anchor') return 'structure';
+    if (colorKind === 'document' || colorKind === 'episode' || colorKind === 'chunk' || colorKind === 'anchor') return 'structure';
     if (colorKind === 'temporal' || colorKind === 'temporalFact') return 'temporal';
     if (colorKind === 'causal' || colorKind === 'causalFact') return 'causal';
     if (colorKind === 'memoryState') return 'memory';
@@ -180,6 +180,7 @@ function graphStructureFamily(colorKind: string): string {
 
 function renderKindForGraphColor(colorKind: string, fallback: string): string {
     if (colorKind === 'document') return 'note';
+    if (colorKind === 'episode') return 'episode';
     if (colorKind === 'chunk') return 'chunk';
     if (colorKind === 'anchor') return 'anchor';
     return displayKind(fallback || colorKind);

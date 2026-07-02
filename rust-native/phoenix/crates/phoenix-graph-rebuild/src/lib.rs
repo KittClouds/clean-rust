@@ -10,7 +10,9 @@ mod builder;
 mod chunk_semantic_bridge;
 mod compiler;
 mod embedding;
+mod episode_projection;
 mod facts;
+mod memory_governance;
 mod semantic;
 #[cfg(test)]
 mod tests;
@@ -60,6 +62,12 @@ pub use embedding::{
     build_snapshot_embedding_target_report, build_snapshot_embedding_targets,
     GraphEmbeddingTargetBuild, GraphEmbeddingTargetOriginCount,
 };
+pub use memory_governance::{
+    assert_memory_governance_candidate_only, build_memory_governance_candidates,
+    build_memory_governance_candidates_from_snapshot, MemoryGovernanceEngineInput,
+    MEMORY_GOVERNANCE_COMMIT_POLICY, MEMORY_GOVERNANCE_NO_TOPOLOGY_COMMIT,
+    MEMORY_GOVERNANCE_SCHEMA_VERSION,
+};
 pub use phoenix_chunker_native::{
     build_chunks, classify_document_profiles, Chunk, ChunkerConfig, DocumentProfileRequest,
     DocumentProfileSummary,
@@ -79,6 +87,9 @@ pub use types::{
     GraphDocumentCompilerHyperedgeRole, GraphDocumentCompilerSummary, GraphDocumentConfidence,
     GraphDocumentEvidenceSpan, GraphDocumentReviewRow, GraphDocumentReviewSummary,
     GraphDocumentSidecarSummary, GraphDocumentUnitSummary, GraphDropReasons, GraphEdge,
-    GraphEmbeddingTarget, GraphEpisode, GraphEvent, GraphMemoryState, GraphMention, GraphNode,
-    GraphProjectionRef, GraphRebuildSnapshot, GraphRelationship, GraphScopeKind, GraphTemporalEdge,
+    GraphEmbeddingTarget, GraphEpisode, GraphEpisodeProjectionEdge, GraphEvent,
+    GraphMemoryGovernanceAction, GraphMemoryGovernanceCandidate, GraphMemoryGovernanceCommitPolicy,
+    GraphMemoryGovernanceSignals, GraphMemoryGovernanceStatus, GraphMemoryGovernanceTargetKind,
+    GraphMemoryState, GraphMention, GraphNode, GraphProjectionRef, GraphRebuildSnapshot,
+    GraphRelationship, GraphScopeKind, GraphTemporalEdge,
 };

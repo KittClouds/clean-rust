@@ -38,6 +38,7 @@ const STYLE_LAB_KEYS = [
     'temporal',
     'scenePresence',
     'document',
+    'episode',
     'chunk',
     'anchor',
     'graphFact',
@@ -519,7 +520,7 @@ function contractChecksFor(
         parityCheck(rows, 'registry-to-embed-siegel', ['character', 'npc', 'creature', 'location', 'network', 'item', 'concept'], 'embedSiegel'),
         parityCheck(rows, 'state-context-to-graph', ['memoryState', 'decisionState', 'rankStatus', 'serviceContext', 'affiliationContext', 'familyContext'], 'graphInventory'),
         parityCheck(rows, 'state-context-to-embed-siegel', ['memoryState', 'decisionState', 'rankStatus', 'serviceContext', 'affiliationContext', 'familyContext'], 'embedSiegel'),
-        parityCheck(rows, 'story-structure-to-graph', ['document', 'chunk', 'anchor', 'eventNode', 'temporalFact', 'causalFact'], 'graphInventory'),
+        parityCheck(rows, 'story-structure-to-graph', ['document', 'episode', 'chunk', 'anchor', 'eventNode', 'temporalFact', 'causalFact'], 'graphInventory'),
     ];
     const explained = new Set(embedExclusions.map((row) => row.styleKey));
     const unexplainedEmbedLoss = rows.filter((row) =>
@@ -618,7 +619,8 @@ function familyForTarget(target: GraphRebuildEmbeddingTarget): string {
 
 function styleKeyForTarget(target: GraphRebuildEmbeddingTarget): string {
     if (target.kind === 'entity') return target.entityKind || 'entity';
-    if (target.kind === 'note' || target.kind === 'episode' || target.kind === 'structureRoot') return 'document';
+    if (target.kind === 'episode') return 'episode';
+    if (target.kind === 'note' || target.kind === 'structureRoot') return 'document';
     if (target.kind === 'chunk' || target.kind === 'documentUnit') return 'chunk';
     if (target.kind === 'anchor' || target.kind === 'evidenceSpan') return 'anchor';
     if (target.kind === 'event') return 'eventNode';

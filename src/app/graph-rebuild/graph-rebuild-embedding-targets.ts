@@ -18,6 +18,7 @@ import type {
     GraphDocumentHyperedge,
     GraphDocumentHyperedgeRole,
 } from './graph-document-compiler-types';
+import { graphEpisodeTargetId } from './graph-episode-projection';
 import { selectGraphRebuildEmbeddingTargetPlan } from './graph-rebuild-embedding-target-policy';
 import { summarizeMeaningFrame } from './graph-rebuild-meaning-frames';
 
@@ -91,7 +92,7 @@ export function buildGraphRebuildEmbeddingTargetPlan(
         parentIds: [structureRootId(chunk.noteId, 'document-structure')],
     });
     for (const episode of episodes) targets.push({
-        id: episodeTargetId(episode.id),
+        id: graphEpisodeTargetId(episode.id),
         kind: 'episode',
         sourceId: episode.id,
         noteId: episode.noteId,
@@ -569,10 +570,6 @@ function structureRootId(noteId: string, key: StructuralRootKey): string {
     return `embed:structure-root:${noteId}:${key}`;
 }
 
-function episodeTargetId(episodeId: string): string {
-    return `embed:episode:${episodeId}`;
-}
-
 function episodeEvidenceIds(
     episode: GraphRebuildEpisode,
     eventById: Map<string, GraphRebuildEvent>,
@@ -607,7 +604,7 @@ function eventParentIds(
 ): string[] {
     const episode = episodeByEventId.get(event.id);
     return unique([
-        ...(episode ? [episodeTargetId(episode.id)] : []),
+        ...(episode ? [graphEpisodeTargetId(episode.id)] : []),
         structureRootId(event.noteId, 'temporal'),
         ...(event.chunkId ? [`embed:chunk:${event.chunkId}`] : []),
         ...event.entityIds.map((entityId) => `embed:entity:${entityId}`),

@@ -48,6 +48,7 @@ import {
     buildGraphPacketRowAdapter,
     graphPacketEmbeddingTargetCount,
 } from './graph-packet-row-adapter';
+import { episodeProjectionEmbeddingEdge } from './graph-episode-projection-canvas';
 
 const HOPF_RESONANCE_DIMS = 96;
 const HOPF_RESONANCE_NEIGHBORS = 8;
@@ -2518,6 +2519,17 @@ function buildTargetEdges(snapshot: GraphRebuildSnapshot): GalaxyInputEdge[] {
     }
     for (const edge of snapshot.embeddingGraphPostProcess?.backboneEdges || []) {
         add(edge.id, edge.sourceTargetId, edge.targetTargetId, `embedding-${edge.role}`, edge.score);
+    }
+    for (const edge of snapshot.episodeProjectionEdges || []) {
+        const projectionEdge = episodeProjectionEmbeddingEdge(edge);
+        add(
+            projectionEdge.id,
+            projectionEdge.sourceId,
+            projectionEdge.targetId,
+            projectionEdge.type,
+            projectionEdge.confidence,
+            projectionEdge.metadata,
+        );
     }
     addDiscourseOverlayEdges(snapshot, add);
     return dedupeEdges(edges);

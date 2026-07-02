@@ -352,8 +352,8 @@ function applyHydratedField(
     if (field === 'sourceRows') {
         assignKnown(snapshot, value, [
             'chunks', 'mentions', 'entityAnchors', 'relationships', 'events',
-            'episodes', 'chunkSemanticBridges', 'episodeConnections',
-            'temporalEdges', 'causalEdges', 'memoryState',
+            'episodes', 'chunkSemanticBridges', 'episodeConnections', 'episodeProjectionEdges',
+            'temporalEdges', 'causalEdges', 'memoryState', 'memoryGovernanceCandidates',
         ]);
     } else if (field === 'renderRows') {
         assignKnown(snapshot, value, ['projectionRefs', 'nodes', 'edges', 'structuralPostProcess', 'projectedUiGraph']);

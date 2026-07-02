@@ -464,6 +464,7 @@ fn adapter_snapshot(source: &str, middle: &str, target: &str) -> GraphRebuildSna
             entity_ids: vec![kai.clone(), tempest.clone()],
             label: "Episode 1".into(),
         }],
+        episode_projection_edges: Vec::new(),
         temporal_edges: vec![GraphTemporalEdge {
             id: "temporal:event:warning:event:answer".into(),
             source_id: "event:warning".into(),
@@ -474,6 +475,7 @@ fn adapter_snapshot(source: &str, middle: &str, target: &str) -> GraphRebuildSna
         }],
         causal_edges: Vec::new(),
         memory_state: Vec::new(),
+        memory_governance_candidates: Vec::new(),
         embedding_targets: Vec::new(),
         embedding_vectors: Vec::new(),
         projection_refs: Vec::new(),

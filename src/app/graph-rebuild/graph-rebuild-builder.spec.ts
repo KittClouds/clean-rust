@@ -274,6 +274,15 @@ describe('Phoenix graph rebuild builder', () => {
         expect(snapshot.episodes.map((episode) => episode.eventIds.length)).toEqual([12, 12, 2]);
         expect(snapshot.episodeConnections?.filter((connection) => connection.kind === 'episode_temporal'))
             .toHaveLength(2);
+        expect(snapshot.episodeProjectionEdges?.filter((edge) => edge.kind === 'document_contains_episode'))
+            .toHaveLength(3);
+        expect(snapshot.episodeProjectionEdges?.filter((edge) => edge.kind === 'episode_contains_event'))
+            .toHaveLength(26);
+        expect(snapshot.episodeProjectionEdges?.filter((edge) => edge.kind === 'episode_contains_chunk'))
+            .toHaveLength(26);
+        expect(snapshot.episodeProjectionEdges?.filter((edge) => edge.kind === 'episode_temporal'))
+            .toHaveLength(2);
+        expect(snapshot.episodeProjectionEdges?.every((edge) => edge.noTopologyCommit)).toBe(true);
         expect(snapshot.chunkSemanticBridges).toEqual([]);
         expect(snapshot.episodeConnections?.filter((connection) => connection.kind === 'episode_wormhole'))
             .toHaveLength(0);
@@ -315,9 +324,21 @@ describe('Phoenix graph rebuild builder', () => {
         });
         expect(wormholes[0].relationType).not.toBe('episode_wormhole_shared_entities');
         expect(wormholes[0].bridgeType).toBeTruthy();
+        const projectionWormholes = snapshot.episodeProjectionEdges?.filter((edge) => edge.kind === 'episode_wormhole_candidate') || [];
+        expect(projectionWormholes).toHaveLength(1);
+        expect(projectionWormholes[0]).toMatchObject({
+            sourceTargetId: 'embed:episode:episode:note-1:0',
+            targetTargetId: 'embed:episode:episode:note-1:2',
+            status: 'candidate_overlay',
+            noTopologyCommit: true,
+            relationType: 'episode_route_continuity',
+        });
         expect(snapshot.nodes.some((node) => node.id.includes('chunk_semantic_bridge'))).toBe(false);
         expect(snapshot.edges.some((edge) =>
             edge.id.includes('chunk_semantic_bridge') || edge.type.includes('chunk_semantic_bridge'),
+        )).toBe(false);
+        expect(snapshot.edges.some((edge) =>
+            edge.id.includes('episode_projection') || edge.type.includes('episode_'),
         )).toBe(false);
         expect(snapshot.counters.promotedFacts).toBe(
             snapshot.counters.acceptedRelationships
@@ -332,6 +353,10 @@ describe('Phoenix graph rebuild builder', () => {
             episodeConnections: 3,
             episodeTemporalConnections: 2,
             episodeWormholeConnections: 1,
+            episodeProjectionEdges: 58,
+            episodeProjectionStructuralEdges: 55,
+            episodeProjectionDerivedEdges: 2,
+            episodeProjectionCandidateEdges: 1,
         });
         expect(snapshot.embeddingTargets.find((target) => target.id === 'embed:event:event:note-1:12:warning_event')?.parentIds)
             .toEqual(expect.arrayContaining(['embed:episode:episode:note-1:1']));

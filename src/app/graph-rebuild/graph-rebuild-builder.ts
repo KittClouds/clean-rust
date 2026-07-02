@@ -40,6 +40,7 @@ import {
 import { buildGraphSemanticEvalLedgerSummary } from './graph-semantic-eval-ledger';
 import { buildGraphCalendarRegistryBridgeSummary } from './graph-calendar-registry-bridge';
 import { buildGraphMemoryGraphRagBridgeSummary } from './graph-memory-graphrag-bridge';
+import { episodeProjectionEdgeCounters } from './graph-episode-projection';
 import { buildGraphDiscourseSpineSummary } from './graph-discourse-spine';
 import { buildGraphDiscourseBridgeCandidateSummary } from './graph-discourse-bridge-candidates';
 import { buildGraphDiscourseBridgeAdjudicationSummary } from './graph-discourse-bridge-adjudication';
@@ -187,9 +188,11 @@ export function buildGraphRebuildSnapshot(input: BuildGraphRebuildSnapshotInput)
         episodes: derived.episodes,
         chunkSemanticBridges: derived.chunkSemanticBridges,
         episodeConnections: derived.episodeConnections,
+        episodeProjectionEdges: derived.episodeProjectionEdges,
         temporalEdges: derived.temporalEdges,
         causalEdges: derived.causalEdges,
         memoryState: derived.memoryState,
+        memoryGovernanceCandidates: [],
         embeddingTargets,
         embeddingTargetPlan,
         embeddingVectors: [],
@@ -241,9 +244,16 @@ export function buildGraphRebuildSnapshot(input: BuildGraphRebuildSnapshotInput)
             episodeTemporalConnections: derived.episodeConnections.filter((connection) => connection.kind === 'episode_temporal').length,
             episodeCausalConnections: derived.episodeConnections.filter((connection) => connection.kind === 'episode_causal').length,
             episodeWormholeConnections: derived.episodeConnections.filter((connection) => connection.kind === 'episode_wormhole').length,
+            ...episodeProjectionEdgeCounters(derived.episodeProjectionEdges),
             temporalEdges: derived.temporalEdges.length,
             causalEdges: derived.causalEdges.length,
             memoryState: derived.memoryState.length,
+            memoryGovernanceCandidates: 0,
+            memoryGovernanceRetain: 0,
+            memoryGovernanceAttenuate: 0,
+            memoryGovernanceCompress: 0,
+            memoryGovernanceQuarantine: 0,
+            memoryGovernanceRetire: 0,
             embeddingTargets: embeddingTargets.length,
             embeddingTargetCandidates: embeddingTargetPlan.candidateCount,
             embeddingQueuedTargets: embeddingWorkTargets.length,

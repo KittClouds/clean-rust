@@ -262,6 +262,89 @@ export interface GraphRebuildEpisodeConnection {
     rationale: string[];
 }
 
+export type GraphRebuildEpisodeProjectionEdgeKind =
+    | 'document_contains_episode'
+    | 'episode_contains_event'
+    | 'episode_contains_chunk'
+    | 'episode_temporal'
+    | 'episode_causal'
+    | 'episode_wormhole_candidate';
+
+export type GraphRebuildEpisodeProjectionEdgeStatus =
+    | 'structural'
+    | 'derived'
+    | 'candidate_overlay';
+
+export interface GraphRebuildEpisodeProjectionEdge {
+    schemaVersion: 'phoenix-episode-projection-edge/v1';
+    id: string;
+    kind: GraphRebuildEpisodeProjectionEdgeKind;
+    sourceId: string;
+    targetId: string;
+    sourceTargetId: string;
+    targetTargetId: string;
+    noteId?: string;
+    episodeId?: string;
+    sourceEpisodeId?: string;
+    targetEpisodeId?: string;
+    eventId?: string;
+    chunkId?: string;
+    episodeConnectionId?: string;
+    relationType: string;
+    evidenceIds: string[];
+    confidence: number;
+    status: GraphRebuildEpisodeProjectionEdgeStatus;
+    noTopologyCommit: true;
+    rationale: string[];
+}
+
+export const GRAPH_MEMORY_GOVERNANCE_SCHEMA_VERSION = 'phoenix-memory-governance-candidate/v1' as const;
+export const GRAPH_MEMORY_GOVERNANCE_COMMIT_POLICY = 'no_topology_commit' as const;
+export const GRAPH_MEMORY_GOVERNANCE_NO_TOPOLOGY_COMMIT =
+    'memory_governance_candidate:no_topology_commit' as const;
+
+export type GraphMemoryGovernanceTargetKind = 'chunk' | 'episode';
+
+export type GraphMemoryGovernanceAction =
+    | 'retain'
+    | 'attenuate'
+    | 'compress'
+    | 'quarantine'
+    | 'retire';
+
+export type GraphMemoryGovernanceStatus = 'candidate';
+
+export interface GraphMemoryGovernanceSignals {
+    age: number;
+    accessFrequency: number;
+    redundancy: number;
+    contradictionRisk: number;
+    causalImportance: number;
+    narrativeSalience: number;
+    retrievalUtility: number;
+    evidenceStrength: number;
+    userPinned: boolean;
+}
+
+export interface GraphMemoryGovernanceCandidate {
+    schemaVersion: typeof GRAPH_MEMORY_GOVERNANCE_SCHEMA_VERSION;
+    id: string;
+    targetId: string;
+    targetKind: GraphMemoryGovernanceTargetKind;
+    action: GraphMemoryGovernanceAction;
+    reason: string;
+    evidenceIds: string[];
+    supportingEntityIds: string[];
+    relatedEventIds: string[];
+    relatedChunkIds: string[];
+    signals: GraphMemoryGovernanceSignals;
+    confidence: number;
+    status: GraphMemoryGovernanceStatus;
+    commitPolicy: typeof GRAPH_MEMORY_GOVERNANCE_COMMIT_POLICY;
+    noTopologyCommit: true;
+    rationale: string[];
+}
+
 export interface GraphRebuildTemporalEdge {
     id: string;
     sourceId: string;
@@ -2055,9 +2138,19 @@ export interface GraphRebuildCounters {
     episodeTemporalConnections?: number;
     episodeCausalConnections?: number;
     episodeWormholeConnections?: number;
+    episodeProjectionEdges?: number;
+    episodeProjectionStructuralEdges?: number;
+    episodeProjectionDerivedEdges?: number;
+    episodeProjectionCandidateEdges?: number;
     temporalEdges: number;
     causalEdges: number;
     memoryState: number;
+    memoryGovernanceCandidates?: number;
+    memoryGovernanceRetain?: number;
+    memoryGovernanceAttenuate?: number;
+    memoryGovernanceCompress?: number;
+    memoryGovernanceQuarantine?: number;
+    memoryGovernanceRetire?: number;
     embeddingTargets: number;
     embeddingTargetCandidates?: number;
     embeddingQueuedTargets?: number;
@@ -2312,6 +2405,10 @@ export interface GraphRebuildBuildTimings {
     nativeChunkSemanticBridgeCandidates?: number;
     nativeChunkSemanticBridgeQualityDemotions?: number;
     nativeChunkSemanticBridgeRustMicros?: number;
+    nativeMemoryGovernanceMs?: number;
+    nativeMemoryGovernanceSkipped?: number;
+    nativeMemoryGovernanceCandidates?: number;
+    nativeMemoryGovernanceRustMicros?: number;
     nativeCompilerMs?: number;
     nativeCompilerSkipped?: number;
     nativeCompilerInputBytesByFamily?: Record<string, number>;
@@ -2440,9 +2537,11 @@ export interface GraphRebuildSnapshot {
     episodes: GraphRebuildEpisode[];
     chunkSemanticBridges?: GraphRebuildChunkSemanticBridge[];
     episodeConnections?: GraphRebuildEpisodeConnection[];
+    episodeProjectionEdges?: GraphRebuildEpisodeProjectionEdge[];
     temporalEdges: GraphRebuildTemporalEdge[];
     causalEdges: GraphRebuildCausalEdge[];
     memoryState: GraphRebuildMemoryState[];
+    memoryGovernanceCandidates?: GraphMemoryGovernanceCandidate[];
     embeddingTargets: GraphRebuildEmbeddingTarget[];
     embeddingTargetPlan?: GraphRebuildEmbeddingTargetPlan;
     embeddingVectors: GraphRebuildEmbeddingVector[];

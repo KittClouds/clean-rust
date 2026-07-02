@@ -18,14 +18,16 @@ use crate::tts::{
 use base64::{engine::general_purpose::STANDARD as BASE64_STANDARD, Engine as _};
 use flate2::{read::GzDecoder, write::GzEncoder, Compression};
 use phoenix_graph_rebuild::{
-    assert_chunk_semantic_bridge_candidate_only, audit_chunk_semantic_bridge_quality_gate,
-    build_atlas_packet, build_chunk_semantic_bridge_candidates_from_snapshot, build_chunks,
-    build_document_semantic_summary, build_snapshot_embedding_target_report,
-    classify_document_profiles, compile_legacy_snapshot, promote_chunk_semantic_bridge_candidates,
-    AtlasPacket, Chunk, ChunkSemanticBridgeCandidate, ChunkSemanticBridgePromotionChunk,
-    ChunkSemanticBridgePromotionInput, ChunkSemanticBridgeSnapshotDocument, ChunkerConfig,
-    DocumentProfileRequest, DocumentSemanticRequest, GraphEmbeddingTarget,
-    GraphEmbeddingTargetOriginCount, GraphRebuildSnapshot,
+    assert_chunk_semantic_bridge_candidate_only, assert_memory_governance_candidate_only,
+    audit_chunk_semantic_bridge_quality_gate, build_atlas_packet,
+    build_chunk_semantic_bridge_candidates_from_snapshot, build_chunks,
+    build_document_semantic_summary, build_memory_governance_candidates_from_snapshot,
+    build_snapshot_embedding_target_report, classify_document_profiles, compile_legacy_snapshot,
+    promote_chunk_semantic_bridge_candidates, AtlasPacket, Chunk, ChunkSemanticBridgeCandidate,
+    ChunkSemanticBridgePromotionChunk, ChunkSemanticBridgePromotionInput,
+    ChunkSemanticBridgeSnapshotDocument, ChunkerConfig, DocumentProfileRequest,
+    DocumentSemanticRequest, GraphEmbeddingTarget, GraphEmbeddingTargetOriginCount,
+    GraphMemoryGovernanceCandidate, GraphRebuildSnapshot,
 };
 use phoenix_hyperbolic::lorentz_tree::{
     HyperboloidPoint, LorentzForest, LorentzForestIndex, LorentzNode, LorentzQueryMode,
@@ -106,6 +108,28 @@ struct ChunkSemanticBridgeResponse {
     candidates: Vec<ChunkSemanticBridgeCandidate>,
     quality_gate: phoenix_graph_rebuild::BridgeQualityGateAudit,
     timing: ChunkSemanticBridgeTiming,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct MemoryGovernanceRequest {
+    snapshot: GraphRebuildSnapshot,
+}
+
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct MemoryGovernanceTiming {
+    governance_build_micros: u128,
+    total_micros: u128,
+}
+
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct MemoryGovernanceResponse {
+    schema_version: &'static str,
+    source: &'static str,
+    candidates: Vec<GraphMemoryGovernanceCandidate>,
+    timing: MemoryGovernanceTiming,
 }
 
 #[derive(Debug, Deserialize)]
@@ -994,6 +1018,29 @@ impl PhoenixApi for PhoenixApiImpl {
                     quality_gate,
                     timing: ChunkSemanticBridgeTiming {
                         bridge_build_micros,
+                        total_micros: started.elapsed().as_micros(),
+                    },
+                },
+                "error": null,
+            }));
+        }
+        if command == "graphRebuild:memoryGovernance" {
+            let started = Instant::now();
+            let request = serde_json::from_value::<MemoryGovernanceRequest>(payload)
+                .map_err(|error| format!("invalid memory governance request: {error}"))?;
+            let governance_started = Instant::now();
+            let candidates = build_memory_governance_candidates_from_snapshot(&request.snapshot);
+            assert_memory_governance_candidate_only(&candidates)
+                .map_err(|error| error.to_string())?;
+            let governance_build_micros = governance_started.elapsed().as_micros();
+            return serialize_json(&json!({
+                "success": true,
+                "payload": MemoryGovernanceResponse {
+                    schema_version: "phoenix-memory-governance-native-output/v1",
+                    source: "rust",
+                    candidates,
+                    timing: MemoryGovernanceTiming {
+                        governance_build_micros,
                         total_micros: started.elapsed().as_micros(),
                     },
                 },

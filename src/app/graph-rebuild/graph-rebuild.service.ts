@@ -32,6 +32,7 @@ import {
     graphOperatorMutationJournalFromTruthCommits,
     type GraphOperatorMutationJournal,
 } from './graph-operator-mutation-journal';
+import { applyNativeMemoryGovernanceCandidates } from './graph-memory-governance';
 import type {
     GraphAtlasFamily,
     GraphAtlasManifoldTarget,
@@ -87,6 +88,7 @@ import type {
     GraphRebuildEmbeddingTarget,
     GraphRebuildEmbeddingTargetPlan,
     GraphRebuildEmbeddingProfile,
+    GraphMemoryGovernanceCandidate,
     GraphRebuildNoteFolderContext,
     GraphRebuildRelationshipHint,
     GraphRebuildScopeKind,
@@ -208,6 +210,18 @@ interface NativeChunkSemanticBridgeOutput {
     candidates: GraphRebuildChunkSemanticBridge[];
     qualityGate: NativeChunkSemanticBridgeQualityGate;
     timing: NativeChunkSemanticBridgeTiming;
+}
+
+interface NativeMemoryGovernanceTiming {
+    governanceBuildMicros: number;
+    totalMicros: number;
+}
+
+interface NativeMemoryGovernanceOutput {
+    schemaVersion: 'phoenix-memory-governance-native-output/v1';
+    source: 'rust';
+    candidates: GraphMemoryGovernanceCandidate[];
+    timing: NativeMemoryGovernanceTiming;
 }
 
 interface CompressedNativeAtlasSeedPayload {
@@ -424,6 +438,7 @@ export class GraphRebuildService {
             recordGraphCollapseSnapshotBoundary(snapshot, 'typescript_snapshot');
             snapshot = await this.reconcileDocumentGraphMutations(snapshot);
             await this.attachNativeChunkSemanticBridges(snapshot, noteTexts, timings);
+            await this.attachNativeMemoryGovernance(snapshot, timings);
             const interactivePacketAttached = durabilityMode === 'interactive'
                 && attachInteractiveAtlasPacketForSnapshotTargets(
                     snapshot,
@@ -529,6 +544,33 @@ export class GraphRebuildService {
             }
         } finally {
             if (timings) timings.nativeChunkSemanticBridgeMs = elapsedMs(started);
+        }
+    }
+
+    private async attachNativeMemoryGovernance(
+        snapshot: GraphRebuildSnapshot,
+        timings?: GraphRebuildBuildTimings,
+    ): Promise<void> {
+        const started = performance.now();
+        try {
+            if (this.phoenix.target !== 'native') {
+                applyNativeMemoryGovernanceCandidates(snapshot, []);
+                if (timings) timings.nativeMemoryGovernanceSkipped = 1;
+                return;
+            }
+            const native = await this.phoenix.storeCommand('graphRebuild:memoryGovernance', {
+                snapshot: graphRebuildSnapshotToNativeMemoryGovernancePayload(snapshot),
+            }) as NativeMemoryGovernanceOutput | null;
+            if (!isNativeMemoryGovernanceOutput(native)) {
+                throw new Error('Rust memory governance command returned an invalid v1 payload.');
+            }
+            applyNativeMemoryGovernanceCandidates(snapshot, native.candidates);
+            if (timings) {
+                timings.nativeMemoryGovernanceCandidates = native.candidates.length;
+                timings.nativeMemoryGovernanceRustMicros = native.timing.governanceBuildMicros;
+            }
+        } finally {
+            if (timings) timings.nativeMemoryGovernanceMs = elapsedMs(started);
         }
     }
 
@@ -1159,6 +1201,7 @@ export function graphRebuildSnapshotToNativeCompilerPayload(snapshot: GraphRebui
         episodes: [],
         chunkSemanticBridges: [],
         episodeConnections: [],
+        episodeProjectionEdges: [],
         temporalEdges: snapshot.temporalEdges,
         causalEdges: snapshot.causalEdges,
         memoryState: snapshot.memoryState,
@@ -1193,6 +1236,7 @@ export function graphRebuildSnapshotToNativeChunkBridgePayload(snapshot: GraphRe
         episodes: snapshot.episodes,
         chunkSemanticBridges: [],
         episodeConnections: [],
+        episodeProjectionEdges: [],
         temporalEdges: snapshot.temporalEdges,
         causalEdges: snapshot.causalEdges,
         memoryState: [],
@@ -1205,6 +1249,37 @@ export function graphRebuildSnapshotToNativeChunkBridgePayload(snapshot: GraphRe
     };
 }
 
+export function graphRebuildSnapshotToNativeMemoryGovernancePayload(snapshot: GraphRebuildSnapshot): GraphRebuildSnapshot {
+    return {
+        schemaVersion: snapshot.schemaVersion,
+        id: snapshot.id,
+        source: snapshot.source,
+        scopeKind: snapshot.scopeKind,
+        scopeId: snapshot.scopeId,
+        noteIds: snapshot.noteIds,
+        builtAt: snapshot.builtAt,
+        chunks: snapshot.chunks,
+        mentions: [],
+        entityAnchors: snapshot.entityAnchors,
+        relationships: [],
+        events: snapshot.events,
+        episodes: snapshot.episodes,
+        chunkSemanticBridges: [],
+        episodeConnections: [],
+        episodeProjectionEdges: [],
+        temporalEdges: snapshot.temporalEdges,
+        causalEdges: snapshot.causalEdges,
+        memoryState: snapshot.memoryState,
+        memoryGovernanceCandidates: [],
+        embeddingTargets: [],
+        embeddingVectors: [],
+        projectionRefs: [],
+        nodes: [],
+        edges: [],
+        counters: snapshot.counters,
+    };
+}
+
 function isNativeChunkSemanticBridgeOutput(
     value: NativeChunkSemanticBridgeOutput | null | undefined,
 ): value is NativeChunkSemanticBridgeOutput {
@@ -1212,6 +1287,15 @@ function isNativeChunkSemanticBridgeOutput(
         && value.source === 'rust'
         && Array.isArray(value.candidates)
         && !!value.qualityGate
+        && !!value.timing;
+}
+
+function isNativeMemoryGovernanceOutput(
+    value: NativeMemoryGovernanceOutput | null | undefined,
+): value is NativeMemoryGovernanceOutput {
+    return value?.schemaVersion === 'phoenix-memory-governance-native-output/v1'
+        && value.source === 'rust'
+        && Array.isArray(value.candidates)
         && !!value.timing;
 }
 
@@ -2110,9 +2194,11 @@ export function graphRebuildSnapshotPersistenceView(
     persisted.episodes = [];
     persisted.chunkSemanticBridges = [];
     persisted.episodeConnections = [];
+    persisted.episodeProjectionEdges = [];
     persisted.temporalEdges = [];
     persisted.causalEdges = [];
     persisted.memoryState = [];
+    persisted.memoryGovernanceCandidates = [];
     persisted.embeddingTargets = [];
     persisted.projectionRefs = [];
     persisted.nodes = [];
@@ -2547,6 +2633,10 @@ function emptyBuildTimings(): GraphRebuildBuildTimings {
         nativeChunkSemanticBridgeCandidates: 0,
         nativeChunkSemanticBridgeQualityDemotions: 0,
         nativeChunkSemanticBridgeRustMicros: 0,
+        nativeMemoryGovernanceMs: 0,
+        nativeMemoryGovernanceSkipped: 0,
+        nativeMemoryGovernanceCandidates: 0,
+        nativeMemoryGovernanceRustMicros: 0,
         nativeCompilerMs: 0,
         nativeCompilerSkipped: 0,
         nativeCompilerInputBytesByFamily: {},
@@ -2603,6 +2693,7 @@ const SNAPSHOT_PAYLOAD_PROFILE_FIELDS: Array<[string, keyof GraphRebuildSnapshot
     ['payloadTemporalEdgesChars', 'temporalEdges'],
     ['payloadCausalEdgesChars', 'causalEdges'],
     ['payloadMemoryStateChars', 'memoryState'],
+    ['payloadMemoryGovernanceCandidatesChars', 'memoryGovernanceCandidates'],
     ['payloadEmbeddingTargetsChars', 'embeddingTargets'],
     ['payloadEmbeddingTargetPlanChars', 'embeddingTargetPlan'],
     ['payloadEmbeddingGraphPostProcessChars', 'embeddingGraphPostProcess'],
@@ -2658,9 +2749,11 @@ function snapshotContentBlobValue(
                 episodes: snapshot.episodes,
                 chunkSemanticBridges: snapshot.chunkSemanticBridges,
                 episodeConnections: snapshot.episodeConnections,
+                episodeProjectionEdges: snapshot.episodeProjectionEdges,
                 temporalEdges: snapshot.temporalEdges,
                 causalEdges: snapshot.causalEdges,
                 memoryState: snapshot.memoryState,
+                memoryGovernanceCandidates: snapshot.memoryGovernanceCandidates,
             });
         case 'renderRows':
             return compactBlobGroup({

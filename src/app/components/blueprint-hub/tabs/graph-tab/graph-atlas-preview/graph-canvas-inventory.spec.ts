@@ -171,6 +171,99 @@ describe('graph canvas inventory', () => {
         }
     });
 
+    it('renders episode projection nodes and read-only edges from the shared contract', () => {
+        const next = snapshot();
+        next.atlasPacket!.objects.push(
+            atlasObject('structure-root:note-1:document-structure', 'structure', 'ledgerOnly', 'structureRoot', 'Document structure'),
+            atlasObject('episode:note-1:0', 'structure', 'ledgerOnly', 'episode', 'Episode 1'),
+            atlasObject('event:note-1:0', 'fact', 'compiledToGraph', 'event', 'Kai enters'),
+        );
+        next.atlasPacket!.manifoldTargets.push(
+            {
+                id: 'embed:structure-root:note-1:document-structure',
+                objectId: 'structure-root:note-1:document-structure',
+                family: 'structure',
+                admission: 'admitted',
+                status: 'accepted',
+                vectorStatus: 'missing',
+                coordinateSource: 'packet-row',
+                kind: 'structureRoot',
+                label: 'Document structure',
+                sourceId: 'note-1:document-structure',
+                noteId: 'note-1',
+                evidenceIds: [],
+                parentIds: [],
+            },
+            {
+                id: 'embed:episode:episode:note-1:0',
+                objectId: 'episode:note-1:0',
+                family: 'structure',
+                admission: 'admitted',
+                status: 'accepted',
+                vectorStatus: 'missing',
+                coordinateSource: 'packet-row',
+                kind: 'episode',
+                label: 'Episode 1',
+                sourceId: 'episode:note-1:0',
+                noteId: 'note-1',
+                evidenceIds: ['event:note-1:0'],
+                parentIds: ['embed:structure-root:note-1:document-structure'],
+            },
+            {
+                id: 'embed:event:event:note-1:0',
+                objectId: 'event:note-1:0',
+                family: 'fact',
+                admission: 'admitted',
+                status: 'compiledToGraph',
+                vectorStatus: 'missing',
+                coordinateSource: 'packet-row',
+                kind: 'event',
+                label: 'Kai enters',
+                sourceId: 'event:note-1:0',
+                noteId: 'note-1',
+                chunkId: 'note-1:0',
+                evidenceIds: ['anchor-1'],
+                parentIds: ['embed:episode:episode:note-1:0'],
+            },
+        );
+        next.episodeProjectionEdges = [{
+            schemaVersion: 'phoenix-episode-projection-edge/v1',
+            id: 'episode_projection:document_contains_episode:note-1:episode:note-1:0',
+            kind: 'document_contains_episode',
+            sourceId: 'note-1:document-structure',
+            targetId: 'episode:note-1:0',
+            sourceTargetId: 'embed:structure-root:note-1:document-structure',
+            targetTargetId: 'embed:episode:episode:note-1:0',
+            noteId: 'note-1',
+            episodeId: 'episode:note-1:0',
+            relationType: 'document_contains_episode',
+            evidenceIds: [],
+            confidence: 1,
+            status: 'structural',
+            noTopologyCommit: true,
+            rationale: ['episode_projection:document_spine:no_topology_commit'],
+        }];
+
+        const inventory = buildGraphCanvasInventory(next);
+        const episode = inventory.nodes.find((node) => node.id === 'episode:note-1:0');
+        const edge = inventory.edges.find((candidate) => candidate.type === 'document_contains_episode');
+
+        expect(episode?.metadata?.['graphColorKind']).toBe('episode');
+        expect(episode?.colorHsl).toBe(DEFAULT_GRAPH_NODE_COLORS.episode);
+        expect(edge).toMatchObject({
+            sourceId: 'structure-root:note-1:document-structure',
+            targetId: 'episode:note-1:0',
+            confidence: 1,
+        });
+        expect(edge?.metadata).toMatchObject({
+            noTopologyCommit: true,
+            topologyCommit: false,
+            canvasLens: 'structure',
+            graphColorKind: 'episode',
+            graphImpact: 'Episode projection edge is render-only; no Overgraph truth write or topology commit exists.',
+        });
+    });
+
     it('does not synthesize TS graph rows when the Rust packet is absent', () => {
         const inventory = buildGraphCanvasInventory(null);
 

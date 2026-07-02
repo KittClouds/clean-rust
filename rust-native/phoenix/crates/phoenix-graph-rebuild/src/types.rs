@@ -121,6 +121,38 @@ pub struct GraphEpisode {
 
 #[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
+pub struct GraphEpisodeProjectionEdge {
+    pub schema_version: CompactString,
+    pub id: CompactString,
+    pub kind: CompactString,
+    pub source_id: CompactString,
+    pub target_id: CompactString,
+    pub source_target_id: CompactString,
+    pub target_target_id: CompactString,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub note_id: Option<CompactString>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub episode_id: Option<CompactString>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub source_episode_id: Option<CompactString>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub target_episode_id: Option<CompactString>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub event_id: Option<CompactString>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub chunk_id: Option<CompactString>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub episode_connection_id: Option<CompactString>,
+    pub relation_type: CompactString,
+    pub evidence_ids: Vec<CompactString>,
+    pub confidence: f32,
+    pub status: CompactString,
+    pub no_topology_commit: bool,
+    pub rationale: Vec<CompactString>,
+}
+
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct GraphTemporalEdge {
     pub id: CompactString,
     pub source_id: CompactString,
@@ -139,6 +171,96 @@ pub struct GraphMemoryState {
     pub key: CompactString,
     pub value: CompactString,
     pub evidence_ids: Vec<CompactString>,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum GraphMemoryGovernanceTargetKind {
+    Chunk,
+    Episode,
+}
+
+impl GraphMemoryGovernanceTargetKind {
+    pub const fn as_str(self) -> &'static str {
+        match self {
+            Self::Chunk => "chunk",
+            Self::Episode => "episode",
+        }
+    }
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum GraphMemoryGovernanceAction {
+    Retain,
+    Attenuate,
+    Compress,
+    Quarantine,
+    Retire,
+}
+
+impl GraphMemoryGovernanceAction {
+    pub const fn as_str(self) -> &'static str {
+        match self {
+            Self::Retain => "retain",
+            Self::Attenuate => "attenuate",
+            Self::Compress => "compress",
+            Self::Quarantine => "quarantine",
+            Self::Retire => "retire",
+        }
+    }
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum GraphMemoryGovernanceStatus {
+    Candidate,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum GraphMemoryGovernanceCommitPolicy {
+    NoTopologyCommit,
+}
+
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct GraphMemoryGovernanceSignals {
+    pub age: f32,
+    pub access_frequency: f32,
+    pub redundancy: f32,
+    pub contradiction_risk: f32,
+    pub causal_importance: f32,
+    pub narrative_salience: f32,
+    pub retrieval_utility: f32,
+    pub evidence_strength: f32,
+    pub user_pinned: bool,
+}
+
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct GraphMemoryGovernanceCandidate {
+    pub schema_version: CompactString,
+    pub id: CompactString,
+    pub target_id: CompactString,
+    pub target_kind: GraphMemoryGovernanceTargetKind,
+    pub action: GraphMemoryGovernanceAction,
+    pub reason: CompactString,
+    #[serde(default)]
+    pub evidence_ids: Vec<CompactString>,
+    #[serde(default)]
+    pub supporting_entity_ids: Vec<CompactString>,
+    #[serde(default)]
+    pub related_event_ids: Vec<CompactString>,
+    #[serde(default)]
+    pub related_chunk_ids: Vec<CompactString>,
+    pub signals: GraphMemoryGovernanceSignals,
+    pub confidence: f32,
+    pub status: GraphMemoryGovernanceStatus,
+    pub commit_policy: GraphMemoryGovernanceCommitPolicy,
+    pub no_topology_commit: bool,
+    #[serde(default)]
+    pub rationale: Vec<CompactString>,
 }
 
 #[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
@@ -210,9 +332,29 @@ pub struct GraphCounters {
     pub rejected_relationships: usize,
     pub events: usize,
     pub episodes: usize,
+    #[serde(default)]
+    pub episode_projection_edges: usize,
+    #[serde(default)]
+    pub episode_projection_structural_edges: usize,
+    #[serde(default)]
+    pub episode_projection_derived_edges: usize,
+    #[serde(default)]
+    pub episode_projection_candidate_edges: usize,
     pub temporal_edges: usize,
     pub causal_edges: usize,
     pub memory_state: usize,
+    #[serde(default)]
+    pub memory_governance_candidates: usize,
+    #[serde(default)]
+    pub memory_governance_retain: usize,
+    #[serde(default)]
+    pub memory_governance_attenuate: usize,
+    #[serde(default)]
+    pub memory_governance_compress: usize,
+    #[serde(default)]
+    pub memory_governance_quarantine: usize,
+    #[serde(default)]
+    pub memory_governance_retire: usize,
     pub embedding_targets: usize,
     pub embedding_vectors: usize,
     pub projection_refs: usize,
@@ -587,9 +729,13 @@ pub struct GraphRebuildSnapshot {
     pub relationships: Vec<GraphRelationship>,
     pub events: Vec<GraphEvent>,
     pub episodes: Vec<GraphEpisode>,
+    #[serde(default)]
+    pub episode_projection_edges: Vec<GraphEpisodeProjectionEdge>,
     pub temporal_edges: Vec<GraphTemporalEdge>,
     pub causal_edges: Vec<GraphTemporalEdge>,
     pub memory_state: Vec<GraphMemoryState>,
+    #[serde(default)]
+    pub memory_governance_candidates: Vec<GraphMemoryGovernanceCandidate>,
     pub embedding_targets: Vec<GraphEmbeddingTarget>,
     pub embedding_vectors: Vec<CompactString>,
     pub projection_refs: Vec<GraphProjectionRef>,

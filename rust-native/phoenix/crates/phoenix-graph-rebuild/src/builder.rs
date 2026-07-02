@@ -10,10 +10,12 @@ use thiserror::Error;
 
 use crate::adjudication::adjudicate_cooccurrence_edges;
 use crate::embedding::build_embedding_targets;
+use crate::episode_projection::build_episode_projection_edges;
 use crate::facts::derive_graph_facts;
+use crate::memory_governance::build_memory_governance_candidates;
 use crate::types::{
-    GraphAnchor, GraphChunk, GraphCounters, GraphDropReasons, GraphEdge, GraphMention, GraphNode,
-    GraphRebuildSnapshot, GraphScopeKind,
+    GraphAnchor, GraphChunk, GraphCounters, GraphDropReasons, GraphEdge,
+    GraphMemoryGovernanceAction, GraphMention, GraphNode, GraphRebuildSnapshot, GraphScopeKind,
 };
 
 #[derive(Debug, Error)]
@@ -147,7 +149,19 @@ pub fn build_graph_rebuild_snapshot(
     let episodes = derived.episodes;
     let temporal_edges = derived.temporal_edges;
     let causal_edges = derived.causal_edges;
+    let episode_projection_edges =
+        build_episode_projection_edges(&episodes, &events, &chunks, &temporal_edges, &causal_edges);
     let memory_state = derived.memory_state;
+    let memory_governance_candidates =
+        build_memory_governance_candidates(crate::memory_governance::MemoryGovernanceEngineInput {
+            chunks: &chunks,
+            episodes: &episodes,
+            anchors: &anchors,
+            events: &events,
+            temporal_edges: &temporal_edges,
+            causal_edges: &causal_edges,
+            memory_state: &memory_state,
+        });
     let embedding_targets = build_embedding_targets(
         input.note_id,
         input.text,
@@ -156,6 +170,7 @@ pub fn build_graph_rebuild_snapshot(
         &nodes,
         &relationships,
         &events,
+        &episodes,
         &temporal_edges,
         &causal_edges,
         &memory_state,
@@ -181,9 +196,43 @@ pub fn build_graph_rebuild_snapshot(
         rejected_relationships,
         events: events.len(),
         episodes: episodes.len(),
+        episode_projection_edges: episode_projection_edges.len(),
+        episode_projection_structural_edges: episode_projection_edges
+            .iter()
+            .filter(|edge| edge.status == "structural")
+            .count(),
+        episode_projection_derived_edges: episode_projection_edges
+            .iter()
+            .filter(|edge| edge.status == "derived")
+            .count(),
+        episode_projection_candidate_edges: episode_projection_edges
+            .iter()
+            .filter(|edge| edge.status == "candidate_overlay")
+            .count(),
         temporal_edges: temporal_edges.len(),
         causal_edges: causal_edges.len(),
         memory_state: memory_state.len(),
+        memory_governance_candidates: memory_governance_candidates.len(),
+        memory_governance_retain: count_memory_governance_action(
+            &memory_governance_candidates,
+            GraphMemoryGovernanceAction::Retain,
+        ),
+        memory_governance_attenuate: count_memory_governance_action(
+            &memory_governance_candidates,
+            GraphMemoryGovernanceAction::Attenuate,
+        ),
+        memory_governance_compress: count_memory_governance_action(
+            &memory_governance_candidates,
+            GraphMemoryGovernanceAction::Compress,
+        ),
+        memory_governance_quarantine: count_memory_governance_action(
+            &memory_governance_candidates,
+            GraphMemoryGovernanceAction::Quarantine,
+        ),
+        memory_governance_retire: count_memory_governance_action(
+            &memory_governance_candidates,
+            GraphMemoryGovernanceAction::Retire,
+        ),
         embedding_targets: embedding_targets.len(),
         nodes: nodes.len(),
         edges: edges.len(),
@@ -210,9 +259,11 @@ pub fn build_graph_rebuild_snapshot(
         relationships,
         events,
         episodes,
+        episode_projection_edges,
         temporal_edges,
         causal_edges,
         memory_state,
+        memory_governance_candidates,
         embedding_targets,
         embedding_vectors: Vec::new(),
         projection_refs: Vec::new(),
@@ -253,6 +304,16 @@ fn build_chunks(note_id: &str, text: &str) -> Vec<GraphChunk> {
             .into(),
         })
         .collect()
+}
+
+fn count_memory_governance_action(
+    candidates: &[crate::types::GraphMemoryGovernanceCandidate],
+    action: GraphMemoryGovernanceAction,
+) -> usize {
+    candidates
+        .iter()
+        .filter(|candidate| candidate.action == action)
+        .count()
 }
 
 fn known_to_mention(note_id: &str, chunks: &[GraphChunk], known: &KnownMatch) -> GraphMention {

@@ -240,7 +240,10 @@ export function graphTopologyDisplayColorKind(colorKind: string): string {
 
 function graphTopologyStyleKindForFamily(family: GraphAtlasFamily | string, kind: string, label: string): GraphNodeColorKind | '' {
     const token = compactStyleToken(`${kind} ${label}`);
-    if (family === 'structure') return token.includes('chunk') || token.includes('documentunit') || token.includes('leaf') ? 'chunk' : 'document';
+    if (family === 'structure') {
+        if (token.includes('episode')) return 'episode';
+        return token.includes('chunk') || token.includes('documentunit') || token.includes('leaf') ? 'chunk' : 'document';
+    }
     if (family === 'evidence') return 'anchor';
     if (family === 'temporal' || token.includes('temporalfact')) return 'temporalFact';
     if (family === 'causal' || token.includes('causalfact')) return 'causalFact';
@@ -260,6 +263,8 @@ function graphTopologyStyleKindForEmbeddingKind(kind: string): GraphNodeColorKin
         case 'note':
         case 'structure-root':
             return 'document';
+        case 'episode':
+            return 'episode';
         case 'chunk':
         case 'document-unit':
             return 'chunk';

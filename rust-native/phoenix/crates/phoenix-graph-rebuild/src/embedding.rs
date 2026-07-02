@@ -2,9 +2,10 @@ use std::collections::BTreeMap;
 
 use compact_str::{format_compact, CompactString};
 
+use crate::episode_projection::episode_target_id;
 use crate::types::{
-    GraphAnchor, GraphChunk, GraphEmbeddingTarget, GraphEvent, GraphMemoryState, GraphNode,
-    GraphRelationship, GraphTemporalEdge,
+    GraphAnchor, GraphChunk, GraphEmbeddingTarget, GraphEpisode, GraphEvent, GraphMemoryState,
+    GraphNode, GraphRelationship, GraphTemporalEdge,
 };
 
 mod snapshot_targets;
@@ -21,6 +22,7 @@ pub fn build_embedding_targets(
     nodes: &[GraphNode],
     relationships: &[GraphRelationship],
     events: &[GraphEvent],
+    episodes: &[GraphEpisode],
     temporal_edges: &[GraphTemporalEdge],
     causal_edges: &[GraphTemporalEdge],
     memory_state: &[GraphMemoryState],
@@ -31,6 +33,7 @@ pub fn build_embedding_targets(
             + nodes.len()
             + relationships.len()
             + events.len()
+            + episodes.len()
             + temporal_edges.len()
             + causal_edges.len()
             + memory_state.len()
@@ -63,6 +66,25 @@ pub fn build_embedding_targets(
         parent_ids: vec![structure_root_id(&chunk.note_id, "document-structure")],
         ..GraphEmbeddingTarget::default()
     }));
+    targets.extend(episodes.iter().map(|episode| GraphEmbeddingTarget {
+        id: episode_target_id(&episode.id),
+        kind: "episode".into(),
+        source_id: episode.id.clone(),
+        note_id: Some(episode.note_id.clone()),
+        chunk_id: None,
+        entity_id: None,
+        label: episode.label.clone(),
+        text: format_compact!(
+            "{} events:{} entities:{}",
+            episode.label,
+            episode.event_ids.len(),
+            episode.entity_ids.len()
+        ),
+        evidence_ids: Vec::new(),
+        parent_ids: vec![structure_root_id(&episode.note_id, "document-structure")],
+        ..GraphEmbeddingTarget::default()
+    }));
+    let event_episode = event_episode_targets(episodes);
     targets.extend(nodes.iter().map(|node| GraphEmbeddingTarget {
         id: format_compact!("embed:entity:{}", node.entity_id.0),
         kind: "entity".into(),
@@ -133,7 +155,7 @@ pub fn build_embedding_targets(
         label: event.label.clone(),
         text: event.label.clone(),
         evidence_ids: event.evidence_anchor_ids.clone(),
-        parent_ids: Vec::new(),
+        parent_ids: event_parent_ids(event, &event_episode),
         ..GraphEmbeddingTarget::default()
     }));
     targets.extend(
@@ -269,6 +291,32 @@ fn temporal_target(note_id: &str, edge: &GraphTemporalEdge, prefix: &str) -> Gra
 
 fn structure_root_id(note_id: &str, key: &str) -> CompactString {
     format_compact!("embed:structure-root:{note_id}:{key}")
+}
+
+fn event_episode_targets(episodes: &[GraphEpisode]) -> BTreeMap<CompactString, CompactString> {
+    let mut out = BTreeMap::new();
+    for episode in episodes {
+        let target_id = episode_target_id(&episode.id);
+        for event_id in &episode.event_ids {
+            out.insert(event_id.clone(), target_id.clone());
+        }
+    }
+    out
+}
+
+fn event_parent_ids(
+    event: &GraphEvent,
+    event_episode: &BTreeMap<CompactString, CompactString>,
+) -> Vec<CompactString> {
+    let mut parents = Vec::new();
+    if let Some(episode_id) = event_episode.get(&event.id) {
+        parents.push(episode_id.clone());
+    }
+    parents.push(structure_root_id(&event.note_id, "temporal"));
+    if let Some(chunk_id) = &event.chunk_id {
+        parents.push(format_compact!("embed:chunk:{chunk_id}"));
+    }
+    parents
 }
 
 fn note_embedding_text(note_id: &str, note_text: &str) -> CompactString {

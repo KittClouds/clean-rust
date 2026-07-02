@@ -19,6 +19,7 @@ export type GraphNodeColorKind =
     | 'temporal'
     | 'relationship'
     | 'document'
+    | 'episode'
     | 'chunk'
     | 'anchor'
     | 'graphFact'
@@ -100,6 +101,7 @@ export const DEFAULT_GRAPH_NODE_COLORS: Record<GraphNodeColorKind, string> = {
     temporal: '64 84% 52%',
     relationship: '292 76% 65%',
     document: '210 82% 58%',
+    episode: '188 72% 56%',
     chunk: '176 70% 46%',
     anchor: '262 78% 66%',
     graphFact: '38 92% 57%',
@@ -222,6 +224,7 @@ const GRAPH_NODE_KIND_ALIASES: Record<string, GraphNodeColorKind> = {
     relationship: 'relationship',
     document: 'document',
     note: 'document',
+    episode: 'episode',
     chunk: 'chunk',
     leaf: 'chunk',
     anchor: 'anchor',
