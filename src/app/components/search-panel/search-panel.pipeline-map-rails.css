@@ -1,3 +1,13 @@
+.recipe-control-deck {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+  padding: 8px;
+  border: 1px solid rgba(var(--phthalo-rgb), 0.18);
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.18);
+}
+
 .recipe-grid {
   display: grid;
   gap: 4px;

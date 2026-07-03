@@ -108,6 +108,14 @@ fn main() {
         "memory_governance_compress={}",
         snapshot.counters.memory_governance_compress
     );
+    println!(
+        "memory_governance_quarantine={}",
+        snapshot.counters.memory_governance_quarantine
+    );
+    println!(
+        "memory_governance_retire={}",
+        snapshot.counters.memory_governance_retire
+    );
     println!("embedding_targets={}", snapshot.counters.embedding_targets);
     println!("nodes={}", snapshot.counters.nodes);
     println!("edges={}", snapshot.counters.edges);

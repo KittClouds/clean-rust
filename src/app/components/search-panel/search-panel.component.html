@@ -88,6 +88,68 @@
       </div>
     </div>
 
+    <div class="recipe-control-deck">
+      <div class="backend-map-head compact">
+        <span>Graph recipes</span>
+        <strong>{{ selectedRecipePlan().label }}</strong>
+      </div>
+
+      <div class="recipe-grid">
+        <button *ngFor="let recipe of graphBuildRecipes" type="button" class="recipe-card"
+          [class.recipe-selected]="selectedRecipe() === recipe.id"
+          [class.recipe-primary]="recipe.id === 'adjudicatedSemanticGraph'"
+          [disabled]="!!activeRecipe()" (click)="selectRecipe(recipe.id)">
+          <span class="recipe-icon">
+            <ng-icon [name]="recipe.icon" class="h-3.5 w-3.5"></ng-icon>
+          </span>
+          <span class="recipe-copy">
+            <strong>{{ recipe.label }}</strong>
+            <small>{{ recipe.subtitle }}</small>
+          </span>
+          <span class="recipe-output">{{ recipe.output }}</span>
+        </button>
+      </div>
+
+      <div class="selected-recipe-panel">
+        <div class="selected-recipe-copy">
+          <span class="section-kicker">Selected lane</span>
+          <strong>{{ selectedRecipePlan().label }}</strong>
+          <small>{{ selectedRecipePlan().backendRoute }}</small>
+        </div>
+
+        <div class="recipe-lane-summary">
+          <span>Models: {{ selectedCapabilityModelSummary() }}</span>
+          <span>Policy: {{ selectedRecipePlan().mutationPolicy }} / {{ selectedRecipePlan().operations.length }} operations</span>
+        </div>
+
+        <div class="selected-pipeline-rail">
+          <div *ngFor="let node of selectedPipelineRail(); let i = index" class="pipe-node"
+            [ngClass]="'capability-' + node.status">
+            <span class="pipe-idx">{{ i + 1 }}</span>
+            <span class="pipe-body">
+              <strong>{{ node.label }}</strong>
+              <em>{{ node.status }}</em>
+            </span>
+          </div>
+        </div>
+
+        <div class="recipe-actions">
+          <button type="button" class="secondary-action warm-required-action" [ngClass]="warmButtonTone()"
+            (click)="warmSelectedRecipeModels()" [disabled]="isWarmDisabled()">
+            <ng-icon [name]="activeRecipeStep() === 'warm' ? 'lucideLoader2' : 'lucideMicrochip'"
+              class="h-3.5 w-3.5" [class.animate-spin]="activeRecipeStep() === 'warm'"></ng-icon>
+            {{ warmButtonLabel() }}
+          </button>
+          <button type="button" class="primary-action" (click)="runSelectedRecipe()"
+            [disabled]="isRecipeDisabled(selectedRecipe())">
+            <ng-icon [name]="isRecipeBusy(selectedRecipe()) ? 'lucideLoader2' : 'lucideSparkles'"
+              class="h-3.5 w-3.5" [class.animate-spin]="isRecipeBusy(selectedRecipe())"></ng-icon>
+            {{ selectedRecipePlan().actionLabel }}
+          </button>
+        </div>
+      </div>
+    </div>
+
     <div class="stage8-workbench" *ngIf="stage8Workbench() as stage8">
       <div class="stage8-head">
         <div>

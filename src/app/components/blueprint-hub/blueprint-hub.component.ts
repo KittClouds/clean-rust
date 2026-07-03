@@ -5,6 +5,7 @@ import { GraphTabComponent } from './tabs/graph-tab/graph-tab.component';
 import { PatternsTabComponent } from './tabs/patterns-tab/patterns-tab.component';
 import { PlotThreadsTabComponent } from './tabs/plot-threads-tab/plot-threads-tab.component';
 import { WorldbuildingTabComponent } from './tabs/worldbuilding-tab/worldbuilding-tab.component';
+import { AttributesTabComponent } from './tabs/attributes-tab/attributes-tab.component';
 
 @Component({
     selector: 'app-blueprint-hub',
@@ -14,7 +15,8 @@ import { WorldbuildingTabComponent } from './tabs/worldbuilding-tab/worldbuildin
         GraphTabComponent,
         PatternsTabComponent,
         PlotThreadsTabComponent,
-        WorldbuildingTabComponent
+        WorldbuildingTabComponent,
+        AttributesTabComponent
     ],
     templateUrl: './blueprint-hub.component.html',
     styleUrl: './blueprint-hub.component.css'

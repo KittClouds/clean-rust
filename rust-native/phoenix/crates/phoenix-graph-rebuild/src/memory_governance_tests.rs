@@ -65,6 +65,79 @@ fn gives_low_signal_chunks_specific_attenuation_rationale() {
 }
 
 #[test]
+fn quarantines_celebrity_dominated_chunks_without_topology_commit() {
+    let mut entity_ids = HashSet::new();
+    entity_ids.insert("entity:ryan".into());
+    entity_ids.insert("entity:len".into());
+    let stats = TargetStats {
+        evidence_ids: vec!["anchor:ryan:popular".into(), "anchor:len:popular".into()],
+        entity_ids,
+        dominant_entity_pressure: 0.48,
+        dominant_entity_count: 2,
+        ..TargetStats::default()
+    };
+    let candidate = chunk_candidate(&chunk("note:memory:chunk:celebrity", 3), Some(&stats));
+
+    assert_eq!(candidate.action, GraphMemoryGovernanceAction::Quarantine);
+    assert_eq!(
+        candidate.reason,
+        "chunk_entity_salience_dominated_by_celebrity_surface"
+    );
+    assert!(candidate.no_topology_commit);
+    assert!(candidate.confidence > 0.65);
+    assert!(candidate
+        .rationale
+        .iter()
+        .any(|row| row == "audit:celebrity_entity_dominance"));
+    assert!(candidate
+        .rationale
+        .iter()
+        .any(|row| row.as_str().starts_with("audit:dominant_entity_pressure:")));
+}
+
+#[test]
+fn retrieval_preview_suppresses_quarantined_rows_without_mutation() {
+    let mut entity_ids = HashSet::new();
+    entity_ids.insert("entity:ryan".into());
+    entity_ids.insert("entity:len".into());
+    let stats = TargetStats {
+        evidence_ids: vec!["anchor:ryan:popular".into(), "anchor:len:popular".into()],
+        entity_ids,
+        dominant_entity_pressure: 0.52,
+        dominant_entity_count: 2,
+        ..TargetStats::default()
+    };
+    let governance = vec![chunk_candidate(
+        &chunk("note:memory:chunk:celebrity", 3),
+        Some(&stats),
+    )];
+    let retrieval = vec![retrieval_candidate(
+        "hit:celebrity",
+        "note:memory:chunk:celebrity",
+        GraphMemoryGovernanceTargetKind::Chunk,
+        0.90,
+    )];
+
+    let preview =
+        build_memory_governance_retrieval_preview(MemoryGovernanceRetrievalPreviewInput {
+            retrieval_candidates: &retrieval,
+            governance_candidates: &governance,
+        });
+    let row = &preview.rows[0];
+
+    assert_eq!(
+        row.governance_action,
+        Some(GraphMemoryGovernanceAction::Quarantine)
+    );
+    assert!(row.no_topology_commit);
+    assert!(row.adjusted_score < row.original_score);
+    assert!(row
+        .rationale
+        .iter()
+        .any(|rationale| rationale == "audit:celebrity_entity_dominance"));
+}
+
+#[test]
 fn ranks_episode_compression_by_signal_density() {
     let episode = GraphEpisode {
         id: "episode:ranked".into(),

@@ -3,7 +3,7 @@
     z-index: 10;
     display: flex;
     height: 100%;
-    width: 318px;
+    width: var(--atlas-sidebar-width, 318px);
     flex-shrink: 0;
     flex-direction: column;
     overflow: hidden;

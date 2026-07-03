@@ -1,0 +1,57 @@
+<div class="atlas-control-shell">
+    <header class="atlas-control-header">
+        <div>
+            <span>Blueprint Hub</span>
+            <h2>Atlas Control</h2>
+        </div>
+        <div class="atlas-control-ledger">
+            <span><strong>{{ graphSummary().entities }}</strong> entities</span>
+            <span><strong>{{ graphSummary().edges }}</strong> links</span>
+            <span><strong>{{ graphSummary().suggestions }}</strong> suggestions</span>
+            <span><strong>{{ graphSummary().room }}</strong> room</span>
+        </div>
+    </header>
+
+    <main class="atlas-control-grid">
+        <section class="atlas-control-pane atlas-control-index">
+            <app-search-panel class="atlas-control-panel-fill"></app-search-panel>
+        </section>
+
+        <section class="atlas-control-pane atlas-control-rooms">
+            <app-graph-entity-sidebar
+                class="atlas-control-panel-fill"
+                [entities]="entities()"
+                [suggestions]="suggestions()"
+                [selectedEntity]="activeEntity()"
+                [linkCount]="atlasEdges().length"
+                [lensMode]="graphLensMode()"
+                [isScanning]="isScanningSuggestions()"
+                [scanError]="suggestionError()"
+                [contextId]="machineScope()"
+                [searchText]="atlasSearch()"
+                (entitySelected)="selectEntity($event)"
+                (editEntityRequested)="editEntity($event)"
+                (deleteEntityRequested)="deleteEntity($event)"
+                (addEntityRequested)="openCreator()"
+                (flushRequested)="flushRegistry()"
+                (acceptSuggestionRequested)="acceptSuggestion($event)"
+                (rejectSuggestionRequested)="rejectSuggestion($event)"
+                (styleRequested)="openStyleDrawer()"
+                (scanRequested)="runSuggestionScan('sidebar')"
+                (searchTextChange)="atlasSearch.set($event)"
+                (lensModeChange)="graphLensMode.set($event)"
+                (operatingRoomChange)="setOperatingRoom($event)">
+            </app-graph-entity-sidebar>
+        </section>
+    </main>
+
+    @if (isStyleDrawerOpen()) {
+    <app-graph-style-drawer (close)="closeStyleDrawer()"></app-graph-style-drawer>
+    }
+</div>
+
+<app-entity-creator-dialog
+    [(visible)]="isCreatorOpen"
+    [editEntity]="editingEntity()"
+    (save)="onSaveEntity($event)">
+</app-entity-creator-dialog>

@@ -12,6 +12,8 @@ pub const MEMORY_GOVERNANCE_SCHEMA_VERSION: &str = "phoenix-memory-governance-ca
 pub const MEMORY_GOVERNANCE_COMMIT_POLICY: &str = "no_topology_commit";
 pub const MEMORY_GOVERNANCE_NO_TOPOLOGY_COMMIT: &str =
     "memory_governance_candidate:no_topology_commit";
+const CELEBRITY_ENTITY_PRESSURE_THRESHOLD: f32 = 0.20;
+const WEAK_EVIDENCE_STRENGTH_THRESHOLD: f32 = 0.50;
 
 #[path = "memory_governance_retrieval_preview.rs"]
 mod retrieval_preview;
@@ -56,6 +58,8 @@ struct TargetStats {
     causal_degree: usize,
     memory_state_count: usize,
     redundancy: f32,
+    dominant_entity_pressure: f32,
+    dominant_entity_count: usize,
 }
 
 pub fn build_memory_governance_candidates_from_snapshot(
@@ -77,6 +81,7 @@ pub fn build_memory_governance_candidates(
 ) -> Vec<GraphMemoryGovernanceCandidate> {
     let mut chunk_stats = chunk_stats(input);
     assign_chunk_redundancy(input.chunks, &mut chunk_stats);
+    assign_entity_dominance(input.chunks.len(), &mut chunk_stats);
     let episode_stats = episode_stats(input, &chunk_stats);
     let mut out = Vec::with_capacity(input.chunks.len() + input.episodes.len());
 
@@ -281,6 +286,11 @@ fn chunk_candidate(
             GraphMemoryGovernanceAction::Attenuate,
             "chunk_has_no_events_or_entity_evidence",
         )
+    } else if celebrity_entity_dominance_candidate(&stats, &signals) {
+        (
+            GraphMemoryGovernanceAction::Quarantine,
+            "chunk_entity_salience_dominated_by_celebrity_surface",
+        )
     } else if stats.event_count == 0 && stats.redundancy >= 0.65 {
         (
             GraphMemoryGovernanceAction::Attenuate,
@@ -384,7 +394,11 @@ fn governance_confidence(
         GraphMemoryGovernanceAction::Retain => {
             clamp(0.50 + signals.narrative_salience * 0.22 + signals.causal_importance * 0.16)
         }
-        GraphMemoryGovernanceAction::Quarantine | GraphMemoryGovernanceAction::Retire => 0.0,
+        GraphMemoryGovernanceAction::Quarantine => clamp(
+            0.58 + stats.dominant_entity_pressure * 0.25 + signals.narrative_salience * 0.08
+                - signals.evidence_strength * 0.08,
+        ),
+        GraphMemoryGovernanceAction::Retire => 0.0,
     }
 }
 
@@ -480,7 +494,29 @@ fn governance_audit_rationale(
                 out.push(format_compact!("audit:events:{}", stats.event_count));
             }
         }
-        GraphMemoryGovernanceAction::Quarantine | GraphMemoryGovernanceAction::Retire => {}
+        GraphMemoryGovernanceAction::Quarantine => {
+            out.push("audit:celebrity_entity_dominance".into());
+            out.push(format_compact!(
+                "audit:dominant_entity_pressure:{:.2}",
+                stats.dominant_entity_pressure
+            ));
+            if stats.event_count == 0 {
+                out.push("audit:no_events".into());
+            }
+            if stats.evidence_ids.len() <= 3 {
+                out.push(format_compact!(
+                    "audit:weak_evidence:{}",
+                    stats.evidence_ids.len()
+                ));
+            }
+            if stats.causal_degree == 0 {
+                out.push("audit:no_causal_edges".into());
+            }
+            if stats.memory_state_count == 0 {
+                out.push("audit:no_memory_state".into());
+            }
+        }
+        GraphMemoryGovernanceAction::Retire => {}
     }
     if out.is_empty() {
         out.push(format_compact!("audit:{reason}"));
@@ -537,6 +573,46 @@ fn assign_chunk_redundancy(chunks: &[GraphChunk], stats: &mut HashMap<&str, Targ
             / denominator)
             .min(1.0);
     }
+}
+
+fn assign_entity_dominance(chunk_count: usize, stats: &mut HashMap<&str, TargetStats>) {
+    let mut entity_counts = HashMap::<CompactString, usize>::new();
+    for row in stats.values() {
+        for entity_id in &row.entity_ids {
+            *entity_counts.entry(entity_id.clone()).or_insert(0) += 1;
+        }
+    }
+    let denominator = chunk_count.max(1) as f32;
+    for row in stats.values_mut() {
+        let mut dominant_count = 0_usize;
+        row.dominant_entity_pressure = row
+            .entity_ids
+            .iter()
+            .filter_map(|entity_id| entity_counts.get(entity_id).copied())
+            .inspect(|count| {
+                if *count as f32 / denominator >= CELEBRITY_ENTITY_PRESSURE_THRESHOLD {
+                    dominant_count += 1;
+                }
+            })
+            .max()
+            .map(|count| count as f32 / denominator)
+            .unwrap_or(0.0)
+            .min(1.0);
+        row.dominant_entity_count = dominant_count;
+    }
+}
+
+fn celebrity_entity_dominance_candidate(
+    stats: &TargetStats,
+    signals: &GraphMemoryGovernanceSignals,
+) -> bool {
+    stats.event_count == 0
+        && stats.entity_ids.len() >= 2
+        && stats.causal_degree == 0
+        && stats.memory_state_count == 0
+        && stats.dominant_entity_pressure >= CELEBRITY_ENTITY_PRESSURE_THRESHOLD
+        && stats.dominant_entity_count >= 2
+        && signals.evidence_strength <= WEAK_EVIDENCE_STRENGTH_THRESHOLD
 }
 
 fn mark_event_edge_degree<'a>(

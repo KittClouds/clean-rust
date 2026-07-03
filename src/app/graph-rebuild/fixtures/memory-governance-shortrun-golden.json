@@ -34,11 +34,13 @@
     "byAction": {
       "attenuate": 23,
       "compress": 12,
-      "retain": 375
+      "quarantine": 35,
+      "retain": 340
     },
     "byTargetAction": {
       "chunk:attenuate": 23,
-      "chunk:retain": 375,
+      "chunk:quarantine": 35,
+      "chunk:retain": 340,
       "episode:compress": 12
     }
   },
@@ -149,6 +151,33 @@
         "reason:chunk_has_causal_or_memory_state_signal",
         "audit:causal_degree:2",
         "audit:events:1"
+      ]
+    },
+    {
+      "schemaVersion": "phoenix-memory-governance-candidate/v1",
+      "id": "memory_governance:chunk:quarantine:shortrun:chunk:135",
+      "targetId": "shortrun:chunk:135",
+      "targetKind": "chunk",
+      "action": "quarantine",
+      "reason": "chunk_entity_salience_dominated_by_celebrity_surface",
+      "status": "candidate",
+      "commitPolicy": "no_topology_commit",
+      "noTopologyCommit": true,
+      "confidence": 0.776,
+      "evidenceCount": 2,
+      "supportingEntityCount": 2,
+      "relatedEventCount": 0,
+      "relatedChunkCount": 0,
+      "rationale": [
+        "memory_governance_candidate:no_topology_commit",
+        "memory_governance:retrieval_policy_overlay",
+        "reason:chunk_entity_salience_dominated_by_celebrity_surface",
+        "audit:celebrity_entity_dominance",
+        "audit:dominant_entity_pressure:0.83",
+        "audit:no_events",
+        "audit:weak_evidence:2",
+        "audit:no_causal_edges",
+        "audit:no_memory_state"
       ]
     },
     {
