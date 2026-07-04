@@ -103,11 +103,13 @@ export interface GraphGovernanceRunProtectedMemoryProof {
 
 export interface GraphGovernanceRunCompressionDominanceProof {
     passed: boolean;
+    fullRowProofRows: number;
     compressedRows: number;
     policyRows: number;
     boundedRows: number;
     maxPositiveDelta: number;
     maxAdjustedScore: number;
+    violationCount: number;
     sampleRows: GraphGovernanceRunRetrievalRow[];
     violations: string[];
 }
@@ -244,8 +246,9 @@ function noTopologyProof(
     rows: GraphMemoryGovernanceCandidate[],
     variants: GraphMemoryGovernanceRetrievalWeightingVariant[],
 ): GraphGovernanceRunNoTopologyProof {
-    const retrievalRows = variants.flatMap((variant) => variant.topRows || []);
     const violations: string[] = [];
+    let retrievalRows = 0;
+    let retrievalNoTopologyRows = 0;
     for (const row of rows) {
         if (row.schemaVersion !== GRAPH_MEMORY_GOVERNANCE_SCHEMA_VERSION) violations.push(`${row.id}:schema`);
         if (row.status !== 'candidate') violations.push(`${row.id}:status`);
@@ -255,8 +258,21 @@ function noTopologyProof(
             violations.push(`${row.id}:missing_no_topology_rationale`);
         }
     }
-    for (const row of retrievalRows) {
-        if (row.noTopologyCommit !== true) violations.push(`${row.id}:retrieval_topology_write`);
+    for (const variant of variants) {
+        if (variant.fullRowProof) {
+            retrievalRows += variant.fullRowProof.rowCount;
+            retrievalNoTopologyRows += variant.fullRowProof.noTopologyRows;
+            if (variant.fullRowProof.noTopologyRows !== variant.fullRowProof.rowCount) {
+                violations.push(`${variant.policy.id}:retrieval_full_row_topology_write`);
+            }
+        } else {
+            const topRows = variant.topRows || [];
+            retrievalRows += topRows.length;
+            retrievalNoTopologyRows += topRows.filter((row) => row.noTopologyCommit === true).length;
+        }
+        for (const row of variant.topRows || []) {
+            if (row.noTopologyCommit !== true) violations.push(`${row.id}:retrieval_topology_write`);
+        }
     }
     return {
         passed: violations.length === 0,
@@ -266,9 +282,9 @@ function noTopologyProof(
         commitPolicyRows: rows.filter((row) => row.commitPolicy === GRAPH_MEMORY_GOVERNANCE_COMMIT_POLICY).length,
         missingNoTopologyRationaleRows: rows.filter((row) =>
             !row.rationale?.includes(GRAPH_MEMORY_GOVERNANCE_NO_TOPOLOGY_COMMIT)).length,
-        retrievalExperimentReportOnly: retrievalRows.every((row) => row.noTopologyCommit === true),
-        retrievalRows: retrievalRows.length,
-        retrievalNoTopologyRows: retrievalRows.filter((row) => row.noTopologyCommit === true).length,
+        retrievalExperimentReportOnly: retrievalNoTopologyRows === retrievalRows,
+        retrievalRows,
+        retrievalNoTopologyRows,
         violations,
     };
 }
@@ -314,35 +330,92 @@ function compressionDominanceProof(
 ): GraphGovernanceRunCompressionDominanceProof {
     const rows: GraphMemoryGovernanceRetrievalPreviewRow[] = [];
     const violations: string[] = [];
+    let fullRowProofRows = 0;
+    let compressedRows = 0;
     let policyRows = 0;
     let boundedRows = 0;
+    let maxPositiveDelta = 0;
+    let maxAdjustedScore = 0;
+    let violationCount = 0;
 
     for (const variant of variants) {
+        const proof = variant.fullRowProof?.compressionDominance;
+        if (proof) {
+            fullRowProofRows += variant.fullRowProof?.rowCount || 0;
+            compressedRows += proof.compressedRows;
+            policyRows += proof.policyRows;
+            boundedRows += proof.boundedRows;
+            maxPositiveDelta = Math.max(maxPositiveDelta, proof.maxPositiveDelta);
+            maxAdjustedScore = Math.max(maxAdjustedScore, proof.maxAdjustedScore);
+            violationCount += proof.violationCount;
+            violations.push(...(proof.violations || []));
+            if (!proof.passed && proof.violationCount === 0) {
+                violationCount += 1;
+                violations.push(`${variant.policy.id}:compression_full_row_proof_failed`);
+            }
+        } else {
+            const fallback = compressionDominanceTopRowProof(variant);
+            compressedRows += fallback.compressedRows;
+            policyRows += fallback.policyRows;
+            boundedRows += fallback.boundedRows;
+            maxPositiveDelta = Math.max(maxPositiveDelta, fallback.maxPositiveDelta);
+            maxAdjustedScore = Math.max(maxAdjustedScore, fallback.maxAdjustedScore);
+            violationCount += fallback.violations.length;
+            violations.push(...fallback.violations);
+        }
         for (const row of variant.topRows || []) {
             if (row.governanceAction !== 'compress') continue;
             rows.push(row);
-            const hasPolicy = row.rationale?.includes(COMPRESSION_DOMINANCE_POLICY);
-            if (hasPolicy) policyRows += 1;
-            else violations.push(`${row.id}:missing_compression_policy`);
-
-            const maxDelta = variant.policy.compressMaxBoost ?? Number.POSITIVE_INFINITY;
-            const scoreCeiling = Math.max(row.originalScore, variant.policy.compressScoreCeiling ?? 1);
-            const boundedByDelta = row.scoreDelta <= maxDelta + SCORE_EPSILON;
-            const boundedByCeiling = row.adjustedScore <= scoreCeiling + SCORE_EPSILON;
-            if (boundedByDelta && boundedByCeiling) boundedRows += 1;
-            if (!boundedByDelta) violations.push(`${row.id}:compress_boost_exceeds_cap`);
-            if (!boundedByCeiling) violations.push(`${row.id}:compress_score_exceeds_ceiling`);
         }
     }
 
     return {
-        passed: violations.length === 0,
-        compressedRows: rows.length,
+        passed: violationCount === 0,
+        fullRowProofRows,
+        compressedRows,
         policyRows,
         boundedRows,
-        maxPositiveDelta: roundMetric(Math.max(0, ...rows.map((row) => row.scoreDelta))),
-        maxAdjustedScore: roundMetric(Math.max(0, ...rows.map((row) => row.adjustedScore))),
+        maxPositiveDelta: roundMetric(maxPositiveDelta),
+        maxAdjustedScore: roundMetric(maxAdjustedScore),
+        violationCount,
         sampleRows: rows.slice().sort(scoreDeltaDesc).slice(0, limit).map(retrievalRow),
+        violations: violations.slice(0, 24),
+    };
+}
+
+function compressionDominanceTopRowProof(
+    variant: GraphMemoryGovernanceRetrievalWeightingVariant,
+): Pick<GraphGovernanceRunCompressionDominanceProof,
+    'compressedRows' | 'policyRows' | 'boundedRows' | 'maxPositiveDelta' | 'maxAdjustedScore' | 'violations'> {
+    const violations: string[] = [];
+    let compressedRows = 0;
+    let policyRows = 0;
+    let boundedRows = 0;
+    let maxPositiveDelta = 0;
+    let maxAdjustedScore = 0;
+    for (const row of variant.topRows || []) {
+        if (row.governanceAction !== 'compress') continue;
+        compressedRows += 1;
+        maxPositiveDelta = Math.max(maxPositiveDelta, row.scoreDelta);
+        maxAdjustedScore = Math.max(maxAdjustedScore, row.adjustedScore);
+        const hasPolicy = row.rationale?.includes(COMPRESSION_DOMINANCE_POLICY);
+        if (hasPolicy) policyRows += 1;
+        else violations.push(`${row.id}:missing_compression_policy`);
+
+        const maxDelta = variant.policy.compressMaxBoost ?? Number.POSITIVE_INFINITY;
+        const scoreCeiling = Math.max(row.originalScore, variant.policy.compressScoreCeiling ?? 1);
+        const boundedByDelta = row.scoreDelta <= maxDelta + SCORE_EPSILON;
+        const boundedByCeiling = row.adjustedScore <= scoreCeiling + SCORE_EPSILON;
+        if (boundedByDelta && boundedByCeiling) boundedRows += 1;
+        if (!boundedByDelta) violations.push(`${row.id}:compress_boost_exceeds_cap`);
+        if (!boundedByCeiling) violations.push(`${row.id}:compress_score_exceeds_ceiling`);
+    }
+    return {
+        compressedRows,
+        policyRows,
+        boundedRows,
+        maxPositiveDelta,
+        maxAdjustedScore,
         violations,
     };
 }

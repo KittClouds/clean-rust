@@ -17,6 +17,7 @@ describe('AttributesTabComponent', () => {
         expect(template).toContain('User pin source locked');
         expect(template).toContain('Compression bounded');
         expect(template).toContain('protected pins');
+        expect(template).toContain('full proof rows');
         expect(template).toContain('bounded compression rows');
         expect(template).toContain('candidateRows');
         expect(template).toContain('Attention Required');

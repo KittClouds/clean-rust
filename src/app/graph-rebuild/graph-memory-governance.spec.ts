@@ -121,6 +121,14 @@ describe('graph memory governance', () => {
         expect(() => assertMemoryGovernanceRetrievalExperimentReportOnly(experiment))
             .toThrow(/may not mutate topology/);
     });
+
+    it('rejects retrieval full-row proofs that can commit topology', () => {
+        const experiment = retrievalExperiment();
+        experiment.variants[0].fullRowProof!.noTopologyRows = 1;
+
+        expect(() => assertMemoryGovernanceRetrievalExperimentReportOnly(experiment))
+            .toThrow(/proof may not mutate topology/);
+    });
 });
 
 function governanceCandidate(
@@ -244,6 +252,20 @@ function retrievalExperiment(): GraphMemoryGovernanceRetrievalWeightingExperimen
                 changedRankCount: 1,
                 promotedCount: 1,
                 demotedCount: 0,
+            },
+            fullRowProof: {
+                rowCount: 2,
+                noTopologyRows: 2,
+                compressionDominance: {
+                    passed: true,
+                    compressedRows: 0,
+                    policyRows: 0,
+                    boundedRows: 0,
+                    maxPositiveDelta: 0,
+                    maxAdjustedScore: 0,
+                    violationCount: 0,
+                    violations: [],
+                },
             },
             topRows: [{
                 id: 'memory_governance_retrieval_preview:app_embedding_target:embed:episode:episode:1',

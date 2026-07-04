@@ -111,11 +111,15 @@
                     <small>compressed retrieval rows</small>
                 </span>
                 <span>
+                    <strong>{{ certificate.compressionDominanceProof.fullRowProofRows }}</strong>
+                    <small>full proof rows</small>
+                </span>
+                <span>
                     <strong>{{ certificate.compressionDominanceProof.boundedRows }}</strong>
                     <small>bounded compression rows</small>
                 </span>
                 <span>
-                    <strong>{{ certificate.compressionDominanceProof.violations.length }}</strong>
+                    <strong>{{ certificate.compressionDominanceProof.violationCount }}</strong>
                     <small>compression violations</small>
                 </span>
                 @if (certificate.retrievalDeltas.variants[0]; as variant) {

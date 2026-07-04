@@ -34,11 +34,13 @@ pub use pin::{
 pub use retrieval_preview::{
     build_memory_governance_retrieval_preview,
     build_memory_governance_retrieval_preview_with_policy,
-    build_memory_governance_retrieval_weighting_experiment, MemoryGovernanceRetrievalCandidate,
-    MemoryGovernanceRetrievalPreview, MemoryGovernanceRetrievalPreviewInput,
-    MemoryGovernanceRetrievalPreviewRow, MemoryGovernanceRetrievalPreviewSummary,
-    MemoryGovernanceRetrievalWeightPolicy, MemoryGovernanceRetrievalWeightingExperiment,
-    MemoryGovernanceRetrievalWeightingVariant, MEMORY_GOVERNANCE_COMPRESSION_DOMINANCE_POLICY,
+    build_memory_governance_retrieval_weighting_experiment,
+    MemoryGovernanceCompressionDominanceProof, MemoryGovernanceRetrievalCandidate,
+    MemoryGovernanceRetrievalFullRowProof, MemoryGovernanceRetrievalPreview,
+    MemoryGovernanceRetrievalPreviewInput, MemoryGovernanceRetrievalPreviewRow,
+    MemoryGovernanceRetrievalPreviewSummary, MemoryGovernanceRetrievalWeightPolicy,
+    MemoryGovernanceRetrievalWeightingExperiment, MemoryGovernanceRetrievalWeightingVariant,
+    MEMORY_GOVERNANCE_COMPRESSION_DOMINANCE_POLICY,
     MEMORY_GOVERNANCE_RETRIEVAL_PREVIEW_SCHEMA_VERSION,
     MEMORY_GOVERNANCE_RETRIEVAL_WEIGHTING_EXPERIMENT_SCHEMA_VERSION,
 };

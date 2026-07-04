@@ -15,6 +15,8 @@ pub const MEMORY_GOVERNANCE_COMPRESSION_DOMINANCE_POLICY: &str =
 const COMPRESSION_FREE_CHUNK_FANOUT: usize = 3;
 const COMPRESSION_FREE_EVIDENCE_FANOUT: usize = 12;
 const COMPRESSION_EVIDENCE_FANOUT_WEIGHT: f32 = 0.25;
+const COMPRESSION_PROOF_SCORE_EPSILON: f32 = 0.001;
+const PROOF_VIOLATION_SAMPLE_LIMIT: usize = 12;
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -62,11 +64,33 @@ pub struct MemoryGovernanceRetrievalWeightingExperiment {
 pub struct MemoryGovernanceRetrievalWeightingVariant {
     pub policy: MemoryGovernanceRetrievalWeightPolicy,
     pub summary: MemoryGovernanceRetrievalPreviewSummary,
+    pub full_row_proof: MemoryGovernanceRetrievalFullRowProof,
     pub top_rows: Vec<MemoryGovernanceRetrievalPreviewRow>,
     pub mean_abs_rank_delta_millis: u32,
     pub retained_mean_score_delta_millis: i32,
     pub compressed_mean_score_delta_millis: i32,
     pub attenuated_mean_score_delta_millis: i32,
+}
+
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct MemoryGovernanceRetrievalFullRowProof {
+    pub row_count: usize,
+    pub no_topology_rows: usize,
+    pub compression_dominance: MemoryGovernanceCompressionDominanceProof,
+}
+
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct MemoryGovernanceCompressionDominanceProof {
+    pub passed: bool,
+    pub compressed_rows: usize,
+    pub policy_rows: usize,
+    pub bounded_rows: usize,
+    pub max_positive_delta: f32,
+    pub max_adjusted_score: f32,
+    pub violation_count: usize,
+    pub violations: Vec<CompactString>,
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
@@ -327,8 +351,10 @@ fn weighting_variant(
     policy: MemoryGovernanceRetrievalWeightPolicy,
     preview: MemoryGovernanceRetrievalPreview,
 ) -> MemoryGovernanceRetrievalWeightingVariant {
+    let full_row_proof = full_row_proof(&preview.rows, &policy);
     MemoryGovernanceRetrievalWeightingVariant {
         policy,
+        full_row_proof,
         mean_abs_rank_delta_millis: mean_abs_rank_delta_millis(&preview.rows),
         retained_mean_score_delta_millis: mean_score_delta_millis(
             &preview.rows,
@@ -344,6 +370,86 @@ fn weighting_variant(
         ),
         top_rows: preview.rows.into_iter().take(8).collect(),
         summary: preview.summary,
+    }
+}
+
+fn full_row_proof(
+    rows: &[MemoryGovernanceRetrievalPreviewRow],
+    policy: &MemoryGovernanceRetrievalWeightPolicy,
+) -> MemoryGovernanceRetrievalFullRowProof {
+    MemoryGovernanceRetrievalFullRowProof {
+        row_count: rows.len(),
+        no_topology_rows: rows.iter().filter(|row| row.no_topology_commit).count(),
+        compression_dominance: compression_dominance_proof(rows, policy),
+    }
+}
+
+fn compression_dominance_proof(
+    rows: &[MemoryGovernanceRetrievalPreviewRow],
+    policy: &MemoryGovernanceRetrievalWeightPolicy,
+) -> MemoryGovernanceCompressionDominanceProof {
+    let mut proof = MemoryGovernanceCompressionDominanceProof {
+        passed: true,
+        compressed_rows: 0,
+        policy_rows: 0,
+        bounded_rows: 0,
+        max_positive_delta: 0.0,
+        max_adjusted_score: 0.0,
+        violation_count: 0,
+        violations: Vec::new(),
+    };
+    for row in rows
+        .iter()
+        .filter(|row| row.governance_action == Some(GraphMemoryGovernanceAction::Compress))
+    {
+        proof.compressed_rows += 1;
+        proof.max_positive_delta = proof.max_positive_delta.max(row.score_delta.max(0.0));
+        proof.max_adjusted_score = proof.max_adjusted_score.max(row.adjusted_score);
+        if row
+            .rationale
+            .iter()
+            .any(|line| line == MEMORY_GOVERNANCE_COMPRESSION_DOMINANCE_POLICY)
+        {
+            proof.policy_rows += 1;
+        } else {
+            push_proof_violation(
+                &mut proof,
+                format_compact!("{}:missing_compression_policy", row.id),
+            );
+        }
+        let ceiling = row.original_score.max(policy.compress_score_ceiling);
+        let bounded_by_delta =
+            row.score_delta <= policy.compress_max_boost + COMPRESSION_PROOF_SCORE_EPSILON;
+        let bounded_by_ceiling = row.adjusted_score <= ceiling + COMPRESSION_PROOF_SCORE_EPSILON;
+        if bounded_by_delta && bounded_by_ceiling {
+            proof.bounded_rows += 1;
+        }
+        if !bounded_by_delta {
+            push_proof_violation(
+                &mut proof,
+                format_compact!("{}:compress_boost_exceeds_cap", row.id),
+            );
+        }
+        if !bounded_by_ceiling {
+            push_proof_violation(
+                &mut proof,
+                format_compact!("{}:compress_score_exceeds_ceiling", row.id),
+            );
+        }
+    }
+    proof.max_positive_delta = round_score(proof.max_positive_delta);
+    proof.max_adjusted_score = round_score(proof.max_adjusted_score);
+    proof.passed = proof.violation_count == 0;
+    proof
+}
+
+fn push_proof_violation(
+    proof: &mut MemoryGovernanceCompressionDominanceProof,
+    violation: CompactString,
+) {
+    proof.violation_count += 1;
+    if proof.violations.len() < PROOF_VIOLATION_SAMPLE_LIMIT {
+        proof.violations.push(violation);
     }
 }
 

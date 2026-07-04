@@ -574,6 +574,18 @@ fn retrieval_weighting_experiment_compares_policy_effects_without_live_retrieval
     );
     assert!(episode_anchor.summary.promoted_count >= conservative.summary.promoted_count);
     assert!(decay_heavy.summary.demoted_count >= conservative.summary.demoted_count);
+    assert_eq!(episode_anchor.full_row_proof.row_count, retrieval.len());
+    assert_eq!(
+        episode_anchor.full_row_proof.no_topology_rows,
+        retrieval.len()
+    );
+    assert_eq!(
+        episode_anchor
+            .full_row_proof
+            .compression_dominance
+            .compressed_rows,
+        1
+    );
     assert!(experiment
         .variants
         .iter()

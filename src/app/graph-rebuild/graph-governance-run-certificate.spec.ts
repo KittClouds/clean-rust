@@ -48,8 +48,8 @@ describe('buildGovernanceRunCertificate', () => {
             candidateOnlyRows: 4,
             noTopologyCommitRows: 4,
             retrievalExperimentReportOnly: true,
-            retrievalRows: 2,
-            retrievalNoTopologyRows: 2,
+            retrievalRows: 4,
+            retrievalNoTopologyRows: 4,
         });
         expect(certificate.topRows[0]).toMatchObject({
             id: 'gov:compress',
@@ -83,10 +83,12 @@ describe('buildGovernanceRunCertificate', () => {
         });
         expect(certificate.compressionDominanceProof).toMatchObject({
             passed: true,
-            compressedRows: 1,
-            policyRows: 1,
-            boundedRows: 1,
+            fullRowProofRows: 4,
+            compressedRows: 3,
+            policyRows: 3,
+            boundedRows: 3,
             maxPositiveDelta: 0.045,
+            violationCount: 0,
         });
     });
 
@@ -169,19 +171,30 @@ describe('buildGovernanceRunCertificate', () => {
 
     it('marks compression dominance proof failed when compressed retrieval rows exceed policy bounds', () => {
         const graph = snapshot();
-        graph.memoryGovernanceRetrievalExperiment!.variants[0].topRows[0] = {
-            ...graph.memoryGovernanceRetrievalExperiment!.variants[0].topRows[0],
-            adjustedScore: 0.91,
-            scoreDelta: 0.19,
-            rationale: [GRAPH_MEMORY_GOVERNANCE_NO_TOPOLOGY_COMMIT],
+        graph.memoryGovernanceRetrievalExperiment!.variants[0].fullRowProof = {
+            rowCount: 4,
+            noTopologyRows: 4,
+            compressionDominance: {
+                passed: false,
+                compressedRows: 3,
+                policyRows: 2,
+                boundedRows: 2,
+                maxPositiveDelta: 0.19,
+                maxAdjustedScore: 0.91,
+                violationCount: 2,
+                violations: [
+                    'ret:episode:hidden:missing_compression_policy',
+                    'ret:episode:hidden:compress_boost_exceeds_cap',
+                ],
+            },
         };
 
         const certificate = buildGovernanceRunCertificate(graph);
 
         expect(certificate.compressionDominanceProof.passed).toBe(false);
         expect(certificate.compressionDominanceProof.violations).toEqual(expect.arrayContaining([
-            'ret:episode:1:missing_compression_policy',
-            'ret:episode:1:compress_boost_exceeds_cap',
+            'ret:episode:hidden:missing_compression_policy',
+            'ret:episode:hidden:compress_boost_exceeds_cap',
         ]));
     });
 
@@ -285,6 +298,20 @@ function snapshot(): GraphRebuildSnapshot {
                     changedRankCount: 2,
                     promotedCount: 1,
                     demotedCount: 1,
+                },
+                fullRowProof: {
+                    rowCount: 4,
+                    noTopologyRows: 4,
+                    compressionDominance: {
+                        passed: true,
+                        compressedRows: 3,
+                        policyRows: 3,
+                        boundedRows: 3,
+                        maxPositiveDelta: 0.045,
+                        maxAdjustedScore: 0.765,
+                        violationCount: 0,
+                        violations: [],
+                    },
                 },
                 topRows: [
                     {

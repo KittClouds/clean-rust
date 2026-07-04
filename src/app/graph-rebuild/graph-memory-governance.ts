@@ -105,6 +105,9 @@ export function assertMemoryGovernanceRetrievalExperimentReportOnly(
         throw new Error('Memory governance retrieval experiment may not mutate topology.');
     }
     for (const variant of experiment.variants || []) {
+        if (variant.fullRowProof && variant.fullRowProof.noTopologyRows !== variant.fullRowProof.rowCount) {
+            throw new Error(`Memory governance retrieval proof may not mutate topology: ${variant.policy.id}`);
+        }
         for (const row of variant.topRows || []) {
             if (row.noTopologyCommit !== true) {
                 throw new Error(`Memory governance retrieval row may not mutate topology: ${row.id}`);

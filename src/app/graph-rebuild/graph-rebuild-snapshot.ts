@@ -399,9 +399,27 @@ export interface GraphMemoryGovernanceRetrievalPreviewRow {
     noTopologyCommit: true;
 }
 
+export interface GraphMemoryGovernanceRetrievalFullRowProof {
+    rowCount: number;
+    noTopologyRows: number;
+    compressionDominance: GraphMemoryGovernanceCompressionDominanceProof;
+}
+
+export interface GraphMemoryGovernanceCompressionDominanceProof {
+    passed: boolean;
+    compressedRows: number;
+    policyRows: number;
+    boundedRows: number;
+    maxPositiveDelta: number;
+    maxAdjustedScore: number;
+    violationCount: number;
+    violations: string[];
+}
+
 export interface GraphMemoryGovernanceRetrievalWeightingVariant {
     policy: GraphMemoryGovernanceRetrievalWeightPolicy;
     summary: GraphMemoryGovernanceRetrievalPreviewSummary;
+    fullRowProof?: GraphMemoryGovernanceRetrievalFullRowProof;
     topRows: GraphMemoryGovernanceRetrievalPreviewRow[];
     meanAbsRankDeltaMillis: number;
     retainedMeanScoreDeltaMillis: number;
