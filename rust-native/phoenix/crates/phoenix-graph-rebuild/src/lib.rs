@@ -16,6 +16,8 @@ mod fact_extraction_tests;
 mod facts;
 mod memory_governance;
 #[cfg(test)]
+mod memory_governance_adversarial_tests;
+#[cfg(test)]
 mod negative_relation_tests;
 mod semantic;
 #[cfg(test)]

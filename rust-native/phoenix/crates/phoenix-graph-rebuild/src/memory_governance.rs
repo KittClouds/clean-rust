@@ -72,6 +72,7 @@ struct TargetStats {
     supersession_risk: f32,
     supersession_count: usize,
     supersession_kinds: HashSet<CompactString>,
+    user_pinned: bool,
 }
 
 pub fn build_memory_governance_candidates_from_snapshot(
@@ -223,6 +224,7 @@ fn chunk_stats<'a>(input: MemoryGovernanceEngineInput<'a>) -> HashMap<&'a str, T
             row.memory_state_count += 1;
             push_unique(&mut row.evidence_ids, evidence_id.clone());
             row.entity_ids.insert(state.entity_id.0.as_str().into());
+            row.user_pinned |= memory_state_is_pinned(state);
         }
     }
     stats
@@ -278,6 +280,7 @@ fn episode_stats<'a>(
                     row.supersession_count += chunk_row.supersession_count;
                     row.supersession_kinds
                         .extend(chunk_row.supersession_kinds.iter().cloned());
+                    row.user_pinned |= chunk_row.user_pinned;
                 }
             }
         }
@@ -299,7 +302,9 @@ fn chunk_candidate(
 ) -> GraphMemoryGovernanceCandidate {
     let stats = stats.cloned().unwrap_or_default();
     let signals = signals(&stats);
-    let (action, reason) = if contradiction_quarantine_candidate(&signals) {
+    let (action, reason) = if signals.user_pinned {
+        (GraphMemoryGovernanceAction::Retain, "target_user_pinned_memory")
+    } else if contradiction_quarantine_candidate(&signals) {
         (
             GraphMemoryGovernanceAction::Quarantine,
             "target_has_contradictory_memory_evidence",
@@ -351,7 +356,9 @@ fn episode_candidate(
 ) -> GraphMemoryGovernanceCandidate {
     let stats = stats.cloned().unwrap_or_default();
     let signals = signals(&stats);
-    let action = if contradiction_quarantine_candidate(&signals) {
+    let action = if signals.user_pinned {
+        GraphMemoryGovernanceAction::Retain
+    } else if contradiction_quarantine_candidate(&signals) {
         GraphMemoryGovernanceAction::Quarantine
     } else if supersession_attenuate_candidate(&stats, &signals) {
         GraphMemoryGovernanceAction::Attenuate
@@ -371,6 +378,7 @@ fn episode_candidate(
         }
         GraphMemoryGovernanceAction::Compress => "episode_can_compact_child_chunks",
         GraphMemoryGovernanceAction::Attenuate => "episode_has_no_event_evidence",
+        GraphMemoryGovernanceAction::Retain if signals.user_pinned => "target_user_pinned_memory",
         _ => "episode_preserves_story_continuity",
     };
     candidate(
@@ -436,7 +444,11 @@ fn governance_confidence(
                 - signals.evidence_strength * 0.12,
         ),
         GraphMemoryGovernanceAction::Retain => {
-            clamp(0.50 + signals.narrative_salience * 0.22 + signals.causal_importance * 0.16)
+            clamp(
+                0.50 + signals.narrative_salience * 0.22
+                    + signals.causal_importance * 0.16
+                    + if signals.user_pinned { 0.18 } else { 0.0 },
+            )
         }
         GraphMemoryGovernanceAction::Quarantine => clamp(
             0.58 + stats.dominant_entity_pressure * 0.25
@@ -479,14 +491,8 @@ fn governance_audit_rationale(
         GraphMemoryGovernanceAction::Attenuate => {
             if reason == "target_superseded_by_later_memory_evidence" {
                 out.push("audit:superseded_memory_evidence".into());
-                out.push(format_compact!(
-                    "audit:supersession_risk:{:.2}",
-                    stats.supersession_risk
-                ));
-                out.push(format_compact!(
-                    "audit:supersession_count:{}",
-                    stats.supersession_count
-                ));
+                out.push(format_compact!("audit:supersession_risk:{:.2}", stats.supersession_risk));
+                out.push(format_compact!("audit:supersession_count:{}", stats.supersession_count));
                 let mut kinds = stats
                     .supersession_kinds
                     .iter()
@@ -517,44 +523,26 @@ fn governance_audit_rationale(
             }
         }
         GraphMemoryGovernanceAction::Compress => {
-            out.push(format_compact!(
-                "audit:episode_events:{}",
-                stats.event_count
-            ));
-            out.push(format_compact!(
-                "audit:episode_chunks:{}",
-                stats.chunk_ids.len()
-            ));
-            out.push(format_compact!(
-                "audit:evidence:{}",
-                stats.evidence_ids.len()
-            ));
+            out.push(format_compact!("audit:episode_events:{}", stats.event_count));
+            out.push(format_compact!("audit:episode_chunks:{}", stats.chunk_ids.len()));
+            out.push(format_compact!("audit:evidence:{}", stats.evidence_ids.len()));
             out.push(format_compact!("audit:entities:{}", stats.entity_ids.len()));
             if stats.causal_degree > 0 {
-                out.push(format_compact!(
-                    "audit:causal_degree:{}",
-                    stats.causal_degree
-                ));
+                out.push(format_compact!("audit:causal_degree:{}", stats.causal_degree));
             }
             if stats.temporal_degree > 0 {
-                out.push(format_compact!(
-                    "audit:temporal_degree:{}",
-                    stats.temporal_degree
-                ));
+                out.push(format_compact!("audit:temporal_degree:{}", stats.temporal_degree));
             }
         }
         GraphMemoryGovernanceAction::Retain => {
+            if stats.user_pinned {
+                out.push("audit:user_pinned".into());
+            }
             if stats.causal_degree > 0 {
-                out.push(format_compact!(
-                    "audit:causal_degree:{}",
-                    stats.causal_degree
-                ));
+                out.push(format_compact!("audit:causal_degree:{}", stats.causal_degree));
             }
             if stats.memory_state_count > 0 {
-                out.push(format_compact!(
-                    "audit:memory_state_count:{}",
-                    stats.memory_state_count
-                ));
+                out.push(format_compact!("audit:memory_state_count:{}", stats.memory_state_count));
             }
             if stats.event_count > 0 {
                 out.push(format_compact!("audit:events:{}", stats.event_count));
@@ -563,14 +551,8 @@ fn governance_audit_rationale(
         GraphMemoryGovernanceAction::Quarantine => {
             if reason == "target_has_contradictory_memory_evidence" {
                 out.push("audit:contradictory_memory_evidence".into());
-                out.push(format_compact!(
-                    "audit:contradiction_risk:{:.2}",
-                    stats.contradiction_risk
-                ));
-                out.push(format_compact!(
-                    "audit:contradiction_count:{}",
-                    stats.contradiction_count
-                ));
+                out.push(format_compact!("audit:contradiction_risk:{:.2}", stats.contradiction_risk));
+                out.push(format_compact!("audit:contradiction_count:{}", stats.contradiction_count));
                 let mut kinds = stats
                     .contradiction_kinds
                     .iter()
@@ -591,10 +573,7 @@ fn governance_audit_rationale(
                 out.push("audit:no_events".into());
             }
             if stats.evidence_ids.len() <= 3 {
-                out.push(format_compact!(
-                    "audit:weak_evidence:{}",
-                    stats.evidence_ids.len()
-                ));
+                out.push(format_compact!("audit:weak_evidence:{}", stats.evidence_ids.len()));
             }
             if stats.causal_degree == 0 {
                 out.push("audit:no_causal_edges".into());
@@ -630,8 +609,15 @@ fn signals(stats: &TargetStats) -> GraphMemoryGovernanceSignals {
             evidence * 0.12 + events * 0.18 + stats.memory_state_count as f32 * 0.20,
         ),
         evidence_strength: clamp(evidence / 6.0),
-        user_pinned: false,
+        user_pinned: stats.user_pinned,
     }
+}
+
+fn memory_state_is_pinned(state: &GraphMemoryState) -> bool {
+    let key = state.key.to_ascii_lowercase();
+    let value = state.value.to_ascii_lowercase();
+    matches!(key.as_str(), "user_pinned" | "pinned" | "memory_pin")
+        && matches!(value.as_str(), "true" | "yes" | "pinned")
 }
 
 fn assign_chunk_redundancy(chunks: &[GraphChunk], stats: &mut HashMap<&str, TargetStats>) {
