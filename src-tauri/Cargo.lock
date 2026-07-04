@@ -4715,6 +4715,8 @@ dependencies = [
  "phoenix-hyperbolic 0.1.0",
  "phoenix-native",
  "phoenix-rel-post 0.1.1",
+ "phoenix-store-native-core 0.1.1",
+ "phoenix-store-overgraph 0.1.1",
  "phoenix-types 0.1.0",
  "serde",
  "serde_json",

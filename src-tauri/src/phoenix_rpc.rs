@@ -36,6 +36,8 @@ use phoenix_graph_post::promotion_verdict::{
     build_graph_promotion_verdict_certificate, GraphPromotionUserOverride,
     GraphPromotionVerdictCertificate,
 };
+use phoenix_store_native_core::{PhoenixGraphKernelStoreV2, PhoenixGraphLearningStore};
+use phoenix_store_overgraph::PhoenixOvergraphStore;
 use phoenix_hyperbolic::lorentz_tree::{
     HyperboloidPoint, LorentzForest, LorentzForestIndex, LorentzNode, LorentzQueryMode,
     LorentzScoreConfig, LorentzTree, LorentzTreeKind, LorentzTreeMembership, LorentzTreeQuery,
@@ -188,6 +190,11 @@ struct PromotionVerdictResponse {
     source: &'static str,
     certificate: GraphPromotionVerdictCertificate,
     timing: PromotionVerdictTiming,
+}
+
+struct DurablePromotionVerdictInputs {
+    receipts: Vec<GraphProposalBatchReceipt>,
+    commits: Vec<GraphTruthCommit>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -1149,10 +1156,31 @@ impl PhoenixApi for PhoenixApiImpl {
             let started = Instant::now();
             let request = serde_json::from_value::<PromotionVerdictRequest>(payload)
                 .map_err(|error| format!("invalid graph promotion verdict request: {error}"))?;
+            let durable = if request.receipts.is_empty() || request.commits.is_empty() {
+                let config = {
+                    let guard = self.lock_state()?;
+                    guard.host.config().cloned()
+                };
+                load_durable_promotion_verdict_inputs(config.as_ref())?
+            } else {
+                None
+            };
+            let durable_receipts = durable.as_ref().map(|input| input.receipts.as_slice());
+            let durable_commits = durable.as_ref().map(|input| input.commits.as_slice());
+            let receipts = if request.receipts.is_empty() {
+                durable_receipts.unwrap_or_default()
+            } else {
+                request.receipts.as_slice()
+            };
+            let commits = if request.commits.is_empty() {
+                durable_commits.unwrap_or_default()
+            } else {
+                request.commits.as_slice()
+            };
             let verdict_started = Instant::now();
             let certificate = build_graph_promotion_verdict_certificate(
-                &request.receipts,
-                &request.commits,
+                receipts,
+                commits,
                 &request.user_overrides,
             )
             .map_err(|error| error.to_string())?;
@@ -1353,6 +1381,48 @@ impl PhoenixApiImpl {
         let response = op(&guard.host, request).map_err(|error| error.to_string())?;
         serialize_json(&response)
     }
+}
+
+fn load_durable_promotion_verdict_inputs(
+    config: Option<&phoenix_native::PhoenixNativeConfig>,
+) -> Result<Option<DurablePromotionVerdictInputs>, String> {
+    let Some(config) = config else {
+        return Ok(None);
+    };
+    let Some(store_path) = desktop_overgraph_store_path(config) else {
+        return Ok(None);
+    };
+    if !store_path.exists() {
+        return Ok(None);
+    }
+    let store = PhoenixOvergraphStore::open(&store_path)
+        .map_err(|error| format!("open graph proposal receipt store: {error}"))?;
+    let receipts = store
+        .load_graph_proposal_receipts()
+        .map_err(|error| format!("load graph proposal receipts: {error}"))?;
+    let commits = store
+        .load_graph_truth_commits()
+        .map_err(|error| format!("load graph truth commits: {error}"))?;
+    Ok(Some(DurablePromotionVerdictInputs { receipts, commits }))
+}
+
+fn desktop_overgraph_store_path(config: &phoenix_native::PhoenixNativeConfig) -> Option<PathBuf> {
+    if config.runtime.target != RuntimeTarget::Native {
+        return None;
+    }
+    if let Some(path) = &config.storage_path {
+        return Some(path.join("phoenix-overgraph"));
+    }
+    if config.runtime.storage == StorageMode::NativeEphemeral {
+        return None;
+    }
+    platform_data_dir().map(|path| path.join("Phoenix Desktop").join("phoenix-overgraph"))
+}
+
+fn platform_data_dir() -> Option<PathBuf> {
+    std::env::var_os("LOCALAPPDATA")
+        .or_else(|| std::env::var_os("APPDATA"))
+        .map(PathBuf::from)
 }
 
 fn build_init_request(request: &DesktopInitRequest) -> RuntimeInitRequest {
