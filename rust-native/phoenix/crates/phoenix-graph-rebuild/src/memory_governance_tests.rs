@@ -580,6 +580,68 @@ fn retrieval_weighting_experiment_compares_policy_effects_without_live_retrieval
         .all(|variant| variant.top_rows.iter().all(|row| row.no_topology_commit)));
 }
 
+#[test]
+fn retrieval_preview_caps_and_dampens_compressed_episode_supernodes() {
+    let stats = compression_stats(32, 6, 12, 12);
+    let episode = GraphEpisode {
+        id: "episode:supernode".into(),
+        note_id: "note:memory".into(),
+        event_ids: stats.event_ids.clone(),
+        entity_ids: stats
+            .entity_ids
+            .iter()
+            .map(|id| EntityId(id.to_string()))
+            .collect(),
+        label: "High fanout episode".into(),
+    };
+    let governance = vec![episode_candidate(&episode, Some(&stats))];
+    let retrieval = vec![retrieval_candidate(
+        "hit:episode:supernode",
+        "episode:supernode",
+        GraphMemoryGovernanceTargetKind::Episode,
+        0.20,
+    )];
+    let policy = MemoryGovernanceRetrievalWeightPolicy {
+        id: "dominance_guard".into(),
+        retain_confidence_boost: 0.0,
+        retain_causal_boost: 0.0,
+        retain_retrieval_boost: 0.0,
+        compress_confidence_boost: 0.45,
+        compress_narrative_boost: 0.30,
+        compress_max_boost: 0.50,
+        compress_score_ceiling: 0.40,
+        compress_fanout_dampening: 0.25,
+        attenuate_confidence_penalty: 0.0,
+        quarantine_multiplier: 1.0,
+        retire_multiplier: 1.0,
+    };
+
+    let preview = build_memory_governance_retrieval_preview_with_policy(
+        MemoryGovernanceRetrievalPreviewInput {
+            retrieval_candidates: &retrieval,
+            governance_candidates: &governance,
+        },
+        &policy,
+    );
+    let row = &preview.rows[0];
+
+    assert_eq!(
+        row.governance_action,
+        Some(GraphMemoryGovernanceAction::Compress)
+    );
+    assert_eq!(row.adjusted_score, policy.compress_score_ceiling);
+    assert!(row.score_delta <= policy.compress_max_boost);
+    assert!(row
+        .rationale
+        .iter()
+        .any(|line| { line == MEMORY_GOVERNANCE_COMPRESSION_DOMINANCE_POLICY }));
+    assert!(row
+        .rationale
+        .iter()
+        .any(|line| line == "compression:fanout_multiplier:0.350"));
+    assert!(preview.no_topology_commit);
+}
+
 fn governance_snapshot() -> GraphRebuildSnapshot {
     let kai = EntityId("character:kai".to_owned());
     let hazel = EntityId("character:hazel".to_owned());

@@ -8,8 +8,8 @@ use crate::{
     GraphMemoryGovernanceAction, GraphMemoryGovernanceCandidate, GraphMemoryGovernanceTargetKind,
     GraphMemoryState, GraphRebuildInput, GraphRelationship, GraphScopeKind, GraphTemporalEdge,
     MemoryGovernanceEngineInput, MemoryGovernanceRetrievalCandidate,
-    MemoryGovernanceRetrievalPreviewInput, MEMORY_GOVERNANCE_NO_TOPOLOGY_COMMIT,
-    MEMORY_GOVERNANCE_PIN_SOURCE_RATIONALE,
+    MemoryGovernanceRetrievalPreviewInput, MEMORY_GOVERNANCE_COMPRESSION_DOMINANCE_POLICY,
+    MEMORY_GOVERNANCE_NO_TOPOLOGY_COMMIT, MEMORY_GOVERNANCE_PIN_SOURCE_RATIONALE,
 };
 
 #[test]
@@ -281,8 +281,12 @@ fn adversarial_compression_dominance_is_report_only_and_score_capped() {
     assert_eq!(episode.action, GraphMemoryGovernanceAction::Compress);
     assert!(preview.no_topology_commit);
     assert!(preview_row.no_topology_commit);
-    assert!(preview_row.adjusted_score <= 1.0);
-    assert!(preview_row.score_delta <= 0.03);
+    assert_eq!(preview_row.adjusted_score, preview_row.original_score);
+    assert_eq!(preview_row.score_delta, 0.0);
+    assert!(preview_row
+        .rationale
+        .iter()
+        .any(|line| { line == MEMORY_GOVERNANCE_COMPRESSION_DOMINANCE_POLICY }));
 }
 
 #[test]

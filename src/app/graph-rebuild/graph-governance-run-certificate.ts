@@ -18,6 +18,8 @@ const NEGATIVE_RELATION_TYPES = new Set(['opposes', 'threatens', 'betrays', 'rej
 const NEGATIVE_RELATION_POLICY = 'graph-rebuild-negative-cue-review-policy';
 const PROTECTED_PIN_RATIONALE = 'audit:user_pinned';
 const PROTECTED_PIN_SOURCE_RATIONALE = 'audit:pin_source:user_override';
+const COMPRESSION_DOMINANCE_POLICY = 'memory_governance:compression_dominance_policy';
+const SCORE_EPSILON = 0.001;
 
 export interface GraphGovernanceRunCertificate {
     schemaVersion: typeof GRAPH_GOVERNANCE_RUN_CERTIFICATE_SCHEMA_VERSION;
@@ -28,6 +30,7 @@ export interface GraphGovernanceRunCertificate {
     attentionLanes: GraphGovernanceRunAttentionLanes;
     noTopologyProof: GraphGovernanceRunNoTopologyProof;
     protectedMemoryProof: GraphGovernanceRunProtectedMemoryProof;
+    compressionDominanceProof: GraphGovernanceRunCompressionDominanceProof;
     topRows: GraphGovernanceRunCandidateRow[];
     weakestRows: GraphGovernanceRunCandidateRow[];
     retrievalDeltas: GraphGovernanceRunRetrievalDeltas;
@@ -95,6 +98,17 @@ export interface GraphGovernanceRunProtectedMemoryProof {
     noTopologyCommitRows: number;
     sourceViolationRows: number;
     sampleRows: GraphGovernanceRunCandidateRow[];
+    violations: string[];
+}
+
+export interface GraphGovernanceRunCompressionDominanceProof {
+    passed: boolean;
+    compressedRows: number;
+    policyRows: number;
+    boundedRows: number;
+    maxPositiveDelta: number;
+    maxAdjustedScore: number;
+    sampleRows: GraphGovernanceRunRetrievalRow[];
     violations: string[];
 }
 
@@ -182,6 +196,7 @@ export function buildGovernanceRunCertificate(
         },
         noTopologyProof: noTopologyProof(candidates, retrievalExperiment?.variants || []),
         protectedMemoryProof: protectedMemoryProof(candidates, rowLimit),
+        compressionDominanceProof: compressionDominanceProof(retrievalExperiment?.variants || [], rowLimit),
         topRows: candidates.slice().sort(confidenceDesc).slice(0, rowLimit).map(candidateRow),
         weakestRows: candidates.slice().sort(confidenceAsc).slice(0, rowLimit).map(candidateRow),
         retrievalDeltas: retrievalDeltas(snapshot),
@@ -289,6 +304,45 @@ function protectedMemoryProof(
         sourceViolationRows: protectedRows.filter((row) =>
             !row.rationale?.includes(PROTECTED_PIN_SOURCE_RATIONALE)).length,
         sampleRows: protectedRows.slice().sort(confidenceDesc).slice(0, limit).map(candidateRow),
+        violations,
+    };
+}
+
+function compressionDominanceProof(
+    variants: GraphMemoryGovernanceRetrievalWeightingVariant[],
+    limit: number,
+): GraphGovernanceRunCompressionDominanceProof {
+    const rows: GraphMemoryGovernanceRetrievalPreviewRow[] = [];
+    const violations: string[] = [];
+    let policyRows = 0;
+    let boundedRows = 0;
+
+    for (const variant of variants) {
+        for (const row of variant.topRows || []) {
+            if (row.governanceAction !== 'compress') continue;
+            rows.push(row);
+            const hasPolicy = row.rationale?.includes(COMPRESSION_DOMINANCE_POLICY);
+            if (hasPolicy) policyRows += 1;
+            else violations.push(`${row.id}:missing_compression_policy`);
+
+            const maxDelta = variant.policy.compressMaxBoost ?? Number.POSITIVE_INFINITY;
+            const scoreCeiling = Math.max(row.originalScore, variant.policy.compressScoreCeiling ?? 1);
+            const boundedByDelta = row.scoreDelta <= maxDelta + SCORE_EPSILON;
+            const boundedByCeiling = row.adjustedScore <= scoreCeiling + SCORE_EPSILON;
+            if (boundedByDelta && boundedByCeiling) boundedRows += 1;
+            if (!boundedByDelta) violations.push(`${row.id}:compress_boost_exceeds_cap`);
+            if (!boundedByCeiling) violations.push(`${row.id}:compress_score_exceeds_ceiling`);
+        }
+    }
+
+    return {
+        passed: violations.length === 0,
+        compressedRows: rows.length,
+        policyRows,
+        boundedRows,
+        maxPositiveDelta: roundMetric(Math.max(0, ...rows.map((row) => row.scoreDelta))),
+        maxAdjustedScore: roundMetric(Math.max(0, ...rows.map((row) => row.adjustedScore))),
+        sampleRows: rows.slice().sort(scoreDeltaDesc).slice(0, limit).map(retrievalRow),
         violations,
     };
 }
@@ -431,4 +485,8 @@ function scoreDeltaAsc(left: GraphMemoryGovernanceRetrievalPreviewRow, right: Gr
 
 function ratio(count: number, total: number): number {
     return total > 0 ? Math.round((count / total) * 1_000) / 1_000 : 0;
+}
+
+function roundMetric(value: number): number {
+    return Math.round(value * 1_000) / 1_000;
 }

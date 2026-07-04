@@ -15,7 +15,9 @@ describe('AttributesTabComponent', () => {
         expect(template).toContain('runtimeDiagnostics');
         expect(template).toContain('Candidate decisions');
         expect(template).toContain('User pin source locked');
+        expect(template).toContain('Compression bounded');
         expect(template).toContain('protected pins');
+        expect(template).toContain('bounded compression rows');
         expect(template).toContain('candidateRows');
         expect(template).toContain('Attention Required');
         expect(template).toContain('Exception lanes');

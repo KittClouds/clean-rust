@@ -38,7 +38,8 @@ pub use retrieval_preview::{
     MemoryGovernanceRetrievalPreview, MemoryGovernanceRetrievalPreviewInput,
     MemoryGovernanceRetrievalPreviewRow, MemoryGovernanceRetrievalPreviewSummary,
     MemoryGovernanceRetrievalWeightPolicy, MemoryGovernanceRetrievalWeightingExperiment,
-    MemoryGovernanceRetrievalWeightingVariant, MEMORY_GOVERNANCE_RETRIEVAL_PREVIEW_SCHEMA_VERSION,
+    MemoryGovernanceRetrievalWeightingVariant, MEMORY_GOVERNANCE_COMPRESSION_DOMINANCE_POLICY,
+    MEMORY_GOVERNANCE_RETRIEVAL_PREVIEW_SCHEMA_VERSION,
     MEMORY_GOVERNANCE_RETRIEVAL_WEIGHTING_EXPERIMENT_SCHEMA_VERSION,
 };
 pub use shortrun::{

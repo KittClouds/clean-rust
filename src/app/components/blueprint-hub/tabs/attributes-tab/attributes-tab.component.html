@@ -55,6 +55,11 @@
                     [class.atlas-proof-fail]="!certificate.protectedMemoryProof.passed">
                     {{ certificate.protectedMemoryProof.passed ? 'User pin source locked' : 'Pin proof failed' }}
                 </strong>
+                <strong
+                    [class.atlas-proof-pass]="certificate.compressionDominanceProof.passed"
+                    [class.atlas-proof-fail]="!certificate.compressionDominanceProof.passed">
+                    {{ certificate.compressionDominanceProof.passed ? 'Compression bounded' : 'Compression proof failed' }}
+                </strong>
             </header>
 
             <div class="atlas-certificate-grid">
@@ -100,6 +105,18 @@
                 <span>
                     <strong>{{ certificate.protectedMemoryProof.sourceViolationRows }}</strong>
                     <small>pin source violations</small>
+                </span>
+                <span>
+                    <strong>{{ certificate.compressionDominanceProof.compressedRows }}</strong>
+                    <small>compressed retrieval rows</small>
+                </span>
+                <span>
+                    <strong>{{ certificate.compressionDominanceProof.boundedRows }}</strong>
+                    <small>bounded compression rows</small>
+                </span>
+                <span>
+                    <strong>{{ certificate.compressionDominanceProof.violations.length }}</strong>
+                    <small>compression violations</small>
                 </span>
                 @if (certificate.retrievalDeltas.variants[0]; as variant) {
                 <span>

@@ -10,6 +10,11 @@ pub const MEMORY_GOVERNANCE_RETRIEVAL_PREVIEW_SCHEMA_VERSION: &str =
     "phoenix-memory-governance-retrieval-preview/v1";
 pub const MEMORY_GOVERNANCE_RETRIEVAL_WEIGHTING_EXPERIMENT_SCHEMA_VERSION: &str =
     "phoenix-memory-governance-retrieval-weighting-experiment/v1";
+pub const MEMORY_GOVERNANCE_COMPRESSION_DOMINANCE_POLICY: &str =
+    "memory_governance:compression_dominance_policy";
+const COMPRESSION_FREE_CHUNK_FANOUT: usize = 3;
+const COMPRESSION_FREE_EVIDENCE_FANOUT: usize = 12;
+const COMPRESSION_EVIDENCE_FANOUT_WEIGHT: f32 = 0.25;
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -35,6 +40,9 @@ pub struct MemoryGovernanceRetrievalWeightPolicy {
     pub retain_retrieval_boost: f32,
     pub compress_confidence_boost: f32,
     pub compress_narrative_boost: f32,
+    pub compress_max_boost: f32,
+    pub compress_score_ceiling: f32,
+    pub compress_fanout_dampening: f32,
     pub attenuate_confidence_penalty: f32,
     pub quarantine_multiplier: f32,
     pub retire_multiplier: f32,
@@ -128,6 +136,12 @@ pub fn build_memory_governance_retrieval_preview_with_policy(
         let governance =
             governance_by_target.get(&(retrieval.target_kind, retrieval.target_id.as_str()));
         let adjusted_score = adjusted_score(retrieval.score, governance.copied(), policy);
+        let mut rationale = governance
+            .map(|row| row.rationale.clone())
+            .unwrap_or_default();
+        if let Some(row) = governance.copied() {
+            append_retrieval_policy_rationale(&mut rationale, row, policy);
+        }
         rows.push(MemoryGovernanceRetrievalPreviewRow {
             id: format_compact!("memory_governance_retrieval_preview:{}", retrieval.id),
             target_id: retrieval.target_id.clone(),
@@ -141,9 +155,7 @@ pub fn build_memory_governance_retrieval_preview_with_policy(
             governance_action: governance.map(|row| row.action),
             governance_confidence: governance.map(|row| round_score(row.confidence)),
             reason: governance.map(|row| row.reason.clone()),
-            rationale: governance
-                .map(|row| row.rationale.clone())
-                .unwrap_or_default(),
+            rationale,
             no_topology_commit: true,
         });
     }
@@ -212,9 +224,7 @@ fn adjusted_score(
                 + governance.signals.retrieval_utility * policy.retain_retrieval_boost
         }
         GraphMemoryGovernanceAction::Compress => {
-            original_score
-                + governance.confidence * policy.compress_confidence_boost
-                + governance.signals.narrative_salience * policy.compress_narrative_boost
+            compression_adjusted_score(original_score, governance, policy)
         }
         GraphMemoryGovernanceAction::Attenuate => {
             original_score * (1.0 - governance.confidence * policy.attenuate_confidence_penalty)
@@ -223,6 +233,59 @@ fn adjusted_score(
         GraphMemoryGovernanceAction::Retire => original_score * policy.retire_multiplier,
     };
     round_score(score.clamp(0.0, 1.0))
+}
+
+fn compression_adjusted_score(
+    original_score: f32,
+    governance: &GraphMemoryGovernanceCandidate,
+    policy: &MemoryGovernanceRetrievalWeightPolicy,
+) -> f32 {
+    let raw_boost = governance.confidence * policy.compress_confidence_boost
+        + governance.signals.narrative_salience * policy.compress_narrative_boost;
+    let boost = (raw_boost * compression_fanout_multiplier(governance, policy))
+        .min(policy.compress_max_boost)
+        .max(0.0);
+    let ceiling = original_score.max(policy.compress_score_ceiling).min(1.0);
+    (original_score + boost).min(ceiling)
+}
+
+fn compression_fanout_multiplier(
+    governance: &GraphMemoryGovernanceCandidate,
+    policy: &MemoryGovernanceRetrievalWeightPolicy,
+) -> f32 {
+    let chunk_fanout = governance
+        .related_chunk_ids
+        .len()
+        .saturating_sub(COMPRESSION_FREE_CHUNK_FANOUT) as f32;
+    let evidence_fanout = governance
+        .evidence_ids
+        .len()
+        .saturating_sub(COMPRESSION_FREE_EVIDENCE_FANOUT) as f32;
+    let pressure = chunk_fanout + evidence_fanout * COMPRESSION_EVIDENCE_FANOUT_WEIGHT;
+    (1.0 / (1.0 + pressure * policy.compress_fanout_dampening)).clamp(0.35, 1.0)
+}
+
+fn append_retrieval_policy_rationale(
+    out: &mut Vec<CompactString>,
+    governance: &GraphMemoryGovernanceCandidate,
+    policy: &MemoryGovernanceRetrievalWeightPolicy,
+) {
+    if governance.action != GraphMemoryGovernanceAction::Compress {
+        return;
+    }
+    out.push(MEMORY_GOVERNANCE_COMPRESSION_DOMINANCE_POLICY.into());
+    out.push(format_compact!(
+        "compression:max_boost:{:.3}",
+        policy.compress_max_boost
+    ));
+    out.push(format_compact!(
+        "compression:score_ceiling:{:.3}",
+        policy.compress_score_ceiling
+    ));
+    out.push(format_compact!(
+        "compression:fanout_multiplier:{:.3}",
+        compression_fanout_multiplier(governance, policy)
+    ));
 }
 
 fn summary_for(
@@ -323,6 +386,9 @@ fn conservative_retrieval_weight_policy() -> MemoryGovernanceRetrievalWeightPoli
         retain_retrieval_boost: 0.01,
         compress_confidence_boost: 0.07,
         compress_narrative_boost: 0.015,
+        compress_max_boost: 0.035,
+        compress_score_ceiling: 0.92,
+        compress_fanout_dampening: 0.20,
         attenuate_confidence_penalty: 0.18,
         quarantine_multiplier: 0.50,
         retire_multiplier: 0.10,
@@ -337,6 +403,9 @@ fn balanced_retrieval_weight_policy() -> MemoryGovernanceRetrievalWeightPolicy {
         retain_retrieval_boost: 0.02,
         compress_confidence_boost: 0.14,
         compress_narrative_boost: 0.03,
+        compress_max_boost: 0.045,
+        compress_score_ceiling: 0.94,
+        compress_fanout_dampening: 0.18,
         attenuate_confidence_penalty: 0.36,
         quarantine_multiplier: 0.35,
         retire_multiplier: 0.05,
@@ -351,6 +420,9 @@ fn episode_anchor_retrieval_weight_policy() -> MemoryGovernanceRetrievalWeightPo
         retain_retrieval_boost: 0.015,
         compress_confidence_boost: 0.22,
         compress_narrative_boost: 0.05,
+        compress_max_boost: 0.065,
+        compress_score_ceiling: 0.96,
+        compress_fanout_dampening: 0.16,
         attenuate_confidence_penalty: 0.30,
         quarantine_multiplier: 0.35,
         retire_multiplier: 0.05,
@@ -365,6 +437,9 @@ fn decay_heavy_retrieval_weight_policy() -> MemoryGovernanceRetrievalWeightPolic
         retain_retrieval_boost: 0.015,
         compress_confidence_boost: 0.12,
         compress_narrative_boost: 0.025,
+        compress_max_boost: 0.040,
+        compress_score_ceiling: 0.93,
+        compress_fanout_dampening: 0.22,
         attenuate_confidence_penalty: 0.58,
         quarantine_multiplier: 0.25,
         retire_multiplier: 0.02,

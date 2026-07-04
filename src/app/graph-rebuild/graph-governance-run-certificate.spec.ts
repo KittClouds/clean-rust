@@ -73,13 +73,20 @@ describe('buildGovernanceRunCertificate', () => {
         });
         expect(certificate.retrievalDeltas.variants[0].strongestBoosts[0]).toMatchObject({
             targetId: 'episode:1',
-            scoreDelta: 0.12,
+            scoreDelta: 0.045,
             noTopologyCommit: true,
         });
         expect(certificate.retrievalDeltas.variants[0].strongestDemotions[0]).toMatchObject({
             targetId: 'chunk:2',
             scoreDelta: -0.18,
             noTopologyCommit: true,
+        });
+        expect(certificate.compressionDominanceProof).toMatchObject({
+            passed: true,
+            compressedRows: 1,
+            policyRows: 1,
+            boundedRows: 1,
+            maxPositiveDelta: 0.045,
         });
     });
 
@@ -158,6 +165,24 @@ describe('buildGovernanceRunCertificate', () => {
         expect(certificate.protectedMemoryProof.violations).toContain(
             'gov:fake-pin:missing_user_override_source',
         );
+    });
+
+    it('marks compression dominance proof failed when compressed retrieval rows exceed policy bounds', () => {
+        const graph = snapshot();
+        graph.memoryGovernanceRetrievalExperiment!.variants[0].topRows[0] = {
+            ...graph.memoryGovernanceRetrievalExperiment!.variants[0].topRows[0],
+            adjustedScore: 0.91,
+            scoreDelta: 0.19,
+            rationale: [GRAPH_MEMORY_GOVERNANCE_NO_TOPOLOGY_COMMIT],
+        };
+
+        const certificate = buildGovernanceRunCertificate(graph);
+
+        expect(certificate.compressionDominanceProof.passed).toBe(false);
+        expect(certificate.compressionDominanceProof.violations).toEqual(expect.arrayContaining([
+            'ret:episode:1:missing_compression_policy',
+            'ret:episode:1:compress_boost_exceeds_cap',
+        ]));
     });
 
     it('separates contradiction, supersession, and negative relation attention lanes', () => {
@@ -243,6 +268,9 @@ function snapshot(): GraphRebuildSnapshot {
                     retainRetrievalBoost: 0.02,
                     compressConfidenceBoost: 0.14,
                     compressNarrativeBoost: 0.03,
+                    compressMaxBoost: 0.045,
+                    compressScoreCeiling: 0.94,
+                    compressFanoutDampening: 0.18,
                     attenuateConfidencePenalty: 0.36,
                     quarantineMultiplier: 0.35,
                     retireMultiplier: 0.05,
@@ -266,13 +294,18 @@ function snapshot(): GraphRebuildSnapshot {
                         originalRank: 4,
                         adjustedRank: 1,
                         originalScore: 0.72,
-                        adjustedScore: 0.84,
-                        scoreDelta: 0.12,
+                        adjustedScore: 0.765,
+                        scoreDelta: 0.045,
                         governanceCandidateId: 'gov:compress',
                         governanceAction: 'compress',
                         governanceConfidence: 0.89,
                         reason: 'episode_can_compact_child_chunks',
-                        rationale: [GRAPH_MEMORY_GOVERNANCE_NO_TOPOLOGY_COMMIT],
+                        rationale: [
+                            GRAPH_MEMORY_GOVERNANCE_NO_TOPOLOGY_COMMIT,
+                            'memory_governance:compression_dominance_policy',
+                            'compression:max_boost:0.045',
+                            'compression:score_ceiling:0.940',
+                        ],
                         noTopologyCommit: true,
                     },
                     {
@@ -294,7 +327,7 @@ function snapshot(): GraphRebuildSnapshot {
                 ],
                 meanAbsRankDeltaMillis: 2250,
                 retainedMeanScoreDeltaMillis: 120,
-                compressedMeanScoreDeltaMillis: 120,
+                compressedMeanScoreDeltaMillis: 45,
                 attenuatedMeanScoreDeltaMillis: -180,
             }],
         },

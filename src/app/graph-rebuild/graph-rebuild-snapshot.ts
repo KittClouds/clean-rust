@@ -374,6 +374,9 @@ export interface GraphMemoryGovernanceRetrievalWeightPolicy {
     retainRetrievalBoost: number;
     compressConfidenceBoost: number;
     compressNarrativeBoost: number;
+    compressMaxBoost: number;
+    compressScoreCeiling: number;
+    compressFanoutDampening: number;
     attenuateConfidencePenalty: number;
     quarantineMultiplier: number;
     retireMultiplier: number;
