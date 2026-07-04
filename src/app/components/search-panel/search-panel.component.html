@@ -1,5 +1,4 @@
 <div
-  #workbenchScroll
   class="workbench-scroll flex h-full w-full flex-col gap-2 overflow-y-auto overflow-x-hidden bg-sidebar-background p-2 custom-scrollbar">
 
   <section class="atlas-banner">
@@ -88,68 +87,6 @@
       </div>
     </div>
 
-    <div class="recipe-control-deck">
-      <div class="backend-map-head compact">
-        <span>Graph recipes</span>
-        <strong>{{ selectedRecipePlan().label }}</strong>
-      </div>
-
-      <div class="recipe-grid">
-        <button *ngFor="let recipe of graphBuildRecipes" type="button" class="recipe-card"
-          [class.recipe-selected]="selectedRecipe() === recipe.id"
-          [class.recipe-primary]="recipe.id === 'adjudicatedSemanticGraph'"
-          [disabled]="!!activeRecipe()" (click)="selectRecipe(recipe.id)">
-          <span class="recipe-icon">
-            <ng-icon [name]="recipe.icon" class="h-3.5 w-3.5"></ng-icon>
-          </span>
-          <span class="recipe-copy">
-            <strong>{{ recipe.label }}</strong>
-            <small>{{ recipe.subtitle }}</small>
-          </span>
-          <span class="recipe-output">{{ recipe.output }}</span>
-        </button>
-      </div>
-
-      <div class="selected-recipe-panel">
-        <div class="selected-recipe-copy">
-          <span class="section-kicker">Selected lane</span>
-          <strong>{{ selectedRecipePlan().label }}</strong>
-          <small>{{ selectedRecipePlan().backendRoute }}</small>
-        </div>
-
-        <div class="recipe-lane-summary">
-          <span>Models: {{ selectedCapabilityModelSummary() }}</span>
-          <span>Policy: {{ selectedRecipePlan().mutationPolicy }} / {{ selectedRecipePlan().operations.length }} operations</span>
-        </div>
-
-        <div class="selected-pipeline-rail">
-          <div *ngFor="let node of selectedPipelineRail(); let i = index" class="pipe-node"
-            [ngClass]="'capability-' + node.status">
-            <span class="pipe-idx">{{ i + 1 }}</span>
-            <span class="pipe-body">
-              <strong>{{ node.label }}</strong>
-              <em>{{ node.status }}</em>
-            </span>
-          </div>
-        </div>
-
-        <div class="recipe-actions">
-          <button type="button" class="secondary-action warm-required-action" [ngClass]="warmButtonTone()"
-            (click)="warmSelectedRecipeModels()" [disabled]="isWarmDisabled()">
-            <ng-icon [name]="activeRecipeStep() === 'warm' ? 'lucideLoader2' : 'lucideMicrochip'"
-              class="h-3.5 w-3.5" [class.animate-spin]="activeRecipeStep() === 'warm'"></ng-icon>
-            {{ warmButtonLabel() }}
-          </button>
-          <button type="button" class="primary-action" (click)="runSelectedRecipe()"
-            [disabled]="isRecipeDisabled(selectedRecipe())">
-            <ng-icon [name]="isRecipeBusy(selectedRecipe()) ? 'lucideLoader2' : 'lucideSparkles'"
-              class="h-3.5 w-3.5" [class.animate-spin]="isRecipeBusy(selectedRecipe())"></ng-icon>
-            {{ selectedRecipePlan().actionLabel }}
-          </button>
-        </div>
-      </div>
-    </div>
-
     <div class="stage8-workbench" *ngIf="stage8Workbench() as stage8">
       <div class="stage8-head">
         <div>
@@ -194,6 +131,27 @@
               [class.animate-spin]="truthReviewLaneBusy()"></ng-icon>
             {{ truthReviewLaneButtonLabel() }}
           </button>
+        </div>
+        <div class="stage8-nli-controls" [ngClass]="'stage8-tone-' + modernBertNliTone()">
+          <span class="stage8-nli-chip">
+            <b>NLI</b>
+            <em>{{ modernBertNliStatusLabel() }}</em>
+          </span>
+          <small>{{ modernBertNliDetail() }}</small>
+          <span class="stage8-nli-actions">
+            <button type="button" class="stage8-truth-review-action" (click)="loadModernBertNli()"
+              [disabled]="isModernBertNliLoadDisabled()">
+              <ng-icon [name]="activeLaneWarm() === 'nli' ? 'lucideLoader2' : 'lucideMicrochip'"
+                class="h-3.5 w-3.5" [class.animate-spin]="activeLaneWarm() === 'nli'"></ng-icon>
+              {{ modernBertNliLoadButtonLabel() }}
+            </button>
+            <button type="button" class="stage8-truth-review-action" (click)="runModernBertNliReview()"
+              [disabled]="isModernBertNliReviewDisabled()">
+              <ng-icon [name]="nliReviewRunning() ? 'lucideLoader2' : 'lucideSearch'" class="h-3.5 w-3.5"
+                [class.animate-spin]="nliReviewRunning()"></ng-icon>
+              {{ modernBertNliReviewButtonLabel() }}
+            </button>
+          </span>
         </div>
         <div class="stage8-truth-review-ledger">
           <span>{{ stage8.truthReview.cacheDetail }}</span>
@@ -307,8 +265,8 @@
         <button type="button" class="secondary-action ner-suggestions-action"
           title="Run Dynamic NER and populate entity suggestions without rebuilding the graph"
           (click)="runEntitySuggestionStage()" [disabled]="isRunNerDisabled()">
-          <ng-icon [name]="isRecipeBusy('runNer') ? 'lucideLoader2' : 'lucideCpu'" class="h-3.5 w-3.5"
-            [class.animate-spin]="isRecipeBusy('runNer')"></ng-icon>
+          <ng-icon [name]="nerSuggestionRunning() ? 'lucideLoader2' : 'lucideCpu'" class="h-3.5 w-3.5"
+            [class.animate-spin]="nerSuggestionRunning()"></ng-icon>
           {{ nerSuggestionsButtonLabel() }}
         </button>
       </div>

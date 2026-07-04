@@ -18,10 +18,8 @@ use crate::{
     GraphDocumentEvidenceSpan, GraphDocumentSidecarSummary, GraphMention, GraphRebuildInput,
     GraphScopeKind, RelationFact,
 };
-
 const PARITY_FIXTURE: &str =
     include_str!("../../../../../src/app/graph-rebuild/fixtures/graph-rebuild-parity-smoke.json");
-
 #[test]
 fn builds_chunks_anchors_edges_and_embedding_targets() {
     let text = "Kai watched Hazel. Hazel answered Kai. Rift watched Kai.";
@@ -70,39 +68,6 @@ fn builds_chunks_anchors_edges_and_embedding_targets() {
         .any(|relationship| relationship.adjudication_source == "graph-rebuild-typed-cue-policy"));
     assert!(!snapshot.events.is_empty());
     assert!(snapshot.counters.embedding_targets >= snapshot.counters.chunks + 6 + 3);
-}
-
-#[test]
-fn emits_memory_state_and_graph_fact_targets() {
-    let text =
-        "Tempest stood as Diamond. Kai approved the packet with Tempest because Nemo warned Kai.";
-    let entities = vec![
-        entry("e-kai", "Kai", &[]),
-        entry("e-tempest", "Tempest", &[]),
-        entry("e-nemo", "Nemo", &[]),
-    ];
-    let snapshot = build_graph_rebuild_snapshot(GraphRebuildInput {
-        scope_kind: GraphScopeKind::Note,
-        scope_id: "note:facts",
-        note_id: "note-2",
-        text,
-        scope: ScopeKey::default(),
-        entities: &entities,
-        candidate_count: 3,
-        built_at: Some(12),
-    })
-    .expect("snapshot");
-
-    assert!(snapshot.counters.events > 0);
-    assert!(snapshot.counters.memory_state > 0);
-    assert!(snapshot
-        .relationships
-        .iter()
-        .any(|relationship| relationship.relation_type == "approves_or_accepts"));
-    assert!(snapshot
-        .embedding_targets
-        .iter()
-        .any(|target| target.kind == "memoryState"));
 }
 
 #[test]

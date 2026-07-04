@@ -10,12 +10,15 @@ import {
 const template = readFileSync(new URL('./search-panel.component.html', import.meta.url), 'utf8');
 
 describe('SearchPanelComponent recipe controls', () => {
-    it('keeps graph recipe execution controls visible in the Atlas panel', () => {
-        expect(template).toContain('class="recipe-control-deck"');
-        expect(template).toContain('(click)="warmSelectedRecipeModels()"');
-        expect(template).toContain('(click)="runSelectedRecipe()"');
-        expect(template).toContain('selectedPipelineRail()');
-        expect(template).toContain('selectedRecipePlan().operations.length');
+    it('keeps the retired recipe lane out of the Atlas panel', () => {
+        expect(template).not.toContain('class="recipe-control-deck"');
+        expect(template).not.toContain('Selected lane');
+        expect(template).not.toContain('selectedPipelineRail()');
+        expect(template).not.toContain('selectedRecipePlan()');
+        expect(template).toContain('(click)="loadGraphModels()"');
+        expect(template).toContain('(click)="buildGraphAtlas()"');
+        expect(template).toContain('(click)="embedAtlas()"');
+        expect(template).toContain('(click)="runModernBertNliReview()"');
     });
 
     it('routes the adjudicated semantic recipe through the NLI capability contract', () => {

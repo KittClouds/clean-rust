@@ -32,15 +32,15 @@
   "counts": {
     "total": 410,
     "byAction": {
-      "attenuate": 23,
+      "attenuate": 24,
       "compress": 12,
       "quarantine": 35,
-      "retain": 340
+      "retain": 339
     },
     "byTargetAction": {
-      "chunk:attenuate": 23,
+      "chunk:attenuate": 24,
       "chunk:quarantine": 35,
-      "chunk:retain": 340,
+      "chunk:retain": 339,
       "episode:compress": 12
     }
   },

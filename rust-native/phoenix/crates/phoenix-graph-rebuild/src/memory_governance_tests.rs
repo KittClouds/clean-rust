@@ -1,7 +1,7 @@
 use phoenix_types::EntityId;
 
 use super::*;
-use crate::types::{GraphEpisode, GraphMemoryGovernanceAction, GraphScopeKind};
+use crate::types::{GraphEpisode, GraphMemoryGovernanceAction, GraphRelationship, GraphScopeKind};
 
 #[test]
 fn emits_candidate_only_governance_rows_without_topology_commit() {
@@ -135,6 +135,255 @@ fn retrieval_preview_suppresses_quarantined_rows_without_mutation() {
         .rationale
         .iter()
         .any(|rationale| rationale == "audit:celebrity_entity_dominance"));
+}
+
+#[test]
+fn quarantines_explicit_state_contradictions_without_topology_commit() {
+    let mut snapshot = governance_snapshot();
+    let kai = EntityId("character:kai".to_owned());
+    snapshot.memory_state = vec![
+        GraphMemoryState {
+            id: "memory:kai:decision:0".into(),
+            entity_id: kai.clone(),
+            note_id: Some("note:memory".into()),
+            key: "decision_state".into(),
+            value: "approved".into(),
+            evidence_ids: vec!["anchor:kai:0".into()],
+        },
+        GraphMemoryState {
+            id: "memory:kai:decision:2".into(),
+            entity_id: kai,
+            note_id: Some("note:memory".into()),
+            key: "decision_state".into(),
+            value: "rejected".into(),
+            evidence_ids: vec!["anchor:kai:0".into()],
+        },
+    ];
+
+    let candidates = build_memory_governance_candidates_from_snapshot(&snapshot);
+    assert_memory_governance_candidate_only(&candidates).expect("candidate only");
+    let chunk = candidates
+        .iter()
+        .find(|row| row.target_id == "note:memory:chunk:0")
+        .expect("conflicted chunk");
+
+    assert_eq!(chunk.action, GraphMemoryGovernanceAction::Quarantine);
+    assert_eq!(chunk.reason, "target_has_contradictory_memory_evidence");
+    assert!(chunk.signals.contradiction_risk >= 0.50);
+    assert!(chunk
+        .rationale
+        .iter()
+        .any(|row| row == "audit:state_conflict"));
+    assert!(chunk
+        .rationale
+        .iter()
+        .any(|row| row == "audit:contradictory_memory_evidence"));
+}
+
+#[test]
+fn separated_state_changes_attenuate_older_memory_as_superseded() {
+    let mut snapshot = governance_snapshot();
+    let kai = EntityId("character:kai".to_owned());
+    let hazel = EntityId("character:hazel".to_owned());
+    let tempest = EntityId("character:tempest".to_owned());
+    snapshot
+        .entity_anchors
+        .push(anchor("anchor:kai:2", &kai, "note:memory:chunk:2"));
+    snapshot
+        .entity_anchors
+        .push(anchor("anchor:hazel:0", &hazel, "note:memory:chunk:0"));
+    snapshot
+        .entity_anchors
+        .push(anchor("anchor:tempest:0", &tempest, "note:memory:chunk:0"));
+    snapshot
+        .entity_anchors
+        .push(anchor("anchor:tempest:2", &tempest, "note:memory:chunk:2"));
+    snapshot.memory_state = vec![
+        memory_state(
+            "memory:kai:decision:0",
+            &kai,
+            "decision_state",
+            "approved",
+            "anchor:kai:0",
+        ),
+        memory_state(
+            "memory:kai:decision:2",
+            &kai,
+            "decision_state",
+            "rejected",
+            "anchor:kai:2",
+        ),
+        memory_state(
+            "memory:hazel:presence:0",
+            &hazel,
+            "location_state",
+            "present",
+            "anchor:hazel:0",
+        ),
+        memory_state(
+            "memory:hazel:presence:2",
+            &hazel,
+            "location_state",
+            "absent",
+            "anchor:hazel:2",
+        ),
+        memory_state(
+            "memory:tempest:life:0",
+            &tempest,
+            "life_state",
+            "alive",
+            "anchor:tempest:0",
+        ),
+        memory_state(
+            "memory:tempest:life:2",
+            &tempest,
+            "life_state",
+            "dead",
+            "anchor:tempest:2",
+        ),
+    ];
+
+    let candidates = build_memory_governance_candidates_from_snapshot(&snapshot);
+    assert_memory_governance_candidate_only(&candidates).expect("candidate only");
+    let older = candidates
+        .iter()
+        .find(|row| row.target_id == "note:memory:chunk:0")
+        .expect("older superseded chunk");
+    let newer = candidates
+        .iter()
+        .find(|row| row.target_id == "note:memory:chunk:2")
+        .expect("newer chunk");
+
+    assert_eq!(older.action, GraphMemoryGovernanceAction::Attenuate);
+    assert_eq!(older.reason, "target_superseded_by_later_memory_evidence");
+    assert_eq!(older.signals.contradiction_risk, 0.0);
+    assert!(older.signals.age >= 0.50);
+    assert!(older
+        .rationale
+        .iter()
+        .any(|row| row == "audit:state_supersession"));
+    assert_ne!(newer.action, GraphMemoryGovernanceAction::Attenuate);
+}
+
+#[test]
+fn quarantines_opposing_temporal_edges_without_mutating_edges() {
+    let mut snapshot = governance_snapshot();
+    let edge_count = snapshot.edges.len();
+    snapshot.temporal_edges.push(GraphTemporalEdge {
+        id: "temporal:event:hazel:event:kai".into(),
+        source_id: "event:hazel:2".into(),
+        target_id: "event:kai:0".into(),
+        relation_type: "before".into(),
+        evidence_ids: vec!["event:hazel:2".into(), "event:kai:0".into()],
+        confidence: 0.8,
+    });
+
+    let candidates = build_memory_governance_candidates_from_snapshot(&snapshot);
+    let chunk = candidates
+        .iter()
+        .find(|row| row.target_id == "note:memory:chunk:0")
+        .expect("conflicted chunk");
+
+    assert_eq!(snapshot.edges.len(), edge_count);
+    assert_eq!(chunk.action, GraphMemoryGovernanceAction::Quarantine);
+    assert_eq!(chunk.reason, "target_has_contradictory_memory_evidence");
+    assert!(chunk
+        .rationale
+        .iter()
+        .any(|row| row == "audit:temporal_conflict"));
+    assert!(chunk
+        .related_event_ids
+        .iter()
+        .any(|row| row == "event:kai:0"));
+}
+
+#[test]
+fn quarantines_relationship_polarity_conflicts_without_topology_commit() {
+    let mut snapshot = governance_snapshot();
+    let kai = EntityId("character:kai".to_owned());
+    let hazel = EntityId("character:hazel".to_owned());
+    snapshot
+        .entity_anchors
+        .push(anchor("anchor:hazel:0", &hazel, "note:memory:chunk:0"));
+    snapshot.relationships = vec![
+        relationship(
+            "relationship:kai:hazel:ally",
+            &kai,
+            &hazel,
+            "allied_with",
+            &["anchor:kai:0", "anchor:hazel:0"],
+        ),
+        relationship(
+            "relationship:kai:hazel:opposes",
+            &kai,
+            &hazel,
+            "opposes",
+            &["anchor:kai:0", "anchor:hazel:0"],
+        ),
+    ];
+
+    let candidates = build_memory_governance_candidates_from_snapshot(&snapshot);
+    assert_memory_governance_candidate_only(&candidates).expect("candidate only");
+    let chunk = candidates
+        .iter()
+        .find(|row| row.target_id == "note:memory:chunk:0")
+        .expect("relationship conflict chunk");
+
+    assert_eq!(chunk.action, GraphMemoryGovernanceAction::Quarantine);
+    assert_eq!(chunk.reason, "target_has_contradictory_memory_evidence");
+    assert!(chunk
+        .rationale
+        .iter()
+        .any(|row| row == "audit:relationship_conflict"));
+}
+
+#[test]
+fn separated_relationship_polarity_attenuates_older_memory_as_superseded() {
+    let mut snapshot = governance_snapshot();
+    let kai = EntityId("character:kai".to_owned());
+    let hazel = EntityId("character:hazel".to_owned());
+    snapshot
+        .entity_anchors
+        .push(anchor("anchor:hazel:0", &hazel, "note:memory:chunk:0"));
+    snapshot
+        .entity_anchors
+        .push(anchor("anchor:kai:2", &kai, "note:memory:chunk:2"));
+    snapshot.relationships = vec![
+        relationship(
+            "relationship:kai:hazel:ally",
+            &kai,
+            &hazel,
+            "allied_with",
+            &["anchor:kai:0", "anchor:hazel:0"],
+        ),
+        relationship(
+            "relationship:kai:hazel:opposes",
+            &kai,
+            &hazel,
+            "opposes",
+            &["anchor:kai:2", "anchor:hazel:2"],
+        ),
+    ];
+
+    let candidates = build_memory_governance_candidates_from_snapshot(&snapshot);
+    let older = candidates
+        .iter()
+        .find(|row| row.target_id == "note:memory:chunk:0")
+        .expect("older superseded chunk");
+    let newer = candidates
+        .iter()
+        .find(|row| row.target_id == "note:memory:chunk:2")
+        .expect("newer chunk");
+
+    assert_eq!(older.action, GraphMemoryGovernanceAction::Attenuate);
+    assert_eq!(older.reason, "target_superseded_by_later_memory_evidence");
+    assert_eq!(older.signals.contradiction_risk, 0.0);
+    assert!(older.signals.age >= 0.50);
+    assert!(older
+        .rationale
+        .iter()
+        .any(|row| row == "audit:relationship_supersession"));
+    assert_ne!(newer.action, GraphMemoryGovernanceAction::Attenuate);
 }
 
 #[test]
@@ -429,6 +678,48 @@ fn event(id: &str, chunk_id: &str, entity_ids: &[EntityId]) -> GraphEvent {
         entity_ids: entity_ids.to_vec(),
         evidence_anchor_ids: Vec::new(),
         confidence: 0.8,
+    }
+}
+
+fn memory_state(
+    id: &str,
+    entity_id: &EntityId,
+    key: &str,
+    value: &str,
+    evidence_id: &str,
+) -> GraphMemoryState {
+    GraphMemoryState {
+        id: id.into(),
+        entity_id: entity_id.clone(),
+        note_id: Some("note:memory".into()),
+        key: key.into(),
+        value: value.into(),
+        evidence_ids: vec![evidence_id.into()],
+    }
+}
+
+fn relationship(
+    id: &str,
+    source: &EntityId,
+    target: &EntityId,
+    relation_type: &str,
+    evidence_anchor_ids: &[&str],
+) -> GraphRelationship {
+    GraphRelationship {
+        id: id.into(),
+        source_entity_id: source.clone(),
+        target_entity_id: target.clone(),
+        relation_type: relation_type.into(),
+        evidence_anchor_ids: evidence_anchor_ids
+            .iter()
+            .map(|row| CompactString::from(*row))
+            .collect(),
+        confidence: 0.82,
+        status: "accepted".into(),
+        adjudication_source: "test".into(),
+        adjudication_score: 0.82,
+        rationale: "test relationship".into(),
+        decision_evidence: Vec::new(),
     }
 }
 

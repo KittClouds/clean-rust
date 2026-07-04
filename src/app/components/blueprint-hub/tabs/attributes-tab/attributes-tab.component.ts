@@ -11,6 +11,7 @@ import { NerService } from '../../../../services/ner.service';
 import { AtlasScanCoordinatorService } from '../../../../services/atlas-scan-coordinator.service';
 import { PhoenixMachineControlService } from '../../../../services/phoenix-machine-control.service';
 import { PhoenixProjectionService } from '../../../../services/phoenix-projection.service';
+import { GraphRebuildService } from '../../../../graph-rebuild/graph-rebuild.service';
 import { SearchPanelComponent } from '../../../search-panel/search-panel.component';
 import {
     EntityCreatorData,
@@ -22,6 +23,7 @@ import { buildGraphAtlasReadContext } from '../graph-tab/graph-atlas-preview/gra
 import { GraphStyleDrawerComponent } from '../graph-tab/graph-style-drawer/graph-style-drawer.component';
 import type { GraphLensState } from '../graph-tab/graph-lens';
 import type { GraphOperatingRoomId } from '../graph-tab/graph-operating-room';
+import { buildAtlasControlReviewDeck } from './atlas-control-review';
 
 @Component({
     selector: 'app-attributes-tab',
@@ -41,6 +43,7 @@ export class AttributesTabComponent {
     private readonly nerService = inject(NerService);
     private readonly noteStore = inject(NoteEditorStore);
     private readonly projection = inject(PhoenixProjectionService);
+    private readonly graphRebuild = inject(GraphRebuildService);
     private readonly machine = inject(PhoenixMachineControlService);
     private readonly entitySelection = inject(EntitySelectionService);
     private readonly atlasScan = inject(AtlasScanCoordinatorService);
@@ -48,6 +51,7 @@ export class AttributesTabComponent {
     readonly entities = computed(() => this.projection.entities());
     readonly suggestions = this.nerService.suggestions;
     readonly graphLensMode = this.machine.graphLensMode;
+    readonly graphSnapshot = this.graphRebuild.snapshot;
     readonly isScanningSuggestions = computed(() => this.nerService.isAnalyzing() || this.atlasScan.running());
     readonly suggestionError = computed(() => this.atlasScan.error() || this.nerService.errorMessage());
     readonly atlasSearch = signal('');
@@ -90,11 +94,18 @@ export class AttributesTabComponent {
     });
 
     readonly graphSummary = computed(() => ({
-        entities: this.entities().length,
-        edges: this.atlasEdges().length,
-        suggestions: this.suggestions().length,
-        room: this.operatingRoom(),
+        entities: this.graphSnapshot()?.counters.entities ?? this.entities().length,
+        edges: this.graphSnapshot()?.counters.edges ?? this.atlasEdges().length,
+        targets: this.graphSnapshot()?.counters.embeddingTargets ?? 0,
+        governance: this.graphSnapshot()?.counters.memoryGovernanceCandidates
+            ?? this.graphSnapshot()?.memoryGovernanceCandidates?.length
+            ?? 0,
     }));
+
+    readonly reviewDeck = computed(() => buildAtlasControlReviewDeck(
+        this.graphSnapshot(),
+        this.entities(),
+    ));
 
     selectEntity(entity: RegisteredEntity): void {
         this.selectedEntity.set(entity);

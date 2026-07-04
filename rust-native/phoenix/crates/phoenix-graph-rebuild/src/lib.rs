@@ -11,8 +11,12 @@ mod chunk_semantic_bridge;
 mod compiler;
 mod embedding;
 mod episode_projection;
+#[cfg(test)]
+mod fact_extraction_tests;
 mod facts;
 mod memory_governance;
+#[cfg(test)]
+mod negative_relation_tests;
 mod semantic;
 #[cfg(test)]
 mod tests;

@@ -5,7 +5,7 @@ use crate::types::{
     GraphAnchor, GraphChunk, GraphEvent, GraphMemoryGovernanceAction,
     GraphMemoryGovernanceCandidate, GraphMemoryGovernanceCommitPolicy,
     GraphMemoryGovernanceSignals, GraphMemoryGovernanceStatus, GraphMemoryGovernanceTargetKind,
-    GraphMemoryState, GraphRebuildSnapshot, GraphTemporalEdge,
+    GraphMemoryState, GraphRebuildSnapshot, GraphRelationship, GraphTemporalEdge,
 };
 
 pub const MEMORY_GOVERNANCE_SCHEMA_VERSION: &str = "phoenix-memory-governance-candidate/v1";
@@ -14,11 +14,16 @@ pub const MEMORY_GOVERNANCE_NO_TOPOLOGY_COMMIT: &str =
     "memory_governance_candidate:no_topology_commit";
 const CELEBRITY_ENTITY_PRESSURE_THRESHOLD: f32 = 0.20;
 const WEAK_EVIDENCE_STRENGTH_THRESHOLD: f32 = 0.50;
+const CONTRADICTION_QUARANTINE_THRESHOLD: f32 = 0.50;
+const SUPERSESSION_ATTENUATE_THRESHOLD: f32 = 0.50;
 
+#[path = "memory_governance_contradiction.rs"]
+mod contradiction;
 #[path = "memory_governance_retrieval_preview.rs"]
 mod retrieval_preview;
 #[path = "memory_governance_shortrun.rs"]
 mod shortrun;
+use contradiction::assign_contradiction_pressure;
 pub use retrieval_preview::{
     build_memory_governance_retrieval_preview,
     build_memory_governance_retrieval_preview_with_policy,
@@ -41,6 +46,7 @@ pub struct MemoryGovernanceEngineInput<'a> {
     pub chunks: &'a [GraphChunk],
     pub episodes: &'a [crate::types::GraphEpisode],
     pub anchors: &'a [GraphAnchor],
+    pub relationships: &'a [GraphRelationship],
     pub events: &'a [GraphEvent],
     pub temporal_edges: &'a [GraphTemporalEdge],
     pub causal_edges: &'a [GraphTemporalEdge],
@@ -60,6 +66,12 @@ struct TargetStats {
     redundancy: f32,
     dominant_entity_pressure: f32,
     dominant_entity_count: usize,
+    contradiction_risk: f32,
+    contradiction_count: usize,
+    contradiction_kinds: HashSet<CompactString>,
+    supersession_risk: f32,
+    supersession_count: usize,
+    supersession_kinds: HashSet<CompactString>,
 }
 
 pub fn build_memory_governance_candidates_from_snapshot(
@@ -69,6 +81,7 @@ pub fn build_memory_governance_candidates_from_snapshot(
         chunks: &snapshot.chunks,
         episodes: &snapshot.episodes,
         anchors: &snapshot.entity_anchors,
+        relationships: &snapshot.relationships,
         events: &snapshot.events,
         temporal_edges: &snapshot.temporal_edges,
         causal_edges: &snapshot.causal_edges,
@@ -82,6 +95,7 @@ pub fn build_memory_governance_candidates(
     let mut chunk_stats = chunk_stats(input);
     assign_chunk_redundancy(input.chunks, &mut chunk_stats);
     assign_entity_dominance(input.chunks.len(), &mut chunk_stats);
+    assign_contradiction_pressure(input, &mut chunk_stats);
     let episode_stats = episode_stats(input, &chunk_stats);
     let mut out = Vec::with_capacity(input.chunks.len() + input.episodes.len());
 
@@ -255,6 +269,15 @@ fn episode_stats<'a>(
                 push_unique(&mut row.chunk_ids, chunk_id.clone());
                 if let Some(chunk_row) = chunk_stats.get(chunk_id.as_str()) {
                     row.memory_state_count += chunk_row.memory_state_count;
+                    row.contradiction_risk =
+                        row.contradiction_risk.max(chunk_row.contradiction_risk);
+                    row.contradiction_count += chunk_row.contradiction_count;
+                    row.contradiction_kinds
+                        .extend(chunk_row.contradiction_kinds.iter().cloned());
+                    row.supersession_risk = row.supersession_risk.max(chunk_row.supersession_risk);
+                    row.supersession_count += chunk_row.supersession_count;
+                    row.supersession_kinds
+                        .extend(chunk_row.supersession_kinds.iter().cloned());
                 }
             }
         }
@@ -276,7 +299,17 @@ fn chunk_candidate(
 ) -> GraphMemoryGovernanceCandidate {
     let stats = stats.cloned().unwrap_or_default();
     let signals = signals(&stats);
-    let (action, reason) = if stats.causal_degree > 0 || stats.memory_state_count > 0 {
+    let (action, reason) = if contradiction_quarantine_candidate(&signals) {
+        (
+            GraphMemoryGovernanceAction::Quarantine,
+            "target_has_contradictory_memory_evidence",
+        )
+    } else if supersession_attenuate_candidate(&stats, &signals) {
+        (
+            GraphMemoryGovernanceAction::Attenuate,
+            "target_superseded_by_later_memory_evidence",
+        )
+    } else if stats.causal_degree > 0 || stats.memory_state_count > 0 {
         (
             GraphMemoryGovernanceAction::Retain,
             "chunk_has_causal_or_memory_state_signal",
@@ -318,7 +351,11 @@ fn episode_candidate(
 ) -> GraphMemoryGovernanceCandidate {
     let stats = stats.cloned().unwrap_or_default();
     let signals = signals(&stats);
-    let action = if stats.event_count == 0 {
+    let action = if contradiction_quarantine_candidate(&signals) {
+        GraphMemoryGovernanceAction::Quarantine
+    } else if supersession_attenuate_candidate(&stats, &signals) {
+        GraphMemoryGovernanceAction::Attenuate
+    } else if stats.event_count == 0 {
         GraphMemoryGovernanceAction::Attenuate
     } else if stats.chunk_ids.len() > 1 && stats.event_count > 1 {
         GraphMemoryGovernanceAction::Compress
@@ -326,6 +363,12 @@ fn episode_candidate(
         GraphMemoryGovernanceAction::Retain
     };
     let reason = match action {
+        GraphMemoryGovernanceAction::Quarantine => "target_has_contradictory_memory_evidence",
+        GraphMemoryGovernanceAction::Attenuate
+            if stats.supersession_risk >= SUPERSESSION_ATTENUATE_THRESHOLD =>
+        {
+            "target_superseded_by_later_memory_evidence"
+        }
         GraphMemoryGovernanceAction::Compress => "episode_can_compact_child_chunks",
         GraphMemoryGovernanceAction::Attenuate => "episode_has_no_event_evidence",
         _ => "episode_preserves_story_continuity",
@@ -388,14 +431,17 @@ fn governance_confidence(
 ) -> f32 {
     match action {
         GraphMemoryGovernanceAction::Compress => compression_confidence(stats),
-        GraphMemoryGovernanceAction::Attenuate => {
-            clamp(0.52 + signals.redundancy * 0.18 - signals.evidence_strength * 0.12)
-        }
+        GraphMemoryGovernanceAction::Attenuate => clamp(
+            0.52 + signals.redundancy * 0.18 + stats.supersession_risk * 0.18
+                - signals.evidence_strength * 0.12,
+        ),
         GraphMemoryGovernanceAction::Retain => {
             clamp(0.50 + signals.narrative_salience * 0.22 + signals.causal_importance * 0.16)
         }
         GraphMemoryGovernanceAction::Quarantine => clamp(
-            0.58 + stats.dominant_entity_pressure * 0.25 + signals.narrative_salience * 0.08
+            0.58 + stats.dominant_entity_pressure * 0.25
+                + signals.contradiction_risk * 0.24
+                + signals.narrative_salience * 0.08
                 - signals.evidence_strength * 0.08,
         ),
         GraphMemoryGovernanceAction::Retire => 0.0,
@@ -431,6 +477,26 @@ fn governance_audit_rationale(
     let mut out = Vec::with_capacity(8);
     match action {
         GraphMemoryGovernanceAction::Attenuate => {
+            if reason == "target_superseded_by_later_memory_evidence" {
+                out.push("audit:superseded_memory_evidence".into());
+                out.push(format_compact!(
+                    "audit:supersession_risk:{:.2}",
+                    stats.supersession_risk
+                ));
+                out.push(format_compact!(
+                    "audit:supersession_count:{}",
+                    stats.supersession_count
+                ));
+                let mut kinds = stats
+                    .supersession_kinds
+                    .iter()
+                    .map(CompactString::as_str)
+                    .collect::<Vec<_>>();
+                kinds.sort_unstable();
+                for kind in kinds {
+                    out.push(format_compact!("audit:{kind}"));
+                }
+            }
             if stats.event_count == 0 {
                 out.push("audit:no_events".into());
             }
@@ -495,11 +561,32 @@ fn governance_audit_rationale(
             }
         }
         GraphMemoryGovernanceAction::Quarantine => {
-            out.push("audit:celebrity_entity_dominance".into());
-            out.push(format_compact!(
-                "audit:dominant_entity_pressure:{:.2}",
-                stats.dominant_entity_pressure
-            ));
+            if reason == "target_has_contradictory_memory_evidence" {
+                out.push("audit:contradictory_memory_evidence".into());
+                out.push(format_compact!(
+                    "audit:contradiction_risk:{:.2}",
+                    stats.contradiction_risk
+                ));
+                out.push(format_compact!(
+                    "audit:contradiction_count:{}",
+                    stats.contradiction_count
+                ));
+                let mut kinds = stats
+                    .contradiction_kinds
+                    .iter()
+                    .map(CompactString::as_str)
+                    .collect::<Vec<_>>();
+                kinds.sort_unstable();
+                for kind in kinds {
+                    out.push(format_compact!("audit:{kind}"));
+                }
+            } else {
+                out.push("audit:celebrity_entity_dominance".into());
+                out.push(format_compact!(
+                    "audit:dominant_entity_pressure:{:.2}",
+                    stats.dominant_entity_pressure
+                ));
+            }
             if stats.event_count == 0 {
                 out.push("audit:no_events".into());
             }
@@ -531,10 +618,10 @@ fn signals(stats: &TargetStats) -> GraphMemoryGovernanceSignals {
     let causal = stats.causal_degree as f32;
     let temporal = stats.temporal_degree as f32;
     GraphMemoryGovernanceSignals {
-        age: 0.0,
+        age: stats.supersession_risk,
         access_frequency: 0.0,
         redundancy: stats.redundancy,
-        contradiction_risk: 0.0,
+        contradiction_risk: stats.contradiction_risk,
         causal_importance: clamp(causal / 3.0),
         narrative_salience: clamp(
             events * 0.24 + entities * 0.10 + causal * 0.20 + temporal * 0.08,
@@ -613,6 +700,17 @@ fn celebrity_entity_dominance_candidate(
         && stats.dominant_entity_pressure >= CELEBRITY_ENTITY_PRESSURE_THRESHOLD
         && stats.dominant_entity_count >= 2
         && signals.evidence_strength <= WEAK_EVIDENCE_STRENGTH_THRESHOLD
+}
+
+fn contradiction_quarantine_candidate(signals: &GraphMemoryGovernanceSignals) -> bool {
+    signals.contradiction_risk >= CONTRADICTION_QUARANTINE_THRESHOLD && !signals.user_pinned
+}
+
+fn supersession_attenuate_candidate(
+    stats: &TargetStats,
+    signals: &GraphMemoryGovernanceSignals,
+) -> bool {
+    stats.supersession_risk >= SUPERSESSION_ATTENUATE_THRESHOLD && !signals.user_pinned
 }
 
 fn mark_event_edge_degree<'a>(

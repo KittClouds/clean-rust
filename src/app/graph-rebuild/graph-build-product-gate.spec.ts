@@ -319,6 +319,38 @@ describeBaseline('product graph build gate', () => {
         expect(persistedSnapshotId(store, 'snapshot')).toBe(secondInteractive.id);
         expect(persistedSnapshotId(store, DIAGNOSTIC_SNAPSHOT_DOCUMENT_KEY)).toBe(diagnosticIdBeforeStaleRun);
     }, 30_000);
+
+    it('keeps graph builds alive when optional native candidate commands are unavailable', async () => {
+        const text = 'Kai approved Hazel near Red Mesa. Hazel opposed Kai before dawn.';
+        backend.target = 'native';
+        backend.unsupportedCommands.add('graphRebuild:chunkSemanticBridges');
+        backend.unsupportedCommands.add('graphRebuild:memoryGovernance');
+        backend.unsupportedCommands.add('graphRebuild:memoryGovernanceRetrievalExperiment');
+        harnessState.notes = [shortrunNote(text)];
+        harnessState.entities = shortrunEntities();
+        harnessState.occurrences = [];
+        const snapshot = await graphRebuild.buildAndPersistSnapshot({
+            scopeKind: 'note',
+            scopeId: 'note:shortrun',
+            noteIds: ['shortrun'],
+            noteTexts: { shortrun: text },
+            chunks: buildAdaptiveGraphRebuildChunks('shortrun', text),
+            entities: harnessState.entities,
+            postProcessMode: 'full',
+            durabilityMode: 'interactive',
+        });
+
+        expect(snapshot.chunkSemanticBridges).toEqual([]);
+        expect(snapshot.memoryGovernanceCandidates).toEqual([]);
+        expect(snapshot.buildTimings?.nativeChunkSemanticBridgeSkipped).toBe(1);
+        expect(snapshot.buildTimings?.nativeMemoryGovernanceSkipped).toBe(1);
+        expect(snapshot.buildTimings?.nativeMemoryGovernanceRetrievalExperimentSkipped).toBe(1);
+        expect(backend.commands.map((row) => row.command)).toEqual(expect.arrayContaining([
+            'graphRebuild:chunkSemanticBridges',
+            'graphRebuild:memoryGovernance',
+            'graphRebuild:memoryGovernanceRetrievalExperiment',
+        ]));
+    }, 30_000);
 });
 
 function persistedSnapshotId(
@@ -1047,11 +1079,16 @@ function scopedDocumentKey(scopeId: string, namespace: string, documentKey: stri
 
 function createBackendHarness() {
     const commands: Array<{ command: string; requestChars: number }> = [];
+    const unsupportedCommands = new Set<string>();
     return {
         commands,
+        unsupportedCommands,
         target: SHOULD_WRITE_TAXONOMY_AUDIT ? 'native' : 'web',
         storeCommand: vi.fn(async (command: string, payload: unknown) => {
             commands.push({ command, requestChars: JSON.stringify(payload || {}).length });
+            if (unsupportedCommands.has(command)) {
+                throw new Error(`unsupported store command: ${command}`);
+            }
             if (command === 'graphRebuild:chunkSemanticBridges') {
                 return compileNativeChunkBridgeSidecar(payload);
             }

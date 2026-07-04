@@ -6,11 +6,213 @@
         </div>
         <div class="atlas-control-ledger">
             <span><strong>{{ graphSummary().entities }}</strong> entities</span>
-            <span><strong>{{ graphSummary().edges }}</strong> links</span>
-            <span><strong>{{ graphSummary().suggestions }}</strong> suggestions</span>
-            <span><strong>{{ graphSummary().room }}</strong> room</span>
+            <span><strong>{{ graphSummary().edges }}</strong> graph edges</span>
+            <span><strong>{{ graphSummary().targets }}</strong> targets</span>
+            <span><strong>{{ graphSummary().governance }}</strong> governance</span>
         </div>
     </header>
+
+    <section class="atlas-review-deck">
+        <header class="atlas-review-header">
+            <div>
+                <span>Memory Governance</span>
+                <h3>Candidate decisions</h3>
+            </div>
+            <div class="atlas-review-ledger">
+                <span>{{ reviewDeck().snapshotLabel }}</span>
+                <span>{{ reviewDeck().totalGovernance }} candidates</span>
+                <span>{{ reviewDeck().noTopologyCommit }} no-commit</span>
+            </div>
+        </header>
+
+        <div class="atlas-review-runtime">
+            @for (metric of reviewDeck().runtimeDiagnostics; track metric.id) {
+            <span
+                [class.atlas-runtime-ready]="metric.tone === 'ready'"
+                [class.atlas-runtime-warning]="metric.tone === 'warning'">
+                <em>{{ metric.label }}</em>
+                <strong>{{ metric.value }}</strong>
+                <small>{{ metric.detail }}</small>
+            </span>
+            }
+        </div>
+
+        <section class="atlas-governance-queue">
+            <header>
+                <div>
+                    <span>All Governance Candidates</span>
+                    <h4>Candidate decisions</h4>
+                    <small>{{ reviewDeck().noTopologyCommit }} candidate-only rows / no graph writes</small>
+                </div>
+                <strong>{{ reviewDeck().candidateRows.length }}</strong>
+            </header>
+            <div class="atlas-action-summary">
+                @for (summary of reviewDeck().actionSummaries; track summary.action) {
+                <span
+                    class="atlas-action-chip"
+                    [class.atlas-action-retain]="summary.tone === 'retain'"
+                    [class.atlas-action-compress]="summary.tone === 'compress'"
+                    [class.atlas-action-attenuate]="summary.tone === 'attenuate'"
+                    [class.atlas-action-quarantine]="summary.tone === 'quarantine'"
+                    [class.atlas-action-retire]="summary.tone === 'retire'">
+                    <em>{{ summary.label }}</em>
+                    <strong>{{ summary.count }}</strong>
+                    <small>{{ summary.metric }}</small>
+                </span>
+                } @empty {
+                <span class="atlas-action-chip atlas-action-empty">
+                    <em>No candidates</em>
+                    <strong>0</strong>
+                    <small>0%</small>
+                </span>
+                }
+            </div>
+            <div class="atlas-governance-table-wrap">
+                <table class="atlas-negative-table atlas-governance-table">
+                    <thead>
+                        <tr>
+                            <th>Action</th>
+                            <th>Target</th>
+                            <th>Reason</th>
+                            <th>Evidence</th>
+                            <th>Confidence</th>
+                            <th>Signals</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (row of reviewDeck().candidateRows; track row.id) {
+                        <tr [class]="'atlas-row-' + row.tone">
+                            <td><strong>{{ row.action }}</strong></td>
+                            <td>
+                                <span>{{ row.target }}</span>
+                                <small>{{ row.targetKind }}</small>
+                            </td>
+                            <td>{{ row.detail }}</td>
+                            <td>{{ row.evidence }}</td>
+                            <td>{{ row.confidence }}</td>
+                            <td>{{ row.signals }}</td>
+                        </tr>
+                        } @empty {
+                        <tr>
+                            <td colspan="6" class="atlas-governance-empty">No native governance candidates.</td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <header class="atlas-review-header">
+            <div>
+                <span>Attention Required</span>
+                <h3>Exception lanes</h3>
+            </div>
+            <div class="atlas-review-ledger">
+                <span>{{ reviewDeck().attentionCount }} attention rows</span>
+            </div>
+        </header>
+
+        @if (reviewDeck().attentionCount === 0) {
+        <section class="atlas-attention-clear">
+            <div>
+                <span>Clear</span>
+                <strong>No contradiction, supersession, or negative relation rows.</strong>
+                <small>{{ reviewDeck().totalGovernance }} candidate decisions remain available above.</small>
+            </div>
+            <b>0</b>
+        </section>
+        } @else {
+        <div class="atlas-review-content">
+            <div class="atlas-governance-lanes">
+                @for (lane of reviewDeck().governanceLanes; track lane.id) {
+                @if (lane.count > 0) {
+                <article
+                    class="atlas-governance-lane"
+                    [class.atlas-governance-clear]="lane.count === 0"
+                    [class.atlas-governance-contradiction]="lane.id === 'contradiction'"
+                    [class.atlas-governance-supersession]="lane.id === 'supersession'">
+                    <header>
+                        <div>
+                            <span>{{ lane.action }}</span>
+                            <h4>{{ lane.label }}</h4>
+                        </div>
+                        <strong>{{ lane.count }}</strong>
+                    </header>
+                    <div class="atlas-lane-meter">
+                        <span [style.width]="lane.metric"></span>
+                    </div>
+                    <small>{{ lane.metric }} of candidate queue</small>
+                    <div class="atlas-lane-rows">
+                        @for (row of lane.rows; track row.id) {
+                        <div class="atlas-lane-row">
+                            <span>
+                                <strong>{{ row.target }}</strong>
+                                <em>{{ row.metric }}</em>
+                            </span>
+                            <p>{{ row.detail }}</p>
+                            <div class="atlas-row-tags">
+                                <b>{{ row.confidence }}</b>
+                                <b>{{ row.evidence }}</b>
+                                @for (entity of row.entities; track entity) {
+                                <b>{{ entity }}</b>
+                                }
+                            </div>
+                        </div>
+                        } @empty {
+                        <div class="atlas-lane-empty">Clear: no matching candidate rows.</div>
+                        }
+                    </div>
+                </article>
+                }
+                }
+            </div>
+
+            @if (reviewDeck().negativeRelations.length > 0) {
+            <section
+                class="atlas-negative-audit"
+                [class.atlas-negative-clear]="reviewDeck().negativeRelations.length === 0">
+                <header>
+                    <div>
+                        <span>Negative Relation Audit</span>
+                        <h4>Review-only candidates</h4>
+                    </div>
+                    <strong>{{ reviewDeck().negativeRelations.length }}</strong>
+                </header>
+                <div class="atlas-negative-table-wrap">
+                    <table class="atlas-negative-table">
+                        <thead>
+                            <tr>
+                                <th>Relation</th>
+                                <th>Pair</th>
+                                <th>Evidence</th>
+                                <th>Confidence</th>
+                                <th>Source</th>
+                                <th>Review note</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (row of reviewDeck().negativeRelations; track row.id) {
+                            <tr>
+                                <td><strong>{{ row.relation }}</strong></td>
+                                <td>{{ row.pair }}</td>
+                                <td>{{ row.evidence }}</td>
+                                <td>{{ row.confidence }}</td>
+                                <td>{{ row.source }}</td>
+                                <td>{{ row.rationale }}</td>
+                            </tr>
+                            } @empty {
+                            <tr>
+                                <td colspan="6" class="atlas-negative-empty">Clear: no negative relation review candidates.</td>
+                            </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            }
+        </div>
+        }
+    </section>
 
     <main class="atlas-control-grid">
         <section class="atlas-control-pane atlas-control-index">

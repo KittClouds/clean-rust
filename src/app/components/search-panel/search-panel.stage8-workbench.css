@@ -247,6 +247,66 @@
   opacity: 0.55;
 }
 
+.stage8-nli-controls {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 6px 8px;
+  align-items: center;
+  padding-top: 6px;
+  border-top: 1px solid rgba(125, 225, 209, 0.12);
+}
+
+.stage8-nli-controls > small,
+.stage8-nli-chip b,
+.stage8-nli-chip em {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.stage8-nli-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+  padding: 4px 7px;
+  border: 1px solid rgba(125, 225, 209, 0.2);
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.38);
+}
+
+.stage8-nli-chip b {
+  color: var(--phthalo-bright);
+  font-size: 8px;
+  font-weight: 900;
+}
+
+.stage8-nli-controls > small {
+  color: #8aa2c4;
+  font-size: 8px;
+}
+
+.stage8-nli-chip em {
+  color: var(--phthalo-bright);
+  font-size: 8px;
+  font-style: normal;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.stage8-nli-actions {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 5px;
+}
+
+.stage8-nli-actions .stage8-truth-review-action {
+  width: 100%;
+  min-width: 0;
+}
+
 .stage8-truth-review-ledger {
   display: flex;
   min-width: 0;

@@ -92,73 +92,9 @@ describe('SearchPanelComponent model recipe lifecycle', () => {
         vi.clearAllMocks();
     });
 
-    it('loads the semantic model before Semantic Graph runs', async () => {
-        await component.runAtlasRecipe('semanticGraph');
-
-        expect(ner.warmProvider).toHaveBeenCalledWith('dynamic_ner');
-        expect(ner.runDynamicScan).toHaveBeenCalledWith(expect.objectContaining({
-            plainText: expect.stringContaining('Aella'),
-        }));
-        expect(machine.loadSemanticModel).toHaveBeenCalledWith(
-            'jina-v5-nano-retrieval',
-            'Jina v5 Nano',
-            '768d',
-        );
-        expect(atlasScan.runRichEmbeddingScan).toHaveBeenCalledWith(expect.objectContaining({
-            includeSemanticAtlas: true,
-            modelId: 'jina-v5-nano-retrieval',
-            modelLabel: 'Jina v5 Nano',
-            dimensionLabel: '768d',
-        }));
-        expect(machine.loadSemanticModel.mock.invocationCallOrder[0])
-            .toBeLessThan(atlasScan.runRichEmbeddingScan.mock.invocationCallOrder[0]);
-    });
-
-    it('routes EmbeddingGemma through the semantic graph model contract', async () => {
-        component.selectedModel.set('embeddinggemma-300m');
-
-        await component.runAtlasRecipe('semanticGraph');
-
-        expect(component.currentModelLabel()).toBe('EmbeddingGemma 300M');
-        expect(component.activeEmbeddingDimensionLabel()).toBe('768d');
-        expect(machine.loadSemanticModel).toHaveBeenCalledWith(
-            'embeddinggemma-300m',
-            'EmbeddingGemma 300M',
-            '768d',
-        );
-        expect(atlasScan.runRichEmbeddingScan).toHaveBeenCalledWith(expect.objectContaining({
-            includeSemanticAtlas: true,
-            modelId: 'embeddinggemma-300m',
-            modelLabel: 'EmbeddingGemma 300M',
-            dimensionLabel: '768d',
-        }));
-    });
-
-    it('anchors Text Graph with Dynamic NER while keeping semantic and NLI lanes out', async () => {
-        await component.runAtlasRecipe('textGraph');
-        component.setBuildPolicy('force');
-        await component.runAtlasRecipe('textGraph');
-
-        expect(ner.warmProvider).toHaveBeenCalledWith('dynamic_ner');
-        expect(ner.runDynamicScan).toHaveBeenCalledTimes(2);
-        expect(machine.loadSemanticModel).not.toHaveBeenCalled();
-        expect(nli.initialize).not.toHaveBeenCalled();
-        expect(atlasScan.runRichEmbeddingScan).toHaveBeenNthCalledWith(1, expect.objectContaining({
-            policy: 'dirty-only',
-            includeSemanticAtlas: false,
-        }));
-        expect(atlasScan.runRichEmbeddingScan).toHaveBeenNthCalledWith(2, expect.objectContaining({
-            policy: 'force',
-            includeSemanticAtlas: false,
-        }));
-    });
-
     it('runs the NER suggestion stage without opening or rebuilding the graph', async () => {
-        component.selectRecipe('semanticGraph');
-
         await component.runEntitySuggestionStage();
 
-        expect(component.selectedRecipe()).toBe('semanticGraph');
         expect(ner.warmProvider).toHaveBeenCalledWith('dynamic_ner');
         expect(ner.runDynamicScan).toHaveBeenCalledWith(expect.objectContaining({
             noteId: 'note-1',
@@ -166,49 +102,8 @@ describe('SearchPanelComponent model recipe lifecycle', () => {
             plainText: expect.stringContaining('Aella'),
         }));
         expect(atlasScan.runRichEmbeddingScan).not.toHaveBeenCalled();
+        expect(fullAtlasPipeline.buildGraph).not.toHaveBeenCalled();
         expect(machine.requestGraphFocus).not.toHaveBeenCalled();
-    });
-
-    it('stops the run when required model warming fails', async () => {
-        machine.loadSemanticModel.mockRejectedValueOnce(new Error('semantic load failed'));
-
-        await component.runAtlasRecipe('semanticGraph');
-
-        expect(atlasScan.runRichEmbeddingScan).not.toHaveBeenCalled();
-        expect(component.failedRecipeStep()).toBe('warm');
-        expect(machine.error()).toBe('semantic load failed');
-    });
-
-    it('offers whole-path presets and the full backend graph target map', () => {
-        expect(component.graphBuildRecipes.map((recipe) => recipe.id)).toEqual([
-            'textGraph',
-            'semanticGraph',
-            'adjudicatedSemanticGraph',
-            'reasoningGraph',
-        ]);
-
-        const targetIds = component.backendGraphTargets().map((target) => target.capability.id);
-        expect(targetIds).toEqual(expect.arrayContaining([
-            'dynamicSurface',
-            'dynamicChunking',
-            'dynamicNer',
-            'assertedKernel',
-            'relationGraph',
-            'temporalGraph',
-            'eventIdentity',
-            'memoryState',
-            'causalGraph',
-            'semanticAtlas',
-            'nliAdjudication',
-            'hopfProjection',
-            'lorentzForest',
-        ]));
-
-        component.selectCapability('causalGraph');
-        expect(component.selectedCapabilityState().status).toBe('ready');
-        expect(component.selectedCapabilityState().operationKind).toBe('nativeStoreProbe');
-        expect(component.selectedRecipe()).toBe('reasoningGraph');
-        expect(component.isRecipeDisabled(component.selectedRecipe())).toBe(false);
     });
 
     it('exposes model review lanes from Atlas Command state', () => {
@@ -223,192 +118,9 @@ describe('SearchPanelComponent model recipe lifecycle', () => {
         ]);
     });
 
-    it('exposes layered and sleeping capabilities from Atlas Command state', () => {
-        expect(component.capabilityLayers().map((layer) => layer.label)).toEqual([
-            'Text Surface',
-            'Entity + Mention Intelligence',
-            'Graph Commit',
-            'Reasoning Graphs',
-            'Semantic + Adjudication',
-            'Manifold / Geometry',
-            'Retrieval / Visualization',
-        ]);
-        expect(component.sleepingCapabilities().map((capability) => capability.id)).toContain('causalGraph');
-        expect(component.capabilityListLabel(['dynamicSurface', 'causalGraph'])).toBe('Dynamic Text Surface → Causal Graph');
-    });
-
-    it('surfaces runtime graph build plans and contextual warm labels', () => {
-        component.selectRecipe('textGraph');
-        const textPlan = component.selectedRecipePlan();
-
-        expect(textPlan.requiredModels.map((model) => model.id)).toEqual(['dynamicNer']);
-        expect(component.modelRequirementLabel(textPlan.requiredModels)).toContain('Dynamic NER');
-        expect(component.warmButtonLabel()).toBe('Warmed');
-        expect(textPlan.backendRoute).toContain('includeSemanticAtlas=false');
-        expect(component.expectedOutputLabel(textPlan.expectedOutputs)).toContain('graph delta counts');
-
-        component.selectRecipe('semanticGraph');
-        const semanticPlan = component.selectedRecipePlan();
-
-        expect(semanticPlan.requiredModels.map((model) => model.id)).toEqual(['dynamicNer', 'semanticEmbedding']);
-        expect(component.warmButtonLabel()).toBe('Warm Embedding');
-        expect(component.serviceRequirementLabel(semanticPlan.requiredServices)).toContain('PhoenixMachineControlService.loadSemanticModel');
-        expect(component.expectedOutputLabel(semanticPlan.expectedOutputs)).toContain('relation candidates');
-
-        component.selectRecipe('adjudicatedSemanticGraph');
-        expect(component.warmButtonLabel()).toBe('Warm Embedding + NLI');
-        expect(component.selectedPipelineRail().map((stage) => stage.label)).toContain('NLI Adjudication');
-
-        component.selectRecipe('reasoningGraph');
-        expect(component.selectedRecipePlan().requiredModels.map((model) => model.id)).toEqual(['dynamicNer', 'semanticEmbedding', 'nli']);
-        expect(component.selectedPipelineRail().map((stage) => stage.label)).toEqual(expect.arrayContaining([
-            'Relation Graph',
-            'Temporal Graph',
-            'Memory / State',
-            'Causal Graph',
-        ]));
-    });
-
-    it('syncs graph recipe chips to their involved target toggles', () => {
-        component.selectedCapabilityIds.set(['relationGraph', 'hybridManifold', 'galaxyVisualization']);
-
-        component.selectRecipe('textGraph');
-
-        expect(component.selectedCapabilityIds()).toEqual([
-            'dynamicSurface',
-            'dynamicChunking',
-            'dynamicNer',
-            'mentionGraph',
-            'evidenceGraph',
-            'surfaceGraph',
-            'assertedKernel',
-        ]);
-        expect(component.isCapabilitySelected('semanticEmbedding')).toBe(false);
-        expect(component.isCapabilitySelected('hybridManifold')).toBe(false);
-
-        component.selectRecipe('semanticGraph');
-
-        expect(component.selectedCapabilityIds()).toEqual([
-            'dynamicSurface',
-            'dynamicChunking',
-            'dynamicNer',
-            'mentionGraph',
-            'evidenceGraph',
-            'surfaceGraph',
-            'assertedKernel',
-            'semanticEmbedding',
-            'semanticAtlas',
-            'semanticCandidate',
-            'hybridManifold',
-            'hopfProjection',
-            'lorentzForest',
-            'productManifold',
-        ]);
-        expect(component.isCapabilitySelected('nliAdjudication')).toBe(false);
-
-        component.selectRecipe('adjudicatedSemanticGraph');
-
-        expect(component.selectedCapabilityIds()).toEqual(expect.arrayContaining([
-            'semanticCandidate',
-            'nliAdjudication',
-        ]));
-        expect(component.isCapabilitySelected('relationGraph')).toBe(false);
-
-        component.selectRecipe('reasoningGraph');
-
-        expect(component.selectedCapabilityIds()).toEqual(expect.arrayContaining([
-            'dynamicNer',
-            'semanticEmbedding',
-            'semanticAtlas',
-            'semanticCandidate',
-            'hybridManifold',
-            'hopfProjection',
-            'lorentzForest',
-            'nliAdjudication',
-            'relationGraph',
-            'temporalGraph',
-            'eventIdentity',
-            'memoryState',
-            'causalGraph',
-        ]));
-        expect(component.isCapabilitySelected('causalGraph')).toBe(true);
-    });
-
-    it('drives the selected rail from the backend capability dependency chain', () => {
-        component.selectedCapabilityIds.set(['semanticEmbedding', 'semanticAtlas']);
-        component.selectCapability('assertedKernel');
-
-        expect(component.selectedCapabilityIds()).toEqual([
-            'dynamicSurface',
-            'dynamicChunking',
-            'dynamicNer',
-            'mentionGraph',
-            'evidenceGraph',
-            'surfaceGraph',
-            'assertedKernel',
-        ]);
-        expect(component.isCapabilitySelected('semanticEmbedding')).toBe(false);
-        expect(component.selectedPipelineRail().map((stage) => stage.label)).toEqual(expect.arrayContaining([
-            'Global',
-            'Dynamic Text Surface',
-            'Dynamic Chunking',
-            'Dynamic NER',
-            'Mention / Co-occurrence Graph',
-            'Evidence Graph',
-            'Surface Graph',
-            'Asserted Kernel',
-        ]));
-
-        component.selectCapability('temporalGraph');
-        expect(component.selectedCapabilityState().operationKind).toBe('nativeStoreProbe');
-        expect(component.selectedRecipe()).toBe('reasoningGraph');
-        expect(component.selectedCapabilityIds()).toEqual(expect.arrayContaining([
-            'dynamicNer',
-            'semanticEmbedding',
-            'nliAdjudication',
-            'temporalGraph',
-        ]));
-    });
-
-    it('keeps projection selections attached to the semantic embedding contract', () => {
-        for (const capabilityId of ['hybridManifold', 'hopfProjection', 'lorentzForest'] as const) {
-            component.selectCapability(capabilityId);
-
-            expect(component.selectedRecipe()).toBe('semanticGraph');
-            expect(component.selectedCapabilityIds()).toEqual(expect.arrayContaining([
-                'dynamicNer',
-                'semanticEmbedding',
-                'semanticAtlas',
-                'semanticCandidate',
-                'hybridManifold',
-                'hopfProjection',
-                'lorentzForest',
-                capabilityId,
-            ]));
-            expect(component.isCapabilitySelected('nliAdjudication')).toBe(false);
-            expect(component.isCapabilitySelected('relationGraph')).toBe(false);
-            expect(component.isCapabilitySelected('causalGraph')).toBe(false);
-        }
-    });
-
-    it('preserves graph target scroll position while selecting capabilities', async () => {
-        const scrollHost = { scrollTop: 640 };
-        (component as any).workbenchScroll = { nativeElement: scrollHost };
-
-        const group = component.backendGraphTargetGroups()[0];
-        const target = group.targets[0];
-
-        expect(component.trackCapabilityGroup(0, group)).toBe(group.id);
-        expect(component.trackCapabilityTarget(0, target)).toBe(target.capability.id);
-
-        component.selectCapability('temporalGraph');
-        scrollHost.scrollTop = 0;
-        await Promise.resolve();
-
-        expect(scrollHost.scrollTop).toBe(640);
-    });
-
     it('passes selected multi-note source into graph build runtime options', async () => {
+        const pipeline = injector.get(GraphRebuildPipelineService) as unknown as ReturnType<typeof createFullAtlasPipelineMock>;
+        pipeline.graphModelsReady.mockReturnValue(true);
         dbNotesMock.rows.set('note-a', {
             id: 'note-a',
             title: 'A',
@@ -432,11 +144,13 @@ describe('SearchPanelComponent model recipe lifecycle', () => {
         component.toggleBuildNote('note-a');
         component.toggleBuildNote('note-b');
 
-        await component.runAtlasRecipe('textGraph');
+        await component.buildGraphAtlas();
 
-        expect(atlasScan.runRichEmbeddingScan).toHaveBeenCalledWith(expect.objectContaining({
-            noteIds: ['note-a', 'note-b'],
-            buildScope: { mode: 'multiNote', noteIds: ['note-a', 'note-b'] },
+        expect(pipeline.buildGraph).toHaveBeenCalledWith(expect.objectContaining({
+            scope: expect.objectContaining({
+                kind: 'multiNote',
+                noteIds: ['note-a', 'note-b'],
+            }),
         }));
     });
 
@@ -582,6 +296,28 @@ describe('SearchPanelComponent model recipe lifecycle', () => {
         expect(fullAtlasPipeline.buildGraph).not.toHaveBeenCalled();
         expect(machine.loadSemanticModel).not.toHaveBeenCalled();
         expect(machine.indexSemanticDocuments).not.toHaveBeenCalled();
+    });
+
+    it('loads ModernBERT NLI from the Stage 8 review deck without building graph data', async () => {
+        await component.loadModernBertNli();
+
+        expect(nli.initialize).toHaveBeenCalledWith('onnx-community/ModernBERT-base-nli-ONNX');
+        expect(machine.notice()).toBe('ModernBERT NLI is loaded for Stage 8 review. No graph topology was written.');
+        expect(fullAtlasPipeline.buildGraph).not.toHaveBeenCalled();
+        expect(phoenix.storeCommand).not.toHaveBeenCalled();
+    });
+
+    it('runs ModernBERT NLI review as candidate adjudication without graph promotion', async () => {
+        component.setBuildScopeMode('note');
+
+        await component.runModernBertNliReview();
+
+        expect(nli.initialize).toHaveBeenCalledWith('onnx-community/ModernBERT-base-nli-ONNX');
+        expect(phoenix.storeCommand).toHaveBeenCalledWith('semantic:listNliJudgmentInputs', {
+            documentIds: ['note-1'],
+        });
+        expect(machine.notice()).toBe('ModernBERT NLI review queue is empty for this scope. No graph topology was written.');
+        expect(fullAtlasPipeline.buildGraph).not.toHaveBeenCalled();
     });
 
     it('uses the full EmbeddingGemma ONNX model id in truth-review payloads', async () => {

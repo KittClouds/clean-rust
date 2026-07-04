@@ -562,6 +562,16 @@ export class GraphRebuildService {
                 timings.nativeChunkSemanticBridgeQualityDemotions = native.qualityGate.demotedSameEntityOnly;
                 timings.nativeChunkSemanticBridgeRustMicros = native.timing.bridgeBuildMicros;
             }
+        } catch (error) {
+            if (!isUnsupportedStoreCommand(error, 'graphRebuild:chunkSemanticBridges')) throw error;
+            applyNativeChunkSemanticBridgeCandidates(snapshot, []);
+            if (timings) {
+                timings.nativeChunkSemanticBridgeSkipped = 1;
+                timings.nativeChunkSemanticBridgeCandidates = 0;
+                timings.nativeChunkSemanticBridgeQualityDemotions = 0;
+                timings.nativeChunkSemanticBridgeRustMicros = 0;
+            }
+            console.warn('[GraphRebuild] Native chunk semantic bridge command unavailable; continuing without candidate bridges.', error);
         } finally {
             if (timings) timings.nativeChunkSemanticBridgeMs = elapsedMs(started);
         }
@@ -589,6 +599,15 @@ export class GraphRebuildService {
                 timings.nativeMemoryGovernanceCandidates = native.candidates.length;
                 timings.nativeMemoryGovernanceRustMicros = native.timing.governanceBuildMicros;
             }
+        } catch (error) {
+            if (!isUnsupportedStoreCommand(error, 'graphRebuild:memoryGovernance')) throw error;
+            applyNativeMemoryGovernanceCandidates(snapshot, []);
+            if (timings) {
+                timings.nativeMemoryGovernanceSkipped = 1;
+                timings.nativeMemoryGovernanceCandidates = 0;
+                timings.nativeMemoryGovernanceRustMicros = 0;
+            }
+            console.warn('[GraphRebuild] Native memory governance command unavailable; continuing without governance candidates.', error);
         } finally {
             if (timings) timings.nativeMemoryGovernanceMs = elapsedMs(started);
         }
@@ -618,6 +637,13 @@ export class GraphRebuildService {
                 timings.nativeMemoryGovernanceRetrievalExperimentRustMicros =
                     native.timing.experimentBuildMicros;
             }
+        } catch (error) {
+            if (!isUnsupportedStoreCommand(error, 'graphRebuild:memoryGovernanceRetrievalExperiment')) throw error;
+            if (timings) {
+                timings.nativeMemoryGovernanceRetrievalExperimentSkipped = 1;
+                timings.nativeMemoryGovernanceRetrievalExperimentRustMicros = 0;
+            }
+            console.warn('[GraphRebuild] Native memory governance retrieval experiment unavailable; continuing without retrieval report.', error);
         } finally {
             if (timings) timings.nativeMemoryGovernanceRetrievalExperimentMs = elapsedMs(started);
         }
@@ -2437,7 +2463,8 @@ export function decodeNativeGraphCompilerSidecar(
 }
 
 function isUnsupportedStoreCommand(error: unknown, command: string): boolean {
-    return error instanceof Error && error.message.includes(`unsupported store command: ${command}`);
+    const message = error instanceof Error ? error.message : String(error);
+    return message.includes(`unsupported store command: ${command}`);
 }
 
 function isCompressedGraphRebuildJsonPayload(value: unknown): value is CompressedGraphRebuildJsonPayload {

@@ -11,6 +11,13 @@ describe('AttributesTabComponent', () => {
         const template = readFileSync(join(here, 'attributes-tab.component.html'), 'utf8');
 
         expect(template).toContain('Atlas Control');
+        expect(template).toContain('Memory Governance');
+        expect(template).toContain('runtimeDiagnostics');
+        expect(template).toContain('Candidate decisions');
+        expect(template).toContain('candidateRows');
+        expect(template).toContain('Attention Required');
+        expect(template).toContain('Exception lanes');
+        expect(template).toContain('Negative Relation Audit');
         expect(template).toContain('<app-search-panel');
         expect(template).toContain('<app-graph-entity-sidebar');
     });

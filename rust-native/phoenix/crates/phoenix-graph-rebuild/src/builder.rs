@@ -158,6 +158,7 @@ pub fn build_graph_rebuild_snapshot(
             chunks: &chunks,
             episodes: &episodes,
             anchors: &anchors,
+            relationships: &relationships,
             events: &events,
             temporal_edges: &temporal_edges,
             causal_edges: &causal_edges,
