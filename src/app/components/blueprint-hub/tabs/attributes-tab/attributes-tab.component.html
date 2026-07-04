@@ -50,6 +50,11 @@
                     [class.atlas-proof-fail]="!certificate.noTopologyProof.passed">
                     {{ certificate.noTopologyProof.passed ? 'No topology writes' : 'Proof failed' }}
                 </strong>
+                <strong
+                    [class.atlas-proof-pass]="certificate.protectedMemoryProof.passed"
+                    [class.atlas-proof-fail]="!certificate.protectedMemoryProof.passed">
+                    {{ certificate.protectedMemoryProof.passed ? 'User pin source locked' : 'Pin proof failed' }}
+                </strong>
             </header>
 
             <div class="atlas-certificate-grid">
@@ -83,6 +88,18 @@
                 <span>
                     <strong>{{ certificate.attentionLanes.totalAttentionRows }}</strong>
                     <small>attention rows</small>
+                </span>
+                <span>
+                    <strong>{{ certificate.protectedMemoryProof.protectedRows }}</strong>
+                    <small>protected pins</small>
+                </span>
+                <span>
+                    <strong>{{ certificate.protectedMemoryProof.userOverrideRows }}</strong>
+                    <small>user override pins</small>
+                </span>
+                <span>
+                    <strong>{{ certificate.protectedMemoryProof.sourceViolationRows }}</strong>
+                    <small>pin source violations</small>
                 </span>
                 @if (certificate.retrievalDeltas.variants[0]; as variant) {
                 <span>

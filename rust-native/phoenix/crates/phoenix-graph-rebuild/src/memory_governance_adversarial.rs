@@ -9,7 +9,7 @@ use crate::memory_governance::{
     build_memory_governance_retrieval_preview, MemoryGovernanceEngineInput,
     MemoryGovernanceRetrievalCandidate, MemoryGovernanceRetrievalPreviewInput,
     MEMORY_GOVERNANCE_COMMIT_POLICY, MEMORY_GOVERNANCE_NO_TOPOLOGY_COMMIT,
-    MEMORY_GOVERNANCE_SCHEMA_VERSION,
+    MEMORY_GOVERNANCE_PIN_SOURCE_RATIONALE, MEMORY_GOVERNANCE_SCHEMA_VERSION,
 };
 use crate::types::{
     GraphAnchor, GraphChunk, GraphEpisode, GraphEvent, GraphMemoryGovernanceAction,
@@ -137,7 +137,9 @@ pub fn build_memory_governance_adversarial_certificate() -> MemoryGovernanceAdve
         total_candidate_rows += fixture.no_topology_proof.candidate_rows;
         total_negative_relation_rows += fixture.negative_relation_rows.len();
         no_topology_violations += fixture.no_topology_proof.violations.len();
-        *attention_lanes.entry(fixture.threat_lane.clone()).or_insert(0) += 1;
+        *attention_lanes
+            .entry(fixture.threat_lane.clone())
+            .or_insert(0) += 1;
         for (action, count) in &fixture.candidates_by_action {
             *action_counts.entry(action.clone()).or_insert(0) += count;
         }
@@ -154,7 +156,9 @@ pub fn build_memory_governance_adversarial_certificate() -> MemoryGovernanceAdve
         no_topology_violations,
         action_counts,
         attention_lanes,
-        timing: MemoryGovernanceAdversarialTiming { total_micros: started.elapsed().as_micros() },
+        timing: MemoryGovernanceAdversarialTiming {
+            total_micros: started.elapsed().as_micros(),
+        },
         fixtures,
     }
 }
@@ -167,8 +171,20 @@ fn contradiction_fixture() -> MemoryGovernanceAdversarialFixtureResult {
         anchor("anchor:kai:rejected", &kai, "chunk:contradiction"),
     ];
     fixture.memory_state = vec![
-        state("memory:approved", &kai, "decision_state", "approved", "anchor:kai:approved"),
-        state("memory:rejected", &kai, "decision_state", "rejected", "anchor:kai:rejected"),
+        state(
+            "memory:approved",
+            &kai,
+            "decision_state",
+            "approved",
+            "anchor:kai:approved",
+        ),
+        state(
+            "memory:rejected",
+            &kai,
+            "decision_state",
+            "rejected",
+            "anchor:kai:rejected",
+        ),
     ];
     candidate_fixture(
         "contradiction",
@@ -242,7 +258,13 @@ fn pinned_fixture() -> MemoryGovernanceAdversarialFixtureResult {
         anchor("anchor:kai:rejected", &kai, "chunk:pinned"),
     ];
     fixture.memory_state = vec![
-        state("memory:pin", &kai, "user_pinned", "true", "anchor:kai:pin"),
+        state_with_evidence(
+            "memory:pin",
+            &kai,
+            "user_pinned",
+            "true",
+            &["anchor:kai:pin", "user_override:pin:kai"],
+        ),
         state(
             "memory:approved",
             &kai,
@@ -265,7 +287,7 @@ fn pinned_fixture() -> MemoryGovernanceAdversarialFixtureResult {
         "chunk:pinned",
         GraphMemoryGovernanceAction::Retain,
         "target_user_pinned_memory",
-        &["audit:user_pinned"],
+        &["audit:user_pinned", MEMORY_GOVERNANCE_PIN_SOURCE_RATIONALE],
         build_memory_governance_candidates(fixture.input()),
     )
 }
@@ -711,13 +733,23 @@ fn state(
     value: &str,
     evidence_id: &str,
 ) -> GraphMemoryState {
+    state_with_evidence(id, entity_id, key, value, &[evidence_id])
+}
+
+fn state_with_evidence(
+    id: &str,
+    entity_id: &EntityId,
+    key: &str,
+    value: &str,
+    evidence_ids: &[&str],
+) -> GraphMemoryState {
     GraphMemoryState {
         id: id.into(),
         entity_id: entity_id.clone(),
         note_id: Some("note:adversarial".into()),
         key: key.into(),
         value: value.into(),
-        evidence_ids: vec![evidence_id.into()],
+        evidence_ids: evidence_ids.iter().map(|id| (*id).into()).collect(),
     }
 }
 

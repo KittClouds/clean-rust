@@ -16,6 +16,8 @@ export const GRAPH_GOVERNANCE_RUN_CERTIFICATE_SCHEMA_VERSION =
 
 const NEGATIVE_RELATION_TYPES = new Set(['opposes', 'threatens', 'betrays', 'rejects']);
 const NEGATIVE_RELATION_POLICY = 'graph-rebuild-negative-cue-review-policy';
+const PROTECTED_PIN_RATIONALE = 'audit:user_pinned';
+const PROTECTED_PIN_SOURCE_RATIONALE = 'audit:pin_source:user_override';
 
 export interface GraphGovernanceRunCertificate {
     schemaVersion: typeof GRAPH_GOVERNANCE_RUN_CERTIFICATE_SCHEMA_VERSION;
@@ -25,6 +27,7 @@ export interface GraphGovernanceRunCertificate {
     candidatesByAction: GraphGovernanceRunActionCounts;
     attentionLanes: GraphGovernanceRunAttentionLanes;
     noTopologyProof: GraphGovernanceRunNoTopologyProof;
+    protectedMemoryProof: GraphGovernanceRunProtectedMemoryProof;
     topRows: GraphGovernanceRunCandidateRow[];
     weakestRows: GraphGovernanceRunCandidateRow[];
     retrievalDeltas: GraphGovernanceRunRetrievalDeltas;
@@ -81,6 +84,17 @@ export interface GraphGovernanceRunNoTopologyProof {
     retrievalExperimentReportOnly: boolean;
     retrievalRows: number;
     retrievalNoTopologyRows: number;
+    violations: string[];
+}
+
+export interface GraphGovernanceRunProtectedMemoryProof {
+    passed: boolean;
+    protectedRows: number;
+    userOverrideRows: number;
+    retainRows: number;
+    noTopologyCommitRows: number;
+    sourceViolationRows: number;
+    sampleRows: GraphGovernanceRunCandidateRow[];
     violations: string[];
 }
 
@@ -167,6 +181,7 @@ export function buildGovernanceRunCertificate(
             },
         },
         noTopologyProof: noTopologyProof(candidates, retrievalExperiment?.variants || []),
+        protectedMemoryProof: protectedMemoryProof(candidates, rowLimit),
         topRows: candidates.slice().sort(confidenceDesc).slice(0, rowLimit).map(candidateRow),
         weakestRows: candidates.slice().sort(confidenceAsc).slice(0, rowLimit).map(candidateRow),
         retrievalDeltas: retrievalDeltas(snapshot),
@@ -239,6 +254,41 @@ function noTopologyProof(
         retrievalExperimentReportOnly: retrievalRows.every((row) => row.noTopologyCommit === true),
         retrievalRows: retrievalRows.length,
         retrievalNoTopologyRows: retrievalRows.filter((row) => row.noTopologyCommit === true).length,
+        violations,
+    };
+}
+
+function protectedMemoryProof(
+    rows: GraphMemoryGovernanceCandidate[],
+    limit: number,
+): GraphGovernanceRunProtectedMemoryProof {
+    const protectedRows = rows.filter(isProtectedMemoryCandidate);
+    const violations: string[] = [];
+    for (const row of protectedRows) {
+        if (row.status !== 'candidate') violations.push(`${row.id}:status`);
+        if (row.action !== 'retain') violations.push(`${row.id}:not_retain`);
+        if (row.noTopologyCommit !== true) violations.push(`${row.id}:topology_write`);
+        if (row.commitPolicy !== GRAPH_MEMORY_GOVERNANCE_COMMIT_POLICY) {
+            violations.push(`${row.id}:commit_policy`);
+        }
+        if (row.signals.userPinned !== true) violations.push(`${row.id}:missing_user_pinned_signal`);
+        if (!row.rationale?.includes(PROTECTED_PIN_RATIONALE)) {
+            violations.push(`${row.id}:missing_pin_rationale`);
+        }
+        if (!row.rationale?.includes(PROTECTED_PIN_SOURCE_RATIONALE)) {
+            violations.push(`${row.id}:missing_user_override_source`);
+        }
+    }
+    return {
+        passed: violations.length === 0,
+        protectedRows: protectedRows.length,
+        userOverrideRows: protectedRows.filter((row) =>
+            row.rationale?.includes(PROTECTED_PIN_SOURCE_RATIONALE)).length,
+        retainRows: protectedRows.filter((row) => row.action === 'retain').length,
+        noTopologyCommitRows: protectedRows.filter((row) => row.noTopologyCommit === true).length,
+        sourceViolationRows: protectedRows.filter((row) =>
+            !row.rationale?.includes(PROTECTED_PIN_SOURCE_RATIONALE)).length,
+        sampleRows: protectedRows.slice().sort(confidenceDesc).slice(0, limit).map(candidateRow),
         violations,
     };
 }
@@ -334,6 +384,12 @@ function isSupersessionCandidate(row: GraphMemoryGovernanceCandidate): boolean {
 function isNegativeReviewRelationship(row: GraphRebuildRelationship): boolean {
     return row.status === 'review'
         && (NEGATIVE_RELATION_TYPES.has(row.relationType) || row.adjudicationSource === NEGATIVE_RELATION_POLICY);
+}
+
+function isProtectedMemoryCandidate(row: GraphMemoryGovernanceCandidate): boolean {
+    return row.signals.userPinned === true
+        || row.reason === 'target_user_pinned_memory'
+        || row.rationale?.includes(PROTECTED_PIN_RATIONALE);
 }
 
 function topSignals(row: GraphMemoryGovernanceCandidate): Array<{ label: string; value: number }> {

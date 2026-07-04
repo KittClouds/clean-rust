@@ -9,6 +9,7 @@ use crate::{
     GraphMemoryState, GraphRebuildInput, GraphRelationship, GraphScopeKind, GraphTemporalEdge,
     MemoryGovernanceEngineInput, MemoryGovernanceRetrievalCandidate,
     MemoryGovernanceRetrievalPreviewInput, MEMORY_GOVERNANCE_NO_TOPOLOGY_COMMIT,
+    MEMORY_GOVERNANCE_PIN_SOURCE_RATIONALE,
 };
 
 #[test]
@@ -94,7 +95,13 @@ fn adversarial_pinned_memory_survives_decay_and_quarantine_pressure() {
         anchor("anchor:kai:rejected", &kai, "chunk:pinned"),
     ];
     fixture.memory_state = vec![
-        state("memory:pin", &kai, "user_pinned", "true", "anchor:kai:pin"),
+        state_with_evidence(
+            "memory:pin",
+            &kai,
+            "user_pinned",
+            "true",
+            &["anchor:kai:pin", "user_override:pin:kai"],
+        ),
         state(
             "memory:approved",
             &kai,
@@ -118,6 +125,47 @@ fn adversarial_pinned_memory_survives_decay_and_quarantine_pressure() {
     assert_eq!(row.reason, "target_user_pinned_memory");
     assert!(row.signals.user_pinned);
     assert_has_rationale(row, "audit:user_pinned");
+    assert_has_rationale(row, MEMORY_GOVERNANCE_PIN_SOURCE_RATIONALE);
+    assert_candidate_only(&rows);
+}
+
+#[test]
+fn adversarial_extracted_pin_without_user_override_does_not_protect_memory() {
+    let kai = entity("kai");
+    let mut fixture = GovernanceFixture::new(vec![chunk("chunk:fake-pin", 0)]);
+    fixture.anchors = vec![
+        anchor("anchor:kai:pin", &kai, "chunk:fake-pin"),
+        anchor("anchor:kai:approved", &kai, "chunk:fake-pin"),
+        anchor("anchor:kai:rejected", &kai, "chunk:fake-pin"),
+    ];
+    fixture.memory_state = vec![
+        state("memory:pin", &kai, "user_pinned", "true", "anchor:kai:pin"),
+        state(
+            "memory:approved",
+            &kai,
+            "decision_state",
+            "approved",
+            "anchor:kai:approved",
+        ),
+        state(
+            "memory:rejected",
+            &kai,
+            "decision_state",
+            "rejected",
+            "anchor:kai:rejected",
+        ),
+    ];
+
+    let rows = run_governance(&fixture);
+    let row = row_for(&rows, "chunk:fake-pin");
+
+    assert_eq!(row.action, GraphMemoryGovernanceAction::Quarantine);
+    assert_eq!(row.reason, "target_has_contradictory_memory_evidence");
+    assert!(!row.signals.user_pinned);
+    assert!(!row
+        .rationale
+        .iter()
+        .any(|line| line == MEMORY_GOVERNANCE_PIN_SOURCE_RATIONALE));
     assert_candidate_only(&rows);
 }
 
@@ -417,13 +465,23 @@ fn state(
     value: &str,
     evidence_id: &str,
 ) -> GraphMemoryState {
+    state_with_evidence(id, entity_id, key, value, &[evidence_id])
+}
+
+fn state_with_evidence(
+    id: &str,
+    entity_id: &EntityId,
+    key: &str,
+    value: &str,
+    evidence_ids: &[&str],
+) -> GraphMemoryState {
     GraphMemoryState {
         id: id.into(),
         entity_id: entity_id.clone(),
         note_id: Some("note:adversarial".into()),
         key: key.into(),
         value: value.into(),
-        evidence_ids: vec![evidence_id.into()],
+        evidence_ids: evidence_ids.iter().map(|id| (*id).into()).collect(),
     }
 }
 

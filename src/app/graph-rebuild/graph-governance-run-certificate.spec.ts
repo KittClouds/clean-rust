@@ -104,6 +104,62 @@ describe('buildGovernanceRunCertificate', () => {
         ]));
     });
 
+    it('certifies protected memory only when a user override pin is retain-only and no-commit', () => {
+        const graph = snapshot();
+        graph.memoryGovernanceCandidates = [{
+            ...governanceCandidate('gov:pin', 'chunk:pinned', 'chunk', 'retain', 0.88, {
+                userPinned: true,
+            }),
+            reason: 'target_user_pinned_memory',
+            rationale: [
+                GRAPH_MEMORY_GOVERNANCE_NO_TOPOLOGY_COMMIT,
+                'reason:target_user_pinned_memory',
+                'audit:user_pinned',
+                'audit:pin_source:user_override',
+            ],
+        }];
+
+        const certificate = buildGovernanceRunCertificate(graph);
+
+        expect(certificate.protectedMemoryProof).toMatchObject({
+            passed: true,
+            protectedRows: 1,
+            userOverrideRows: 1,
+            retainRows: 1,
+            noTopologyCommitRows: 1,
+            sourceViolationRows: 0,
+        });
+        expect(certificate.protectedMemoryProof.sampleRows[0]).toMatchObject({
+            id: 'gov:pin',
+            action: 'retain',
+            noTopologyCommit: true,
+        });
+    });
+
+    it('rejects protected memory proof when the pin lacks a user override source', () => {
+        const graph = snapshot();
+        graph.memoryGovernanceCandidates = [{
+            ...governanceCandidate('gov:fake-pin', 'chunk:pinned', 'chunk', 'retain', 0.88, {
+                userPinned: true,
+            }),
+            reason: 'target_user_pinned_memory',
+            rationale: [
+                GRAPH_MEMORY_GOVERNANCE_NO_TOPOLOGY_COMMIT,
+                'reason:target_user_pinned_memory',
+                'audit:user_pinned',
+            ],
+        }];
+
+        const certificate = buildGovernanceRunCertificate(graph);
+
+        expect(certificate.noTopologyProof.passed).toBe(true);
+        expect(certificate.protectedMemoryProof.passed).toBe(false);
+        expect(certificate.protectedMemoryProof.sourceViolationRows).toBe(1);
+        expect(certificate.protectedMemoryProof.violations).toContain(
+            'gov:fake-pin:missing_user_override_source',
+        );
+    });
+
     it('separates contradiction, supersession, and negative relation attention lanes', () => {
         const graph = snapshot();
         graph.memoryGovernanceCandidates = [

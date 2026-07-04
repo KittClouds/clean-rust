@@ -19,11 +19,18 @@ const SUPERSESSION_ATTENUATE_THRESHOLD: f32 = 0.50;
 
 #[path = "memory_governance_contradiction.rs"]
 mod contradiction;
+#[path = "memory_governance_pin.rs"]
+mod pin;
 #[path = "memory_governance_retrieval_preview.rs"]
 mod retrieval_preview;
 #[path = "memory_governance_shortrun.rs"]
 mod shortrun;
 use contradiction::assign_contradiction_pressure;
+use pin::memory_state_is_user_override_pin;
+pub use pin::{
+    MEMORY_GOVERNANCE_PIN_PROTECTION_RATIONALE, MEMORY_GOVERNANCE_PIN_SOURCE_RATIONALE,
+    MEMORY_GOVERNANCE_PIN_USER_OVERRIDE_PREFIX,
+};
 pub use retrieval_preview::{
     build_memory_governance_retrieval_preview,
     build_memory_governance_retrieval_preview_with_policy,
@@ -224,7 +231,7 @@ fn chunk_stats<'a>(input: MemoryGovernanceEngineInput<'a>) -> HashMap<&'a str, T
             row.memory_state_count += 1;
             push_unique(&mut row.evidence_ids, evidence_id.clone());
             row.entity_ids.insert(state.entity_id.0.as_str().into());
-            row.user_pinned |= memory_state_is_pinned(state);
+            row.user_pinned |= memory_state_is_user_override_pin(state);
         }
     }
     stats
@@ -303,7 +310,10 @@ fn chunk_candidate(
     let stats = stats.cloned().unwrap_or_default();
     let signals = signals(&stats);
     let (action, reason) = if signals.user_pinned {
-        (GraphMemoryGovernanceAction::Retain, "target_user_pinned_memory")
+        (
+            GraphMemoryGovernanceAction::Retain,
+            "target_user_pinned_memory",
+        )
     } else if contradiction_quarantine_candidate(&signals) {
         (
             GraphMemoryGovernanceAction::Quarantine,
@@ -443,13 +453,11 @@ fn governance_confidence(
             0.52 + signals.redundancy * 0.18 + stats.supersession_risk * 0.18
                 - signals.evidence_strength * 0.12,
         ),
-        GraphMemoryGovernanceAction::Retain => {
-            clamp(
-                0.50 + signals.narrative_salience * 0.22
-                    + signals.causal_importance * 0.16
-                    + if signals.user_pinned { 0.18 } else { 0.0 },
-            )
-        }
+        GraphMemoryGovernanceAction::Retain => clamp(
+            0.50 + signals.narrative_salience * 0.22
+                + signals.causal_importance * 0.16
+                + if signals.user_pinned { 0.18 } else { 0.0 },
+        ),
         GraphMemoryGovernanceAction::Quarantine => clamp(
             0.58 + stats.dominant_entity_pressure * 0.25
                 + signals.contradiction_risk * 0.24
@@ -491,8 +499,14 @@ fn governance_audit_rationale(
         GraphMemoryGovernanceAction::Attenuate => {
             if reason == "target_superseded_by_later_memory_evidence" {
                 out.push("audit:superseded_memory_evidence".into());
-                out.push(format_compact!("audit:supersession_risk:{:.2}", stats.supersession_risk));
-                out.push(format_compact!("audit:supersession_count:{}", stats.supersession_count));
+                out.push(format_compact!(
+                    "audit:supersession_risk:{:.2}",
+                    stats.supersession_risk
+                ));
+                out.push(format_compact!(
+                    "audit:supersession_count:{}",
+                    stats.supersession_count
+                ));
                 let mut kinds = stats
                     .supersession_kinds
                     .iter()
@@ -523,26 +537,48 @@ fn governance_audit_rationale(
             }
         }
         GraphMemoryGovernanceAction::Compress => {
-            out.push(format_compact!("audit:episode_events:{}", stats.event_count));
-            out.push(format_compact!("audit:episode_chunks:{}", stats.chunk_ids.len()));
-            out.push(format_compact!("audit:evidence:{}", stats.evidence_ids.len()));
+            out.push(format_compact!(
+                "audit:episode_events:{}",
+                stats.event_count
+            ));
+            out.push(format_compact!(
+                "audit:episode_chunks:{}",
+                stats.chunk_ids.len()
+            ));
+            out.push(format_compact!(
+                "audit:evidence:{}",
+                stats.evidence_ids.len()
+            ));
             out.push(format_compact!("audit:entities:{}", stats.entity_ids.len()));
             if stats.causal_degree > 0 {
-                out.push(format_compact!("audit:causal_degree:{}", stats.causal_degree));
+                out.push(format_compact!(
+                    "audit:causal_degree:{}",
+                    stats.causal_degree
+                ));
             }
             if stats.temporal_degree > 0 {
-                out.push(format_compact!("audit:temporal_degree:{}", stats.temporal_degree));
+                out.push(format_compact!(
+                    "audit:temporal_degree:{}",
+                    stats.temporal_degree
+                ));
             }
         }
         GraphMemoryGovernanceAction::Retain => {
             if stats.user_pinned {
-                out.push("audit:user_pinned".into());
+                out.push(MEMORY_GOVERNANCE_PIN_PROTECTION_RATIONALE.into());
+                out.push(MEMORY_GOVERNANCE_PIN_SOURCE_RATIONALE.into());
             }
             if stats.causal_degree > 0 {
-                out.push(format_compact!("audit:causal_degree:{}", stats.causal_degree));
+                out.push(format_compact!(
+                    "audit:causal_degree:{}",
+                    stats.causal_degree
+                ));
             }
             if stats.memory_state_count > 0 {
-                out.push(format_compact!("audit:memory_state_count:{}", stats.memory_state_count));
+                out.push(format_compact!(
+                    "audit:memory_state_count:{}",
+                    stats.memory_state_count
+                ));
             }
             if stats.event_count > 0 {
                 out.push(format_compact!("audit:events:{}", stats.event_count));
@@ -551,8 +587,14 @@ fn governance_audit_rationale(
         GraphMemoryGovernanceAction::Quarantine => {
             if reason == "target_has_contradictory_memory_evidence" {
                 out.push("audit:contradictory_memory_evidence".into());
-                out.push(format_compact!("audit:contradiction_risk:{:.2}", stats.contradiction_risk));
-                out.push(format_compact!("audit:contradiction_count:{}", stats.contradiction_count));
+                out.push(format_compact!(
+                    "audit:contradiction_risk:{:.2}",
+                    stats.contradiction_risk
+                ));
+                out.push(format_compact!(
+                    "audit:contradiction_count:{}",
+                    stats.contradiction_count
+                ));
                 let mut kinds = stats
                     .contradiction_kinds
                     .iter()
@@ -573,7 +615,10 @@ fn governance_audit_rationale(
                 out.push("audit:no_events".into());
             }
             if stats.evidence_ids.len() <= 3 {
-                out.push(format_compact!("audit:weak_evidence:{}", stats.evidence_ids.len()));
+                out.push(format_compact!(
+                    "audit:weak_evidence:{}",
+                    stats.evidence_ids.len()
+                ));
             }
             if stats.causal_degree == 0 {
                 out.push("audit:no_causal_edges".into());
@@ -611,13 +656,6 @@ fn signals(stats: &TargetStats) -> GraphMemoryGovernanceSignals {
         evidence_strength: clamp(evidence / 6.0),
         user_pinned: stats.user_pinned,
     }
-}
-
-fn memory_state_is_pinned(state: &GraphMemoryState) -> bool {
-    let key = state.key.to_ascii_lowercase();
-    let value = state.value.to_ascii_lowercase();
-    matches!(key.as_str(), "user_pinned" | "pinned" | "memory_pin")
-        && matches!(value.as_str(), "true" | "yes" | "pinned")
 }
 
 fn assign_chunk_redundancy(chunks: &[GraphChunk], stats: &mut HashMap<&str, TargetStats>) {
