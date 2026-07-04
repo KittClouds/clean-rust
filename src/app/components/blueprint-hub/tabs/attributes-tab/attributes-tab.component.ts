@@ -24,6 +24,7 @@ import { GraphStyleDrawerComponent } from '../graph-tab/graph-style-drawer/graph
 import type { GraphLensState } from '../graph-tab/graph-lens';
 import type { GraphOperatingRoomId } from '../graph-tab/graph-operating-room';
 import { buildAtlasControlReviewDeck } from './atlas-control-review';
+import { buildGovernanceRunCertificate } from '../../../../graph-rebuild/graph-governance-run-certificate';
 
 @Component({
     selector: 'app-attributes-tab',
@@ -106,6 +107,10 @@ export class AttributesTabComponent {
         this.graphSnapshot(),
         this.entities(),
     ));
+    readonly governanceCertificate = computed(() => {
+        const snapshot = this.graphSnapshot();
+        return snapshot ? buildGovernanceRunCertificate(snapshot) : null;
+    });
 
     selectEntity(entity: RegisteredEntity): void {
         this.selectedEntity.set(entity);
@@ -218,6 +223,23 @@ export class AttributesTabComponent {
         const scope = this.activeScope();
         if (scope.type === 'global' || scope.scopeFolderId === 'vault:global') return 'global';
         return scope.scopeFolderId || scope.id || 'global';
+    }
+
+    percent(value: number): string {
+        return `${Math.round(value * 100)}%`;
+    }
+
+    millis(value: number | undefined): string {
+        return value === undefined ? '--' : `${value.toLocaleString()} ms`;
+    }
+
+    micros(value: number | undefined): string {
+        return value === undefined ? '--' : `${value.toLocaleString()} us`;
+    }
+
+    compactId(value: string | undefined): string {
+        if (!value) return '--';
+        return value.length <= 18 ? value : value.slice(-18);
     }
 
     private manualEntityContext(): { noteId: string; narrativeId?: string } {

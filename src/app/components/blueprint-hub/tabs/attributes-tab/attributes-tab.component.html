@@ -37,6 +37,88 @@
             }
         </div>
 
+        @if (governanceCertificate(); as certificate) {
+        <section class="atlas-run-certificate">
+            <header>
+                <div>
+                    <span>Governance Run Certificate v1</span>
+                    <h4>Run proof</h4>
+                    <small>{{ certificate.document.scopeKind }} / {{ compactId(certificate.document.scopeId) }}</small>
+                </div>
+                <strong
+                    [class.atlas-proof-pass]="certificate.noTopologyProof.passed"
+                    [class.atlas-proof-fail]="!certificate.noTopologyProof.passed">
+                    {{ certificate.noTopologyProof.passed ? 'No topology writes' : 'Proof failed' }}
+                </strong>
+            </header>
+
+            <div class="atlas-certificate-grid">
+                <span>
+                    <em>Snapshot</em>
+                    <strong>{{ compactId(certificate.document.snapshotId) }}</strong>
+                </span>
+                <span>
+                    <em>Total time</em>
+                    <strong>{{ millis(certificate.timings.totalMs) }}</strong>
+                </span>
+                <span>
+                    <em>Governance Rust</em>
+                    <strong>{{ micros(certificate.timings.nativeMemoryGovernanceRustMicros) }}</strong>
+                </span>
+                <span>
+                    <em>Retrieval rows</em>
+                    <strong>{{ certificate.noTopologyProof.retrievalRows }}</strong>
+                </span>
+            </div>
+
+            <div class="atlas-certificate-proof">
+                <span>
+                    <strong>{{ certificate.noTopologyProof.candidateOnlyRows }}</strong>
+                    <small>candidate-only rows</small>
+                </span>
+                <span>
+                    <strong>{{ certificate.noTopologyProof.noTopologyCommitRows }}</strong>
+                    <small>no-commit rows</small>
+                </span>
+                <span>
+                    <strong>{{ certificate.attentionLanes.totalAttentionRows }}</strong>
+                    <small>attention rows</small>
+                </span>
+                @if (certificate.retrievalDeltas.variants[0]; as variant) {
+                <span>
+                    <strong>{{ variant.summary.changedRankCount }}</strong>
+                    <small>retrieval rank deltas</small>
+                </span>
+                }
+            </div>
+
+            <div class="atlas-certificate-samples">
+                <article>
+                    <span>Top confidence rows</span>
+                    @for (row of certificate.topRows.slice(0, 3); track row.id) {
+                    <p>
+                        <strong>{{ row.action }}</strong>
+                        <em>{{ row.targetKind }} / {{ percent(row.confidence) }} / {{ row.evidenceCount }} evidence</em>
+                    </p>
+                    } @empty {
+                    <p><strong>None</strong><em>No governance rows</em></p>
+                    }
+                </article>
+                <article>
+                    <span>Weakest rows</span>
+                    @for (row of certificate.weakestRows.slice(0, 3); track row.id) {
+                    <p>
+                        <strong>{{ row.action }}</strong>
+                        <em>{{ row.targetKind }} / {{ percent(row.confidence) }} / {{ row.evidenceCount }} evidence</em>
+                    </p>
+                    } @empty {
+                    <p><strong>None</strong><em>No governance rows</em></p>
+                    }
+                </article>
+            </div>
+        </section>
+        }
+
         <section class="atlas-governance-queue">
             <header>
                 <div>

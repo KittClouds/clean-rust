@@ -216,6 +216,129 @@
     color: rgb(253 224 71);
 }
 
+.atlas-run-certificate {
+    display: grid;
+    gap: 12px;
+    border: 1px solid rgba(153, 246, 228, 0.2);
+    border-radius: 8px;
+    background: rgba(3, 7, 12, 0.78);
+    padding: 12px;
+}
+
+.atlas-run-certificate > header {
+    display: flex;
+    align-items: start;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.atlas-run-certificate > header span,
+.atlas-certificate-samples span {
+    color: rgb(153 246 228);
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+.atlas-run-certificate h4 {
+    margin: 3px 0 0;
+    color: white;
+    font-size: 17px;
+    font-weight: 950;
+}
+
+.atlas-run-certificate header small {
+    color: rgb(161 161 170);
+}
+
+.atlas-run-certificate > header > strong {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 999px;
+    padding: 7px 10px;
+    font-size: 10px;
+    font-weight: 950;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.atlas-proof-pass {
+    background: rgba(20, 83, 45, 0.22);
+    color: rgb(134 239 172);
+}
+
+.atlas-proof-fail {
+    background: rgba(127, 29, 29, 0.22);
+    color: rgb(253 164 175);
+}
+
+.atlas-certificate-grid,
+.atlas-certificate-proof,
+.atlas-certificate-samples {
+    display: grid;
+    gap: 8px;
+}
+
+.atlas-certificate-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.atlas-certificate-grid span,
+.atlas-certificate-proof span,
+.atlas-certificate-samples article {
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.075);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.025);
+    padding: 9px 10px;
+}
+
+.atlas-certificate-grid em,
+.atlas-certificate-proof small,
+.atlas-certificate-samples em {
+    display: block;
+    color: rgb(113 113 122);
+    font-size: 9px;
+    font-style: normal;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.atlas-certificate-grid strong,
+.atlas-certificate-proof strong {
+    display: block;
+    color: rgb(250 250 250);
+    font-size: 15px;
+    font-weight: 950;
+}
+
+.atlas-certificate-proof {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.atlas-certificate-proof strong {
+    color: var(--ui-accent-bright);
+    font-size: 20px;
+}
+
+.atlas-certificate-samples {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.atlas-certificate-samples article {
+    display: grid;
+    gap: 6px;
+}
+
+.atlas-certificate-samples p {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin: 0;
+}
+
 .atlas-governance-queue {
     display: grid;
     min-width: 0;
@@ -631,7 +754,10 @@
     }
 
     .atlas-action-summary,
-    .atlas-review-runtime {
+    .atlas-review-runtime,
+    .atlas-certificate-grid,
+    .atlas-certificate-proof,
+    .atlas-certificate-samples {
         grid-template-columns: 1fr;
     }
 
