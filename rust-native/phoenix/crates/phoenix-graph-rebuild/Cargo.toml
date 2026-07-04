@@ -31,3 +31,7 @@ path = "examples/atlas_packet_from_snapshot.rs"
 [[example]]
 name = "chunk_bridge_shortrun_parity"
 path = "examples/chunk_bridge_shortrun_parity.rs"
+
+[[example]]
+name = "memory_governance_adversarial_certificate"
+path = "examples/memory_governance_adversarial_certificate.rs"

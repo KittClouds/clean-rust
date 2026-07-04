@@ -3,10 +3,10 @@ use phoenix_types::{EntityId, EntityKind, LexiconEntry, ScopeKey};
 
 use crate::{
     assert_memory_governance_candidate_only, build_graph_rebuild_snapshot,
-    build_memory_governance_candidates, build_memory_governance_retrieval_preview,
-    GraphAnchor, GraphChunk, GraphEpisode, GraphEvent, GraphMemoryGovernanceAction,
-    GraphMemoryGovernanceCandidate, GraphMemoryGovernanceTargetKind, GraphMemoryState,
-    GraphRebuildInput, GraphRelationship, GraphScopeKind, GraphTemporalEdge,
+    build_memory_governance_adversarial_certificate, build_memory_governance_candidates,
+    build_memory_governance_retrieval_preview, GraphAnchor, GraphChunk, GraphEpisode, GraphEvent,
+    GraphMemoryGovernanceAction, GraphMemoryGovernanceCandidate, GraphMemoryGovernanceTargetKind,
+    GraphMemoryState, GraphRebuildInput, GraphRelationship, GraphScopeKind, GraphTemporalEdge,
     MemoryGovernanceEngineInput, MemoryGovernanceRetrievalCandidate,
     MemoryGovernanceRetrievalPreviewInput, MEMORY_GOVERNANCE_NO_TOPOLOGY_COMMIT,
 };
@@ -20,8 +20,20 @@ fn adversarial_contradiction_quarantines_local_state_conflict() {
         anchor("anchor:kai:rejected", &kai, "chunk:0"),
     ];
     fixture.memory_state = vec![
-        state("memory:approved", &kai, "decision_state", "approved", "anchor:kai:approved"),
-        state("memory:rejected", &kai, "decision_state", "rejected", "anchor:kai:rejected"),
+        state(
+            "memory:approved",
+            &kai,
+            "decision_state",
+            "approved",
+            "anchor:kai:approved",
+        ),
+        state(
+            "memory:rejected",
+            &kai,
+            "decision_state",
+            "rejected",
+            "anchor:kai:rejected",
+        ),
     ];
 
     let rows = run_governance(&fixture);
@@ -43,8 +55,20 @@ fn adversarial_supersession_attenuates_only_the_older_state() {
         anchor("anchor:kai:new", &kai, "chunk:new"),
     ];
     fixture.memory_state = vec![
-        state("memory:old", &kai, "decision_state", "approved", "anchor:kai:old"),
-        state("memory:new", &kai, "decision_state", "rejected", "anchor:kai:new"),
+        state(
+            "memory:old",
+            &kai,
+            "decision_state",
+            "approved",
+            "anchor:kai:old",
+        ),
+        state(
+            "memory:new",
+            &kai,
+            "decision_state",
+            "rejected",
+            "anchor:kai:new",
+        ),
     ];
 
     let rows = run_governance(&fixture);
@@ -71,8 +95,20 @@ fn adversarial_pinned_memory_survives_decay_and_quarantine_pressure() {
     ];
     fixture.memory_state = vec![
         state("memory:pin", &kai, "user_pinned", "true", "anchor:kai:pin"),
-        state("memory:approved", &kai, "decision_state", "approved", "anchor:kai:approved"),
-        state("memory:rejected", &kai, "decision_state", "rejected", "anchor:kai:rejected"),
+        state(
+            "memory:approved",
+            &kai,
+            "decision_state",
+            "approved",
+            "anchor:kai:approved",
+        ),
+        state(
+            "memory:rejected",
+            &kai,
+            "decision_state",
+            "rejected",
+            "anchor:kai:rejected",
+        ),
     ];
 
     let rows = run_governance(&fixture);
@@ -89,19 +125,32 @@ fn adversarial_pinned_memory_survives_decay_and_quarantine_pressure() {
 fn adversarial_celebrity_dominance_quarantines_opaque_copresence() {
     let kai = entity("kai");
     let rift = entity("rift");
-    let mut fixture = GovernanceFixture::new((0..5).map(|index| {
-        chunk(&format!("chunk:{index}"), index)
-    }).collect());
+    let mut fixture = GovernanceFixture::new(
+        (0..5)
+            .map(|index| chunk(&format!("chunk:{index}"), index))
+            .collect(),
+    );
     for index in 0..5 {
-        fixture.anchors.push(anchor(&format!("anchor:kai:{index}"), &kai, &format!("chunk:{index}")));
-        fixture.anchors.push(anchor(&format!("anchor:rift:{index}"), &rift, &format!("chunk:{index}")));
+        fixture.anchors.push(anchor(
+            &format!("anchor:kai:{index}"),
+            &kai,
+            &format!("chunk:{index}"),
+        ));
+        fixture.anchors.push(anchor(
+            &format!("anchor:rift:{index}"),
+            &rift,
+            &format!("chunk:{index}"),
+        ));
     }
 
     let rows = run_governance(&fixture);
     let row = row_for(&rows, "chunk:3");
 
     assert_eq!(row.action, GraphMemoryGovernanceAction::Quarantine);
-    assert_eq!(row.reason, "chunk_entity_salience_dominated_by_celebrity_surface");
+    assert_eq!(
+        row.reason,
+        "chunk_entity_salience_dominated_by_celebrity_surface"
+    );
     assert!(row.signals.evidence_strength <= 0.50);
     assert_has_rationale(row, "audit:celebrity_entity_dominance");
     assert_candidate_only(&rows);
@@ -111,19 +160,32 @@ fn adversarial_celebrity_dominance_quarantines_opaque_copresence() {
 fn adversarial_weak_evidence_pressure_is_auditable() {
     let kai = entity("kai");
     let rift = entity("rift");
-    let mut fixture = GovernanceFixture::new((0..4).map(|index| {
-        chunk(&format!("weak:{index}"), index)
-    }).collect());
+    let mut fixture = GovernanceFixture::new(
+        (0..4)
+            .map(|index| chunk(&format!("weak:{index}"), index))
+            .collect(),
+    );
     for index in 0..4 {
-        fixture.anchors.push(anchor(&format!("anchor:kai:weak:{index}"), &kai, &format!("weak:{index}")));
-        fixture.anchors.push(anchor(&format!("anchor:rift:weak:{index}"), &rift, &format!("weak:{index}")));
+        fixture.anchors.push(anchor(
+            &format!("anchor:kai:weak:{index}"),
+            &kai,
+            &format!("weak:{index}"),
+        ));
+        fixture.anchors.push(anchor(
+            &format!("anchor:rift:weak:{index}"),
+            &rift,
+            &format!("weak:{index}"),
+        ));
     }
 
     let rows = run_governance(&fixture);
     let row = row_for(&rows, "weak:0");
 
     assert_eq!(row.action, GraphMemoryGovernanceAction::Quarantine);
-    assert!(row.rationale.iter().any(|value| value.as_str().starts_with("audit:weak_evidence:")));
+    assert!(row
+        .rationale
+        .iter()
+        .any(|value| value.as_str().starts_with("audit:weak_evidence:")));
     assert_eq!(row.evidence_ids.len(), 2);
     assert_candidate_only(&rows);
 }
@@ -141,7 +203,9 @@ fn adversarial_compression_dominance_is_report_only_and_score_capped() {
         let chunk_id = format!("episode:chunk:{index}");
         let anchor_id = format!("anchor:kai:event:{index}");
         fixture.anchors.push(anchor(&anchor_id, &kai, &chunk_id));
-        fixture.events.push(event(&event_id, &chunk_id, &[kai.clone()], &[&anchor_id]));
+        fixture
+            .events
+            .push(event(&event_id, &chunk_id, &[kai.clone()], &[&anchor_id]));
     }
     fixture.episodes.push(GraphEpisode {
         id: "episode:dominant".into(),
@@ -153,11 +217,17 @@ fn adversarial_compression_dominance_is_report_only_and_score_capped() {
 
     let rows = run_governance(&fixture);
     let episode = row_for(&rows, "episode:dominant");
-    let retrieval = vec![retrieval("hit:episode", "episode:dominant", GraphMemoryGovernanceTargetKind::Episode, 0.97)];
-    let preview = build_memory_governance_retrieval_preview(MemoryGovernanceRetrievalPreviewInput {
-        retrieval_candidates: &retrieval,
-        governance_candidates: &rows,
-    });
+    let retrieval = vec![retrieval(
+        "hit:episode",
+        "episode:dominant",
+        GraphMemoryGovernanceTargetKind::Episode,
+        0.97,
+    )];
+    let preview =
+        build_memory_governance_retrieval_preview(MemoryGovernanceRetrievalPreviewInput {
+            retrieval_candidates: &retrieval,
+            governance_candidates: &rows,
+        });
     let preview_row = &preview.rows[0];
 
     assert_eq!(episode.action, GraphMemoryGovernanceAction::Compress);
@@ -181,12 +251,73 @@ fn adversarial_negative_relation_stays_review_only() {
         built_at: Some(17),
     })
     .expect("negative relation fixture");
-    let row = snapshot.relationships.iter().find(|row| row.relation_type == "betrays").expect("review row");
+    let row = snapshot
+        .relationships
+        .iter()
+        .find(|row| row.relation_type == "betrays")
+        .expect("review row");
 
     assert_eq!(row.status, "review");
-    assert_eq!(row.adjudication_source, "graph-rebuild-negative-cue-review-policy");
+    assert_eq!(
+        row.adjudication_source,
+        "graph-rebuild-negative-cue-review-policy"
+    );
     assert!(row.rationale.contains("requires confirmation"));
-    assert!(snapshot.edges.iter().all(|edge| edge.edge_type != "betrays"));
+    assert!(snapshot
+        .edges
+        .iter()
+        .all(|edge| edge.edge_type != "betrays"));
+}
+
+#[test]
+fn adversarial_certificate_covers_all_hostile_fixture_lanes() {
+    let certificate = build_memory_governance_adversarial_certificate();
+
+    assert_eq!(certificate.fixture_count, 7);
+    assert_eq!(certificate.failed_fixtures, 0);
+    assert_eq!(certificate.no_topology_violations, 0);
+    assert_eq!(certificate.total_negative_relation_rows, 1);
+    assert_eq!(
+        certificate.attention_lanes.get("contradiction").copied(),
+        Some(1)
+    );
+    assert_eq!(
+        certificate.attention_lanes.get("supersession").copied(),
+        Some(1)
+    );
+    assert_eq!(
+        certificate.attention_lanes.get("pinned_memory").copied(),
+        Some(1)
+    );
+    assert_eq!(
+        certificate
+            .attention_lanes
+            .get("celebrity_dominance")
+            .copied(),
+        Some(1)
+    );
+    assert_eq!(
+        certificate.attention_lanes.get("weak_evidence").copied(),
+        Some(1)
+    );
+    assert_eq!(
+        certificate
+            .attention_lanes
+            .get("compression_dominance")
+            .copied(),
+        Some(1)
+    );
+    assert_eq!(
+        certificate
+            .attention_lanes
+            .get("negative_relation")
+            .copied(),
+        Some(1)
+    );
+    assert!(certificate
+        .fixtures
+        .iter()
+        .all(|fixture| fixture.checks.iter().all(|check| check.passed)));
 }
 
 #[derive(Default)]
@@ -203,7 +334,10 @@ struct GovernanceFixture {
 
 impl GovernanceFixture {
     fn new(chunks: Vec<GraphChunk>) -> Self {
-        Self { chunks, ..Self::default() }
+        Self {
+            chunks,
+            ..Self::default()
+        }
     }
 
     fn input(&self) -> MemoryGovernanceEngineInput<'_> {
@@ -227,15 +361,27 @@ fn run_governance(fixture: &GovernanceFixture) -> Vec<GraphMemoryGovernanceCandi
 fn assert_candidate_only(rows: &[GraphMemoryGovernanceCandidate]) {
     assert_memory_governance_candidate_only(rows).expect("candidate-only governance rows");
     assert!(rows.iter().all(|row| row.no_topology_commit));
-    assert!(rows.iter().all(|row| row.rationale.iter().any(|value| value == MEMORY_GOVERNANCE_NO_TOPOLOGY_COMMIT)));
+    assert!(rows.iter().all(|row| row
+        .rationale
+        .iter()
+        .any(|value| value == MEMORY_GOVERNANCE_NO_TOPOLOGY_COMMIT)));
 }
 
-fn row_for<'a>(rows: &'a [GraphMemoryGovernanceCandidate], target_id: &str) -> &'a GraphMemoryGovernanceCandidate {
-    rows.iter().find(|row| row.target_id == target_id).expect("governance target")
+fn row_for<'a>(
+    rows: &'a [GraphMemoryGovernanceCandidate],
+    target_id: &str,
+) -> &'a GraphMemoryGovernanceCandidate {
+    rows.iter()
+        .find(|row| row.target_id == target_id)
+        .expect("governance target")
 }
 
 fn assert_has_rationale(row: &GraphMemoryGovernanceCandidate, rationale: &str) {
-    assert!(row.rationale.iter().any(|value| value == rationale), "{:?}", row.rationale);
+    assert!(
+        row.rationale.iter().any(|value| value == rationale),
+        "{:?}",
+        row.rationale
+    );
 }
 
 fn chunk(id: &str, ordinal: u32) -> GraphChunk {
@@ -264,7 +410,13 @@ fn anchor(id: &str, entity_id: &EntityId, chunk_id: &str) -> GraphAnchor {
     }
 }
 
-fn state(id: &str, entity_id: &EntityId, key: &str, value: &str, evidence_id: &str) -> GraphMemoryState {
+fn state(
+    id: &str,
+    entity_id: &EntityId,
+    key: &str,
+    value: &str,
+    evidence_id: &str,
+) -> GraphMemoryState {
     GraphMemoryState {
         id: id.into(),
         entity_id: entity_id.clone(),
@@ -282,7 +434,10 @@ fn event(id: &str, chunk_id: &str, entity_ids: &[EntityId], evidence_ids: &[&str
         chunk_id: Some(chunk_id.into()),
         label: "event".into(),
         entity_ids: entity_ids.to_vec(),
-        evidence_anchor_ids: evidence_ids.iter().map(|value| CompactString::from(*value)).collect(),
+        evidence_anchor_ids: evidence_ids
+            .iter()
+            .map(|value| CompactString::from(*value))
+            .collect(),
         confidence: 0.82,
     }
 }

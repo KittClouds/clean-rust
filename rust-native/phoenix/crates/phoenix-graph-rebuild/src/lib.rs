@@ -15,6 +15,7 @@ mod episode_projection;
 mod fact_extraction_tests;
 mod facts;
 mod memory_governance;
+mod memory_governance_adversarial;
 #[cfg(test)]
 mod memory_governance_adversarial_tests;
 #[cfg(test)]
@@ -85,6 +86,13 @@ pub use memory_governance::{
     MEMORY_GOVERNANCE_NO_TOPOLOGY_COMMIT, MEMORY_GOVERNANCE_RETRIEVAL_PREVIEW_SCHEMA_VERSION,
     MEMORY_GOVERNANCE_RETRIEVAL_WEIGHTING_EXPERIMENT_SCHEMA_VERSION,
     MEMORY_GOVERNANCE_SCHEMA_VERSION,
+};
+pub use memory_governance_adversarial::{
+    build_memory_governance_adversarial_certificate, MemoryGovernanceAdversarialCandidateRow,
+    MemoryGovernanceAdversarialCertificate, MemoryGovernanceAdversarialCheck,
+    MemoryGovernanceAdversarialFixtureResult, MemoryGovernanceAdversarialNegativeRelationRow,
+    MemoryGovernanceAdversarialNoTopologyProof, MemoryGovernanceAdversarialRetrievalRow,
+    MemoryGovernanceAdversarialTiming, MEMORY_GOVERNANCE_ADVERSARIAL_CERTIFICATE_SCHEMA_VERSION,
 };
 pub use phoenix_chunker_native::{
     build_chunks, classify_document_profiles, Chunk, ChunkerConfig, DocumentProfileRequest,
