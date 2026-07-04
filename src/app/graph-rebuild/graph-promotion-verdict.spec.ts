@@ -42,9 +42,9 @@ describe('graph promotion verdict preview receipts', () => {
         expect(receipts[0].proposals[0]).toEqual(expect.objectContaining({
             atom: {
                 kind: 'edge',
-                sourceId: 'entity:borrik',
-                targetId: 'entity:brynwyn',
-                edgeType: 'semantic::co_occurs_with',
+                source_id: 'entity:borrik',
+                target_id: 'entity:brynwyn',
+                edge_type: 'semantic::co_occurs_with',
             },
             truth: { kind: 'semantic', plane: 'worldState' },
             status: 'reviewedSupport',

@@ -137,9 +137,9 @@ export interface GraphPromotionProposalObservation {
     proposalId: string;
     atom: {
         kind: 'edge';
-        sourceId: string;
-        targetId: string;
-        edgeType: string;
+        source_id: string;
+        target_id: string;
+        edge_type: string;
     };
     family: string;
     sourceKind: string;
@@ -172,7 +172,7 @@ export function buildGraphPromotionPreviewReceipts(
         if (proposals.has(atomKey)) continue;
         proposals.set(atomKey, {
             proposalId: cleanId(suggestion.id),
-            atom: { kind: 'edge', sourceId, targetId, edgeType },
+            atom: { kind: 'edge', source_id: sourceId, target_id: targetId, edge_type: edgeType },
             family: cleanId(suggestion.kind),
             sourceKind: 'entity',
             targetKind: 'entity',
@@ -393,9 +393,9 @@ function stablePreviewHash(
         String(snapshot.builtAt || ''),
         ...proposals.map((row) => [
             row.proposalId,
-            row.atom.sourceId,
-            row.atom.targetId,
-            row.atom.edgeType,
+            row.atom.source_id,
+            row.atom.target_id,
+            row.atom.edge_type,
             row.evidenceRefs.join(','),
         ].join('|')),
     ].join('\n');
