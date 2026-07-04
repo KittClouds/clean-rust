@@ -39,6 +39,7 @@ import {
 } from './graph-memory-governance';
 import {
     applyNativePromotionVerdictCertificate,
+    buildGraphPromotionPreviewReceipts,
     isNativePromotionVerdictOutput,
     type NativePromotionVerdictOutput,
 } from './graph-promotion-verdict';
@@ -666,8 +667,11 @@ export class GraphRebuildService {
                 if (timings) timings.nativePromotionVerdictSkipped = 1;
                 return;
             }
+            const previewReceipts = buildGraphPromotionPreviewReceipts(snapshot);
             const native = await this.phoenix.storeCommand('graphPromotion:verdictCertificate', {
                 scopeId: snapshot.scopeId,
+                receipts: previewReceipts,
+                commits: [],
             }) as NativePromotionVerdictOutput | null;
             if (!isNativePromotionVerdictOutput(native)) {
                 throw new Error('Rust promotion verdict command returned an invalid v1 payload.');

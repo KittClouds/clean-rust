@@ -354,6 +354,8 @@ describeBaseline('product graph build gate', () => {
             'graphRebuild:memoryGovernanceRetrievalExperiment',
             'graphPromotion:verdictCertificate',
         ]));
+        expect(backend.commands.find((row) => row.command === 'graphPromotion:verdictCertificate')?.payload)
+            .toMatchObject({ scopeId: 'note:shortrun', receipts: expect.any(Array), commits: [] });
     }, 30_000);
 });
 
@@ -1082,14 +1084,14 @@ function scopedDocumentKey(scopeId: string, namespace: string, documentKey: stri
 }
 
 function createBackendHarness() {
-    const commands: Array<{ command: string; requestChars: number }> = [];
+    const commands: Array<{ command: string; payload: unknown; requestChars: number }> = [];
     const unsupportedCommands = new Set<string>();
     return {
         commands,
         unsupportedCommands,
         target: SHOULD_WRITE_TAXONOMY_AUDIT ? 'native' : 'web',
         storeCommand: vi.fn(async (command: string, payload: unknown) => {
-            commands.push({ command, requestChars: JSON.stringify(payload || {}).length });
+            commands.push({ command, payload, requestChars: JSON.stringify(payload || {}).length });
             if (unsupportedCommands.has(command)) {
                 throw new Error(`unsupported store command: ${command}`);
             }

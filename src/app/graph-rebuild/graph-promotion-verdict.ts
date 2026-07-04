@@ -1,4 +1,8 @@
-import type { GraphRebuildBuildTimings, GraphRebuildSnapshot } from './graph-rebuild-snapshot';
+import type {
+    GraphRebuildBuildTimings,
+    GraphRebuildLinkSuggestion,
+    GraphRebuildSnapshot,
+} from './graph-rebuild-snapshot';
 
 export const GRAPH_PROMOTION_VERDICT_SCHEMA_VERSION = 'phoenix-graph-promotion-verdict/v1' as const;
 
@@ -103,6 +107,105 @@ export interface NativePromotionVerdictOutput {
         verdictBuildMicros: number;
         totalMicros: number;
     };
+}
+
+export type GraphPromotionProposalStatus =
+    | 'generated'
+    | 'reviewedSupport'
+    | 'reviewedContradiction'
+    | 'deferred'
+    | 'rejected';
+
+export interface GraphPromotionProposalReceipt {
+    schemaVersion: 1;
+    receiptId: string;
+    scopeKey: string;
+    generation: number;
+    createdAt: number;
+    compilerPolicy: {
+        compilerId: string;
+        compilerVersion: string;
+        policyId: string;
+        policyVersion: string;
+    };
+    sourceGenerations: Array<{ sourceId: string; generation: number }>;
+    modelId: string | null;
+    proposals: GraphPromotionProposalObservation[];
+}
+
+export interface GraphPromotionProposalObservation {
+    proposalId: string;
+    atom: {
+        kind: 'edge';
+        sourceId: string;
+        targetId: string;
+        edgeType: string;
+    };
+    family: string;
+    sourceKind: string;
+    targetKind: string;
+    truth: { kind: 'semantic'; plane: 'worldState' };
+    status: GraphPromotionProposalStatus;
+    evidenceRefs: string[];
+    features: number[];
+    shadowScoreMillis: number | null;
+}
+
+const PROMOTION_PREVIEW_FEATURE_DIM = 16;
+
+export function buildGraphPromotionPreviewReceipts(
+    snapshot: GraphRebuildSnapshot,
+): GraphPromotionProposalReceipt[] {
+    const suggestions = (snapshot.graphAwareLinkSuggestions || [])
+        .filter(isPromotionPreviewSuggestion)
+        .slice()
+        .sort(compareLinkSuggestions);
+    if (!suggestions.length) return [];
+
+    const generation = Math.max(1, Math.trunc(snapshot.builtAt || Date.now()));
+    const proposals = new Map<string, GraphPromotionProposalObservation>();
+    for (const suggestion of suggestions) {
+        const sourceId = cleanId(suggestion.sourceEntityId);
+        const targetId = cleanId(suggestion.targetEntityId);
+        const edgeType = `semantic::${cleanId(suggestion.suggestedRelationType)}`;
+        const atomKey = `${sourceId}\u0000${targetId}\u0000${edgeType}`;
+        if (proposals.has(atomKey)) continue;
+        proposals.set(atomKey, {
+            proposalId: cleanId(suggestion.id),
+            atom: { kind: 'edge', sourceId, targetId, edgeType },
+            family: cleanId(suggestion.kind),
+            sourceKind: 'entity',
+            targetKind: 'entity',
+            truth: { kind: 'semantic', plane: 'worldState' },
+            status: promotionStatusFor(suggestion),
+            evidenceRefs: evidenceRefsFor(suggestion),
+            features: promotionFeaturesFor(suggestion),
+            shadowScoreMillis: scoreMillisFor(suggestion),
+        });
+    }
+    const orderedProposals = Array.from(proposals.values());
+    if (!orderedProposals.length) return [];
+
+    const receiptHash = stablePreviewHash(snapshot, orderedProposals);
+    return [{
+        schemaVersion: 1,
+        receiptId: `graph-proposal:atlas-preview:${receiptHash}`,
+        scopeKey: cleanId(snapshot.scopeId || 'global'),
+        generation,
+        createdAt: generation,
+        compilerPolicy: {
+            compilerId: 'phoenix-ts-compatibility-bridge',
+            compilerVersion: '1',
+            policyId: 'graph-post-proposal:atlas-link-preview',
+            policyVersion: '1',
+        },
+        sourceGenerations: [{
+            sourceId: cleanId(snapshot.id || snapshot.scopeId || 'graph-rebuild-snapshot'),
+            generation,
+        }],
+        modelId: null,
+        proposals: orderedProposals,
+    }];
 }
 
 export function applyNativePromotionVerdictCertificate(
@@ -220,4 +323,95 @@ function isNonNegativeNumber(value: unknown): value is number {
 
 function isFiniteNumber(value: unknown): value is number {
     return typeof value === 'number' && Number.isFinite(value);
+}
+
+function isPromotionPreviewSuggestion(
+    suggestion: GraphRebuildLinkSuggestion,
+): boolean {
+    return !!cleanId(suggestion.id)
+        && !!cleanId(suggestion.sourceEntityId)
+        && !!cleanId(suggestion.targetEntityId)
+        && !!cleanId(suggestion.suggestedRelationType);
+}
+
+function compareLinkSuggestions(
+    left: GraphRebuildLinkSuggestion,
+    right: GraphRebuildLinkSuggestion,
+): number {
+    return cleanId(left.kind).localeCompare(cleanId(right.kind))
+        || cleanId(left.suggestedRelationType).localeCompare(cleanId(right.suggestedRelationType))
+        || cleanId(left.sourceEntityId).localeCompare(cleanId(right.sourceEntityId))
+        || cleanId(left.targetEntityId).localeCompare(cleanId(right.targetEntityId))
+        || cleanId(left.id).localeCompare(cleanId(right.id));
+}
+
+function promotionStatusFor(suggestion: GraphRebuildLinkSuggestion): GraphPromotionProposalStatus {
+    return suggestion.status === 'confirmed' ? 'reviewedSupport' : 'reviewedSupport';
+}
+
+function evidenceRefsFor(suggestion: GraphRebuildLinkSuggestion): string[] {
+    const seen = new Set<string>();
+    const rows: string[] = [];
+    for (const raw of suggestion.evidenceIds || []) {
+        const value = cleanId(raw);
+        if (!value || seen.has(value)) continue;
+        seen.add(value);
+        rows.push(value);
+        if (rows.length >= 32) break;
+    }
+    return rows;
+}
+
+function promotionFeaturesFor(suggestion: GraphRebuildLinkSuggestion): number[] {
+    const features = Array.from({ length: PROMOTION_PREVIEW_FEATURE_DIM }, () => 0);
+    features[0] = scoreMillisFor(suggestion) || 0;
+    features[1] = scaledScore(suggestion.confidence);
+    features[5] = Math.min(1000, (suggestion.evidenceIds || []).length * 50);
+    features[11] = suggestion.status === 'confirmed' ? 1000 : 750;
+    return features;
+}
+
+function scoreMillisFor(suggestion: GraphRebuildLinkSuggestion): number | null {
+    const raw = Number.isFinite(suggestion.rerankScore)
+        ? suggestion.rerankScore
+        : suggestion.confidence;
+    const scaled = scaledScore(raw);
+    return scaled > 0 ? scaled : null;
+}
+
+function scaledScore(value: unknown): number {
+    return clampInt(Math.round((typeof value === 'number' && Number.isFinite(value) ? value : 0) * 1000), 0, 1000);
+}
+
+function stablePreviewHash(
+    snapshot: GraphRebuildSnapshot,
+    proposals: GraphPromotionProposalObservation[],
+): string {
+    const payload = [
+        snapshot.id || '',
+        snapshot.scopeId || '',
+        String(snapshot.builtAt || ''),
+        ...proposals.map((row) => [
+            row.proposalId,
+            row.atom.sourceId,
+            row.atom.targetId,
+            row.atom.edgeType,
+            row.evidenceRefs.join(','),
+        ].join('|')),
+    ].join('\n');
+    let hash = 2166136261;
+    for (let index = 0; index < payload.length; index += 1) {
+        hash ^= payload.charCodeAt(index);
+        hash = Math.imul(hash, 16777619);
+    }
+    return (hash >>> 0).toString(16).padStart(8, '0');
+}
+
+function cleanId(value: unknown): string {
+    return typeof value === 'string' ? value.trim() : '';
+}
+
+function clampInt(value: number, min: number, max: number): number {
+    if (!Number.isFinite(value)) return min;
+    return Math.max(min, Math.min(max, value));
 }
