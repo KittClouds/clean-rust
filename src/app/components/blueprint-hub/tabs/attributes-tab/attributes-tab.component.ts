@@ -29,7 +29,18 @@ import type {
     GraphPromotionVerdictCertificate,
     GraphPromotionVerdictGate,
     GraphPromotionVerdictRow,
+    GraphPromotionTruthAtom,
 } from '../../../../graph-rebuild/graph-promotion-verdict';
+
+type AtlasWorkflowTone = 'ready' | 'review' | 'warning' | 'quiet';
+
+interface AtlasWorkflowStep {
+    id: string;
+    label: string;
+    value: string;
+    detail: string;
+    tone: AtlasWorkflowTone;
+}
 
 @Component({
     selector: 'app-attributes-tab',
@@ -42,7 +53,11 @@ import type {
         EntityCreatorDialogComponent,
     ],
     templateUrl: './attributes-tab.component.html',
-    styleUrls: ['./attributes-tab.component.css', './attributes-tab-promotion.component.css'],
+    styleUrls: [
+        './attributes-tab.component.css',
+        './attributes-tab-promotion.component.css',
+        './attributes-tab-workflow.component.css',
+    ],
 })
 export class AttributesTabComponent {
     private readonly scopeService = inject(ScopeService);
@@ -73,6 +88,14 @@ export class AttributesTabComponent {
         if (local) return local;
         const selectedId = this.entitySelection.selectedEntityId();
         return this.entities().find((entity) => entity.id === selectedId) ?? null;
+    });
+    readonly entityLabelById = computed(() => {
+        const labels = new Map<string, string>();
+        for (const entity of this.entities()) {
+            labels.set(entity.id, entity.label);
+            labels.set(cleanEntityLookupKey(entity.id), entity.label);
+        }
+        return labels;
     });
 
     readonly atlasEdges = computed<AtlasPreviewEdge[]>(() => {
@@ -122,6 +145,53 @@ export class AttributesTabComponent {
     readonly promotionCertificate = computed(() =>
         this.graphSnapshot()?.promotionVerdictCertificate ?? null,
     );
+    readonly workflowSteps = computed<AtlasWorkflowStep[]>(() => {
+        const summary = this.graphSummary();
+        const review = this.reviewDeck();
+        const promotion = this.promotionCertificate();
+        const certificate = this.governanceCertificate();
+        const proofOk = !!certificate
+            && certificate.noTopologyProof.passed
+            && certificate.protectedMemoryProof.passed
+            && certificate.compressionDominanceProof.passed;
+        return [
+            {
+                id: 'graph',
+                label: 'Graph build',
+                value: summary.edges.toLocaleString(),
+                detail: `${summary.targets.toLocaleString()} retrieval targets`,
+                tone: summary.edges > 0 ? 'ready' : 'quiet',
+            },
+            {
+                id: 'governance',
+                label: 'Governance',
+                value: summary.governance.toLocaleString(),
+                detail: `${review.noTopologyCommit.toLocaleString()} no-commit rows`,
+                tone: summary.governance > 0 ? 'ready' : 'quiet',
+            },
+            {
+                id: 'review',
+                label: 'Review lanes',
+                value: review.attentionCount.toLocaleString(),
+                detail: review.attentionCount > 0 ? 'needs attention' : 'clear exceptions',
+                tone: review.attentionCount > 0 ? 'warning' : 'ready',
+            },
+            {
+                id: 'promotion',
+                label: 'Promotion',
+                value: summary.verdicts.toLocaleString(),
+                detail: promotion ? `${promotion.audit.acceptable.toLocaleString()} acceptable` : 'certificate pending',
+                tone: summary.verdicts > 0 ? 'review' : 'quiet',
+            },
+            {
+                id: 'proof',
+                label: 'Run proof',
+                value: proofOk ? 'ok' : '--',
+                detail: certificate ? 'candidate-only verified' : 'waiting for run',
+                tone: proofOk ? 'ready' : 'quiet',
+            },
+        ];
+    });
     readonly promotionRows = computed(() =>
         this.promotionCertificate()?.rows.slice(0, 48) ?? [],
     );
@@ -261,6 +331,9 @@ export class AttributesTabComponent {
     }
 
     promotionTruthLabel(row: GraphPromotionVerdictRow): string {
+        const atomLabel = this.promotionAtomLabel(row.atom);
+        if (atomLabel) return atomLabel;
+
         const truth = row.truth || {};
         const subject = cleanUnknownText(truth.subject);
         const predicate = cleanUnknownText(truth.predicate);
@@ -270,10 +343,20 @@ export class AttributesTabComponent {
         return row.family || row.proposalId || row.id;
     }
 
+    promotionTruthMeta(row: GraphPromotionVerdictRow): string {
+        if (row.atom?.kind === 'edge') return `${titleLabel(edgeTypeLabel(row.atom.edge_type))} edge`;
+        if (row.atom?.kind === 'vertex') return 'Vertex atom';
+        return titleLabel(row.family);
+    }
+
     promotionGateLabel(row: GraphPromotionVerdictRow): string {
         const blocking = row.gates.filter((gate) => gate.status === 'block').length;
         const passed = row.gates.filter((gate) => gate.status === 'pass' || gate.status === 'override').length;
         return blocking > 0 ? `${blocking} blocked / ${passed} passed` : `${passed} passed`;
+    }
+
+    promotionGateChipLabel(gate: GraphPromotionVerdictGate): string {
+        return titleLabel(gate.kind);
     }
 
     promotionGateTitle(gate: GraphPromotionVerdictGate): string {
@@ -294,6 +377,25 @@ export class AttributesTabComponent {
         const micros = this.graphSnapshot()?.buildTimings?.nativePromotionVerdictRustMicros;
         if (micros !== undefined) return this.micros(micros);
         return certificate ? 'attached' : '--';
+    }
+
+    private promotionAtomLabel(atom: GraphPromotionTruthAtom | undefined): string {
+        if (!atom) return '';
+        if (atom.kind === 'vertex') return this.entityLabel(atom.vertex_id);
+        const source = this.entityLabel(atom.source_id);
+        const relation = titleLabel(edgeTypeLabel(atom.edge_type));
+        const target = this.entityLabel(atom.target_id);
+        if (!source || !target) return '';
+        return `${source} -> ${relation} -> ${target}`;
+    }
+
+    private entityLabel(rawId: string): string {
+        const id = cleanUnknownText(rawId);
+        if (!id) return '';
+        const labels = this.entityLabelById();
+        return labels.get(id)
+            ?? labels.get(cleanEntityLookupKey(id))
+            ?? titleLabel(cleanEntityLookupKey(id));
     }
 
     private manualEntityContext(): { noteId: string; narrativeId?: string } {
@@ -318,4 +420,17 @@ function titleLabel(value: string | undefined | null): string {
 
 function cleanUnknownText(value: unknown): string {
     return typeof value === 'string' ? value.trim() : '';
+}
+
+function cleanEntityLookupKey(value: string): string {
+    return value
+        .trim()
+        .replace(/^atom:entity:/, '')
+        .replace(/^entity:/, '');
+}
+
+function edgeTypeLabel(value: string): string {
+    return cleanUnknownText(value)
+        .replace(/^semantic::/, '')
+        .replace(/^relation::/, '');
 }

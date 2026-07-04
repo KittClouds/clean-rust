@@ -18,6 +18,8 @@ describe('SearchPanelComponent recipe controls', () => {
         expect(template).toContain('(click)="loadGraphModels()"');
         expect(template).toContain('(click)="buildGraphAtlas()"');
         expect(template).toContain('(click)="embedAtlas()"');
+        expect(template).toContain('stage8-workflow');
+        expect(template).toContain('ModernBERT gates');
         expect(template).toContain('(click)="runModernBertNliReview()"');
     });
 

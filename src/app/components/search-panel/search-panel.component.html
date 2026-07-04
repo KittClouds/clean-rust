@@ -99,6 +99,29 @@
         </button>
       </div>
 
+      <div class="stage8-workflow">
+        <span class="stage8-workflow-step" [ngClass]="graphModelsReady() ? 'stage8-step-ready' : 'stage8-step-waiting'">
+          <b>1</b>
+          <strong>Models</strong>
+          <small>{{ graphModelsReady() ? 'warm' : 'stage' }}</small>
+        </span>
+        <span class="stage8-workflow-step" [ngClass]="stage8.router.tone === 'ready' ? 'stage8-step-ready' : 'stage8-step-waiting'">
+          <b>2</b>
+          <strong>Graph</strong>
+          <small>{{ stage8.router.status }}</small>
+        </span>
+        <span class="stage8-workflow-step" [ngClass]="modernBertNliTone() === 'ready' ? 'stage8-step-ready' : 'stage8-step-waiting'">
+          <b>3</b>
+          <strong>NLI</strong>
+          <small>{{ modernBertNliStatusLabel() }}</small>
+        </span>
+        <span class="stage8-workflow-step" [ngClass]="'stage8-step-' + stage8.truthReview.tone">
+          <b>4</b>
+          <strong>Review</strong>
+          <small>{{ stage8.truthReview.status }}</small>
+        </span>
+      </div>
+
       <div class="stage8-router" [ngClass]="'stage8-tone-' + stage8.router.tone">
         <span class="stage8-router-dot"></span>
         <span class="stage8-router-main">
@@ -139,6 +162,7 @@
           </span>
           <small>{{ modernBertNliDetail() }}</small>
           <span class="stage8-nli-actions">
+            <em>ModernBERT gates</em>
             <button type="button" class="stage8-truth-review-action" (click)="loadModernBertNli()"
               [disabled]="isModernBertNliLoadDisabled()">
               <ng-icon [name]="activeLaneWarm() === 'nli' ? 'lucideLoader2' : 'lucideMicrochip'"

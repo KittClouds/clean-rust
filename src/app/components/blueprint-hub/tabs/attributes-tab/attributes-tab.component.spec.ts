@@ -11,6 +11,8 @@ describe('AttributesTabComponent', () => {
         const template = readFileSync(join(here, 'attributes-tab.component.html'), 'utf8');
 
         expect(template).toContain('Atlas Control');
+        expect(template).toContain('atlas-workflow-strip');
+        expect(template).toContain('workflowSteps');
         expect(template).toContain('Memory Governance');
         expect(template).toContain('runtimeDiagnostics');
         expect(template).toContain('Candidate decisions');
@@ -22,6 +24,8 @@ describe('AttributesTabComponent', () => {
         expect(template).toContain('candidateRows');
         expect(template).toContain('Promotion Cockpit');
         expect(template).toContain('Candidate -> accepted truth');
+        expect(template).toContain('Proposed atom');
+        expect(template).toContain('promotionTruthMeta');
         expect(template).toContain('Receipt gated');
         expect(template).toContain('rollback plans');
         expect(template).toContain('Witness count');
@@ -29,6 +33,7 @@ describe('AttributesTabComponent', () => {
         expect(template).toContain('NLI fit');
         expect(template).toContain('User override');
         expect(template).toContain('No durable proposal receipt verdicts');
+        expect(template).toContain('Waiting for receipts');
         expect(template).toContain('Attention Required');
         expect(template).toContain('Exception lanes');
         expect(template).toContain('Negative Relation Audit');

@@ -13,6 +13,21 @@
         </div>
     </header>
 
+    <section class="atlas-workflow-strip">
+        @for (step of workflowSteps(); track step.id) {
+        <article
+            class="atlas-workflow-step"
+            [class.atlas-workflow-ready]="step.tone === 'ready'"
+            [class.atlas-workflow-review]="step.tone === 'review'"
+            [class.atlas-workflow-warning]="step.tone === 'warning'"
+            [class.atlas-workflow-quiet]="step.tone === 'quiet'">
+            <span>{{ step.label }}</span>
+            <strong>{{ step.value }}</strong>
+            <small>{{ step.detail }}</small>
+        </article>
+        }
+    </section>
+
     <section class="atlas-review-deck">
         <header class="atlas-review-header">
             <div>
@@ -222,7 +237,7 @@
                     <thead>
                         <tr>
                             <th>Verdict</th>
-                            <th>Truth</th>
+                            <th>Proposed atom</th>
                             <th>Evidence</th>
                             <th>Gates</th>
                             <th>Apply</th>
@@ -237,7 +252,10 @@
                                 <strong>{{ promotionVerdictLabel(row) }}</strong>
                                 <small>{{ row.family }}</small>
                             </td>
-                            <td>{{ promotionTruthLabel(row) }}</td>
+                            <td>
+                                <strong>{{ promotionTruthLabel(row) }}</strong>
+                                <small>{{ promotionTruthMeta(row) }}</small>
+                            </td>
                             <td>
                                 <span>{{ row.evidenceRefs.length }} refs</span>
                                 <small>{{ row.witnessCount }} witnesses</small>
@@ -246,7 +264,7 @@
                                 <span>{{ promotionGateLabel(row) }}</span>
                                 <small>
                                     @for (gate of row.gates.slice(0, 3); track gate.kind) {
-                                    <b [title]="promotionGateTitle(gate)">{{ gate.kind }}</b>
+                                    <b [title]="promotionGateTitle(gate)">{{ promotionGateChipLabel(gate) }}</b>
                                     }
                                 </small>
                             </td>
@@ -271,9 +289,9 @@
                 <div>
                     <span>Promotion Cockpit</span>
                     <h4>Candidate -> accepted truth</h4>
-                    <small>certificate unavailable</small>
+                    <small>Run review or promote a receipt-backed candidate to create verdict rows.</small>
                 </div>
-                <strong class="atlas-proof-fail">No certificate</strong>
+                <strong class="atlas-proof-fail">Waiting for receipts</strong>
             </header>
         </section>
         }

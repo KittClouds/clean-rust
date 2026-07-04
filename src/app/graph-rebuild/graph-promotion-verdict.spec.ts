@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { buildGraphPromotionPreviewReceipts } from './graph-promotion-verdict';
+import { buildGraphPromotionPreviewReceipts, isNativePromotionVerdictOutput } from './graph-promotion-verdict';
 import type { GraphRebuildLinkSuggestion, GraphRebuildSnapshot } from './graph-rebuild-snapshot';
 
 describe('graph promotion verdict preview receipts', () => {
@@ -68,6 +68,70 @@ describe('graph promotion verdict preview receipts', () => {
 
     it('does not emit empty preview receipts', () => {
         expect(buildGraphPromotionPreviewReceipts(snapshotWithSuggestions([]))).toEqual([]);
+    });
+
+    it('accepts native verdict rows with promotion atoms', () => {
+        expect(isNativePromotionVerdictOutput({
+            schemaVersion: 'phoenix-graph-promotion-verdict-native-output/v1',
+            source: 'rust',
+            timing: {
+                verdictBuildMicros: 12,
+                totalMicros: 14,
+            },
+            certificate: {
+                schemaVersion: 'phoenix-graph-promotion-verdict/v1',
+                source: 'rust-deterministic-promotion-verdict',
+                noTopologyWrites: true,
+                receiptCount: 1,
+                commitCount: 0,
+                audit: {
+                    total: 1,
+                    acceptable: 1,
+                    alreadyCommitted: 0,
+                    blocked: 0,
+                    deferred: 0,
+                    rejected: 0,
+                    rollbackAvailable: 0,
+                    evidenceBlocked: 0,
+                    contradictionBlocked: 0,
+                    nliBlocked: 0,
+                    userOverrides: 0,
+                },
+                rows: [{
+                    id: 'row-1',
+                    receiptId: 'receipt-1',
+                    proposalId: 'proposal-1',
+                    atom: {
+                        kind: 'edge',
+                        source_id: 'entity:borrik',
+                        target_id: 'entity:brynwyn',
+                        edge_type: 'semantic::co_occurs_with',
+                    },
+                    family: 'backbone_promotion',
+                    truth: { kind: 'semantic', plane: 'worldState' },
+                    candidateStatus: 'reviewedSupport',
+                    outcome: 'candidate',
+                    status: 'acceptable',
+                    evidenceRefs: ['chunk:1'],
+                    witnessCount: 1,
+                    applyPlan: {
+                        operation: 'assert',
+                        rationale: 'preview',
+                    },
+                    rollbackPlan: {
+                        availableNow: false,
+                        availableAfterCommit: true,
+                        rationale: 'after commit',
+                    },
+                    gates: [{
+                        kind: 'receipt',
+                        status: 'pass',
+                        summary: 'receipt validated',
+                    }],
+                    rationale: 'all required gates passed',
+                }],
+            },
+        })).toBe(true);
     });
 });
 

@@ -39,6 +39,18 @@ export interface GraphPromotionTruthDescriptor {
     [key: string]: unknown;
 }
 
+export type GraphPromotionTruthAtom =
+    | {
+        kind: 'edge';
+        source_id: string;
+        target_id: string;
+        edge_type: string;
+    }
+    | {
+        kind: 'vertex';
+        vertex_id: string;
+    };
+
 export interface GraphPromotionApplyPlan {
     operation?: string | null;
     predecessorCommitId?: string | null;
@@ -57,6 +69,7 @@ export interface GraphPromotionVerdictRow {
     id: string;
     receiptId: string;
     proposalId: string;
+    atom?: GraphPromotionTruthAtom;
     family: string;
     truth: GraphPromotionTruthDescriptor;
     candidateStatus: string;
@@ -272,6 +285,7 @@ function isPromotionVerdictRow(value: unknown): value is GraphPromotionVerdictRo
         && typeof record.id === 'string'
         && typeof record.receiptId === 'string'
         && typeof record.proposalId === 'string'
+        && (record.atom === undefined || isPromotionTruthAtom(record.atom))
         && typeof record.family === 'string'
         && isPromotionStatus(record.status)
         && Array.isArray(record.evidenceRefs)
@@ -282,6 +296,20 @@ function isPromotionVerdictRow(value: unknown): value is GraphPromotionVerdictRo
         && isPromotionPlan(record.applyPlan)
         && isPromotionRollbackPlan(record.rollbackPlan)
         && typeof record.rationale === 'string';
+}
+
+function isPromotionTruthAtom(value: unknown): value is GraphPromotionTruthAtom {
+    const record = objectRecord(value) as Partial<GraphPromotionTruthAtom> | null;
+    if (!record || typeof record.kind !== 'string') return false;
+    if (record.kind === 'edge') {
+        return typeof (record as any).source_id === 'string'
+            && typeof (record as any).target_id === 'string'
+            && typeof (record as any).edge_type === 'string';
+    }
+    if (record.kind === 'vertex') {
+        return typeof (record as any).vertex_id === 'string';
+    }
+    return false;
 }
 
 function isPromotionGate(value: unknown): value is GraphPromotionVerdictGate {
