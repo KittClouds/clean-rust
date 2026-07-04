@@ -326,6 +326,7 @@ describeBaseline('product graph build gate', () => {
         backend.unsupportedCommands.add('graphRebuild:chunkSemanticBridges');
         backend.unsupportedCommands.add('graphRebuild:memoryGovernance');
         backend.unsupportedCommands.add('graphRebuild:memoryGovernanceRetrievalExperiment');
+        backend.unsupportedCommands.add('graphPromotion:verdictCertificate');
         harnessState.notes = [shortrunNote(text)];
         harnessState.entities = shortrunEntities();
         harnessState.occurrences = [];
@@ -342,13 +343,16 @@ describeBaseline('product graph build gate', () => {
 
         expect(snapshot.chunkSemanticBridges).toEqual([]);
         expect(snapshot.memoryGovernanceCandidates).toEqual([]);
+        expect(snapshot.promotionVerdictCertificate).toBeUndefined();
         expect(snapshot.buildTimings?.nativeChunkSemanticBridgeSkipped).toBe(1);
         expect(snapshot.buildTimings?.nativeMemoryGovernanceSkipped).toBe(1);
         expect(snapshot.buildTimings?.nativeMemoryGovernanceRetrievalExperimentSkipped).toBe(1);
+        expect(snapshot.buildTimings?.nativePromotionVerdictSkipped).toBe(1);
         expect(backend.commands.map((row) => row.command)).toEqual(expect.arrayContaining([
             'graphRebuild:chunkSemanticBridges',
             'graphRebuild:memoryGovernance',
             'graphRebuild:memoryGovernanceRetrievalExperiment',
+            'graphPromotion:verdictCertificate',
         ]));
     }, 30_000);
 });
@@ -1092,6 +1096,9 @@ function createBackendHarness() {
             if (command === 'graphRebuild:chunkSemanticBridges') {
                 return compileNativeChunkBridgeSidecar(payload);
             }
+            if (command === 'graphPromotion:verdictCertificate') {
+                return emptyNativePromotionVerdictOutput();
+            }
             if (SHOULD_WRITE_TAXONOMY_AUDIT && command === 'graphRebuild:compileDualWrite') {
                 return compileNativeAuditSidecar(payload);
             }
@@ -1107,6 +1114,35 @@ function createBackendHarness() {
             }
             return null;
         }),
+    };
+}
+
+function emptyNativePromotionVerdictOutput(): unknown {
+    return {
+        schemaVersion: 'phoenix-graph-promotion-verdict-native-output/v1',
+        source: 'rust',
+        certificate: {
+            schemaVersion: 'phoenix-graph-promotion-verdict/v1',
+            source: 'rust-deterministic-promotion-verdict',
+            noTopologyWrites: true,
+            receiptCount: 0,
+            commitCount: 0,
+            audit: {
+                total: 0,
+                acceptable: 0,
+                alreadyCommitted: 0,
+                blocked: 0,
+                deferred: 0,
+                rejected: 0,
+                rollbackAvailable: 0,
+                evidenceBlocked: 0,
+                contradictionBlocked: 0,
+                nliBlocked: 0,
+                userOverrides: 0,
+            },
+            rows: [],
+        },
+        timing: { verdictBuildMicros: 0, totalMicros: 0 },
     };
 }
 

@@ -37,6 +37,11 @@ import {
     applyNativeMemoryGovernanceRetrievalExperiment,
     memoryGovernanceRetrievalCandidatesFromSnapshot,
 } from './graph-memory-governance';
+import {
+    applyNativePromotionVerdictCertificate,
+    isNativePromotionVerdictOutput,
+    type NativePromotionVerdictOutput,
+} from './graph-promotion-verdict';
 import type {
     GraphAtlasFamily,
     GraphAtlasManifoldTarget,
@@ -459,6 +464,7 @@ export class GraphRebuildService {
             await this.attachNativeChunkSemanticBridges(snapshot, noteTexts, timings);
             await this.attachNativeMemoryGovernance(snapshot, timings);
             await this.attachNativeMemoryGovernanceRetrievalExperiment(snapshot, timings);
+            await this.attachNativePromotionVerdictCertificate(snapshot, timings);
             const interactivePacketAttached = durabilityMode === 'interactive'
                 && attachInteractiveAtlasPacketForSnapshotTargets(
                     snapshot,
@@ -646,6 +652,42 @@ export class GraphRebuildService {
             console.warn('[GraphRebuild] Native memory governance retrieval experiment unavailable; continuing without retrieval report.', error);
         } finally {
             if (timings) timings.nativeMemoryGovernanceRetrievalExperimentMs = elapsedMs(started);
+        }
+    }
+
+    private async attachNativePromotionVerdictCertificate(
+        snapshot: GraphRebuildSnapshot,
+        timings?: GraphRebuildBuildTimings,
+    ): Promise<void> {
+        const started = performance.now();
+        try {
+            if (this.phoenix.target !== 'native') {
+                applyNativePromotionVerdictCertificate(snapshot, null, timings);
+                if (timings) timings.nativePromotionVerdictSkipped = 1;
+                return;
+            }
+            const native = await this.phoenix.storeCommand('graphPromotion:verdictCertificate', {
+                scopeId: snapshot.scopeId,
+            }) as NativePromotionVerdictOutput | null;
+            if (!isNativePromotionVerdictOutput(native)) {
+                throw new Error('Rust promotion verdict command returned an invalid v1 payload.');
+            }
+            applyNativePromotionVerdictCertificate(snapshot, native.certificate, timings);
+            if (timings) {
+                timings.nativePromotionVerdictRows = native.certificate.audit.total;
+                timings.nativePromotionVerdictRustMicros = native.timing.verdictBuildMicros;
+            }
+        } catch (error) {
+            if (!isUnsupportedStoreCommand(error, 'graphPromotion:verdictCertificate')) throw error;
+            applyNativePromotionVerdictCertificate(snapshot, null, timings);
+            if (timings) {
+                timings.nativePromotionVerdictSkipped = 1;
+                timings.nativePromotionVerdictRows = 0;
+                timings.nativePromotionVerdictRustMicros = 0;
+            }
+            console.warn('[GraphRebuild] Native promotion verdict command unavailable; continuing without promotion verdict rows.', error);
+        } finally {
+            if (timings) timings.nativePromotionVerdictMs = elapsedMs(started);
         }
     }
 
@@ -2305,6 +2347,7 @@ export function graphRebuildSnapshotPersistenceView(
     delete persisted.documentCompilerSummary;
     delete (persisted as GraphRebuildSnapshot & { atlasDebugSummaries?: unknown }).atlasDebugSummaries;
     delete persisted.graphTruthCommitLedger;
+    delete persisted.promotionVerdictCertificate;
     delete persisted.calendarRegistrySummary;
     if (snapshot.graphCompiler && snapshot.graphModelV2) {
         delete persisted.graphCompiler;
@@ -2726,6 +2769,10 @@ function emptyBuildTimings(): GraphRebuildBuildTimings {
         nativeMemoryGovernanceRetrievalExperimentSkipped: 0,
         nativeMemoryGovernanceRetrievalExperimentCandidates: 0,
         nativeMemoryGovernanceRetrievalExperimentRustMicros: 0,
+        nativePromotionVerdictMs: 0,
+        nativePromotionVerdictSkipped: 0,
+        nativePromotionVerdictRows: 0,
+        nativePromotionVerdictRustMicros: 0,
         nativeCompilerMs: 0,
         nativeCompilerSkipped: 0,
         nativeCompilerInputBytesByFamily: {},
@@ -2783,6 +2830,7 @@ const SNAPSHOT_PAYLOAD_PROFILE_FIELDS: Array<[string, keyof GraphRebuildSnapshot
     ['payloadCausalEdgesChars', 'causalEdges'],
     ['payloadMemoryStateChars', 'memoryState'],
     ['payloadMemoryGovernanceCandidatesChars', 'memoryGovernanceCandidates'],
+    ['payloadPromotionVerdictCertificateChars', 'promotionVerdictCertificate'],
     ['payloadEmbeddingTargetsChars', 'embeddingTargets'],
     ['payloadEmbeddingTargetPlanChars', 'embeddingTargetPlan'],
     ['payloadEmbeddingGraphPostProcessChars', 'embeddingGraphPostProcess'],

@@ -4190,6 +4190,34 @@ dependencies = [
 ]
 
 [[package]]
+name = "phoenix-graph-post"
+version = "0.1.1"
+dependencies = [
+ "bm25_turbo",
+ "compact_str 0.8.1",
+ "hashbrown 0.15.5",
+ "memmap2",
+ "phoenix-chunker 0.1.1",
+ "phoenix-embed",
+ "phoenix-graph 0.1.1",
+ "phoenix-graph-kernel 0.1.1",
+ "phoenix-hyperbolic 0.1.1",
+ "phoenix-rel-post 0.1.1",
+ "phoenix-scope-analysis",
+ "phoenix-semantic-v2 0.1.1",
+ "phoenix-store-native-core 0.1.1",
+ "phoenix-store-overgraph 0.1.1",
+ "phoenix-types 0.1.1",
+ "rmp-serde",
+ "rustc-hash 1.1.0",
+ "serde",
+ "serde_json",
+ "thiserror 1.0.69",
+ "wide 0.7.33",
+ "zerocopy 0.7.35",
+]
+
+[[package]]
 name = "phoenix-graph-rebuild"
 version = "0.1.1"
 dependencies = [
@@ -4681,6 +4709,8 @@ dependencies = [
  "ort",
  "ort-sys",
  "phoenix-document-index",
+ "phoenix-graph-kernel 0.1.1",
+ "phoenix-graph-post",
  "phoenix-graph-rebuild",
  "phoenix-hyperbolic 0.1.0",
  "phoenix-native",

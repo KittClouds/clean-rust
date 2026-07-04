@@ -31,6 +31,11 @@ use phoenix_graph_rebuild::{
     MemoryGovernanceRetrievalCandidate, MemoryGovernanceRetrievalPreviewInput,
     MemoryGovernanceRetrievalWeightingExperiment,
 };
+use phoenix_graph_kernel::{GraphProposalBatchReceipt, GraphTruthCommit};
+use phoenix_graph_post::promotion_verdict::{
+    build_graph_promotion_verdict_certificate, GraphPromotionUserOverride,
+    GraphPromotionVerdictCertificate,
+};
 use phoenix_hyperbolic::lorentz_tree::{
     HyperboloidPoint, LorentzForest, LorentzForestIndex, LorentzNode, LorentzQueryMode,
     LorentzScoreConfig, LorentzTree, LorentzTreeKind, LorentzTreeMembership, LorentzTreeQuery,
@@ -156,6 +161,33 @@ struct MemoryGovernanceRetrievalExperimentResponse {
     source: &'static str,
     experiment: MemoryGovernanceRetrievalWeightingExperiment,
     timing: MemoryGovernanceRetrievalExperimentTiming,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct PromotionVerdictRequest {
+    #[serde(default)]
+    receipts: Vec<GraphProposalBatchReceipt>,
+    #[serde(default)]
+    commits: Vec<GraphTruthCommit>,
+    #[serde(default)]
+    user_overrides: Vec<GraphPromotionUserOverride>,
+}
+
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct PromotionVerdictTiming {
+    verdict_build_micros: u128,
+    total_micros: u128,
+}
+
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct PromotionVerdictResponse {
+    schema_version: &'static str,
+    source: &'static str,
+    certificate: GraphPromotionVerdictCertificate,
+    timing: PromotionVerdictTiming,
 }
 
 #[derive(Debug, Deserialize)]
@@ -1107,6 +1139,35 @@ impl PhoenixApi for PhoenixApiImpl {
                     timing: MemoryGovernanceRetrievalExperimentTiming {
                         governance_build_micros,
                         experiment_build_micros,
+                        total_micros: started.elapsed().as_micros(),
+                    },
+                },
+                "error": null,
+            }));
+        }
+        if command == "graphPromotion:verdictCertificate" {
+            let started = Instant::now();
+            let request = serde_json::from_value::<PromotionVerdictRequest>(payload)
+                .map_err(|error| format!("invalid graph promotion verdict request: {error}"))?;
+            let verdict_started = Instant::now();
+            let certificate = build_graph_promotion_verdict_certificate(
+                &request.receipts,
+                &request.commits,
+                &request.user_overrides,
+            )
+            .map_err(|error| error.to_string())?;
+            if !certificate.no_topology_writes {
+                return Err("promotion verdict certificate attempted topology writes".to_owned());
+            }
+            let verdict_build_micros = verdict_started.elapsed().as_micros();
+            return serialize_json(&json!({
+                "success": true,
+                "payload": PromotionVerdictResponse {
+                    schema_version: "phoenix-graph-promotion-verdict-native-output/v1",
+                    source: "rust",
+                    certificate,
+                    timing: PromotionVerdictTiming {
+                        verdict_build_micros,
                         total_micros: started.elapsed().as_micros(),
                     },
                 },

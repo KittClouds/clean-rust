@@ -20,6 +20,15 @@ describe('AttributesTabComponent', () => {
         expect(template).toContain('full proof rows');
         expect(template).toContain('bounded compression rows');
         expect(template).toContain('candidateRows');
+        expect(template).toContain('Promotion Cockpit');
+        expect(template).toContain('Candidate -> accepted truth');
+        expect(template).toContain('Receipt gated');
+        expect(template).toContain('rollback plans');
+        expect(template).toContain('Witness count');
+        expect(template).toContain('Temporal / causal fit');
+        expect(template).toContain('NLI fit');
+        expect(template).toContain('User override');
+        expect(template).toContain('No durable proposal receipt verdicts');
         expect(template).toContain('Attention Required');
         expect(template).toContain('Exception lanes');
         expect(template).toContain('Negative Relation Audit');

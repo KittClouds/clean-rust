@@ -25,6 +25,11 @@ import type { GraphLensState } from '../graph-tab/graph-lens';
 import type { GraphOperatingRoomId } from '../graph-tab/graph-operating-room';
 import { buildAtlasControlReviewDeck } from './atlas-control-review';
 import { buildGovernanceRunCertificate } from '../../../../graph-rebuild/graph-governance-run-certificate';
+import type {
+    GraphPromotionVerdictCertificate,
+    GraphPromotionVerdictGate,
+    GraphPromotionVerdictRow,
+} from '../../../../graph-rebuild/graph-promotion-verdict';
 
 @Component({
     selector: 'app-attributes-tab',
@@ -37,7 +42,7 @@ import { buildGovernanceRunCertificate } from '../../../../graph-rebuild/graph-g
         EntityCreatorDialogComponent,
     ],
     templateUrl: './attributes-tab.component.html',
-    styleUrl: './attributes-tab.component.css',
+    styleUrls: ['./attributes-tab.component.css', './attributes-tab-promotion.component.css'],
 })
 export class AttributesTabComponent {
     private readonly scopeService = inject(ScopeService);
@@ -101,6 +106,9 @@ export class AttributesTabComponent {
         governance: this.graphSnapshot()?.counters.memoryGovernanceCandidates
             ?? this.graphSnapshot()?.memoryGovernanceCandidates?.length
             ?? 0,
+        verdicts: this.graphSnapshot()?.counters.promotionVerdictRows
+            ?? this.graphSnapshot()?.promotionVerdictCertificate?.audit.total
+            ?? 0,
     }));
 
     readonly reviewDeck = computed(() => buildAtlasControlReviewDeck(
@@ -111,6 +119,12 @@ export class AttributesTabComponent {
         const snapshot = this.graphSnapshot();
         return snapshot ? buildGovernanceRunCertificate(snapshot) : null;
     });
+    readonly promotionCertificate = computed(() =>
+        this.graphSnapshot()?.promotionVerdictCertificate ?? null,
+    );
+    readonly promotionRows = computed(() =>
+        this.promotionCertificate()?.rows.slice(0, 48) ?? [],
+    );
 
     selectEntity(entity: RegisteredEntity): void {
         this.selectedEntity.set(entity);
@@ -242,6 +256,46 @@ export class AttributesTabComponent {
         return value.length <= 18 ? value : value.slice(-18);
     }
 
+    promotionVerdictLabel(row: GraphPromotionVerdictRow): string {
+        return titleLabel(row.status);
+    }
+
+    promotionTruthLabel(row: GraphPromotionVerdictRow): string {
+        const truth = row.truth || {};
+        const subject = cleanUnknownText(truth.subject);
+        const predicate = cleanUnknownText(truth.predicate);
+        const object = cleanUnknownText(truth.object);
+        if (subject && predicate && object) return `${subject} ${predicate} ${object}`;
+        if (subject && object) return `${subject} -> ${object}`;
+        return row.family || row.proposalId || row.id;
+    }
+
+    promotionGateLabel(row: GraphPromotionVerdictRow): string {
+        const blocking = row.gates.filter((gate) => gate.status === 'block').length;
+        const passed = row.gates.filter((gate) => gate.status === 'pass' || gate.status === 'override').length;
+        return blocking > 0 ? `${blocking} blocked / ${passed} passed` : `${passed} passed`;
+    }
+
+    promotionGateTitle(gate: GraphPromotionVerdictGate): string {
+        return `${titleLabel(gate.kind)}: ${gate.summary}`;
+    }
+
+    promotionApplyLabel(row: GraphPromotionVerdictRow): string {
+        return row.applyPlan.operation ? titleLabel(row.applyPlan.operation) : 'No write';
+    }
+
+    promotionRollbackLabel(row: GraphPromotionVerdictRow): string {
+        if (row.rollbackPlan.availableNow) return 'Ready';
+        if (row.rollbackPlan.availableAfterCommit) return 'After commit';
+        return 'Unavailable';
+    }
+
+    promotionTiming(certificate: GraphPromotionVerdictCertificate | null): string {
+        const micros = this.graphSnapshot()?.buildTimings?.nativePromotionVerdictRustMicros;
+        if (micros !== undefined) return this.micros(micros);
+        return certificate ? 'attached' : '--';
+    }
+
     private manualEntityContext(): { noteId: string; narrativeId?: string } {
         const currentNote = this.noteStore.currentNote();
         const scope = this.activeScope();
@@ -250,4 +304,18 @@ export class AttributesTabComponent {
             narrativeId: currentNote?.narrativeId || scope.narrativeId || (scope.type === 'narrative' ? scope.id : undefined),
         };
     }
+}
+
+function titleLabel(value: string | undefined | null): string {
+    if (!value) return '--';
+    return value
+        .replace(/([a-z])([A-Z])/g, '$1 $2')
+        .replace(/[_:-]+/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim()
+        .replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+function cleanUnknownText(value: unknown): string {
+    return typeof value === 'string' ? value.trim() : '';
 }

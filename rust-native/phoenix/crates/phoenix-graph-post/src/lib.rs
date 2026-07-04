@@ -20,6 +20,9 @@ mod promotion_receipts;
 pub mod promotion_training;
 #[cfg(test)]
 mod promotion_training_tests;
+pub mod promotion_verdict;
+#[cfg(test)]
+mod promotion_verdict_tests;
 mod query_session;
 mod query_units;
 mod retrieval;

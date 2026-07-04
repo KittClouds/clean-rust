@@ -27,6 +27,7 @@ import type { GraphDocumentGraphMutationLedger } from './graph-document-durable-
 import type { GraphOperatorMutationJournal } from './graph-operator-mutation-journal';
 import type { GraphTruthCommitLedger } from './graph-truth-commit-ledger';
 import type { GraphAtlasPacket } from './graph-atlas-packet';
+import type { GraphPromotionVerdictCertificate } from './graph-promotion-verdict';
 
 export type GraphRebuildScopeKind = 'global' | 'folder' | 'narrative' | 'note' | 'multiNote';
 export type GraphRebuildAnchorSource = EntityOccurrence['source'] | 'accepted_suggestion';
@@ -2245,6 +2246,11 @@ export interface GraphRebuildCounters {
     memoryGovernanceRetrievalGoverned?: number;
     memoryGovernanceRetrievalChangedRanks?: number;
     memoryGovernanceRetrievalPolicies?: number;
+    promotionVerdictRows?: number;
+    promotionVerdictAcceptable?: number;
+    promotionVerdictBlocked?: number;
+    promotionVerdictAlreadyCommitted?: number;
+    promotionVerdictRollbackAvailable?: number;
     embeddingTargets: number;
     embeddingTargetCandidates?: number;
     embeddingQueuedTargets?: number;
@@ -2507,6 +2513,10 @@ export interface GraphRebuildBuildTimings {
     nativeMemoryGovernanceRetrievalExperimentSkipped?: number;
     nativeMemoryGovernanceRetrievalExperimentCandidates?: number;
     nativeMemoryGovernanceRetrievalExperimentRustMicros?: number;
+    nativePromotionVerdictMs?: number;
+    nativePromotionVerdictSkipped?: number;
+    nativePromotionVerdictRows?: number;
+    nativePromotionVerdictRustMicros?: number;
     nativeCompilerMs?: number;
     nativeCompilerSkipped?: number;
     nativeCompilerInputBytesByFamily?: Record<string, number>;
@@ -2641,6 +2651,7 @@ export interface GraphRebuildSnapshot {
     memoryState: GraphRebuildMemoryState[];
     memoryGovernanceCandidates?: GraphMemoryGovernanceCandidate[];
     memoryGovernanceRetrievalExperiment?: GraphMemoryGovernanceRetrievalWeightingExperiment;
+    promotionVerdictCertificate?: GraphPromotionVerdictCertificate;
     embeddingTargets: GraphRebuildEmbeddingTarget[];
     embeddingTargetPlan?: GraphRebuildEmbeddingTargetPlan;
     embeddingVectors: GraphRebuildEmbeddingVector[];

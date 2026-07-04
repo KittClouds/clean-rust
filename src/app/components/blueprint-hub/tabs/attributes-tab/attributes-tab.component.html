@@ -9,6 +9,7 @@
             <span><strong>{{ graphSummary().edges }}</strong> graph edges</span>
             <span><strong>{{ graphSummary().targets }}</strong> targets</span>
             <span><strong>{{ graphSummary().governance }}</strong> governance</span>
+            <span><strong>{{ graphSummary().verdicts }}</strong> verdicts</span>
         </div>
     </header>
 
@@ -154,6 +155,126 @@
                     }
                 </article>
             </div>
+        </section>
+        }
+
+        @if (promotionCertificate(); as promotion) {
+        <section class="atlas-promotion-cockpit">
+            <header>
+                <div>
+                    <span>Promotion Cockpit</span>
+                    <h4>Candidate -> accepted truth</h4>
+                    <small>{{ promotion.receiptCount }} receipts / {{ promotion.commitCount }} commits</small>
+                </div>
+                <strong
+                    [class.atlas-proof-pass]="promotion.noTopologyWrites"
+                    [class.atlas-proof-fail]="!promotion.noTopologyWrites">
+                    {{ promotion.noTopologyWrites ? 'No topology writes' : 'Topology write risk' }}
+                </strong>
+                <strong class="atlas-proof-pass">Receipt gated</strong>
+                <strong
+                    [class.atlas-proof-pass]="promotion.audit.rollbackAvailable > 0 || promotion.audit.total === 0"
+                    [class.atlas-proof-fail]="promotion.audit.total > 0 && promotion.audit.rollbackAvailable === 0">
+                    {{ promotion.audit.rollbackAvailable }} rollback plans
+                </strong>
+            </header>
+
+            <div class="atlas-promotion-grid">
+                <span>
+                    <em>Verdict rows</em>
+                    <strong>{{ promotion.audit.total }}</strong>
+                </span>
+                <span>
+                    <em>Acceptable</em>
+                    <strong>{{ promotion.audit.acceptable }}</strong>
+                </span>
+                <span>
+                    <em>Blocked</em>
+                    <strong>{{ promotion.audit.blocked }}</strong>
+                </span>
+                <span>
+                    <em>Already committed</em>
+                    <strong>{{ promotion.audit.alreadyCommitted }}</strong>
+                </span>
+                <span>
+                    <em>User overrides</em>
+                    <strong>{{ promotion.audit.userOverrides }}</strong>
+                </span>
+                <span>
+                    <em>Rust verdict</em>
+                    <strong>{{ promotionTiming(promotion) }}</strong>
+                </span>
+            </div>
+
+            <div class="atlas-promotion-gates">
+                <span>Receipt</span>
+                <span>Evidence</span>
+                <span>Witness count</span>
+                <span>Contradiction</span>
+                <span>Temporal / causal fit</span>
+                <span>NLI fit</span>
+                <span>User override</span>
+                <span>Rollback</span>
+            </div>
+
+            <div class="atlas-promotion-table-wrap">
+                <table class="atlas-negative-table atlas-promotion-table">
+                    <thead>
+                        <tr>
+                            <th>Verdict</th>
+                            <th>Truth</th>
+                            <th>Evidence</th>
+                            <th>Gates</th>
+                            <th>Apply</th>
+                            <th>Rollback</th>
+                            <th>Rationale</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (row of promotionRows(); track row.id) {
+                        <tr [class]="'atlas-promotion-row-' + row.status">
+                            <td>
+                                <strong>{{ promotionVerdictLabel(row) }}</strong>
+                                <small>{{ row.family }}</small>
+                            </td>
+                            <td>{{ promotionTruthLabel(row) }}</td>
+                            <td>
+                                <span>{{ row.evidenceRefs.length }} refs</span>
+                                <small>{{ row.witnessCount }} witnesses</small>
+                            </td>
+                            <td>
+                                <span>{{ promotionGateLabel(row) }}</span>
+                                <small>
+                                    @for (gate of row.gates.slice(0, 3); track gate.kind) {
+                                    <b [title]="promotionGateTitle(gate)">{{ gate.kind }}</b>
+                                    }
+                                </small>
+                            </td>
+                            <td>{{ promotionApplyLabel(row) }}</td>
+                            <td>{{ promotionRollbackLabel(row) }}</td>
+                            <td>{{ row.rationale }}</td>
+                        </tr>
+                        } @empty {
+                        <tr>
+                            <td colspan="7" class="atlas-promotion-empty">
+                                No durable proposal receipt verdicts.
+                            </td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        } @else {
+        <section class="atlas-promotion-cockpit atlas-promotion-empty-state">
+            <header>
+                <div>
+                    <span>Promotion Cockpit</span>
+                    <h4>Candidate -> accepted truth</h4>
+                    <small>certificate unavailable</small>
+                </div>
+                <strong class="atlas-proof-fail">No certificate</strong>
+            </header>
         </section>
         }
 
