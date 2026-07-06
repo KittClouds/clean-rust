@@ -21,8 +21,11 @@ import { GraphGalaxyParticles } from './graph-galaxy-particles';
 import { makeAtomTexture, makeHaloTexture, makeLabelSprite, makeNodeTexture, type LabelSprite } from './graph-galaxy-textures';
 import type { GraphRendererMode, GraphRendererPointer, GraphRendererPort } from './graph-renderer-port';
 import type { GraphCanvasHit } from './graph-canvas-interaction';
+import { setHopfEdgeCurvePoint, type GalaxyCurvePoint } from './graph-galaxy-edge-curves';
 
 const MAX_EDGE_SEGMENTS = 8;
+const CURVED_EDGE_SEGMENTS = 16;
+const LEAN_CURVED_EDGE_SEGMENTS = 12;
 const TREE_FILAMENT_EDGE_SEGMENTS = 18;
 const MAX_EDGE_TUBE_SEGMENTS = 18;
 const HOPF_EDGE_SEGMENTS = 24;
@@ -30,8 +33,8 @@ const HOPF_CROSS_EDGE_SEGMENTS = 32;
 const MAX_EDGE_STROKES = 5;
 const LEAN_EDGE_STYLE_THRESHOLD = 1200;
 const LEAN_EDGE_STROKES = 2;
-const LEAN_HOPF_EDGE_SEGMENTS = 12;
-const LEAN_HOPF_CROSS_EDGE_SEGMENTS = 16;
+const LEAN_HOPF_EDGE_SEGMENTS = 20;
+const LEAN_HOPF_CROSS_EDGE_SEGMENTS = 24;
 const MAX_HOPF_RIBBON_GUIDES = 128;
 const MAX_HOPF_DATA_TUBES = 20;
 const MAX_HOPF_TORUS_TUBES = 12;
@@ -118,6 +121,7 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
     private readonly color = new THREE.Color();
     private readonly densityVector = new THREE.Vector3();
     private readonly edgeSurfacePoint = new THREE.Vector3();
+    private readonly edgeCurvePoint: GalaxyCurvePoint = { x: 0, y: 0, z: 0 };
     private readonly fieldVector = new THREE.Vector3();
     private readonly instanceMatrix = new THREE.Matrix4();
     private readonly instancePosition = new THREE.Vector3();
@@ -491,7 +495,7 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
         const edgeCount = scene.edgePairs.length / 2;
         const denseEdges = this.isDenseEdgeScene(scene);
         const maxEdgeSegments = denseEdges
-            ? Math.max(MAX_EDGE_SEGMENTS, LEAN_HOPF_CROSS_EDGE_SEGMENTS)
+            ? Math.max(LEAN_CURVED_EDGE_SEGMENTS, LEAN_HOPF_CROSS_EDGE_SEGMENTS)
             : Math.max(MAX_EDGE_TUBE_SEGMENTS, HOPF_CROSS_EDGE_SEGMENTS);
         const maxEdgeStrokes = denseEdges ? LEAN_EDGE_STROKES : MAX_EDGE_STROKES;
         const vertexCapacity = edgeCount * maxEdgeSegments * 2 * maxEdgeStrokes;
@@ -773,7 +777,7 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
         const baseSteps = tubeMode
             ? MAX_EDGE_SEGMENTS
             : this.settings.edgeMode === 'curved'
-            ? (treeFilaments && !leanEdges ? TREE_FILAMENT_EDGE_SEGMENTS : MAX_EDGE_SEGMENTS)
+            ? (treeFilaments && !leanEdges ? TREE_FILAMENT_EDGE_SEGMENTS : leanEdges ? LEAN_CURVED_EDGE_SEGMENTS : CURVED_EDGE_SEGMENTS)
             : 1;
         for (let edge = 0; edge < data.edgePairs.length / 2; edge++) {
             const interGalaxy = data.edgeKinds[edge] === 1;
@@ -785,7 +789,7 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
             const hopfEdge = !surfaceEdge && !tubeMode && this.mode === '3d' && data.layoutMode === 'hopfProjection' && this.settings.edgeMode === 'curved';
             const hopfCrossBase = hopfEdge && this.isHopfCrossBaseEdge(data, source, target);
             const steps = surfaceEdge
-                ? (treeFilaments && !leanEdges ? TREE_FILAMENT_EDGE_SEGMENTS : MAX_EDGE_SEGMENTS)
+                ? (treeFilaments && !leanEdges ? TREE_FILAMENT_EDGE_SEGMENTS : leanEdges ? LEAN_CURVED_EDGE_SEGMENTS : CURVED_EDGE_SEGMENTS)
                 : hopfEdge
                 ? (hopfCrossBase ? (leanEdges ? LEAN_HOPF_CROSS_EDGE_SEGMENTS : HOPF_CROSS_EDGE_SEGMENTS) : (leanEdges ? LEAN_HOPF_EDGE_SEGMENTS : HOPF_EDGE_SEGMENTS))
                 : baseSteps;
@@ -851,7 +855,7 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
         const baseSteps = tubeMode
             ? MAX_EDGE_SEGMENTS
             : this.settings.edgeMode === 'curved'
-            ? (treeFilaments && !leanEdges ? TREE_FILAMENT_EDGE_SEGMENTS : MAX_EDGE_SEGMENTS)
+            ? (treeFilaments && !leanEdges ? TREE_FILAMENT_EDGE_SEGMENTS : leanEdges ? LEAN_CURVED_EDGE_SEGMENTS : CURVED_EDGE_SEGMENTS)
             : 1;
         for (let edge = 0; edge < data.edgePairs.length / 2; edge++) {
             const source = data.edgePairs[edge * 2];
@@ -862,7 +866,7 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
             const hopfEdge = !surfaceEdge && !tubeMode && this.mode === '3d' && data.layoutMode === 'hopfProjection' && this.settings.edgeMode === 'curved';
             const hopfCrossBase = hopfEdge && this.isHopfCrossBaseEdge(data, source, target);
             const steps = surfaceEdge
-                ? (treeFilaments && !leanEdges ? TREE_FILAMENT_EDGE_SEGMENTS : MAX_EDGE_SEGMENTS)
+                ? (treeFilaments && !leanEdges ? TREE_FILAMENT_EDGE_SEGMENTS : leanEdges ? LEAN_CURVED_EDGE_SEGMENTS : CURVED_EDGE_SEGMENTS)
                 : hopfEdge
                 ? (hopfCrossBase ? (leanEdges ? LEAN_HOPF_CROSS_EDGE_SEGMENTS : HOPF_CROSS_EDGE_SEGMENTS) : (leanEdges ? LEAN_HOPF_EDGE_SEGMENTS : HOPF_EDGE_SEGMENTS))
                 : baseSteps;
@@ -1191,25 +1195,56 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
         newBx: number, newBy: number, newBz: number,
         terminalTaper = false,
     ): number {
+        const segments = Math.floor(source.length / 6);
+        if (segments < 1 || segments * 6 !== source.length) {
+            output.set(source, cursor);
+            return cursor + source.length;
+        }
         const odx = oldBx - oldAx, ody = oldBy - oldAy, odz = oldBz - oldAz;
         const ndx = newBx - newAx, ndy = newBy - newAy, ndz = newBz - newAz;
         const oldLenSq = Math.max(0.000001, odx * odx + ody * ody + odz * odz);
-        const offsetScale = THREE.MathUtils.clamp(Math.sqrt((ndx * ndx + ndy * ndy + ndz * ndz) / oldLenSq), 0.25, 2.4);
+        const offsetScale =
+            THREE.MathUtils.clamp(Math.sqrt((ndx * ndx + ndy * ndy + ndz * ndz) / oldLenSq), 0.25, 1.65) * (terminalTaper ? 0.92 : 1);
+        let liftX = 0, liftY = 0, liftZ = 0, weightSum = 0;
         for (let index = 0; index < source.length; index += 3) {
             const px = source[index], py = source[index + 1], pz = source[index + 2];
             const t = THREE.MathUtils.clamp(((px - oldAx) * odx + (py - oldAy) * ody + (pz - oldAz) * odz) / oldLenSq, 0, 1);
             const oldBaseX = oldAx + odx * t, oldBaseY = oldAy + ody * t, oldBaseZ = oldAz + odz * t;
-            const envelope = terminalTaper ? this.treeFilamentTerminalTaper(t) : 1;
-            output[cursor++] = newAx + ndx * t + (px - oldBaseX) * offsetScale * envelope;
-            output[cursor++] = newAy + ndy * t + (py - oldBaseY) * offsetScale * envelope;
-            output[cursor++] = newAz + ndz * t + (pz - oldBaseZ) * offsetScale * envelope;
+            const weight = Math.sin(Math.PI * t);
+            if (weight <= 0.000001) continue;
+            liftX += (px - oldBaseX) * weight;
+            liftY += (py - oldBaseY) * weight;
+            liftZ += (pz - oldBaseZ) * weight;
+            weightSum += weight;
         }
-        output[cursor - source.length] = newAx;
-        output[cursor - source.length + 1] = newAy;
-        output[cursor - source.length + 2] = newAz;
-        output[cursor - 3] = newBx;
-        output[cursor - 2] = newBy;
-        output[cursor - 1] = newBz;
+        const liftScale = weightSum > 0 ? offsetScale / weightSum : 0;
+        liftX *= liftScale;
+        liftY *= liftScale;
+        liftZ *= liftScale;
+        const cx = (newAx + newBx) * 0.5 + liftX * 2;
+        const cy = (newAy + newBy) * 0.5 + liftY * 2;
+        const cz = (newAz + newBz) * 0.5 + liftZ * 2;
+        for (let segment = 0; segment < segments; segment++) {
+            cursor = this.writeQuadraticGuidePoint(output, cursor, newAx, newAy, newAz, cx, cy, cz, newBx, newBy, newBz, segment / segments);
+            cursor = this.writeQuadraticGuidePoint(output, cursor, newAx, newAy, newAz, cx, cy, cz, newBx, newBy, newBz, (segment + 1) / segments);
+        }
+        return cursor;
+    }
+
+    private writeQuadraticGuidePoint(
+        output: Float32Array,
+        cursor: number,
+        ax: number, ay: number, az: number,
+        cx: number, cy: number, cz: number,
+        bx: number, by: number, bz: number,
+        t: number,
+    ): number {
+        const left = (1 - t) * (1 - t);
+        const mid = 2 * (1 - t) * t;
+        const right = t * t;
+        output[cursor++] = left * ax + mid * cx + right * bx;
+        output[cursor++] = left * ay + mid * cy + right * by;
+        output[cursor++] = left * az + mid * cz + right * bz;
         return cursor;
     }
 
@@ -2593,45 +2628,9 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
         tone = 1,
         crossBase = false,
     ): number {
-        const ar = Math.max(0.0001, Math.hypot(ax, ay, az));
-        const br = Math.max(0.0001, Math.hypot(bx, by, bz));
-        const au = { x: ax / ar, y: ay / ar, z: az / ar };
-        const bu = { x: bx / br, y: by / br, z: bz / br };
-        let nx = au.y * bu.z - au.z * bu.y;
-        let ny = au.z * bu.x - au.x * bu.z;
-        let nz = au.x * bu.y - au.y * bu.x;
-        let normalLength = Math.hypot(nx, ny, nz);
         const seed = this.stableUnit(`hopf-edge:${edge}`);
-        const sign = seed < 0.5 ? -1 : 1;
-        if (normalLength < 0.0001) {
-            nx = au.y * sign - au.z * 0.38;
-            ny = au.z + 0.22;
-            nz = -au.x + au.y * 0.38;
-            normalLength = Math.hypot(nx, ny, nz) || 1;
-        }
-        nx /= normalLength;
-        ny /= normalLength;
-        nz /= normalLength;
-        const sweep = Math.sin(Math.PI * t);
-        const curveScale = THREE.MathUtils.clamp(this.settings.edgeCurveStrength, 0.25, 1.2);
-        const bend = (crossBase ? 0.36 : 0.18) * curveScale * sweep * sign;
-        const baseX = au.x * (1 - t) + bu.x * t;
-        const baseY = au.y * (1 - t) + bu.y * t;
-        const baseZ = au.z * (1 - t) + bu.z * t;
-        const sideX = ny * baseZ - nz * baseY;
-        const sideY = nz * baseX - nx * baseZ;
-        const sideZ = nx * baseY - ny * baseX;
-        const sideLength = Math.hypot(sideX, sideY, sideZ) || 1;
-        const spin = Math.sin(Math.PI * 2 * t + seed * Math.PI * 2) * (crossBase ? 0.075 : 0.034) * sweep;
-        let dx = baseX + nx * bend + (sideX / sideLength) * spin;
-        let dy = baseY + ny * bend + (sideY / sideLength) * spin;
-        let dz = baseZ + nz * bend + (sideZ / sideLength) * spin;
-        const directionLength = Math.hypot(dx, dy, dz) || 1;
-        dx /= directionLength;
-        dy /= directionLength;
-        dz /= directionLength;
-        const radius = THREE.MathUtils.lerp(ar, br, t) + lift * (crossBase ? 0.72 : 0.38) * sweep;
-        positionAttr.setXYZ(cursor, dx * radius, dy * radius, dz * radius);
+        setHopfEdgeCurvePoint(this.edgeCurvePoint, ax, ay, az, bx, by, bz, lift, t, this.settings.edgeCurveStrength, seed, crossBase);
+        positionAttr.setXYZ(cursor, this.edgeCurvePoint.x, this.edgeCurvePoint.y, this.edgeCurvePoint.z);
         this.writeEdgeColor(colorAttr, cursor, data, focus, edge, t, tone);
         return cursor + 1;
     }

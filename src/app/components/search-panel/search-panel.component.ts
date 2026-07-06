@@ -37,6 +37,11 @@ import { BlueprintHubService } from '../blueprint-hub/blueprint-hub.service';
 import { NliWorkerService } from '../../lib/services/nli-worker.service';
 import { AtlasCapabilityRuntimeService } from '../../services/atlas-capability-runtime.service';
 import { GraphRebuildPipelineService } from '../../graph-rebuild/graph-rebuild-pipeline.service';
+import { GraphRebuildService } from '../../graph-rebuild/graph-rebuild.service';
+import {
+  buildReviewAdjudicationRunCertificate,
+  type GraphReviewAdjudicationRunCertificate,
+} from '../../graph-rebuild/graph-review-adjudication-certificate';
 import { CalendarService } from '../../services/calendar.service';
 import { PhoenixBackendService } from '../../services/phoenix-backend.service';
 import { EmbeddingModelRegistry } from '../../lib/embeddings/models/ModelRegistry';
@@ -217,6 +222,17 @@ interface Stage8TruthReviewView extends SemanticTruthReviewLaneState {
   contractDetail: string;
 }
 
+interface Stage8ReviewAdjudicationView {
+  status: string;
+  tone: CompilerTone;
+  totalDetail: string;
+  eligibleDetail: string;
+  excludedDetail: string;
+  judgedDetail: string;
+  dimensionDetail: string;
+  reasonDetail: string;
+}
+
 interface Stage8LaneView {
   id: Stage8LaneId;
   label: string;
@@ -243,6 +259,7 @@ interface Stage8WorkbenchView {
   detail: string;
   router: Stage8RouterView;
   truthReview: Stage8TruthReviewView;
+  reviewAdjudication: Stage8ReviewAdjudicationView;
   contract: GraphProjectionContractReport;
   lanes: Stage8LaneView[];
   reviewItems: Stage8ReviewItemView[];
@@ -317,6 +334,7 @@ export class SearchPanelComponent implements OnInit {
   private readonly nli = inject(NliWorkerService);
   private readonly atlasRuntime = inject(AtlasCapabilityRuntimeService);
   private readonly fullAtlasPipeline = inject(GraphRebuildPipelineService);
+  private readonly graphRebuild = inject(GraphRebuildService);
   private readonly calendar = inject(CalendarService);
   private readonly phoenix = inject(PhoenixBackendService);
 
@@ -341,6 +359,7 @@ export class SearchPanelComponent implements OnInit {
 
   readonly selectedModel = signal<ModelId>(DEFAULT_SEARCH_MODEL_ID);
   readonly activeLaneWarm = signal<AtlasModelLaneId | null>(null);
+  readonly manualReviewCertificate = signal<GraphReviewAdjudicationRunCertificate | null>(null);
   readonly folders = signal<Array<{ id: string; name: string }>>([]);
   readonly notes = signal<SearchPanelNote[]>([]);
   readonly buildScopeMode = signal<AtlasBuildScope['mode']>('global');
@@ -525,6 +544,20 @@ export class SearchPanelComponent implements OnInit {
   readonly reviewClusters = computed<ProductDiagnosticsReviewCluster[]>(() =>
     buildReviewClusterViews(this.fullAtlasPipeline.lastSnapshot())
   );
+  readonly reviewAdjudicationCertificate = computed<GraphReviewAdjudicationRunCertificate | null>(() => {
+    const snapshot = this.fullAtlasPipeline.lastSnapshot() || this.graphRebuild.snapshot();
+    if (!snapshot) return this.manualReviewCertificate();
+    return snapshot.reviewAdjudicationCertificate
+      || this.manualReviewCertificate()
+      || buildReviewAdjudicationRunCertificate({
+        snapshot,
+        source: 'derived',
+        modelId: this.nli.modelId() || 'onnx-community/ModernBERT-base-nli',
+        modelLabel: 'ModernBERT NLI',
+        dimensionLabel: this.activeEmbeddingDimensionLabel(),
+        embeddingDimension: numericFromDimensionLabel(this.activeEmbeddingDimensionLabel()),
+      });
+  });
   readonly compilerWorkbench = computed<CompilerWorkbenchView | null>(() =>
     buildCompilerWorkbenchView(
       this.fullAtlasPipeline.lastSnapshot(),
@@ -548,6 +581,7 @@ export class SearchPanelComponent implements OnInit {
       this.vectorStatus(),
       this.dynamicNerLabel(),
       this.truthReviewLane(),
+      this.reviewAdjudicationCertificate(),
       this.reviewClusters(),
       this.graphAwareLinkSuggestions(),
     )
@@ -879,17 +913,40 @@ export class SearchPanelComponent implements OnInit {
     this.error.set(null);
     this.nliReviewRunning.set(true);
     try {
-      const result = await this.atlasRuntime.runCapability('nliAdjudication', this.atlasRunOptions());
+      const options = this.atlasRunOptions();
+      const result = await this.atlasRuntime.runCapability('nliAdjudication', options);
       const raw = asRecord(result.rawResult);
-      const planned = numericField(raw, 0, 'plannedInputCount', 'planned_input_count');
-      const classified = numericField(raw, 0, 'resultCount', 'result_count');
-      const duplicate = numericField(raw, 0, 'duplicateInputCount', 'duplicate_input_count');
-      this.notice.set(planned
-        ? `ModernBERT NLI review classified ${classified.toLocaleString()} candidate pair${classified === 1 ? '' : 's'}`
-          + ` (${duplicate.toLocaleString()} duplicate${duplicate === 1 ? '' : 's'} skipped). Promotion remains separate.`
-        : 'ModernBERT NLI review queue is empty for this scope. No graph topology was written.');
+      const snapshot = this.fullAtlasPipeline.lastSnapshot() || this.graphRebuild.snapshot();
+      const certificate = buildReviewAdjudicationRunCertificate({
+        snapshot,
+        rawResult: result.rawResult,
+        source: 'manual_stage8',
+        modelId: this.nli.modelId() || 'onnx-community/ModernBERT-base-nli',
+        modelLabel: 'ModernBERT NLI',
+        dimensionLabel: options.dimensionLabel,
+        embeddingDimension: options.embeddingDimension,
+      });
+      this.manualReviewCertificate.set(certificate);
+      this.graphRebuild.attachReviewAdjudicationCertificate(certificate);
+      const total = certificate.queue.totalReviewRows;
+      const eligible = certificate.queue.nliEligibleRows;
+      const judged = certificate.queue.judgedRows;
+      const applied = certificate.queue.appliedRows;
+      const duplicate = numericField(raw, certificate.queue.duplicateRows, 'duplicateInputCount', 'duplicate_input_count');
+      this.notice.set(eligible
+        ? `ModernBERT review: ${eligible.toLocaleString()} NLI-eligible of ${total.toLocaleString()} review row${total === 1 ? '' : 's'}; `
+          + `${judged.toLocaleString()} judged / ${applied.toLocaleString()} applied; `
+          + `${duplicate.toLocaleString()} duplicate${duplicate === 1 ? '' : 's'} skipped; 0 topology writes.`
+        : `ModernBERT review found no NLI-eligible rows among ${total.toLocaleString()} review row${total === 1 ? '' : 's'}. No graph topology was written.`);
     } catch (err) {
-      this.error.set(this.toErrorMessage(err));
+      const message = this.toErrorMessage(err);
+      this.truthReviewLane.set(failedSemanticTruthReviewLaneState(
+        this.semanticTruthReviewFallback(),
+        message,
+        0,
+        'NLI review unavailable',
+      ));
+      this.error.set(message);
     } finally {
       this.nliReviewRunning.set(false);
     }
@@ -1299,6 +1356,7 @@ export class SearchPanelComponent implements OnInit {
       selectedModel: this.selectedModel(),
       selectedModelLabel: this.currentModelLabel(),
       dimensionLabel: this.activeEmbeddingDimensionLabel(),
+      embeddingDimension: numericFromDimensionLabel(this.activeEmbeddingDimensionLabel()),
       scope: this.indexScope(),
       buildScope: this.selectedBuildScope(),
       buildPolicy: this.buildPolicy(),
@@ -1331,6 +1389,8 @@ export class SearchPanelComponent implements OnInit {
         modelId: fallback.modelId,
         modelLabel: fallback.modelLabel,
         embeddingProfile: embeddingProfileFromDimensionLabel(fallback.dimensionLabel),
+        dimensionLabel: fallback.dimensionLabel,
+        dimension: numericFromDimensionLabel(fallback.dimensionLabel),
         executionProvider: fallback.executionProvider,
       },
     };
@@ -1612,6 +1672,7 @@ function buildStage8WorkbenchView(
   vectorStatus: string,
   dynamicNerStatus: string,
   truthReview: SemanticTruthReviewLaneState,
+  reviewAdjudication: GraphReviewAdjudicationRunCertificate | null,
   reviewClusters: ProductDiagnosticsReviewCluster[],
   graphLinks: GraphRebuildLinkSuggestion[],
 ): Stage8WorkbenchView {
@@ -1668,6 +1729,7 @@ function buildStage8WorkbenchView(
       tone: routerTone,
     },
     truthReview: buildStage8TruthReviewView(truthReview, modelLabel, dimensionLabel),
+    reviewAdjudication: buildStage8ReviewAdjudicationView(reviewAdjudication, dimensionLabel, truthReview),
     contract,
     lanes: [
       stage8Lane('identity', 'Identity', identityReviews, `${entityLinking?.sameEntity || 0} same / ${entityLinking?.ambiguous || 0} ambiguous`, identityReviews ? 'review' : 'quiet', 'identity'),
@@ -1682,6 +1744,43 @@ function buildStage8WorkbenchView(
     ],
     reviewItems: buildStage8ReviewItems(snapshot, reviewClusters, graphLinks),
     receipts: buildLastRunReceiptRows(receipt).slice(0, 4),
+  };
+}
+
+function buildStage8ReviewAdjudicationView(
+  certificate: GraphReviewAdjudicationRunCertificate | null,
+  dimensionLabel: string,
+  truthReview: SemanticTruthReviewLaneState,
+): Stage8ReviewAdjudicationView {
+  if (!certificate) {
+    return {
+      status: truthReview.status === 'running' ? 'running' : 'idle',
+      tone: truthReview.tone,
+      totalDetail: '0 review rows',
+      eligibleDetail: '0 NLI eligible',
+      excludedDetail: '0 excluded',
+      judgedDetail: '0 judged / 0 applied',
+      dimensionDetail: `${dimensionLabel} / certificate pending`,
+      reasonDetail: 'run Build Graph or Run NLI to publish ReviewAdjudicationRunCertificate v1',
+    };
+  }
+  const queue = certificate.queue;
+  const failed = !certificate.proof.noTopologyWrites || !certificate.proof.dimensionContractPassed;
+  const tone: CompilerTone = failed ? 'danger' : queue.nliEligibleRows > 0 || queue.judgedRows > 0 ? 'ready' : 'quiet';
+  const reason = queue.excludedReasons[0];
+  return {
+    status: failed ? 'error' : certificate.proof.modelRan ? 'ready' : 'planned',
+    tone,
+    totalDetail: `${formatCount(queue.totalReviewRows)} review rows`,
+    eligibleDetail: `${formatCount(queue.nliEligibleRows)} NLI eligible`,
+    excludedDetail: `${formatCount(queue.excludedRows)} excluded`,
+    judgedDetail: `${formatCount(queue.judgedRows)} judged / ${formatCount(queue.appliedRows)} applied`,
+    dimensionDetail: `${certificate.model.dimensionLabel || dimensionLabel} / ${certificate.proof.dimensionContractPassed ? 'dimension contract' : 'dimension mismatch'}`,
+    reasonDetail: reason
+      ? `${reason.label}: ${formatCount(reason.count)}`
+      : queue.nliEligibleRows > 0
+        ? 'ModernBERT queue is explicitly bounded to pairwise review rows'
+        : 'waiting for ModernBERT run',
   };
 }
 
@@ -1721,6 +1820,7 @@ function failedSemanticTruthReviewLaneState(
   fallback: Pick<SemanticTruthReviewLaneState, 'modelId' | 'modelLabel' | 'dimensionLabel' | 'executionProvider'>,
   message: string,
   elapsedMs: number,
+  detail = 'truth-review lane unavailable',
 ): SemanticTruthReviewLaneState {
   return {
     ...semanticTruthReviewIdleState(),
@@ -1728,7 +1828,7 @@ function failedSemanticTruthReviewLaneState(
     status: 'error',
     tone: 'danger',
     totalMs: elapsedMs,
-    detail: 'truth-review lane unavailable',
+    detail,
     error: message,
   };
 }
@@ -1768,12 +1868,16 @@ function normalizeSemanticTruthReviewResponse(
   const summary = asRecord(output['summary']);
   const committedTopologyWrites = numericField(output, 0, 'committedTopologyWrites', 'committed_topology_writes');
   const candidateOnly = booleanField(response, true, 'candidateOnly', 'candidate_only');
+  const expectedDimension = numericFromDimensionLabel(fallback.dimensionLabel);
+  const responseDimension = numericField(response, expectedDimension, 'dimension');
+  const dimensionMatches = !expectedDimension || !responseDimension || expectedDimension === responseDimension;
+  const healthy = candidateOnly && committedTopologyWrites === 0 && dimensionMatches;
   return {
-    status: candidateOnly && committedTopologyWrites === 0 ? 'ready' : 'error',
-    tone: candidateOnly && committedTopologyWrites === 0 ? 'ready' : 'danger',
+    status: healthy ? 'ready' : 'error',
+    tone: healthy ? 'ready' : 'danger',
     modelId: stringField(response, fallback.modelId, 'modelId', 'model_id'),
     modelLabel: fallback.modelLabel,
-    dimensionLabel: `${numericField(response, numericFromDimensionLabel(fallback.dimensionLabel), 'dimension')}d`,
+    dimensionLabel: fallback.dimensionLabel,
     executionProvider: stringField(response, fallback.executionProvider, 'executionProvider', 'execution_provider'),
     candidateOnly,
     committedTopologyWrites,
@@ -1783,7 +1887,10 @@ function normalizeSemanticTruthReviewResponse(
     cacheMisses: numericField(cache, 0, 'misses'),
     deriveMs: numericField(timings, 0, 'deriveMs', 'derive_ms'),
     totalMs: numericField(timings, elapsedMs, 'totalMs', 'total_ms'),
-    detail: stringField(response, 'truth-review lane complete', 'message', 'detail'),
+    detail: dimensionMatches
+      ? stringField(response, 'truth-review lane complete', 'message', 'detail')
+      : `dimension mismatch: expected ${expectedDimension}d, got ${responseDimension}d`,
+    error: dimensionMatches ? undefined : `dimension mismatch: expected ${expectedDimension}d, got ${responseDimension}d`,
   };
 }
 

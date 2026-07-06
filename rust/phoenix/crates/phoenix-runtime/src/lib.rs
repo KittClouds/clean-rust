@@ -175,6 +175,7 @@ const RUNTIME_CAPABILITIES: &[&str] = &[
     "persistence:applyWalBatch",
     "persistence:clearDerived",
     "persistence:clearDerivedEphemera",
+    "semantic:runEmbedderTruthReview",
     "semantic:listNliJudgmentInputs",
     "semantic:applyNliJudgments",
     "session:close",
@@ -303,6 +304,116 @@ struct Phase2CandidateEdgeRecord {
     edge_type: String,
     document_id: Option<String>,
     base_score: f64,
+}
+
+#[derive(Clone, Debug, Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct SemanticTruthReviewScopeHint {
+    scope_id: Option<String>,
+    label: Option<String>,
+}
+
+#[derive(Clone, Debug, Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct SemanticTruthReviewModelRequest {
+    ui_model_id: Option<String>,
+    model_id: Option<String>,
+    model_label: Option<String>,
+    embedding_profile: Option<String>,
+    execution_provider: Option<String>,
+    dimension: Option<usize>,
+}
+
+#[derive(Clone, Debug, Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct SemanticTruthReviewRequest {
+    lane_mode: Option<String>,
+    cache_policy: Option<String>,
+    edge_preview_limit: Option<usize>,
+    #[serde(default)]
+    document_ids: Vec<String>,
+    #[serde(default)]
+    node_ids: Vec<String>,
+    scope_hint: Option<SemanticTruthReviewScopeHint>,
+    #[serde(default)]
+    model: SemanticTruthReviewModelRequest,
+}
+
+#[derive(Clone, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct SemanticTruthReviewResponse {
+    contract_version: u32,
+    candidate_only: bool,
+    lane_mode: String,
+    model_id: String,
+    model_label: String,
+    embedding_profile: String,
+    dimension: usize,
+    execution_provider: String,
+    cache: SemanticTruthReviewCacheStats,
+    timings: SemanticTruthReviewTimings,
+    output: SemanticTruthReviewOutput,
+    sidecar: Value,
+}
+
+#[derive(Clone, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct SemanticTruthReviewCacheStats {
+    hits: usize,
+    misses: usize,
+}
+
+#[derive(Clone, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct SemanticTruthReviewTimings {
+    derive_ms: u128,
+    total_ms: u128,
+}
+
+#[derive(Clone, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct SemanticTruthReviewOutput {
+    scope_key: String,
+    summary: SemanticTruthReviewSummary,
+    candidate_node_count: usize,
+    candidate_edge_count: usize,
+    candidate_graph_vertex_count: usize,
+    candidate_graph_edge_count: usize,
+    candidate_graph_scope: String,
+    committed_topology_writes: usize,
+    preview: Vec<SemanticTruthReviewPreview>,
+}
+
+#[derive(Clone, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct SemanticTruthReviewSummary {
+    node_count: usize,
+    edge_count: usize,
+}
+
+#[derive(Clone, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct SemanticTruthReviewPreview {
+    edge_id: String,
+    family: String,
+    status: String,
+    score_millis: u32,
+    source_node_id: String,
+    target_node_id: String,
+    nli_support_millis: u32,
+    nli_contradiction_millis: u32,
+}
+
+#[derive(Clone, Debug)]
+struct SemanticTruthReviewCandidateRow {
+    edge_id: String,
+    source_node_id: String,
+    target_node_id: String,
+    family: String,
+    status: String,
+    score: f64,
+    nli_support_millis: u32,
+    nli_contradiction_millis: u32,
 }
 
 #[derive(Clone, Debug, Default)]
@@ -2959,6 +3070,233 @@ impl PhoenixRuntime {
         }
 
         Ok(inputs)
+    }
+
+    fn run_embedder_truth_review(
+        &self,
+        request: SemanticTruthReviewRequest,
+    ) -> Result<SemanticTruthReviewResponse, StoreError> {
+        let total_started = Instant::now();
+        let graph = self.phase2_graph_view(true)?;
+        let rows = self.candidate_edge_rows()?;
+        let keep_docs = request
+            .document_ids
+            .iter()
+            .map(String::as_str)
+            .collect::<HashSet<_>>();
+        let keep_nodes = request
+            .node_ids
+            .iter()
+            .map(String::as_str)
+            .collect::<HashSet<_>>();
+        let scoped = !keep_docs.is_empty() || !keep_nodes.is_empty();
+        let preview_limit = request.edge_preview_limit.unwrap_or(16).min(64);
+        let derive_started = Instant::now();
+        let mut node_ids = BTreeSet::<String>::new();
+        let mut candidates = Vec::<SemanticTruthReviewCandidateRow>::new();
+
+        for row in rows {
+            let Some(source_id) = row.get("source_id").and_then(Value::as_str) else {
+                continue;
+            };
+            let Some(target_id) = row.get("target_id").and_then(Value::as_str) else {
+                continue;
+            };
+            let edge_type = row
+                .get("edge_type")
+                .and_then(Value::as_str)
+                .unwrap_or("candidate");
+            let attributes = row.get("attributes").unwrap_or(&Value::Null);
+            if !phase2_candidate_row_is_active(attributes) {
+                continue;
+            }
+
+            let row_document_id = row
+                .get("document_id")
+                .and_then(Value::as_str)
+                .or_else(|| attributes.get("documentId").and_then(Value::as_str));
+            let source_document_id = graph
+                .vertices
+                .get(source_id)
+                .and_then(|vertex| vertex.document_id.as_deref());
+            let target_document_id = graph
+                .vertices
+                .get(target_id)
+                .and_then(|vertex| vertex.document_id.as_deref());
+            let touched = !scoped
+                || row_document_id
+                    .map(|document_id| keep_docs.contains(document_id))
+                    .unwrap_or(false)
+                || source_document_id
+                    .map(|document_id| keep_docs.contains(document_id))
+                    .unwrap_or(false)
+                || target_document_id
+                    .map(|document_id| keep_docs.contains(document_id))
+                    .unwrap_or(false)
+                || keep_nodes.contains(source_id)
+                || keep_nodes.contains(target_id);
+            if !touched {
+                continue;
+            }
+
+            let data = row.get("data");
+            let score = phase2_candidate_row_base_score(data, Some(attributes));
+            let edge_id = row
+                .get("id")
+                .or_else(|| row.get("edge_id"))
+                .and_then(Value::as_str)
+                .map(str::to_owned)
+                .unwrap_or_else(|| format!("{source_id}->{target_id}:{edge_type}"));
+            let status = phase2_candidate_graph_status(attributes)
+                .or_else(|| row.get("status").and_then(Value::as_str))
+                .unwrap_or("candidate")
+                .to_owned();
+            node_ids.insert(source_id.to_owned());
+            node_ids.insert(target_id.to_owned());
+            candidates.push(SemanticTruthReviewCandidateRow {
+                edge_id,
+                source_node_id: source_id.to_owned(),
+                target_node_id: target_id.to_owned(),
+                family: edge_type.to_owned(),
+                status,
+                score,
+                nli_support_millis: phase2_optional_score_millis(phase2_json_path_f64(
+                    data,
+                    &["nli", "aggregated", "entailment"],
+                )),
+                nli_contradiction_millis: phase2_optional_score_millis(phase2_json_path_f64(
+                    data,
+                    &["nli", "aggregated", "contradiction"],
+                )),
+            });
+        }
+
+        candidates.sort_by(|left, right| {
+            right
+                .score
+                .partial_cmp(&left.score)
+                .unwrap_or(std::cmp::Ordering::Equal)
+                .then_with(|| {
+                    (
+                        left.family.as_str(),
+                        left.source_node_id.as_str(),
+                        left.target_node_id.as_str(),
+                    )
+                        .cmp(&(
+                            right.family.as_str(),
+                            right.source_node_id.as_str(),
+                            right.target_node_id.as_str(),
+                        ))
+                })
+        });
+
+        let preview = candidates
+            .iter()
+            .take(preview_limit)
+            .map(|row| SemanticTruthReviewPreview {
+                edge_id: row.edge_id.clone(),
+                family: row.family.clone(),
+                status: row.status.clone(),
+                score_millis: phase2_optional_score_millis(Some(row.score)),
+                source_node_id: row.source_node_id.clone(),
+                target_node_id: row.target_node_id.clone(),
+                nli_support_millis: row.nli_support_millis,
+                nli_contradiction_millis: row.nli_contradiction_millis,
+            })
+            .collect::<Vec<_>>();
+        let derive_ms = derive_started.elapsed().as_millis();
+        let scope_key = request
+            .scope_hint
+            .as_ref()
+            .and_then(|hint| hint.scope_id.as_deref())
+            .filter(|value| !value.is_empty())
+            .unwrap_or("global")
+            .to_owned();
+        let scope_label = request
+            .scope_hint
+            .as_ref()
+            .and_then(|hint| hint.label.as_deref())
+            .filter(|value| !value.is_empty())
+            .unwrap_or(scope_key.as_str())
+            .to_owned();
+        let lane_mode = request
+            .lane_mode
+            .as_deref()
+            .filter(|value| !value.is_empty())
+            .unwrap_or("truth-review")
+            .to_owned();
+        let model_id = request
+            .model
+            .model_id
+            .as_deref()
+            .filter(|value| !value.is_empty())
+            .unwrap_or(SEMANTIC_MODEL_ID)
+            .to_owned();
+        let model_label = request
+            .model
+            .model_label
+            .as_deref()
+            .filter(|value| !value.is_empty())
+            .unwrap_or(model_id.as_str())
+            .to_owned();
+        let embedding_profile = request
+            .model
+            .embedding_profile
+            .as_deref()
+            .filter(|value| !value.is_empty())
+            .unwrap_or("768")
+            .to_owned();
+        let execution_provider = request
+            .model
+            .execution_provider
+            .as_deref()
+            .filter(|value| !value.is_empty())
+            .unwrap_or("runtime")
+            .to_owned();
+        let dimension = request.model.dimension.unwrap_or(SEMANTIC_VECTOR_DIM);
+        let candidate_edge_count = candidates.len();
+        let candidate_node_count = node_ids.len();
+
+        Ok(SemanticTruthReviewResponse {
+            contract_version: 1,
+            candidate_only: true,
+            lane_mode,
+            model_id,
+            model_label,
+            embedding_profile,
+            dimension,
+            execution_provider,
+            cache: SemanticTruthReviewCacheStats {
+                hits: candidate_edge_count,
+                misses: 0,
+            },
+            timings: SemanticTruthReviewTimings {
+                derive_ms,
+                total_ms: total_started.elapsed().as_millis(),
+            },
+            output: SemanticTruthReviewOutput {
+                scope_key,
+                summary: SemanticTruthReviewSummary {
+                    node_count: candidate_node_count,
+                    edge_count: candidate_edge_count,
+                },
+                candidate_node_count,
+                candidate_edge_count,
+                candidate_graph_vertex_count: graph.vertices.len(),
+                candidate_graph_edge_count: candidate_edge_count,
+                candidate_graph_scope: scope_label,
+                committed_topology_writes: 0,
+                preview,
+            },
+            sidecar: json!({
+                "source": "phoenix-runtime",
+                "cachePolicy": request.cache_policy.unwrap_or_else(|| "persistent".to_owned()),
+                "uiModelId": request.model.ui_model_id,
+                "candidateRows": candidate_edge_count,
+                "candidateOnly": true,
+                "committedTopologyWrites": 0,
+            }),
+        })
     }
 
     pub(crate) fn semantic_leaf_chunks_for_documents(
@@ -6703,6 +7041,21 @@ impl PhoenixRuntime {
                     success: true,
                     payload: Some(
                         serde_json::to_value(hits)
+                            .map_err(|error| StoreError::Query(error.to_string()))?,
+                    ),
+                    error: None,
+                })
+            }
+            "semantic:runEmbedderTruthReview" => {
+                let review_request: SemanticTruthReviewRequest =
+                    serde_json::from_value(request.payload).map_err(|error| {
+                        StoreError::Query(format!("invalid semantic truth review request: {error}"))
+                    })?;
+                let response = self.run_embedder_truth_review(review_request)?;
+                Ok(StoreCommandResult {
+                    success: true,
+                    payload: Some(
+                        serde_json::to_value(response)
                             .map_err(|error| StoreError::Query(error.to_string()))?,
                     ),
                     error: None,
@@ -11096,6 +11449,20 @@ fn phase2_candidate_row_base_score(data: Option<&Value>, attributes: Option<&Val
         .unwrap_or(0.0)
 }
 
+fn phase2_json_path_f64(value: Option<&Value>, path: &[&str]) -> Option<f64> {
+    let mut current = value?;
+    for key in path {
+        current = current.get(*key)?;
+    }
+    current.as_f64()
+}
+
+fn phase2_optional_score_millis(value: Option<f64>) -> u32 {
+    value
+        .map(|score| (score.clamp(0.0, 1.0) * 1000.0).round() as u32)
+        .unwrap_or(0)
+}
+
 fn phase2_similarity_score(distance: f64) -> f64 {
     1.0 / (1.0 + distance.max(0.0))
 }
@@ -13956,6 +14323,116 @@ mod tests {
                 && row.get("target_id").and_then(Value::as_str) == Some("doc::doc-sem-b")
                 && row.get("edge_type").and_then(Value::as_str) == Some("similar_to")
         }));
+    }
+
+    #[test]
+    fn native_semantic_truth_review_command_reports_candidate_only_edges() {
+        let runtime = native_test_runtime();
+        runtime.init().expect("init");
+        let session = runtime
+            .create_session(CreateSessionRequest {
+                session_id: None,
+                label: "Native truth review".to_owned(),
+                scope: ScopeKey::default(),
+            })
+            .expect("session");
+
+        runtime
+            .ingest(IngestRequest {
+                session_id: Some(session.session_id.clone()),
+                documents: vec![
+                    phoenix_types::IngestDocument {
+                        document_id: DocumentId("doc-review-a".to_owned()),
+                        note_id: None,
+                        title: "Review A".to_owned(),
+                        text: "Ryan mapped dock alpha before dawn.".to_owned(),
+                        scope: ScopeKey::default(),
+                    },
+                    phoenix_types::IngestDocument {
+                        document_id: DocumentId("doc-review-b".to_owned()),
+                        note_id: None,
+                        title: "Review B".to_owned(),
+                        text: "Rian mapped dock beta before dawn.".to_owned(),
+                        scope: ScopeKey::default(),
+                    },
+                ],
+                commit: false,
+            })
+            .expect("ingest");
+
+        runtime
+            .store_command(StoreCommandRequest {
+                command: "semantic:upsertDocumentVectors".to_owned(),
+                payload: json!({
+                    "rows": [
+                        {
+                            "documentId": "doc-review-a",
+                            "values": semantic_test_vector(0),
+                            "leafCount": 1,
+                            "evidenceRefs": ["span:doc-review-a"]
+                        },
+                        {
+                            "documentId": "doc-review-b",
+                            "values": semantic_test_vector(0),
+                            "leafCount": 1,
+                            "evidenceRefs": ["span:doc-review-b"]
+                        }
+                    ]
+                }),
+            })
+            .expect("upsert document vectors");
+
+        runtime
+            .store_command(StoreCommandRequest {
+                command: "semantic:refreshCandidateGraphEdges".to_owned(),
+                payload: json!({
+                    "documentIds": ["doc-review-a", "doc-review-b"],
+                    "nodeIds": [],
+                }),
+            })
+            .expect("refresh candidate graph");
+
+        let payload = runtime
+            .store_command(StoreCommandRequest {
+                command: "semantic:runEmbedderTruthReview".to_owned(),
+                payload: json!({
+                    "laneMode": "truth-review",
+                    "documentIds": ["doc-review-a", "doc-review-b"],
+                    "nodeIds": [],
+                    "edgePreviewLimit": 4,
+                    "model": {
+                        "modelId": "jinaai/jina-embeddings-v5-text-nano-retrieval",
+                        "modelLabel": "Jina v5 Nano",
+                        "embeddingProfile": "768",
+                        "executionProvider": "directml"
+                    }
+                }),
+            })
+            .expect("truth review")
+            .payload
+            .expect("payload");
+
+        assert_eq!(
+            payload.get("candidateOnly").and_then(Value::as_bool),
+            Some(true)
+        );
+        assert_eq!(
+            payload
+                .pointer("/output/committedTopologyWrites")
+                .and_then(Value::as_u64),
+            Some(0)
+        );
+        assert!(
+            payload
+                .pointer("/output/candidateEdgeCount")
+                .and_then(Value::as_u64)
+                .unwrap_or(0)
+                >= 1
+        );
+        assert_eq!(
+            payload.pointer("/cache/misses").and_then(Value::as_u64),
+            Some(0)
+        );
     }
 
     #[cfg(feature = "legacy-cozo-graph")]

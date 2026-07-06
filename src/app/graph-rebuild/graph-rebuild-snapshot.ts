@@ -28,6 +28,7 @@ import type { GraphOperatorMutationJournal } from './graph-operator-mutation-jou
 import type { GraphTruthCommitLedger } from './graph-truth-commit-ledger';
 import type { GraphAtlasPacket } from './graph-atlas-packet';
 import type { GraphPromotionVerdictCertificate } from './graph-promotion-verdict';
+import type { GraphReviewAdjudicationRunCertificate } from './graph-review-adjudication-certificate';
 
 export type GraphRebuildScopeKind = 'global' | 'folder' | 'narrative' | 'note' | 'multiNote';
 export type GraphRebuildAnchorSource = EntityOccurrence['source'] | 'accepted_suggestion';
@@ -2251,6 +2252,14 @@ export interface GraphRebuildCounters {
     promotionVerdictBlocked?: number;
     promotionVerdictAlreadyCommitted?: number;
     promotionVerdictRollbackAvailable?: number;
+    reviewAdjudicationTotalRows?: number;
+    reviewAdjudicationEligibleRows?: number;
+    reviewAdjudicationExcludedRows?: number;
+    reviewAdjudicationDuplicateRows?: number;
+    reviewAdjudicationJudgedRows?: number;
+    reviewAdjudicationAppliedRows?: number;
+    reviewAdjudicationTopologyWrites?: number;
+    reviewAdjudicationDimension?: number;
     embeddingTargets: number;
     embeddingTargetCandidates?: number;
     embeddingQueuedTargets?: number;
@@ -2652,6 +2661,7 @@ export interface GraphRebuildSnapshot {
     memoryGovernanceCandidates?: GraphMemoryGovernanceCandidate[];
     memoryGovernanceRetrievalExperiment?: GraphMemoryGovernanceRetrievalWeightingExperiment;
     promotionVerdictCertificate?: GraphPromotionVerdictCertificate;
+    reviewAdjudicationCertificate?: GraphReviewAdjudicationRunCertificate;
     embeddingTargets: GraphRebuildEmbeddingTarget[];
     embeddingTargetPlan?: GraphRebuildEmbeddingTargetPlan;
     embeddingVectors: GraphRebuildEmbeddingVector[];

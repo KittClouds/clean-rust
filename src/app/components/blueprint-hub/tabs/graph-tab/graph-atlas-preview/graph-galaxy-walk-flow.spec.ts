@@ -63,8 +63,55 @@ describe('graph galaxy walk flow', () => {
         expect(branches.map((branch) => scene.ids[branch.target])).toEqual(['root-a', 'root-b', 'root-a-secondary']);
     });
 
+    it('walks every graph-model packet connection even when native edge types are generic', () => {
+        const scene = graphModelPacketScene();
+
+        const branches = buildGalaxyWalkBranches(scene);
+
+        expect(branches).toHaveLength(4);
+        expect(new Set(branches.map((branch) => branch.edge))).toEqual(new Set([0, 1, 2, 3]));
+        expect(branches.map((branch) => [scene.ids[branch.source], scene.ids[branch.target]])).toEqual([
+            ['atom:document:note-1', 'atom:chunk:note-1:0'],
+            ['atom:chunk:note-1:0', 'fact:relationship:rel-1'],
+            ['fact:relationship:rel-1', 'atom:entity:kai'],
+            ['fact:relationship:rel-1', 'atom:entity:hazel'],
+        ]);
+    });
+
+    it('walks native packet edges even when the packet is still marked as embeddings source mode', () => {
+        const scene = {
+            ...graphModelPacketScene(),
+            sourceMode: 'embeddings' as const,
+            edgeKinds: new Uint8Array([2, 2, 0, 0]),
+        };
+
+        const branches = buildGalaxyWalkBranches(scene);
+
+        expect(new Set(branches.map((branch) => branch.edge))).toEqual(new Set([0, 1, 2, 3]));
+        expect(branches.filter((branch) => branch.source === 2).map((branch) => scene.ids[branch.target])).toEqual([
+            'atom:entity:kai',
+            'atom:entity:hazel',
+        ]);
+    });
+
+    it('does not let shared graph-model paths crowd out visible packet edges', () => {
+        const scene = denseSharedGraphModelPacketScene();
+
+        const branches = buildGalaxyWalkBranches(scene, scene.edgePairs.length / 2);
+        const walkedEdges = branches.map((branch) => branch.edge);
+
+        expect(walkedEdges).toHaveLength(8);
+        expect(new Set(walkedEdges).size).toBe(8);
+        expect(new Set(walkedEdges)).toEqual(new Set([0, 1, 2, 3, 4, 5, 6, 7]));
+        expect(branches.find((branch) => branch.edge === 7)).toMatchObject({
+            source: 2,
+            target: 7,
+        });
+    });
+
     it('ranks the general document hierarchy without story-only assumptions', () => {
         expect(galaxyWalkHierarchyRank('doc', 'document')).toBeLessThan(galaxyWalkHierarchyRank('root', 'section'));
+        expect(galaxyWalkHierarchyRank('atom:document:note-1', 'graphModelV2Atom:document')).toBeLessThan(galaxyWalkHierarchyRank('atom:chunk:note-1:0', 'graphModelV2Atom:chunk'));
         expect(galaxyWalkHierarchyRank('root', 'section')).toBeLessThan(galaxyWalkHierarchyRank('chunk', 'leaf_chunk'));
         expect(galaxyWalkHierarchyRank('chunk', 'leaf_chunk')).toBeLessThan(galaxyWalkHierarchyRank('claim', 'claim'));
         expect(galaxyWalkHierarchyRank('claim', 'claim')).toBeLessThan(galaxyWalkHierarchyRank('entity', 'concept'));
@@ -88,6 +135,64 @@ function walkScene() {
         edgeTypes: ['target-parent', 'target-parent', 'target-parent', 'chunk-anchor', 'chunk-entity', 'target-parent', 'target-parent', 'related-to'],
         edgeKinds: new Uint8Array([2, 2, 2, 2, 2, 2, 2, 0]),
         edgeAlpha: new Float32Array([1, 0.98, 0.95, 0.9, 0.85, 1, 0.95, 0.8]),
+        hierarchyHints: [],
+    };
+}
+
+function graphModelPacketScene() {
+    return {
+        sourceMode: 'graph' as const,
+        ids: ['atom:document:note-1', 'atom:chunk:note-1:0', 'fact:relationship:rel-1', 'atom:entity:kai', 'atom:entity:hazel'],
+        kinds: ['graphModelV2Atom:document', 'graphModelV2Atom:chunk', 'graphModelV2Fact:relationship', 'graphModelV2Atom:entity', 'graphModelV2Atom:entity'],
+        edgePairs: new Uint32Array([
+            0, 1,
+            1, 2,
+            2, 3,
+            2, 4,
+        ]),
+        edgeTypes: ['native_edge', 'native_edge', 'native_edge', 'native_edge'],
+        edgeKinds: new Uint8Array([0, 0, 0, 0]),
+        edgeAlpha: new Float32Array([0.88, 0.8, 0.74, 0.72]),
+        hierarchyHints: [],
+    };
+}
+
+function denseSharedGraphModelPacketScene() {
+    return {
+        sourceMode: 'graph' as const,
+        ids: [
+            'atom:document:note-1',
+            'atom:chunk:shared',
+            'fact:relationship:rel-1',
+            'atom:entity:kai',
+            'atom:entity:hazel',
+            'atom:document:note-2',
+            'atom:chunk:note-2:0',
+            'atom:entity:sol',
+        ],
+        kinds: [
+            'graphModelV2Atom:document',
+            'graphModelV2Atom:chunk',
+            'graphModelV2Fact:relationship',
+            'graphModelV2Atom:entity',
+            'graphModelV2Atom:entity',
+            'graphModelV2Atom:document',
+            'graphModelV2Atom:chunk',
+            'graphModelV2Atom:entity',
+        ],
+        edgePairs: new Uint32Array([
+            0, 1,
+            1, 2,
+            2, 3,
+            2, 4,
+            5, 1,
+            5, 6,
+            6, 2,
+            2, 7,
+        ]),
+        edgeTypes: new Array(8).fill('native_edge'),
+        edgeKinds: new Uint8Array(8),
+        edgeAlpha: new Float32Array([0.9, 0.82, 0.74, 0.72, 0.84, 0.8, 0.76, 0.68]),
         hierarchyHints: [],
     };
 }

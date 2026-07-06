@@ -6,6 +6,10 @@ import type {
 } from './graph-discourse-workbench';
 import type { GraphDiscourseTone } from './graph-discourse-analytics';
 import { profileLabel } from '../../../../graph-rebuild/graph-document-profile';
+import {
+    buildReviewAdjudicationRunCertificate,
+    type GraphReviewAdjudicationRunCertificate,
+} from '../../../../graph-rebuild/graph-review-adjudication-certificate';
 
 export type GraphOperatingRoomId =
     | 'entities'
@@ -48,7 +52,12 @@ export function buildGraphOperatingRoomView(
     snapshot: GraphRebuildSnapshot | null,
     entities: RegisteredEntity[],
 ): GraphOperatingRoomView {
-    const records = [...entityRecords(entities, snapshot), ...profileRecords(snapshot), ...(workbench?.records || [])];
+    const records = [
+        ...entityRecords(entities, snapshot),
+        ...profileRecords(snapshot),
+        ...reviewAdjudicationRecords(snapshot),
+        ...(workbench?.records || []),
+    ];
     const recordsByRoom = emptyRoomMap();
     for (const row of records) {
         for (const roomId of roomsForRecord(row)) recordsByRoom[roomId].push(row);
@@ -131,6 +140,70 @@ function profileRecords(snapshot: GraphRebuildSnapshot | null): GraphDiscourseWo
     }));
 }
 
+function reviewAdjudicationRecords(snapshot: GraphRebuildSnapshot | null): GraphDiscourseWorkbenchRecord[] {
+    if (!snapshot) return [];
+    const certificate = reviewAdjudicationCertificate(snapshot);
+    const tone: GraphDiscourseTone = certificate.proof.noTopologyWrites && certificate.proof.dimensionContractPassed
+        ? 'ready'
+        : 'danger';
+    const records = [
+        record({
+            id: `review-adjudication:inventory:${snapshot.id}`,
+            kind: 'review-adjudication:inventory',
+            title: 'Review Queue Inventory',
+            subtitle: `${certificate.queue.nliEligibleRows} NLI eligible / ${certificate.queue.totalReviewRows} review rows`,
+            detail: `${certificate.queue.excludedRows} excluded / ${certificate.queue.duplicateRows} duplicate pairs / ${certificate.queue.judgedRows} judged`,
+            status: certificate.proof.modelRan ? 'accepted' : 'reviewable',
+            tone,
+            focusQuery: 'ModernBERT NLI review queue inventory',
+            sourceIds: certificate.document.noteIds,
+            tags: ['review_adjudication', 'nli_eligible', 'candidate_only'],
+            actionKinds: ['inspect'],
+            facts: [
+                fact('Total review rows', certificate.queue.totalReviewRows),
+                fact('NLI eligible rows', certificate.queue.nliEligibleRows),
+                fact('Excluded rows', certificate.queue.excludedRows),
+                fact('Judged rows', certificate.queue.judgedRows),
+                fact('Dimension', certificate.model.dimensionLabel || certificate.model.dimension),
+                fact('Topology writes', certificate.queue.topologyWrites),
+            ],
+        }),
+    ];
+
+    for (const reason of certificate.queue.excludedReasons) {
+        records.push(record({
+            id: `review-adjudication:excluded:${reason.id}:${snapshot.id}`,
+            kind: 'review-adjudication:excluded_reason',
+            title: reason.label,
+            subtitle: `${reason.count} excluded rows`,
+            detail: reason.detail,
+            status: 'reviewable',
+            tone: 'review',
+            focusQuery: `ModernBERT excluded reason ${reason.label}`,
+            sourceIds: certificate.document.noteIds,
+            tags: ['review_adjudication', 'excluded_reason', reason.id],
+            actionKinds: ['inspect'],
+            facts: [
+                fact('Reason', reason.label),
+                fact('Rows', reason.count),
+                fact('Detail', reason.detail),
+            ],
+        }));
+    }
+    return records;
+}
+
+function reviewAdjudicationCertificate(snapshot: GraphRebuildSnapshot): GraphReviewAdjudicationRunCertificate {
+    return snapshot.reviewAdjudicationCertificate ?? buildReviewAdjudicationRunCertificate({
+        snapshot,
+        source: 'derived',
+        modelId: 'onnx-community/ModernBERT-base-nli',
+        modelLabel: 'ModernBERT NLI',
+        dimensionLabel: snapshot.embeddingProfile?.dimensionLabel,
+        embeddingDimension: snapshot.embeddingProfile?.selectedDimensions,
+    });
+}
+
 function roomsForRecord(row: GraphDiscourseWorkbenchRecord): GraphOperatingRoomId[] {
     const rooms: GraphOperatingRoomId[] = [];
     const kind = row.kind.toLowerCase();
@@ -173,8 +246,10 @@ function isFactKind(kind: string, tags: string): boolean {
 function isReviewKind(row: GraphDiscourseWorkbenchRecord, status: string, tags: string): boolean {
     return row.tone === 'review'
         || row.tone === 'danger'
+        || row.kind.startsWith('review-adjudication:')
         || ['proposed', 'accepted', 'rejected', 'muted', 'deferred', 'reviewable', 'pending_commit'].includes(status)
         || tags.includes('ambiguous')
+        || tags.includes('review_adjudication')
         || tags.includes('reject')
         || tags.includes('accept_fact');
 }
@@ -201,6 +276,8 @@ function countCards(
         count('facts-relations', 'facts', 'Relations', filter(rooms.facts, (row) => relationLike(row)), 'relation candidates and facts', toneForRows(filter(rooms.facts, relationLike)), fallback.factRelations),
         count('facts-hyperedges', 'facts', 'Hyperedges', filter(rooms.facts, (row) => row.kind.includes('hyperedge')), 'n-ary document facts', toneForRows(filter(rooms.facts, (row) => row.kind.includes('hyperedge'))), fallback.factHyperedges),
         count('review-gaps', 'review', 'Gaps', filter(rooms.review, (row) => row.tab === 'gaps' || row.status === 'reviewable'), 'open gap records', 'review', fallback.reviewGaps),
+        count('review-nli-eligible', 'review', 'NLI eligible', filter(rooms.review, (row) => row.kind === 'review-adjudication:inventory'), 'ModernBERT pairwise review inputs', 'ready', fallback.reviewNliEligible),
+        count('review-excluded', 'review', 'Excluded', filter(rooms.review, (row) => row.kind === 'review-adjudication:excluded_reason'), 'rows outside the NLI pair contract', fallback.reviewExcluded > 0 ? 'review' : 'quiet', fallback.reviewExcluded),
         count('review-accepted', 'review', 'Accepted', filter(rooms.review, (row) => ['accepted', 'supported', 'pending_commit'].includes(row.status)), 'accepted objects', 'ready', fallback.reviewAccepted),
         count('review-ambiguous', 'review', 'Ambiguous', filter(rooms.review, (row) => row.status === 'deferred' || row.status === 'reviewable' || row.tags.includes('ambiguous_case')), 'ambiguity queue', 'review', fallback.reviewAmbiguous),
         count('discourse-wormholes', 'discourse', 'Wormholes', filter(rooms.discourse, (row) => row.tags.includes('chunk_wormhole') || row.kind.includes('wormhole')), 'wormhole evidence', toneForRows(filter(rooms.discourse, (row) => row.tags.includes('chunk_wormhole') || row.kind.includes('wormhole'))), fallback.discourseWormholes),
@@ -215,6 +292,8 @@ interface GraphOperatingRoomFallbackCounts {
     factRelations: number;
     factHyperedges: number;
     reviewGaps: number;
+    reviewNliEligible: number;
+    reviewExcluded: number;
     reviewAccepted: number;
     reviewAmbiguous: number;
     discourseWormholes: number;
@@ -248,6 +327,8 @@ function roomFallbackCounts(snapshot: GraphRebuildSnapshot | null): GraphOperati
             counter(snapshot, 'documentReviewActionableRows') + counter(snapshot, 'documentCompilerReviewable') + counter(snapshot, 'reviewRelationships'),
             counter(snapshot, 'semanticEvalAmbiguousCases') + counter(snapshot, 'discourseEvalAmbiguousCases') + (entityLinking?.ambiguous || 0),
         ),
+        reviewNliEligible: counter(snapshot, 'reviewAdjudicationEligibleRows'),
+        reviewExcluded: counter(snapshot, 'reviewAdjudicationExcludedRows'),
         reviewAccepted: maxCount(
             review?.acceptedRows,
             counter(snapshot, 'documentReviewAcceptedRows') + counter(snapshot, 'acceptedRelationships'),
@@ -315,6 +396,8 @@ function roomTabFallbackCount(
     if (id === 'facts') return fallback.factRelations + fallback.factHyperedges;
     if (id === 'review') return maxCount(
         counter(snapshot, 'documentReviewRows'),
+        counter(snapshot, 'reviewAdjudicationTotalRows'),
+        counter(snapshot, 'reviewAdjudicationEligibleRows'),
         counter(snapshot, 'semanticEvalLedgerRows') + counter(snapshot, 'discourseEvalLedgerRows'),
         fallback.reviewGaps,
         fallback.reviewAccepted,

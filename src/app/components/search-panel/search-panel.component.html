@@ -115,10 +115,10 @@
           <strong>NLI</strong>
           <small>{{ modernBertNliStatusLabel() }}</small>
         </span>
-        <span class="stage8-workflow-step" [ngClass]="'stage8-step-' + stage8.truthReview.tone">
+        <span class="stage8-workflow-step" [ngClass]="'stage8-step-' + stage8.reviewAdjudication.tone">
           <b>4</b>
           <strong>Review</strong>
-          <small>{{ stage8.truthReview.status }}</small>
+          <small>{{ stage8.reviewAdjudication.status }}</small>
         </span>
       </div>
 
@@ -182,6 +182,15 @@
           <span>{{ stage8.truthReview.timingDetail }}</span>
           <span>{{ stage8.truthReview.candidateDetail }}</span>
         </div>
+        <div class="stage8-truth-review-ledger">
+          <span>{{ stage8.reviewAdjudication.totalDetail }}</span>
+          <span>{{ stage8.reviewAdjudication.eligibleDetail }}</span>
+          <span>{{ stage8.reviewAdjudication.excludedDetail }}</span>
+          <span>{{ stage8.reviewAdjudication.judgedDetail }}</span>
+        </div>
+        <small class="stage8-truth-review-error">
+          {{ stage8.reviewAdjudication.dimensionDetail }} / {{ stage8.reviewAdjudication.reasonDetail }}
+        </small>
         <small class="stage8-truth-review-error" *ngIf="stage8.truthReview.error">{{ stage8.truthReview.error }}</small>
       </div>
 

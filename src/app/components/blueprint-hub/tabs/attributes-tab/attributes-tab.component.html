@@ -9,6 +9,7 @@
             <span><strong>{{ graphSummary().edges }}</strong> graph edges</span>
             <span><strong>{{ graphSummary().targets }}</strong> targets</span>
             <span><strong>{{ graphSummary().governance }}</strong> governance</span>
+            <span><strong>{{ graphSummary().nliEligible }}</strong> NLI eligible</span>
             <span><strong>{{ graphSummary().verdicts }}</strong> verdicts</span>
         </div>
     </header>
@@ -27,6 +28,83 @@
         </article>
         }
     </section>
+
+    @if (reviewAdjudicationCertificate(); as reviewCertificate) {
+    <section class="atlas-review-deck">
+        <header class="atlas-review-header">
+            <div>
+                <span>Review Adjudication</span>
+                <h3>Queue inventory</h3>
+            </div>
+            <div class="atlas-review-ledger">
+                <span>{{ reviewCertificate.source }}</span>
+                <span>{{ reviewCertificate.queue.totalReviewRows }} total</span>
+                <span>{{ reviewCertificate.queue.nliEligibleRows }} NLI eligible</span>
+            </div>
+        </header>
+
+        <div class="atlas-review-runtime">
+            <span class="atlas-runtime-ready">
+                <em>Total review rows</em>
+                <strong>{{ reviewCertificate.queue.totalReviewRows }}</strong>
+                <small>Graph Review inventory</small>
+            </span>
+            <span
+                [class.atlas-runtime-ready]="reviewCertificate.queue.nliEligibleRows > 0"
+                [class.atlas-runtime-warning]="reviewCertificate.queue.nliEligibleRows === 0 && reviewCertificate.queue.totalReviewRows > 0">
+                <em>NLI eligible</em>
+                <strong>{{ reviewCertificate.queue.nliEligibleRows }}</strong>
+                <small>pairwise ModernBERT inputs</small>
+            </span>
+            <span
+                [class.atlas-runtime-ready]="reviewCertificate.queue.excludedRows === 0"
+                [class.atlas-runtime-warning]="reviewCertificate.queue.excludedRows > 0">
+                <em>Excluded</em>
+                <strong>{{ reviewCertificate.queue.excludedRows }}</strong>
+                <small>{{ reviewCertificate.queue.duplicateRows }} duplicate pairs</small>
+            </span>
+            <span
+                [class.atlas-runtime-ready]="reviewCertificate.proof.noTopologyWrites"
+                [class.atlas-runtime-warning]="!reviewCertificate.proof.noTopologyWrites">
+                <em>Topology writes</em>
+                <strong>{{ reviewCertificate.queue.topologyWrites }}</strong>
+                <small>review pass is report-only</small>
+            </span>
+            <span
+                [class.atlas-runtime-ready]="reviewCertificate.proof.dimensionContractPassed"
+                [class.atlas-runtime-warning]="!reviewCertificate.proof.dimensionContractPassed">
+                <em>Dimension</em>
+                <strong>{{ reviewCertificate.model.dimensionLabel || '--' }}</strong>
+                <small>{{ reviewCertificate.model.modelLabel }}</small>
+            </span>
+            <span
+                [class.atlas-runtime-ready]="reviewCertificate.proof.modelRan"
+                [class.atlas-runtime-warning]="!reviewCertificate.proof.modelRan && reviewCertificate.queue.nliEligibleRows > 0">
+                <em>Judged rows</em>
+                <strong>{{ reviewCertificate.queue.judgedRows }}</strong>
+                <small>{{ reviewCertificate.queue.appliedRows }} applied judgments</small>
+            </span>
+        </div>
+
+        <section class="atlas-attention-clear">
+            @if (reviewCertificate.queue.excludedReasons.length) {
+            <div>
+                <span>Excluded reasons</span>
+                @for (reason of reviewCertificate.queue.excludedReasons; track reason.id) {
+                <strong>{{ reason.label }}: {{ reason.count }}</strong>
+                <small>{{ reason.detail }}</small>
+                }
+            </div>
+            } @else {
+            <div>
+                <span>Clear</span>
+                <strong>All review rows matched the ModernBERT queue contract.</strong>
+                <small>No excluded rows were reported by the adjudication certificate.</small>
+            </div>
+            }
+        </section>
+    </section>
+    }
 
     <section class="atlas-review-deck">
         <header class="atlas-review-header">

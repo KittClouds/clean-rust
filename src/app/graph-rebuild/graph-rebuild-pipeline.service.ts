@@ -16,6 +16,11 @@ import { embeddingProfileFromModelSelection } from './graph-rebuild-embedding-si
 import { GLINER_LINKER_MODEL_ID } from './graph-rebuild-entity-linking';
 import { relationshipHintsFromNliResult } from './graph-nli-adjudication-contract';
 import { buildGraphIndexLayerReceipts } from './graph-index-layer-receipts';
+import {
+    applyReviewAdjudicationCertificate,
+    buildReviewAdjudicationRunCertificate,
+    type GraphReviewAdjudicationRunCertificate,
+} from './graph-review-adjudication-certificate';
 import { GraphRebuildService } from './graph-rebuild.service';
 import { buildSiegelBackboneProjectionReceipt } from './graph-rebuild-siegel-backbone';
 import { assertGraphSnapshotAuthority } from './graph-snapshot-authority';
@@ -205,6 +210,7 @@ export class GraphRebuildPipelineService {
         const projectionReceipts: GraphIndexProjectionReceipt[] = [];
         const snapshotRef: { value?: GraphRebuildSnapshot } = {};
         let relationshipHints: GraphRebuildRelationshipHint[] = [];
+        let rawNliAdjudicationResult: unknown;
         let postProcessFingerprintValue: string | undefined;
         let resumeContentCheckpoints: (() => void) | null = null;
         let acceptedNerOccurrences: EntityOccurrence[] = [];
@@ -251,6 +257,7 @@ export class GraphRebuildPipelineService {
                 const captureRelationshipHints = capability === 'nliAdjudication'
                     ? (rawResult: unknown) => {
                         rawStageResult = rawResult;
+                        rawNliAdjudicationResult = rawResult;
                         relationshipHints = relationshipHintsFromNliResult(rawResult);
                     }
                     : undefined;
@@ -312,6 +319,17 @@ export class GraphRebuildPipelineService {
             if (!completedSnapshot) {
                 throw new Error('Build graph stage completed without a snapshot.');
             }
+            const reviewCertificate = buildReviewAdjudicationRunCertificate({
+                snapshot: completedSnapshot,
+                rawResult: rawNliAdjudicationResult,
+                source: 'graph_build',
+                modelId: request.modelSelection.nliModelId,
+                modelLabel: 'ModernBERT NLI',
+                dimensionLabel: request.modelSelection.embeddingDimensionLabel,
+                embeddingDimension: embeddingDimensionFromLabel(request.modelSelection.embeddingDimensionLabel),
+            });
+            applyReviewAdjudicationCertificate(completedSnapshot, reviewCertificate);
+            appendReviewAdjudicationCertificateStage(stageReceipts, reviewCertificate);
             appendSignalCoverageStages(stageReceipts, completedSnapshot);
             appendGraphTruthContractStage(stageReceipts, completedSnapshot);
             appendEntityLinkerPlanStage(stageReceipts, completedSnapshot, request.embeddingStagePolicy?.entityLinkerEnabled !== false);
@@ -792,6 +810,7 @@ export class GraphRebuildPipelineService {
             selectedModel: request.modelSelection.embeddingModelId as any,
             selectedModelLabel: request.modelSelection.embeddingModelLabel,
             dimensionLabel: request.modelSelection.embeddingDimensionLabel,
+            embeddingDimension: embeddingDimensionFromLabel(request.modelSelection.embeddingDimensionLabel),
             scope: request.scope.kind === 'global' ? 'global' : request.scope.scopeId,
             buildScope: atlasScopeFromGraphScope(request.scope),
             buildPolicy: request.policy === 'force' ? 'force' : 'dirty-only',
@@ -965,16 +984,63 @@ function appendTransportTimingStage(
 ): void {
     const counters = transportDeltaCounters(before, after);
     if (!counters['transportCalls'] && !counters['transportTotalMs']) return;
+    const offenders = transportDeltaOffenders(before, after, 3);
+    for (const offender of offenders) {
+        const prefix = `transportOffender${offender.rank}`;
+        counters[`${prefix}Calls`] = offender.count;
+        counters[`${prefix}TotalMs`] = offender.totalMs;
+        counters[`${prefix}MaxMs`] = offender.maxMs;
+        counters[`${prefix}RequestBytes`] = offender.requestBytes;
+        counters[`${prefix}ResponseBytes`] = offender.responseBytes;
+        counters[`${prefix}Errors`] = offender.errors;
+    }
     stageReceipts.push(instrumentationStage(
         'transportOps',
         'Transport Ops',
         counters['transportTotalMs'],
         counters,
-        'TauRPC transport calls and payload volume during this graph run',
+        transportOffenderMessage(offenders),
     ));
 }
 
 type TransportAggregate = PhoenixTransportAuditSnapshot['calls'][number];
+
+interface TransportOffender {
+    rank: number;
+    name: string;
+    kind: string;
+    count: number;
+    totalMs: number;
+    maxMs: number;
+    requestBytes: number;
+    responseBytes: number;
+    errors: number;
+}
+
+function appendReviewAdjudicationCertificateStage(
+    stageReceipts: GraphIndexStageReceipt[],
+    certificate: GraphReviewAdjudicationRunCertificate,
+): void {
+    const queue = certificate.queue;
+    stageReceipts.push(instrumentationStage(
+        'reviewAdjudicationCertificate',
+        'Review Adjudication Certificate',
+        certificate.stageSummaries.reduce((sum, stage) => sum + stage.durationMs, 0),
+        {
+            totalReviewRows: queue.totalReviewRows,
+            nliEligibleRows: queue.nliEligibleRows,
+            excludedRows: queue.excludedRows,
+            duplicateRows: queue.duplicateRows,
+            judgedRows: queue.judgedRows,
+            appliedRows: queue.appliedRows,
+            topologyWrites: queue.topologyWrites,
+            dimension: certificate.model.dimension,
+            dimensionContractPassed: certificate.proof.dimensionContractPassed ? 1 : 0,
+            noTopologyWrites: certificate.proof.noTopologyWrites ? 1 : 0,
+        },
+        `${queue.nliEligibleRows.toLocaleString()} NLI-eligible / ${queue.totalReviewRows.toLocaleString()} total review rows; ${queue.excludedRows.toLocaleString()} excluded`,
+    ));
+}
 
 function contentMutationTimingCounters(
     timing: PhoenixContentMutationTiming | undefined,
@@ -1156,6 +1222,51 @@ function transportDeltaCounters(
     return counters;
 }
 
+function transportDeltaOffenders(
+    before: PhoenixTransportAuditSnapshot,
+    after: PhoenixTransportAuditSnapshot,
+    limit: number,
+): TransportOffender[] {
+    const beforeByKey = new Map(before.calls.map((call) => [transportAggregateKey(call), call]));
+    const offenders: TransportOffender[] = [];
+    for (const call of after.calls) {
+        const previous = beforeByKey.get(transportAggregateKey(call));
+        const count = Math.max(0, call.count - (previous?.count || 0));
+        if (!count) continue;
+        const totalMs = Math.round(Math.max(0, call.totalMs - (previous?.totalMs || 0)));
+        if (totalMs <= 0) continue;
+        offenders.push({
+            rank: 0,
+            name: call.name || 'unknown',
+            kind: call.kind || 'unknown',
+            count,
+            totalMs,
+            maxMs: Math.round(call.maxMs > (previous?.maxMs || 0) ? call.maxMs : totalMs / count),
+            requestBytes: Math.round(Math.max(0, call.totalRequestBytes - (previous?.totalRequestBytes || 0))),
+            responseBytes: Math.round(Math.max(0, call.totalResponseBytes - (previous?.totalResponseBytes || 0))),
+            errors: Math.max(0, call.errors - (previous?.errors || 0)),
+        });
+    }
+    return offenders
+        .sort((left, right) =>
+            right.totalMs - left.totalMs
+            || (right.requestBytes + right.responseBytes) - (left.requestBytes + left.responseBytes)
+        )
+        .slice(0, limit)
+        .map((row, index) => ({ ...row, rank: index + 1 }));
+}
+
+function transportOffenderMessage(offenders: TransportOffender[]): string {
+    if (!offenders.length) return 'TauRPC transport calls and payload volume during this graph run';
+    return `TauRPC transport offenders: ${offenders
+        .map((row) => `${row.rank}. ${compactTransportName(row.name)} ${row.totalMs} ms / ${row.count} call${row.count === 1 ? '' : 's'}`)
+        .join('; ')}`;
+}
+
+function compactTransportName(name: string): string {
+    return name.replace(/^phoenix\./, '').replace(/^store_command:/, 'store:');
+}
+
 function addTransportFamilyCounters(
     counters: Record<string, number>,
     prefix: string,
@@ -1185,6 +1296,11 @@ function transportPayloadCounterDelta(
         out[key] = Math.max(0, value - (before[key] || 0));
     }
     return out;
+}
+
+function embeddingDimensionFromLabel(label: string | undefined): number {
+    const match = String(label || '').match(/(\d+)/);
+    return match ? Number(match[1]) : 0;
 }
 
 function prefixedCounters(counters: Record<string, number>, prefix: string): Record<string, number> {

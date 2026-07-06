@@ -44,6 +44,7 @@ import { BlueprintHubService } from '../blueprint-hub/blueprint-hub.service';
 import { NliWorkerService } from '../../lib/services/nli-worker.service';
 import { AtlasCapabilityRuntimeService } from '../../services/atlas-capability-runtime.service';
 import { GraphRebuildPipelineService } from '../../graph-rebuild/graph-rebuild-pipeline.service';
+import { GraphRebuildService } from '../../graph-rebuild/graph-rebuild.service';
 import { PhoenixUiApiService } from '../../services/phoenix-ui-api.service';
 import { PhoenixBackendService } from '../../services/phoenix-backend.service';
 import { CalendarService } from '../../services/calendar.service';
@@ -57,6 +58,7 @@ describe('SearchPanelComponent model recipe lifecycle', () => {
     let nli: ReturnType<typeof createNliMock>;
     let phoenix: ReturnType<typeof createPhoenixBackendMock>;
     let fullAtlasPipeline: ReturnType<typeof createFullAtlasPipelineMock>;
+    let graphRebuild: ReturnType<typeof createGraphRebuildMock>;
 
     beforeEach(() => {
         dbNotesMock.rows.clear();
@@ -69,6 +71,7 @@ describe('SearchPanelComponent model recipe lifecycle', () => {
         nli = createNliMock();
         phoenix = createPhoenixBackendMock();
         fullAtlasPipeline = createFullAtlasPipelineMock();
+        graphRebuild = createGraphRebuildMock();
         const parentInjector = Injector.create({ providers: [] }) as unknown as EnvironmentInjector;
         injector = createEnvironmentInjector([
             { provide: NotesService, useValue: createNotesMock() },
@@ -81,6 +84,7 @@ describe('SearchPanelComponent model recipe lifecycle', () => {
             { provide: PhoenixUiApiService, useValue: createPhoenixUiApiMock() },
             { provide: PhoenixBackendService, useValue: phoenix },
             { provide: GraphRebuildPipelineService, useValue: fullAtlasPipeline },
+            { provide: GraphRebuildService, useValue: graphRebuild },
             { provide: CalendarService, useValue: createCalendarMock() },
             AtlasCapabilityRuntimeService,
         ], parentInjector);
@@ -313,10 +317,30 @@ describe('SearchPanelComponent model recipe lifecycle', () => {
         await component.runModernBertNliReview();
 
         expect(nli.initialize).toHaveBeenCalledWith('onnx-community/ModernBERT-base-nli-ONNX');
-        expect(phoenix.storeCommand).toHaveBeenCalledWith('semantic:listNliJudgmentInputs', {
+        expect(phoenix.storeCommand).toHaveBeenCalledWith('semantic:listNliJudgmentInputs', expect.objectContaining({
             documentIds: ['note-1'],
-        });
-        expect(machine.notice()).toBe('ModernBERT NLI review queue is empty for this scope. No graph topology was written.');
+            modelId: 'onnx-community/ModernBERT-base-nli-ONNX',
+            embeddingModelId: 'jina-v5-nano-retrieval',
+            dimensionLabel: '768d',
+            dimension: 768,
+        }));
+        expect(machine.notice()).toBe('ModernBERT review found no NLI-eligible rows among 0 review rows. No graph topology was written.');
+        expect(fullAtlasPipeline.buildGraph).not.toHaveBeenCalled();
+    });
+
+    it('surfaces ModernBERT NLI review failures in the Stage 8 review lane', async () => {
+        component.setBuildScopeMode('note');
+        phoenix.storeCommand.mockRejectedValueOnce(new Error('native NLI queue failed'));
+
+        await component.runModernBertNliReview();
+
+        expect(component.truthReviewLane()).toEqual(expect.objectContaining({
+            status: 'error',
+            tone: 'danger',
+            detail: 'NLI review unavailable',
+            error: 'native NLI queue failed',
+        }));
+        expect(machine.error()).toBe('native NLI queue failed');
         expect(fullAtlasPipeline.buildGraph).not.toHaveBeenCalled();
     });
 
@@ -736,5 +760,12 @@ function createFullAtlasPipelineMock() {
                 snapshot: { counters: { nodes: 2, edges: 1, embeddingTargets: 3 } },
             };
         }),
+    };
+}
+
+function createGraphRebuildMock() {
+    return {
+        snapshot: signal<any>(null),
+        attachReviewAdjudicationCertificate: vi.fn(),
     };
 }

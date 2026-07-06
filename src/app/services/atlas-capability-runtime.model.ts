@@ -154,6 +154,7 @@ export interface AtlasRunOptions {
     selectedModel?: PhoenixMachineModelId;
     selectedModelLabel?: string;
     dimensionLabel?: string;
+    embeddingDimension?: number;
     scope?: 'global' | string;
     buildScope?: AtlasBuildScope;
     buildPolicy?: 'dirty-only' | 'force';

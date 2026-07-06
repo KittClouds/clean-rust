@@ -449,7 +449,7 @@ describe('Transit manifold guide styling', () => {
         expect(Math.abs(output[5] - output[2])).toBeGreaterThan(0.08);
     });
 
-    it('tapers live membership guide offsets before they attach to the next tree node', () => {
+    it('renders live membership routes as one continuous gentle swoop', () => {
         const renderer = new ThreeGalaxyRenderer() as unknown as RendererProbe;
         const guide = {
             id: 'caps:bridge:a-b',
@@ -473,8 +473,12 @@ describe('Transit manifold guide styling', () => {
             new Map([['a', 0], ['b', 1]]),
         );
 
-        expect(output[4]).toBeGreaterThan(1);
-        expect(output[7]).toBeLessThan(0.4);
+        expect(Array.from(output.slice(0, 3))).toEqual([0, 0, 0]);
+        expect(output[3]).toBeCloseTo(output[6]);
+        expect(output[4]).toBeCloseTo(output[7]);
+        expect(output[4]).toBeGreaterThan(0.8);
+        expect(output[9]).toBe(10);
+        expect(output[10]).toBe(0);
         expect(Array.from(output.slice(output.length - 3))).toEqual([10, 0, 0]);
     });
 

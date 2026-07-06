@@ -3,6 +3,7 @@ import * as THREE from 'three';
 
 import { entityColorStore, hexColorToHsl } from '../../../../../lib/store/entityColorStore';
 import { buildGalaxyScene, hslToRgb, mergeGalaxySettings } from './graph-galaxy-engine';
+import { buildGalaxyFocusMask } from './graph-galaxy-focus';
 import { galaxySceneToV2, type GalaxySceneV2 } from './graph-galaxy-scene-v2';
 import { ThreeGalaxyRenderer } from './three-galaxy-renderer';
 
@@ -35,6 +36,17 @@ type RendererColorHarness = {
         index: number,
         surface?: 'default' | 'transit',
     ): { r: number; g: number; b: number };
+};
+
+type EdgeGeometryHarness = {
+    settings: ReturnType<typeof mergeGalaxySettings>;
+    mode: '3d';
+    edges: THREE.LineSegments | null;
+    edgeSurfacePoint: THREE.Vector3;
+    edgeCurvePoint: { x: number; y: number; z: number };
+    color: THREE.Color;
+    buildEdges(scene: GalaxySceneV2): THREE.LineSegments | null;
+    updateEdgeGeometry(data: GalaxySceneV2, positions: Float32Array, focus: ReturnType<typeof buildGalaxyFocusMask>): void;
 };
 
 function sceneWithStyleLabColor(hex: string): { scene: GalaxySceneV2; expected: THREE.Color } {
@@ -150,3 +162,52 @@ describe('ThreeGalaxyRenderer Style Lab node colors', () => {
         expectRendererColor(new THREE.Color(hubTint.r, hubTint.g, hubTint.b), new THREE.Color(sourceColor.r, sourceColor.g, sourceColor.b));
     });
 });
+
+describe('ThreeGalaxyRenderer curved edge geometry', () => {
+    it('samples normal curved edges densely enough to avoid faceted kinks', () => {
+        const scene = rendererEdgeScene();
+        const renderer = edgeGeometryHarness();
+
+        renderer.edges = renderer.buildEdges(scene);
+        renderer.updateEdgeGeometry(scene, scene.positions3d, buildGalaxyFocusMask(scene, null, null));
+
+        expect(renderer.edges?.geometry.drawRange.count).toBe(32);
+        renderer.edges?.geometry.dispose();
+        (renderer.edges?.material as THREE.Material | undefined)?.dispose();
+    });
+});
+
+function edgeGeometryHarness(): EdgeGeometryHarness {
+    const renderer = Object.create(ThreeGalaxyRenderer.prototype) as EdgeGeometryHarness;
+    renderer.settings = mergeGalaxySettings({ edgeMode: 'curved', edgeWidth: 0.45 });
+    renderer.mode = '3d';
+    renderer.edges = null;
+    renderer.edgeSurfacePoint = new THREE.Vector3();
+    renderer.edgeCurvePoint = { x: 0, y: 0, z: 0 };
+    renderer.color = new THREE.Color();
+    return renderer;
+}
+
+function rendererEdgeScene(): GalaxySceneV2 {
+    return {
+        sourceMode: 'graph',
+        layoutMode: 'single',
+        ids: ['a', 'b'],
+        labels: ['A', 'B'],
+        kinds: ['concept', 'concept'],
+        groupIds: ['', ''],
+        groups: [],
+        hopfRibbons: [],
+        lorentzGuides: [],
+        positions3d: new Float32Array([0, 0, 0, 2, 0, 0]),
+        positions2d: new Float32Array([0, 0, 0, 2, 0, 0]),
+        radii: new Float32Array([0.08, 0.08]),
+        colors: new Float32Array([1, 0.2, 0.1, 0.1, 0.8, 1]),
+        edgePairs: new Uint32Array([0, 1]),
+        edgeIds: ['edge:a-b'],
+        edgeTypes: ['related'],
+        edgeColors: new Float32Array([1, 0.2, 0.1, 0.1, 0.8, 1]),
+        edgeAlpha: new Float32Array([1]),
+        edgeKinds: new Uint8Array([0]),
+    };
+}

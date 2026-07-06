@@ -652,8 +652,14 @@ export class AtlasCapabilityRuntimeService {
     private async runNliAdjudication(options: AtlasRunOptions): Promise<unknown> {
         const documentIds = Array.from(new Set((options.noteIds || noteIdsFromBuildScope(options.buildScope)).filter(Boolean)));
         const planStarted = performance.now();
+        const dimensionLabel = this.embeddingDimensionLabel(options);
+        const dimension = this.embeddingDimension(options);
         const inputsPayload = await this.phoenix.storeCommand('semantic:listNliJudgmentInputs', {
             documentIds,
+            modelId: NLI_MODEL_ID,
+            embeddingModelId: this.embeddingModelId(options),
+            dimensionLabel,
+            dimension,
         });
         const rawInputCount = Array.isArray(inputsPayload) ? inputsPayload.length : 0;
         const inputs = normalizeNliInputs(inputsPayload);
@@ -672,6 +678,9 @@ export class AtlasCapabilityRuntimeService {
                 inputCount: inputs.length,
                 plannedInputCount: 0,
                 duplicateInputCount: Math.max(0, inputs.length - plannedInputs.length),
+                modelId: NLI_MODEL_ID,
+                dimensionLabel,
+                dimension,
                 applied: null,
                 stageSummaries,
             };
@@ -706,6 +715,9 @@ export class AtlasCapabilityRuntimeService {
         const applyStarted = performance.now();
         const applied = await this.phoenix.storeCommand('semantic:applyNliJudgments', {
             modelId: NLI_MODEL_ID,
+            embeddingModelId: this.embeddingModelId(options),
+            dimensionLabel,
+            dimension,
             device: this.nli.device(),
             results,
         });
@@ -720,6 +732,9 @@ export class AtlasCapabilityRuntimeService {
             duplicateInputCount: Math.max(0, inputs.length - plannedInputs.length),
             resultCount: results.length,
             labelCounts,
+            modelId: NLI_MODEL_ID,
+            dimensionLabel,
+            dimension,
             stageSummaries,
             judgments: results.map((result) => ({
                 judgmentId: result.judgmentId,
@@ -1335,6 +1350,16 @@ export class AtlasCapabilityRuntimeService {
 
     private embeddingDimensionLabel(options: AtlasRunOptions): string {
         return options.dimensionLabel || DEFAULT_GRAPH_EMBEDDING_DIMENSION_LABEL;
+    }
+
+    private embeddingDimension(options: AtlasRunOptions): number {
+        if (typeof options.embeddingDimension === 'number'
+            && Number.isFinite(options.embeddingDimension)
+            && options.embeddingDimension > 0) {
+            return Math.floor(options.embeddingDimension);
+        }
+        const match = this.embeddingDimensionLabel(options).match(/(\d+)/);
+        return match ? Number(match[1]) : 0;
     }
 
     private searchScope(options: AtlasRunOptions): SearchScope | undefined {

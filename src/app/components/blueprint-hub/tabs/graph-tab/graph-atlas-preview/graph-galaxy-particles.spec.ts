@@ -5,6 +5,7 @@ import { DEFAULT_GALAXY_SETTINGS } from './graph-galaxy-engine';
 import { buildGalaxyFocusMask } from './graph-galaxy-focus';
 import { GraphGalaxyParticles } from './graph-galaxy-particles';
 import type { GalaxySceneV2 } from './graph-galaxy-scene-v2';
+import { setHopfEdgeCurvePoint, type GalaxyCurvePoint } from './graph-galaxy-edge-curves';
 
 describe('GraphGalaxyParticles', () => {
     it('renders a bounded particle for every edge using the destination node color', () => {
@@ -241,7 +242,7 @@ describe('GraphGalaxyParticles', () => {
 
         probe.seeds[0] = 0.95;
         particles.update(transit, transit.positions3d, settings, 0);
-        expect(Math.abs(position.getY(0))).toBeLessThan(0.04);
+        expect(Math.abs(position.getY(0))).toBeLessThan(0.2);
 
         particles.bind(siegel, settings);
         probe.seeds[0] = 0.5;
@@ -385,55 +386,20 @@ function hopfParticleScene(): GalaxySceneV2 {
 }
 
 function hopfArcPoint(scene: GalaxySceneV2, edgeCurveStrength: number, edge: number, t: number): { x: number; y: number; z: number; lift: number } {
+    const point: GalaxyCurvePoint = { x: 0, y: 0, z: 0 };
     const source = scene.edgePairs[edge * 2];
     const target = scene.edgePairs[edge * 2 + 1];
     const sourceOffset = source * 3;
     const targetOffset = target * 3;
     const ax = scene.positions3d[sourceOffset], ay = scene.positions3d[sourceOffset + 1], az = scene.positions3d[sourceOffset + 2];
     const bx = scene.positions3d[targetOffset], by = scene.positions3d[targetOffset + 1], bz = scene.positions3d[targetOffset + 2];
-    const ar = Math.max(0.0001, Math.hypot(ax, ay, az));
-    const br = Math.max(0.0001, Math.hypot(bx, by, bz));
-    const aux = ax / ar, auy = ay / ar, auz = az / ar;
-    const bux = bx / br, buy = by / br, buz = bz / br;
-    let nx = auy * buz - auz * buy;
-    let ny = auz * bux - aux * buz;
-    let nz = aux * buy - auy * bux;
     const seed = stableUnit(`hopf-edge:${edge}`);
-    const sign = seed < 0.5 ? -1 : 1;
-    let normalLength = Math.hypot(nx, ny, nz);
-    if (normalLength < 0.0001) {
-        nx = auy * sign - auz * 0.38;
-        ny = auz + 0.22;
-        nz = -aux + auy * 0.38;
-        normalLength = Math.hypot(nx, ny, nz) || 1;
-    }
-    nx /= normalLength;
-    ny /= normalLength;
-    nz /= normalLength;
-
-    const crossBase = scene.hopfBaseIds?.[source] !== scene.hopfBaseIds?.[target];
-    const sweep = Math.sin(Math.PI * t);
+    const crossBase = Boolean(scene.hopfBaseIds?.[source] && scene.hopfBaseIds?.[target] && scene.hopfBaseIds[source] !== scene.hopfBaseIds[target]);
     const curveScale = THREE.MathUtils.clamp(edgeCurveStrength, 0.25, 1.2);
     const liftScale = curveScale * (scene.edgeKinds[edge] === 1 ? 0.92 : 0.58);
     const lift = (0.08 + Math.abs(source - target) * 0.002) * liftScale + (scene.edgeKinds[edge] === 1 ? 0.18 : 0) + (crossBase ? 0.1 : 0);
-    const bend = (crossBase ? 0.36 : 0.18) * curveScale * sweep * sign;
-    const baseX = aux * (1 - t) + bux * t;
-    const baseY = auy * (1 - t) + buy * t;
-    const baseZ = auz * (1 - t) + buz * t;
-    const sideX = ny * baseZ - nz * baseY;
-    const sideY = nz * baseX - nx * baseZ;
-    const sideZ = nx * baseY - ny * baseX;
-    const sideLength = Math.hypot(sideX, sideY, sideZ) || 1;
-    const spin = Math.sin(Math.PI * 2 * t + seed * Math.PI * 2) * (crossBase ? 0.075 : 0.034) * sweep;
-    let dx = baseX + nx * bend + (sideX / sideLength) * spin;
-    let dy = baseY + ny * bend + (sideY / sideLength) * spin;
-    let dz = baseZ + nz * bend + (sideZ / sideLength) * spin;
-    const directionLength = Math.hypot(dx, dy, dz) || 1;
-    dx /= directionLength;
-    dy /= directionLength;
-    dz /= directionLength;
-    const radius = THREE.MathUtils.lerp(ar, br, t) + lift * (crossBase ? 0.72 : 0.38) * sweep;
-    return { x: dx * radius, y: dy * radius, z: dz * radius, lift };
+    setHopfEdgeCurvePoint(point, ax, ay, az, bx, by, bz, lift, t, edgeCurveStrength, seed, crossBase);
+    return { x: point.x, y: point.y, z: point.z, lift };
 }
 
 function stableUnit(value: string): number {

@@ -43,6 +43,10 @@ import {
     isNativePromotionVerdictOutput,
     type NativePromotionVerdictOutput,
 } from './graph-promotion-verdict';
+import {
+    applyReviewAdjudicationCertificate,
+    type GraphReviewAdjudicationRunCertificate,
+} from './graph-review-adjudication-certificate';
 import type {
     GraphAtlasFamily,
     GraphAtlasManifoldTarget,
@@ -349,6 +353,19 @@ export class GraphRebuildService {
 
     currentSnapshotRunSerial(): number {
         return this.primarySnapshotRunSerial;
+    }
+
+    attachReviewAdjudicationCertificate(certificate: GraphReviewAdjudicationRunCertificate): void {
+        const current = this.snapshotState();
+        if (!current) return;
+        if (certificate.document.snapshotId && certificate.document.snapshotId !== current.id) return;
+        const next: GraphRebuildSnapshot = {
+            ...current,
+            counters: { ...current.counters },
+            reviewAdjudicationCertificate: certificate,
+        };
+        applyReviewAdjudicationCertificate(next, certificate);
+        this.snapshotState.set(next);
     }
 
     async buildAndPersistSnapshot(request: GraphRebuildBuildRequest): Promise<GraphRebuildSnapshot> {
@@ -2352,6 +2369,7 @@ export function graphRebuildSnapshotPersistenceView(
     delete (persisted as GraphRebuildSnapshot & { atlasDebugSummaries?: unknown }).atlasDebugSummaries;
     delete persisted.graphTruthCommitLedger;
     delete persisted.promotionVerdictCertificate;
+    delete persisted.reviewAdjudicationCertificate;
     delete persisted.calendarRegistrySummary;
     if (snapshot.graphCompiler && snapshot.graphModelV2) {
         delete persisted.graphCompiler;

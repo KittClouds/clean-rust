@@ -4,8 +4,9 @@ import { isTransitLayoutMode, type GalaxyRenderSettings } from './graph-galaxy-e
 import type { GalaxyFocusMask } from './graph-galaxy-focus';
 import type { GalaxyLorentzGuideView, GalaxySceneV2 } from './graph-galaxy-scene-v2';
 import { buildGalaxyWalkBranches, type GalaxyWalkBranch } from './graph-galaxy-walk-flow';
+import { setHopfEdgeCurvePoint, type GalaxyCurvePoint } from './graph-galaxy-edge-curves';
 
-const MAX_FLOW_PARTICLES = 1800;
+const MAX_FLOW_PARTICLES = 4096;
 const EMPTY_VEC3 = new Float32Array(0);
 const EMPTY_SCALAR = new Float32Array(0);
 const CAPS_SURFACE_EDGE_MIN_RADIUS = 0.34;
@@ -62,6 +63,7 @@ export class GraphGalaxyParticles {
     private readonly walkBranches: GalaxyWalkBranch[] = [];
     private readonly seeds: number[] = [];
     private readonly speeds: number[] = [];
+    private readonly hopfEdgePoint: GalaxyCurvePoint = { x: 0, y: 0, z: 0 };
     private walkStartedAt: number | null = null;
     private walkTreeDepth = 0;
 
@@ -369,47 +371,9 @@ export class GraphGalaxyParticles {
         const targetOffset = target * 3;
         const ax = positions[sourceOffset], ay = positions[sourceOffset + 1], az = positions[sourceOffset + 2];
         const bx = positions[targetOffset], by = positions[targetOffset + 1], bz = positions[targetOffset + 2];
-        const ar = Math.max(0.0001, Math.hypot(ax, ay, az));
-        const br = Math.max(0.0001, Math.hypot(bx, by, bz));
-        const aux = ax / ar, auy = ay / ar, auz = az / ar;
-        const bux = bx / br, buy = by / br, buz = bz / br;
-        let nx = auy * buz - auz * buy;
-        let ny = auz * bux - aux * buz;
-        let nz = aux * buy - auy * bux;
         const seed = this.stableUnit(`hopf-edge:${edge}`);
-        const sign = seed < 0.5 ? -1 : 1;
-        let normalLength = Math.hypot(nx, ny, nz);
-        if (normalLength < 0.0001) {
-            nx = auy * sign - auz * 0.38;
-            ny = auz + 0.22;
-            nz = -aux + auy * 0.38;
-            normalLength = Math.hypot(nx, ny, nz) || 1;
-        }
-        nx /= normalLength;
-        ny /= normalLength;
-        nz /= normalLength;
-
-        const sweep = Math.sin(Math.PI * t);
-        const curveScale = THREE.MathUtils.clamp(edgeCurveStrength, 0.25, 1.2);
-        const bend = (crossBase ? 0.36 : 0.18) * curveScale * sweep * sign;
-        const baseX = aux * (1 - t) + bux * t;
-        const baseY = auy * (1 - t) + buy * t;
-        const baseZ = auz * (1 - t) + buz * t;
-        const sideX = ny * baseZ - nz * baseY;
-        const sideY = nz * baseX - nx * baseZ;
-        const sideZ = nx * baseY - ny * baseX;
-        const sideLength = Math.hypot(sideX, sideY, sideZ) || 1;
-        const spin = Math.sin(Math.PI * 2 * t + seed * Math.PI * 2) * (crossBase ? 0.075 : 0.034) * sweep;
-        let dx = baseX + nx * bend + (sideX / sideLength) * spin;
-        let dy = baseY + ny * bend + (sideY / sideLength) * spin;
-        let dz = baseZ + nz * bend + (sideZ / sideLength) * spin;
-        const directionLength = Math.hypot(dx, dy, dz) || 1;
-        dx /= directionLength;
-        dy /= directionLength;
-        dz /= directionLength;
-
-        const radius = THREE.MathUtils.lerp(ar, br, t) + lift * (crossBase ? 0.72 : 0.38) * sweep;
-        positionAttr.setXYZ(particle, dx * radius, dy * radius, dz * radius);
+        setHopfEdgeCurvePoint(this.hopfEdgePoint, ax, ay, az, bx, by, bz, lift, t, edgeCurveStrength, seed, crossBase);
+        positionAttr.setXYZ(particle, this.hopfEdgePoint.x, this.hopfEdgePoint.y, this.hopfEdgePoint.z);
     }
 
     private writeTubeEdgePosition(
@@ -480,23 +444,51 @@ export class GraphGalaxyParticles {
         const sourceIndex = data.ids.indexOf(guide.nodeIds[0] || '');
         const targetIndex = data.ids.indexOf(guide.nodeIds[1] || '');
         if (sourceIndex < 0 || targetIndex < 0 || guide.guideKind !== 'membership') return null;
-        const last = guide.positions3d.length - 3;
-        const oldA = { x: guide.positions3d[0], y: guide.positions3d[1], z: guide.positions3d[2] };
-        const oldB = { x: guide.positions3d[last], y: guide.positions3d[last + 1], z: guide.positions3d[last + 2] };
+        const source = guide.positions3d;
+        const segments = Math.floor(source.length / 6);
+        if (segments < 1 || segments * 6 !== source.length) return null;
+        const last = source.length - 3;
+        const oldAx = source[0], oldAy = source[1], oldAz = source[2];
+        const oldBx = source[last], oldBy = source[last + 1], oldBz = source[last + 2];
         const point = this.staticGuidePoint(guide, t);
-        const odx = oldB.x - oldA.x, ody = oldB.y - oldA.y, odz = oldB.z - oldA.z;
+        const odx = oldBx - oldAx, ody = oldBy - oldAy, odz = oldBz - oldAz;
         const oldLenSq = Math.max(0.000001, odx * odx + ody * ody + odz * odz);
-        const newA = { x: positions[sourceIndex * 3], y: positions[sourceIndex * 3 + 1], z: positions[sourceIndex * 3 + 2] };
-        const newB = { x: positions[targetIndex * 3], y: positions[targetIndex * 3 + 1], z: positions[targetIndex * 3 + 2] };
-        const ndx = newB.x - newA.x, ndy = newB.y - newA.y, ndz = newB.z - newA.z;
-        const offsetScale = THREE.MathUtils.clamp(Math.sqrt((ndx * ndx + ndy * ndy + ndz * ndz) / oldLenSq), 0.25, 2.4);
-        const localT = THREE.MathUtils.clamp(((point.x - oldA.x) * odx + (point.y - oldA.y) * ody + (point.z - oldA.z) * odz) / oldLenSq, 0, 1);
-        const oldBase = { x: oldA.x + odx * localT, y: oldA.y + ody * localT, z: oldA.z + odz * localT };
-        const envelope = this.usesTreeFilamentFlow(data) ? this.treeFilamentTerminalTaper(localT) : 1;
+        const newA = sourceIndex * 3;
+        const newB = targetIndex * 3;
+        const newAx = positions[newA], newAy = positions[newA + 1], newAz = positions[newA + 2];
+        const newBx = positions[newB], newBy = positions[newB + 1], newBz = positions[newB + 2];
+        const ndx = newBx - newAx, ndy = newBy - newAy, ndz = newBz - newAz;
+        const offsetScale =
+            THREE.MathUtils.clamp(Math.sqrt((ndx * ndx + ndy * ndy + ndz * ndz) / oldLenSq), 0.25, 1.65) * (this.usesTreeFilamentFlow(data) ? 0.92 : 1);
+        let liftX = 0, liftY = 0, liftZ = 0, weightSum = 0;
+        for (let index = 0; index < source.length; index += 3) {
+            const px = source[index], py = source[index + 1], pz = source[index + 2];
+            const projectedT = THREE.MathUtils.clamp(((px - oldAx) * odx + (py - oldAy) * ody + (pz - oldAz) * odz) / oldLenSq, 0, 1);
+            const oldBaseX = oldAx + odx * projectedT;
+            const oldBaseY = oldAy + ody * projectedT;
+            const oldBaseZ = oldAz + odz * projectedT;
+            const weight = Math.sin(Math.PI * projectedT);
+            if (weight <= 0.000001) continue;
+            liftX += (px - oldBaseX) * weight;
+            liftY += (py - oldBaseY) * weight;
+            liftZ += (pz - oldBaseZ) * weight;
+            weightSum += weight;
+        }
+        const liftScale = weightSum > 0 ? offsetScale / weightSum : 0;
+        liftX *= liftScale;
+        liftY *= liftScale;
+        liftZ *= liftScale;
+        const localT = THREE.MathUtils.clamp(((point.x - oldAx) * odx + (point.y - oldAy) * ody + (point.z - oldAz) * odz) / oldLenSq, 0, 1);
+        const left = (1 - localT) * (1 - localT);
+        const mid = 2 * (1 - localT) * localT;
+        const right = localT * localT;
+        const cx = (newAx + newBx) * 0.5 + liftX * 2;
+        const cy = (newAy + newBy) * 0.5 + liftY * 2;
+        const cz = (newAz + newBz) * 0.5 + liftZ * 2;
         return {
-            x: newA.x + ndx * localT + (point.x - oldBase.x) * offsetScale * envelope,
-            y: newA.y + ndy * localT + (point.y - oldBase.y) * offsetScale * envelope,
-            z: newA.z + ndz * localT + (point.z - oldBase.z) * offsetScale * envelope,
+            x: left * newAx + mid * cx + right * newBx,
+            y: left * newAy + mid * cy + right * newBy,
+            z: left * newAz + mid * cz + right * newBz,
         };
     }
 

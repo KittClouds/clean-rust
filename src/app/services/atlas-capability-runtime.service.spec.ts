@@ -372,9 +372,13 @@ describe('AtlasCapabilityRuntimeService', () => {
             'product',
         ]);
         expect(nli.initialize).toHaveBeenCalledWith('onnx-community/ModernBERT-base-nli-ONNX');
-        expect(phoenix.storeCommand).toHaveBeenNthCalledWith(1, 'semantic:listNliJudgmentInputs', {
+        expect(phoenix.storeCommand).toHaveBeenNthCalledWith(1, 'semantic:listNliJudgmentInputs', expect.objectContaining({
             documentIds: ['note-1'],
-        });
+            modelId: 'onnx-community/ModernBERT-base-nli-ONNX',
+            embeddingModelId: 'mongodb-leaf-mt',
+            dimensionLabel: '384d',
+            dimension: 384,
+        }));
         expect(phoenix.storeCommand).toHaveBeenNthCalledWith(2, 'semantic:applyNliJudgments', expect.any(Object));
     });
 
@@ -642,9 +646,13 @@ describe('AtlasCapabilityRuntimeService', () => {
 
         const result = await service.runCapability('nliAdjudication', { noteIds: ['note-1'] });
 
-        expect(phoenix.storeCommand).toHaveBeenNthCalledWith(1, 'semantic:listNliJudgmentInputs', {
+        expect(phoenix.storeCommand).toHaveBeenNthCalledWith(1, 'semantic:listNliJudgmentInputs', expect.objectContaining({
             documentIds: ['note-1'],
-        });
+            modelId: 'onnx-community/ModernBERT-base-nli-ONNX',
+            embeddingModelId: 'jina-v5-nano-retrieval',
+            dimensionLabel: '768d',
+            dimension: 768,
+        }));
         expect(nli.initialize).toHaveBeenCalledWith('onnx-community/ModernBERT-base-nli-ONNX');
         expect(nli.classifyStream).toHaveBeenCalledWith(
             expect.arrayContaining([expect.objectContaining({ judgmentId: 'judgment-1' })]),
@@ -654,6 +662,9 @@ describe('AtlasCapabilityRuntimeService', () => {
         expect(nli.classifyStream.mock.calls[0][0]).toHaveLength(1);
         expect(phoenix.storeCommand).toHaveBeenNthCalledWith(2, 'semantic:applyNliJudgments', expect.objectContaining({
             modelId: 'onnx-community/ModernBERT-base-nli-ONNX',
+            embeddingModelId: 'jina-v5-nano-retrieval',
+            dimensionLabel: '768d',
+            dimension: 768,
             results: expect.arrayContaining([expect.objectContaining({ predictedLabel: 'entailment' })]),
         }));
         expect(result.rawResult).toEqual(expect.objectContaining({

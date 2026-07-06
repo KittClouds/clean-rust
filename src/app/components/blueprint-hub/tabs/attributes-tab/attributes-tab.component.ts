@@ -25,6 +25,10 @@ import type { GraphLensState } from '../graph-tab/graph-lens';
 import type { GraphOperatingRoomId } from '../graph-tab/graph-operating-room';
 import { buildAtlasControlReviewDeck } from './atlas-control-review';
 import { buildGovernanceRunCertificate } from '../../../../graph-rebuild/graph-governance-run-certificate';
+import {
+    buildReviewAdjudicationRunCertificate,
+    type GraphReviewAdjudicationRunCertificate,
+} from '../../../../graph-rebuild/graph-review-adjudication-certificate';
 import type {
     GraphPromotionVerdictCertificate,
     GraphPromotionVerdictGate,
@@ -129,6 +133,9 @@ export class AttributesTabComponent {
         governance: this.graphSnapshot()?.counters.memoryGovernanceCandidates
             ?? this.graphSnapshot()?.memoryGovernanceCandidates?.length
             ?? 0,
+        nliEligible: this.graphSnapshot()?.counters.reviewAdjudicationEligibleRows
+            ?? this.reviewAdjudicationCertificate()?.queue.nliEligibleRows
+            ?? 0,
         verdicts: this.graphSnapshot()?.counters.promotionVerdictRows
             ?? this.graphSnapshot()?.promotionVerdictCertificate?.audit.total
             ?? 0,
@@ -145,11 +152,24 @@ export class AttributesTabComponent {
     readonly promotionCertificate = computed(() =>
         this.graphSnapshot()?.promotionVerdictCertificate ?? null,
     );
+    readonly reviewAdjudicationCertificate = computed<GraphReviewAdjudicationRunCertificate | null>(() => {
+        const snapshot = this.graphSnapshot();
+        if (!snapshot) return null;
+        return snapshot.reviewAdjudicationCertificate ?? buildReviewAdjudicationRunCertificate({
+            snapshot,
+            source: 'derived',
+            modelId: 'onnx-community/ModernBERT-base-nli',
+            modelLabel: 'ModernBERT NLI',
+            dimensionLabel: snapshot.embeddingProfile?.dimensionLabel,
+            embeddingDimension: snapshot.embeddingProfile?.selectedDimensions,
+        });
+    });
     readonly workflowSteps = computed<AtlasWorkflowStep[]>(() => {
         const summary = this.graphSummary();
         const review = this.reviewDeck();
         const promotion = this.promotionCertificate();
         const certificate = this.governanceCertificate();
+        const adjudication = this.reviewAdjudicationCertificate();
         const proofOk = !!certificate
             && certificate.noTopologyProof.passed
             && certificate.protectedMemoryProof.passed
@@ -171,10 +191,14 @@ export class AttributesTabComponent {
             },
             {
                 id: 'review',
-                label: 'Review lanes',
-                value: review.attentionCount.toLocaleString(),
-                detail: review.attentionCount > 0 ? 'needs attention' : 'clear exceptions',
-                tone: review.attentionCount > 0 ? 'warning' : 'ready',
+                label: 'Review queue',
+                value: (adjudication?.queue.nliEligibleRows ?? 0).toLocaleString(),
+                detail: adjudication
+                    ? `${adjudication.queue.totalReviewRows.toLocaleString()} total / ${adjudication.queue.excludedRows.toLocaleString()} excluded`
+                    : 'certificate pending',
+                tone: adjudication
+                    ? (!adjudication.proof.noTopologyWrites || !adjudication.proof.dimensionContractPassed ? 'warning' : 'ready')
+                    : 'quiet',
             },
             {
                 id: 'promotion',
