@@ -37,6 +37,7 @@ import {
     normalizeEntityKind,
 } from '../../../../lib/store/entityColorStore';
 import type { NerSuggestion } from '../../../../services/ner.service';
+import { AtlasControlContractService } from '../../../../services/atlas-control-contract.service';
 import { GraphRebuildService } from '../../../../graph-rebuild/graph-rebuild.service';
 import type { GraphRebuildSnapshot } from '../../../../graph-rebuild/graph-rebuild-snapshot';
 import { applyGraphDocumentReviewDecisionToSnapshot } from '../../../../graph-rebuild/graph-document-review-snapshot';
@@ -56,7 +57,6 @@ import {
     type GraphOperatingRoomCount,
     type GraphOperatingRoomId,
 } from './graph-operating-room';
-import { buildAtlasControlContract } from '../attributes-tab/atlas-control-contract';
 import {
     buildGraphEvaluationDashboard,
     type GraphEvaluationTone,
@@ -125,6 +125,7 @@ const ENTITY_ICONS: Record<string, any> = {
 })
 export class GraphEntitySidebarComponent implements OnChanges, OnDestroy {
     private readonly graphRebuild = inject(GraphRebuildService);
+    private readonly atlasControl = inject(AtlasControlContractService);
 
     @Input() entities: RegisteredEntity[] = [];
     @Input() suggestions: NerSuggestion[] = [];
@@ -197,13 +198,7 @@ export class GraphEntitySidebarComponent implements OnChanges, OnDestroy {
         this.dataRevision();
         return buildGraphDiscourseWorkbenchView(this.diagnosticsSnapshot(), this.entities);
     });
-    readonly atlasControlContract = computed(() => {
-        this.dataRevision();
-        return buildAtlasControlContract({
-            snapshot: this.diagnosticsSnapshot(),
-            entityCount: this.entities.length,
-        });
-    });
+    readonly atlasControlContract = this.atlasControl.contract;
     readonly operatingRoom = computed(() => {
         this.dataRevision();
         return buildGraphOperatingRoomView(

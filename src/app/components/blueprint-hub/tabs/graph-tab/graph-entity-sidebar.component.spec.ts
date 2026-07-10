@@ -3,8 +3,10 @@ import '@angular/compiler';
 import {
     Injector,
     SimpleChange,
+    computed,
     createEnvironmentInjector,
     runInInjectionContext,
+    signal,
     type EnvironmentInjector,
 } from '@angular/core';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -15,23 +17,42 @@ import { entityColorStore } from '../../../../lib/store/entityColorStore';
 import { buildGraphRebuildSnapshot } from '../../../../graph-rebuild/graph-rebuild-builder';
 import { buildAdaptiveGraphRebuildChunks } from '../../../../graph-rebuild/graph-rebuild-meaning-frames';
 import { GraphRebuildService } from '../../../../graph-rebuild/graph-rebuild.service';
+import { AtlasControlContractService } from '../../../../services/atlas-control-contract.service';
+import { PhoenixProjectionService } from '../../../../services/phoenix-projection.service';
+import { NliWorkerService } from '../../../../lib/services/nli-worker.service';
 import { GraphEntitySidebarComponent } from './graph-entity-sidebar.component';
 
 describe('GraphEntitySidebarComponent discourse focus', () => {
     let injector: EnvironmentInjector;
     let component: GraphEntitySidebarComponent;
     let restorePersistedSnapshot: ReturnType<typeof vi.fn>;
+    let graphSnapshot: ReturnType<typeof signal<any>>;
 
     beforeEach(() => {
         restorePersistedSnapshot = vi.fn(async () => undefined);
+        graphSnapshot = signal<any>(null);
         injector = createEnvironmentInjector([
             {
                 provide: GraphRebuildService,
                 useValue: {
-                    loadPersistedSnapshot: vi.fn(async () => null),
+                    snapshot: graphSnapshot,
+                    isBuilding: computed(() => false),
+                    loadPersistedSnapshot: vi.fn(async () => graphSnapshot()),
                     restorePersistedSnapshot,
+                    attachReviewAdjudicationCertificate: vi.fn(),
                 },
             },
+            { provide: PhoenixProjectionService, useValue: { entityCount: computed(() => 2) } },
+            {
+                provide: NliWorkerService,
+                useValue: {
+                    isInitialized: signal(false),
+                    modelId: signal(null),
+                    isProcessing: signal(false),
+                    progress: signal(null),
+                },
+            },
+            AtlasControlContractService,
         ], Injector.create({ providers: [] }) as unknown as EnvironmentInjector);
         component = runInInjectionContext(injector, () => new GraphEntitySidebarComponent());
         component.entities = entities();
@@ -127,6 +148,7 @@ describe('GraphEntitySidebarComponent discourse focus', () => {
 
     it('keeps compact persisted Atlas room counts from run counters', () => {
         component.diagnosticsSnapshot.set(compactRunSnapshot());
+        graphSnapshot.set(component.diagnosticsSnapshot());
 
         const tabs = Object.fromEntries(component.operatingRoomTabs().map((tab) => [tab.id, tab.count]));
         const counts = component.operatingRoom().countsById;
@@ -171,6 +193,7 @@ describe('GraphEntitySidebarComponent discourse focus', () => {
             embeddingStagePolicy: { entityLinkerEnabled: false },
         });
         component.diagnosticsSnapshot.set(snapshot);
+        graphSnapshot.set(snapshot);
         const profileCount = component.operatingRoom().countsById['structure-profiles'];
 
         component.selectOperatingCount(profileCount);
@@ -201,6 +224,7 @@ describe('GraphEntitySidebarComponent discourse focus', () => {
             embeddingStagePolicy: { entityLinkerEnabled: false },
         });
         component.diagnosticsSnapshot.set(snapshot);
+        graphSnapshot.set(snapshot);
         const record = component.discourseWorkbench()?.records.find((candidate) =>
             candidate.kind === 'document-review:graph_fact_candidate'
             && candidate.actionKinds.includes('accept_fact')

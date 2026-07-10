@@ -6,16 +6,10 @@ import type {
 } from './graph-discourse-workbench';
 import type { GraphDiscourseTone } from './graph-discourse-analytics';
 import { profileLabel } from '../../../../graph-rebuild/graph-document-profile';
-import {
-    buildReviewAdjudicationViewContract,
-    buildReviewAdjudicationRunCertificate,
-    type GraphReviewAdjudicationRunCertificate,
-} from '../../../../graph-rebuild/graph-review-adjudication-certificate';
-import {
-    buildAtlasControlContract,
-    type AtlasControlCard,
-    type AtlasControlContract,
-} from '../attributes-tab/atlas-control-contract';
+import type {
+    AtlasControlCard,
+    AtlasControlContract,
+} from '../../../../graph-rebuild/atlas-control-contract';
 
 export type GraphOperatingRoomId =
     | 'entities'
@@ -57,16 +51,12 @@ export function buildGraphOperatingRoomView(
     workbench: GraphDiscourseWorkbenchView | null,
     snapshot: GraphRebuildSnapshot | null,
     entities: RegisteredEntity[],
-    atlasControl?: AtlasControlContract,
+    atlasControl: AtlasControlContract,
 ): GraphOperatingRoomView {
-    const control = atlasControl ?? buildAtlasControlContract({
-        snapshot,
-        entityCount: entities.length,
-    });
     const records = [
         ...entityRecords(entities, snapshot),
         ...profileRecords(snapshot),
-        ...reviewAdjudicationRecords(snapshot, control),
+        ...reviewAdjudicationRecords(snapshot, atlasControl),
         ...(workbench?.records || []),
     ];
     const recordsByRoom = emptyRoomMap();
@@ -74,9 +64,9 @@ export function buildGraphOperatingRoomView(
         for (const roomId of roomsForRecord(row)) recordsByRoom[roomId].push(row);
     }
     const recordsById = Object.fromEntries(records.map((row) => [row.id, row]));
-    const counts = countCards(recordsByRoom, snapshot, control);
+    const counts = countCards(recordsByRoom, snapshot, atlasControl);
     return {
-        tabs: ROOM_IDS.map((id) => roomTab(id, recordsByRoom[id], snapshot, entities.length, control)),
+        tabs: ROOM_IDS.map((id) => roomTab(id, recordsByRoom[id], snapshot, entities.length, atlasControl)),
         counts,
         countsById: Object.fromEntries(counts.map((row) => [row.id, row])),
         recordsByRoom,
@@ -153,34 +143,35 @@ function profileRecords(snapshot: GraphRebuildSnapshot | null): GraphDiscourseWo
 
 function reviewAdjudicationRecords(
     snapshot: GraphRebuildSnapshot | null,
-    atlasControl?: AtlasControlContract,
+    atlasControl: AtlasControlContract,
 ): GraphDiscourseWorkbenchRecord[] {
     if (!snapshot) return [];
-    const certificate = reviewAdjudicationCertificate(snapshot);
-    const contract = atlasControl?.certificates.reviewAdjudication
-        ?? buildReviewAdjudicationViewContract(certificate);
-    const tone: GraphDiscourseTone = contract.proof.noTopologyWrites && contract.proof.dimensionContractPassed
+    const certificate = snapshot.reviewAdjudicationCertificate;
+    const contract = atlasControl.certificates.reviewAdjudication;
+    const tone: GraphDiscourseTone = contract.proof.noTopologyWrites.status !== 'failed'
+        && contract.proof.inputContract.status !== 'failed'
         ? 'ready'
         : 'danger';
     const records = [
         record({
             id: `review-adjudication:inventory:${snapshot.id}`,
             kind: 'review-adjudication:inventory',
-            title: 'Review Queue Inventory',
+            title: 'Review Contract Summary',
             subtitle: contract.queue.summary,
-            detail: `${contract.queue.excludedLabel} / ${formatCount(contract.queue.duplicateRows)} duplicate pairs / ${formatCount(contract.queue.judgedRows)} judged`,
+            detail: `${contract.queue.excludedLabel} / ${formatCount(contract.queue.duplicatePairs)} duplicate pairs / ${formatCount(contract.queue.judgedRows)} judged`,
             status: contract.proof.modelRan ? 'accepted' : 'reviewable',
             tone,
             focusQuery: 'ModernBERT NLI review queue inventory',
-            sourceIds: certificate.document.noteIds,
-            tags: ['review_adjudication', 'nli_eligible', 'candidate_only'],
+            sourceIds: certificate?.document.noteIds ?? snapshot.noteIds,
+            tags: ['review_adjudication', 'text_pair_nli', 'candidate_only'],
             actionKinds: ['inspect'],
             facts: [
-                fact('Total review rows', contract.queue.totalReviewRows),
-                fact('NLI eligible rows', contract.queue.nliEligibleRows),
-                fact('Excluded rows', contract.queue.excludedRows),
+                fact('Review ledger rows', contract.queue.ledgerRows),
+                fact('Manual decisions', contract.queue.manualDecisionRows),
+                fact('NLI pair rows', contract.queue.nliPairRows),
+                fact('NLI exclusions', contract.queue.nliExcludedRows),
                 fact('Judged rows', contract.queue.judgedRows),
-                fact('Embedding contract', contract.model.embeddingDimensionLabel || certificate.model.dimension),
+                fact('NLI input contract', contract.model.inputDetail),
                 fact('Button state', contract.action.label),
                 fact('Button reason', contract.action.reason),
                 fact('Topology writes', contract.queue.topologyWrites),
@@ -188,7 +179,7 @@ function reviewAdjudicationRecords(
         }),
     ];
 
-    for (const reason of certificate.queue.excludedReasons) {
+    for (const reason of contract.queue.excludedReasons) {
         records.push(record({
             id: `review-adjudication:excluded:${reason.id}:${snapshot.id}`,
             kind: 'review-adjudication:excluded_reason',
@@ -198,7 +189,7 @@ function reviewAdjudicationRecords(
             status: 'reviewable',
             tone: 'review',
             focusQuery: `ModernBERT excluded reason ${reason.label}`,
-            sourceIds: certificate.document.noteIds,
+            sourceIds: certificate?.document.noteIds ?? snapshot.noteIds,
             tags: ['review_adjudication', 'excluded_reason', reason.id],
             actionKinds: ['inspect'],
             facts: [
@@ -209,17 +200,6 @@ function reviewAdjudicationRecords(
         }));
     }
     return records;
-}
-
-function reviewAdjudicationCertificate(snapshot: GraphRebuildSnapshot): GraphReviewAdjudicationRunCertificate {
-    return snapshot.reviewAdjudicationCertificate ?? buildReviewAdjudicationRunCertificate({
-        snapshot,
-        source: 'derived',
-        modelId: 'onnx-community/ModernBERT-base-nli',
-        modelLabel: 'ModernBERT NLI',
-        dimensionLabel: snapshot.embeddingProfile?.dimensionLabel,
-        embeddingDimension: snapshot.embeddingProfile?.selectedDimensions,
-    });
 }
 
 function roomsForRecord(row: GraphDiscourseWorkbenchRecord): GraphOperatingRoomId[] {

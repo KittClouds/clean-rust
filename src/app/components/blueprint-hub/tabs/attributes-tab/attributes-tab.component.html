@@ -31,7 +31,7 @@
         <header class="atlas-review-header">
             <div>
                 <span>Review Adjudication</span>
-                <h3>Queue inventory</h3>
+                <h3>Review contract</h3>
             </div>
             <div class="atlas-review-ledger">
                 <span>{{ reviewContract.source }}</span>
@@ -43,41 +43,41 @@
 
         <div class="atlas-review-runtime">
             <span class="atlas-runtime-ready">
-                <em>Total review rows</em>
-                <strong>{{ reviewContract.queue.totalReviewRows }}</strong>
-                <small>Graph Review inventory</small>
+                <em>Audit ledger</em>
+                <strong>{{ reviewContract.queue.ledgerRows }}</strong>
+                <small>inspectable system rows</small>
             </span>
             <span
-                [class.atlas-runtime-ready]="reviewContract.queue.nliEligibleRows > 0"
-                [class.atlas-runtime-warning]="reviewContract.queue.nliEligibleRows === 0 && reviewContract.queue.totalReviewRows > 0">
-                <em>NLI eligible</em>
-                <strong>{{ reviewContract.queue.nliEligibleRows }}</strong>
-                <small>pairwise ModernBERT inputs</small>
+                [class.atlas-runtime-ready]="reviewContract.queue.manualDecisionRows > 0"
+                [class.atlas-runtime-warning]="reviewContract.queue.manualDecisionRows === 0 && reviewContract.queue.ledgerRows > 0">
+                <em>Manual decisions</em>
+                <strong>{{ reviewContract.queue.manualDecisionRows }}</strong>
+                <small>receipt-gated user actions</small>
             </span>
             <span
-                [class.atlas-runtime-ready]="reviewContract.queue.excludedRows === 0"
-                [class.atlas-runtime-warning]="reviewContract.queue.excludedRows > 0">
-                <em>Excluded</em>
-                <strong>{{ reviewContract.queue.excludedRows }}</strong>
-                <small>{{ reviewContract.queue.duplicateRows }} duplicate pairs</small>
+                [class.atlas-runtime-ready]="reviewContract.queue.nliPairRows > 0"
+                [class.atlas-runtime-warning]="reviewContract.queue.nliPairRows === 0 && reviewContract.queue.ledgerRows > 0">
+                <em>NLI pairs</em>
+                <strong>{{ reviewContract.queue.nliPairRows }}</strong>
+                <small>{{ reviewContract.queue.nliExcludedRows }} excluded / {{ reviewContract.queue.duplicatePairs }} duplicate</small>
             </span>
             <span
-                [class.atlas-runtime-ready]="reviewContract.proof.noTopologyWrites"
-                [class.atlas-runtime-warning]="!reviewContract.proof.noTopologyWrites">
+                [class.atlas-runtime-ready]="reviewContract.proof.noTopologyWrites.status === 'passed'"
+                [class.atlas-runtime-warning]="reviewContract.proof.noTopologyWrites.status !== 'passed'">
                 <em>Topology writes</em>
                 <strong>{{ reviewContract.queue.topologyWrites }}</strong>
-                <small>review pass is report-only</small>
+                <small>{{ reviewContract.proof.noTopologyWrites.status }}</small>
             </span>
             <span
-                [class.atlas-runtime-ready]="reviewContract.proof.dimensionContractPassed"
-                [class.atlas-runtime-warning]="!reviewContract.proof.dimensionContractPassed">
-                <em>Embedding contract</em>
-                <strong>{{ reviewContract.model.embeddingDimensionLabel || '--' }}</strong>
-                <small>{{ reviewContract.model.classifierLabel }}</small>
+                [class.atlas-runtime-ready]="reviewContract.proof.inputContract.status === 'passed'"
+                [class.atlas-runtime-warning]="reviewContract.proof.inputContract.status !== 'passed'">
+                <em>NLI input</em>
+                <strong>Text pair</strong>
+                <small>{{ reviewContract.model.inputDetail }}</small>
             </span>
             <span
                 [class.atlas-runtime-ready]="reviewContract.proof.modelRan"
-                [class.atlas-runtime-warning]="!reviewContract.proof.modelRan && reviewContract.queue.nliEligibleRows > 0">
+                [class.atlas-runtime-warning]="!reviewContract.proof.modelRan && reviewContract.queue.nliPairRows > 0">
                 <em>Judged rows</em>
                 <strong>{{ reviewContract.queue.judgedRows }}</strong>
                 <small>{{ reviewContract.queue.appliedRows }} applied judgments</small>

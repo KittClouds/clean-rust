@@ -43,8 +43,11 @@ import { AtlasScanCoordinatorService } from '../../services/atlas-scan-coordinat
 import { BlueprintHubService } from '../blueprint-hub/blueprint-hub.service';
 import { NliWorkerService } from '../../lib/services/nli-worker.service';
 import { AtlasCapabilityRuntimeService } from '../../services/atlas-capability-runtime.service';
+import { AtlasControlContractService } from '../../services/atlas-control-contract.service';
+import { PhoenixProjectionService } from '../../services/phoenix-projection.service';
 import { GraphRebuildPipelineService } from '../../graph-rebuild/graph-rebuild-pipeline.service';
 import { GraphRebuildService } from '../../graph-rebuild/graph-rebuild.service';
+import { buildReviewAdjudicationRunCertificate } from '../../graph-rebuild/graph-review-adjudication-certificate';
 import { PhoenixUiApiService } from '../../services/phoenix-ui-api.service';
 import { PhoenixBackendService } from '../../services/phoenix-backend.service';
 import { CalendarService } from '../../services/calendar.service';
@@ -85,8 +88,10 @@ describe('SearchPanelComponent model recipe lifecycle', () => {
             { provide: PhoenixBackendService, useValue: phoenix },
             { provide: GraphRebuildPipelineService, useValue: fullAtlasPipeline },
             { provide: GraphRebuildService, useValue: graphRebuild },
+            { provide: PhoenixProjectionService, useValue: { entityCount: computed(() => 50) } },
             { provide: CalendarService, useValue: createCalendarMock() },
             AtlasCapabilityRuntimeService,
+            AtlasControlContractService,
         ], parentInjector);
         component = runInInjectionContext(injector, () => new SearchPanelComponent());
     });
@@ -330,8 +335,8 @@ describe('SearchPanelComponent model recipe lifecycle', () => {
 
         expect(component.modernBertNliReviewButtonLabel()).toBe('No NLI pairs');
         expect(component.isModernBertNliReviewDisabled()).toBe(true);
-        expect(component.stage8Workbench().reviewAdjudication.eligibleDetail).toBe('0 NLI eligible');
-        expect(component.stage8Workbench().reviewAdjudication.actionReason).toContain('pairwise ModernBERT input contract');
+        expect(component.stage8Workbench().reviewAdjudication.eligibleDetail).toBe('0 NLI pairs');
+        expect(component.stage8Workbench().reviewAdjudication.actionReason).toContain('premise/hypothesis pairs');
 
         await component.runModernBertNliReview();
 
@@ -341,6 +346,19 @@ describe('SearchPanelComponent model recipe lifecycle', () => {
 
     it('runs ModernBERT NLI review as candidate adjudication without graph promotion', async () => {
         component.setBuildScopeMode('note');
+        const snapshot = {
+            id: 'snapshot:runnable-nli',
+            scopeKind: 'note',
+            scopeId: 'note-1',
+            noteIds: ['note-1'],
+            counters: { documentReviewRows: 1 },
+        } as any;
+        snapshot.reviewAdjudicationCertificate = buildReviewAdjudicationRunCertificate({
+            snapshot,
+            source: 'graph_build',
+            rawResult: { plannedInputCount: 1 },
+        });
+        graphRebuild.snapshot.set(snapshot);
 
         await component.runModernBertNliReview();
 
@@ -352,12 +370,25 @@ describe('SearchPanelComponent model recipe lifecycle', () => {
             dimensionLabel: '768d',
             dimension: 768,
         }));
-        expect(machine.notice()).toBe('ModernBERT review found no NLI-eligible rows among 0 review rows. No graph topology was written.');
+        expect(machine.notice()).toBe('ModernBERT review found no NLI-eligible rows among 1 review row. No graph topology was written.');
         expect(fullAtlasPipeline.buildGraph).not.toHaveBeenCalled();
     });
 
     it('surfaces ModernBERT NLI review failures in the Stage 8 review lane', async () => {
         component.setBuildScopeMode('note');
+        const snapshot = {
+            id: 'snapshot:failing-nli',
+            scopeKind: 'note',
+            scopeId: 'note-1',
+            noteIds: ['note-1'],
+            counters: { documentReviewRows: 1 },
+        } as any;
+        snapshot.reviewAdjudicationCertificate = buildReviewAdjudicationRunCertificate({
+            snapshot,
+            source: 'graph_build',
+            rawResult: { plannedInputCount: 1 },
+        });
+        graphRebuild.snapshot.set(snapshot);
         phoenix.storeCommand.mockRejectedValueOnce(new Error('native NLI queue failed'));
 
         await component.runModernBertNliReview();
@@ -547,6 +578,7 @@ function createNliMock() {
         isInitialized: signal(false),
         modelId: signal<string | null>(null),
         isProcessing: signal(false),
+        progress: signal(null),
         device: signal('wasm'),
         initialize: vi.fn(async () => undefined),
         classifyStream: vi.fn(async () => undefined),
@@ -792,8 +824,12 @@ function createFullAtlasPipelineMock() {
 }
 
 function createGraphRebuildMock() {
+    const snapshot = signal<any>(null);
     return {
-        snapshot: signal<any>(null),
-        attachReviewAdjudicationCertificate: vi.fn(),
+        snapshot,
+        isBuilding: computed(() => false),
+        attachReviewAdjudicationCertificate: vi.fn((certificate: any) => {
+            snapshot.update((current) => current ? { ...current, reviewAdjudicationCertificate: certificate } : current);
+        }),
     };
 }

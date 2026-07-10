@@ -1,12 +1,34 @@
 import type { GraphRebuildSnapshot } from './graph-rebuild-snapshot';
 
 export const GRAPH_REVIEW_ADJUDICATION_CERTIFICATE_SCHEMA_VERSION =
-    'phoenix-review-adjudication-run-certificate/v1' as const;
+    'phoenix-review-adjudication-run-certificate/v2' as const;
 export const GRAPH_REVIEW_ADJUDICATION_VIEW_CONTRACT_SCHEMA_VERSION =
-    'phoenix-review-adjudication-view-contract/v1' as const;
+    'phoenix-review-adjudication-view-contract/v2' as const;
 
 export type GraphReviewAdjudicationEntrypoint = 'graph_build' | 'manual_stage8' | 'derived';
 export type GraphReviewAdjudicationViewTone = 'ready' | 'review' | 'warning' | 'danger' | 'quiet';
+export type GraphReviewProofState = 'pending' | 'passed' | 'failed';
+export type GraphReviewInventoryCategoryId =
+    | 'review_ledger'
+    | 'manual_decision'
+    | 'nli_pair'
+    | 'nli_excluded'
+    | 'nli_duplicate'
+    | 'nli_judgment'
+    | 'applied_judgment';
+
+export interface GraphReviewProofCheck {
+    status: GraphReviewProofState;
+    detail: string;
+}
+
+export interface GraphReviewInventoryCategory {
+    id: GraphReviewInventoryCategoryId;
+    label: string;
+    rowCount: number;
+    source: 'document_review' | 'review_adjudication';
+    action: 'inspect' | 'manual_receipt' | 'run_nli' | 'none';
+}
 
 export interface GraphReviewQueueExcludedReason {
     id: string;
@@ -16,14 +38,16 @@ export interface GraphReviewQueueExcludedReason {
 }
 
 export interface GraphReviewQueueInventory {
-    totalReviewRows: number;
-    nliEligibleRows: number;
-    excludedRows: number;
-    duplicateRows: number;
+    ledgerRows: number;
+    manualDecisionRows: number;
+    nliPairRows: number;
+    nliExcludedRows: number;
+    duplicatePairs: number;
     judgedRows: number;
     appliedRows: number;
     topologyWrites: number;
     nliEligibilityPercent: number;
+    categories: GraphReviewInventoryCategory[];
     excludedReasons: GraphReviewQueueExcludedReason[];
 }
 
@@ -56,15 +80,20 @@ export interface GraphReviewAdjudicationRunCertificate {
     model: {
         modelId: string;
         modelLabel: string;
-        dimension: number;
-        dimensionLabel: string;
+        input: {
+            kind: 'text_pair';
+            premiseField: 'premise';
+            hypothesisField: 'hypothesis';
+            outputLabels: ['entailment', 'neutral', 'contradiction'];
+        };
     };
     queue: GraphReviewQueueInventory;
     proof: {
-        candidateOnly: true;
-        noTopologyWrites: boolean;
-        dimensionContractPassed: boolean;
-        modelRan: boolean;
+        status: GraphReviewProofState;
+        candidateOnly: GraphReviewProofCheck;
+        noTopologyWrites: GraphReviewProofCheck;
+        inputContract: GraphReviewProofCheck;
+        modelExecution: GraphReviewProofCheck;
     };
     rows: GraphReviewAdjudicationPreviewRow[];
     stageSummaries: GraphReviewAdjudicationStageSummary[];
@@ -91,14 +120,14 @@ export interface GraphReviewAdjudicationViewContract {
     model: {
         classifierLabel: string;
         classifierDetail: string;
-        embeddingDimensionLabel: string;
-        embeddingDimensionDetail: string;
+        inputKind: 'text_pair';
+        inputDetail: string;
     };
     proof: {
-        noTopologyWrites: boolean;
-        dimensionContractPassed: boolean;
+        status: GraphReviewProofState;
+        noTopologyWrites: GraphReviewProofCheck;
+        inputContract: GraphReviewProofCheck;
         modelRan: boolean;
-        status: string;
         tone: GraphReviewAdjudicationViewTone;
     };
     action: GraphReviewAdjudicationActionState;
@@ -111,8 +140,6 @@ export interface BuildReviewAdjudicationRunCertificateInput {
     source: GraphReviewAdjudicationEntrypoint;
     modelId?: string;
     modelLabel?: string;
-    dimensionLabel?: string;
-    embeddingDimension?: number;
 }
 
 export interface BuildReviewAdjudicationViewContractOptions {
@@ -128,7 +155,8 @@ export function buildReviewAdjudicationRunCertificate(
 ): GraphReviewAdjudicationRunCertificate {
     const raw = asRecord(input.rawResult);
     const snapshot = input.snapshot;
-    const totalReviewRows = reviewRowTotal(snapshot, raw);
+    const ledgerRows = reviewLedgerRows(snapshot, raw);
+    const manualDecisionRows = manualReviewRows(snapshot);
     const rawInputs = numericField(raw, 0, 'inputCount', 'rawInputCount', 'rawInputs', 'input_count')
         || arrayLengthField(raw, 'inputs', 'rawInputs');
     const plannedInputs = numericField(raw, 0, 'plannedInputCount', 'plannedInputs', 'planned_input_count')
@@ -136,17 +164,35 @@ export function buildReviewAdjudicationRunCertificate(
     const judgedRows = numericField(raw, 0, 'resultCount', 'result_count', 'results', 'judgments')
         || arrayLengthField(raw, 'results', 'judgments');
     const appliedRows = appliedRowCount(raw['applied']);
-    const duplicateRows = numericField(raw, 0, 'duplicateInputCount', 'duplicateInputs');
-    const nliEligibleRows = Math.max(plannedInputs, rawInputs - duplicateRows, judgedRows, 0);
+    const duplicatePairs = numericField(raw, 0, 'duplicateInputCount', 'duplicateInputs');
+    const nliPairRows = Math.max(plannedInputs, rawInputs - duplicatePairs, judgedRows, 0);
+    const nliExcludedRows = numericField(raw, 0, 'excludedInputCount', 'excludedInputs', 'excluded_input_count')
+        || arrayLengthField(raw, 'excludedInputs');
     const topologyWrites = numericField(raw, 0, 'topologyWrites', 'committedTopologyWrites', 'topology_writes');
-    const excludedRows = Math.max(0, totalReviewRows - nliEligibleRows - duplicateRows);
-    const dimensionLabel = input.dimensionLabel || snapshot?.embeddingProfile?.dimensionLabel || '';
-    const dimension = input.embeddingDimension
-        || numericField(raw, 0, 'dimension')
-        || parseDimensionLabel(dimensionLabel);
-    const expectedDimension = parseDimensionLabel(dimensionLabel);
     const stageSummaries = normalizeStageSummaries(raw['stageSummaries']);
     const rows = normalizeJudgments(raw['judgments']);
+    const modelRan = judgedRows > 0 || appliedRows > 0;
+    const noTopologyWrites = proofCheck(
+        topologyWrites === 0 ? 'passed' : 'failed',
+        topologyWrites === 0 ? 'Review adjudication wrote no graph topology.' : `${topologyWrites} topology writes detected.`,
+    );
+    const inputContract = proofCheck(
+        nliPairRows > 0 ? 'passed' : 'pending',
+        nliPairRows > 0 ? `${nliPairRows} premise/hypothesis pairs entered the classifier.` : 'No text pairs were available to validate.',
+    );
+    const modelExecution = proofCheck(
+        modelRan ? 'passed' : 'pending',
+        modelRan ? `${judgedRows} pair judgments were produced.` : 'ModernBERT did not run for this certificate.',
+    );
+    const categories = inventoryCategories({
+        ledgerRows,
+        manualDecisionRows,
+        nliPairRows,
+        nliExcludedRows,
+        duplicatePairs,
+        judgedRows,
+        appliedRows,
+    });
     return {
         schemaVersion: GRAPH_REVIEW_ADJUDICATION_CERTIFICATE_SCHEMA_VERSION,
         generatedAt: Date.now(),
@@ -160,25 +206,32 @@ export function buildReviewAdjudicationRunCertificate(
         model: {
             modelId: input.modelId || stringField(raw, 'modelId') || 'onnx-community/ModernBERT-base-nli',
             modelLabel: input.modelLabel || stringField(raw, 'modelLabel') || 'ModernBERT NLI',
-            dimension,
-            dimensionLabel: dimensionLabel || (dimension ? `${dimension}d` : ''),
+            input: {
+                kind: 'text_pair',
+                premiseField: 'premise',
+                hypothesisField: 'hypothesis',
+                outputLabels: ['entailment', 'neutral', 'contradiction'],
+            },
         },
         queue: {
-            totalReviewRows,
-            nliEligibleRows,
-            excludedRows,
-            duplicateRows,
+            ledgerRows,
+            manualDecisionRows,
+            nliPairRows,
+            nliExcludedRows,
+            duplicatePairs,
             judgedRows,
             appliedRows,
             topologyWrites,
-            nliEligibilityPercent: totalReviewRows ? Math.round((nliEligibleRows / totalReviewRows) * 100) : 0,
-            excludedReasons: excludedReasons(totalReviewRows, nliEligibleRows, duplicateRows, excludedRows),
+            nliEligibilityPercent: ledgerRows ? Math.round((nliPairRows / ledgerRows) * 100) : 0,
+            categories,
+            excludedReasons: excludedReasons(nliPairRows, duplicatePairs, nliExcludedRows),
         },
         proof: {
-            candidateOnly: true,
-            noTopologyWrites: topologyWrites === 0,
-            dimensionContractPassed: !expectedDimension || !dimension || expectedDimension === dimension,
-            modelRan: judgedRows > 0 || appliedRows > 0,
+            status: noTopologyWrites.status === 'failed' ? 'failed' : nliPairRows > 0 && !modelRan ? 'pending' : 'passed',
+            candidateOnly: proofCheck('passed', 'Review output is candidate-only.'),
+            noTopologyWrites,
+            inputContract,
+            modelExecution,
         },
         rows,
         stageSummaries,
@@ -190,14 +243,13 @@ export function applyReviewAdjudicationCertificate(
     certificate: GraphReviewAdjudicationRunCertificate,
 ): void {
     snapshot.reviewAdjudicationCertificate = certificate;
-    snapshot.counters.reviewAdjudicationTotalRows = certificate.queue.totalReviewRows;
-    snapshot.counters.reviewAdjudicationEligibleRows = certificate.queue.nliEligibleRows;
-    snapshot.counters.reviewAdjudicationExcludedRows = certificate.queue.excludedRows;
-    snapshot.counters.reviewAdjudicationDuplicateRows = certificate.queue.duplicateRows;
+    snapshot.counters.reviewAdjudicationTotalRows = certificate.queue.ledgerRows;
+    snapshot.counters.reviewAdjudicationEligibleRows = certificate.queue.nliPairRows;
+    snapshot.counters.reviewAdjudicationExcludedRows = certificate.queue.nliExcludedRows;
+    snapshot.counters.reviewAdjudicationDuplicateRows = certificate.queue.duplicatePairs;
     snapshot.counters.reviewAdjudicationJudgedRows = certificate.queue.judgedRows;
     snapshot.counters.reviewAdjudicationAppliedRows = certificate.queue.appliedRows;
     snapshot.counters.reviewAdjudicationTopologyWrites = certificate.queue.topologyWrites;
-    snapshot.counters.reviewAdjudicationDimension = certificate.model.dimension;
 }
 
 export function buildReviewAdjudicationViewContract(
@@ -205,13 +257,13 @@ export function buildReviewAdjudicationViewContract(
     options: BuildReviewAdjudicationViewContractOptions = {},
 ): GraphReviewAdjudicationViewContract {
     const queue = certificate?.queue ?? emptyQueue();
-    const failed = !!certificate && (!certificate.proof.noTopologyWrites || !certificate.proof.dimensionContractPassed);
+    const proofStatus = certificate?.proof.status ?? 'pending';
     const reason = queue.excludedReasons[0] ?? null;
-    const proofTone: GraphReviewAdjudicationViewTone = failed
+    const proofTone: GraphReviewAdjudicationViewTone = proofStatus === 'failed'
         ? 'danger'
-        : certificate?.proof.modelRan
+        : certificate?.proof.modelExecution.status === 'passed'
             ? 'ready'
-            : queue.nliEligibleRows > 0
+            : queue.nliPairRows > 0
                 ? 'review'
                 : 'quiet';
     return {
@@ -219,25 +271,23 @@ export function buildReviewAdjudicationViewContract(
         source: certificate?.source ?? 'missing',
         queue: {
             ...queue,
-            totalLabel: `${formatCount(queue.totalReviewRows)} review rows`,
-            eligibleLabel: `${formatCount(queue.nliEligibleRows)} NLI eligible`,
-            excludedLabel: `${formatCount(queue.excludedRows)} excluded`,
+            totalLabel: `${formatCount(queue.ledgerRows)} ledger rows`,
+            eligibleLabel: `${formatCount(queue.nliPairRows)} NLI pairs`,
+            excludedLabel: `${formatCount(queue.nliExcludedRows)} NLI exclusions`,
             judgedLabel: `${formatCount(queue.judgedRows)} judged / ${formatCount(queue.appliedRows)} applied`,
-            summary: `${formatCount(queue.nliEligibleRows)} NLI eligible / ${formatCount(queue.totalReviewRows)} review rows`,
+            summary: `${formatCount(queue.manualDecisionRows)} manual decisions / ${formatCount(queue.nliPairRows)} NLI pairs / ${formatCount(queue.ledgerRows)} ledger rows`,
         },
         model: {
             classifierLabel: certificate?.model.modelLabel || 'ModernBERT NLI',
             classifierDetail: 'ModernBERT / pairwise candidate judgments / 0 topology writes',
-            embeddingDimensionLabel: certificate?.model.dimensionLabel || '',
-            embeddingDimensionDetail: certificate
-                ? `${certificate.model.dimensionLabel || `${certificate.model.dimension || 0}d`} embedding target contract`
-                : 'embedding target contract pending',
+            inputKind: 'text_pair',
+            inputDetail: 'premise + hypothesis text -> entailment / neutral / contradiction',
         },
         proof: {
-            noTopologyWrites: certificate?.proof.noTopologyWrites ?? true,
-            dimensionContractPassed: certificate?.proof.dimensionContractPassed ?? true,
-            modelRan: certificate?.proof.modelRan ?? false,
-            status: failed ? 'error' : certificate?.proof.modelRan ? 'ready' : queue.nliEligibleRows > 0 ? 'planned' : 'idle',
+            status: proofStatus,
+            noTopologyWrites: certificate?.proof.noTopologyWrites ?? proofCheck('pending', 'No review certificate is attached.'),
+            inputContract: certificate?.proof.inputContract ?? proofCheck('pending', 'No text-pair contract is attached.'),
+            modelRan: certificate?.proof.modelExecution.status === 'passed',
             tone: proofTone,
         },
         action: buildReviewActionState(certificate, options),
@@ -263,20 +313,23 @@ function buildReviewActionState(
     if (!hasScope) {
         return actionState('Pick Scope', true, 'blocked', 'Choose a runnable atlas scope first.', 'warning');
     }
-    if (certificate && (!certificate.proof.noTopologyWrites || !certificate.proof.dimensionContractPassed)) {
-        return actionState('Fix Contract', true, 'error', 'Review certificate failed the no-topology or embedding dimension proof.', 'danger');
+    if (!certificate) {
+        return actionState('Build Graph First', true, 'pending', 'A review certificate requires a graph snapshot.', 'quiet');
     }
-    if (certificate && queue.totalReviewRows > 0 && queue.nliEligibleRows === 0) {
+    if (certificate.proof.noTopologyWrites.status === 'failed' || certificate.proof.inputContract.status === 'failed') {
+        return actionState('Fix Contract', true, 'error', 'Review certificate failed the no-topology or text-pair input proof.', 'danger');
+    }
+    if (queue.nliPairRows === 0) {
         return actionState(
             'No NLI pairs',
             true,
             'blocked',
-            `${formatCount(queue.totalReviewRows)} review rows exist, but none match the pairwise ModernBERT input contract.`,
+            `${formatCount(queue.ledgerRows)} ledger rows exist, but no premise/hypothesis pairs were planned.`,
             'quiet',
         );
     }
     const label = options.modelInitialized ? 'Run NLI' : 'Load + Run';
-    return actionState(label, false, certificate?.proof.modelRan ? 'ready' : 'planned', 'ModernBERT can score pairwise candidate rows.', 'ready');
+    return actionState(label, false, certificate.proof.modelExecution.status === 'passed' ? 'ready' : 'planned', 'ModernBERT can score the planned premise/hypothesis pairs.', 'ready');
 }
 
 function actionState(
@@ -291,14 +344,16 @@ function actionState(
 
 function emptyQueue(): GraphReviewQueueInventory {
     return {
-        totalReviewRows: 0,
-        nliEligibleRows: 0,
-        excludedRows: 0,
-        duplicateRows: 0,
+        ledgerRows: 0,
+        manualDecisionRows: 0,
+        nliPairRows: 0,
+        nliExcludedRows: 0,
+        duplicatePairs: 0,
         judgedRows: 0,
         appliedRows: 0,
         topologyWrites: 0,
         nliEligibilityPercent: 0,
+        categories: [],
         excludedReasons: [],
     };
 }
@@ -307,52 +362,81 @@ function formatCount(value: number): string {
     return Math.max(0, Math.round(value || 0)).toLocaleString();
 }
 
-function reviewRowTotal(snapshot: GraphRebuildSnapshot | null, raw: Record<string, unknown>): number {
+function reviewLedgerRows(snapshot: GraphRebuildSnapshot | null, raw: Record<string, unknown>): number {
     const rawTotal = numericField(raw, 0, 'totalReviewRows', 'reviewRows', 'total_review_rows', 'review_rows');
     if (rawTotal) return rawTotal;
-    const counters = snapshot?.counters;
-    return Math.max(
-        counters?.documentReviewRows || 0,
-        snapshot?.documentReviewSummary?.rows?.length || 0,
-        (counters?.semanticEvalLedgerRows || 0) + (counters?.discourseEvalLedgerRows || 0),
-        counters?.reviewRelationships || 0,
-        numericField(raw, 0, 'inputCount', 'rawInputs', 'input_count') || arrayLengthField(raw, 'inputs', 'rawInputs'),
-        numericField(raw, 0, 'plannedInputCount', 'plannedInputs', 'planned_input_count') || arrayLengthField(raw, 'plannedInputs'),
-    );
+    const rows = snapshot?.documentReviewSummary?.rows;
+    if (rows) return new Set(rows.map((row) => row.id)).size;
+    return snapshot?.counters.documentReviewRows || 0;
+}
+
+function manualReviewRows(snapshot: GraphRebuildSnapshot | null): number {
+    const rows = snapshot?.documentReviewSummary?.rows;
+    if (rows) {
+        return rows.filter((row) => row.availableActions.some((action) => action.requiresUserIntent)).length;
+    }
+    return snapshot?.counters.documentReviewActionableRows || 0;
 }
 
 function excludedReasons(
-    totalReviewRows: number,
-    nliEligibleRows: number,
-    duplicateRows: number,
-    excludedRows: number,
+    nliPairRows: number,
+    duplicatePairs: number,
+    nliExcludedRows: number,
 ): GraphReviewQueueExcludedReason[] {
     const reasons: GraphReviewQueueExcludedReason[] = [];
-    if (excludedRows > 0) {
+    if (nliExcludedRows > 0) {
         reasons.push({
-            id: 'non_nli_review_row',
-            label: 'Non-NLI review rows',
-            count: excludedRows,
-            detail: 'Graph Review includes gaps, accepted rows, ambiguity, receipts, and diagnostics; only pairwise candidate rows enter ModernBERT.',
+            id: 'invalid_nli_pair',
+            label: 'Excluded NLI pairs',
+            count: nliExcludedRows,
+            detail: 'These candidate pairs failed the explicit premise/hypothesis input contract.',
         });
     }
-    if (duplicateRows > 0) {
+    if (duplicatePairs > 0) {
         reasons.push({
             id: 'duplicate_pair',
             label: 'Duplicate NLI pairs',
-            count: duplicateRows,
+            count: duplicatePairs,
             detail: 'Repeated source-target-edge inputs were collapsed before classification.',
         });
     }
-    if (totalReviewRows > 0 && nliEligibleRows === 0 && excludedRows === 0) {
+    if (nliPairRows === 0 && nliExcludedRows === 0 && duplicatePairs === 0) {
         reasons.push({
             id: 'empty_nli_plan',
             label: 'No planned NLI inputs',
-            count: totalReviewRows,
-            detail: 'The review queue exists, but no rows matched the native NLI pair contract for this run.',
+            count: 0,
+            detail: 'The review ledger is independent from NLI; no premise/hypothesis pairs were planned for this run.',
         });
     }
     return reasons;
+}
+
+function inventoryCategories(
+    counts: Omit<GraphReviewQueueInventory, 'topologyWrites' | 'nliEligibilityPercent' | 'categories' | 'excludedReasons'>,
+): GraphReviewInventoryCategory[] {
+    return [
+        category('review_ledger', 'System audit ledger', counts.ledgerRows, 'document_review', 'inspect'),
+        category('manual_decision', 'Manual decisions', counts.manualDecisionRows, 'document_review', counts.manualDecisionRows ? 'manual_receipt' : 'none'),
+        category('nli_pair', 'NLI pair inputs', counts.nliPairRows, 'review_adjudication', counts.nliPairRows ? 'run_nli' : 'none'),
+        category('nli_excluded', 'Excluded NLI pairs', counts.nliExcludedRows, 'review_adjudication', 'inspect'),
+        category('nli_duplicate', 'Duplicate NLI pairs', counts.duplicatePairs, 'review_adjudication', 'inspect'),
+        category('nli_judgment', 'NLI judgments', counts.judgedRows, 'review_adjudication', 'inspect'),
+        category('applied_judgment', 'Applied judgments', counts.appliedRows, 'review_adjudication', 'inspect'),
+    ];
+}
+
+function category(
+    id: GraphReviewInventoryCategoryId,
+    label: string,
+    rowCount: number,
+    source: GraphReviewInventoryCategory['source'],
+    action: GraphReviewInventoryCategory['action'],
+): GraphReviewInventoryCategory {
+    return { id, label, rowCount, source, action };
+}
+
+function proofCheck(status: GraphReviewProofState, detail: string): GraphReviewProofCheck {
+    return { status, detail };
 }
 
 function normalizeStageSummaries(value: unknown): GraphReviewAdjudicationStageSummary[] {
@@ -393,11 +477,6 @@ function appliedRowCount(applied: unknown): number {
         if (Array.isArray(value)) return value.length;
     }
     return 0;
-}
-
-function parseDimensionLabel(label: string | undefined): number {
-    const match = String(label || '').match(/(\d+)/);
-    return match ? Number(match[1]) : 0;
 }
 
 function numericField(record: Record<string, unknown>, fallback: number, ...keys: string[]): number {

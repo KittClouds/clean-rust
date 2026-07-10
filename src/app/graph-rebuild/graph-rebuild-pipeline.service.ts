@@ -325,8 +325,6 @@ export class GraphRebuildPipelineService {
                 source: 'graph_build',
                 modelId: request.modelSelection.nliModelId,
                 modelLabel: 'ModernBERT NLI',
-                dimensionLabel: request.modelSelection.embeddingDimensionLabel,
-                embeddingDimension: embeddingDimensionFromLabel(request.modelSelection.embeddingDimensionLabel),
             });
             applyReviewAdjudicationCertificate(completedSnapshot, reviewCertificate);
             appendReviewAdjudicationCertificateStage(stageReceipts, reviewCertificate);
@@ -1027,18 +1025,18 @@ function appendReviewAdjudicationCertificateStage(
         'Review Adjudication Certificate',
         certificate.stageSummaries.reduce((sum, stage) => sum + stage.durationMs, 0),
         {
-            totalReviewRows: queue.totalReviewRows,
-            nliEligibleRows: queue.nliEligibleRows,
-            excludedRows: queue.excludedRows,
-            duplicateRows: queue.duplicateRows,
+            ledgerRows: queue.ledgerRows,
+            manualDecisionRows: queue.manualDecisionRows,
+            nliPairRows: queue.nliPairRows,
+            nliExcludedRows: queue.nliExcludedRows,
+            duplicatePairs: queue.duplicatePairs,
             judgedRows: queue.judgedRows,
             appliedRows: queue.appliedRows,
             topologyWrites: queue.topologyWrites,
-            dimension: certificate.model.dimension,
-            dimensionContractPassed: certificate.proof.dimensionContractPassed ? 1 : 0,
-            noTopologyWrites: certificate.proof.noTopologyWrites ? 1 : 0,
+            inputContractPassed: certificate.proof.inputContract.status === 'passed' ? 1 : 0,
+            noTopologyWrites: certificate.proof.noTopologyWrites.status === 'passed' ? 1 : 0,
         },
-        `${queue.nliEligibleRows.toLocaleString()} NLI-eligible / ${queue.totalReviewRows.toLocaleString()} total review rows; ${queue.excludedRows.toLocaleString()} excluded`,
+        `${queue.manualDecisionRows.toLocaleString()} manual decisions / ${queue.nliPairRows.toLocaleString()} NLI pairs / ${queue.ledgerRows.toLocaleString()} ledger rows`,
     ));
 }
 

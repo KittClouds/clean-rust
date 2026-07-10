@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import type { RegisteredEntity } from '../../../../lib/registry';
 import type { GraphRebuildSnapshot } from '../../../../graph-rebuild/graph-rebuild-snapshot';
+import { buildAtlasControlContract } from '../../../../graph-rebuild/atlas-control-contract';
 import { buildGraphDiscourseWorkbenchView } from './graph-discourse-workbench';
 import { buildGraphOperatingRoomView } from './graph-operating-room';
 
@@ -46,7 +47,7 @@ describe('buildGraphDiscourseWorkbenchView', () => {
         };
 
         const workbench = buildGraphDiscourseWorkbenchView(snap, entities());
-        const room = buildGraphOperatingRoomView(workbench, snap, entities());
+        const room = operatingRoom(workbench, snap);
         const ids = workbench?.records.map((record) => record.id) || [];
         const semanticInsightRows = workbench?.recordsByTab.insights
             .filter((record) => record.id.startsWith('insights:semantic-ledger:duplicate-ledger')) || [];
@@ -105,7 +106,7 @@ describe('buildGraphDiscourseWorkbenchView', () => {
     it('builds operating-room rooms where count cards open their underlying rows', () => {
         const snap = snapshot();
         const workbench = buildGraphDiscourseWorkbenchView(snap, entities());
-        const room = buildGraphOperatingRoomView(workbench, snap, entities());
+        const room = operatingRoom(workbench, snap);
         const relations = room.countsById['facts-relations'];
         const receipts = room.countsById['metrics-receipts'];
 
@@ -123,7 +124,7 @@ describe('buildGraphDiscourseWorkbenchView', () => {
         snap.counters.reviewRelationships = 1;
 
         const workbench = buildGraphDiscourseWorkbenchView(snap, entities());
-        const room = buildGraphOperatingRoomView(workbench, snap, entities());
+        const room = operatingRoom(workbench, snap);
         const row = workbench?.recordsById['relations:relationship:relationship-supported'];
 
         expect(row?.detail).toBe('NLI Supported / GLiClass supports / 94% confidence');
@@ -148,7 +149,7 @@ describe('buildGraphDiscourseWorkbenchView', () => {
         snap.counters.reviewRelationships = 1;
 
         const workbench = buildGraphDiscourseWorkbenchView(snap, entities());
-        const room = buildGraphOperatingRoomView(workbench, snap, entities());
+        const room = operatingRoom(workbench, snap);
         const row = workbench?.recordsById['relations:relationship:relationship-contradicted'];
 
         expect(row?.tone).toBe('danger');
@@ -168,6 +169,19 @@ describe('buildGraphDiscourseWorkbenchView', () => {
         expect(row?.facts.some((fact) => fact.label === 'Graph impact' && fact.value.includes('candidate'))).toBe(true);
     });
 });
+
+function operatingRoom(
+    workbench: ReturnType<typeof buildGraphDiscourseWorkbenchView>,
+    snap: GraphRebuildSnapshot,
+) {
+    const registry = entities();
+    return buildGraphOperatingRoomView(
+        workbench,
+        snap,
+        registry,
+        buildAtlasControlContract({ snapshot: snap, entityCount: registry.length }),
+    );
+}
 
 function entities(): RegisteredEntity[] {
     return [

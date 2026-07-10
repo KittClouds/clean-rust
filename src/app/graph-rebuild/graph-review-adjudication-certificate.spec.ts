@@ -10,7 +10,7 @@ import {
 import type { GraphRebuildSnapshot } from './graph-rebuild-snapshot';
 
 describe('buildReviewAdjudicationRunCertificate', () => {
-    it('reports the total review queue, NLI-eligible rows, and excluded reasons', () => {
+    it('reports exact ledger, text-pair, exclusion, and judgment categories', () => {
         const certificate = buildReviewAdjudicationRunCertificate({
             snapshot: snapshot(),
             source: 'manual_stage8',
@@ -18,37 +18,43 @@ describe('buildReviewAdjudicationRunCertificate', () => {
                 inputCount: 96,
                 plannedInputCount: 92,
                 duplicateInputCount: 4,
+                excludedInputCount: 11,
                 resultCount: 92,
                 topologyWrites: 0,
-                dimension: 768,
                 stageSummaries: [
                     { stage: 'candidatePlan', durationMs: 12, counts: { plannedInputs: 92 } },
                 ],
             },
             modelId: 'onnx-community/ModernBERT-base-nli-ONNX',
             modelLabel: 'ModernBERT NLI',
-            dimensionLabel: '768d',
-            embeddingDimension: 768,
         });
 
         expect(certificate.schemaVersion).toBe(GRAPH_REVIEW_ADJUDICATION_CERTIFICATE_SCHEMA_VERSION);
         expect(certificate.queue).toMatchObject({
-            totalReviewRows: 1300,
-            nliEligibleRows: 92,
-            duplicateRows: 4,
+            ledgerRows: 1300,
+            manualDecisionRows: 0,
+            nliPairRows: 92,
+            duplicatePairs: 4,
             judgedRows: 92,
             topologyWrites: 0,
-            excludedRows: 1204,
+            nliExcludedRows: 11,
         });
         expect(certificate.queue.excludedReasons.map((reason) => reason.id)).toEqual([
-            'non_nli_review_row',
+            'invalid_nli_pair',
             'duplicate_pair',
         ]);
+        expect(certificate.model.input).toEqual({
+            kind: 'text_pair',
+            premiseField: 'premise',
+            hypothesisField: 'hypothesis',
+            outputLabels: ['entailment', 'neutral', 'contradiction'],
+        });
         expect(certificate.proof).toMatchObject({
-            candidateOnly: true,
-            noTopologyWrites: true,
-            dimensionContractPassed: true,
-            modelRan: true,
+            status: 'passed',
+            candidateOnly: { status: 'passed' },
+            noTopologyWrites: { status: 'passed' },
+            inputContract: { status: 'passed' },
+            modelExecution: { status: 'passed' },
         });
     });
 
@@ -61,17 +67,15 @@ describe('buildReviewAdjudicationRunCertificate', () => {
                 plannedInputs: [{ id: 1 }],
                 judgments: [{ judgmentId: 'j1', predictedLabel: 'entailment', confidence: 0.9 }],
                 duplicateInputCount: 1,
-                dimension: 768,
             },
-            dimensionLabel: '768d',
         });
 
-        expect(certificate.queue.nliEligibleRows).toBe(1);
+        expect(certificate.queue.nliPairRows).toBe(1);
         expect(certificate.queue.judgedRows).toBe(1);
-        expect(certificate.queue.duplicateRows).toBe(1);
+        expect(certificate.queue.duplicatePairs).toBe(1);
     });
 
-    it('fails the dimension proof when the runtime output violates the explicit contract', () => {
+    it('does not couple text-pair NLI to a graph embedding dimension', () => {
         const certificate = buildReviewAdjudicationRunCertificate({
             snapshot: snapshot(),
             source: 'manual_stage8',
@@ -80,14 +84,11 @@ describe('buildReviewAdjudicationRunCertificate', () => {
                 resultCount: 24,
                 dimension: 384,
             },
-            dimensionLabel: '768d',
         });
 
-        expect(certificate.model).toMatchObject({
-            dimension: 384,
-            dimensionLabel: '768d',
-        });
-        expect(certificate.proof.dimensionContractPassed).toBe(false);
+        expect(certificate.model.input.kind).toBe('text_pair');
+        expect(certificate.proof.inputContract.status).toBe('passed');
+        expect(certificate.model).not.toHaveProperty('dimension');
     });
 
     it('attaches the certificate counters to the snapshot without graph writes', () => {
@@ -99,9 +100,7 @@ describe('buildReviewAdjudicationRunCertificate', () => {
                 plannedInputCount: 12,
                 resultCount: 0,
                 topologyWrites: 0,
-                dimension: 768,
             },
-            dimensionLabel: '768d',
         });
 
         applyReviewAdjudicationCertificate(graph, certificate);
@@ -110,10 +109,9 @@ describe('buildReviewAdjudicationRunCertificate', () => {
         expect(graph.counters).toMatchObject({
             reviewAdjudicationTotalRows: 1300,
             reviewAdjudicationEligibleRows: 12,
-            reviewAdjudicationExcludedRows: 1288,
+            reviewAdjudicationExcludedRows: 0,
             reviewAdjudicationJudgedRows: 0,
             reviewAdjudicationTopologyWrites: 0,
-            reviewAdjudicationDimension: 768,
         });
     });
 
@@ -122,7 +120,6 @@ describe('buildReviewAdjudicationRunCertificate', () => {
             snapshot: snapshot(),
             source: 'derived',
             rawResult: {},
-            dimensionLabel: '768d',
         });
 
         const contract = buildReviewAdjudicationViewContract(certificate, {
@@ -132,19 +129,19 @@ describe('buildReviewAdjudicationRunCertificate', () => {
 
         expect(contract.schemaVersion).toBe(GRAPH_REVIEW_ADJUDICATION_VIEW_CONTRACT_SCHEMA_VERSION);
         expect(contract.queue).toMatchObject({
-            totalReviewRows: 1300,
-            nliEligibleRows: 0,
-            excludedRows: 1300,
-            totalLabel: '1,300 review rows',
-            eligibleLabel: '0 NLI eligible',
+            ledgerRows: 1300,
+            nliPairRows: 0,
+            nliExcludedRows: 0,
+            totalLabel: '1,300 ledger rows',
+            eligibleLabel: '0 NLI pairs',
         });
         expect(contract.action).toMatchObject({
             label: 'No NLI pairs',
             disabled: true,
             status: 'blocked',
         });
-        expect(contract.action.reason).toContain('pairwise ModernBERT input contract');
-        expect(contract.model.embeddingDimensionDetail).toContain('embedding target contract');
+        expect(contract.action.reason).toContain('premise/hypothesis pairs');
+        expect(contract.model.inputDetail).toContain('premise + hypothesis');
     });
 
     it('uses one action state for runnable pairwise review rows', () => {
@@ -153,9 +150,7 @@ describe('buildReviewAdjudicationRunCertificate', () => {
             source: 'manual_stage8',
             rawResult: {
                 plannedInputCount: 8,
-                dimension: 768,
             },
-            dimensionLabel: '768d',
         });
 
         const contract = buildReviewAdjudicationViewContract(certificate, {
@@ -163,7 +158,7 @@ describe('buildReviewAdjudicationRunCertificate', () => {
             hasScope: true,
         });
 
-        expect(contract.queue.summary).toBe('8 NLI eligible / 1,300 review rows');
+        expect(contract.queue.summary).toBe('0 manual decisions / 8 NLI pairs / 1,300 ledger rows');
         expect(contract.action).toMatchObject({
             label: 'Load + Run',
             disabled: false,

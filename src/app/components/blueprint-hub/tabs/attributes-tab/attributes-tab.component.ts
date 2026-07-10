@@ -11,6 +11,7 @@ import { NerService } from '../../../../services/ner.service';
 import { AtlasScanCoordinatorService } from '../../../../services/atlas-scan-coordinator.service';
 import { PhoenixMachineControlService } from '../../../../services/phoenix-machine-control.service';
 import { PhoenixProjectionService } from '../../../../services/phoenix-projection.service';
+import { AtlasControlContractService } from '../../../../services/atlas-control-contract.service';
 import { GraphRebuildService } from '../../../../graph-rebuild/graph-rebuild.service';
 import { SearchPanelComponent } from '../../../search-panel/search-panel.component';
 import {
@@ -23,15 +24,8 @@ import { buildGraphAtlasReadContext } from '../graph-tab/graph-atlas-preview/gra
 import { GraphStyleDrawerComponent } from '../graph-tab/graph-style-drawer/graph-style-drawer.component';
 import type { GraphLensState } from '../graph-tab/graph-lens';
 import type { GraphOperatingRoomId } from '../graph-tab/graph-operating-room';
-import { buildAtlasControlContract, type AtlasControlTone } from './atlas-control-contract';
+import type { AtlasControlTone } from '../../../../graph-rebuild/atlas-control-contract';
 import { buildAtlasControlReviewDeck } from './atlas-control-review';
-import { buildGovernanceRunCertificate } from '../../../../graph-rebuild/graph-governance-run-certificate';
-import {
-    buildReviewAdjudicationViewContract,
-    buildReviewAdjudicationRunCertificate,
-    type GraphReviewAdjudicationViewContract,
-    type GraphReviewAdjudicationRunCertificate,
-} from '../../../../graph-rebuild/graph-review-adjudication-certificate';
 import type {
     GraphPromotionVerdictCertificate,
     GraphPromotionVerdictGate,
@@ -71,6 +65,7 @@ export class AttributesTabComponent {
     private readonly nerService = inject(NerService);
     private readonly noteStore = inject(NoteEditorStore);
     private readonly projection = inject(PhoenixProjectionService);
+    private readonly atlasControl = inject(AtlasControlContractService);
     private readonly graphRebuild = inject(GraphRebuildService);
     private readonly machine = inject(PhoenixMachineControlService);
     private readonly entitySelection = inject(EntitySelectionService);
@@ -133,37 +128,11 @@ export class AttributesTabComponent {
         this.graphSnapshot(),
         this.entities(),
     ));
-    readonly governanceCertificate = computed(() => {
-        const snapshot = this.graphSnapshot();
-        return snapshot ? buildGovernanceRunCertificate(snapshot) : null;
-    });
-    readonly promotionCertificate = computed(() =>
-        this.graphSnapshot()?.promotionVerdictCertificate ?? null,
-    );
-    readonly reviewAdjudicationCertificate = computed<GraphReviewAdjudicationRunCertificate | null>(() => {
-        const snapshot = this.graphSnapshot();
-        if (!snapshot) return null;
-        return snapshot.reviewAdjudicationCertificate ?? buildReviewAdjudicationRunCertificate({
-            snapshot,
-            source: 'derived',
-            modelId: 'onnx-community/ModernBERT-base-nli',
-            modelLabel: 'ModernBERT NLI',
-            dimensionLabel: snapshot.embeddingProfile?.dimensionLabel,
-            embeddingDimension: snapshot.embeddingProfile?.selectedDimensions,
-        });
-    });
-    readonly reviewAdjudicationContract = computed<GraphReviewAdjudicationViewContract>(() =>
-        buildReviewAdjudicationViewContract(this.reviewAdjudicationCertificate()),
-    );
-    readonly atlasControlContract = computed(() => buildAtlasControlContract({
-        snapshot: this.graphSnapshot(),
-        entityCount: this.entities().length,
-        edgeCount: this.atlasEdges().length,
-        reviewAdjudicationCertificate: this.reviewAdjudicationCertificate(),
-        reviewAdjudicationViewContract: this.reviewAdjudicationContract(),
-        governanceCertificate: this.governanceCertificate(),
-        promotionCertificate: this.promotionCertificate(),
-    }));
+    readonly atlasControlContract = this.atlasControl.contract;
+    readonly reviewAdjudicationCertificate = this.atlasControl.reviewCertificate;
+    readonly reviewAdjudicationContract = this.atlasControl.reviewView;
+    readonly governanceCertificate = computed(() => this.atlasControlContract().certificates.governance);
+    readonly promotionCertificate = computed(() => this.atlasControlContract().certificates.promotion);
     readonly headerCards = computed(() => this.atlasControlContract().header);
     readonly workflowSteps = computed<AtlasWorkflowStep[]>(() => {
         return this.atlasControlContract().workflow.map((step) => ({

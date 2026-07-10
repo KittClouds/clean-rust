@@ -36,13 +36,11 @@ import { AtlasScanCoordinatorService } from '../../services/atlas-scan-coordinat
 import { BlueprintHubService } from '../blueprint-hub/blueprint-hub.service';
 import { NliWorkerService } from '../../lib/services/nli-worker.service';
 import { AtlasCapabilityRuntimeService } from '../../services/atlas-capability-runtime.service';
+import { AtlasControlContractService } from '../../services/atlas-control-contract.service';
 import { GraphRebuildPipelineService } from '../../graph-rebuild/graph-rebuild-pipeline.service';
 import { GraphRebuildService } from '../../graph-rebuild/graph-rebuild.service';
 import {
-  buildReviewAdjudicationViewContract,
-  buildReviewAdjudicationRunCertificate,
   type GraphReviewAdjudicationViewContract,
-  type GraphReviewAdjudicationRunCertificate,
 } from '../../graph-rebuild/graph-review-adjudication-certificate';
 import { CalendarService } from '../../services/calendar.service';
 import { PhoenixBackendService } from '../../services/phoenix-backend.service';
@@ -88,10 +86,7 @@ import {
   buildReviewClusterViews,
   type ProductDiagnosticsReviewCluster,
 } from '../blueprint-hub/tabs/graph-tab/graph-product-diagnostics';
-import {
-  buildAtlasControlContract,
-  type AtlasControlTone,
-} from '../blueprint-hub/tabs/attributes-tab/atlas-control-contract';
+import type { AtlasControlTone } from '../../graph-rebuild/atlas-control-contract';
 import {
   buildGraphProjectionContractReport,
   type GraphProjectionContractReport,
@@ -242,7 +237,7 @@ interface Stage8ReviewAdjudicationView {
   eligibleDetail: string;
   excludedDetail: string;
   judgedDetail: string;
-  dimensionDetail: string;
+  inputDetail: string;
   reasonDetail: string;
   actionLabel: string;
   actionDisabled: boolean;
@@ -349,6 +344,7 @@ export class SearchPanelComponent implements OnInit {
   private readonly hubService = inject(BlueprintHubService);
   private readonly nli = inject(NliWorkerService);
   private readonly atlasRuntime = inject(AtlasCapabilityRuntimeService);
+  private readonly atlasControl = inject(AtlasControlContractService);
   private readonly fullAtlasPipeline = inject(GraphRebuildPipelineService);
   private readonly graphRebuild = inject(GraphRebuildService);
   private readonly calendar = inject(CalendarService);
@@ -375,7 +371,6 @@ export class SearchPanelComponent implements OnInit {
 
   readonly selectedModel = signal<ModelId>(DEFAULT_SEARCH_MODEL_ID);
   readonly activeLaneWarm = signal<AtlasModelLaneId | null>(null);
-  readonly manualReviewCertificate = signal<GraphReviewAdjudicationRunCertificate | null>(null);
   readonly folders = signal<Array<{ id: string; name: string }>>([]);
   readonly notes = signal<SearchPanelNote[]>([]);
   readonly buildScopeMode = signal<AtlasBuildScope['mode']>('global');
@@ -389,7 +384,7 @@ export class SearchPanelComponent implements OnInit {
   readonly compilerQueueDecisions = signal<Record<string, CompilerQueueDecision>>({});
   readonly truthReviewLane = signal<SemanticTruthReviewLaneState>(semanticTruthReviewIdleState());
   readonly truthReviewLaneBusy = computed(() => this.truthReviewLane().status === 'running');
-  readonly nliReviewRunning = signal(false);
+  readonly nliReviewRunning = this.atlasControl.nliRunning;
   readonly nerSuggestionRunning = signal(false);
 
   readonly laneOptions = RETRIEVAL_LANE_OPTIONS;
@@ -560,35 +555,9 @@ export class SearchPanelComponent implements OnInit {
   readonly reviewClusters = computed<ProductDiagnosticsReviewCluster[]>(() =>
     buildReviewClusterViews(this.fullAtlasPipeline.lastSnapshot())
   );
-  readonly reviewAdjudicationCertificate = computed<GraphReviewAdjudicationRunCertificate | null>(() => {
-    const snapshot = this.fullAtlasPipeline.lastSnapshot() || this.graphRebuild.snapshot();
-    if (!snapshot) return this.manualReviewCertificate();
-    return snapshot.reviewAdjudicationCertificate
-      || this.manualReviewCertificate()
-      || buildReviewAdjudicationRunCertificate({
-        snapshot,
-        source: 'derived',
-        modelId: this.nli.modelId() || 'onnx-community/ModernBERT-base-nli',
-        modelLabel: 'ModernBERT NLI',
-        dimensionLabel: this.activeEmbeddingDimensionLabel(),
-        embeddingDimension: numericFromDimensionLabel(this.activeEmbeddingDimensionLabel()),
-      });
-  });
-  readonly reviewAdjudicationContract = computed<GraphReviewAdjudicationViewContract>(() =>
-    buildReviewAdjudicationViewContract(this.reviewAdjudicationCertificate(), {
-      modelInitialized: this.nli.isInitialized(),
-      running: this.nliReviewRunning(),
-      loading: this.activeLaneWarm() === 'nli',
-      busy: this.fullAtlasBusy() || !!this.activeLaneWarm(),
-      hasScope: this.hasRunnableBuildScope(),
-    })
-  );
-  readonly atlasControlContract = computed(() => buildAtlasControlContract({
-    snapshot: this.fullAtlasPipeline.lastSnapshot() || this.graphRebuild.snapshot(),
-    entityCount: this.registryEntities(),
-    reviewAdjudicationCertificate: this.reviewAdjudicationCertificate(),
-    reviewAdjudicationViewContract: this.reviewAdjudicationContract(),
-  }));
+  readonly reviewAdjudicationCertificate = this.atlasControl.reviewCertificate;
+  readonly reviewAdjudicationContract = this.atlasControl.reviewView;
+  readonly atlasControlContract = this.atlasControl.contract;
   readonly compilerWorkbench = computed<CompilerWorkbenchView | null>(() =>
     buildCompilerWorkbenchView(
       this.fullAtlasPipeline.lastSnapshot(),
@@ -929,6 +898,7 @@ export class SearchPanelComponent implements OnInit {
     if (this.isModernBertNliLoadDisabled()) return;
     this.error.set(null);
     this.activeLaneWarm.set('nli');
+    this.atlasControl.setNliOperationState('loading');
     try {
       await this.atlasRuntime.warmModelLane('nli', this.atlasRunOptions());
       this.notice.set('ModernBERT NLI is loaded for Stage 8 review. No graph topology was written.');
@@ -936,34 +906,23 @@ export class SearchPanelComponent implements OnInit {
       this.error.set(this.toErrorMessage(err));
     } finally {
       this.activeLaneWarm.set(null);
+      this.atlasControl.setNliOperationState('idle');
     }
   }
 
   async runModernBertNliReview(): Promise<void> {
     if (this.isModernBertNliReviewDisabled()) return;
     this.error.set(null);
-    this.nliReviewRunning.set(true);
+    this.atlasControl.setNliOperationState('running');
     try {
       const options = this.atlasRunOptions();
       const result = await this.atlasRuntime.runCapability('nliAdjudication', options);
-      const raw = asRecord(result.rawResult);
-      const snapshot = this.fullAtlasPipeline.lastSnapshot() || this.graphRebuild.snapshot();
-      const certificate = buildReviewAdjudicationRunCertificate({
-        snapshot,
-        rawResult: result.rawResult,
-        source: 'manual_stage8',
-        modelId: this.nli.modelId() || 'onnx-community/ModernBERT-base-nli',
-        modelLabel: 'ModernBERT NLI',
-        dimensionLabel: options.dimensionLabel,
-        embeddingDimension: options.embeddingDimension,
-      });
-      this.manualReviewCertificate.set(certificate);
-      this.graphRebuild.attachReviewAdjudicationCertificate(certificate);
-      const total = certificate.queue.totalReviewRows;
-      const eligible = certificate.queue.nliEligibleRows;
+      const certificate = this.atlasControl.publishReviewRun(result.rawResult);
+      const total = certificate.queue.ledgerRows;
+      const eligible = certificate.queue.nliPairRows;
       const judged = certificate.queue.judgedRows;
       const applied = certificate.queue.appliedRows;
-      const duplicate = numericField(raw, certificate.queue.duplicateRows, 'duplicateInputCount', 'duplicate_input_count');
+      const duplicate = certificate.queue.duplicatePairs;
       this.notice.set(eligible
         ? `ModernBERT review: ${eligible.toLocaleString()} NLI-eligible of ${total.toLocaleString()} review row${total === 1 ? '' : 's'}; `
           + `${judged.toLocaleString()} judged / ${applied.toLocaleString()} applied; `
@@ -979,7 +938,7 @@ export class SearchPanelComponent implements OnInit {
       ));
       this.error.set(message);
     } finally {
-      this.nliReviewRunning.set(false);
+      this.atlasControl.setNliOperationState('idle');
     }
   }
 
@@ -1772,7 +1731,7 @@ function buildStage8WorkbenchView(
       tone: routerTone,
     },
     truthReview: buildStage8TruthReviewView(truthReview, modelLabel, dimensionLabel),
-    reviewAdjudication: buildStage8ReviewAdjudicationView(reviewAdjudication, dimensionLabel, truthReview),
+    reviewAdjudication: buildStage8ReviewAdjudicationView(reviewAdjudication, truthReview),
     contract,
     lanes: [
       stage8Lane('identity', 'Identity', identityReviews, `${entityLinking?.sameEntity || 0} same / ${entityLinking?.ambiguous || 0} ambiguous`, identityReviews ? 'review' : 'quiet', 'identity'),
@@ -1792,7 +1751,6 @@ function buildStage8WorkbenchView(
 
 function buildStage8ReviewAdjudicationView(
   contract: GraphReviewAdjudicationViewContract,
-  dimensionLabel: string,
   truthReview: SemanticTruthReviewLaneState,
 ): Stage8ReviewAdjudicationView {
   if (contract.source === 'missing') {
@@ -1803,8 +1761,8 @@ function buildStage8ReviewAdjudicationView(
       eligibleDetail: '0 NLI eligible',
       excludedDetail: '0 excluded',
       judgedDetail: '0 judged / 0 applied',
-      dimensionDetail: `${dimensionLabel} / certificate pending`,
-      reasonDetail: 'run Build Graph or Run NLI to publish ReviewAdjudicationRunCertificate v1',
+      inputDetail: 'premise + hypothesis / certificate pending',
+      reasonDetail: 'run Build Graph to publish the shared review contract',
       actionLabel: contract.action.label,
       actionDisabled: contract.action.disabled,
       actionReason: contract.action.reason,
@@ -1817,7 +1775,7 @@ function buildStage8ReviewAdjudicationView(
     eligibleDetail: contract.queue.eligibleLabel,
     excludedDetail: contract.queue.excludedLabel,
     judgedDetail: contract.queue.judgedLabel,
-    dimensionDetail: `${contract.model.embeddingDimensionLabel || dimensionLabel} / ${contract.proof.dimensionContractPassed ? 'embedding contract' : 'dimension mismatch'}`,
+    inputDetail: `${contract.model.inputDetail} / ${contract.proof.inputContract.status}`,
     reasonDetail: contract.reason
       ? `${contract.reason.label}: ${formatCount(contract.reason.count)}`
       : contract.action.reason,
