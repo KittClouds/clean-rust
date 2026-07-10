@@ -21,8 +21,6 @@ import { AtlasScanCoordinatorService } from '../../../../services/atlas-scan-coo
 import type { AtlasMode } from './graph-atlas-preview/graph-atlas-preview.component';
 import type { GraphLensState } from './graph-lens';
 import { buildGraphAtlasReadContext } from './graph-atlas-preview/graph-atlas-read-context';
-import { clearRejectedSuggestionFeedback } from '../../../../lib/entity-learning/entity-feedback';
-import type { GraphOperatingRoomId } from './graph-operating-room';
 
 @Component({
     selector: 'app-graph-tab',
@@ -59,7 +57,6 @@ export class GraphTabComponent {
     styleTargetGraphNodeKind = signal<string | null>(null);
     atlasSearch = signal('');
     atlasMode = signal<AtlasMode>('graph');
-    operatingRoom = signal<GraphOperatingRoomId>('entities');
 
     // Scope state — driven by ScopeService
     scopeLabel = this.scopeService.scopeLabel;
@@ -70,7 +67,6 @@ export class GraphTabComponent {
     activeSuggestionProvider = this.nerService.activeProvider;
     suggestionError = computed(() => this.atlasScan.error() || this.nerService.errorMessage());
 
-    totalEntities = computed(() => this.entities().length);
     activeEntity = computed(() => {
         const local = this.selectedEntity();
         if (local) return local;
@@ -109,7 +105,6 @@ export class GraphTabComponent {
         return edges;
     });
     styleTargetKind = computed(() => this.styleTargetKindOverride() ?? this.activeEntity()?.kind ?? 'CHARACTER');
-    stewardContextId = computed(() => this.machineScope());
 
     // No manual registry subscription needed — entities are a computed signal
 
@@ -125,11 +120,6 @@ export class GraphTabComponent {
 
     showAtlas() {
         this.selectedEntity.set(null);
-    }
-
-    setOperatingRoom(room: GraphOperatingRoomId): void {
-        this.operatingRoom.set(room);
-        if (room === 'metrics') this.showAtlas();
     }
 
     toggleStyleDrawer(styleKey?: string | null | void) {
@@ -221,19 +211,6 @@ export class GraphTabComponent {
         }
     }
 
-    async flushRegistry() {
-        if (confirm(`Delete all ${this.totalEntities()} entities? This cannot be undone.`)) {
-            const cleared = await smartGraphRegistry.clearAll();
-            const clearedRejects = await Promise.all([
-                clearRejectedSuggestionFeedback('atlas_surface'),
-                clearRejectedSuggestionFeedback('dynamic_ner'),
-            ]);
-            if (cleared === 0 && clearedRejects.every((count) => count === 0)) return;
-            this.selectedEntity.set(null);
-            this.entitySelection.clear();
-        }
-    }
-
     async runSuggestionScan(source: 'sidebar' | 'canvas' = 'sidebar', lens?: GraphLensState) {
         if (this.atlasMode() !== 'embeddings') {
             const currentNote = this.noteStore.currentNote();
@@ -262,14 +239,6 @@ export class GraphTabComponent {
         } catch (err) {
             console.error('[GraphTab] Semantic Atlas scan failed', err);
         }
-    }
-
-    async acceptSuggestion(id: string) {
-        await this.nerService.acceptSuggestion(id);
-    }
-
-    async rejectSuggestion(id: string) {
-        await this.nerService.rejectSuggestion(id);
     }
 
     getColor(kind: string): string {

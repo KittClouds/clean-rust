@@ -23,8 +23,6 @@ const nodes: GalaxyRenderableNode[] = [
             reviewState: 'proposed',
             sourceSnippet: 'Amara crossed the archive.',
             detector: 'graph_fact',
-            reviewObjectId: 'sidecar:event:1',
-            reviewActions: ['accept_fact', 'reject_fact'],
         },
     },
 ];

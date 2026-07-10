@@ -96,6 +96,40 @@ describe('buildAtlasControlContract', () => {
             'document_review:review_ledger:review:ledger#2',
         ]);
     });
+
+    it('projects every Atlas room from declared inventories without summing review subsets', () => {
+        const contract = buildAtlasControlContract({
+            snapshot: snapshotFixture(),
+            entityCount: 50,
+            promotionCertificate: promotionCertificateFixture(),
+        });
+
+        expect(contract.roomIds).toEqual(['entities', 'structure', 'facts', 'review', 'discourse', 'metrics']);
+        expect(contract.roomsById.review.totalRows).toBe(2);
+        expect(contract.roomsById.review.visibleRows).toBe(1);
+        expect(contract.inventoryById.manual_decision_rows.totalRows).toBe(1);
+        expect(contract.inventoryById.promotion_verdict_rows.totalRows).toBe(1);
+        expect(contract.roomsById.entities).toMatchObject({ totalRows: 50, visibleRows: 0, coverage: 'none' });
+        for (const roomId of contract.roomIds) {
+            for (const rowId of contract.roomsById[roomId].rowIds) {
+                expect(contract.rowsById[rowId], `${roomId} references missing row ${rowId}`).toBeTruthy();
+            }
+        }
+    });
+
+    it('derives the Review room NLI button state from the shared pair inventory only', () => {
+        const empty = buildAtlasControlContract({ snapshot: snapshotFixture() });
+        const planned = buildAtlasControlContract({ snapshot: snapshotFixture({ nliPairRows: 12 }) });
+
+        expect(empty.roomActionsById['review:run_nli']).toMatchObject({
+            enabled: false,
+            disabledReason: 'No premise/hypothesis pairs are available for ModernBERT.',
+        });
+        expect(planned.roomActionsById['review:run_nli']).toMatchObject({
+            enabled: true,
+            disabledReason: '',
+        });
+    });
 });
 
 function card(contract: ReturnType<typeof buildAtlasControlContract>, id: string): AtlasControlCard {

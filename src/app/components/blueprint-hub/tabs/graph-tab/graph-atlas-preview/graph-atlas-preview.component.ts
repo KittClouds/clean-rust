@@ -31,7 +31,6 @@ import {
     graphCanvasInspectorRecord,
     type GraphCanvasHit,
     type GraphCanvasLens,
-    type GraphCanvasReviewRequest,
     type GraphCanvasSourceRequest,
 } from './graph-canvas-interaction';
 import {
@@ -316,12 +315,10 @@ function readPersistedAtlasViewState(): PersistedAtlasViewState {
                     <app-graph-canvas-inspector
                         [record]="canvasInspectorRecord()"
                         [batchRecords]="canvasBatchRecords()"
-                        [busy]="canvasReviewBusy"
                         (close)="closeCanvasInspector()"
                         (focusRequested)="focusCanvasNodes($event)"
                         (styleRequested)="styleRequested.emit($event)"
-                        (sourceRequested)="sourceRequested.emit($event)"
-                        (reviewRequested)="reviewRequested.emit($event)">
+                        (sourceRequested)="sourceRequested.emit($event)">
                     </app-graph-canvas-inspector>
                     @if (!canvasInspectorRecord() && canvasBatchRecords().length === 0 && canvasHoverRecord(); as hover) {
                     <div class="pointer-events-none absolute bottom-20 left-4 z-30 max-w-[320px] border border-teal-300/20 bg-black/75 px-3 py-2 text-xs shadow-2xl backdrop-blur">
@@ -1007,7 +1004,6 @@ export class GraphAtlasPreviewComponent implements OnInit, OnDestroy {
     }
     @Input() atlasSearch = '';
     @Input() isScanning = false;
-    @Input() canvasReviewBusy = false;
     @Input() activeProvider: EntitySuggestionProviderId | null = null;
     @Output() entitySelected = new EventEmitter<RegisteredEntity>();
     @Output() addEntityRequested = new EventEmitter<void>();
@@ -1016,7 +1012,6 @@ export class GraphAtlasPreviewComponent implements OnInit, OnDestroy {
     @Output() atlasModeChange = new EventEmitter<AtlasMode>();
     @Output() lensModeChange = new EventEmitter<GraphLensMode>();
     @Output() atlasSearchChange = new EventEmitter<string>();
-    @Output() reviewRequested = new EventEmitter<GraphCanvasReviewRequest>();
     @Output() sourceRequested = new EventEmitter<GraphCanvasSourceRequest>();
     @ViewChild('galaxyCanvas') private galaxyCanvas?: GraphGalaxyCanvasComponent;
 

@@ -39,7 +39,13 @@ describe('AtlasControlContractService', () => {
         injector = createEnvironmentInjector([
             { provide: GraphRebuildService, useValue: graphRebuild },
             { provide: NliWorkerService, useValue: nli },
-            { provide: PhoenixProjectionService, useValue: { entityCount: computed(() => 50) } },
+            {
+                provide: PhoenixProjectionService,
+                useValue: {
+                    entityCount: computed(() => 50),
+                    entities: computed(() => []),
+                },
+            },
         ], parent);
         owner = runInInjectionContext(injector, () => new AtlasControlContractService());
     });

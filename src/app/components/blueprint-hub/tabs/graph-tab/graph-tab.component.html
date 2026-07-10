@@ -4,25 +4,14 @@
 
     <app-graph-entity-sidebar
         [entities]="entities()"
-        [suggestions]="suggestions()"
         [selectedEntity]="activeEntity()"
-        [linkCount]="atlasEdges().length"
-        [lensMode]="graphLensMode()"
-        [isScanning]="isScanningSuggestions()"
-        [scanError]="suggestionError()"
-        [contextId]="stewardContextId()"
         [searchText]="atlasSearch()"
         (entitySelected)="selectEntity($event)"
         (editEntityRequested)="editEntity($event)"
         (deleteEntityRequested)="deleteEntityFromSidebar($event)"
         (addEntityRequested)="openCreator()"
-        (flushRequested)="flushRegistry()"
-        (acceptSuggestionRequested)="acceptSuggestion($event)"
-        (rejectSuggestionRequested)="rejectSuggestion($event)"
         (styleRequested)="toggleStyleDrawer()"
-        (searchTextChange)="atlasSearch.set($event)"
-        (lensModeChange)="graphLensMode.set($event)"
-        (operatingRoomChange)="setOperatingRoom($event)">
+        (searchTextChange)="atlasSearch.set($event)">
     </app-graph-entity-sidebar>
 
     <main class="relative z-10 flex min-w-0 flex-1 flex-col">
@@ -55,7 +44,6 @@
             <div class="h-full min-h-[560px] w-full">
                 <app-graph-lens-workspace class="block h-full min-h-[560px]" [narrativeEntities]="entities()" [narrativeEdges]="atlasEdges()"
                     [lensMode]="graphLensMode()"
-                    [operatingRoom]="operatingRoom()"
                     [atlasSearch]="atlasSearch()"
                     [isScanning]="isScanningSuggestions()"
                     [activeProvider]="activeSuggestionProvider()"

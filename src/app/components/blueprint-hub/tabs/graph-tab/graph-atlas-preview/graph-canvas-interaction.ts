@@ -2,7 +2,6 @@ import type { GalaxyInputEdge, GalaxyQueryFocus, GalaxyRenderableNode } from './
 
 export type GraphCanvasLens = 'entities' | 'structure' | 'facts' | 'discourse' | 'accepted' | 'proposed';
 export type GraphCanvasObjectKind = 'node' | 'edge' | 'cluster';
-export type GraphCanvasReviewDecision = 'accepted' | 'rejected' | 'muted' | 'promoted_to_anchor';
 
 export interface GraphCanvasNodeHit {
     kind: 'node';
@@ -24,11 +23,6 @@ export interface GraphCanvasClusterHit {
 }
 
 export type GraphCanvasHit = GraphCanvasNodeHit | GraphCanvasEdgeHit | GraphCanvasClusterHit;
-
-export interface GraphCanvasReviewRequest {
-    objectIds: string[];
-    decision: GraphCanvasReviewDecision;
-}
 
 export interface GraphCanvasSourceRequest {
     noteId: string;
@@ -55,8 +49,6 @@ export interface GraphCanvasInspectorRecord {
     members: Array<{ id: string; label: string; kind: string }>;
     graphImpact: string;
     styleKey: string;
-    reviewObjectIds: string[];
-    reviewActions: string[];
     focusNodeIds: string[];
 }
 
@@ -180,8 +172,6 @@ function nodeRecord(node: GalaxyRenderableNode): GraphCanvasInspectorRecord {
         members: [],
         graphImpact: metadataString(metadata, 'graphImpact'),
         styleKey: styleKeyForMetadata(metadata, node.kind),
-        reviewObjectIds: metadataString(metadata, 'reviewObjectId') ? [metadataString(metadata, 'reviewObjectId')] : [],
-        reviewActions: metadataStrings(metadata, 'reviewActions'),
         focusNodeIds: [node.id],
     };
 }
@@ -212,8 +202,6 @@ function edgeRecord(
         members: [source, target].filter(isNode).map((node) => ({ id: node.id, label: node.label, kind: node.kind })),
         graphImpact: metadataString(metadata, 'graphImpact') || 'Connects two inspectable graph objects.',
         styleKey: styleKeyForMetadata(metadata, edge.type),
-        reviewObjectIds: metadataString(metadata, 'reviewObjectId') ? [metadataString(metadata, 'reviewObjectId')] : [],
-        reviewActions: metadataStrings(metadata, 'reviewActions'),
         focusNodeIds: [edge.sourceId, edge.targetId],
     };
 }
@@ -240,8 +228,6 @@ function clusterRecord(hit: GraphCanvasClusterHit, members: GalaxyRenderableNode
         members: members.map((node) => ({ id: node.id, label: node.label, kind: node.kind })),
         graphImpact: 'Groups objects that share a detected semantic region.',
         styleKey: styleKeyForMetadata(lead, members[0]?.kind || ''),
-        reviewObjectIds: unique(members.map((node) => metadataString(node.metadata, 'reviewObjectId')).filter(Boolean)),
-        reviewActions: unique(members.flatMap((node) => metadataStrings(node.metadata, 'reviewActions'))),
         focusNodeIds: hit.nodeIds,
     };
 }

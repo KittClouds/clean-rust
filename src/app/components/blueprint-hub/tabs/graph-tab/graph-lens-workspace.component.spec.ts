@@ -56,12 +56,10 @@ describe('GraphLensWorkspaceComponent read-only snapshot loading', () => {
     let component: GraphLensWorkspaceComponent;
     let effectScheduler: ReturnType<typeof createImmediateEffectScheduler>;
     let snapshotToLoad: any;
-    let receiptToLoad: any;
 
     beforeEach(() => {
         settingsMock.store.clear();
         snapshotToLoad = null;
-        receiptToLoad = null;
         graphRebuild = createGraphRebuildMock();
         effectScheduler = createImmediateEffectScheduler();
         latestEffectScheduler = effectScheduler;
@@ -107,32 +105,6 @@ describe('GraphLensWorkspaceComponent read-only snapshot loading', () => {
         expect(graphRebuild.buildAndPersistSnapshot).not.toHaveBeenCalled();
     });
 
-    it('projects snapshot chunks and accepted anchors into the graph inventory', async () => {
-        snapshotToLoad = sampleSnapshot();
-
-        await flushAsync();
-
-        const inventory = component.graphRebuildInventory();
-        expect(inventory.nodes.map((node) => node.id)).toEqual(expect.arrayContaining([
-            'e-kai',
-            'chunk:note-1:chunk:0',
-        ]));
-        expect(inventory.edges.map((edge) => edge.id)).toEqual(expect.arrayContaining([
-            'anchor:a-kai',
-        ]));
-        expect(inventory.kindCounts).toContainEqual({ kind: 'leaf_chunk', count: 1 });
-    });
-
-    it('hydrates the evaluation dashboard receipt with the persisted snapshot', async () => {
-        snapshotToLoad = sampleSnapshot();
-        receiptToLoad = { id: 'run-1', durationMs: 1800 };
-
-        await flushAsync();
-
-        expect(graphRebuild.loadPersistedRunReceipt).toHaveBeenCalledWith('global');
-        expect(component.graphIndexReceipt()).toEqual(receiptToLoad);
-    });
-
     it('hydrates the lens from Dexie settings and persists later scope changes', async () => {
         settingsMock.store.set('graph.lens.state.v1', {
             mode: 'multiNote',
@@ -167,7 +139,6 @@ describe('GraphLensWorkspaceComponent read-only snapshot loading', () => {
     function createGraphRebuildMock() {
         return {
             loadPersistedSnapshot: vi.fn(async () => snapshotToLoad),
-            loadPersistedRunReceipt: vi.fn(async () => receiptToLoad),
             buildAndPersistSnapshot: vi.fn(async () => null),
         };
     }
@@ -214,58 +185,4 @@ async function flushAsync(): Promise<void> {
     await Promise.resolve();
     latestEffectScheduler?.flush();
     await Promise.resolve();
-}
-
-function sampleSnapshot() {
-    return {
-        schemaVersion: 'phoenix-graph-rebuild/v1',
-        id: 'snapshot-1',
-        source: 'phoenix-graph-rebuild',
-        scopeKind: 'global',
-        scopeId: 'global',
-        noteIds: ['note-1'],
-        builtAt: 1,
-        chunks: [
-            { id: 'note-1:chunk:0', noteId: 'note-1', start: 0, end: 40, ordinal: 0, source: 'dynamic-chunking' },
-        ],
-        mentions: [],
-        entityAnchors: [
-            {
-                id: 'a-kai',
-                noteId: 'note-1',
-                chunkId: 'note-1:chunk:0',
-                surface: 'Kai',
-                sourceStart: 0,
-                sourceEnd: 3,
-                source: 'accepted_suggestion',
-                confidence: 0.91,
-                entityId: 'e-kai',
-                status: 'accepted',
-                generation: 1,
-            },
-        ],
-        relationships: [],
-        events: [],
-        episodes: [],
-        temporalEdges: [],
-        causalEdges: [],
-        memoryState: [],
-        embeddingTargets: [],
-        embeddingVectors: [],
-        projectionRefs: [],
-        nodes: [
-            {
-                id: 'e-kai',
-                entityId: 'e-kai',
-                label: 'Kai',
-                kind: 'CHARACTER',
-                aliases: [],
-                anchorIds: ['a-kai'],
-                noteIds: ['note-1'],
-                totalMentions: 1,
-            },
-        ],
-        edges: [],
-        counters: null,
-    };
 }

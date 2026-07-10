@@ -58,6 +58,7 @@ export class AtlasControlContractService {
 
     readonly contract = computed<AtlasControlContract>(() => buildAtlasControlContract({
         snapshot: this.snapshot(),
+        entities: this.projection.entities(),
         entityCount: this.projection.entityCount(),
         reviewAdjudicationCertificate: this.reviewCertificate(),
         reviewAdjudicationViewContract: this.reviewView(),

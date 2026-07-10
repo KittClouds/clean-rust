@@ -6,16 +6,13 @@ import type { RegisteredEntity } from '../../../../lib/registry';
 import { db } from '../../../../lib/dexie/db';
 import { PhoenixProjectionService } from '../../../../services/phoenix-projection.service';
 import { GraphRebuildService } from '../../../../graph-rebuild/graph-rebuild.service';
-import type { GraphIndexRunReceipt, GraphRebuildSnapshot } from '../../../../graph-rebuild/graph-rebuild-snapshot';
-import { applyGraphDocumentReviewDecisionToSnapshot } from '../../../../graph-rebuild/graph-document-review-snapshot';
+import type { GraphRebuildSnapshot } from '../../../../graph-rebuild/graph-rebuild-snapshot';
 import { NoteEditorStore } from '../../../../lib/store/note-editor.store';
 import { EditorService } from '../../../../services/editor.service';
 import { BlueprintHubService } from '../../blueprint-hub.service';
 import { GraphAtlasPreviewComponent, type AtlasMode, type AtlasPreviewEdge } from './graph-atlas-preview/graph-atlas-preview.component';
 import { buildGraphCanvasInventory } from './graph-atlas-preview/graph-canvas-inventory';
-import type { GraphCanvasReviewRequest, GraphCanvasSourceRequest } from './graph-atlas-preview/graph-canvas-interaction';
-import { GraphEvaluationDashboardComponent } from './graph-evaluation-dashboard.component';
-import type { GraphOperatingRoomId } from './graph-operating-room';
+import type { GraphCanvasSourceRequest } from './graph-atlas-preview/graph-canvas-interaction';
 import type { EntitySuggestionProviderId } from '../../../../lib/entity-suggestions/entity-suggestion.types';
 import { getSetting, setSetting } from '../../../../lib/dexie/settings.service';
 import {
@@ -47,7 +44,7 @@ function readPersistedGraphLensState(): GraphLensState {
 @Component({
     selector: 'app-graph-lens-workspace',
     standalone: true,
-    imports: [CommonModule, FormsModule, GraphAtlasPreviewComponent, GraphEvaluationDashboardComponent],
+    imports: [CommonModule, FormsModule, GraphAtlasPreviewComponent],
     template: `
         <div class="flex h-full min-h-[560px] flex-col gap-0">
             @if (usesNotes()) {
@@ -85,19 +82,12 @@ function readPersistedGraphLensState(): GraphLensState {
             </section>
             }
 
-            @if (graphSnapshotStale() && operatingRoom !== 'metrics') {
+            @if (graphSnapshotStale()) {
             <section class="shrink-0 rounded-xl border border-amber-400/15 bg-amber-500/5 px-3 py-2 text-xs font-semibold text-amber-100">
                 Latest anchors changed. The atlas view is stale until Build Full Atlas runs again.
             </section>
             }
 
-            @if (operatingRoom === 'metrics') {
-            <app-graph-evaluation-dashboard class="block min-h-0 flex-1"
-                [snapshot]="graphRebuildSnapshot()"
-                [receipt]="graphIndexReceipt()"
-                [stale]="graphSnapshotStale()">
-            </app-graph-evaluation-dashboard>
-            } @else {
             <app-graph-atlas-preview class="block min-h-0 flex-1"
                 [entities]="lensedGraph().entities"
                 [edges]="lensedGraph().edges"
@@ -111,18 +101,15 @@ function readPersistedGraphLensState(): GraphLensState {
                 [atlasSearch]="atlasSearch"
                 [isScanning]="isScanning"
                 [activeProvider]="activeProvider"
-                [canvasReviewBusy]="canvasReviewBusy()"
                 (entitySelected)="entitySelected.emit($event)"
                 (addEntityRequested)="addEntityRequested.emit()"
                 (scanRequested)="scanRequested.emit(lens())"
                 (styleRequested)="styleRequested.emit($event)"
                 (atlasModeChange)="atlasModeChange.emit($event)"
                 (atlasSearchChange)="atlasSearchChange.emit($event)"
-                (reviewRequested)="handleCanvasReview($event)"
                 (sourceRequested)="jumpToCanvasSource($event)"
                 (lensModeChange)="setLensMode($event)">
             </app-graph-atlas-preview>
-            }
         </div>
     `,
 })
@@ -135,14 +122,12 @@ export class GraphLensWorkspaceComponent implements OnDestroy {
     private readonly narrativeEntitiesSignal = signal<RegisteredEntity[]>([]);
     private readonly narrativeEdgesSignal = signal<AtlasPreviewEdge[]>([]);
     private readonly graphRebuildSnapshotSignal = signal<GraphRebuildSnapshot | null>(null);
-    private readonly graphIndexReceiptSignal = signal<GraphIndexRunReceipt | null>(null);
     private readonly graphSnapshotStaleSignal = signal(false);
     private readonly memberships = signal<GraphLensMembership[]>([]);
     private membershipToken = 0;
     private noteToken = 0;
     private graphSnapshotLoadToken = 0;
     private removeAnchorListeners: (() => void) | null = null;
-    readonly canvasReviewBusy = signal(false);
 
     @Input() set narrativeEntities(value: RegisteredEntity[] | null | undefined) {
         this.narrativeEntitiesSignal.set(value ?? []);
@@ -159,7 +144,6 @@ export class GraphLensWorkspaceComponent implements OnDestroy {
     }
 
     @Input() atlasSearch = '';
-    @Input() operatingRoom: GraphOperatingRoomId = 'entities';
     @Input() isScanning = false;
     @Input() activeProvider: EntitySuggestionProviderId | null = null;
     @Input() set candidateCount(value: number | null | undefined) {
@@ -205,7 +189,6 @@ export class GraphLensWorkspaceComponent implements OnDestroy {
     readonly graphRebuildInventory = computed(() => buildGraphCanvasInventory(this.graphRebuildSnapshotSignal()));
     readonly graphRebuildCounters = computed(() => this.graphRebuildSnapshotSignal()?.counters ?? null);
     readonly graphRebuildSnapshot = computed(() => this.graphRebuildSnapshotSignal());
-    readonly graphIndexReceipt = computed(() => this.graphIndexReceiptSignal());
     readonly graphSnapshotStale = computed(() => this.graphSnapshotStaleSignal());
     readonly filteredNotes = computed(() => {
         const query = this.noteQuery().trim().toLowerCase();
@@ -282,23 +265,6 @@ export class GraphLensWorkspaceComponent implements OnDestroy {
         this.persistLensState();
     }
 
-    async handleCanvasReview(request: GraphCanvasReviewRequest): Promise<void> {
-        if (this.canvasReviewBusy()) return;
-        const next = applyGraphDocumentReviewDecisionToSnapshot(
-            this.graphRebuildSnapshotSignal(),
-            request.objectIds,
-            request.decision,
-        );
-        if (!next) return;
-        this.canvasReviewBusy.set(true);
-        try {
-            await this.graphRebuild.restorePersistedSnapshot(next);
-            this.graphRebuildSnapshotSignal.set(next);
-        } finally {
-            this.canvasReviewBusy.set(false);
-        }
-    }
-
     async jumpToCanvasSource(request: GraphCanvasSourceRequest): Promise<void> {
         await this.noteEditor.openNote(request.noteId);
         this.hub.close();
@@ -343,16 +309,9 @@ export class GraphLensWorkspaceComponent implements OnDestroy {
         const token = ++this.graphSnapshotLoadToken;
         const normalized = normalizeGraphLensForBuild(lens);
         try {
-            const receiptPromise = typeof this.graphRebuild.loadPersistedRunReceipt === 'function'
-                ? this.graphRebuild.loadPersistedRunReceipt(normalized.scopeId)
-                : Promise.resolve(null);
-            const [snapshot, receipt] = await Promise.all([
-                this.graphRebuild.loadPersistedSnapshot(normalized.scopeId),
-                receiptPromise,
-            ]);
+            const snapshot = await this.graphRebuild.loadPersistedSnapshot(normalized.scopeId);
             if (token === this.graphSnapshotLoadToken) {
                 this.graphRebuildSnapshotSignal.set(snapshot);
-                this.graphIndexReceiptSignal.set(receipt);
                 this.graphSnapshotStaleSignal.set(false);
             }
         } catch (error) {

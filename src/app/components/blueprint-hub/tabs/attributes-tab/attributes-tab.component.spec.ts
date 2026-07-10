@@ -13,33 +13,17 @@ describe('AttributesTabComponent', () => {
         expect(template).toContain('Atlas Control');
         expect(template).toContain('atlas-workflow-strip');
         expect(template).toContain('workflowSteps');
-        expect(template).toContain('reviewAdjudicationContract');
-        expect(template).toContain('Memory Governance');
-        expect(template).toContain('runtimeDiagnostics');
-        expect(template).toContain('Candidate decisions');
-        expect(template).toContain('User pin source locked');
-        expect(template).toContain('Compression bounded');
-        expect(template).toContain('protected pins');
-        expect(template).toContain('full proof rows');
-        expect(template).toContain('bounded compression rows');
-        expect(template).toContain('candidateRows');
-        expect(template).toContain('Promotion Cockpit');
-        expect(template).toContain('Candidate -> accepted truth');
-        expect(template).toContain('Proposed atom');
-        expect(template).toContain('promotionTruthMeta');
-        expect(template).toContain('Receipt gated');
-        expect(template).toContain('rollback plans');
-        expect(template).toContain('Witness count');
-        expect(template).toContain('Temporal / causal fit');
-        expect(template).toContain('NLI fit');
-        expect(template).toContain('User override');
-        expect(template).toContain('No durable proposal receipt verdicts');
-        expect(template).toContain('Waiting for receipts');
-        expect(template).toContain('Attention Required');
-        expect(template).toContain('Exception lanes');
-        expect(template).toContain('Negative Relation Audit');
         expect(template).toContain('<app-search-panel');
-        expect(template).toContain('<app-graph-entity-sidebar');
+        expect(template).toContain('<app-atlas-control-rooms');
+        expect(template).toContain('[contract]="atlasControlContract()"');
+        expect(template).toContain('(actionRequested)="dispatchRoomAction($event)"');
+        expect(template).toContain('(roomChange)="setOperatingRoom($event)"');
+
+        expect(template).not.toContain('reviewAdjudicationContract');
+        expect(template).not.toContain('reviewDeck()');
+        expect(template).not.toContain('Promotion Cockpit');
+        expect(template).not.toContain('atlas-governance-queue');
+        expect(template).not.toContain('<app-graph-entity-sidebar');
     });
 
     it('replaces the hub placeholder for the attributes route', () => {

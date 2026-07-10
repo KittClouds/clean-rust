@@ -88,7 +88,10 @@ describe('SearchPanelComponent model recipe lifecycle', () => {
             { provide: PhoenixBackendService, useValue: phoenix },
             { provide: GraphRebuildPipelineService, useValue: fullAtlasPipeline },
             { provide: GraphRebuildService, useValue: graphRebuild },
-            { provide: PhoenixProjectionService, useValue: { entityCount: computed(() => 50) } },
+            { provide: PhoenixProjectionService, useValue: {
+                entities: computed(() => []),
+                entityCount: computed(() => 50),
+            } },
             { provide: CalendarService, useValue: createCalendarMock() },
             AtlasCapabilityRuntimeService,
             AtlasControlContractService,

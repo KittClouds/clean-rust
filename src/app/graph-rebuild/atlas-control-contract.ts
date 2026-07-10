@@ -1,17 +1,11 @@
-import type {
-    GraphDocumentReviewActionKind,
-    GraphDocumentReviewRow,
-} from './graph-document-review';
 import {
     buildGovernanceRunCertificate,
     type GraphGovernanceRunCertificate,
 } from './graph-governance-run-certificate';
 import type {
     GraphPromotionVerdictCertificate,
-    GraphPromotionVerdictRow,
 } from './graph-promotion-verdict';
 import type {
-    GraphMemoryGovernanceCandidate,
     GraphRebuildSnapshot,
 } from './graph-rebuild-snapshot';
 import {
@@ -21,6 +15,13 @@ import {
     type GraphReviewAdjudicationViewContract,
     type GraphReviewProofState,
 } from './graph-review-adjudication-certificate';
+import {
+    buildAtlasControlRooms,
+    type AtlasControlRoom,
+    type AtlasControlRoomActionDescriptor,
+    type AtlasControlRoomId,
+} from './atlas-control-room-contract';
+import { buildAtlasControlRows } from './atlas-control-rows';
 
 export const ATLAS_CONTROL_CONTRACT_SCHEMA_VERSION = 'phoenix-atlas-control-contract/v2' as const;
 
@@ -113,7 +114,10 @@ export type AtlasControlAction =
     | 'demote_to_sidecar'
     | 'mute_pattern'
     | 'compile_to_graph'
-    | 'preview_promotion';
+    | 'preview_promotion'
+    | 'add_entity'
+    | 'edit_entity'
+    | 'delete_entity';
 
 export type AtlasControlTone = 'ready' | 'review' | 'warning' | 'danger' | 'quiet';
 export type AtlasControlReceiptKind =
@@ -147,6 +151,21 @@ export interface AtlasControlRow {
     allowedActions: AtlasControlAction[];
     receiptPolicy: AtlasControlReceiptPolicy;
     receiptIds: string[];
+    noteId: string | null;
+    sourceStart: number | null;
+    sourceEnd: number | null;
+    sourceIds: string[];
+    targetIds: string[];
+    entityIds: string[];
+    evidenceIds: string[];
+    tags: string[];
+}
+
+export interface AtlasControlEntityInput {
+    id: string;
+    label: string;
+    kind: string;
+    aliases?: string[];
 }
 
 export interface AtlasControlInventoryCategory {
@@ -207,6 +226,9 @@ export interface AtlasControlContract {
     rowsById: Record<string, AtlasControlRow>;
     inventory: AtlasControlInventoryCategory[];
     inventoryById: Record<AtlasControlInventoryCategoryId, AtlasControlInventoryCategory>;
+    roomIds: AtlasControlRoomId[];
+    roomsById: Record<AtlasControlRoomId, AtlasControlRoom>;
+    roomActionsById: Record<string, AtlasControlRoomActionDescriptor>;
     invariants: {
         typedRowIdentities: AtlasControlInvariant;
         exactInventory: AtlasControlInvariant;
@@ -224,6 +246,7 @@ export interface AtlasControlContract {
 
 export interface BuildAtlasControlContractInput {
     snapshot: GraphRebuildSnapshot | null;
+    entities?: AtlasControlEntityInput[];
     entityCount?: number;
     edgeCount?: number;
     reviewAdjudicationCertificate?: GraphReviewAdjudicationRunCertificate | null;
@@ -262,7 +285,7 @@ export function buildAtlasControlContract(input: BuildAtlasControlContractInput)
         snapshot?.memoryGovernanceCandidates?.length,
     );
     const promotionCount = nonNegative(promotion?.audit.total, counters['promotionVerdictRows']);
-    const rows = buildTypedRows(snapshotId, snapshot, reviewCertificate, promotion);
+    const rows = buildAtlasControlRows(snapshotId, snapshot, reviewCertificate, promotion, input.entities ?? []);
     const inventory = buildInventory({
         rows,
         entityCount,
@@ -283,7 +306,16 @@ export function buildAtlasControlContract(input: BuildAtlasControlContractInput)
     const workflow = buildWorkflow(inventoryById, review, governance, promotion);
     const sections = buildSections(inventoryById, review, governance, promotion);
     const allCards = [...header, ...workflow, ...sections.flatMap((section) => section.cards)];
+    const cardsById = Object.fromEntries(allCards.map((item) => [item.id, item]));
+    const rowsById = Object.fromEntries(rows.map((item) => [item.identity.id, item]));
     const invariants = buildInvariants(snapshot, rows, inventory, reviewCertificate, governance, promotion);
+    const roomProjection = buildAtlasControlRooms({
+        snapshotAvailable: !!snapshot,
+        inventoryById,
+        cardsById,
+        rowsById,
+        invariants,
+    });
 
     return {
         schemaVersion: ATLAS_CONTROL_CONTRACT_SCHEMA_VERSION,
@@ -293,97 +325,16 @@ export function buildAtlasControlContract(input: BuildAtlasControlContractInput)
         header,
         workflow,
         sections,
-        cardsById: Object.fromEntries(allCards.map((item) => [item.id, item])),
+        cardsById,
         rows,
-        rowsById: Object.fromEntries(rows.map((item) => [item.identity.id, item])),
+        rowsById,
         inventory,
         inventoryById,
+        roomIds: roomProjection.roomIds,
+        roomsById: roomProjection.roomsById,
+        roomActionsById: roomProjection.actionsById,
         invariants,
         certificates: { reviewAdjudication: review, governance, promotion },
-    };
-}
-
-function buildTypedRows(
-    snapshotId: string,
-    snapshot: GraphRebuildSnapshot | null,
-    review: GraphReviewAdjudicationRunCertificate | null,
-    promotion: GraphPromotionVerdictCertificate | null,
-): AtlasControlRow[] {
-    const rows: AtlasControlRow[] = [];
-    for (const row of snapshot?.documentReviewSummary?.rows ?? []) rows.push(documentReviewRow(snapshotId, row));
-    for (const row of review?.rows ?? []) {
-        rows.push(typedRow(snapshotId, 'review_adjudication', 'nli_judgment', row.id, 'nli_judgment',
-            `${row.sourceId} -> ${row.targetId}`, `${row.edgeType}: ${row.label}`, row.label,
-            row.confidence, [], noReceipt(), []));
-    }
-    for (const row of snapshot?.memoryGovernanceCandidates ?? []) rows.push(governanceRow(snapshotId, row));
-    for (const row of promotion?.rows ?? []) rows.push(promotionRow(snapshotId, row));
-    return uniquifyRows(rows);
-}
-
-function documentReviewRow(snapshotId: string, row: GraphDocumentReviewRow): AtlasControlRow {
-    const actions = unique(row.availableActions.map((action) => reviewAction(action.kind)).filter(isAction));
-    const manual = row.availableActions.some((action) => action.requiresUserIntent);
-    return typedRow(
-        snapshotId,
-        'document_review',
-        manual ? 'manual_decision' : 'review_ledger',
-        row.id,
-        row.objectKind,
-        row.title,
-        row.detail,
-        row.state,
-        row.confidence,
-        actions,
-        manual ? receipt('document_review_action_receipt', true, false) : noReceipt(),
-        row.receiptIds,
-    );
-}
-
-function governanceRow(snapshotId: string, row: GraphMemoryGovernanceCandidate): AtlasControlRow {
-    return typedRow(snapshotId, 'memory_governance', 'governance_candidate', row.id, row.targetKind,
-        row.targetId, row.reason, row.action, row.confidence, ['inspect'], noReceipt(), []);
-}
-
-function promotionRow(snapshotId: string, row: GraphPromotionVerdictRow): AtlasControlRow {
-    return typedRow(snapshotId, 'promotion_verdict', 'promotion_verdict', row.id, row.family,
-        promotionLabel(row), row.rationale, row.status, row.deterministicScoreMillis == null
-            ? null
-            : row.deterministicScoreMillis / 1000,
-        ['preview_promotion'], receipt('promotion_proposal_receipt', row.rollbackPlan.availableAfterCommit, true),
-        row.receiptId ? [row.receiptId] : []);
-}
-
-function typedRow(
-    snapshotId: string,
-    sourceContract: AtlasControlSourceContract,
-    lane: AtlasControlLane,
-    rawId: string,
-    kind: string,
-    label: string,
-    detail: string,
-    state: string,
-    confidence: number | null,
-    allowedActions: AtlasControlAction[],
-    receiptPolicy: AtlasControlReceiptPolicy,
-    receiptIds: string[],
-): AtlasControlRow {
-    return {
-        identity: {
-            id: `${sourceContract}:${lane}:${rawId || 'missing-id'}`,
-            rawId: rawId || 'missing-id',
-            snapshotId,
-            sourceContract,
-            lane,
-            kind,
-        },
-        label,
-        detail,
-        state,
-        confidence,
-        allowedActions,
-        receiptPolicy,
-        receiptIds: [...receiptIds],
     };
 }
 
@@ -401,13 +352,16 @@ function buildInventory(input: {
     promotionCount: number;
 }): AtlasControlInventoryCategory[] {
     const laneRows = (lane: AtlasControlLane) => input.rows.filter((row) => row.identity.lane === lane);
+    const topologyRows = laneRows('graph_topology');
+    const entityRows = topologyRows.filter((row) => row.identity.kind.startsWith('entity:'));
+    const edgeRows = topologyRows.filter((row) => row.identity.kind.startsWith('edge:'));
     return [
-        inventory('entities', 'Entities', 'graph', 'graph_topology', 'graph_build', input.entityCount, [], 'inspect_only', ['inspect'], noReceipt()),
-        inventory('graph_edges', 'Graph edges', 'graph', 'graph_topology', 'graph_build', input.edgeCount, [], 'inspect_only', ['inspect'], noReceipt()),
+        inventory('entities', 'Entities', 'graph', 'graph_topology', 'graph_build', input.entityCount, entityRows, 'inspect_only', ['inspect'], noReceipt()),
+        inventory('graph_edges', 'Graph edges', 'graph', 'graph_topology', 'graph_build', input.edgeCount, edgeRows, 'inspect_only', ['inspect'], noReceipt()),
         inventory('retrieval_targets', 'Retrieval targets', 'graph', 'graph_topology', 'graph_build', input.targetCount, [], 'inspect_only', ['inspect'], noReceipt()),
-        inventory('structure_rows', 'Structure rows', 'structure', 'structure_ledger', 'graph_build', input.structureRows, [], 'inspect_only', ['inspect'], noReceipt()),
-        inventory('fact_rows', 'Fact rows', 'facts', 'fact_ledger', 'document_review', input.factRows, [], 'inspect_only', ['inspect'], noReceipt()),
-        inventory('discourse_rows', 'Discourse rows', 'discourse', 'discourse_ledger', 'graph_build', input.discourseRows, [], 'inspect_only', ['inspect'], noReceipt()),
+        inventory('structure_rows', 'Structure rows', 'structure', 'structure_ledger', 'graph_build', input.structureRows, laneRows('structure_ledger'), 'inspect_only', ['inspect'], noReceipt()),
+        inventory('fact_rows', 'Fact rows', 'facts', 'fact_ledger', 'document_review', input.factRows, laneRows('fact_ledger'), 'inspect_only', ['inspect'], noReceipt()),
+        inventory('discourse_rows', 'Discourse rows', 'discourse', 'discourse_ledger', 'graph_build', input.discourseRows, laneRows('discourse_ledger'), 'inspect_only', ['inspect'], noReceipt()),
         inventory('review_ledger_rows', 'Review ledger rows', 'review', 'review_ledger', 'document_review', input.review.queue.ledgerRows, laneRows('review_ledger'), 'inspect_only', ['inspect'], noReceipt()),
         inventory('manual_decision_rows', 'Manual decision rows', 'review', 'manual_decision', 'document_review', input.review.queue.manualDecisionRows, laneRows('manual_decision'), input.review.queue.manualDecisionRows ? 'manual_receipt' : 'none', manualActions(input.rows), receipt('document_review_action_receipt', true, false)),
         inventory('nli_pair_rows', 'NLI pair rows', 'review', 'nli_pair', 'review_adjudication', input.review.queue.nliPairRows, [], input.review.action.disabled ? 'none' : 'model_run', input.review.action.disabled ? [] : ['run_nli'], receipt('review_adjudication_run_certificate', false, false)),
@@ -415,7 +369,7 @@ function buildInventory(input: {
         inventory('nli_judgment_rows', 'NLI judgment rows', 'review', 'nli_judgment', 'review_adjudication', input.review.queue.judgedRows, laneRows('nli_judgment'), 'inspect_only', ['inspect'], noReceipt()),
         inventory('governance_candidate_rows', 'Governance candidates', 'governance', 'governance_candidate', 'memory_governance', input.governanceCount, laneRows('governance_candidate'), 'inspect_only', ['inspect'], noReceipt()),
         inventory('promotion_verdict_rows', 'Promotion verdicts', 'promotion', 'promotion_verdict', 'promotion_verdict', input.promotionCount, laneRows('promotion_verdict'), input.promotionCount ? 'promotion_preview' : 'none', input.promotionCount ? ['preview_promotion'] : [], receipt('promotion_proposal_receipt', true, true)),
-        inventory('metrics_rows', 'Metric rows', 'metrics', 'metrics_ledger', 'metrics', input.metricsRows, [], 'inspect_only', ['inspect'], noReceipt()),
+        inventory('metrics_rows', 'Metric rows', 'metrics', 'metrics_ledger', 'metrics', input.metricsRows, laneRows('metrics_ledger'), 'inspect_only', ['inspect'], noReceipt()),
     ];
 }
 
@@ -608,43 +562,6 @@ function manualActions(rows: AtlasControlRow[]): AtlasControlAction[] {
     return unique(rows.filter((row) => row.identity.lane === 'manual_decision').flatMap((row) => row.allowedActions));
 }
 
-function reviewAction(kind: GraphDocumentReviewActionKind): AtlasControlAction | null {
-    const actions: Record<GraphDocumentReviewActionKind, AtlasControlAction> = {
-        accept_fact: 'accept_review_row',
-        reject_fact: 'reject_review_row',
-        promote_sidecar_to_anchor: 'promote_to_anchor',
-        merge_duplicate_units: 'merge_duplicates',
-        demote_graph_fact_to_sidecar: 'demote_to_sidecar',
-        mute_detector_pattern: 'mute_pattern',
-        jump_to_source_span: 'jump_to_source',
-        inspect_evidence_path: 'inspect',
-        compare_parent_child_context: 'compare_context',
-        show_proposal_reason: 'show_reason',
-        compile_to_graph: 'compile_to_graph',
-    };
-    return actions[kind] ?? null;
-}
-
-function promotionLabel(row: GraphPromotionVerdictRow): string {
-    const truth = row.truth;
-    if (truth.subject || truth.predicate || truth.object) {
-        return [truth.subject, truth.predicate, truth.object].filter(Boolean).join(' -> ');
-    }
-    if (row.atom?.kind === 'edge') return `${row.atom.source_id} -> ${row.atom.edge_type} -> ${row.atom.target_id}`;
-    if (row.atom?.kind === 'vertex') return row.atom.vertex_id;
-    return row.proposalId;
-}
-
-function uniquifyRows(rows: AtlasControlRow[]): AtlasControlRow[] {
-    const seen = new Map<string, number>();
-    return rows.map((row) => {
-        const count = seen.get(row.identity.id) ?? 0;
-        seen.set(row.identity.id, count + 1);
-        if (count === 0) return row;
-        return { ...row, identity: { ...row.identity, id: `${row.identity.id}#${count + 1}` } };
-    });
-}
-
 function receipt(
     kind: AtlasControlReceiptKind,
     reversible: boolean,
@@ -659,10 +576,6 @@ function noReceipt(): AtlasControlReceiptPolicy {
 
 function invariant(status: GraphReviewProofState, detail: string): AtlasControlInvariant {
     return { status, detail };
-}
-
-function isAction(value: AtlasControlAction | null): value is AtlasControlAction {
-    return value !== null;
 }
 
 function unique<T>(values: T[]): T[] {

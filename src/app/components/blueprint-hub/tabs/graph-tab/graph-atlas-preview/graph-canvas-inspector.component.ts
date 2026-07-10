@@ -1,12 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { Anchor, Check, Crosshair, FileSearch, Palette, VolumeX, X, XCircle } from 'lucide-angular';
+import { Crosshair, FileSearch, Palette, X } from 'lucide-angular';
 import { LucideAngularModule } from 'lucide-angular';
 
 import type {
     GraphCanvasInspectorRecord,
-    GraphCanvasReviewDecision,
-    GraphCanvasReviewRequest,
     GraphCanvasSourceRequest,
 } from './graph-canvas-interaction';
 
@@ -19,7 +17,7 @@ import type {
         <aside class="canvas-inspector" aria-label="Graph selection details">
             <header class="inspector-header">
                 <div class="min-w-0">
-                    <p class="inspector-kicker">{{ batchRecords.length ? 'Batch review' : objectKindLabel(record) }}</p>
+                    <p class="inspector-kicker">{{ batchRecords.length ? 'Selection' : objectKindLabel(record) }}</p>
                     <h3>{{ batchRecords.length ? batchRecords.length + ' selected objects' : record?.title }}</h3>
                     @if (!batchRecords.length && record?.subtitle) {
                     <p class="inspector-subtitle">{{ record?.subtitle }}</p>
@@ -121,30 +119,6 @@ import type {
             }
             }
 
-            @if (reviewObjectIds().length) {
-            <footer class="review-actions" [class.review-actions-busy]="busy">
-                @if (canReview('accept_fact')) {
-                <button type="button" class="review-button accept" [disabled]="busy" (click)="review('accepted')" title="Accept selected facts">
-                    <lucide-icon [img]="CheckIcon" class="h-4 w-4"></lucide-icon><span>Accept</span>
-                </button>
-                }
-                @if (canReview('reject_fact')) {
-                <button type="button" class="review-button reject" [disabled]="busy" (click)="review('rejected')" title="Reject selected facts">
-                    <lucide-icon [img]="RejectIcon" class="h-4 w-4"></lucide-icon><span>Reject</span>
-                </button>
-                }
-                @if (canReview('mute_detector_pattern')) {
-                <button type="button" class="review-button" [disabled]="busy" (click)="review('muted')" title="Mute detector pattern">
-                    <lucide-icon [img]="MuteIcon" class="h-4 w-4"></lucide-icon><span>Mute</span>
-                </button>
-                }
-                @if (canReview('promote_sidecar_to_anchor')) {
-                <button type="button" class="review-button promote" [disabled]="busy" (click)="review('promoted_to_anchor')" title="Promote to user anchor">
-                    <lucide-icon [img]="AnchorIcon" class="h-4 w-4"></lucide-icon><span>Promote</span>
-                </button>
-                }
-            </footer>
-            }
         </aside>
         }
     `,
@@ -181,50 +155,23 @@ import type {
         .evidence-grid div { border-left: 1px solid rgba(94,234,212,.25); padding-left: .55rem; }
         .evidence-grid span { display: block; color: white; font-size: 1rem; font-weight: 800; }
         .evidence-grid small { color: #71717a; font-size: .6rem; letter-spacing: .1em; text-transform: uppercase; }
-        .review-actions { position: sticky; bottom: 0; display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .45rem; padding: .75rem; border-top: 1px solid rgba(255,255,255,.08); background: rgba(5,8,14,.97); }
-        .review-button { display: inline-flex; min-height: 2.4rem; align-items: center; justify-content: center; gap: .42rem; border: 1px solid rgba(255,255,255,.1); background: #0b0e14; color: #d4d4d8; font-size: .72rem; font-weight: 800; }
-        .review-button.accept { border-color: rgba(45,212,191,.3); color: #99f6e4; }
-        .review-button.reject { border-color: rgba(251,113,133,.3); color: #fda4af; }
-        .review-button.promote { border-color: rgba(250,204,21,.3); color: #fde047; }
-        .review-button:disabled { cursor: wait; opacity: .45; }
     `],
 })
 export class GraphCanvasInspectorComponent {
     @Input() record: GraphCanvasInspectorRecord | null = null;
     @Input() batchRecords: GraphCanvasInspectorRecord[] = [];
-    @Input() busy = false;
     @Output() close = new EventEmitter<void>();
     @Output() focusRequested = new EventEmitter<string[]>();
     @Output() styleRequested = new EventEmitter<string>();
     @Output() sourceRequested = new EventEmitter<GraphCanvasSourceRequest>();
-    @Output() reviewRequested = new EventEmitter<GraphCanvasReviewRequest>();
 
     readonly XIcon = X;
-    readonly CheckIcon = Check;
-    readonly RejectIcon = XCircle;
-    readonly MuteIcon = VolumeX;
-    readonly AnchorIcon = Anchor;
     readonly CrosshairIcon = Crosshair;
     readonly FileSearchIcon = FileSearch;
     readonly PaletteIcon = Palette;
 
     objectKindLabel(record: GraphCanvasInspectorRecord | null): string {
         return record ? `${record.objectKind} detail` : 'Graph detail';
-    }
-
-    reviewObjectIds(): string[] {
-        const records = this.batchRecords.length ? this.batchRecords : (this.record ? [this.record] : []);
-        return [...new Set(records.flatMap((record) => record.reviewObjectIds))];
-    }
-
-    canReview(action: string): boolean {
-        const records = this.batchRecords.length ? this.batchRecords : (this.record ? [this.record] : []);
-        return records.some((record) => record.reviewActions.includes(action));
-    }
-
-    review(decision: GraphCanvasReviewDecision): void {
-        const objectIds = this.reviewObjectIds();
-        if (objectIds.length) this.reviewRequested.emit({ objectIds, decision });
     }
 
     jumpToSource(record: GraphCanvasInspectorRecord): void {
