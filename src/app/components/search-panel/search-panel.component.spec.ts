@@ -311,6 +311,34 @@ describe('SearchPanelComponent model recipe lifecycle', () => {
         expect(phoenix.storeCommand).not.toHaveBeenCalled();
     });
 
+    it('disables ModernBERT review when the shared contract has no pairwise NLI rows', async () => {
+        graphRebuild.snapshot.set({
+            id: 'snapshot:zero-nli',
+            scopeKind: 'note',
+            scopeId: 'note-1',
+            noteIds: ['note-1'],
+            counters: {
+                documentReviewRows: 1300,
+                semanticEvalLedgerRows: 627,
+                discourseEvalLedgerRows: 0,
+            },
+            embeddingProfile: {
+                dimensionLabel: '768d',
+                selectedDimensions: 768,
+            },
+        });
+
+        expect(component.modernBertNliReviewButtonLabel()).toBe('No NLI pairs');
+        expect(component.isModernBertNliReviewDisabled()).toBe(true);
+        expect(component.stage8Workbench().reviewAdjudication.eligibleDetail).toBe('0 NLI eligible');
+        expect(component.stage8Workbench().reviewAdjudication.actionReason).toContain('pairwise ModernBERT input contract');
+
+        await component.runModernBertNliReview();
+
+        expect(phoenix.storeCommand).not.toHaveBeenCalledWith('semantic:listNliJudgmentInputs', expect.anything());
+        expect(fullAtlasPipeline.buildGraph).not.toHaveBeenCalled();
+    });
+
     it('runs ModernBERT NLI review as candidate adjudication without graph promotion', async () => {
         component.setBuildScopeMode('note');
 

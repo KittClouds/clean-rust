@@ -13,6 +13,7 @@ describe('AttributesTabComponent', () => {
         expect(template).toContain('Atlas Control');
         expect(template).toContain('atlas-workflow-strip');
         expect(template).toContain('workflowSteps');
+        expect(template).toContain('reviewAdjudicationContract');
         expect(template).toContain('Memory Governance');
         expect(template).toContain('runtimeDiagnostics');
         expect(template).toContain('Candidate decisions');

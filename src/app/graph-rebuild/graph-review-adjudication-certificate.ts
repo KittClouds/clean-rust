@@ -2,8 +2,11 @@ import type { GraphRebuildSnapshot } from './graph-rebuild-snapshot';
 
 export const GRAPH_REVIEW_ADJUDICATION_CERTIFICATE_SCHEMA_VERSION =
     'phoenix-review-adjudication-run-certificate/v1' as const;
+export const GRAPH_REVIEW_ADJUDICATION_VIEW_CONTRACT_SCHEMA_VERSION =
+    'phoenix-review-adjudication-view-contract/v1' as const;
 
 export type GraphReviewAdjudicationEntrypoint = 'graph_build' | 'manual_stage8' | 'derived';
+export type GraphReviewAdjudicationViewTone = 'ready' | 'review' | 'warning' | 'danger' | 'quiet';
 
 export interface GraphReviewQueueExcludedReason {
     id: string;
@@ -67,6 +70,41 @@ export interface GraphReviewAdjudicationRunCertificate {
     stageSummaries: GraphReviewAdjudicationStageSummary[];
 }
 
+export interface GraphReviewAdjudicationActionState {
+    label: string;
+    disabled: boolean;
+    status: string;
+    reason: string;
+    tone: GraphReviewAdjudicationViewTone;
+}
+
+export interface GraphReviewAdjudicationViewContract {
+    schemaVersion: typeof GRAPH_REVIEW_ADJUDICATION_VIEW_CONTRACT_SCHEMA_VERSION;
+    source: GraphReviewAdjudicationEntrypoint | 'missing';
+    queue: GraphReviewQueueInventory & {
+        totalLabel: string;
+        eligibleLabel: string;
+        excludedLabel: string;
+        judgedLabel: string;
+        summary: string;
+    };
+    model: {
+        classifierLabel: string;
+        classifierDetail: string;
+        embeddingDimensionLabel: string;
+        embeddingDimensionDetail: string;
+    };
+    proof: {
+        noTopologyWrites: boolean;
+        dimensionContractPassed: boolean;
+        modelRan: boolean;
+        status: string;
+        tone: GraphReviewAdjudicationViewTone;
+    };
+    action: GraphReviewAdjudicationActionState;
+    reason: GraphReviewQueueExcludedReason | null;
+}
+
 export interface BuildReviewAdjudicationRunCertificateInput {
     snapshot: GraphRebuildSnapshot | null;
     rawResult?: unknown;
@@ -75,6 +113,14 @@ export interface BuildReviewAdjudicationRunCertificateInput {
     modelLabel?: string;
     dimensionLabel?: string;
     embeddingDimension?: number;
+}
+
+export interface BuildReviewAdjudicationViewContractOptions {
+    modelInitialized?: boolean;
+    running?: boolean;
+    loading?: boolean;
+    busy?: boolean;
+    hasScope?: boolean;
 }
 
 export function buildReviewAdjudicationRunCertificate(
@@ -152,6 +198,113 @@ export function applyReviewAdjudicationCertificate(
     snapshot.counters.reviewAdjudicationAppliedRows = certificate.queue.appliedRows;
     snapshot.counters.reviewAdjudicationTopologyWrites = certificate.queue.topologyWrites;
     snapshot.counters.reviewAdjudicationDimension = certificate.model.dimension;
+}
+
+export function buildReviewAdjudicationViewContract(
+    certificate: GraphReviewAdjudicationRunCertificate | null,
+    options: BuildReviewAdjudicationViewContractOptions = {},
+): GraphReviewAdjudicationViewContract {
+    const queue = certificate?.queue ?? emptyQueue();
+    const failed = !!certificate && (!certificate.proof.noTopologyWrites || !certificate.proof.dimensionContractPassed);
+    const reason = queue.excludedReasons[0] ?? null;
+    const proofTone: GraphReviewAdjudicationViewTone = failed
+        ? 'danger'
+        : certificate?.proof.modelRan
+            ? 'ready'
+            : queue.nliEligibleRows > 0
+                ? 'review'
+                : 'quiet';
+    return {
+        schemaVersion: GRAPH_REVIEW_ADJUDICATION_VIEW_CONTRACT_SCHEMA_VERSION,
+        source: certificate?.source ?? 'missing',
+        queue: {
+            ...queue,
+            totalLabel: `${formatCount(queue.totalReviewRows)} review rows`,
+            eligibleLabel: `${formatCount(queue.nliEligibleRows)} NLI eligible`,
+            excludedLabel: `${formatCount(queue.excludedRows)} excluded`,
+            judgedLabel: `${formatCount(queue.judgedRows)} judged / ${formatCount(queue.appliedRows)} applied`,
+            summary: `${formatCount(queue.nliEligibleRows)} NLI eligible / ${formatCount(queue.totalReviewRows)} review rows`,
+        },
+        model: {
+            classifierLabel: certificate?.model.modelLabel || 'ModernBERT NLI',
+            classifierDetail: 'ModernBERT / pairwise candidate judgments / 0 topology writes',
+            embeddingDimensionLabel: certificate?.model.dimensionLabel || '',
+            embeddingDimensionDetail: certificate
+                ? `${certificate.model.dimensionLabel || `${certificate.model.dimension || 0}d`} embedding target contract`
+                : 'embedding target contract pending',
+        },
+        proof: {
+            noTopologyWrites: certificate?.proof.noTopologyWrites ?? true,
+            dimensionContractPassed: certificate?.proof.dimensionContractPassed ?? true,
+            modelRan: certificate?.proof.modelRan ?? false,
+            status: failed ? 'error' : certificate?.proof.modelRan ? 'ready' : queue.nliEligibleRows > 0 ? 'planned' : 'idle',
+            tone: proofTone,
+        },
+        action: buildReviewActionState(certificate, options),
+        reason,
+    };
+}
+
+function buildReviewActionState(
+    certificate: GraphReviewAdjudicationRunCertificate | null,
+    options: BuildReviewAdjudicationViewContractOptions,
+): GraphReviewAdjudicationActionState {
+    const queue = certificate?.queue ?? emptyQueue();
+    const hasScope = options.hasScope ?? true;
+    if (options.running) {
+        return actionState('Reviewing', true, 'running', 'ModernBERT review is already running.', 'review');
+    }
+    if (options.loading) {
+        return actionState('Loading NLI', true, 'warming', 'ModernBERT NLI is warming.', 'review');
+    }
+    if (options.busy) {
+        return actionState('Graph busy', true, 'busy', 'Wait for the active graph or model operation to finish.', 'quiet');
+    }
+    if (!hasScope) {
+        return actionState('Pick Scope', true, 'blocked', 'Choose a runnable atlas scope first.', 'warning');
+    }
+    if (certificate && (!certificate.proof.noTopologyWrites || !certificate.proof.dimensionContractPassed)) {
+        return actionState('Fix Contract', true, 'error', 'Review certificate failed the no-topology or embedding dimension proof.', 'danger');
+    }
+    if (certificate && queue.totalReviewRows > 0 && queue.nliEligibleRows === 0) {
+        return actionState(
+            'No NLI pairs',
+            true,
+            'blocked',
+            `${formatCount(queue.totalReviewRows)} review rows exist, but none match the pairwise ModernBERT input contract.`,
+            'quiet',
+        );
+    }
+    const label = options.modelInitialized ? 'Run NLI' : 'Load + Run';
+    return actionState(label, false, certificate?.proof.modelRan ? 'ready' : 'planned', 'ModernBERT can score pairwise candidate rows.', 'ready');
+}
+
+function actionState(
+    label: string,
+    disabled: boolean,
+    status: string,
+    reason: string,
+    tone: GraphReviewAdjudicationViewTone,
+): GraphReviewAdjudicationActionState {
+    return { label, disabled, status, reason, tone };
+}
+
+function emptyQueue(): GraphReviewQueueInventory {
+    return {
+        totalReviewRows: 0,
+        nliEligibleRows: 0,
+        excludedRows: 0,
+        duplicateRows: 0,
+        judgedRows: 0,
+        appliedRows: 0,
+        topologyWrites: 0,
+        nliEligibilityPercent: 0,
+        excludedReasons: [],
+    };
+}
+
+function formatCount(value: number): string {
+    return Math.max(0, Math.round(value || 0)).toLocaleString();
 }
 
 function reviewRowTotal(snapshot: GraphRebuildSnapshot | null, raw: Record<string, unknown>): number {

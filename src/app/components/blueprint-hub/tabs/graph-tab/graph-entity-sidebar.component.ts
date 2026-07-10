@@ -56,6 +56,7 @@ import {
     type GraphOperatingRoomCount,
     type GraphOperatingRoomId,
 } from './graph-operating-room';
+import { buildAtlasControlContract } from '../attributes-tab/atlas-control-contract';
 import {
     buildGraphEvaluationDashboard,
     type GraphEvaluationTone,
@@ -196,9 +197,21 @@ export class GraphEntitySidebarComponent implements OnChanges, OnDestroy {
         this.dataRevision();
         return buildGraphDiscourseWorkbenchView(this.diagnosticsSnapshot(), this.entities);
     });
+    readonly atlasControlContract = computed(() => {
+        this.dataRevision();
+        return buildAtlasControlContract({
+            snapshot: this.diagnosticsSnapshot(),
+            entityCount: this.entities.length,
+        });
+    });
     readonly operatingRoom = computed(() => {
         this.dataRevision();
-        return buildGraphOperatingRoomView(this.discourseWorkbench(), this.diagnosticsSnapshot(), this.entities);
+        return buildGraphOperatingRoomView(
+            this.discourseWorkbench(),
+            this.diagnosticsSnapshot(),
+            this.entities,
+            this.atlasControlContract(),
+        );
     });
     readonly evaluationDashboard = computed(() =>
         buildGraphEvaluationDashboard(this.diagnosticsSnapshot(), null),

@@ -105,20 +105,20 @@
           <strong>Models</strong>
           <small>{{ graphModelsReady() ? 'warm' : 'stage' }}</small>
         </span>
-        <span class="stage8-workflow-step" [ngClass]="stage8.router.tone === 'ready' ? 'stage8-step-ready' : 'stage8-step-waiting'">
+        <span class="stage8-workflow-step" [ngClass]="stage8ContractStepClass('workflow-graph-build')">
           <b>2</b>
           <strong>Graph</strong>
-          <small>{{ stage8.router.status }}</small>
+          <small>{{ atlasControlCardValue('workflow-graph-build') }} edges</small>
         </span>
-        <span class="stage8-workflow-step" [ngClass]="modernBertNliTone() === 'ready' ? 'stage8-step-ready' : 'stage8-step-waiting'">
+        <span class="stage8-workflow-step" [ngClass]="stage8ContractStepClass('workflow-nli-pairs')">
           <b>3</b>
           <strong>NLI</strong>
-          <small>{{ modernBertNliStatusLabel() }}</small>
+          <small>{{ atlasControlCardValue('workflow-nli-pairs') }} pairs</small>
         </span>
-        <span class="stage8-workflow-step" [ngClass]="'stage8-step-' + stage8.reviewAdjudication.tone">
+        <span class="stage8-workflow-step" [ngClass]="stage8ContractStepClass('workflow-review-ledger')">
           <b>4</b>
           <strong>Review</strong>
-          <small>{{ stage8.reviewAdjudication.status }}</small>
+          <small>{{ atlasControlCardValue('workflow-review-ledger') }} rows</small>
         </span>
       </div>
 
@@ -190,6 +190,9 @@
         </div>
         <small class="stage8-truth-review-error">
           {{ stage8.reviewAdjudication.dimensionDetail }} / {{ stage8.reviewAdjudication.reasonDetail }}
+        </small>
+        <small class="stage8-truth-review-error" *ngIf="stage8.reviewAdjudication.actionDisabled">
+          {{ stage8.reviewAdjudication.actionReason }}
         </small>
         <small class="stage8-truth-review-error" *ngIf="stage8.truthReview.error">{{ stage8.truthReview.error }}</small>
       </div>

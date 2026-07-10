@@ -39,7 +39,9 @@ import { AtlasCapabilityRuntimeService } from '../../services/atlas-capability-r
 import { GraphRebuildPipelineService } from '../../graph-rebuild/graph-rebuild-pipeline.service';
 import { GraphRebuildService } from '../../graph-rebuild/graph-rebuild.service';
 import {
+  buildReviewAdjudicationViewContract,
   buildReviewAdjudicationRunCertificate,
+  type GraphReviewAdjudicationViewContract,
   type GraphReviewAdjudicationRunCertificate,
 } from '../../graph-rebuild/graph-review-adjudication-certificate';
 import { CalendarService } from '../../services/calendar.service';
@@ -87,6 +89,10 @@ import {
   type ProductDiagnosticsReviewCluster,
 } from '../blueprint-hub/tabs/graph-tab/graph-product-diagnostics';
 import {
+  buildAtlasControlContract,
+  type AtlasControlTone,
+} from '../blueprint-hub/tabs/attributes-tab/atlas-control-contract';
+import {
   buildGraphProjectionContractReport,
   type GraphProjectionContractReport,
 } from '../../graph-rebuild/graph-projection-contract-report';
@@ -120,6 +126,13 @@ interface PostprocessStagingView {
 }
 
 type CompilerTone = 'ready' | 'review' | 'danger' | 'quiet';
+
+function atlasToneToCompilerTone(tone: AtlasControlTone | CompilerTone | string): CompilerTone {
+  if (tone === 'danger') return 'danger';
+  if (tone === 'ready') return 'ready';
+  if (tone === 'review' || tone === 'warning') return 'review';
+  return 'quiet';
+}
 
 interface CompilerMetricView {
   id: string;
@@ -231,6 +244,9 @@ interface Stage8ReviewAdjudicationView {
   judgedDetail: string;
   dimensionDetail: string;
   reasonDetail: string;
+  actionLabel: string;
+  actionDisabled: boolean;
+  actionReason: string;
 }
 
 interface Stage8LaneView {
@@ -558,6 +574,21 @@ export class SearchPanelComponent implements OnInit {
         embeddingDimension: numericFromDimensionLabel(this.activeEmbeddingDimensionLabel()),
       });
   });
+  readonly reviewAdjudicationContract = computed<GraphReviewAdjudicationViewContract>(() =>
+    buildReviewAdjudicationViewContract(this.reviewAdjudicationCertificate(), {
+      modelInitialized: this.nli.isInitialized(),
+      running: this.nliReviewRunning(),
+      loading: this.activeLaneWarm() === 'nli',
+      busy: this.fullAtlasBusy() || !!this.activeLaneWarm(),
+      hasScope: this.hasRunnableBuildScope(),
+    })
+  );
+  readonly atlasControlContract = computed(() => buildAtlasControlContract({
+    snapshot: this.fullAtlasPipeline.lastSnapshot() || this.graphRebuild.snapshot(),
+    entityCount: this.registryEntities(),
+    reviewAdjudicationCertificate: this.reviewAdjudicationCertificate(),
+    reviewAdjudicationViewContract: this.reviewAdjudicationContract(),
+  }));
   readonly compilerWorkbench = computed<CompilerWorkbenchView | null>(() =>
     buildCompilerWorkbenchView(
       this.fullAtlasPipeline.lastSnapshot(),
@@ -581,7 +612,7 @@ export class SearchPanelComponent implements OnInit {
       this.vectorStatus(),
       this.dynamicNerLabel(),
       this.truthReviewLane(),
-      this.reviewAdjudicationCertificate(),
+      this.atlasControlContract().certificates.reviewAdjudication,
       this.reviewClusters(),
       this.graphAwareLinkSuggestions(),
     )
@@ -974,10 +1005,8 @@ export class SearchPanelComponent implements OnInit {
   }
 
   isModernBertNliReviewDisabled(): boolean {
-    return this.nliReviewRunning()
-      || this.fullAtlasBusy()
-      || !!this.activeLaneWarm()
-      || !this.hasRunnableBuildScope();
+    const card = this.atlasControlCard('workflow-nli-pairs');
+    return card?.actionability !== 'model_run' || !card.allowedActions.includes('run_nli');
   }
 
   fullAtlasBuildButtonLabel(): string {
@@ -1012,9 +1041,7 @@ export class SearchPanelComponent implements OnInit {
   }
 
   modernBertNliReviewButtonLabel(): string {
-    if (this.nliReviewRunning()) return 'Reviewing';
-    if (!this.hasRunnableBuildScope()) return 'Pick Scope';
-    return this.nli.isInitialized() ? 'Run NLI' : 'Load + Run';
+    return this.reviewAdjudicationContract().action.label;
   }
 
   modernBertNliStatusLabel(): string {
@@ -1024,15 +1051,31 @@ export class SearchPanelComponent implements OnInit {
   }
 
   modernBertNliTone(): CompilerTone {
-    const status = this.modernBertNliStatusLabel();
-    if (status === 'ready') return 'ready';
-    if (status === 'warming' || status === 'running') return 'review';
-    if (status === 'error') return 'danger';
-    return 'quiet';
+    return atlasToneToCompilerTone(
+      this.atlasControlCard('workflow-nli-pairs')?.tone
+      ?? this.reviewAdjudicationContract().action.tone,
+    );
   }
 
   modernBertNliDetail(): string {
-    return 'ModernBERT / candidate judgments / 0 topology writes';
+    return this.atlasControlCard('workflow-nli-pairs')?.detail
+      || this.reviewAdjudicationContract().model.classifierDetail;
+  }
+
+  atlasControlCard(id: string) {
+    return this.atlasControlContract().cardsById[id] ?? null;
+  }
+
+  atlasControlCardValue(id: string): string {
+    return this.atlasControlCard(id)?.valueLabel ?? '0';
+  }
+
+  atlasControlCardDetail(id: string): string {
+    return this.atlasControlCard(id)?.detail ?? '';
+  }
+
+  stage8ContractStepClass(id: string): string {
+    return `stage8-step-${atlasToneToCompilerTone(this.atlasControlCard(id)?.tone ?? 'quiet')}`;
   }
 
   async runEntitySuggestionStage(): Promise<void> {
@@ -1672,7 +1715,7 @@ function buildStage8WorkbenchView(
   vectorStatus: string,
   dynamicNerStatus: string,
   truthReview: SemanticTruthReviewLaneState,
-  reviewAdjudication: GraphReviewAdjudicationRunCertificate | null,
+  reviewAdjudication: GraphReviewAdjudicationViewContract,
   reviewClusters: ProductDiagnosticsReviewCluster[],
   graphLinks: GraphRebuildLinkSuggestion[],
 ): Stage8WorkbenchView {
@@ -1748,11 +1791,11 @@ function buildStage8WorkbenchView(
 }
 
 function buildStage8ReviewAdjudicationView(
-  certificate: GraphReviewAdjudicationRunCertificate | null,
+  contract: GraphReviewAdjudicationViewContract,
   dimensionLabel: string,
   truthReview: SemanticTruthReviewLaneState,
 ): Stage8ReviewAdjudicationView {
-  if (!certificate) {
+  if (contract.source === 'missing') {
     return {
       status: truthReview.status === 'running' ? 'running' : 'idle',
       tone: truthReview.tone,
@@ -1762,25 +1805,25 @@ function buildStage8ReviewAdjudicationView(
       judgedDetail: '0 judged / 0 applied',
       dimensionDetail: `${dimensionLabel} / certificate pending`,
       reasonDetail: 'run Build Graph or Run NLI to publish ReviewAdjudicationRunCertificate v1',
+      actionLabel: contract.action.label,
+      actionDisabled: contract.action.disabled,
+      actionReason: contract.action.reason,
     };
   }
-  const queue = certificate.queue;
-  const failed = !certificate.proof.noTopologyWrites || !certificate.proof.dimensionContractPassed;
-  const tone: CompilerTone = failed ? 'danger' : queue.nliEligibleRows > 0 || queue.judgedRows > 0 ? 'ready' : 'quiet';
-  const reason = queue.excludedReasons[0];
   return {
-    status: failed ? 'error' : certificate.proof.modelRan ? 'ready' : 'planned',
-    tone,
-    totalDetail: `${formatCount(queue.totalReviewRows)} review rows`,
-    eligibleDetail: `${formatCount(queue.nliEligibleRows)} NLI eligible`,
-    excludedDetail: `${formatCount(queue.excludedRows)} excluded`,
-    judgedDetail: `${formatCount(queue.judgedRows)} judged / ${formatCount(queue.appliedRows)} applied`,
-    dimensionDetail: `${certificate.model.dimensionLabel || dimensionLabel} / ${certificate.proof.dimensionContractPassed ? 'dimension contract' : 'dimension mismatch'}`,
-    reasonDetail: reason
-      ? `${reason.label}: ${formatCount(reason.count)}`
-      : queue.nliEligibleRows > 0
-        ? 'ModernBERT queue is explicitly bounded to pairwise review rows'
-        : 'waiting for ModernBERT run',
+    status: contract.proof.status,
+    tone: contract.proof.tone as CompilerTone,
+    totalDetail: contract.queue.totalLabel,
+    eligibleDetail: contract.queue.eligibleLabel,
+    excludedDetail: contract.queue.excludedLabel,
+    judgedDetail: contract.queue.judgedLabel,
+    dimensionDetail: `${contract.model.embeddingDimensionLabel || dimensionLabel} / ${contract.proof.dimensionContractPassed ? 'embedding contract' : 'dimension mismatch'}`,
+    reasonDetail: contract.reason
+      ? `${contract.reason.label}: ${formatCount(contract.reason.count)}`
+      : contract.action.reason,
+    actionLabel: contract.action.label,
+    actionDisabled: contract.action.disabled,
+    actionReason: contract.action.reason,
   };
 }
 

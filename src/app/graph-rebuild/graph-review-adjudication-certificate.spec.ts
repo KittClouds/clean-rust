@@ -2,7 +2,9 @@ import { describe, expect, it } from 'vitest';
 
 import {
     applyReviewAdjudicationCertificate,
+    buildReviewAdjudicationViewContract,
     buildReviewAdjudicationRunCertificate,
+    GRAPH_REVIEW_ADJUDICATION_VIEW_CONTRACT_SCHEMA_VERSION,
     GRAPH_REVIEW_ADJUDICATION_CERTIFICATE_SCHEMA_VERSION,
 } from './graph-review-adjudication-certificate';
 import type { GraphRebuildSnapshot } from './graph-rebuild-snapshot';
@@ -113,6 +115,61 @@ describe('buildReviewAdjudicationRunCertificate', () => {
             reviewAdjudicationTopologyWrites: 0,
             reviewAdjudicationDimension: 768,
         });
+    });
+
+    it('publishes the shared view contract that blocks a zero-eligible NLI run', () => {
+        const certificate = buildReviewAdjudicationRunCertificate({
+            snapshot: snapshot(),
+            source: 'derived',
+            rawResult: {},
+            dimensionLabel: '768d',
+        });
+
+        const contract = buildReviewAdjudicationViewContract(certificate, {
+            modelInitialized: true,
+            hasScope: true,
+        });
+
+        expect(contract.schemaVersion).toBe(GRAPH_REVIEW_ADJUDICATION_VIEW_CONTRACT_SCHEMA_VERSION);
+        expect(contract.queue).toMatchObject({
+            totalReviewRows: 1300,
+            nliEligibleRows: 0,
+            excludedRows: 1300,
+            totalLabel: '1,300 review rows',
+            eligibleLabel: '0 NLI eligible',
+        });
+        expect(contract.action).toMatchObject({
+            label: 'No NLI pairs',
+            disabled: true,
+            status: 'blocked',
+        });
+        expect(contract.action.reason).toContain('pairwise ModernBERT input contract');
+        expect(contract.model.embeddingDimensionDetail).toContain('embedding target contract');
+    });
+
+    it('uses one action state for runnable pairwise review rows', () => {
+        const certificate = buildReviewAdjudicationRunCertificate({
+            snapshot: snapshot(),
+            source: 'manual_stage8',
+            rawResult: {
+                plannedInputCount: 8,
+                dimension: 768,
+            },
+            dimensionLabel: '768d',
+        });
+
+        const contract = buildReviewAdjudicationViewContract(certificate, {
+            modelInitialized: false,
+            hasScope: true,
+        });
+
+        expect(contract.queue.summary).toBe('8 NLI eligible / 1,300 review rows');
+        expect(contract.action).toMatchObject({
+            label: 'Load + Run',
+            disabled: false,
+            status: 'planned',
+        });
+        expect(contract.proof.tone).toBe('review');
     });
 });
 

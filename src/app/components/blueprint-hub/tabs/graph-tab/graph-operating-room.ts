@@ -7,9 +7,15 @@ import type {
 import type { GraphDiscourseTone } from './graph-discourse-analytics';
 import { profileLabel } from '../../../../graph-rebuild/graph-document-profile';
 import {
+    buildReviewAdjudicationViewContract,
     buildReviewAdjudicationRunCertificate,
     type GraphReviewAdjudicationRunCertificate,
 } from '../../../../graph-rebuild/graph-review-adjudication-certificate';
+import {
+    buildAtlasControlContract,
+    type AtlasControlCard,
+    type AtlasControlContract,
+} from '../attributes-tab/atlas-control-contract';
 
 export type GraphOperatingRoomId =
     | 'entities'
@@ -51,11 +57,16 @@ export function buildGraphOperatingRoomView(
     workbench: GraphDiscourseWorkbenchView | null,
     snapshot: GraphRebuildSnapshot | null,
     entities: RegisteredEntity[],
+    atlasControl?: AtlasControlContract,
 ): GraphOperatingRoomView {
+    const control = atlasControl ?? buildAtlasControlContract({
+        snapshot,
+        entityCount: entities.length,
+    });
     const records = [
         ...entityRecords(entities, snapshot),
         ...profileRecords(snapshot),
-        ...reviewAdjudicationRecords(snapshot),
+        ...reviewAdjudicationRecords(snapshot, control),
         ...(workbench?.records || []),
     ];
     const recordsByRoom = emptyRoomMap();
@@ -63,9 +74,9 @@ export function buildGraphOperatingRoomView(
         for (const roomId of roomsForRecord(row)) recordsByRoom[roomId].push(row);
     }
     const recordsById = Object.fromEntries(records.map((row) => [row.id, row]));
-    const counts = countCards(recordsByRoom, snapshot);
+    const counts = countCards(recordsByRoom, snapshot, control);
     return {
-        tabs: ROOM_IDS.map((id) => roomTab(id, recordsByRoom[id], snapshot, entities.length)),
+        tabs: ROOM_IDS.map((id) => roomTab(id, recordsByRoom[id], snapshot, entities.length, control)),
         counts,
         countsById: Object.fromEntries(counts.map((row) => [row.id, row])),
         recordsByRoom,
@@ -140,10 +151,15 @@ function profileRecords(snapshot: GraphRebuildSnapshot | null): GraphDiscourseWo
     }));
 }
 
-function reviewAdjudicationRecords(snapshot: GraphRebuildSnapshot | null): GraphDiscourseWorkbenchRecord[] {
+function reviewAdjudicationRecords(
+    snapshot: GraphRebuildSnapshot | null,
+    atlasControl?: AtlasControlContract,
+): GraphDiscourseWorkbenchRecord[] {
     if (!snapshot) return [];
     const certificate = reviewAdjudicationCertificate(snapshot);
-    const tone: GraphDiscourseTone = certificate.proof.noTopologyWrites && certificate.proof.dimensionContractPassed
+    const contract = atlasControl?.certificates.reviewAdjudication
+        ?? buildReviewAdjudicationViewContract(certificate);
+    const tone: GraphDiscourseTone = contract.proof.noTopologyWrites && contract.proof.dimensionContractPassed
         ? 'ready'
         : 'danger';
     const records = [
@@ -151,21 +167,23 @@ function reviewAdjudicationRecords(snapshot: GraphRebuildSnapshot | null): Graph
             id: `review-adjudication:inventory:${snapshot.id}`,
             kind: 'review-adjudication:inventory',
             title: 'Review Queue Inventory',
-            subtitle: `${certificate.queue.nliEligibleRows} NLI eligible / ${certificate.queue.totalReviewRows} review rows`,
-            detail: `${certificate.queue.excludedRows} excluded / ${certificate.queue.duplicateRows} duplicate pairs / ${certificate.queue.judgedRows} judged`,
-            status: certificate.proof.modelRan ? 'accepted' : 'reviewable',
+            subtitle: contract.queue.summary,
+            detail: `${contract.queue.excludedLabel} / ${formatCount(contract.queue.duplicateRows)} duplicate pairs / ${formatCount(contract.queue.judgedRows)} judged`,
+            status: contract.proof.modelRan ? 'accepted' : 'reviewable',
             tone,
             focusQuery: 'ModernBERT NLI review queue inventory',
             sourceIds: certificate.document.noteIds,
             tags: ['review_adjudication', 'nli_eligible', 'candidate_only'],
             actionKinds: ['inspect'],
             facts: [
-                fact('Total review rows', certificate.queue.totalReviewRows),
-                fact('NLI eligible rows', certificate.queue.nliEligibleRows),
-                fact('Excluded rows', certificate.queue.excludedRows),
-                fact('Judged rows', certificate.queue.judgedRows),
-                fact('Dimension', certificate.model.dimensionLabel || certificate.model.dimension),
-                fact('Topology writes', certificate.queue.topologyWrites),
+                fact('Total review rows', contract.queue.totalReviewRows),
+                fact('NLI eligible rows', contract.queue.nliEligibleRows),
+                fact('Excluded rows', contract.queue.excludedRows),
+                fact('Judged rows', contract.queue.judgedRows),
+                fact('Embedding contract', contract.model.embeddingDimensionLabel || certificate.model.dimension),
+                fact('Button state', contract.action.label),
+                fact('Button reason', contract.action.reason),
+                fact('Topology writes', contract.queue.topologyWrites),
             ],
         }),
     ];
@@ -266,18 +284,22 @@ function isDiscourseKind(kind: string, tags: string): boolean {
 function countCards(
     rooms: Record<GraphOperatingRoomId, GraphDiscourseWorkbenchRecord[]>,
     snapshot: GraphRebuildSnapshot | null,
+    atlasControl?: AtlasControlContract,
 ): GraphOperatingRoomCount[] {
     const all = uniqueRecords(ROOM_IDS.flatMap((room) => rooms[room]));
     const fallback = roomFallbackCounts(snapshot);
+    const reviewManual = atlasCardNumber(atlasControl, 'review-manual-action', fallback.reviewGaps);
+    const reviewNli = atlasCardNumber(atlasControl, 'review-nli-pairs', fallback.reviewNliEligible);
+    const reviewExcluded = atlasCardNumber(atlasControl, 'review-excluded', fallback.reviewExcluded);
     return [
         count('entities-total', 'entities', 'Registered', rooms.entities, `${snapshot?.counters.nodes || 0} graph nodes`, 'ready'),
         count('structure-total', 'structure', 'Structure', rooms.structure, `${fallback.structureUnits} units`, toneForRows(rooms.structure), fallback.structureUnits),
         count('structure-profiles', 'structure', 'Profiles', filter(rooms.structure, (row) => row.kind.startsWith('document-profile:')), 'document and region weighting', toneForRows(filter(rooms.structure, (row) => row.kind.startsWith('document-profile:')))),
         count('facts-relations', 'facts', 'Relations', filter(rooms.facts, (row) => relationLike(row)), 'relation candidates and facts', toneForRows(filter(rooms.facts, relationLike)), fallback.factRelations),
         count('facts-hyperedges', 'facts', 'Hyperedges', filter(rooms.facts, (row) => row.kind.includes('hyperedge')), 'n-ary document facts', toneForRows(filter(rooms.facts, (row) => row.kind.includes('hyperedge'))), fallback.factHyperedges),
-        count('review-gaps', 'review', 'Gaps', filter(rooms.review, (row) => row.tab === 'gaps' || row.status === 'reviewable'), 'open gap records', 'review', fallback.reviewGaps),
-        count('review-nli-eligible', 'review', 'NLI eligible', filter(rooms.review, (row) => row.kind === 'review-adjudication:inventory'), 'ModernBERT pairwise review inputs', 'ready', fallback.reviewNliEligible),
-        count('review-excluded', 'review', 'Excluded', filter(rooms.review, (row) => row.kind === 'review-adjudication:excluded_reason'), 'rows outside the NLI pair contract', fallback.reviewExcluded > 0 ? 'review' : 'quiet', fallback.reviewExcluded),
+        count('review-gaps', 'review', 'Manual decisions', filter(rooms.review, (row) => row.tab === 'gaps' || row.status === 'reviewable'), atlasCardDetail(atlasControl, 'review-manual-action', 'accept/reject receipt rows'), atlasCardTone(atlasControl, 'review-manual-action', 'review'), reviewManual, reviewManual),
+        count('review-nli-eligible', 'review', 'NLI eligible', filter(rooms.review, (row) => row.kind === 'review-adjudication:inventory'), atlasCardDetail(atlasControl, 'review-nli-pairs', 'ModernBERT pairwise review inputs'), atlasCardTone(atlasControl, 'review-nli-pairs', 'ready'), reviewNli, reviewNli),
+        count('review-excluded', 'review', 'Excluded', filter(rooms.review, (row) => row.kind === 'review-adjudication:excluded_reason'), atlasCardDetail(atlasControl, 'review-excluded', 'rows outside the NLI pair contract'), atlasCardTone(atlasControl, 'review-excluded', reviewExcluded > 0 ? 'review' : 'quiet'), reviewExcluded, reviewExcluded),
         count('review-accepted', 'review', 'Accepted', filter(rooms.review, (row) => ['accepted', 'supported', 'pending_commit'].includes(row.status)), 'accepted objects', 'ready', fallback.reviewAccepted),
         count('review-ambiguous', 'review', 'Ambiguous', filter(rooms.review, (row) => row.status === 'deferred' || row.status === 'reviewable' || row.tags.includes('ambiguous_case')), 'ambiguity queue', 'review', fallback.reviewAmbiguous),
         count('discourse-wormholes', 'discourse', 'Wormholes', filter(rooms.discourse, (row) => row.tags.includes('chunk_wormhole') || row.kind.includes('wormhole')), 'wormhole evidence', toneForRows(filter(rooms.discourse, (row) => row.tags.includes('chunk_wormhole') || row.kind.includes('wormhole'))), fallback.discourseWormholes),
@@ -359,9 +381,10 @@ function count(
     detail: string,
     tone: GraphDiscourseTone,
     fallbackValue = 0,
+    exactValue?: number,
 ): GraphOperatingRoomCount {
     const uniqueRows = uniqueRecords(rows);
-    const value = Math.max(uniqueRows.length, fallbackValue);
+    const value = exactValue ?? Math.max(uniqueRows.length, fallbackValue);
     return {
         id,
         roomId,
@@ -373,13 +396,38 @@ function count(
     };
 }
 
+function atlasCard(atlasControl: AtlasControlContract | undefined, id: string): AtlasControlCard | undefined {
+    return atlasControl?.cardsById[id];
+}
+
+function atlasCardNumber(atlasControl: AtlasControlContract | undefined, id: string, fallback: number): number {
+    const value = atlasCard(atlasControl, id)?.value;
+    return typeof value === 'number' && Number.isFinite(value) ? value : fallback;
+}
+
+function atlasCardDetail(atlasControl: AtlasControlContract | undefined, id: string, fallback: string): string {
+    return atlasCard(atlasControl, id)?.detail || fallback;
+}
+
+function atlasCardTone(
+    atlasControl: AtlasControlContract | undefined,
+    id: string,
+    fallback: GraphDiscourseTone,
+): GraphDiscourseTone {
+    const tone = atlasCard(atlasControl, id)?.tone;
+    if (tone === 'warning') return 'review';
+    if (tone === 'ready' || tone === 'review' || tone === 'danger' || tone === 'quiet') return tone;
+    return fallback;
+}
+
 function roomTab(
     id: GraphOperatingRoomId,
     records: GraphDiscourseWorkbenchRecord[],
     snapshot: GraphRebuildSnapshot | null,
     entityCount: number,
+    atlasControl?: AtlasControlContract,
 ): GraphOperatingRoomTab {
-    const fallback = roomTabFallbackCount(id, snapshot, entityCount);
+    const fallback = roomTabFallbackCount(id, snapshot, entityCount, atlasControl);
     const countValue = Math.max(records.length, fallback);
     const tone = toneForRows(records);
     return { id, label: title(id), detail: roomDetail(id), count: countValue, tone: tone === 'quiet' && countValue > 0 ? 'ready' : tone };
@@ -389,21 +437,25 @@ function roomTabFallbackCount(
     id: GraphOperatingRoomId,
     snapshot: GraphRebuildSnapshot | null,
     entityCount: number,
+    atlasControl?: AtlasControlContract,
 ): number {
     const fallback = roomFallbackCounts(snapshot);
     if (id === 'entities') return Math.max(entityCount, snapshot?.atlasPacket?.counters.registryEntities || 0);
     if (id === 'structure') return fallback.structureUnits;
     if (id === 'facts') return fallback.factRelations + fallback.factHyperedges;
-    if (id === 'review') return maxCount(
-        counter(snapshot, 'documentReviewRows'),
-        counter(snapshot, 'reviewAdjudicationTotalRows'),
-        counter(snapshot, 'reviewAdjudicationEligibleRows'),
-        counter(snapshot, 'semanticEvalLedgerRows') + counter(snapshot, 'discourseEvalLedgerRows'),
-        fallback.reviewGaps,
-        fallback.reviewAccepted,
-        fallback.reviewAmbiguous,
-        atlasFamilies(snapshot, ['review']),
-    );
+    if (id === 'review') {
+        const localFallback = maxCount(
+            counter(snapshot, 'documentReviewRows'),
+            counter(snapshot, 'reviewAdjudicationTotalRows'),
+            counter(snapshot, 'reviewAdjudicationEligibleRows'),
+            counter(snapshot, 'semanticEvalLedgerRows') + counter(snapshot, 'discourseEvalLedgerRows'),
+            fallback.reviewGaps,
+            fallback.reviewAccepted,
+            fallback.reviewAmbiguous,
+            atlasFamilies(snapshot, ['review']),
+        );
+        return atlasCardNumber(atlasControl, 'review-ledger', localFallback);
+    }
     if (id === 'discourse') return maxCount(fallback.discoursePackets + fallback.discourseWormholes, counter(snapshot, 'discourseEvalLedgerRows'));
     return Math.max(recordsMetricCount(snapshot), fallback.receipts);
 }
@@ -465,6 +517,10 @@ function record(input: Partial<GraphDiscourseWorkbenchRecord> & Pick<GraphDiscou
 
 function fact(label: string, value: unknown) {
     return { label, value: String(value ?? '') };
+}
+
+function formatCount(value: number): string {
+    return Math.max(0, Math.round(value || 0)).toLocaleString();
 }
 
 function uniqueRooms(values: GraphOperatingRoomId[]): GraphOperatingRoomId[] {

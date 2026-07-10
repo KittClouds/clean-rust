@@ -23,10 +23,13 @@ import { buildGraphAtlasReadContext } from '../graph-tab/graph-atlas-preview/gra
 import { GraphStyleDrawerComponent } from '../graph-tab/graph-style-drawer/graph-style-drawer.component';
 import type { GraphLensState } from '../graph-tab/graph-lens';
 import type { GraphOperatingRoomId } from '../graph-tab/graph-operating-room';
+import { buildAtlasControlContract, type AtlasControlTone } from './atlas-control-contract';
 import { buildAtlasControlReviewDeck } from './atlas-control-review';
 import { buildGovernanceRunCertificate } from '../../../../graph-rebuild/graph-governance-run-certificate';
 import {
+    buildReviewAdjudicationViewContract,
     buildReviewAdjudicationRunCertificate,
+    type GraphReviewAdjudicationViewContract,
     type GraphReviewAdjudicationRunCertificate,
 } from '../../../../graph-rebuild/graph-review-adjudication-certificate';
 import type {
@@ -126,21 +129,6 @@ export class AttributesTabComponent {
         return edges;
     });
 
-    readonly graphSummary = computed(() => ({
-        entities: this.graphSnapshot()?.counters.entities ?? this.entities().length,
-        edges: this.graphSnapshot()?.counters.edges ?? this.atlasEdges().length,
-        targets: this.graphSnapshot()?.counters.embeddingTargets ?? 0,
-        governance: this.graphSnapshot()?.counters.memoryGovernanceCandidates
-            ?? this.graphSnapshot()?.memoryGovernanceCandidates?.length
-            ?? 0,
-        nliEligible: this.graphSnapshot()?.counters.reviewAdjudicationEligibleRows
-            ?? this.reviewAdjudicationCertificate()?.queue.nliEligibleRows
-            ?? 0,
-        verdicts: this.graphSnapshot()?.counters.promotionVerdictRows
-            ?? this.graphSnapshot()?.promotionVerdictCertificate?.audit.total
-            ?? 0,
-    }));
-
     readonly reviewDeck = computed(() => buildAtlasControlReviewDeck(
         this.graphSnapshot(),
         this.entities(),
@@ -164,57 +152,27 @@ export class AttributesTabComponent {
             embeddingDimension: snapshot.embeddingProfile?.selectedDimensions,
         });
     });
+    readonly reviewAdjudicationContract = computed<GraphReviewAdjudicationViewContract>(() =>
+        buildReviewAdjudicationViewContract(this.reviewAdjudicationCertificate()),
+    );
+    readonly atlasControlContract = computed(() => buildAtlasControlContract({
+        snapshot: this.graphSnapshot(),
+        entityCount: this.entities().length,
+        edgeCount: this.atlasEdges().length,
+        reviewAdjudicationCertificate: this.reviewAdjudicationCertificate(),
+        reviewAdjudicationViewContract: this.reviewAdjudicationContract(),
+        governanceCertificate: this.governanceCertificate(),
+        promotionCertificate: this.promotionCertificate(),
+    }));
+    readonly headerCards = computed(() => this.atlasControlContract().header);
     readonly workflowSteps = computed<AtlasWorkflowStep[]>(() => {
-        const summary = this.graphSummary();
-        const review = this.reviewDeck();
-        const promotion = this.promotionCertificate();
-        const certificate = this.governanceCertificate();
-        const adjudication = this.reviewAdjudicationCertificate();
-        const proofOk = !!certificate
-            && certificate.noTopologyProof.passed
-            && certificate.protectedMemoryProof.passed
-            && certificate.compressionDominanceProof.passed;
-        return [
-            {
-                id: 'graph',
-                label: 'Graph build',
-                value: summary.edges.toLocaleString(),
-                detail: `${summary.targets.toLocaleString()} retrieval targets`,
-                tone: summary.edges > 0 ? 'ready' : 'quiet',
-            },
-            {
-                id: 'governance',
-                label: 'Governance',
-                value: summary.governance.toLocaleString(),
-                detail: `${review.noTopologyCommit.toLocaleString()} no-commit rows`,
-                tone: summary.governance > 0 ? 'ready' : 'quiet',
-            },
-            {
-                id: 'review',
-                label: 'Review queue',
-                value: (adjudication?.queue.nliEligibleRows ?? 0).toLocaleString(),
-                detail: adjudication
-                    ? `${adjudication.queue.totalReviewRows.toLocaleString()} total / ${adjudication.queue.excludedRows.toLocaleString()} excluded`
-                    : 'certificate pending',
-                tone: adjudication
-                    ? (!adjudication.proof.noTopologyWrites || !adjudication.proof.dimensionContractPassed ? 'warning' : 'ready')
-                    : 'quiet',
-            },
-            {
-                id: 'promotion',
-                label: 'Promotion',
-                value: summary.verdicts.toLocaleString(),
-                detail: promotion ? `${promotion.audit.acceptable.toLocaleString()} acceptable` : 'certificate pending',
-                tone: summary.verdicts > 0 ? 'review' : 'quiet',
-            },
-            {
-                id: 'proof',
-                label: 'Run proof',
-                value: proofOk ? 'ok' : '--',
-                detail: certificate ? 'candidate-only verified' : 'waiting for run',
-                tone: proofOk ? 'ready' : 'quiet',
-            },
-        ];
+        return this.atlasControlContract().workflow.map((step) => ({
+            id: step.id,
+            label: step.label,
+            value: step.valueLabel,
+            detail: step.detail,
+            tone: atlasToneFromContract(step.tone),
+        }));
     });
     readonly promotionRows = computed(() =>
         this.promotionCertificate()?.rows.slice(0, 48) ?? [],
@@ -430,6 +388,11 @@ export class AttributesTabComponent {
             narrativeId: currentNote?.narrativeId || scope.narrativeId || (scope.type === 'narrative' ? scope.id : undefined),
         };
     }
+}
+
+function atlasToneFromContract(tone: AtlasControlTone): AtlasWorkflowTone {
+    if (tone === 'danger' || tone === 'warning') return 'warning';
+    return tone;
 }
 
 function titleLabel(value: string | undefined | null): string {

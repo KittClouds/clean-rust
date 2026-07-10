@@ -178,8 +178,9 @@ export function buildGraphDiscourseWorkbenchView(
 
     records.push(...statRecords(snapshot));
 
+    const renderRecords = withUniqueWorkbenchRecordIds(records);
     const recordsByTab = emptyTabMap();
-    for (const row of records.sort(sortRecords)) {
+    for (const row of renderRecords.sort(sortRecords)) {
         recordsByTab[row.tab].push(row);
     }
     const visible = TABS.flatMap((tab) => recordsByTab[tab]);
@@ -189,6 +190,21 @@ export function buildGraphDiscourseWorkbenchView(
         recordsById: Object.fromEntries(visible.map((row) => [row.id, row])),
         openReviewCount: visible.filter((row) => row.tone === 'review' || row.tone === 'danger').length,
     };
+}
+
+function withUniqueWorkbenchRecordIds(records: GraphDiscourseWorkbenchRecord[]): GraphDiscourseWorkbenchRecord[] {
+    const seen = new Map<string, number>();
+    return records.map((row) => {
+        const occurrence = seen.get(row.id) ?? 0;
+        seen.set(row.id, occurrence + 1);
+        if (occurrence === 0) return row;
+        const originalId = row.id;
+        return {
+            ...row,
+            id: `${originalId}:view-${occurrence + 1}`,
+            sourceIds: unique([originalId, ...row.sourceIds]),
+        };
+    });
 }
 
 function discourseLedgerRecord(

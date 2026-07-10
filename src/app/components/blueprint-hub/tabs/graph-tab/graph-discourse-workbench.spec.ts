@@ -19,6 +19,49 @@ describe('buildGraphDiscourseWorkbenchView', () => {
         expect(row?.focusQuery).toContain('Chunk 1');
     });
 
+    it('keeps repeated semantic ledger ids render-unique without collapsing rows', () => {
+        const snap = snapshot();
+        snap.semanticEvalLedgerSummary = {
+            schemaVersion: 'phoenix-semantic-eval-ledger/v1',
+            generatedAt: 1,
+            sourceSnapshotId: 'snap-1',
+            datasetPurpose: ['reranker_eval'],
+            entries: [
+                semanticLedgerEntry('duplicate-ledger', 'candidate-a', 'decision-a', 0.91),
+                semanticLedgerEntry('duplicate-ledger', 'candidate-b', 'decision-b', 0.9),
+            ],
+            compactExport: { scopeId: 'global', builtAt: 1, rowCount: 2, rows: [] },
+            counters: {
+                rowCount: 2,
+                byLabel: { ambiguous_case: 2 },
+                byCandidateKind: { relation_link: 2 },
+                acceptedCandidates: 0,
+                rejectedCandidates: 0,
+                ambiguousCases: 2,
+                userCorrections: 0,
+                modelDisagreements: 0,
+                manifoldDisagreements: 0,
+                graphChangeRows: 0,
+            },
+        };
+
+        const workbench = buildGraphDiscourseWorkbenchView(snap, entities());
+        const room = buildGraphOperatingRoomView(workbench, snap, entities());
+        const ids = workbench?.records.map((record) => record.id) || [];
+        const semanticInsightRows = workbench?.recordsByTab.insights
+            .filter((record) => record.id.startsWith('insights:semantic-ledger:duplicate-ledger')) || [];
+
+        expect(new Set(ids).size).toBe(ids.length);
+        expect(semanticInsightRows.map((record) => record.id)).toEqual([
+            'insights:semantic-ledger:duplicate-ledger',
+            'insights:semantic-ledger:duplicate-ledger:view-2',
+        ]);
+        expect(semanticInsightRows[1].sourceIds).toContain('insights:semantic-ledger:duplicate-ledger');
+        expect(room.recordsByRoom.review.filter((record) =>
+            record.id.startsWith('insights:semantic-ledger:duplicate-ledger')
+        )).toHaveLength(2);
+    });
+
     it('projects overlay and graph suggestions into actionable section rows', () => {
         const view = buildGraphDiscourseWorkbenchView(snapshot(), entities());
 
@@ -165,6 +208,49 @@ function nliRelationship(decision: 'supported' | 'contradicted') {
             'classification_label:supports',
             'classification_score_millis:880',
         ],
+    };
+}
+
+function semanticLedgerEntry(
+    id: string,
+    candidateId: string,
+    decisionId: string,
+    score: number,
+): NonNullable<GraphRebuildSnapshot['semanticEvalLedgerSummary']>['entries'][number] {
+    return {
+        id,
+        candidateId,
+        decisionId,
+        label: 'ambiguous_case',
+        candidateKind: 'relation_link',
+        adjudicationState: 'deferred',
+        sourceHypothesis: `${candidateId} needs semantic adjudication.`,
+        evidenceTargetIds: ['embed:chunk:chunk-1', 'embed:chunk:chunk-2'],
+        score,
+        scoringBundle: {
+            candidateScore: score,
+            spineFinalScore: score,
+            rerankRelevance: score,
+            rerankCalibrated: score,
+            rerankSource: 'gliclass_instruct',
+            manifoldAgreement: score,
+            finalScore: score,
+            scoreParts: [],
+        },
+        rerank: {
+            judgmentId: `judgment-${candidateId}`,
+            decision: 'review',
+            scoreSource: 'gliclass_instruct',
+            topLabelKind: 'relation_bridge',
+            relevanceScore: score,
+            calibratedScore: score,
+        },
+        manifoldVotes: [],
+        flags: ['duplicate_id_fixture'],
+        beforeGraph: { edgeCount: 1, factIds: [], edgeIds: [] },
+        afterGraph: { edgeCount: 1, factIds: [], edgeIds: [] },
+        userCorrectionIds: [],
+        rationale: ['duplicate ledger ids must not become duplicate render keys'],
     };
 }
 
