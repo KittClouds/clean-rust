@@ -309,7 +309,7 @@
     </details>
 
     <div class="last-run">
-      <span>Last run</span>
+      <span>{{ lastRunHeading() }}</span>
       <strong>{{ lastRunStatus().label }}</strong>
       <small>{{ lastRunStatus().detail }}<ng-container *ngIf="lastRunStatus().durationMs !== null"> / {{
           lastRunStatus().durationMs }} ms</ng-container></small>

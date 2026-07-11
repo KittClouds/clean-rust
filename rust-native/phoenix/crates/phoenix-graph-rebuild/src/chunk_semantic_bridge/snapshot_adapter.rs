@@ -5,9 +5,9 @@ use phoenix_types::EntityId;
 use crate::types::{GraphRebuildSnapshot, GraphTemporalEdge};
 
 use super::{
-    build_chunk_semantic_bridge_candidates, ChunkSemanticBridgeCandidate, ChunkSemanticBridgeChunk,
+    build_chunk_semantic_bridge_run, ChunkSemanticBridgeCandidate, ChunkSemanticBridgeChunk,
     ChunkSemanticBridgeEngineInput, ChunkSemanticBridgeEntity, ChunkSemanticBridgeEvent,
-    ChunkSemanticBridgeEventEdge, ChunkSemanticBridgeEvidence,
+    ChunkSemanticBridgeEventEdge, ChunkSemanticBridgeEvidence, ChunkSemanticBridgeRun,
 };
 
 #[derive(Clone, Copy, Debug)]
@@ -20,9 +20,21 @@ pub fn build_chunk_semantic_bridge_candidates_from_snapshot<'a>(
     snapshot: &'a GraphRebuildSnapshot,
     documents: &'a [ChunkSemanticBridgeSnapshotDocument<'a>],
 ) -> Vec<ChunkSemanticBridgeCandidate> {
+    build_chunk_semantic_bridge_run_from_snapshot(snapshot, documents).candidates
+}
+
+pub fn build_chunk_semantic_bridge_run_from_snapshot<'a>(
+    snapshot: &'a GraphRebuildSnapshot,
+    documents: &'a [ChunkSemanticBridgeSnapshotDocument<'a>],
+) -> ChunkSemanticBridgeRun {
     let texts = documents
         .iter()
         .map(|document| (document.note_id, document.text))
+        .collect::<HashMap<_, _>>();
+    let document_order = documents
+        .iter()
+        .enumerate()
+        .map(|(index, document)| (document.note_id, index))
         .collect::<HashMap<_, _>>();
     let event_by_id = snapshot
         .events
@@ -32,7 +44,7 @@ pub fn build_chunk_semantic_bridge_candidates_from_snapshot<'a>(
     let episode_by_chunk = episode_ids_by_chunk(snapshot, &event_by_id);
     let (entities_by_chunk, evidence_by_chunk) = chunk_anchor_indexes(snapshot);
 
-    let chunks = snapshot
+    let mut chunks = snapshot
         .chunks
         .iter()
         .map(|chunk| {
@@ -60,6 +72,20 @@ pub fn build_chunk_semantic_bridge_candidates_from_snapshot<'a>(
             }
         })
         .collect::<Vec<_>>();
+    chunks.sort_by(|left, right| {
+        document_order
+            .get(left.note_id)
+            .copied()
+            .unwrap_or(usize::MAX)
+            .cmp(
+                &document_order
+                    .get(right.note_id)
+                    .copied()
+                    .unwrap_or(usize::MAX),
+            )
+            .then_with(|| left.ordinal.cmp(&right.ordinal))
+            .then_with(|| left.id.cmp(right.id))
+    });
 
     let events = snapshot
         .events
@@ -87,7 +113,7 @@ pub fn build_chunk_semantic_bridge_candidates_from_snapshot<'a>(
         .collect::<Vec<_>>();
     let evidence = snapshot_evidence(snapshot);
 
-    build_chunk_semantic_bridge_candidates(ChunkSemanticBridgeEngineInput {
+    build_chunk_semantic_bridge_run(ChunkSemanticBridgeEngineInput {
         chunks: chunks.as_slice(),
         events: events.as_slice(),
         entities: entities.as_slice(),

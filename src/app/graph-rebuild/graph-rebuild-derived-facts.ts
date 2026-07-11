@@ -18,6 +18,7 @@ import type {
     GraphRebuildSnapshot,
     GraphRebuildTemporalEdge,
 } from './graph-rebuild-snapshot';
+import type { GraphCrossDocumentBridgeRunCertificate } from './graph-cross-document-bridge-certificate';
 import {
     buildGraphEpisodeProjectionEdges,
     episodeProjectionEdgeCounters,
@@ -97,6 +98,7 @@ export function deriveGraphRebuildFacts(
 export function applyNativeChunkSemanticBridgeCandidates(
     snapshot: GraphRebuildSnapshot,
     candidates: GraphRebuildChunkSemanticBridge[],
+    crossDocumentCertificate?: GraphCrossDocumentBridgeRunCertificate,
 ): void {
     const chunkSemanticBridges = assertChunkSemanticBridgeCandidateOnly(attachChunkBridgeEpisodeIds(
         candidates,
@@ -111,6 +113,7 @@ export function applyNativeChunkSemanticBridgeCandidates(
         chunkSemanticBridges,
     );
     snapshot.chunkSemanticBridges = chunkSemanticBridges;
+    snapshot.crossDocumentBridgeCertificate = crossDocumentCertificate;
     snapshot.episodeConnections = episodeConnections;
     snapshot.episodeProjectionEdges = buildGraphEpisodeProjectionEdges(
         snapshot.episodes || [],

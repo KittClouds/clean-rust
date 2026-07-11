@@ -288,6 +288,165 @@ fn snapshot_adapter_returns_candidates_without_mutating_snapshot() {
 }
 
 #[test]
+fn emits_cross_document_chunk_and_episode_candidates_without_topology_commit() {
+    let kai = EntityId("character:kai".to_owned());
+    let tempest = EntityId("character:tempest".to_owned());
+    let entities = vec![kai, tempest];
+    let chunks = vec![
+        document_chunk(
+            "source-span-alpha",
+            "early",
+            0,
+            "episode:early:0",
+            "Kai asked Tempest to remember the transit warning.",
+            &entities,
+        ),
+        document_chunk(
+            "source-span-omega",
+            "late",
+            0,
+            "episode:late:0",
+            "Tempest answered Kai and opened the transit door.",
+            &entities,
+        ),
+    ];
+
+    let candidates = build_chunk_semantic_bridge_candidates(ChunkSemanticBridgeEngineInput {
+        chunks: &chunks,
+        ..ChunkSemanticBridgeEngineInput::default()
+    });
+
+    assert_eq!(candidates.len(), 1);
+    let bridge = &candidates[0];
+    assert_eq!(bridge.source_chunk_id, "source-span-alpha");
+    assert_eq!(bridge.target_chunk_id, "source-span-omega");
+    assert_eq!(bridge.source_episode_id.as_deref(), Some("episode:early:0"));
+    assert_eq!(bridge.target_episode_id.as_deref(), Some("episode:late:0"));
+    assert!(bridge
+        .rationale
+        .iter()
+        .any(|row| row == "cross_document_bridge"));
+    assert!(bridge
+        .rationale
+        .iter()
+        .any(|row| row == "document_pair:early->late"));
+    assert_chunk_semantic_bridge_candidate_only(&candidates).expect("candidate-only cross-doc");
+}
+
+#[test]
+fn cross_document_run_certificate_proves_coverage_excerpts_and_no_topology() {
+    let kai = EntityId("character:kai".to_owned());
+    let entities = vec![kai];
+    let chunks = vec![
+        document_chunk(
+            "early:chunk:0",
+            "early",
+            0,
+            "episode:early:0",
+            "Kai sealed the transit warning beneath the red gate.",
+            &entities,
+        ),
+        document_chunk(
+            "late:chunk:0",
+            "late",
+            0,
+            "episode:late:0",
+            "Kai answered the old warning and opened the red gate.",
+            &entities,
+        ),
+    ];
+
+    let run = build_chunk_semantic_bridge_run(ChunkSemanticBridgeEngineInput {
+        chunks: &chunks,
+        ..ChunkSemanticBridgeEngineInput::default()
+    });
+    let certificate = &run.cross_document_certificate;
+
+    assert_eq!(
+        certificate.schema_version,
+        CROSS_DOCUMENT_BRIDGE_CERTIFICATE_SCHEMA_VERSION
+    );
+    assert_eq!(certificate.pair_coverage.len(), 1);
+    assert_eq!(certificate.pair_coverage[0].source_document_id, "early");
+    assert_eq!(certificate.pair_coverage[0].target_document_id, "late");
+    assert_eq!(certificate.selected_candidates, run.candidates.len());
+    assert!(certificate.no_topology_writes);
+    assert!(certificate
+        .selected_rows
+        .iter()
+        .all(|row| !row.source_excerpt.is_empty() && !row.target_excerpt.is_empty()));
+    assert!(certificate
+        .selected_rows
+        .iter()
+        .all(|row| row.no_topology_commit));
+    assert!(certificate.weakest_rows.len() <= certificate.selected_rows.len());
+}
+
+#[test]
+fn cross_document_selection_covers_pairs_and_dampens_global_protagonist() {
+    let ryan = EntityId("character:ryan".to_owned());
+    let ab = EntityId("thread:ab".to_owned());
+    let ac = EntityId("thread:ac".to_owned());
+    let bc = EntityId("thread:bc".to_owned());
+    let a_entities = vec![ryan.clone(), ab.clone(), ac.clone()];
+    let b_entities = vec![ryan.clone(), ab, bc.clone()];
+    let c_entities = vec![ryan, ac, bc];
+    let text = "Ryan asked what the transit warning meant and later answered at the door.";
+    let chunks = vec![
+        document_chunk("a:chunk:0", "a", 0, "episode:a:0", text, &a_entities),
+        document_chunk("a:chunk:1", "a", 1, "episode:a:1", text, &a_entities),
+        document_chunk("a:chunk:2", "a", 2, "episode:a:2", text, &a_entities),
+        document_chunk("b:chunk:0", "b", 0, "episode:b:0", text, &b_entities),
+        document_chunk("b:chunk:1", "b", 1, "episode:b:1", text, &b_entities),
+        document_chunk("b:chunk:2", "b", 2, "episode:b:2", text, &b_entities),
+        document_chunk("c:chunk:0", "c", 0, "episode:c:0", text, &c_entities),
+        document_chunk("c:chunk:1", "c", 1, "episode:c:1", text, &c_entities),
+        document_chunk("c:chunk:2", "c", 2, "episode:c:2", text, &c_entities),
+    ];
+
+    let candidates = build_chunk_semantic_bridge_candidates(ChunkSemanticBridgeEngineInput {
+        chunks: &chunks,
+        ..ChunkSemanticBridgeEngineInput::default()
+    });
+    let cross_document = candidates
+        .iter()
+        .filter(|bridge| {
+            bridge
+                .source_chunk_id
+                .split_once(":chunk:")
+                .map(|row| row.0)
+                != bridge
+                    .target_chunk_id
+                    .split_once(":chunk:")
+                    .map(|row| row.0)
+        })
+        .collect::<Vec<_>>();
+    let mut counts = hashbrown::HashMap::<String, usize>::new();
+    for bridge in &cross_document {
+        let source = bridge.source_chunk_id.split_once(":chunk:").unwrap().0;
+        let target = bridge.target_chunk_id.split_once(":chunk:").unwrap().0;
+        *counts.entry(format!("{source}->{target}")).or_default() += 1;
+        assert!(bridge.supporting_entity_ids.len() >= 2);
+        assert!(bridge
+            .rationale
+            .iter()
+            .any(|row| row.starts_with("primary_support_entity:")));
+        assert!(!bridge
+            .rationale
+            .iter()
+            .any(|row| row == "primary_support_entity:character:ryan"));
+        assert!(bridge
+            .rationale
+            .iter()
+            .any(|row| row == "support_role:incidental_registry_wide:character:ryan"));
+    }
+
+    assert_eq!(counts.len(), 3);
+    assert!(counts.values().all(|count| *count > 0 && *count <= 24));
+    assert_chunk_semantic_bridge_candidate_only(&candidates).expect("candidate-only fair rows");
+}
+
+#[test]
 fn shortrun_parity_report_compares_rust_candidates_to_fixture() {
     let report = build_chunk_semantic_bridge_shortrun_parity_report(
         include_str!("../../../../../../docs/shortrun.md"),
@@ -362,6 +521,26 @@ fn chunk<'a>(
             1 => "episode:1",
             _ => "episode:2",
         }),
+        entity_ids,
+        evidence_ids: &[],
+    }
+}
+
+fn document_chunk<'a>(
+    id: &'a str,
+    note_id: &'a str,
+    ordinal: u32,
+    episode_id: &'a str,
+    text: &'a str,
+    entity_ids: &'a [EntityId],
+) -> ChunkSemanticBridgeChunk<'a> {
+    ChunkSemanticBridgeChunk {
+        id,
+        note_id,
+        ordinal,
+        text,
+        role: None,
+        episode_id: Some(episode_id),
         entity_ids,
         evidence_ids: &[],
     }

@@ -61,6 +61,15 @@ import {
 } from './graph-atlas-packet';
 import { buildGraphRebuildSnapshot } from './graph-rebuild-builder';
 import { applyNativeChunkSemanticBridgeCandidates } from './graph-rebuild-derived-facts';
+import {
+    isGraphCrossDocumentBridgeRunCertificate,
+    type GraphCrossDocumentBridgeRunCertificate,
+} from './graph-cross-document-bridge-certificate';
+import {
+    applyNativeStoryContinuityContract,
+    isNativeStoryContinuityOutput,
+    type NativeStoryContinuityOutput,
+} from './graph-story-continuity';
 import { finalizeGraphRebuildSnapshot } from './graph-snapshot-finalizer';
 import {
     buildGraphSnapshotSourceEvidence,
@@ -224,6 +233,7 @@ interface NativeChunkSemanticBridgeOutput {
     schemaVersion: 'phoenix-chunk-semantic-bridge-native-output/v1';
     source: 'rust';
     candidates: GraphRebuildChunkSemanticBridge[];
+    crossDocumentCertificate: GraphCrossDocumentBridgeRunCertificate;
     qualityGate: NativeChunkSemanticBridgeQualityGate;
     timing: NativeChunkSemanticBridgeTiming;
 }
@@ -480,6 +490,7 @@ export class GraphRebuildService {
             recordGraphCollapseSnapshotBoundary(snapshot, 'typescript_snapshot');
             snapshot = await this.reconcileDocumentGraphMutations(snapshot);
             await this.attachNativeChunkSemanticBridges(snapshot, noteTexts, timings);
+            await this.attachNativeStoryContinuity(snapshot, noteTexts, timings);
             await this.attachNativeMemoryGovernance(snapshot, timings);
             await this.attachNativeMemoryGovernanceRetrievalExperiment(snapshot, timings);
             await this.attachNativePromotionVerdictCertificate(snapshot, timings);
@@ -580,7 +591,11 @@ export class GraphRebuildService {
             if (!isNativeChunkSemanticBridgeOutput(native)) {
                 throw new Error('Rust chunk semantic bridge command returned an invalid v1 payload.');
             }
-            applyNativeChunkSemanticBridgeCandidates(snapshot, native.candidates);
+            applyNativeChunkSemanticBridgeCandidates(
+                snapshot,
+                native.candidates,
+                native.crossDocumentCertificate,
+            );
             if (timings) {
                 timings.nativeChunkSemanticBridgeCandidates = native.candidates.length;
                 timings.nativeChunkSemanticBridgeQualityDemotions = native.qualityGate.demotedSameEntityOnly;
@@ -634,6 +649,52 @@ export class GraphRebuildService {
             console.warn('[GraphRebuild] Native memory governance command unavailable; continuing without governance candidates.', error);
         } finally {
             if (timings) timings.nativeMemoryGovernanceMs = elapsedMs(started);
+        }
+    }
+
+    private async attachNativeStoryContinuity(
+        snapshot: GraphRebuildSnapshot,
+        noteTexts: Record<string, string>,
+        timings?: GraphRebuildBuildTimings,
+    ): Promise<void> {
+        const started = performance.now();
+        try {
+            if (this.phoenix.target !== 'native') {
+                if (timings) timings.nativeStoryContinuitySkipped = 1;
+                return;
+            }
+            const native = await this.phoenix.storeCommand('graphRebuild:storyContinuity', {
+                snapshot: graphRebuildSnapshotToNativeChunkBridgePayload(snapshot),
+                documents: snapshot.noteIds.map((noteId) => ({ noteId, text: noteTexts[noteId] || '' })),
+                documentSemanticSummary: snapshot.documentSemanticSummary,
+                bridgeCandidates: snapshot.chunkSemanticBridges || [],
+            }) as NativeStoryContinuityOutput | null;
+            if (!isNativeStoryContinuityOutput(native)) {
+                throw new Error('Rust story continuity command returned an invalid v1 payload.');
+            }
+            applyNativeStoryContinuityContract(snapshot, native.contract);
+            if (timings) {
+                const counters = native.contract.certificate.counters;
+                timings.nativeStoryContinuityRows = counters.events
+                    + counters.boundaryReceipts
+                    + counters.episodes
+                    + counters.temporalCandidates
+                    + counters.stateIntervals
+                    + counters.causalCandidates
+                    + counters.episodeConnections
+                    + counters.conflicts;
+                timings.nativeStoryContinuityRustMicros = native.timing.continuityBuildMicros;
+            }
+        } catch (error) {
+            if (!isUnsupportedStoreCommand(error, 'graphRebuild:storyContinuity')) throw error;
+            if (timings) {
+                timings.nativeStoryContinuitySkipped = 1;
+                timings.nativeStoryContinuityRows = 0;
+                timings.nativeStoryContinuityRustMicros = 0;
+            }
+            console.warn('[GraphRebuild] Native story continuity command unavailable; retaining compatibility continuity rows.', error);
+        } finally {
+            if (timings) timings.nativeStoryContinuityMs = elapsedMs(started);
         }
     }
 
@@ -1424,6 +1485,7 @@ function isNativeChunkSemanticBridgeOutput(
     return value?.schemaVersion === 'phoenix-chunk-semantic-bridge-native-output/v1'
         && value.source === 'rust'
         && Array.isArray(value.candidates)
+        && isGraphCrossDocumentBridgeRunCertificate(value.crossDocumentCertificate)
         && !!value.qualityGate
         && !!value.timing;
 }
@@ -2235,6 +2297,7 @@ const SNAPSHOT_CONTENT_BLOB_FIELDS: GraphRebuildContentBlobField[] = [
     'graphModelV2',
     'semanticCandidateSummary',
     'manifoldSpecializationSummary',
+    'storyContinuity',
     'atlasPacket',
 ];
 
@@ -2340,12 +2403,14 @@ export function graphRebuildSnapshotPersistenceView(
     persisted.events = [];
     persisted.episodes = [];
     persisted.chunkSemanticBridges = [];
+    delete persisted.crossDocumentBridgeCertificate;
     persisted.episodeConnections = [];
     persisted.episodeProjectionEdges = [];
     persisted.temporalEdges = [];
     persisted.causalEdges = [];
     persisted.memoryState = [];
     persisted.memoryGovernanceCandidates = [];
+    delete persisted.storyContinuity;
     persisted.embeddingTargets = [];
     persisted.projectionRefs = [];
     persisted.nodes = [];
@@ -2907,6 +2972,7 @@ function snapshotContentBlobValue(
                 events: snapshot.events,
                 episodes: snapshot.episodes,
                 chunkSemanticBridges: snapshot.chunkSemanticBridges,
+                crossDocumentBridgeCertificate: snapshot.crossDocumentBridgeCertificate,
                 episodeConnections: snapshot.episodeConnections,
                 episodeProjectionEdges: snapshot.episodeProjectionEdges,
                 temporalEdges: snapshot.temporalEdges,
@@ -2934,6 +3000,8 @@ function snapshotContentBlobValue(
             return snapshot.semanticCandidateSummary;
         case 'manifoldSpecializationSummary':
             return snapshot.manifoldSpecializationSummary;
+        case 'storyContinuity':
+            return snapshot.storyContinuity;
         case 'atlasPacket':
             return snapshot.atlasPacket ? {
                 ...snapshot.atlasPacket,

@@ -11,6 +11,7 @@ import type {
 import type { GraphModelV2Snapshot } from './graph-model-v2';
 import type { GraphCalendarRegistryBridgeSummary } from './graph-calendar-registry-bridge';
 import type { GraphMemoryGraphRagBridgeSummary } from './graph-memory-graphrag-bridge';
+import type { GraphCrossDocumentBridgeRunCertificate } from './graph-cross-document-bridge-certificate';
 import type { GraphDiscourseSpineSummary } from './graph-discourse-spine';
 import type { GraphDiscourseBridgeCandidateSummary } from './graph-discourse-bridge-candidates';
 import type { GraphDiscourseBridgeAdjudicationSummary } from './graph-discourse-bridge-adjudication';
@@ -29,6 +30,7 @@ import type { GraphTruthCommitLedger } from './graph-truth-commit-ledger';
 import type { GraphAtlasPacket } from './graph-atlas-packet';
 import type { GraphPromotionVerdictCertificate } from './graph-promotion-verdict';
 import type { GraphReviewAdjudicationRunCertificate } from './graph-review-adjudication-certificate';
+import type { GraphStoryContinuityContract } from './graph-story-continuity';
 
 export type GraphRebuildScopeKind = 'global' | 'folder' | 'narrative' | 'note' | 'multiNote';
 export type GraphRebuildAnchorSource = EntityOccurrence['source'] | 'accepted_suggestion';
@@ -2260,6 +2262,16 @@ export interface GraphRebuildCounters {
     reviewAdjudicationAppliedRows?: number;
     reviewAdjudicationTopologyWrites?: number;
     reviewAdjudicationDimension?: number;
+    continuityEvents?: number;
+    continuityBoundaryReceipts?: number;
+    continuityEpisodes?: number;
+    continuityTemporalCandidates?: number;
+    continuityCausalCandidates?: number;
+    continuityStateIntervals?: number;
+    continuityEpisodeConnections?: number;
+    continuityConflicts?: number;
+    continuityCrossDocumentConnections?: number;
+    continuityReviewRequired?: number;
     embeddingTargets: number;
     embeddingTargetCandidates?: number;
     embeddingQueuedTargets?: number;
@@ -2514,6 +2526,10 @@ export interface GraphRebuildBuildTimings {
     nativeChunkSemanticBridgeCandidates?: number;
     nativeChunkSemanticBridgeQualityDemotions?: number;
     nativeChunkSemanticBridgeRustMicros?: number;
+    nativeStoryContinuityMs?: number;
+    nativeStoryContinuitySkipped?: number;
+    nativeStoryContinuityRows?: number;
+    nativeStoryContinuityRustMicros?: number;
     nativeMemoryGovernanceMs?: number;
     nativeMemoryGovernanceSkipped?: number;
     nativeMemoryGovernanceCandidates?: number;
@@ -2581,6 +2597,7 @@ export type GraphRebuildContentBlobField =
     | 'graphModelV2'
     | 'semanticCandidateSummary'
     | 'manifoldSpecializationSummary'
+    | 'storyContinuity'
     | 'atlasPacket';
 
 export interface GraphRebuildContentBlobRef {
@@ -2653,6 +2670,7 @@ export interface GraphRebuildSnapshot {
     events: GraphRebuildEvent[];
     episodes: GraphRebuildEpisode[];
     chunkSemanticBridges?: GraphRebuildChunkSemanticBridge[];
+    crossDocumentBridgeCertificate?: GraphCrossDocumentBridgeRunCertificate;
     episodeConnections?: GraphRebuildEpisodeConnection[];
     episodeProjectionEdges?: GraphRebuildEpisodeProjectionEdge[];
     temporalEdges: GraphRebuildTemporalEdge[];
@@ -2662,6 +2680,7 @@ export interface GraphRebuildSnapshot {
     memoryGovernanceRetrievalExperiment?: GraphMemoryGovernanceRetrievalWeightingExperiment;
     promotionVerdictCertificate?: GraphPromotionVerdictCertificate;
     reviewAdjudicationCertificate?: GraphReviewAdjudicationRunCertificate;
+    storyContinuity?: GraphStoryContinuityContract;
     embeddingTargets: GraphRebuildEmbeddingTarget[];
     embeddingTargetPlan?: GraphRebuildEmbeddingTargetPlan;
     embeddingVectors: GraphRebuildEmbeddingVector[];

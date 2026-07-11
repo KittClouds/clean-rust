@@ -456,6 +456,40 @@
     font-weight: 800;
 }
 
+.atlas-cross-document-excerpts {
+    display: grid;
+    gap: 10px;
+    margin-top: 16px;
+}
+
+.atlas-cross-document-excerpts article {
+    display: grid;
+    gap: 7px;
+    padding: 12px;
+    border: 1px solid #1b3035;
+    background: #071114;
+}
+
+.atlas-cross-document-excerpts span {
+    color: #63d8cb;
+    font-size: 9px;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.atlas-cross-document-excerpts strong {
+    color: #c7d0d7;
+    font-size: 10px;
+    overflow-wrap: anywhere;
+}
+
+.atlas-cross-document-excerpts p {
+    margin: 0;
+    color: #aab5bd;
+    font-size: 12px;
+    line-height: 1.55;
+}
+
 .atlas-room-proofs {
     display: flex;
     flex-wrap: wrap;

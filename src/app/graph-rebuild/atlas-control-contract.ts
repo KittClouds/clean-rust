@@ -34,7 +34,8 @@ export type AtlasControlFamily =
     | 'governance'
     | 'promotion'
     | 'metrics'
-    | 'proof';
+    | 'proof'
+    | 'continuity';
 
 export type AtlasControlLane =
     | 'graph_topology'
@@ -47,7 +48,13 @@ export type AtlasControlLane =
     | 'nli_judgment'
     | 'governance_candidate'
     | 'promotion_verdict'
-    | 'metrics_ledger';
+    | 'metrics_ledger'
+    | 'continuity_episode_map'
+    | 'continuity_timeline'
+    | 'continuity_causality'
+    | 'continuity_state_history'
+    | 'continuity_cross_document'
+    | 'continuity_exception';
 
 export type AtlasControlSourceContract =
     | 'graph_build'
@@ -56,7 +63,9 @@ export type AtlasControlSourceContract =
     | 'memory_governance'
     | 'governance_certificate'
     | 'promotion_verdict'
-    | 'metrics';
+    | 'metrics'
+    | 'cross_document_bridge'
+    | 'story_continuity';
 
 export type AtlasControlInventoryCategoryId =
     | 'entities'
@@ -72,7 +81,13 @@ export type AtlasControlInventoryCategoryId =
     | 'nli_judgment_rows'
     | 'governance_candidate_rows'
     | 'promotion_verdict_rows'
-    | 'metrics_rows';
+    | 'metrics_rows'
+    | 'continuity_episode_rows'
+    | 'continuity_temporal_rows'
+    | 'continuity_causal_rows'
+    | 'continuity_state_rows'
+    | 'continuity_cross_document_rows'
+    | 'continuity_exception_rows';
 
 export type AtlasControlIntent =
     | 'run'
@@ -117,14 +132,23 @@ export type AtlasControlAction =
     | 'preview_promotion'
     | 'add_entity'
     | 'edit_entity'
-    | 'delete_entity';
+    | 'delete_entity'
+    | 'split_episode'
+    | 'merge_episodes'
+    | 'confirm_boundary'
+    | 'confirm_ordering'
+    | 'reject_ordering'
+    | 'confirm_causal_link'
+    | 'reject_causal_link'
+    | 'resolve_continuity_conflict';
 
 export type AtlasControlTone = 'ready' | 'review' | 'warning' | 'danger' | 'quiet';
 export type AtlasControlReceiptKind =
     | 'graph_build_receipt'
     | 'document_review_action_receipt'
     | 'review_adjudication_run_certificate'
-    | 'promotion_proposal_receipt';
+    | 'promotion_proposal_receipt'
+    | 'continuity_action_receipt';
 
 export interface AtlasControlReceiptPolicy {
     required: boolean;
@@ -159,6 +183,9 @@ export interface AtlasControlRow {
     entityIds: string[];
     evidenceIds: string[];
     tags: string[];
+    sourceExcerpt: string | null;
+    targetExcerpt: string | null;
+    targetDocumentId: string | null;
 }
 
 export interface AtlasControlEntityInput {
@@ -370,7 +397,30 @@ function buildInventory(input: {
         inventory('governance_candidate_rows', 'Governance candidates', 'governance', 'governance_candidate', 'memory_governance', input.governanceCount, laneRows('governance_candidate'), 'inspect_only', ['inspect'], noReceipt()),
         inventory('promotion_verdict_rows', 'Promotion verdicts', 'promotion', 'promotion_verdict', 'promotion_verdict', input.promotionCount, laneRows('promotion_verdict'), input.promotionCount ? 'promotion_preview' : 'none', input.promotionCount ? ['preview_promotion'] : [], receipt('promotion_proposal_receipt', true, true)),
         inventory('metrics_rows', 'Metric rows', 'metrics', 'metrics_ledger', 'metrics', input.metricsRows, laneRows('metrics_ledger'), 'inspect_only', ['inspect'], noReceipt()),
+        continuityInventory('continuity_episode_rows', 'Episode map', 'continuity_episode_map', laneRows('continuity_episode_map')),
+        continuityInventory('continuity_temporal_rows', 'Timeline', 'continuity_timeline', laneRows('continuity_timeline')),
+        continuityInventory('continuity_causal_rows', 'Causality', 'continuity_causality', laneRows('continuity_causality')),
+        continuityInventory('continuity_state_rows', 'State history', 'continuity_state_history', laneRows('continuity_state_history')),
+        inventory('continuity_cross_document_rows', 'Cross-document', 'continuity',
+            'continuity_cross_document', 'cross_document_bridge',
+            laneRows('continuity_cross_document').length, laneRows('continuity_cross_document'),
+            'inspect_only', ['inspect', 'compare_context'], noReceipt()),
+        continuityInventory('continuity_exception_rows', 'Exceptions', 'continuity_exception', laneRows('continuity_exception')),
     ];
+}
+
+function continuityInventory(
+    id: AtlasControlInventoryCategoryId,
+    label: string,
+    lane: AtlasControlLane,
+    rows: AtlasControlRow[],
+): AtlasControlInventoryCategory {
+    return inventory(
+        id, label, 'continuity', lane, 'story_continuity', rows.length, rows,
+        rows.some((row) => row.receiptPolicy.required) ? 'manual_receipt' : 'inspect_only',
+        [...new Set(rows.flatMap((row) => row.allowedActions))],
+        receipt('continuity_action_receipt', true, false),
+    );
 }
 
 function inventory(
@@ -495,10 +545,13 @@ function combineProofs(
 ): AtlasControlInvariant {
     if (!snapshot) return invariant('pending', 'No graph snapshot is attached.');
     const failed = review?.proof.noTopologyWrites.status === 'failed'
-        || governance?.noTopologyProof.passed === false;
+        || governance?.noTopologyProof.passed === false
+        || snapshot.crossDocumentBridgeCertificate?.noTopologyWrites === false;
     if (failed) return invariant('failed', 'At least one attached certificate reports a topology write.');
     if (!review || !governance || !promotion) return invariant('pending', 'One or more proof certificates are not attached.');
-    return invariant('passed', 'Review, governance, and promotion certificates report no topology writes.');
+    return invariant('passed', snapshot.crossDocumentBridgeCertificate
+        ? 'Review, governance, promotion, and cross-document certificates report no topology writes.'
+        : 'Review, governance, and promotion certificates report no topology writes.');
 }
 
 function inventoryCard(

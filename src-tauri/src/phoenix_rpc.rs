@@ -17,27 +17,27 @@ use crate::tts::{
 };
 use base64::{engine::general_purpose::STANDARD as BASE64_STANDARD, Engine as _};
 use flate2::{read::GzDecoder, write::GzEncoder, Compression};
-use phoenix_graph_rebuild::{
-    assert_chunk_semantic_bridge_candidate_only, assert_memory_governance_candidate_only,
-    audit_chunk_semantic_bridge_quality_gate, build_atlas_packet,
-    build_chunk_semantic_bridge_candidates_from_snapshot, build_chunks,
-    build_document_semantic_summary, build_memory_governance_candidates_from_snapshot,
-    build_memory_governance_retrieval_weighting_experiment, build_snapshot_embedding_target_report,
-    classify_document_profiles, compile_legacy_snapshot, promote_chunk_semantic_bridge_candidates,
-    AtlasPacket, Chunk, ChunkSemanticBridgeCandidate, ChunkSemanticBridgePromotionChunk,
-    ChunkSemanticBridgePromotionInput, ChunkSemanticBridgeSnapshotDocument, ChunkerConfig,
-    DocumentProfileRequest, DocumentSemanticRequest, GraphEmbeddingTarget,
-    GraphEmbeddingTargetOriginCount, GraphMemoryGovernanceCandidate, GraphRebuildSnapshot,
-    MemoryGovernanceRetrievalCandidate, MemoryGovernanceRetrievalPreviewInput,
-    MemoryGovernanceRetrievalWeightingExperiment,
-};
 use phoenix_graph_kernel::{GraphProposalBatchReceipt, GraphTruthCommit};
 use phoenix_graph_post::promotion_verdict::{
     build_graph_promotion_verdict_certificate, GraphPromotionUserOverride,
     GraphPromotionVerdictCertificate,
 };
-use phoenix_store_native_core::{PhoenixGraphKernelStoreV2, PhoenixGraphLearningStore};
-use phoenix_store_overgraph::PhoenixOvergraphStore;
+use phoenix_graph_rebuild::{
+    assert_chunk_semantic_bridge_candidate_only, assert_memory_governance_candidate_only,
+    assert_story_continuity_candidate_only, audit_chunk_semantic_bridge_quality_gate,
+    build_atlas_packet, build_chunk_semantic_bridge_run_from_snapshot, build_chunks,
+    build_document_semantic_summary, build_memory_governance_candidates_from_snapshot,
+    build_memory_governance_retrieval_weighting_experiment, build_snapshot_embedding_target_report,
+    build_story_continuity_contract, classify_document_profiles, compile_legacy_snapshot,
+    promote_chunk_semantic_bridge_candidates, AtlasPacket, Chunk, ChunkSemanticBridgeCandidate,
+    ChunkSemanticBridgePromotionChunk, ChunkSemanticBridgePromotionInput,
+    ChunkSemanticBridgeSnapshotDocument, ChunkerConfig, CrossDocumentBridgeRunCertificate,
+    DocumentProfileRequest, DocumentSemanticRequest, DocumentSemanticSummary, GraphEmbeddingTarget,
+    GraphEmbeddingTargetOriginCount, GraphMemoryGovernanceCandidate, GraphRebuildSnapshot,
+    MemoryGovernanceRetrievalCandidate, MemoryGovernanceRetrievalPreviewInput,
+    MemoryGovernanceRetrievalWeightingExperiment, StoryContinuityContract, StoryContinuityDocument,
+    StoryContinuityInput,
+};
 use phoenix_hyperbolic::lorentz_tree::{
     HyperboloidPoint, LorentzForest, LorentzForestIndex, LorentzNode, LorentzQueryMode,
     LorentzScoreConfig, LorentzTree, LorentzTreeKind, LorentzTreeMembership, LorentzTreeQuery,
@@ -45,6 +45,8 @@ use phoenix_hyperbolic::lorentz_tree::{
 };
 use phoenix_hyperbolic::siegel_finsler::{run_siegel_finsler_kernel, SiegelKernelRunRequest};
 use phoenix_native::{runtime_banner, PhoenixNativeHost, SnapshotPartition};
+use phoenix_store_native_core::{PhoenixGraphKernelStoreV2, PhoenixGraphLearningStore};
+use phoenix_store_overgraph::PhoenixOvergraphStore;
 use phoenix_types::{
     AnalyzeTextRequest, AtlasRichScanRequest, CommitRequest, CreateSessionRequest,
     GraphDeltaRequest, IngestRequest, QueryRequest, RebuildRequest, RuntimeConfig,
@@ -115,8 +117,36 @@ struct ChunkSemanticBridgeResponse {
     schema_version: &'static str,
     source: &'static str,
     candidates: Vec<ChunkSemanticBridgeCandidate>,
+    cross_document_certificate: CrossDocumentBridgeRunCertificate,
     quality_gate: phoenix_graph_rebuild::BridgeQualityGateAudit,
     timing: ChunkSemanticBridgeTiming,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct StoryContinuityRequest {
+    snapshot: GraphRebuildSnapshot,
+    documents: Vec<DocumentChunkInput>,
+    #[serde(default)]
+    document_semantic_summary: Option<DocumentSemanticSummary>,
+    #[serde(default)]
+    bridge_candidates: Vec<ChunkSemanticBridgeCandidate>,
+}
+
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct StoryContinuityTiming {
+    continuity_build_micros: u128,
+    total_micros: u128,
+}
+
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct StoryContinuityResponse {
+    schema_version: &'static str,
+    source: &'static str,
+    contract: StoryContinuityContract,
+    timing: StoryContinuityTiming,
 }
 
 #[derive(Debug, Deserialize)]
@@ -1068,21 +1098,56 @@ impl PhoenixApi for PhoenixApiImpl {
                 })
                 .collect::<Vec<_>>();
             let bridge_started = Instant::now();
-            let candidates =
-                build_chunk_semantic_bridge_candidates_from_snapshot(&request.snapshot, &documents);
-            assert_chunk_semantic_bridge_candidate_only(&candidates)
+            let run = build_chunk_semantic_bridge_run_from_snapshot(&request.snapshot, &documents);
+            assert_chunk_semantic_bridge_candidate_only(&run.candidates)
                 .map_err(|error| error.to_string())?;
             let bridge_build_micros = bridge_started.elapsed().as_micros();
-            let quality_gate = audit_chunk_semantic_bridge_quality_gate(&candidates);
+            let quality_gate = audit_chunk_semantic_bridge_quality_gate(&run.candidates);
             return serialize_json(&json!({
                 "success": true,
                 "payload": ChunkSemanticBridgeResponse {
                     schema_version: "phoenix-chunk-semantic-bridge-native-output/v1",
                     source: "rust",
-                    candidates,
+                    candidates: run.candidates,
+                    cross_document_certificate: run.cross_document_certificate,
                     quality_gate,
                     timing: ChunkSemanticBridgeTiming {
                         bridge_build_micros,
+                        total_micros: started.elapsed().as_micros(),
+                    },
+                },
+                "error": null,
+            }));
+        }
+        if command == "graphRebuild:storyContinuity" {
+            let started = Instant::now();
+            let request = serde_json::from_value::<StoryContinuityRequest>(payload)
+                .map_err(|error| format!("invalid story continuity request: {error}"))?;
+            let documents = request
+                .documents
+                .into_iter()
+                .map(|document| StoryContinuityDocument {
+                    note_id: document.note_id.into(),
+                    text: document.text,
+                })
+                .collect::<Vec<_>>();
+            let continuity_started = Instant::now();
+            let contract = build_story_continuity_contract(StoryContinuityInput {
+                snapshot: &request.snapshot,
+                documents: &documents,
+                semantic_summary: request.document_semantic_summary.as_ref(),
+                bridge_candidates: &request.bridge_candidates,
+            });
+            assert_story_continuity_candidate_only(&contract).map_err(|error| error.to_string())?;
+            let continuity_build_micros = continuity_started.elapsed().as_micros();
+            return serialize_json(&json!({
+                "success": true,
+                "payload": StoryContinuityResponse {
+                    schema_version: "phoenix-story-continuity-native-output/v1",
+                    source: "rust",
+                    contract,
+                    timing: StoryContinuityTiming {
+                        continuity_build_micros,
                         total_micros: started.elapsed().as_micros(),
                     },
                 },

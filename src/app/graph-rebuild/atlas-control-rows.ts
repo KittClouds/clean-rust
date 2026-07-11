@@ -23,6 +23,19 @@ import type {
 } from './graph-rebuild-snapshot';
 import type { GraphReviewAdjudicationRunCertificate } from './graph-review-adjudication-certificate';
 import type {
+    GraphContinuityCausalCandidate,
+    GraphContinuityConflictCandidate,
+    GraphContinuityStateIntervalCandidate,
+    GraphContinuityTemporalCandidate,
+    GraphEpisodeBoundaryReceipt,
+    GraphEpisodeContinuityCandidate,
+    GraphStoryEpisode,
+} from './graph-story-continuity';
+import type {
+    GraphCrossDocumentBridgeAuditRow,
+    GraphCrossDocumentBridgePairCoverage,
+} from './graph-cross-document-bridge-certificate';
+import type {
     AtlasControlAction,
     AtlasControlEntityInput,
     AtlasControlLane,
@@ -41,6 +54,9 @@ interface AtlasControlRowTrace {
     entityIds?: string[];
     evidenceIds?: string[];
     tags?: string[];
+    sourceExcerpt?: string;
+    targetExcerpt?: string;
+    targetDocumentId?: string;
 }
 
 export function buildAtlasControlRows(
@@ -85,6 +101,29 @@ export function buildAtlasControlRows(
     }
     for (const row of snapshot?.memoryGovernanceCandidates ?? []) rows.push(governanceRow(snapshotId, row));
     for (const row of promotion?.rows ?? []) rows.push(promotionRow(snapshotId, row));
+    for (const row of snapshot?.storyContinuity?.boundaryReceipts ?? []) rows.push(continuityBoundaryRow(snapshotId, row));
+    for (const row of snapshot?.storyContinuity?.episodes ?? []) rows.push(continuityEpisodeRow(snapshotId, row));
+    for (const row of snapshot?.storyContinuity?.episodeConnections ?? []) rows.push(continuityConnectionRow(snapshotId, row));
+    for (const row of snapshot?.storyContinuity?.temporalCandidates ?? []) rows.push(continuityTemporalRow(snapshotId, row));
+    for (const row of snapshot?.storyContinuity?.causalCandidates ?? []) rows.push(continuityCausalRow(snapshotId, row));
+    for (const row of snapshot?.storyContinuity?.stateIntervals ?? []) rows.push(continuityStateRow(snapshotId, row));
+    for (const row of snapshot?.storyContinuity?.conflicts ?? []) rows.push(continuityConflictRow(snapshotId, row));
+    const crossDocument = snapshot?.crossDocumentBridgeCertificate;
+    for (const pair of crossDocument?.pairCoverage ?? []) {
+        rows.push(crossDocumentPairCoverageRow(snapshotId, pair));
+    }
+    const weakestIds = new Set((crossDocument?.weakestRows ?? []).map((row) => row.id));
+    for (const row of crossDocument?.selectedRows ?? []) {
+        rows.push(crossDocumentCandidateRow(snapshotId, row, weakestIds.has(row.id)));
+    }
+    for (const row of crossDocument?.rejectedRows ?? []) {
+        rows.push(crossDocumentCandidateRow(snapshotId, row, false));
+    }
+    for (const receipt of snapshot?.storyContinuity?.actionReceipts ?? []) {
+        const target = rows.find((row) =>
+            row.identity.sourceContract === 'story_continuity' && row.identity.rawId === receipt.targetRowId);
+        if (target && !target.receiptIds.includes(receipt.id)) target.receiptIds.push(receipt.id);
+    }
     for (const [key, value] of Object.entries(snapshot?.buildTimings ?? {})) {
         if (typeof value !== 'number' || !Number.isFinite(value)) continue;
         rows.push(typedRow(snapshotId, 'metrics', 'metrics_ledger', key, 'timing', humanize(key),
@@ -92,6 +131,130 @@ export function buildAtlasControlRows(
             'measured', null, ['inspect'], noReceipt(), [], { tags: ['timing'] }));
     }
     return uniquifyRows(rows);
+}
+
+function continuityBoundaryRow(snapshotId: string, row: GraphEpisodeBoundaryReceipt): AtlasControlRow {
+    return typedRow(snapshotId, 'story_continuity', 'continuity_episode_map', row.id, 'episode_boundary',
+        `Boundary at ${row.sourceOffset}`, row.signals.map((signal) => signal.detail).join(' / '), row.status,
+        row.confidenceMillis / 1000, ['inspect', 'jump_to_source', 'confirm_boundary', 'split_episode'],
+        continuityReceipt(), [], {
+            noteId: row.noteId, sourceStart: row.sourceOffset, sourceEnd: row.sourceOffset,
+            sourceIds: row.beforeChunkId ? [row.beforeChunkId] : [], targetIds: [row.afterChunkId],
+            evidenceIds: row.signals.flatMap((signal) => signal.evidenceIds),
+            tags: ['continuity', 'boundary', row.decision, 'no_topology_commit'],
+        });
+}
+
+function continuityEpisodeRow(snapshotId: string, row: GraphStoryEpisode): AtlasControlRow {
+    return typedRow(snapshotId, 'story_continuity', 'continuity_episode_map', row.id, 'story_episode',
+        row.label, `${row.eventIds.length} events / ${row.chunkIds.length} source spans`, row.status,
+        row.confidenceMillis / 1000, ['inspect', 'jump_to_source', 'split_episode', 'merge_episodes'],
+        continuityReceipt(), row.boundaryReceiptIds, {
+            noteId: row.noteId, sourceStart: row.sourceStart, sourceEnd: row.sourceEnd,
+            sourceIds: row.chunkIds, targetIds: row.eventIds, entityIds: row.entityIds,
+            evidenceIds: row.boundaryReceiptIds, tags: ['continuity', 'episode', 'no_topology_commit'],
+        });
+}
+
+function continuityConnectionRow(snapshotId: string, row: GraphEpisodeContinuityCandidate): AtlasControlRow {
+    return typedRow(snapshotId, 'story_continuity', 'continuity_episode_map', row.id, 'episode_continuity',
+        `${row.sourceEpisodeId} -> ${humanize(row.kind)} -> ${row.targetEpisodeId}`,
+        row.rationale.join(' '), row.status, row.confidenceMillis / 1000,
+        ['inspect', 'compare_context'], noReceipt(), [], {
+            sourceIds: [row.sourceEpisodeId], targetIds: [row.targetEpisodeId],
+            entityIds: row.supportingEntityIds, evidenceIds: row.evidenceIds,
+            tags: ['continuity', row.kind, row.evidenceClass, 'no_topology_commit'],
+        });
+}
+
+function continuityTemporalRow(snapshotId: string, row: GraphContinuityTemporalCandidate): AtlasControlRow {
+    return typedRow(snapshotId, 'story_continuity', 'continuity_timeline', row.id, 'temporal_candidate',
+        `${row.sourceId} -> ${humanize(row.relation)} -> ${row.targetId}`,
+        [humanize(row.evidenceClass), row.cue].filter(Boolean).join(' / '), row.status,
+        row.confidenceMillis / 1000,
+        ['inspect', 'compare_context', 'confirm_ordering', 'reject_ordering'], continuityReceipt(), [], {
+            sourceIds: [row.sourceId], targetIds: [row.targetId], evidenceIds: row.evidenceIds,
+            tags: ['continuity', 'temporal', row.relation, row.evidenceClass, 'no_topology_commit'],
+        });
+}
+
+function continuityCausalRow(snapshotId: string, row: GraphContinuityCausalCandidate): AtlasControlRow {
+    return typedRow(snapshotId, 'story_continuity', 'continuity_causality', row.id, 'causal_candidate',
+        `${row.sourceEventId} -> ${humanize(row.relation)} -> ${row.targetEventId}`,
+        `${humanize(row.modality)} / ${row.temporalLegal ? 'temporally legal' : 'temporal review required'}`,
+        row.status, row.confidenceMillis / 1000,
+        ['inspect', 'compare_context', 'confirm_causal_link', 'reject_causal_link'], continuityReceipt(), [], {
+            sourceIds: [row.sourceEventId], targetIds: [row.targetEventId], evidenceIds: row.evidenceIds,
+            tags: ['continuity', 'causal', row.relation, row.polarity, row.modality, 'no_topology_commit'],
+        });
+}
+
+function continuityStateRow(snapshotId: string, row: GraphContinuityStateIntervalCandidate): AtlasControlRow {
+    return typedRow(snapshotId, 'story_continuity', 'continuity_state_history', row.id, 'state_interval',
+        `${row.subjectKey} / ${humanize(row.stateKey)}`,
+        `${row.value ?? row.polarity} / ${row.startEventId} -> ${row.endEventId || 'ongoing'}`, row.status,
+        row.confidenceMillis / 1000, ['inspect', 'compare_context'], noReceipt(), [], {
+            noteId: row.noteId, sourceStart: row.sourceStart, sourceEnd: row.sourceEnd,
+            sourceIds: [row.startEventId],
+            targetIds: row.endEventId ? [row.endEventId] : [],
+            entityIds: [row.subjectKey],
+            tags: ['continuity', 'state_history', row.stateKey, row.polarity,
+                row.persists ? 'persists' : 'bounded', 'no_topology_commit'],
+        });
+}
+
+function continuityConflictRow(snapshotId: string, row: GraphContinuityConflictCandidate): AtlasControlRow {
+    return typedRow(snapshotId, 'story_continuity', 'continuity_exception', row.id, 'continuity_conflict',
+        humanize(row.kind), `${humanize(row.severity)} / ${row.rowIds.length} conflicting rows`, row.status,
+        row.confidenceMillis / 1000,
+        ['inspect', 'compare_context', 'resolve_continuity_conflict'], continuityReceipt(), [], {
+            noteId: row.noteId, sourceIds: row.rowIds, evidenceIds: row.evidenceIds,
+            tags: ['continuity', 'exception', row.kind, row.severity, 'no_topology_commit'],
+        });
+}
+
+function crossDocumentPairCoverageRow(
+    snapshotId: string,
+    row: GraphCrossDocumentBridgePairCoverage,
+): AtlasControlRow {
+    const rawId = `pair:${row.sourceDocumentId}->${row.targetDocumentId}`;
+    return typedRow(snapshotId, 'cross_document_bridge', 'continuity_cross_document', rawId,
+        'cross_document_pair_coverage', `${row.sourceDocumentId} -> ${row.targetDocumentId}`,
+        `${row.selectedCandidates} selected / ${row.eligibleCandidates} eligible / ${row.rejectedCandidates} rejected`,
+        'measured', row.coverageMillis / 1000, ['inspect'], noReceipt(), [], {
+            sourceIds: [row.sourceDocumentId], targetIds: [row.targetDocumentId],
+            tags: ['cross_document', 'pair_coverage', ...row.selectedBridgeTypes, 'no_topology_commit'],
+        });
+}
+
+function crossDocumentCandidateRow(
+    snapshotId: string,
+    row: GraphCrossDocumentBridgeAuditRow,
+    weakest: boolean,
+): AtlasControlRow {
+    const rejected = !!row.rejectionReason;
+    return typedRow(snapshotId, 'cross_document_bridge', 'continuity_cross_document',
+        `${rejected ? 'rejected' : 'selected'}:${row.id}`, row.bridgeType, row.claim,
+        `${row.sourceDocumentId} -> ${row.targetDocumentId}${rejected ? ` / rejected: ${humanize(row.rejectionReason!)}` : ''}`,
+        rejected ? 'rejected' : 'candidate', row.confidenceMillis / 1000,
+        ['inspect', 'compare_context'], noReceipt(), [], {
+            noteId: row.sourceDocumentId,
+            sourceIds: [row.sourceChunkId], targetIds: [row.targetChunkId],
+            entityIds: row.supportingEntityIds, evidenceIds: row.evidenceIds,
+            sourceExcerpt: row.sourceExcerpt, targetExcerpt: row.targetExcerpt,
+            targetDocumentId: row.targetDocumentId,
+            tags: ['cross_document', row.bridgeType, rejected ? 'rejected' : 'selected',
+                weakest ? 'weakest_selected' : '', 'no_topology_commit'],
+        });
+}
+
+function continuityReceipt(): AtlasControlReceiptPolicy {
+    return {
+        required: true,
+        kind: 'continuity_action_receipt',
+        reversible: true,
+        topologyMutationAllowed: false,
+    };
 }
 
 function entityRow(snapshotId: string, entity: AtlasControlEntityInput): AtlasControlRow {
@@ -268,6 +431,9 @@ function typedRow(
         entityIds: clean(trace.entityIds),
         evidenceIds: clean(trace.evidenceIds),
         tags: clean(trace.tags),
+        sourceExcerpt: trace.sourceExcerpt ?? null,
+        targetExcerpt: trace.targetExcerpt ?? null,
+        targetDocumentId: trace.targetDocumentId ?? null,
     };
 }
 

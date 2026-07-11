@@ -324,6 +324,7 @@ describeBaseline('product graph build gate', () => {
         const text = 'Kai approved Hazel near Red Mesa. Hazel opposed Kai before dawn.';
         backend.target = 'native';
         backend.unsupportedCommands.add('graphRebuild:chunkSemanticBridges');
+        backend.unsupportedCommands.add('graphRebuild:storyContinuity');
         backend.unsupportedCommands.add('graphRebuild:memoryGovernance');
         backend.unsupportedCommands.add('graphRebuild:memoryGovernanceRetrievalExperiment');
         backend.unsupportedCommands.add('graphPromotion:verdictCertificate');
@@ -345,11 +346,13 @@ describeBaseline('product graph build gate', () => {
         expect(snapshot.memoryGovernanceCandidates).toEqual([]);
         expect(snapshot.promotionVerdictCertificate).toBeUndefined();
         expect(snapshot.buildTimings?.nativeChunkSemanticBridgeSkipped).toBe(1);
+        expect(snapshot.buildTimings?.nativeStoryContinuitySkipped).toBe(1);
         expect(snapshot.buildTimings?.nativeMemoryGovernanceSkipped).toBe(1);
         expect(snapshot.buildTimings?.nativeMemoryGovernanceRetrievalExperimentSkipped).toBe(1);
         expect(snapshot.buildTimings?.nativePromotionVerdictSkipped).toBe(1);
         expect(backend.commands.map((row) => row.command)).toEqual(expect.arrayContaining([
             'graphRebuild:chunkSemanticBridges',
+            'graphRebuild:storyContinuity',
             'graphRebuild:memoryGovernance',
             'graphRebuild:memoryGovernanceRetrievalExperiment',
             'graphPromotion:verdictCertificate',

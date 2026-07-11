@@ -21,6 +21,7 @@ mod memory_governance_adversarial_tests;
 #[cfg(test)]
 mod negative_relation_tests;
 mod semantic;
+mod story_continuity;
 #[cfg(test)]
 mod tests;
 mod types;
@@ -37,21 +38,28 @@ pub use chunk_semantic_bridge::{
     assert_chunk_semantic_bridge_candidate_only, audit_chunk_semantic_bridge_quality_gate,
     bridge_quality_gate_decision, build_chunk_semantic_bridge_candidates,
     build_chunk_semantic_bridge_candidates_from_snapshot,
+    build_chunk_semantic_bridge_entity_frequency_profiles,
+    build_chunk_semantic_bridge_run_from_snapshot,
     build_chunk_semantic_bridge_shortrun_parity_report, is_same_entity_only_bridge_suspect,
     promote_chunk_semantic_bridge_candidates, BridgeCandidateOnlyAudit, BridgeCounts,
     BridgeQualityGateAudit, BridgeQualityGateDecision, BridgeRepresentativeRow,
     BridgeShortrunParityComparison, BridgeShortrunParityReport, BridgeTimingReport,
     ChunkSemanticBridgeCandidate, ChunkSemanticBridgeChunk, ChunkSemanticBridgeCommitPolicy,
-    ChunkSemanticBridgeEngineInput, ChunkSemanticBridgeEntity, ChunkSemanticBridgeEvent,
+    ChunkSemanticBridgeEngineInput, ChunkSemanticBridgeEntity,
+    ChunkSemanticBridgeEntityFrequencyProfile, ChunkSemanticBridgeEvent,
     ChunkSemanticBridgeEventEdge, ChunkSemanticBridgeEvidence, ChunkSemanticBridgePromotionAudit,
     ChunkSemanticBridgePromotionChunk, ChunkSemanticBridgePromotionCommitPolicy,
     ChunkSemanticBridgePromotionInput, ChunkSemanticBridgePromotionOutput,
     ChunkSemanticBridgePromotionProposal, ChunkSemanticBridgePromotionRejection,
-    ChunkSemanticBridgePromotionStatus, ChunkSemanticBridgeSnapshotDocument,
-    ChunkSemanticBridgeStatus, ChunkSemanticBridgeType, CHUNK_SEMANTIC_BRIDGE_COMMIT_POLICY,
-    CHUNK_SEMANTIC_BRIDGE_NO_TOPOLOGY_COMMIT, CHUNK_SEMANTIC_BRIDGE_PROMOTION_COMMIT_POLICY,
+    ChunkSemanticBridgePromotionStatus, ChunkSemanticBridgeRun,
+    ChunkSemanticBridgeSnapshotDocument, ChunkSemanticBridgeStatus, ChunkSemanticBridgeSupportRole,
+    ChunkSemanticBridgeType, CrossDocumentBridgeAuditRow, CrossDocumentBridgePairCoverage,
+    CrossDocumentBridgeRejectionCount, CrossDocumentBridgeRunCertificate,
+    CHUNK_SEMANTIC_BRIDGE_COMMIT_POLICY, CHUNK_SEMANTIC_BRIDGE_NO_TOPOLOGY_COMMIT,
+    CHUNK_SEMANTIC_BRIDGE_PROMOTION_COMMIT_POLICY,
     CHUNK_SEMANTIC_BRIDGE_PROMOTION_NO_TOPOLOGY_COMMIT,
     CHUNK_SEMANTIC_BRIDGE_PROMOTION_SCHEMA_VERSION, CHUNK_SEMANTIC_BRIDGE_SCHEMA_VERSION,
+    CROSS_DOCUMENT_BRIDGE_CERTIFICATE_SCHEMA_VERSION, ENTITY_FREQUENCY_PROFILE_SCHEMA_VERSION,
 };
 pub use compiler::{
     assert_graph_compile_invariants, compile_dual_write_snapshot, compile_graph_snapshot,
@@ -109,6 +117,18 @@ pub use semantic::{
     DocumentSemanticRecoveredArgument, DocumentSemanticRequest, DocumentSemanticScope,
     DocumentSemanticSituationInstance, DocumentSemanticSpeechOrBeliefFrame,
     DocumentSemanticStateInterval, DocumentSemanticSummary, DocumentSemanticTemporalConflict,
+};
+pub use story_continuity::{
+    assert_story_continuity_candidate_only, build_story_continuity_contract,
+    ContinuityBoundarySignal, ContinuityCausalCandidate, ContinuityCausalRelation,
+    ContinuityConflictCandidate, ContinuityEventIdentity, ContinuityEvidenceClass,
+    ContinuityStateIntervalCandidate, ContinuityStatus, ContinuityTemporalCandidate,
+    ContinuityTemporalRelation, EpisodeBoundaryDecision, EpisodeBoundaryReceipt,
+    EpisodeContinuityCandidate, EpisodeContinuityKind, StoryContinuityContract,
+    StoryContinuityCounters, StoryContinuityDocument, StoryContinuityInput,
+    StoryContinuityRunCertificate, StoryEpisodeCandidate,
+    STORY_CONTINUITY_CERTIFICATE_SCHEMA_VERSION, STORY_CONTINUITY_NO_TOPOLOGY_COMMIT,
+    STORY_CONTINUITY_SCHEMA_VERSION,
 };
 pub use types::{
     GraphAnchor, GraphCalendarRegistryBridgeCounters, GraphCalendarRegistryBridgeSummary,

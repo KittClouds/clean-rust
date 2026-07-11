@@ -23,6 +23,10 @@ import type {
     AtlasControlRoomActionRequest,
     AtlasControlRoomId,
 } from '../../../../graph-rebuild/atlas-control-room-contract';
+import {
+    appendStoryContinuityActionReceipt,
+    type GraphContinuityAction,
+} from '../../../../graph-rebuild/graph-story-continuity';
 import { AtlasControlRoomsComponent } from './atlas-control-rooms.component';
 
 type AtlasWorkflowTone = 'ready' | 'review' | 'warning' | 'quiet';
@@ -159,6 +163,14 @@ export class AttributesTabComponent {
             return;
         }
         if (!row) return;
+        if (isContinuityAction(request.action)) {
+            const current = this.graphSnapshot();
+            if (!current) return;
+            const next = structuredClone(current);
+            const receipt = appendStoryContinuityActionReceipt(next, row.identity.rawId, request.action);
+            if (receipt) await this.graphRebuild.restorePersistedSnapshot(next);
+            return;
+        }
         if (request.action === 'jump_to_source' && row.noteId) {
             await this.noteStore.openNote(row.noteId);
             this.requestRowFocus(row);
@@ -201,6 +213,21 @@ export class AttributesTabComponent {
         });
     }
 }
+
+function isContinuityAction(action: AtlasControlRoomActionRequest['action']): action is GraphContinuityAction {
+    return CONTINUITY_ACTIONS.has(action as GraphContinuityAction);
+}
+
+const CONTINUITY_ACTIONS = new Set<GraphContinuityAction>([
+    'split_episode',
+    'merge_episodes',
+    'confirm_boundary',
+    'confirm_ordering',
+    'reject_ordering',
+    'confirm_causal_link',
+    'reject_causal_link',
+    'resolve_continuity_conflict',
+]);
 
 function reviewDecisionForAction(action: AtlasControlRoomActionRequest['action']): GraphDocumentReviewDecision | null {
     const decisions: Partial<Record<AtlasControlRoomActionRequest['action'], GraphDocumentReviewDecision>> = {

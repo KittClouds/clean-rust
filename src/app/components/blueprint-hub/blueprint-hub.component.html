@@ -38,25 +38,30 @@
     <!-- Content Area -->
     @if (isPageMode || hubService.isHubOpen()) {
     <div class="flex-1 overflow-hidden bg-hub relative">
-        @switch (activeTab()) {
-            @case ('graph') {
-                <app-graph-tab class="h-full w-full"></app-graph-tab>
-            }
+        <app-graph-tab
+            class="blueprint-hub-tab-layer"
+            [class.blueprint-hub-tab-layer--active]="activeTab() === 'graph'"
+            [class.blueprint-hub-tab-layer--inactive]="activeTab() !== 'graph'"
+            [attr.aria-hidden]="activeTab() !== 'graph'"
+            [attr.inert]="activeTab() !== 'graph' ? '' : null">
+        </app-graph-tab>
 
+        @if (activeTab() !== 'graph') {
+        @switch (activeTab()) {
             @case ('patterns') {
-                <app-patterns-tab class="h-full w-full"></app-patterns-tab>
+                <app-patterns-tab class="blueprint-hub-tab-layer blueprint-hub-tab-layer--active"></app-patterns-tab>
             }
 
             @case ('plot-threads') {
-                <app-plot-threads-tab class="h-full w-full"></app-plot-threads-tab>
+                <app-plot-threads-tab class="blueprint-hub-tab-layer blueprint-hub-tab-layer--active"></app-plot-threads-tab>
             }
 
             @case ('worldbuilding') {
-                <app-worldbuilding-tab class="h-full w-full"></app-worldbuilding-tab>
+                <app-worldbuilding-tab class="blueprint-hub-tab-layer blueprint-hub-tab-layer--active"></app-worldbuilding-tab>
             }
 
             @case ('attributes') {
-                <app-attributes-tab class="h-full w-full"></app-attributes-tab>
+                <app-attributes-tab class="blueprint-hub-tab-layer blueprint-hub-tab-layer--active"></app-attributes-tab>
             }
 
             @default {
@@ -72,6 +77,7 @@
                     </div>
                 </div>
             }
+        }
         }
     </div>
     }

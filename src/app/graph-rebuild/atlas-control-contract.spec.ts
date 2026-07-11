@@ -14,6 +14,7 @@ import {
     buildAtlasControlContract,
     type AtlasControlCard,
 } from './atlas-control-contract';
+import { GRAPH_CROSS_DOCUMENT_BRIDGE_CERTIFICATE_SCHEMA_VERSION } from './graph-cross-document-bridge-certificate';
 
 describe('buildAtlasControlContract', () => {
     it('publishes typed lanes, exact inventories, receipts, and text-pair NLI metadata', () => {
@@ -84,6 +85,46 @@ describe('buildAtlasControlContract', () => {
         expect(card(contract, 'header-graph-edges').value).toBe(0);
     });
 
+    it('projects cross-document coverage and excerpts into the continuity room', () => {
+        const snapshot = snapshotFixture();
+        snapshot.crossDocumentBridgeCertificate = {
+            schemaVersion: GRAPH_CROSS_DOCUMENT_BRIDGE_CERTIFICATE_SCHEMA_VERSION,
+            sourceDocumentIds: ['early', 'late'],
+            generatedCandidates: 2,
+            eligibleCandidates: 2,
+            selectedCandidates: 1,
+            rejectedCandidates: 1,
+            pairCoverage: [{
+                sourceDocumentId: 'early', targetDocumentId: 'late',
+                generatedCandidates: 2, eligibleCandidates: 2,
+                selectedCandidates: 1, rejectedCandidates: 1,
+                selectedBridgeTypes: ['setup_payoff'], coverageMillis: 500,
+            }],
+            rejectionCounts: [{ reason: 'document_pair_type_quota', count: 1 }],
+            selectedRows: [crossDocumentRow('selected')],
+            rejectedRows: [{ ...crossDocumentRow('rejected'), rejectionReason: 'document_pair_type_quota' }],
+            weakestRows: [crossDocumentRow('selected')],
+            noTopologyWrites: true,
+            invariantReceipts: ['chunk_semantic_bridge_candidate:no_topology_commit'],
+        };
+
+        const contract = buildAtlasControlContract({ snapshot });
+        const inventory = contract.inventoryById.continuity_cross_document_rows;
+        const candidate = inventory.rowIds
+            .map((id) => contract.rowsById[id])
+            .find((row) => row.identity.rawId.startsWith('selected:'));
+
+        expect(inventory.totalRows).toBe(3);
+        expect(contract.roomsById.continuity.inventoryCategoryIds)
+            .toContain('continuity_cross_document_rows');
+        expect(candidate).toMatchObject({
+            sourceExcerpt: 'The warning was sealed beneath the gate.',
+            targetExcerpt: 'The old warning was answered at the gate.',
+            targetDocumentId: 'late',
+            state: 'candidate',
+        });
+    });
+
     it('namespaces repeated raw row ids without losing their audit identity', () => {
         const snapshot = snapshotFixture();
         snapshot.documentReviewSummary!.rows.push({ ...snapshot.documentReviewSummary!.rows[0] });
@@ -104,7 +145,7 @@ describe('buildAtlasControlContract', () => {
             promotionCertificate: promotionCertificateFixture(),
         });
 
-        expect(contract.roomIds).toEqual(['entities', 'structure', 'facts', 'review', 'discourse', 'metrics']);
+        expect(contract.roomIds).toEqual(['entities', 'structure', 'facts', 'continuity', 'review', 'discourse', 'metrics']);
         expect(contract.roomsById.review.totalRows).toBe(2);
         expect(contract.roomsById.review.visibleRows).toBe(1);
         expect(contract.inventoryById.manual_decision_rows.totalRows).toBe(1);
@@ -234,6 +275,24 @@ function governanceCandidate(): any {
         commitPolicy: 'candidate_only_no_topology_commit',
         noTopologyCommit: true,
         rationale: [],
+    };
+}
+
+function crossDocumentRow(id: string): any {
+    return {
+        id: `bridge:${id}`,
+        sourceDocumentId: 'early',
+        targetDocumentId: 'late',
+        sourceChunkId: 'early:chunk:0',
+        targetChunkId: 'late:chunk:0',
+        sourceExcerpt: 'The warning was sealed beneath the gate.',
+        targetExcerpt: 'The old warning was answered at the gate.',
+        bridgeType: 'setup_payoff',
+        claim: 'The answer resolves the warning.',
+        evidenceIds: ['evidence:early', 'evidence:late'],
+        supportingEntityIds: ['entity:gate'],
+        confidenceMillis: 820,
+        noTopologyCommit: true,
     };
 }
 

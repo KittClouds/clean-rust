@@ -77,10 +77,16 @@ fn evaluate_bridge(
         receipts.push("candidate_contract:passed".into());
     }
 
-    if bridge_quality_gate_decision(bridge) == BridgeQualityGateDecision::DemoteSameEntityOnly {
-        reasons.push("same_entity_only_semantic_support".into());
-    } else {
-        receipts.push("same_entity_only_guard:passed".into());
+    match bridge_quality_gate_decision(bridge) {
+        BridgeQualityGateDecision::Accept => {
+            receipts.push("semantic_support_guard:passed".into());
+        }
+        BridgeQualityGateDecision::DemoteSameEntityOnly => {
+            reasons.push("same_entity_only_semantic_support".into());
+        }
+        BridgeQualityGateDecision::DemoteInsufficientSemanticEvidence => {
+            reasons.push("insufficient_specific_semantic_evidence".into());
+        }
     }
 
     gate_chunk(
@@ -99,6 +105,7 @@ fn evaluate_bridge(
     );
     gate_chunk_evidence(bridge, &mut reasons, &mut receipts);
     gate_accepted_evidence(bridge, accepted_evidence_ids, &mut reasons, &mut receipts);
+    gate_frequency_support_contract(bridge, &mut reasons, &mut receipts);
     gate_type_semantics(bridge, &mut reasons, &mut receipts);
     gate_confidence(bridge, &mut reasons, &mut receipts);
     if bridge.semantic_verbs.is_empty() {
@@ -188,11 +195,80 @@ fn gate_type_semantics(
             bridge.bridge_type.as_str()
         ));
     }
-    if bridge.supporting_entity_ids.len() < min_supporting_entities(bridge.bridge_type) {
+    let semantic_only = bridge
+        .rationale
+        .iter()
+        .any(|row| row == "support_role:semantic_only")
+        && bridge
+            .rationale
+            .iter()
+            .any(|row| row == "semantic_admission:passed");
+    if !semantic_only
+        && bridge.supporting_entity_ids.len() < min_supporting_entities(bridge.bridge_type)
+    {
         reasons.push(format_compact!(
             "insufficient_supporting_entities:{}",
             bridge.bridge_type.as_str()
         ));
+    }
+}
+
+fn gate_frequency_support_contract(
+    bridge: &ChunkSemanticBridgeCandidate,
+    reasons: &mut Vec<CompactString>,
+    receipts: &mut Vec<CompactString>,
+) {
+    if !bridge
+        .rationale
+        .iter()
+        .any(|row| row == "cross_document_bridge")
+    {
+        return;
+    }
+    let profile = bridge
+        .rationale
+        .iter()
+        .find(|row| row.starts_with("entity_frequency_profile:"));
+    let primary = bridge
+        .rationale
+        .iter()
+        .find(|row| row.starts_with("primary_support_entity:"));
+    let specificity = bridge
+        .rationale
+        .iter()
+        .find(|row| row.starts_with("primary_support_specificity_millis:"));
+    let semantic_only = bridge
+        .rationale
+        .iter()
+        .any(|row| row == "support_role:semantic_only");
+    let fair_selection = bridge
+        .rationale
+        .iter()
+        .any(|row| row == "registry_max_min_selection:passed");
+
+    if profile.is_some() && (semantic_only || primary.is_some() && specificity.is_some()) {
+        receipts.push("entity_frequency_support_contract:passed".into());
+        if let Some(primary) = primary {
+            receipts.push(primary.clone());
+        }
+        if let Some(specificity) = specificity {
+            receipts.push(specificity.clone());
+        }
+    } else {
+        reasons.push("entity_frequency_support_contract_missing".into());
+    }
+    if semantic_only
+        && !bridge
+            .rationale
+            .iter()
+            .any(|row| row == "semantic_admission:passed")
+    {
+        reasons.push("semantic_only_support_without_proof".into());
+    }
+    if fair_selection {
+        receipts.push("registry_max_min_selection:passed".into());
+    } else {
+        reasons.push("registry_max_min_selection_receipt_missing".into());
     }
 }
 
@@ -264,9 +340,8 @@ fn deterministic_score(bridge: &ChunkSemanticBridgeCandidate, accepted: bool) ->
     if !accepted {
         return 0.0;
     }
-    let entity_bonus = (bridge.supporting_entity_ids.len() as f32 * 0.02).min(0.08);
     let evidence_bonus = (bridge.evidence_ids.len() as f32 * 0.005).min(0.04);
-    (bridge.confidence + entity_bonus + evidence_bonus).clamp(0.0, 0.97)
+    (bridge.confidence + evidence_bonus).clamp(0.0, 0.97)
 }
 
 fn required_rationale_prefix(bridge_type: ChunkSemanticBridgeType) -> &'static str {

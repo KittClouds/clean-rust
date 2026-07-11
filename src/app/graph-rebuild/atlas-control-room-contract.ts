@@ -9,7 +9,7 @@ import type {
     AtlasControlTone,
 } from './atlas-control-contract';
 
-export type AtlasControlRoomId = 'entities' | 'structure' | 'facts' | 'review' | 'discourse' | 'metrics';
+export type AtlasControlRoomId = 'entities' | 'structure' | 'facts' | 'continuity' | 'review' | 'discourse' | 'metrics';
 export type AtlasControlRoomState = 'unavailable' | 'empty' | 'ready' | 'blocked' | 'error';
 export type AtlasControlRoomCoverage = 'none' | 'partial' | 'complete';
 
@@ -115,6 +115,25 @@ const ROOM_DEFINITIONS: RoomDefinition[] = [
         actions: ['inspect', 'jump_to_source', 'compare_context'],
         emptyTitle: 'No fact ledger',
         emptyDetail: 'Build the graph to populate relation and evidence-backed fact rows.',
+    },
+    {
+        id: 'continuity',
+        label: 'Continuity',
+        purpose: 'Source-derived episodes, temporal order, causality, state history, and conflicts.',
+        primary: 'continuity_episode_rows',
+        inventories: [
+            'continuity_episode_rows',
+            'continuity_temporal_rows',
+            'continuity_causal_rows',
+            'continuity_state_rows',
+            'continuity_cross_document_rows',
+            'continuity_exception_rows',
+        ],
+        cards: [],
+        proofs: ['typedRowIdentities', 'exactInventory', 'noTopologyWrites'],
+        actions: ['inspect', 'jump_to_source', 'compare_context'],
+        emptyTitle: 'No continuity contract',
+        emptyDetail: 'Build the graph with the native continuity engine to create source-derived episode and relation candidates.',
     },
     {
         id: 'review',
@@ -280,6 +299,14 @@ function actionLabel(action: AtlasControlAction): string {
         add_entity: 'Add entity',
         edit_entity: 'Edit entity',
         delete_entity: 'Delete entity',
+        split_episode: 'Split episode',
+        merge_episodes: 'Merge episodes',
+        confirm_boundary: 'Confirm boundary',
+        confirm_ordering: 'Confirm ordering',
+        reject_ordering: 'Reject ordering',
+        confirm_causal_link: 'Confirm causal link',
+        reject_causal_link: 'Reject causal link',
+        resolve_continuity_conflict: 'Resolve conflict',
     };
     return labels[action];
 }

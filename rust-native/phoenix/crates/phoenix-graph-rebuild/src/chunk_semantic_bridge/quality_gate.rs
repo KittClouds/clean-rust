@@ -16,6 +16,7 @@ const OPAQUE_EVENT_CUES: &[&str] = &[
 pub enum BridgeQualityGateDecision {
     Accept,
     DemoteSameEntityOnly,
+    DemoteInsufficientSemanticEvidence,
 }
 
 #[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
@@ -24,12 +25,15 @@ pub struct BridgeQualityGateAudit {
     pub total: usize,
     pub accepted: usize,
     pub demoted_same_entity_only: usize,
+    pub demoted_insufficient_semantic_evidence: usize,
 }
 
 pub fn bridge_quality_gate_decision(
     bridge: &ChunkSemanticBridgeCandidate,
 ) -> BridgeQualityGateDecision {
-    if is_same_entity_only_bridge_suspect(bridge) {
+    if is_weak_support_semantic_bridge_suspect(bridge) {
+        BridgeQualityGateDecision::DemoteInsufficientSemanticEvidence
+    } else if is_same_entity_only_bridge_suspect(bridge) {
         BridgeQualityGateDecision::DemoteSameEntityOnly
     } else {
         BridgeQualityGateDecision::Accept
@@ -49,9 +53,39 @@ pub fn audit_chunk_semantic_bridge_quality_gate(
             BridgeQualityGateDecision::DemoteSameEntityOnly => {
                 audit.demoted_same_entity_only += 1;
             }
+            BridgeQualityGateDecision::DemoteInsufficientSemanticEvidence => {
+                audit.demoted_insufficient_semantic_evidence += 1;
+            }
         }
     }
     audit
+}
+
+fn is_weak_support_semantic_bridge_suspect(bridge: &ChunkSemanticBridgeCandidate) -> bool {
+    let weak_support = bridge
+        .rationale
+        .iter()
+        .any(|row| row == "entity_support:zero" || row == "entity_support:frequency_floor_only");
+    if !weak_support {
+        return false;
+    }
+    let proof_count = bridge.rationale.iter().find_map(|row| {
+        row.strip_prefix("semantic_proof_count:")
+            .and_then(|value| value.parse::<u8>().ok())
+    });
+    let has_specific_proof = bridge
+        .rationale
+        .iter()
+        .any(|row| row.starts_with("semantic_proof:"));
+    let admitted = bridge
+        .rationale
+        .iter()
+        .any(|row| row == "semantic_admission:passed");
+    !admitted
+        || !has_specific_proof
+        || proof_count.unwrap_or_default() < 2
+        || bridge.source_cue.is_none()
+        || bridge.target_cue.is_none()
 }
 
 pub fn is_same_entity_only_bridge_suspect(bridge: &ChunkSemanticBridgeCandidate) -> bool {

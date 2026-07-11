@@ -315,7 +315,7 @@ export class GraphGalaxyCanvasComponent implements AfterViewInit, OnChanges, OnD
     private syncSurface(): void {
         graphGalaxyRuntimeMeter.recordSurface(this.meterId, this.canHoldSurface());
         if (!this.canHoldSurface()) {
-            this.releaseSurface();
+            this.suspendSurface();
             return;
         }
         this.ensureRendererMounted();
@@ -351,13 +351,8 @@ export class GraphGalaxyCanvasComponent implements AfterViewInit, OnChanges, OnD
         graphGalaxyRuntimeMeter.recordDraw(this.meterId, budget.backingWidth / budget.dpr, budget.backingHeight / budget.dpr, budget.dpr, performance.now(), 0);
     }
 
-    private releaseSurface(): void {
+    private suspendSurface(): void {
         this.stop();
-        this.renderer.releaseContext();
-        graphGalaxyRuntimeMeter.recordContext(this.meterId, false);
-        const canvas = this.canvasRef?.nativeElement;
-        if (canvas) { canvas.width = 0; canvas.height = 0; }
-        graphGalaxyRuntimeMeter.recordDraw(this.meterId, 0, 0, 1, performance.now(), 0);
     }
 
     private ensureRendererMounted(): void {

@@ -6,6 +6,8 @@ pub const CHUNK_SEMANTIC_BRIDGE_SCHEMA_VERSION: &str = "phoenix-chunk-semantic-b
 pub const CHUNK_SEMANTIC_BRIDGE_COMMIT_POLICY: &str = "no_topology_commit";
 pub const CHUNK_SEMANTIC_BRIDGE_NO_TOPOLOGY_COMMIT: &str =
     "chunk_semantic_bridge_candidate:no_topology_commit";
+pub const CROSS_DOCUMENT_BRIDGE_CERTIFICATE_SCHEMA_VERSION: &str =
+    "phoenix-cross-document-bridge-run-certificate/v1";
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
@@ -155,4 +157,68 @@ pub struct ChunkSemanticBridgeCandidate {
     pub target_cue: Option<CompactString>,
     #[serde(default)]
     pub rationale: Vec<CompactString>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CrossDocumentBridgePairCoverage {
+    pub source_document_id: CompactString,
+    pub target_document_id: CompactString,
+    pub generated_candidates: usize,
+    pub eligible_candidates: usize,
+    pub selected_candidates: usize,
+    pub rejected_candidates: usize,
+    pub selected_bridge_types: Vec<ChunkSemanticBridgeType>,
+    pub coverage_millis: u16,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CrossDocumentBridgeAuditRow {
+    pub id: CompactString,
+    pub source_document_id: CompactString,
+    pub target_document_id: CompactString,
+    pub source_chunk_id: CompactString,
+    pub target_chunk_id: CompactString,
+    pub source_excerpt: CompactString,
+    pub target_excerpt: CompactString,
+    pub bridge_type: ChunkSemanticBridgeType,
+    pub claim: CompactString,
+    pub evidence_ids: Vec<CompactString>,
+    pub supporting_entity_ids: Vec<CompactString>,
+    pub confidence_millis: u16,
+    pub rejection_reason: Option<CompactString>,
+    pub no_topology_commit: bool,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CrossDocumentBridgeRejectionCount {
+    pub reason: CompactString,
+    pub count: usize,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CrossDocumentBridgeRunCertificate {
+    pub schema_version: CompactString,
+    pub source_document_ids: Vec<CompactString>,
+    pub generated_candidates: usize,
+    pub eligible_candidates: usize,
+    pub selected_candidates: usize,
+    pub rejected_candidates: usize,
+    pub pair_coverage: Vec<CrossDocumentBridgePairCoverage>,
+    pub rejection_counts: Vec<CrossDocumentBridgeRejectionCount>,
+    pub selected_rows: Vec<CrossDocumentBridgeAuditRow>,
+    pub rejected_rows: Vec<CrossDocumentBridgeAuditRow>,
+    pub weakest_rows: Vec<CrossDocumentBridgeAuditRow>,
+    pub no_topology_writes: bool,
+    pub invariant_receipts: Vec<CompactString>,
+}
+
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ChunkSemanticBridgeRun {
+    pub candidates: Vec<ChunkSemanticBridgeCandidate>,
+    pub cross_document_certificate: CrossDocumentBridgeRunCertificate,
 }

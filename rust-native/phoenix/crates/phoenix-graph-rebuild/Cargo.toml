@@ -35,3 +35,7 @@ path = "examples/chunk_bridge_shortrun_parity.rs"
 [[example]]
 name = "memory_governance_adversarial_certificate"
 path = "examples/memory_governance_adversarial_certificate.rs"
+
+[[example]]
+name = "story_continuity_audit"
+path = "examples/story_continuity_audit.rs"

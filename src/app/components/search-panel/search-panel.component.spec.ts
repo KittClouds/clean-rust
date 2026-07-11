@@ -130,6 +130,22 @@ describe('SearchPanelComponent model recipe lifecycle', () => {
         ]);
     });
 
+    it('labels manifold load timing as a projection switch rather than a run', () => {
+        machine.lastSummary.set({
+            kind: 'manifold-load',
+            label: 'Hopf manifold ready',
+            startedAt: 10,
+            completedAt: 596,
+            durationMs: 586,
+        });
+
+        expect(component.lastRunHeading()).toBe('Last projection switch');
+        expect(component.lastRunStatus()).toEqual(expect.objectContaining({
+            label: 'Hopf manifold ready',
+            durationMs: 586,
+        }));
+    });
+
     it('passes selected multi-note source into graph build runtime options', async () => {
         const pipeline = injector.get(GraphRebuildPipelineService) as unknown as ReturnType<typeof createFullAtlasPipelineMock>;
         pipeline.graphModelsReady.mockReturnValue(true);

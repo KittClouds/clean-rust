@@ -123,6 +123,20 @@
                 @for (tag of row.tags.slice(0, 8); track tag) { <span>{{ tag }}</span> }
             </div>
             }
+            @if (row.sourceExcerpt || row.targetExcerpt) {
+            <section class="atlas-cross-document-excerpts" aria-label="Cross-document source excerpts">
+                <article>
+                    <span>Source document</span>
+                    <strong>{{ row.noteId || row.sourceIds[0] }}</strong>
+                    <p>{{ row.sourceExcerpt || 'No source excerpt available.' }}</p>
+                </article>
+                <article>
+                    <span>Target document</span>
+                    <strong>{{ row.targetDocumentId || row.targetIds[0] }}</strong>
+                    <p>{{ row.targetExcerpt || 'No target excerpt available.' }}</p>
+                </article>
+            </section>
+            }
             <div class="atlas-row-actions">
                 @for (action of rowActions(); track action.id) {
                 <button

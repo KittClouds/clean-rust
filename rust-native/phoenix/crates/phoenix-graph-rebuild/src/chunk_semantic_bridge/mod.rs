@@ -8,19 +8,33 @@ use compact_str::{format_compact, CompactString};
 use hashbrown::{HashMap, HashSet};
 use phoenix_types::EntityId;
 
+mod cross_document;
+mod cross_document_audit;
 mod cues;
+mod frequency_profile;
+#[cfg(test)]
+mod frequency_support_tests;
 mod promotion;
 #[cfg(test)]
 mod promotion_tests;
 mod promotion_types;
 mod quality_gate;
+mod selection;
+mod semantic_admission;
 mod shortrun_parity;
 mod snapshot_adapter;
 #[cfg(test)]
 mod tests;
 mod types;
 
+use cross_document::extend_cross_document_bridges;
+use cross_document_audit::build_cross_document_certificate;
 use cues::*;
+pub use frequency_profile::{
+    build_chunk_semantic_bridge_entity_frequency_profiles,
+    ChunkSemanticBridgeEntityFrequencyProfile, ChunkSemanticBridgeSupportRole,
+    ENTITY_FREQUENCY_PROFILE_SCHEMA_VERSION,
+};
 pub use promotion::promote_chunk_semantic_bridge_candidates;
 pub use promotion_types::{
     ChunkSemanticBridgePromotionAudit, ChunkSemanticBridgePromotionChunk,
@@ -35,6 +49,8 @@ pub use quality_gate::{
     audit_chunk_semantic_bridge_quality_gate, bridge_quality_gate_decision,
     is_same_entity_only_bridge_suspect, BridgeQualityGateAudit, BridgeQualityGateDecision,
 };
+use selection::select_bridge_rows_fair;
+use semantic_admission::SemanticEvidenceProof;
 #[allow(unused_imports)]
 pub use shortrun_parity::{
     build_chunk_semantic_bridge_shortrun_parity_report, BridgeCandidateOnlyAudit, BridgeCounts,
@@ -42,24 +58,29 @@ pub use shortrun_parity::{
     BridgeTimingReport,
 };
 pub use snapshot_adapter::{
-    build_chunk_semantic_bridge_candidates_from_snapshot, ChunkSemanticBridgeSnapshotDocument,
+    build_chunk_semantic_bridge_candidates_from_snapshot,
+    build_chunk_semantic_bridge_run_from_snapshot, ChunkSemanticBridgeSnapshotDocument,
 };
 pub use types::{
     ChunkSemanticBridgeCandidate, ChunkSemanticBridgeChunk, ChunkSemanticBridgeCommitPolicy,
     ChunkSemanticBridgeEngineInput, ChunkSemanticBridgeEntity, ChunkSemanticBridgeEvent,
-    ChunkSemanticBridgeEventEdge, ChunkSemanticBridgeEvidence, ChunkSemanticBridgeStatus,
-    ChunkSemanticBridgeType, CHUNK_SEMANTIC_BRIDGE_COMMIT_POLICY,
+    ChunkSemanticBridgeEventEdge, ChunkSemanticBridgeEvidence, ChunkSemanticBridgeRun,
+    ChunkSemanticBridgeStatus, ChunkSemanticBridgeType, CrossDocumentBridgeAuditRow,
+    CrossDocumentBridgePairCoverage, CrossDocumentBridgeRejectionCount,
+    CrossDocumentBridgeRunCertificate, CHUNK_SEMANTIC_BRIDGE_COMMIT_POLICY,
     CHUNK_SEMANTIC_BRIDGE_NO_TOPOLOGY_COMMIT, CHUNK_SEMANTIC_BRIDGE_SCHEMA_VERSION,
+    CROSS_DOCUMENT_BRIDGE_CERTIFICATE_SCHEMA_VERSION,
 };
 
-const BRIDGE_LIMIT: usize = 320;
-const BRIDGE_TYPE_QUOTA: usize = 40;
+pub(super) const BRIDGE_LIMIT: usize = 320;
+pub(super) const BRIDGE_TYPE_QUOTA: usize = 40;
 const MAX_DISTANCE: u32 = 36;
 
 struct EngineIndex<'a> {
     chunk_by_id: HashMap<&'a str, usize>,
     event_by_id: HashMap<&'a str, usize>,
     event_by_chunk: HashMap<&'a str, usize>,
+    evidence_source_by_id: HashMap<&'a str, &'a str>,
     lower_chunk_text: Vec<String>,
 }
 
@@ -70,12 +91,20 @@ struct BridgeClass<'a> {
     target_cue: Option<&'a str>,
     confidence: f32,
     rationale: CompactString,
+    semantic_proof: Option<SemanticEvidenceProof>,
 }
 
 pub fn build_chunk_semantic_bridge_candidates(
     input: ChunkSemanticBridgeEngineInput<'_>,
 ) -> Vec<ChunkSemanticBridgeCandidate> {
+    build_chunk_semantic_bridge_run(input).candidates
+}
+
+pub fn build_chunk_semantic_bridge_run(
+    input: ChunkSemanticBridgeEngineInput<'_>,
+) -> ChunkSemanticBridgeRun {
     let index = EngineIndex::new(input);
+    let frequency = frequency_profile::EntityFrequencyIndex::new(input.chunks);
     let mut bridges = HashMap::<CompactString, ChunkSemanticBridgeCandidate>::new();
 
     for edge in input.causal_edges {
@@ -92,6 +121,7 @@ pub fn build_chunk_semantic_bridge_candidates(
             target_cue: Some(edge.relation_type),
             confidence: edge.confidence.max(0.64),
             rationale: "causal_event_edge_seed".into(),
+            semantic_proof: Some(SemanticEvidenceProof::explicit_causal_edge()),
         };
         insert_bridge(
             &mut bridges,
@@ -174,14 +204,32 @@ pub fn build_chunk_semantic_bridge_candidates(
         }
     }
 
-    select_bridge_rows(
-        bridges
-            .into_values()
+    extend_cross_document_bridges(&mut bridges, input, &index, &frequency);
+
+    let generated = bridges.into_values().collect::<Vec<_>>();
+    let mut selected = select_bridge_rows_fair(
+        generated
+            .iter()
             .filter(|bridge| {
                 bridge_quality_gate_decision(bridge) == BridgeQualityGateDecision::Accept
             })
+            .cloned()
             .collect(),
-    )
+    );
+    for bridge in &mut selected {
+        if bridge
+            .rationale
+            .iter()
+            .any(|row| row == "cross_document_bridge")
+        {
+            frequency.attach_candidate_support_receipts(bridge);
+        }
+    }
+    let cross_document_certificate = build_cross_document_certificate(input, &generated, &selected);
+    ChunkSemanticBridgeRun {
+        candidates: selected,
+        cross_document_certificate,
+    }
 }
 
 pub fn assert_chunk_semantic_bridge_candidate_only(
@@ -229,10 +277,17 @@ impl<'a> EngineIndex<'a> {
             }
         }
 
+        let evidence_source_by_id = input
+            .evidence
+            .iter()
+            .filter_map(|row| row.source_id.map(|source_id| (row.id, source_id)))
+            .collect();
+
         Self {
             chunk_by_id,
             event_by_id,
             event_by_chunk,
+            evidence_source_by_id,
             lower_chunk_text,
         }
     }
@@ -251,17 +306,21 @@ fn insert_bridge(
     let (Some(source), Some(target)) = (source, target) else {
         return;
     };
-    if source.id == target.id || source.note_id != target.note_id {
+    if source.id == target.id {
         return;
     }
     let supporting_entity_ids = shared_entities(source.entity_ids, target.entity_ids);
-    if supporting_entity_ids.is_empty() {
+    let cross_document = source.note_id != target.note_id;
+    if supporting_entity_ids.is_empty() && (!cross_document || class.semantic_proof.is_none()) {
         return;
     }
-    let distance = source.ordinal.abs_diff(target.ordinal);
+    let distance = if cross_document {
+        0
+    } else {
+        source.ordinal.abs_diff(target.ordinal)
+    };
     let confidence = clamp(
-        class.confidence + (supporting_entity_ids.len() as f32 * 0.015).min(0.08)
-            - ((distance as f32) * 0.002).min(0.08),
+        class.confidence - ((distance as f32) * 0.002).min(0.08),
         0.52,
         0.92,
     );
@@ -315,8 +374,34 @@ fn insert_bridge(
         &mut rationale,
         format_compact!("supporting_entities:{}", supporting_entity_ids.len()),
     );
-    push_unique(&mut rationale, format_compact!("chunk_distance:{distance}"));
+    if cross_document {
+        push_unique(&mut rationale, "cross_document_bridge".into());
+        push_unique(
+            &mut rationale,
+            format_compact!("document_pair:{}->{}", source.note_id, target.note_id),
+        );
+    } else {
+        push_unique(&mut rationale, format_compact!("chunk_distance:{distance}"));
+    }
     push_unique(&mut rationale, class.rationale);
+    if let Some(proof) = &class.semantic_proof {
+        push_unique(
+            &mut rationale,
+            format_compact!("semantic_proof:{}", proof.kind),
+        );
+        push_unique(
+            &mut rationale,
+            format_compact!("semantic_proof_key:{}", proof.key),
+        );
+        push_unique(
+            &mut rationale,
+            format_compact!("semantic_proof_count:{}", proof.signal_count),
+        );
+        push_unique(&mut rationale, "semantic_admission:passed".into());
+    }
+    if cross_document && supporting_entity_ids.is_empty() {
+        push_unique(&mut rationale, "entity_support:zero".into());
+    }
 
     let mut merged_supporting_entities = current
         .as_ref()
@@ -512,65 +597,6 @@ fn classify_pair<'a>(
     None
 }
 
-fn select_bridge_rows(
-    mut bridges: Vec<ChunkSemanticBridgeCandidate>,
-) -> Vec<ChunkSemanticBridgeCandidate> {
-    bridges.sort_by(compare_bridge_rows);
-    let mut selected = HashMap::<CompactString, ChunkSemanticBridgeCandidate>::new();
-    for bridge_type in [
-        ChunkSemanticBridgeType::SetupPayoff,
-        ChunkSemanticBridgeType::CauseEffect,
-        ChunkSemanticBridgeType::EvidenceReframe,
-        ChunkSemanticBridgeType::RelationshipDelta,
-        ChunkSemanticBridgeType::StateDelta,
-        ChunkSemanticBridgeType::RouteContinuity,
-        ChunkSemanticBridgeType::MotifEcho,
-        ChunkSemanticBridgeType::TopicContinuation,
-    ] {
-        for row in bridges
-            .iter()
-            .filter(|bridge| bridge.bridge_type == bridge_type)
-            .take(BRIDGE_TYPE_QUOTA)
-        {
-            selected.insert(row.id.clone(), row.clone());
-        }
-    }
-    for row in bridges {
-        if selected.len() >= BRIDGE_LIMIT {
-            break;
-        }
-        selected.insert(row.id.clone(), row);
-    }
-    let mut out: Vec<_> = selected.into_values().collect();
-    out.sort_by(compare_bridge_rows);
-    out.truncate(BRIDGE_LIMIT);
-    out
-}
-
-fn compare_bridge_rows(
-    left: &ChunkSemanticBridgeCandidate,
-    right: &ChunkSemanticBridgeCandidate,
-) -> std::cmp::Ordering {
-    bridge_rank(left.bridge_type)
-        .cmp(&bridge_rank(right.bridge_type))
-        .then_with(|| right.confidence.total_cmp(&left.confidence))
-        .then_with(|| left.source_chunk_id.cmp(&right.source_chunk_id))
-        .then_with(|| left.target_chunk_id.cmp(&right.target_chunk_id))
-}
-
-fn bridge_rank(bridge_type: ChunkSemanticBridgeType) -> u8 {
-    match bridge_type {
-        ChunkSemanticBridgeType::SetupPayoff => 0,
-        ChunkSemanticBridgeType::CauseEffect => 1,
-        ChunkSemanticBridgeType::EvidenceReframe => 2,
-        ChunkSemanticBridgeType::RelationshipDelta => 3,
-        ChunkSemanticBridgeType::StateDelta => 4,
-        ChunkSemanticBridgeType::RouteContinuity => 5,
-        ChunkSemanticBridgeType::MotifEcho => 6,
-        ChunkSemanticBridgeType::TopicContinuation => 7,
-    }
-}
-
 fn bridge_class<'a>(
     bridge_type: ChunkSemanticBridgeType,
     semantic_verbs: &'static [&'static str],
@@ -586,6 +612,7 @@ fn bridge_class<'a>(
         target_cue,
         confidence,
         rationale: rationale.into(),
+        semantic_proof: None,
     }
 }
 

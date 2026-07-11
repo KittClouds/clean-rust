@@ -508,6 +508,13 @@ export class SearchPanelComponent implements OnInit {
     }
     return this.commandStatus().lastRun;
   });
+  readonly lastRunHeading = computed(() =>
+    this.machine.lastSummary()?.kind === 'manifold-load'
+      && !this.fullAtlasPipeline.lastReceipt()
+      && !this.atlasRuntime.lastBuildReceipt()
+      ? 'Last projection switch'
+      : 'Last run'
+  );
   readonly lastRunReceiptRows = computed(() =>
     buildLastRunReceiptRows(this.fullAtlasPipeline.lastReceipt())
   );
