@@ -10,8 +10,8 @@ export interface GalaxyFocusMask {
 }
 
 export function buildGalaxyFocusMask(data: GalaxySceneV2, selectedId: string | null, hoverId: string | null): GalaxyFocusMask {
-    const selectedIndex = selectedId ? data.ids.indexOf(selectedId) : -1;
-    const hoverIndex = hoverId ? data.ids.indexOf(hoverId) : -1;
+    const selectedIndex = selectedId ? galaxyNodeIndex(data, selectedId) : -1;
+    const hoverIndex = hoverId ? galaxyNodeIndex(data, hoverId) : -1;
     const focusIndex = hoverIndex >= 0 ? hoverIndex : selectedIndex;
     const nodeLevels = new Uint8Array(data.ids.length);
     const edgeLevels = new Uint8Array(data.edgePairs.length / 2);
@@ -31,14 +31,12 @@ export function buildGalaxyFocusMask(data: GalaxySceneV2, selectedId: string | n
     }
 
     nodeLevels[focusIndex] = 3;
-    for (let edge = 0; edge < edgeLevels.length; edge++) {
+    for (const edge of incidentEdgesFor(data, focusIndex)) {
         const source = data.edgePairs[edge * 2];
         const target = data.edgePairs[edge * 2 + 1];
-        if (source === focusIndex || target === focusIndex) {
-            edgeLevels[edge] = 2;
-            nodeLevels[source] = Math.max(nodeLevels[source], source === focusIndex ? 3 : 2);
-            nodeLevels[target] = Math.max(nodeLevels[target], target === focusIndex ? 3 : 2);
-        }
+        edgeLevels[edge] = 2;
+        nodeLevels[source] = Math.max(nodeLevels[source], source === focusIndex ? 3 : 2);
+        nodeLevels[target] = Math.max(nodeLevels[target], target === focusIndex ? 3 : 2);
     }
     return { hasFocus: true, focusIndex, selectedIndex, hoverIndex, nodeLevels, edgeLevels };
 }
@@ -63,7 +61,6 @@ function walkSiegelDirection(
     edgeLevels: Uint8Array,
     direction: 'ancestor' | 'descendant',
 ): boolean {
-    const edgeCount = edgeLevels.length;
     const seen = new Uint8Array(data.ids.length);
     const queue = new Uint32Array(data.ids.length);
     const depths = new Uint8Array(data.ids.length);
@@ -76,7 +73,7 @@ function walkSiegelDirection(
         const current = queue[head++];
         const depth = depths[current];
         if (depth >= 6) continue;
-        for (let edge = 0; edge < edgeCount; edge += 1) {
+        for (const edge of incidentEdgesFor(data, current)) {
             if (data.edgeKinds[edge] !== 2) continue;
             const source = data.edgePairs[edge * 2];
             const target = data.edgePairs[edge * 2 + 1];
@@ -111,7 +108,6 @@ function focusStructuralHierarchy(
     nodeLevels: Uint8Array,
     edgeLevels: Uint8Array,
 ): boolean {
-    const edgeCount = edgeLevels.length;
     nodeLevels[focusIndex] = 3;
     let found = false;
     found = walkStructuralDirection(data, focusIndex, nodeLevels, edgeLevels, 'ancestor') || found;
@@ -126,7 +122,6 @@ function walkStructuralDirection(
     edgeLevels: Uint8Array,
     direction: 'ancestor' | 'descendant',
 ): boolean {
-    const edgeCount = edgeLevels.length;
     const seen = new Uint8Array(data.ids.length);
     const queue = new Uint32Array(data.ids.length);
     const depths = new Uint8Array(data.ids.length);
@@ -139,7 +134,7 @@ function walkStructuralDirection(
         const current = queue[head++];
         const depth = depths[current];
         if (depth >= 5) continue;
-        for (let edge = 0; edge < edgeCount; edge += 1) {
+        for (const edge of incidentEdgesFor(data, current)) {
             if (data.edgeKinds[edge] !== 2) continue;
             const source = data.edgePairs[edge * 2];
             const target = data.edgePairs[edge * 2 + 1];
@@ -169,8 +164,7 @@ function includeIncidentConnections(
     nodeLevels: Uint8Array,
     edgeLevels: Uint8Array,
 ): void {
-    const edgeCount = edgeLevels.length;
-    for (let edge = 0; edge < edgeCount; edge += 1) {
+    for (const edge of incidentEdgesFor(data, focusIndex)) {
         const source = data.edgePairs[edge * 2];
         const target = data.edgePairs[edge * 2 + 1];
         const next = source === focusIndex ? target : target === focusIndex ? source : -1;
@@ -178,6 +172,20 @@ function includeIncidentConnections(
         edgeLevels[edge] = 2;
         nodeLevels[next] = Math.max(nodeLevels[next], 2);
     }
+}
+
+function galaxyNodeIndex(data: GalaxySceneV2, id: string): number {
+    return data.runtimeIndex?.nodeById.get(id) ?? data.ids.indexOf(id);
+}
+
+function incidentEdgesFor(data: GalaxySceneV2, node: number): readonly number[] {
+    const indexed = data.runtimeIndex?.incidentEdges[node];
+    if (indexed) return indexed;
+    const edges: number[] = [];
+    for (let edge = 0; edge < data.edgePairs.length / 2; edge++) {
+        if (data.edgePairs[edge * 2] === node || data.edgePairs[edge * 2 + 1] === node) edges.push(edge);
+    }
+    return edges;
 }
 
 function structuralParent(data: GalaxySceneV2, source: number, target: number): number {

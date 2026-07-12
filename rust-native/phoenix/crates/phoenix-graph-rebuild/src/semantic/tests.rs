@@ -1,7 +1,50 @@
 use super::{
-    build_document_semantic_summary, DocumentSemanticEntity, DocumentSemanticInput,
+    build_document_semantic_document, build_document_semantic_summary,
+    merge_document_semantic_documents, DocumentSemanticEntity, DocumentSemanticInput,
     DocumentSemanticRequest,
 };
+
+#[test]
+fn per_document_artifacts_merge_to_the_exact_batch_summary() {
+    let request = DocumentSemanticRequest {
+        documents: vec![
+            DocumentSemanticInput {
+                note_id: "note-a".to_owned(),
+                text: "Kai gave Hazel the key in New Rome.".to_owned(),
+            },
+            DocumentSemanticInput {
+                note_id: "note-b".to_owned(),
+                text: "Hazel returned the key before Kai departed.".to_owned(),
+            },
+        ],
+        entities: vec![
+            DocumentSemanticEntity {
+                id: "entity-kai".to_owned(),
+                label: "Kai".to_owned(),
+                aliases: Vec::new(),
+                kind: "character".to_owned(),
+            },
+            DocumentSemanticEntity {
+                id: "entity-hazel".to_owned(),
+                label: "Hazel".to_owned(),
+                aliases: Vec::new(),
+                kind: "character".to_owned(),
+            },
+        ],
+    };
+    let batch = build_document_semantic_summary(&request);
+    let documents = request
+        .documents
+        .iter()
+        .map(|document| build_document_semantic_document(document, &request.entities))
+        .collect();
+    let incremental = merge_document_semantic_documents(documents);
+
+    assert_eq!(
+        serde_json::to_value(incremental).unwrap(),
+        serde_json::to_value(batch).unwrap()
+    );
+}
 
 #[test]
 fn builds_reviewable_semantic_rows_with_utf16_offsets() {

@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-import { isTransitLayoutMode, type GalaxyRenderSettings, type GalaxySphereSurfaceMode } from './graph-galaxy-engine';
+import type { GalaxyRenderSettings, GalaxySphereSurfaceMode } from './graph-galaxy-engine';
 import type { GalaxySceneV2 } from './graph-galaxy-scene-v2';
 
 export type GalaxyNodeObject = THREE.Sprite | THREE.Mesh;
@@ -12,6 +12,14 @@ export interface GalaxySphereNodeBatch {
 }
 
 export interface GalaxyGlowBatch {
+    points: THREE.Points<THREE.BufferGeometry, THREE.ShaderMaterial>;
+    positions: Float32Array;
+    colors: Float32Array;
+    sizes: Float32Array;
+    alphas: Float32Array;
+}
+
+export interface GalaxyBillboardNodeBatch {
     points: THREE.Points<THREE.BufferGeometry, THREE.ShaderMaterial>;
     positions: Float32Array;
     colors: Float32Array;
@@ -62,45 +70,79 @@ export function galaxyGlowBatch(group: THREE.Group | null): GalaxyGlowBatch | nu
     return group?.userData['glowBatch'] as GalaxyGlowBatch | undefined || null;
 }
 
+export function galaxyBillboardNodeBatch(group: THREE.Group | null): GalaxyBillboardNodeBatch | null {
+    return group?.userData['billboardNodeBatch'] as GalaxyBillboardNodeBatch | undefined || null;
+}
+
 export function buildGalaxyNodes(scene: GalaxySceneV2, settings: GalaxyRenderSettings, nodeTexture: THREE.Texture, atomTexture: THREE.Texture): THREE.Group | null {
     if (!scene.ids.length) return null;
     const sphereSurface = settings.sphereSurface || 'solid';
-    if (settings.nodeShape === 'sphere' && sphereSurface !== 'solid') {
+    if (settings.nodeShape === 'sphere') {
         return buildStyledSphereNodes(scene, sphereSurface);
     }
+    return buildBillboardNodes(scene, settings.nodeShape === 'atom' ? atomTexture : nodeTexture, settings.nodeShape === 'atom');
+}
+
+function buildBillboardNodes(scene: GalaxySceneV2, texture: THREE.Texture, atom: boolean): THREE.Group {
     const group = new THREE.Group();
-    const transitAtom = settings.nodeShape === 'atom' && isTransitLayoutMode(scene.layoutMode);
-    for (let index = 0; index < scene.ids.length; index++) {
-        const material: GalaxyNodeMaterial = settings.nodeShape === 'sphere'
-            ? new THREE.MeshBasicMaterial({
-                color: 0xffffff,
-                transparent: true,
-                opacity: 0.92,
-                depthWrite: false,
-                depthTest: true,
-                toneMapped: false,
-            })
-            : new THREE.SpriteMaterial({
-                map: settings.nodeShape === 'atom' ? atomTexture : nodeTexture,
-                color: 0xffffff,
-                transparent: true,
-                opacity: transitAtom ? 0.98 : 0.96,
-                alphaTest: transitAtom ? 0.055 : 0,
-                depthWrite: false,
-                depthTest: true,
-                blending: THREE.NormalBlending,
-                toneMapped: false,
-            });
-        const object: GalaxyNodeObject = settings.nodeShape === 'sphere'
-            ? new THREE.Mesh(new THREE.SphereGeometry(1, 16, 10), material as THREE.MeshBasicMaterial | THREE.MeshPhysicalMaterial)
-            : new THREE.Sprite(material as THREE.SpriteMaterial);
-        object.userData['index'] = index;
-        group.add(object);
-    }
+    const count = scene.ids.length;
+    const positions = new Float32Array(count * 3);
+    const colors = new Float32Array(count * 3);
+    const sizes = new Float32Array(count);
+    const alphas = new Float32Array(count);
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3).setUsage(THREE.DynamicDrawUsage));
+    geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3).setUsage(THREE.DynamicDrawUsage));
+    geometry.setAttribute('aSize', new THREE.BufferAttribute(sizes, 1).setUsage(THREE.DynamicDrawUsage));
+    geometry.setAttribute('aAlpha', new THREE.BufferAttribute(alphas, 1).setUsage(THREE.DynamicDrawUsage));
+    const material = new THREE.ShaderMaterial({
+        name: atom ? 'GalaxyAtomBatch' : 'GalaxyHaloNodeBatch',
+        uniforms: {
+            nodeTexture: { value: texture },
+            viewportHeight: { value: 800 },
+        },
+        vertexShader: `
+            attribute float aSize;
+            attribute float aAlpha;
+            varying vec3 vColor;
+            varying float vAlpha;
+            uniform float viewportHeight;
+            void main() {
+                vColor = color;
+                vAlpha = aAlpha;
+                vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+                float perspectiveScale = projectionMatrix[1][1] * 0.5 / max(0.01, -mvPosition.z);
+                gl_PointSize = clamp(aSize * perspectiveScale * viewportHeight, 0.0, 192.0);
+                gl_Position = projectionMatrix * mvPosition;
+            }
+        `,
+        fragmentShader: `
+            uniform sampler2D nodeTexture;
+            varying vec3 vColor;
+            varying float vAlpha;
+            void main() {
+                vec4 texel = texture2D(nodeTexture, gl_PointCoord);
+                float alpha = texel.a * vAlpha;
+                if (alpha <= ${atom ? '0.055' : '0.002'}) discard;
+                gl_FragColor = vec4(texel.rgb * vColor, alpha);
+            }
+        `,
+        transparent: true,
+        depthWrite: false,
+        depthTest: true,
+        blending: THREE.NormalBlending,
+        toneMapped: false,
+        vertexColors: true,
+    });
+    const points = new THREE.Points(geometry, material);
+    points.frustumCulled = false;
+    const batch: GalaxyBillboardNodeBatch = { points, positions, colors, sizes, alphas };
+    group.userData['billboardNodeBatch'] = batch;
+    group.add(points);
     return group;
 }
 
-function buildStyledSphereNodes(scene: GalaxySceneV2, surface: Exclude<GalaxySphereSurfaceMode, 'solid'>): THREE.Group {
+function buildStyledSphereNodes(scene: GalaxySceneV2, surface: GalaxySphereSurfaceMode): THREE.Group {
     const group = new THREE.Group();
     const hidden = new THREE.Matrix4().makeScale(0, 0, 0);
     const batch: GalaxySphereNodeBatch = {
@@ -130,13 +172,29 @@ function glassInstanceColors(count: number): THREE.InstancedBufferAttribute {
 }
 
 function sphereSurfaceMaterial(
-    surface: Exclude<GalaxySphereSurfaceMode, 'solid'>,
+    surface: GalaxySphereSurfaceMode,
     state: (typeof SPHERE_NODE_STATES)[number],
-): THREE.ShaderMaterial {
+): THREE.Material {
+    if (surface === 'solid') return solidSphereMaterial(state.state);
     if (surface === 'spellglass') return spellglassSphereMaterial(state);
     if (surface === 'obsidian') return obsidianSphereMaterial(state);
     if (surface === 'starcore') return starcoreSphereMaterial(state);
     return glassSphereMaterial(state);
+}
+
+function solidSphereMaterial(state: GalaxySphereNodeState): THREE.MeshBasicMaterial {
+    const opacity = state === 'dimmed' ? 0.18 : state === 'neighbor' ? 0.82 : state === 'active' ? 1 : 0.94;
+    const material = new THREE.MeshBasicMaterial({
+        color: 0xffffff,
+        transparent: true,
+        opacity,
+        depthWrite: false,
+        depthTest: true,
+        toneMapped: false,
+    });
+    material.userData['sphereSurface'] = 'solid';
+    material.userData['sphereState'] = state;
+    return material;
 }
 
 function glassSphereMaterial(state: (typeof SPHERE_NODE_STATES)[number]): THREE.ShaderMaterial {
@@ -412,7 +470,6 @@ export function buildGalaxyGlows(scene: GalaxySceneV2, haloTexture: THREE.Textur
             viewportHeight: { value: 800 },
         },
         vertexShader: `
-            attribute vec3 color;
             attribute float aSize;
             attribute float aAlpha;
             varying vec3 vColor;
@@ -444,6 +501,7 @@ export function buildGalaxyGlows(scene: GalaxySceneV2, haloTexture: THREE.Textur
         depthTest: false,
         blending: THREE.NormalBlending,
         toneMapped: false,
+        vertexColors: true,
     });
     const points = new THREE.Points(geometry, material);
     points.frustumCulled = false;

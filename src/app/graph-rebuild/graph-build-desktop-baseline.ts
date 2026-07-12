@@ -25,10 +25,20 @@ export interface GraphBuildDesktopBaselineInput {
     deltaRuns?: number;
 }
 
+export interface GraphBuildMutationLocalityCertificate {
+    schemaVersion: 'phoenix-graph-build-mutation-locality/v1';
+    materializationMs: number;
+    cold: GraphBuildBaselineRunRow;
+    changed: GraphBuildBaselineRunRow;
+    semanticLocalityPassed: boolean;
+    performancePassed: boolean;
+}
+
 declare global {
     interface Window {
         __PHOENIX_GRAPH_BUILD_BASELINE__?: {
             run(input: GraphBuildDesktopBaselineInput): Promise<GraphBuildBaselineCertificate>;
+            runMutationLocality(input: GraphBuildDesktopBaselineInput): Promise<GraphBuildMutationLocalityCertificate>;
             evictArenaAndReadFirstPage(): Promise<unknown>;
             pageAllNativeProofRows(): Promise<unknown>;
         };
@@ -82,6 +92,58 @@ export class GraphBuildDesktopBaselineService {
             throw new Error(`Native proof paging incomplete: ${keys.size} != ${detailRows}`);
         }
         return { runHandle, pages, detailRows, uniqueRows: keys.size, complete: true };
+    }
+
+    async runMutationLocality(
+        input: GraphBuildDesktopBaselineInput,
+    ): Promise<GraphBuildMutationLocalityCertificate> {
+        if (input.documents.length !== 2 || input.documents.some((document) => !document.text.trim())) {
+            throw new Error('Mutation locality requires exactly two non-empty documents.');
+        }
+        if (this.pipeline.running()) throw new Error('Graph pipeline is already running.');
+        const scopeId = `benchmark:graph-mutation:${crypto.randomUUID()}`;
+        const priorSnapshot = this.graphRebuild.snapshot();
+        const priorReceipt = this.pipeline.lastReceipt();
+        const noteIds: string[] = [];
+        this.store.pauseSnapshots();
+        try {
+            for (const [index, document] of input.documents.entries()) {
+                noteIds.push(await ops.createNote({
+                    worldId: '', title: document.title || `Mutation document ${index + 1}`,
+                    content: document.text, markdownContent: document.text, hasBody: true,
+                    folderId: '', entityKind: '', entitySubtype: '', isEntity: false,
+                    isPinned: false, favorite: false, ownerId: 'graph-mutation-baseline',
+                    narrativeId: scopeId,
+                }));
+            }
+            const request = baselineRequest(scopeId, noteIds);
+            await this.pipeline.loadGraphModels(request);
+            const cold = await this.measureRun('cold_force', 1, request);
+            const changedText = `${input.documents[0].text}\n\nKai records one exact locality mutation.`;
+            const materializeStarted = performance.now();
+            await ops.updateNote(noteIds[0], { content: changedText, markdownContent: changedText });
+            await this.store.settleDocumentSemanticMaterialization();
+            const materializationMs = performance.now() - materializeStarted;
+            const changed = await this.measureRun('delta', 1, { ...request, policy: 'delta' });
+            return {
+                schemaVersion: 'phoenix-graph-build-mutation-locality/v1',
+                materializationMs: Math.round(materializationMs * 100) / 100,
+                cold,
+                changed,
+                semanticLocalityPassed: changed.documentSemanticDocumentsBuilt === 0
+                    && changed.documentSemanticDocumentsReused === 2,
+                performancePassed: changed.wallMs <= 3_000,
+            };
+        } finally {
+            await this.settleBackgroundWork();
+            const scopedDocuments = await this.store.listScopedDocuments(scopeId).catch(() => []);
+            for (const document of scopedDocuments) {
+                await this.store.deleteScopedDocument(scopeId, document.namespace, document.documentKey);
+            }
+            for (const noteId of noteIds) await ops.deleteNote(noteId);
+            await this.restoreVisibleState(priorSnapshot, priorReceipt);
+            this.store.resumeSnapshots();
+        }
     }
 
     async run(input: GraphBuildDesktopBaselineInput): Promise<GraphBuildBaselineCertificate> {
@@ -247,6 +309,7 @@ export function installGraphBuildDesktopBaseline(injector: Injector): void {
     const harness = injector.get(GraphBuildDesktopBaselineService);
     window.__PHOENIX_GRAPH_BUILD_BASELINE__ = {
         run: (input) => harness.run(input),
+        runMutationLocality: (input) => harness.runMutationLocality(input),
         evictArenaAndReadFirstPage: () => harness.evictArenaAndReadFirstPage(),
         pageAllNativeProofRows: () => harness.pageAllNativeProofRows(),
     };

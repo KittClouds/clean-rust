@@ -21,7 +21,12 @@ export interface GraphBuildBaselineRunRow {
     chunks: number;
     anchors: number;
     acceptedRelationships: number;
+    documentHyperedges: number;
     interactiveIdentityReused: number;
+    documentSemanticDocumentsBuilt: number;
+    documentSemanticDocumentsReused: number;
+    documentSemanticRawBytesWritten: number;
+    documentSemanticCompressedBytesWritten: number;
     storeDocuments: number;
     writtenContentBlobs: number;
     reusedContentBlobs: number;
@@ -104,6 +109,10 @@ export interface GraphBuildBaselineLaneSummary {
     decodeTimingUnavailableCallsTotal: number;
     callsP50: number;
     interactiveIdentityReusedTotal: number;
+    documentSemanticDocumentsBuiltTotal: number;
+    documentSemanticDocumentsReusedTotal: number;
+    documentSemanticRawBytesWrittenTotal: number;
+    documentSemanticCompressedBytesWrittenTotal: number;
     semanticLedgersP50Ms: number;
     semanticTasksP50Ms: number;
     semanticCandidatesP50Ms: number;
@@ -205,7 +214,12 @@ export function graphBuildRunRow(
         chunks: snapshot.counters.chunks || 0,
         anchors: snapshot.counters.acceptedAnchors || 0,
         acceptedRelationships: snapshot.counters.acceptedRelationships || 0,
+        documentHyperedges: snapshot.documentCompilerSummary?.hyperedges.length || 0,
         interactiveIdentityReused: identityReuse?.counters['identityMatched'] || 0,
+        documentSemanticDocumentsBuilt: timing?.documentSemanticDocumentsBuilt || 0,
+        documentSemanticDocumentsReused: timing?.documentSemanticDocumentsReused || 0,
+        documentSemanticRawBytesWritten: timing?.documentSemanticRawBytesWritten || 0,
+        documentSemanticCompressedBytesWritten: timing?.documentSemanticCompressedBytesWritten || 0,
         storeDocuments: timing?.snapshotStoreDocuments || 0,
         writtenContentBlobs: timing?.snapshotWrittenContentBlobs || 0,
         reusedContentBlobs: timing?.snapshotReusedContentBlobs || 0,
@@ -292,6 +306,10 @@ export function summarizeGraphBuildLane(rows: GraphBuildBaselineRunRow[]): Graph
         decodeTimingUnavailableCallsTotal: sum(rows, (row) => row.transportDecodeTimingUnavailableCalls),
         callsP50: percentile(rows.map((row) => row.transportCalls), 0.5),
         interactiveIdentityReusedTotal: sum(rows, (row) => row.interactiveIdentityReused),
+        documentSemanticDocumentsBuiltTotal: sum(rows, (row) => row.documentSemanticDocumentsBuilt),
+        documentSemanticDocumentsReusedTotal: sum(rows, (row) => row.documentSemanticDocumentsReused),
+        documentSemanticRawBytesWrittenTotal: sum(rows, (row) => row.documentSemanticRawBytesWritten),
+        documentSemanticCompressedBytesWrittenTotal: sum(rows, (row) => row.documentSemanticCompressedBytesWritten),
         semanticLedgersP50Ms: percentile(rows.map((row) => row.snapshotSemanticLedgersMs), 0.5),
         semanticTasksP50Ms: percentile(rows.map((row) => row.snapshotSemanticTasksMs), 0.5),
         semanticCandidatesP50Ms: percentile(rows.map((row) => row.snapshotSemanticCandidatesMs), 0.5),
@@ -441,7 +459,8 @@ function graphBuildNoTopologyProof(snapshot: GraphRebuildSnapshot): boolean {
 }
 
 function countSignature(row: GraphBuildBaselineRunRow): string {
-    return [row.nodes, row.edges, row.targets, row.chunks, row.anchors, row.acceptedRelationships].join(':');
+    return [row.nodes, row.edges, row.targets, row.chunks, row.anchors,
+        row.acceptedRelationships, row.documentHyperedges].join(':');
 }
 
 function percentile(values: number[], quantile: number): number {

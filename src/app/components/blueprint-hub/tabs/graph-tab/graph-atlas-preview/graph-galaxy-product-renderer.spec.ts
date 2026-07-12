@@ -104,6 +104,19 @@ describe('Galaxy camera controls', () => {
 });
 
 describe('Transit manifold guide styling', () => {
+    it('installs a changed scene with one layout application and one draw', () => {
+        const renderer = new ThreeGalaxyRenderer();
+        const harness = renderer as unknown as { applyModePositions(): void };
+        const applyModePositions = vi.spyOn(harness, 'applyModePositions');
+        const render = vi.spyOn(renderer, 'render');
+
+        renderer.installScene(emptyRendererScene(), { edgeMode: 'curved' }, '3d');
+
+        expect(applyModePositions).toHaveBeenCalledTimes(1);
+        expect(render).toHaveBeenCalledTimes(1);
+        renderer.dispose();
+    });
+
     it('routes hover and selection through focus refresh instead of full geometry refresh', () => {
         const renderer = new ThreeGalaxyRenderer() as unknown as {
             selectNode(id: string | null): void;
@@ -356,7 +369,7 @@ describe('Transit manifold guide styling', () => {
         expect(batch?.points).toBeInstanceOf(THREE.Points);
         expect(batch?.points.material.blending).toBe(THREE.NormalBlending);
         expect(batch?.points.material.name).toBe('GalaxyGlowBatch');
-        expect(batch?.points.material.vertexColors).toBe(false);
+        expect(batch?.points.material.vertexColors).toBe(true);
         expect(batch?.positions.length).toBe(3);
 
         const renderer = new ThreeGalaxyRenderer() as unknown as RendererProbe & {
@@ -529,6 +542,30 @@ function minimalTransitScene(): GalaxySceneV2 {
             guideKind: 'rootLane',
             guideWeight: 0.5,
         }],
+        positions3d: new Float32Array(),
+        positions2d: new Float32Array(),
+        radii: new Float32Array(),
+        colors: new Float32Array(),
+        edgePairs: new Uint32Array(),
+        edgeIds: [],
+        edgeTypes: [],
+        edgeColors: new Float32Array(),
+        edgeAlpha: new Float32Array(),
+        edgeKinds: new Uint8Array(),
+    };
+}
+
+function emptyRendererScene(): GalaxySceneV2 {
+    return {
+        sourceMode: 'graph',
+        layoutMode: 'single',
+        ids: [],
+        labels: [],
+        kinds: [],
+        groupIds: [],
+        groups: [],
+        hopfRibbons: [],
+        lorentzGuides: [],
         positions3d: new Float32Array(),
         positions2d: new Float32Array(),
         radii: new Float32Array(),

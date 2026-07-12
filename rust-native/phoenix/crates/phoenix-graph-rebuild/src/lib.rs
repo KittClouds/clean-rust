@@ -110,7 +110,8 @@ pub use phoenix_chunker_native::{
     DocumentProfileSummary,
 };
 pub use semantic::{
-    build_document_semantic_summary, DocumentSemanticArgument, DocumentSemanticAttributionFrame,
+    build_document_semantic_document, build_document_semantic_summary,
+    merge_document_semantic_documents, DocumentSemanticArgument, DocumentSemanticAttributionFrame,
     DocumentSemanticConditionalFrame, DocumentSemanticCounters, DocumentSemanticDocument,
     DocumentSemanticEntity, DocumentSemanticEventOrdering, DocumentSemanticFactualityEnvelope,
     DocumentSemanticFrame, DocumentSemanticInput, DocumentSemanticProposition,

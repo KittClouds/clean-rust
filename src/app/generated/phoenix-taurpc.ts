@@ -34,7 +34,7 @@ export type DesktopGraphRunOpenDocument = { documentId: string; textHash: string
 
 export type DesktopGraphRunOpenRequest = { documents: DesktopMentionBatchDocument[]; resolverSeed: DesktopMentionBatchResolverSeed[] }
 
-export type DesktopGraphRunOpenResponse = { schemaVersion: string; runHandle: string; documents: DesktopGraphRunOpenDocument[] }
+export type DesktopGraphRunOpenResponse = { schemaVersion: string; runHandle: string; documents: DesktopGraphRunOpenDocument[]; documentsBuilt: number; documentsReused: number }
 
 export type DesktopGraphRunPage = { schemaVersion: string; source: string; runHandle: string; offset: number; limit: number; detailRows: number; returnedDetailRows: number; nextOffset: number | null; arena: DesktopGraphRunArenaStats; counts: DesktopGraphRunCounts; projection: JsonValue }
 
@@ -62,7 +62,7 @@ export type DesktopRelationCount = { relation: string; rows: number }
 
 export type DesktopRuntimeInfo = { banner: string; target: string; ready: boolean; storage: string; storagePath: string | null; featureFlags: DesktopFeatureFlags; schemaVersion: string; relationCount: number; relationCounts: DesktopRelationCount[]; diagnostics: DesktopDiagnostic[] }
 
-export type DesktopSnapshotAnalysisRequest = { runHandle?: string; snapshot: JsonValue; documents: JsonValue; documentSemanticSummary?: JsonValue; retrievalCandidates?: JsonValue; receipts?: JsonValue; commits?: JsonValue; userOverrides?: JsonValue; siegel?: JsonValue }
+export type DesktopSnapshotAnalysisRequest = { runHandle?: string; snapshot: JsonValue; documents: JsonValue; documentSemanticSummary?: JsonValue; documentSemanticHandle?: string; retrievalCandidates?: JsonValue; receipts?: JsonValue; commits?: JsonValue; userOverrides?: JsonValue; siegel?: JsonValue }
 
 export type DesktopSnapshotImportResult = { schemaVersion: string; relationCount: number; createdAt: number; relationNames: string[]; checksum: string | null }
 

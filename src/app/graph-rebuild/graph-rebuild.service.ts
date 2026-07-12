@@ -151,6 +151,7 @@ const SNAPSHOT_CONTENT_BLOB_PREFIX = 'snapshot-blob';
 const CONTENT_BLOB_SCHEMA_VERSION = 'phoenix-graph-rebuild-content-blob/v1';
 const COMPRESSED_JSON_SCHEMA_VERSION = 'phoenix-graph-rebuild-json-payload/gzip-base64/v1';
 const COMPRESSED_SNAPSHOT_SCHEMA_VERSION = 'phoenix-graph-rebuild-payload/gzip-base64/v1';
+const COMPRESSED_DOCUMENT_SEMANTIC_SCHEMA_VERSION = 'phoenix-document-semantics/gzip-base64/v1';
 const SNAPSHOT_COMPRESSION_MIN_CHARS = 64 * 1024;
 const BASE64_CHUNK_SIZE = 0x8000;
 const NATIVE_COMPILER_REVIEW_ROW_LIMIT = 128;
@@ -218,6 +219,23 @@ interface NativeAtlasSeed {
     atlasPacket: GraphAtlasPacket;
     embeddingTargets: GraphRebuildEmbeddingTarget[];
     originatingFamilies: NativeEmbeddingTargetOriginCount[];
+}
+
+interface CompressedDocumentSemanticPayload {
+    schemaVersion: typeof COMPRESSED_DOCUMENT_SEMANTIC_SCHEMA_VERSION;
+    sourceSchemaVersion: GraphDocumentSemanticSummary['schemaVersion'];
+    encoding: 'gzip+base64';
+    rawBytes: number;
+    compressedBytes: number;
+    payload: string;
+    artifactHandle?: string;
+    artifactStats?: {
+        documentsBuilt?: number;
+        documentsReused?: number;
+        rawBytesWritten?: number;
+        compressedBytesWritten?: number;
+        summaryCacheHit?: boolean;
+    };
 }
 
 interface NativeChunkSemanticBridgeQualityGate {
@@ -442,6 +460,8 @@ export class GraphRebuildService {
     private readonly absentOperatorMutationJournalScopes = new Set<string>();
     private readonly releasedNativeGraphRunLeases = new Set<string>();
     private readonly contentManifestByScope = new Map<string, GraphRebuildContentManifest>();
+    private readonly documentSemanticSummaryByIdentity = new Map<string, GraphDocumentSemanticSummary>();
+    private readonly documentSemanticArtifactHandleByIdentity = new Map<string, string>();
     private activeNativeGraphRun: { snapshotId: string; runHandle: string } | null = null;
     private nativeSiegelReceiptState: { snapshotId: string; receipt: unknown } | null = null;
     private primarySnapshotRunSerial = 0;
@@ -574,14 +594,26 @@ export class GraphRebuildService {
                     this.classifyDocumentProfiles(noteTexts, builtAt)
                 );
             if (durabilityMode === 'interactive') timings.documentProfileMs = 0;
-            const documentSemanticSummary = durabilityMode === 'interactive'
-                ? undefined
-                : await timedAsync(timings, 'documentSemanticMs', () =>
-                    this.buildDocumentSemanticSummary(noteTexts, request.entities)
-                );
-            if (durabilityMode === 'interactive') {
+            const documentSemanticIdentity = graphDocumentSemanticIdentity(noteTexts, request.entities);
+            let documentSemanticSummary = this.documentSemanticSummaryByIdentity.get(documentSemanticIdentity);
+            if (documentSemanticSummary) {
                 timings.documentSemanticMs = 0;
-                timings.documentSemanticSkipped = 1;
+                timings.documentSemanticCacheHit = 1;
+            } else {
+                documentSemanticSummary = await timedAsync(timings, 'documentSemanticMs', () =>
+                    this.buildDocumentSemanticSummary(
+                        noteTexts,
+                        request.entities,
+                        timings,
+                        documentSemanticIdentity,
+                    )
+                );
+                if (documentSemanticSummary) {
+                    this.documentSemanticSummaryByIdentity.set(documentSemanticIdentity, documentSemanticSummary);
+                    trimOldestMapEntries(this.documentSemanticSummaryByIdentity, 8);
+                } else {
+                    timings.documentSemanticSkipped = 1;
+                }
             }
             const operatorMutationJournal = await this.loadOperatorMutationJournal(request.scopeId, {
                 allowSnapshotFallback: durabilityMode !== 'interactive',
@@ -639,6 +671,8 @@ export class GraphRebuildService {
                 cpuProfiler,
                 builtAt,
             }));
+            snapshot.documentSemanticArtifactHandle = this.documentSemanticArtifactHandleByIdentity
+                .get(documentSemanticIdentity);
             Object.assign(timings, cpuProfiler.timings);
             recordGraphCollapseBoundary(snapshot.id, snapshot.scopeId, 'source_evidence', {
                 notes: request.noteIds.length,
@@ -758,7 +792,10 @@ export class GraphRebuildService {
         const page = await this.phoenix.analyzeGraphSnapshot({
             snapshot: graphRebuildSnapshotToNativeAnalysisPayload(snapshot),
             documents: snapshot.noteIds.map((noteId) => ({ noteId, text: noteTexts[noteId] || '' })),
-            documentSemanticSummary: snapshot.documentSemanticSummary,
+            documentSemanticHandle: snapshot.documentSemanticArtifactHandle,
+            documentSemanticSummary: snapshot.documentSemanticArtifactHandle
+                ? undefined
+                : snapshot.documentSemanticSummary,
             retrievalCandidates,
             receipts: buildGraphPromotionPreviewReceipts(snapshot),
             commits: [],
@@ -997,6 +1034,8 @@ export class GraphRebuildService {
     private async buildDocumentSemanticSummary(
         noteTexts: Record<string, string>,
         entities: RegisteredEntity[],
+        timings: GraphRebuildBuildTimings,
+        semanticIdentity: string,
     ): Promise<GraphDocumentSemanticSummary | undefined> {
         if (this.phoenix.target !== 'native') return undefined;
         try {
@@ -1009,7 +1048,23 @@ export class GraphRebuildService {
                     kind: entity.kind,
                 })),
             });
-            return isGraphDocumentSemanticSummary(native) ? native : undefined;
+            if (isCompressedDocumentSemanticPayload(native)) {
+                const stats = native.artifactStats;
+                timings.documentSemanticDocumentsBuilt = Number(stats?.documentsBuilt || 0);
+                timings.documentSemanticDocumentsReused = Number(stats?.documentsReused || 0);
+                timings.documentSemanticRawBytesWritten = Number(stats?.rawBytesWritten || 0);
+                timings.documentSemanticCompressedBytesWritten = Number(stats?.compressedBytesWritten || 0);
+                if (stats?.summaryCacheHit) timings.documentSemanticCacheHit = 1;
+                if (native.artifactHandle) {
+                    this.documentSemanticArtifactHandleByIdentity.set(
+                        semanticIdentity,
+                        native.artifactHandle,
+                    );
+                    trimOldestMapEntries(this.documentSemanticArtifactHandleByIdentity, 8);
+                }
+            }
+            const decoded = decodeDocumentSemanticSummary(native);
+            return isGraphDocumentSemanticSummary(decoded) ? decoded : undefined;
         } catch (error) {
             if (!isUnsupportedStoreCommand(error, 'documentSemantic:build')) {
                 console.warn('[GraphRebuild] Native document semantics unavailable; retaining compatibility facts', error);
@@ -1589,6 +1644,7 @@ export function graphRebuildSnapshotToNativeAnalysisPayload(snapshot: GraphRebui
         nodes: snapshot.nodes,
         edges: [],
         counters: snapshot.counters,
+        documentCompilerSummary: nativeCompilerDocumentCompilerSummary(snapshot),
     };
 }
 
@@ -2332,6 +2388,27 @@ function reuseInteractivePrimarySnapshotIdentity(
     return true;
 }
 
+export function graphDocumentSemanticIdentity(
+    noteTexts: Record<string, string>,
+    entities: RegisteredEntity[],
+): string {
+    const documents = Object.entries(noteTexts)
+        .sort(([left], [right]) => left.localeCompare(right));
+    const semanticEntities = entities
+        .map((entity) => ({
+            id: entity.id,
+            label: entity.label,
+            aliases: [...(entity.aliases || [])].sort(),
+            kind: entity.kind,
+        }))
+        .sort((left, right) => left.id.localeCompare(right.id));
+    return graphSnapshotContentHash(JSON.stringify(graphSnapshotStableContentValue({
+        schemaVersion: 'phoenix-document-semantics-input/v1',
+        documents,
+        entities: semanticEntities,
+    })));
+}
+
 function trimOldestMapEntries<K, V>(values: Map<K, V>, limit: number): void {
     while (values.size > limit) {
         const oldest = values.keys().next();
@@ -2795,6 +2872,18 @@ function isCompressedGraphCompilerFactGraphPayload(value: unknown): value is Com
         && typeof record.payload === 'string';
 }
 
+export function decodeDocumentSemanticSummary(value: unknown): unknown {
+    if (!isCompressedDocumentSemanticPayload(value)) return value;
+    return JSON.parse(strFromU8(gunzipSync(base64ToBytes(value.payload))));
+}
+
+function isCompressedDocumentSemanticPayload(value: unknown): value is CompressedDocumentSemanticPayload {
+    const record = value && typeof value === 'object' ? value as Partial<CompressedDocumentSemanticPayload> : null;
+    return record?.schemaVersion === COMPRESSED_DOCUMENT_SEMANTIC_SCHEMA_VERSION
+        && record.encoding === 'gzip+base64'
+        && typeof record.payload === 'string';
+}
+
 export function graphRebuildSnapshotDocumentPayloadStats(payload: string): GraphRebuildSnapshotDocumentPayloadStats {
     try {
         const parsed = JSON.parse(payload) as unknown;
@@ -3064,6 +3153,11 @@ function emptyBuildTimings(): GraphRebuildBuildTimings {
         snapshotReusedContentBlobs: 0,
         previousSnapshotHydrationSkipped: 0,
         documentSemanticSkipped: 0,
+        documentSemanticCacheHit: 0,
+        documentSemanticDocumentsBuilt: 0,
+        documentSemanticDocumentsReused: 0,
+        documentSemanticRawBytesWritten: 0,
+        documentSemanticCompressedBytesWritten: 0,
         nativeChunkerSkipped: 0,
         snapshotEventMs: 0,
         snapshotPayloadChars: 0,

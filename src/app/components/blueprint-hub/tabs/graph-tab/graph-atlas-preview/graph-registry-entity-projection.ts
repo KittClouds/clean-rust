@@ -14,6 +14,10 @@ export interface RegistryEntityProjectionPoint extends GalaxyVec3 {
 
 const TAU = Math.PI * 2;
 
+export function completeRegistryEntityProjection<T>(entities: readonly T[]): readonly T[] {
+    return entities;
+}
+
 export function registryEntityKindOrder(entities: RegistryEntityProjectionInput[]): Map<string, number> {
     const kinds = Array.from(new Set(
         entities

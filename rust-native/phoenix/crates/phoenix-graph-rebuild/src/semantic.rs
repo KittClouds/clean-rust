@@ -294,6 +294,33 @@ pub fn build_document_semantic_summary(
     }
 }
 
+pub fn build_document_semantic_document(
+    document: &DocumentSemanticInput,
+    entities: &[DocumentSemanticEntity],
+) -> DocumentSemanticDocument {
+    let mut summary = build_document_semantic_summary(&DocumentSemanticRequest {
+        documents: vec![document.clone()],
+        entities: entities.to_vec(),
+    });
+    summary.documents.pop().unwrap_or_default()
+}
+
+pub fn merge_document_semantic_documents(
+    documents: Vec<DocumentSemanticDocument>,
+) -> DocumentSemanticSummary {
+    let mut counters = DocumentSemanticCounters::default();
+    for document in &documents {
+        add_counters(&mut counters, &document.counters);
+    }
+    counters.documents = documents.len();
+    DocumentSemanticSummary {
+        schema_version: "phoenix-document-semantics/v1".to_owned(),
+        source: "native_rust".to_owned(),
+        documents,
+        counters,
+    }
+}
+
 fn resolver_seeds(entities: &[DocumentSemanticEntity]) -> Vec<ResolverEntitySeed> {
     entities
         .iter()

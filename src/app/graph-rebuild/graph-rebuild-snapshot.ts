@@ -2611,6 +2611,11 @@ export interface GraphRebuildBuildTimings {
     snapshotReusedContentBlobs?: number;
     previousSnapshotHydrationSkipped?: number;
     documentSemanticSkipped?: number;
+    documentSemanticCacheHit?: number;
+    documentSemanticDocumentsBuilt?: number;
+    documentSemanticDocumentsReused?: number;
+    documentSemanticRawBytesWritten?: number;
+    documentSemanticCompressedBytesWritten?: number;
     nativeChunkerSkipped?: number;
     snapshotEventMs: number;
     snapshotPayloadChars: number;
@@ -2759,6 +2764,7 @@ export interface GraphRebuildSnapshot {
     discourseCompilerOverlaySummary?: GraphDiscourseCompilerOverlaySummary;
     documentSidecarSummary?: GraphDocumentSidecarSummary;
     documentSemanticSummary?: GraphDocumentSemanticSummary;
+    documentSemanticArtifactHandle?: string;
     documentReviewSummary?: GraphDocumentReviewSummary;
     documentCompilerSummary?: GraphDocumentCompilerSummary;
     graphTruthCommitLedger?: GraphTruthCommitLedger;

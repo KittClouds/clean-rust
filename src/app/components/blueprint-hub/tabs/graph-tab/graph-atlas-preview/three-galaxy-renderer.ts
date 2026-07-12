@@ -7,6 +7,7 @@ import { GraphGalaxyForceController, transitManifoldExpansionScale } from './gra
 import {
     buildGalaxyGlows,
     buildGalaxyNodes,
+    galaxyBillboardNodeBatch,
     galaxySphereNodeBatch,
     galaxySphereNodeStateIndex,
     galaxyGlowBatch,
@@ -27,7 +28,6 @@ const MAX_EDGE_SEGMENTS = 8;
 const CURVED_EDGE_SEGMENTS = 16;
 const LEAN_CURVED_EDGE_SEGMENTS = 12;
 const TREE_FILAMENT_EDGE_SEGMENTS = 18;
-const MAX_EDGE_TUBE_SEGMENTS = 18;
 const HOPF_EDGE_SEGMENTS = 24;
 const HOPF_CROSS_EDGE_SEGMENTS = 32;
 const MAX_EDGE_STROKES = 5;
@@ -54,6 +54,7 @@ const CAPS_SHELL_RADII = [0.54, 0.98, 1.22, 1.34, 1.48, 1.68, 1.92];
 const HYBRID_SURFACE_EDGE_MIN_RADIUS = 2.32 * 0.92;
 const HYBRID_SURFACE_EDGE_MAX_RADIUS_DELTA = 0.42;
 const MAX_CAMERA_VIEW_SHIFT = 2.6;
+const PICK_CELL_SIZE = 32;
 const TREE_FILAMENT_EDGE_LAYOUTS = new Set(['lorentzTree', 'transitManifold', 'productManifold', 'siegelFinsler']);
 type GuideSurface = 'default' | 'transit';
 type EdgeStyleData = Pick<GalaxySceneV2, 'edgeAlpha' | 'edgeKinds'> & Partial<Pick<GalaxySceneV2, 'edgePairs' | 'layoutMode'>>;
@@ -159,6 +160,17 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
     private densityFactors = new Float32Array(0);
     private guidePositionBuffer = new Float32Array(0);
     private labelSignature = '';
+    private pickIndexDirty = true;
+    private pickIndexWidth = 0;
+    private pickIndexHeight = 0;
+    private pickIndexCols = 0;
+    private pickIndexRows = 0;
+    private pickNodeScreen = new Float32Array(0);
+    private pickNodeBins: number[][] = [];
+    private pickEdgeBins: number[][] = [];
+    private pickEdgeSeen = new Uint32Array(0);
+    private pickEdgeEpoch = 0;
+    private readonly pickCandidateBuffer: number[] = [];
     private readonly timings: ThreeGalaxyRendererTimings = emptyRendererTimings();
 
     constructor() {
@@ -194,8 +206,21 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
     }
 
     setScene(scene: GalaxySceneV2): void {
+        this.installScene(scene, this.settings, this.mode, this.selectedId);
+    }
+
+    installScene(
+        scene: GalaxySceneV2,
+        settings: Partial<GalaxyRenderSettings> | null,
+        mode: GraphRendererMode,
+        selectedId: string | null = this.selectedId,
+    ): void {
         const started = this.now();
+        this.settings = mergeGalaxySettings(settings);
+        this.mode = mode;
+        this.selectedId = selectedId;
         this.sceneData = scene;
+        this.pickIndexDirty = true;
         this.clearObjects();
         this.nodeShape = this.settings.nodeShape;
         this.shells = this.buildGroupShells(scene);
@@ -206,7 +231,7 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
         this.force.bind(scene);
         this.force.setSettings(this.settings);
         this.particles.bind(scene, this.settings);
-        this.force.setMode(this.mode);
+        this.force.setMode(mode);
         if (this.shells) this.scene.add(this.shells);
         if (this.edges) this.scene.add(this.edges);
         if (this.glows) this.scene.add(this.glows);
@@ -217,8 +242,7 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
     }
 
     setSettings(settings: Partial<GalaxyRenderSettings> | null): void {
-        const previousShape = this.settings.nodeShape;
-        const previousSphereSurface = this.settings.sphereSurface;
+        const previous = this.settings;
         const previousHybridField = `${this.settings.hybridHorospheresVisible}:${this.settings.hybridPrototypeRaysVisible}`;
         this.settings = mergeGalaxySettings(settings);
         this.force.setSettings(this.settings);
@@ -227,17 +251,34 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
         if (this.sceneData?.layoutMode === 'hybridSpace' && previousHybridField !== nextHybridField) {
             this.rebuildShellObjects(this.sceneData);
         }
-        if (this.sceneData && (previousShape !== this.settings.nodeShape
-            || previousSphereSurface !== this.settings.sphereSurface)) {
+        const nodeObjectsChanged = previous.nodeShape !== this.settings.nodeShape
+            || previous.sphereSurface !== this.settings.sphereSurface;
+        const edgeGeometryChanged = previous.edgeMode !== this.settings.edgeMode
+            || previous.edgeWidth !== this.settings.edgeWidth;
+        const positionGeometryChanged = edgeGeometryChanged
+            || previous.edgeCurveStrength !== this.settings.edgeCurveStrength
+            || previous.edgeLength !== this.settings.edgeLength
+            || previous.nodeDistance !== this.settings.nodeDistance;
+        if (this.sceneData && nodeObjectsChanged) {
             this.nodeShape = this.settings.nodeShape;
             this.rebuildNodeObjects(this.sceneData);
-            this.applyModePositions();
-            this.render();
-            return;
         }
+        if (this.sceneData && edgeGeometryChanged) this.rebuildEdgeObject(this.sceneData);
         this.applyMaterialSettings();
-        this.applyModePositions();
+        if (nodeObjectsChanged || positionGeometryChanged) this.applyModePositions();
+        else this.applyFocusState();
         this.render();
+    }
+
+    private rebuildEdgeObject(data: GalaxySceneV2): void {
+        if (this.edges) {
+            this.scene.remove(this.edges);
+            this.edges.geometry.dispose();
+            const material = this.edges.material;
+            Array.isArray(material) ? material.forEach((item) => item.dispose()) : material.dispose();
+        }
+        this.edges = this.buildEdges(data);
+        if (this.edges) this.scene.add(this.edges);
     }
 
     private rebuildShellObjects(data: GalaxySceneV2): void {
@@ -256,8 +297,10 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
     }
 
     setMode(mode: GraphRendererMode): void {
+        if (this.mode === mode) return;
         this.mode = mode;
         this.force.setMode(mode);
+        if (this.sceneData) this.rebuildEdgeObject(this.sceneData);
         this.applyModePositions();
         this.updateCamera();
     }
@@ -490,15 +533,13 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
     }
 
     private buildEdges(scene: GalaxySceneV2): THREE.LineSegments | null {
-        if (!scene.edgePairs.length) return null;
+        if (!scene.edgePairs.length || this.settings.edgeMode === 'hidden') return null;
         const geometry = new THREE.BufferGeometry();
-        const edgeCount = scene.edgePairs.length / 2;
-        const denseEdges = this.isDenseEdgeScene(scene);
-        const maxEdgeSegments = denseEdges
-            ? Math.max(LEAN_CURVED_EDGE_SEGMENTS, LEAN_HOPF_CROSS_EDGE_SEGMENTS)
-            : Math.max(MAX_EDGE_TUBE_SEGMENTS, HOPF_CROSS_EDGE_SEGMENTS);
-        const maxEdgeStrokes = denseEdges ? LEAN_EDGE_STROKES : MAX_EDGE_STROKES;
-        const vertexCapacity = edgeCount * maxEdgeSegments * 2 * maxEdgeStrokes;
+        const positions = this.mode === '2d' ? scene.positions2d : scene.positions3d;
+        let vertexCapacity = 0;
+        for (let edge = 0; edge < scene.edgePairs.length / 2; edge++) {
+            vertexCapacity += this.edgeSegmentCount(scene, positions, edge) * this.edgeStrokeCount(scene, edge) * 2;
+        }
         geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(vertexCapacity * 3), 3));
         geometry.setAttribute('color', new THREE.BufferAttribute(new Float32Array(vertexCapacity * 3), 3));
         const material = new THREE.LineBasicMaterial({
@@ -517,6 +558,7 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
         if (!data) return;
         const started = this.now();
         const positions = this.mode === '2d' ? data.positions2d : data.positions3d;
+        this.pickIndexDirty = true;
         const focusStarted = this.now();
         const focus = buildGalaxyFocusMask(data, this.selectedId, this.hoverId);
         this.recordTiming('focusMs', focusStarted);
@@ -563,6 +605,7 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
         if (!data) return;
         const positions = this.positions();
         if (!positions) return;
+        this.pickIndexDirty = true;
         const started = this.now();
         const focusStarted = this.now();
         const focus = buildGalaxyFocusMask(data, this.selectedId, this.hoverId);
@@ -584,6 +627,7 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
         if (!this.nodes || !this.glows) return;
         const density = this.nodeDensityFactors(data, positions);
         const sphereBatch = galaxySphereNodeBatch(this.nodes);
+        const billboardBatch = galaxyBillboardNodeBatch(this.nodes);
         const glowBatch = galaxyGlowBatch(this.glows);
         for (let i = 0; i < data.ids.length; i++) {
             const densityFactor = density[i] ?? 1;
@@ -611,6 +655,9 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
                 dimmed,
                 transitAtom,
             });
+            const baseOpacity = transitAtom
+                ? (dimmed ? 0.16 : neighbor ? 0.86 : hovered || active ? 1 : 0.98)
+                : (dimmed ? 0.18 : neighbor ? 0.82 : hovered || active ? 1 : 0.94);
             this.nodeColor(data, i);
             if (sphereBatch) {
                 this.writeSphereNodeInstance(
@@ -622,6 +669,16 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
                     z,
                     nodeScale,
                 );
+            } else if (billboardBatch) {
+                this.writeBillboardNode(
+                    billboardBatch,
+                    i,
+                    x,
+                    y,
+                    z,
+                    nodeScale,
+                    baseOpacity,
+                );
             } else {
                 const node = this.nodes.children[i] as GalaxyNodeObject | undefined;
                 if (!node) continue;
@@ -629,9 +686,6 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
                 node.scale.setScalar(nodeScale);
                 const material = node.material as GalaxyNodeMaterial;
                 material.color.copy(this.color);
-                const baseOpacity = transitAtom
-                    ? (dimmed ? 0.16 : neighbor ? 0.86 : hovered || active ? 1 : 0.98)
-                    : (dimmed ? 0.18 : neighbor ? 0.82 : hovered || active ? 1 : 0.94);
                 material.opacity = material instanceof THREE.MeshPhysicalMaterial
                     ? baseOpacity * (hovered || active ? 0.88 : neighbor ? 0.8 : 0.76)
                     : baseOpacity;
@@ -659,7 +713,36 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
             }
         }
         if (sphereBatch) this.markSphereNodeBatchDirty(sphereBatch);
+        if (billboardBatch) this.markBillboardNodeBatchDirty(billboardBatch);
         if (glowBatch) this.markGlowBatchDirty(glowBatch);
+    }
+
+    private writeBillboardNode(
+        batch: NonNullable<ReturnType<typeof galaxyBillboardNodeBatch>>,
+        index: number,
+        x: number,
+        y: number,
+        z: number,
+        size: number,
+        alpha: number,
+    ): void {
+        const offset = index * 3;
+        batch.positions[offset] = x;
+        batch.positions[offset + 1] = y;
+        batch.positions[offset + 2] = z;
+        batch.colors[offset] = this.color.r;
+        batch.colors[offset + 1] = this.color.g;
+        batch.colors[offset + 2] = this.color.b;
+        batch.sizes[index] = size;
+        batch.alphas[index] = alpha;
+    }
+
+    private markBillboardNodeBatchDirty(batch: NonNullable<ReturnType<typeof galaxyBillboardNodeBatch>>): void {
+        const geometry = batch.points.geometry;
+        (geometry.getAttribute('position') as THREE.BufferAttribute).needsUpdate = true;
+        (geometry.getAttribute('color') as THREE.BufferAttribute).needsUpdate = true;
+        (geometry.getAttribute('aSize') as THREE.BufferAttribute).needsUpdate = true;
+        (geometry.getAttribute('aAlpha') as THREE.BufferAttribute).needsUpdate = true;
     }
 
     private writeSphereNodeInstance(
@@ -712,8 +795,10 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
 
     private updateGlowViewport(): void {
         const batch = galaxyGlowBatch(this.glows);
+        const nodeBatch = galaxyBillboardNodeBatch(this.nodes);
         const height = this.renderer?.domElement.height || this.renderer?.domElement.clientHeight || 800;
         if (batch) batch.points.material.uniforms['viewportHeight'].value = Math.max(1, height);
+        if (nodeBatch) nodeBatch.points.material.uniforms['viewportHeight'].value = Math.max(1, height);
     }
 
     private nodeDensityFactors(data: GalaxySceneV2, positions: Float32Array): Float32Array {
@@ -771,14 +856,8 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
         positionAttr.array.fill(0);
         colorAttr.array.fill(0);
         let cursor = 0;
-        const tubeMode = this.settings.edgeMode === 'tube';
         const treeFilaments = this.usesTreeFilamentEdges(data);
-        const leanEdges = this.usesLeanEdgeContract(data);
-        const baseSteps = tubeMode
-            ? MAX_EDGE_SEGMENTS
-            : this.settings.edgeMode === 'curved'
-            ? (treeFilaments && !leanEdges ? TREE_FILAMENT_EDGE_SEGMENTS : leanEdges ? LEAN_CURVED_EDGE_SEGMENTS : CURVED_EDGE_SEGMENTS)
-            : 1;
+        const tubeMode = this.settings.edgeMode === 'tube';
         for (let edge = 0; edge < data.edgePairs.length / 2; edge++) {
             const interGalaxy = data.edgeKinds[edge] === 1;
             const source = data.edgePairs[edge * 2];
@@ -788,11 +867,7 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
             const surfaceEdge = this.capsSurfaceEdge(data, ax, ay, az, bx, by, bz);
             const hopfEdge = !surfaceEdge && !tubeMode && this.mode === '3d' && data.layoutMode === 'hopfProjection' && this.settings.edgeMode === 'curved';
             const hopfCrossBase = hopfEdge && this.isHopfCrossBaseEdge(data, source, target);
-            const steps = surfaceEdge
-                ? (treeFilaments && !leanEdges ? TREE_FILAMENT_EDGE_SEGMENTS : leanEdges ? LEAN_CURVED_EDGE_SEGMENTS : CURVED_EDGE_SEGMENTS)
-                : hopfEdge
-                ? (hopfCrossBase ? (leanEdges ? LEAN_HOPF_CROSS_EDGE_SEGMENTS : HOPF_CROSS_EDGE_SEGMENTS) : (leanEdges ? LEAN_HOPF_EDGE_SEGMENTS : HOPF_EDGE_SEGMENTS))
-                : baseSteps;
+            const steps = this.edgeSegmentCount(data, positions, edge);
             const curveScale = THREE.MathUtils.clamp(this.settings.edgeCurveStrength, 0.25, 1.2) * (interGalaxy ? 0.92 : 0.58);
             const lift = tubeMode
                 ? this.edgeTubeLift(data, edge, source, target)
@@ -849,27 +924,8 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
         const colorAttr = this.edges.geometry.getAttribute('color') as THREE.BufferAttribute;
         colorAttr.array.fill(0);
         let cursor = 0;
-        const tubeMode = this.settings.edgeMode === 'tube';
-        const treeFilaments = this.usesTreeFilamentEdges(data);
-        const leanEdges = this.usesLeanEdgeContract(data);
-        const baseSteps = tubeMode
-            ? MAX_EDGE_SEGMENTS
-            : this.settings.edgeMode === 'curved'
-            ? (treeFilaments && !leanEdges ? TREE_FILAMENT_EDGE_SEGMENTS : leanEdges ? LEAN_CURVED_EDGE_SEGMENTS : CURVED_EDGE_SEGMENTS)
-            : 1;
         for (let edge = 0; edge < data.edgePairs.length / 2; edge++) {
-            const source = data.edgePairs[edge * 2];
-            const target = data.edgePairs[edge * 2 + 1];
-            const ax = positions[source * 3], ay = positions[source * 3 + 1], az = positions[source * 3 + 2];
-            const bx = positions[target * 3], by = positions[target * 3 + 1], bz = positions[target * 3 + 2];
-            const surfaceEdge = this.capsSurfaceEdge(data, ax, ay, az, bx, by, bz);
-            const hopfEdge = !surfaceEdge && !tubeMode && this.mode === '3d' && data.layoutMode === 'hopfProjection' && this.settings.edgeMode === 'curved';
-            const hopfCrossBase = hopfEdge && this.isHopfCrossBaseEdge(data, source, target);
-            const steps = surfaceEdge
-                ? (treeFilaments && !leanEdges ? TREE_FILAMENT_EDGE_SEGMENTS : leanEdges ? LEAN_CURVED_EDGE_SEGMENTS : CURVED_EDGE_SEGMENTS)
-                : hopfEdge
-                ? (hopfCrossBase ? (leanEdges ? LEAN_HOPF_CROSS_EDGE_SEGMENTS : HOPF_CROSS_EDGE_SEGMENTS) : (leanEdges ? LEAN_HOPF_EDGE_SEGMENTS : HOPF_EDGE_SEGMENTS))
-                : baseSteps;
+            const steps = this.edgeSegmentCount(data, positions, edge);
             const strokes = this.edgeStrokeCount(data, edge);
             for (let stroke = 0; stroke < strokes; stroke++) {
                 const tone = this.edgeStrokeTone(stroke, strokes);
@@ -880,6 +936,36 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
             }
         }
         colorAttr.needsUpdate = true;
+    }
+
+    private edgeSegmentCount(data: GalaxySceneV2, positions: Float32Array, edge: number): number {
+        const tubeMode = this.settings.edgeMode === 'tube';
+        const treeFilaments = this.usesTreeFilamentEdges(data);
+        const leanEdges = this.usesLeanEdgeContract(data);
+        const source = data.edgePairs[edge * 2];
+        const target = data.edgePairs[edge * 2 + 1];
+        const ax = positions[source * 3], ay = positions[source * 3 + 1], az = positions[source * 3 + 2];
+        const bx = positions[target * 3], by = positions[target * 3 + 1], bz = positions[target * 3 + 2];
+        const surfaceEdge = this.capsSurfaceEdge(data, ax, ay, az, bx, by, bz);
+        if (surfaceEdge) {
+            return treeFilaments && !leanEdges
+                ? TREE_FILAMENT_EDGE_SEGMENTS
+                : leanEdges ? LEAN_CURVED_EDGE_SEGMENTS : CURVED_EDGE_SEGMENTS;
+        }
+        const hopfEdge = !tubeMode
+            && this.mode === '3d'
+            && data.layoutMode === 'hopfProjection'
+            && this.settings.edgeMode === 'curved';
+        if (hopfEdge) {
+            const crossBase = this.isHopfCrossBaseEdge(data, source, target);
+            return crossBase
+                ? (leanEdges ? LEAN_HOPF_CROSS_EDGE_SEGMENTS : HOPF_CROSS_EDGE_SEGMENTS)
+                : (leanEdges ? LEAN_HOPF_EDGE_SEGMENTS : HOPF_EDGE_SEGMENTS);
+        }
+        if (tubeMode) return MAX_EDGE_SEGMENTS;
+        if (this.settings.edgeMode !== 'curved') return 1;
+        if (treeFilaments && !leanEdges) return TREE_FILAMENT_EDGE_SEGMENTS;
+        return leanEdges ? LEAN_CURVED_EDGE_SEGMENTS : CURVED_EDGE_SEGMENTS;
     }
 
     private isHopfCrossBaseEdge(data: GalaxySceneV2, source: number, target: number): boolean {
@@ -945,6 +1031,7 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
             this.applyViewShift(this.ortho);
             this.ortho.updateMatrixWorld();
         }
+        this.pickIndexDirty = true;
         if (render) this.render();
     }
 
@@ -1097,12 +1184,16 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
             if (child.userData['guideKind'] !== 'lorentz') return;
             const guides = child.userData['lorentzGuides'] as GalaxyLorentzGuideView[] | undefined;
             if (child instanceof THREE.LineSegments && Array.isArray(guides)) {
+                let changed = false;
+                for (const guide of guides) changed = this.guideEndpointsChanged(child, guide, data, guidePositions, indexById) || changed;
+                if (!changed) return;
                 this.updateLorentzGuideLinePositions(child, guides, data, guidePositions, indexById);
                 return;
             }
             const guide = child.userData['lorentzGuide'] as GalaxyLorentzGuideView | undefined;
             const layer = child.userData['lorentzLayer'];
             if (!(child instanceof THREE.Mesh) || !guide || (layer !== 'tubeCore' && layer !== 'tubeGlow')) return;
+            if (!this.guideEndpointsChanged(child, guide, data, guidePositions, indexById)) return;
             const points = this.lorentzGuidePath(guide, data, guidePositions, indexById);
             if (points.length < 4) return;
             const previous = child.geometry;
@@ -1110,6 +1201,42 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
             child.geometry = new THREE.TubeGeometry(curve, LORENTZ_TUBE_SEGMENTS, this.lorentzTubeRadius(guide, layer, this.guideSurface(child)), LORENTZ_TUBE_RADIAL_SEGMENTS, false);
             previous.dispose();
         });
+    }
+
+    private guideEndpointsChanged(
+        owner: THREE.Object3D,
+        guide: GalaxyLorentzGuideView,
+        data: GalaxySceneV2,
+        positions: Float32Array,
+        indexById: Map<string, number>,
+    ): boolean {
+        if (guide.guideKind !== 'membership') return false;
+        const source = this.liveGuideNodeIndex(guide, data, indexById, 0);
+        const target = this.liveGuideNodeIndex(guide, data, indexById, 1);
+        if (source < 0 || target < 0) return false;
+        const a = source * 3;
+        const b = target * 3;
+        let endpoints = owner.userData['guideEndpoints'] as Map<string, Float64Array> | undefined;
+        if (!endpoints) {
+            endpoints = new Map<string, Float64Array>();
+            owner.userData['guideEndpoints'] = endpoints;
+        }
+        let previous = endpoints.get(guide.id);
+        if (!previous) {
+            previous = new Float64Array(6);
+            previous.fill(Number.NaN);
+            endpoints.set(guide.id, previous);
+        }
+        const changed = previous[0] !== positions[a]
+            || previous[1] !== positions[a + 1]
+            || previous[2] !== positions[a + 2]
+            || previous[3] !== positions[b]
+            || previous[4] !== positions[b + 1]
+            || previous[5] !== positions[b + 2];
+        if (!changed) return false;
+        previous[0] = positions[a]; previous[1] = positions[a + 1]; previous[2] = positions[a + 2];
+        previous[3] = positions[b]; previous[4] = positions[b + 1]; previous[5] = positions[b + 2];
+        return true;
     }
 
     private guideAttachmentContract(data: GalaxySceneV2): GuideAttachmentContract {
@@ -2373,21 +2500,17 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
 
     private screenSpacePick(pointer: GraphRendererPointer): number {
         const data = this.sceneData;
-        const positions = this.positions();
-        if (!data || !positions || pointer.width <= 0 || pointer.height <= 0) return -1;
-        const camera = this.camera();
+        if (!data || pointer.width <= 0 || pointer.height <= 0) return -1;
+        this.ensureScreenPickIndex(pointer);
         let best = -1;
         let bestScore = Number.POSITIVE_INFINITY;
         const glowBoost = this.settings.glow * 4;
         const shapeBoost = galaxyNodePickShapeBoost(this.settings.nodeShape);
         const densityPenalty = data.ids.length > 160 ? 4 : 0;
-
-        for (let i = 0; i < data.ids.length; i++) {
+        for (const i of this.pickCandidates(this.pickNodeBins, pointer.x, pointer.y)) {
             const offset = i * 3;
-            this.pickVector.set(positions[offset], positions[offset + 1], positions[offset + 2]).project(camera);
-            if (this.pickVector.z < -1 || this.pickVector.z > 1) continue;
-            const sx = (this.pickVector.x * 0.5 + 0.5) * pointer.width;
-            const sy = (-this.pickVector.y * 0.5 + 0.5) * pointer.height;
+            const sx = this.pickNodeScreen[offset];
+            const sy = this.pickNodeScreen[offset + 1];
             const dx = sx - pointer.x;
             const dy = sy - pointer.y;
             const radius = THREE.MathUtils.clamp(11 + data.radii[i] * 1.9 + glowBoost + shapeBoost - densityPenalty, 10, 34);
@@ -2403,21 +2526,20 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
 
     private screenSpaceEdgePick(pointer: GraphRendererPointer): number {
         const data = this.sceneData;
-        const positions = this.positions();
-        if (!data || !positions || pointer.width <= 0 || pointer.height <= 0) return -1;
-        const camera = this.camera();
+        if (!data || pointer.width <= 0 || pointer.height <= 0) return -1;
+        this.ensureScreenPickIndex(pointer);
         let best = -1;
         let bestDistance = 9 * 9;
-        for (let index = 0; index < data.edgeIds.length; index++) {
+        this.pickEdgeEpoch = (this.pickEdgeEpoch + 1) >>> 0 || 1;
+        for (const index of this.pickCandidates(this.pickEdgeBins, pointer.x, pointer.y)) {
+            if (this.pickEdgeSeen[index] === this.pickEdgeEpoch) continue;
+            this.pickEdgeSeen[index] = this.pickEdgeEpoch;
             const sourceOffset = data.edgePairs[index * 2] * 3;
             const targetOffset = data.edgePairs[index * 2 + 1] * 3;
-            this.pickVector.set(positions[sourceOffset], positions[sourceOffset + 1], positions[sourceOffset + 2]).project(camera);
-            this.pickVectorB.set(positions[targetOffset], positions[targetOffset + 1], positions[targetOffset + 2]).project(camera);
-            if (this.pickVector.z < -1 || this.pickVector.z > 1 || this.pickVectorB.z < -1 || this.pickVectorB.z > 1) continue;
-            const ax = (this.pickVector.x * 0.5 + 0.5) * pointer.width;
-            const ay = (-this.pickVector.y * 0.5 + 0.5) * pointer.height;
-            const bx = (this.pickVectorB.x * 0.5 + 0.5) * pointer.width;
-            const by = (-this.pickVectorB.y * 0.5 + 0.5) * pointer.height;
+            const ax = this.pickNodeScreen[sourceOffset];
+            const ay = this.pickNodeScreen[sourceOffset + 1];
+            const bx = this.pickNodeScreen[targetOffset];
+            const by = this.pickNodeScreen[targetOffset + 1];
             const distance = pointSegmentDistanceSquared(pointer.x, pointer.y, ax, ay, bx, by);
             if (distance < bestDistance) {
                 best = index;
@@ -2425,6 +2547,93 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
             }
         }
         return best;
+    }
+
+    private ensureScreenPickIndex(pointer: GraphRendererPointer): void {
+        const data = this.sceneData;
+        const positions = this.positions();
+        const width = Math.max(1, Math.floor(pointer.width));
+        const height = Math.max(1, Math.floor(pointer.height));
+        if (!data || !positions) return;
+        if (!this.pickIndexDirty && this.pickIndexWidth === width && this.pickIndexHeight === height) return;
+
+        this.pickIndexWidth = width;
+        this.pickIndexHeight = height;
+        this.pickIndexCols = Math.max(1, Math.ceil(width / PICK_CELL_SIZE));
+        this.pickIndexRows = Math.max(1, Math.ceil(height / PICK_CELL_SIZE));
+        const binCount = this.pickIndexCols * this.pickIndexRows;
+        this.pickNodeBins = this.resetPickBins(this.pickNodeBins, binCount);
+        this.pickEdgeBins = this.resetPickBins(this.pickEdgeBins, binCount);
+        if (this.pickNodeScreen.length !== data.ids.length * 3) {
+            this.pickNodeScreen = new Float32Array(data.ids.length * 3);
+        }
+        if (this.pickEdgeSeen.length !== data.edgeIds.length) {
+            this.pickEdgeSeen = new Uint32Array(data.edgeIds.length);
+            this.pickEdgeEpoch = 0;
+        }
+
+        const camera = this.camera();
+        for (let index = 0; index < data.ids.length; index++) {
+            const offset = index * 3;
+            this.pickVector.set(positions[offset], positions[offset + 1], positions[offset + 2]).project(camera);
+            const sx = (this.pickVector.x * 0.5 + 0.5) * width;
+            const sy = (-this.pickVector.y * 0.5 + 0.5) * height;
+            this.pickNodeScreen[offset] = sx;
+            this.pickNodeScreen[offset + 1] = sy;
+            this.pickNodeScreen[offset + 2] = this.pickVector.z;
+            if (this.pickVector.z < -1 || this.pickVector.z > 1) continue;
+            const bin = this.pickBin(sx, sy);
+            if (bin >= 0) this.pickNodeBins[bin].push(index);
+        }
+
+        for (let edge = 0; edge < data.edgeIds.length; edge++) {
+            const sourceOffset = data.edgePairs[edge * 2] * 3;
+            const targetOffset = data.edgePairs[edge * 2 + 1] * 3;
+            if (this.pickNodeScreen[sourceOffset + 2] < -1 || this.pickNodeScreen[sourceOffset + 2] > 1
+                || this.pickNodeScreen[targetOffset + 2] < -1 || this.pickNodeScreen[targetOffset + 2] > 1) continue;
+            const ax = this.pickNodeScreen[sourceOffset];
+            const ay = this.pickNodeScreen[sourceOffset + 1];
+            const bx = this.pickNodeScreen[targetOffset];
+            const by = this.pickNodeScreen[targetOffset + 1];
+            const steps = Math.max(1, Math.ceil(Math.max(Math.abs(bx - ax), Math.abs(by - ay)) / (PICK_CELL_SIZE * 0.5)));
+            let previousBin = -1;
+            for (let step = 0; step <= steps; step++) {
+                const t = step / steps;
+                const bin = this.pickBin(
+                    THREE.MathUtils.lerp(ax, bx, t),
+                    THREE.MathUtils.lerp(ay, by, t),
+                );
+                if (bin < 0 || bin === previousBin) continue;
+                this.pickEdgeBins[bin].push(edge);
+                previousBin = bin;
+            }
+        }
+        this.pickIndexDirty = false;
+    }
+
+    private resetPickBins(bins: number[][], count: number): number[][] {
+        if (bins.length !== count) return Array.from({ length: count }, () => []);
+        for (const bin of bins) bin.length = 0;
+        return bins;
+    }
+
+    private pickCandidates(bins: number[][], x: number, y: number): readonly number[] {
+        this.pickCandidateBuffer.length = 0;
+        const centerX = Math.floor(x / PICK_CELL_SIZE);
+        const centerY = Math.floor(y / PICK_CELL_SIZE);
+        for (let yy = Math.max(0, centerY - 1); yy <= Math.min(this.pickIndexRows - 1, centerY + 1); yy++) {
+            for (let xx = Math.max(0, centerX - 1); xx <= Math.min(this.pickIndexCols - 1, centerX + 1); xx++) {
+                this.pickCandidateBuffer.push(...bins[xx + yy * this.pickIndexCols]);
+            }
+        }
+        return this.pickCandidateBuffer;
+    }
+
+    private pickBin(x: number, y: number): number {
+        const column = Math.floor(x / PICK_CELL_SIZE);
+        const row = Math.floor(y / PICK_CELL_SIZE);
+        if (column < 0 || column >= this.pickIndexCols || row < 0 || row >= this.pickIndexRows) return -1;
+        return column + row * this.pickIndexCols;
     }
 
     private screenSpaceGroupPick(pointer: GraphRendererPointer): GraphCanvasHit | null {

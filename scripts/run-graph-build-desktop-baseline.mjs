@@ -19,7 +19,8 @@ try {
   await cdp.call('Runtime.enable');
   await cdp.call('Page.navigate', { url: `http://127.0.0.1:4200/?graphPerf=1` });
   await waitForHarness(cdp);
-  const expression = `window.__PHOENIX_GRAPH_BUILD_BASELINE__.run(${JSON.stringify({
+  const method = args.mutationLocality ? 'runMutationLocality' : 'run';
+  const expression = `window.__PHOENIX_GRAPH_BUILD_BASELINE__.${method}(${JSON.stringify({
     documents,
     warmForceRuns: args.warmRuns,
     deltaRuns: args.deltaRuns,
@@ -39,7 +40,9 @@ try {
   await mkdir(dirname(output), { recursive: true });
   await writeFile(output, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
   console.log(`[graph-desktop-baseline] wrote ${output}`);
-  console.log(JSON.stringify({ summary: report.summary, parity: report.parity }, null, 2));
+  console.log(JSON.stringify(args.mutationLocality
+    ? report
+    : { summary: report.summary, parity: report.parity }, null, 2));
 } finally {
   cdp.close();
 }
@@ -47,6 +50,7 @@ try {
 function parseArgs(argv) {
   const result = {
     documents: [], titles: [], port: 9222, warmRuns: 10, deltaRuns: 10,
+    mutationLocality: false,
     output: 'target/graph-build-baselines/two-document-desktop.json',
   };
   for (let index = 0; index < argv.length; index += 1) {
@@ -57,6 +61,7 @@ function parseArgs(argv) {
     else if (value === '--warm-runs') result.warmRuns = Number(argv[++index]);
     else if (value === '--delta-runs') result.deltaRuns = Number(argv[++index]);
     else if (value === '--output') result.output = argv[++index];
+    else if (value === '--mutation-locality') result.mutationLocality = true;
     else throw new Error(`Unknown argument: ${value}`);
   }
   return result;

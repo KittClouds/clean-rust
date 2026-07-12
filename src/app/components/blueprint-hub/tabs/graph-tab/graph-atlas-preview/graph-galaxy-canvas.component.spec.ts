@@ -6,6 +6,7 @@ import { describe, expect, it } from 'vitest';
 import { mergeGalaxySettings } from './graph-galaxy-engine';
 import {
     canGraphGalaxyCanvasHoldSurface,
+    galaxySceneIdentityNeedsRebuild,
     galaxySettingsNeedSceneRebuild,
 } from './graph-galaxy-canvas.component';
 
@@ -31,6 +32,12 @@ describe('GraphGalaxyCanvasComponent settings rebuild routing', () => {
         const current = mergeGalaxySettings({ labelMode: 'always' });
 
         expect(galaxySettingsNeedSceneRebuild(previous, current)).toBe(false);
+    });
+
+    it('terminates collection churn when the graph scene identity is unchanged', () => {
+        expect(galaxySceneIdentityNeedsRebuild('graph-a', 'graph-a', true)).toBe(false);
+        expect(galaxySceneIdentityNeedsRebuild('graph-a', 'graph-b', true)).toBe(true);
+        expect(galaxySceneIdentityNeedsRebuild('', '', true)).toBe(true);
     });
 });
 

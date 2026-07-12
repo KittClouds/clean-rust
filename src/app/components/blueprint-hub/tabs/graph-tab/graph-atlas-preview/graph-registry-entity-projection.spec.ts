@@ -1,12 +1,21 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+    completeRegistryEntityProjection,
     registryEntityKindOrder,
     registryEntityProjectionPoint,
     REGISTRY_ENTITY_PROJECTION_SPACE,
 } from './graph-registry-entity-projection';
 
 describe('registry entity projection', () => {
+    it('admits every registry entity without the legacy 80-node renderer cap', () => {
+        const entities = Array.from({ length: 167 }, (_, index) => ({ id: `entity-${index}` }));
+
+        const projected = completeRegistryEntityProjection(entities);
+
+        expect(projected).toBe(entities);
+        expect(projected).toHaveLength(167);
+    });
     const entities = Array.from({ length: 16 }, (_, index) => ({
         id: `entity-${index}`,
         kind: index < 10 ? 'CHARACTER' : 'LOCATION',

@@ -1,4 +1,4 @@
-export type GraphGalaxyCompilerSource = 'native' | 'local' | 'fallback';
+export type GraphGalaxyCompilerSource = 'native' | 'worker' | 'local' | 'fallback' | 'cache';
 
 export interface GraphGalaxyCanvasMeter {
     id: number;

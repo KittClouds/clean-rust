@@ -5,6 +5,7 @@ use std::path::{Path, PathBuf};
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use memmap2::MmapOptions;
+use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 
 const STORE_SCHEMA: &str = "phoenix-graph-run-store/v1";
@@ -245,6 +246,50 @@ pub(crate) fn load_section(root: &Path, section: &DurableSectionRef) -> Result<V
     })
 }
 
+pub(crate) fn load_immutable_artifact<T: DeserializeOwned>(
+    root: &Path,
+    namespace: &str,
+    identity: &str,
+) -> Result<Option<T>, String> {
+    let path = root
+        .join("artifacts")
+        .join(namespace)
+        .join(format!("{identity}.zst"));
+    if !path.is_file() {
+        return Ok(None);
+    }
+    let file = File::open(&path)
+        .map_err(|error| format!("open immutable artifact {}: {error}", path.display()))?;
+    let mapped = unsafe { MmapOptions::new().map(&file) }
+        .map_err(|error| format!("mmap immutable artifact {}: {error}", path.display()))?;
+    let raw = zstd::stream::decode_all(Cursor::new(&mapped[..]))
+        .map_err(|error| format!("decompress immutable artifact {}: {error}", path.display()))?;
+    serde_json::from_slice(&raw)
+        .map(Some)
+        .map_err(|error| format!("decode immutable artifact {}: {error}", path.display()))
+}
+
+pub(crate) fn persist_immutable_artifact<T: Serialize>(
+    root: &Path,
+    namespace: &str,
+    identity: &str,
+    value: &T,
+) -> Result<(usize, usize, bool), String> {
+    let path = root
+        .join("artifacts")
+        .join(namespace)
+        .join(format!("{identity}.zst"));
+    if path.is_file() {
+        return Ok((0, 0, false));
+    }
+    let raw = serde_json::to_vec(value)
+        .map_err(|error| format!("encode immutable artifact {namespace}/{identity}: {error}"))?;
+    let compressed = zstd::stream::encode_all(Cursor::new(&raw), 3)
+        .map_err(|error| format!("compress immutable artifact {namespace}/{identity}: {error}"))?;
+    write_immutable(&path, &compressed)?;
+    Ok((raw.len(), compressed.len(), true))
+}
+
 fn manifest_identity(
     scope_id: &str,
     snapshot_id: &str,
@@ -448,6 +493,37 @@ mod tests {
             serde_json::from_slice::<Vec<String>>(&bytes).unwrap(),
             vec!["a", "b"]
         );
+        let _ = fs::remove_dir_all(root);
+    }
+
+    #[test]
+    fn immutable_artifact_reopens_exactly_after_restart() {
+        let root = test_root("artifact-restart");
+        let value = BTreeMap::from([
+            ("noteId".to_owned(), "note-a".to_owned()),
+            ("semantic".to_owned(), "exact".to_owned()),
+        ]);
+        let first =
+            persist_immutable_artifact(&root, "document-semantics-v1", "b3-artifact", &value)
+                .unwrap();
+        let warm = persist_immutable_artifact(
+            &root,
+            "document-semantics-v1",
+            "b3-artifact",
+            &RefuseEncoding,
+        )
+        .unwrap();
+        let loaded = load_immutable_artifact::<BTreeMap<String, String>>(
+            &root,
+            "document-semantics-v1",
+            "b3-artifact",
+        )
+        .unwrap()
+        .unwrap();
+
+        assert!(first.0 > 0 && first.1 > 0 && first.2);
+        assert_eq!(warm, (0, 0, false));
+        assert_eq!(loaded, value);
         let _ = fs::remove_dir_all(root);
     }
 

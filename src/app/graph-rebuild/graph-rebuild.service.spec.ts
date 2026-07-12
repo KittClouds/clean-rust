@@ -6,6 +6,7 @@ import {
     GRAPH_REBUILD_NAMESPACE,
     authorizeGraphRebuildSnapshotForLoad,
     decodeNativeGraphCompilerSidecar,
+    decodeDocumentSemanticSummary,
     graphModelV2OverGraphExportToScopedDocument,
     graphIndexReceiptToScopedDocument,
     graphRebuildSnapshotDocumentPayloadStats,
@@ -32,7 +33,33 @@ import type { GraphIndexRunReceipt, GraphRebuildSnapshot } from './graph-rebuild
 import type { EntityOccurrence } from '../lib/dexie/db';
 import type { RegisteredEntity } from '../lib/registry';
 
+function bytesToBase64(bytes: Uint8Array): string {
+    let binary = '';
+    for (const byte of bytes) binary += String.fromCharCode(byte);
+    return btoa(binary);
+}
+
 describe('GraphRebuildService persistence helpers', () => {
+    it('decodes compressed native document semantics without changing the summary', () => {
+        const summary = {
+            schemaVersion: 'phoenix-document-semantics/v1',
+            source: 'native_rust',
+            documents: [],
+            counters: { documents: 0, propositions: 0, situations: 0 },
+        };
+        const compressed = gzipSync(strToU8(JSON.stringify(summary)));
+
+        expect(decodeDocumentSemanticSummary({
+            schemaVersion: 'phoenix-document-semantics/gzip-base64/v1',
+            sourceSchemaVersion: summary.schemaVersion,
+            encoding: 'gzip+base64',
+            rawBytes: JSON.stringify(summary).length,
+            compressedBytes: compressed.length,
+            payload: bytesToBase64(compressed),
+        })).toEqual(summary);
+        expect(decodeDocumentSemanticSummary(summary)).toBe(summary);
+    });
+
     it('uses the Full Atlas dynamic chunking contract instead of note-block lines', () => {
         const text = Array.from({ length: 70 }, (_, index) =>
             `Sentence ${index} keeps Kai and Hazel inside a realistic narrative beat for chunk packing.`,

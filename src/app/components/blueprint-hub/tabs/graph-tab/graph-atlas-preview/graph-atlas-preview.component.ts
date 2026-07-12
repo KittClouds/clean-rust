@@ -18,6 +18,7 @@ import { type EmbeddingAtlasData, type EmbeddingQueryTrace, type EmbeddingSource
 import { manifoldAdapter } from './graph-manifold-atlas';
 import { buildGraphRebuildEmbeddingAtlas, graphRebuildEmbeddingTargetCount } from './graph-rebuild-embedding-atlas';
 import {
+    completeRegistryEntityProjection,
     registryEntityKindOrder,
     registryEntityProjectionPoint,
     REGISTRY_ENTITY_PROJECTION_SPACE,
@@ -184,6 +185,10 @@ function readPersistedAtlasViewState(): PersistedAtlasViewState {
                             }
                             @if (atlasMode === 'embeddings') {
                             <span class="atlas-status-token" [title]="'Input graph: ' + semanticGraphAvailabilityLabel()">input {{ semanticGraphAvailabilityLabel() }}</span>
+                            @if (!usesGraphRebuildEmbeddingAtlas()) {
+                            <span class="atlas-status-token" [title]="'Registry anchors ' + registryAnchorCount()">registry anchors {{ registryAnchorCount() }}</span>
+                            <span class="atlas-status-token" [title]="'Projection sidecar nodes ' + projectionSidecarNodeCount()">sidecar nodes {{ projectionSidecarNodeCount() }}</span>
+                            }
                             }
                             @if (hopfReceiptSummary(); as hopf) {
                             <span class="atlas-status-token atlas-status-token-source" [title]="'Hopf receipts ' + hopf.assignments + ' / ' + hopf.occupiedCells + ' cells / ' + hopf.docCharts + ' charts / ' + hopf.braids + ' braids'">hopf {{ hopf.assignments }} / {{ hopf.occupiedCells }}</span>
@@ -307,6 +312,7 @@ function readPersistedAtlasViewState(): PersistedAtlasViewState {
                     } @else {
                     <app-graph-galaxy-canvas #galaxyCanvas class="block h-full min-h-0 w-full"
                         [entities]="activeNodes()" [edges]="activeEdges()" [settings]="settings" [selectedEntityId]="selectedEntityId"
+                        [sceneIdentity]="activeSceneIdentity()"
                         [queryFocus]="canvasQueryFocus()" [viewMode]="viewMode" [sourceMode]="atlasMode" [surfaceActive]="isAtlasSurfaceActive()"
                         [lassoEnabled]="lassoEnabled()"
                         (entitySelected)="onCanvasEntitySelected($event)" (entityHovered)="hoveredEntity = $event"
@@ -1586,6 +1592,21 @@ export class GraphAtlasPreviewComponent implements OnInit, OnDestroy {
         return this.activeGraph().graphEdges;
     }
 
+    activeSceneIdentity(): string {
+        const snapshot = this.graphSnapshotSignal();
+        if (!snapshot || (this.atlasMode !== 'graph' && !this.usesGraphRebuildEmbeddingAtlas())) return '';
+        const graphIdentity = snapshot.authorityContract?.contentHash || snapshot.id;
+        const traceIdentity = this.queryTrace()?.queryNode.id || '';
+        return [
+            graphIdentity,
+            this.atlasMode,
+            this.manifoldMode(),
+            this.canvasLens(),
+            this.graphKindFilter(),
+            traceIdentity,
+        ].join('\u0000');
+    }
+
     activeNodeCount(): number {
         return this.activeNodes().length;
     }
@@ -1594,12 +1615,20 @@ export class GraphAtlasPreviewComponent implements OnInit, OnDestroy {
         return this.activeEdges().length;
     }
 
+    registryAnchorCount(): number {
+        return this.entities.length;
+    }
+
+    projectionSidecarNodeCount(): number {
+        return this.displayEmbeddingAtlas().nodes.length;
+    }
+
     primaryCountLabel(): string {
         if (this.atlasMode === 'entities') return 'registry entities';
         if (this.atlasMode === 'graph') return 'graph nodes';
         if (this.usesGraphRebuildEmbeddingAtlas()) return 'embedding targets';
         if (this.manifoldMode() === 'siegel') return 'finsler nodes';
-        return this.manifoldMode() === 'lorentz' ? 'cap nodes' : 'semantic vectors';
+        return this.manifoldMode() === 'lorentz' ? 'canvas nodes' : 'semantic vectors';
     }
 
     secondaryCountLabel(): string {
@@ -1779,7 +1808,7 @@ export class GraphAtlasPreviewComponent implements OnInit, OnDestroy {
         return this.graphRebuildEmbeddingAtlas() ?? this.embeddingAtlas();
     }
 
-    private usesGraphRebuildEmbeddingAtlas(): boolean {
+    usesGraphRebuildEmbeddingAtlas(): boolean {
         return this.atlasMode === 'embeddings' && !!this.graphRebuildEmbeddingAtlas();
     }
 
@@ -1927,8 +1956,8 @@ export class GraphAtlasPreviewComponent implements OnInit, OnDestroy {
     private embeddingNodesWithEntityAnchors(): GalaxyRenderableNode[] {
         const atlas = this.displayEmbeddingAtlas();
         if (this.usesGraphRebuildEmbeddingAtlas()) return atlas.nodes;
-        if (!this.entities.length || !atlas.nodes.length) return atlas.nodes;
-        const anchors = this.entities.slice(0, 80).map((entity, index) => {
+        if (!this.entities.length) return atlas.nodes;
+        const anchors = completeRegistryEntityProjection(this.entities).map((entity, index) => {
             const sourceSystem = entitySourceSystem(entity as RegisteredEntity);
             const matches = matchingEmbeddingNodes(entity, atlas.nodes).slice(0, 8);
             const point = matches.length
@@ -2014,7 +2043,7 @@ export class GraphAtlasPreviewComponent implements OnInit, OnDestroy {
         if (this.usesGraphRebuildEmbeddingAtlas()) return atlas.edges;
         if (!this.entities.length || !atlas.nodes.length) return atlas.edges;
         const anchorEdges: AtlasPreviewEdge[] = [];
-        for (const entity of this.entities.slice(0, 80)) {
+        for (const entity of completeRegistryEntityProjection(this.entities)) {
             const matches = matchingEmbeddingNodes(entity, atlas.nodes).slice(0, 5);
             for (const [index, node] of matches.entries()) {
                 anchorEdges.push({

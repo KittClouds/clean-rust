@@ -2,7 +2,9 @@ import { describe, expect, it } from 'vitest';
 
 import {
     SPHERE_NODE_RENDER_SCALE,
+    buildGalaxyGlows,
     buildGalaxyNodes,
+    galaxyBillboardNodeBatch,
     galaxyNodePickShapeBoost,
     galaxyNodeShapeScale,
     galaxySphereNodeBatch,
@@ -40,8 +42,10 @@ describe('galaxy node shape rendering', () => {
         const solid = buildGalaxyNodes(scene, mergeGalaxySettings({ nodeShape: 'sphere', sphereSurface: 'solid' }), texture, texture);
         const glass = buildGalaxyNodes(scene, mergeGalaxySettings({ nodeShape: 'sphere', sphereSurface: 'glass' }), texture, texture);
         const batch = galaxySphereNodeBatch(glass);
+        const solidBatch = galaxySphereNodeBatch(solid);
 
         expect((solid?.children[0] as THREE.Mesh).material).toBeInstanceOf(THREE.MeshBasicMaterial);
+        expect(solidBatch?.meshes).toHaveLength(4);
         expect(batch?.meshes[1].material).toBeInstanceOf(THREE.ShaderMaterial);
         const material = batch?.meshes[1].material as THREE.ShaderMaterial | undefined;
         expect(material?.userData['glassSurface']).toBe('b-glass-marble');
@@ -56,6 +60,38 @@ describe('galaxy node shape rendering', () => {
         expect(material?.depthWrite).toBe(false);
 
         texture.dispose();
+    });
+
+    it('batches atom and halo nodes into one textured draw each', () => {
+        const scene = { ids: ['node:a', 'node:b', 'node:c'] } as GalaxySceneV2;
+        const nodeTexture = new THREE.Texture();
+        const atomTexture = new THREE.Texture();
+        const atom = buildGalaxyNodes(scene, mergeGalaxySettings({ nodeShape: 'atom' }), nodeTexture, atomTexture);
+        const halo = buildGalaxyNodes(scene, mergeGalaxySettings({ nodeShape: 'halo' }), nodeTexture, atomTexture);
+        const atomBatch = galaxyBillboardNodeBatch(atom);
+        const haloBatch = galaxyBillboardNodeBatch(halo);
+
+        expect(atom?.children).toHaveLength(1);
+        expect(halo?.children).toHaveLength(1);
+        expect(atomBatch?.points).toBeInstanceOf(THREE.Points);
+        expect(haloBatch?.points).toBeInstanceOf(THREE.Points);
+        expect(atomBatch?.positions).toHaveLength(scene.ids.length * 3);
+        expect(atomBatch?.points.material.uniforms['nodeTexture'].value).toBe(atomTexture);
+        expect(haloBatch?.points.material.uniforms['nodeTexture'].value).toBe(nodeTexture);
+        expect(atomBatch?.points.material.fragmentShader).toContain('0.055');
+        expect(atomBatch?.points.material.vertexColors).toBe(true);
+        expect(atomBatch?.points.material.vertexShader).not.toContain('attribute vec3 color;');
+
+        const glow = buildGalaxyGlows(scene, nodeTexture);
+        const glowMaterial = (glow?.children[0] as THREE.Points | undefined)?.material as THREE.ShaderMaterial | undefined;
+        expect(glowMaterial?.vertexColors).toBe(true);
+        expect(glowMaterial?.vertexShader).not.toContain('attribute vec3 color;');
+
+        atom?.traverse((object) => (object as THREE.Mesh).geometry?.dispose());
+        halo?.traverse((object) => (object as THREE.Mesh).geometry?.dispose());
+        glow?.traverse((object) => (object as THREE.Mesh).geometry?.dispose());
+        nodeTexture.dispose();
+        atomTexture.dispose();
     });
 
     it('batches B-glass spheres into colored shader instances instead of per-node meshes', () => {

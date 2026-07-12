@@ -43,6 +43,8 @@ export interface PhoenixMentionBatchResult {
 }
 export interface PhoenixGraphRunOpenResult {
     runHandle: string;
+    documentsBuilt?: number;
+    documentsReused?: number;
     documents: Array<{
         documentId: string;
         textHash: string;

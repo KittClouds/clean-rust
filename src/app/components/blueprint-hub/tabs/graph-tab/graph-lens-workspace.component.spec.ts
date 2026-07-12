@@ -41,7 +41,11 @@ vi.mock('../../../../lib/dexie/settings.service', () => ({
     }),
 }));
 
-import { GraphLensWorkspaceComponent } from './graph-lens-workspace.component';
+import {
+    GraphLensWorkspaceComponent,
+    graphSnapshotRenderIdentity,
+    sameGraphRenderIdentity,
+} from './graph-lens-workspace.component';
 import { GraphRebuildService } from '../../../../graph-rebuild/graph-rebuild.service';
 import { PhoenixProjectionService } from '../../../../services/phoenix-projection.service';
 import { NoteEditorStore } from '../../../../lib/store/note-editor.store';
@@ -136,6 +140,34 @@ describe('GraphLensWorkspaceComponent read-only snapshot loading', () => {
         });
     });
 
+    it('does not reload or replace render state for a receipt with the same graph identity', async () => {
+        await flushAsync();
+        const first = renderSnapshot('snapshot-a', 'authority-a');
+        snapshotToLoad = first;
+        window.dispatchEvent(new CustomEvent('graph-rebuild-snapshot-updated'));
+        await flushAsync();
+
+        expect(component.graphRebuildSnapshot()).toBe(first);
+        expect(graphRebuild.loadPersistedSnapshot).toHaveBeenCalledTimes(2);
+
+        snapshotToLoad = { ...first, buildTimings: { totalMs: 1 } };
+        window.dispatchEvent(new CustomEvent('graph-index-run-completed', {
+            detail: { scopeId: 'global', snapshotId: 'snapshot-a', authorityHash: 'authority-a' },
+        }));
+        await flushAsync();
+
+        expect(graphRebuild.loadPersistedSnapshot).toHaveBeenCalledTimes(2);
+        expect(component.graphRebuildSnapshot()).toBe(first);
+    });
+
+    it('treats timing-only snapshot clones as the same render identity', () => {
+        const first = renderSnapshot('snapshot-a', 'authority-a');
+        const timingClone = { ...first, buildTimings: { totalMs: 2 } };
+        expect(graphSnapshotRenderIdentity(first)).toBe(graphSnapshotRenderIdentity(timingClone));
+        expect(sameGraphRenderIdentity(first, timingClone)).toBe(true);
+        expect(sameGraphRenderIdentity(first, renderSnapshot('snapshot-a', 'authority-b'))).toBe(false);
+    });
+
     function createGraphRebuildMock() {
         return {
             loadPersistedSnapshot: vi.fn(async () => snapshotToLoad),
@@ -143,6 +175,14 @@ describe('GraphLensWorkspaceComponent read-only snapshot loading', () => {
         };
     }
 });
+
+function renderSnapshot(id: string, contentHash: string): any {
+    return {
+        id,
+        scopeId: 'global',
+        authorityContract: { contentHash },
+    };
+}
 
 function createProjectionMock() {
     return {

@@ -222,6 +222,9 @@ export async function updateNote(id: string, updates: Partial<Note>): Promise<No
     const now = Date.now();
     const merged = { ...existing, ...updates, updatedAt: now, version: now };
     await store.upsertNote(merged as StoreNote);
+    if (updates.content !== undefined || updates.markdownContent !== undefined) {
+        store.scheduleDocumentSemanticMaterialization(merged as StoreNote);
+    }
     const note = { ...storeNoteToNote(merged as StoreNote), hasBody: true };
     warmDexieNote(note);
 

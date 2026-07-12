@@ -311,7 +311,9 @@ export class GraphLensWorkspaceComponent implements OnDestroy {
         try {
             const snapshot = await this.graphRebuild.loadPersistedSnapshot(normalized.scopeId);
             if (token === this.graphSnapshotLoadToken) {
-                this.graphRebuildSnapshotSignal.set(snapshot);
+                if (!sameGraphRenderIdentity(this.graphRebuildSnapshotSignal(), snapshot)) {
+                    this.graphRebuildSnapshotSignal.set(snapshot);
+                }
                 this.graphSnapshotStaleSignal.set(false);
             }
         } catch (error) {
@@ -322,7 +324,15 @@ export class GraphLensWorkspaceComponent implements OnDestroy {
     private bindAnchorEvents(): void {
         if (typeof window === 'undefined') return;
         const markStale = () => this.graphSnapshotStaleSignal.set(true);
-        const reload = () => void this.loadPersistedGraphSnapshot(this.lens());
+        const reload = (event: Event) => {
+            const normalized = normalizeGraphLensForBuild(this.lens());
+            if (graphSnapshotEventMatchesCurrent(
+                event,
+                normalized.scopeId,
+                this.graphRebuildSnapshotSignal(),
+            )) return;
+            void this.loadPersistedGraphSnapshot(this.lens());
+        };
         window.addEventListener('graph-rebuild-anchors-changed', markStale);
         window.addEventListener('entities-changed', markStale);
         window.addEventListener('graph-rebuild-snapshot-updated', reload);
@@ -334,6 +344,38 @@ export class GraphLensWorkspaceComponent implements OnDestroy {
             window.removeEventListener('graph-index-run-completed', reload);
         };
     }
+}
+
+export function graphSnapshotRenderIdentity(
+    snapshot: GraphRebuildSnapshot | null | undefined,
+): string {
+    if (!snapshot) return '';
+    const authority = snapshot.authorityContract?.contentHash || '';
+    return `${snapshot.scopeId}\u0000${snapshot.id}\u0000${authority}`;
+}
+
+export function sameGraphRenderIdentity(
+    current: GraphRebuildSnapshot | null | undefined,
+    next: GraphRebuildSnapshot | null | undefined,
+): boolean {
+    const currentIdentity = graphSnapshotRenderIdentity(current);
+    return Boolean(currentIdentity && currentIdentity === graphSnapshotRenderIdentity(next));
+}
+
+export function graphSnapshotEventMatchesCurrent(
+    event: Event,
+    scopeId: string,
+    current: GraphRebuildSnapshot | null | undefined,
+): boolean {
+    if (!current || current.scopeId !== scopeId) return false;
+    const detail = (event as CustomEvent<{
+        scopeId?: string;
+        snapshotId?: string;
+        authorityHash?: string;
+    }>).detail;
+    if (!detail || detail.scopeId !== scopeId || detail.snapshotId !== current.id) return false;
+    const currentAuthority = current.authorityContract?.contentHash || '';
+    return !detail.authorityHash || !currentAuthority || detail.authorityHash === currentAuthority;
 }
 
 function normalizeGraphLensForBuild(lens: GraphLensState): {

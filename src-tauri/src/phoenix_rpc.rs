@@ -1,15 +1,15 @@
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet, VecDeque};
 use std::hash::{Hash, Hasher};
 use std::io::{Read, Write};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex, OnceLock};
 use std::time::Instant;
 
 use crate::document_index_read::{read_document_index, DesktopDocumentIndexReadRequest};
 use crate::graph_galaxy::{compile_scene, DesktopGalaxyScene, DesktopGalaxySceneRequest};
 use crate::graph_run_store::{
-    load_manifest_for_handle, load_section, section_identity, DurableGraphRunReceipt,
-    GraphRunStoreTxn,
+    load_immutable_artifact, load_manifest_for_handle, load_section, persist_immutable_artifact,
+    section_identity, DurableGraphRunReceipt, GraphRunStoreTxn,
 };
 use crate::graph_scene_packet::{
     compile_packet, GraphScenePacket, GraphScenePacketEdgeInput, GraphScenePacketInput,
@@ -31,13 +31,14 @@ use phoenix_graph_rebuild::{
     assert_chunk_semantic_bridge_candidate_only, assert_memory_governance_candidate_only,
     assert_story_continuity_candidate_only, audit_chunk_semantic_bridge_quality_gate,
     build_atlas_packet, build_chunk_semantic_bridge_run_from_snapshot, build_chunks,
-    build_document_semantic_summary, build_memory_governance_candidates_from_snapshot,
+    build_document_semantic_document, build_memory_governance_candidates_from_snapshot,
     build_memory_governance_retrieval_weighting_experiment, build_snapshot_embedding_target_report,
     build_story_continuity_contract, classify_document_profiles, compile_legacy_snapshot,
-    promote_chunk_semantic_bridge_candidates, AtlasPacket, Chunk, ChunkSemanticBridgeCandidate,
-    ChunkSemanticBridgePromotionChunk, ChunkSemanticBridgePromotionInput,
-    ChunkSemanticBridgeSnapshotDocument, ChunkerConfig, CrossDocumentBridgeRunCertificate,
-    DocumentProfileRequest, DocumentSemanticRequest, DocumentSemanticSummary, GraphEmbeddingTarget,
+    merge_document_semantic_documents, promote_chunk_semantic_bridge_candidates, AtlasPacket,
+    Chunk, ChunkSemanticBridgeCandidate, ChunkSemanticBridgePromotionChunk,
+    ChunkSemanticBridgePromotionInput, ChunkSemanticBridgeSnapshotDocument, ChunkerConfig,
+    CrossDocumentBridgeRunCertificate, DocumentProfileRequest, DocumentSemanticDocument,
+    DocumentSemanticRequest, DocumentSemanticSummary, GraphEmbeddingTarget,
     GraphEmbeddingTargetOriginCount, GraphMemoryGovernanceCandidate, GraphRebuildSnapshot,
     MemoryGovernanceCompressionDominanceProof, MemoryGovernanceRetrievalCandidate,
     MemoryGovernanceRetrievalFullRowProof, MemoryGovernanceRetrievalPreviewInput,
@@ -70,6 +71,22 @@ const GRAPH_RUN_ARENA_CAPACITY: usize = 8;
 const GRAPH_RUN_ARENA_RESIDENT_BYTES: usize = 256 * 1024 * 1024;
 const GRAPH_RUN_DEFAULT_PAGE_ROWS: usize = 8;
 const GRAPH_RUN_MAX_PAGE_ROWS: usize = 64;
+const DOCUMENT_SEMANTIC_CACHE_CAPACITY: usize = 8;
+const DOCUMENT_SEMANTIC_DOCUMENT_CACHE_CAPACITY: usize = 32;
+const DOCUMENT_SEMANTIC_COMPRESSED_SCHEMA: &str = "phoenix-document-semantics/gzip-base64/v1";
+const DOCUMENT_SEMANTIC_ARTIFACT_NAMESPACE: &str = "document-semantics-v1";
+const DOCUMENT_SEMANTIC_SUMMARY_NAMESPACE: &str = "document-semantic-summaries-v1";
+const DOCUMENT_DISCOVERY_ARTIFACT_NAMESPACE: &str = "document-discovery-v1";
+
+#[derive(Default, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct DocumentSemanticArtifactStats {
+    documents_built: usize,
+    documents_reused: usize,
+    raw_bytes_written: usize,
+    compressed_bytes_written: usize,
+    summary_cache_hit: bool,
+}
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -249,6 +266,8 @@ pub struct DesktopSnapshotAnalysisRequest {
     #[specta(type = serde_json::Value)]
     document_semantic_summary: Option<DocumentSemanticSummary>,
     #[serde(default)]
+    document_semantic_handle: Option<String>,
+    #[serde(default)]
     #[specta(type = serde_json::Value)]
     retrieval_candidates: Vec<MemoryGovernanceRetrievalCandidate>,
     #[serde(default)]
@@ -313,6 +332,7 @@ struct GraphRunEntry {
 
 struct GraphRunContent {
     section_roots: BTreeMap<String, String>,
+    document_compiler: Option<phoenix_graph_rebuild::GraphDocumentCompilerSummary>,
     analysis: Arc<DesktopSnapshotAnalysisResponse>,
 }
 
@@ -519,13 +539,19 @@ pub struct DesktopGraphRunOpenResponse {
     pub schema_version: &'static str,
     pub run_handle: String,
     pub documents: Vec<DesktopGraphRunOpenDocument>,
+    pub documents_built: u32,
+    pub documents_reused: u32,
 }
 
 struct ResidentMentionDocument {
     text_hash: String,
-    kinds: Vec<String>,
-    entity_refs: Vec<String>,
-    mentions: Vec<Vec<f64>>,
+}
+
+#[derive(Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct DocumentDiscoveryArtifact {
+    text_hash: String,
+    candidates: Vec<DesktopDiscoveryCandidate>,
 }
 
 struct ResidentDiscoveryRun {
@@ -592,6 +618,11 @@ struct GraphRunCoordinator {
     discovery_order: VecDeque<String>,
     content_order: VecDeque<String>,
     resident_documents: HashMap<String, Arc<str>>,
+    semantic_summaries: HashMap<String, Arc<DocumentSemanticSummary>>,
+    semantic_order: VecDeque<String>,
+    semantic_documents:
+        HashMap<String, Arc<OnceLock<Result<Arc<DocumentSemanticArtifact>, String>>>>,
+    semantic_document_order: VecDeque<String>,
     resident_content_bytes: usize,
     resident_byte_limit: usize,
     next_sequence: u64,
@@ -607,6 +638,10 @@ impl Default for GraphRunCoordinator {
             discovery_order: VecDeque::new(),
             content_order: VecDeque::new(),
             resident_documents: HashMap::new(),
+            semantic_summaries: HashMap::new(),
+            semantic_order: VecDeque::new(),
+            semantic_documents: HashMap::new(),
+            semantic_document_order: VecDeque::new(),
             resident_content_bytes: 0,
             resident_byte_limit: GRAPH_RUN_ARENA_RESIDENT_BYTES,
             next_sequence: 0,
@@ -829,6 +864,88 @@ impl GraphRunCoordinator {
     fn document(&self, text_hash: &str) -> Option<Arc<str>> {
         self.resident_documents.get(text_hash).cloned()
     }
+
+    fn semantic_summary(&mut self, identity: &str) -> Option<Arc<DocumentSemanticSummary>> {
+        let summary = self.semantic_summaries.get(identity)?.clone();
+        if let Some(index) = self
+            .semantic_order
+            .iter()
+            .position(|value| value == identity)
+        {
+            self.semantic_order.remove(index);
+        }
+        self.semantic_order.push_back(identity.to_owned());
+        Some(summary)
+    }
+
+    fn retain_semantic_summary(&mut self, identity: String, summary: Arc<DocumentSemanticSummary>) {
+        self.semantic_summaries.insert(identity.clone(), summary);
+        if let Some(index) = self
+            .semantic_order
+            .iter()
+            .position(|value| value == &identity)
+        {
+            self.semantic_order.remove(index);
+        }
+        self.semantic_order.push_back(identity);
+        while self.semantic_order.len() > DOCUMENT_SEMANTIC_CACHE_CAPACITY {
+            if let Some(expired) = self.semantic_order.pop_front() {
+                self.semantic_summaries.remove(&expired);
+            }
+        }
+    }
+
+    fn semantic_document_slot(
+        &mut self,
+        identity: &str,
+    ) -> (
+        Arc<OnceLock<Result<Arc<DocumentSemanticArtifact>, String>>>,
+        bool,
+    ) {
+        if let Some(slot) = self.semantic_documents.get(identity) {
+            let slot = slot.clone();
+            self.touch_semantic_document(identity);
+            return (slot, false);
+        }
+        let slot = Arc::new(OnceLock::new());
+        self.semantic_documents
+            .insert(identity.to_owned(), slot.clone());
+        self.semantic_document_order.push_back(identity.to_owned());
+        while self.semantic_document_order.len() > DOCUMENT_SEMANTIC_DOCUMENT_CACHE_CAPACITY {
+            let Some(expired) = self.semantic_document_order.pop_front() else {
+                break;
+            };
+            let complete = self
+                .semantic_documents
+                .get(&expired)
+                .is_some_and(|entry| entry.get().is_some());
+            if complete {
+                self.semantic_documents.remove(&expired);
+            } else {
+                self.semantic_document_order.push_back(expired);
+                break;
+            }
+        }
+        (slot, true)
+    }
+
+    fn touch_semantic_document(&mut self, identity: &str) {
+        if let Some(index) = self
+            .semantic_document_order
+            .iter()
+            .position(|value| value == identity)
+        {
+            self.semantic_document_order.remove(index);
+        }
+        self.semantic_document_order.push_back(identity.to_owned());
+    }
+}
+
+struct DocumentSemanticArtifact {
+    document: DocumentSemanticDocument,
+    built: bool,
+    raw_bytes_written: usize,
+    compressed_bytes_written: usize,
 }
 
 #[derive(Clone, Default)]
@@ -1597,18 +1714,46 @@ impl PhoenixApi for PhoenixApiImpl {
         self,
         request: DesktopGraphRunOpenRequest,
     ) -> Result<DesktopGraphRunOpenResponse, String> {
+        let resolver_bytes = serde_json::to_vec(&request.resolver_seed)
+            .map_err(|error| format!("identify graph discovery resolver: {error}"))?;
         let resolver_seed = request
             .resolver_seed
             .into_iter()
             .map(desktop_resolver_seed)
             .collect::<Vec<_>>();
         let guard = self.lock_state()?;
+        let root = desktop_graph_run_store_path(guard.host.config());
         let mut response_documents = Vec::with_capacity(request.documents.len());
         let mut resident_documents = Vec::with_capacity(request.documents.len());
         let mut discovery_documents = Vec::with_capacity(request.documents.len());
+        let mut documents_built = 0_u32;
+        let mut documents_reused = 0_u32;
         for document in request.documents {
             let text_hash = document_text_hash(&document.text);
             let resident_text = Arc::<str>::from(document.text.as_str());
+            let artifact_identity =
+                document_discovery_artifact_identity(&document.text, &resolver_bytes);
+            let cached = match root.as_deref() {
+                Some(root) => load_immutable_artifact::<DocumentDiscoveryArtifact>(
+                    root,
+                    DOCUMENT_DISCOVERY_ARTIFACT_NAMESPACE,
+                    &artifact_identity,
+                )?,
+                None => None,
+            };
+            if let Some(artifact) = cached {
+                resident_documents.push((artifact.text_hash.clone(), resident_text));
+                discovery_documents.push(ResidentMentionDocument {
+                    text_hash: artifact.text_hash.clone(),
+                });
+                response_documents.push(DesktopGraphRunOpenDocument {
+                    document_id: document.document_id,
+                    text_hash: artifact.text_hash,
+                    candidates: artifact.candidates,
+                });
+                documents_reused += 1;
+                continue;
+            }
             let scan = guard
                 .host
                 .scan(ScanRequest {
@@ -1618,11 +1763,6 @@ impl PhoenixApi for PhoenixApiImpl {
                     resolver_seed: resolver_seed.clone(),
                 })
                 .map_err(|error| error.to_string())?;
-            let mut kinds = Vec::new();
-            let mut kind_indexes = HashMap::new();
-            let mut entity_refs = Vec::new();
-            let mut entity_ref_indexes = HashMap::new();
-            let mut mentions = Vec::new();
             let mut candidate_states: FastHashMap<String, DiscoveryCandidateState> =
                 FastHashMap::new();
             for (index, mention) in scan.mentions.into_iter().enumerate() {
@@ -1643,34 +1783,30 @@ impl PhoenixApi for PhoenixApiImpl {
                         index,
                     );
                 }
-                let kind_index = kind
-                    .as_deref()
-                    .map(|value| intern_batch_string(value, &mut kinds, &mut kind_indexes));
-                let entity_ref_index = entity_ref.as_deref().map(|value| {
-                    intern_batch_string(value, &mut entity_refs, &mut entity_ref_indexes)
-                });
-                mentions.push(vec![
-                    mention.range.start as f64,
-                    mention.range.end as f64,
-                    kind_index.map(|value| value as f64).unwrap_or(-1.0),
-                    entity_ref_index.map(|value| value as f64).unwrap_or(-1.0),
-                    mention.confidence as f64,
-                    mention.sentence_index as f64,
-                ]);
             }
             let candidates = finish_discovery_candidates(candidate_states);
+            if let Some(root) = root.as_deref() {
+                let artifact = DocumentDiscoveryArtifact {
+                    text_hash: text_hash.clone(),
+                    candidates: candidates.clone(),
+                };
+                let _ = persist_immutable_artifact(
+                    root,
+                    DOCUMENT_DISCOVERY_ARTIFACT_NAMESPACE,
+                    &artifact_identity,
+                    &artifact,
+                )?;
+            }
             resident_documents.push((text_hash.clone(), resident_text));
             discovery_documents.push(ResidentMentionDocument {
                 text_hash: text_hash.clone(),
-                kinds,
-                entity_refs,
-                mentions,
             });
             response_documents.push(DesktopGraphRunOpenDocument {
                 document_id: document.document_id,
                 text_hash,
                 candidates,
             });
+            documents_built += 1;
         }
         drop(guard);
         let mut coordinator = self
@@ -1687,6 +1823,8 @@ impl PhoenixApi for PhoenixApiImpl {
             schema_version: "phoenix-graph-run-open/v1",
             run_handle,
             documents: response_documents,
+            documents_built,
+            documents_reused,
         })
     }
 
@@ -1708,11 +1846,43 @@ impl PhoenixApi for PhoenixApiImpl {
                 }
             }
         }
+        if request.document_semantic_summary.is_none() {
+            if let Some(handle) = request.document_semantic_handle.as_deref() {
+                let resident = self
+                    .graph_runs
+                    .lock()
+                    .map_err(|_| "graph run coordinator lock poisoned".to_owned())?
+                    .semantic_summary(handle);
+                request.document_semantic_summary = if let Some(summary) = resident {
+                    Some(summary.as_ref().clone())
+                } else {
+                    let config = {
+                        let guard = self.lock_state()?;
+                        guard.host.config().cloned()
+                    };
+                    let root = desktop_graph_run_store_path(config.as_ref()).ok_or_else(|| {
+                        "document semantic handle requires native durable storage".to_owned()
+                    })?;
+                    let summary = load_immutable_artifact::<DocumentSemanticSummary>(
+                        &root,
+                        DOCUMENT_SEMANTIC_SUMMARY_NAMESPACE,
+                        handle,
+                    )?
+                    .ok_or_else(|| format!("document semantic handle is missing: {handle}"))?;
+                    self.graph_runs
+                        .lock()
+                        .map_err(|_| "graph run coordinator lock poisoned".to_owned())?
+                        .retain_semantic_summary(handle.to_owned(), Arc::new(summary.clone()));
+                    Some(summary)
+                };
+            }
+        }
         let snapshot_id = request.snapshot.id.to_string();
         let scope_id = request.snapshot.scope_id.to_string();
         let requested_run_handle = request.run_handle.clone();
         let documents = self.resolve_graph_run_documents(&request.documents)?;
         let section_roots = graph_analysis_section_roots(&request, &documents)?;
+        let document_compiler = request.snapshot.document_compiler_summary.clone();
         let identity = graph_analysis_identity(&section_roots);
         let (reusable, slot) = {
             let mut coordinator = self
@@ -1733,6 +1903,7 @@ impl PhoenixApi for PhoenixApiImpl {
                 let analysis = self.analyze_graph_snapshot_request(request, &documents)?;
                 Ok(Arc::new(GraphRunContent {
                     section_roots,
+                    document_compiler,
                     analysis: Arc::new(analysis),
                 }))
             })
@@ -2204,10 +2375,58 @@ impl PhoenixApi for PhoenixApiImpl {
         if command == "documentSemantic:build" {
             let request = serde_json::from_value::<DocumentSemanticRequest>(payload)
                 .map_err(|error| format!("invalid document semantic request: {error}"))?;
-            let summary = build_document_semantic_summary(&request);
+            let config = {
+                let guard = self.lock_state()?;
+                guard.host.config().cloned()
+            };
+            let root = desktop_graph_run_store_path(config.as_ref());
+            let (summary, artifact_stats, artifact_handle) =
+                build_or_load_document_semantics(&request, root.as_deref(), &self.graph_runs)?;
+            let mut compressed = compressed_json_payload(
+                summary.as_ref(),
+                DOCUMENT_SEMANTIC_COMPRESSED_SCHEMA,
+                &summary.schema_version,
+            )?;
+            compressed
+                .as_object_mut()
+                .ok_or_else(|| {
+                    "compressed document semantic envelope was not an object".to_owned()
+                })?
+                .insert(
+                    "artifactStats".to_owned(),
+                    serde_json::to_value(artifact_stats)
+                        .map_err(|error| format!("encode semantic artifact stats: {error}"))?,
+                );
+            compressed
+                .as_object_mut()
+                .expect("compressed semantic envelope object")
+                .insert("artifactHandle".to_owned(), Value::String(artifact_handle));
             return serialize_json(&json!({
                 "success": true,
-                "payload": summary,
+                "payload": compressed,
+                "error": null,
+            }));
+        }
+        if command == "documentSemantic:materialize" {
+            let request =
+                serde_json::from_value::<DocumentSemanticRequest>(payload).map_err(|error| {
+                    format!("invalid document semantic materialize request: {error}")
+                })?;
+            let config = {
+                let guard = self.lock_state()?;
+                guard.host.config().cloned()
+            };
+            let root = desktop_graph_run_store_path(config.as_ref());
+            let (summary, artifact_stats, artifact_handle) =
+                build_or_load_document_semantics(&request, root.as_deref(), &self.graph_runs)?;
+            return serialize_json(&json!({
+                "success": true,
+                "payload": {
+                    "schemaVersion": "phoenix-document-semantics-materialized/v1",
+                    "artifactHandle": artifact_handle,
+                    "artifactStats": artifact_stats,
+                    "counters": summary.counters,
+                },
                 "error": null,
             }));
         }
@@ -3015,7 +3234,12 @@ fn graph_analysis_section_roots(
         graph_digest_part(&mut hasher, document_text_hash(&document.text).as_bytes());
     }
     let core = format!("b3-{}", hasher.finalize().to_hex());
-    let semantic = dependency_json(&request.document_semantic_summary)?;
+    let semantic = if let Some(handle) = &request.document_semantic_handle {
+        dependency_digest("semantic-handle", &[handle.as_bytes()])
+    } else {
+        dependency_json(&request.document_semantic_summary)?
+    };
+    let hyperedges = dependency_json(&request.snapshot.document_compiler_summary)?;
     let retrieval_inputs = dependency_json(&request.retrieval_candidates)?;
     let promotion = promotion_dependency_digest(
         &snapshot_content,
@@ -3027,6 +3251,10 @@ fn graph_analysis_section_roots(
     let governance = dependency_digest("governance", &[snapshot_content.as_bytes()]);
     Ok(BTreeMap::from([
         ("bridge".to_owned(), core.clone()),
+        (
+            "hyperedges".to_owned(),
+            dependency_digest("hyperedges", &[hyperedges.as_bytes()]),
+        ),
         (
             "continuity".to_owned(),
             dependency_digest("continuity", &[core.as_bytes(), semantic.as_bytes()]),
@@ -3245,6 +3473,163 @@ fn graph_digest_part(hasher: &mut blake3::Hasher, bytes: &[u8]) {
     hasher.update(bytes);
 }
 
+fn build_or_load_document_semantics(
+    request: &DocumentSemanticRequest,
+    root: Option<&Path>,
+    coordinator: &Arc<Mutex<GraphRunCoordinator>>,
+) -> Result<
+    (
+        Arc<DocumentSemanticSummary>,
+        DocumentSemanticArtifactStats,
+        String,
+    ),
+    String,
+> {
+    let canonical = canonical_document_semantic_request(request);
+    let summary_identity = document_semantic_summary_identity(&canonical)?;
+    if let Some(summary) = coordinator
+        .lock()
+        .map_err(|_| "graph run coordinator lock poisoned".to_owned())?
+        .semantic_summary(&summary_identity)
+    {
+        return Ok((
+            summary,
+            DocumentSemanticArtifactStats {
+                documents_reused: request.documents.len(),
+                summary_cache_hit: true,
+                ..DocumentSemanticArtifactStats::default()
+            },
+            summary_identity,
+        ));
+    }
+
+    let entity_bytes = serde_json::to_vec(&canonical.entities)
+        .map_err(|error| format!("identify document semantic entity binding: {error}"))?;
+    let mut documents = Vec::<DocumentSemanticDocument>::with_capacity(request.documents.len());
+    let mut stats = DocumentSemanticArtifactStats::default();
+    for document in &canonical.documents {
+        let text_identity = document_semantic_text_identity(document);
+        let identity = document_semantic_binding_identity(&text_identity, &entity_bytes);
+        let (slot, owns_build) = coordinator
+            .lock()
+            .map_err(|_| "graph run coordinator lock poisoned".to_owned())?
+            .semantic_document_slot(&identity);
+        let artifact = slot
+            .get_or_init(|| {
+                let cached = match root {
+                    Some(root) => load_immutable_artifact::<DocumentSemanticDocument>(
+                        root,
+                        DOCUMENT_SEMANTIC_ARTIFACT_NAMESPACE,
+                        &identity,
+                    )?,
+                    None => None,
+                };
+                if let Some(document) = cached {
+                    return Ok(Arc::new(DocumentSemanticArtifact {
+                        document,
+                        built: false,
+                        raw_bytes_written: 0,
+                        compressed_bytes_written: 0,
+                    }));
+                }
+                let semantic = build_document_semantic_document(document, &canonical.entities);
+                let (raw_bytes_written, compressed_bytes_written) = if let Some(root) = root {
+                    let (raw, compressed, _) = persist_immutable_artifact(
+                        root,
+                        DOCUMENT_SEMANTIC_ARTIFACT_NAMESPACE,
+                        &identity,
+                        &semantic,
+                    )?;
+                    (raw, compressed)
+                } else {
+                    (0, 0)
+                };
+                Ok(Arc::new(DocumentSemanticArtifact {
+                    document: semantic,
+                    built: true,
+                    raw_bytes_written,
+                    compressed_bytes_written,
+                }))
+            })
+            .clone()?;
+        documents.push(artifact.document.clone());
+        if !owns_build || !artifact.built {
+            stats.documents_reused += 1;
+        } else {
+            stats.documents_built += 1;
+            stats.raw_bytes_written += artifact.raw_bytes_written;
+            stats.compressed_bytes_written += artifact.compressed_bytes_written;
+        }
+    }
+
+    let summary = Arc::new(merge_document_semantic_documents(documents));
+    if let Some(root) = root {
+        let _ = persist_immutable_artifact(
+            root,
+            DOCUMENT_SEMANTIC_SUMMARY_NAMESPACE,
+            &summary_identity,
+            summary.as_ref(),
+        )?;
+    }
+    coordinator
+        .lock()
+        .map_err(|_| "graph run coordinator lock poisoned".to_owned())?
+        .retain_semantic_summary(summary_identity.clone(), summary.clone());
+    Ok((summary, stats, summary_identity))
+}
+
+fn canonical_document_semantic_request(
+    request: &DocumentSemanticRequest,
+) -> DocumentSemanticRequest {
+    let mut canonical = request.clone();
+    canonical
+        .documents
+        .sort_by(|left, right| left.note_id.cmp(&right.note_id));
+    for entity in &mut canonical.entities {
+        entity.aliases.sort();
+        entity.aliases.dedup();
+    }
+    canonical
+        .entities
+        .sort_by(|left, right| left.id.cmp(&right.id));
+    canonical
+}
+
+fn document_semantic_summary_identity(request: &DocumentSemanticRequest) -> Result<String, String> {
+    let bytes = serde_json::to_vec(request)
+        .map_err(|error| format!("identify document semantic summary: {error}"))?;
+    let mut hasher = blake3::Hasher::new();
+    graph_digest_part(&mut hasher, b"phoenix-document-semantic-summary/v2");
+    graph_digest_part(&mut hasher, &bytes);
+    Ok(format!("b3-{}", hasher.finalize().to_hex()))
+}
+
+fn document_semantic_text_identity(
+    document: &phoenix_graph_rebuild::DocumentSemanticInput,
+) -> String {
+    let mut hasher = blake3::Hasher::new();
+    graph_digest_part(&mut hasher, b"phoenix-document-semantic-text/v1");
+    graph_digest_part(&mut hasher, document.note_id.as_bytes());
+    graph_digest_part(&mut hasher, document.text.as_bytes());
+    format!("b3-{}", hasher.finalize().to_hex())
+}
+
+fn document_semantic_binding_identity(text_identity: &str, entity_bytes: &[u8]) -> String {
+    let mut hasher = blake3::Hasher::new();
+    graph_digest_part(&mut hasher, b"phoenix-document-semantic-binding/v1");
+    graph_digest_part(&mut hasher, text_identity.as_bytes());
+    graph_digest_part(&mut hasher, entity_bytes);
+    format!("b3-{}", hasher.finalize().to_hex())
+}
+
+fn document_discovery_artifact_identity(text: &str, resolver_bytes: &[u8]) -> String {
+    let mut hasher = blake3::Hasher::new();
+    graph_digest_part(&mut hasher, b"phoenix-document-discovery-artifact/v1");
+    graph_digest_part(&mut hasher, text.as_bytes());
+    graph_digest_part(&mut hasher, resolver_bytes);
+    format!("b3-{}", hasher.finalize().to_hex())
+}
+
 fn desktop_graph_run_store_path(
     config: Option<&phoenix_native::PhoenixNativeConfig>,
 ) -> Option<PathBuf> {
@@ -3289,6 +3674,15 @@ fn persist_graph_run_entry(
         }};
     }
     let analysis = entry.content.analysis.as_ref();
+    persist!(
+        "hyperedges",
+        entry
+            .content
+            .document_compiler
+            .as_ref()
+            .map_or(0, |summary| summary.hyperedges.len()),
+        &entry.content.document_compiler
+    );
     persist!("bridge", analysis.bridge.candidates.len(), &analysis.bridge);
     persist!(
         "continuity",
@@ -6529,6 +6923,162 @@ fn compressed_json_payload<T: Serialize>(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn semantic_test_root(name: &str) -> PathBuf {
+        let nonce = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap_or_default()
+            .as_nanos();
+        std::env::temp_dir().join(format!(
+            "phoenix-semantic-artifact-{name}-{}-{nonce}",
+            std::process::id()
+        ))
+    }
+
+    #[test]
+    fn document_semantics_reuse_unchanged_documents_across_restart_and_localize_edits() {
+        let root = semantic_test_root("restart-locality");
+        let mut request = DocumentSemanticRequest {
+            documents: vec![
+                phoenix_graph_rebuild::DocumentSemanticInput {
+                    note_id: "note-a".to_owned(),
+                    text: "Kai gave Hazel the key.".to_owned(),
+                },
+                phoenix_graph_rebuild::DocumentSemanticInput {
+                    note_id: "note-b".to_owned(),
+                    text: "Hazel returned before Kai departed.".to_owned(),
+                },
+            ],
+            entities: vec![phoenix_graph_rebuild::DocumentSemanticEntity {
+                id: "entity-kai".to_owned(),
+                label: "Kai".to_owned(),
+                aliases: Vec::new(),
+                kind: "character".to_owned(),
+            }],
+        };
+        let first_coordinator = Arc::new(Mutex::new(GraphRunCoordinator::default()));
+        let (first, first_stats, first_handle) =
+            build_or_load_document_semantics(&request, Some(&root), &first_coordinator).unwrap();
+        assert_eq!(first_stats.documents_built, 2);
+        assert_eq!(first_stats.documents_reused, 0);
+
+        let restarted = Arc::new(Mutex::new(GraphRunCoordinator::default()));
+        let (warm, warm_stats, warm_handle) =
+            build_or_load_document_semantics(&request, Some(&root), &restarted).unwrap();
+        assert_eq!(warm_stats.documents_built, 0);
+        assert_eq!(warm_stats.documents_reused, 2);
+        assert_eq!(warm_handle, first_handle);
+        let durable_summary = load_immutable_artifact::<DocumentSemanticSummary>(
+            &root,
+            DOCUMENT_SEMANTIC_SUMMARY_NAMESPACE,
+            &first_handle,
+        )
+        .unwrap()
+        .unwrap();
+        assert_eq!(
+            serde_json::to_value(first.as_ref()).unwrap(),
+            serde_json::to_value(warm.as_ref()).unwrap()
+        );
+        assert_eq!(
+            serde_json::to_value(first.as_ref()).unwrap(),
+            serde_json::to_value(durable_summary).unwrap()
+        );
+
+        request.documents[1].text.push_str(" Kai stayed.");
+        let changed = Arc::new(Mutex::new(GraphRunCoordinator::default()));
+        let (_, changed_stats, changed_handle) =
+            build_or_load_document_semantics(&request, Some(&root), &changed).unwrap();
+        assert_eq!(changed_stats.documents_built, 1);
+        assert_eq!(changed_stats.documents_reused, 1);
+        assert_ne!(changed_handle, first_handle);
+        let _ = std::fs::remove_dir_all(root);
+    }
+
+    #[test]
+    fn document_semantic_text_identity_is_independent_from_entity_binding() {
+        let document = phoenix_graph_rebuild::DocumentSemanticInput {
+            note_id: "note-a".to_owned(),
+            text: "Kai gave Hazel the key.".to_owned(),
+        };
+        let text_identity = document_semantic_text_identity(&document);
+        let first = document_semantic_binding_identity(&text_identity, b"entity-set-a");
+        let second = document_semantic_binding_identity(&text_identity, b"entity-set-b");
+
+        assert_eq!(text_identity, document_semantic_text_identity(&document));
+        assert_ne!(first, second);
+    }
+
+    #[test]
+    fn document_semantic_identity_ignores_input_and_alias_order() {
+        let mut first = DocumentSemanticRequest {
+            documents: vec![
+                phoenix_graph_rebuild::DocumentSemanticInput {
+                    note_id: "note-b".to_owned(),
+                    text: "Hazel returned.".to_owned(),
+                },
+                phoenix_graph_rebuild::DocumentSemanticInput {
+                    note_id: "note-a".to_owned(),
+                    text: "Kai departed.".to_owned(),
+                },
+            ],
+            entities: vec![
+                phoenix_graph_rebuild::DocumentSemanticEntity {
+                    id: "hazel".to_owned(),
+                    label: "Hazel".to_owned(),
+                    aliases: vec!["H".to_owned(), "Haz".to_owned()],
+                    kind: "character".to_owned(),
+                },
+                phoenix_graph_rebuild::DocumentSemanticEntity {
+                    id: "kai".to_owned(),
+                    label: "Kai".to_owned(),
+                    aliases: vec!["K".to_owned()],
+                    kind: "character".to_owned(),
+                },
+            ],
+        };
+        let expected = canonical_document_semantic_request(&first);
+        first.documents.reverse();
+        first.entities.reverse();
+        first.entities[1].aliases.reverse();
+        let reordered = canonical_document_semantic_request(&first);
+
+        assert_eq!(
+            document_semantic_summary_identity(&expected).unwrap(),
+            document_semantic_summary_identity(&reordered).unwrap(),
+        );
+        assert_eq!(
+            serde_json::to_vec(&expected.entities).unwrap(),
+            serde_json::to_vec(&reordered.entities).unwrap(),
+        );
+    }
+
+    #[test]
+    fn compressed_document_semantics_round_trip_exactly() {
+        let summary = json!({
+            "schemaVersion": "phoenix-document-semantics/v1",
+            "source": "native_rust",
+            "documents": [],
+            "counters": { "documents": 0, "propositions": 0, "situations": 0 }
+        });
+        let envelope = compressed_json_payload(
+            &summary,
+            DOCUMENT_SEMANTIC_COMPRESSED_SCHEMA,
+            "phoenix-document-semantics/v1",
+        )
+        .unwrap();
+        let compressed = BASE64_STANDARD
+            .decode(envelope["payload"].as_str().unwrap())
+            .unwrap();
+        let mut decoder = GzDecoder::new(compressed.as_slice());
+        let mut raw = Vec::new();
+        decoder.read_to_end(&mut raw).unwrap();
+
+        assert_eq!(
+            envelope["schemaVersion"],
+            DOCUMENT_SEMANTIC_COMPRESSED_SCHEMA
+        );
+        assert_eq!(serde_json::from_slice::<Value>(&raw).unwrap(), summary);
+    }
 
     #[test]
     fn graph_run_page_cursor_spans_families_without_duplicates() {

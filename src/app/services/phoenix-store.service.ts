@@ -312,6 +312,8 @@ export class PhoenixStoreService {
     private derivedLoadPromise: Promise<void> | null = null;
     private lineSearchIndex: PhoenixLineSearchIndex | null = null;
     private lineSearchGenerationKey = '';
+    private readonly semanticMaterializationPending = new Map<string, StoreNote>();
+    private semanticMaterializationRunning = false;
     private recoveryState: RecoveryState = {
         contentRecovered: false,
         derivedRecovered: false,
@@ -656,6 +658,56 @@ export class PhoenixStoreService {
 
     async upsertScopedDocument(document: StoreScopedDocument): Promise<PhoenixContentMutationTiming> {
         return this.runContentRelationUpsert('scoped_documents', scopedDocumentToRow(document));
+    }
+
+    scheduleDocumentSemanticMaterialization(note: StoreNote): void {
+        const text = note.markdownContent || note.content || '';
+        if (this.phoenix.target !== 'native' || !text.trim()) return;
+        this.semanticMaterializationPending.set(note.id, note);
+        if (!this.semanticMaterializationRunning) {
+            queueMicrotask(() => void this.drainDocumentSemanticMaterialization());
+        }
+    }
+
+    async settleDocumentSemanticMaterialization(): Promise<void> {
+        while (this.semanticMaterializationRunning || this.semanticMaterializationPending.size) {
+            if (!this.semanticMaterializationRunning) {
+                await this.drainDocumentSemanticMaterialization();
+            } else {
+                await new Promise<void>((resolve) => setTimeout(resolve, 25));
+            }
+        }
+    }
+
+    private async drainDocumentSemanticMaterialization(): Promise<void> {
+        if (this.semanticMaterializationRunning || !this.semanticMaterializationPending.size) return;
+        this.semanticMaterializationRunning = true;
+        try {
+            while (this.semanticMaterializationPending.size) {
+                const notes = [...this.semanticMaterializationPending.values()];
+                this.semanticMaterializationPending.clear();
+                const entities = await this.listEntities();
+                await this.phoenix.storeCommand('documentSemantic:materialize', {
+                    documents: notes.map((note) => ({
+                        noteId: note.id,
+                        text: note.markdownContent || note.content || '',
+                    })),
+                    entities: entities.map((entity) => ({
+                        id: entity.id,
+                        label: entity.label,
+                        aliases: entity.aliases || [],
+                        kind: entity.kind,
+                    })),
+                });
+            }
+        } catch (error) {
+            console.warn('[PhoenixStore] Document semantic materialization failed', error);
+        } finally {
+            this.semanticMaterializationRunning = false;
+            if (this.semanticMaterializationPending.size) {
+                queueMicrotask(() => void this.drainDocumentSemanticMaterialization());
+            }
+        }
     }
 
     async upsertScopedDocuments(documents: StoreScopedDocument[]): Promise<PhoenixContentMutationTiming> {

@@ -161,6 +161,12 @@ export interface GalaxySceneV2 {
     edgeColors: Float32Array;
     edgeAlpha: Float32Array;
     edgeKinds: Uint8Array;
+    runtimeIndex?: GalaxySceneRuntimeIndex;
+}
+
+export interface GalaxySceneRuntimeIndex {
+    nodeById: Map<string, number>;
+    incidentEdges: number[][];
 }
 
 export function galaxySceneToV2(scene: GalaxyScene, sourceMode: GalaxySceneSourceMode = 'entities'): GalaxySceneV2 {
@@ -244,7 +250,7 @@ export function galaxySceneToV2(scene: GalaxyScene, sourceMode: GalaxySceneSourc
         edgeKinds[index] = edge.interGalaxy ? 1 : hierarchyEdgeKind(edge.type);
     }
 
-    return {
+    return attachGalaxySceneRuntimeIndex({
         sourceMode,
         layoutMode: scene.layoutMode,
         ids,
@@ -276,7 +282,21 @@ export function galaxySceneToV2(scene: GalaxyScene, sourceMode: GalaxySceneSourc
         edgeColors,
         edgeAlpha,
         edgeKinds,
-    };
+    });
+}
+
+export function attachGalaxySceneRuntimeIndex(scene: GalaxySceneV2): GalaxySceneV2 {
+    const nodeById = new Map<string, number>();
+    const incidentEdges = Array.from({ length: scene.ids.length }, () => [] as number[]);
+    for (let index = 0; index < scene.ids.length; index++) nodeById.set(scene.ids[index], index);
+    for (let edge = 0; edge < scene.edgePairs.length / 2; edge++) {
+        const source = scene.edgePairs[edge * 2];
+        const target = scene.edgePairs[edge * 2 + 1];
+        if (source < incidentEdges.length) incidentEdges[source].push(edge);
+        if (target < incidentEdges.length && target !== source) incidentEdges[target].push(edge);
+    }
+    scene.runtimeIndex = { nodeById, incidentEdges };
+    return scene;
 }
 
 /**

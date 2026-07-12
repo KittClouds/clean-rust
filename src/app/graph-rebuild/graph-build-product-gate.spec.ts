@@ -213,7 +213,7 @@ describeBaseline('product graph build gate', () => {
         expect(warm.snapshot.authorityContract?.snapshotId).toBe(cold.snapshot.id);
         expect(warm.snapshot.counters.nodes).toBe(27);
         expect(warm.snapshot.counters.edges).toBe(233);
-        expect(warm.snapshot.counters.embeddingTargets).toBe(666);
+        expect(warm.snapshot.counters.embeddingTargets).toBe(668);
         expect(warm.snapshot.atlasPacket?.objects.length).toBe(cold.snapshot.atlasPacket?.objects.length);
         expect(warm.snapshot.atlasPacket?.manifoldTargets.length)
             .toBe(cold.snapshot.atlasPacket?.manifoldTargets.length);
@@ -229,7 +229,24 @@ describeBaseline('product graph build gate', () => {
         expect(warm.snapshot.buildTimings?.snapshotStoreDocuments).toBe(0);
         expect(warm.snapshot.buildTimings?.previousSnapshotHydrationSkipped).toBe(1);
         expect(warm.snapshot.buildTimings?.nativeChunkerSkipped).toBe(1);
-        expect(warm.snapshot.buildTimings?.documentSemanticSkipped).toBe(1);
+        expect(warm.snapshot.buildTimings?.documentSemanticSkipped).toBe(0);
+        expect(warm.snapshot.buildTimings?.documentSemanticCacheHit).toBe(1);
+        expect(cold.snapshot.counters.documentCompilerHyperedges).toBeGreaterThan(0);
+        expect(warm.snapshot.counters.documentCompilerHyperedges).toBe(cold.snapshot.counters.documentCompilerHyperedges);
+        expect(backend.commands.filter((row) => row.command === 'documentSemantic:build')).toHaveLength(1);
+        const hyperedgeTarget = warm.snapshot.embeddingTargets.find((target) =>
+            target.sourceId.startsWith('fact:document-hyperedge:'),
+        );
+        const hyperedgePacketTarget = warm.snapshot.atlasPacket?.manifoldTargets.find((target) =>
+            target.id === hyperedgeTarget?.id,
+        );
+        const hyperedgeObject = warm.snapshot.atlasPacket?.objects.find((object) =>
+            object.id === hyperedgePacketTarget?.objectId,
+        );
+        expect(hyperedgeTarget?.kind).toBe('graphFact');
+        expect(hyperedgeTarget?.parentIds.length).toBeGreaterThan(1);
+        expect(hyperedgePacketTarget?.family).toBe('fact');
+        expect(hyperedgeObject?.sourceIds).toContain(hyperedgeTarget?.sourceId);
         expect(warm.snapshot.buildTimings?.nativeMemoryGovernanceRetrievalExperimentCandidates).toBe(0);
         expect(warm.snapshot.buildTimings?.nativeMemoryGovernanceRetrievalExperimentSkipped).toBe(1);
         expect(warm.snapshot.buildTimings?.nativeGraphRunReusedSections).toBe(7);
@@ -1151,6 +1168,7 @@ function createBackendHarness() {
                     counters: { objects: 0, manifoldTargets: 0, registryEntities: snapshot.nodes.length, evidenceAnchors: snapshot.entityAnchors.length, modelVectors: 0, families: [] },
                 } };
             }
+            if (command === 'documentSemantic:build') return productGateDocumentSemantics(payload);
             return null;
         }),
     };
@@ -1255,6 +1273,98 @@ function emptyNativeSnapshotAnalysisOutput(payload: unknown): unknown {
             verdictBuildMicros: 0,
             totalMicros: 0,
         },
+    };
+}
+
+function productGateDocumentSemantics(payload: unknown): unknown {
+    const request = payload as {
+        documents?: Array<{ noteId: string; text: string }>;
+        entities?: Array<{ id: string; label: string }>;
+    };
+    const document = request.documents?.[0];
+    const actor = request.entities?.[0];
+    const recipient = request.entities?.[1];
+    if (!document || !actor || !recipient) return null;
+    const end = Math.min(document.text.length, 96);
+    const propositionId = `${document.noteId}:semantic:proposition:0`;
+    const situationId = `${document.noteId}:semantic:situation:0`;
+    const counters = {
+        documents: 1,
+        sentences: 1,
+        propositions: 1,
+        arguments: 2,
+        resolvedArguments: 2,
+        roleAnnotations: 2,
+        unresolvedRoleSurfaces: 0,
+        roleFailureReasons: 0,
+        frameAnnotations: 1,
+        lexicalFrameMatches: 1,
+        fallbackFrameMatches: 0,
+        lowConfidenceFrames: 0,
+        frameFailureReasons: 0,
+        factualityAnnotations: 1,
+        situationInstances: 1,
+        stateIntervals: 0,
+        eventOrderings: 0,
+        temporalConflicts: 0,
+        worldStateIneligibleSituations: 0,
+        nAry: 1,
+        reviewable: 1,
+        ledgerOnly: 0,
+    };
+    const factuality = {
+        factuality: 'asserted', polarity: 'positive', speechAct: 'assertion', asserted: true,
+        negated: false, modal: false, hypothetical: false, conditional: false, quoted: false,
+        reported: false, believed: false, questioned: false, commanded: false,
+        confidenceMillis: 950, scopeKinds: ['assertion'], detectorReasons: ['product_gate'], failureReasons: [],
+    };
+    return {
+        schemaVersion: 'phoenix-document-semantics/v1',
+        source: 'native_rust',
+        documents: [{
+            noteId: document.noteId,
+            textChars: document.text.length,
+            propositions: [{
+                id: propositionId,
+                noteId: document.noteId,
+                sentenceIndex: 0,
+                start: 0,
+                end,
+                preview: document.text.slice(0, end),
+                predicate: 'connect',
+                relationType: 'relationship',
+                predicateQuality: 'finite_verb',
+                predicateAdmission: 'review',
+                qualityReasons: ['product_gate'],
+                triggerStart: 0,
+                triggerEnd: Math.min(7, end),
+                frame: {
+                    frame: 'relationship', family: 'relationship', target: 'connect', lexicalUnit: 'connect.v',
+                    definition: 'Connects participants.', source: 'lexical_table', confidenceMillis: 950,
+                    expectedRoles: ['actor', 'recipient'], matchedRoles: ['actor', 'recipient'], missingRoles: [],
+                    reasons: ['product_gate'], failureReasons: [],
+                },
+                factuality,
+                arguments: [
+                    { role: 'subject', syntacticRole: 'subject', semanticRole: 'actor', surface: actor.label, entityId: actor.id, start: 0, end: 1, roleConfidenceMillis: 950, roleFailureReasons: [] },
+                    { role: 'object', syntacticRole: 'object', semanticRole: 'recipient', surface: recipient.label, entityId: recipient.id, start: 2, end: 3, roleConfidenceMillis: 950, roleFailureReasons: [] },
+                ],
+                documentArgumentRecoveries: [],
+                scope: [{ kind: 'assertion' }],
+                evidence: [{ label: document.text.slice(0, end), kind: 'sentence', start: 0, end }],
+                confidenceMillis: 950,
+                reviewState: 'proposed',
+            }],
+            situations: [{
+                id: situationId, propositionId, noteId: document.noteId, sentenceIndex: 0,
+                start: 0, end, predicate: 'connect', frame: 'relationship', situationKind: 'event',
+                participantEntityIds: [actor.id, recipient.id], participantSurfaces: [actor.label, recipient.label],
+                factuality: 'asserted', worldStateEligible: true, recurrenceIndex: 0, confidenceMillis: 950,
+                detectorReasons: ['product_gate'], failureReasons: [],
+            }],
+            stateIntervals: [], eventOrderings: [], temporalConflicts: [], counters,
+        }],
+        counters,
     };
 }
 
