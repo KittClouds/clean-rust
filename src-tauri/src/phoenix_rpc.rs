@@ -34,12 +34,11 @@ use phoenix_graph_rebuild::{
     build_document_semantic_document, build_memory_governance_candidates_from_snapshot,
     build_memory_governance_retrieval_weighting_experiment, build_snapshot_embedding_target_report,
     build_story_continuity_contract, classify_document_profiles, compile_legacy_snapshot,
-    merge_document_semantic_documents, promote_chunk_semantic_bridge_candidates, AtlasPacket,
-    Chunk, ChunkSemanticBridgeCandidate, ChunkSemanticBridgePromotionChunk,
-    ChunkSemanticBridgePromotionInput, ChunkSemanticBridgeSnapshotDocument, ChunkerConfig,
-    CrossDocumentBridgeRunCertificate, DocumentProfileRequest, DocumentSemanticDocument,
-    DocumentSemanticRequest, DocumentSemanticSummary, GraphEmbeddingTarget,
-    GraphEmbeddingTargetOriginCount, GraphMemoryGovernanceCandidate, GraphRebuildSnapshot,
+    merge_document_semantic_documents, AtlasPacket, Chunk, ChunkSemanticBridgeCandidate,
+    ChunkSemanticBridgeSnapshotDocument, ChunkerConfig, CrossDocumentBridgeRunCertificate,
+    DocumentProfileRequest, DocumentSemanticDocument, DocumentSemanticRequest,
+    DocumentSemanticSummary, GraphEmbeddingTarget, GraphEmbeddingTargetOriginCount,
+    GraphMemoryGovernanceCandidate, GraphRebuildSnapshot,
     MemoryGovernanceCompressionDominanceProof, MemoryGovernanceRetrievalCandidate,
     MemoryGovernanceRetrievalFullRowProof, MemoryGovernanceRetrievalPreviewInput,
     MemoryGovernanceRetrievalWeightingExperiment, MemoryGovernanceRetrievalWeightingVariant,
@@ -128,13 +127,6 @@ struct DocumentChunkRange {
     ordinal: usize,
 }
 
-#[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
-struct ChunkSemanticBridgeRequest {
-    snapshot: GraphRebuildSnapshot,
-    documents: Vec<DocumentChunkInput>,
-}
-
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct ChunkSemanticBridgeTiming {
@@ -153,17 +145,6 @@ struct ChunkSemanticBridgeResponse {
     timing: ChunkSemanticBridgeTiming,
 }
 
-#[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
-struct StoryContinuityRequest {
-    snapshot: GraphRebuildSnapshot,
-    documents: Vec<DocumentChunkInput>,
-    #[serde(default)]
-    document_semantic_summary: Option<DocumentSemanticSummary>,
-    #[serde(default)]
-    bridge_candidates: Vec<ChunkSemanticBridgeCandidate>,
-}
-
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct StoryContinuityTiming {
@@ -178,12 +159,6 @@ struct StoryContinuityResponse {
     source: String,
     contract: StoryContinuityContract,
     timing: StoryContinuityTiming,
-}
-
-#[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
-struct MemoryGovernanceRequest {
-    snapshot: GraphRebuildSnapshot,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -202,13 +177,6 @@ struct MemoryGovernanceResponse {
     timing: MemoryGovernanceTiming,
 }
 
-#[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
-struct MemoryGovernanceRetrievalExperimentRequest {
-    snapshot: GraphRebuildSnapshot,
-    retrieval_candidates: Vec<MemoryGovernanceRetrievalCandidate>,
-}
-
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct MemoryGovernanceRetrievalExperimentTiming {
@@ -224,17 +192,6 @@ struct MemoryGovernanceRetrievalExperimentResponse {
     source: String,
     experiment: MemoryGovernanceRetrievalWeightingExperiment,
     timing: MemoryGovernanceRetrievalExperimentTiming,
-}
-
-#[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
-struct PromotionVerdictRequest {
-    #[serde(default)]
-    receipts: Vec<GraphProposalBatchReceipt>,
-    #[serde(default)]
-    commits: Vec<GraphTruthCommit>,
-    #[serde(default)]
-    user_overrides: Vec<GraphPromotionUserOverride>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -561,20 +518,6 @@ struct ResidentDiscoveryRun {
 struct DurablePromotionVerdictInputs {
     receipts: Vec<GraphProposalBatchReceipt>,
     commits: Vec<GraphTruthCommit>,
-}
-
-#[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
-struct ChunkSemanticBridgePromotionRequest {
-    candidates: Vec<ChunkSemanticBridgeCandidate>,
-    chunks: Vec<ChunkSemanticBridgePromotionChunkInput>,
-    accepted_evidence_ids: Vec<String>,
-}
-
-#[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
-struct ChunkSemanticBridgePromotionChunkInput {
-    id: String,
 }
 
 fn default_document_chunk_size() -> usize {
@@ -992,6 +935,8 @@ pub struct DesktopDiagnostic {
 #[serde(rename_all = "camelCase")]
 pub struct DesktopRuntimeInfo {
     pub banner: String,
+    pub build_git_sha: String,
+    pub build_profile: String,
     pub target: String,
     pub ready: bool,
     pub storage: String,
@@ -1444,7 +1389,6 @@ struct IcoCellInternal {
 
 #[derive(Clone, Debug)]
 struct IcoTopology {
-    resolution: u32,
     cells: Vec<IcoCellInternal>,
     by_id: HashMap<String, usize>,
 }
@@ -1461,7 +1405,6 @@ struct IcoProjection {
 #[derive(Clone, Debug)]
 struct HopfAnchorAssignment {
     anchor_id: String,
-    fiber_id: String,
     fiber_kind: String,
     cell_id: String,
     chart_id: String,
@@ -1469,7 +1412,6 @@ struct HopfAnchorAssignment {
     center_vector: [f64; 3],
     cell_distance: f64,
     boundary_score: f64,
-    phase: f64,
 }
 
 #[derive(Default)]
@@ -2111,217 +2053,6 @@ impl PhoenixApi for PhoenixApiImpl {
                     "atlasSeedPayload": atlas_seed_payload,
                     "embeddingTargetSource": "rust-graph-family-targets/v1",
                 },
-                "error": null,
-            }));
-        }
-        if command == "graphRebuild:chunkSemanticBridges" {
-            let started = Instant::now();
-            let request = serde_json::from_value::<ChunkSemanticBridgeRequest>(payload)
-                .map_err(|error| format!("invalid chunk semantic bridge request: {error}"))?;
-            let documents = request
-                .documents
-                .iter()
-                .map(|document| ChunkSemanticBridgeSnapshotDocument {
-                    note_id: document.note_id.as_str(),
-                    text: document.text.as_str(),
-                })
-                .collect::<Vec<_>>();
-            let bridge_started = Instant::now();
-            let run = build_chunk_semantic_bridge_run_from_snapshot(&request.snapshot, &documents);
-            assert_chunk_semantic_bridge_candidate_only(&run.candidates)
-                .map_err(|error| error.to_string())?;
-            let bridge_build_micros = bridge_started.elapsed().as_micros();
-            let quality_gate = audit_chunk_semantic_bridge_quality_gate(&run.candidates);
-            return serialize_json(&json!({
-                "success": true,
-                "payload": ChunkSemanticBridgeResponse {
-                    schema_version: "phoenix-chunk-semantic-bridge-native-output/v1".to_owned(),
-                    source: "rust".to_owned(),
-                    candidates: run.candidates,
-                    cross_document_certificate: run.cross_document_certificate,
-                    quality_gate,
-                    timing: ChunkSemanticBridgeTiming {
-                        bridge_build_micros,
-                        total_micros: started.elapsed().as_micros(),
-                    },
-                },
-                "error": null,
-            }));
-        }
-        if command == "graphRebuild:storyContinuity" {
-            let started = Instant::now();
-            let request = serde_json::from_value::<StoryContinuityRequest>(payload)
-                .map_err(|error| format!("invalid story continuity request: {error}"))?;
-            let documents = request
-                .documents
-                .into_iter()
-                .map(|document| StoryContinuityDocument {
-                    note_id: document.note_id.into(),
-                    text: document.text,
-                })
-                .collect::<Vec<_>>();
-            let continuity_started = Instant::now();
-            let contract = build_story_continuity_contract(StoryContinuityInput {
-                snapshot: &request.snapshot,
-                documents: &documents,
-                semantic_summary: request.document_semantic_summary.as_ref(),
-                bridge_candidates: &request.bridge_candidates,
-            });
-            assert_story_continuity_candidate_only(&contract).map_err(|error| error.to_string())?;
-            let continuity_build_micros = continuity_started.elapsed().as_micros();
-            return serialize_json(&json!({
-                "success": true,
-                "payload": StoryContinuityResponse {
-                    schema_version: "phoenix-story-continuity-native-output/v1".to_owned(),
-                    source: "rust".to_owned(),
-                    contract,
-                    timing: StoryContinuityTiming {
-                        continuity_build_micros,
-                        total_micros: started.elapsed().as_micros(),
-                    },
-                },
-                "error": null,
-            }));
-        }
-        if command == "graphRebuild:memoryGovernance" {
-            let started = Instant::now();
-            let request = serde_json::from_value::<MemoryGovernanceRequest>(payload)
-                .map_err(|error| format!("invalid memory governance request: {error}"))?;
-            let governance_started = Instant::now();
-            let candidates = build_memory_governance_candidates_from_snapshot(&request.snapshot);
-            assert_memory_governance_candidate_only(&candidates)
-                .map_err(|error| error.to_string())?;
-            let governance_build_micros = governance_started.elapsed().as_micros();
-            return serialize_json(&json!({
-                "success": true,
-                "payload": MemoryGovernanceResponse {
-                    schema_version: "phoenix-memory-governance-native-output/v1".to_owned(),
-                    source: "rust".to_owned(),
-                    candidates,
-                    timing: MemoryGovernanceTiming {
-                        governance_build_micros,
-                        total_micros: started.elapsed().as_micros(),
-                    },
-                },
-                "error": null,
-            }));
-        }
-        if command == "graphRebuild:memoryGovernanceRetrievalExperiment" {
-            let started = Instant::now();
-            let request =
-                serde_json::from_value::<MemoryGovernanceRetrievalExperimentRequest>(payload)
-                    .map_err(|error| {
-                        format!("invalid memory governance retrieval experiment request: {error}")
-                    })?;
-            let governance_started = Instant::now();
-            let governance_candidates = if request.snapshot.memory_governance_candidates.is_empty()
-            {
-                build_memory_governance_candidates_from_snapshot(&request.snapshot)
-            } else {
-                request.snapshot.memory_governance_candidates.clone()
-            };
-            assert_memory_governance_candidate_only(&governance_candidates)
-                .map_err(|error| error.to_string())?;
-            let governance_build_micros = governance_started.elapsed().as_micros();
-            let experiment_started = Instant::now();
-            let experiment = build_memory_governance_retrieval_weighting_experiment(
-                MemoryGovernanceRetrievalPreviewInput {
-                    retrieval_candidates: &request.retrieval_candidates,
-                    governance_candidates: &governance_candidates,
-                },
-            );
-            let experiment_build_micros = experiment_started.elapsed().as_micros();
-            return serialize_json(&json!({
-                "success": true,
-                "payload": MemoryGovernanceRetrievalExperimentResponse {
-                    schema_version: "phoenix-memory-governance-retrieval-experiment-native-output/v1".to_owned(),
-                    source: "rust".to_owned(),
-                    experiment,
-                    timing: MemoryGovernanceRetrievalExperimentTiming {
-                        governance_build_micros,
-                        experiment_build_micros,
-                        total_micros: started.elapsed().as_micros(),
-                    },
-                },
-                "error": null,
-            }));
-        }
-        if command == "graphPromotion:verdictCertificate" {
-            let started = Instant::now();
-            let request = serde_json::from_value::<PromotionVerdictRequest>(payload)
-                .map_err(|error| format!("invalid graph promotion verdict request: {error}"))?;
-            let durable = if request.receipts.is_empty() || request.commits.is_empty() {
-                let config = {
-                    let guard = self.lock_state()?;
-                    guard.host.config().cloned()
-                };
-                load_durable_promotion_verdict_inputs(config.as_ref())?
-            } else {
-                None
-            };
-            let durable_receipts = durable.as_ref().map(|input| input.receipts.as_slice());
-            let durable_commits = durable.as_ref().map(|input| input.commits.as_slice());
-            let receipts = if request.receipts.is_empty() {
-                durable_receipts.unwrap_or_default()
-            } else {
-                request.receipts.as_slice()
-            };
-            let commits = if request.commits.is_empty() {
-                durable_commits.unwrap_or_default()
-            } else {
-                request.commits.as_slice()
-            };
-            let verdict_started = Instant::now();
-            let certificate = build_graph_promotion_verdict_certificate(
-                receipts,
-                commits,
-                &request.user_overrides,
-            )
-            .map_err(|error| error.to_string())?;
-            if !certificate.no_topology_writes {
-                return Err("promotion verdict certificate attempted topology writes".to_owned());
-            }
-            let verdict_build_micros = verdict_started.elapsed().as_micros();
-            return serialize_json(&json!({
-                "success": true,
-                "payload": PromotionVerdictResponse {
-                    schema_version: "phoenix-graph-promotion-verdict-native-output/v1".to_owned(),
-                    source: "rust".to_owned(),
-                    certificate,
-                    timing: PromotionVerdictTiming {
-                        verdict_build_micros,
-                        total_micros: started.elapsed().as_micros(),
-                    },
-                },
-                "error": null,
-            }));
-        }
-        if command == "graphRebuild:promoteChunkSemanticBridges" {
-            let request = serde_json::from_value::<ChunkSemanticBridgePromotionRequest>(payload)
-                .map_err(|error| {
-                    format!("invalid chunk semantic bridge promotion request: {error}")
-                })?;
-            let chunks = request
-                .chunks
-                .iter()
-                .map(|chunk| ChunkSemanticBridgePromotionChunk {
-                    id: chunk.id.as_str(),
-                })
-                .collect::<Vec<_>>();
-            let accepted_evidence_ids = request
-                .accepted_evidence_ids
-                .iter()
-                .map(String::as_str)
-                .collect::<Vec<_>>();
-            let promotion =
-                promote_chunk_semantic_bridge_candidates(ChunkSemanticBridgePromotionInput {
-                    candidates: &request.candidates,
-                    chunks: &chunks,
-                    accepted_evidence_ids: &accepted_evidence_ids,
-                });
-            return serialize_json(&json!({
-                "success": true,
-                "payload": promotion,
                 "error": null,
             }));
         }
@@ -3874,6 +3605,13 @@ fn desktop_runtime_info(
         .unwrap_or_else(default_runtime_config);
     DesktopRuntimeInfo {
         banner: runtime_banner().to_owned(),
+        build_git_sha: env!("PHOENIX_BUILD_GIT_SHA").to_owned(),
+        build_profile: if cfg!(debug_assertions) {
+            "debug"
+        } else {
+            "release"
+        }
+        .to_owned(),
         target: runtime_target_name(runtime.target).to_owned(),
         ready: init_result.map(|result| result.ready).unwrap_or(false),
         storage: storage_mode_name(runtime.storage).to_owned(),
@@ -4659,7 +4397,6 @@ fn semantic_payload_to_hopf_payload(semantic: &DesktopManifoldPayload) -> Deskto
         };
         assignments.push(HopfAnchorAssignment {
             anchor_id: anchor_id.clone(),
-            fiber_id: fiber_id.clone(),
             fiber_kind: fiber_kind.to_owned(),
             cell_id: projection.primary_cell_id.clone(),
             chart_id: chart_projection.primary_cell_id.clone(),
@@ -4667,7 +4404,6 @@ fn semantic_payload_to_hopf_payload(semantic: &DesktopManifoldPayload) -> Deskto
             center_vector: projection.center_vector,
             cell_distance: projection.cell_distance,
             boundary_score: projection.boundary_score,
-            phase,
         });
         nodes.push(DesktopManifoldNode {
             id: anchor_id.clone(),
@@ -5131,7 +4867,6 @@ fn product_index_to_payload(
         let phase = hopf_phase_for_kind(fiber_kind, &semantic_node.id, *index);
         assignments.push(HopfAnchorAssignment {
             anchor_id: node.id.clone(),
-            fiber_id: format!("product:fiber:{}:{fiber_kind}", node.id),
             fiber_kind: fiber_kind.to_owned(),
             cell_id: projection.primary_cell_id.clone(),
             chart_id: chart_projection.primary_cell_id,
@@ -5139,7 +4874,6 @@ fn product_index_to_payload(
             center_vector: projection.center_vector,
             cell_distance: projection.cell_distance,
             boundary_score: projection.boundary_score,
-            phase,
         });
         node.source_type = "product_node".to_owned();
         node.base_vector = Some(projection.center_vector);
@@ -5993,11 +5727,7 @@ impl IcoTopology {
             cell.neighbor_cell_ids.sort();
             cell.neighbor_cell_ids.dedup();
         }
-        Self {
-            resolution,
-            cells,
-            by_id,
-        }
+        Self { cells, by_id }
     }
 
     fn cell(&self, cell_id: &str) -> Option<&IcoCellInternal> {
@@ -6826,13 +6556,6 @@ fn hash_unit_parts(kind: &str, index: usize) -> f64 {
     f64::from(hash) / f64::from(u32::MAX)
 }
 
-fn now_millis_for_snapshot() -> u64 {
-    std::time::SystemTime::now()
-        .duration_since(std::time::UNIX_EPOCH)
-        .map(|duration| duration.as_millis() as u64)
-        .unwrap_or_default()
-}
-
 fn parse_json<T: DeserializeOwned>(json: &str) -> Result<T, String> {
     serde_json::from_str(json).map_err(|error| format!("invalid Phoenix JSON payload: {error}"))
 }
@@ -7180,6 +6903,8 @@ mod tests {
 
         assert_eq!(info.target, "native");
         assert_eq!(info.storage, "nativeLocal");
+        assert!(!info.build_git_sha.is_empty());
+        assert!(matches!(info.build_profile.as_str(), "debug" | "release"));
         assert!(!info.feature_flags.graptor);
         assert!(!info.feature_flags.gldr);
     }

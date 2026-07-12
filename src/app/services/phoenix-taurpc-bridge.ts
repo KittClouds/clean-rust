@@ -138,6 +138,7 @@ class PhoenixTaurpcBridge implements PhoenixNativeBridge {
     private readonly readyCallbacks = new Set<ReadyCallback>();
     private readonly residentGraphDocuments = new Map<string, { text: string; textHash: string }>();
     private pendingGraphRun: { runHandle: string; signature: string } | null = null;
+    private reportedBuild = '';
 
     constructor(private readonly rpc: PhoenixRpc) {}
 
@@ -173,6 +174,11 @@ class PhoenixTaurpcBridge implements PhoenixNativeBridge {
             'phoenix.init_runtime',
             () => this.rpc.phoenix.init_runtime(request),
         );
+        const build = `${info.buildProfile}:${info.buildGitSha}`;
+        if (build !== this.reportedBuild) {
+            this.reportedBuild = build;
+            console.info(`[PhoenixNative] ${info.buildProfile} ${info.buildGitSha.slice(0, 12)}`);
+        }
         this.markReady(Boolean(info.ready));
         return info;
     }

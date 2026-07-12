@@ -43,3 +43,6 @@ zstd = "0.13"
 [patch.crates-io]
 esaxx-rs = { path = "../rust-native/phoenix-gliner-smoke/vendor/esaxx-rs" }
 scirs2-text = { path = "../rust-native/phoenix/vendor/scirs2-text" }
+
+[dev-dependencies]
+tauri = { version = "2", features = ["test"] }

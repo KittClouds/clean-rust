@@ -199,10 +199,8 @@ pub(crate) fn section_identity(root: &str, name: &str, dependencies: &[String]) 
     format!("b3-{}", hasher.finalize().to_hex())
 }
 
-pub(crate) fn load_manifest(
-    root: &Path,
-    scope_id: &str,
-) -> Result<Option<DurableGraphRunManifest>, String> {
+#[cfg(test)]
+fn load_manifest(root: &Path, scope_id: &str) -> Result<Option<DurableGraphRunManifest>, String> {
     read_json(
         &root
             .join("scopes")
