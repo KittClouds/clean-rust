@@ -280,6 +280,21 @@ export interface BuildAtlasControlContractInput {
     reviewAdjudicationViewContract?: GraphReviewAdjudicationViewContract | null;
     governanceCertificate?: GraphGovernanceRunCertificate | null;
     promotionCertificate?: GraphPromotionVerdictCertificate | null;
+    additionalRows?: AtlasControlRow[];
+    nativeProofCounts?: AtlasNativeProofCounts | null;
+}
+
+export interface AtlasNativeProofCounts {
+    crossDocumentPairCoverage: number;
+    crossDocumentSelected: number;
+    crossDocumentRejected: number;
+    continuityBoundaries: number;
+    continuityEpisodes: number;
+    continuityTemporal: number;
+    continuityStates: number;
+    continuityCausal: number;
+    continuityConnections: number;
+    continuityConflicts: number;
 }
 
 export function buildAtlasControlContract(input: BuildAtlasControlContractInput): AtlasControlContract {
@@ -307,12 +322,15 @@ export function buildAtlasControlContract(input: BuildAtlasControlContractInput)
     const discourseRows = nonNegative(counters['discourseRows'], counters['discoursePackets']);
     const metricsRows = nonNegative(counters['metricsRows'], counters['metrics']);
     const governanceCount = nonNegative(
-        governance?.candidatesByAction.total,
         counters['memoryGovernanceCandidates'],
+        governance?.candidatesByAction.total,
         snapshot?.memoryGovernanceCandidates?.length,
     );
     const promotionCount = nonNegative(promotion?.audit.total, counters['promotionVerdictRows']);
-    const rows = buildAtlasControlRows(snapshotId, snapshot, reviewCertificate, promotion, input.entities ?? []);
+    const rows = uniqueControlRows([
+        ...buildAtlasControlRows(snapshotId, snapshot, reviewCertificate, promotion, input.entities ?? []),
+        ...(input.additionalRows ?? []),
+    ]);
     const inventory = buildInventory({
         rows,
         entityCount,
@@ -325,6 +343,7 @@ export function buildAtlasControlContract(input: BuildAtlasControlContractInput)
         review,
         governanceCount,
         promotionCount,
+        nativeProofCounts: input.nativeProofCounts ?? null,
     });
     const inventoryById = Object.fromEntries(inventory.map((item) => [item.id, item])) as
         Record<AtlasControlInventoryCategoryId, AtlasControlInventoryCategory>;
@@ -377,6 +396,7 @@ function buildInventory(input: {
     review: GraphReviewAdjudicationViewContract;
     governanceCount: number;
     promotionCount: number;
+    nativeProofCounts: AtlasNativeProofCounts | null;
 }): AtlasControlInventoryCategory[] {
     const laneRows = (lane: AtlasControlLane) => input.rows.filter((row) => row.identity.lane === lane);
     const topologyRows = laneRows('graph_topology');
@@ -397,15 +417,27 @@ function buildInventory(input: {
         inventory('governance_candidate_rows', 'Governance candidates', 'governance', 'governance_candidate', 'memory_governance', input.governanceCount, laneRows('governance_candidate'), 'inspect_only', ['inspect'], noReceipt()),
         inventory('promotion_verdict_rows', 'Promotion verdicts', 'promotion', 'promotion_verdict', 'promotion_verdict', input.promotionCount, laneRows('promotion_verdict'), input.promotionCount ? 'promotion_preview' : 'none', input.promotionCount ? ['preview_promotion'] : [], receipt('promotion_proposal_receipt', true, true)),
         inventory('metrics_rows', 'Metric rows', 'metrics', 'metrics_ledger', 'metrics', input.metricsRows, laneRows('metrics_ledger'), 'inspect_only', ['inspect'], noReceipt()),
-        continuityInventory('continuity_episode_rows', 'Episode map', 'continuity_episode_map', laneRows('continuity_episode_map')),
-        continuityInventory('continuity_temporal_rows', 'Timeline', 'continuity_timeline', laneRows('continuity_timeline')),
-        continuityInventory('continuity_causal_rows', 'Causality', 'continuity_causality', laneRows('continuity_causality')),
-        continuityInventory('continuity_state_rows', 'State history', 'continuity_state_history', laneRows('continuity_state_history')),
+        continuityInventory('continuity_episode_rows', 'Episode map', 'continuity_episode_map', laneRows('continuity_episode_map'),
+            nonNegative(input.nativeProofCounts?.continuityBoundaries)
+                + nonNegative(input.nativeProofCounts?.continuityEpisodes)
+                + nonNegative(input.nativeProofCounts?.continuityConnections)),
+        continuityInventory('continuity_temporal_rows', 'Timeline', 'continuity_timeline', laneRows('continuity_timeline'),
+            nonNegative(input.nativeProofCounts?.continuityTemporal)),
+        continuityInventory('continuity_causal_rows', 'Causality', 'continuity_causality', laneRows('continuity_causality'),
+            nonNegative(input.nativeProofCounts?.continuityCausal)),
+        continuityInventory('continuity_state_rows', 'State history', 'continuity_state_history', laneRows('continuity_state_history'),
+            nonNegative(input.nativeProofCounts?.continuityStates)),
         inventory('continuity_cross_document_rows', 'Cross-document', 'continuity',
             'continuity_cross_document', 'cross_document_bridge',
-            laneRows('continuity_cross_document').length, laneRows('continuity_cross_document'),
+            input.nativeProofCounts
+                ? nonNegative(input.nativeProofCounts.crossDocumentPairCoverage)
+                    + nonNegative(input.nativeProofCounts.crossDocumentSelected)
+                    + nonNegative(input.nativeProofCounts.crossDocumentRejected)
+                : laneRows('continuity_cross_document').length,
+            laneRows('continuity_cross_document'),
             'inspect_only', ['inspect', 'compare_context'], noReceipt()),
-        continuityInventory('continuity_exception_rows', 'Exceptions', 'continuity_exception', laneRows('continuity_exception')),
+        continuityInventory('continuity_exception_rows', 'Exceptions', 'continuity_exception', laneRows('continuity_exception'),
+            nonNegative(input.nativeProofCounts?.continuityConflicts)),
     ];
 }
 
@@ -414,9 +446,10 @@ function continuityInventory(
     label: string,
     lane: AtlasControlLane,
     rows: AtlasControlRow[],
+    completeRows = rows.length,
 ): AtlasControlInventoryCategory {
     return inventory(
-        id, label, 'continuity', lane, 'story_continuity', rows.length, rows,
+        id, label, 'continuity', lane, 'story_continuity', Math.max(completeRows, rows.length), rows,
         rows.some((row) => row.receiptPolicy.required) ? 'manual_receipt' : 'inspect_only',
         [...new Set(rows.flatMap((row) => row.allowedActions))],
         receipt('continuity_action_receipt', true, false),
@@ -633,6 +666,10 @@ function invariant(status: GraphReviewProofState, detail: string): AtlasControlI
 
 function unique<T>(values: T[]): T[] {
     return [...new Set(values)];
+}
+
+function uniqueControlRows(rows: AtlasControlRow[]): AtlasControlRow[] {
+    return [...new Map(rows.map((row) => [row.identity.id, row])).values()];
 }
 
 function valueTone(value: number | string): AtlasControlTone {

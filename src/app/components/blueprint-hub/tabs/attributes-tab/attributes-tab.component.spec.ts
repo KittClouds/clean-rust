@@ -16,6 +16,8 @@ describe('AttributesTabComponent', () => {
         expect(template).toContain('<app-search-panel');
         expect(template).toContain('<app-atlas-control-rooms');
         expect(template).toContain('[contract]="atlasControlContract()"');
+        expect(template).toContain('[paging]="atlasProofPaging()"');
+        expect(template).toContain('(nextPageRequested)="loadNextAtlasProofPage()"');
         expect(template).toContain('(actionRequested)="dispatchRoomAction($event)"');
         expect(template).toContain('(roomChange)="setOperatingRoom($event)"');
 

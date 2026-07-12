@@ -38,6 +38,14 @@ describe('GraphCrossDocumentBridgeRunCertificate', () => {
         expect(isGraphCrossDocumentBridgeRunCertificate(value)).toBe(false);
     });
 
+    it('accepts explicitly paged audit rows without weakening strict validation', () => {
+        const value = certificate();
+        value.selectedRows = [];
+
+        expect(isGraphCrossDocumentBridgeRunCertificate(value)).toBe(false);
+        expect(isGraphCrossDocumentBridgeRunCertificate(value, true)).toBe(true);
+    });
+
     it('persists and hydrates the native certificate through source rows', () => {
         const snapshot = snapshotFixture();
         snapshot.crossDocumentBridgeCertificate = certificate();

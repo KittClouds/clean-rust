@@ -15,6 +15,7 @@
     "watch": "ng build --watch --configuration development",
     "hopf:space": "node scripts/hopf-resonance-space-smoke.mjs",
     "bench:graph:zeroshot": "node scripts/graph-build-zeroshot-baseline.mjs",
+    "bench:graph:desktop-two-doc": "node scripts/run-graph-build-desktop-baseline.mjs",
     "audit:graph-taxonomy": "node scripts/graph-atlas-taxonomy-audit.mjs",
     "test": "vitest run",
     "test:watch": "vitest"

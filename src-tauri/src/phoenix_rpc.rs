@@ -2,11 +2,15 @@ use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet, VecDeque};
 use std::hash::{Hash, Hasher};
 use std::io::{Read, Write};
 use std::path::PathBuf;
-use std::sync::{Arc, Mutex};
+use std::sync::{Arc, Mutex, OnceLock};
 use std::time::Instant;
 
 use crate::document_index_read::{read_document_index, DesktopDocumentIndexReadRequest};
 use crate::graph_galaxy::{compile_scene, DesktopGalaxyScene, DesktopGalaxySceneRequest};
+use crate::graph_run_store::{
+    load_manifest_for_handle, load_section, section_identity, DurableGraphRunReceipt,
+    GraphRunStoreTxn,
+};
 use crate::graph_scene_packet::{
     compile_packet, GraphScenePacket, GraphScenePacketEdgeInput, GraphScenePacketInput,
     GraphScenePacketNodeInput, GraphScenePacketRequest, GraphScenePacketSettings,
@@ -17,6 +21,7 @@ use crate::tts::{
 };
 use base64::{engine::general_purpose::STANDARD as BASE64_STANDARD, Engine as _};
 use flate2::{read::GzDecoder, write::GzEncoder, Compression};
+use hashbrown::HashMap as FastHashMap;
 use phoenix_graph_kernel::{GraphProposalBatchReceipt, GraphTruthCommit};
 use phoenix_graph_post::promotion_verdict::{
     build_graph_promotion_verdict_certificate, GraphPromotionUserOverride,
@@ -34,28 +39,37 @@ use phoenix_graph_rebuild::{
     ChunkSemanticBridgeSnapshotDocument, ChunkerConfig, CrossDocumentBridgeRunCertificate,
     DocumentProfileRequest, DocumentSemanticRequest, DocumentSemanticSummary, GraphEmbeddingTarget,
     GraphEmbeddingTargetOriginCount, GraphMemoryGovernanceCandidate, GraphRebuildSnapshot,
-    MemoryGovernanceRetrievalCandidate, MemoryGovernanceRetrievalPreviewInput,
-    MemoryGovernanceRetrievalWeightingExperiment, StoryContinuityContract, StoryContinuityDocument,
-    StoryContinuityInput,
+    MemoryGovernanceCompressionDominanceProof, MemoryGovernanceRetrievalCandidate,
+    MemoryGovernanceRetrievalFullRowProof, MemoryGovernanceRetrievalPreviewInput,
+    MemoryGovernanceRetrievalWeightingExperiment, MemoryGovernanceRetrievalWeightingVariant,
+    StoryContinuityContract, StoryContinuityDocument, StoryContinuityInput,
 };
 use phoenix_hyperbolic::lorentz_tree::{
     HyperboloidPoint, LorentzForest, LorentzForestIndex, LorentzNode, LorentzQueryMode,
     LorentzScoreConfig, LorentzTree, LorentzTreeKind, LorentzTreeMembership, LorentzTreeQuery,
     MmapLorentzForestIndex,
 };
-use phoenix_hyperbolic::siegel_finsler::{run_siegel_finsler_kernel, SiegelKernelRunRequest};
+use phoenix_hyperbolic::siegel_finsler::{
+    run_siegel_finsler_kernel, SiegelKernelRunReceipt, SiegelKernelRunRequest,
+};
 use phoenix_native::{runtime_banner, PhoenixNativeHost, SnapshotPartition};
 use phoenix_store_native_core::{PhoenixGraphKernelStoreV2, PhoenixGraphLearningStore};
 use phoenix_store_overgraph::PhoenixOvergraphStore;
 use phoenix_types::{
-    AnalyzeTextRequest, AtlasRichScanRequest, CommitRequest, CreateSessionRequest,
-    GraphDeltaRequest, IngestRequest, QueryRequest, RebuildRequest, RuntimeConfig,
-    RuntimeInitRequest, RuntimeInitResult, RuntimeTarget, ScanRequest, SessionStateRequest,
-    SessionStatsRequest, SnapshotPolicy, StorageMode, StoreCommandRequest,
+    AnalyzeTextRequest, AtlasRichScanRequest, CommitRequest, CreateSessionRequest, EntityId,
+    EntityKind, GraphDeltaRequest, IngestRequest, MentionEntityRef, MentionSource, QueryRequest,
+    RebuildRequest, ResolverEntitySeed, RuntimeConfig, RuntimeInitRequest, RuntimeInitResult,
+    RuntimeTarget, ScanRequest, ScopeKey, SessionId, SessionStateRequest, SessionStatsRequest,
+    SnapshotPolicy, StorageMode, StoreCommandRequest,
 };
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
+
+const GRAPH_RUN_ARENA_CAPACITY: usize = 8;
+const GRAPH_RUN_ARENA_RESIDENT_BYTES: usize = 256 * 1024 * 1024;
+const GRAPH_RUN_DEFAULT_PAGE_ROWS: usize = 8;
+const GRAPH_RUN_MAX_PAGE_ROWS: usize = 64;
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -75,7 +89,7 @@ struct DocumentChunkRequest {
     overlap: usize,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct DocumentChunkInput {
     note_id: String,
@@ -104,18 +118,18 @@ struct ChunkSemanticBridgeRequest {
     documents: Vec<DocumentChunkInput>,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct ChunkSemanticBridgeTiming {
     bridge_build_micros: u128,
     total_micros: u128,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct ChunkSemanticBridgeResponse {
-    schema_version: &'static str,
-    source: &'static str,
+    schema_version: String,
+    source: String,
     candidates: Vec<ChunkSemanticBridgeCandidate>,
     cross_document_certificate: CrossDocumentBridgeRunCertificate,
     quality_gate: phoenix_graph_rebuild::BridgeQualityGateAudit,
@@ -133,18 +147,18 @@ struct StoryContinuityRequest {
     bridge_candidates: Vec<ChunkSemanticBridgeCandidate>,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct StoryContinuityTiming {
     continuity_build_micros: u128,
     total_micros: u128,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct StoryContinuityResponse {
-    schema_version: &'static str,
-    source: &'static str,
+    schema_version: String,
+    source: String,
     contract: StoryContinuityContract,
     timing: StoryContinuityTiming,
 }
@@ -155,18 +169,18 @@ struct MemoryGovernanceRequest {
     snapshot: GraphRebuildSnapshot,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct MemoryGovernanceTiming {
     governance_build_micros: u128,
     total_micros: u128,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct MemoryGovernanceResponse {
-    schema_version: &'static str,
-    source: &'static str,
+    schema_version: String,
+    source: String,
     candidates: Vec<GraphMemoryGovernanceCandidate>,
     timing: MemoryGovernanceTiming,
 }
@@ -178,7 +192,7 @@ struct MemoryGovernanceRetrievalExperimentRequest {
     retrieval_candidates: Vec<MemoryGovernanceRetrievalCandidate>,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct MemoryGovernanceRetrievalExperimentTiming {
     governance_build_micros: u128,
@@ -186,11 +200,11 @@ struct MemoryGovernanceRetrievalExperimentTiming {
     total_micros: u128,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct MemoryGovernanceRetrievalExperimentResponse {
-    schema_version: &'static str,
-    source: &'static str,
+    schema_version: String,
+    source: String,
     experiment: MemoryGovernanceRetrievalWeightingExperiment,
     timing: MemoryGovernanceRetrievalExperimentTiming,
 }
@@ -206,20 +220,316 @@ struct PromotionVerdictRequest {
     user_overrides: Vec<GraphPromotionUserOverride>,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct PromotionVerdictTiming {
     verdict_build_micros: u128,
     total_micros: u128,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct PromotionVerdictResponse {
-    schema_version: &'static str,
-    source: &'static str,
+    schema_version: String,
+    source: String,
     certificate: GraphPromotionVerdictCertificate,
     timing: PromotionVerdictTiming,
+}
+
+#[taurpc::ipc_type]
+#[serde(rename_all = "camelCase")]
+pub struct DesktopSnapshotAnalysisRequest {
+    #[serde(default)]
+    run_handle: Option<String>,
+    #[specta(type = serde_json::Value)]
+    snapshot: GraphRebuildSnapshot,
+    #[specta(type = serde_json::Value)]
+    documents: Vec<DesktopSnapshotAnalysisDocument>,
+    #[serde(default)]
+    #[specta(type = serde_json::Value)]
+    document_semantic_summary: Option<DocumentSemanticSummary>,
+    #[serde(default)]
+    #[specta(type = serde_json::Value)]
+    retrieval_candidates: Vec<MemoryGovernanceRetrievalCandidate>,
+    #[serde(default)]
+    #[specta(type = serde_json::Value)]
+    receipts: Vec<GraphProposalBatchReceipt>,
+    #[serde(default)]
+    #[specta(type = serde_json::Value)]
+    commits: Vec<GraphTruthCommit>,
+    #[serde(default)]
+    #[specta(type = serde_json::Value)]
+    user_overrides: Vec<GraphPromotionUserOverride>,
+    #[serde(default)]
+    #[specta(type = serde_json::Value)]
+    siegel: Option<SiegelKernelRunRequest>,
+}
+
+#[taurpc::ipc_type]
+#[serde(rename_all = "camelCase")]
+pub struct DesktopSnapshotAnalysisDocument {
+    note_id: String,
+    text: Option<String>,
+    text_hash: Option<String>,
+}
+
+#[taurpc::ipc_type]
+#[serde(rename_all = "camelCase")]
+pub struct DesktopSnapshotAnalysisTiming {
+    bridge_build_micros: f64,
+    continuity_build_micros: f64,
+    governance_build_micros: f64,
+    retrieval_build_micros: f64,
+    verdict_build_micros: f64,
+    total_micros: f64,
+}
+
+#[taurpc::ipc_type]
+#[serde(rename_all = "camelCase")]
+pub struct DesktopSnapshotAnalysisResponse {
+    schema_version: &'static str,
+    source: &'static str,
+    #[specta(type = serde_json::Value)]
+    bridge: ChunkSemanticBridgeResponse,
+    #[specta(type = serde_json::Value)]
+    continuity: StoryContinuityResponse,
+    #[specta(type = serde_json::Value)]
+    governance: MemoryGovernanceResponse,
+    #[specta(type = serde_json::Value)]
+    retrieval: Option<MemoryGovernanceRetrievalExperimentResponse>,
+    #[specta(type = serde_json::Value)]
+    promotion: PromotionVerdictResponse,
+    #[specta(type = serde_json::Value)]
+    siegel: Option<SiegelKernelRunReceipt>,
+    no_topology_writes: bool,
+    timing: DesktopSnapshotAnalysisTiming,
+}
+
+struct GraphRunEntry {
+    scope_id: String,
+    snapshot_id: String,
+    content: Arc<GraphRunContent>,
+}
+
+struct GraphRunContent {
+    section_roots: BTreeMap<String, String>,
+    analysis: Arc<DesktopSnapshotAnalysisResponse>,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+struct GraphAnalysisIdentity {
+    digest: String,
+    canonical: Arc<[u8]>,
+}
+
+struct GraphRunLease {
+    content_id: String,
+    entry: Arc<GraphRunEntry>,
+    reused: bool,
+}
+
+struct SharedGraphRunContent {
+    canonical_identity: Arc<[u8]>,
+    content: Arc<GraphRunContent>,
+    resident_bytes: usize,
+    active_leases: usize,
+}
+
+struct PendingGraphRunContent {
+    canonical_identity: Arc<[u8]>,
+    slot: Arc<OnceLock<Result<Arc<GraphRunContent>, String>>>,
+}
+
+struct GraphRunLeaseStats {
+    content_id: String,
+    resident_bytes: usize,
+    active_leases: usize,
+    reused: bool,
+}
+
+#[derive(Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct DurableAnalysisMetadata {
+    schema_version: String,
+    source: String,
+    no_topology_writes: bool,
+}
+
+#[taurpc::ipc_type]
+#[serde(rename_all = "camelCase")]
+pub struct DesktopGraphRunPageRequest {
+    run_handle: String,
+    offset: u32,
+    limit: u32,
+}
+
+#[taurpc::ipc_type]
+#[serde(rename_all = "camelCase")]
+pub struct DesktopGraphRunPersistRequest {
+    run_handle: String,
+}
+
+#[taurpc::ipc_type]
+#[serde(rename_all = "camelCase")]
+pub struct DesktopGraphRunPersistReceipt {
+    schema_version: String,
+    run_handle: String,
+    scope_id: String,
+    snapshot_id: String,
+    manifest_id: String,
+    committed_at: f64,
+    changed_sections: u32,
+    reused_sections: u32,
+    encoded_sections: u32,
+    compressed_sections: u32,
+    raw_bytes_written: f64,
+    compressed_bytes_written: f64,
+}
+
+#[taurpc::ipc_type]
+#[serde(rename_all = "camelCase")]
+pub struct DesktopGraphRunPage {
+    schema_version: &'static str,
+    source: &'static str,
+    run_handle: String,
+    offset: u32,
+    limit: u32,
+    detail_rows: u32,
+    returned_detail_rows: u32,
+    next_offset: Option<u32>,
+    arena: DesktopGraphRunArenaStats,
+    counts: DesktopGraphRunCounts,
+    #[specta(type = serde_json::Value)]
+    projection: DesktopSnapshotAnalysisResponse,
+}
+
+#[taurpc::ipc_type]
+#[serde(rename_all = "camelCase")]
+pub struct DesktopGraphRunArenaStats {
+    analysis_identity: String,
+    reused: bool,
+    resident_bytes: f64,
+    active_leases: u32,
+    projection_micros: f64,
+}
+
+#[taurpc::ipc_type]
+#[serde(rename_all = "camelCase")]
+pub struct DesktopGraphRunCounts {
+    bridge_candidates: u32,
+    bridge_by_type: BTreeMap<String, u32>,
+    cross_document_pair_coverage: u32,
+    cross_document_selected: u32,
+    cross_document_rejected: u32,
+    cross_document_weakest: u32,
+    promotion_rows: u32,
+    continuity_events: u32,
+    continuity_boundaries: u32,
+    continuity_episodes: u32,
+    continuity_temporal: u32,
+    continuity_states: u32,
+    continuity_causal: u32,
+    continuity_connections: u32,
+    continuity_conflicts: u32,
+    governance_candidates: u32,
+    governance_by_action: BTreeMap<String, u32>,
+    retrieval_top_rows: u32,
+    retrieval_violations: u32,
+}
+
+#[taurpc::ipc_type]
+#[serde(rename_all = "camelCase")]
+pub struct DesktopMentionBatchDocument {
+    pub document_id: String,
+    pub text: String,
+}
+
+#[taurpc::ipc_type]
+#[serde(rename_all = "camelCase")]
+pub struct DesktopMentionBatchScope {
+    pub world_id: Option<String>,
+    pub narrative_id: Option<String>,
+    pub folder_id: Option<String>,
+    pub folder_path: Option<String>,
+}
+
+#[taurpc::ipc_type]
+#[serde(rename_all = "camelCase")]
+pub struct DesktopMentionBatchResolverSeed {
+    pub entity_id: String,
+    pub canonical_name: String,
+    pub aliases: Vec<String>,
+    pub kind: Option<String>,
+    pub scope: DesktopMentionBatchScope,
+}
+
+#[taurpc::ipc_type]
+#[serde(rename_all = "camelCase")]
+pub struct DesktopMentionBatchRequest {
+    pub documents: Vec<DesktopMentionBatchDocument>,
+    pub resolver_seed: Vec<DesktopMentionBatchResolverSeed>,
+}
+
+#[taurpc::ipc_type]
+#[serde(rename_all = "camelCase")]
+pub struct DesktopMentionBatchResult {
+    pub document_id: String,
+    pub text_hash: String,
+    pub mentions: Vec<Vec<f64>>,
+}
+
+#[taurpc::ipc_type]
+#[serde(rename_all = "camelCase")]
+pub struct DesktopMentionBatchResponse {
+    pub schema_version: &'static str,
+    pub kinds: Vec<String>,
+    pub entity_refs: Vec<String>,
+    pub documents: Vec<DesktopMentionBatchResult>,
+}
+
+#[taurpc::ipc_type]
+#[serde(rename_all = "camelCase")]
+pub struct DesktopGraphRunOpenRequest {
+    pub documents: Vec<DesktopMentionBatchDocument>,
+    pub resolver_seed: Vec<DesktopMentionBatchResolverSeed>,
+}
+
+#[taurpc::ipc_type]
+#[serde(rename_all = "camelCase")]
+pub struct DesktopDiscoveryCandidate {
+    pub key: String,
+    pub token: String,
+    pub kind: String,
+    pub score: f64,
+    pub count: u32,
+    pub status: u32,
+}
+
+#[taurpc::ipc_type]
+#[serde(rename_all = "camelCase")]
+pub struct DesktopGraphRunOpenDocument {
+    pub document_id: String,
+    pub text_hash: String,
+    pub candidates: Vec<DesktopDiscoveryCandidate>,
+}
+
+#[taurpc::ipc_type]
+#[serde(rename_all = "camelCase")]
+pub struct DesktopGraphRunOpenResponse {
+    pub schema_version: &'static str,
+    pub run_handle: String,
+    pub documents: Vec<DesktopGraphRunOpenDocument>,
+}
+
+struct ResidentMentionDocument {
+    text_hash: String,
+    kinds: Vec<String>,
+    entity_refs: Vec<String>,
+    mentions: Vec<Vec<f64>>,
+}
+
+struct ResidentDiscoveryRun {
+    documents: Vec<ResidentMentionDocument>,
 }
 
 struct DurablePromotionVerdictInputs {
@@ -274,9 +584,257 @@ struct PhoenixDesktopState {
     last_init: Option<RuntimeInitResult>,
 }
 
+struct GraphRunCoordinator {
+    leases: HashMap<String, GraphRunLease>,
+    contents: HashMap<String, SharedGraphRunContent>,
+    pending: HashMap<String, PendingGraphRunContent>,
+    discovery_runs: HashMap<String, Arc<ResidentDiscoveryRun>>,
+    discovery_order: VecDeque<String>,
+    content_order: VecDeque<String>,
+    resident_documents: HashMap<String, Arc<str>>,
+    resident_content_bytes: usize,
+    resident_byte_limit: usize,
+    next_sequence: u64,
+}
+
+impl Default for GraphRunCoordinator {
+    fn default() -> Self {
+        Self {
+            leases: HashMap::new(),
+            contents: HashMap::new(),
+            pending: HashMap::new(),
+            discovery_runs: HashMap::new(),
+            discovery_order: VecDeque::new(),
+            content_order: VecDeque::new(),
+            resident_documents: HashMap::new(),
+            resident_content_bytes: 0,
+            resident_byte_limit: GRAPH_RUN_ARENA_RESIDENT_BYTES,
+            next_sequence: 0,
+        }
+    }
+}
+
+impl GraphRunCoordinator {
+    fn open(&mut self, discovery: ResidentDiscoveryRun) -> String {
+        self.next_sequence = self.next_sequence.wrapping_add(1);
+        let mut hasher = std::collections::hash_map::DefaultHasher::new();
+        for document in &discovery.documents {
+            document.text_hash.hash(&mut hasher);
+        }
+        self.next_sequence.hash(&mut hasher);
+        let handle = format!("graph-run:{:016x}", hasher.finish());
+        self.discovery_runs
+            .insert(handle.clone(), Arc::new(discovery));
+        self.discovery_order.push_back(handle.clone());
+        while self.discovery_order.len() > GRAPH_RUN_ARENA_CAPACITY {
+            if let Some(expired) = self.discovery_order.pop_front() {
+                self.discovery_runs.remove(&expired);
+            }
+        }
+        handle
+    }
+
+    fn new_lease_handle(&mut self, content_id: &str) -> String {
+        self.next_sequence = self.next_sequence.wrapping_add(1);
+        let mut hasher = blake3::Hasher::new();
+        graph_digest_part(&mut hasher, b"phoenix-graph-run-lease/v1");
+        graph_digest_part(&mut hasher, content_id.as_bytes());
+        graph_digest_part(&mut hasher, &self.next_sequence.to_le_bytes());
+        format!("graph-run:v1:{}", hasher.finalize().to_hex())
+    }
+
+    fn reusable(
+        &mut self,
+        identity: &GraphAnalysisIdentity,
+    ) -> Result<Option<Arc<GraphRunContent>>, String> {
+        let Some(content) = self.contents.get(&identity.digest) else {
+            return Ok(None);
+        };
+        if content.canonical_identity.as_ref() != identity.canonical.as_ref() {
+            return Err(format!(
+                "graph analysis identity collision: {}",
+                identity.digest
+            ));
+        }
+        let entry = Arc::clone(&content.content);
+        self.touch_content(&identity.digest);
+        Ok(Some(entry))
+    }
+
+    fn analysis_slot(
+        &mut self,
+        identity: &GraphAnalysisIdentity,
+    ) -> Result<Arc<OnceLock<Result<Arc<GraphRunContent>, String>>>, String> {
+        if let Some(pending) = self.pending.get(&identity.digest) {
+            if pending.canonical_identity.as_ref() != identity.canonical.as_ref() {
+                return Err(format!(
+                    "pending graph analysis identity collision: {}",
+                    identity.digest
+                ));
+            }
+            return Ok(Arc::clone(&pending.slot));
+        }
+        let slot = Arc::new(OnceLock::new());
+        self.pending.insert(
+            identity.digest.clone(),
+            PendingGraphRunContent {
+                canonical_identity: Arc::clone(&identity.canonical),
+                slot: Arc::clone(&slot),
+            },
+        );
+        Ok(slot)
+    }
+
+    fn lease(
+        &mut self,
+        identity: &GraphAnalysisIdentity,
+        candidate: Arc<GraphRunContent>,
+        resident_bytes: usize,
+        scope_id: String,
+        snapshot_id: String,
+        preferred_handle: Option<&str>,
+    ) -> Result<(String, bool), String> {
+        let reused = self.contents.contains_key(&identity.digest);
+        if let Some(content) = self.contents.get(&identity.digest) {
+            if content.canonical_identity.as_ref() != identity.canonical.as_ref() {
+                return Err(format!(
+                    "graph analysis identity collision: {}",
+                    identity.digest
+                ));
+            }
+        } else {
+            self.resident_content_bytes =
+                self.resident_content_bytes.saturating_add(resident_bytes);
+            self.contents.insert(
+                identity.digest.clone(),
+                SharedGraphRunContent {
+                    canonical_identity: Arc::clone(&identity.canonical),
+                    content: candidate,
+                    resident_bytes,
+                    active_leases: 0,
+                },
+            );
+        }
+        let content = Arc::clone(&self.contents[&identity.digest].content);
+        let handle = if let Some(handle) = preferred_handle {
+            if !self.discovery_runs.contains_key(handle) {
+                return Err(format!("graph run is closed or expired: {handle}"));
+            }
+            self.discovery_runs.remove(handle);
+            self.discovery_order.retain(|candidate| candidate != handle);
+            handle.to_owned()
+        } else {
+            self.new_lease_handle(&identity.digest)
+        };
+        let entry = Arc::new(GraphRunEntry {
+            scope_id,
+            snapshot_id,
+            content,
+        });
+        self.contents
+            .get_mut(&identity.digest)
+            .expect("content inserted")
+            .active_leases += 1;
+        self.leases.insert(
+            handle.clone(),
+            GraphRunLease {
+                content_id: identity.digest.clone(),
+                entry,
+                reused,
+            },
+        );
+        self.pending.remove(&identity.digest);
+        self.touch_content(&identity.digest);
+        self.evict_inactive();
+        Ok((handle, reused))
+    }
+
+    fn get(&mut self, handle: &str) -> Option<Arc<GraphRunEntry>> {
+        let lease = self.leases.get(handle)?;
+        let content_id = lease.content_id.clone();
+        let entry = Arc::clone(&lease.entry);
+        self.touch_content(&content_id);
+        Some(entry)
+    }
+
+    fn stats(&self, handle: &str) -> Option<GraphRunLeaseStats> {
+        let lease = self.leases.get(handle)?;
+        let content = self.contents.get(&lease.content_id)?;
+        Some(GraphRunLeaseStats {
+            content_id: lease.content_id.clone(),
+            resident_bytes: content.resident_bytes,
+            active_leases: content.active_leases,
+            reused: lease.reused,
+        })
+    }
+
+    fn close(&mut self, handle: &str) -> bool {
+        let removed = self.leases.remove(handle);
+        if let Some(lease) = removed.as_ref() {
+            if let Some(content) = self.contents.get_mut(&lease.content_id) {
+                content.active_leases = content.active_leases.saturating_sub(1);
+            }
+        }
+        let discovery_removed = self.discovery_runs.remove(handle).is_some();
+        if discovery_removed {
+            self.discovery_order.retain(|candidate| candidate != handle);
+        }
+        self.evict_inactive();
+        removed.is_some() || discovery_removed
+    }
+
+    fn clear(&mut self) {
+        self.leases.clear();
+        self.contents.clear();
+        self.pending.clear();
+        self.discovery_runs.clear();
+        self.discovery_order.clear();
+        self.content_order.clear();
+        self.resident_documents.clear();
+        self.resident_content_bytes = 0;
+    }
+
+    fn touch_content(&mut self, content_id: &str) {
+        self.content_order
+            .retain(|candidate| candidate != content_id);
+        self.content_order.push_back(content_id.to_owned());
+    }
+
+    fn evict_inactive(&mut self) {
+        while self.contents.len() > GRAPH_RUN_ARENA_CAPACITY
+            || self.resident_content_bytes > self.resident_byte_limit
+        {
+            let Some(index) = self.content_order.iter().position(|content_id| {
+                self.contents
+                    .get(content_id)
+                    .is_some_and(|content| content.active_leases == 0)
+            }) else {
+                break;
+            };
+            let Some(content_id) = self.content_order.remove(index) else {
+                break;
+            };
+            if let Some(content) = self.contents.remove(&content_id) {
+                self.resident_content_bytes = self
+                    .resident_content_bytes
+                    .saturating_sub(content.resident_bytes);
+            }
+        }
+    }
+
+    fn retain_document(&mut self, text_hash: String, text: Arc<str>) {
+        self.resident_documents.entry(text_hash).or_insert(text);
+    }
+
+    fn document(&self, text_hash: &str) -> Option<Arc<str>> {
+        self.resident_documents.get(text_hash).cloned()
+    }
+}
+
 #[derive(Clone, Default)]
 pub struct PhoenixApiImpl {
     state: Arc<Mutex<PhoenixDesktopState>>,
+    graph_runs: Arc<Mutex<GraphRunCoordinator>>,
     tts: NativeTtsService,
 }
 
@@ -819,6 +1377,22 @@ pub trait PhoenixApi {
     async fn commit_json(request_json: String) -> Result<String, String>;
     async fn rebuild_json(request_json: String) -> Result<String, String>;
     async fn scan_json(request_json: String) -> Result<String, String>;
+    async fn scan_mentions_batch(
+        request: DesktopMentionBatchRequest,
+    ) -> Result<DesktopMentionBatchResponse, String>;
+    async fn open_graph_run(
+        request: DesktopGraphRunOpenRequest,
+    ) -> Result<DesktopGraphRunOpenResponse, String>;
+    async fn analyze_graph_snapshot(
+        request: DesktopSnapshotAnalysisRequest,
+    ) -> Result<DesktopGraphRunPage, String>;
+    async fn read_graph_run_page(
+        request: DesktopGraphRunPageRequest,
+    ) -> Result<DesktopGraphRunPage, String>;
+    async fn persist_graph_run(
+        request: DesktopGraphRunPersistRequest,
+    ) -> Result<DesktopGraphRunPersistReceipt, String>;
+    async fn close_graph_run(run_handle: String) -> bool;
     async fn atlas_rich_scan_json(request_json: String) -> Result<String, String>;
     async fn nli_adjudicate_claims_json(request_json: String) -> Result<String, String>;
     async fn manifold_snapshot_json(request_json: String) -> Result<String, String>;
@@ -876,6 +1450,9 @@ impl PhoenixApi for PhoenixApiImpl {
     }
 
     async fn close_runtime(self) -> bool {
+        if let Ok(mut runs) = self.graph_runs.lock() {
+            runs.clear();
+        }
         match self.state.lock() {
             Ok(mut guard) => {
                 guard.last_init = None;
@@ -933,6 +1510,287 @@ impl PhoenixApi for PhoenixApiImpl {
 
     async fn scan_json(self, request_json: String) -> Result<String, String> {
         self.with_host_json::<ScanRequest, _, _>(request_json, |host, request| host.scan(request))
+    }
+
+    async fn scan_mentions_batch(
+        self,
+        request: DesktopMentionBatchRequest,
+    ) -> Result<DesktopMentionBatchResponse, String> {
+        let resolver_seed = request
+            .resolver_seed
+            .into_iter()
+            .map(desktop_resolver_seed)
+            .collect::<Vec<_>>();
+        let guard = self.lock_state()?;
+        let mut kinds = Vec::new();
+        let mut kind_indexes = HashMap::new();
+        let mut entity_refs = Vec::new();
+        let mut entity_ref_indexes = HashMap::new();
+        let mut documents = Vec::with_capacity(request.documents.len());
+        let mut resident_documents = Vec::with_capacity(request.documents.len());
+        for document in request.documents {
+            let text_hash = document_text_hash(&document.text);
+            let resident_text = Arc::<str>::from(document.text.as_str());
+            resident_documents.push((text_hash.clone(), resident_text.clone()));
+            let scan = guard
+                .host
+                .scan(ScanRequest {
+                    text: document.text,
+                    scope: ScopeKey::default(),
+                    session_id: Some(SessionId::from("phoenix-ui-discovery-batch")),
+                    resolver_seed: resolver_seed.clone(),
+                })
+                .map_err(|error| error.to_string())?;
+            let mentions = scan
+                .mentions
+                .into_iter()
+                .filter(|mention| mention.source == Some(MentionSource::Discovery))
+                .map(|mention| {
+                    let kind = mention
+                        .kind
+                        .map(desktop_entity_kind)
+                        .map(|kind| intern_batch_string(&kind, &mut kinds, &mut kind_indexes));
+                    let entity_ref =
+                        mention
+                            .entity_ref
+                            .map(desktop_mention_entity_ref)
+                            .map(|entity_ref| {
+                                intern_batch_string(
+                                    &entity_ref,
+                                    &mut entity_refs,
+                                    &mut entity_ref_indexes,
+                                )
+                            });
+                    vec![
+                        mention.range.start as f64,
+                        mention.range.end as f64,
+                        kind.map(|index| index as f64).unwrap_or(-1.0),
+                        entity_ref.map(|index| index as f64).unwrap_or(-1.0),
+                        mention.confidence as f64,
+                        mention.sentence_index as f64,
+                    ]
+                })
+                .collect();
+            documents.push(DesktopMentionBatchResult {
+                document_id: document.document_id,
+                text_hash,
+                mentions,
+            });
+        }
+        drop(guard);
+        let mut coordinator = self
+            .graph_runs
+            .lock()
+            .map_err(|_| "graph run coordinator lock poisoned".to_owned())?;
+        for (text_hash, text) in resident_documents {
+            coordinator.retain_document(text_hash, text);
+        }
+        Ok(DesktopMentionBatchResponse {
+            schema_version: "phoenix-compact-mention-batch/v1",
+            kinds,
+            entity_refs,
+            documents,
+        })
+    }
+
+    async fn open_graph_run(
+        self,
+        request: DesktopGraphRunOpenRequest,
+    ) -> Result<DesktopGraphRunOpenResponse, String> {
+        let resolver_seed = request
+            .resolver_seed
+            .into_iter()
+            .map(desktop_resolver_seed)
+            .collect::<Vec<_>>();
+        let guard = self.lock_state()?;
+        let mut response_documents = Vec::with_capacity(request.documents.len());
+        let mut resident_documents = Vec::with_capacity(request.documents.len());
+        let mut discovery_documents = Vec::with_capacity(request.documents.len());
+        for document in request.documents {
+            let text_hash = document_text_hash(&document.text);
+            let resident_text = Arc::<str>::from(document.text.as_str());
+            let scan = guard
+                .host
+                .scan(ScanRequest {
+                    text: document.text,
+                    scope: ScopeKey::default(),
+                    session_id: Some(SessionId::from("phoenix-graph-run-open")),
+                    resolver_seed: resolver_seed.clone(),
+                })
+                .map_err(|error| error.to_string())?;
+            let mut kinds = Vec::new();
+            let mut kind_indexes = HashMap::new();
+            let mut entity_refs = Vec::new();
+            let mut entity_ref_indexes = HashMap::new();
+            let mut mentions = Vec::new();
+            let mut candidate_states: FastHashMap<String, DiscoveryCandidateState> =
+                FastHashMap::new();
+            for (index, mention) in scan.mentions.into_iter().enumerate() {
+                if mention.source != Some(MentionSource::Discovery) {
+                    continue;
+                }
+                let surface = mention.surface.trim().to_owned();
+                let kind = mention.kind.map(desktop_entity_kind);
+                let entity_ref = mention.entity_ref.map(desktop_mention_entity_ref);
+                let key = normalize_discovery_key(entity_ref.as_deref().unwrap_or(&surface));
+                if !key.is_empty() && !surface.is_empty() {
+                    update_discovery_candidate(
+                        &mut candidate_states,
+                        key,
+                        surface,
+                        kind.as_deref().unwrap_or("UNKNOWN"),
+                        mention.confidence as f64,
+                        index,
+                    );
+                }
+                let kind_index = kind
+                    .as_deref()
+                    .map(|value| intern_batch_string(value, &mut kinds, &mut kind_indexes));
+                let entity_ref_index = entity_ref.as_deref().map(|value| {
+                    intern_batch_string(value, &mut entity_refs, &mut entity_ref_indexes)
+                });
+                mentions.push(vec![
+                    mention.range.start as f64,
+                    mention.range.end as f64,
+                    kind_index.map(|value| value as f64).unwrap_or(-1.0),
+                    entity_ref_index.map(|value| value as f64).unwrap_or(-1.0),
+                    mention.confidence as f64,
+                    mention.sentence_index as f64,
+                ]);
+            }
+            let candidates = finish_discovery_candidates(candidate_states);
+            resident_documents.push((text_hash.clone(), resident_text));
+            discovery_documents.push(ResidentMentionDocument {
+                text_hash: text_hash.clone(),
+                kinds,
+                entity_refs,
+                mentions,
+            });
+            response_documents.push(DesktopGraphRunOpenDocument {
+                document_id: document.document_id,
+                text_hash,
+                candidates,
+            });
+        }
+        drop(guard);
+        let mut coordinator = self
+            .graph_runs
+            .lock()
+            .map_err(|_| "graph run coordinator lock poisoned".to_owned())?;
+        for (text_hash, text) in resident_documents {
+            coordinator.retain_document(text_hash, text);
+        }
+        let run_handle = coordinator.open(ResidentDiscoveryRun {
+            documents: discovery_documents,
+        });
+        Ok(DesktopGraphRunOpenResponse {
+            schema_version: "phoenix-graph-run-open/v1",
+            run_handle,
+            documents: response_documents,
+        })
+    }
+
+    async fn analyze_graph_snapshot(
+        self,
+        mut request: DesktopSnapshotAnalysisRequest,
+    ) -> Result<DesktopGraphRunPage, String> {
+        if request.receipts.is_empty() || request.commits.is_empty() {
+            let config = {
+                let guard = self.lock_state()?;
+                guard.host.config().cloned()
+            };
+            if let Some(durable) = load_durable_promotion_verdict_inputs(config.as_ref())? {
+                if request.receipts.is_empty() {
+                    request.receipts = durable.receipts;
+                }
+                if request.commits.is_empty() {
+                    request.commits = durable.commits;
+                }
+            }
+        }
+        let snapshot_id = request.snapshot.id.to_string();
+        let scope_id = request.snapshot.scope_id.to_string();
+        let requested_run_handle = request.run_handle.clone();
+        let documents = self.resolve_graph_run_documents(&request.documents)?;
+        let section_roots = graph_analysis_section_roots(&request, &documents)?;
+        let identity = graph_analysis_identity(&section_roots);
+        let (reusable, slot) = {
+            let mut coordinator = self
+                .graph_runs
+                .lock()
+                .map_err(|_| "graph run coordinator lock poisoned".to_owned())?;
+            if let Some(content) = coordinator.reusable(&identity)? {
+                (Some(content), None)
+            } else {
+                (None, Some(coordinator.analysis_slot(&identity)?))
+            }
+        };
+        let content = if let Some(content) = reusable {
+            content
+        } else {
+            let slot = slot.expect("analysis slot exists for a cache miss");
+            slot.get_or_init(|| {
+                let analysis = self.analyze_graph_snapshot_request(request, &documents)?;
+                Ok(Arc::new(GraphRunContent {
+                    section_roots,
+                    analysis: Arc::new(analysis),
+                }))
+            })
+            .clone()?
+        };
+        let resident_bytes = graph_run_resident_bytes(content.analysis.as_ref());
+        let mut coordinator = self
+            .graph_runs
+            .lock()
+            .map_err(|_| "graph run coordinator lock poisoned".to_owned())?;
+        let (run_handle, _) = coordinator.lease(
+            &identity,
+            content,
+            resident_bytes,
+            scope_id,
+            snapshot_id.clone(),
+            requested_run_handle.as_deref(),
+        )?;
+        drop(coordinator);
+        self.graph_run_page(&run_handle, 0, GRAPH_RUN_DEFAULT_PAGE_ROWS)
+    }
+
+    async fn read_graph_run_page(
+        self,
+        request: DesktopGraphRunPageRequest,
+    ) -> Result<DesktopGraphRunPage, String> {
+        self.graph_run_page(
+            &request.run_handle,
+            request.offset as usize,
+            request.limit as usize,
+        )
+    }
+
+    async fn persist_graph_run(
+        self,
+        request: DesktopGraphRunPersistRequest,
+    ) -> Result<DesktopGraphRunPersistReceipt, String> {
+        let config = {
+            let guard = self.lock_state()?;
+            guard.host.config().cloned()
+        };
+        let root = desktop_graph_run_store_path(config.as_ref())
+            .ok_or_else(|| "durable graph run storage is unavailable".to_owned())?;
+        let entry = self
+            .graph_runs
+            .lock()
+            .map_err(|_| "graph run coordinator lock poisoned".to_owned())?
+            .get(&request.run_handle)
+            .ok_or_else(|| format!("graph run is closed or expired: {}", request.run_handle))?;
+        let receipt = persist_graph_run_entry(&root, &request.run_handle, entry.as_ref())?;
+        Ok(desktop_durable_graph_run_receipt(receipt))
+    }
+
+    async fn close_graph_run(self, run_handle: String) -> bool {
+        self.graph_runs
+            .lock()
+            .map(|mut coordinator| coordinator.close(&run_handle))
+            .unwrap_or(false)
     }
 
     async fn atlas_rich_scan_json(self, request_json: String) -> Result<String, String> {
@@ -1106,8 +1964,8 @@ impl PhoenixApi for PhoenixApiImpl {
             return serialize_json(&json!({
                 "success": true,
                 "payload": ChunkSemanticBridgeResponse {
-                    schema_version: "phoenix-chunk-semantic-bridge-native-output/v1",
-                    source: "rust",
+                    schema_version: "phoenix-chunk-semantic-bridge-native-output/v1".to_owned(),
+                    source: "rust".to_owned(),
                     candidates: run.candidates,
                     cross_document_certificate: run.cross_document_certificate,
                     quality_gate,
@@ -1143,8 +2001,8 @@ impl PhoenixApi for PhoenixApiImpl {
             return serialize_json(&json!({
                 "success": true,
                 "payload": StoryContinuityResponse {
-                    schema_version: "phoenix-story-continuity-native-output/v1",
-                    source: "rust",
+                    schema_version: "phoenix-story-continuity-native-output/v1".to_owned(),
+                    source: "rust".to_owned(),
                     contract,
                     timing: StoryContinuityTiming {
                         continuity_build_micros,
@@ -1166,8 +2024,8 @@ impl PhoenixApi for PhoenixApiImpl {
             return serialize_json(&json!({
                 "success": true,
                 "payload": MemoryGovernanceResponse {
-                    schema_version: "phoenix-memory-governance-native-output/v1",
-                    source: "rust",
+                    schema_version: "phoenix-memory-governance-native-output/v1".to_owned(),
+                    source: "rust".to_owned(),
                     candidates,
                     timing: MemoryGovernanceTiming {
                         governance_build_micros,
@@ -1205,8 +2063,8 @@ impl PhoenixApi for PhoenixApiImpl {
             return serialize_json(&json!({
                 "success": true,
                 "payload": MemoryGovernanceRetrievalExperimentResponse {
-                    schema_version: "phoenix-memory-governance-retrieval-experiment-native-output/v1",
-                    source: "rust",
+                    schema_version: "phoenix-memory-governance-retrieval-experiment-native-output/v1".to_owned(),
+                    source: "rust".to_owned(),
                     experiment,
                     timing: MemoryGovernanceRetrievalExperimentTiming {
                         governance_build_micros,
@@ -1256,8 +2114,8 @@ impl PhoenixApi for PhoenixApiImpl {
             return serialize_json(&json!({
                 "success": true,
                 "payload": PromotionVerdictResponse {
-                    schema_version: "phoenix-graph-promotion-verdict-native-output/v1",
-                    source: "rust",
+                    schema_version: "phoenix-graph-promotion-verdict-native-output/v1".to_owned(),
+                    source: "rust".to_owned(),
                     certificate,
                     timing: PromotionVerdictTiming {
                         verdict_build_micros,
@@ -1428,6 +2286,291 @@ impl PhoenixApiImpl {
             .map_err(|_| "phoenix desktop state lock poisoned".to_owned())
     }
 
+    fn graph_run_page(
+        &self,
+        run_handle: &str,
+        offset: usize,
+        requested_limit: usize,
+    ) -> Result<DesktopGraphRunPage, String> {
+        let (resident, arena) = {
+            let mut coordinator = self
+                .graph_runs
+                .lock()
+                .map_err(|_| "graph run coordinator lock poisoned".to_owned())?;
+            (coordinator.get(run_handle), coordinator.stats(run_handle))
+        };
+        let durable;
+        let analysis = if let Some(entry) = resident.as_ref() {
+            entry.content.analysis.as_ref()
+        } else {
+            let config = {
+                let guard = self.lock_state()?;
+                guard.host.config().cloned()
+            };
+            let root = desktop_graph_run_store_path(config.as_ref())
+                .ok_or_else(|| format!("graph run is closed or expired: {run_handle}"))?;
+            durable = load_durable_graph_run(&root, run_handle)?
+                .ok_or_else(|| format!("graph run is closed or expired: {run_handle}"))?;
+            &durable
+        };
+        let limit = requested_limit.clamp(1, GRAPH_RUN_MAX_PAGE_ROWS);
+        let projection_started = Instant::now();
+        let (mut projection, detail_rows, returned_detail_rows, max_rows) =
+            project_graph_run_page(analysis, offset, limit);
+        let projection_micros = projection_started.elapsed().as_micros() as f64;
+        if arena.as_ref().is_some_and(|stats| stats.reused) {
+            projection.timing = DesktopSnapshotAnalysisTiming {
+                bridge_build_micros: 0.0,
+                continuity_build_micros: 0.0,
+                governance_build_micros: 0.0,
+                retrieval_build_micros: 0.0,
+                verdict_build_micros: 0.0,
+                total_micros: 0.0,
+            };
+            projection.bridge.timing.bridge_build_micros = 0;
+            projection.bridge.timing.total_micros = 0;
+            projection.continuity.timing.continuity_build_micros = 0;
+            projection.continuity.timing.total_micros = 0;
+            projection.governance.timing.governance_build_micros = 0;
+            projection.governance.timing.total_micros = 0;
+            if let Some(retrieval) = projection.retrieval.as_mut() {
+                retrieval.timing.governance_build_micros = 0;
+                retrieval.timing.experiment_build_micros = 0;
+                retrieval.timing.total_micros = 0;
+            }
+            projection.promotion.timing.verdict_build_micros = 0;
+            projection.promotion.timing.total_micros = 0;
+        }
+        let next_offset = (offset.saturating_add(returned_detail_rows) < max_rows)
+            .then_some(offset.saturating_add(returned_detail_rows) as u32);
+        Ok(DesktopGraphRunPage {
+            schema_version: "phoenix-graph-run-page/v1",
+            source: "rust",
+            run_handle: run_handle.to_owned(),
+            offset: offset as u32,
+            limit: limit as u32,
+            detail_rows: detail_rows as u32,
+            returned_detail_rows: returned_detail_rows as u32,
+            next_offset,
+            arena: arena.map_or_else(
+                || DesktopGraphRunArenaStats {
+                    analysis_identity: "durable".to_owned(),
+                    reused: false,
+                    resident_bytes: 0.0,
+                    active_leases: 0,
+                    projection_micros,
+                },
+                |stats| DesktopGraphRunArenaStats {
+                    analysis_identity: stats.content_id,
+                    reused: stats.reused,
+                    resident_bytes: stats.resident_bytes as f64,
+                    active_leases: count_for_wire(stats.active_leases),
+                    projection_micros,
+                },
+            ),
+            counts: graph_run_counts(analysis),
+            projection,
+        })
+    }
+
+    fn analyze_graph_snapshot_request(
+        &self,
+        request: DesktopSnapshotAnalysisRequest,
+        resolved_documents: &[DocumentChunkInput],
+    ) -> Result<DesktopSnapshotAnalysisResponse, String> {
+        let started = Instant::now();
+        let documents = resolved_documents
+            .iter()
+            .map(|document| ChunkSemanticBridgeSnapshotDocument {
+                note_id: document.note_id.as_str(),
+                text: document.text.as_str(),
+            })
+            .collect::<Vec<_>>();
+
+        let bridge_started = Instant::now();
+        let bridge_run =
+            build_chunk_semantic_bridge_run_from_snapshot(&request.snapshot, &documents);
+        assert_chunk_semantic_bridge_candidate_only(&bridge_run.candidates)
+            .map_err(|error| error.to_string())?;
+        let bridge_build_micros = bridge_started.elapsed().as_micros();
+        let bridge_quality_gate = audit_chunk_semantic_bridge_quality_gate(&bridge_run.candidates);
+
+        let continuity_documents = resolved_documents
+            .iter()
+            .map(|document| StoryContinuityDocument {
+                note_id: document.note_id.as_str().into(),
+                text: document.text.clone(),
+            })
+            .collect::<Vec<_>>();
+        let continuity_started = Instant::now();
+        let continuity_contract = build_story_continuity_contract(StoryContinuityInput {
+            snapshot: &request.snapshot,
+            documents: &continuity_documents,
+            semantic_summary: request.document_semantic_summary.as_ref(),
+            bridge_candidates: &bridge_run.candidates,
+        });
+        assert_story_continuity_candidate_only(&continuity_contract)
+            .map_err(|error| error.to_string())?;
+        let continuity_build_micros = continuity_started.elapsed().as_micros();
+
+        let governance_started = Instant::now();
+        let governance_candidates =
+            build_memory_governance_candidates_from_snapshot(&request.snapshot);
+        assert_memory_governance_candidate_only(&governance_candidates)
+            .map_err(|error| error.to_string())?;
+        let governance_build_micros = governance_started.elapsed().as_micros();
+
+        let retrieval_started = Instant::now();
+        let retrieval_experiment = (!request.retrieval_candidates.is_empty()).then(|| {
+            build_memory_governance_retrieval_weighting_experiment(
+                MemoryGovernanceRetrievalPreviewInput {
+                    retrieval_candidates: &request.retrieval_candidates,
+                    governance_candidates: &governance_candidates,
+                },
+            )
+        });
+        let retrieval_build_micros = retrieval_started.elapsed().as_micros();
+
+        let durable = if request.receipts.is_empty() || request.commits.is_empty() {
+            let config = {
+                let guard = self.lock_state()?;
+                guard.host.config().cloned()
+            };
+            load_durable_promotion_verdict_inputs(config.as_ref())?
+        } else {
+            None
+        };
+        let receipts = if request.receipts.is_empty() {
+            durable
+                .as_ref()
+                .map(|input| input.receipts.as_slice())
+                .unwrap_or_default()
+        } else {
+            request.receipts.as_slice()
+        };
+        let commits = if request.commits.is_empty() {
+            durable
+                .as_ref()
+                .map(|input| input.commits.as_slice())
+                .unwrap_or_default()
+        } else {
+            request.commits.as_slice()
+        };
+        let verdict_started = Instant::now();
+        let verdict_certificate =
+            build_graph_promotion_verdict_certificate(receipts, commits, &request.user_overrides)
+                .map_err(|error| error.to_string())?;
+        if !verdict_certificate.no_topology_writes {
+            return Err("snapshot analysis attempted topology writes".to_owned());
+        }
+        let verdict_build_micros = verdict_started.elapsed().as_micros();
+        let siegel = request.siegel.as_ref().map(run_siegel_finsler_kernel);
+        let total_micros = started.elapsed().as_micros();
+
+        Ok(
+            DesktopSnapshotAnalysisResponse {
+                schema_version: "phoenix-graph-snapshot-analysis-native-output/v1",
+                source: "rust",
+                bridge: ChunkSemanticBridgeResponse {
+                    schema_version: "phoenix-chunk-semantic-bridge-native-output/v1".to_owned(),
+                    source: "rust".to_owned(),
+                    candidates: bridge_run.candidates,
+                    cross_document_certificate: bridge_run.cross_document_certificate,
+                    quality_gate: bridge_quality_gate,
+                    timing: ChunkSemanticBridgeTiming {
+                        bridge_build_micros,
+                        total_micros: bridge_build_micros,
+                    },
+                },
+                continuity: StoryContinuityResponse {
+                    schema_version: "phoenix-story-continuity-native-output/v1".to_owned(),
+                    source: "rust".to_owned(),
+                    contract: continuity_contract,
+                    timing: StoryContinuityTiming {
+                        continuity_build_micros,
+                        total_micros: continuity_build_micros,
+                    },
+                },
+                governance: MemoryGovernanceResponse {
+                    schema_version: "phoenix-memory-governance-native-output/v1".to_owned(),
+                    source: "rust".to_owned(),
+                    candidates: governance_candidates,
+                    timing: MemoryGovernanceTiming {
+                        governance_build_micros,
+                        total_micros: governance_build_micros,
+                    },
+                },
+                retrieval: retrieval_experiment.map(|experiment| {
+                    MemoryGovernanceRetrievalExperimentResponse {
+                        schema_version:
+                            "phoenix-memory-governance-retrieval-experiment-native-output/v1"
+                                .to_owned(),
+                        source: "rust".to_owned(),
+                        experiment,
+                        timing: MemoryGovernanceRetrievalExperimentTiming {
+                            governance_build_micros: 0,
+                            experiment_build_micros: retrieval_build_micros,
+                            total_micros: retrieval_build_micros,
+                        },
+                    }
+                }),
+                promotion: PromotionVerdictResponse {
+                    schema_version: "phoenix-graph-promotion-verdict-native-output/v1".to_owned(),
+                    source: "rust".to_owned(),
+                    certificate: verdict_certificate,
+                    timing: PromotionVerdictTiming {
+                        verdict_build_micros,
+                        total_micros: verdict_build_micros,
+                    },
+                },
+                siegel,
+                no_topology_writes: true,
+                timing: DesktopSnapshotAnalysisTiming {
+                    bridge_build_micros: bridge_build_micros as f64,
+                    continuity_build_micros: continuity_build_micros as f64,
+                    governance_build_micros: governance_build_micros as f64,
+                    retrieval_build_micros: retrieval_build_micros as f64,
+                    verdict_build_micros: verdict_build_micros as f64,
+                    total_micros: total_micros as f64,
+                },
+            },
+        )
+    }
+
+    fn resolve_graph_run_documents(
+        &self,
+        documents: &[DesktopSnapshotAnalysisDocument],
+    ) -> Result<Vec<DocumentChunkInput>, String> {
+        let coordinator = self
+            .graph_runs
+            .lock()
+            .map_err(|_| "graph run coordinator lock poisoned".to_owned())?;
+        documents
+            .iter()
+            .map(|document| {
+                let text = match (&document.text, &document.text_hash) {
+                    (Some(text), _) => text.clone(),
+                    (None, Some(text_hash)) => coordinator
+                        .document(text_hash)
+                        .map(|text| text.to_string())
+                        .ok_or_else(|| {
+                            format!("resident graph document is unavailable: {text_hash}")
+                        })?,
+                    (None, None) => {
+                        return Err(format!(
+                            "graph analysis document has neither text nor textHash: {}",
+                            document.note_id
+                        ));
+                    }
+                };
+                Ok(DocumentChunkInput {
+                    note_id: document.note_id.clone(),
+                    text,
+                })
+            })
+            .collect()
+    }
+
     fn with_host_json<Request, Response, F>(
         &self,
         request_json: String,
@@ -1445,6 +2588,812 @@ impl PhoenixApiImpl {
         let guard = self.lock_state()?;
         let response = op(&guard.host, request).map_err(|error| error.to_string())?;
         serialize_json(&response)
+    }
+}
+
+fn project_graph_run_page(
+    analysis: &DesktopSnapshotAnalysisResponse,
+    offset: usize,
+    limit: usize,
+) -> (DesktopSnapshotAnalysisResponse, usize, usize, usize) {
+    let mut page = GraphRunPageCursor::new(offset, limit);
+    let bridge = &analysis.bridge;
+    let cross_document = &bridge.cross_document_certificate;
+    let projected_bridge = ChunkSemanticBridgeResponse {
+        schema_version: bridge.schema_version.clone(),
+        source: bridge.source.clone(),
+        candidates: page.take(&bridge.candidates),
+        cross_document_certificate: CrossDocumentBridgeRunCertificate {
+            schema_version: cross_document.schema_version.clone(),
+            source_document_ids: cross_document.source_document_ids.clone(),
+            generated_candidates: cross_document.generated_candidates,
+            eligible_candidates: cross_document.eligible_candidates,
+            selected_candidates: cross_document.selected_candidates,
+            rejected_candidates: cross_document.rejected_candidates,
+            pair_coverage: page.take(&cross_document.pair_coverage),
+            rejection_counts: cross_document.rejection_counts.clone(),
+            selected_rows: page.take(&cross_document.selected_rows),
+            rejected_rows: page.take(&cross_document.rejected_rows),
+            weakest_rows: page.take(&cross_document.weakest_rows),
+            no_topology_writes: cross_document.no_topology_writes,
+            invariant_receipts: cross_document.invariant_receipts.clone(),
+        },
+        quality_gate: bridge.quality_gate.clone(),
+        timing: bridge.timing.clone(),
+    };
+
+    let continuity = &analysis.continuity;
+    let contract = &continuity.contract;
+    let projected_continuity = StoryContinuityResponse {
+        schema_version: continuity.schema_version.clone(),
+        source: continuity.source.clone(),
+        contract: StoryContinuityContract {
+            schema_version: contract.schema_version.clone(),
+            source: contract.source.clone(),
+            source_snapshot_id: contract.source_snapshot_id.clone(),
+            generated_at: contract.generated_at,
+            commit_policy: contract.commit_policy.clone(),
+            no_topology_commit: contract.no_topology_commit,
+            events: page.take(&contract.events),
+            boundary_receipts: page.take(&contract.boundary_receipts),
+            episodes: page.take(&contract.episodes),
+            temporal_candidates: page.take(&contract.temporal_candidates),
+            state_intervals: page.take(&contract.state_intervals),
+            causal_candidates: page.take(&contract.causal_candidates),
+            episode_connections: page.take(&contract.episode_connections),
+            conflicts: page.take(&contract.conflicts),
+            certificate: contract.certificate.clone(),
+        },
+        timing: continuity.timing.clone(),
+    };
+
+    let governance = &analysis.governance;
+    let projected_governance = MemoryGovernanceResponse {
+        schema_version: governance.schema_version.clone(),
+        source: governance.source.clone(),
+        candidates: page.take(&governance.candidates),
+        timing: governance.timing.clone(),
+    };
+    let projected_retrieval = analysis.retrieval.as_ref().map(|retrieval| {
+        let variants = retrieval
+            .experiment
+            .variants
+            .iter()
+            .map(|variant| MemoryGovernanceRetrievalWeightingVariant {
+                policy: variant.policy.clone(),
+                summary: variant.summary.clone(),
+                full_row_proof: MemoryGovernanceRetrievalFullRowProof {
+                    row_count: variant.full_row_proof.row_count,
+                    no_topology_rows: variant.full_row_proof.no_topology_rows,
+                    compression_dominance: MemoryGovernanceCompressionDominanceProof {
+                        passed: variant.full_row_proof.compression_dominance.passed,
+                        compressed_rows: variant
+                            .full_row_proof
+                            .compression_dominance
+                            .compressed_rows,
+                        policy_rows: variant.full_row_proof.compression_dominance.policy_rows,
+                        bounded_rows: variant.full_row_proof.compression_dominance.bounded_rows,
+                        max_positive_delta: variant
+                            .full_row_proof
+                            .compression_dominance
+                            .max_positive_delta,
+                        max_adjusted_score: variant
+                            .full_row_proof
+                            .compression_dominance
+                            .max_adjusted_score,
+                        violation_count: variant
+                            .full_row_proof
+                            .compression_dominance
+                            .violation_count,
+                        violations: page
+                            .take(&variant.full_row_proof.compression_dominance.violations),
+                    },
+                },
+                top_rows: page.take(&variant.top_rows),
+                mean_abs_rank_delta_millis: variant.mean_abs_rank_delta_millis,
+                retained_mean_score_delta_millis: variant.retained_mean_score_delta_millis,
+                compressed_mean_score_delta_millis: variant.compressed_mean_score_delta_millis,
+                attenuated_mean_score_delta_millis: variant.attenuated_mean_score_delta_millis,
+            })
+            .collect();
+        MemoryGovernanceRetrievalExperimentResponse {
+            schema_version: retrieval.schema_version.clone(),
+            source: retrieval.source.clone(),
+            experiment: MemoryGovernanceRetrievalWeightingExperiment {
+                schema_version: retrieval.experiment.schema_version.clone(),
+                baseline_policy_id: retrieval.experiment.baseline_policy_id.clone(),
+                variants,
+                no_topology_commit: retrieval.experiment.no_topology_commit,
+            },
+            timing: retrieval.timing.clone(),
+        }
+    });
+
+    let promotion = &analysis.promotion;
+    let certificate = &promotion.certificate;
+    let projected_promotion = PromotionVerdictResponse {
+        schema_version: promotion.schema_version.clone(),
+        source: promotion.source.clone(),
+        certificate: GraphPromotionVerdictCertificate {
+            schema_version: certificate.schema_version.clone(),
+            source: certificate.source.clone(),
+            no_topology_writes: certificate.no_topology_writes,
+            receipt_count: certificate.receipt_count,
+            commit_count: certificate.commit_count,
+            audit: certificate.audit.clone(),
+            rows: page.take(&certificate.rows),
+        },
+        timing: promotion.timing.clone(),
+    };
+
+    let projection = DesktopSnapshotAnalysisResponse {
+        schema_version: analysis.schema_version,
+        source: analysis.source,
+        bridge: projected_bridge,
+        continuity: projected_continuity,
+        governance: projected_governance,
+        retrieval: projected_retrieval,
+        promotion: projected_promotion,
+        siegel: analysis.siegel.clone(),
+        no_topology_writes: analysis.no_topology_writes,
+        timing: analysis.timing.clone(),
+    };
+    (projection, page.seen, page.returned, page.seen)
+}
+
+struct GraphRunPageCursor {
+    offset: usize,
+    limit: usize,
+    seen: usize,
+    returned: usize,
+}
+
+impl GraphRunPageCursor {
+    fn new(offset: usize, limit: usize) -> Self {
+        Self {
+            offset,
+            limit,
+            seen: 0,
+            returned: 0,
+        }
+    }
+
+    fn take<T: Clone>(&mut self, rows: &[T]) -> Vec<T> {
+        let family_start = self.seen;
+        self.seen = self.seen.saturating_add(rows.len());
+        if self.returned >= self.limit || self.offset >= self.seen {
+            return Vec::new();
+        }
+        let start = self.offset.saturating_sub(family_start).min(rows.len());
+        let remaining = self.limit.saturating_sub(self.returned);
+        let selected = rows
+            .iter()
+            .skip(start)
+            .take(remaining)
+            .cloned()
+            .collect::<Vec<_>>();
+        self.returned = self.returned.saturating_add(selected.len());
+        selected
+    }
+}
+
+fn graph_run_counts(analysis: &DesktopSnapshotAnalysisResponse) -> DesktopGraphRunCounts {
+    let mut bridge_by_type = BTreeMap::new();
+    for candidate in &analysis.bridge.candidates {
+        *bridge_by_type
+            .entry(candidate.bridge_type.as_str().to_owned())
+            .or_insert(0) += 1;
+    }
+    let mut governance_by_action = BTreeMap::new();
+    for candidate in &analysis.governance.candidates {
+        *governance_by_action
+            .entry(candidate.action.as_str().to_owned())
+            .or_insert(0) += 1;
+    }
+    DesktopGraphRunCounts {
+        bridge_candidates: analysis.bridge.candidates.len() as u32,
+        bridge_by_type,
+        cross_document_pair_coverage: count_for_wire(
+            analysis
+                .bridge
+                .cross_document_certificate
+                .pair_coverage
+                .len(),
+        ),
+        cross_document_selected: count_for_wire(
+            analysis
+                .bridge
+                .cross_document_certificate
+                .selected_rows
+                .len(),
+        ),
+        cross_document_rejected: count_for_wire(
+            analysis
+                .bridge
+                .cross_document_certificate
+                .rejected_rows
+                .len(),
+        ),
+        cross_document_weakest: count_for_wire(
+            analysis
+                .bridge
+                .cross_document_certificate
+                .weakest_rows
+                .len(),
+        ),
+        promotion_rows: count_for_wire(analysis.promotion.certificate.rows.len()),
+        continuity_events: count_for_wire(analysis.continuity.contract.events.len()),
+        continuity_boundaries: count_for_wire(analysis.continuity.contract.boundary_receipts.len()),
+        continuity_episodes: count_for_wire(analysis.continuity.contract.episodes.len()),
+        continuity_temporal: count_for_wire(analysis.continuity.contract.temporal_candidates.len()),
+        continuity_states: count_for_wire(analysis.continuity.contract.state_intervals.len()),
+        continuity_causal: count_for_wire(analysis.continuity.contract.causal_candidates.len()),
+        continuity_connections: count_for_wire(
+            analysis.continuity.contract.episode_connections.len(),
+        ),
+        continuity_conflicts: count_for_wire(analysis.continuity.contract.conflicts.len()),
+        governance_candidates: analysis.governance.candidates.len() as u32,
+        governance_by_action,
+        retrieval_top_rows: count_for_wire(analysis.retrieval.as_ref().map_or(0, |retrieval| {
+            retrieval
+                .experiment
+                .variants
+                .iter()
+                .map(|variant| variant.top_rows.len())
+                .sum()
+        })),
+        retrieval_violations: count_for_wire(analysis.retrieval.as_ref().map_or(0, |retrieval| {
+            retrieval
+                .experiment
+                .variants
+                .iter()
+                .map(|variant| {
+                    variant
+                        .full_row_proof
+                        .compression_dominance
+                        .violations
+                        .len()
+                })
+                .sum()
+        })),
+    }
+}
+
+fn graph_run_resident_bytes(analysis: &DesktopSnapshotAnalysisResponse) -> usize {
+    let continuity = &analysis.continuity.contract;
+    let mut rows = analysis.bridge.candidates.len()
+        + analysis
+            .bridge
+            .cross_document_certificate
+            .selected_rows
+            .len()
+        + analysis
+            .bridge
+            .cross_document_certificate
+            .rejected_rows
+            .len()
+        + analysis
+            .bridge
+            .cross_document_certificate
+            .weakest_rows
+            .len()
+        + analysis.promotion.certificate.rows.len()
+        + continuity.events.len()
+        + continuity.boundary_receipts.len()
+        + continuity.episodes.len()
+        + continuity.temporal_candidates.len()
+        + continuity.state_intervals.len()
+        + continuity.causal_candidates.len()
+        + continuity.episode_connections.len()
+        + continuity.conflicts.len()
+        + analysis.governance.candidates.len();
+    if let Some(retrieval) = analysis.retrieval.as_ref() {
+        for variant in &retrieval.experiment.variants {
+            rows = rows.saturating_add(variant.top_rows.len()).saturating_add(
+                variant
+                    .full_row_proof
+                    .compression_dominance
+                    .violations
+                    .len(),
+            );
+        }
+    }
+    std::mem::size_of_val(analysis)
+        .saturating_add(4 * 1024)
+        .saturating_add(rows.saturating_mul(512))
+}
+
+struct DiscoveryCandidateState {
+    key: String,
+    token: String,
+    kind: String,
+    score: f64,
+    count: u32,
+    surfaces: FastHashMap<String, (u32, usize)>,
+}
+
+fn normalize_discovery_key(value: &str) -> String {
+    value
+        .split_whitespace()
+        .collect::<Vec<_>>()
+        .join(" ")
+        .to_lowercase()
+}
+
+fn update_discovery_candidate(
+    states: &mut FastHashMap<String, DiscoveryCandidateState>,
+    key: String,
+    surface: String,
+    kind: &str,
+    score: f64,
+    index: usize,
+) {
+    let state = states
+        .entry(key.clone())
+        .or_insert_with(|| DiscoveryCandidateState {
+            key,
+            token: surface.clone(),
+            kind: kind.to_owned(),
+            score,
+            count: 0,
+            surfaces: FastHashMap::new(),
+        });
+    state.count += 1;
+    state.score = state.score.max(score);
+    if state.kind == "UNKNOWN" && kind != "UNKNOWN" {
+        state.kind = kind.to_owned();
+    }
+    let stats = state.surfaces.entry(surface).or_insert((0, index));
+    stats.0 += 1;
+    if let Some((preferred, _)) = state.surfaces.iter().max_by(|left, right| {
+        left.1
+             .0
+            .cmp(&right.1 .0)
+            .then_with(|| left.0.len().cmp(&right.0.len()))
+            .then_with(|| right.1 .1.cmp(&left.1 .1))
+    }) {
+        state.token.clone_from(preferred);
+    }
+}
+
+fn finish_discovery_candidates(
+    states: FastHashMap<String, DiscoveryCandidateState>,
+) -> Vec<DesktopDiscoveryCandidate> {
+    let mut candidates = states
+        .into_values()
+        .map(|state| DesktopDiscoveryCandidate {
+            key: state.key,
+            token: state.token,
+            kind: state.kind,
+            score: state.score,
+            count: state.count,
+            status: 0,
+        })
+        .collect::<Vec<_>>();
+    candidates.sort_by(|left, right| {
+        right
+            .count
+            .cmp(&left.count)
+            .then_with(|| right.score.total_cmp(&left.score))
+            .then_with(|| left.token.cmp(&right.token))
+    });
+    candidates
+}
+
+fn intern_batch_string(
+    value: &str,
+    values: &mut Vec<String>,
+    indexes: &mut HashMap<String, u32>,
+) -> u32 {
+    if let Some(index) = indexes.get(value) {
+        return *index;
+    }
+    let index = values.len() as u32;
+    let owned = value.to_owned();
+    values.push(owned.clone());
+    indexes.insert(owned, index);
+    index
+}
+
+fn document_text_hash(text: &str) -> String {
+    let mut hasher = std::collections::hash_map::DefaultHasher::new();
+    text.as_bytes().hash(&mut hasher);
+    format!("text:{:016x}", hasher.finish())
+}
+
+fn graph_analysis_section_roots(
+    request: &DesktopSnapshotAnalysisRequest,
+    documents: &[DocumentChunkInput],
+) -> Result<BTreeMap<String, String>, String> {
+    let snapshot_content = graph_snapshot_dependency_digest(&request.snapshot);
+    let mut hasher = blake3::Hasher::new();
+    graph_digest_part(&mut hasher, b"phoenix-graph-analysis-core/v1");
+    graph_digest_part(&mut hasher, snapshot_content.as_bytes());
+    graph_digest_part(&mut hasher, request.snapshot.scope_id.as_bytes());
+    for document in documents {
+        graph_digest_part(&mut hasher, document.note_id.as_bytes());
+        graph_digest_part(&mut hasher, document_text_hash(&document.text).as_bytes());
+    }
+    let core = format!("b3-{}", hasher.finalize().to_hex());
+    let semantic = dependency_json(&request.document_semantic_summary)?;
+    let retrieval_inputs = dependency_json(&request.retrieval_candidates)?;
+    let promotion = promotion_dependency_digest(
+        &snapshot_content,
+        &request.receipts,
+        &request.commits,
+        &request.user_overrides,
+    )?;
+    let siegel = dependency_json(&request.siegel)?;
+    let governance = dependency_digest("governance", &[snapshot_content.as_bytes()]);
+    Ok(BTreeMap::from([
+        ("bridge".to_owned(), core.clone()),
+        (
+            "continuity".to_owned(),
+            dependency_digest("continuity", &[core.as_bytes(), semantic.as_bytes()]),
+        ),
+        ("governance".to_owned(), governance.clone()),
+        (
+            "retrieval".to_owned(),
+            dependency_digest(
+                "retrieval",
+                &[governance.as_bytes(), retrieval_inputs.as_bytes()],
+            ),
+        ),
+        ("promotion".to_owned(), promotion),
+        ("siegel".to_owned(), siegel),
+        (
+            "metadata".to_owned(),
+            dependency_digest("metadata", &[b"candidate-only"]),
+        ),
+    ]))
+}
+
+fn graph_analysis_identity(section_roots: &BTreeMap<String, String>) -> GraphAnalysisIdentity {
+    let mut canonical = Vec::with_capacity(512);
+    push_graph_identity_part(
+        &mut canonical,
+        b"phoenix-graph-analysis-content-identity/v1",
+    );
+    push_graph_identity_part(
+        &mut canonical,
+        b"phoenix-graph-snapshot-analysis-native-output/v1",
+    );
+    for (name, root) in section_roots {
+        push_graph_identity_part(&mut canonical, name.as_bytes());
+        push_graph_identity_part(&mut canonical, root.as_bytes());
+    }
+    let digest = format!("b3-{}", blake3::hash(&canonical).to_hex());
+    GraphAnalysisIdentity {
+        digest,
+        canonical: Arc::from(canonical),
+    }
+}
+
+fn push_graph_identity_part(target: &mut Vec<u8>, bytes: &[u8]) {
+    target.extend_from_slice(&(bytes.len() as u64).to_le_bytes());
+    target.extend_from_slice(bytes);
+}
+
+fn graph_snapshot_dependency_digest(snapshot: &GraphRebuildSnapshot) -> String {
+    let mut hasher = blake3::Hasher::new();
+    graph_digest_part(&mut hasher, b"phoenix-graph-snapshot-semantic-content/v1");
+    graph_digest_part(&mut hasher, snapshot.schema_version.as_bytes());
+    graph_digest_part(&mut hasher, snapshot.scope_id.as_bytes());
+    macro_rules! text {
+        ($value:expr) => {
+            graph_digest_part(&mut hasher, $value.as_bytes())
+        };
+    }
+    macro_rules! float {
+        ($value:expr) => {
+            graph_digest_part(&mut hasher, &$value.to_bits().to_le_bytes())
+        };
+    }
+    for row in &snapshot.chunks {
+        text!(row.id);
+        text!(row.note_id);
+        graph_digest_part(&mut hasher, &row.start.to_le_bytes());
+        graph_digest_part(&mut hasher, &row.end.to_le_bytes());
+    }
+    for row in &snapshot.mentions {
+        text!(row.id);
+        text!(row.note_id);
+        text!(row.surface);
+        graph_digest_part(&mut hasher, &row.source_start.to_le_bytes());
+        graph_digest_part(&mut hasher, &row.source_end.to_le_bytes());
+        if let Some(id) = &row.entity_id {
+            text!(id.0);
+        }
+        text!(row.status);
+        float!(row.confidence);
+    }
+    for row in &snapshot.entity_anchors {
+        text!(row.id);
+        text!(row.entity_id.0);
+        text!(row.note_id);
+        graph_digest_part(&mut hasher, &row.source_start.to_le_bytes());
+        graph_digest_part(&mut hasher, &row.source_end.to_le_bytes());
+        float!(row.confidence);
+    }
+    for row in &snapshot.relationships {
+        text!(row.id);
+        text!(row.source_entity_id.0);
+        text!(row.target_entity_id.0);
+        text!(row.relation_type);
+        text!(row.status);
+        float!(row.confidence);
+    }
+    for row in &snapshot.events {
+        text!(row.id);
+        text!(row.note_id);
+        text!(row.label);
+        for id in &row.entity_ids {
+            text!(id.0);
+        }
+        for id in &row.evidence_anchor_ids {
+            text!(id);
+        }
+        float!(row.confidence);
+    }
+    for row in &snapshot.episodes {
+        text!(row.id);
+        text!(row.note_id);
+        text!(row.label);
+        for id in &row.event_ids {
+            text!(id);
+        }
+        for id in &row.entity_ids {
+            text!(id.0);
+        }
+    }
+    for row in snapshot.temporal_edges.iter().chain(&snapshot.causal_edges) {
+        text!(row.id);
+        text!(row.source_id);
+        text!(row.target_id);
+        text!(row.relation_type);
+        for id in &row.evidence_ids {
+            text!(id);
+        }
+        float!(row.confidence);
+    }
+    for row in &snapshot.memory_state {
+        text!(row.id);
+        text!(row.entity_id.0);
+        text!(row.key);
+        text!(row.value);
+        for id in &row.evidence_ids {
+            text!(id);
+        }
+    }
+    for row in &snapshot.embedding_targets {
+        text!(row.id);
+        text!(row.kind);
+        text!(row.source_id);
+        text!(row.label);
+        text!(row.text);
+        for id in &row.evidence_ids {
+            text!(id);
+        }
+        for id in &row.parent_ids {
+            text!(id);
+        }
+    }
+    for row in &snapshot.nodes {
+        text!(row.id.0);
+        text!(row.label);
+        text!(row.kind);
+        for id in &row.anchor_ids {
+            text!(id);
+        }
+        for id in &row.note_ids {
+            text!(id);
+        }
+    }
+    for row in &snapshot.edges {
+        text!(row.id);
+        text!(row.source_id.0);
+        text!(row.target_id.0);
+        text!(row.edge_type);
+        graph_digest_part(&mut hasher, &row.weight.to_le_bytes());
+        float!(row.confidence);
+        for id in &row.evidence_anchor_ids {
+            text!(id);
+        }
+    }
+    format!("b3-{}", hasher.finalize().to_hex())
+}
+
+fn promotion_dependency_digest(
+    snapshot_content: &str,
+    receipts: &[GraphProposalBatchReceipt],
+    commits: &[GraphTruthCommit],
+    overrides: &[GraphPromotionUserOverride],
+) -> Result<String, String> {
+    let mut hasher = blake3::Hasher::new();
+    graph_digest_part(&mut hasher, b"phoenix-graph-promotion-dependency/v1");
+    graph_digest_part(&mut hasher, snapshot_content.as_bytes());
+    let receipts = serde_json::to_vec(receipts)
+        .map_err(|error| format!("hash promotion receipts: {error}"))?;
+    graph_digest_part(&mut hasher, &receipts);
+    for commit in commits {
+        graph_digest_part(&mut hasher, commit.commit_id().as_bytes());
+    }
+    let overrides = serde_json::to_vec(overrides)
+        .map_err(|error| format!("hash promotion overrides: {error}"))?;
+    graph_digest_part(&mut hasher, &overrides);
+    Ok(format!("b3-{}", hasher.finalize().to_hex()))
+}
+
+fn dependency_json<T: Serialize>(value: &T) -> Result<String, String> {
+    let bytes = serde_json::to_vec(value)
+        .map_err(|error| format!("hash graph analysis dependency: {error}"))?;
+    Ok(dependency_digest("json", &[&bytes]))
+}
+
+fn dependency_digest(domain: &str, parts: &[&[u8]]) -> String {
+    let mut hasher = blake3::Hasher::new();
+    graph_digest_part(&mut hasher, b"phoenix-graph-analysis-dependency/v1");
+    graph_digest_part(&mut hasher, domain.as_bytes());
+    for part in parts {
+        graph_digest_part(&mut hasher, part);
+    }
+    format!("b3-{}", hasher.finalize().to_hex())
+}
+
+fn graph_digest_part(hasher: &mut blake3::Hasher, bytes: &[u8]) {
+    hasher.update(&(bytes.len() as u64).to_le_bytes());
+    hasher.update(bytes);
+}
+
+fn desktop_graph_run_store_path(
+    config: Option<&phoenix_native::PhoenixNativeConfig>,
+) -> Option<PathBuf> {
+    let config = config?;
+    if config.runtime.target != RuntimeTarget::Native
+        || config.runtime.storage == StorageMode::NativeEphemeral
+    {
+        return None;
+    }
+    if let Some(path) = &config.storage_path {
+        return Some(path.join("graph-runs"));
+    }
+    platform_data_dir().map(|path| path.join("Phoenix Desktop").join("graph-runs"))
+}
+
+fn persist_graph_run_entry(
+    root: &std::path::Path,
+    run_handle: &str,
+    entry: &GraphRunEntry,
+) -> Result<DurableGraphRunReceipt, String> {
+    let mut transaction = GraphRunStoreTxn::open(
+        root.to_path_buf(),
+        run_handle,
+        &entry.scope_id,
+        &entry.snapshot_id,
+    )?;
+    macro_rules! persist {
+        ($name:literal, $rows:expr, $value:expr) => {{
+            let root = entry
+                .content
+                .section_roots
+                .get($name)
+                .ok_or_else(|| format!("graph run section dependency is missing: {}", $name))?;
+            let dependencies = vec![root.clone()];
+            transaction.persist_section(
+                $name,
+                section_identity(root, $name, &dependencies),
+                $rows,
+                dependencies,
+                $value,
+            )?;
+        }};
+    }
+    let analysis = entry.content.analysis.as_ref();
+    persist!("bridge", analysis.bridge.candidates.len(), &analysis.bridge);
+    persist!(
+        "continuity",
+        analysis.continuity.contract.events.len()
+            + analysis.continuity.contract.episodes.len()
+            + analysis.continuity.contract.temporal_candidates.len()
+            + analysis.continuity.contract.causal_candidates.len()
+            + analysis.continuity.contract.conflicts.len(),
+        &analysis.continuity
+    );
+    persist!(
+        "governance",
+        analysis.governance.candidates.len(),
+        &analysis.governance
+    );
+    persist!(
+        "retrieval",
+        analysis
+            .retrieval
+            .as_ref()
+            .map_or(0, |row| row.experiment.variants.len()),
+        &analysis.retrieval
+    );
+    persist!(
+        "promotion",
+        analysis.promotion.certificate.rows.len(),
+        &analysis.promotion
+    );
+    persist!(
+        "siegel",
+        usize::from(analysis.siegel.is_some()),
+        &analysis.siegel
+    );
+    let metadata = DurableAnalysisMetadata {
+        schema_version: analysis.schema_version.to_owned(),
+        source: analysis.source.to_owned(),
+        no_topology_writes: analysis.no_topology_writes,
+    };
+    persist!("metadata", 1, &metadata);
+    transaction.commit()
+}
+
+fn load_durable_graph_run(
+    root: &std::path::Path,
+    run_handle: &str,
+) -> Result<Option<DesktopSnapshotAnalysisResponse>, String> {
+    let Some(manifest) = load_manifest_for_handle(root, run_handle)? else {
+        return Ok(None);
+    };
+    fn decode<T: DeserializeOwned>(
+        root: &std::path::Path,
+        manifest: &crate::graph_run_store::DurableGraphRunManifest,
+        name: &str,
+    ) -> Result<T, String> {
+        let section = manifest
+            .sections
+            .get(name)
+            .ok_or_else(|| format!("durable graph run section is missing: {name}"))?;
+        let bytes = load_section(root, section)?;
+        serde_json::from_slice(&bytes)
+            .map_err(|error| format!("decode durable graph run section {name}: {error}"))
+    }
+    let metadata: DurableAnalysisMetadata = decode(root, &manifest, "metadata")?;
+    if metadata.schema_version != "phoenix-graph-snapshot-analysis-native-output/v1"
+        || metadata.source != "rust"
+    {
+        return Err("durable graph run metadata contract mismatch".to_owned());
+    }
+    Ok(Some(DesktopSnapshotAnalysisResponse {
+        schema_version: "phoenix-graph-snapshot-analysis-native-output/v1",
+        source: "rust",
+        bridge: decode(root, &manifest, "bridge")?,
+        continuity: decode(root, &manifest, "continuity")?,
+        governance: decode(root, &manifest, "governance")?,
+        retrieval: decode(root, &manifest, "retrieval")?,
+        promotion: decode(root, &manifest, "promotion")?,
+        siegel: decode(root, &manifest, "siegel")?,
+        no_topology_writes: metadata.no_topology_writes,
+        timing: DesktopSnapshotAnalysisTiming {
+            bridge_build_micros: 0.0,
+            continuity_build_micros: 0.0,
+            governance_build_micros: 0.0,
+            retrieval_build_micros: 0.0,
+            verdict_build_micros: 0.0,
+            total_micros: 0.0,
+        },
+    }))
+}
+
+fn desktop_durable_graph_run_receipt(
+    receipt: DurableGraphRunReceipt,
+) -> DesktopGraphRunPersistReceipt {
+    DesktopGraphRunPersistReceipt {
+        schema_version: receipt.schema_version,
+        run_handle: receipt.run_handle,
+        scope_id: receipt.scope_id,
+        snapshot_id: receipt.snapshot_id,
+        manifest_id: receipt.manifest_id,
+        committed_at: receipt.committed_at as f64,
+        changed_sections: receipt.changed_sections,
+        reused_sections: receipt.reused_sections,
+        encoded_sections: receipt.encoded_sections,
+        compressed_sections: receipt.compressed_sections,
+        raw_bytes_written: receipt.raw_bytes_written as f64,
+        compressed_bytes_written: receipt.compressed_bytes_written as f64,
     }
 }
 
@@ -4499,6 +6448,60 @@ fn serialize_json<T: Serialize>(value: &T) -> Result<String, String> {
         .map_err(|error| format!("failed to serialize Phoenix result: {error}"))
 }
 
+fn desktop_resolver_seed(seed: DesktopMentionBatchResolverSeed) -> ResolverEntitySeed {
+    ResolverEntitySeed {
+        entity_id: EntityId::from(seed.entity_id),
+        canonical_name: seed.canonical_name,
+        aliases: seed.aliases,
+        kind: seed.kind.as_deref().and_then(parse_desktop_entity_kind),
+        gender: None,
+        number: None,
+        scope: ScopeKey {
+            world_id: seed.scope.world_id,
+            narrative_id: seed.scope.narrative_id,
+            folder_id: seed.scope.folder_id,
+            folder_path: seed.scope.folder_path,
+        },
+    }
+}
+
+fn parse_desktop_entity_kind(kind: &str) -> Option<EntityKind> {
+    match kind.to_ascii_lowercase().as_str() {
+        "character" => Some(EntityKind::Character),
+        "location" => Some(EntityKind::Location),
+        "npc" => Some(EntityKind::Npc),
+        "item" => Some(EntityKind::Item),
+        "faction" => Some(EntityKind::Faction),
+        "organization" => Some(EntityKind::Organization),
+        "event" => Some(EntityKind::Event),
+        "concept" => Some(EntityKind::Concept),
+        "other" => Some(EntityKind::Other),
+        _ => None,
+    }
+}
+
+fn desktop_entity_kind(kind: EntityKind) -> String {
+    match kind {
+        EntityKind::Character => "character",
+        EntityKind::Location => "location",
+        EntityKind::Npc => "npc",
+        EntityKind::Item => "item",
+        EntityKind::Faction => "faction",
+        EntityKind::Organization => "organization",
+        EntityKind::Event => "event",
+        EntityKind::Concept => "concept",
+        EntityKind::Other => "other",
+    }
+    .to_owned()
+}
+
+fn desktop_mention_entity_ref(entity_ref: MentionEntityRef) -> String {
+    match entity_ref {
+        MentionEntityRef::Known(entity_id) => entity_id.0,
+        MentionEntityRef::Speculative(key) => key,
+    }
+}
+
 fn compressed_json_payload<T: Serialize>(
     value: &T,
     schema_version: &str,
@@ -4528,6 +6531,85 @@ mod tests {
     use super::*;
 
     #[test]
+    fn graph_run_page_cursor_spans_families_without_duplicates() {
+        let mut first = GraphRunPageCursor::new(1, 4);
+        assert_eq!(first.take(&[0, 1]), vec![1]);
+        assert_eq!(first.take(&[2, 3, 4]), vec![2, 3, 4]);
+        assert!(first.take(&[5, 6]).is_empty());
+        assert_eq!(first.returned, 4);
+        assert_eq!(first.seen, 7);
+
+        let mut second = GraphRunPageCursor::new(5, 4);
+        assert!(second.take(&[0, 1]).is_empty());
+        assert!(second.take(&[2, 3, 4]).is_empty());
+        assert_eq!(second.take(&[5, 6]), vec![5, 6]);
+        assert_eq!(second.returned, 2);
+    }
+
+    #[test]
+    fn graph_analysis_identity_is_content_addressed_and_domain_separated() {
+        let roots = BTreeMap::from([
+            ("bridge".to_owned(), "b3-bridge".to_owned()),
+            ("promotion".to_owned(), "b3-promotion".to_owned()),
+        ]);
+        let same = graph_analysis_identity(&roots);
+        let mut changed = roots.clone();
+        changed.insert("promotion".to_owned(), "b3-other".to_owned());
+        let changed = graph_analysis_identity(&changed);
+
+        assert_eq!(same, graph_analysis_identity(&roots));
+        assert_ne!(same.digest, changed.digest);
+        assert_ne!(same.canonical, changed.canonical);
+    }
+
+    #[test]
+    fn concurrent_identical_analysis_claims_share_one_build_slot() {
+        let identity = graph_analysis_identity(&BTreeMap::from([(
+            "bridge".to_owned(),
+            "b3-bridge".to_owned(),
+        )]));
+        let mut coordinator = GraphRunCoordinator::default();
+
+        let first = coordinator.analysis_slot(&identity).unwrap();
+        let second = coordinator.analysis_slot(&identity).unwrap();
+
+        assert!(Arc::ptr_eq(&first, &second));
+    }
+
+    #[test]
+    fn graph_analysis_digest_collision_fails_closed() {
+        let mut coordinator = GraphRunCoordinator::default();
+        let first = GraphAnalysisIdentity {
+            digest: "forced-collision".to_owned(),
+            canonical: Arc::from(&b"identity-a"[..]),
+        };
+        let second = GraphAnalysisIdentity {
+            digest: "forced-collision".to_owned(),
+            canonical: Arc::from(&b"identity-b"[..]),
+        };
+
+        coordinator.analysis_slot(&first).unwrap();
+        let error = match coordinator.analysis_slot(&second) {
+            Ok(_) => panic!("forced collision must fail closed"),
+            Err(error) => error,
+        };
+
+        assert!(error.contains("identity collision"));
+    }
+
+    #[test]
+    fn graph_run_lease_tokens_are_generation_checked_not_raw_digests() {
+        let mut coordinator = GraphRunCoordinator::default();
+
+        let first = coordinator.new_lease_handle("b3-content");
+        let second = coordinator.new_lease_handle("b3-content");
+
+        assert!(first.starts_with("graph-run:v1:"));
+        assert_ne!(first, second);
+        assert!(!coordinator.close(&first));
+    }
+
+    #[test]
     fn desktop_runtime_defaults_to_native_graph_lane() {
         let request = build_init_request(&DesktopInitRequest {
             force_reset: false,
@@ -4550,6 +6632,54 @@ mod tests {
         assert_eq!(info.storage, "nativeLocal");
         assert!(!info.feature_flags.graptor);
         assert!(!info.feature_flags.gldr);
+    }
+
+    #[test]
+    fn mention_batch_entity_kinds_match_existing_json_enum_names() {
+        assert_eq!(desktop_entity_kind(EntityKind::Character), "character");
+        assert_eq!(desktop_entity_kind(EntityKind::Npc), "npc");
+        assert_eq!(
+            parse_desktop_entity_kind("CHARACTER"),
+            Some(EntityKind::Character)
+        );
+        assert_eq!(parse_desktop_entity_kind("unknown"), None);
+    }
+
+    #[test]
+    fn graph_run_discovery_projection_groups_mentions_without_exporting_spans() {
+        let mut states = FastHashMap::new();
+        update_discovery_candidate(
+            &mut states,
+            normalize_discovery_key("Kai Gearlock"),
+            "Kai".to_owned(),
+            "UNKNOWN",
+            0.72,
+            0,
+        );
+        update_discovery_candidate(
+            &mut states,
+            normalize_discovery_key("Kai Gearlock"),
+            "Kai Gearlock".to_owned(),
+            "character",
+            0.91,
+            1,
+        );
+        update_discovery_candidate(
+            &mut states,
+            normalize_discovery_key("Kai Gearlock"),
+            "Kai Gearlock".to_owned(),
+            "character",
+            0.88,
+            2,
+        );
+
+        let candidates = finish_discovery_candidates(states);
+        assert_eq!(candidates.len(), 1);
+        assert_eq!(candidates[0].key, "kai gearlock");
+        assert_eq!(candidates[0].token, "Kai Gearlock");
+        assert_eq!(candidates[0].kind, "character");
+        assert_eq!(candidates[0].count, 3);
+        assert_eq!(candidates[0].score, 0.91);
     }
 
     #[test]

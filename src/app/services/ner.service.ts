@@ -39,6 +39,26 @@ class PhoenixScanEntitySuggestionProvider implements EntitySuggestionProviderApi
 
     async scan(request: EntitySuggestionScanRequest): Promise<LocalEntitySuggestion[]> {
         const rawSuggestions = await this.phoenixUiApi.scanDiscovery(request.plainText);
+        return this.toLocalSuggestions(rawSuggestions, request.plainText);
+    }
+
+    async scanBatch(requests: EntitySuggestionScanRequest[]): Promise<LocalEntitySuggestion[][]> {
+        const results = await this.phoenixUiApi.scanDiscoveryBatch(
+            requests.map((request) => ({ documentId: request.noteId, text: request.plainText })),
+        );
+        const candidatesByDocument = new Map(
+            results.map((result) => [result.documentId, result.candidates]),
+        );
+        return requests.map((request) => this.toLocalSuggestions(
+            candidatesByDocument.get(request.noteId) || [],
+            request.plainText,
+        ));
+    }
+
+    private toLocalSuggestions(
+        rawSuggestions: PhoenixDiscoveryCandidate[],
+        plainText: string,
+    ): LocalEntitySuggestion[] {
         if (!Array.isArray(rawSuggestions) || !rawSuggestions.length) {
             return [];
         }
@@ -56,10 +76,10 @@ class PhoenixScanEntitySuggestionProvider implements EntitySuggestionProviderApi
                 const isPromoted = Number(candidate.status || 0) === 1;
                 return !isKnown && !isPromoted;
             })
-            .filter((candidate) => isPlausiblePhoenixDiscoveryCandidate(candidate, request.plainText))
+            .filter((candidate) => isPlausiblePhoenixDiscoveryCandidate(candidate, plainText))
             .map((candidate) => ({
                 label: cleanPhoenixCandidateLabel(candidate.token) || 'Unknown',
-                kind: resolvePhoenixScanKind(candidate, request.plainText),
+                kind: resolvePhoenixScanKind(candidate, plainText),
                 confidence: mapScoreToConfidenceLevel(Number(candidate.score || 0.8)),
                 rawScore: Number(candidate.score || 0.8),
                 reasoning: '',
@@ -401,7 +421,7 @@ export class NerService {
     private noteStore = inject(NoteEditorStore);
     private lfmLocalProvider = inject(LfmLocalEntitySuggestionProvider);
     private glinerLocalProvider = inject(GlinerLocalEntitySuggestionProvider);
-    private fstProvider: EntitySuggestionProviderApi;
+    private fstProvider: PhoenixScanEntitySuggestionProvider;
     private readonly fstStatus = signal<EntitySuggestionProviderStatus>({
         ready: true,
         loading: false,
@@ -447,6 +467,22 @@ export class NerService {
 
     async runDynamicScan(request: EntitySuggestionScanRequest): Promise<void> {
         await this.runManualScan('dynamic_ner', request);
+    }
+
+    async scanDynamicBatch(requests: EntitySuggestionScanRequest[]): Promise<LocalEntitySuggestion[][]> {
+        return this.fstProvider.scanBatch(requests);
+    }
+
+    async applyDynamicScanResult(
+        request: EntitySuggestionScanRequest,
+        providerSuggestions: LocalEntitySuggestion[],
+    ): Promise<void> {
+        this.currentText = String(request.plainText || '');
+        const mapped = this.mapProviderSuggestions(providerSuggestions, 'dynamic_ner');
+        const filtered = await filterRejectedSuggestions(mapped, 'dynamic_ner');
+        this.suggestions.set(filtered);
+        this.lastSuggestionSource.set('dynamic_ner');
+        this.errorMessage.set(null);
     }
 
     async loadAtlasSurfaceSuggestions(candidates: AtlasRichScanCandidateSummary[]): Promise<void> {

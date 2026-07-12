@@ -35,8 +35,10 @@
             <app-atlas-control-rooms
                 class="atlas-control-panel-fill"
                 [contract]="atlasControlContract()"
+                [paging]="atlasProofPaging()"
                 [selectedRoomId]="selectedRoomId()"
                 (roomChange)="setOperatingRoom($event)"
+                (nextPageRequested)="loadNextAtlasProofPage()"
                 (actionRequested)="dispatchRoomAction($event)">
             </app-atlas-control-rooms>
         </section>

@@ -101,6 +101,27 @@ describe('graph story continuity contract', () => {
         expect(hydrated.storyContinuity).toEqual(snapshot.storyContinuity);
         expect(hydrated.storyContinuity?.actionReceipts).toHaveLength(1);
     });
+
+    it('keeps continuity content identity stable when only run timings change', () => {
+        const first = snapshotFixture();
+        const second = snapshotFixture();
+        const firstContract = contractFixture();
+        const secondContract = structuredClone(firstContract);
+        secondContract.generatedAt = 999;
+        secondContract.certificate.buildMicros = 91;
+        secondContract.certificate.eventIdentityMicros = 17;
+        secondContract.certificate.episodeBoundaryMicros = 23;
+        secondContract.certificate.relationResolutionMicros = 31;
+        applyNativeStoryContinuityContract(first, firstContract);
+        applyNativeStoryContinuityContract(second, secondContract);
+
+        const firstBlob = graphRebuildSnapshotContentBlobDocuments(first)
+            .find((document) => document.documentKey.includes('storyContinuity'));
+        const secondBlob = graphRebuildSnapshotContentBlobDocuments(second)
+            .find((document) => document.documentKey.includes('storyContinuity'));
+
+        expect(firstBlob?.documentKey).toBe(secondBlob?.documentKey);
+    });
 });
 
 function contractFixture(): GraphStoryContinuityContract {

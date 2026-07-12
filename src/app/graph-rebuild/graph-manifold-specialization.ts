@@ -12,6 +12,7 @@ import type {
     GraphSemanticCandidateSummary,
     GraphSemanticManifoldKind,
 } from './graph-rebuild-snapshot';
+import type { GraphSemanticDerivationContext } from './graph-semantic-derivation-context';
 
 interface ContributionDraft {
     candidate: GraphSemanticCandidate;
@@ -24,7 +25,7 @@ interface ContributionDraft {
 }
 
 interface SpecializationContext {
-    targetRows: Map<string, GraphRebuildEmbeddingTargetPostProcess>;
+    targetRows: ReadonlyMap<string, GraphRebuildEmbeddingTargetPostProcess>;
 }
 
 const MAX_CONTRIBUTIONS = 480;
@@ -174,9 +175,11 @@ export function buildGraphManifoldSpecializationSummary(
     snapshot: GraphRebuildSnapshot,
     candidates: GraphSemanticCandidateSummary | undefined,
     generatedAt = snapshot.builtAt,
+    derivationContext?: GraphSemanticDerivationContext,
 ): GraphManifoldSpecializationSummary {
     const context: SpecializationContext = {
-        targetRows: new Map((snapshot.embeddingGraphPostProcess?.targets || []).map((row) => [row.targetId, row])),
+        targetRows: derivationContext?.targetRows()
+            || new Map((snapshot.embeddingGraphPostProcess?.targets || []).map((row) => [row.targetId, row])),
     };
     const builder = new ManifoldSpecializationBuilder(snapshot.id, generatedAt);
     for (const candidate of candidates?.candidates || []) {

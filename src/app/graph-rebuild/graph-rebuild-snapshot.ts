@@ -28,6 +28,7 @@ import type { GraphDocumentGraphMutationLedger } from './graph-document-durable-
 import type { GraphOperatorMutationJournal } from './graph-operator-mutation-journal';
 import type { GraphTruthCommitLedger } from './graph-truth-commit-ledger';
 import type { GraphAtlasPacket } from './graph-atlas-packet';
+import type { GraphRebuildCpuProfiler } from './graph-rebuild-cpu-profile';
 import type { GraphPromotionVerdictCertificate } from './graph-promotion-verdict';
 import type { GraphReviewAdjudicationRunCertificate } from './graph-review-adjudication-certificate';
 import type { GraphStoryContinuityContract } from './graph-story-continuity';
@@ -2520,7 +2521,48 @@ export interface GraphRebuildBuildTimings {
     documentProfileMs?: number;
     documentSemanticMs?: number;
     snapshotBuildMs: number;
+    snapshotAnchorsMs?: number;
+    snapshotFactsMs?: number;
+    snapshotCompatibilityViewsMs?: number;
+    snapshotTargetsMs?: number;
+    snapshotPostProcessMs?: number;
+    snapshotEmbeddingPostProcessMs?: number;
+    snapshotEmbeddingSignaturesMs?: number;
+    snapshotEmbeddingPairPlanMs?: number;
+    snapshotEmbeddingNeighborsMs?: number;
+    snapshotEmbeddingClustersMs?: number;
+    snapshotEmbeddingRowsEdgesMs?: number;
+    snapshotGraphAwareLinksMs?: number;
+    snapshotEntityLinkingMs?: number;
+    snapshotAssemblyMs?: number;
+    snapshotSemanticTasksMs?: number;
+    snapshotSemanticCandidatesMs?: number;
+    snapshotManifoldSpecializationMs?: number;
+    snapshotSemanticRerankMs?: number;
+    snapshotSemanticAdjudicationMs?: number;
+    snapshotSemanticEvalLedgerMs?: number;
+    snapshotSemanticLedgersMs?: number;
+    snapshotSemanticIndexBuilds?: number;
+    snapshotSemanticIndexEntries?: number;
+    snapshotSemanticAvoidedIndexBuilds?: number;
+    snapshotSemanticAvoidedIndexEntries?: number;
+    packetConstructionMs?: number;
     stateCommitMs: number;
+    nativeSnapshotAnalysisMs?: number;
+    nativeSnapshotAnalysisRustMicros?: number;
+    nativeGraphRunArenaReused?: number;
+    nativeGraphRunArenaResidentBytes?: number;
+    nativeGraphRunArenaActiveLeases?: number;
+    nativeGraphRunPageProjectionMicros?: number;
+    nativeGraphRunDetailRows?: number;
+    nativeGraphRunReturnedDetailRows?: number;
+    nativeGraphRunPersistMs?: number;
+    nativeGraphRunChangedSections?: number;
+    nativeGraphRunReusedSections?: number;
+    nativeGraphRunEncodedSections?: number;
+    nativeGraphRunCompressedSections?: number;
+    nativeGraphRunRawBytesWritten?: number;
+    nativeGraphRunCompressedBytesWritten?: number;
     nativeChunkSemanticBridgeMs?: number;
     nativeChunkSemanticBridgeSkipped?: number;
     nativeChunkSemanticBridgeCandidates?: number;
@@ -2889,6 +2931,7 @@ export interface BuildGraphRebuildSnapshotInput {
     documentSemanticSummary?: GraphDocumentSemanticSummary;
     operatorMutationJournal?: GraphOperatorMutationJournal;
     durabilityMode?: GraphBuildDurabilityMode;
+    cpuProfiler?: GraphRebuildCpuProfiler;
 }
 
 export interface GraphRebuildNoteFolderContext {

@@ -21,7 +21,7 @@ import {
     buildReviewAdjudicationRunCertificate,
     type GraphReviewAdjudicationRunCertificate,
 } from './graph-review-adjudication-certificate';
-import { GraphRebuildService } from './graph-rebuild.service';
+import { GraphRebuildService, type NativeGraphRunPersistReceipt } from './graph-rebuild.service';
 import { buildSiegelBackboneProjectionReceipt } from './graph-rebuild-siegel-backbone';
 import { assertGraphSnapshotAuthority } from './graph-snapshot-authority';
 import type {
@@ -34,8 +34,10 @@ import type {
     GraphIndexRunStatus,
     GraphIndexRunScope,
     GraphIndexStageReceipt,
+    GraphSnapshotAuthorityContract,
     GraphBuildDurabilityMode,
     GraphRebuildCounters,
+    GraphRebuildBuildTimings,
     GraphRebuildDropReasons,
     GraphRebuildEntityLinkCounters,
     GraphRebuildRelationshipHint,
@@ -61,6 +63,7 @@ const PROJECTION_CAPABILITIES: Array<{ capability: AtlasCapabilityId; mode: Grap
 const POST_COMMIT_DIAGNOSTIC_DEBOUNCE_MS = 250;
 const POST_COMMIT_DIAGNOSTIC_IDLE_TIMEOUT_MS = 2_000;
 const INTERACTIVE_PERSISTED_RECEIPT_STAGE_IDS = new Set([
+    'interactiveIdentityReuse',
     'dynamicNer',
     'nliAdjudication',
     'graphBuildSnapshot',
@@ -93,6 +96,11 @@ type ScopedDocument = {
     folderId?: string;
     version?: number;
     updatedAt?: number;
+};
+
+type InteractiveRunReuseState = {
+    identity: string;
+    snapshot: GraphRebuildSnapshot;
 };
 
 type PostCommitDiagnosticInput = {
@@ -137,6 +145,10 @@ export class GraphRebuildPipelineService {
     private postCommitDiagnosticQueue: Promise<void> = Promise.resolve();
     private postCommitDiagnosticToken = 0;
     private cancelScheduledPostCommitDiagnostic: (() => void) | null = null;
+    private readonly scopedDocumentBodyCache = new Map<string, { generation: string; note: Note }>();
+    private readonly interactiveCapabilityCache = new Map<string, unknown>();
+    private interactiveRunReuseState: InteractiveRunReuseState | null = null;
+    private reusedRunReceiptSerial = 0;
 
     readonly running = computed(() => this.runningState());
     readonly lastReceipt = computed(() => this.lastReceiptState());
@@ -214,6 +226,7 @@ export class GraphRebuildPipelineService {
         let postProcessFingerprintValue: string | undefined;
         let resumeContentCheckpoints: (() => void) | null = null;
         let acceptedNerOccurrences: EntityOccurrence[] = [];
+        let interactiveIdentityValue: string | undefined;
         try {
             const docs = await this.loadScopedDocuments(request.scope.noteIds);
             const scope = expandScopeNoteIds(request.scope, docs);
@@ -224,6 +237,19 @@ export class GraphRebuildPipelineService {
                 : request.entities;
             const fingerprint = postProcessFingerprint(scope, docs, entities, request.modelSelection, request.embeddingStagePolicy);
             postProcessFingerprintValue = fingerprint;
+            if (durabilityMode === 'interactive') {
+                interactiveIdentityValue = await interactiveRunIdentity(scope, docs, entities, request);
+                const reused = await this.tryReuseInteractiveRun({
+                    identity: interactiveIdentityValue,
+                    fingerprint,
+                    request,
+                    scope,
+                    runStarted,
+                    transportStarted,
+                    modelReadiness,
+                });
+                if (reused) return reused;
+            }
 
             const nerStage = await this.runStage('dynamicNer', 'Dynamic NER + Alex Deltas', async () => {
                 const delta = await this.runNerDeltas(docs);
@@ -254,14 +280,24 @@ export class GraphRebuildPipelineService {
 
             for (const capability of POSTPROCESS_FACT_CAPABILITIES) {
                 let rawStageResult: unknown;
-                const captureRelationshipHints = capability === 'nliAdjudication'
-                    ? (rawResult: unknown) => {
-                        rawStageResult = rawResult;
+                const captureResult = (rawResult: unknown) => {
+                    rawStageResult = rawResult;
+                    if (capability === 'nliAdjudication') {
                         rawNliAdjudicationResult = rawResult;
                         relationshipHints = relationshipHintsFromNliResult(rawResult);
                     }
+                };
+                const capabilityCacheKey = durabilityMode === 'interactive'
+                    ? `${fingerprint}:${capability}`
+                    : '';
+                const cached = capabilityCacheKey && this.interactiveCapabilityCache.has(capabilityCacheKey)
+                    ? { value: this.interactiveCapabilityCache.get(capabilityCacheKey) }
                     : undefined;
-                const receipt = await this.runCapabilityStage(capability, options, captureRelationshipHints);
+                const receipt = await this.runCapabilityStage(capability, options, captureResult, cached);
+                if (capabilityCacheKey && receipt.status === 'completed' && !cached) {
+                    this.interactiveCapabilityCache.set(capabilityCacheKey, rawStageResult);
+                    trimOldestMapEntries(this.interactiveCapabilityCache, 64);
+                }
                 stageReceipts.push(receipt);
                 assertStageCompleted(receipt);
                 if (capability === 'nliAdjudication') {
@@ -346,10 +382,18 @@ export class GraphRebuildPipelineService {
             appendSnapshotTimingStages(stageReceipts, completedSnapshot);
             appendStagedNativeScenePacketSkippedStage(stageReceipts, completedSnapshot);
 
+            const projectionAuthority = assertGraphSnapshotAuthority(completedSnapshot);
             for (const projection of PROJECTION_CAPABILITIES) {
-                projectionReceipts.push(snapshotOwnedProjectionReceipt(projection.mode, completedSnapshot));
+                projectionReceipts.push(snapshotOwnedProjectionReceipt(
+                    projection.mode,
+                    completedSnapshot,
+                    projectionAuthority,
+                ));
             }
-            projectionReceipts.push(await buildSiegelBackboneProjectionReceipt(completedSnapshot));
+            projectionReceipts.push(await buildSiegelBackboneProjectionReceipt(completedSnapshot, {
+                nativeReceipt: this.graphRebuild.nativeSiegelReceipt?.(completedSnapshot.id),
+                allowRuntimeNative: false,
+            }));
             appendTransportTimingStage(stageReceipts, transportStarted, phoenixTransportAudit.snapshot());
 
             const completedAt = Date.now();
@@ -370,13 +414,17 @@ export class GraphRebuildPipelineService {
                 snapshot: completedSnapshot,
                 message: `Build Graph produced ${completedSnapshot.counters.nodes} nodes, ${completedSnapshot.counters.edges} edges, and ${completedSnapshot.counters.embeddingTargets} targets.`,
             });
-            await this.publishRunReceipt(receipt, completedSnapshot);
+            await this.publishRunReceipt(receipt, completedSnapshot, true);
             if (durabilityMode === 'interactive') {
                 appendInteractivePostCommitStage(stageReceipts, completedSnapshot);
                 this.refreshLayerReceipts(receipt, completedSnapshot);
             }
             this.enqueueRunReceiptPersistence(receipt);
             if (durabilityMode === 'interactive') {
+                this.interactiveRunReuseState = {
+                    identity: interactiveIdentityValue!,
+                    snapshot: completedSnapshot,
+                };
                 this.scheduleInteractivePostCommitWork({
                     scope,
                     snapshotId: completedSnapshot.id,
@@ -419,6 +467,92 @@ export class GraphRebuildPipelineService {
             resumeContentCheckpoints?.();
             this.runningState.set(false);
         }
+    }
+
+    private async tryReuseInteractiveRun(input: {
+        identity: string;
+        fingerprint: string;
+        request: GraphIndexRunRequest;
+        scope: GraphIndexRunScope;
+        runStarted: number;
+        transportStarted: PhoenixTransportAuditSnapshot;
+        modelReadiness: GraphIndexModelReadiness[];
+    }): Promise<PipelineResult | null> {
+        const state = this.interactiveRunReuseState;
+        if (!state
+            || state.identity !== input.identity
+            || this.lastSnapshotState()?.id !== state.snapshot.id
+            || this.lastSnapshotState()?.authorityContract?.contentHash
+                !== state.snapshot.authorityContract?.contentHash) {
+            return null;
+        }
+
+        const reuseStarted = performance.now();
+        const authority = assertGraphSnapshotAuthority(state.snapshot);
+        const persistStarted = performance.now();
+        const durable = await this.graphRebuild.persistResidentNativeGraphRun?.(state.snapshot);
+        if (!durable) return null;
+        const persistMs = elapsedTimingMs(persistStarted);
+        const reusedSnapshot: GraphRebuildSnapshot = {
+            ...state.snapshot,
+            buildTimings: reusedGraphBuildTimings(
+                state.snapshot.buildTimings,
+                durable,
+                elapsedTimingMs(reuseStarted),
+                persistMs,
+            ),
+        };
+
+        const stageReceipts: GraphIndexStageReceipt[] = [instrumentationStage(
+            'interactiveIdentityReuse',
+            'Interactive Identity Reuse',
+            elapsedTimingMs(reuseStarted),
+            {
+                identityMatched: 1,
+                authorityVerified: 1,
+                nativeDurableReceipt: 1,
+                changedSections: durable.changedSections,
+                reusedSections: durable.reusedSections,
+                encodedSections: durable.encodedSections,
+                compressedSections: durable.compressedSections,
+                rawBytesWritten: durable.rawBytesWritten,
+                compressedBytesWritten: durable.compressedBytesWritten,
+            },
+            'Complete semantic input identity matched the current sealed snapshot and resident native run.',
+        )];
+        const projectionReceipts = PROJECTION_CAPABILITIES.map((projection) =>
+            snapshotOwnedProjectionReceipt(projection.mode, reusedSnapshot, authority),
+        );
+        projectionReceipts.push(await buildSiegelBackboneProjectionReceipt(reusedSnapshot, {
+            nativeReceipt: this.graphRebuild.nativeSiegelReceipt?.(reusedSnapshot.id),
+            allowRuntimeNative: false,
+        }));
+        appendTransportTimingStage(stageReceipts, input.transportStarted, phoenixTransportAudit.snapshot());
+
+        const completedAt = Date.now();
+        const receipt = this.buildRunReceipt({
+            idPrefix: `graph-atlas:identity-reuse:${++this.reusedRunReceiptSerial}`,
+            scope: input.scope,
+            policy: input.request.policy,
+            postProcessMode: 'full',
+            durabilityMode: 'interactive',
+            postProcessFingerprint: input.fingerprint,
+            postProcessCacheHit: true,
+            modelSelection: input.request.modelSelection,
+            modelReadiness: input.modelReadiness,
+            startedAt: input.runStarted,
+            completedAt,
+            stageReceipts,
+            projectionReceipts,
+            snapshot: reusedSnapshot,
+            message: `Reused sealed graph ${reusedSnapshot.id}; semantic input identity is unchanged.`,
+        });
+        await this.publishRunReceipt(receipt, reusedSnapshot, true);
+        appendInteractivePostCommitStage(stageReceipts, reusedSnapshot);
+        this.refreshLayerReceipts(receipt, reusedSnapshot);
+        this.enqueueRunReceiptPersistence(receipt);
+        this.interactiveRunReuseState = { identity: input.identity, snapshot: reusedSnapshot };
+        return { receipt, snapshot: reusedSnapshot };
     }
 
     private buildRunReceipt(input: {
@@ -477,8 +611,12 @@ export class GraphRebuildPipelineService {
     private async publishRunReceipt(
         receipt: GraphIndexRunReceipt,
         snapshot: GraphRebuildSnapshot | null,
+        authorityVerified = false,
     ): Promise<void> {
-        if (snapshot) assertRunReceiptParity(receipt, snapshot);
+        if (snapshot) {
+            if (authorityVerified) assertRunReceiptParityWithContract(receipt, snapshot);
+            else assertRunReceiptParity(receipt, snapshot);
+        }
         const startedAt = Date.now();
         const uiStage: GraphIndexStageReceipt = {
             id: 'uiCommit',
@@ -699,13 +837,23 @@ export class GraphRebuildPipelineService {
         let acceptedAnchors = 0;
         let dropped = 0;
         const acceptedOccurrences: EntityOccurrence[] = [];
-        for (const doc of docs) {
-            if (!doc.plainText.trim()) continue;
-            await this.ner.runDynamicScan({
+        const scanDocs = docs.filter((doc) => doc.plainText.trim());
+        const scanRequests = scanDocs.map((doc) => ({
                 noteId: doc.id,
                 noteTitle: doc.title || 'Untitled Note',
                 plainText: doc.plainText,
-            });
+        }));
+        if (!scanRequests.length) {
+            return {
+                counts: { documents: docs.length, candidates, acceptedAnchors, dropped },
+                acceptedOccurrences,
+            };
+        }
+        const batchResults = await this.ner.scanDynamicBatch(scanRequests);
+        for (let index = 0; index < scanRequests.length; index += 1) {
+            const request = scanRequests[index];
+            const doc = scanDocs[index];
+            await this.ner.applyDynamicScanResult(request, batchResults[index] || []);
             const suggestions = [...this.ner.suggestions()];
             candidates += suggestions.length;
             for (const suggestion of suggestions) {
@@ -731,11 +879,14 @@ export class GraphRebuildPipelineService {
         capability: AtlasCapabilityId,
         options: AtlasRunOptions,
         onRawResult?: (result: unknown) => void,
+        cached?: { value: unknown },
     ): Promise<GraphIndexStageReceipt> {
         return this.runStage(capability, capabilityLabel(capability), async () => {
-            const result = await this.atlasRuntime.runCapability(capability, { ...options, skipModelWarm: true });
-            onRawResult?.(result.rawResult);
-            const counters = numberCounts(result.rawResult);
+            const rawResult = cached
+                ? cached.value
+                : (await this.atlasRuntime.runCapability(capability, { ...options, skipModelWarm: true })).rawResult;
+            onRawResult?.(rawResult);
+            const counters = numberCounts(rawResult);
             return {
                 outputCount: sumOutputCounts(counters),
                 counters,
@@ -794,7 +945,35 @@ export class GraphRebuildPipelineService {
 
     private async loadScopedNotesWithBodies(noteIds: string[]): Promise<Note[]> {
         if (noteIds.length) {
-            return (await ops.getNotesByIds(noteIds)) as unknown as Note[];
+            const headers = await db.notes.bulkGet(noteIds);
+            const headerById = new Map(headers.filter((note): note is Note => !!note).map((note) => [note.id, note]));
+            const resolved = new Map<string, Note>();
+            const missing: string[] = [];
+            for (let index = 0; index < noteIds.length; index += 1) {
+                const noteId = noteIds[index];
+                const header = headers[index];
+                const generation = noteBodyGeneration(header);
+                const cached = generation ? this.scopedDocumentBodyCache.get(noteId) : undefined;
+                if (header && cached?.generation === generation) {
+                    resolved.set(noteId, { ...cached.note, ...header,
+                        content: cached.note.content, markdownContent: cached.note.markdownContent });
+                } else {
+                    missing.push(noteId);
+                }
+            }
+            if (missing.length) {
+                const hydrated = await ops.getNotesByIds(missing) as unknown as Note[];
+                for (const note of hydrated) {
+                    const header = headerById.get(note.id);
+                    const merged = header
+                        ? { ...note, ...header, content: note.content, markdownContent: note.markdownContent }
+                        : note;
+                    resolved.set(note.id, merged);
+                    const generation = noteBodyGeneration(merged);
+                    if (generation) this.scopedDocumentBodyCache.set(note.id, { generation, note: merged });
+                }
+            }
+            return noteIds.map((noteId) => resolved.get(noteId)).filter((note): note is Note => !!note);
         }
         const cached = await db.notes.toArray();
         const ids = cached.map((note) => note.id).filter(Boolean);
@@ -847,6 +1026,19 @@ export class GraphRebuildPipelineService {
 
     private async warmEntityLinker(): Promise<void> {
         this.entityLinkerWarmState.set(true);
+    }
+}
+
+function noteBodyGeneration(note: Pick<Note, 'version' | 'updatedAt'> | null | undefined): string {
+    if (!note || !Number.isFinite(note.updatedAt) || note.updatedAt <= 0) return '';
+    return `${note.version || 0}:${note.updatedAt}`;
+}
+
+function trimOldestMapEntries<Key, Value>(map: Map<Key, Value>, limit: number): void {
+    while (map.size > limit) {
+        const oldest = map.keys().next();
+        if (oldest.done) return;
+        map.delete(oldest.value);
     }
 }
 
@@ -982,7 +1174,7 @@ function appendTransportTimingStage(
 ): void {
     const counters = transportDeltaCounters(before, after);
     if (!counters['transportCalls'] && !counters['transportTotalMs']) return;
-    const offenders = transportDeltaOffenders(before, after, 3);
+    const offenders = transportDeltaOffenders(before, after, 12);
     for (const offender of offenders) {
         const prefix = `transportOffender${offender.rank}`;
         counters[`${prefix}Calls`] = offender.count;
@@ -990,6 +1182,8 @@ function appendTransportTimingStage(
         counters[`${prefix}MaxMs`] = offender.maxMs;
         counters[`${prefix}RequestBytes`] = offender.requestBytes;
         counters[`${prefix}ResponseBytes`] = offender.responseBytes;
+        counters[`${prefix}RequestBytesUnavailableCalls`] = offender.requestBytesUnavailableCalls;
+        counters[`${prefix}ResponseBytesUnavailableCalls`] = offender.responseBytesUnavailableCalls;
         counters[`${prefix}Errors`] = offender.errors;
     }
     stageReceipts.push(instrumentationStage(
@@ -1012,6 +1206,8 @@ interface TransportOffender {
     maxMs: number;
     requestBytes: number;
     responseBytes: number;
+    requestBytesUnavailableCalls: number;
+    responseBytesUnavailableCalls: number;
     errors: number;
 }
 
@@ -1072,12 +1268,22 @@ function transportDeltaCounters(
         transportMaxMs: 0,
         transportRequestBytes: 0,
         transportResponseBytes: 0,
+        transportRequestBytesMeasuredCalls: 0,
+        transportRequestBytesUnavailableCalls: 0,
+        transportResponseBytesMeasuredCalls: 0,
+        transportResponseBytesUnavailableCalls: 0,
+        transportEncodeMs: 0,
+        transportDecodeMs: 0,
+        transportEncodeTimingUnavailableCalls: 0,
+        transportDecodeTimingUnavailableCalls: 0,
         jsonRpcCalls: 0,
         jsonRpcRequestBytes: 0,
         jsonRpcResponseBytes: 0,
         typedRpcCalls: 0,
         typedRpcRequestBytes: 0,
         typedRpcResponseBytes: 0,
+        typedRpcRequestBytesUnavailableCalls: 0,
+        typedRpcResponseBytesUnavailableCalls: 0,
         bootSnapshotJsonCalls: 0,
         bootSnapshotJsonRequestBytes: 0,
         bootSnapshotJsonResponseBytes: 0,
@@ -1125,6 +1331,20 @@ function transportDeltaCounters(
         const totalMs = Math.max(0, call.totalMs - (previous?.totalMs || 0));
         const requestBytes = Math.max(0, call.totalRequestBytes - (previous?.totalRequestBytes || 0));
         const responseBytes = Math.max(0, call.totalResponseBytes - (previous?.totalResponseBytes || 0));
+        const requestBytesMeasuredCalls = Math.max(0,
+            call.requestBytesMeasuredCalls - (previous?.requestBytesMeasuredCalls || 0));
+        const requestBytesUnavailableCalls = Math.max(0,
+            call.requestBytesUnavailableCalls - (previous?.requestBytesUnavailableCalls || 0));
+        const responseBytesMeasuredCalls = Math.max(0,
+            call.responseBytesMeasuredCalls - (previous?.responseBytesMeasuredCalls || 0));
+        const responseBytesUnavailableCalls = Math.max(0,
+            call.responseBytesUnavailableCalls - (previous?.responseBytesUnavailableCalls || 0));
+        const encodeMs = Math.max(0, call.totalEncodeMs - (previous?.totalEncodeMs || 0));
+        const decodeMs = Math.max(0, call.totalDecodeMs - (previous?.totalDecodeMs || 0));
+        const encodeTimingUnavailableCalls = Math.max(0,
+            call.encodeTimingUnavailableCalls - (previous?.encodeTimingUnavailableCalls || 0));
+        const decodeTimingUnavailableCalls = Math.max(0,
+            call.decodeTimingUnavailableCalls - (previous?.decodeTimingUnavailableCalls || 0));
         const errors = Math.max(0, call.errors - (previous?.errors || 0));
         const localMaxMs = call.maxMs > (previous?.maxMs || 0)
             ? call.maxMs
@@ -1134,12 +1354,22 @@ function transportDeltaCounters(
         counters['transportTotalMs'] += totalMs;
         counters['transportRequestBytes'] += requestBytes;
         counters['transportResponseBytes'] += responseBytes;
+        counters['transportRequestBytesMeasuredCalls'] += requestBytesMeasuredCalls;
+        counters['transportRequestBytesUnavailableCalls'] += requestBytesUnavailableCalls;
+        counters['transportResponseBytesMeasuredCalls'] += responseBytesMeasuredCalls;
+        counters['transportResponseBytesUnavailableCalls'] += responseBytesUnavailableCalls;
+        counters['transportEncodeMs'] += encodeMs;
+        counters['transportDecodeMs'] += decodeMs;
+        counters['transportEncodeTimingUnavailableCalls'] += encodeTimingUnavailableCalls;
+        counters['transportDecodeTimingUnavailableCalls'] += decodeTimingUnavailableCalls;
         counters['transportMaxMs'] = Math.max(counters['transportMaxMs'], localMaxMs);
         if (call.kind === 'taurpc-json') {
             addTransportFamilyCounters(counters, 'jsonRpc', count, totalMs, requestBytes, responseBytes);
         }
         if (call.kind === 'taurpc-typed') {
             addTransportFamilyCounters(counters, 'typedRpc', count, totalMs, requestBytes, responseBytes);
+            counters['typedRpcRequestBytesUnavailableCalls'] += requestBytesUnavailableCalls;
+            counters['typedRpcResponseBytesUnavailableCalls'] += responseBytesUnavailableCalls;
         }
         if (call.name === 'phoenix.boot_snapshot_json') {
             addTransportFamilyCounters(counters, 'bootSnapshotJson', count, totalMs, requestBytes, responseBytes);
@@ -1242,6 +1472,10 @@ function transportDeltaOffenders(
             maxMs: Math.round(call.maxMs > (previous?.maxMs || 0) ? call.maxMs : totalMs / count),
             requestBytes: Math.round(Math.max(0, call.totalRequestBytes - (previous?.totalRequestBytes || 0))),
             responseBytes: Math.round(Math.max(0, call.totalResponseBytes - (previous?.totalResponseBytes || 0))),
+            requestBytesUnavailableCalls: Math.max(0,
+                call.requestBytesUnavailableCalls - (previous?.requestBytesUnavailableCalls || 0)),
+            responseBytesUnavailableCalls: Math.max(0,
+                call.responseBytesUnavailableCalls - (previous?.responseBytesUnavailableCalls || 0)),
             errors: Math.max(0, call.errors - (previous?.errors || 0)),
         });
     }
@@ -1868,10 +2102,11 @@ function instrumentationStage(
 function snapshotOwnedProjectionReceipt(
     mode: GraphIndexProjectionMode,
     snapshot: GraphRebuildSnapshot | null,
+    verifiedContract?: GraphSnapshotAuthorityContract,
 ): GraphIndexProjectionReceipt {
     const now = Date.now();
     const targetCount = snapshot?.counters.embeddingTargets || 0;
-    const contract = snapshot ? assertGraphSnapshotAuthority(snapshot) : undefined;
+    const contract = verifiedContract || (snapshot ? assertGraphSnapshotAuthority(snapshot) : undefined);
     return {
         mode,
         status: 'synced',
@@ -1893,6 +2128,23 @@ function snapshotOwnedProjectionReceipt(
 
 export function assertRunReceiptParity(receipt: GraphIndexRunReceipt, snapshot: GraphRebuildSnapshot): void {
     const contract = assertGraphSnapshotAuthority(snapshot);
+    assertRunReceiptParityAgainstContract(receipt, snapshot, contract);
+}
+
+function assertRunReceiptParityWithContract(
+    receipt: GraphIndexRunReceipt,
+    snapshot: GraphRebuildSnapshot,
+): void {
+    const contract = snapshot.authorityContract;
+    if (!contract) throw new Error(`Graph snapshot authority contract missing for ${snapshot.id}`);
+    assertRunReceiptParityAgainstContract(receipt, snapshot, contract);
+}
+
+function assertRunReceiptParityAgainstContract(
+    receipt: GraphIndexRunReceipt,
+    snapshot: GraphRebuildSnapshot,
+    contract: GraphSnapshotAuthorityContract,
+): void {
     const issues: string[] = [];
     if (receipt.snapshotId !== contract.snapshotId) issues.push('snapshot id');
     const receiptCounts = receipt.counters;
@@ -1912,7 +2164,9 @@ export function assertRunReceiptParity(receipt: GraphIndexRunReceipt, snapshot: 
         if (actual !== required) issues.push(`${label} ${actual} != ${required}`);
     }
     const authorityStage = receipt.stageReceipts.find((stage) => stage.id === 'snapshotAuthorityContract');
-    if (!authorityStage || authorityStage.status !== 'completed' || authorityStage.counters['authorityParity'] !== 1) {
+    const reuseStage = receipt.stageReceipts.find((stage) => stage.id === 'interactiveIdentityReuse');
+    if ((!authorityStage || authorityStage.status !== 'completed' || authorityStage.counters['authorityParity'] !== 1)
+        && (!reuseStage || reuseStage.status !== 'completed' || reuseStage.counters['authorityVerified'] !== 1)) {
         issues.push('snapshot authority stage');
     }
     for (const projection of receipt.projectionReceipts) {
@@ -2267,6 +2521,173 @@ function postProcessFingerprint(
         embeddingStagePolicy: normalizedEmbeddingStagePolicy(embeddingStagePolicy),
     });
     return simpleHash(payload);
+}
+
+async function interactiveRunIdentity(
+    scope: GraphIndexRunScope,
+    docs: ScopedDocument[],
+    entities: GraphIndexRunRequest['entities'],
+    request: GraphIndexRunRequest,
+): Promise<string> {
+    const documentRows = await Promise.all(docs.map(async (doc) => ({
+        id: doc.id,
+        version: doc.version || 0,
+        updatedAt: doc.updatedAt || 0,
+        textSha256: await sha256Text(doc.plainText),
+    })));
+    const payload = canonicalJson({
+        schemaVersion: 'phoenix-interactive-graph-input-identity/v1',
+        scope: {
+            kind: scope.kind,
+            scopeId: scope.scopeId,
+            noteIds: [...scope.noteIds].sort(),
+        },
+        documents: documentRows.sort((left, right) => left.id.localeCompare(right.id)),
+        entities: [...entities].sort((left, right) => left.id.localeCompare(right.id)),
+        modelSelection: request.modelSelection,
+        embeddingStagePolicy: normalizedEmbeddingStagePolicy(request.embeddingStagePolicy),
+        calendarRegistrySnapshot: request.calendarRegistrySnapshot || null,
+        postProcessMode: 'full',
+    });
+    return sha256Text(payload);
+}
+
+function reusedGraphBuildTimings(
+    previous: GraphRebuildBuildTimings | undefined,
+    durable: NativeGraphRunPersistReceipt,
+    totalMs: number,
+    persistMs: number,
+): GraphRebuildBuildTimings | undefined {
+    if (!previous) return undefined;
+    return {
+        ...previous,
+        occurrenceLoadMs: 0,
+        chunkLoadMs: 0,
+        noteTextLoadMs: 0,
+        noteFolderLoadMs: 0,
+        dbLoadMs: 0,
+        occurrenceRecoverMs: 0,
+        documentProfileMs: 0,
+        documentSemanticMs: 0,
+        snapshotBuildMs: 0,
+        snapshotAnchorsMs: 0,
+        snapshotFactsMs: 0,
+        snapshotCompatibilityViewsMs: 0,
+        snapshotTargetsMs: 0,
+        snapshotPostProcessMs: 0,
+        snapshotEmbeddingPostProcessMs: 0,
+        snapshotEmbeddingSignaturesMs: 0,
+        snapshotEmbeddingPairPlanMs: 0,
+        snapshotEmbeddingNeighborsMs: 0,
+        snapshotEmbeddingClustersMs: 0,
+        snapshotEmbeddingRowsEdgesMs: 0,
+        snapshotGraphAwareLinksMs: 0,
+        snapshotEntityLinkingMs: 0,
+        snapshotAssemblyMs: 0,
+        snapshotSemanticTasksMs: 0,
+        snapshotSemanticCandidatesMs: 0,
+        snapshotManifoldSpecializationMs: 0,
+        snapshotSemanticRerankMs: 0,
+        snapshotSemanticAdjudicationMs: 0,
+        snapshotSemanticEvalLedgerMs: 0,
+        snapshotSemanticLedgersMs: 0,
+        snapshotSemanticIndexBuilds: 0,
+        snapshotSemanticIndexEntries: 0,
+        snapshotSemanticAvoidedIndexBuilds: 0,
+        snapshotSemanticAvoidedIndexEntries: 0,
+        packetConstructionMs: 0,
+        stateCommitMs: 0,
+        nativeSnapshotAnalysisMs: 0,
+        nativeSnapshotAnalysisRustMicros: 0,
+        nativeGraphRunArenaReused: 1,
+        nativeGraphRunArenaResidentBytes: undefined,
+        nativeGraphRunArenaActiveLeases: undefined,
+        nativeGraphRunPageProjectionMicros: 0,
+        nativeGraphRunDetailRows: 0,
+        nativeGraphRunReturnedDetailRows: 0,
+        nativeGraphRunPersistMs: persistMs,
+        nativeGraphRunChangedSections: durable.changedSections,
+        nativeGraphRunReusedSections: durable.reusedSections,
+        nativeGraphRunEncodedSections: durable.encodedSections,
+        nativeGraphRunCompressedSections: durable.compressedSections,
+        nativeGraphRunRawBytesWritten: durable.rawBytesWritten,
+        nativeGraphRunCompressedBytesWritten: durable.compressedBytesWritten,
+        nativeChunkSemanticBridgeMs: 0,
+        nativeChunkSemanticBridgeSkipped: 1,
+        nativeChunkSemanticBridgeCandidates: 0,
+        nativeChunkSemanticBridgeQualityDemotions: 0,
+        nativeChunkSemanticBridgeRustMicros: 0,
+        nativeStoryContinuityMs: 0,
+        nativeStoryContinuitySkipped: 1,
+        nativeStoryContinuityRows: 0,
+        nativeStoryContinuityRustMicros: 0,
+        nativeMemoryGovernanceMs: 0,
+        nativeMemoryGovernanceSkipped: 1,
+        nativeMemoryGovernanceCandidates: 0,
+        nativeMemoryGovernanceRustMicros: 0,
+        nativeMemoryGovernanceRetrievalExperimentMs: 0,
+        nativeMemoryGovernanceRetrievalExperimentSkipped: 1,
+        nativeMemoryGovernanceRetrievalExperimentCandidates: 0,
+        nativeMemoryGovernanceRetrievalExperimentRustMicros: 0,
+        nativePromotionVerdictMs: 0,
+        nativePromotionVerdictSkipped: 1,
+        nativePromotionVerdictRows: 0,
+        nativePromotionVerdictRustMicros: 0,
+        nativeCompilerMs: 0,
+        nativeCompilerSkipped: 1,
+        nativeCompilerInputBytesByFamily: {},
+        nativeTargetsByOriginatingFamily: {},
+        nativeAtlasSeedRawBytes: 0,
+        nativeAtlasSeedCompressedBytes: 0,
+        snapshotPersistMs: 0,
+        snapshotSerializeMs: 0,
+        snapshotPrimaryEncodeMs: 0,
+        snapshotPrimaryWriteSkipped: 1,
+        snapshotPrimaryIdentityReused: 1,
+        snapshotOverGraphEncodeMs: 0,
+        snapshotStoreMs: 0,
+        snapshotPrimaryStoreMs: 0,
+        snapshotOverGraphStoreMs: 0,
+        snapshotStoreDocuments: 0,
+        snapshotContentBlobReads: 0,
+        snapshotContentBlobManifestTrusted: 0,
+        snapshotContentBlobManifestMatches: 0,
+        snapshotContentBlobManifestMisses: 0,
+        snapshotWrittenContentBlobs: 0,
+        snapshotReusedContentBlobs: 0,
+        previousSnapshotHydrationSkipped: 1,
+        documentSemanticSkipped: 1,
+        nativeChunkerSkipped: 1,
+        snapshotEventMs: 0,
+        snapshotPayloadProfileMs: 0,
+        authoritySealMs: 0,
+        authorityAssertMs: Math.max(0, totalMs - persistMs),
+        dbOpsMs: 0,
+        totalMs,
+    };
+}
+
+async function sha256Text(value: string): Promise<string> {
+    const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(value));
+    return [...new Uint8Array(digest)]
+        .map((byte) => byte.toString(16).padStart(2, '0'))
+        .join('');
+}
+
+function canonicalJson(value: unknown): string {
+    return JSON.stringify(canonicalValue(value));
+}
+
+function canonicalValue(value: unknown): unknown {
+    if (Array.isArray(value)) return value.map(canonicalValue);
+    if (!value || typeof value !== 'object') return value;
+    const record = value as Record<string, unknown>;
+    return Object.fromEntries(
+        Object.keys(record)
+            .filter((key) => record[key] !== undefined)
+            .sort()
+            .map((key) => [key, canonicalValue(record[key])]),
+    );
 }
 
 function normalizedEmbeddingStagePolicy(

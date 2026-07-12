@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ViewChild, computed, inject, signal } from '@angular/core';
+import { Component, OnDestroy, ViewChild, computed, inject, signal } from '@angular/core';
 
 import { smartGraphRegistry, type RegisteredEntity } from '../../../../lib/registry';
 import { EntitySelectionService } from '../../../../lib/services/entity-selection.service';
@@ -54,7 +54,7 @@ interface AtlasWorkflowStep {
         './attributes-tab-workflow.component.css',
     ],
 })
-export class AttributesTabComponent {
+export class AttributesTabComponent implements OnDestroy {
     @ViewChild(SearchPanelComponent) private searchPanel?: SearchPanelComponent;
 
     private readonly scopeService = inject(ScopeService);
@@ -74,6 +74,7 @@ export class AttributesTabComponent {
     readonly activeScope = this.scopeService.activeScope;
 
     readonly atlasControlContract = this.atlasControl.contract;
+    readonly atlasProofPaging = this.atlasControl.proofPaging;
     readonly headerCards = computed(() => this.atlasControlContract().header);
     readonly workflowSteps = computed<AtlasWorkflowStep[]>(() => {
         return this.atlasControlContract().workflow.map((step) => ({
@@ -86,6 +87,14 @@ export class AttributesTabComponent {
     });
     setOperatingRoom(room: AtlasControlRoomId): void {
         this.selectedRoomId.set(room);
+    }
+
+    loadNextAtlasProofPage(): void {
+        void this.atlasControl.loadNextProofPage();
+    }
+
+    ngOnDestroy(): void {
+        void this.atlasControl.releaseProofLease();
     }
 
     openCreator(): void {

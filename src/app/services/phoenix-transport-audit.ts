@@ -5,8 +5,10 @@ export interface PhoenixTransportCallSample {
     kind: PhoenixTransportKind;
     startedAt: number;
     durationMs: number;
-    requestBytes: number;
-    responseBytes: number;
+    requestBytes: number | null;
+    responseBytes: number | null;
+    encodeMs: number | null;
+    decodeMs: number | null;
     ok: boolean;
     counters?: Record<string, number>;
 }
@@ -21,6 +23,16 @@ export interface PhoenixTransportAggregate {
     maxMs: number;
     totalRequestBytes: number;
     totalResponseBytes: number;
+    requestBytesMeasuredCalls: number;
+    requestBytesUnavailableCalls: number;
+    responseBytesMeasuredCalls: number;
+    responseBytesUnavailableCalls: number;
+    totalEncodeMs: number;
+    totalDecodeMs: number;
+    encodeTimingMeasuredCalls: number;
+    encodeTimingUnavailableCalls: number;
+    decodeTimingMeasuredCalls: number;
+    decodeTimingUnavailableCalls: number;
     counters: Record<string, number>;
 }
 
@@ -30,6 +42,12 @@ export interface PhoenixTransportAuditSnapshot {
     totalErrors: number;
     totalRequestBytes: number;
     totalResponseBytes: number;
+    requestBytesUnavailableCalls: number;
+    responseBytesUnavailableCalls: number;
+    totalEncodeMs: number;
+    totalDecodeMs: number;
+    encodeTimingUnavailableCalls: number;
+    decodeTimingUnavailableCalls: number;
     calls: PhoenixTransportAggregate[];
     recentCalls: PhoenixTransportCallSample[];
 }
@@ -53,12 +71,11 @@ function byteLengthOfString(value: string): number {
     return value.length;
 }
 
-function byteLengthOfJson(value: unknown): number {
-    try {
-        return byteLengthOfString(JSON.stringify(value ?? null));
-    } catch {
-        return 0;
-    }
+export interface PhoenixTransportCodecMetrics {
+    requestBytes?: number;
+    responseBytes?: number;
+    encodeMs?: number;
+    decodeMs?: number;
 }
 
 class PhoenixTransportAudit {
@@ -85,11 +102,15 @@ class PhoenixTransportAudit {
     ): Promise<T> {
         const startedAt = performance.now();
         let rawResponse = '';
+        let decodeMs: number | null = null;
         let ok = false;
         try {
             rawResponse = await op();
+            const decodeStartedAt = performance.now();
+            const result = parse(rawResponse);
+            decodeMs = performance.now() - decodeStartedAt;
             ok = true;
-            return parse(rawResponse);
+            return result;
         } finally {
             this.record({
                 name,
@@ -98,12 +119,18 @@ class PhoenixTransportAudit {
                 durationMs: performance.now() - startedAt,
                 requestBytes: byteLengthOfString(requestJson),
                 responseBytes: byteLengthOfString(rawResponse),
+                encodeMs: null,
+                decodeMs,
                 ok,
             });
         }
     }
 
-    async measureTypedRpc<T>(name: string, request: unknown, op: () => Promise<T>): Promise<T> {
+    async measureTypedRpc<T>(
+        name: string,
+        op: () => Promise<T>,
+        readCodecMetrics?: (response: T | undefined) => PhoenixTransportCodecMetrics,
+    ): Promise<T> {
         const startedAt = performance.now();
         let response: T | undefined;
         let ok = false;
@@ -112,13 +139,16 @@ class PhoenixTransportAudit {
             ok = true;
             return response;
         } finally {
+            const metrics = safeCodecMetrics(readCodecMetrics, response);
             this.record({
                 name,
                 kind: 'taurpc-typed',
                 startedAt: Date.now(),
                 durationMs: performance.now() - startedAt,
-                requestBytes: byteLengthOfJson(request),
-                responseBytes: byteLengthOfJson(response),
+                requestBytes: finiteMetric(metrics.requestBytes),
+                responseBytes: finiteMetric(metrics.responseBytes),
+                encodeMs: finiteMetric(metrics.encodeMs),
+                decodeMs: finiteMetric(metrics.decodeMs),
                 ok,
             });
         }
@@ -139,6 +169,8 @@ class PhoenixTransportAudit {
                 durationMs: performance.now() - startedAt,
                 requestBytes: 0,
                 responseBytes: 0,
+                encodeMs: 0,
+                decodeMs: 0,
                 ok,
             });
         }
@@ -164,6 +196,12 @@ class PhoenixTransportAudit {
             totalErrors: calls.reduce((sum, call) => sum + call.errors, 0),
             totalRequestBytes: calls.reduce((sum, call) => sum + call.totalRequestBytes, 0),
             totalResponseBytes: calls.reduce((sum, call) => sum + call.totalResponseBytes, 0),
+            requestBytesUnavailableCalls: calls.reduce((sum, call) => sum + call.requestBytesUnavailableCalls, 0),
+            responseBytesUnavailableCalls: calls.reduce((sum, call) => sum + call.responseBytesUnavailableCalls, 0),
+            totalEncodeMs: calls.reduce((sum, call) => sum + call.totalEncodeMs, 0),
+            totalDecodeMs: calls.reduce((sum, call) => sum + call.totalDecodeMs, 0),
+            encodeTimingUnavailableCalls: calls.reduce((sum, call) => sum + call.encodeTimingUnavailableCalls, 0),
+            decodeTimingUnavailableCalls: calls.reduce((sum, call) => sum + call.decodeTimingUnavailableCalls, 0),
             calls,
             recentCalls: [...this.recentCalls],
         };
@@ -176,7 +214,7 @@ class PhoenixTransportAudit {
         );
         for (const call of snapshot.calls.slice(0, 12)) {
             console.log(
-                `${call.kind} ${call.name}: count=${call.count}, total=${call.totalMs.toFixed(1)}ms, max=${call.maxMs.toFixed(1)}ms, bytes=${call.totalRequestBytes}->${call.totalResponseBytes}, errors=${call.errors}`,
+                `${call.kind} ${call.name}: count=${call.count}, total=${call.totalMs.toFixed(1)}ms, max=${call.maxMs.toFixed(1)}ms, bytes=${formatMeasuredBytes(call.totalRequestBytes, call.requestBytesUnavailableCalls)}->${formatMeasuredBytes(call.totalResponseBytes, call.responseBytesUnavailableCalls)}, errors=${call.errors}`,
             );
         }
         console.groupEnd();
@@ -194,8 +232,18 @@ class PhoenixTransportAudit {
             current.errors += sample.ok ? 0 : 1;
             current.totalMs += sample.durationMs;
             current.maxMs = Math.max(current.maxMs, sample.durationMs);
-            current.totalRequestBytes += sample.requestBytes;
-            current.totalResponseBytes += sample.responseBytes;
+            current.totalRequestBytes += sample.requestBytes || 0;
+            current.totalResponseBytes += sample.responseBytes || 0;
+            current.requestBytesMeasuredCalls += sample.requestBytes === null ? 0 : 1;
+            current.requestBytesUnavailableCalls += sample.requestBytes === null ? 1 : 0;
+            current.responseBytesMeasuredCalls += sample.responseBytes === null ? 0 : 1;
+            current.responseBytesUnavailableCalls += sample.responseBytes === null ? 1 : 0;
+            current.totalEncodeMs += sample.encodeMs || 0;
+            current.totalDecodeMs += sample.decodeMs || 0;
+            current.encodeTimingMeasuredCalls += sample.encodeMs === null ? 0 : 1;
+            current.encodeTimingUnavailableCalls += sample.encodeMs === null ? 1 : 0;
+            current.decodeTimingMeasuredCalls += sample.decodeMs === null ? 0 : 1;
+            current.decodeTimingUnavailableCalls += sample.decodeMs === null ? 1 : 0;
             mergeCounters(current.counters, sample.counters);
             return;
         }
@@ -207,8 +255,18 @@ class PhoenixTransportAudit {
             totalMs: sample.durationMs,
             avgMs: sample.durationMs,
             maxMs: sample.durationMs,
-            totalRequestBytes: sample.requestBytes,
-            totalResponseBytes: sample.responseBytes,
+            totalRequestBytes: sample.requestBytes || 0,
+            totalResponseBytes: sample.responseBytes || 0,
+            requestBytesMeasuredCalls: sample.requestBytes === null ? 0 : 1,
+            requestBytesUnavailableCalls: sample.requestBytes === null ? 1 : 0,
+            responseBytesMeasuredCalls: sample.responseBytes === null ? 0 : 1,
+            responseBytesUnavailableCalls: sample.responseBytes === null ? 1 : 0,
+            totalEncodeMs: sample.encodeMs || 0,
+            totalDecodeMs: sample.decodeMs || 0,
+            encodeTimingMeasuredCalls: sample.encodeMs === null ? 0 : 1,
+            encodeTimingUnavailableCalls: sample.encodeMs === null ? 1 : 0,
+            decodeTimingMeasuredCalls: sample.decodeMs === null ? 0 : 1,
+            decodeTimingUnavailableCalls: sample.decodeMs === null ? 1 : 0,
             counters: { ...(sample.counters || {}) },
         });
     }
@@ -220,6 +278,26 @@ class PhoenixTransportAudit {
         window.kittPhoenixTransportAudit = () => this.snapshot();
         window.kittResetPhoenixTransportAudit = () => this.reset();
     }
+}
+
+function safeCodecMetrics<T>(
+    readCodecMetrics: ((response: T | undefined) => PhoenixTransportCodecMetrics) | undefined,
+    response: T | undefined,
+): PhoenixTransportCodecMetrics {
+    if (!readCodecMetrics) return {};
+    try {
+        return readCodecMetrics(response) || {};
+    } catch {
+        return {};
+    }
+}
+
+function finiteMetric(value: number | undefined): number | null {
+    return typeof value === 'number' && Number.isFinite(value) && value >= 0 ? value : null;
+}
+
+function formatMeasuredBytes(bytes: number, unavailableCalls: number): string {
+    return unavailableCalls ? `${bytes} B + ${unavailableCalls} unavailable` : `${bytes} B`;
 }
 
 function mergeCounters(target: Record<string, number>, source: Record<string, number> | undefined): void {

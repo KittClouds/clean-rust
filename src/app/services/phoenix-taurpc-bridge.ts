@@ -8,6 +8,11 @@ import type {
 } from './phoenix-graph-scene-packet.model';
 import { phoenixTransportAudit } from './phoenix-transport-audit';
 import type { PhoenixSnapshotPartition } from './phoenix-wasm.service';
+import type {
+    PhoenixMentionBatchRequest,
+    PhoenixMentionBatchResult,
+    PhoenixGraphRunOpenResult,
+} from './phoenix-backend.service';
 import {
     errorMessage,
     extractText,
@@ -92,10 +97,47 @@ function auditToken(value: unknown): string {
         .slice(0, 64);
 }
 
+export function graphAnalysisResidentDocumentRequest(
+    request: unknown,
+    residentDocuments: Map<string, { text: string; textHash: string }>,
+    pendingRun: { runHandle: string; signature: string } | null,
+): unknown {
+    const record = objectRecord(request);
+    const documents = Array.isArray(record?.['documents']) ? record['documents'] : null;
+    if (!record || !documents) return request;
+    let changed = false;
+    const compactDocuments = documents.map((value) => {
+        const document = objectRecord(value);
+        const noteId = stringValue(document?.['noteId']);
+        const text = stringValue(document?.['text']);
+        const resident = residentDocuments.get(noteId);
+        if (!resident || resident.text !== text) return value;
+        changed = true;
+        return { noteId, text: null, textHash: resident.textHash };
+    });
+    const compactRequest = changed ? { ...record, documents: compactDocuments } : record;
+    const signature = graphRunDocumentSignature(compactDocuments, 'noteId');
+    return pendingRun?.signature === signature
+        ? { ...compactRequest, runHandle: pendingRun.runHandle }
+        : compactRequest;
+}
+
+function graphRunDocumentSignature(documents: unknown[], idField: 'documentId' | 'noteId'): string {
+    return documents
+        .map((value) => {
+            const document = objectRecord(value);
+            return `${stringValue(document?.[idField])}:${stringValue(document?.['textHash'])}`;
+        })
+        .sort()
+        .join('|');
+}
+
 class PhoenixTaurpcBridge implements PhoenixNativeBridge {
     private ready = false;
     private loading: Promise<void> | null = null;
     private readonly readyCallbacks = new Set<ReadyCallback>();
+    private readonly residentGraphDocuments = new Map<string, { text: string; textHash: string }>();
+    private pendingGraphRun: { runHandle: string; signature: string } | null = null;
 
     constructor(private readonly rpc: PhoenixRpc) {}
 
@@ -125,11 +167,10 @@ class PhoenixTaurpcBridge implements PhoenixNativeBridge {
         const request = {
             forceReset,
             storagePath: null,
-            storage: 'nativeEphemeral',
+            storage: 'nativeLocal',
         };
         const info = await phoenixTransportAudit.measureTypedRpc(
             'phoenix.init_runtime',
-            request,
             () => this.rpc.phoenix.init_runtime(request),
         );
         this.markReady(Boolean(info.ready));
@@ -158,6 +199,107 @@ class PhoenixTaurpcBridge implements PhoenixNativeBridge {
 
     async scan(request: Record<string, unknown>): Promise<any> {
         return this.callJson('scan_json', request);
+    }
+
+    async scanMentionsBatch(request: PhoenixMentionBatchRequest): Promise<PhoenixMentionBatchResult[]> {
+        await this.loadRuntime();
+        const response = await phoenixTransportAudit.measureTypedRpc(
+            'phoenix.scan_mentions_batch',
+            () => this.rpc.phoenix.scan_mentions_batch(request),
+        );
+        const textByDocument = new Map(request.documents.map((document) => [document.documentId, document.text]));
+        for (const document of response.documents) {
+            const text = textByDocument.get(document.documentId);
+            if (text !== undefined) {
+                this.residentGraphDocuments.set(document.documentId, {
+                    text,
+                    textHash: document.textHash,
+                });
+            }
+        }
+        return response.documents.map((document) => {
+            const text = textByDocument.get(document.documentId) || '';
+            const mentions = document.mentions.map((row) => ({
+                start: Number(row[0] || 0),
+                end: Number(row[1] || 0),
+                kindIndex: Number(row[2] ?? -1),
+                entityIndex: Number(row[3] ?? -1),
+                confidence: Number(row[4] || 0),
+                sentenceIndex: Number(row[5] || 0),
+            }));
+            const offsets = utf8MentionOffsets(text, mentions);
+            return {
+                documentId: document.documentId,
+                mentions: mentions.map((mention) => ({
+                    range: { start: mention.start, end: mention.end },
+                    surface: text.slice(
+                        offsets.get(mention.start) ?? mention.start,
+                        offsets.get(mention.end) ?? mention.end,
+                    ),
+                    kind: mention.kindIndex < 0 ? null : response.kinds[mention.kindIndex] || null,
+                    entityRef: mention.entityIndex < 0
+                        ? null
+                        : response.entityRefs[mention.entityIndex] || null,
+                    source: 'discovery' as const,
+                    confidence: mention.confidence,
+                    sentenceIndex: mention.sentenceIndex,
+                })),
+            };
+        });
+    }
+
+    async openGraphRun(request: PhoenixMentionBatchRequest): Promise<PhoenixGraphRunOpenResult> {
+        await this.loadRuntime();
+        const response = await phoenixTransportAudit.measureTypedRpc(
+            'phoenix.open_graph_run',
+            () => this.rpc.phoenix.open_graph_run(request),
+        );
+        const textByDocument = new Map(request.documents.map((document) => [document.documentId, document.text]));
+        for (const document of response.documents) {
+            const text = textByDocument.get(document.documentId);
+            if (text !== undefined) {
+                this.residentGraphDocuments.set(document.documentId, { text, textHash: document.textHash });
+            }
+        }
+        this.pendingGraphRun = {
+            runHandle: response.runHandle,
+            signature: graphRunDocumentSignature(response.documents, 'documentId'),
+        };
+        return response;
+    }
+
+    async analyzeGraphSnapshot(request: unknown): Promise<unknown> {
+        await this.loadRuntime();
+        const residentRequest = graphAnalysisResidentDocumentRequest(
+            request,
+            this.residentGraphDocuments,
+            this.pendingGraphRun,
+        );
+        return phoenixTransportAudit.measureTypedRpc(
+            'phoenix.analyze_graph_snapshot',
+            () => this.rpc.phoenix.analyze_graph_snapshot(residentRequest as never),
+        );
+    }
+
+    async readGraphRunPage(request: { runHandle: string; offset: number; limit: number }): Promise<unknown> {
+        await this.loadRuntime();
+        return phoenixTransportAudit.measureTypedRpc(
+            'phoenix.read_graph_run_page',
+            () => this.rpc.phoenix.read_graph_run_page(request),
+        );
+    }
+
+    async persistGraphRun(runHandle: string): Promise<unknown> {
+        await this.loadRuntime();
+        return phoenixTransportAudit.measureTypedRpc(
+            'phoenix.persist_graph_run',
+            () => this.rpc.phoenix.persist_graph_run({ runHandle }),
+        );
+    }
+
+    async closeGraphRun(runHandle: string): Promise<boolean> {
+        await this.loadRuntime();
+        return this.rpc.phoenix.close_graph_run(runHandle);
     }
 
     async atlasRichScan(request: Record<string, unknown>): Promise<any> {
@@ -216,7 +358,6 @@ class PhoenixTaurpcBridge implements PhoenixNativeBridge {
         await this.loadRuntime();
         const bytes = await phoenixTransportAudit.measureTypedRpc(
             'phoenix.export_snapshot',
-            { partition },
             () => this.rpc.phoenix.export_snapshot(partition),
         );
         return bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
@@ -227,7 +368,6 @@ class PhoenixTaurpcBridge implements PhoenixNativeBridge {
         const payload = Array.from(bytes);
         return phoenixTransportAudit.measureTypedRpc(
             'phoenix.import_snapshot',
-            { bytes: payload.length },
             () => this.rpc.phoenix.import_snapshot(payload),
         );
     }
@@ -255,7 +395,6 @@ class PhoenixTaurpcBridge implements PhoenixNativeBridge {
     async compileGalaxyScene(request: PhoenixGalaxySceneRequest): Promise<PhoenixGalaxyScene> {
         const response = await phoenixTransportAudit.measureTypedRpc(
             'phoenix.compile_galaxy_scene',
-            request,
             () => this.rpc.phoenix.compile_galaxy_scene({
                 entities: request.entities.map((entity) => ({
                     ...entity,
@@ -602,6 +741,28 @@ class PhoenixTaurpcBridge implements PhoenixNativeBridge {
 
 function parseJson<T = any>(value: string): T {
     return value.trim() ? JSON.parse(value) as T : null as T;
+}
+
+export function utf8MentionOffsets(
+    text: string,
+    mentions: Array<{ start: number; end: number }>,
+): Map<number, number> {
+    const endpoints = new Set<number>();
+    for (const mention of mentions) {
+        endpoints.add(mention.start);
+        endpoints.add(mention.end);
+    }
+    const offsets = new Map<number, number>();
+    let byteOffset = 0;
+    let utf16Offset = 0;
+    for (const character of text) {
+        if (endpoints.has(byteOffset)) offsets.set(byteOffset, utf16Offset);
+        const codePoint = character.codePointAt(0) || 0;
+        byteOffset += codePoint <= 0x7f ? 1 : codePoint <= 0x7ff ? 2 : codePoint <= 0xffff ? 3 : 4;
+        utf16Offset += character.length;
+    }
+    if (endpoints.has(byteOffset)) offsets.set(byteOffset, utf16Offset);
+    return offsets;
 }
 
 function flattenNumericCounters(value: unknown, prefix: string, out: Record<string, number> = {}): Record<string, number> {

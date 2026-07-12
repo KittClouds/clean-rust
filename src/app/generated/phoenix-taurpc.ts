@@ -24,13 +24,49 @@ export type DesktopGalaxySceneRequest = { entities: DesktopGalaxySceneEntity[]; 
 
 export type DesktopGalaxySceneSettings = { edgeLength: number; nodeDistance: number }
 
+export type DesktopGraphRunCounts = { bridgeCandidates: number; bridgeByType: Partial<{ [key in string]: number }>; crossDocumentPairCoverage: number; crossDocumentSelected: number; crossDocumentRejected: number; crossDocumentWeakest: number; promotionRows: number; continuityEvents: number; continuityBoundaries: number; continuityEpisodes: number; continuityTemporal: number; continuityStates: number; continuityCausal: number; continuityConnections: number; continuityConflicts: number; governanceCandidates: number; governanceByAction: Partial<{ [key in string]: number }>; retrievalTopRows: number; retrievalViolations: number }
+
+export type DesktopGraphRunArenaStats = { analysisIdentity: string; reused: boolean; residentBytes: number; activeLeases: number; projectionMicros: number }
+
+export type DesktopDiscoveryCandidate = { key: string; token: string; kind: string; score: number; count: number; status: number }
+
+export type DesktopGraphRunOpenDocument = { documentId: string; textHash: string; candidates: DesktopDiscoveryCandidate[] }
+
+export type DesktopGraphRunOpenRequest = { documents: DesktopMentionBatchDocument[]; resolverSeed: DesktopMentionBatchResolverSeed[] }
+
+export type DesktopGraphRunOpenResponse = { schemaVersion: string; runHandle: string; documents: DesktopGraphRunOpenDocument[] }
+
+export type DesktopGraphRunPage = { schemaVersion: string; source: string; runHandle: string; offset: number; limit: number; detailRows: number; returnedDetailRows: number; nextOffset: number | null; arena: DesktopGraphRunArenaStats; counts: DesktopGraphRunCounts; projection: JsonValue }
+
+export type DesktopGraphRunPageRequest = { runHandle: string; offset: number; limit: number }
+
+export type DesktopGraphRunPersistRequest = { runHandle: string }
+
+export type DesktopGraphRunPersistReceipt = { schemaVersion: string; runHandle: string; scopeId: string; snapshotId: string; manifestId: string; committedAt: number; changedSections: number; reusedSections: number; encodedSections: number; compressedSections: number; rawBytesWritten: number; compressedBytesWritten: number }
+
 export type DesktopInitRequest = { forceReset: boolean; storagePath: string | null; storage: string | null }
+
+export type DesktopMentionBatchDocument = { documentId: string; text: string }
+
+export type DesktopMentionBatchRequest = { documents: DesktopMentionBatchDocument[]; resolverSeed: DesktopMentionBatchResolverSeed[] }
+
+export type DesktopMentionBatchResolverSeed = { entityId: string; canonicalName: string; aliases: string[]; kind: string | null; scope: DesktopMentionBatchScope }
+
+export type DesktopMentionBatchResponse = { schemaVersion: string; kinds: string[]; entityRefs: string[]; documents: DesktopMentionBatchResult[] }
+
+export type DesktopMentionBatchResult = { documentId: string; textHash: string; mentions: number[][] }
+
+export type DesktopMentionBatchScope = { worldId: string | null; narrativeId: string | null; folderId: string | null; folderPath: string | null }
 
 export type DesktopRelationCount = { relation: string; rows: number }
 
 export type DesktopRuntimeInfo = { banner: string; target: string; ready: boolean; storage: string; storagePath: string | null; featureFlags: DesktopFeatureFlags; schemaVersion: string; relationCount: number; relationCounts: DesktopRelationCount[]; diagnostics: DesktopDiagnostic[] }
 
+export type DesktopSnapshotAnalysisRequest = { runHandle?: string; snapshot: JsonValue; documents: JsonValue; documentSemanticSummary?: JsonValue; retrievalCandidates?: JsonValue; receipts?: JsonValue; commits?: JsonValue; userOverrides?: JsonValue; siegel?: JsonValue }
+
 export type DesktopSnapshotImportResult = { schemaVersion: string; relationCount: number; createdAt: number; relationNames: string[]; checksum: string | null }
+
+export type JsonValue = null | boolean | number | string | JsonValue[] | Partial<{ [key in string]: JsonValue }>
 
 export type NativeQwenSpeakRequest = { text: string; runnerPath: string | null; model: string | null; modelPath: string | null; refAudio: string | null; refText: string | null; outputDir: string | null; loadPrompt: string | null; savePrompt: string | null; usePromptCache: boolean | null; language: string | null; device: string | null; dtype: string | null; maxTokens: number | null; greedy: boolean | null; xVectorOnly: boolean | null; timeoutSecs: number | null }
 
@@ -46,11 +82,13 @@ export type NativeTtsSynthResult = { sampleRate: number; sampleCount: number; pc
 
 export type NativeTtsTimings = { conditionMs: number; tokenMs: number; decodeMs: number; totalMs: number }
 
-const ARGS_MAP = { 'phoenix':'{"analyze_text_json":["request_json"],"atlas_rich_scan_json":["request_json"],"boot_snapshot_json":[],"build_structure_json":["request_json"],"close_runtime":[],"commit_json":["request_json"],"compile_galaxy_scene":["request"],"create_session_json":["request_json"],"export_snapshot":["partition"],"graph_delta_json":["request_json"],"graph_scene_packet_json":["request_json"],"import_snapshot":["bytes"],"ingest_json":["request_json"],"init_runtime":["request"],"lorentz_forest_build_json":["request_json"],"lorentz_forest_cache_json":["request_json"],"lorentz_forest_query_json":["request_json"],"manifold_snapshot_json":["request_json"],"nli_adjudicate_claims_json":["request_json"],"query_json":["request_json"],"rebuild_json":["request_json"],"runtime_info":[],"scan_json":["request_json"],"session_state_json":["request_json"],"session_stats_json":["request_json"],"siegel_finsler_receipt_json":["request_json"],"store_command":["command","payload_json"],"tts_load":["request"],"tts_qwen_speak":["request"],"tts_speak":["request"],"tts_status":[],"tts_supertonic_speak":["request"],"tts_unload":[]}' }
-export type Router = { "phoenix": {analyze_text_json: (requestJson: string) => Promise<string>, 
+const ARGS_MAP = { 'phoenix':'{"analyze_graph_snapshot":["request"],"analyze_text_json":["request_json"],"atlas_rich_scan_json":["request_json"],"boot_snapshot_json":[],"build_structure_json":["request_json"],"close_graph_run":["run_handle"],"close_runtime":[],"commit_json":["request_json"],"compile_galaxy_scene":["request"],"create_session_json":["request_json"],"export_snapshot":["partition"],"graph_delta_json":["request_json"],"graph_scene_packet_json":["request_json"],"import_snapshot":["bytes"],"ingest_json":["request_json"],"init_runtime":["request"],"lorentz_forest_build_json":["request_json"],"lorentz_forest_cache_json":["request_json"],"lorentz_forest_query_json":["request_json"],"manifold_snapshot_json":["request_json"],"nli_adjudicate_claims_json":["request_json"],"open_graph_run":["request"],"persist_graph_run":["request"],"query_json":["request_json"],"read_graph_run_page":["request"],"rebuild_json":["request_json"],"runtime_info":[],"scan_json":["request_json"],"scan_mentions_batch":["request"],"session_state_json":["request_json"],"session_stats_json":["request_json"],"siegel_finsler_receipt_json":["request_json"],"store_command":["command","payload_json"],"tts_load":["request"],"tts_qwen_speak":["request"],"tts_speak":["request"],"tts_status":[],"tts_supertonic_speak":["request"],"tts_unload":[]}' }
+export type Router = { "phoenix": {analyze_graph_snapshot: (request: DesktopSnapshotAnalysisRequest) => Promise<DesktopGraphRunPage>,
+analyze_text_json: (requestJson: string) => Promise<string>,
 atlas_rich_scan_json: (requestJson: string) => Promise<string>, 
 boot_snapshot_json: () => Promise<string>, 
 build_structure_json: (requestJson: string) => Promise<string>, 
+close_graph_run: (runHandle: string) => Promise<boolean>,
 close_runtime: () => Promise<boolean>, 
 commit_json: (requestJson: string) => Promise<string>, 
 compile_galaxy_scene: (request: DesktopGalaxySceneRequest) => Promise<DesktopGalaxyScene>, 
@@ -66,10 +104,14 @@ lorentz_forest_cache_json: (requestJson: string) => Promise<string>,
 lorentz_forest_query_json: (requestJson: string) => Promise<string>, 
 manifold_snapshot_json: (requestJson: string) => Promise<string>, 
 nli_adjudicate_claims_json: (requestJson: string) => Promise<string>, 
+open_graph_run: (request: DesktopGraphRunOpenRequest) => Promise<DesktopGraphRunOpenResponse>,
+persist_graph_run: (request: DesktopGraphRunPersistRequest) => Promise<DesktopGraphRunPersistReceipt>,
 query_json: (requestJson: string) => Promise<string>, 
+read_graph_run_page: (request: DesktopGraphRunPageRequest) => Promise<DesktopGraphRunPage>,
 rebuild_json: (requestJson: string) => Promise<string>, 
 runtime_info: () => Promise<DesktopRuntimeInfo>, 
 scan_json: (requestJson: string) => Promise<string>, 
+scan_mentions_batch: (request: DesktopMentionBatchRequest) => Promise<DesktopMentionBatchResponse>,
 session_state_json: (requestJson: string) => Promise<string>, 
 session_stats_json: (requestJson: string) => Promise<string>, 
 siegel_finsler_receipt_json: (requestJson: string) => Promise<string>,

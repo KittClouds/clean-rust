@@ -29,6 +29,7 @@ import type {
     GraphContinuityTemporalCandidate,
     GraphEpisodeBoundaryReceipt,
     GraphEpisodeContinuityCandidate,
+    GraphStoryContinuityContract,
     GraphStoryEpisode,
 } from './graph-story-continuity';
 import type {
@@ -77,7 +78,6 @@ export function buildAtlasControlRows(
     for (const edge of snapshot?.temporalEdges ?? []) rows.push(temporalRow(snapshotId, edge));
     for (const edge of snapshot?.causalEdges ?? []) rows.push(causalRow(snapshotId, edge));
     for (const state of snapshot?.memoryState ?? []) rows.push(memoryStateRow(snapshotId, state));
-    for (const bridge of snapshot?.chunkSemanticBridges ?? []) rows.push(chunkBridgeRow(snapshotId, bridge));
     for (const connection of snapshot?.episodeConnections ?? []) rows.push(episodeConnectionRow(snapshotId, connection));
     for (const entry of snapshot?.discourseEvalLedgerSummary?.entries ?? []) {
         rows.push(typedRow(snapshotId, 'graph_build', 'discourse_ledger', entry.id, entry.candidateKind,
@@ -99,26 +99,15 @@ export function buildAtlasControlRows(
                 tags: ['text_pair_nli', row.label],
             }));
     }
-    for (const row of snapshot?.memoryGovernanceCandidates ?? []) rows.push(governanceRow(snapshotId, row));
-    for (const row of promotion?.rows ?? []) rows.push(promotionRow(snapshotId, row));
-    for (const row of snapshot?.storyContinuity?.boundaryReceipts ?? []) rows.push(continuityBoundaryRow(snapshotId, row));
-    for (const row of snapshot?.storyContinuity?.episodes ?? []) rows.push(continuityEpisodeRow(snapshotId, row));
-    for (const row of snapshot?.storyContinuity?.episodeConnections ?? []) rows.push(continuityConnectionRow(snapshotId, row));
-    for (const row of snapshot?.storyContinuity?.temporalCandidates ?? []) rows.push(continuityTemporalRow(snapshotId, row));
-    for (const row of snapshot?.storyContinuity?.causalCandidates ?? []) rows.push(continuityCausalRow(snapshotId, row));
-    for (const row of snapshot?.storyContinuity?.stateIntervals ?? []) rows.push(continuityStateRow(snapshotId, row));
-    for (const row of snapshot?.storyContinuity?.conflicts ?? []) rows.push(continuityConflictRow(snapshotId, row));
-    const crossDocument = snapshot?.crossDocumentBridgeCertificate;
-    for (const pair of crossDocument?.pairCoverage ?? []) {
-        rows.push(crossDocumentPairCoverageRow(snapshotId, pair));
-    }
-    const weakestIds = new Set((crossDocument?.weakestRows ?? []).map((row) => row.id));
-    for (const row of crossDocument?.selectedRows ?? []) {
-        rows.push(crossDocumentCandidateRow(snapshotId, row, weakestIds.has(row.id)));
-    }
-    for (const row of crossDocument?.rejectedRows ?? []) {
-        rows.push(crossDocumentCandidateRow(snapshotId, row, false));
-    }
+    rows.push(...buildAtlasNativeProofRows(snapshotId, {
+        bridge: {
+            candidates: snapshot?.chunkSemanticBridges ?? [],
+            crossDocumentCertificate: snapshot?.crossDocumentBridgeCertificate ?? null,
+        },
+        continuity: { contract: snapshot?.storyContinuity ?? null },
+        governance: { candidates: snapshot?.memoryGovernanceCandidates ?? [] },
+        promotion: { certificate: promotion },
+    }));
     for (const receipt of snapshot?.storyContinuity?.actionReceipts ?? []) {
         const target = rows.find((row) =>
             row.identity.sourceContract === 'story_continuity' && row.identity.rawId === receipt.targetRowId);
@@ -131,6 +120,46 @@ export function buildAtlasControlRows(
             'measured', null, ['inspect'], noReceipt(), [], { tags: ['timing'] }));
     }
     return uniquifyRows(rows);
+}
+
+export interface AtlasNativeProofProjection {
+    bridge: {
+        candidates: GraphRebuildChunkSemanticBridge[];
+        crossDocumentCertificate: GraphRebuildSnapshot['crossDocumentBridgeCertificate'] | null;
+    };
+    continuity: { contract: GraphStoryContinuityContract | null };
+    governance: { candidates: GraphMemoryGovernanceCandidate[] };
+    promotion: { certificate: GraphPromotionVerdictCertificate | null };
+}
+
+export function buildAtlasNativeProofRows(
+    snapshotId: string,
+    projection: AtlasNativeProofProjection,
+): AtlasControlRow[] {
+    const rows: AtlasControlRow[] = [];
+    for (const bridge of projection.bridge.candidates) rows.push(chunkBridgeRow(snapshotId, bridge));
+    for (const row of projection.governance.candidates) rows.push(governanceRow(snapshotId, row));
+    for (const row of projection.promotion.certificate?.rows ?? []) rows.push(promotionRow(snapshotId, row));
+    const continuity = projection.continuity.contract;
+    for (const row of continuity?.boundaryReceipts ?? []) rows.push(continuityBoundaryRow(snapshotId, row));
+    for (const row of continuity?.episodes ?? []) rows.push(continuityEpisodeRow(snapshotId, row));
+    for (const row of continuity?.episodeConnections ?? []) rows.push(continuityConnectionRow(snapshotId, row));
+    for (const row of continuity?.temporalCandidates ?? []) rows.push(continuityTemporalRow(snapshotId, row));
+    for (const row of continuity?.causalCandidates ?? []) rows.push(continuityCausalRow(snapshotId, row));
+    for (const row of continuity?.stateIntervals ?? []) rows.push(continuityStateRow(snapshotId, row));
+    for (const row of continuity?.conflicts ?? []) rows.push(continuityConflictRow(snapshotId, row));
+    const crossDocument = projection.bridge.crossDocumentCertificate;
+    for (const pair of crossDocument?.pairCoverage ?? []) {
+        rows.push(crossDocumentPairCoverageRow(snapshotId, pair));
+    }
+    const weakestIds = new Set((crossDocument?.weakestRows ?? []).map((row) => row.id));
+    for (const row of crossDocument?.selectedRows ?? []) {
+        rows.push(crossDocumentCandidateRow(snapshotId, row, weakestIds.has(row.id)));
+    }
+    for (const row of crossDocument?.rejectedRows ?? []) {
+        rows.push(crossDocumentCandidateRow(snapshotId, row, false));
+    }
+    return rows;
 }
 
 function continuityBoundaryRow(snapshotId: string, row: GraphEpisodeBoundaryReceipt): AtlasControlRow {

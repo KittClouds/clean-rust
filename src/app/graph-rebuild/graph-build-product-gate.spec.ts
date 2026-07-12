@@ -184,6 +184,7 @@ describeBaseline('product graph build gate', () => {
     }, SHOULD_WRITE_TAXONOMY_AUDIT ? 180_000 : 30_000);
 
     it('gates product buildGraph warm interactive latency and write count', async () => {
+        backend.target = 'native';
         const text = productGateText();
         const chunks = buildAdaptiveGraphRebuildChunks('shortrun', text);
         harnessState.notes = [shortrunNote(text)];
@@ -219,21 +220,22 @@ describeBaseline('product graph build gate', () => {
         expect(warm.snapshot.atlasPacket?.sourceContract.authority).toBe('rust-atlas-packet');
         expect(warm.snapshot.atlasPacket?.sourceContract.authority).not.toContain('typescript');
         expect(warm.snapshot.buildTimings?.nativeCompilerSkipped).toBe(1);
-        expect(warm.snapshot.buildTimings?.snapshotReusedContentBlobs).toBeGreaterThan(0);
+        expect(warm.snapshot.buildTimings?.snapshotReusedContentBlobs).toBe(0);
         expect(warm.snapshot.buildTimings?.snapshotWrittenContentBlobs).toBe(0);
         expect(warm.snapshot.buildTimings?.snapshotContentBlobReads).toBe(0);
-        expect(warm.snapshot.buildTimings?.snapshotContentBlobManifestTrusted).toBe(1);
+        expect(warm.snapshot.buildTimings?.snapshotContentBlobManifestTrusted).toBe(0);
         expect(warm.snapshot.buildTimings?.snapshotPrimaryIdentityReused).toBe(1);
         expect(warm.snapshot.buildTimings?.snapshotPrimaryWriteSkipped).toBe(1);
         expect(warm.snapshot.buildTimings?.snapshotStoreDocuments).toBe(0);
         expect(warm.snapshot.buildTimings?.previousSnapshotHydrationSkipped).toBe(1);
         expect(warm.snapshot.buildTimings?.nativeChunkerSkipped).toBe(1);
         expect(warm.snapshot.buildTimings?.documentSemanticSkipped).toBe(1);
-        expect(warm.snapshot.buildTimings?.nativeMemoryGovernanceRetrievalExperimentCandidates)
-            .toBeGreaterThan(0);
-        expect(warm.snapshot.buildTimings?.nativeMemoryGovernanceRetrievalExperimentCandidates)
-            .toBeLessThan(warm.snapshot.counters.embeddingTargets);
+        expect(warm.snapshot.buildTimings?.nativeMemoryGovernanceRetrievalExperimentCandidates).toBe(0);
         expect(warm.snapshot.buildTimings?.nativeMemoryGovernanceRetrievalExperimentSkipped).toBe(1);
+        expect(warm.snapshot.buildTimings?.nativeGraphRunReusedSections).toBe(7);
+        expect(warm.snapshot.buildTimings?.nativeGraphRunChangedSections).toBe(0);
+        expect(warm.snapshot.buildTimings?.nativeGraphRunEncodedSections).toBe(0);
+        expect(warm.snapshot.buildTimings?.nativeGraphRunCompressedSections).toBe(0);
         expect(parity).toMatchObject({
             graphDiscourse: expect.any(Number),
             graphProposed: expect.any(Number),
@@ -266,6 +268,18 @@ describeBaseline('product graph build gate', () => {
             .toBe(warm.snapshot.authorityContract?.contentHash);
         expect(backend.commands.filter((row) => row.command === 'graphRebuild:compileDualWrite').length)
             .toBe(0);
+        expect(backend.snapshotAnalyses).toHaveLength(1);
+        expect(backend.persistGraphRun).toHaveBeenCalledTimes(2);
+        expect(backend.closeGraphRun).toHaveBeenCalledTimes(0);
+        expect(backend.commands.filter((row) => row.command === 'graphRebuild:analyzeSnapshot'))
+            .toHaveLength(0);
+        expect(backend.commands.filter((row) => [
+            'graphRebuild:chunkSemanticBridges',
+            'graphRebuild:storyContinuity',
+            'graphRebuild:memoryGovernance',
+            'graphRebuild:memoryGovernanceRetrievalExperiment',
+            'graphPromotion:verdictCertificate',
+        ].includes(row.command))).toHaveLength(0);
         expect(store.upsertScopedDocuments).toHaveBeenCalledTimes(1);
         console.log(`[graph-product-gate] warmMs=${warmWallMs} scopedWrites=${warmScopedWrites} receiptWritesAfterReturn=${warmScopedWritesAfterReceipt} operatorJournalReads=${warmOperatorJournalReads} blobsWritten=${warm.snapshot.buildTimings?.snapshotWrittenContentBlobs || 0} nodes=${warm.snapshot.counters.nodes} edges=${warm.snapshot.counters.edges} targets=${warm.snapshot.counters.embeddingTargets}`);
     }, 30_000);
@@ -320,18 +334,14 @@ describeBaseline('product graph build gate', () => {
         expect(persistedSnapshotId(store, DIAGNOSTIC_SNAPSHOT_DOCUMENT_KEY)).toBe(diagnosticIdBeforeStaleRun);
     }, 30_000);
 
-    it('keeps graph builds alive when optional native candidate commands are unavailable', async () => {
+    it('fails closed when the native snapshot analysis boundary is unavailable', async () => {
         const text = 'Kai approved Hazel near Red Mesa. Hazel opposed Kai before dawn.';
         backend.target = 'native';
-        backend.unsupportedCommands.add('graphRebuild:chunkSemanticBridges');
-        backend.unsupportedCommands.add('graphRebuild:storyContinuity');
-        backend.unsupportedCommands.add('graphRebuild:memoryGovernance');
-        backend.unsupportedCommands.add('graphRebuild:memoryGovernanceRetrievalExperiment');
-        backend.unsupportedCommands.add('graphPromotion:verdictCertificate');
+        backend.unsupportedCommands.add('graphRebuild:analyzeSnapshot');
         harnessState.notes = [shortrunNote(text)];
         harnessState.entities = shortrunEntities();
         harnessState.occurrences = [];
-        const snapshot = await graphRebuild.buildAndPersistSnapshot({
+        await expect(graphRebuild.buildAndPersistSnapshot({
             scopeKind: 'note',
             scopeId: 'note:shortrun',
             noteIds: ['shortrun'],
@@ -340,25 +350,17 @@ describeBaseline('product graph build gate', () => {
             entities: harnessState.entities,
             postProcessMode: 'full',
             durabilityMode: 'interactive',
-        });
+        })).rejects.toThrow('unsupported store command: graphRebuild:analyzeSnapshot');
 
-        expect(snapshot.chunkSemanticBridges).toEqual([]);
-        expect(snapshot.memoryGovernanceCandidates).toEqual([]);
-        expect(snapshot.promotionVerdictCertificate).toBeUndefined();
-        expect(snapshot.buildTimings?.nativeChunkSemanticBridgeSkipped).toBe(1);
-        expect(snapshot.buildTimings?.nativeStoryContinuitySkipped).toBe(1);
-        expect(snapshot.buildTimings?.nativeMemoryGovernanceSkipped).toBe(1);
-        expect(snapshot.buildTimings?.nativeMemoryGovernanceRetrievalExperimentSkipped).toBe(1);
-        expect(snapshot.buildTimings?.nativePromotionVerdictSkipped).toBe(1);
-        expect(backend.commands.map((row) => row.command)).toEqual(expect.arrayContaining([
+        expect(backend.snapshotAnalyses).toHaveLength(1);
+        expect(backend.commands.map((row) => row.command)).not.toContain('graphRebuild:analyzeSnapshot');
+        expect(backend.commands.filter((row) => [
             'graphRebuild:chunkSemanticBridges',
             'graphRebuild:storyContinuity',
             'graphRebuild:memoryGovernance',
             'graphRebuild:memoryGovernanceRetrievalExperiment',
             'graphPromotion:verdictCertificate',
-        ]));
-        expect(backend.commands.find((row) => row.command === 'graphPromotion:verdictCertificate')?.payload)
-            .toMatchObject({ scopeId: 'note:shortrun', receipts: expect.any(Array), commits: [] });
+        ].includes(row.command))).toHaveLength(0);
     }, 30_000);
 });
 
@@ -921,21 +923,29 @@ function entity(id: string, label: string, kind: EntityKind, aliases: string[] =
 
 function createNerHarness() {
     const suggestions = signal<any[]>([]);
+    const suggestionsForText = (plainText: string) => {
+        const lower = plainText.toLocaleLowerCase();
+        return harnessState.entities
+            .filter((entity) => [entity.label, ...(entity.aliases || [])]
+                .some((surface) => lower.includes(String(surface).toLocaleLowerCase())))
+            .map((entity) => ({
+                id: `suggestion:${entity.id}`,
+                entityId: entity.id,
+                label: entity.label,
+                kind: entity.kind,
+                confidence: 0.91,
+                source: 'dynamic_ner',
+            }));
+    };
     return {
         suggestions: computed(() => suggestions()),
         runDynamicScan: vi.fn(async (input: { plainText: string }) => {
-            const lower = input.plainText.toLocaleLowerCase();
-            suggestions.set(harnessState.entities
-                .filter((entity) => [entity.label, ...(entity.aliases || [])]
-                    .some((surface) => lower.includes(String(surface).toLocaleLowerCase())))
-                .map((entity) => ({
-                    id: `suggestion:${entity.id}`,
-                    entityId: entity.id,
-                    label: entity.label,
-                    kind: entity.kind,
-                    confidence: 0.91,
-                    source: 'dynamic_ner',
-                })));
+            suggestions.set(suggestionsForText(input.plainText));
+        }),
+        scanDynamicBatch: vi.fn(async (requests: Array<{ plainText: string }>) =>
+            requests.map((request) => suggestionsForText(request.plainText))),
+        applyDynamicScanResult: vi.fn(async (_request: unknown, result: any[]) => {
+            suggestions.set(result);
         }),
         acceptSuggestionForContext: vi.fn(async (id: string) => {
             suggestions.set(suggestions().filter((suggestion) => suggestion.id !== id));
@@ -1088,21 +1098,45 @@ function scopedDocumentKey(scopeId: string, namespace: string, documentKey: stri
 
 function createBackendHarness() {
     const commands: Array<{ command: string; payload: unknown; requestChars: number }> = [];
+    const snapshotAnalyses: unknown[] = [];
     const unsupportedCommands = new Set<string>();
+    let latestNativeSnapshot: { id: string; scopeId: string } | null = null;
     return {
         commands,
+        snapshotAnalyses,
         unsupportedCommands,
         target: SHOULD_WRITE_TAXONOMY_AUDIT ? 'native' : 'web',
+        analyzeGraphSnapshot: vi.fn(async (payload: unknown) => {
+            snapshotAnalyses.push(payload);
+            const snapshot = (payload as { snapshot?: { id?: string; scopeId?: string } }).snapshot;
+            latestNativeSnapshot = {
+                id: snapshot?.id || 'snapshot:test',
+                scopeId: snapshot?.scopeId || 'scope:test',
+            };
+            if (unsupportedCommands.has('graphRebuild:analyzeSnapshot')) {
+                throw new Error('unsupported store command: graphRebuild:analyzeSnapshot');
+            }
+            return emptyNativeGraphRunPage(payload);
+        }),
+        persistGraphRun: vi.fn(async (runHandle: string) => ({
+            schemaVersion: 'phoenix-graph-run-durable-receipt/v1',
+            runHandle,
+            scopeId: latestNativeSnapshot?.scopeId || 'scope:test',
+            snapshotId: latestNativeSnapshot?.id || 'snapshot:test',
+            manifestId: 'b3:test',
+            changedSections: 0,
+            reusedSections: 7,
+            encodedSections: 0,
+            compressedSections: 0,
+            rawBytesWritten: 0,
+            compressedBytesWritten: 0,
+        })),
+        readGraphRunPage: vi.fn(async () => null),
+        closeGraphRun: vi.fn(async () => true),
         storeCommand: vi.fn(async (command: string, payload: unknown) => {
             commands.push({ command, payload, requestChars: JSON.stringify(payload || {}).length });
             if (unsupportedCommands.has(command)) {
                 throw new Error(`unsupported store command: ${command}`);
-            }
-            if (command === 'graphRebuild:chunkSemanticBridges') {
-                return compileNativeChunkBridgeSidecar(payload);
-            }
-            if (command === 'graphPromotion:verdictCertificate') {
-                return emptyNativePromotionVerdictOutput();
             }
             if (SHOULD_WRITE_TAXONOMY_AUDIT && command === 'graphRebuild:compileDualWrite') {
                 return compileNativeAuditSidecar(payload);
@@ -1119,6 +1153,151 @@ function createBackendHarness() {
             }
             return null;
         }),
+    };
+}
+
+function emptyNativeSnapshotAnalysisOutput(payload: unknown): unknown {
+    const request = payload as {
+        snapshot?: { id?: string; builtAt?: number };
+        documents?: Array<{ noteId?: string }>;
+    };
+    const sourceSnapshotId = request.snapshot?.id || 'snapshot:test';
+    const sourceDocumentIds = (request.documents || [])
+        .map((document) => document.noteId || '')
+        .filter(Boolean);
+    const continuityCounters = {
+        events: 0,
+        boundaryReceipts: 0,
+        episodes: 0,
+        temporalCandidates: 0,
+        stateIntervals: 0,
+        causalCandidates: 0,
+        episodeConnections: 0,
+        conflicts: 0,
+        crossDocumentConnections: 0,
+        reviewRequired: 0,
+    };
+    return {
+        schemaVersion: 'phoenix-graph-snapshot-analysis-native-output/v1',
+        source: 'rust',
+        bridge: {
+            schemaVersion: 'phoenix-chunk-semantic-bridge-native-output/v1',
+            source: 'rust',
+            candidates: [],
+            crossDocumentCertificate: {
+                schemaVersion: 'phoenix-cross-document-bridge-run-certificate/v1',
+                sourceDocumentIds,
+                generatedCandidates: 0,
+                eligibleCandidates: 0,
+                selectedCandidates: 0,
+                rejectedCandidates: 0,
+                pairCoverage: [],
+                rejectionCounts: [],
+                selectedRows: [],
+                rejectedRows: [],
+                weakestRows: [],
+                noTopologyWrites: true,
+                invariantReceipts: ['chunk_semantic_bridge_candidate:no_topology_commit'],
+            },
+            qualityGate: { total: 0, accepted: 0, demotedSameEntityOnly: 0 },
+            timing: { bridgeBuildMicros: 0, totalMicros: 0 },
+        },
+        continuity: {
+            schemaVersion: 'phoenix-story-continuity-native-output/v1',
+            source: 'rust',
+            contract: {
+                schemaVersion: 'phoenix-story-continuity/v1',
+                source: 'rust_story_continuity',
+                sourceSnapshotId,
+                generatedAt: request.snapshot?.builtAt || 0,
+                commitPolicy: 'candidate_only',
+                noTopologyCommit: true,
+                events: [],
+                boundaryReceipts: [],
+                episodes: [],
+                temporalCandidates: [],
+                stateIntervals: [],
+                causalCandidates: [],
+                episodeConnections: [],
+                conflicts: [],
+                certificate: {
+                    schemaVersion: 'phoenix-story-continuity-run-certificate/v1',
+                    sourceSnapshotId,
+                    sourceDocumentIds,
+                    buildMicros: 0,
+                    eventIdentityMicros: 0,
+                    episodeBoundaryMicros: 0,
+                    relationResolutionMicros: 0,
+                    counters: continuityCounters,
+                    noTopologyWrites: true,
+                    allRowsEvidenced: true,
+                    stableSourceIdentities: true,
+                    fixedBatchingDetected: false,
+                    invariantReceipts: [],
+                },
+            },
+            timing: { continuityBuildMicros: 0, totalMicros: 0 },
+        },
+        governance: {
+            schemaVersion: 'phoenix-memory-governance-native-output/v1',
+            source: 'rust',
+            candidates: [],
+            timing: { governanceBuildMicros: 0, totalMicros: 0 },
+        },
+        retrieval: null,
+        promotion: emptyNativePromotionVerdictOutput(),
+        noTopologyWrites: true,
+        timing: {
+            bridgeBuildMicros: 0,
+            continuityBuildMicros: 0,
+            governanceBuildMicros: 0,
+            retrievalBuildMicros: 0,
+            verdictBuildMicros: 0,
+            totalMicros: 0,
+        },
+    };
+}
+
+function emptyNativeGraphRunPage(payload: unknown): unknown {
+    const snapshotId = (payload as { snapshot?: { id?: string } })?.snapshot?.id || 'test';
+    return {
+        schemaVersion: 'phoenix-graph-run-page/v1',
+        source: 'rust',
+        runHandle: `graph-run:${snapshotId}`,
+        offset: 0,
+        limit: 8,
+        detailRows: 0,
+        returnedDetailRows: 0,
+        nextOffset: null,
+        arena: {
+            analysisIdentity: 'b3-test-analysis',
+            reused: false,
+            residentBytes: 4096,
+            activeLeases: 1,
+            projectionMicros: 10,
+        },
+        counts: {
+            bridgeCandidates: 0,
+            bridgeByType: {},
+            crossDocumentPairCoverage: 0,
+            crossDocumentSelected: 0,
+            crossDocumentRejected: 0,
+            crossDocumentWeakest: 0,
+            promotionRows: 0,
+            continuityEvents: 0,
+            continuityBoundaries: 0,
+            continuityEpisodes: 0,
+            continuityTemporal: 0,
+            continuityStates: 0,
+            continuityCausal: 0,
+            continuityConnections: 0,
+            continuityConflicts: 0,
+            governanceCandidates: 0,
+            governanceByAction: {},
+            retrievalTopRows: 0,
+            retrievalViolations: 0,
+        },
+        projection: emptyNativeSnapshotAnalysisOutput(payload),
     };
 }
 
@@ -1170,33 +1349,6 @@ function compileNativeAuditSidecar(payload: unknown): unknown {
     if (result.error) throw result.error;
     if (result.status !== 0) {
         throw new Error(result.stderr || `native audit sidecar exited ${result.status}`);
-    }
-    return JSON.parse(result.stdout);
-}
-
-function compileNativeChunkBridgeSidecar(payload: unknown): unknown {
-    const result = spawnSync('cargo', [
-        'run',
-        '--quiet',
-        '--manifest-path',
-        'rust-native/phoenix/Cargo.toml',
-        '-p',
-        'phoenix-graph-rebuild',
-        '--example',
-        'chunk_bridge_from_snapshot',
-    ], {
-        cwd: process.cwd(),
-        env: {
-            ...process.env,
-            CARGO_TARGET_DIR: process.env['CARGO_TARGET_DIR'] || 'D:\\phoenix-target-overgraph',
-        },
-        input: JSON.stringify(payload || {}),
-        encoding: 'utf8',
-        maxBuffer: 64 * 1024 * 1024,
-    });
-    if (result.error) throw result.error;
-    if (result.status !== 0) {
-        throw new Error(result.stderr || `native chunk bridge sidecar exited ${result.status}`);
     }
     return JSON.parse(result.stdout);
 }

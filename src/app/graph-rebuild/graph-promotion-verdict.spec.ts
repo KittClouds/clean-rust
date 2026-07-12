@@ -34,7 +34,7 @@ describe('graph promotion verdict preview receipts', () => {
             }),
             modelId: null,
         }));
-        expect(receipts[0].receiptId).toBe('graph-proposal:atlas-preview:ea436c3c');
+        expect(receipts[0].receiptId).toBe('graph-proposal:atlas-preview:8c10da0d');
         expect(receipts[0].proposals.map((proposal) => proposal.proposalId)).toEqual([
             'suggestion-a',
             'suggestion-b',
@@ -64,6 +64,15 @@ describe('graph promotion verdict preview receipts', () => {
         expect(receipts).toHaveLength(1);
         expect(receipts[0].proposals).toHaveLength(1);
         expect(receipts[0].proposals[0].proposalId).toBe('first');
+    });
+
+    it('keeps preview receipt identity stable across rebuild timestamps', () => {
+        const first = snapshotWithSuggestions([linkSuggestion()]);
+        const second = { ...first, id: 'snapshot:other-run', builtAt: 987654 };
+
+        expect(buildGraphPromotionPreviewReceipts(second)).toEqual(
+            buildGraphPromotionPreviewReceipts(first),
+        );
     });
 
     it('does not emit empty preview receipts', () => {

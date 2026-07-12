@@ -13,6 +13,7 @@ import type {
     AtlasControlRoomActionRequest,
     AtlasControlRoomId,
 } from '../../../../graph-rebuild/atlas-control-room-contract';
+import type { AtlasProofPagingState } from '../../../../services/atlas-control-contract.service';
 
 const ROW_LIMIT = 160;
 
@@ -25,9 +26,18 @@ const ROW_LIMIT = 160;
 })
 export class AtlasControlRoomsComponent {
     readonly contract = input.required<AtlasControlContract>();
+    readonly paging = input<AtlasProofPagingState>({
+        runHandle: null,
+        status: 'idle',
+        loadedRows: 0,
+        totalRows: 0,
+        nextOffset: null,
+        error: null,
+    });
     readonly selectedRoomId = input<AtlasControlRoomId>('entities');
     readonly roomChange = output<AtlasControlRoomId>();
     readonly actionRequested = output<AtlasControlRoomActionRequest>();
+    readonly nextPageRequested = output<void>();
 
     readonly selectedInventoryId = signal<AtlasControlInventoryCategoryId | null>(null);
     readonly selectedRowId = signal<string | null>(null);
@@ -81,11 +91,13 @@ export class AtlasControlRoomsComponent {
         this.selectedRowId.set(null);
         this.query.set('');
         this.roomChange.emit(roomId);
+        this.requestNextPageIfAvailable();
     }
 
     selectInventory(id: AtlasControlInventoryCategoryId): void {
         this.selectedInventoryId.update((current) => current === id ? null : id);
         this.selectedRowId.set(null);
+        this.requestNextPageIfAvailable();
     }
 
     selectRow(rowId: string): void {
@@ -105,6 +117,11 @@ export class AtlasControlRoomsComponent {
         this.query.set('');
     }
 
+    requestNextPage(): void {
+        if (this.paging().status === 'loading' || this.paging().nextOffset == null) return;
+        this.nextPageRequested.emit();
+    }
+
     dispatch(action: AtlasControlRoomActionDescriptor, rowId: string | null = null): void {
         if (!action.enabled) return;
         if (action.action === 'inspect' && rowId) this.selectedRowId.set(rowId);
@@ -118,5 +135,11 @@ export class AtlasControlRoomsComponent {
 
     private actionDescriptor(action: AtlasControlAction): AtlasControlRoomActionDescriptor | null {
         return this.contract().roomActionsById[`${this.activeRoom().id}:${action}`] ?? null;
+    }
+
+    private requestNextPageIfAvailable(): void {
+        if (this.paging().status === 'ready' && this.paging().nextOffset != null) {
+            this.nextPageRequested.emit();
+        }
     }
 }

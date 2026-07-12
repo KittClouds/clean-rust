@@ -175,7 +175,6 @@ export function buildGraphPromotionPreviewReceipts(
         .sort(compareLinkSuggestions);
     if (!suggestions.length) return [];
 
-    const generation = Math.max(1, Math.trunc(snapshot.builtAt || Date.now()));
     const proposals = new Map<string, GraphPromotionProposalObservation>();
     for (const suggestion of suggestions) {
         const sourceId = cleanId(suggestion.sourceEntityId);
@@ -200,10 +199,12 @@ export function buildGraphPromotionPreviewReceipts(
     if (!orderedProposals.length) return [];
 
     const receiptHash = stablePreviewHash(snapshot, orderedProposals);
+    const generation = Math.max(1, Number.parseInt(receiptHash, 16) >>> 0);
+    const scopeKey = cleanId(snapshot.scopeId || 'global');
     return [{
         schemaVersion: 1,
         receiptId: `graph-proposal:atlas-preview:${receiptHash}`,
-        scopeKey: cleanId(snapshot.scopeId || 'global'),
+        scopeKey,
         generation,
         createdAt: generation,
         compilerPolicy: {
@@ -213,7 +214,7 @@ export function buildGraphPromotionPreviewReceipts(
             policyVersion: '1',
         },
         sourceGenerations: [{
-            sourceId: cleanId(snapshot.id || snapshot.scopeId || 'graph-rebuild-snapshot'),
+            sourceId: `graph-preview:${scopeKey}`,
             generation,
         }],
         modelId: null,
@@ -416,15 +417,19 @@ function stablePreviewHash(
     proposals: GraphPromotionProposalObservation[],
 ): string {
     const payload = [
-        snapshot.id || '',
         snapshot.scopeId || '',
-        String(snapshot.builtAt || ''),
         ...proposals.map((row) => [
             row.proposalId,
             row.atom.source_id,
             row.atom.target_id,
             row.atom.edge_type,
+            row.family,
+            row.sourceKind,
+            row.targetKind,
+            row.status,
             row.evidenceRefs.join(','),
+            row.features.join(','),
+            String(row.shadowScoreMillis ?? ''),
         ].join('|')),
     ].join('\n');
     let hash = 2166136261;

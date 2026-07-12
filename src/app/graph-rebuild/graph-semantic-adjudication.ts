@@ -11,6 +11,7 @@ import type {
     GraphSemanticCandidate,
     GraphSemanticRerankJudgment,
 } from './graph-rebuild-snapshot';
+import type { GraphSemanticDerivationContext } from './graph-semantic-derivation-context';
 
 const MAX_DECISIONS = 192;
 const ACCEPT_THRESHOLD = 0.64;
@@ -18,10 +19,12 @@ const ACCEPT_THRESHOLD = 0.64;
 export function buildGraphSemanticAdjudicationDAGSummary(
     snapshot: GraphRebuildSnapshot,
     generatedAt = snapshot.builtAt,
+    context?: GraphSemanticDerivationContext,
 ): GraphSemanticAdjudicationDAGSummary {
     const candidates = snapshot.semanticCandidateSummary?.candidates || [];
-    const judgments = new Map((snapshot.semanticRerankSummary?.judgments || []).map((row) => [row.candidateId, row]));
-    const builder = new SemanticAdjudicationBuilder(snapshot, generatedAt);
+    const judgments = context?.judgmentRows()
+        || new Map((snapshot.semanticRerankSummary?.judgments || []).map((row) => [row.candidateId, row]));
+    const builder = new SemanticAdjudicationBuilder(snapshot, generatedAt, context);
     for (const candidate of candidates.slice(0, MAX_DECISIONS)) {
         builder.add(candidate, judgments.get(candidate.id));
     }
@@ -52,13 +55,17 @@ class SemanticAdjudicationBuilder {
     private readonly receipts: GraphSemanticAdjudicationReceipt[] = [];
     private readonly acceptedKeys = new Set<string>();
 
-    constructor(private readonly snapshot: GraphRebuildSnapshot, private readonly generatedAt: number) {}
+    constructor(
+        private readonly snapshot: GraphRebuildSnapshot,
+        private readonly generatedAt: number,
+        private readonly context?: GraphSemanticDerivationContext,
+    ) {}
 
     add(candidate: GraphSemanticCandidate, judgment: GraphSemanticRerankJudgment | undefined): void {
         const proposalId = `adjudication-proposal:${slug(candidate.id)}`;
         const supportedId = `adjudication-supported:${slug(candidate.id)}`;
         const scoringBundle = scoringBundleFor(candidate, judgment);
-        const mutationDraft = mutationFor(this.snapshot, candidate, judgment, this.generatedAt);
+        const mutationDraft = mutationFor(this.snapshot, candidate, judgment, this.generatedAt, this.context);
         const duplicateKey = mutationDraft ? mutationKey(mutationDraft) : '';
         const alreadyAccepted = duplicateKey ? this.acceptedKeys.has(duplicateKey) : false;
         const state = decisionState(candidate, judgment, mutationDraft, alreadyAccepted);
@@ -130,10 +137,11 @@ function mutationFor(
     candidate: GraphSemanticCandidate,
     judgment: GraphSemanticRerankJudgment | undefined,
     createdAt: number,
+    context?: GraphSemanticDerivationContext,
 ): GraphSemanticAdjudicationMutation | undefined {
     if (!judgment || judgment.decision !== 'accept') return undefined;
     if (candidate.kind === 'missing_frame' || candidate.kind === 'contradiction_review' || candidate.kind === 'outlier_review') return undefined;
-    const pair = entityPairFor(snapshot, candidate);
+    const pair = entityPairFor(snapshot, candidate, context);
     if (!pair) return undefined;
     const edgeType = edgeTypeFor(candidate);
     const edgeId = `semantic-adjudication:${edgeType}:${slug(`${candidate.id}:${pair[0]}:${pair[1]}`)}`;
@@ -148,7 +156,7 @@ function mutationFor(
         confidence: judgment.calibratedScore,
         evidenceAnchorIds: candidate.evidenceIds.slice(0, 16),
         scopeKeys: [`semantic-adjudication:${snapshot.scopeId}`],
-        noteIds: evidenceNoteIds(snapshot, candidate),
+        noteIds: evidenceNoteIds(snapshot, candidate, context),
     };
     return {
         id: `adjudication-mutation:${slug(edgeId)}`,
@@ -171,9 +179,14 @@ function mutationFor(
     };
 }
 
-function entityPairFor(snapshot: GraphRebuildSnapshot, candidate: GraphSemanticCandidate): [string, string] | null {
-    const anchors = new Map(snapshot.entityAnchors.map((anchor) => [anchor.id, anchor.entityId]));
-    const nodeIds = snapshot.nodes.map((node) => node.entityId);
+function entityPairFor(
+    snapshot: GraphRebuildSnapshot,
+    candidate: GraphSemanticCandidate,
+    context?: GraphSemanticDerivationContext,
+): [string, string] | null {
+    const anchors = context?.anchorEntityIds()
+        || new Map(snapshot.entityAnchors.map((anchor) => [anchor.id, anchor.entityId]));
+    const nodeIds = context?.nodeEntityIds() || snapshot.nodes.map((node) => node.entityId);
     const found: string[] = [];
     const tokens = [
         ...candidate.sourceTargetIds,
@@ -317,9 +330,14 @@ function semanticEdgeWeight(
     return Math.max(1, Math.round(Math.max(candidate.rank, judgment.calibratedScore)));
 }
 
-function evidenceNoteIds(snapshot: GraphRebuildSnapshot, candidate: GraphSemanticCandidate): string[] {
+function evidenceNoteIds(
+    snapshot: GraphRebuildSnapshot,
+    candidate: GraphSemanticCandidate,
+    context?: GraphSemanticDerivationContext,
+): string[] {
     const noteIds = new Set<string>();
-    const anchors = new Map(snapshot.entityAnchors.map((anchor) => [anchor.id, anchor.noteId]));
+    const anchors = context?.anchorNoteIds()
+        || new Map(snapshot.entityAnchors.map((anchor) => [anchor.id, anchor.noteId]));
     for (const id of candidate.evidenceIds) {
         const noteId = anchors.get(id);
         if (noteId) noteIds.add(noteId);

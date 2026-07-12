@@ -120,7 +120,7 @@ describe('GraphRebuildPipelineService', () => {
 
         await expect(service.buildGraph(request())).rejects.toThrow('Load graph models first');
 
-        expect(ner.runDynamicScan).not.toHaveBeenCalled();
+        expect(ner.scanDynamicBatch).not.toHaveBeenCalled();
         expect(graphRebuild.buildAndPersistSnapshot).not.toHaveBeenCalled();
     });
 
@@ -138,7 +138,7 @@ describe('GraphRebuildPipelineService', () => {
             policy: 'force',
         });
 
-        expect(ner.runDynamicScan).toHaveBeenCalledTimes(1);
+        expect(ner.scanDynamicBatch).toHaveBeenCalledTimes(1);
         expect(atlasRuntime.runCapability).not.toHaveBeenCalledWith('semanticAtlas', expect.anything());
         expect(atlasRuntime.runCapability).toHaveBeenCalledWith('nliAdjudication', expect.objectContaining({
             buildPolicy: 'force',
@@ -195,6 +195,91 @@ describe('GraphRebuildPipelineService', () => {
                 projectionModes: expect.arrayContaining(['hybrid', 'hopf', 'lorentz', 'product', 'siegel']),
             }),
         ]));
+    });
+
+    it('reuses unchanged interactive capability results without native probe crossings', async () => {
+        const buildRequest = { ...request(), policy: 'force' as const };
+
+        await service.buildGraph(buildRequest);
+        await service.buildGraph(buildRequest);
+
+        expect(atlasRuntime.runCapability).toHaveBeenCalledTimes(6);
+        expect(atlasRuntime.runCapability.mock.calls.map(([capability]) => capability)).toEqual([
+            'nliAdjudication',
+            'relationGraph',
+            'temporalGraph',
+            'eventIdentity',
+            'memoryState',
+            'causalGraph',
+        ]);
+    });
+
+    it('terminates an unchanged interactive run before NER and snapshot reconstruction', async () => {
+        graphRebuild.persistResidentNativeGraphRun.mockResolvedValue(nativeDurableReuseReceipt());
+        const buildRequest = { ...request(), policy: 'force' as const };
+
+        const first = await service.buildGraph(buildRequest);
+        const second = await service.buildGraph({ ...buildRequest, policy: 'delta' });
+        await flushReceiptPersistence(service);
+
+        expect(second.snapshot).not.toBe(first.snapshot);
+        expect(second.snapshot.id).toBe(first.snapshot.id);
+        expect(second.snapshot.authorityContract).toEqual(first.snapshot.authorityContract);
+        expect(second.snapshot.buildTimings).toMatchObject({
+            snapshotBuildMs: 0,
+            snapshotSemanticLedgersMs: 0,
+            nativeGraphRunChangedSections: 0,
+            nativeGraphRunReusedSections: 7,
+            snapshotStoreDocuments: 0,
+            snapshotWrittenContentBlobs: 0,
+        });
+        expect(second.receipt.id).not.toBe(first.receipt.id);
+        expect(second.receipt.stageReceipts).toEqual(expect.arrayContaining([
+            expect.objectContaining({
+                id: 'interactiveIdentityReuse',
+                counters: expect.objectContaining({
+                    identityMatched: 1,
+                    authorityVerified: 1,
+                    changedSections: 0,
+                    reusedSections: 7,
+                }),
+            }),
+        ]));
+        expect(second.receipt.layerReceipts
+            .filter((layer) => layer.id !== 'transport-boundary' && layer.status !== 'complete')
+            .map((layer) => `${layer.id}:${layer.status}`)).toEqual([]);
+        expect(ner.scanDynamicBatch).toHaveBeenCalledTimes(1);
+        expect(graphRebuild.buildAndPersistSnapshot).toHaveBeenCalledTimes(1);
+        expect(graphRebuild.persistResidentNativeGraphRun).toHaveBeenCalledTimes(1);
+    });
+
+    it('fails closed to a full build when unchanged identity cannot be durably reused', async () => {
+        graphRebuild.persistResidentNativeGraphRun.mockResolvedValue(null);
+        const buildRequest = { ...request(), policy: 'force' as const };
+
+        await service.buildGraph(buildRequest);
+        await service.buildGraph(buildRequest);
+
+        expect(ner.scanDynamicBatch).toHaveBeenCalledTimes(2);
+        expect(graphRebuild.buildAndPersistSnapshot).toHaveBeenCalledTimes(2);
+    });
+
+    it('invalidates whole-run reuse when document content changes', async () => {
+        graphRebuild.persistResidentNativeGraphRun.mockResolvedValue(nativeDurableReuseReceipt());
+        const buildRequest = { ...request(), policy: 'force' as const };
+
+        await service.buildGraph(buildRequest);
+        notesMock.rows[0] = {
+            ...notesMock.rows[0],
+            markdownContent: 'Kai met Hazel. Hazel contradicted Kai.',
+            version: 3,
+            updatedAt: 11,
+        };
+        await service.buildGraph(buildRequest);
+
+        expect(graphRebuild.persistResidentNativeGraphRun).not.toHaveBeenCalled();
+        expect(ner.scanDynamicBatch).toHaveBeenCalledTimes(2);
+        expect(graphRebuild.buildAndPersistSnapshot).toHaveBeenCalledTimes(2);
     });
 
     it('debounces post-commit work and cancels stale diagnostics before they start', async () => {
@@ -282,7 +367,11 @@ describe('GraphRebuildPipelineService', () => {
         await flushReceiptPersistence(service);
 
         expect(notesMock.toArray).toHaveBeenCalled();
-        expect(ner.runDynamicScan).toHaveBeenCalledTimes(2);
+        expect(ner.scanDynamicBatch).toHaveBeenCalledTimes(1);
+        expect(ner.scanDynamicBatch).toHaveBeenCalledWith([
+            expect.objectContaining({ noteId: 'note-1' }),
+            expect.objectContaining({ noteId: 'note-2' }),
+        ]);
         expect(graphRebuild.buildAndPersistSnapshot).toHaveBeenCalledWith(expect.objectContaining({
             scopeKind: 'global',
             scopeId: 'global',
@@ -332,7 +421,7 @@ describe('GraphRebuildPipelineService', () => {
         await flushReceiptPersistence(service);
 
         expect(notesMock.bulkGet).toHaveBeenCalledWith(['note-1', 'deleted-note', 'note-2']);
-        expect(ner.runDynamicScan).toHaveBeenCalledTimes(2);
+        expect(ner.scanDynamicBatch).toHaveBeenCalledTimes(1);
         expect(graphRebuild.buildAndPersistSnapshot).toHaveBeenCalledWith(expect.objectContaining({
             scopeKind: 'multiNote',
             noteIds: ['note-1', 'note-2'],
@@ -391,14 +480,16 @@ describe('GraphRebuildPipelineService', () => {
         });
 
         expect(notesMock.bulkGet).toHaveBeenCalledWith(['note-1', 'note-2']);
-        expect(ner.runDynamicScan).toHaveBeenCalledWith(expect.objectContaining({
-            noteId: 'note-1',
-            plainText: expect.stringContaining('Kai mapped Red Mesa. Kai mapped Red Mesa.'),
-        }));
-        expect(ner.runDynamicScan).toHaveBeenCalledWith(expect.objectContaining({
-            noteId: 'note-2',
-            plainText: expect.stringContaining('Rowan watched Boundary Keep. Rowan watched Boundary Keep.'),
-        }));
+        expect(ner.scanDynamicBatch).toHaveBeenCalledWith([
+            expect.objectContaining({
+                noteId: 'note-1',
+                plainText: expect.stringContaining('Kai mapped Red Mesa. Kai mapped Red Mesa.'),
+            }),
+            expect.objectContaining({
+                noteId: 'note-2',
+                plainText: expect.stringContaining('Rowan watched Boundary Keep. Rowan watched Boundary Keep.'),
+            }),
+        ]);
     });
 
     it('resumes content checkpoints once clean graph receipt persistence is queued', async () => {
@@ -1079,6 +1170,23 @@ function createGraphRebuildMock() {
         persistRunReceipt: vi.fn(async () => receiptStoreTiming()),
         persistPostProcessCache: vi.fn(async () => undefined),
         restorePersistedSnapshot: vi.fn(async () => undefined),
+        persistResidentNativeGraphRun: vi.fn(async () => null as ReturnType<typeof nativeDurableReuseReceipt> | null),
+    };
+}
+
+function nativeDurableReuseReceipt() {
+    return {
+        schemaVersion: 'phoenix-graph-run-durable-receipt/v1' as const,
+        runHandle: 'graph-run:test',
+        scopeId: 'note:note-1',
+        snapshotId: 'snapshot-1',
+        manifestId: 'manifest:test',
+        changedSections: 0,
+        reusedSections: 7,
+        encodedSections: 0,
+        compressedSections: 0,
+        rawBytesWritten: 0,
+        compressedBytesWritten: 0,
     };
 }
 
@@ -1474,6 +1582,8 @@ function createNerMock() {
     return {
         suggestions: computed(() => suggestions()),
         runDynamicScan: vi.fn(async () => undefined),
+        scanDynamicBatch: vi.fn(async (requests: any[]) => requests.map(() => [])),
+        applyDynamicScanResult: vi.fn(async () => undefined),
         acceptSuggestionForContext: vi.fn(async (id: string) => {
             const suggestion = suggestions().find((row) => row.id === id);
             suggestions.set(suggestions().filter((suggestion) => suggestion.id !== id));

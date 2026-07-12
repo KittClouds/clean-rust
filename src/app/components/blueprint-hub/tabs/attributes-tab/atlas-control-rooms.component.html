@@ -93,12 +93,31 @@
                 </button>
                 } @empty {
                 <div class="atlas-room-empty">
+                    @if (activeRoom().totalRows > 0 && paging().nextOffset != null) {
+                    <strong>Proof rows are still native</strong>
+                    <span>Load this room's next verified page to inspect it.</span>
+                    } @else {
                     <strong>{{ activeRoom().emptyState.title }}</strong>
                     <span>{{ activeRoom().emptyState.detail }}</span>
+                    }
                 </div>
                 }
                 @if (filteredRowIds().length > visibleRows().length) {
                 <div class="atlas-room-limit">Showing {{ visibleRows().length }} of {{ filteredRowIds().length }} matching rows.</div>
+                }
+                @if (paging().status === 'loading') {
+                <div class="atlas-room-limit">Loading verified native proof rows...</div>
+                } @else if (paging().status === 'expired' || paging().status === 'error') {
+                <button type="button" class="atlas-room-page-action" (click)="requestNextPage()">
+                    Retry native proof page
+                </button>
+                <div class="atlas-room-limit">{{ paging().error }}</div>
+                } @else if (paging().nextOffset != null) {
+                <button type="button" class="atlas-room-page-action" (click)="requestNextPage()">
+                    Load next proof page
+                </button>
+                } @else if (paging().status === 'complete' && paging().totalRows > 0) {
+                <div class="atlas-room-limit">All {{ paging().totalRows }} native proof rows inspected.</div>
                 }
             </div>
         </section>

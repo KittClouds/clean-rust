@@ -49,6 +49,7 @@ export interface GraphCrossDocumentBridgeRunCertificate {
 
 export function isGraphCrossDocumentBridgeRunCertificate(
     value: GraphCrossDocumentBridgeRunCertificate | null | undefined,
+    allowPagedRows = false,
 ): value is GraphCrossDocumentBridgeRunCertificate {
     if (value?.schemaVersion !== GRAPH_CROSS_DOCUMENT_BRIDGE_CERTIFICATE_SCHEMA_VERSION
         || !Array.isArray(value.sourceDocumentIds)
@@ -72,11 +73,18 @@ export function isGraphCrossDocumentBridgeRunCertificate(
         && value.eligibleCandidates <= value.generatedCandidates
         && value.selectedCandidates <= value.eligibleCandidates
         && value.selectedCandidates + value.rejectedCandidates === value.generatedCandidates
-        && value.selectedRows.length === value.selectedCandidates
-        && pairTotals.generated === value.generatedCandidates
-        && pairTotals.eligible === value.eligibleCandidates
-        && pairTotals.selected === value.selectedCandidates
-        && pairTotals.rejected === value.rejectedCandidates
+        && (allowPagedRows
+            ? value.selectedRows.length <= value.selectedCandidates
+                && value.rejectedRows.length <= value.rejectedCandidates
+                && pairTotals.generated <= value.generatedCandidates
+                && pairTotals.eligible <= value.eligibleCandidates
+                && pairTotals.selected <= value.selectedCandidates
+                && pairTotals.rejected <= value.rejectedCandidates
+            : value.selectedRows.length === value.selectedCandidates
+                && pairTotals.generated === value.generatedCandidates
+                && pairTotals.eligible === value.eligibleCandidates
+                && pairTotals.selected === value.selectedCandidates
+                && pairTotals.rejected === value.rejectedCandidates)
         && rejectionTotal === value.rejectedCandidates
         && value.noTopologyWrites === true
         && value.invariantReceipts.includes('chunk_semantic_bridge_candidate:no_topology_commit')

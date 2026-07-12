@@ -138,6 +138,33 @@ describe('buildAtlasControlContract', () => {
         ]);
     });
 
+    it('keeps complete native totals while only the first proof page is visible', () => {
+        const contract = buildAtlasControlContract({
+            snapshot: snapshotFixture(),
+            nativeProofCounts: {
+                crossDocumentPairCoverage: 4,
+                crossDocumentSelected: 12,
+                crossDocumentRejected: 7,
+                continuityBoundaries: 30,
+                continuityEpisodes: 20,
+                continuityTemporal: 40,
+                continuityStates: 18,
+                continuityCausal: 22,
+                continuityConnections: 10,
+                continuityConflicts: 6,
+            },
+        });
+
+        expect(contract.inventoryById.continuity_episode_rows).toMatchObject({
+            totalRows: 60,
+        });
+        expect(contract.inventoryById.continuity_temporal_rows.totalRows).toBe(40);
+        expect(contract.inventoryById.continuity_cross_document_rows).toMatchObject({
+            totalRows: 23,
+        });
+        expect(contract.invariants.exactInventory.status).toBe('passed');
+    });
+
     it('projects every Atlas room from declared inventories without summing review subsets', () => {
         const contract = buildAtlasControlContract({
             snapshot: snapshotFixture(),

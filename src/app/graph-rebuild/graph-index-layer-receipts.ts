@@ -31,6 +31,7 @@ interface LayerDraft {
 }
 
 const INPUT_STAGE_IDS = [
+    'interactiveIdentityReuse',
     'dynamicNer',
     'deltaPostprocessPlan',
     'signalCandidatePlan',
@@ -44,6 +45,7 @@ const INPUT_STAGE_IDS = [
 ];
 
 const DIAGNOSTIC_STAGE_IDS = [
+    'interactiveIdentityReuse',
     'entityLinkerPlan',
     'edgeTypeJudgmentPlan',
     'semanticRerankPlan',
@@ -94,7 +96,7 @@ export function buildGraphIndexLayerReceipts(input: LayerInput): GraphIndexLayer
             source: 'graph rebuild snapshot rows',
             consumes: ['sourceEvidence', 'chunks', 'relationshipHints'],
             produces: ['chunks', 'mentions', 'anchors', 'nodes', 'edges', 'embeddingTargets'],
-            stageIds: presentStageIds(stageById, ['graphBuildSnapshot', 'signalTargetCoverage', 'snapshotCpu']),
+            stageIds: presentStageIds(stageById, ['interactiveIdentityReuse', 'graphBuildSnapshot', 'signalTargetCoverage', 'snapshotCpu']),
             counters: {
                 chunks: input.receipt.counters.chunks || 0,
                 mentions: input.receipt.counters.mentions || 0,
@@ -113,7 +115,7 @@ export function buildGraphIndexLayerReceipts(input: LayerInput): GraphIndexLayer
             source: packetContract?.tsGraphBuilderRole || 'native-atlas-packet-authority',
             consumes: ['snapshotRows', 'admittedEmbeddingTargets', 'graphCompilerSidecar'],
             produces: ['atlasPacket.objects', 'atlasPacket.manifoldTargets'],
-            stageIds: presentStageIds(stageById, ['nativeCompilerBoundary', 'stagedNativeScenePacket']),
+            stageIds: presentStageIds(stageById, ['interactiveIdentityReuse', 'nativeCompilerBoundary', 'stagedNativeScenePacket']),
             authority: packetContract?.authority,
             counters: {
                 packetObjects: snapshot?.atlasPacket?.objects.length || 0,
@@ -133,7 +135,7 @@ export function buildGraphIndexLayerReceipts(input: LayerInput): GraphIndexLayer
             source: 'graph-snapshot-authority',
             consumes: ['snapshotRows', 'atlasPacket', 'embeddingTargets'],
             produces: ['authorityContract.contentHash', 'authorityContract.counts'],
-            stageIds: presentStageIds(stageById, ['snapshotAuthorityContract']),
+            stageIds: presentStageIds(stageById, ['interactiveIdentityReuse', 'snapshotAuthorityContract']),
             authority: contract?.authority,
             contentHash: contract?.contentHash,
             counters: {
@@ -152,7 +154,7 @@ export function buildGraphIndexLayerReceipts(input: LayerInput): GraphIndexLayer
             source: 'snapshot content manifest and run receipt document',
             consumes: ['authorityContract', 'contentBlobs', 'runReceipt'],
             produces: ['primarySnapshotDocument', 'contentBlobDocuments', 'receiptDocument'],
-            stageIds: presentStageIds(stageById, ['snapshotDbOps', 'snapshotPayloadProfile', 'receiptDbOps']),
+            stageIds: presentStageIds(stageById, ['interactiveIdentityReuse', 'snapshotDbOps', 'snapshotPayloadProfile', 'receiptDbOps']),
             counters: {
                 snapshotPayloadChars: timing?.snapshotPayloadChars || 0,
                 snapshotStoreDocuments: timing?.snapshotStoreDocuments || 0,

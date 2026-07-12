@@ -38,6 +38,7 @@ import {
     buildGraphSemanticAdjudicationDAGSummary,
 } from './graph-semantic-adjudication';
 import { buildGraphSemanticEvalLedgerSummary } from './graph-semantic-eval-ledger';
+import { GraphSemanticDerivationContext } from './graph-semantic-derivation-context';
 import { buildGraphCalendarRegistryBridgeSummary } from './graph-calendar-registry-bridge';
 import { buildGraphMemoryGraphRagBridgeSummary } from './graph-memory-graphrag-bridge';
 import { episodeProjectionEdgeCounters } from './graph-episode-projection';
@@ -60,6 +61,7 @@ const CO_OCCURRENCE_LINKS_PER_ANCHOR = 4;
 
 /** Builds the source-evidence snapshot rows that the Rust Atlas packet seals. */
 export function buildGraphRebuildSnapshot(input: BuildGraphRebuildSnapshotInput): GraphRebuildSnapshot {
+    input.cpuProfiler?.begin();
     const builtAt = input.builtAt ?? Date.now();
     const chunks = normalizeChunks(input.chunks || []);
     const chunksByNote = groupChunksByNote(chunks);
@@ -75,6 +77,7 @@ export function buildGraphRebuildSnapshot(input: BuildGraphRebuildSnapshotInput)
         builtAt,
     });
     const { mentions, entityAnchors, dropReasons: drops } = hygiene;
+    input.cpuProfiler?.mark('snapshotAnchorsMs');
 
     const nodes = buildNodes(entityAnchors, entitiesById);
     const cooccurrenceEdges = buildEdges(entityAnchors, drops);
@@ -90,6 +93,7 @@ export function buildGraphRebuildSnapshot(input: BuildGraphRebuildSnapshotInput)
         ...chunks.map((chunk) => chunk.noteId),
         ...entityAnchors.map((anchor) => anchor.noteId),
     ]);
+    input.cpuProfiler?.mark('snapshotFactsMs');
     const documentSidecarSummary = buildGraphDocumentSidecar({
         noteIds,
         noteTexts: input.noteTexts || {},
@@ -124,6 +128,7 @@ export function buildGraphRebuildSnapshot(input: BuildGraphRebuildSnapshotInput)
             edgeCount: edges.length,
         },
     });
+    input.cpuProfiler?.mark('snapshotCompatibilityViewsMs');
     const embeddingTargetPlan = buildGraphRebuildEmbeddingTargetPlan(
         input,
         chunks,
@@ -145,12 +150,17 @@ export function buildGraphRebuildSnapshot(input: BuildGraphRebuildSnapshotInput)
     );
     const postProcessMode = input.postProcessMode || 'full';
     const includeDiagnosticArms = input.durabilityMode !== 'interactive';
+    input.cpuProfiler?.mark('snapshotTargetsMs');
+    const embeddingPostProcessStarted = performance.now();
     const embeddingGraphPostProcess = postProcessMode === 'full'
         ? buildGraphRebuildEmbeddingGraphPostProcess(
             embeddingWorkTargets,
             input.embeddingProfile,
+            input.cpuProfiler,
         )
         : undefined;
+    input.cpuProfiler?.add('snapshotEmbeddingPostProcessMs', embeddingPostProcessStarted);
+    const graphAwareLinksStarted = performance.now();
     const graphAwareLinkSuggestions = postProcessMode === 'full'
         ? buildGraphAwareLinkSuggestions(
             nodes,
@@ -160,7 +170,9 @@ export function buildGraphRebuildSnapshot(input: BuildGraphRebuildSnapshotInput)
             embeddingGraphPostProcess,
         )
         : [];
+    input.cpuProfiler?.add('snapshotGraphAwareLinksMs', graphAwareLinksStarted);
     const entityLinkerEnabled = input.embeddingStagePolicy?.entityLinkerEnabled !== false;
+    const entityLinkingStarted = performance.now();
     const entityLinking = postProcessMode === 'full' && entityLinkerEnabled
         ? buildGraphRebuildEntityLinkSuggestions({
             mentions,
@@ -172,6 +184,8 @@ export function buildGraphRebuildSnapshot(input: BuildGraphRebuildSnapshotInput)
             embeddingGraphPostProcess,
         })
         : { suggestions: [], counters: emptyEntityLinkCounters(mentions) };
+    input.cpuProfiler?.add('snapshotEntityLinkingMs', entityLinkingStarted);
+    input.cpuProfiler?.mark('snapshotPostProcessMs');
     let snapshot: GraphRebuildSnapshot = {
         schemaVersion: 'phoenix-graph-rebuild/v1',
         id: `graph-rebuild:${input.scopeKind}:${input.scopeId}:${builtAt}`,
@@ -405,6 +419,7 @@ export function buildGraphRebuildSnapshot(input: BuildGraphRebuildSnapshotInput)
         },
         resolutionSuggestions: hygiene.suggestions,
     };
+    input.cpuProfiler?.mark('snapshotAssemblyMs');
     const hopfResonanceSpace = buildHopfResonanceSpace(snapshot, { generatedAt: builtAt });
     if (hopfResonanceSpace.assignments.length !== snapshot.embeddingTargets.length) {
         throw new Error(
@@ -435,41 +450,63 @@ export function buildGraphRebuildSnapshot(input: BuildGraphRebuildSnapshotInput)
     snapshot.counters.shadowLinkSuggestions = shadowLinkSuggestions.length;
     snapshot.counters.finalLinkPatches = finalLinkPatchLog.counters.planned;
     snapshot.counters.finalLinkReceiptFailures = finalLinkPatchLog.counters.failedReceipts;
-    const semanticTaskSummary = buildGraphSemanticTaskSummary(snapshot, builtAt);
+    const semanticLedgersStarted = performance.now();
+    input.cpuProfiler?.checkpoint();
+    const semanticContext = new GraphSemanticDerivationContext(snapshot);
+    const semanticTaskSummary = buildGraphSemanticTaskSummary(snapshot, builtAt, semanticContext);
+    input.cpuProfiler?.mark('snapshotSemanticTasksMs');
     snapshot.semanticTaskSummary = semanticTaskSummary;
     snapshot.counters.semanticTasks = semanticTaskSummary.tasks.length;
     snapshot.counters.semanticTaskReceipts = semanticTaskSummary.receipts.length;
     snapshot.counters.semanticTaskMutationAllowed = semanticTaskSummary.counters.mutationAllowedCount;
-    const semanticCandidateSummary = buildGraphSemanticCandidateSummary(snapshot, semanticTaskSummary, builtAt);
+    const semanticCandidateSummary = buildGraphSemanticCandidateSummary(snapshot, semanticTaskSummary, builtAt, semanticContext);
+    input.cpuProfiler?.mark('snapshotSemanticCandidatesMs');
     snapshot.semanticCandidateSummary = semanticCandidateSummary;
     snapshot.counters.semanticCandidates = semanticCandidateSummary.candidates.length;
     snapshot.counters.semanticCandidateReceipts = semanticCandidateSummary.receipts.length;
     snapshot.counters.semanticCandidateMutationAllowed = semanticCandidateSummary.counters.mutationAllowedCount;
     snapshot.counters.semanticCandidateDeferred = semanticCandidateSummary.counters.deferredCount;
-    const manifoldSpecializationSummary = buildGraphManifoldSpecializationSummary(snapshot, semanticCandidateSummary, builtAt);
+    const manifoldSpecializationSummary = buildGraphManifoldSpecializationSummary(
+        snapshot,
+        semanticCandidateSummary,
+        builtAt,
+        semanticContext,
+    );
+    semanticContext.indexContributions(manifoldSpecializationSummary.contributions);
+    input.cpuProfiler?.mark('snapshotManifoldSpecializationMs');
     snapshot.manifoldSpecializationSummary = manifoldSpecializationSummary;
     snapshot.counters.manifoldSpecializations = manifoldSpecializationSummary.profiles.length;
     snapshot.counters.manifoldCandidateContributions = manifoldSpecializationSummary.contributions.length;
     snapshot.counters.manifoldContributionReceipts = manifoldSpecializationSummary.receipts.length;
     snapshot.counters.manifoldCandidateExplained = manifoldSpecializationSummary.counters.explainedCandidateCount;
     snapshot.counters.manifoldSpecializationMutationAllowed = manifoldSpecializationSummary.counters.mutationAllowedCount;
-    const semanticRerankSummary = buildGraphSemanticRerankSummary(snapshot, semanticCandidateSummary, manifoldSpecializationSummary, builtAt);
+    const semanticRerankSummary = buildGraphSemanticRerankSummary(
+        snapshot,
+        semanticCandidateSummary,
+        manifoldSpecializationSummary,
+        builtAt,
+        semanticContext,
+    );
+    semanticContext.indexJudgments(semanticRerankSummary.judgments);
+    input.cpuProfiler?.mark('snapshotSemanticRerankMs');
     snapshot.semanticRerankSummary = semanticRerankSummary;
     snapshot.counters.semanticRerankInputs = semanticRerankSummary.inputs.length;
     snapshot.counters.semanticRerankJudgments = semanticRerankSummary.judgments.length;
     snapshot.counters.semanticRerankReceipts = semanticRerankSummary.receipts.length;
     snapshot.counters.semanticRerankPlannedModelCalls = semanticRerankSummary.counters.plannedModelCalls;
     snapshot.counters.semanticRerankMutationAllowed = semanticRerankSummary.counters.mutationAllowedCount;
-    const semanticAdjudicationSummary = buildGraphSemanticAdjudicationDAGSummary(snapshot, builtAt);
+    const semanticAdjudicationSummary = buildGraphSemanticAdjudicationDAGSummary(snapshot, builtAt, semanticContext);
     snapshot.semanticAdjudicationSummary = semanticAdjudicationSummary;
     applyGraphSemanticAdjudicationMutations(snapshot, semanticAdjudicationSummary);
+    input.cpuProfiler?.mark('snapshotSemanticAdjudicationMs');
     snapshot.counters.edges = snapshot.edges.length;
     snapshot.counters.semanticAdjudicationDecisions = semanticAdjudicationSummary.decisions.length;
     snapshot.counters.semanticAdjudicationMutations = semanticAdjudicationSummary.mutations.length;
     snapshot.counters.semanticAdjudicationReceipts = semanticAdjudicationSummary.receipts.length;
     snapshot.counters.semanticAdjudicationTopologyCommits = semanticAdjudicationSummary.counters.topologyCommitCount;
     snapshot.counters.semanticAdjudicationLedgerOnly = semanticAdjudicationSummary.counters.ledgerOnlyCount;
-    const semanticEvalLedgerSummary = buildGraphSemanticEvalLedgerSummary(snapshot, builtAt);
+    const semanticEvalLedgerSummary = buildGraphSemanticEvalLedgerSummary(snapshot, builtAt, semanticContext);
+    input.cpuProfiler?.mark('snapshotSemanticEvalLedgerMs');
     snapshot.semanticEvalLedgerSummary = semanticEvalLedgerSummary;
     snapshot.counters.semanticEvalLedgerRows = semanticEvalLedgerSummary.entries.length;
     snapshot.counters.semanticEvalAcceptedCandidates = semanticEvalLedgerSummary.counters.acceptedCandidates;
@@ -478,6 +515,7 @@ export function buildGraphRebuildSnapshot(input: BuildGraphRebuildSnapshotInput)
     snapshot.counters.semanticEvalModelDisagreements = semanticEvalLedgerSummary.counters.modelDisagreements;
     snapshot.counters.semanticEvalManifoldDisagreements = semanticEvalLedgerSummary.counters.manifoldDisagreements;
     snapshot.counters.semanticEvalGraphChangeRows = semanticEvalLedgerSummary.counters.graphChangeRows;
+    input.cpuProfiler?.setSemanticIndexStats(semanticContext.stats());
     if (includeDiagnosticArms) {
         const memoryGraphRagBridgeSummary = buildGraphMemoryGraphRagBridgeSummary(snapshot, builtAt);
         snapshot.memoryGraphRagBridgeSummary = memoryGraphRagBridgeSummary;
@@ -564,6 +602,7 @@ export function buildGraphRebuildSnapshot(input: BuildGraphRebuildSnapshotInput)
         snapshot.counters.calendarRegistryCustomOrdinalReceipts = calendarRegistrySummary.counters.customOrdinalReceipts;
         snapshot.counters.calendarRegistryMutationAllowed = calendarRegistrySummary.counters.mutationAllowedCount;
     }
+    input.cpuProfiler?.add('snapshotSemanticLedgersMs', semanticLedgersStarted);
     return snapshot;
 }
 

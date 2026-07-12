@@ -13,8 +13,10 @@ tauri-build = { version = "2", features = [] }
 
 [dependencies]
 hashbrown = "0.15"
+blake3 = "1.8"
 base64 = "0.22"
 flate2 = "1"
+memmap2 = "0.9"
 phoenix-native = { path = "../rust/phoenix/crates/phoenix-native" }
 phoenix-graph-rebuild = { path = "../rust-native/phoenix/crates/phoenix-graph-rebuild" }
 phoenix-graph-post = { path = "../rust-native/phoenix/crates/phoenix-graph-post" }
@@ -31,11 +33,12 @@ ort = { version = "=2.0.0-rc.9", default-features = false, features = ["ndarray"
 ort-sys = "=2.0.0-rc.9"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-specta = { version = "=2.0.0-rc.22", features = ["derive"] }
+specta = { version = "=2.0.0-rc.22", features = ["derive", "serde_json"] }
 tauri = { version = "2", features = [] }
 taurpc = "0.7.1"
 tokio = { version = "1", features = ["full"] }
 tokenizers = { version = "0.22.2", default-features = false, features = ["onig"] }
+zstd = "0.13"
 
 [patch.crates-io]
 esaxx-rs = { path = "../rust-native/phoenix-gliner-smoke/vendor/esaxx-rs" }

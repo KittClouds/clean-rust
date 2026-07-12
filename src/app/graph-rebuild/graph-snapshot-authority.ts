@@ -306,10 +306,14 @@ const VOLATILE_AUTHORITY_KEYS = new Set([
 
 const VOLATILE_CONTENT_HASH_KEYS = new Set([
     'builtAt',
+    'buildMicros',
     'createdAt',
+    'episodeBoundaryMicros',
+    'eventIdentityMicros',
     'updatedAt',
     'generatedAt',
     'generation',
+    'relationResolutionMicros',
     'snapshotId',
     'sourceSnapshotId',
 ]);

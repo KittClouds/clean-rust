@@ -1,5 +1,6 @@
 mod document_index_read;
 mod graph_galaxy;
+mod graph_run_store;
 mod graph_scene_packet;
 mod nli_claim_rpc;
 mod phoenix_rpc;

@@ -54,6 +54,7 @@ import type {
     GraphAtlasObjectStatus,
     GraphAtlasPacket,
 } from './graph-atlas-packet';
+import { GraphRebuildCpuProfiler } from './graph-rebuild-cpu-profile';
 import {
     GRAPH_ATLAS_BUILDER_ROLE,
     GRAPH_ATLAS_IDENTITY_AUTHORITY,
@@ -78,6 +79,7 @@ import {
 } from './graph-snapshot-source-evidence';
 import { buildGraphRebuildEmbeddingGraphPostProcess } from './graph-rebuild-embedding-postprocess';
 import { selectGraphRebuildEmbeddingTargetPlan } from './graph-rebuild-embedding-target-policy';
+import { graphRebuildSiegelNativeRequest } from './graph-rebuild-siegel-backbone';
 import {
     emptyGraphDocumentGraphMutationLedger,
     graphDocumentGraphMutationLedgerFromTruthCommits,
@@ -263,6 +265,89 @@ interface NativeMemoryGovernanceRetrievalExperimentOutput {
     timing: NativeMemoryGovernanceRetrievalExperimentTiming;
 }
 
+export interface NativeSnapshotAnalysisOutput {
+    schemaVersion: 'phoenix-graph-snapshot-analysis-native-output/v1';
+    source: 'rust';
+    bridge: NativeChunkSemanticBridgeOutput;
+    continuity: NativeStoryContinuityOutput;
+    governance: NativeMemoryGovernanceOutput;
+    retrieval?: NativeMemoryGovernanceRetrievalExperimentOutput | null;
+    promotion: NativePromotionVerdictOutput;
+    siegel?: unknown;
+    noTopologyWrites: true;
+    timing: {
+        bridgeBuildMicros: number;
+        continuityBuildMicros: number;
+        governanceBuildMicros: number;
+        retrievalBuildMicros: number;
+        verdictBuildMicros: number;
+        totalMicros: number;
+    };
+}
+
+export interface NativeGraphRunPage {
+    schemaVersion: 'phoenix-graph-run-page/v1';
+    source: 'rust';
+    runHandle: string;
+    offset: number;
+    limit: number;
+    detailRows: number;
+    returnedDetailRows: number;
+    nextOffset?: number | null;
+    arena: {
+        analysisIdentity: string;
+        reused: boolean;
+        residentBytes: number;
+        activeLeases: number;
+        projectionMicros: number;
+    };
+    counts: {
+        bridgeCandidates: number;
+        bridgeByType: Record<string, number>;
+        crossDocumentPairCoverage: number;
+        crossDocumentSelected: number;
+        crossDocumentRejected: number;
+        crossDocumentWeakest: number;
+        promotionRows: number;
+        continuityEvents: number;
+        continuityBoundaries: number;
+        continuityEpisodes: number;
+        continuityTemporal: number;
+        continuityStates: number;
+        continuityCausal: number;
+        continuityConnections: number;
+        continuityConflicts: number;
+        governanceCandidates: number;
+        governanceByAction: Record<string, number>;
+        retrievalTopRows: number;
+        retrievalViolations: number;
+    };
+    projection: NativeSnapshotAnalysisOutput;
+}
+
+export interface NativeGraphRunPagingState {
+    snapshotId: string;
+    runHandle: string;
+    totalRows: number;
+    loadedRows: number;
+    nextOffset: number | null;
+    counts: NativeGraphRunPage['counts'];
+}
+
+export interface NativeGraphRunPersistReceipt {
+    schemaVersion: 'phoenix-graph-run-durable-receipt/v1';
+    runHandle: string;
+    scopeId: string;
+    snapshotId: string;
+    manifestId: string;
+    changedSections: number;
+    reusedSections: number;
+    encodedSections: number;
+    compressedSections: number;
+    rawBytesWritten: number;
+    compressedBytesWritten: number;
+}
+
 interface CompressedNativeAtlasSeedPayload {
     schemaVersion: 'phoenix-atlas-seed-payload/gzip-base64/v1';
     sourceSchemaVersion: 'phoenix-atlas-seed/v1';
@@ -353,16 +438,91 @@ export class GraphRebuildService {
     private readonly buildingState = signal(false);
     private readonly errorState = signal<string | null>(null);
     private readonly lastBuildTimingsState = signal<GraphRebuildBuildTimings | null>(null);
+    private readonly nativeGraphRunPagingState = signal<NativeGraphRunPagingState | null>(null);
     private readonly absentOperatorMutationJournalScopes = new Set<string>();
+    private readonly releasedNativeGraphRunLeases = new Set<string>();
+    private readonly contentManifestByScope = new Map<string, GraphRebuildContentManifest>();
+    private activeNativeGraphRun: { snapshotId: string; runHandle: string } | null = null;
+    private nativeSiegelReceiptState: { snapshotId: string; receipt: unknown } | null = null;
     private primarySnapshotRunSerial = 0;
 
     readonly snapshot = computed(() => this.snapshotState());
     readonly isBuilding = computed(() => this.buildingState());
     readonly error = computed(() => this.errorState());
     readonly lastBuildTimings = computed(() => this.lastBuildTimingsState());
+    readonly nativeGraphRunPaging = computed(() => this.nativeGraphRunPagingState());
 
     currentSnapshotRunSerial(): number {
         return this.primarySnapshotRunSerial;
+    }
+
+    nativeGraphRunHandle(snapshotId = this.snapshotState()?.id): string | null {
+        return snapshotId && this.activeNativeGraphRun?.snapshotId === snapshotId
+            ? this.activeNativeGraphRun.runHandle
+            : null;
+    }
+
+    residentNativeGraphRunHandle(): string | null {
+        return this.activeNativeGraphRun?.runHandle || null;
+    }
+
+    nativeSiegelReceipt(snapshotId: string): unknown {
+        return this.nativeSiegelReceiptState?.snapshotId === snapshotId
+            ? this.nativeSiegelReceiptState.receipt
+            : undefined;
+    }
+
+    async persistResidentNativeGraphRun(
+        snapshot: GraphRebuildSnapshot,
+    ): Promise<NativeGraphRunPersistReceipt | null> {
+        const current = this.snapshotState();
+        const runHandle = this.nativeGraphRunHandle(snapshot.id);
+        if (!current || !runHandle
+            || current.id !== snapshot.id
+            || current.scopeId !== snapshot.scopeId
+            || current.authorityContract?.contentHash !== snapshot.authorityContract?.contentHash) {
+            return null;
+        }
+        const durable = await this.phoenix.persistGraphRun(runHandle) as NativeGraphRunPersistReceipt;
+        this.assertNativeGraphRunPersistReceipt(durable, snapshot, runHandle);
+        return durable;
+    }
+
+    async readNativeGraphRunPage(offset: number, limit = 32): Promise<NativeGraphRunPage | null> {
+        const active = this.activeNativeGraphRun;
+        if (!active) return null;
+        return this.readNativeGraphRunPageForHandle(active.runHandle, offset, limit);
+    }
+
+    async readNativeGraphRunPageForHandle(
+        runHandle: string,
+        offset: number,
+        limit = 32,
+    ): Promise<NativeGraphRunPage> {
+        const page = await this.phoenix.readGraphRunPage({
+            runHandle,
+            offset,
+            limit,
+        }) as NativeGraphRunPage | null;
+        if (!isNativeGraphRunPage(page)) {
+            throw new Error('Rust graph run page returned an invalid v1 payload.');
+        }
+        if (page.runHandle !== runHandle) {
+            throw new Error('Rust graph run page returned a stale lease.');
+        }
+        return page;
+    }
+
+    async closeNativeGraphRun(): Promise<boolean> {
+        const active = this.activeNativeGraphRun;
+        this.activeNativeGraphRun = null;
+        return active ? this.releaseNativeGraphRunLease(active.runHandle) : false;
+    }
+
+    async releaseNativeGraphRunLease(runHandle: string): Promise<boolean> {
+        if (this.releasedNativeGraphRunLeases.has(runHandle)) return false;
+        this.releasedNativeGraphRunLeases.add(runHandle);
+        return this.phoenix.closeGraphRun(runHandle);
     }
 
     attachReviewAdjudicationCertificate(certificate: GraphReviewAdjudicationRunCertificate): void {
@@ -387,7 +547,8 @@ export class GraphRebuildService {
         const timings = emptyBuildTimings();
         const currentSnapshot = this.snapshotState();
         const previousContentManifest = request.previousContentManifest
-            || (currentSnapshot?.scopeId === request.scopeId ? currentSnapshot.contentManifest : undefined);
+            || (currentSnapshot?.scopeId === request.scopeId ? currentSnapshot.contentManifest : undefined)
+            || this.contentManifestByScope.get(request.scopeId);
         try {
             const persistedOccurrences = await timedAsync(timings, 'occurrenceLoadMs', () =>
                 this.loadOccurrences(request.noteIds, request.entities)
@@ -455,6 +616,7 @@ export class GraphRebuildService {
             });
             const occurrences = sourceEvidence.allOccurrences;
             timings.occurrenceRecoverMs = elapsedMs(recoverStarted);
+            const cpuProfiler = new GraphRebuildCpuProfiler();
             let snapshot = timedSync(timings, 'snapshotBuildMs', () => buildGraphRebuildSnapshot({
                 scopeKind: request.scopeKind,
                 scopeId: request.scopeId,
@@ -474,8 +636,10 @@ export class GraphRebuildService {
                 documentSemanticSummary,
                 operatorMutationJournal: operatorMutationJournal || undefined,
                 durabilityMode,
+                cpuProfiler,
                 builtAt,
             }));
+            Object.assign(timings, cpuProfiler.timings);
             recordGraphCollapseBoundary(snapshot.id, snapshot.scopeId, 'source_evidence', {
                 notes: request.noteIds.length,
                 registryEntities: request.entities.length,
@@ -488,12 +652,9 @@ export class GraphRebuildService {
                 totalOccurrences: sourceEvidence.counters.total,
             });
             recordGraphCollapseSnapshotBoundary(snapshot, 'typescript_snapshot');
-            snapshot = await this.reconcileDocumentGraphMutations(snapshot);
-            await this.attachNativeChunkSemanticBridges(snapshot, noteTexts, timings);
-            await this.attachNativeStoryContinuity(snapshot, noteTexts, timings);
-            await this.attachNativeMemoryGovernance(snapshot, timings);
-            await this.attachNativeMemoryGovernanceRetrievalExperiment(snapshot, timings);
-            await this.attachNativePromotionVerdictCertificate(snapshot, timings);
+            snapshot = await this.reconcileDocumentGraphMutations(snapshot, durabilityMode === 'interactive');
+            await this.attachNativeSnapshotAnalysis(snapshot, noteTexts, timings, durabilityMode);
+            const packetConstructionStarted = performance.now();
             const interactivePacketAttached = durabilityMode === 'interactive'
                 && attachInteractiveAtlasPacketForSnapshotTargets(
                     snapshot,
@@ -514,6 +675,7 @@ export class GraphRebuildService {
             } else {
                 await this.attachNativeGraphCompilerSidecar(snapshot, timings, request);
             }
+            timings.packetConstructionMs = elapsedMs(packetConstructionStarted);
             const authoritySealStarted = performance.now();
             finalizeGraphRebuildSnapshot({
                 snapshot,
@@ -572,204 +734,158 @@ export class GraphRebuildService {
         }
     }
 
-    private async attachNativeChunkSemanticBridges(
+    private async attachNativeSnapshotAnalysis(
         snapshot: GraphRebuildSnapshot,
         noteTexts: Record<string, string>,
-        timings?: GraphRebuildBuildTimings,
+        timings: GraphRebuildBuildTimings,
+        durabilityMode: GraphBuildDurabilityMode,
     ): Promise<void> {
         const started = performance.now();
-        try {
-            if (this.phoenix.target !== 'native') {
-                applyNativeChunkSemanticBridgeCandidates(snapshot, []);
-                if (timings) timings.nativeChunkSemanticBridgeSkipped = 1;
-                return;
-            }
-            const native = await this.phoenix.storeCommand('graphRebuild:chunkSemanticBridges', {
-                snapshot: graphRebuildSnapshotToNativeChunkBridgePayload(snapshot),
-                documents: snapshot.noteIds.map((noteId) => ({ noteId, text: noteTexts[noteId] || '' })),
-            }) as NativeChunkSemanticBridgeOutput | null;
-            if (!isNativeChunkSemanticBridgeOutput(native)) {
-                throw new Error('Rust chunk semantic bridge command returned an invalid v1 payload.');
-            }
-            applyNativeChunkSemanticBridgeCandidates(
-                snapshot,
-                native.candidates,
-                native.crossDocumentCertificate,
-            );
-            if (timings) {
-                timings.nativeChunkSemanticBridgeCandidates = native.candidates.length;
-                timings.nativeChunkSemanticBridgeQualityDemotions = native.qualityGate.demotedSameEntityOnly;
-                timings.nativeChunkSemanticBridgeRustMicros = native.timing.bridgeBuildMicros;
-            }
-        } catch (error) {
-            if (!isUnsupportedStoreCommand(error, 'graphRebuild:chunkSemanticBridges')) throw error;
+        if (this.phoenix.target !== 'native') {
             applyNativeChunkSemanticBridgeCandidates(snapshot, []);
-            if (timings) {
-                timings.nativeChunkSemanticBridgeSkipped = 1;
-                timings.nativeChunkSemanticBridgeCandidates = 0;
-                timings.nativeChunkSemanticBridgeQualityDemotions = 0;
-                timings.nativeChunkSemanticBridgeRustMicros = 0;
-            }
-            console.warn('[GraphRebuild] Native chunk semantic bridge command unavailable; continuing without candidate bridges.', error);
-        } finally {
-            if (timings) timings.nativeChunkSemanticBridgeMs = elapsedMs(started);
-        }
-    }
-
-    private async attachNativeMemoryGovernance(
-        snapshot: GraphRebuildSnapshot,
-        timings?: GraphRebuildBuildTimings,
-    ): Promise<void> {
-        const started = performance.now();
-        try {
-            if (this.phoenix.target !== 'native') {
-                applyNativeMemoryGovernanceCandidates(snapshot, []);
-                if (timings) timings.nativeMemoryGovernanceSkipped = 1;
-                return;
-            }
-            const native = await this.phoenix.storeCommand('graphRebuild:memoryGovernance', {
-                snapshot: graphRebuildSnapshotToNativeMemoryGovernancePayload(snapshot),
-            }) as NativeMemoryGovernanceOutput | null;
-            if (!isNativeMemoryGovernanceOutput(native)) {
-                throw new Error('Rust memory governance command returned an invalid v1 payload.');
-            }
-            applyNativeMemoryGovernanceCandidates(snapshot, native.candidates);
-            if (timings) {
-                timings.nativeMemoryGovernanceCandidates = native.candidates.length;
-                timings.nativeMemoryGovernanceRustMicros = native.timing.governanceBuildMicros;
-            }
-        } catch (error) {
-            if (!isUnsupportedStoreCommand(error, 'graphRebuild:memoryGovernance')) throw error;
             applyNativeMemoryGovernanceCandidates(snapshot, []);
-            if (timings) {
-                timings.nativeMemoryGovernanceSkipped = 1;
-                timings.nativeMemoryGovernanceCandidates = 0;
-                timings.nativeMemoryGovernanceRustMicros = 0;
-            }
-            console.warn('[GraphRebuild] Native memory governance command unavailable; continuing without governance candidates.', error);
-        } finally {
-            if (timings) timings.nativeMemoryGovernanceMs = elapsedMs(started);
-        }
-    }
-
-    private async attachNativeStoryContinuity(
-        snapshot: GraphRebuildSnapshot,
-        noteTexts: Record<string, string>,
-        timings?: GraphRebuildBuildTimings,
-    ): Promise<void> {
-        const started = performance.now();
-        try {
-            if (this.phoenix.target !== 'native') {
-                if (timings) timings.nativeStoryContinuitySkipped = 1;
-                return;
-            }
-            const native = await this.phoenix.storeCommand('graphRebuild:storyContinuity', {
-                snapshot: graphRebuildSnapshotToNativeChunkBridgePayload(snapshot),
-                documents: snapshot.noteIds.map((noteId) => ({ noteId, text: noteTexts[noteId] || '' })),
-                documentSemanticSummary: snapshot.documentSemanticSummary,
-                bridgeCandidates: snapshot.chunkSemanticBridges || [],
-            }) as NativeStoryContinuityOutput | null;
-            if (!isNativeStoryContinuityOutput(native)) {
-                throw new Error('Rust story continuity command returned an invalid v1 payload.');
-            }
-            applyNativeStoryContinuityContract(snapshot, native.contract);
-            if (timings) {
-                const counters = native.contract.certificate.counters;
-                timings.nativeStoryContinuityRows = counters.events
-                    + counters.boundaryReceipts
-                    + counters.episodes
-                    + counters.temporalCandidates
-                    + counters.stateIntervals
-                    + counters.causalCandidates
-                    + counters.episodeConnections
-                    + counters.conflicts;
-                timings.nativeStoryContinuityRustMicros = native.timing.continuityBuildMicros;
-            }
-        } catch (error) {
-            if (!isUnsupportedStoreCommand(error, 'graphRebuild:storyContinuity')) throw error;
-            if (timings) {
-                timings.nativeStoryContinuitySkipped = 1;
-                timings.nativeStoryContinuityRows = 0;
-                timings.nativeStoryContinuityRustMicros = 0;
-            }
-            console.warn('[GraphRebuild] Native story continuity command unavailable; retaining compatibility continuity rows.', error);
-        } finally {
-            if (timings) timings.nativeStoryContinuityMs = elapsedMs(started);
-        }
-    }
-
-    private async attachNativeMemoryGovernanceRetrievalExperiment(
-        snapshot: GraphRebuildSnapshot,
-        timings?: GraphRebuildBuildTimings,
-    ): Promise<void> {
-        const started = performance.now();
-        const retrievalCandidates = memoryGovernanceRetrievalCandidatesFromSnapshot(snapshot);
-        if (timings) timings.nativeMemoryGovernanceRetrievalExperimentCandidates = retrievalCandidates.length;
-        try {
-            if (this.phoenix.target !== 'native' || !retrievalCandidates.length) {
-                if (timings) timings.nativeMemoryGovernanceRetrievalExperimentSkipped = 1;
-                return;
-            }
-            const native = await this.phoenix.storeCommand('graphRebuild:memoryGovernanceRetrievalExperiment', {
-                snapshot: graphRebuildSnapshotToNativeMemoryGovernancePayload(snapshot),
-                retrievalCandidates,
-            }) as NativeMemoryGovernanceRetrievalExperimentOutput | null;
-            if (!isNativeMemoryGovernanceRetrievalExperimentOutput(native)) {
-                throw new Error('Rust memory governance retrieval experiment returned an invalid v1 payload.');
-            }
-            applyNativeMemoryGovernanceRetrievalExperiment(snapshot, native.experiment);
-            if (timings) {
-                timings.nativeMemoryGovernanceRetrievalExperimentRustMicros =
-                    native.timing.experimentBuildMicros;
-            }
-        } catch (error) {
-            if (!isUnsupportedStoreCommand(error, 'graphRebuild:memoryGovernanceRetrievalExperiment')) throw error;
-            if (timings) {
-                timings.nativeMemoryGovernanceRetrievalExperimentSkipped = 1;
-                timings.nativeMemoryGovernanceRetrievalExperimentRustMicros = 0;
-            }
-            console.warn('[GraphRebuild] Native memory governance retrieval experiment unavailable; continuing without retrieval report.', error);
-        } finally {
-            if (timings) timings.nativeMemoryGovernanceRetrievalExperimentMs = elapsedMs(started);
-        }
-    }
-
-    private async attachNativePromotionVerdictCertificate(
-        snapshot: GraphRebuildSnapshot,
-        timings?: GraphRebuildBuildTimings,
-    ): Promise<void> {
-        const started = performance.now();
-        try {
-            if (this.phoenix.target !== 'native') {
-                applyNativePromotionVerdictCertificate(snapshot, null, timings);
-                if (timings) timings.nativePromotionVerdictSkipped = 1;
-                return;
-            }
-            const previewReceipts = buildGraphPromotionPreviewReceipts(snapshot);
-            const native = await this.phoenix.storeCommand('graphPromotion:verdictCertificate', {
-                scopeId: snapshot.scopeId,
-                receipts: previewReceipts,
-                commits: [],
-            }) as NativePromotionVerdictOutput | null;
-            if (!isNativePromotionVerdictOutput(native)) {
-                throw new Error('Rust promotion verdict command returned an invalid v1 payload.');
-            }
-            applyNativePromotionVerdictCertificate(snapshot, native.certificate, timings);
-            if (timings) {
-                timings.nativePromotionVerdictRows = native.certificate.audit.total;
-                timings.nativePromotionVerdictRustMicros = native.timing.verdictBuildMicros;
-            }
-        } catch (error) {
-            if (!isUnsupportedStoreCommand(error, 'graphPromotion:verdictCertificate')) throw error;
             applyNativePromotionVerdictCertificate(snapshot, null, timings);
-            if (timings) {
-                timings.nativePromotionVerdictSkipped = 1;
-                timings.nativePromotionVerdictRows = 0;
-                timings.nativePromotionVerdictRustMicros = 0;
+            timings.nativeChunkSemanticBridgeSkipped = 1;
+            timings.nativeStoryContinuitySkipped = 1;
+            timings.nativeMemoryGovernanceSkipped = 1;
+            timings.nativeMemoryGovernanceRetrievalExperimentSkipped = 1;
+            timings.nativePromotionVerdictSkipped = 1;
+            timings.nativeSnapshotAnalysisMs = elapsedMs(started);
+            return;
+        }
+
+        const retrievalCandidates = memoryGovernanceRetrievalCandidatesFromSnapshot(snapshot);
+        const page = await this.phoenix.analyzeGraphSnapshot({
+            snapshot: graphRebuildSnapshotToNativeAnalysisPayload(snapshot),
+            documents: snapshot.noteIds.map((noteId) => ({ noteId, text: noteTexts[noteId] || '' })),
+            documentSemanticSummary: snapshot.documentSemanticSummary,
+            retrievalCandidates,
+            receipts: buildGraphPromotionPreviewReceipts(snapshot),
+            commits: [],
+            siegel: graphRebuildSiegelNativeRequest(snapshot),
+        }) as NativeGraphRunPage | null;
+        if (!isNativeGraphRunPage(page)) {
+            throw new Error('Rust graph run analysis returned an invalid v1 page.');
+        }
+        if (durabilityMode === 'interactive') {
+            const previousRun = this.activeNativeGraphRun;
+            this.activeNativeGraphRun = { snapshotId: snapshot.id, runHandle: page.runHandle };
+            if (previousRun && previousRun.runHandle !== page.runHandle) {
+                void this.releaseNativeGraphRunLease(previousRun.runHandle);
             }
-            console.warn('[GraphRebuild] Native promotion verdict command unavailable; continuing without promotion verdict rows.', error);
-        } finally {
-            if (timings) timings.nativePromotionVerdictMs = elapsedMs(started);
+            this.nativeGraphRunPagingState.set({
+                snapshotId: snapshot.id,
+                runHandle: page.runHandle,
+                totalRows: page.detailRows,
+                loadedRows: page.returnedDetailRows,
+                nextOffset: page.nextOffset ?? null,
+                counts: page.counts,
+            });
+        }
+        const native = page.projection;
+        if (native.siegel) {
+            this.nativeSiegelReceiptState = { snapshotId: snapshot.id, receipt: native.siegel };
+        }
+
+        applyNativeChunkSemanticBridgeCandidates(
+            snapshot,
+            native.bridge.candidates,
+            native.bridge.crossDocumentCertificate,
+        );
+        applyNativeStoryContinuityContract(snapshot, native.continuity.contract);
+        applyNativeMemoryGovernanceCandidates(snapshot, native.governance.candidates);
+        if (native.retrieval) {
+            applyNativeMemoryGovernanceRetrievalExperiment(snapshot, native.retrieval.experiment);
+        }
+        applyNativePromotionVerdictCertificate(snapshot, native.promotion.certificate, timings);
+
+        snapshot.counters = {
+            ...snapshot.counters,
+            chunkSemanticBridges: page.counts.bridgeCandidates,
+            chunkSetupPayoffBridges: page.counts.bridgeByType['setup_payoff'] || 0,
+            chunkCauseEffectBridges: page.counts.bridgeByType['cause_effect'] || 0,
+            chunkStateDeltaBridges: page.counts.bridgeByType['state_delta'] || 0,
+            chunkRelationshipDeltaBridges: page.counts.bridgeByType['relationship_delta'] || 0,
+            chunkTopicContinuationBridges: page.counts.bridgeByType['topic_continuation'] || 0,
+            chunkEvidenceReframeBridges: page.counts.bridgeByType['evidence_reframe'] || 0,
+            chunkMotifEchoBridges: page.counts.bridgeByType['motif_echo'] || 0,
+            chunkRouteContinuityBridges: page.counts.bridgeByType['route_continuity'] || 0,
+            memoryGovernanceCandidates: page.counts.governanceCandidates,
+            memoryGovernanceRetain: page.counts.governanceByAction['retain'] || 0,
+            memoryGovernanceAttenuate: page.counts.governanceByAction['attenuate'] || 0,
+            memoryGovernanceCompress: page.counts.governanceByAction['compress'] || 0,
+            memoryGovernanceQuarantine: page.counts.governanceByAction['quarantine'] || 0,
+            memoryGovernanceRetire: page.counts.governanceByAction['retire'] || 0,
+        };
+
+        const continuityCounters = native.continuity.contract.certificate.counters;
+        snapshot.counters = {
+            ...snapshot.counters,
+            continuityEvents: continuityCounters.events,
+            continuityBoundaryReceipts: continuityCounters.boundaryReceipts,
+            continuityEpisodes: continuityCounters.episodes,
+            continuityTemporalCandidates: continuityCounters.temporalCandidates,
+            continuityCausalCandidates: continuityCounters.causalCandidates,
+            continuityStateIntervals: continuityCounters.stateIntervals,
+            continuityEpisodeConnections: continuityCounters.episodeConnections,
+            continuityConflicts: continuityCounters.conflicts,
+            continuityCrossDocumentConnections: continuityCounters.crossDocumentConnections,
+            continuityReviewRequired: continuityCounters.reviewRequired,
+        };
+        timings.nativeSnapshotAnalysisMs = elapsedMs(started);
+        timings.nativeSnapshotAnalysisRustMicros = native.timing.totalMicros;
+        timings.nativeGraphRunArenaReused = page.arena.reused ? 1 : 0;
+        timings.nativeGraphRunArenaResidentBytes = page.arena.residentBytes;
+        timings.nativeGraphRunArenaActiveLeases = page.arena.activeLeases;
+        timings.nativeGraphRunPageProjectionMicros = page.arena.projectionMicros;
+        timings.nativeGraphRunDetailRows = page.detailRows;
+        timings.nativeGraphRunReturnedDetailRows = page.returnedDetailRows;
+        timings.nativeChunkSemanticBridgeMs = timings.nativeSnapshotAnalysisMs;
+        timings.nativeChunkSemanticBridgeCandidates = page.counts.bridgeCandidates;
+        timings.nativeChunkSemanticBridgeQualityDemotions =
+            native.bridge.qualityGate.demotedSameEntityOnly;
+        timings.nativeChunkSemanticBridgeRustMicros = native.timing.bridgeBuildMicros;
+        timings.nativeStoryContinuityRows = continuityCounters.events
+            + continuityCounters.boundaryReceipts
+            + continuityCounters.episodes
+            + continuityCounters.temporalCandidates
+            + continuityCounters.stateIntervals
+            + continuityCounters.causalCandidates
+            + continuityCounters.episodeConnections
+            + continuityCounters.conflicts;
+        timings.nativeStoryContinuityRustMicros = native.timing.continuityBuildMicros;
+        timings.nativeMemoryGovernanceCandidates = page.counts.governanceCandidates;
+        timings.nativeMemoryGovernanceRustMicros = native.timing.governanceBuildMicros;
+        timings.nativeMemoryGovernanceRetrievalExperimentCandidates = retrievalCandidates.length;
+        timings.nativeMemoryGovernanceRetrievalExperimentRustMicros = native.timing.retrievalBuildMicros;
+        timings.nativePromotionVerdictRows = native.promotion.certificate.audit.total;
+        timings.nativePromotionVerdictRustMicros = native.timing.verdictBuildMicros;
+        if (durabilityMode === 'interactive') {
+            const persistStarted = performance.now();
+            const durable = await this.phoenix.persistGraphRun(page.runHandle) as NativeGraphRunPersistReceipt;
+            this.assertNativeGraphRunPersistReceipt(durable, snapshot, page.runHandle);
+            timings.nativeGraphRunPersistMs = elapsedMs(persistStarted);
+            timings.nativeGraphRunChangedSections = durable.changedSections;
+            timings.nativeGraphRunReusedSections = durable.reusedSections;
+            timings.nativeGraphRunEncodedSections = durable.encodedSections;
+            timings.nativeGraphRunCompressedSections = durable.compressedSections;
+            timings.nativeGraphRunRawBytesWritten = durable.rawBytesWritten;
+            timings.nativeGraphRunCompressedBytesWritten = durable.compressedBytesWritten;
+        } else {
+            void this.phoenix.closeGraphRun(page.runHandle);
+        }
+    }
+
+    private assertNativeGraphRunPersistReceipt(
+        durable: NativeGraphRunPersistReceipt,
+        snapshot: GraphRebuildSnapshot,
+        runHandle: string,
+    ): void {
+        if (durable.schemaVersion !== 'phoenix-graph-run-durable-receipt/v1'
+            || durable.runHandle !== runHandle
+            || durable.snapshotId !== snapshot.id
+            || durable.scopeId !== snapshot.scopeId) {
+            throw new Error('Rust graph run persistence returned a mismatched durable receipt.');
         }
     }
 
@@ -920,6 +1036,10 @@ export class GraphRebuildService {
             console.warn('[GraphRebuild] Ignoring persisted graph rebuild snapshot that failed authority parity', error),
         );
         if (!authorized) return null;
+        if (authorized.contentManifest) {
+            this.contentManifestByScope.set(scopeId, authorized.contentManifest);
+            trimOldestMapEntries(this.contentManifestByScope, 64);
+        }
         this.snapshotState.set(authorized);
         return authorized;
     }
@@ -997,7 +1117,26 @@ export class GraphRebuildService {
 
     private async reconcileDocumentGraphMutations(
         snapshot: GraphRebuildSnapshot,
+        reuseCurrentProjection = false,
     ): Promise<GraphRebuildSnapshot> {
+        const current = this.snapshotState();
+        if (reuseCurrentProjection && current?.scopeId === snapshot.scopeId) {
+            snapshot.graphTruthCommitLedger = current.graphTruthCommitLedger;
+            snapshot.documentGraphMutationLedger = current.documentGraphMutationLedger;
+            snapshot.operatorMutationJournal = current.operatorMutationJournal;
+            if (snapshot.operatorMutationJournal) {
+                snapshot.counters = {
+                    ...snapshot.counters,
+                    operatorMutationIntents: snapshot.operatorMutationJournal.counters.intents,
+                    operatorMutationActive: snapshot.operatorMutationJournal.counters.active,
+                    operatorMutationApplied: snapshot.operatorMutationJournal.counters.applied,
+                    operatorMutationConflicted: snapshot.operatorMutationJournal.counters.conflicted,
+                    operatorMutationUndone: snapshot.operatorMutationJournal.counters.undone,
+                    operatorMutationReceipts: snapshot.operatorMutationJournal.counters.receipts,
+                };
+            }
+            return snapshot;
+        }
         const truthProjection = await this.loadGraphTruthCommitProjection(snapshot.scopeId);
         if (truthProjection) {
             snapshot.graphTruthCommitLedger = truthProjection.ledger;
@@ -1114,7 +1253,11 @@ export class GraphRebuildService {
         const serializeStarted = performance.now();
         const contentBlobEntries = graphRebuildSnapshotContentBlobEntries(snapshot);
         const persistedSnapshot = graphRebuildSnapshotPersistenceView(snapshot, contentBlobEntries);
-        if (persistedSnapshot.contentManifest) snapshot.contentManifest = persistedSnapshot.contentManifest;
+        if (persistedSnapshot.contentManifest) {
+            snapshot.contentManifest = persistedSnapshot.contentManifest;
+            this.contentManifestByScope.set(snapshot.scopeId, persistedSnapshot.contentManifest);
+            trimOldestMapEntries(this.contentManifestByScope, 64);
+        }
         const contentBlobDocuments = graphRebuildSnapshotContentBlobDocuments(snapshot, contentBlobEntries);
         const documentKey = options.durabilityMode === 'diagnostic'
             ? DIAGNOSTIC_SNAPSHOT_DOCUMENT_KEY
@@ -1418,37 +1561,7 @@ export function graphRebuildSnapshotToNativeCompilerPayload(snapshot: GraphRebui
     };
 }
 
-export function graphRebuildSnapshotToNativeChunkBridgePayload(snapshot: GraphRebuildSnapshot): GraphRebuildSnapshot {
-    return {
-        schemaVersion: snapshot.schemaVersion,
-        id: snapshot.id,
-        source: snapshot.source,
-        scopeKind: snapshot.scopeKind,
-        scopeId: snapshot.scopeId,
-        noteIds: snapshot.noteIds,
-        builtAt: snapshot.builtAt,
-        chunks: snapshot.chunks,
-        mentions: [],
-        entityAnchors: snapshot.entityAnchors,
-        relationships: [],
-        events: snapshot.events,
-        episodes: snapshot.episodes,
-        chunkSemanticBridges: [],
-        episodeConnections: [],
-        episodeProjectionEdges: [],
-        temporalEdges: snapshot.temporalEdges,
-        causalEdges: snapshot.causalEdges,
-        memoryState: [],
-        embeddingTargets: [],
-        embeddingVectors: [],
-        projectionRefs: [],
-        nodes: snapshot.nodes,
-        edges: [],
-        counters: snapshot.counters,
-    };
-}
-
-export function graphRebuildSnapshotToNativeMemoryGovernancePayload(snapshot: GraphRebuildSnapshot): GraphRebuildSnapshot {
+export function graphRebuildSnapshotToNativeAnalysisPayload(snapshot: GraphRebuildSnapshot): GraphRebuildSnapshot {
     return {
         schemaVersion: snapshot.schemaVersion,
         id: snapshot.id,
@@ -1473,7 +1586,7 @@ export function graphRebuildSnapshotToNativeMemoryGovernancePayload(snapshot: Gr
         embeddingTargets: [],
         embeddingVectors: [],
         projectionRefs: [],
-        nodes: [],
+        nodes: snapshot.nodes,
         edges: [],
         counters: snapshot.counters,
     };
@@ -1485,7 +1598,7 @@ function isNativeChunkSemanticBridgeOutput(
     return value?.schemaVersion === 'phoenix-chunk-semantic-bridge-native-output/v1'
         && value.source === 'rust'
         && Array.isArray(value.candidates)
-        && isGraphCrossDocumentBridgeRunCertificate(value.crossDocumentCertificate)
+        && isGraphCrossDocumentBridgeRunCertificate(value.crossDocumentCertificate, true)
         && !!value.qualityGate
         && !!value.timing;
 }
@@ -1506,6 +1619,62 @@ function isNativeMemoryGovernanceRetrievalExperimentOutput(
         && value.source === 'rust'
         && !!value.experiment
         && !!value.timing;
+}
+
+function isNativeSnapshotAnalysisOutput(
+    value: NativeSnapshotAnalysisOutput | null | undefined,
+): value is NativeSnapshotAnalysisOutput {
+    return value?.schemaVersion === 'phoenix-graph-snapshot-analysis-native-output/v1'
+        && value.source === 'rust'
+        && value.noTopologyWrites === true
+        && isNativeChunkSemanticBridgeOutput(value.bridge)
+        && isNativeStoryContinuityOutput(value.continuity)
+        && isNativeMemoryGovernanceOutput(value.governance)
+        && (!value.retrieval || isNativeMemoryGovernanceRetrievalExperimentOutput(value.retrieval))
+        && isNativePromotionVerdictOutput(value.promotion)
+        && !!value.timing;
+}
+
+function isNativeGraphRunPage(
+    value: NativeGraphRunPage | null | undefined,
+): value is NativeGraphRunPage {
+    return value?.schemaVersion === 'phoenix-graph-run-page/v1'
+        && value.source === 'rust'
+        && typeof value.runHandle === 'string'
+        && value.runHandle.startsWith('graph-run:')
+        && Number.isInteger(value.offset)
+        && Number.isInteger(value.limit)
+        && Number.isInteger(value.detailRows)
+        && Number.isInteger(value.returnedDetailRows)
+        && typeof value.arena?.analysisIdentity === 'string'
+        && typeof value.arena.reused === 'boolean'
+        && Number.isFinite(value.arena.residentBytes)
+        && Number.isInteger(value.arena.activeLeases)
+        && Number.isFinite(value.arena.projectionMicros)
+        && !!value.counts
+        && Number.isInteger(value.counts.bridgeCandidates)
+        && Number.isInteger(value.counts.governanceCandidates)
+        && [
+            value.counts.crossDocumentPairCoverage,
+            value.counts.crossDocumentSelected,
+            value.counts.crossDocumentRejected,
+            value.counts.crossDocumentWeakest,
+            value.counts.promotionRows,
+            value.counts.continuityEvents,
+            value.counts.continuityBoundaries,
+            value.counts.continuityEpisodes,
+            value.counts.continuityTemporal,
+            value.counts.continuityStates,
+            value.counts.continuityCausal,
+            value.counts.continuityConnections,
+            value.counts.continuityConflicts,
+            value.counts.retrievalTopRows,
+            value.counts.retrievalViolations,
+        ].every(Number.isInteger)
+        && !!value.counts.bridgeByType
+        && !!value.counts.governanceByAction
+        && (!value.nextOffset || Number.isInteger(value.nextOffset))
+        && isNativeSnapshotAnalysisOutput(value.projection);
 }
 
 function nativeCompilerDocumentReviewSummary(
@@ -2161,6 +2330,14 @@ function reuseInteractivePrimarySnapshotIdentity(
     }
     sealGraphSnapshotAuthority(snapshot);
     return true;
+}
+
+function trimOldestMapEntries<K, V>(values: Map<K, V>, limit: number): void {
+    while (values.size > limit) {
+        const oldest = values.keys().next();
+        if (oldest.done) return;
+        values.delete(oldest.value);
+    }
 }
 
 function normalizeTargetKind(kind: string): string {

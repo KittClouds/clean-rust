@@ -26,4 +26,12 @@ describe('AtlasControlRoomsComponent contract boundary', () => {
         expect(source).toContain('.slice(0, ROW_LIMIT)');
         expect(template).toContain('(click)="dispatch(action, row.identity.id)"');
     });
+
+    it('requests native proof pages without manufacturing an empty ledger', () => {
+        expect(source).toContain('output<void>()');
+        expect(source).toContain('this.nextPageRequested.emit()');
+        expect(template).toContain('Proof rows are still native');
+        expect(template).toContain('Load next proof page');
+        expect(template).toContain('Retry native proof page');
+    });
 });

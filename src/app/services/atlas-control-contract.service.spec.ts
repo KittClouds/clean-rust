@@ -19,12 +19,21 @@ describe('AtlasControlContractService', () => {
     let injector: EnvironmentInjector;
     let owner: AtlasControlContractService;
     let snapshot: ReturnType<typeof signal<any>>;
+    let nativePaging: ReturnType<typeof signal<any>>;
+    let readPage: ReturnType<typeof vi.fn>;
+    let releaseLease: ReturnType<typeof vi.fn>;
 
     beforeEach(() => {
         snapshot = signal<any>(null);
+        nativePaging = signal<any>(null);
+        readPage = vi.fn();
+        releaseLease = vi.fn(async () => true);
         const graphRebuild = {
             snapshot,
             isBuilding: computed(() => false),
+            nativeGraphRunPaging: computed(() => nativePaging()),
+            readNativeGraphRunPageForHandle: readPage,
+            releaseNativeGraphRunLease: releaseLease,
             attachReviewAdjudicationCertificate: vi.fn((certificate: unknown) => {
                 snapshot.update((current) => current ? { ...current, reviewAdjudicationCertificate: certificate } : current);
             }),
@@ -85,6 +94,36 @@ describe('AtlasControlContractService', () => {
         expect(owner.contract().inventoryById.nli_judgment_rows.totalRows).toBe(2);
         expect(owner.contract().invariants.reviewNliSeparated.status).toBe('passed');
     });
+
+    it('drops a late page from a superseded run and publishes only the current page', async () => {
+        snapshot.set({ ...graphSnapshot(), counters: { memoryGovernanceCandidates: 1 } });
+        nativePaging.set(paging('run:old'));
+        const pending = deferred<any>();
+        readPage.mockReturnValueOnce(pending.promise);
+
+        const staleLoad = owner.loadNextProofPage();
+        nativePaging.set(paging('run:new'));
+        pending.resolve(nativePage('run:old', governanceCandidate('stale')));
+        await staleLoad;
+
+        expect(owner.proofPaging().runHandle).toBe('run:new');
+        expect(owner.contract().rows.some((row) => row.identity.rawId === 'stale')).toBe(false);
+
+        readPage.mockResolvedValueOnce(nativePage('run:new', governanceCandidate('current')));
+        await owner.loadNextProofPage();
+
+        expect(owner.proofPaging()).toMatchObject({ status: 'complete', loadedRows: 16 });
+        expect(owner.contract().rows.filter((row) => row.identity.rawId === 'current')).toHaveLength(1);
+    });
+
+    it('releases one native lease exactly once', async () => {
+        nativePaging.set(paging('run:release'));
+
+        expect(await owner.releaseProofLease()).toBe(true);
+        expect(await owner.releaseProofLease()).toBe(false);
+        expect(releaseLease).toHaveBeenCalledTimes(1);
+        expect(releaseLease).toHaveBeenCalledWith('run:release');
+    });
 });
 
 function graphSnapshot(): any {
@@ -99,4 +138,67 @@ function graphSnapshot(): any {
         edges: [],
         embeddingTargets: [],
     };
+}
+
+function paging(runHandle: string): any {
+    return {
+        snapshotId: 'snapshot:owner-test',
+        runHandle,
+        totalRows: 16,
+        loadedRows: 8,
+        nextOffset: 8,
+        counts: {
+            crossDocumentPairCoverage: 0,
+            crossDocumentSelected: 0,
+            crossDocumentRejected: 0,
+            continuityBoundaries: 0,
+            continuityEpisodes: 0,
+            continuityTemporal: 0,
+            continuityStates: 0,
+            continuityCausal: 0,
+            continuityConnections: 0,
+            continuityConflicts: 0,
+        },
+    };
+}
+
+function nativePage(runHandle: string, row: any): any {
+    return {
+        runHandle,
+        returnedDetailRows: 8,
+        nextOffset: null,
+        projection: {
+            bridge: { candidates: [], crossDocumentCertificate: null },
+            continuity: { contract: null },
+            governance: { candidates: [row] },
+            promotion: { certificate: null },
+        },
+    };
+}
+
+function governanceCandidate(id: string): any {
+    return {
+        schemaVersion: 'phoenix-memory-governance-candidate/v1',
+        id,
+        targetId: 'chunk:1',
+        targetKind: 'chunk',
+        action: 'retain',
+        reason: 'keep vivid',
+        evidenceIds: ['evidence:1'],
+        supportingEntityIds: [],
+        relatedEventIds: [],
+        relatedChunkIds: [],
+        signals: {},
+        confidence: 0.8,
+        status: 'candidate',
+        commitPolicy: 'candidate_only_no_topology_commit',
+        noTopologyCommit: true,
+        rationale: [],
+    };
+}
+
+function deferred<T>(): { promise: Promise<T>; resolve(value: T): void } {
+    let resolve!: (value: T) => void;
+    const promise = new Promise<T>((next) => { resolve = next; });
+    return { promise, resolve };
 }

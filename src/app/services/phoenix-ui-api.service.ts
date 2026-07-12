@@ -745,6 +745,42 @@ export class PhoenixUiApiService {
         return groupDiscoveryMentions(text, mentions);
     }
 
+    async scanDiscoveryBatch(
+        documents: Array<{ documentId: string; text: string }>,
+    ): Promise<Array<{ documentId: string; candidates: PhoenixDiscoveryCandidate[] }>> {
+        await this.loadRuntime();
+        if (!this.dictionary.length) {
+            await this.hydrateWithEntitiesInternal();
+        }
+        const request = {
+            documents,
+            resolverSeed: this.buildResolverSeed().map((seed) => ({
+                entityId: String(seed['entityId'] || ''),
+                canonicalName: String(seed['canonicalName'] || ''),
+                aliases: Array.isArray(seed['aliases']) ? seed['aliases'].map(String) : [],
+                kind: typeof seed['kind'] === 'string' ? seed['kind'] : null,
+                scope: mentionBatchScope(seed['scope']),
+            })),
+        };
+        if (this.phoenix.target === 'native') {
+            const opened = await this.phoenix.openGraphRun(request);
+            return opened.documents.map((document) => ({
+                documentId: document.documentId,
+                candidates: document.candidates,
+            }));
+        }
+        const results = await this.phoenix.scanMentionsBatch(request);
+        const textByDocument = new Map(documents.map((document) => [document.documentId, document.text]));
+        return results.map((result) => {
+            const text = textByDocument.get(result.documentId) || '';
+            const mentions = normalizeScanMentions(text, Array.isArray(result.mentions) ? result.mentions : []);
+            return {
+                documentId: result.documentId,
+                candidates: groupDiscoveryMentions(text, mentions),
+            };
+        });
+    }
+
     async scanImplicitAsync(text: string): Promise<DecorationSpan[]> {
         return this.scanEntityMentionsAsync(text);
     }
@@ -1904,6 +1940,21 @@ function withManifoldLoadTimings<TPayload>(
             ...(snapshot.timings || {}),
             ...timings,
         },
+    };
+}
+
+function mentionBatchScope(value: unknown): {
+    worldId: string | null;
+    narrativeId: string | null;
+    folderId: string | null;
+    folderPath: string | null;
+} {
+    const scope = asRecord(value);
+    return {
+        worldId: typeof scope['worldId'] === 'string' ? scope['worldId'] : null,
+        narrativeId: typeof scope['narrativeId'] === 'string' ? scope['narrativeId'] : null,
+        folderId: typeof scope['folderId'] === 'string' ? scope['folderId'] : null,
+        folderPath: typeof scope['folderPath'] === 'string' ? scope['folderPath'] : null,
     };
 }
 

@@ -34,7 +34,7 @@ impl SiegelFinslerTimings {
 #[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SiegelFinslerContract {
-    pub projection_space: &'static str,
+    pub projection_space: String,
     pub target_count: usize,
     pub directed_edge_count: usize,
     pub genus: u16,
@@ -54,7 +54,7 @@ impl SiegelFinslerContract {
             estimate_siegel_contract_bytes(input.target_count, input.directed_edge_count, genus);
 
         Self {
-            projection_space: SIEGEL_FINSLER_PROJECTION_SPACE,
+            projection_space: SIEGEL_FINSLER_PROJECTION_SPACE.to_owned(),
             target_count: input.target_count,
             directed_edge_count: input.directed_edge_count,
             genus,

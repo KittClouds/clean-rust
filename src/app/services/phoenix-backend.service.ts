@@ -24,6 +24,31 @@ import type {
     PhoenixDocumentIndexReadRequest,
     PhoenixDocumentIndexReadResponse,
 } from './phoenix-document-index.model';
+import type {
+    DesktopMentionBatchRequest,
+} from '../generated/phoenix-taurpc';
+
+export type PhoenixMentionBatchRequest = DesktopMentionBatchRequest;
+export interface PhoenixMentionBatchResult {
+    documentId: string;
+    mentions: Array<{
+        range: { start: number; end: number };
+        surface: string;
+        kind: string | null;
+        entityRef: string | null;
+        source: 'discovery';
+        confidence: number;
+        sentenceIndex: number;
+    }>;
+}
+export interface PhoenixGraphRunOpenResult {
+    runHandle: string;
+    documents: Array<{
+        documentId: string;
+        textHash: string;
+        candidates: Array<{ key: string; token: string; kind: string; score: number; count: number; status: number }>;
+    }>;
+}
 
 type PhoenixTransportMethodName =
     | 'onReady'
@@ -89,6 +114,12 @@ export type PhoenixNativeBridge = Pick<PhoenixWasmService, 'isReady' | PhoenixNa
     loadRuntime(): Promise<void>;
     bootSnapshot(): Promise<PhoenixBootSnapshotPayload>;
     compileGalaxyScene(request: PhoenixGalaxySceneRequest): Promise<PhoenixGalaxyScene>;
+    scanMentionsBatch?(request: PhoenixMentionBatchRequest): Promise<PhoenixMentionBatchResult[]>;
+    openGraphRun?(request: PhoenixMentionBatchRequest): Promise<PhoenixGraphRunOpenResult>;
+    analyzeGraphSnapshot?(request: unknown): Promise<unknown>;
+    readGraphRunPage?(request: { runHandle: string; offset: number; limit: number }): Promise<unknown>;
+    persistGraphRun?(runHandle: string): Promise<unknown>;
+    closeGraphRun?(runHandle: string): Promise<boolean>;
     graphScenePacket?(request: PhoenixGraphScenePacketRequest): Promise<PhoenixGraphScenePacket>;
     nliAdjudicateClaims?(request: Record<string, unknown>): Promise<any>;
     siegelFinslerReceipt?(request: Record<string, unknown>): Promise<any>;
@@ -213,6 +244,70 @@ export class PhoenixBackendService {
         return this.target === 'native'
             ? this.requireNativeBridge().scan(request)
             : this.wasm.scan(request);
+    }
+
+    async scanMentionsBatch(request: PhoenixMentionBatchRequest): Promise<PhoenixMentionBatchResult[]> {
+        if (this.target === 'native') {
+            const bridge = this.requireNativeBridge();
+            if (bridge.scanMentionsBatch) {
+                return bridge.scanMentionsBatch(request);
+            }
+        }
+        return Promise.all(request.documents.map(async (document) => {
+            const scan = await this.scan({
+                text: document.text,
+                scope: {},
+                sessionId: 'phoenix-ui-discovery-batch',
+                resolverSeed: request.resolverSeed,
+            });
+            return {
+                documentId: document.documentId,
+                mentions: Array.isArray(scan?.mentions) ? scan.mentions : [],
+            };
+        }));
+    }
+
+    async openGraphRun(request: PhoenixMentionBatchRequest): Promise<PhoenixGraphRunOpenResult> {
+        if (this.target !== 'native') {
+            throw new Error('PhoenixBackendService.openGraphRun() requires the native runtime.');
+        }
+        const bridge = this.requireNativeBridge();
+        if (!bridge.openGraphRun) throw new Error('Native graph run open RPC is unavailable.');
+        return bridge.openGraphRun(request);
+    }
+
+    async analyzeGraphSnapshot(request: unknown): Promise<unknown> {
+        if (this.target !== 'native') {
+            throw new Error('PhoenixBackendService.analyzeGraphSnapshot() requires the native runtime.');
+        }
+        const bridge = this.requireNativeBridge();
+        if (!bridge.analyzeGraphSnapshot) {
+            throw new Error('Native graph snapshot analysis RPC is unavailable.');
+        }
+        return bridge.analyzeGraphSnapshot(request);
+    }
+
+    async readGraphRunPage(request: { runHandle: string; offset: number; limit: number }): Promise<unknown> {
+        if (this.target !== 'native') {
+            throw new Error('PhoenixBackendService.readGraphRunPage() requires the native runtime.');
+        }
+        const bridge = this.requireNativeBridge();
+        if (!bridge.readGraphRunPage) throw new Error('Native graph run paging RPC is unavailable.');
+        return bridge.readGraphRunPage(request);
+    }
+
+    async persistGraphRun(runHandle: string): Promise<unknown> {
+        if (this.target !== 'native') {
+            throw new Error('PhoenixBackendService.persistGraphRun() requires the native runtime.');
+        }
+        const bridge = this.requireNativeBridge();
+        if (!bridge.persistGraphRun) throw new Error('Native graph run persistence RPC is unavailable.');
+        return bridge.persistGraphRun(runHandle);
+    }
+
+    async closeGraphRun(runHandle: string): Promise<boolean> {
+        if (this.target !== 'native') return false;
+        return this.requireNativeBridge().closeGraphRun?.(runHandle) ?? false;
     }
 
     async atlasRichScan(request: Record<string, unknown>): Promise<any> {
