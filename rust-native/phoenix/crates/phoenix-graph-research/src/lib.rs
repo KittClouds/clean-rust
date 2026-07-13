@@ -6,6 +6,8 @@ mod build;
 mod evaluation;
 mod evaluation_artifact;
 mod evaluation_model;
+mod frozen_model_artifact;
+mod frozen_model_model;
 mod model;
 mod ranking;
 mod ranking_artifact;
@@ -23,6 +25,11 @@ pub use build::{freeze_graph_research_snapshot, FrozenGraphResearchInput};
 pub use evaluation::{certify_evaluation_protocol, evaluate_binary_scores};
 pub use evaluation_artifact::ResearchEvaluationBundle;
 pub use evaluation_model::*;
+pub use frozen_model_artifact::{
+    certify_model_scores, certify_model_seed_receipt, FrozenModelBundle, FrozenModelMapped,
+    ModelLeF32,
+};
+pub use frozen_model_model::*;
 pub use model::*;
 pub use ranking::{evaluate_ranking_scores, run_structural_ranking_baselines};
 pub use ranking_artifact::RankingEvaluationBundle;
@@ -42,3 +49,6 @@ mod topology_tests;
 
 #[cfg(test)]
 mod ranking_tests;
+
+#[cfg(test)]
+mod frozen_model_tests;

@@ -76,8 +76,9 @@ feature schema, and BLAKE3 source identity; it must not mutate the current artif
 ## Scope guard
 
 Candle is intentionally integrated as an isolated spike crate, not as a Phoenix
-workspace dependency. Promotion requires a model artifact contract and a training
-spike. Burn remains a credible candidate for that later ticket because its backend
+workspace dependency. Frozen Model Artifact v1 now supplies the model contract;
+promotion still requires a training spike. Burn remains a credible candidate for
+that later ticket because its backend
 abstraction and autodiff surface are broader; this benchmark only establishes that
 the abstraction does not buy us performance on the present CPU inference path.
 

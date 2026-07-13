@@ -36,3 +36,6 @@ Probabilities are clipped only inside log-loss calculation. Report identities ar
 ## Promotion rule
 
 An R-GCN, HGT, or hypergraph model may enter the ladder only after its features are certified as derived from training-visible topology. It must improve validation average precision without materially worsening Brier score, repeat across certified seeds, and report only one locked-test evaluation after selection.
+
+Any learned family must emit `phoenix-frozen-model/v1`; ad hoc runtime checkpoints do
+not qualify as evidence.
