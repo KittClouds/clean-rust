@@ -5,29 +5,51 @@ export interface GalaxyFocusMask {
     focusIndex: number;
     selectedIndex: number;
     hoverIndex: number;
+    selectedIndices: Uint32Array;
+    pathNodeIndices: Uint32Array;
+    pathEdgeIndices: Uint32Array;
+    pathFound: boolean;
     nodeLevels: Uint8Array;
     edgeLevels: Uint8Array;
 }
 
-export function buildGalaxyFocusMask(data: GalaxySceneV2, selectedId: string | null, hoverId: string | null): GalaxyFocusMask {
-    const selectedIndex = selectedId ? galaxyNodeIndex(data, selectedId) : -1;
+export function buildGalaxyFocusMask(
+    data: GalaxySceneV2,
+    selected: string | readonly string[] | null,
+    hoverId: string | null,
+): GalaxyFocusMask {
+    const selectedIds = typeof selected === 'string' ? [selected] : selected?.slice(0, 2) ?? [];
+    const selectedValues = selectedIds
+        .map((id) => galaxyNodeIndex(data, id))
+        .filter((index, position, values) => index >= 0 && values.indexOf(index) === position);
+    const selectedIndices = Uint32Array.from(selectedValues);
+    const selectedIndex = selectedValues[0] ?? -1;
     const hoverIndex = hoverId ? galaxyNodeIndex(data, hoverId) : -1;
     const focusIndex = hoverIndex >= 0 ? hoverIndex : selectedIndex;
     const nodeLevels = new Uint8Array(data.ids.length);
     const edgeLevels = new Uint8Array(data.edgePairs.length / 2);
+    if (selectedValues.length === 2) {
+        return shortestPathFocus(data, selectedValues[0], selectedValues[1], hoverIndex, nodeLevels, edgeLevels);
+    }
+    const noPath = {
+        selectedIndices,
+        pathNodeIndices: new Uint32Array(0),
+        pathEdgeIndices: new Uint32Array(0),
+        pathFound: false,
+    };
     if (focusIndex < 0) {
         nodeLevels.fill(1);
         edgeLevels.fill(1);
-        return { hasFocus: false, focusIndex, selectedIndex, hoverIndex, nodeLevels, edgeLevels };
+        return { ...noPath, hasFocus: false, focusIndex, selectedIndex, hoverIndex, nodeLevels, edgeLevels };
     }
 
     if (data.layoutMode === 'siegelFinsler' && focusDirectedHierarchy(data, focusIndex, nodeLevels, edgeLevels)) {
-        return { hasFocus: true, focusIndex, selectedIndex, hoverIndex, nodeLevels, edgeLevels };
+        return { ...noPath, hasFocus: true, focusIndex, selectedIndex, hoverIndex, nodeLevels, edgeLevels };
     }
 
     if (data.layoutMode === 'lorentzTree' && focusStructuralHierarchy(data, focusIndex, nodeLevels, edgeLevels)) {
         includeIncidentConnections(data, focusIndex, nodeLevels, edgeLevels);
-        return { hasFocus: true, focusIndex, selectedIndex, hoverIndex, nodeLevels, edgeLevels };
+        return { ...noPath, hasFocus: true, focusIndex, selectedIndex, hoverIndex, nodeLevels, edgeLevels };
     }
 
     nodeLevels[focusIndex] = 3;
@@ -38,7 +60,82 @@ export function buildGalaxyFocusMask(data: GalaxySceneV2, selectedId: string | n
         nodeLevels[source] = Math.max(nodeLevels[source], source === focusIndex ? 3 : 2);
         nodeLevels[target] = Math.max(nodeLevels[target], target === focusIndex ? 3 : 2);
     }
-    return { hasFocus: true, focusIndex, selectedIndex, hoverIndex, nodeLevels, edgeLevels };
+    return { ...noPath, hasFocus: true, focusIndex, selectedIndex, hoverIndex, nodeLevels, edgeLevels };
+}
+
+function shortestPathFocus(
+    data: GalaxySceneV2,
+    start: number,
+    target: number,
+    hoverIndex: number,
+    nodeLevels: Uint8Array,
+    edgeLevels: Uint8Array,
+): GalaxyFocusMask {
+    const previousNode = new Int32Array(data.ids.length);
+    const previousEdge = new Int32Array(data.ids.length);
+    const queue = new Uint32Array(data.ids.length);
+    previousNode.fill(-1);
+    previousEdge.fill(-1);
+    previousNode[start] = start;
+    let head = 0;
+    let tail = 0;
+    queue[tail++] = start;
+
+    while (head < tail && previousNode[target] < 0) {
+        const current = queue[head++];
+        for (const edge of incidentEdgesFor(data, current)) {
+            const source = data.edgePairs[edge * 2];
+            const destination = data.edgePairs[edge * 2 + 1];
+            const next = source === current ? destination : destination === current ? source : -1;
+            if (next < 0 || previousNode[next] >= 0) continue;
+            previousNode[next] = current;
+            previousEdge[next] = edge;
+            queue[tail++] = next;
+            if (next === target) break;
+        }
+    }
+
+    const selectedIndices = Uint32Array.of(start, target);
+    if (previousNode[target] < 0) {
+        nodeLevels[start] = 3;
+        nodeLevels[target] = 3;
+        return {
+            hasFocus: true,
+            focusIndex: target,
+            selectedIndex: start,
+            hoverIndex,
+            selectedIndices,
+            pathNodeIndices: selectedIndices,
+            pathEdgeIndices: new Uint32Array(0),
+            pathFound: false,
+            nodeLevels,
+            edgeLevels,
+        };
+    }
+
+    const reversedNodes: number[] = [target];
+    const reversedEdges: number[] = [];
+    for (let node = target; node !== start;) {
+        reversedEdges.push(previousEdge[node]);
+        node = previousNode[node];
+        reversedNodes.push(node);
+    }
+    reversedNodes.reverse();
+    reversedEdges.reverse();
+    for (const node of reversedNodes) nodeLevels[node] = node === start || node === target ? 3 : 2;
+    for (const edge of reversedEdges) edgeLevels[edge] = 3;
+    return {
+        hasFocus: true,
+        focusIndex: target,
+        selectedIndex: start,
+        hoverIndex,
+        selectedIndices,
+        pathNodeIndices: Uint32Array.from(reversedNodes),
+        pathEdgeIndices: Uint32Array.from(reversedEdges),
+        pathFound: true,
+        nodeLevels,
+        edgeLevels,
+    };
 }
 
 function focusDirectedHierarchy(

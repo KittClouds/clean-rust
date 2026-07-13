@@ -36,7 +36,7 @@ describe('galaxy node shape rendering', () => {
         expect(galaxyNodePickShapeBoost('sphere')).toBe(2);
     });
 
-    it('A/B flips sphere nodes between solid and colored B-glass', () => {
+    it('A/B flips sphere nodes between solid and the B-aurora reliquary', () => {
         const scene = { ids: ['node:a'] } as GalaxySceneV2;
         const texture = new THREE.Texture();
         const solid = buildGalaxyNodes(scene, mergeGalaxySettings({ nodeShape: 'sphere', sphereSurface: 'solid' }), texture, texture);
@@ -48,11 +48,18 @@ describe('galaxy node shape rendering', () => {
         expect(solidBatch?.meshes).toHaveLength(4);
         expect(batch?.meshes[1].material).toBeInstanceOf(THREE.ShaderMaterial);
         const material = batch?.meshes[1].material as THREE.ShaderMaterial | undefined;
-        expect(material?.userData['glassSurface']).toBe('b-glass-marble');
+        expect(material?.name).toBe('BAuroraReliquary');
+        expect(material?.userData['sphereDesign']).toBe('b-aurora-reliquary');
         expect(material?.userData['sphereSurface']).toBe('glass');
         expect(material?.vertexShader).toContain('instanceColor');
         expect(material?.fragmentShader).toContain('rimStrength');
-        expect(material?.fragmentShader).toContain('sheen');
+        expect(material?.fragmentShader).toContain('auroraRibbon');
+        expect(material?.fragmentShader).toContain('eclipseCore');
+        expect(material?.fragmentShader).toContain('coronaColor');
+        expect(material?.fragmentShader).toContain('source / max(sourcePeak');
+        expect(material?.fragmentShader).not.toContain('source.gbr');
+        expect(material?.fragmentShader).not.toContain('source.brg');
+        expect(material?.fragmentShader).not.toContain('shellBand');
         expect(material?.fragmentShader).not.toContain('bloom');
         expect(material?.uniforms['opacity'].value).toBeGreaterThan(0.7);
         expect(material?.uniforms['sheen'].value).toBeLessThan(0.05);
@@ -94,7 +101,7 @@ describe('galaxy node shape rendering', () => {
         atomTexture.dispose();
     });
 
-    it('batches B-glass spheres into colored shader instances instead of per-node meshes', () => {
+    it('batches B-aurora spheres into colored shader instances instead of per-node meshes', () => {
         const scene = { ids: ['node:a', 'node:b', 'node:c'] } as GalaxySceneV2;
         const texture = new THREE.Texture();
         const glass = buildGalaxyNodes(scene, mergeGalaxySettings({ nodeShape: 'sphere', sphereSurface: 'glass' }), texture, texture);

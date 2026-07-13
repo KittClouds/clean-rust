@@ -13,7 +13,11 @@ import {
     type PhoenixLineSearchScope,
 } from '../lib/search/phoenix-line-search';
 import { PhoenixBackendService } from './phoenix-backend.service';
-import { PhoenixStoreService, type StoreScopedDocument } from './phoenix-store.service';
+import {
+    PhoenixStoreService,
+    type StoreEntity,
+    type StoreScopedDocument,
+} from './phoenix-store.service';
 import { buildHybridEmbeddingValidationReceipt } from './hybrid-embedding-validation';
 import {
     HYBRID_EMBEDDING_ARTIFACT_DOCUMENT_KEY,
@@ -515,6 +519,18 @@ export class PhoenixUiApiService {
     async hydrateWithEntities(): Promise<void> {
         await this.loadRuntime();
         await this.hydrateWithEntitiesInternal();
+    }
+
+    async hydrateWithEntityRows(
+        entities: ReadonlyArray<Pick<StoreEntity, 'id' | 'label' | 'kind' | 'aliases'>>,
+    ): Promise<void> {
+        await this.loadRuntime();
+        await this.rebuildDictionary(entities.map((entity) => ({
+            id: entity.id,
+            label: entity.label,
+            kind: entity.kind,
+            aliases: entity.aliases || [],
+        })));
     }
 
     private async hydrateWithEntitiesInternal(): Promise<void> {
@@ -1186,14 +1202,6 @@ export class PhoenixUiApiService {
         console.log('[PhoenixUiApi] initialize:store.initialize:start');
         await this.store.initialize();
         console.log(`[PhoenixUiApi] initialize:store.initialize:complete (${Date.now() - startedAt}ms)`);
-        console.log('[PhoenixUiApi] initialize:ensureMainSession:start');
-        await this.ensureMainSession();
-        console.log(`[PhoenixUiApi] initialize:ensureMainSession:complete (${Date.now() - startedAt}ms)`);
-        if (!this.dictionary.length) {
-            console.log('[PhoenixUiApi] initialize:hydrateWithEntities:start');
-            await this.hydrateWithEntitiesInternal();
-            console.log(`[PhoenixUiApi] initialize:hydrateWithEntities:complete (${Date.now() - startedAt}ms)`);
-        }
         this.ready = true;
         const readyCallbacks = Array.from(this.readyCallbacks);
         this.readyCallbacks.clear();

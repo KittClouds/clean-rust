@@ -12,6 +12,11 @@ import { galaxySceneToV2 } from './graph-galaxy-scene-v2';
 import { entityColorStore } from '../../../../../lib/store/entityColorStore';
 
 describe('Graph galaxy scene prioritization', () => {
+    it('keeps detail cards enabled by default while preserving a persisted opt-out', () => {
+        expect(mergeGalaxySettings().detailCardsVisible).toBe(true);
+        expect(mergeGalaxySettings({ detailCardsVisible: false }).detailCardsVisible).toBe(false);
+    });
+
     it('keeps entity nodes and their edges when chunk evidence floods a graph snapshot', () => {
         const entities = Array.from({ length: 21 }, (_, index) => ({
             id: `entity-${index}`,

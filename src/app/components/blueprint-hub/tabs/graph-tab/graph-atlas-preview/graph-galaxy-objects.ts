@@ -151,7 +151,7 @@ function buildStyledSphereNodes(scene: GalaxySceneV2, surface: GalaxySphereSurfa
             const material = sphereSurfaceMaterial(surface, state);
             const mesh = new THREE.InstancedMesh(geometry, material, scene.ids.length);
             mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-            mesh.instanceColor = glassInstanceColors(scene.ids.length);
+            mesh.instanceColor = sphereInstanceColors(scene.ids.length);
             mesh.frustumCulled = false;
             mesh.renderOrder = 8 + stateIndex;
             mesh.userData['sphereNodeState'] = state.state;
@@ -165,7 +165,7 @@ function buildStyledSphereNodes(scene: GalaxySceneV2, surface: GalaxySphereSurfa
     return group;
 }
 
-function glassInstanceColors(count: number): THREE.InstancedBufferAttribute {
+function sphereInstanceColors(count: number): THREE.InstancedBufferAttribute {
     const colors = new Float32Array(count * 3);
     colors.fill(1);
     return new THREE.InstancedBufferAttribute(colors, 3).setUsage(THREE.DynamicDrawUsage);
@@ -179,7 +179,8 @@ function sphereSurfaceMaterial(
     if (surface === 'spellglass') return spellglassSphereMaterial(state);
     if (surface === 'obsidian') return obsidianSphereMaterial(state);
     if (surface === 'starcore') return starcoreSphereMaterial(state);
-    return glassSphereMaterial(state);
+    // `glass` is retained as the persisted B-slot token; its visual identity is Aurora Reliquary.
+    return auroraReliquarySphereMaterial(state);
 }
 
 function solidSphereMaterial(state: GalaxySphereNodeState): THREE.MeshBasicMaterial {
@@ -197,92 +198,65 @@ function solidSphereMaterial(state: GalaxySphereNodeState): THREE.MeshBasicMater
     return material;
 }
 
-function glassSphereMaterial(state: (typeof SPHERE_NODE_STATES)[number]): THREE.ShaderMaterial {
-    const material = new THREE.ShaderMaterial({
-        name: 'BGlassInstancedMarble',
-        uniforms: {
-            opacity: { value: state.opacity },
-            rimStrength: { value: state.rimStrength },
-            innerStrength: { value: state.innerStrength },
-            sheen: { value: state.sheen },
-        },
-        vertexShader: `
-            varying vec3 vGlassColor;
-            varying vec3 vGlassNormal;
-            varying vec3 vGlassView;
-            varying vec3 vGlassLocal;
+function auroraReliquarySphereMaterial(state: (typeof SPHERE_NODE_STATES)[number]): THREE.ShaderMaterial {
+    const material = styledSphereMaterial('BAuroraReliquary', 'glass', state, `
+        uniform float opacity;
+        uniform float rimStrength;
+        uniform float innerStrength;
+        uniform float sheen;
+        varying vec3 vSphereColor;
+        varying vec3 vSphereNormal;
+        varying vec3 vSphereView;
+        varying vec3 vSphereLocal;
 
-            void main() {
-                vec4 instancedPosition = vec4(position, 1.0);
-                vec3 instancedNormal = normal;
+        void main() {
+            vec3 normal = normalize(vSphereNormal);
+            vec3 view = normalize(vSphereView);
+            vec3 source = max(vSphereColor, vec3(0.035));
+            float sourcePeak = max(max(source.r, source.g), source.b);
+            vec3 pigment = source / max(sourcePeak, 0.001);
+            float facing = clamp(dot(normal, view), 0.0, 1.0);
+            float corona = pow(1.0 - facing, 1.72);
+            float longitude = atan(vSphereLocal.z, vSphereLocal.x);
+            float latitude = asin(clamp(vSphereLocal.y, -1.0, 1.0));
 
-                #ifdef USE_INSTANCING
-                    instancedPosition = instanceMatrix * instancedPosition;
-                    instancedNormal = mat3(instanceMatrix) * instancedNormal;
-                #endif
+            // Two broad aurora ribbons cross the dark reliquary at different inclinations.
+            float ribbonAxis = latitude - 0.24 * sin(longitude * 2.0 + vSphereLocal.z * 1.8);
+            float auroraRibbon = 1.0 - smoothstep(0.055, 0.22, abs(ribbonAxis));
+            float veilAxis = latitude + 0.36 - 0.12 * sin(longitude * 3.0 - vSphereLocal.x * 2.4);
+            float auroraVeil = 1.0 - smoothstep(0.035, 0.14, abs(veilAxis));
+            float filament = clamp(auroraRibbon + auroraVeil * 0.74, 0.0, 1.0);
+            float filamentCore = 1.0 - smoothstep(0.0, 0.055, abs(ribbonAxis));
 
-                vec4 worldPosition = modelMatrix * instancedPosition;
-                vGlassNormal = normalize(mat3(modelMatrix) * instancedNormal);
-                vGlassView = normalize(cameraPosition - worldPosition.xyz);
-                vGlassLocal = position;
+            float prismPhase = longitude * 1.5 + latitude * 4.0;
+            float auroraBreath = 0.9 + 0.1 * sin(prismPhase);
+            vec3 aurora = pigment * auroraBreath;
 
-                #ifdef USE_INSTANCING_COLOR
-                    vGlassColor = instanceColor;
-                #else
-                    vGlassColor = vec3(0.42, 1.0, 0.92);
-                #endif
+            // Keep the selector hue legible through the dark core instead of channel-swizzling it.
+            vec3 eclipseCore = vec3(0.003, 0.008, 0.022) + pigment * (0.15 + facing * 0.1);
+            float submergedGlow = pow(facing, 2.4) * (0.12 + innerStrength * 0.1);
+            vec3 hue = eclipseCore + pigment * submergedGlow;
+            hue += aurora * filament * (0.82 + innerStrength * 0.5);
+            hue += mix(aurora, vec3(1.0), 0.24) * filamentCore * 0.66;
 
-                gl_Position = projectionMatrix * viewMatrix * worldPosition;
-            }
-        `,
-        fragmentShader: `
-            uniform float opacity;
-            uniform float rimStrength;
-            uniform float innerStrength;
-            uniform float sheen;
-            varying vec3 vGlassColor;
-            varying vec3 vGlassNormal;
-            varying vec3 vGlassView;
-            varying vec3 vGlassLocal;
+            // A saturated teal-violet corona frames the registry pigment without replacing it.
+            vec3 coronaColor = mix(
+                vec3(0.015, 0.86, 0.7),
+                vec3(0.58, 0.18, 1.0),
+                0.5 + 0.5 * sin(longitude * 2.0)
+            );
+            coronaColor = mix(coronaColor, pigment, 0.12);
+            hue += coronaColor * corona * rimStrength * (0.74 + filament * 0.22);
+            vec3 lightDir = normalize(vec3(-0.46, 0.58, 0.68));
+            float jewel = pow(max(dot(normal, lightDir), 0.0), 46.0);
+            hue += vec3(1.0, 0.94, 0.78) * jewel * (0.46 + sheen * 2.0);
 
-            void main() {
-                vec3 normal = normalize(vGlassNormal);
-                vec3 view = normalize(vGlassView);
-                vec3 source = max(vGlassColor, vec3(0.025));
-                float maxChannel = max(max(source.r, source.g), source.b);
-                float lift = 0.36 / max(maxChannel, 0.001);
-                float lowChroma = 1.0 - smoothstep(0.0, 0.36, maxChannel);
-                source = mix(source, min(source * lift, vec3(1.0)), lowChroma * 0.45);
-
-                float rim = pow(1.0 - clamp(abs(dot(normal, view)), 0.0, 1.0), 2.65);
-                rim = smoothstep(0.12, 0.88, rim);
-                float latitude = 0.5 + 0.5 * sin(vGlassLocal.y * 7.4 + vGlassLocal.x * 2.8 + vGlassLocal.z * 1.9);
-                float vein = 0.5 + 0.5 * sin(vGlassLocal.x * 12.0 + vGlassLocal.y * 5.2 - vGlassLocal.z * 3.4);
-                float cap = smoothstep(-0.9, 0.92, vGlassLocal.y);
-                vec3 depth = mix(vec3(0.018, 0.032, 0.044), source * 0.78, 0.56 + cap * 0.18);
-                vec3 core = source * (0.76 + latitude * 0.34 - vein * 0.055) + vec3(0.024, 0.032, 0.04);
-                vec3 rimColor = mix(vec3(0.44, 0.96, 0.9), min(source + vec3(0.16), vec3(1.0)), 0.62);
-                vec3 lightDir = normalize(vec3(-0.32, 0.46, 0.82));
-                vec3 highlight = vec3(1.0, 0.94, 0.78) * pow(max(dot(normal, lightDir), 0.0), 22.0) * 0.32;
-                vec3 hue = mix(depth, core, innerStrength);
-                hue = mix(hue, rimColor, rim * rimStrength);
-                hue += highlight + source * sheen * (0.08 + rim * 0.14);
-                float alpha = opacity * (0.3 + rim * 0.56 + latitude * 0.035);
-                if (alpha <= 0.008) discard;
-                gl_FragColor = vec4(hue, alpha);
-            }
-        `,
-        transparent: true,
-        depthWrite: false,
-        depthTest: true,
-        blending: THREE.NormalBlending,
-        side: THREE.FrontSide,
-        toneMapped: false,
-    });
-    material.userData['glassSurface'] = 'b-glass-marble';
-    material.userData['sphereSurface'] = 'glass';
-    material.userData['glassState'] = state.state;
-    material.userData['sphereState'] = state.state;
+            float alpha = opacity * (0.8 + corona * 0.18 + filament * 0.02);
+            if (alpha <= 0.008) discard;
+            gl_FragColor = vec4(hue, alpha);
+        }
+    `);
+    material.userData['sphereDesign'] = 'b-aurora-reliquary';
     return material;
 }
 
@@ -423,7 +397,7 @@ function starcoreSphereMaterial(state: (typeof SPHERE_NODE_STATES)[number]): THR
 
 function styledSphereMaterial(
     name: string,
-    surface: Exclude<GalaxySphereSurfaceMode, 'solid' | 'glass'>,
+    surface: Exclude<GalaxySphereSurfaceMode, 'solid'>,
     state: (typeof SPHERE_NODE_STATES)[number],
     fragmentShader: string,
     blending: THREE.Blending = THREE.NormalBlending,

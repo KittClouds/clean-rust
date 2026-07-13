@@ -12,6 +12,12 @@ use phoenix_er_post::api as er_api;
 use phoenix_event_identity_post::api as event_identity_api;
 use phoenix_graph_kernel::{project_graph_proposal_outcomes, GraphProposalOutcome};
 use phoenix_graph_post::api as graph_api;
+use phoenix_graph_rebuild::GraphDocumentCompilerSummary;
+use phoenix_graph_research::{
+    freeze_graph_research_snapshot, tensorize_frozen_graph, FrozenGraphResearchBundle,
+    FrozenGraphResearchError, FrozenGraphResearchInput, FrozenGraphResearchPaths,
+    FrozenTensorBundle, FrozenTensorPaths, TemporalSplitPolicy, TensorizationPolicy,
+};
 use phoenix_memory_post::api as memory_api;
 use phoenix_rel_post::api as rel_api;
 use phoenix_state_schema_post::api as state_schema_api;
@@ -28,6 +34,7 @@ pub use pipeline_scheduler::{
     PipelineGenerationContext, PipelineRunMetrics, PipelineRunRequest, PipelineRunShape,
     PipelineStage, PipelineStageStatus, ScopeGenerationKey, StageProductEnvelope,
 };
+use std::path::Path;
 
 #[derive(Debug, thiserror::Error)]
 pub enum PipelineApiError {
@@ -37,6 +44,22 @@ pub enum PipelineApiError {
     Alex(#[from] AlexError),
     #[error(transparent)]
     Relation(#[from] phoenix_rel_post::GlirelWorkerError),
+}
+
+#[derive(Debug, thiserror::Error)]
+pub enum GraphResearchExportError {
+    #[error(transparent)]
+    Store(#[from] StoreError),
+    #[error(transparent)]
+    Research(#[from] FrozenGraphResearchError),
+    #[error("cannot freeze graph research data without a kernel checkpoint")]
+    MissingCheckpoint,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct GraphResearchTensorExportPaths {
+    pub research: FrozenGraphResearchPaths,
+    pub tensors: FrozenTensorPaths,
 }
 
 #[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
@@ -611,6 +634,73 @@ where
         let commits = self.store.load_graph_truth_commits()?;
         project_graph_proposal_outcomes(&receipts, &commits)
             .map_err(|error| StoreError::Schema(error.to_string()))
+    }
+
+    pub fn freeze_research_snapshot(
+        &self,
+        root: impl AsRef<Path>,
+        frozen_at_ms: i64,
+        split_policy: TemporalSplitPolicy,
+        document_compiler: Option<&GraphDocumentCompilerSummary>,
+        document_compiler_observed_at_ms: Option<i64>,
+    ) -> Result<FrozenGraphResearchPaths, GraphResearchExportError>
+    where
+        S: PhoenixGraphLearningStore,
+    {
+        let checkpoint = self
+            .store
+            .load_kernel_checkpoint()?
+            .ok_or(GraphResearchExportError::MissingCheckpoint)?;
+        let commits = self.store.load_graph_truth_commits()?;
+        let proposal_receipts = self.store.load_graph_proposal_receipts()?;
+        let snapshot = freeze_graph_research_snapshot(FrozenGraphResearchInput {
+            checkpoint: &checkpoint,
+            commits: &commits,
+            proposal_receipts: &proposal_receipts,
+            document_compiler,
+            document_compiler_observed_at_ms,
+            frozen_at_ms,
+            split_policy,
+        })?;
+        FrozenGraphResearchBundle::write(&snapshot, root).map_err(Into::into)
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    pub fn freeze_research_tensors(
+        &self,
+        research_root: impl AsRef<Path>,
+        tensor_root: impl AsRef<Path>,
+        frozen_at_ms: i64,
+        split_policy: TemporalSplitPolicy,
+        tensor_policy: TensorizationPolicy,
+        document_compiler: Option<&GraphDocumentCompilerSummary>,
+        document_compiler_observed_at_ms: Option<i64>,
+    ) -> Result<GraphResearchTensorExportPaths, GraphResearchExportError>
+    where
+        S: PhoenixGraphLearningStore,
+    {
+        let checkpoint = self
+            .store
+            .load_kernel_checkpoint()?
+            .ok_or(GraphResearchExportError::MissingCheckpoint)?;
+        let commits = self.store.load_graph_truth_commits()?;
+        let proposal_receipts = self.store.load_graph_proposal_receipts()?;
+        let research = freeze_graph_research_snapshot(FrozenGraphResearchInput {
+            checkpoint: &checkpoint,
+            commits: &commits,
+            proposal_receipts: &proposal_receipts,
+            document_compiler,
+            document_compiler_observed_at_ms,
+            frozen_at_ms,
+            split_policy,
+        })?;
+        let tensors = tensorize_frozen_graph(&research, tensor_policy)?;
+        let research_paths = FrozenGraphResearchBundle::write(&research, research_root)?;
+        let tensor_paths = FrozenTensorBundle::write(&tensors, tensor_root)?;
+        Ok(GraphResearchTensorExportPaths {
+            research: research_paths,
+            tensors: tensor_paths,
+        })
     }
 
     pub fn current_slot(

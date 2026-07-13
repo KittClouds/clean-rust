@@ -71,7 +71,7 @@ use phoenix_store_native_core::{
     SEMANTIC_MODEL_ID, SEMANTIC_VECTOR_DIM,
 };
 #[cfg(not(target_arch = "wasm32"))]
-use phoenix_store_overgraph::PhoenixOvergraphStore;
+use phoenix_store_overgraph::{OvergraphFlushReport, PhoenixOvergraphStore};
 use phoenix_structure::PhoenixStructure;
 use phoenix_triverse_v2::PhoenixTriverseV2;
 use phoenix_types as dynamic_types;
@@ -173,6 +173,7 @@ const RUNTIME_CAPABILITIES: &[&str] = &[
     "note:upsert",
     "note:delete",
     "persistence:applyWalBatch",
+    "persistence:flushNativeStore",
     "persistence:clearDerived",
     "persistence:clearDerivedEphemera",
     "semantic:runEmbedderTruthReview",
@@ -782,21 +783,12 @@ impl PhoenixRuntime {
         }
     }
 
-    fn replace_native_relation_rows_with_keys(
+    fn upsert_native_relation_rows(
         &self,
         relation: &str,
         rows: &[Value],
-        key_fields: &[&str],
     ) -> Result<(), StoreError> {
-        let store = self.native_row_store()?;
-        let mut existing = store.fetch_rows(relation)?;
-        existing.retain(|existing_row| {
-            !rows
-                .iter()
-                .any(|candidate| relation_rows_match_keys(existing_row, candidate, key_fields))
-        });
-        existing.extend(rows.iter().cloned());
-        store.replace_relation_rows(relation, &existing)
+        self.native_row_store()?.put_rows(relation, rows)
     }
 
     pub(crate) fn put_relation_row(&self, relation: &str, row: Value) -> Result<(), StoreError> {
@@ -900,6 +892,14 @@ impl PhoenixRuntime {
                 Err(self.legacy_graph_disabled("legacy relation names"))
             }
         }
+    }
+
+    #[cfg(not(target_arch = "wasm32"))]
+    pub fn flush_native_store(&self) -> Result<OvergraphFlushReport, StoreError> {
+        self.overgraph_store
+            .as_ref()
+            .ok_or_else(|| self.native_unsupported("native store flush"))?
+            .flush()
     }
 
     fn fetch_store_command_relation_rows(&self, relation: &str) -> Result<Vec<Value>, StoreError> {
@@ -4607,11 +4607,7 @@ impl PhoenixRuntime {
                     })
                 })
                 .collect::<Vec<_>>();
-            self.replace_native_relation_rows_with_keys(
-                "semantic_documents",
-                &semantic_document_rows,
-                &["document_id"],
-            )?;
+            self.upsert_native_relation_rows("semantic_documents", &semantic_document_rows)?;
 
             let prototype_inputs = self.list_candidate_prototype_inputs(&document_ids)?;
             semantic_node_rows = prototype_inputs
@@ -4632,10 +4628,9 @@ impl PhoenixRuntime {
                 })
                 .collect::<Vec<_>>();
             if !semantic_node_rows.is_empty() {
-                self.replace_native_relation_rows_with_keys(
+                self.upsert_native_relation_rows(
                     "semantic_node_prototypes",
                     &semantic_node_rows,
-                    &["node_id"],
                 )?;
             }
         } else if request.options.include_semantic_atlas {
@@ -5199,45 +5194,33 @@ impl PhoenixRuntime {
             evidence_ledger::build_dataset_factory(scan_id, &evidence_receipts, created_at);
         if self.native_graph_enabled() {
             if !receipt_rows.is_empty() {
-                self.replace_native_relation_rows_with_keys(
-                    "evidence_ledger",
-                    &receipt_rows,
-                    &["receipt_id"],
-                )?;
+                self.upsert_native_relation_rows("evidence_ledger", &receipt_rows)?;
             }
             if !dataset_build.snapshot_rows.is_empty() {
-                self.replace_native_relation_rows_with_keys(
+                self.upsert_native_relation_rows(
                     "dataset_snapshots",
                     &dataset_build.snapshot_rows,
-                    &["snapshot_id"],
                 )?;
             }
             if !dataset_build.example_rows.is_empty() {
-                self.replace_native_relation_rows_with_keys(
+                self.upsert_native_relation_rows(
                     "dataset_examples",
                     &dataset_build.example_rows,
-                    &["example_id"],
                 )?;
             }
             if !semantic_frame_rows.is_empty() {
-                self.replace_native_relation_rows_with_keys(
-                    "semantic_frames",
-                    &semantic_frame_rows,
-                    &["frame_id"],
-                )?;
+                self.upsert_native_relation_rows("semantic_frames", &semantic_frame_rows)?;
             }
             if !semantic_frame_argument_rows.is_empty() {
-                self.replace_native_relation_rows_with_keys(
+                self.upsert_native_relation_rows(
                     "semantic_frame_arguments",
                     &semantic_frame_argument_rows,
-                    &["argument_id"],
                 )?;
             }
             if !semantic_frame_fact_rows.is_empty() {
-                self.replace_native_relation_rows_with_keys(
+                self.upsert_native_relation_rows(
                     "semantic_frame_facts",
                     &semantic_frame_fact_rows,
-                    &["fact_id"],
                 )?;
             }
         } else {
@@ -5536,11 +5519,7 @@ impl PhoenixRuntime {
     pub fn upsert_entity_cards_batch(&self, cards: &[EntityCard]) -> Result<(), StoreError> {
         if self.native_graph_enabled() {
             let rows = cards.iter().map(entity_card_row).collect::<Vec<_>>();
-            self.replace_native_relation_rows_with_keys(
-                "entity_cards",
-                &rows,
-                &["entity_id", "card_id"],
-            )?;
+            self.upsert_native_relation_rows("entity_cards", &rows)?;
         } else {
             #[cfg(feature = "legacy-cozo-graph")]
             {
@@ -5590,7 +5569,7 @@ impl PhoenixRuntime {
     pub fn upsert_folder_schema(&self, schema: &FolderSchema) -> Result<(), StoreError> {
         if self.native_graph_enabled() {
             let row = folder_schema_row(schema);
-            self.replace_native_relation_rows_with_keys("folder_schemas", &[row], &["id"])?;
+            self.upsert_native_relation_rows("folder_schemas", &[row])?;
         } else {
             #[cfg(feature = "legacy-cozo-graph")]
             {
@@ -6355,6 +6334,28 @@ impl PhoenixRuntime {
                     })),
                     error: None,
                 })
+            }
+            "persistence:flushNativeStore" => {
+                #[cfg(not(target_arch = "wasm32"))]
+                {
+                    let report = self.flush_native_store()?;
+                    Ok(StoreCommandResult {
+                        success: true,
+                        payload: Some(serde_json::json!({
+                            "flushed": report.flushed,
+                            "walBytesBefore": report.wal_bytes_before,
+                            "walBytesAfter": report.wal_bytes_after,
+                            "segmentCount": report.segment_count,
+                        })),
+                        error: None,
+                    })
+                }
+                #[cfg(target_arch = "wasm32")]
+                {
+                    Err(StoreError::Query(
+                        "native store flush is unavailable on wasm".to_owned(),
+                    ))
+                }
             }
             "persistence:clearDerived" => {
                 self.clear_derived_partition()?;
@@ -7167,11 +7168,7 @@ impl PhoenixRuntime {
                             })
                         })
                         .collect::<Vec<_>>();
-                    self.replace_native_relation_rows_with_keys(
-                        "semantic_documents",
-                        &values,
-                        &["document_id"],
-                    )?;
+                    self.upsert_native_relation_rows("semantic_documents", &values)?;
                 } else {
                     #[cfg(feature = "legacy-cozo-graph")]
                     {
@@ -7231,11 +7228,7 @@ impl PhoenixRuntime {
                             })
                         })
                         .collect::<Vec<_>>();
-                    self.replace_native_relation_rows_with_keys(
-                        "semantic_node_prototypes",
-                        &values,
-                        &["node_id"],
-                    )?;
+                    self.upsert_native_relation_rows("semantic_node_prototypes", &values)?;
                 } else {
                     #[cfg(feature = "legacy-cozo-graph")]
                     {
@@ -7510,7 +7503,7 @@ impl PhoenixRuntime {
             .and_then(Value::as_str)
             .ok_or_else(|| StoreError::Query("missing store command field: row.id".to_owned()))?;
         if self.native_graph_enabled() {
-            self.replace_native_relation_rows_with_keys("notes", &[row.clone()], NOTE_KEY_COLUMNS)?;
+            self.native_row_store()?.put_row("notes", row.clone())?;
         } else {
             #[cfg(feature = "legacy-cozo-graph")]
             {
@@ -12032,6 +12025,7 @@ fn om_record_from_value(row: Value) -> Result<OmRecord, StoreError> {
     })
 }
 
+#[cfg(feature = "legacy-cozo-graph")]
 const NOTE_KEY_COLUMNS: &[&str] = &["id", "version"];
 const ALLOWED_WAL_RELATIONS: &[&str] = &[
     "entities",
@@ -12292,12 +12286,6 @@ fn note_values_from_rows(
         })
     });
     values
-}
-
-fn relation_rows_match_keys(left: &Value, right: &Value, key_fields: &[&str]) -> bool {
-    key_fields
-        .iter()
-        .all(|field| left.get(*field) == right.get(*field))
 }
 
 fn entity_card_row(card: &EntityCard) -> Value {
@@ -15405,6 +15393,19 @@ mod tests {
                 },
             ])
             .expect("cards");
+        runtime
+            .upsert_entity_cards_batch(&[phoenix_types::EntityCard {
+                entity_id: EntityId("CHARACTER".to_owned()),
+                card_id: "traits".to_owned(),
+                name: "Updated Traits".to_owned(),
+                color: "#00aaff".to_owned(),
+                icon: "bolt".to_owned(),
+                display_order: 1,
+                is_collapsed: true,
+                created_at: 11,
+                updated_at: 12,
+            }])
+            .expect("update one card");
 
         runtime
             .upsert_folder_schema(&phoenix_types::FolderSchema {
@@ -15435,6 +15436,7 @@ mod tests {
 
         assert_eq!(cards.len(), 2);
         assert_eq!(cards[0].card_id, "traits");
+        assert_eq!(cards[0].name, "Updated Traits");
         assert_eq!(schema.allowed_subfolders, "[\"profiles\",\"chapters\"]");
         assert_eq!(schema.allowed_note_types, "[\"bio\",\"scene\"]");
     }

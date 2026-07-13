@@ -129,6 +129,7 @@ function createStoreMock() {
         getNote: vi.fn(async () => null),
         getNotesByIds: vi.fn(async () => []),
         upsertNote: vi.fn(async () => undefined),
+        scheduleDocumentSemanticMaterialization: vi.fn(),
     };
 }
 

@@ -29,7 +29,10 @@ import {
     type PhoenixLineSearchOptions,
 } from '../lib/search/phoenix-line-search';
 import type { PhoenixBootSnapshotRows } from './phoenix-boot-snapshot.model';
-import { PhoenixBackendService } from './phoenix-backend.service';
+import {
+    isPhoenixStoreCommandTimeout,
+    PhoenixBackendService,
+} from './phoenix-backend.service';
 import { PhoenixSnapshotPartition } from './phoenix-wasm.service';
 
 export interface StoreNote {
@@ -272,6 +275,13 @@ interface PhoenixCheckpointBundle {
 interface ContentWalMutation {
     command: string;
     payload: Record<string, unknown>;
+}
+
+export interface PhoenixNativeStoreFlushReport {
+    flushed: boolean;
+    walBytesBefore: number;
+    walBytesAfter: number;
+    segmentCount: number;
 }
 
 export interface PhoenixContentMutationTiming {
@@ -658,6 +668,33 @@ export class PhoenixStoreService {
 
     async upsertScopedDocument(document: StoreScopedDocument): Promise<PhoenixContentMutationTiming> {
         return this.runContentRelationUpsert('scoped_documents', scopedDocumentToRow(document));
+    }
+
+    async checkpointContentIfNeeded(): Promise<void> {
+        await this.ensureInitialized();
+        if (this.snapshotsPaused) {
+            return;
+        }
+        await this.runSerialized(() => this.flushContentCheckpoint(false));
+    }
+
+    async flushNativeStore(): Promise<PhoenixNativeStoreFlushReport | null> {
+        await this.ensureInitialized();
+        if (this.phoenix.target !== 'native') {
+            return null;
+        }
+        return this.runSerialized(async () => {
+            const payload = await this.phoenix.storeCommand('persistence:flushNativeStore');
+            const report = payload && typeof payload === 'object'
+                ? payload as Record<string, unknown>
+                : {};
+            return {
+                flushed: Boolean(report['flushed']),
+                walBytesBefore: Number(report['walBytesBefore'] || 0),
+                walBytesAfter: Number(report['walBytesAfter'] || 0),
+                segmentCount: Number(report['segmentCount'] || 0),
+            };
+        });
     }
 
     scheduleDocumentSemanticMaterialization(note: StoreNote): void {
@@ -1408,8 +1445,16 @@ export class PhoenixStoreService {
                 await this.phoenix.storeCommand('persistence:applyWalBatch', { records: batch.records });
                 timing.runtimeApplyMs = elapsedPhoenixStoreMs(stepStarted);
             } catch (error) {
-                console.error('[PhoenixStoreService] Runtime apply failed after WAL commit. Rebuilding runtime.', error);
                 timing.runtimeApplyMs = elapsedPhoenixStoreMs(stepStarted);
+                if (isPhoenixStoreCommandTimeout(error)) {
+                    this.manifest = nextManifest;
+                    console.error(
+                        '[PhoenixStoreService] Runtime apply timed out after durable WAL commit. Shell restart required.',
+                        error,
+                    );
+                    throw error;
+                }
+                console.error('[PhoenixStoreService] Runtime apply failed after WAL commit. Rebuilding runtime.', error);
                 stepStarted = performance.now();
                 await this.reloadRuntimeFromPersistence();
                 timing.runtimeReloadMs = elapsedPhoenixStoreMs(stepStarted);

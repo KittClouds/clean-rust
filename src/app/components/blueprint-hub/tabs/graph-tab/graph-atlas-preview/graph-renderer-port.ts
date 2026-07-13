@@ -30,6 +30,7 @@ export interface GraphRendererPort {
     tickForces(): boolean;
     hasActiveForces(): boolean;
     selectNode(id: string | null): void;
+    selectNodes(ids: readonly string[]): void;
     hoverNode(id: string | null): void;
     pick(pointer: GraphRendererPointer): string | null;
     dispose(): void;

@@ -52,6 +52,51 @@ export interface PhoenixGraphRunOpenResult {
     }>;
 }
 
+const PHOENIX_CONTENT_COMMAND_TIMEOUT_MS = 10_000;
+
+export class PhoenixStoreCommandTimeoutError extends Error {
+    readonly code = 'PHOENIX_STORE_COMMAND_TIMEOUT';
+
+    constructor(readonly command: string, readonly timeoutMs: number) {
+        super(`Phoenix store command timed out after ${timeoutMs} ms: ${command}`);
+        this.name = 'PhoenixStoreCommandTimeoutError';
+    }
+}
+
+export function isPhoenixStoreCommandTimeout(error: unknown): error is PhoenixStoreCommandTimeoutError {
+    return error instanceof PhoenixStoreCommandTimeoutError;
+}
+
+export function withPhoenixStoreCommandTimeout<T>(
+    command: string,
+    operation: Promise<T>,
+    timeoutMs: number = PHOENIX_CONTENT_COMMAND_TIMEOUT_MS,
+): Promise<T> {
+    return new Promise<T>((resolve, reject) => {
+        const timeout = setTimeout(
+            () => reject(new PhoenixStoreCommandTimeoutError(command, timeoutMs)),
+            timeoutMs,
+        );
+        operation.then(
+            value => {
+                clearTimeout(timeout);
+                resolve(value);
+            },
+            error => {
+                clearTimeout(timeout);
+                reject(error);
+            },
+        );
+    });
+}
+
+function isContentStoreCommand(command: string): boolean {
+    return command.startsWith('note:')
+        || command.startsWith('folder:')
+        || command.startsWith('relation:')
+        || command === 'persistence:applyWalBatch';
+}
+
 type PhoenixTransportMethodName =
     | 'onReady'
     | 'loadWasm'
@@ -445,9 +490,12 @@ export class PhoenixBackendService {
     }
 
     async storeCommand(command: string, payload: Record<string, unknown> = {}): Promise<any> {
-        return this.target === 'native'
+        const operation = this.target === 'native'
             ? this.requireNativeBridge().storeCommand(command, payload)
             : this.wasm.storeCommand(command, payload);
+        return this.target === 'native' && isContentStoreCommand(command)
+            ? withPhoenixStoreCommandTimeout(command, operation)
+            : operation;
     }
 
     async readDocumentIndex(

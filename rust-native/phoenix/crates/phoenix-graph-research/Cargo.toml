@@ -1,0 +1,22 @@
+[package]
+name = "phoenix-graph-research"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[dependencies]
+blake3 = "1.8"
+compact_str.workspace = true
+hashbrown.workspace = true
+memmap2.workspace = true
+phoenix-graph-kernel = { path = "../phoenix-graph-kernel" }
+phoenix-graph-rebuild = { path = "../phoenix-graph-rebuild" }
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+zerocopy.workspace = true
+
+[dev-dependencies]
+phoenix-types = { path = "../phoenix-types" }
+tempfile = "3"

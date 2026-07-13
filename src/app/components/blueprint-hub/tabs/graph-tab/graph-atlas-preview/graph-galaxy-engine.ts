@@ -174,6 +174,7 @@ export interface GalaxyRenderSettings {
     nodeShape: GalaxyNodeShapeMode;
     sphereSurface?: GalaxySphereSurfaceMode;
     clickFocus: boolean;
+    detailCardsVisible: boolean;
     labelLimit: number;
     selectedPulse: boolean;
     layoutMode: GalaxyLayoutMode;
@@ -385,6 +386,7 @@ export const DEFAULT_GALAXY_SETTINGS: GalaxyRenderSettings = {
     nodeShape: 'atom',
     sphereSurface: 'solid',
     clickFocus: false,
+    detailCardsVisible: true,
     labelLimit: 14,
     selectedPulse: true,
     layoutMode: 'single',

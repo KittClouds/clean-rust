@@ -25,6 +25,7 @@ import {
 } from './graph-registry-entity-projection';
 import { GraphGalaxyCanvasComponent } from './graph-galaxy-canvas.component';
 import { GraphCanvasInspectorComponent } from './graph-canvas-inspector.component';
+import { boundedPathSelection, nextPathSelection } from './graph-path-selection';
 import {
     buildCanvasSearchFocus,
     filterGraphForCanvasLens,
@@ -68,7 +69,7 @@ const SPHERE_SURFACE_CYCLE: readonly GalaxySphereSurfaceMode[] = [
 ];
 const SPHERE_SURFACE_LABELS: Record<GalaxySphereSurfaceMode, string> = {
     solid: 'A - solid',
-    glass: 'B - glass',
+    glass: 'B - aurora',
     spellglass: 'C - spellglass',
     obsidian: 'D - obsidian',
     starcore: 'E - starcore',
@@ -311,13 +312,14 @@ function readPersistedAtlasViewState(): PersistedAtlasViewState {
                     </div>
                     } @else {
                     <app-graph-galaxy-canvas #galaxyCanvas class="block h-full min-h-0 w-full"
-                        [entities]="activeNodes()" [edges]="activeEdges()" [settings]="settings" [selectedEntityId]="selectedEntityId"
+                        [entities]="activeNodes()" [edges]="activeEdges()" [settings]="settings" [selectedEntityIds]="canvasSelectedNodeIds()"
                         [sceneIdentity]="activeSceneIdentity()"
                         [queryFocus]="canvasQueryFocus()" [viewMode]="viewMode" [sourceMode]="atlasMode" [surfaceActive]="isAtlasSurfaceActive()"
                         [lassoEnabled]="lassoEnabled()"
-                        (entitySelected)="onCanvasEntitySelected($event)" (entityHovered)="hoveredEntity = $event"
+                        (entityHovered)="hoveredEntity = $event"
                         (objectSelected)="onCanvasObjectSelected($event)" (objectHovered)="hoveredCanvasHit.set($event)"
                         (batchSelected)="onCanvasBatchSelected($event)"></app-graph-galaxy-canvas>
+                    @if (settings.detailCardsVisible) {
                     <app-graph-canvas-inspector
                         [record]="canvasInspectorRecord()"
                         [batchRecords]="canvasBatchRecords()"
@@ -326,7 +328,8 @@ function readPersistedAtlasViewState(): PersistedAtlasViewState {
                         (styleRequested)="styleRequested.emit($event)"
                         (sourceRequested)="sourceRequested.emit($event)">
                     </app-graph-canvas-inspector>
-                    @if (!canvasInspectorRecord() && canvasBatchRecords().length === 0 && canvasHoverRecord(); as hover) {
+                    }
+                    @if ((!settings.detailCardsVisible || (!canvasInspectorRecord() && canvasBatchRecords().length === 0)) && canvasHoverRecord(); as hover) {
                     <div class="pointer-events-none absolute bottom-20 left-4 z-30 max-w-[320px] border border-teal-300/20 bg-black/75 px-3 py-2 text-xs shadow-2xl backdrop-blur">
                         <div class="flex items-center justify-between gap-3">
                             <strong class="truncate text-zinc-100">{{ hover.title }}</strong>
@@ -445,6 +448,7 @@ function readPersistedAtlasViewState(): PersistedAtlasViewState {
                             }
                             <button type="button" class="galaxy-control-button" (click)="toggleAutoRotate()">Rotate<span>{{ settings.autoRotate ? 'on' : 'off' }}</span></button>
                             <button type="button" class="galaxy-control-button" (click)="cycleBackgroundMode()">Backdrop<span>{{ backgroundLabel() }}</span></button>
+                            <button type="button" class="galaxy-control-button" (click)="toggleDetailCards()">Detail cards<span>{{ settings.detailCardsVisible ? 'on' : 'off' }}</span></button>
                             @if (settings.layoutMode === 'hybridSpace' || isTransitLayout(settings.layoutMode)) {
                             <button type="button" class="galaxy-control-button" (click)="toggleHybridShell()">Shell<span>{{ settings.hybridShellVisible ? 'on' : 'off' }}</span></button>
                             }
@@ -1036,6 +1040,9 @@ export class GraphAtlasPreviewComponent implements OnInit, OnDestroy {
     readonly selectedCanvasHit = signal<GraphCanvasHit | null>(null);
     readonly hoveredCanvasHit = signal<GraphCanvasHit | null>(null);
     readonly batchSelectedNodeIds = signal<string[]>([]);
+    readonly pathSelectedNodeIds = signal<string[]>([]);
+    private canvasSingleSelectionId: string | null = null;
+    private canvasSingleSelection: readonly string[] = [];
     queryText = signal('');
     queryTrace = signal<EmbeddingQueryTrace | null>(null);
     readonly manifoldMode = this.machine.manifoldMode;
@@ -1172,7 +1179,7 @@ export class GraphAtlasPreviewComponent implements OnInit, OnDestroy {
 
     setGraphKindFilter(kind: string): void {
         this.graphKindFilter.set(kind);
-        this.selectedEntityId = null;
+        this.closeCanvasInspector();
         this.hoveredEntity = null;
         this.persistViewState();
     }
@@ -1214,7 +1221,7 @@ export class GraphAtlasPreviewComponent implements OnInit, OnDestroy {
         const patch = this.layoutPatchForManifold(mode);
         if (this.settings.layoutMode !== patch.layoutMode) this.updateSettings(patch);
         this.queryTrace.set(null);
-        this.selectedEntityId = null;
+        this.closeCanvasInspector();
         if (this.atlasMode === 'embeddings') void this.refreshEmbeddingAtlas(this.currentReadContext(), mode);
         this.persistViewState();
     }
@@ -1331,26 +1338,53 @@ export class GraphAtlasPreviewComponent implements OnInit, OnDestroy {
         return source.replace(/_/g, ' ');
     }
 
-    onCanvasEntitySelected(node: GalaxyRenderableNode): void {
-        this.selectedEntityId = this.selectedEntityId === node.id ? null : node.id;
-    }
-
     onCanvasObjectSelected(hit: GraphCanvasHit): void {
-        this.selectedCanvasHit.set(hit);
+        if (hit.kind !== 'node') {
+            if (this.settings.detailCardsVisible) this.selectedCanvasHit.set(hit);
+            return;
+        }
         this.batchSelectedNodeIds.set([]);
-        if (hit.kind === 'node') this.selectedEntityId = hit.id;
+        if (this.settings.detailCardsVisible) {
+            this.selectedCanvasHit.set(hit);
+            this.pathSelectedNodeIds.set([hit.id]);
+            this.selectedEntityId = hit.id;
+            return;
+        }
+        this.selectedCanvasHit.set(null);
+        const next = nextPathSelection(this.pathSelectedNodeIds(), hit.id);
+        this.pathSelectedNodeIds.set(next);
+        this.selectedEntityId = next.at(-1) ?? null;
     }
 
     onCanvasBatchSelected(ids: string[]): void {
+        if (!this.settings.detailCardsVisible) {
+            const selected = boundedPathSelection(ids);
+            this.pathSelectedNodeIds.set(selected);
+            this.selectedCanvasHit.set(null);
+            this.batchSelectedNodeIds.set([]);
+            this.selectedEntityId = selected.at(-1) ?? null;
+            return;
+        }
         this.batchSelectedNodeIds.set(ids);
         this.selectedCanvasHit.set(null);
+        this.pathSelectedNodeIds.set(ids.length === 1 ? ids : []);
         this.selectedEntityId = ids.length === 1 ? ids[0] : null;
     }
 
     closeCanvasInspector(): void {
         this.selectedCanvasHit.set(null);
         this.batchSelectedNodeIds.set([]);
+        this.pathSelectedNodeIds.set([]);
         this.selectedEntityId = null;
+    }
+
+    canvasSelectedNodeIds(): readonly string[] {
+        if (!this.settings.detailCardsVisible) return this.pathSelectedNodeIds();
+        if (this.canvasSingleSelectionId !== this.selectedEntityId) {
+            this.canvasSingleSelectionId = this.selectedEntityId;
+            this.canvasSingleSelection = this.selectedEntityId ? [this.selectedEntityId] : [];
+        }
+        return this.canvasSingleSelection;
     }
 
     focusCanvasNodes(ids: string[]): void {
@@ -1396,11 +1430,13 @@ export class GraphAtlasPreviewComponent implements OnInit, OnDestroy {
         this.persistViewState();
         const trace = manifoldAdapter(this.manifoldMode()).trace(this.queryText(), this.displayEmbeddingAtlas());
         this.queryTrace.set(trace);
+        this.pathSelectedNodeIds.set([]);
         this.selectedEntityId = trace?.queryNode.id ?? null;
     }
 
     clearAtlasQuery(): void {
         this.queryTrace.set(null);
+        this.pathSelectedNodeIds.set([]);
         this.selectedEntityId = null;
     }
 
@@ -1590,6 +1626,11 @@ export class GraphAtlasPreviewComponent implements OnInit, OnDestroy {
 
     activeEdges(): AtlasPreviewEdge[] {
         return this.activeGraph().graphEdges;
+    }
+
+    toggleDetailCards(): void {
+        this.updateSettings({ detailCardsVisible: !this.settings.detailCardsVisible });
+        this.closeCanvasInspector();
     }
 
     activeSceneIdentity(): string {

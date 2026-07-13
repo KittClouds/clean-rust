@@ -52,7 +52,9 @@ use phoenix_hyperbolic::lorentz_tree::{
 use phoenix_hyperbolic::siegel_finsler::{
     run_siegel_finsler_kernel, SiegelKernelRunReceipt, SiegelKernelRunRequest,
 };
-use phoenix_native::{runtime_banner, PhoenixNativeHost, SnapshotPartition};
+use phoenix_native::{
+    runtime_banner, PhoenixNativeConfig, PhoenixNativeHost, SnapshotPartition,
+};
 use phoenix_store_native_core::{PhoenixGraphKernelStoreV2, PhoenixGraphLearningStore};
 use phoenix_store_overgraph::PhoenixOvergraphStore;
 use phoenix_types::{
@@ -1492,11 +1494,21 @@ impl PhoenixApi for PhoenixApiImpl {
 
     async fn init_runtime(self, request: DesktopInitRequest) -> Result<DesktopRuntimeInfo, String> {
         let mut guard = self.lock_state()?;
+        let init_request = build_init_request(&request);
+        let requested_config = PhoenixNativeConfig::from_init_request(&init_request);
+        if !request.force_reset
+            && guard.host.config() == Some(&requested_config)
+            && guard.last_init.as_ref().is_some_and(|result| result.ready)
+        {
+            return Ok(desktop_runtime_info(
+                guard.host.config(),
+                guard.last_init.as_ref(),
+            ));
+        }
         if request.force_reset {
             let _ = guard.host.close();
         }
 
-        let init_request = build_init_request(&request);
         let result = guard
             .host
             .open(init_request)

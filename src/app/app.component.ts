@@ -17,7 +17,6 @@ import { NoteEditorStore } from './lib/store/note-editor.store';
 import { DiscoveryStore } from './lib/store/discoveryStore';
 import { setPhoenixStoreBridge } from './lib/operations';
 import * as ops from './lib/operations';
-import { FactSheetService } from './components/fact-sheets/fact-sheet.service';
 import { db, type Entity as DexieEntity } from './lib/dexie/db';
 import { loadSettings } from './lib/dexie/settings.service';
 import { PhoenixUiApiService } from './services/phoenix-ui-api.service';
@@ -53,13 +52,13 @@ export class AppComponent implements OnInit, OnDestroy {
   private noteEditorStore = inject(NoteEditorStore);
   private knowledgeService = inject(KnowledgeService);
   private discoveryStore = inject(DiscoveryStore);
-  private factSheetService = inject(FactSheetService);
 
   // Navigation API subscriptions
   private notesSub: Subscription | null = null;
   private navUnsubscribe: (() => void) | null = null;
   private bootStep = 'boot:start';
   private bootWatchdog: ReturnType<typeof setInterval> | null = null;
+  private shellRevealed = false;
   fatalBootError: FatalBootErrorState | null = null;
 
   async ngOnInit() {
@@ -84,22 +83,32 @@ export class AppComponent implements OnInit, OnDestroy {
     console.log('[AppComponent] Starting orchestrated boot...');
 
     try {
-      this.setBootStep('settings:start');
-      await phoenixTransportAudit.measureBootPhase('settings.load', async () => {
+      const nativePhoenixRuntime = detectPhoenixRuntimeTarget() === 'native';
+      if (nativePhoenixRuntime) {
+        setPhoenixStoreBridge(this.phoenixStore);
+      }
+
+      this.setBootStep('critical-path:start');
+      const settingsPromise = phoenixTransportAudit.measureBootPhase('settings.load', async () => {
         await loadSettings();
         highlightingStore.reloadFromStorage();
       });
-      this.setBootStep('settings:complete');
-
-      const nativePhoenixRuntime = detectPhoenixRuntimeTarget() === 'native';
-      this.setBootStep('seed:start');
       const seedPromise = phoenixTransportAudit.measureBootPhase('seed.schemas', () => seedDefaultSchemas());
-      let runtimeLoadPromise: Promise<void> | null = null;
-      if (nativePhoenixRuntime) {
-        this.setBootStep('phoenix:runtime:start');
-        runtimeLoadPromise = phoenixTransportAudit.measureBootPhase('phoenix.runtime', () => this.phoenixUiApi.loadRuntime());
-      } else {
-        this.setBootStep('phoenix:runtime:skipped:web');
+      const runtimeLoadPromise = nativePhoenixRuntime
+        ? phoenixTransportAudit.measureBootPhase('phoenix.runtime', () => this.phoenixUiApi.loadRuntime())
+        : null;
+
+      await settingsPromise;
+      this.setBootStep('settings:complete');
+      if (!await this.noteEditorStore.hasStoredActiveNoteIntent()) {
+        this.shellRevealed = true;
+        this.spinner.hide();
+        this.setBootStep('shell:cached-no-note:interactive');
+        console.log('[AppComponent] Cached no-note shell revealed before native hydration.');
+      }
+
+      this.setBootStep('seed:start');
+      if (!runtimeLoadPromise) {
         console.info('[AppComponent] Phoenix native runtime unavailable in web mode; using Dexie/UI-only boot.');
       }
 
@@ -116,8 +125,6 @@ export class AppComponent implements OnInit, OnDestroy {
       this.setBootStep(runtimeLoadPromise ? 'phoenix:runtime:complete' : 'phoenix:runtime:skipped:web:complete');
 
       if (nativePhoenixRuntime) {
-        setPhoenixStoreBridge(this.phoenixStore);
-
         this.setBootStep('dexie:hydrate:start');
         try {
           await phoenixTransportAudit.measureBootPhase('dexie.hydrate', () => this.hydrateDexieFromPhoenix());
@@ -144,17 +151,6 @@ export class AppComponent implements OnInit, OnDestroy {
       this.orchestrator.completePhase('registry');
       this.setBootStep('registry+editor:complete');
 
-      if (nativePhoenixRuntime) {
-        this.setBootStep('phoenix:hydrateWithEntities:start');
-        await phoenixTransportAudit.measureBootPhase(
-          'phoenix.dictionaryHydrate',
-          () => this.phoenixUiApi.hydrateWithEntities(),
-        );
-        console.log('[AppComponent] Phoenix hydrated with entities');
-        this.setBootStep('phoenix:hydrateWithEntities:complete');
-      } else {
-        this.setBootStep('phoenix:hydrateWithEntities:skipped:web');
-      }
       this.orchestrator.completePhase('runtime_hydrate');
 
       this.orchestrator.completePhase('ready');
@@ -162,20 +158,26 @@ export class AppComponent implements OnInit, OnDestroy {
       phoenixTransportAudit.printSummary('boot ready');
 
       this.setBootStep('background:start');
-      const factSheetPromise = (async () => {
-        if (!nativePhoenixRuntime) {
-          console.info('[AppComponent] FactSheet backend sync skipped for web runtime.');
-          return;
-        }
-        try {
-          await this.factSheetService.syncToBackend();
-          console.log('[AppComponent] FactSheet schemas synced (background)');
-        } catch (err) {
-          console.error('[AppComponent] FactSheet sync failed:', err);
-        }
-      })();
+      const dictionaryPromise = nativePhoenixRuntime
+        ? smartGraphRegistry.rebuildDictionaryNow()
+        : Promise.resolve();
+      const nativeMaintenancePromise = nativePhoenixRuntime
+        ? (async () => {
+            try {
+              await this.phoenixStore.checkpointContentIfNeeded();
+              const report = await this.phoenixStore.flushNativeStore();
+              if (report) {
+                console.log(
+                  `[AppComponent] Native store maintenance: WAL ${report.walBytesBefore} -> ${report.walBytesAfter} bytes, segments=${report.segmentCount}`,
+                );
+              }
+            } catch (error) {
+              console.warn('[AppComponent] Native store maintenance deferred:', error);
+            }
+          })()
+        : Promise.resolve();
 
-      void Promise.all([factSheetPromise]).then(() => {
+      void Promise.all([dictionaryPromise, nativeMaintenancePromise]).then(() => {
         this.orchestrator.completePhase('background');
         this.setBootStep('background:complete');
       });
@@ -189,9 +191,10 @@ export class AppComponent implements OnInit, OnDestroy {
       }
     } finally {
       this.stopBootWatchdog();
-      // Minimum display time for spinner
-      await new Promise(resolve => setTimeout(resolve, 300));
-      this.spinner.hide();
+      if (!this.shellRevealed) {
+        await new Promise(resolve => setTimeout(resolve, 300));
+        this.spinner.hide();
+      }
     }
   }
 

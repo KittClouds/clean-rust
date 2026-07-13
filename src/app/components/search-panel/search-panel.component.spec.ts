@@ -847,6 +847,7 @@ function createGraphRebuildMock() {
     return {
         snapshot,
         isBuilding: computed(() => false),
+        nativeGraphRunPaging: signal(null),
         attachReviewAdjudicationCertificate: vi.fn((certificate: any) => {
             snapshot.update((current) => current ? { ...current, reviewAdjudicationCertificate: certificate } : current);
         }),

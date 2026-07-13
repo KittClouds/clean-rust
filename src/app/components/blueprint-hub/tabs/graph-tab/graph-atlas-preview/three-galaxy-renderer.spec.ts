@@ -279,6 +279,54 @@ describe('ThreeGalaxyRenderer large-scene picking performance contract', () => {
     });
 });
 
+describe('ThreeGalaxyRenderer shortest-path overlay', () => {
+    it('allocates only the selected walk when ordinary edges are hidden', () => {
+        const renderer = new ThreeGalaxyRenderer();
+        const scene = rendererEdgeScene();
+        renderer.installScene(scene, mergeGalaxySettings({ edgeMode: 'hidden' }), '3d', ['a', 'b']);
+        const harness = renderer as unknown as {
+            edges: THREE.LineSegments | null;
+            pathEdges: THREE.LineSegments | null;
+            focusMask: ReturnType<typeof buildGalaxyFocusMask> | null;
+        };
+
+        expect(harness.edges).toBeNull();
+        expect(harness.focusMask?.pathFound).toBe(true);
+        expect(Array.from(harness.focusMask?.pathEdgeIndices ?? [])).toEqual([0]);
+        expect(harness.pathEdges).not.toBeNull();
+        expect(harness.pathEdges?.geometry.getAttribute('position').count).toBe(32);
+        expect(harness.pathEdges?.material.blending).toBe(THREE.AdditiveBlending);
+
+        const retainedOverlay = harness.pathEdges;
+        const retainedGeometry = harness.pathEdges?.geometry;
+        renderer.hoverNode('a');
+        expect(harness.pathEdges).toBe(retainedOverlay);
+        expect(harness.pathEdges?.geometry).toBe(retainedGeometry);
+
+        renderer.selectNodes([]);
+        expect(harness.pathEdges).toBeNull();
+        renderer.dispose();
+    });
+
+    it('follows a Caps shell geodesic instead of cutting a straight chord through it', () => {
+        const renderer = new ThreeGalaxyRenderer();
+        const scene = rendererEdgeScene();
+        scene.layoutMode = 'lorentzTree';
+        scene.positions3d = new Float32Array([1, 0, 0, 0, 1, 0]);
+        scene.positions2d = scene.positions3d.slice();
+        renderer.installScene(scene, mergeGalaxySettings({ edgeMode: 'hidden' }), '3d', ['a', 'b']);
+        const harness = renderer as unknown as { pathEdges: THREE.LineSegments | null };
+        const positions = harness.pathEdges?.geometry.getAttribute('position').array as Float32Array;
+        let minimumRadius = Number.POSITIVE_INFINITY;
+        for (let offset = 0; offset < positions.length; offset += 3) {
+            minimumRadius = Math.min(minimumRadius, Math.hypot(positions[offset], positions[offset + 1], positions[offset + 2]));
+        }
+
+        expect(minimumRadius).toBeGreaterThan(0.99);
+        renderer.dispose();
+    });
+});
+
 function edgeGeometryHarness(): EdgeGeometryHarness {
     const renderer = Object.create(ThreeGalaxyRenderer.prototype) as EdgeGeometryHarness;
     renderer.settings = mergeGalaxySettings({ edgeMode: 'curved', edgeWidth: 0.45 });

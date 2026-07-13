@@ -100,6 +100,17 @@ function emptyRendererTimings(): ThreeGalaxyRendererTimings {
     };
 }
 
+function normalizeSelectedIds(selected: string | readonly string[] | null): string[] {
+    const values = typeof selected === 'string' ? [selected] : selected ?? [];
+    const normalized: string[] = [];
+    for (const id of values) {
+        if (!id || normalized.includes(id)) continue;
+        normalized.push(id);
+        if (normalized.length === 2) break;
+    }
+    return normalized;
+}
+
 export class ThreeGalaxyRenderer implements GraphRendererPort {
     private renderer: THREE.WebGLRenderer | null = null;
     private readonly scene = new THREE.Scene();
@@ -140,9 +151,10 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
     private glows: THREE.Group | null = null;
     private shells: THREE.Group | null = null;
     private edges: THREE.LineSegments | null = null;
+    private pathEdges: THREE.LineSegments | null = null;
     private labels: LabelSprite[] = [];
     private focusMask: GalaxyFocusMask | null = null;
-    private selectedId: string | null = null;
+    private selectedIds: string[] = [];
     private hoverId: string | null = null;
     private settings: GalaxyRenderSettings = mergeGalaxySettings();
     private nodeShape = this.settings.nodeShape;
@@ -160,6 +172,7 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
     private densityFactors = new Float32Array(0);
     private guidePositionBuffer = new Float32Array(0);
     private labelSignature = '';
+    private pathEdgeSelection: Uint32Array | null = null;
     private pickIndexDirty = true;
     private pickIndexWidth = 0;
     private pickIndexHeight = 0;
@@ -206,20 +219,21 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
     }
 
     setScene(scene: GalaxySceneV2): void {
-        this.installScene(scene, this.settings, this.mode, this.selectedId);
+        this.installScene(scene, this.settings, this.mode, this.selectedIds);
     }
 
     installScene(
         scene: GalaxySceneV2,
         settings: Partial<GalaxyRenderSettings> | null,
         mode: GraphRendererMode,
-        selectedId: string | null = this.selectedId,
+        selected: string | readonly string[] | null = this.selectedIds,
     ): void {
         const started = this.now();
         this.settings = mergeGalaxySettings(settings);
         this.mode = mode;
-        this.selectedId = selectedId;
+        this.selectedIds = normalizeSelectedIds(selected);
         this.sceneData = scene;
+        this.focusMask = null;
         this.pickIndexDirty = true;
         this.clearObjects();
         this.nodeShape = this.settings.nodeShape;
@@ -452,8 +466,15 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
     }
 
     selectNode(id: string | null): void {
-        if (this.selectedId === id) return;
-        this.selectedId = id;
+        this.selectNodes(id ? [id] : []);
+    }
+
+    selectNodes(ids: readonly string[]): void {
+        const next = normalizeSelectedIds(ids);
+        if (next.length === this.selectedIds.length && next.every((id, index) => id === this.selectedIds[index])) return;
+        this.selectedIds = next;
+        if (next.length === 2) this.hoverId = null;
+        this.focusMask = null;
         this.applyFocusState();
     }
 
@@ -560,7 +581,7 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
         const positions = this.mode === '2d' ? data.positions2d : data.positions3d;
         this.pickIndexDirty = true;
         const focusStarted = this.now();
-        const focus = buildGalaxyFocusMask(data, this.selectedId, this.hoverId);
+        const focus = this.resolveFocusMask(data);
         this.recordTiming('focusMs', focusStarted);
         this.focusMask = focus;
         this.updateGroupShells(data);
@@ -571,6 +592,7 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
         this.recordTiming('instancesMs', instancesStarted);
         const edgeStarted = this.now();
         this.updateEdgeGeometry(data, positions, focus);
+        this.syncPathEdges(data, positions, focus);
         this.recordTiming('edgeGeometryMs', edgeStarted);
         const labelsStarted = this.now();
         this.updateLabels(data, positions, true);
@@ -584,7 +606,7 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
         if (!data || !positions) return;
         const started = this.now();
         const focusStarted = this.now();
-        const focus = buildGalaxyFocusMask(data, this.selectedId, this.hoverId);
+        const focus = this.resolveFocusMask(data);
         this.recordTiming('focusMs', focusStarted);
         this.focusMask = focus;
         this.updateGuideFocus(data, focus);
@@ -593,6 +615,7 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
         this.recordTiming('instancesMs', instancesStarted);
         const edgeStarted = this.now();
         this.updateEdgeColors(data, positions, focus);
+        this.syncPathEdges(data, positions, focus);
         this.recordTiming('edgeGeometryMs', edgeStarted);
         const labelsStarted = this.now();
         this.updateLabels(data, positions, false);
@@ -608,7 +631,7 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
         this.pickIndexDirty = true;
         const started = this.now();
         const focusStarted = this.now();
-        const focus = buildGalaxyFocusMask(data, this.selectedId, this.hoverId);
+        const focus = this.resolveFocusMask(data);
         this.recordTiming('focusMs', focusStarted);
         this.focusMask = focus;
         this.updateGroupShells(data);
@@ -619,6 +642,7 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
         this.recordTiming('instancesMs', instancesStarted);
         const edgeStarted = this.now();
         this.updateEdgeGeometry(data, positions, focus);
+        this.syncPathEdges(data, positions, focus);
         this.recordTiming('edgeGeometryMs', edgeStarted);
         this.recordTiming('liveGeometryMs', started);
     }
@@ -631,7 +655,7 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
         const glowBatch = galaxyGlowBatch(this.glows);
         for (let i = 0; i < data.ids.length; i++) {
             const densityFactor = density[i] ?? 1;
-            const active = data.ids[i] === this.selectedId;
+            const active = this.selectedIds.includes(data.ids[i]);
             const hovered = data.ids[i] === this.hoverId;
             const level = focus.nodeLevels[i] ?? 1;
             const dimmed = focus.hasFocus && level === 0;
@@ -715,6 +739,16 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
         if (sphereBatch) this.markSphereNodeBatchDirty(sphereBatch);
         if (billboardBatch) this.markBillboardNodeBatchDirty(billboardBatch);
         if (glowBatch) this.markGlowBatchDirty(glowBatch);
+    }
+
+    private resolveFocusMask(data: GalaxySceneV2): GalaxyFocusMask {
+        const cached = this.focusMask;
+        if (this.selectedIds.length === 2 && cached?.selectedIndices.length === 2) {
+            const first = data.ids[cached.selectedIndices[0]];
+            const second = data.ids[cached.selectedIndices[1]];
+            if (first === this.selectedIds[0] && second === this.selectedIds[1]) return cached;
+        }
+        return buildGalaxyFocusMask(data, this.selectedIds, this.hoverId);
     }
 
     private writeBillboardNode(
@@ -938,8 +972,146 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
         colorAttr.needsUpdate = true;
     }
 
+    private syncPathEdges(data: GalaxySceneV2, positions: Float32Array, focus: GalaxyFocusMask): void {
+        if (!focus.pathFound) {
+            this.clearPathEdges();
+            return;
+        }
+        if (!this.pathEdges || this.pathEdgeSelection !== focus.pathEdgeIndices) {
+            this.clearPathEdges();
+            const geometry = new THREE.BufferGeometry();
+            let vertexCount = 0;
+            const pathEdgeMode = this.settings.edgeMode === 'hidden' ? 'curved' : this.settings.edgeMode;
+            for (const edge of focus.pathEdgeIndices) {
+                vertexCount += this.edgeSegmentCountForMode(data, positions, edge, pathEdgeMode) * 2;
+            }
+            geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(vertexCount * 3), 3));
+            geometry.setAttribute('color', new THREE.BufferAttribute(new Float32Array(vertexCount * 3), 3));
+            const material = new THREE.LineBasicMaterial({
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.98,
+                depthWrite: false,
+                depthTest: true,
+                blending: THREE.AdditiveBlending,
+                toneMapped: false,
+            });
+            this.pathEdges = new THREE.LineSegments(geometry, material);
+            this.pathEdges.renderOrder = 18;
+            this.pathEdges.frustumCulled = false;
+            this.pathEdgeSelection = focus.pathEdgeIndices;
+            this.scene.add(this.pathEdges);
+        }
+
+        const position = this.pathEdges.geometry.getAttribute('position') as THREE.BufferAttribute;
+        const color = this.pathEdges.geometry.getAttribute('color') as THREE.BufferAttribute;
+        this.writePathGeometry(position, color, data, positions, focus);
+        position.needsUpdate = true;
+        color.needsUpdate = true;
+        this.pathEdges.geometry.computeBoundingSphere();
+    }
+
+    private writePathColor(attribute: THREE.BufferAttribute, vertex: number, progress: number): void {
+        attribute.setXYZ(
+            vertex,
+            THREE.MathUtils.lerp(0.02, 0.62, progress),
+            THREE.MathUtils.lerp(0.94, 0.22, progress),
+            THREE.MathUtils.lerp(0.74, 1, progress),
+        );
+    }
+
+    private writePathGeometry(
+        position: THREE.BufferAttribute,
+        color: THREE.BufferAttribute,
+        data: GalaxySceneV2,
+        positions: Float32Array,
+        focus: GalaxyFocusMask,
+    ): void {
+        const treeFilaments = this.usesTreeFilamentEdges(data);
+        const edgeMode = this.settings.edgeMode === 'hidden' ? 'curved' : this.settings.edgeMode;
+        const tubeMode = edgeMode === 'tube';
+        const pathLength = Math.max(1, focus.pathEdgeIndices.length);
+        let cursor = 0;
+        for (let pathStep = 0; pathStep < focus.pathEdgeIndices.length; pathStep++) {
+            const edge = focus.pathEdgeIndices[pathStep];
+            const interGalaxy = data.edgeKinds[edge] === 1;
+            const source = data.edgePairs[edge * 2];
+            const target = data.edgePairs[edge * 2 + 1];
+            const ax = positions[source * 3], ay = positions[source * 3 + 1], az = positions[source * 3 + 2];
+            const bx = positions[target * 3], by = positions[target * 3 + 1], bz = positions[target * 3 + 2];
+            const surfaceEdge = this.capsSurfaceEdge(data, ax, ay, az, bx, by, bz);
+            const hopfEdge = !surfaceEdge && !tubeMode && this.mode === '3d' && data.layoutMode === 'hopfProjection' && edgeMode === 'curved';
+            const hopfCrossBase = hopfEdge && this.isHopfCrossBaseEdge(data, source, target);
+            const steps = this.edgeSegmentCountForMode(data, positions, edge, edgeMode);
+            const curveScale = THREE.MathUtils.clamp(this.settings.edgeCurveStrength, 0.25, 1.2) * (interGalaxy ? 0.92 : 0.58);
+            const lift = tubeMode
+                ? this.edgeTubeLift(data, edge, source, target)
+                : edgeMode === 'curved'
+                    ? treeFilaments
+                        ? this.treeFilamentEdgeLift(data, edge, source, target, curveScale)
+                        : (0.08 + Math.abs(source - target) * 0.002) * curveScale + (interGalaxy ? 0.18 : 0) + (hopfCrossBase ? 0.1 : 0)
+                    : 0;
+            for (let segment = 0; segment < steps; segment++) {
+                const t0 = segment / steps;
+                const t1 = (segment + 1) / steps;
+                cursor = this.writePathGeometryVertex(position, color, cursor, data, focus, edge, ax, ay, az, bx, by, bz, lift, t0, surfaceEdge, tubeMode, treeFilaments, hopfEdge, hopfCrossBase);
+                this.writePathColor(color, cursor - 1, (pathStep + t0) / pathLength);
+                cursor = this.writePathGeometryVertex(position, color, cursor, data, focus, edge, ax, ay, az, bx, by, bz, lift, t1, surfaceEdge, tubeMode, treeFilaments, hopfEdge, hopfCrossBase);
+                this.writePathColor(color, cursor - 1, (pathStep + t1) / pathLength);
+            }
+        }
+        this.pathEdges?.geometry.setDrawRange(0, cursor);
+    }
+
+    private writePathGeometryVertex(
+        position: THREE.BufferAttribute,
+        color: THREE.BufferAttribute,
+        cursor: number,
+        data: GalaxySceneV2,
+        focus: GalaxyFocusMask,
+        edge: number,
+        ax: number, ay: number, az: number,
+        bx: number, by: number, bz: number,
+        lift: number,
+        t: number,
+        surfaceEdge: boolean,
+        tubeMode: boolean,
+        treeFilaments: boolean,
+        hopfEdge: boolean,
+        hopfCrossBase: boolean,
+    ): number {
+        if (surfaceEdge) return this.writeCapsSurfaceEdgeVertex(position, color, cursor, data, focus, edge, ax, ay, az, bx, by, bz, 0, 0, t, 1);
+        if (tubeMode && treeFilaments) return this.writeTreeTubeEdgeVertex(position, color, cursor, data, focus, edge, ax, ay, az, bx, by, bz, 0, 0, lift, t, 1);
+        if (tubeMode) return this.writeTubeEdgeVertex(position, color, cursor, data, focus, edge, ax, ay, az, bx, by, bz, lift, t, 1);
+        if (hopfEdge) return this.writeHopfEdgeVertex(position, color, cursor, data, focus, edge, ax, ay, az, bx, by, bz, lift, t, 1, hopfCrossBase);
+        if (treeFilaments) return this.writeTreeFilamentEdgeVertex(position, color, cursor, data, focus, edge, ax, ay, az, bx, by, bz, 0, 0, lift, t, 1);
+        return this.writeEdgeVertex(position, color, cursor, data, focus, edge, ax, ay, az, bx, by, bz, lift, t, 1);
+    }
+
+    private clearPathEdges(): void {
+        if (!this.pathEdges) {
+            this.pathEdgeSelection = null;
+            return;
+        }
+        this.scene.remove(this.pathEdges);
+        this.pathEdges.geometry.dispose();
+        const material = this.pathEdges.material;
+        Array.isArray(material) ? material.forEach((item) => item.dispose()) : material.dispose();
+        this.pathEdges = null;
+        this.pathEdgeSelection = null;
+    }
+
     private edgeSegmentCount(data: GalaxySceneV2, positions: Float32Array, edge: number): number {
-        const tubeMode = this.settings.edgeMode === 'tube';
+        return this.edgeSegmentCountForMode(data, positions, edge, this.settings.edgeMode);
+    }
+
+    private edgeSegmentCountForMode(
+        data: GalaxySceneV2,
+        positions: Float32Array,
+        edge: number,
+        edgeMode: GalaxyRenderSettings['edgeMode'],
+    ): number {
+        const tubeMode = edgeMode === 'tube';
         const treeFilaments = this.usesTreeFilamentEdges(data);
         const leanEdges = this.usesLeanEdgeContract(data);
         const source = data.edgePairs[edge * 2];
@@ -955,7 +1127,7 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
         const hopfEdge = !tubeMode
             && this.mode === '3d'
             && data.layoutMode === 'hopfProjection'
-            && this.settings.edgeMode === 'curved';
+            && edgeMode === 'curved';
         if (hopfEdge) {
             const crossBase = this.isHopfCrossBaseEdge(data, source, target);
             return crossBase
@@ -963,7 +1135,7 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
                 : (leanEdges ? LEAN_HOPF_EDGE_SEGMENTS : HOPF_EDGE_SEGMENTS);
         }
         if (tubeMode) return MAX_EDGE_SEGMENTS;
-        if (this.settings.edgeMode !== 'curved') return 1;
+        if (edgeMode !== 'curved') return 1;
         if (treeFilaments && !leanEdges) return TREE_FILAMENT_EDGE_SEGMENTS;
         return leanEdges ? LEAN_CURVED_EDGE_SEGMENTS : CURVED_EDGE_SEGMENTS;
     }
@@ -984,9 +1156,9 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
 
     private labelSetSignature(data: GalaxySceneV2): string {
         if (this.settings.labelMode === 'off') return 'off';
-        const selected = this.selectedId ? data.ids.indexOf(this.selectedId) : -1;
+        const selected = this.selectedIds.map((id) => data.ids.indexOf(id)).filter((index) => index >= 0);
         const hovered = this.hoverId ? data.ids.indexOf(this.hoverId) : -1;
-        return `${this.settings.labelMode}:${this.settings.labelLimit}:${data.ids.length}:${selected}:${hovered}`;
+        return `${this.settings.labelMode}:${this.settings.labelLimit}:${data.ids.length}:${selected.join(',')}:${hovered}`;
     }
 
     private rebuildLabels(data: GalaxySceneV2, positions: Float32Array): void {
@@ -994,16 +1166,17 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
         if (this.settings.labelMode === 'off') return;
         const limit = data.ids.length <= 18 ? data.ids.length : Math.max(1, this.settings.labelLimit);
         const important = [...data.ids.keys()].sort((a, b) => data.radii[b] - data.radii[a]).slice(0, limit);
-        const selected = this.selectedId ? data.ids.indexOf(this.selectedId) : -1;
+        const selected = this.selectedIds.map((id) => data.ids.indexOf(id)).filter((index) => index >= 0);
+        const selectedSet = new Set(selected);
         const hovered = this.hoverId ? data.ids.indexOf(this.hoverId) : -1;
         const labelIndexes = new Set<number>();
         if (this.settings.labelMode === 'always' || this.settings.labelMode === 'important') {
             for (const index of important) labelIndexes.add(index);
         }
-        if (selected >= 0) labelIndexes.add(selected);
+        for (const index of selected) labelIndexes.add(index);
         if (hovered >= 0) labelIndexes.add(hovered);
         for (const index of labelIndexes) {
-            const active = index === selected || index === hovered;
+            const active = selectedSet.has(index) || index === hovered;
             const sprite = makeLabelSprite(data.labels[index], active);
             sprite.position.set(positions[index * 3], positions[index * 3 + 1] + Math.max(0.11, data.radii[index] * 0.045), positions[index * 3 + 2]);
             sprite.scale.set(active ? 0.72 : 0.52, active ? 0.2 : 0.15, 1);
@@ -2966,6 +3139,7 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
     }
 
     private clearObjects(): void {
+        this.clearPathEdges();
         for (const object of [this.nodes, this.glows, this.shells, this.edges]) {
             if (!object) continue;
             this.scene.remove(object);

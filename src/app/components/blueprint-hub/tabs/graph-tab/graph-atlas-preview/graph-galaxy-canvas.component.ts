@@ -9,6 +9,7 @@ import { galaxySceneToV2, type GalaxySceneSourceMode, type GalaxySceneV2 } from 
 import { mergeGalaxySettings, type GalaxyInputEdge, type GalaxyQueryFocus, type GalaxyRenderableNode, type GalaxyRenderSettings } from './graph-galaxy-engine';
 import { ThreeGalaxyRenderer } from './three-galaxy-renderer';
 import type { GraphCanvasHit } from './graph-canvas-interaction';
+import { pathSelectionLocksCanvasFocus } from './graph-path-selection';
 
 export interface GraphGalaxySurfaceGate {
     destroyed: boolean;
@@ -63,7 +64,7 @@ export class GraphGalaxyCanvasComponent implements AfterViewInit, OnChanges, OnD
     @Input() entities: GalaxyRenderableNode[] = [];
     @Input() edges: GalaxyInputEdge[] = [];
     @Input() settings: Partial<GalaxyRenderSettings> | null = null;
-    @Input() selectedEntityId: string | null = null;
+    @Input() selectedEntityIds: readonly string[] = [];
     @Input() queryFocus: GalaxyQueryFocus | null = null;
     @Input() viewMode: '3d' | 'map' = '3d';
     @Input() sourceMode: GalaxySceneSourceMode = 'entities';
@@ -145,8 +146,8 @@ export class GraphGalaxyCanvasComponent implements AfterViewInit, OnChanges, OnD
             collectionChanged,
         );
         if (identityChanged || changes['sourceMode']) this.markLayoutDirty();
-        if (changes['selectedEntityId'] && this.renderer.hasContext()) {
-            this.renderer.selectNode(this.selectedEntityId);
+        if (changes['selectedEntityIds'] && this.renderer.hasContext()) {
+            this.renderer.selectNodes(this.selectedEntityIds);
             this.recordRendererTimings();
         }
         if (changes['viewMode'] && this.renderer.hasContext()) this.renderer.setMode(this.viewMode === 'map' ? '2d' : '3d');
@@ -286,9 +287,6 @@ export class GraphGalaxyCanvasComponent implements AfterViewInit, OnChanges, OnD
             ? this.entities.find((item) => item.id === hit.id || item.metadata?.sourceEntityId === hit.id)
             : null;
         if (entity) {
-            const nextId = entity.id === this.selectedEntityId ? null : entity.id;
-            this.renderer.selectNode(nextId);
-            this.draw();
             this.entitySelected.emit(entity);
         }
         this.objectSelected.emit(hit);
@@ -381,7 +379,7 @@ export class GraphGalaxyCanvasComponent implements AfterViewInit, OnChanges, OnD
                 this.scene,
                 this.currentSettings(),
                 this.viewMode === 'map' ? '2d' : '3d',
-                this.selectedEntityId,
+                this.selectedEntityIds,
             );
             this.recordRendererTimings({ rendererSetSceneMs: performance.now() - setSceneStarted });
             this.recordDrawMetrics();
@@ -434,7 +432,7 @@ export class GraphGalaxyCanvasComponent implements AfterViewInit, OnChanges, OnD
                         this.scene,
                         this.currentSettings(),
                         this.viewMode === 'map' ? '2d' : '3d',
-                        this.selectedEntityId,
+                        this.selectedEntityIds,
                     );
                 }
                 const rendererSetSceneMs = performance.now() - setSceneStarted;
@@ -479,9 +477,11 @@ export class GraphGalaxyCanvasComponent implements AfterViewInit, OnChanges, OnD
         if (this.hoverKey === key) return;
         this.hoverKey = key;
         const nodeId = hit?.kind === 'node' ? hit.id : null;
-        this.renderer.hoverNode(nodeId);
-        this.recordRendererTimings();
-        this.draw();
+        if (!pathSelectionLocksCanvasFocus(this.selectedEntityIds)) {
+            this.renderer.hoverNode(nodeId);
+            this.recordRendererTimings();
+            this.draw();
+        }
         const entity = nodeId ? this.entities.find((item) => item.id === nodeId || item.metadata?.sourceEntityId === nodeId) ?? null : null;
         this.entityHovered.emit(entity);
         this.objectHovered.emit(hit);
