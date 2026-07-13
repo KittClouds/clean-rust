@@ -1,5 +1,5 @@
 use super::*;
-use compact_str::CompactString;
+use compact_str::{format_compact, CompactString};
 use phoenix_graph_kernel::{
     GraphProposalBatchReceipt, GraphProposalFeatures, GraphProposalObservation,
     GraphProposalStatus, GraphTruthAtomKey, KernelBiTemporal, KernelCheckpointData,
@@ -302,6 +302,145 @@ fn tensor_artifact_is_mmap_ready_and_rejects_corruption() {
     ));
 }
 
+#[test]
+fn evaluation_protocol_and_baselines_are_deterministic_and_test_locked() {
+    let source = evaluation_snapshot();
+    let tensors = tensorize_frozen_graph(
+        &source,
+        TensorizationPolicy {
+            negatives_per_asserted_edge: 1,
+        },
+    )
+    .expect("tensorize evaluation fixture");
+    let policy = evaluation_policy(&source);
+    let first = certify_evaluation_protocol(&source, &tensors, policy.clone()).expect("certify");
+    let second = certify_evaluation_protocol(&source, &tensors, policy.clone()).expect("repeat");
+    assert_eq!(first, second);
+    assert!(first.protocol_id.starts_with("b3-"));
+    assert_eq!(first.seed_certificate.seeds.len(), 3);
+    assert_eq!(first.leakage_audit.train_examples, 2);
+    assert_eq!(first.leakage_audit.validation_examples, 2);
+    assert_eq!(first.leakage_audit.test_examples, 2);
+
+    let report = run_baseline_ladder(&source, &tensors, policy).expect("baseline ladder");
+    assert_ne!(report.selected_family, BaselineFamily::PriorHeuristic);
+    assert_eq!(report.validation_summaries.len(), 3);
+    assert_eq!(report.runs.len(), 9);
+    assert!(report
+        .runs
+        .iter()
+        .all(|run| { run.held_out_test.is_some() == (run.family == report.selected_family) }));
+    assert_eq!(
+        report,
+        run_baseline_ladder(&source, &tensors, evaluation_policy(&source)).expect("repeat ladder")
+    );
+    let directory = tempfile::tempdir().expect("evaluation tempdir");
+    let paths = ResearchEvaluationBundle::write(&first, &report, directory.path())
+        .expect("write evaluation artifacts");
+    assert!(paths.protocol.exists());
+    assert!(paths.baselines.exists());
+    assert_eq!(
+        paths,
+        ResearchEvaluationBundle::write(&first, &report, directory.path())
+            .expect("content-addressed artifact reuse")
+    );
+}
+
+#[test]
+fn evaluation_fails_closed_on_temporal_or_schema_leakage() {
+    let source = evaluation_snapshot();
+    let mut tensors = tensorize_frozen_graph(
+        &source,
+        TensorizationPolicy {
+            negatives_per_asserted_edge: 1,
+        },
+    )
+    .expect("tensorize");
+    tensors.proposal_splits[0] = ResearchSplit::Test;
+    assert!(matches!(
+        certify_evaluation_protocol(&source, &tensors, evaluation_policy(&source)),
+        Err(ResearchEvaluationError::Leakage("proposal chronology"))
+    ));
+
+    let mut tensors = tensorize_frozen_graph(
+        &source,
+        TensorizationPolicy {
+            negatives_per_asserted_edge: 1,
+        },
+    )
+    .expect("tensorize");
+    tensors.feature_certificates[0].label_free = false;
+    assert!(matches!(
+        certify_evaluation_protocol(&source, &tensors, evaluation_policy(&source)),
+        Err(ResearchEvaluationError::FeatureSchema(_))
+    ));
+}
+
+#[test]
+fn binary_metrics_measure_ranking_probability_and_calibration() {
+    let perfect = evaluate_binary_scores(&[false, true], &[0.0, 1.0], 10).expect("metrics");
+    assert_eq!(perfect.average_precision, Some(1.0));
+    assert_eq!(perfect.roc_auc, Some(1.0));
+    assert!(perfect.brier_score < 1.0e-12);
+    assert!(perfect.log_loss < 1.0e-6);
+    assert!(perfect.expected_calibration_error < 2.0e-7);
+}
+
+#[test]
+fn evaluates_ten_thousand_proposals_within_the_baseline_gate() {
+    let mut source = evaluation_snapshot();
+    let schema = source.proposals[0].feature_schema_id.clone();
+    source.proposals = (0..10_002)
+        .map(|index| {
+            let (split, observed_at_ms, label_available_at_ms) = match index % 3 {
+                0 => (ResearchSplit::Train, 80, 90),
+                1 => (ResearchSplit::Validation, 140, 150),
+                _ => (ResearchSplit::Test, 220, 230),
+            };
+            let positive = (index / 3) % 2 == 0;
+            let mut features = [0_i16; PROPOSAL_FEATURE_DIM];
+            features[0] = if positive { 1000 } else { -1000 };
+            features[1] = (index % 997) as i16;
+            ResearchProposal {
+                proposal_id: format_compact!("scale-proposal-{index:05}"),
+                receipt_id: "scale-receipt".into(),
+                feature_schema_id: schema.clone(),
+                split,
+                label: if positive {
+                    ResearchProposalLabel::Active
+                } else {
+                    ResearchProposalLabel::Retracted
+                },
+                observed_at_ms,
+                label_available_at_ms,
+                features,
+            }
+        })
+        .collect();
+    source.dataset_id = "b3-evaluation-scale".into();
+    let tensors = tensorize_frozen_graph(
+        &source,
+        TensorizationPolicy {
+            negatives_per_asserted_edge: 1,
+        },
+    )
+    .expect("tensorize scale fixture");
+    let mut policy = evaluation_policy(&source);
+    policy.repeats = 1;
+    policy.ftrl.epochs = 4;
+    policy.mlp.epochs = 4;
+    let started = Instant::now();
+    let report = run_baseline_ladder(&source, &tensors, policy).expect("scale baseline ladder");
+    let elapsed = started.elapsed();
+    eprintln!(
+        "baseline scale: {} proposals, 3 families, {:.3}s",
+        source.proposals.len(),
+        elapsed.as_secs_f32()
+    );
+    assert_eq!(report.runs.len(), 3);
+    assert!(elapsed.as_secs_f32() < 5.0);
+}
+
 fn complete_research_snapshot() -> FrozenGraphResearchSnapshot {
     let checkpoint = checkpoint();
     let compiler = compiler();
@@ -437,5 +576,91 @@ fn proposal_receipt() -> GraphProposalBatchReceipt {
             features: GraphProposalFeatures([0; 16]),
             shadow_score_millis: None,
         }],
+    }
+}
+
+pub(crate) fn evaluation_snapshot() -> FrozenGraphResearchSnapshot {
+    let mut source = complete_research_snapshot();
+    let schema = source.proposals[0].feature_schema_id.clone();
+    source.proposals = [
+        (
+            "train-negative",
+            ResearchSplit::Train,
+            ResearchProposalLabel::Retracted,
+            80,
+            90,
+            -1000,
+        ),
+        (
+            "train-positive",
+            ResearchSplit::Train,
+            ResearchProposalLabel::Active,
+            80,
+            90,
+            1000,
+        ),
+        (
+            "validation-negative",
+            ResearchSplit::Validation,
+            ResearchProposalLabel::Superseded,
+            140,
+            150,
+            -1000,
+        ),
+        (
+            "validation-positive",
+            ResearchSplit::Validation,
+            ResearchProposalLabel::Active,
+            140,
+            150,
+            1000,
+        ),
+        (
+            "test-negative",
+            ResearchSplit::Test,
+            ResearchProposalLabel::Reverted,
+            220,
+            230,
+            -1000,
+        ),
+        (
+            "test-positive",
+            ResearchSplit::Test,
+            ResearchProposalLabel::Active,
+            220,
+            230,
+            1000,
+        ),
+    ]
+    .into_iter()
+    .map(
+        |(id, split, label, observed_at_ms, label_available_at_ms, signal)| {
+            let mut features = [0_i16; PROPOSAL_FEATURE_DIM];
+            features[0] = signal;
+            ResearchProposal {
+                proposal_id: id.into(),
+                receipt_id: "evaluation-receipt".into(),
+                feature_schema_id: schema.clone(),
+                split,
+                label,
+                observed_at_ms,
+                label_available_at_ms,
+                features,
+            }
+        },
+    )
+    .collect();
+    source.dataset_id = "b3-evaluation-fixture".into();
+    source
+}
+
+pub(crate) fn evaluation_policy(source: &FrozenGraphResearchSnapshot) -> EvaluationPolicy {
+    EvaluationPolicy {
+        feature_schema_id: source.proposals[0].feature_schema_id.clone(),
+        seed_root: 0x5eed_cafe,
+        repeats: 3,
+        calibration_bins: 10,
+        ftrl: FtrlConfig::default(),
+        mlp: MlpConfig::default(),
     }
 }

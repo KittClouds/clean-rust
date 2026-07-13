@@ -2826,6 +2826,7 @@ dependencies = [
  "serde_json",
  "tempfile",
  "thiserror 1.0.69",
+ "wide 0.7.33",
  "zerocopy 0.7.35",
 ]
 

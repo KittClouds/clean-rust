@@ -14,9 +14,13 @@ use phoenix_graph_kernel::{project_graph_proposal_outcomes, GraphProposalOutcome
 use phoenix_graph_post::api as graph_api;
 use phoenix_graph_rebuild::GraphDocumentCompilerSummary;
 use phoenix_graph_research::{
-    freeze_graph_research_snapshot, tensorize_frozen_graph, FrozenGraphResearchBundle,
-    FrozenGraphResearchError, FrozenGraphResearchInput, FrozenGraphResearchPaths,
-    FrozenTensorBundle, FrozenTensorPaths, TemporalSplitPolicy, TensorizationPolicy,
+    certify_evaluation_protocol, derive_train_topology_features, freeze_graph_research_snapshot,
+    run_baseline_ladder_for_protocol, run_structural_ranking_baselines, tensorize_frozen_graph,
+    BaselineLadderReport, EvaluationPolicy, FrozenGraphResearchBundle, FrozenGraphResearchError,
+    FrozenGraphResearchInput, FrozenGraphResearchPaths, FrozenTensorBundle, FrozenTensorPaths,
+    RankingEvaluationError, RankingEvaluationReport, ResearchEvaluationError,
+    ResearchEvaluationProtocol, TemporalSplitPolicy, TensorizationPolicy,
+    TrainTopologyFeaturePolicy, TrainTopologyFeatureSnapshot,
 };
 use phoenix_memory_post::api as memory_api;
 use phoenix_rel_post::api as rel_api;
@@ -52,6 +56,10 @@ pub enum GraphResearchExportError {
     Store(#[from] StoreError),
     #[error(transparent)]
     Research(#[from] FrozenGraphResearchError),
+    #[error(transparent)]
+    Evaluation(#[from] ResearchEvaluationError),
+    #[error(transparent)]
+    Ranking(#[from] RankingEvaluationError),
     #[error("cannot freeze graph research data without a kernel checkpoint")]
     MissingCheckpoint,
 }
@@ -60,6 +68,13 @@ pub enum GraphResearchExportError {
 pub struct GraphResearchTensorExportPaths {
     pub research: FrozenGraphResearchPaths,
     pub tensors: FrozenTensorPaths,
+}
+
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct GraphResearchEvaluation {
+    pub protocol: ResearchEvaluationProtocol,
+    pub baselines: BaselineLadderReport,
 }
 
 #[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
@@ -701,6 +716,104 @@ where
             research: research_paths,
             tensors: tensor_paths,
         })
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    pub fn evaluate_research_baselines(
+        &self,
+        frozen_at_ms: i64,
+        split_policy: TemporalSplitPolicy,
+        tensor_policy: TensorizationPolicy,
+        evaluation_policy: EvaluationPolicy,
+        document_compiler: Option<&GraphDocumentCompilerSummary>,
+        document_compiler_observed_at_ms: Option<i64>,
+    ) -> Result<GraphResearchEvaluation, GraphResearchExportError>
+    where
+        S: PhoenixGraphLearningStore,
+    {
+        let checkpoint = self
+            .store
+            .load_kernel_checkpoint()?
+            .ok_or(GraphResearchExportError::MissingCheckpoint)?;
+        let commits = self.store.load_graph_truth_commits()?;
+        let proposal_receipts = self.store.load_graph_proposal_receipts()?;
+        let research = freeze_graph_research_snapshot(FrozenGraphResearchInput {
+            checkpoint: &checkpoint,
+            commits: &commits,
+            proposal_receipts: &proposal_receipts,
+            document_compiler,
+            document_compiler_observed_at_ms,
+            frozen_at_ms,
+            split_policy,
+        })?;
+        let tensors = tensorize_frozen_graph(&research, tensor_policy)?;
+        let protocol = certify_evaluation_protocol(&research, &tensors, evaluation_policy.clone())?;
+        let baselines = run_baseline_ladder_for_protocol(&tensors, &protocol)?;
+        Ok(GraphResearchEvaluation {
+            protocol,
+            baselines,
+        })
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    pub fn derive_research_topology_features(
+        &self,
+        frozen_at_ms: i64,
+        split_policy: TemporalSplitPolicy,
+        tensor_policy: TensorizationPolicy,
+        evaluation_policy: EvaluationPolicy,
+        feature_policy: TrainTopologyFeaturePolicy,
+        document_compiler: Option<&GraphDocumentCompilerSummary>,
+        document_compiler_observed_at_ms: Option<i64>,
+    ) -> Result<TrainTopologyFeatureSnapshot, GraphResearchExportError>
+    where
+        S: PhoenixGraphLearningStore,
+    {
+        let checkpoint = self
+            .store
+            .load_kernel_checkpoint()?
+            .ok_or(GraphResearchExportError::MissingCheckpoint)?;
+        let commits = self.store.load_graph_truth_commits()?;
+        let proposal_receipts = self.store.load_graph_proposal_receipts()?;
+        let research = freeze_graph_research_snapshot(FrozenGraphResearchInput {
+            checkpoint: &checkpoint,
+            commits: &commits,
+            proposal_receipts: &proposal_receipts,
+            document_compiler,
+            document_compiler_observed_at_ms,
+            frozen_at_ms,
+            split_policy,
+        })?;
+        let tensors = tensorize_frozen_graph(&research, tensor_policy)?;
+        let protocol = certify_evaluation_protocol(&research, &tensors, evaluation_policy)?;
+        derive_train_topology_features(&research, &tensors, &protocol, feature_policy)
+            .map_err(Into::into)
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    pub fn evaluate_structural_rankings(
+        &self,
+        frozen_at_ms: i64,
+        split_policy: TemporalSplitPolicy,
+        tensor_policy: TensorizationPolicy,
+        evaluation_policy: EvaluationPolicy,
+        feature_policy: TrainTopologyFeaturePolicy,
+        document_compiler: Option<&GraphDocumentCompilerSummary>,
+        document_compiler_observed_at_ms: Option<i64>,
+    ) -> Result<RankingEvaluationReport, GraphResearchExportError>
+    where
+        S: PhoenixGraphLearningStore,
+    {
+        let features = self.derive_research_topology_features(
+            frozen_at_ms,
+            split_policy,
+            tensor_policy,
+            evaluation_policy,
+            feature_policy,
+            document_compiler,
+            document_compiler_observed_at_ms,
+        )?;
+        run_structural_ranking_baselines(&features).map_err(Into::into)
     }
 
     pub fn current_slot(
