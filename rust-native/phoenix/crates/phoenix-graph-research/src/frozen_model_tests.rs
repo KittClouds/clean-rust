@@ -19,9 +19,22 @@ fn frozen_model_round_trips_and_restart_scores_without_training() {
         2
     );
     let expected = reference_scores(&snapshot.tensors, &features);
+    let expected_snapshot = snapshot.clone();
+    assert_eq!(
+        score_bits(&score_mlp16_tensors(&snapshot.tensors, &features).expect("tensor scores")),
+        score_bits(&expected)
+    );
     drop(snapshot);
 
     let mapped = FrozenModelMapped::open(&first.manifest).expect("restart mmap");
+    assert_eq!(
+        mapped.manifest().weights_file,
+        format!("{}.fmw", mapped.manifest().weights_blake3)
+    );
+    assert_eq!(
+        mapped.snapshot().expect("mapped snapshot"),
+        expected_snapshot
+    );
     let restarted = mapped.score_mlp16(&features).expect("restart inference");
     assert_eq!(score_bits(&restarted), score_bits(&expected));
     assert_eq!(mapped.manifest().training.training_executions, 1);

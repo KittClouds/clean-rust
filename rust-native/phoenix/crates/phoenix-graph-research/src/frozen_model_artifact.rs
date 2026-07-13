@@ -1,7 +1,7 @@
 use crate::{
     FrozenModelArchitecture, FrozenModelError, FrozenModelHyperparameters, FrozenModelManifest,
     FrozenModelPaths, FrozenModelRuntimeIdentity, FrozenModelScoreCertificate,
-    FrozenModelSeedReceipt, FrozenModelSnapshot, FrozenModelSourceIdentity,
+    FrozenModelSeedReceipt, FrozenModelSnapshot, FrozenModelSourceIdentity, FrozenModelTensor,
     FrozenModelTensorManifest, FrozenTrainingReceipt, ResearchSplit, SeedCertificate,
     FROZEN_MODEL_BINARY_VERSION, FROZEN_MODEL_SCHEMA, MODEL_HIDDEN_BIAS, MODEL_HIDDEN_WEIGHT,
     MODEL_OUTPUT_BIAS, MODEL_OUTPUT_WEIGHT,
@@ -67,7 +67,7 @@ impl FrozenModelBundle {
             tensors,
         };
         manifest.model_id = model_identity(&manifest)?;
-        manifest.weights_file = format_compact!("{}.fmw", manifest.model_id);
+        manifest.weights_file = format_compact!("{}.fmw", manifest.weights_blake3);
         validate_manifest(&manifest)?;
 
         let root = root.as_ref();
@@ -117,6 +117,32 @@ impl FrozenModelMapped {
         &self.manifest
     }
 
+    pub fn snapshot(&self) -> Result<FrozenModelSnapshot, FrozenModelError> {
+        let mut tensors = Vec::with_capacity(self.manifest.tensors.len());
+        for descriptor in &self.manifest.tensors {
+            let values = self
+                .tensor(descriptor.name.as_str())?
+                .iter()
+                .map(|value| value.get())
+                .collect();
+            tensors.push(FrozenModelTensor {
+                name: descriptor.name.clone(),
+                shape: descriptor.shape.clone(),
+                values,
+            });
+        }
+        Ok(FrozenModelSnapshot {
+            source: self.manifest.source.clone(),
+            architecture: self.manifest.architecture.clone(),
+            hyperparameters: self.manifest.hyperparameters,
+            seeds: self.manifest.seeds.clone(),
+            runtime: self.manifest.runtime.clone(),
+            training: self.manifest.training.clone(),
+            score_certificates: self.manifest.score_certificates.clone(),
+            tensors,
+        })
+    }
+
     pub fn tensor(&self, name: &str) -> Result<Ref<&[u8], [ModelLeF32]>, FrozenModelError> {
         let tensor = self
             .manifest
@@ -146,18 +172,13 @@ impl FrozenModelMapped {
         let hidden_bias = load_array::<16>(self.tensor(MODEL_HIDDEN_BIAS)?)?;
         let output_weight = load_array::<16>(self.tensor(MODEL_OUTPUT_WEIGHT)?)?;
         let output_bias = load_array::<1>(self.tensor(MODEL_OUTPUT_BIAS)?)?[0];
-        let mut scores = Vec::with_capacity(features.len());
-        for feature in features {
-            let mut hidden = [0.0_f32; 16];
-            for (index, value) in hidden.iter_mut().enumerate() {
-                let row: &[f32; 16] = hidden_weight[index * 16..(index + 1) * 16]
-                    .try_into()
-                    .expect("fixed MLP row");
-                *value = (simd_dot(row, feature) + hidden_bias[index]).max(0.0);
-            }
-            scores.push(sigmoid(simd_dot(&output_weight, &hidden) + output_bias));
-        }
-        Ok(scores)
+        Ok(score_mlp16_arrays(
+            &hidden_weight,
+            &hidden_bias,
+            &output_weight,
+            output_bias,
+            features,
+        ))
     }
 
     fn validate_binary(&self) -> Result<(), FrozenModelError> {
@@ -196,6 +217,49 @@ impl FrozenModelMapped {
         }
         Ok(())
     }
+}
+
+pub fn score_mlp16_tensors(
+    tensors: &[FrozenModelTensor],
+    features: &[[f32; 16]],
+) -> Result<Vec<f32>, FrozenModelError> {
+    if tensors.len() != TENSOR_COUNT {
+        return Err(FrozenModelError::InvalidTensorLayout("tensor count"));
+    }
+    for (index, tensor) in tensors.iter().enumerate() {
+        let (name, shape) = expected_tensor(index);
+        if tensor.name != name
+            || tensor.shape.as_slice() != shape
+            || tensor.values.len() as u64 != shape_product(shape)?
+            || tensor.values.iter().any(|value| !value.is_finite())
+        {
+            return Err(FrozenModelError::InvalidTensorLayout(
+                "tensor specification",
+            ));
+        }
+    }
+    let hidden_weight: &[f32; 256] = tensors[0]
+        .values
+        .as_slice()
+        .try_into()
+        .map_err(|_| FrozenModelError::InvalidTensorLayout("hidden weight"))?;
+    let hidden_bias: &[f32; 16] = tensors[1]
+        .values
+        .as_slice()
+        .try_into()
+        .map_err(|_| FrozenModelError::InvalidTensorLayout("hidden bias"))?;
+    let output_weight: &[f32; 16] = tensors[2]
+        .values
+        .as_slice()
+        .try_into()
+        .map_err(|_| FrozenModelError::InvalidTensorLayout("output weight"))?;
+    Ok(score_mlp16_arrays(
+        hidden_weight,
+        hidden_bias,
+        output_weight,
+        tensors[3].values[0],
+        features,
+    ))
 }
 
 pub fn certify_model_seed_receipt(
@@ -310,7 +374,7 @@ fn validate_snapshot(snapshot: &FrozenModelSnapshot) -> Result<(), FrozenModelEr
 fn validate_manifest(manifest: &FrozenModelManifest) -> Result<(), FrozenModelError> {
     if manifest.schema_version != FROZEN_MODEL_SCHEMA
         || manifest.model_id != model_identity(manifest)?
-        || manifest.weights_file != format!("{}.fmw", manifest.model_id)
+        || manifest.weights_file != format!("{}.fmw", manifest.weights_blake3)
         || !is_blake3(manifest.weights_blake3.as_str())
     {
         return Err(FrozenModelError::IdentityMismatch);
@@ -508,6 +572,27 @@ fn simd_dot(left: &[f32; 16], right: &[f32; 16]) -> f32 {
     let low: [f32; 8] = (f32x8::from(left_low) * f32x8::from(right_low)).into();
     let high: [f32; 8] = (f32x8::from(left_high) * f32x8::from(right_high)).into();
     low.into_iter().chain(high).sum()
+}
+
+fn score_mlp16_arrays(
+    hidden_weight: &[f32; 256],
+    hidden_bias: &[f32; 16],
+    output_weight: &[f32; 16],
+    output_bias: f32,
+    features: &[[f32; 16]],
+) -> Vec<f32> {
+    let mut scores = Vec::with_capacity(features.len());
+    for feature in features {
+        let mut hidden = [0.0_f32; 16];
+        for (index, value) in hidden.iter_mut().enumerate() {
+            let row: &[f32; 16] = hidden_weight[index * 16..(index + 1) * 16]
+                .try_into()
+                .expect("fixed MLP row");
+            *value = (simd_dot(row, feature) + hidden_bias[index]).max(0.0);
+        }
+        scores.push(sigmoid(simd_dot(output_weight, &hidden) + output_bias));
+    }
+    scores
 }
 
 fn sigmoid(value: f32) -> f32 {

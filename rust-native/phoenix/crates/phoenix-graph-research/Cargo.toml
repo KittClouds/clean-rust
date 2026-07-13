@@ -5,13 +5,17 @@ edition.workspace = true
 license.workspace = true
 authors.workspace = true
 
+[features]
+default = ["graph-build"]
+graph-build = ["dep:phoenix-graph-kernel", "dep:phoenix-graph-rebuild"]
+
 [dependencies]
 blake3 = "1.8"
 compact_str.workspace = true
 hashbrown.workspace = true
 memmap2.workspace = true
-phoenix-graph-kernel = { path = "../phoenix-graph-kernel" }
-phoenix-graph-rebuild = { path = "../phoenix-graph-rebuild" }
+phoenix-graph-kernel = { path = "../phoenix-graph-kernel", optional = true }
+phoenix-graph-rebuild = { path = "../phoenix-graph-rebuild", optional = true }
 serde.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true

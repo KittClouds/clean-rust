@@ -92,5 +92,5 @@ gaps/overlaps, and trailing bytes.
 V1 stores final inference weights and an optimizer receipt; it does not store optimizer
 state for training resume. It does not train a model, read live graph state, mutate
 topology, unlock test data, or add Candle to the Phoenix workspace. Candle Baseline
-Trainer v1 is the next ticket and must emit this artifact rather than inventing a
-parallel checkpoint format.
+Trainer v1 now emits this artifact directly without inventing a parallel checkpoint
+format.

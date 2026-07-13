@@ -77,8 +77,8 @@ feature schema, and BLAKE3 source identity; it must not mutate the current artif
 
 Candle is intentionally integrated as an isolated spike crate, not as a Phoenix
 workspace dependency. Frozen Model Artifact v1 now supplies the model contract;
-promotion still requires a training spike. Burn remains a credible candidate for
-that later ticket because its backend
+the isolated Candle Baseline Trainer v1 now proves deterministic training and direct
+artifact emission. Burn remains a credible candidate for a later GPU/autodiff ticket because its backend
 abstraction and autodiff surface are broader; this benchmark only establishes that
 the abstraction does not buy us performance on the present CPU inference path.
 
