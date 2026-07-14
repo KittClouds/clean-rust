@@ -391,6 +391,9 @@ fn economics_digest(economics: &HyperEpochEconomics) -> CompactString {
     let mut hasher = blake3::Hasher::new();
     hasher.update(b"phoenix-hyper-gradient-economics/v1");
     hasher.update(&economics.mean_binary_cross_entropy.to_bits().to_le_bytes());
+    hasher.update(&economics.clip_coefficient.to_bits().to_le_bytes());
+    hasher.update(&[economics.clip_activated as u8]);
+    hasher.update(&economics.clip_activation_rate.to_bits().to_le_bytes());
     for block in [
         economics.entity_embeddings,
         economics.relation_embeddings,
@@ -416,6 +419,9 @@ fn economics_digest(economics: &HyperEpochEconomics) -> CompactString {
 fn canonical_economics(economics: HyperEpochEconomics) -> HyperEpochEconomics {
     HyperEpochEconomics {
         mean_binary_cross_entropy: canonical_f64(economics.mean_binary_cross_entropy),
+        clip_coefficient: economics.clip_coefficient,
+        clip_activated: economics.clip_activated,
+        clip_activation_rate: canonical_f64(economics.clip_activation_rate),
         entity_embeddings: canonical_block(economics.entity_embeddings),
         relation_embeddings: canonical_block(economics.relation_embeddings),
         relation_projection: canonical_block(economics.relation_projection),

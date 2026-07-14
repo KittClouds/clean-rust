@@ -12,14 +12,11 @@ use phoenix_graph_research::{
 
 const HIDDEN: usize = HYPER_ENCODER_HIDDEN;
 
+#[rustfmt::skip]
 pub(crate) struct FusedHyperTrainingOutcome {
-    pub weights: HyperEncoderWeights,
-    pub gradient_arena_bytes: u64,
-    pub epoch_allocation_bytes: u64,
-    pub epoch_allocation_count: u64,
-    pub optimizer_state_blake3: String,
-    pub optimizer_steps: u64,
-    pub final_epoch: HyperEpochEconomics,
+    pub weights: HyperEncoderWeights, pub gradient_arena_bytes: u64,
+    pub epoch_allocation_bytes: u64, pub epoch_allocation_count: u64,
+    pub optimizer_state_blake3: String, pub optimizer_steps: u64, pub final_epoch: HyperEpochEconomics,
 }
 
 pub(crate) fn train_fused_hyper_encoder16(
@@ -53,6 +50,7 @@ pub(crate) fn train_fused_hyper_encoder16_with_optimizer(
     let mut final_epoch = None;
     let batch_size = optimizer.batch_size as usize;
     let mut optimizer_steps = 0_u64;
+    let mut clipped_optimizer_steps = 0_u64;
     let batch_context = TrainBatchContext {
         source,
         staged,
@@ -63,13 +61,9 @@ pub(crate) fn train_fused_hyper_encoder16_with_optimizer(
     for _ in 0..config.epochs {
         for start in (0..examples.len()).step_by(batch_size) {
             let end = (start + batch_size).min(examples.len());
-            final_epoch = Some(train_batch(
-                &batch_context,
-                start,
-                end,
-                &mut weights,
-                &mut arena,
-            )?);
+            let economics = train_batch(&batch_context, start, end, &mut weights, &mut arena)?;
+            clipped_optimizer_steps += u64::from(economics.clip_activated);
+            final_epoch = Some(economics);
             optimizer_steps += 1;
         }
     }
@@ -77,6 +71,9 @@ pub(crate) fn train_fused_hyper_encoder16_with_optimizer(
     if epoch_delta.bytes != 0 || epoch_delta.count != 0 {
         return Err(CandleTrainerError::Contract("hyper fused epoch allocated"));
     }
+    let mut final_epoch =
+        final_epoch.ok_or(CandleTrainerError::Contract("hyper epoch economics"))?;
+    final_epoch.clip_activation_rate = clipped_optimizer_steps as f64 / optimizer_steps as f64;
     Ok(FusedHyperTrainingOutcome {
         optimizer_state_blake3: weights_digest(&weights),
         optimizer_steps,
@@ -84,7 +81,7 @@ pub(crate) fn train_fused_hyper_encoder16_with_optimizer(
         gradient_arena_bytes,
         epoch_allocation_bytes: epoch_delta.bytes,
         epoch_allocation_count: epoch_delta.count,
-        final_epoch: final_epoch.ok_or(CandleTrainerError::Contract("hyper epoch economics"))?,
+        final_epoch,
     })
 }
 
@@ -269,47 +266,52 @@ fn train_batch(
         }
     }
     encoder_backward(weights, gradients, staged, mode, &qualifiers);
-    let clip_scale = gradient_clip_scale(gradients, optimizer);
+    let unscale = optimizer.gradient_unscale();
+    let clip_scale = gradient_clip_scale(gradients, optimizer, unscale);
+    let update_scale = unscale * clip_scale;
     let economics = HyperEpochEconomics {
         mean_binary_cross_entropy: binary_cross_entropy / batch_examples as f64,
+        clip_coefficient: clip_scale,
+        clip_activated: clip_scale < 1.0,
+        clip_activation_rate: f64::from(clip_scale < 1.0),
         entity_embeddings: block_economics(
             &weights.node_embeddings,
             &gradients.node,
             optimizer,
-            clip_scale,
+            update_scale,
         ),
         relation_embeddings: block_economics(
             &weights.relation_embeddings,
             &gradients.relation,
             optimizer,
-            clip_scale,
+            update_scale,
         ),
         relation_projection: block_economics(
             &weights.relation_projection,
             &gradients.relation_projection,
             optimizer,
-            clip_scale,
+            update_scale,
         ),
         qualifier_projection: block_economics(
             &weights.qualifier_projection,
             &gradients.qualifier_projection,
             optimizer,
-            clip_scale,
+            update_scale,
         ),
         direction_matrices: block_economics(
             &weights.direction_weights,
             &gradients.direction,
             optimizer,
-            clip_scale,
+            update_scale,
         ),
         decoder_bias: block_economics(
             &weights.decoder_bias,
             &gradients.bias,
             optimizer,
-            clip_scale,
+            update_scale,
         ),
     };
-    sgd(weights, gradients, optimizer, clip_scale);
+    sgd(weights, gradients, optimizer, update_scale);
     if !weights_finite(weights) {
         return Err(CandleTrainerError::Contract("hyper non-finite weights"));
     }
@@ -751,7 +753,11 @@ fn update(values: &mut [f32], gradients: &[f32], optimizer: HyperOptimizerConfig
     }
 }
 
-fn gradient_clip_scale(gradients: &GradientArena, optimizer: HyperOptimizerConfig) -> f32 {
+fn gradient_clip_scale(
+    gradients: &GradientArena,
+    optimizer: HyperOptimizerConfig,
+    gradient_unscale: f32,
+) -> f32 {
     if optimizer.gradient_clip_policy == HyperGradientClipPolicy::None {
         return 1.0;
     }
@@ -765,7 +771,8 @@ fn gradient_clip_scale(gradients: &GradientArena, optimizer: HyperOptimizerConfi
         gradients.bias.as_slice(),
     ] {
         for &gradient in values {
-            squared += f64::from(gradient) * f64::from(gradient);
+            let gradient = f64::from(gradient * gradient_unscale);
+            squared += gradient * gradient;
         }
     }
     let norm = squared.sqrt() as f32;

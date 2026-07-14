@@ -1,7 +1,8 @@
 use crate::{
-    hyper_encoder_model_identity_from_authority, HyperEncoderError, HyperEncoderModelManifest,
-    HyperEncoderModelPaths, HyperEncoderModelSnapshot, HyperEncoderPairManifest,
-    HyperEncoderPairPaths, HyperEncoderWeights, HYPER_ENCODER_DIRECTIONS, HYPER_ENCODER_HIDDEN,
+    hyper_encoder_model_identity_from_authority, hyper_encoder_model_identity_from_view,
+    HyperEncoderError, HyperEncoderModelManifest, HyperEncoderModelPaths,
+    HyperEncoderModelSnapshot, HyperEncoderPairManifest, HyperEncoderPairPaths,
+    HyperEncoderWeightView, HyperEncoderWeights, HYPER_ENCODER_DIRECTIONS, HYPER_ENCODER_HIDDEN,
     HYPER_ENCODER_MODEL_BINARY_VERSION, HYPER_ENCODER_MODEL_SCHEMA, HYPER_ENCODER_PAIR_SCHEMA,
 };
 use compact_str::CompactString;
@@ -37,14 +38,13 @@ impl HyperEncoderMapped {
         }
         validate_header(&mmap, &manifest)?;
         let mapped = Self { manifest, mmap };
-        let weights = mapped.weights()?;
-        let model_id = hyper_encoder_model_identity_from_authority(
+        let model_id = hyper_encoder_model_identity_from_view(
             mapped.manifest.source_dataset_id.as_str(),
             mapped.manifest.source_binary_blake3.as_str(),
             mapped.manifest.task_id.as_str(),
             mapped.manifest.task_binary_blake3.as_str(),
             mapped.manifest.config,
-            &weights,
+            mapped.weight_view()?,
         )?;
         if model_id != mapped.manifest.model_id
             || mapped.manifest.validation.model_id != mapped.manifest.model_id
@@ -92,6 +92,50 @@ impl HyperEncoderMapped {
             return Err(HyperEncoderError::CorruptArtifact("weight payload"));
         }
         Ok(weights)
+    }
+
+    pub fn weight_view(&self) -> Result<HyperEncoderWeightView<'_>, HyperEncoderError> {
+        if cfg!(target_endian = "big") {
+            return Err(HyperEncoderError::CorruptArtifact("native weight endian"));
+        }
+        let payload = self
+            .mmap
+            .get(HEADER_BYTES..)
+            .ok_or(HyperEncoderError::CorruptArtifact("weight payload"))?;
+        // SAFETY: mmap allocations are page-aligned, HEADER_BYTES is a multiple of four,
+        // the payload length is validated as f32-sized, and the artifact is little-endian.
+        let (prefix, values, suffix) = unsafe { payload.align_to::<f32>() };
+        if !prefix.is_empty() || !suffix.is_empty() || values.iter().any(|value| !value.is_finite())
+        {
+            return Err(HyperEncoderError::CorruptArtifact("weight payload"));
+        }
+        let counts = tensor_counts(
+            self.manifest.candidate_universe as usize,
+            self.manifest.directed_relation_count as usize,
+        );
+        let mut cursor = 0_usize;
+        let mut take = |count: usize| -> Result<&[f32], HyperEncoderError> {
+            let end = cursor
+                .checked_add(count)
+                .ok_or(HyperEncoderError::CorruptArtifact("weight range"))?;
+            let result = values
+                .get(cursor..end)
+                .ok_or(HyperEncoderError::CorruptArtifact("weight range"))?;
+            cursor = end;
+            Ok(result)
+        };
+        let view = HyperEncoderWeightView {
+            node_embeddings: take(counts[0])?,
+            direction_weights: take(counts[1])?,
+            relation_embeddings: take(counts[2])?,
+            relation_projection: take(counts[3])?,
+            qualifier_projection: take(counts[4])?,
+            decoder_bias: take(counts[5])?,
+        };
+        if cursor != values.len() {
+            return Err(HyperEncoderError::CorruptArtifact("weight range"));
+        }
+        Ok(view)
     }
 }
 

@@ -15,6 +15,8 @@ mod frozen_model_model;
 mod hyper_encoder;
 mod hyper_encoder_artifact;
 mod hyper_encoder_model;
+mod hyper_encoder_null_artifact;
+mod hyper_encoder_null_model;
 mod hyper_relational_artifact;
 mod hyper_relational_binary;
 mod hyper_relational_build;
@@ -67,11 +69,14 @@ pub use frozen_model_model::*;
 pub use hyper_encoder::*;
 pub use hyper_encoder_artifact::*;
 pub use hyper_encoder_model::*;
+pub use hyper_encoder_null_artifact::*;
+pub use hyper_encoder_null_model::*;
 pub use hyper_relational_artifact::HyperRelationalTaskMapped;
 pub use hyper_relational_build::build_canonical_hyper_relational_task;
 pub use hyper_relational_eval::{
     create_hyper_relational_test_lock, evaluate_hyper_relational_validation_batched,
-    evaluate_locked_hyper_relational_test_batched, DEFAULT_HYPER_RELATIONAL_QUERY_BATCH,
+    evaluate_locked_hyper_relational_test_batched, profile_hyper_relational_validation_batched,
+    DEFAULT_HYPER_RELATIONAL_QUERY_BATCH,
 };
 pub use hyper_relational_model::*;
 pub use link_prediction_artifact::LinkPredictionTaskMapped;

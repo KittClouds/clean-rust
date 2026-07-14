@@ -77,6 +77,29 @@ pub struct HyperEncoderWeights {
     pub decoder_bias: Vec<f32>,
 }
 
+#[derive(Clone, Copy, Debug)]
+pub struct HyperEncoderWeightView<'a> {
+    pub node_embeddings: &'a [f32],
+    pub direction_weights: &'a [f32],
+    pub relation_embeddings: &'a [f32],
+    pub relation_projection: &'a [f32],
+    pub qualifier_projection: &'a [f32],
+    pub decoder_bias: &'a [f32],
+}
+
+impl<'a> From<&'a HyperEncoderWeights> for HyperEncoderWeightView<'a> {
+    fn from(weights: &'a HyperEncoderWeights) -> Self {
+        Self {
+            node_embeddings: &weights.node_embeddings,
+            direction_weights: &weights.direction_weights,
+            relation_embeddings: &weights.relation_embeddings,
+            relation_projection: &weights.relation_projection,
+            qualifier_projection: &weights.qualifier_projection,
+            decoder_bias: &weights.decoder_bias,
+        }
+    }
+}
+
 #[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct HyperEncoderTrainingConfig {

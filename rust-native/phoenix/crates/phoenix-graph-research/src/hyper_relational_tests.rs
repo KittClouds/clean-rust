@@ -2,11 +2,15 @@ use crate::hyper_relational_binary::{
     Header, HyperLeU32, HyperQualifierContextRecord, HyperQueryRecord, HyperTruthGroupRecord,
 };
 use crate::{
-    build_canonical_hyper_relational_task, create_hyper_relational_test_lock,
-    evaluate_hyper_encoder_pair, evaluate_hyper_relational_validation_batched,
-    evaluate_locked_hyper_relational_test_batched, import_wd50k, stage_hyper_encoder,
-    ExternalDatasetMapped, HyperRelationalCandidatePolicy, HyperRelationalTaskError,
-    HyperRelationalTaskMapped, HyperRelationalTestLockInput,
+    build_canonical_hyper_relational_task, create_hyper_relational_test_lock, encode_hyper_encoder,
+    encode_role_scoped_qualifier_null, evaluate_hyper_encoder_pair,
+    evaluate_hyper_relational_validation_batched, evaluate_locked_hyper_relational_test_batched,
+    import_wd50k, initialize_hyper_encoder_weights, profile_hyper_relational_validation_batched,
+    stage_hyper_encoder, ExternalDatasetMapped, HyperEncoderConfig, HyperEncoderError,
+    HyperEncoderModelPaths, HyperEncoderModelSnapshot, HyperEncoderTrainingConfig,
+    HyperEncoderTrainingReceipt, HyperEncoderWeightView, HyperRelationalCandidatePolicy,
+    HyperRelationalTaskError, HyperRelationalTaskMapped, HyperRelationalTestLockInput,
+    QualifierNullCompositionMapped, DEFAULT_HYPER_RELATIONAL_QUERY_BATCH,
 };
 use std::fs::OpenOptions;
 use std::io::{Seek, SeekFrom, Write};
@@ -97,6 +101,14 @@ fn exact_evaluator_certifies_both_candidate_policies_and_locks_test_once() {
         deterministic_scores,
     )
     .expect("full single");
+    let profiled = profile_hyper_relational_validation_batched(
+        &task,
+        "model-a",
+        HyperRelationalCandidatePolicy::FullEntity,
+        3,
+        deterministic_scores,
+    )
+    .expect("profiled");
     let role = evaluate_hyper_relational_validation_batched(
         &task,
         "model-a",
@@ -106,6 +118,9 @@ fn exact_evaluator_certifies_both_candidate_policies_and_locks_test_once() {
     )
     .expect("role");
     assert_eq!(full, full_single);
+    assert_eq!(full, profiled.certificate);
+    assert_eq!(profiled.ranks.len() as u64, full.metrics.queries);
+    assert!(profiled.ranks.iter().all(|rank| rank.doubled_rank >= 2));
     assert_eq!(full.score_blake3, role.score_blake3);
     assert_ne!(full.certificate_id, role.certificate_id);
     assert_eq!(full.metrics.queries, task.manifest().validation_queries);
@@ -287,6 +302,27 @@ fn stare_collapses_bit_exactly_without_train_or_validation_qualifiers() {
         build_canonical_hyper_relational_task(&source, root.path().join("task")).expect("task");
     let task = HyperRelationalTaskMapped::open(paths.manifest, &source).expect("task open");
     let staged = stage_hyper_encoder(&source, &task).expect("stage");
+    let weights = initialize_hyper_encoder_weights(&staged, 0x51a7_e001);
+    let control = encode_hyper_encoder(
+        &source,
+        &staged,
+        HyperEncoderConfig::compgcn(0x51a7_e001),
+        &weights,
+    )
+    .expect("control");
+    let routed = encode_role_scoped_qualifier_null(
+        &source,
+        &staged,
+        HyperEncoderConfig::stare(0x51a7_e001),
+        (&weights).into(),
+        (&weights).into(),
+        "qualifier-free-null",
+    )
+    .expect("routed null");
+    let control_score = score_encoded(&source, &task, &control);
+    let routed_score = score_encoded(&source, &task, &routed);
+    assert_eq!(control_score.score_blake3, routed_score.score_blake3);
+    assert_eq!(control_score.metrics, routed_score.metrics);
     let pair = evaluate_hyper_encoder_pair(
         &source,
         &task,
@@ -297,6 +333,245 @@ fn stare_collapses_bit_exactly_without_train_or_validation_qualifiers() {
     .expect("pair");
     assert_eq!(pair.compgcn.score_blake3, pair.stare.score_blake3);
     assert_eq!(pair.compgcn.metrics, pair.stare.metrics);
+}
+
+#[test]
+fn role_scoped_null_routes_same_ids_without_cross_channel_contamination() {
+    let root = tempfile::tempdir().expect("root");
+    write_overlap_wd50k(root.path());
+    let source_paths = import_wd50k(root.path(), root.path().join("source")).expect("source");
+    let source = ExternalDatasetMapped::open(source_paths.manifest).expect("source open");
+    let task_paths =
+        build_canonical_hyper_relational_task(&source, root.path().join("task")).expect("task");
+    let task = HyperRelationalTaskMapped::open(task_paths.manifest, &source).expect("task open");
+    let staged = stage_hyper_encoder(&source, &task).expect("stage");
+    let base = initialize_hyper_encoder_weights(&staged, 0x0dd5_eed1);
+    let score = |backbone: &crate::HyperEncoderWeights,
+                 qualifier: &crate::HyperEncoderWeights,
+                 id: &str| {
+        let encoded = encode_role_scoped_qualifier_null(
+            &source,
+            &staged,
+            HyperEncoderConfig::stare(0x0dd5_eed1),
+            HyperEncoderWeightView::from(backbone),
+            HyperEncoderWeightView::from(qualifier),
+            id,
+        )
+        .expect("routed encode");
+        score_encoded(&source, &task, &encoded).score_blake3
+    };
+    let baseline = score(&base, &base, "baseline");
+
+    let mut irrelevant_backbone = base.clone();
+    irrelevant_backbone.qualifier_projection.fill(19.0);
+    assert_eq!(baseline, score(&irrelevant_backbone, &base, "backbone-q"));
+    let mut irrelevant_checkpoint = base.clone();
+    irrelevant_checkpoint.direction_weights.fill(17.0);
+    irrelevant_checkpoint.relation_projection.fill(13.0);
+    irrelevant_checkpoint.decoder_bias.fill(11.0);
+    assert_eq!(baseline, score(&base, &irrelevant_checkpoint, "q-backbone"));
+
+    let facts = source.facts().expect("facts");
+    let qualifiers = source.qualifiers().expect("qualifiers");
+    let overlap = facts
+        .iter()
+        .copied()
+        .find(|fact| fact.split() == crate::ExternalFactSplit::Validation as u8)
+        .expect("validation overlap");
+    let qualifier = qualifiers[overlap.qualifier_offset() as usize];
+    assert_eq!(overlap.subject(), qualifier.object());
+    assert_eq!(overlap.predicate(), qualifier.predicate());
+
+    let mutate_row = |values: &mut [f32], row: u32| {
+        for value in &mut values[row as usize * 16..(row as usize + 1) * 16] {
+            *value += 4.0;
+        }
+    };
+    let mut primary_entity = base.clone();
+    mutate_row(&mut primary_entity.node_embeddings, overlap.subject());
+    assert_ne!(baseline, score(&primary_entity, &base, "primary-entity"));
+    let mut qualifier_value = base.clone();
+    mutate_row(&mut qualifier_value.node_embeddings, qualifier.object());
+    assert_ne!(baseline, score(&base, &qualifier_value, "qualifier-value"));
+    let mut primary_relation = base.clone();
+    mutate_row(
+        &mut primary_relation.relation_embeddings,
+        overlap.predicate(),
+    );
+    assert_ne!(
+        baseline,
+        score(&primary_relation, &base, "primary-relation")
+    );
+    let mut qualifier_role = base.clone();
+    mutate_row(
+        &mut qualifier_role.relation_embeddings,
+        qualifier.predicate(),
+    );
+    assert_ne!(baseline, score(&base, &qualifier_role, "qualifier-role"));
+}
+
+#[test]
+fn null_composition_is_two_parent_immutable_routed_and_corruption_closed() {
+    let root = tempfile::tempdir().expect("root");
+    write_overlap_wd50k(root.path());
+    let source_paths = import_wd50k(root.path(), root.path().join("source")).expect("source");
+    let source = ExternalDatasetMapped::open(source_paths.manifest).expect("source open");
+    let task_paths =
+        build_canonical_hyper_relational_task(&source, root.path().join("task")).expect("task");
+    let task = HyperRelationalTaskMapped::open(task_paths.manifest, &source).expect("task open");
+    let staged = stage_hyper_encoder(&source, &task).expect("stage");
+    let initial = initialize_hyper_encoder_weights(&staged, 0xc0de_0011);
+    let artifacts = root.path().join("artifacts");
+    let mut trained = initial.clone();
+    trained.node_embeddings[0] += 0.25;
+    let backbone = write_model_fixture(
+        &source,
+        &task,
+        &staged,
+        HyperEncoderConfig::compgcn(0xc0de_0011),
+        trained,
+        1,
+        artifacts.join("backbone"),
+    );
+    let checkpoint = write_model_fixture(
+        &source,
+        &task,
+        &staged,
+        HyperEncoderConfig::stare(0xc0de_0011),
+        initial,
+        0,
+        artifacts.join("checkpoint-zero"),
+    );
+    let optimizer_identity = format!("b3-{}", blake3::hash(b"optimizer-v1").to_hex());
+    let composition = crate::write_qualifier_null_composition(
+        &backbone.manifest,
+        &checkpoint.manifest,
+        optimizer_identity,
+        1,
+        &artifacts,
+    )
+    .expect("write composition");
+    let mapped = QualifierNullCompositionMapped::open(&composition.manifest).expect("open");
+    assert_eq!(mapped.manifest().redundant_weight_bytes, 0);
+    let receipt = mapped.routing_receipt(&source, &staged).expect("routing");
+    assert!(receipt.same_id_dual_role_entities > 0);
+    assert!(receipt.same_id_dual_role_relations > 0);
+    assert_eq!(
+        receipt,
+        mapped.routing_receipt(&source, &staged).expect("reroute")
+    );
+    let encoded = mapped.encode(&source, &staged).expect("encode");
+    let certificate = score_encoded(&source, &task, &encoded);
+    assert_eq!(certificate.model_id, mapped.manifest().composition_id);
+    drop(encoded);
+    drop(mapped);
+
+    let checkpoint_byte = flip_weight_byte(&checkpoint.weights);
+    assert!(matches!(
+        QualifierNullCompositionMapped::open(&composition.manifest),
+        Err(HyperEncoderError::CorruptArtifact("weight identity"))
+    ));
+    restore_weight_byte(&checkpoint.weights, checkpoint_byte);
+    let backbone_byte = flip_weight_byte(&backbone.weights);
+    assert!(matches!(
+        QualifierNullCompositionMapped::open(&composition.manifest),
+        Err(HyperEncoderError::CorruptArtifact("weight identity"))
+    ));
+    restore_weight_byte(&backbone.weights, backbone_byte);
+    QualifierNullCompositionMapped::open(&composition.manifest).expect("restored parents");
+}
+
+fn write_model_fixture(
+    source: &ExternalDatasetMapped,
+    task: &HyperRelationalTaskMapped,
+    staged: &crate::HyperEncoderStagedInput,
+    config: HyperEncoderConfig,
+    weights: crate::HyperEncoderWeights,
+    optimizer_steps: u64,
+    root: std::path::PathBuf,
+) -> HyperEncoderModelPaths {
+    let encoded = encode_hyper_encoder(source, staged, config, &weights).expect("fixture encode");
+    let validation = score_encoded(source, task, &encoded);
+    let digest = |label: &[u8]| format!("b3-{}", blake3::hash(label).to_hex()).into();
+    crate::write_hyper_encoder_model(
+        &HyperEncoderModelSnapshot {
+            pair_id: "fixture-pair".into(),
+            source_dataset_id: staged.source_dataset_id.clone(),
+            source_binary_blake3: staged.source_binary_blake3.clone(),
+            task_id: staged.task_id.clone(),
+            task_binary_blake3: staged.task_binary_blake3.clone(),
+            candidate_universe: staged.candidate_universe,
+            base_relation_count: staged.base_relation_count,
+            config,
+            training_config: HyperEncoderTrainingConfig {
+                epochs: 1,
+                learning_rate: 0.01,
+                l2: 0.0,
+                negatives_per_positive: 1,
+            },
+            training: HyperEncoderTrainingReceipt {
+                trainer_id: "fixture-trainer".into(),
+                initialization_blake3: digest(b"initialization"),
+                train_topology_blake3: staged.profile.train_topology_blake3.clone(),
+                example_schedule_blake3: digest(b"schedule"),
+                train_statements: staged.profile.train_statements,
+                directed_messages: staged.profile.directed_messages,
+                training_examples: 2,
+                optimizer_steps,
+                optimizer_state_blake3: digest(b"optimizer-state"),
+                gradient_arena_bytes: 0,
+                epoch_allocation_bytes: 0,
+                epoch_allocation_count: 0,
+                test_locked_during_training: true,
+            },
+            validation,
+            weights,
+        },
+        root,
+    )
+    .expect("write fixture model")
+}
+
+fn flip_weight_byte(path: &Path) -> u8 {
+    let mut file = OpenOptions::new()
+        .read(true)
+        .write(true)
+        .open(path)
+        .expect("open weight");
+    file.seek(SeekFrom::Start(40)).expect("seek");
+    let mut byte = [0_u8; 1];
+    std::io::Read::read_exact(&mut file, &mut byte).expect("read");
+    file.seek(SeekFrom::Start(40)).expect("seek");
+    file.write_all(&[byte[0] ^ 0xff]).expect("flip");
+    file.sync_all().expect("sync");
+    byte[0]
+}
+
+fn restore_weight_byte(path: &Path, byte: u8) {
+    let mut file = OpenOptions::new()
+        .write(true)
+        .open(path)
+        .expect("open weight");
+    file.seek(SeekFrom::Start(40)).expect("seek");
+    file.write_all(&[byte]).expect("restore");
+    file.sync_all().expect("sync");
+}
+
+fn score_encoded(
+    source: &ExternalDatasetMapped,
+    task: &HyperRelationalTaskMapped,
+    encoded: &crate::HyperEncoderEncoded<'_>,
+) -> crate::HyperRelationalScoreCertificate {
+    evaluate_hyper_relational_validation_batched(
+        task,
+        encoded.model_id(),
+        HyperRelationalCandidatePolicy::FullEntity,
+        DEFAULT_HYPER_RELATIONAL_QUERY_BATCH,
+        |queries, candidates, scores| {
+            encoded.score_candidate_batch(source, queries, candidates, scores)
+        },
+    )
+    .expect("score")
 }
 
 fn deterministic_scores(
@@ -348,6 +623,17 @@ fn write_wd50k_variant(root: &Path) {
         &root.join("statements").join("test.txt"),
         b"Q7,P3,Q10\nQ1,P1,Q2,PQ2,Q4,PQ,Q3\n",
     );
+}
+
+fn write_overlap_wd50k(root: &Path) {
+    let statements = root.join("statements");
+    std::fs::create_dir_all(&statements).expect("statements");
+    write(
+        &statements.join("train.txt"),
+        b"Q1,P1,Q2,P1,Q1\nQ2,P2,Q3,P2,Q2\n",
+    );
+    write(&statements.join("valid.txt"), b"Q1,P1,Q3,P1,Q1\n");
+    write(&statements.join("test.txt"), b"Q3,P2,Q1,P2,Q3\n");
 }
 
 fn write(path: &Path, bytes: &[u8]) {

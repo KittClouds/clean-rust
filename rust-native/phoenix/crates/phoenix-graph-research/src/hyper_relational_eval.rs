@@ -1,11 +1,12 @@
 use crate::hyper_relational_binary::{HyperLeU32, HyperQueryRecord};
 use crate::{
-    HyperRelationalCandidatePolicy, HyperRelationalMetricSlice, HyperRelationalQueryView,
-    HyperRelationalRankingMetrics, HyperRelationalScoreCertificate, HyperRelationalTaskError,
-    HyperRelationalTaskMapped, HyperRelationalTestLock, HyperRelationalTestLockInput,
-    HyperRelationalTestLockPaths, HyperRelationalTestResultPaths, LinkPredictionSplit,
-    ENTITY_ROLE_OBJECT, ENTITY_ROLE_PRIMARY, ENTITY_ROLE_QUALIFIER, ENTITY_ROLE_SUBJECT,
-    HYPER_RELATIONAL_SCORE_SCHEMA, HYPER_RELATIONAL_TEST_LOCK_SCHEMA,
+    HyperRelationalCandidatePolicy, HyperRelationalMetricSlice, HyperRelationalQueryRank,
+    HyperRelationalQueryView, HyperRelationalRankingMetrics, HyperRelationalScoreCertificate,
+    HyperRelationalTaskError, HyperRelationalTaskMapped, HyperRelationalTestLock,
+    HyperRelationalTestLockInput, HyperRelationalTestLockPaths, HyperRelationalTestResultPaths,
+    LinkPredictionSplit, ProfiledHyperRelationalEvaluation, ENTITY_ROLE_OBJECT,
+    ENTITY_ROLE_PRIMARY, ENTITY_ROLE_QUALIFIER, ENTITY_ROLE_SUBJECT, HYPER_RELATIONAL_SCORE_SCHEMA,
+    HYPER_RELATIONAL_TEST_LOCK_SCHEMA,
 };
 use std::fs::OpenOptions;
 use std::io::Write;
@@ -62,6 +63,27 @@ pub fn evaluate_hyper_relational_validation_batched<F>(
     batch_size: usize,
     scorer: F,
 ) -> Result<HyperRelationalScoreCertificate, HyperRelationalTaskError>
+where
+    F: FnMut(&[HyperRelationalQueryView], &[u32], &mut [f32]) -> Result<(), String>,
+{
+    Ok(evaluate_split_batched(
+        task,
+        model_id,
+        LinkPredictionSplit::Validation,
+        candidate_policy,
+        batch_size,
+        scorer,
+    )?
+    .certificate)
+}
+
+pub fn profile_hyper_relational_validation_batched<F>(
+    task: &HyperRelationalTaskMapped,
+    model_id: &str,
+    candidate_policy: HyperRelationalCandidatePolicy,
+    batch_size: usize,
+    scorer: F,
+) -> Result<ProfiledHyperRelationalEvaluation, HyperRelationalTaskError>
 where
     F: FnMut(&[HyperRelationalQueryView], &[u32], &mut [f32]) -> Result<(), String>,
 {
@@ -125,7 +147,8 @@ where
         lock.candidate_policy,
         batch_size,
         scorer,
-    )?;
+    )?
+    .certificate;
     let certificate_path = root.join(format!("{}.test-score.json", certificate.certificate_id));
     write_new_durable(&certificate_path, &serde_json::to_vec_pretty(&certificate)?)?;
     Ok(HyperRelationalTestResultPaths {
@@ -141,7 +164,7 @@ fn evaluate_split_batched<F>(
     candidate_policy: HyperRelationalCandidatePolicy,
     batch_size: usize,
     mut scorer: F,
-) -> Result<HyperRelationalScoreCertificate, HyperRelationalTaskError>
+) -> Result<ProfiledHyperRelationalEvaluation, HyperRelationalTaskError>
 where
     F: FnMut(&[HyperRelationalQueryView], &[u32], &mut [f32]) -> Result<(), String>,
 {
@@ -175,6 +198,7 @@ where
     let mut relation =
         vec![MetricAccumulator::default(); task.manifest().base_relation_count as usize];
     let mut provenance = [MetricAccumulator::default(); 3];
+    let mut ranks = Vec::with_capacity(queries.len());
 
     for records in queries.chunks(batch_size) {
         views.clear();
@@ -217,7 +241,7 @@ where
                 .get(start..end)
                 .ok_or(HyperRelationalTaskError::CorruptArtifact("truth range"))?;
             let target_role = target_role(record, task.manifest().base_relation_count);
-            let rank = filtered_rank(
+            let doubled_rank = filtered_rank(
                 row,
                 filtered,
                 record.target(),
@@ -225,6 +249,15 @@ where
                 target_role,
                 entity_roles,
             )?;
+            let rank = doubled_rank as f64 * 0.5;
+            ranks.push(HyperRelationalQueryRank {
+                statement_id: record.statement_id(),
+                source: record.source(),
+                target: record.target(),
+                relation: record.relation(),
+                qualifier_count: record.qualifier_count(),
+                doubled_rank,
+            });
             let eligible = match candidate_policy {
                 HyperRelationalCandidatePolicy::FullEntity => candidate_count as u64,
                 HyperRelationalCandidatePolicy::PrimaryRole
@@ -250,7 +283,7 @@ where
             provenance[provenance_index].push(rank, eligible);
         }
     }
-    certificate(
+    let certificate = certificate(
         task,
         model_id,
         split,
@@ -263,7 +296,8 @@ where
             relation,
             provenance,
         },
-    )
+    )?;
+    Ok(ProfiledHyperRelationalEvaluation { certificate, ranks })
 }
 
 fn filtered_rank(
@@ -273,7 +307,7 @@ fn filtered_rank(
     policy: HyperRelationalCandidatePolicy,
     target_role: u8,
     entity_roles: &[u8],
-) -> Result<f64, HyperRelationalTaskError> {
+) -> Result<u64, HyperRelationalTaskError> {
     let positive = *scores
         .get(target as usize)
         .ok_or(HyperRelationalTaskError::CorruptArtifact("positive"))?;
@@ -311,7 +345,7 @@ fn filtered_rank(
             pessimistic -= u64::from(score >= positive);
         }
     }
-    Ok(0.5 * (optimistic + pessimistic) as f64 + 1.0)
+    Ok(optimistic + pessimistic + 2)
 }
 
 fn query_view(

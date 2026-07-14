@@ -18,6 +18,9 @@ pub struct GradientBlockEconomics {
 #[serde(rename_all = "camelCase")]
 pub struct HyperEpochEconomics {
     pub mean_binary_cross_entropy: f64,
+    pub clip_coefficient: f32,
+    pub clip_activated: bool,
+    pub clip_activation_rate: f64,
     pub entity_embeddings: GradientBlockEconomics,
     pub relation_embeddings: GradientBlockEconomics,
     pub relation_projection: GradientBlockEconomics,
@@ -57,6 +60,13 @@ pub enum HyperGradientClipPolicy {
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
+pub enum LossScaleSemantics {
+    UnscaleBeforeClip,
+    ClipScaledGradient,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub enum QualifiedSamplingPolicy {
     Natural,
 }
@@ -70,6 +80,7 @@ pub struct HyperOptimizerConfig {
     pub batch_size: u32,
     pub gradient_accumulation_steps: u32,
     pub global_loss_scale: f32,
+    pub loss_scale_semantics: LossScaleSemantics,
     pub gradient_clip_policy: HyperGradientClipPolicy,
     pub gradient_clip_norm: f32,
     pub weight_decay: f32,
@@ -86,6 +97,7 @@ impl HyperOptimizerConfig {
             batch_size: examples as u32,
             gradient_accumulation_steps: 1,
             global_loss_scale: 1.0,
+            loss_scale_semantics: LossScaleSemantics::ClipScaledGradient,
             gradient_clip_policy: HyperGradientClipPolicy::None,
             gradient_clip_norm: 0.0,
             weight_decay: config.l2,
@@ -102,6 +114,7 @@ impl HyperOptimizerConfig {
             batch_size: examples as u32,
             gradient_accumulation_steps: 1,
             global_loss_scale: 1.0,
+            loss_scale_semantics: LossScaleSemantics::ClipScaledGradient,
             gradient_clip_policy: HyperGradientClipPolicy::None,
             gradient_clip_norm: 0.0,
             weight_decay: 0.0,
@@ -118,6 +131,7 @@ impl HyperOptimizerConfig {
             batch_size,
             gradient_accumulation_steps: 1,
             global_loss_scale: 1.0,
+            loss_scale_semantics: LossScaleSemantics::ClipScaledGradient,
             gradient_clip_policy: HyperGradientClipPolicy::None,
             gradient_clip_norm: 0.0,
             weight_decay: 0.0,
@@ -167,5 +181,12 @@ impl HyperOptimizerConfig {
             HyperLossReduction::Sum => 1.0,
         };
         reduction * self.global_loss_scale
+    }
+
+    pub(crate) fn gradient_unscale(self) -> f32 {
+        match self.loss_scale_semantics {
+            LossScaleSemantics::UnscaleBeforeClip => self.global_loss_scale.recip(),
+            LossScaleSemantics::ClipScaledGradient => 1.0,
+        }
     }
 }

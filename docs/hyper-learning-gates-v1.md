@@ -35,4 +35,27 @@ The launch condition is conjunctive: all three fixtures, immutable receipt repla
 
 ## Real-data boundary
 
-The synthetic fixtures deliberately keep qualifier-only IDs out of primary-triple roles, so the CompGCN checkpoint cannot alter their shared embedding rows. WD50K may reuse an entity or relation in both primary and qualifier roles. Before the real optimization envelope is allowed to run, the evaluator must audit that overlap and provide a separate checkpoint-zero qualifier read view whenever overlap is nonzero. Restoring shared rows in the CompGCN backbone would violate the counterfactual; silently using trained shared rows would violate the checkpoint-zero qualifier source.
+The overlap boundary is now closed by `phoenix-role-scoped-qualifier-null-composition/v1`. The null evaluator owns two independently verified mmap artifacts and routes reads by semantic role:
+
+- primary entity, primary relation, shared transforms, direction matrices, and decoder bias read the trained CompGCN checkpoint;
+- qualifier value, qualifier role, and qualifier projection read the checkpoint-zero StarE snapshot;
+- one numeric entity or relation ID may be read from both parents during the same statement without restoring or copying shared rows;
+- the composition manifest references both immutable parents and writes zero redundant weight bytes;
+- a deterministic routing receipt binds every `(parameter class, semantic role, ID, source model)` tuple used by the audit surface.
+
+The correctness fixture uses the same entity and relation IDs in primary and qualifier positions inside one statement. Mutating either source changes only its semantic channel. Qualifier-free routed scoring collapses bit-for-bit to CompGCN. Corruption of either parent fails before scoring. The WD50K optimization envelope is therefore unlocked at the evaluator boundary; no real WD50K envelope run was executed by this cut.
+
+## Loss-scale identity
+
+`LossScaleSemantics` is now a frozen optimizer identity axis:
+
+- `UnscaleBeforeClip` treats the global scale as a numerical device and removes it before norm measurement, clipping, and update.
+- `ClipScaledGradient` preserves the historical wake-up algorithm in which clipping observes the scaled gradient.
+
+Every checkpoint economics receipt includes the final clip coefficient, final-step activation flag, and aggregate clip activation rate across optimizer steps. Power-of-two scaling under `UnscaleBeforeClip` reproduces the unscaled weights and optimizer digest bit-for-bit.
+
+## Verification
+
+- Phoenix graph research library: 56 passed.
+- Candle baseline trainer: 15 passed across unit and integration suites.
+- Historical functional learning gates remain deterministic, restart exact, and passing.

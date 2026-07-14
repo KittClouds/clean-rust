@@ -165,6 +165,24 @@ pub struct HyperRelationalRankingMetrics {
     pub candidates_scored: u64,
 }
 
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct HyperRelationalQueryRank {
+    pub statement_id: u32,
+    pub source: u32,
+    pub target: u32,
+    pub relation: u32,
+    pub qualifier_count: u32,
+    pub doubled_rank: u64,
+}
+
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ProfiledHyperRelationalEvaluation {
+    pub certificate: HyperRelationalScoreCertificate,
+    pub ranks: Vec<HyperRelationalQueryRank>,
+}
+
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct HyperRelationalMetricSlice {

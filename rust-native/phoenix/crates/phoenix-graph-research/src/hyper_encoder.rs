@@ -2,13 +2,14 @@ use crate::external_dataset_artifact::ExternalQualifierRecord;
 use crate::{
     evaluate_hyper_relational_validation_batched, ExternalDatasetKind, ExternalDatasetMapped,
     ExternalFactSplit, HyperEncoderConfig, HyperEncoderError, HyperEncoderMode,
-    HyperEncoderPairResult, HyperEncoderStagingProfile, HyperEncoderWeights,
-    HyperRelationalCandidatePolicy, HyperRelationalQueryView, HyperRelationalTaskMapped,
-    DEFAULT_HYPER_RELATIONAL_QUERY_BATCH, HYPER_ENCODER_DIRECTIONS, HYPER_ENCODER_HIDDEN,
-    HYPER_ENCODER_SCHEMA,
+    HyperEncoderPairResult, HyperEncoderStagingProfile, HyperEncoderWeightView,
+    HyperEncoderWeights, HyperRelationalCandidatePolicy, HyperRelationalQueryView,
+    HyperRelationalTaskMapped, DEFAULT_HYPER_RELATIONAL_QUERY_BATCH, HYPER_ENCODER_DIRECTIONS,
+    HYPER_ENCODER_HIDDEN, HYPER_ENCODER_SCHEMA,
 };
 use compact_str::CompactString;
 use hashbrown::HashMap;
+use std::borrow::Cow;
 use std::time::Instant;
 use wide::f32x8;
 
@@ -38,7 +39,7 @@ pub struct HyperEncoderStagedInput {
     pub base_relation_count: u32,
 }
 
-pub struct HyperEncoderEncoded {
+pub struct HyperEncoderEncoded<'a> {
     model_id: CompactString,
     task_id: CompactString,
     mode: HyperEncoderMode,
@@ -46,10 +47,10 @@ pub struct HyperEncoderEncoded {
     candidate_planes: Vec<f32>,
     candidate_stride: usize,
     relation_states: Vec<[f32; HIDDEN]>,
-    node_embeddings: Vec<f32>,
-    relation_embeddings: Vec<f32>,
-    qualifier_projection: Vec<f32>,
-    decoder_bias: Vec<f32>,
+    node_embeddings: Cow<'a, [f32]>,
+    relation_embeddings: Cow<'a, [f32]>,
+    qualifier_projection: Cow<'a, [f32]>,
+    decoder_bias: Cow<'a, [f32]>,
     canonical_qualifier_refs: Vec<u32>,
 }
 
@@ -201,6 +202,24 @@ pub fn hyper_encoder_model_identity_from_authority(
     config: HyperEncoderConfig,
     weights: &HyperEncoderWeights,
 ) -> Result<CompactString, HyperEncoderError> {
+    hyper_encoder_model_identity_from_view(
+        source_dataset_id,
+        source_binary_blake3,
+        task_id,
+        task_binary_blake3,
+        config,
+        weights.into(),
+    )
+}
+
+pub fn hyper_encoder_model_identity_from_view(
+    source_dataset_id: &str,
+    source_binary_blake3: &str,
+    task_id: &str,
+    task_binary_blake3: &str,
+    config: HyperEncoderConfig,
+    weights: HyperEncoderWeightView<'_>,
+) -> Result<CompactString, HyperEncoderError> {
     let mut hasher = blake3::Hasher::new();
     hasher.update(HYPER_ENCODER_SCHEMA.as_bytes());
     hasher.update(source_dataset_id.as_bytes());
@@ -209,12 +228,12 @@ pub fn hyper_encoder_model_identity_from_authority(
     hasher.update(task_binary_blake3.as_bytes());
     hasher.update(&serde_json::to_vec(&config)?);
     for tensor in [
-        &weights.node_embeddings,
-        &weights.direction_weights,
-        &weights.relation_embeddings,
-        &weights.relation_projection,
-        &weights.qualifier_projection,
-        &weights.decoder_bias,
+        weights.node_embeddings,
+        weights.direction_weights,
+        weights.relation_embeddings,
+        weights.relation_projection,
+        weights.qualifier_projection,
+        weights.decoder_bias,
     ] {
         for value in tensor {
             hasher.update(&value.to_bits().to_le_bytes());
@@ -228,35 +247,86 @@ pub fn encode_hyper_encoder(
     staged: &HyperEncoderStagedInput,
     config: HyperEncoderConfig,
     weights: &HyperEncoderWeights,
-) -> Result<HyperEncoderEncoded, HyperEncoderError> {
-    validate_weights(staged, weights)?;
+) -> Result<HyperEncoderEncoded<'static>, HyperEncoderError> {
+    let model_id = hyper_encoder_model_identity(staged, config, weights)?;
+    encode_hyper_encoder_views(
+        source,
+        staged,
+        config,
+        weights.into(),
+        weights.into(),
+        model_id,
+        Cow::Owned(weights.node_embeddings.clone()),
+        Cow::Owned(weights.relation_embeddings.clone()),
+        Cow::Owned(weights.qualifier_projection.clone()),
+        Cow::Owned(weights.decoder_bias.clone()),
+    )
+}
+
+pub fn encode_role_scoped_qualifier_null<'a>(
+    source: &ExternalDatasetMapped,
+    staged: &HyperEncoderStagedInput,
+    config: HyperEncoderConfig,
+    trained_backbone: HyperEncoderWeightView<'a>,
+    checkpoint_zero: HyperEncoderWeightView<'a>,
+    composition_id: impl Into<CompactString>,
+) -> Result<HyperEncoderEncoded<'a>, HyperEncoderError> {
+    if config.mode != HyperEncoderMode::StareQualifiers {
+        return Err(HyperEncoderError::InvalidContract(
+            "qualifier null evaluation surface",
+        ));
+    }
+    encode_hyper_encoder_views(
+        source,
+        staged,
+        config,
+        trained_backbone,
+        checkpoint_zero,
+        composition_id.into(),
+        Cow::Borrowed(checkpoint_zero.node_embeddings),
+        Cow::Borrowed(checkpoint_zero.relation_embeddings),
+        Cow::Borrowed(checkpoint_zero.qualifier_projection),
+        Cow::Borrowed(trained_backbone.decoder_bias),
+    )
+}
+
+#[allow(clippy::too_many_arguments)]
+fn encode_hyper_encoder_views<'a>(
+    source: &ExternalDatasetMapped,
+    staged: &HyperEncoderStagedInput,
+    config: HyperEncoderConfig,
+    weights: HyperEncoderWeightView<'_>,
+    qualifier_weights: HyperEncoderWeightView<'_>,
+    model_id: CompactString,
+    node_embeddings: Cow<'a, [f32]>,
+    relation_embeddings: Cow<'a, [f32]>,
+    qualifier_projection: Cow<'a, [f32]>,
+    decoder_bias: Cow<'a, [f32]>,
+) -> Result<HyperEncoderEncoded<'a>, HyperEncoderError> {
+    validate_weight_view(staged, weights)?;
+    validate_weight_view(staged, qualifier_weights)?;
     let qualifiers = source.qualifiers()?;
     let nodes_len = staged.candidate_universe as usize;
     let relations = staged.relation_batches.len();
     let mut nodes = vec![[0.0; HIDDEN]; nodes_len];
     let mut composed = [0.0; HIDDEN];
-    let self_relation = row(&weights.relation_embeddings, relations);
+    let self_relation = row(weights.relation_embeddings, relations);
     for (node, output) in nodes.iter_mut().enumerate() {
         multiply(
             &mut composed,
-            row(&weights.node_embeddings, node),
+            row(weights.node_embeddings, node),
             self_relation,
         );
-        transform_add(
-            output,
-            &composed,
-            matrix(&weights.direction_weights, 2),
-            1.0,
-        );
+        transform_add(output, &composed, matrix(weights.direction_weights, 2), 1.0);
     }
     for (relation, batch) in staged.relation_batches.iter().enumerate() {
         let direction = usize::from(relation >= staged.base_relation_count as usize);
         for edge in 0..batch.sources.len() {
-            let mut merged = copy_row(&weights.relation_embeddings, relation);
+            let mut merged = copy_row(weights.relation_embeddings, relation);
             if config.mode.uses_message_qualifiers() {
                 add_qualifier_state(
                     &mut merged,
-                    weights,
+                    qualifier_weights,
                     staged,
                     &qualifiers,
                     batch.qualifier_offsets[edge],
@@ -266,13 +336,13 @@ pub fn encode_hyper_encoder(
             }
             multiply(
                 &mut composed,
-                row(&weights.node_embeddings, batch.sources[edge] as usize),
+                row(weights.node_embeddings, batch.sources[edge] as usize),
                 &merged,
             );
             transform_add(
                 &mut nodes[batch.targets[edge] as usize],
                 &composed,
-                matrix(&weights.direction_weights, direction),
+                matrix(weights.direction_weights, direction),
                 batch.normalizers[edge],
             );
         }
@@ -287,8 +357,8 @@ pub fn encode_hyper_encoder(
             let mut output = [0.0; HIDDEN];
             transform_add(
                 &mut output,
-                row(&weights.relation_embeddings, relation),
-                &weights.relation_projection,
+                row(weights.relation_embeddings, relation),
+                weights.relation_projection,
                 1.0,
             );
             output
@@ -296,22 +366,22 @@ pub fn encode_hyper_encoder(
         .collect::<Vec<_>>();
     let (candidate_planes, candidate_stride) = transpose_candidates(&nodes);
     Ok(HyperEncoderEncoded {
-        model_id: hyper_encoder_model_identity(staged, config, weights)?,
+        model_id,
         task_id: staged.task_id.clone(),
         mode: config.mode,
         nodes,
         candidate_planes,
         candidate_stride,
         relation_states,
-        node_embeddings: weights.node_embeddings.clone(),
-        relation_embeddings: weights.relation_embeddings.clone(),
-        qualifier_projection: weights.qualifier_projection.clone(),
-        decoder_bias: weights.decoder_bias.clone(),
+        node_embeddings,
+        relation_embeddings,
+        qualifier_projection,
+        decoder_bias,
         canonical_qualifier_refs: qualifier_refs(staged, config.mode).to_vec(),
     })
 }
 
-impl HyperEncoderEncoded {
+impl HyperEncoderEncoded<'_> {
     pub fn model_id(&self) -> &str {
         self.model_id.as_str()
     }
@@ -364,6 +434,45 @@ impl HyperEncoderEncoded {
                 let valid = (candidates.len() - start).min(LANES);
                 output[start..start + valid].copy_from_slice(&block[..valid]);
             }
+        }
+        Ok(())
+    }
+
+    pub fn score_target_batch(
+        &self,
+        source: &ExternalDatasetMapped,
+        queries: &[HyperRelationalQueryView],
+        targets: &[u32],
+        scores: &mut [f32],
+    ) -> Result<(), String> {
+        if queries.len() != targets.len() || scores.len() != queries.len() {
+            return Err("hyper encoder target score shape".into());
+        }
+        let qualifiers = source.qualifiers().map_err(|error| error.to_string())?;
+        for ((query, &target), score) in queries.iter().zip(targets).zip(scores) {
+            if query.source as usize >= self.nodes.len()
+                || target as usize >= self.nodes.len()
+                || query.relation as usize >= self.relation_states.len()
+            {
+                return Err("hyper encoder target score bounds".into());
+            }
+            let mut relation = self.relation_states[query.relation as usize];
+            if self.mode.uses_query_qualifiers() {
+                self.add_query_qualifiers(
+                    &mut relation,
+                    &qualifiers,
+                    query.qualifier_offset,
+                    query.qualifier_count,
+                )?;
+            }
+            let mut features = [0.0; HIDDEN];
+            multiply(&mut features, &self.nodes[query.source as usize], &relation);
+            let target = &self.nodes[target as usize];
+            let mut value = 0.0_f32;
+            for feature in 0..HIDDEN {
+                value += features[feature] * target[feature];
+            }
+            *score = value + self.decoder_bias[query.relation as usize];
         }
         Ok(())
     }
@@ -451,7 +560,7 @@ pub fn evaluate_hyper_encoder_pair(
 
 fn add_qualifier_state(
     target: &mut [f32; HIDDEN],
-    weights: &HyperEncoderWeights,
+    weights: HyperEncoderWeightView<'_>,
     staged: &HyperEncoderStagedInput,
     qualifiers: &[ExternalQualifierRecord],
     offset: u32,
@@ -472,7 +581,7 @@ fn add_qualifier_state(
         }
     }
     let mut projected = [0.0; HIDDEN];
-    transform_add(&mut projected, &sum, &weights.qualifier_projection, 1.0);
+    transform_add(&mut projected, &sum, weights.qualifier_projection, 1.0);
     for feature in 0..HIDDEN {
         target[feature] += projected[feature];
     }
@@ -623,9 +732,9 @@ fn transpose_candidates(rows: &[[f32; HIDDEN]]) -> (Vec<f32>, usize) {
     }
     (planes, stride)
 }
-fn validate_weights(
+fn validate_weight_view(
     staged: &HyperEncoderStagedInput,
-    weights: &HyperEncoderWeights,
+    weights: HyperEncoderWeightView<'_>,
 ) -> Result<(), HyperEncoderError> {
     let nodes = staged.candidate_universe as usize;
     let relations = staged.relation_batches.len();

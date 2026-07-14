@@ -275,6 +275,7 @@ fn gate_training_config() -> HyperEncoderTrainingConfig {
 fn gate_optimizer(examples: usize) -> HyperOptimizerConfig {
     let mut optimizer = HyperOptimizerConfig::bounded_sum_no_decay(0.08, 2.min(examples) as u32);
     optimizer.global_loss_scale = 256.0;
+    optimizer.loss_scale_semantics = crate::LossScaleSemantics::ClipScaledGradient;
     optimizer.gradient_clip_policy = HyperGradientClipPolicy::GlobalNorm;
     optimizer.gradient_clip_norm = 1.0;
     optimizer

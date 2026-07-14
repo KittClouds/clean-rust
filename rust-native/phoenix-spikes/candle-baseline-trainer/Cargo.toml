@@ -58,3 +58,7 @@ path = "src/qualifier_matrix_main.rs"
 [[bin]]
 name = "hyper-learning-gates"
 path = "src/hyper_learning_gates_main.rs"
+
+[[bin]]
+name = "optimization-envelope-v1"
+path = "src/optimization_envelope_main.rs"
