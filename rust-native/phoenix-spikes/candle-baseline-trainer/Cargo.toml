@@ -9,10 +9,15 @@ blake3 = "1.8"
 candle-core = "=0.11.0"
 candle-nn = "=0.11.0"
 compact_str = { version = "0.8", features = ["serde"] }
+hashbrown = "0.14"
 phoenix-graph-research = { path = "../../phoenix/crates/phoenix-graph-research", default-features = false }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 thiserror = "2.0"
+wide = "0.7"
+
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "0.61", features = ["Win32_System_ProcessStatus", "Win32_System_Threading"] }
 
 [dev-dependencies]
 tempfile = "3.24"
@@ -25,3 +30,31 @@ panic = "abort"
 [[bin]]
 name = "candle-baseline-trainer"
 path = "src/main.rs"
+
+[[bin]]
+name = "candle-rgcn-trainer"
+path = "src/rgcn_main.rs"
+
+[[bin]]
+name = "candle-temporal-rgcn-trainer"
+path = "src/temporal_rgcn_main.rs"
+
+[[bin]]
+name = "temporal-rgcn-evaluator"
+path = "src/temporal_rgcn_evaluator_main.rs"
+
+[[bin]]
+name = "temporal-compgcn-trainer"
+path = "src/temporal_compgcn_main.rs"
+
+[[bin]]
+name = "paired-hyper-encoder-trainer"
+path = "src/hyper_encoder_main.rs"
+
+[[bin]]
+name = "qualifier-signal-matrix"
+path = "src/qualifier_matrix_main.rs"
+
+[[bin]]
+name = "hyper-learning-gates"
+path = "src/hyper_learning_gates_main.rs"

@@ -1,3 +1,31 @@
+mod hyper_encoder_examples;
+mod hyper_encoder_memory;
+mod hyper_encoder_trainer;
+mod hyper_learning_gate_artifact;
+mod hyper_learning_gate_context;
+mod hyper_learning_gate_metrics;
+mod hyper_learning_gate_receipt;
+mod hyper_learning_gates;
+mod hyper_optimizer;
+mod qualifier_matrix;
+mod rgcn;
+mod telemetry;
+mod temporal_compgcn;
+mod temporal_compgcn_memory;
+mod temporal_rgcn;
+mod temporal_rgcn_evaluator;
+mod temporal_rgcn_memory;
+
+pub use hyper_encoder_trainer::*;
+pub use hyper_learning_gate_receipt::open_hyper_learning_gates;
+pub use hyper_learning_gates::*;
+pub use hyper_optimizer::*;
+pub use qualifier_matrix::*;
+pub use rgcn::*;
+pub use temporal_compgcn::*;
+pub use temporal_rgcn::*;
+pub use temporal_rgcn_evaluator::*;
+
 use candle_core::{Device, Tensor, Var};
 use candle_nn::{Optimizer, SGD};
 use compact_str::{format_compact, CompactString};
@@ -9,13 +37,14 @@ use phoenix_graph_research::{
     FrozenModelPaths, FrozenModelRuntimeIdentity, FrozenModelSnapshot, FrozenModelSourceIdentity,
     FrozenModelTensor, FrozenOptimizerReceipt, FrozenTensorMapped, FrozenTrainingReceipt,
     RankingEvaluationError, RankingMetrics, ResearchEvaluationError, ResearchEvaluationProtocol,
-    ResearchSplit, SeedCertificate, TrainTopologyFeatureMapped, MODEL_HIDDEN_BIAS,
-    MODEL_HIDDEN_WEIGHT, MODEL_OUTPUT_BIAS, MODEL_OUTPUT_WEIGHT, RANKING_EVALUATION_SCHEMA,
-    RESEARCH_EVALUATION_SCHEMA,
+    ResearchSplit, RgcnResearchError, SeedCertificate, TrainTopologyFeatureMapped,
+    MODEL_HIDDEN_BIAS, MODEL_HIDDEN_WEIGHT, MODEL_OUTPUT_BIAS, MODEL_OUTPUT_WEIGHT,
+    RANKING_EVALUATION_SCHEMA, RESEARCH_EVALUATION_SCHEMA,
 };
 use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
 use std::time::Instant;
+use telemetry::{peak_working_set_bytes, AllocationSnapshot};
 
 pub const CANDLE_BASELINE_TRAINER_SCHEMA: &str = "phoenix-candle-baseline-trainer/v1";
 pub const CANDLE_BASELINE_TRAINER_ID: &str = "candle-mlp16/v1";
@@ -77,6 +106,8 @@ pub struct CandleTrainerReport {
     pub model_id: CompactString,
     pub weights_blake3: CompactString,
     pub weights_bytes: u64,
+    pub validation_score_blake3: CompactString,
+    pub validation_certificates_blake3: CompactString,
     pub selected_seed: u64,
     pub training_examples: u64,
     pub validation_examples: u64,
@@ -85,9 +116,19 @@ pub struct CandleTrainerReport {
     pub optimizer_steps: u64,
     pub training_micros: u64,
     pub candle_validation_micros: u64,
+    pub canonical_scoring_micros: u64,
     pub canonical_validation_micros: u64,
     pub artifact_write_micros: u64,
+    pub restart_open_micros: u64,
+    pub restart_scoring_micros: u64,
     pub restart_open_and_score_micros: u64,
+    pub allocation_volume_bytes: u64,
+    pub allocation_count: u64,
+    pub peak_working_set_bytes: u64,
+    pub source_mmap_bytes: u64,
+    pub restart_weight_mmap_bytes: u64,
+    pub mmap_bytes: u64,
+    pub dense_staging_bytes: u64,
     pub candle_max_abs_error: f32,
     pub restart_score_bits_exact: bool,
     pub validation_metrics: BinaryMetrics,
@@ -104,6 +145,15 @@ pub struct CandleTrainingOutcome {
 pub enum CandleTrainerError {
     #[error("trainer contract is invalid: {0}")]
     Contract(&'static str),
+    #[error(
+        "temporal CompGCN candidate did not beat control: candidate MRR {candidate_mrr}, control MRR {control_mrr}, score {score_blake3}, receipt {receipt}"
+    )]
+    TemporalCompgcnCandidate {
+        candidate_mrr: f64,
+        control_mrr: f64,
+        score_blake3: CompactString,
+        receipt: PathBuf,
+    },
     #[error("Candle training failed: {0}")]
     Candle(#[from] candle_core::Error),
     #[error("frozen graph or tensor input failed validation: {0}")]
@@ -112,6 +162,22 @@ pub enum CandleTrainerError {
     Evaluation(#[from] ResearchEvaluationError),
     #[error("ranking evaluation failed: {0}")]
     Ranking(#[from] RankingEvaluationError),
+    #[error("R-GCN research input failed validation: {0}")]
+    Rgcn(#[from] RgcnResearchError),
+    #[error("temporal R-GCN research input failed validation: {0}")]
+    TemporalRgcn(#[from] phoenix_graph_research::TemporalRgcnError),
+    #[error("temporal CompGCN research input failed validation: {0}")]
+    TemporalCompgcn(#[from] phoenix_graph_research::TemporalCompgcnError),
+    #[error("hyper encoder research input failed validation: {0}")]
+    HyperEncoder(#[from] phoenix_graph_research::HyperEncoderError),
+    #[error("hyper-relational task failed validation: {0}")]
+    HyperRelational(#[from] phoenix_graph_research::HyperRelationalTaskError),
+    #[error("canonical link task failed validation: {0}")]
+    LinkPrediction(#[from] phoenix_graph_research::LinkPredictionError),
+    #[error("external dataset failed validation: {0}")]
+    ExternalDataset(#[from] phoenix_graph_research::ExternalDatasetError),
+    #[error("frozen baseline selection failed validation: {0}")]
+    Selection(#[from] phoenix_graph_research::FrozenModelSelectionError),
     #[error("frozen model emission failed: {0}")]
     Model(#[from] FrozenModelError),
     #[error("trainer input I/O failed: {0}")]
@@ -132,9 +198,34 @@ struct PreparedRows {
     validation_features: Vec<[f32; FEATURE_DIM]>,
 }
 
+impl PreparedRows {
+    fn dense_staging_bytes(&self) -> Result<u64, CandleTrainerError> {
+        let train = self
+            .train
+            .capacity()
+            .checked_mul(std::mem::size_of::<TrainRow>());
+        let validation = self
+            .validation
+            .capacity()
+            .checked_mul(std::mem::size_of::<DerivedFeatureRow>());
+        let features = self
+            .validation_features
+            .capacity()
+            .checked_mul(std::mem::size_of::<[f32; FEATURE_DIM]>());
+        train
+            .and_then(|bytes| validation.and_then(|value| bytes.checked_add(value)))
+            .and_then(|bytes| features.and_then(|value| bytes.checked_add(value)))
+            .and_then(|bytes| u64::try_from(bytes).ok())
+            .ok_or(CandleTrainerError::Contract("dense staging byte overflow"))
+    }
+}
+
 struct SourceAuthority {
     identity: FrozenModelSourceIdentity,
     seeds: SeedCertificate,
+    topology: TrainTopologyFeatureMapped,
+    tensor: FrozenTensorMapped,
+    mmap_bytes: u64,
 }
 
 struct CandleMlp {
@@ -226,19 +317,21 @@ impl CandleMlp {
 pub fn train_candle_mlp16(
     request: &CandleTrainerRequest,
 ) -> Result<CandleTrainingOutcome, CandleTrainerError> {
+    let allocations_started = AllocationSnapshot::now();
     request.config.validate()?;
     let authority = open_authority(request)?;
     let seed_receipt = certify_model_seed_receipt(&authority.seeds, request.selected_repeat)?;
     let seed = seed_receipt
         .selected_seed()
         .ok_or(CandleTrainerError::Contract("selected seed"))?;
-    let topology = TrainTopologyFeatureMapped::open(&request.topology_manifest)?;
-    let rows = prepare_rows(&topology)?;
+    let rows = prepare_rows(&authority.topology)?;
     if rows.train.is_empty() || rows.validation.is_empty() {
         return Err(CandleTrainerError::Contract(
             "nonempty train and validation splits",
         ));
     }
+    let dense_staging_bytes = rows.dense_staging_bytes()?;
+    let source_mmap_bytes = authority.mmap_bytes;
 
     let device = Device::Cpu;
     let (model, mut random) = CandleMlp::new(seed, &device)?;
@@ -253,7 +346,9 @@ pub fn train_candle_mlp16(
     drop(model);
 
     let canonical_started = Instant::now();
+    let canonical_scoring_started = Instant::now();
     let canonical_scores = score_mlp16_tensors(&tensors, &rows.validation_features)?;
+    let canonical_scoring_micros = micros(canonical_scoring_started.elapsed());
     let validation_ranking_metrics = evaluate_ranking_scores(
         &rows.validation,
         &canonical_scores,
@@ -280,6 +375,12 @@ pub fn train_candle_mlp16(
         &canonical_scores,
         &validation_ranking_metrics,
     )?;
+    let validation_score_blake3 = binary_score_certificate.score_blake3.clone();
+    let score_certificates = vec![binary_score_certificate, ranking_score_certificate];
+    let validation_certificates_blake3 = format_compact!(
+        "b3-{}",
+        blake3::hash(&serde_json::to_vec(&score_certificates)?).to_hex()
+    );
     let canonical_validation_micros = micros(canonical_started.elapsed());
     let candle_max_abs_error = max_abs_error(&candle_scores, &canonical_scores)?;
     if candle_max_abs_error > 1.0e-4 {
@@ -318,7 +419,7 @@ pub fn train_candle_mlp16(
             test_locked_during_selection: true,
             optimizer,
         },
-        score_certificates: vec![binary_score_certificate, ranking_score_certificate],
+        score_certificates,
         tensors,
     };
     let write_started = Instant::now();
@@ -327,8 +428,12 @@ pub fn train_candle_mlp16(
     drop(snapshot);
 
     let restart_started = Instant::now();
+    let restart_open_started = Instant::now();
     let mapped = FrozenModelMapped::open(&artifact.manifest)?;
+    let restart_open_micros = micros(restart_open_started.elapsed());
+    let restart_scoring_started = Instant::now();
     let restart_scores = mapped.score_mlp16(&rows.validation_features)?;
+    let restart_scoring_micros = micros(restart_scoring_started.elapsed());
     let restart_open_and_score_micros = micros(restart_started.elapsed());
     let restart_score_bits_exact = score_bits(&restart_scores) == score_bits(&canonical_scores);
     let restart_certificates = vec![
@@ -350,11 +455,19 @@ pub fn train_candle_mlp16(
     if !restart_score_bits_exact || mapped.manifest().score_certificates != restart_certificates {
         return Err(CandleTrainerError::Contract("restart score certificate"));
     }
+    let restart_weight_mmap_bytes = mapped.manifest().weights_bytes;
+    let mmap_bytes = source_mmap_bytes
+        .checked_add(restart_weight_mmap_bytes)
+        .ok_or(CandleTrainerError::Contract("mmap byte overflow"))?;
+    let allocation_delta = allocations_started.elapsed();
+    let peak_working_set_bytes = peak_working_set_bytes()?;
     let report = CandleTrainerReport {
         schema_version: CANDLE_BASELINE_TRAINER_SCHEMA.into(),
         model_id: mapped.manifest().model_id.clone(),
         weights_blake3: mapped.manifest().weights_blake3.clone(),
         weights_bytes: mapped.manifest().weights_bytes,
+        validation_score_blake3,
+        validation_certificates_blake3,
         selected_seed: seed,
         training_examples: rows.train.len() as u64,
         validation_examples: rows.validation.len() as u64,
@@ -363,9 +476,19 @@ pub fn train_candle_mlp16(
         optimizer_steps: steps,
         training_micros,
         candle_validation_micros,
+        canonical_scoring_micros,
         canonical_validation_micros,
         artifact_write_micros,
+        restart_open_micros,
+        restart_scoring_micros,
         restart_open_and_score_micros,
+        allocation_volume_bytes: allocation_delta.bytes,
+        allocation_count: allocation_delta.count,
+        peak_working_set_bytes,
+        source_mmap_bytes,
+        restart_weight_mmap_bytes,
+        mmap_bytes,
+        dense_staging_bytes,
         candle_max_abs_error,
         restart_score_bits_exact,
         validation_metrics,
@@ -379,39 +502,48 @@ fn open_authority(request: &CandleTrainerRequest) -> Result<SourceAuthority, Can
     let tensor = FrozenTensorMapped::open(&request.tensor_manifest)?;
     let topology = TrainTopologyFeatureMapped::open(&request.topology_manifest)?;
     let protocol = read_protocol(&request.evaluation_protocol)?;
-    let graph = graph.manifest();
-    let tensor = tensor.manifest();
-    let topology = topology.manifest();
-    if graph.dataset_id != tensor.source_dataset_id
-        || graph.dataset_id != protocol.source_dataset_id
-        || graph.dataset_id != topology.source_dataset_id
-        || tensor.tensor_id != protocol.tensor_id
-        || tensor.tensor_id != topology.source_tensor_id
-        || protocol.protocol_id != topology.evaluation_protocol_id
-        || graph.split_policy != protocol.split_policy
-        || !topology.audit.train_only
-        || !topology.audit.asserted_edges_only
-        || !topology.audit.resolved_incidences_only
-        || !topology.audit.leave_one_positive_out
-        || !is_blake3(graph.dataset_id.as_str())
-        || !is_blake3(tensor.tensor_id.as_str())
+    let graph_manifest = graph.manifest();
+    let tensor_manifest = tensor.manifest();
+    let topology_manifest = topology.manifest();
+    if graph_manifest.dataset_id != tensor_manifest.source_dataset_id
+        || graph_manifest.dataset_id != protocol.source_dataset_id
+        || graph_manifest.dataset_id != topology_manifest.source_dataset_id
+        || tensor_manifest.tensor_id != protocol.tensor_id
+        || tensor_manifest.tensor_id != topology_manifest.source_tensor_id
+        || protocol.protocol_id != topology_manifest.evaluation_protocol_id
+        || graph_manifest.split_policy != protocol.split_policy
+        || !topology_manifest.audit.train_only
+        || !topology_manifest.audit.asserted_edges_only
+        || !topology_manifest.audit.resolved_incidences_only
+        || !topology_manifest.audit.leave_one_positive_out
+        || !is_blake3(graph_manifest.dataset_id.as_str())
+        || !is_blake3(tensor_manifest.tensor_id.as_str())
         || !is_blake3(protocol.protocol_id.as_str())
-        || !is_blake3(topology.derivation_id.as_str())
-        || !is_blake3(topology.audit.topology_blake3.as_str())
+        || !is_blake3(topology_manifest.derivation_id.as_str())
+        || !is_blake3(topology_manifest.audit.topology_blake3.as_str())
     {
         return Err(CandleTrainerError::Contract("source authority chain"));
     }
+    let mmap_bytes = graph_manifest
+        .binary_bytes
+        .checked_add(tensor_manifest.binary_bytes)
+        .and_then(|bytes| bytes.checked_add(topology_manifest.binary_bytes))
+        .ok_or(CandleTrainerError::Contract("source mmap byte overflow"))?;
+    let identity = FrozenModelSourceIdentity {
+        dataset_id: graph_manifest.dataset_id.clone(),
+        checkpoint_id: graph_manifest.checkpoint_id.clone(),
+        checkpoint_generation: graph_manifest.checkpoint_generation,
+        tensor_id: tensor_manifest.tensor_id.clone(),
+        topology_derivation_id: topology_manifest.derivation_id.clone(),
+        topology_blake3: topology_manifest.audit.topology_blake3.clone(),
+        evaluation_protocol_id: protocol.protocol_id,
+    };
     Ok(SourceAuthority {
-        identity: FrozenModelSourceIdentity {
-            dataset_id: graph.dataset_id.clone(),
-            checkpoint_id: graph.checkpoint_id.clone(),
-            checkpoint_generation: graph.checkpoint_generation,
-            tensor_id: tensor.tensor_id.clone(),
-            topology_derivation_id: topology.derivation_id.clone(),
-            topology_blake3: topology.audit.topology_blake3.clone(),
-            evaluation_protocol_id: protocol.protocol_id,
-        },
+        identity,
         seeds: protocol.seed_certificate,
+        topology,
+        tensor,
+        mmap_bytes,
     })
 }
 
@@ -435,9 +567,19 @@ fn read_protocol(path: &Path) -> Result<ResearchEvaluationProtocol, CandleTraine
 
 fn prepare_rows(topology: &TrainTopologyFeatureMapped) -> Result<PreparedRows, CandleTrainerError> {
     let records = topology.link_rows()?;
-    let mut train = Vec::new();
-    let mut validation = Vec::new();
-    let mut validation_features = Vec::new();
+    let mut train_rows = 0_usize;
+    let mut validation_rows = 0_usize;
+    for record in records.iter() {
+        match record.split() {
+            1 => train_rows += 1,
+            2 => validation_rows += 1,
+            3 => {}
+            _ => return Err(CandleTrainerError::Contract("topology row split")),
+        }
+    }
+    let mut train = Vec::with_capacity(train_rows);
+    let mut validation = Vec::with_capacity(validation_rows);
+    let mut validation_features = Vec::with_capacity(validation_rows);
     for record in records.iter() {
         let split = match record.split() {
             1 => ResearchSplit::Train,

@@ -78,6 +78,16 @@ type PickIndexHarness = {
     pickCandidates(bins: number[][], x: number, y: number): readonly number[];
 };
 
+type MapPanHarness = {
+    mode: '2d';
+    ortho: THREE.OrthographicCamera;
+    viewportHeight: number;
+    panX: number;
+    panY: number;
+    pan(deltaX: number, deltaY: number): void;
+    updateCamera(): void;
+};
+
 function sceneWithStyleLabColor(hex: string): { scene: GalaxySceneV2; expected: THREE.Color } {
     const rgb = hslToRgb(hexColorToHsl(hex));
     const scene = {
@@ -91,6 +101,26 @@ function expectRendererColor(color: THREE.Color, expected: THREE.Color): void {
     expect(color.g).toBeCloseTo(expected.g, 6);
     expect(color.b).toBeCloseTo(expected.b, 6);
 }
+
+describe('ThreeGalaxyRenderer map panning', () => {
+    it('moves the orthographic view one screen pixel per pointer pixel', () => {
+        const renderer = Object.create(ThreeGalaxyRenderer.prototype) as MapPanHarness;
+        renderer.mode = '2d';
+        renderer.ortho = new THREE.OrthographicCamera(-4.2, 4.2, 3.1, -3.1, 0.01, 100);
+        renderer.ortho.zoom = 2;
+        renderer.viewportHeight = 620;
+        renderer.panX = 0;
+        renderer.panY = 0;
+        renderer.updateCamera = vi.fn();
+
+        renderer.pan(100, -50);
+
+        const worldUnitsPerPixel = 6.2 / 2 / 620;
+        expect(renderer.panX).toBeCloseTo(-100 * worldUnitsPerPixel, 10);
+        expect(renderer.panY).toBeCloseTo(-50 * worldUnitsPerPixel, 10);
+        expect(renderer.updateCamera).toHaveBeenCalledOnce();
+    });
+});
 
 describe('ThreeGalaxyRenderer Style Lab node colors', () => {
     it('uses the scene buffer color exactly for chunk nodes and glows', () => {

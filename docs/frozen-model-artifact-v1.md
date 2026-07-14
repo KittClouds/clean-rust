@@ -8,15 +8,17 @@ or checkpoint directory. Its model id is BLAKE3-addressed over its source identi
 architecture, hyperparameters, seed receipt, runtime, training receipt, score
 certificates, tensor directory, and weight-blob digest.
 
-V1 freezes the exact MLP-16 architecture already used by the Baseline Ladder. It does
-not introduce a second model design:
+V1 freezes the exact MLP-16 architecture used by the Baseline Ladder and the first
+R-GCN-16 learned topology rung:
 
 ```text
 16 features -> dense 16 + ReLU -> dense 1 + sigmoid
+node-type 16 + typed edge/role messages -> ReLU -> DistMult + sigmoid
 ```
 
-The four required tensors are row-major `hidden.weight [16,16]`, `hidden.bias [16]`,
-`output.weight [16]`, and `output.bias [1]`.
+MLP uses four fixed tensors. R-GCN uses five ordered tensors: node-type embeddings,
+self transform, forward/inverse edge-and-role transforms, edge-relation decoder,
+and decoder bias. Exact vocabulary-derived dimensions are frozen in the manifest.
 
 ## Identity chain
 
@@ -42,7 +44,7 @@ must exist in that certificate.
 ## Immutable storage
 
 Weights use `phoenix-frozen-model-weights/v1`, a little-endian fixed-width binary with
-a 32-byte header followed by four contiguous `f32` tensor sections. The manifest
+a 32-byte header followed by four or five contiguous `f32` tensor sections. The manifest
 holds every tensor's name, shape, element count, and byte offset.
 
 Opening a model:
@@ -70,9 +72,9 @@ provenance explicit without pretending that identical weights are different byte
 
 ## Restart guarantee
 
-`FrozenModelMapped::score_mlp16` loads the four mapped tensors into fixed-size stack
-arrays and performs SIMD reference inference. It has no trainer, optimizer, mutable
-graph, or model-initialization input.
+`FrozenModelMapped::score_mlp16` and the R-GCN SIMD scorer read the mapped tensors and
+perform authoritative inference. They have no trainer, optimizer, mutable graph, or
+model-initialization input.
 
 The restart test writes once, drops the training snapshot, reopens only the immutable
 manifest and mmap weight blob, and requires bit-exact score and score-certificate
@@ -92,5 +94,5 @@ gaps/overlaps, and trailing bytes.
 V1 stores final inference weights and an optimizer receipt; it does not store optimizer
 state for training resume. It does not train a model, read live graph state, mutate
 topology, unlock test data, or add Candle to the Phoenix workspace. Candle Baseline
-Trainer v1 now emits this artifact directly without inventing a parallel checkpoint
-format.
+Trainer v1 and Candle R-GCN v1 emit this artifact directly without inventing a
+parallel checkpoint format.

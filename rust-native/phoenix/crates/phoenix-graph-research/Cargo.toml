@@ -10,12 +10,14 @@ default = ["graph-build"]
 graph-build = ["dep:phoenix-graph-kernel", "dep:phoenix-graph-rebuild"]
 
 [dependencies]
-blake3 = "1.8"
+blake3 = { version = "1.8", features = ["rayon"] }
 compact_str.workspace = true
 hashbrown.workspace = true
+memchr.workspace = true
 memmap2.workspace = true
 phoenix-graph-kernel = { path = "../phoenix-graph-kernel", optional = true }
 phoenix-graph-rebuild = { path = "../phoenix-graph-rebuild", optional = true }
+rayon = "1.11"
 serde.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true

@@ -166,6 +166,7 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
     private panZ = 0;
     private viewShiftX = 0;
     private viewShiftY = 0;
+    private viewportHeight = 1;
     private dragReady = false;
     private densityBins = new Uint16Array(0);
     private densityNodeBins = new Int32Array(0);
@@ -321,6 +322,7 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
 
     resize(width: number, height: number, dpr: number): void {
         if (!this.renderer) return;
+        this.viewportHeight = Math.max(1, height);
         this.renderer.setPixelRatio(dpr);
         this.renderer.setSize(width, height, false);
         this.perspective.aspect = Math.max(0.01, width / Math.max(1, height));
@@ -353,7 +355,9 @@ export class ThreeGalaxyRenderer implements GraphRendererPort {
     }
 
     pan(deltaX: number, deltaY: number): void {
-        const scale = this.mode === '2d' ? 0.008 * this.distance : 0.0045 * this.distance;
+        const scale = this.mode === '2d'
+            ? (this.ortho.top - this.ortho.bottom) / this.ortho.zoom / this.viewportHeight
+            : 0.0045 * this.distance;
         this.panX -= deltaX * scale;
         this.panY += deltaY * scale;
         this.updateCamera();

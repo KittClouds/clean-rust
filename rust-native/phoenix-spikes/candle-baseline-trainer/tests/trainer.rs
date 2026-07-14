@@ -17,6 +17,31 @@ fn deterministic_training_emits_restartable_frozen_model() {
     assert_eq!(first.artifact, second.artifact);
     assert_eq!(first.report.model_id, second.report.model_id);
     assert_eq!(first.report.weights_blake3, second.report.weights_blake3);
+    assert_eq!(
+        first.report.validation_score_blake3,
+        second.report.validation_score_blake3
+    );
+    assert_eq!(
+        first.report.validation_certificates_blake3,
+        second.report.validation_certificates_blake3
+    );
+    assert_eq!(
+        first.report.validation_metrics,
+        second.report.validation_metrics
+    );
+    assert_eq!(
+        first.report.validation_ranking_metrics,
+        second.report.validation_ranking_metrics
+    );
+    assert_eq!(
+        first.report.source_mmap_bytes,
+        second.report.source_mmap_bytes
+    );
+    assert_eq!(first.report.mmap_bytes, second.report.mmap_bytes);
+    assert_eq!(
+        first.report.dense_staging_bytes,
+        second.report.dense_staging_bytes
+    );
     assert_eq!(first.report.selected_seed, fixture.seeds[1]);
     assert!(first.report.restart_score_bits_exact);
     assert!(first.report.candle_max_abs_error <= 1.0e-4);
@@ -27,6 +52,40 @@ fn deterministic_training_emits_restartable_frozen_model() {
             .expect("model artifact directory")
             .count(),
         2
+    );
+
+    let first_manifest = FrozenModelMapped::open(&first.artifact.manifest)
+        .expect("same-seed manifest")
+        .manifest()
+        .clone();
+    let mut different_seed_request = fixture.request.clone();
+    different_seed_request.selected_repeat = 2;
+    let different =
+        train_candle_mlp16(&different_seed_request).expect("different-seed training execution");
+    let different_manifest = FrozenModelMapped::open(&different.artifact.manifest)
+        .expect("different-seed manifest")
+        .manifest()
+        .clone();
+    assert_ne!(first.report.model_id, different.report.model_id);
+    assert_ne!(first.report.weights_blake3, different.report.weights_blake3);
+    assert_ne!(
+        first.report.validation_score_blake3,
+        different.report.validation_score_blake3
+    );
+    assert_ne!(
+        first.report.validation_certificates_blake3,
+        different.report.validation_certificates_blake3
+    );
+    assert_ne!(
+        first_manifest.score_certificates,
+        different_manifest.score_certificates
+    );
+    assert_eq!(different.report.selected_seed, fixture.seeds[2]);
+    assert_eq!(
+        std::fs::read_dir(fixture.output.path())
+            .expect("distinct seed artifacts")
+            .count(),
+        4
     );
 
     let manifest = first.artifact.manifest.clone();
@@ -85,6 +144,23 @@ fn trainer_fails_closed_on_authority_or_seed_drift() {
             .count(),
         0
     );
+
+    let mut bytes = std::fs::read(&fixture.topology_binary).expect("read topology binary");
+    let last = bytes.last_mut().expect("nonempty topology binary");
+    *last ^= 0x80;
+    std::fs::write(&fixture.topology_binary, bytes).expect("corrupt topology binary");
+    assert!(matches!(
+        train_candle_mlp16(&fixture.request),
+        Err(CandleTrainerError::Evaluation(
+            ResearchEvaluationError::CorruptTopologyArtifact(_)
+        ))
+    ));
+    assert_eq!(
+        std::fs::read_dir(fixture.output.path())
+            .expect("no artifact before scoring")
+            .count(),
+        0
+    );
 }
 
 #[test]
@@ -100,10 +176,40 @@ fn training_path_has_a_bounded_smoke_gate_and_never_counts_test_rows() {
         u64::from(fixture.request.config.epochs) * 16
     );
     assert!(outcome.report.restart_score_bits_exact);
+    assert!(outcome.report.allocation_volume_bytes > outcome.report.dense_staging_bytes);
+    assert!(outcome.report.allocation_count > 0);
+    assert!(outcome.report.source_mmap_bytes > 0);
+    assert_eq!(
+        outcome.report.restart_weight_mmap_bytes,
+        outcome.report.weights_bytes
+    );
+    assert_eq!(
+        outcome.report.mmap_bytes,
+        outcome.report.source_mmap_bytes + outcome.report.restart_weight_mmap_bytes
+    );
+    assert!(outcome.report.dense_staging_bytes > 0);
+    assert!(outcome.report.canonical_scoring_micros <= outcome.report.canonical_validation_micros);
+    assert!(outcome.report.restart_open_micros <= outcome.report.restart_open_and_score_micros);
+    assert!(outcome.report.restart_scoring_micros <= outcome.report.restart_open_and_score_micros);
+    assert!(
+        outcome
+            .report
+            .restart_open_and_score_micros
+            .saturating_mul(2)
+            < outcome.report.training_micros,
+        "restart inference is not materially faster than training"
+    );
+    #[cfg(windows)]
+    assert!(outcome.report.peak_working_set_bytes > 0);
     eprintln!(
-        "trainer smoke: wall={elapsed:?} train={}us restart={}us rows={}",
+        "trainer smoke: wall={elapsed:?} train={}us restart={}us alloc={}B peak_ws={}B mmap={}B dense={}B score={}us rows={}",
         outcome.report.training_micros,
         outcome.report.restart_open_and_score_micros,
+        outcome.report.allocation_volume_bytes,
+        outcome.report.peak_working_set_bytes,
+        outcome.report.mmap_bytes,
+        outcome.report.dense_staging_bytes,
+        outcome.report.canonical_scoring_micros,
         outcome.report.training_examples
     );
     assert!(
@@ -116,6 +222,7 @@ struct Fixture {
     _root: TempDir,
     input: TempDir,
     output: TempDir,
+    topology_binary: PathBuf,
     request: CandleTrainerRequest,
     validation_features: Vec<[f32; 16]>,
     seeds: [u64; 3],
@@ -197,6 +304,7 @@ impl Fixture {
             _root: root,
             input,
             output,
+            topology_binary: topology_paths.binary,
             request,
             validation_features,
             seeds,

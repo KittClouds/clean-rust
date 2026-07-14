@@ -73,6 +73,7 @@ dependencies = [
  "cfg-if",
  "constant_time_eq",
  "cpufeatures",
+ "rayon-core",
 ]
 
 [[package]]
@@ -585,6 +586,16 @@ dependencies = [
 
 [[package]]
 name = "hashbrown"
+version = "0.14.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e5274423e17b7c9fc20b6e7e208532f9b19825d82dfd615708b70edd83df41f1"
+dependencies = [
+ "ahash",
+ "allocator-api2",
+]
+
+[[package]]
+name = "hashbrown"
 version = "0.15.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9229cfe53dfd69f0609a49f65461bd93001ea1ef889cd5529dd176593f5338a1"
@@ -822,11 +833,14 @@ dependencies = [
  "candle-core",
  "candle-nn",
  "compact_str 0.8.2",
+ "hashbrown 0.14.5",
  "phoenix-graph-research",
  "serde",
  "serde_json",
  "tempfile",
  "thiserror 2.0.18",
+ "wide",
+ "windows-sys",
 ]
 
 [[package]]
@@ -836,7 +850,9 @@ dependencies = [
  "blake3",
  "compact_str 0.8.2",
  "hashbrown 0.15.5",
+ "memchr",
  "memmap2",
+ "rayon",
  "serde",
  "serde_json",
  "thiserror 1.0.69",

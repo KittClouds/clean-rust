@@ -9,11 +9,17 @@ pub const MODEL_HIDDEN_WEIGHT: &str = "hidden.weight";
 pub const MODEL_HIDDEN_BIAS: &str = "hidden.bias";
 pub const MODEL_OUTPUT_WEIGHT: &str = "output.weight";
 pub const MODEL_OUTPUT_BIAS: &str = "output.bias";
+pub const RGCN_NODE_TYPE_EMBEDDING: &str = "node_type.embedding";
+pub const RGCN_SELF_WEIGHT: &str = "rgcn.self.weight";
+pub const RGCN_RELATION_WEIGHT: &str = "rgcn.relation.weight";
+pub const RGCN_DECODER_RELATION: &str = "decoder.relation";
+pub const RGCN_DECODER_BIAS: &str = "decoder.bias";
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum FrozenModelFamily {
     Mlp16,
+    Rgcn16,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -50,6 +56,18 @@ impl FrozenModelArchitecture {
             hidden_activation: "relu".into(),
             output_activation: "sigmoid".into(),
             weight_layout: "row-major-output-input".into(),
+        }
+    }
+
+    pub fn rgcn16() -> Self {
+        Self {
+            family: FrozenModelFamily::Rgcn16,
+            input_features: 16,
+            hidden_features: 16,
+            output_features: 1,
+            hidden_activation: "relu".into(),
+            output_activation: "sigmoid-distmult".into(),
+            weight_layout: "row-major-type-self-forward-edge-role-inverse-edge-role".into(),
         }
     }
 }

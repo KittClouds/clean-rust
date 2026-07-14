@@ -1,10 +1,11 @@
 use crate::{
-    FrozenModelArchitecture, FrozenModelError, FrozenModelHyperparameters, FrozenModelManifest,
-    FrozenModelPaths, FrozenModelRuntimeIdentity, FrozenModelScoreCertificate,
+    FrozenModelArchitecture, FrozenModelError, FrozenModelFamily, FrozenModelHyperparameters,
+    FrozenModelManifest, FrozenModelPaths, FrozenModelRuntimeIdentity, FrozenModelScoreCertificate,
     FrozenModelSeedReceipt, FrozenModelSnapshot, FrozenModelSourceIdentity, FrozenModelTensor,
     FrozenModelTensorManifest, FrozenTrainingReceipt, ResearchSplit, SeedCertificate,
     FROZEN_MODEL_BINARY_VERSION, FROZEN_MODEL_SCHEMA, MODEL_HIDDEN_BIAS, MODEL_HIDDEN_WEIGHT,
-    MODEL_OUTPUT_BIAS, MODEL_OUTPUT_WEIGHT,
+    MODEL_OUTPUT_BIAS, MODEL_OUTPUT_WEIGHT, RGCN_DECODER_BIAS, RGCN_DECODER_RELATION,
+    RGCN_NODE_TYPE_EMBEDDING, RGCN_RELATION_WEIGHT, RGCN_SELF_WEIGHT,
 };
 use compact_str::{format_compact, CompactString};
 use hashbrown::HashSet;
@@ -18,7 +19,8 @@ use wide::f32x8;
 use zerocopy::{AsBytes, FromBytes, FromZeroes, Ref, Unaligned};
 
 const MAGIC: [u8; 8] = *b"PHXFMW01";
-const TENSOR_COUNT: usize = 4;
+const MLP_TENSOR_COUNT: usize = 4;
+const RGCN_TENSOR_COUNT: usize = 5;
 
 #[derive(AsBytes, FromBytes, FromZeroes, Unaligned, Clone, Copy)]
 #[repr(C)]
@@ -223,7 +225,7 @@ pub fn score_mlp16_tensors(
     tensors: &[FrozenModelTensor],
     features: &[[f32; 16]],
 ) -> Result<Vec<f32>, FrozenModelError> {
-    if tensors.len() != TENSOR_COUNT {
+    if tensors.len() != MLP_TENSOR_COUNT {
         return Err(FrozenModelError::InvalidTensorLayout("tensor count"));
     }
     for (index, tensor) in tensors.iter().enumerate() {
@@ -353,22 +355,7 @@ fn validate_snapshot(snapshot: &FrozenModelSnapshot) -> Result<(), FrozenModelEr
         &snapshot.training,
         &snapshot.score_certificates,
     )?;
-    if snapshot.tensors.len() != TENSOR_COUNT {
-        return Err(FrozenModelError::InvalidTensorLayout("tensor count"));
-    }
-    for (index, tensor) in snapshot.tensors.iter().enumerate() {
-        let (name, shape) = expected_tensor(index);
-        if tensor.name != name
-            || tensor.shape.as_slice() != shape
-            || tensor.values.len() as u64 != shape_product(shape)?
-            || tensor.values.iter().any(|value| !value.is_finite())
-        {
-            return Err(FrozenModelError::InvalidTensorLayout(
-                "tensor specification",
-            ));
-        }
-    }
-    Ok(())
+    validate_snapshot_tensors(&snapshot.architecture, &snapshot.tensors)
 }
 
 fn validate_manifest(manifest: &FrozenModelManifest) -> Result<(), FrozenModelError> {
@@ -388,21 +375,7 @@ fn validate_manifest(manifest: &FrozenModelManifest) -> Result<(), FrozenModelEr
         &manifest.training,
         &manifest.score_certificates,
     )?;
-    if manifest.tensors.len() != TENSOR_COUNT {
-        return Err(FrozenModelError::InvalidTensorLayout(
-            "manifest tensor count",
-        ));
-    }
-    for (index, tensor) in manifest.tensors.iter().enumerate() {
-        let (name, shape) = expected_tensor(index);
-        if tensor.name != name
-            || tensor.shape.as_slice() != shape
-            || tensor.element_count != shape_product(shape)?
-        {
-            return Err(FrozenModelError::InvalidTensorLayout("manifest tensor"));
-        }
-    }
-    Ok(())
+    validate_manifest_tensors(&manifest.architecture, &manifest.tensors)
 }
 
 fn validate_contract(
@@ -424,7 +397,9 @@ fn validate_contract(
     {
         return Err(FrozenModelError::InvalidContract("source identity"));
     }
-    if architecture != &FrozenModelArchitecture::mlp16() {
+    if architecture != &FrozenModelArchitecture::mlp16()
+        && architecture != &FrozenModelArchitecture::rgcn16()
+    {
         return Err(FrozenModelError::InvalidContract("architecture"));
     }
     if hyperparameters.epochs == 0
@@ -499,6 +474,140 @@ fn validate_seed_receipt(receipt: &FrozenModelSeedReceipt) -> Result<(), FrozenM
         return Err(FrozenModelError::InvalidContract("seed digest"));
     }
     Ok(())
+}
+
+fn validate_snapshot_tensors(
+    architecture: &FrozenModelArchitecture,
+    tensors: &[FrozenModelTensor],
+) -> Result<(), FrozenModelError> {
+    match architecture.family {
+        FrozenModelFamily::Mlp16 => {
+            if tensors.len() != MLP_TENSOR_COUNT {
+                return Err(FrozenModelError::InvalidTensorLayout("tensor count"));
+            }
+            for (index, tensor) in tensors.iter().enumerate() {
+                let (name, shape) = expected_tensor(index);
+                validate_snapshot_tensor(tensor, name, shape)?;
+            }
+        }
+        FrozenModelFamily::Rgcn16 => validate_rgcn_snapshot_tensors(tensors)?,
+    }
+    Ok(())
+}
+
+fn validate_rgcn_snapshot_tensors(tensors: &[FrozenModelTensor]) -> Result<(), FrozenModelError> {
+    if tensors.len() != RGCN_TENSOR_COUNT {
+        return Err(FrozenModelError::InvalidTensorLayout("R-GCN tensor count"));
+    }
+    if tensors[0].shape.len() != 2 || tensors[0].shape[0] == 0 {
+        return Err(FrozenModelError::InvalidTensorLayout("R-GCN node types"));
+    }
+    let (message_relations, decoder_relations) =
+        rgcn_relations(&tensors[2].shape, &tensors[3].shape, &tensors[4].shape)?;
+    let expected = [
+        (RGCN_NODE_TYPE_EMBEDDING, vec![tensors[0].shape[0], 16]),
+        (RGCN_SELF_WEIGHT, vec![16, 16]),
+        (RGCN_RELATION_WEIGHT, vec![message_relations, 16, 16]),
+        (RGCN_DECODER_RELATION, vec![decoder_relations, 16]),
+        (RGCN_DECODER_BIAS, vec![decoder_relations]),
+    ];
+    for (tensor, (name, shape)) in tensors.iter().zip(expected) {
+        validate_snapshot_tensor(tensor, name, &shape)?;
+    }
+    Ok(())
+}
+
+fn validate_snapshot_tensor(
+    tensor: &FrozenModelTensor,
+    name: &str,
+    shape: &[u64],
+) -> Result<(), FrozenModelError> {
+    if tensor.name != name
+        || tensor.shape != shape
+        || tensor.values.len() as u64 != shape_product(shape)?
+        || tensor.values.iter().any(|value| !value.is_finite())
+    {
+        return Err(FrozenModelError::InvalidTensorLayout(
+            "tensor specification",
+        ));
+    }
+    Ok(())
+}
+
+fn validate_manifest_tensors(
+    architecture: &FrozenModelArchitecture,
+    tensors: &[FrozenModelTensorManifest],
+) -> Result<(), FrozenModelError> {
+    match architecture.family {
+        FrozenModelFamily::Mlp16 => {
+            if tensors.len() != MLP_TENSOR_COUNT {
+                return Err(FrozenModelError::InvalidTensorLayout(
+                    "manifest tensor count",
+                ));
+            }
+            for (index, tensor) in tensors.iter().enumerate() {
+                let (name, shape) = expected_tensor(index);
+                validate_manifest_tensor(tensor, name, shape)?;
+            }
+        }
+        FrozenModelFamily::Rgcn16 => {
+            if tensors.len() != RGCN_TENSOR_COUNT || tensors[0].shape.len() != 2 {
+                return Err(FrozenModelError::InvalidTensorLayout(
+                    "R-GCN manifest tensor count",
+                ));
+            }
+            let (message_relations, decoder_relations) =
+                rgcn_relations(&tensors[2].shape, &tensors[3].shape, &tensors[4].shape)?;
+            let expected = [
+                (RGCN_NODE_TYPE_EMBEDDING, vec![tensors[0].shape[0], 16]),
+                (RGCN_SELF_WEIGHT, vec![16, 16]),
+                (RGCN_RELATION_WEIGHT, vec![message_relations, 16, 16]),
+                (RGCN_DECODER_RELATION, vec![decoder_relations, 16]),
+                (RGCN_DECODER_BIAS, vec![decoder_relations]),
+            ];
+            if tensors[0].shape[0] == 0 {
+                return Err(FrozenModelError::InvalidTensorLayout("R-GCN node types"));
+            }
+            for (tensor, (name, shape)) in tensors.iter().zip(expected) {
+                validate_manifest_tensor(tensor, name, &shape)?;
+            }
+        }
+    }
+    Ok(())
+}
+
+fn validate_manifest_tensor(
+    tensor: &FrozenModelTensorManifest,
+    name: &str,
+    shape: &[u64],
+) -> Result<(), FrozenModelError> {
+    if tensor.name != name || tensor.shape != shape || tensor.element_count != shape_product(shape)?
+    {
+        return Err(FrozenModelError::InvalidTensorLayout("manifest tensor"));
+    }
+    Ok(())
+}
+
+fn rgcn_relations(
+    message_shape: &[u64],
+    decoder_shape: &[u64],
+    bias_shape: &[u64],
+) -> Result<(u64, u64), FrozenModelError> {
+    if message_shape.len() != 3
+        || message_shape[0] < 2
+        || !message_shape[0].is_multiple_of(2)
+        || message_shape[1..] != [16, 16]
+        || decoder_shape.len() != 2
+        || decoder_shape[0] == 0
+        || decoder_shape[1] != 16
+        || bias_shape != [decoder_shape[0]]
+        || message_shape[0] < decoder_shape[0] * 2
+    {
+        return Err(FrozenModelError::InvalidTensorLayout(
+            "R-GCN relation tensors",
+        ));
+    }
+    Ok((message_shape[0], decoder_shape[0]))
 }
 
 fn encode_weights(

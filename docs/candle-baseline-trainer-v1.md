@@ -68,12 +68,12 @@ Release smoke on the local Ryzen 7 5800X3D, Windows MSVC, using
 | Training examples | 1,024 |
 | Validation examples | 256 |
 | Epochs / optimizer steps | 4 / 64 |
-| Candle training | 5.660 ms |
-| Mmap reopen plus restart scoring | 1.053 ms |
-| End-to-end test wall time | 17.491 ms |
+| Candle training | 7.340 ms |
+| Mmap reopen plus restart scoring | 1.167 ms |
+| End-to-end test wall time | 20.844 ms |
 
-The warm debug integration gate completed the same training path in 104.401 ms and
-the complete trainer test suite in 0.13 seconds.
+The warm debug integration gate completed the same training path in 96.738 ms and
+the complete trainer test suite in 0.12 seconds.
 
 ## Failure shields
 
