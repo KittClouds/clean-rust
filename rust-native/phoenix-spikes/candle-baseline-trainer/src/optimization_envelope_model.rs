@@ -8,8 +8,8 @@ use phoenix_graph_research::{
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 
-pub const OPTIMIZATION_ENVELOPE_SCHEMA: &str = "phoenix-wd50k-optimization-envelope/v1";
-pub const OPTIMIZATION_ENVELOPE_TRAINER: &str = "phoenix-fused-hyper-envelope/v1";
+pub const OPTIMIZATION_ENVELOPE_SCHEMA: &str = "phoenix-wd50k-grouped-pressure-envelope/v1";
+pub const OPTIMIZATION_ENVELOPE_TRAINER: &str = "phoenix-fused-hyper-grouped-pressure/v1";
 pub const OPTIMIZATION_ENVELOPE_SEED: u64 = 0x51a7_e001;
 pub const OPTIMIZATION_ENVELOPE_CHECKPOINTS: [u32; 7] = [0, 1, 2, 4, 8, 16, 32];
 
@@ -109,9 +109,17 @@ pub struct EnvelopeArmCheckpoint {
     pub ranks: RankArtifactReceipt,
     pub parameter_blocks: Vec<ParameterBlockReceipt>,
     pub final_batch: Option<HyperEpochEconomics>,
+    #[serde(default)]
+    pub batch_pressure: Vec<HyperEpochEconomics>,
     pub pre_clip_gradient_norm: f64,
     pub clip_coefficient: f64,
     pub clip_activation_rate: f64,
+    #[serde(default)]
+    pub non_bias_clip_activation_rate: f64,
+    #[serde(default)]
+    pub decoder_bias_clip_activation_rate: f64,
+    #[serde(default)]
+    pub non_bias_update_recovery_vs_legacy_global: f64,
     pub optimizer_steps: u64,
     pub cold_restart_exact: bool,
 }
@@ -141,6 +149,14 @@ pub struct OptimizationEnvelopeManifest {
     pub checkpoints: Vec<EnvelopeCheckpoint>,
     pub optimizer: HyperOptimizerConfig,
     pub optimizer_identity: CompactString,
+    #[serde(default)]
+    pub clip_partition_blake3: CompactString,
+    #[serde(default)]
+    pub clip_group_ordering: Vec<crate::HyperClipGroup>,
+    #[serde(default)]
+    pub clip_group_maximum_norms: Vec<f32>,
+    #[serde(default)]
+    pub decoder_weights_present: bool,
     pub initialization_blake3: CompactString,
     pub example_schedule_blake3: CompactString,
     pub training_examples: u64,

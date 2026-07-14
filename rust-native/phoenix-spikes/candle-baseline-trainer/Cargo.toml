@@ -62,3 +62,7 @@ path = "src/hyper_learning_gates_main.rs"
 [[bin]]
 name = "optimization-envelope-v1"
 path = "src/optimization_envelope_main.rs"
+
+[[bin]]
+name = "gradient-pressure-audit-v1"
+path = "src/gradient_pressure_main.rs"

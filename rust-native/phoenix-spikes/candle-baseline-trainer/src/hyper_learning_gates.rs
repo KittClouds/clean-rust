@@ -5,7 +5,7 @@ use crate::hyper_encoder_memory::{
 use crate::hyper_learning_gate_artifact::{persist_and_reopen_gate_model, GateArtifactRequest};
 use crate::hyper_learning_gate_context::GateArmContext;
 use crate::hyper_learning_gate_metrics::{
-    clip_coefficient, economics_gradient_norm, row_delta, sigmoid, tensor_delta, weights_digest,
+    economics_gradient_norm, row_delta, sigmoid, tensor_delta, weights_digest,
 };
 use crate::hyper_learning_gate_receipt::{open_hyper_learning_gates, seal_learning_gate_receipt};
 use crate::{CandleTrainerError, HyperGradientClipPolicy, HyperOptimizerConfig};
@@ -140,7 +140,7 @@ pub fn run_hyper_learning_gates(
         receipt_id: "pending".into(),
         seed: GATE_SEED,
         epochs: GATE_EPOCHS,
-        optimizer_family: "deterministic-pair-sum-no-decay-global-norm-clip-gate".into(),
+        optimizer_family: "deterministic-pair-sum-no-decay-bias-nonbias-grouped-clip-gate".into(),
         all_passed: single.passed && value.passed && role.passed,
         single_pair: single,
         qualifier_value: value,
@@ -276,7 +276,7 @@ fn gate_optimizer(examples: usize) -> HyperOptimizerConfig {
     let mut optimizer = HyperOptimizerConfig::bounded_sum_no_decay(0.08, 2.min(examples) as u32);
     optimizer.global_loss_scale = 256.0;
     optimizer.loss_scale_semantics = crate::LossScaleSemantics::ClipScaledGradient;
-    optimizer.gradient_clip_policy = HyperGradientClipPolicy::GlobalNorm;
+    optimizer.gradient_clip_policy = HyperGradientClipPolicy::DecoderBiasVsNonBias;
     optimizer.gradient_clip_norm = 1.0;
     optimizer
 }
@@ -476,7 +476,12 @@ fn arm_receipt(
     let initial = score_examples(source, staged, examples, initial_weights, mode)?;
     let trained = score_examples(source, staged, examples, &outcome.weights, mode)?;
     let gradient_norm = economics_gradient_norm(&outcome.final_epoch);
-    let clip = clip_coefficient(gradient_norm, *optimizer);
+    let clip = f64::from(outcome.final_epoch.non_bias_clip_coefficient);
+    let post_clip_gradient_norm = ((outcome.final_epoch.non_bias_raw_gradient_l2 * clip).powi(2)
+        + (outcome.final_epoch.decoder_bias_raw_gradient_l2
+            * f64::from(outcome.final_epoch.decoder_bias_clip_coefficient))
+        .powi(2))
+    .sqrt();
     let restarted = persist_and_reopen_gate_model(GateArtifactRequest {
         root: &artifact_root.join(format!("{mode:?}")),
         source,
@@ -516,7 +521,7 @@ fn arm_receipt(
         ),
         pre_clip_gradient_norm: gradient_norm,
         clip_coefficient: clip,
-        post_clip_gradient_norm: gradient_norm * clip,
+        post_clip_gradient_norm,
         optimizer_state_blake3: outcome.optimizer_state_blake3.as_str().into(),
         cold_score_exact: cold_score == trained,
     })

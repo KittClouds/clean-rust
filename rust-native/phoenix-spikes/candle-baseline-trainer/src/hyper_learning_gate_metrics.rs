@@ -1,6 +1,4 @@
-use crate::{
-    HyperEpochEconomics, HyperGradientClipPolicy, HyperOptimizerConfig, ParameterDeltaReceipt,
-};
+use crate::{HyperEpochEconomics, ParameterDeltaReceipt};
 use compact_str::{format_compact, CompactString};
 use phoenix_graph_research::{HyperEncoderWeights, HYPER_ENCODER_HIDDEN};
 
@@ -49,16 +47,6 @@ pub(crate) fn economics_gradient_norm(economics: &HyperEpochEconomics) -> f64 {
     .map(|value| value * value)
     .sum::<f64>()
     .sqrt()
-}
-
-pub(crate) fn clip_coefficient(norm: f64, optimizer: HyperOptimizerConfig) -> f64 {
-    if optimizer.gradient_clip_policy == HyperGradientClipPolicy::None
-        || norm <= f64::from(optimizer.gradient_clip_norm)
-    {
-        1.0
-    } else {
-        f64::from(optimizer.gradient_clip_norm) / norm
-    }
 }
 
 pub(crate) fn weights_digest(weights: &HyperEncoderWeights) -> CompactString {

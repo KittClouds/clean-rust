@@ -1,10 +1,11 @@
+use crate::hyper_clip_runtime::{apply_grouped_sgd, gradient_clip_scales};
 use crate::hyper_encoder_examples::PreparedHyperExamples;
 use crate::hyper_optimizer::{
-    GradientBlockEconomics, HyperEpochEconomics, HyperGradientClipPolicy, HyperOptimizerConfig,
-    HyperWeightDecaySemantics,
+    GradientBlockEconomics, HyperEpochEconomics, HyperOptimizerConfig, HyperWeightDecaySemantics,
 };
 use crate::telemetry::ThreadAllocationSnapshot;
 use crate::CandleTrainerError;
+use crate::HyperClipPartition;
 use phoenix_graph_research::{
     ExternalDatasetMapped, ExternalQualifierRecord, HyperEncoderMode, HyperEncoderStagedInput,
     HyperEncoderTrainingConfig, HyperEncoderWeights, HYPER_ENCODER_HIDDEN,
@@ -17,6 +18,7 @@ pub(crate) struct FusedHyperTrainingOutcome {
     pub weights: HyperEncoderWeights, pub gradient_arena_bytes: u64,
     pub epoch_allocation_bytes: u64, pub epoch_allocation_count: u64,
     pub optimizer_state_blake3: String, pub optimizer_steps: u64, pub final_epoch: HyperEpochEconomics,
+    pub last_epoch_batches: Vec<HyperEpochEconomics>,
 }
 
 pub(crate) fn train_fused_hyper_encoder16(
@@ -44,13 +46,17 @@ pub(crate) fn train_fused_hyper_encoder16_with_optimizer(
 ) -> Result<FusedHyperTrainingOutcome, CandleTrainerError> {
     config.validate()?;
     optimizer.validate(examples.len())?;
+    HyperClipPartition::for_optimizer(&weights, optimizer)?.validate(&weights)?;
     let mut arena = GradientArena::new(&weights);
     let gradient_arena_bytes = arena.bytes()?;
+    let batch_size = optimizer.batch_size as usize;
+    let mut last_epoch_batches = Vec::with_capacity(examples.len().div_ceil(batch_size));
     let epoch_allocations = ThreadAllocationSnapshot::now();
     let mut final_epoch = None;
-    let batch_size = optimizer.batch_size as usize;
     let mut optimizer_steps = 0_u64;
     let mut clipped_optimizer_steps = 0_u64;
+    let mut clipped_non_bias_steps = 0_u64;
+    let mut clipped_bias_steps = 0_u64;
     let batch_context = TrainBatchContext {
         source,
         staged,
@@ -59,10 +65,14 @@ pub(crate) fn train_fused_hyper_encoder16_with_optimizer(
         optimizer,
     };
     for _ in 0..config.epochs {
+        last_epoch_batches.clear();
         for start in (0..examples.len()).step_by(batch_size) {
             let end = (start + batch_size).min(examples.len());
             let economics = train_batch(&batch_context, start, end, &mut weights, &mut arena)?;
             clipped_optimizer_steps += u64::from(economics.clip_activated);
+            clipped_non_bias_steps += u64::from(economics.non_bias_clip_coefficient < 1.0);
+            clipped_bias_steps += u64::from(economics.decoder_bias_clip_coefficient < 1.0);
+            last_epoch_batches.push(economics);
             final_epoch = Some(economics);
             optimizer_steps += 1;
         }
@@ -74,6 +84,10 @@ pub(crate) fn train_fused_hyper_encoder16_with_optimizer(
     let mut final_epoch =
         final_epoch.ok_or(CandleTrainerError::Contract("hyper epoch economics"))?;
     final_epoch.clip_activation_rate = clipped_optimizer_steps as f64 / optimizer_steps as f64;
+    final_epoch.non_bias_clip_activation_rate =
+        clipped_non_bias_steps as f64 / optimizer_steps as f64;
+    final_epoch.decoder_bias_clip_activation_rate =
+        clipped_bias_steps as f64 / optimizer_steps as f64;
     Ok(FusedHyperTrainingOutcome {
         optimizer_state_blake3: weights_digest(&weights),
         optimizer_steps,
@@ -82,20 +96,21 @@ pub(crate) fn train_fused_hyper_encoder16_with_optimizer(
         epoch_allocation_bytes: epoch_delta.bytes,
         epoch_allocation_count: epoch_delta.count,
         final_epoch,
+        last_epoch_batches,
     })
 }
 
-struct GradientArena {
+pub(crate) struct GradientArena {
     encoded: Vec<[f32; HIDDEN]>,
     relation_encoded: Vec<[f32; HIDDEN]>,
     encoded_grad: Vec<[f32; HIDDEN]>,
     relation_encoded_grad: Vec<[f32; HIDDEN]>,
-    node: Vec<f32>,
-    direction: Vec<f32>,
-    relation: Vec<f32>,
-    relation_projection: Vec<f32>,
-    qualifier_projection: Vec<f32>,
-    bias: Vec<f32>,
+    pub(crate) node: Vec<f32>,
+    pub(crate) direction: Vec<f32>,
+    pub(crate) relation: Vec<f32>,
+    pub(crate) relation_projection: Vec<f32>,
+    pub(crate) qualifier_projection: Vec<f32>,
+    pub(crate) bias: Vec<f32>,
 }
 
 impl GradientArena {
@@ -173,6 +188,11 @@ fn train_batch(
     let mut relation_state_grad = [0.0; HIDDEN];
     let mut qualifier_sum_grad = [0.0; HIDDEN];
     let mut binary_cross_entropy = 0.0_f64;
+    let mut positive_logit_sum = 0.0_f64;
+    let mut negative_logit_sum = 0.0_f64;
+    let mut positive_examples = 0_u64;
+    let mut negative_examples = 0_u64;
+    let mut decoder_bias_sum = 0.0_f64;
     for index in start..end {
         let source_node = examples.sources[index] as usize;
         let target_node = examples.targets[index] as usize;
@@ -204,10 +224,18 @@ fn train_batch(
         let source_row = gradients.encoded[source_node];
         let target_row = gradients.encoded[target_node];
         let mut logit = weights.decoder_bias[relation];
+        decoder_bias_sum += f64::from(weights.decoder_bias[relation]);
         for feature in 0..HIDDEN {
             logit += source_row[feature] * target_row[feature] * relation_state[feature];
         }
         let gradient = (sigmoid(logit) - f32::from(examples.labels[index])) * gradient_multiplier;
+        if examples.labels[index] {
+            positive_logit_sum += f64::from(logit);
+            positive_examples += 1;
+        } else {
+            negative_logit_sum += f64::from(logit);
+            negative_examples += 1;
+        }
         let probability = f64::from(sigmoid(logit)).clamp(f64::EPSILON, 1.0 - f64::EPSILON);
         binary_cross_entropy -= if examples.labels[index] {
             probability.ln()
@@ -267,51 +295,71 @@ fn train_batch(
     }
     encoder_backward(weights, gradients, staged, mode, &qualifiers);
     let unscale = optimizer.gradient_unscale();
-    let clip_scale = gradient_clip_scale(gradients, optimizer, unscale);
-    let update_scale = unscale * clip_scale;
+    let clip = gradient_clip_scales(gradients, optimizer, unscale);
+    let non_bias_update_scale = unscale * clip.non_bias_coefficient;
+    let bias_update_scale = unscale * clip.bias_coefficient;
     let economics = HyperEpochEconomics {
         mean_binary_cross_entropy: binary_cross_entropy / batch_examples as f64,
-        clip_coefficient: clip_scale,
-        clip_activated: clip_scale < 1.0,
-        clip_activation_rate: f64::from(clip_scale < 1.0),
+        clip_coefficient: clip.non_bias_coefficient,
+        clip_activated: clip.non_bias_coefficient < 1.0 || clip.bias_coefficient < 1.0,
+        clip_activation_rate: f64::from(
+            clip.non_bias_coefficient < 1.0 || clip.bias_coefficient < 1.0,
+        ),
+        non_bias_raw_gradient_l2: clip.non_bias_norm,
+        decoder_bias_raw_gradient_l2: clip.bias_norm,
+        non_bias_clip_coefficient: clip.non_bias_coefficient,
+        decoder_bias_clip_coefficient: clip.bias_coefficient,
+        non_bias_clip_activation_rate: f64::from(clip.non_bias_coefficient < 1.0),
+        decoder_bias_clip_activation_rate: f64::from(clip.bias_coefficient < 1.0),
+        positive_examples,
+        negative_examples,
+        mean_positive_logit: positive_logit_sum / positive_examples.max(1) as f64,
+        mean_negative_logit: negative_logit_sum / negative_examples.max(1) as f64,
+        mean_decoder_bias_value: decoder_bias_sum / batch_examples as f64,
         entity_embeddings: block_economics(
             &weights.node_embeddings,
             &gradients.node,
             optimizer,
-            update_scale,
+            non_bias_update_scale,
         ),
         relation_embeddings: block_economics(
             &weights.relation_embeddings,
             &gradients.relation,
             optimizer,
-            update_scale,
+            non_bias_update_scale,
         ),
         relation_projection: block_economics(
             &weights.relation_projection,
             &gradients.relation_projection,
             optimizer,
-            update_scale,
+            non_bias_update_scale,
         ),
         qualifier_projection: block_economics(
             &weights.qualifier_projection,
             &gradients.qualifier_projection,
             optimizer,
-            update_scale,
+            non_bias_update_scale,
         ),
         direction_matrices: block_economics(
             &weights.direction_weights,
             &gradients.direction,
             optimizer,
-            update_scale,
+            non_bias_update_scale,
         ),
         decoder_bias: block_economics(
             &weights.decoder_bias,
             &gradients.bias,
             optimizer,
-            update_scale,
+            bias_update_scale,
         ),
     };
-    sgd(weights, gradients, optimizer, update_scale);
+    apply_grouped_sgd(
+        weights,
+        gradients,
+        optimizer,
+        non_bias_update_scale,
+        bias_update_scale,
+    );
     if !weights_finite(weights) {
         return Err(CandleTrainerError::Contract("hyper non-finite weights"));
     }
@@ -725,61 +773,6 @@ fn sigmoid(value: f32) -> f32 {
     } else {
         let e = value.exp();
         e / (1.0 + e)
-    }
-}
-#[rustfmt::skip]
-fn sgd(weights: &mut HyperEncoderWeights, gradients: &GradientArena, optimizer: HyperOptimizerConfig, clip_scale: f32) {
-    update(&mut weights.node_embeddings, &gradients.node, optimizer, clip_scale);
-    update(&mut weights.direction_weights, &gradients.direction, optimizer, clip_scale);
-    update(&mut weights.relation_embeddings, &gradients.relation, optimizer, clip_scale);
-    update(&mut weights.relation_projection, &gradients.relation_projection, optimizer, clip_scale);
-    update(&mut weights.qualifier_projection, &gradients.qualifier_projection, optimizer, clip_scale);
-    update(&mut weights.decoder_bias, &gradients.bias, optimizer, clip_scale);
-}
-fn update(values: &mut [f32], gradients: &[f32], optimizer: HyperOptimizerConfig, clip_scale: f32) {
-    for (value, gradient) in values.iter_mut().zip(gradients) {
-        let gradient_step = optimizer.learning_rate * *gradient * clip_scale;
-        match optimizer.weight_decay_semantics {
-            HyperWeightDecaySemantics::None => *value -= gradient_step,
-            HyperWeightDecaySemantics::CoupledL2 => {
-                *value -= optimizer.learning_rate
-                    * (*gradient * clip_scale + optimizer.weight_decay * *value);
-            }
-            HyperWeightDecaySemantics::Decoupled => {
-                *value *= 1.0 - optimizer.learning_rate * optimizer.weight_decay;
-                *value -= gradient_step;
-            }
-        }
-    }
-}
-
-fn gradient_clip_scale(
-    gradients: &GradientArena,
-    optimizer: HyperOptimizerConfig,
-    gradient_unscale: f32,
-) -> f32 {
-    if optimizer.gradient_clip_policy == HyperGradientClipPolicy::None {
-        return 1.0;
-    }
-    let mut squared = 0.0_f64;
-    for values in [
-        gradients.node.as_slice(),
-        gradients.direction.as_slice(),
-        gradients.relation.as_slice(),
-        gradients.relation_projection.as_slice(),
-        gradients.qualifier_projection.as_slice(),
-        gradients.bias.as_slice(),
-    ] {
-        for &gradient in values {
-            let gradient = f64::from(gradient * gradient_unscale);
-            squared += gradient * gradient;
-        }
-    }
-    let norm = squared.sqrt() as f32;
-    if norm <= optimizer.gradient_clip_norm {
-        1.0
-    } else {
-        optimizer.gradient_clip_norm / norm
     }
 }
 #[rustfmt::skip]

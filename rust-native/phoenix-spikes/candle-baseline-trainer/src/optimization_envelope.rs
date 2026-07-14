@@ -8,9 +8,9 @@ use crate::optimization_envelope_eval::{
 };
 use crate::optimization_envelope_model::*;
 use crate::{
-    CandleTrainerError, GradientBlockEconomics, HyperEpochEconomics, HyperGradientClipPolicy,
-    HyperLossReduction, HyperOptimizerAlgorithm, HyperOptimizerConfig, HyperWeightDecaySemantics,
-    LossScaleSemantics, QualifiedSamplingPolicy,
+    CandleTrainerError, GradientBlockEconomics, HyperClipPartition, HyperEpochEconomics,
+    HyperGradientClipPolicy, HyperLossReduction, HyperOptimizerAlgorithm, HyperOptimizerConfig,
+    HyperWeightDecaySemantics, LossScaleSemantics, QualifiedSamplingPolicy,
 };
 use compact_str::{format_compact, CompactString};
 use phoenix_graph_research::{
@@ -39,6 +39,9 @@ struct ArmState {
     clipped_steps: u64,
     gradient_arena_bytes: u64,
     last_economics: Option<HyperEpochEconomics>,
+    last_batch_economics: Vec<HyperEpochEconomics>,
+    non_bias_clipped_steps: u64,
+    bias_clipped_steps: u64,
 }
 
 struct PersistedArm {
@@ -66,8 +69,11 @@ pub fn run_optimization_envelope_v1(
     )?;
     let optimizer = optimizer_recipe();
     optimizer.validate(examples.len())?;
-    let optimizer_identity = optimizer.identity()?;
     let initial = initialize_hyper_encoder_weights(&staged, OPTIMIZATION_ENVELOPE_SEED);
+    let clip_partition = HyperClipPartition::for_optimizer(&initial, optimizer)?;
+    clip_partition.validate(&initial)?;
+    let optimizer_identity = optimizer
+        .identity_with_partition_and_schedule(&clip_partition, examples.schedule_blake3.as_str())?;
     let initialization_blake3 = weights_digest(&initial);
     let lineage_id = lineage_identity(
         &staged,
@@ -193,6 +199,10 @@ pub fn run_optimization_envelope_v1(
         checkpoints: completed,
         optimizer,
         optimizer_identity,
+        clip_partition_blake3: clip_partition.partition_blake3.clone(),
+        clip_group_ordering: clip_partition.group_ordering.clone(),
+        clip_group_maximum_norms: vec![CLIP_NORM; clip_partition.group_ordering.len()],
+        decoder_weights_present: clip_partition.decoder_weights_present,
         initialization_blake3,
         example_schedule_blake3: examples.schedule_blake3.as_str().into(),
         training_examples: examples.len() as u64,
@@ -232,6 +242,10 @@ pub fn open_optimization_envelope(
         || manifest.envelope_id != envelope_identity_from_bytes(&bytes, &manifest.envelope_id)?
         || manifest.test_partition_accessed
         || !manifest.validation_only
+        || manifest.optimizer.gradient_clip_policy != HyperGradientClipPolicy::DecoderBiasVsNonBias
+        || manifest.clip_partition_blake3.len() != 67
+        || manifest.clip_group_maximum_norms != vec![CLIP_NORM, CLIP_NORM]
+        || manifest.decoder_weights_present
         || manifest.checkpoints.len() != OPTIMIZATION_ENVELOPE_CHECKPOINTS.len()
     {
         return Err(CandleTrainerError::Contract(
@@ -250,6 +264,9 @@ impl ArmState {
             clipped_steps: 0,
             gradient_arena_bytes: 0,
             last_economics: None,
+            last_batch_economics: Vec::new(),
+            non_bias_clipped_steps: 0,
+            bias_clipped_steps: 0,
         }
     }
 }
@@ -284,8 +301,15 @@ fn absorb_outcome(state: &mut ArmState, outcome: FusedHyperTrainingOutcome) {
     state.optimizer_steps += outcome.optimizer_steps;
     state.clipped_steps +=
         (outcome.final_epoch.clip_activation_rate * outcome.optimizer_steps as f64).round() as u64;
+    state.non_bias_clipped_steps += (outcome.final_epoch.non_bias_clip_activation_rate
+        * outcome.optimizer_steps as f64)
+        .round() as u64;
+    state.bias_clipped_steps += (outcome.final_epoch.decoder_bias_clip_activation_rate
+        * outcome.optimizer_steps as f64)
+        .round() as u64;
     state.gradient_arena_bytes = outcome.gradient_arena_bytes;
     state.last_economics = Some(outcome.final_epoch);
+    state.last_batch_economics = outcome.last_epoch_batches;
     state.weights = outcome.weights;
 }
 
@@ -373,12 +397,20 @@ fn persist_trained_arm(
             ranks: ranks_receipt,
             parameter_blocks: parameter_blocks(initial, &state.weights, economics),
             final_batch: state.last_economics,
+            batch_pressure: state.last_batch_economics.clone(),
             pre_clip_gradient_norm: pre_clip,
             clip_coefficient: state
                 .last_economics
                 .map(|value| f64::from(value.clip_coefficient))
                 .unwrap_or(1.0),
             clip_activation_rate: state.clipped_steps as f64 / state.optimizer_steps.max(1) as f64,
+            non_bias_clip_activation_rate: state.non_bias_clipped_steps as f64
+                / state.optimizer_steps.max(1) as f64,
+            decoder_bias_clip_activation_rate: state.bias_clipped_steps as f64
+                / state.optimizer_steps.max(1) as f64,
+            non_bias_update_recovery_vs_legacy_global: recovery_vs_legacy_global(
+                state.last_economics,
+            ),
             optimizer_steps: state.optimizer_steps,
             cold_restart_exact,
         },
@@ -452,6 +484,7 @@ fn persist_null_arm(
             ranks: ranks_receipt,
             parameter_blocks: null_parameter_blocks(initial, &comp_state.weights, economics),
             final_batch: comp_state.last_economics,
+            batch_pressure: comp_state.last_batch_economics.clone(),
             pre_clip_gradient_norm: pre_clip,
             clip_coefficient: comp_state
                 .last_economics
@@ -459,6 +492,13 @@ fn persist_null_arm(
                 .unwrap_or(1.0),
             clip_activation_rate: comp_state.clipped_steps as f64
                 / comp_state.optimizer_steps.max(1) as f64,
+            non_bias_clip_activation_rate: comp_state.non_bias_clipped_steps as f64
+                / comp_state.optimizer_steps.max(1) as f64,
+            decoder_bias_clip_activation_rate: comp_state.bias_clipped_steps as f64
+                / comp_state.optimizer_steps.max(1) as f64,
+            non_bias_update_recovery_vs_legacy_global: recovery_vs_legacy_global(
+                comp_state.last_economics,
+            ),
             optimizer_steps: comp_state.optimizer_steps,
             cold_restart_exact: true,
         },
@@ -582,6 +622,17 @@ fn empty_economics() -> HyperEpochEconomics {
         clip_coefficient: 1.0,
         clip_activated: false,
         clip_activation_rate: 0.0,
+        non_bias_raw_gradient_l2: 0.0,
+        decoder_bias_raw_gradient_l2: 0.0,
+        non_bias_clip_coefficient: 1.0,
+        decoder_bias_clip_coefficient: 1.0,
+        non_bias_clip_activation_rate: 0.0,
+        decoder_bias_clip_activation_rate: 0.0,
+        positive_examples: 0,
+        negative_examples: 0,
+        mean_positive_logit: 0.0,
+        mean_negative_logit: 0.0,
+        mean_decoder_bias_value: 0.0,
         entity_embeddings: empty_block(0),
         relation_embeddings: empty_block(0),
         relation_projection: empty_block(0),
@@ -600,12 +651,27 @@ fn optimizer_recipe() -> HyperOptimizerConfig {
         gradient_accumulation_steps: 1,
         global_loss_scale: LOSS_SCALE,
         loss_scale_semantics: LossScaleSemantics::ClipScaledGradient,
-        gradient_clip_policy: HyperGradientClipPolicy::GlobalNorm,
+        gradient_clip_policy: HyperGradientClipPolicy::DecoderBiasVsNonBias,
         gradient_clip_norm: CLIP_NORM,
         weight_decay: 0.0,
         weight_decay_semantics: HyperWeightDecaySemantics::None,
         qualified_sampling_policy: QualifiedSamplingPolicy::Natural,
     }
+}
+
+fn recovery_vs_legacy_global(economics: Option<HyperEpochEconomics>) -> f64 {
+    let Some(economics) = economics else {
+        return 1.0;
+    };
+    let global = (economics.non_bias_raw_gradient_l2.powi(2)
+        + economics.decoder_bias_raw_gradient_l2.powi(2))
+    .sqrt();
+    let legacy = if global <= f64::from(CLIP_NORM) {
+        1.0
+    } else {
+        f64::from(CLIP_NORM) / global
+    };
+    f64::from(economics.non_bias_clip_coefficient) / legacy
 }
 
 fn frozen_training_config() -> HyperEncoderTrainingConfig {

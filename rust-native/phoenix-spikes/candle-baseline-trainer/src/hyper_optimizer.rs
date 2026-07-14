@@ -21,6 +21,28 @@ pub struct HyperEpochEconomics {
     pub clip_coefficient: f32,
     pub clip_activated: bool,
     pub clip_activation_rate: f64,
+    #[serde(default)]
+    pub non_bias_raw_gradient_l2: f64,
+    #[serde(default)]
+    pub decoder_bias_raw_gradient_l2: f64,
+    #[serde(default = "one_f32")]
+    pub non_bias_clip_coefficient: f32,
+    #[serde(default = "one_f32")]
+    pub decoder_bias_clip_coefficient: f32,
+    #[serde(default)]
+    pub non_bias_clip_activation_rate: f64,
+    #[serde(default)]
+    pub decoder_bias_clip_activation_rate: f64,
+    #[serde(default)]
+    pub positive_examples: u64,
+    #[serde(default)]
+    pub negative_examples: u64,
+    #[serde(default)]
+    pub mean_positive_logit: f64,
+    #[serde(default)]
+    pub mean_negative_logit: f64,
+    #[serde(default)]
+    pub mean_decoder_bias_value: f64,
     pub entity_embeddings: GradientBlockEconomics,
     pub relation_embeddings: GradientBlockEconomics,
     pub relation_projection: GradientBlockEconomics,
@@ -56,6 +78,8 @@ pub enum HyperWeightDecaySemantics {
 pub enum HyperGradientClipPolicy {
     None,
     GlobalNorm,
+    PartitionedSingleGlobal,
+    DecoderBiasVsNonBias,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -63,6 +87,10 @@ pub enum HyperGradientClipPolicy {
 pub enum LossScaleSemantics {
     UnscaleBeforeClip,
     ClipScaledGradient,
+}
+
+fn one_f32() -> f32 {
+    1.0
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]

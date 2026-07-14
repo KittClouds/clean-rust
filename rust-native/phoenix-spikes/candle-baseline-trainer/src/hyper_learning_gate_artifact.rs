@@ -1,6 +1,6 @@
 use crate::hyper_encoder_examples::PreparedHyperExamples;
 use crate::hyper_encoder_memory::FusedHyperTrainingOutcome;
-use crate::{CandleTrainerError, HyperOptimizerConfig};
+use crate::{CandleTrainerError, HyperClipPartition, HyperOptimizerConfig};
 use compact_str::{format_compact, CompactString};
 use phoenix_graph_research::{
     encode_hyper_encoder, evaluate_hyper_relational_validation_batched,
@@ -53,7 +53,11 @@ pub(crate) fn persist_and_reopen_gate_model(
         },
     )?;
     drop(encoded);
-    let optimizer_id = request.optimizer.identity()?;
+    let partition = HyperClipPartition::for_optimizer(&request.outcome.weights, request.optimizer)?;
+    let optimizer_id = request.optimizer.identity_with_partition_and_schedule(
+        &partition,
+        request.examples.schedule_blake3.as_str(),
+    )?;
     let pair_id = gate_pair_id(
         request.staged,
         request.examples,

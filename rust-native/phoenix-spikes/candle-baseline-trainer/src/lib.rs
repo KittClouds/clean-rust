@@ -1,3 +1,10 @@
+mod gradient_pressure;
+mod gradient_pressure_model;
+mod gradient_pressure_schedule;
+#[cfg(test)]
+mod gradient_pressure_tests;
+mod hyper_clip_partition;
+mod hyper_clip_runtime;
 mod hyper_encoder_examples;
 mod hyper_encoder_memory;
 mod hyper_encoder_trainer;
@@ -21,6 +28,9 @@ mod temporal_rgcn;
 mod temporal_rgcn_evaluator;
 mod temporal_rgcn_memory;
 
+pub use gradient_pressure::*;
+pub use gradient_pressure_model::*;
+pub use hyper_clip_partition::*;
 pub use hyper_encoder_trainer::*;
 pub use hyper_learning_gate_receipt::open_hyper_learning_gates;
 pub use hyper_learning_gates::*;
