@@ -53,6 +53,8 @@ export interface GraphOperatorMutationIntent {
     conflictedAt?: number;
     conflictReason?: string;
     undoneAt?: number;
+    nativeDecisionId?: string;
+    nativeDecisionReceiptId?: string;
 }
 
 export interface GraphOperatorMutationReceipt {
@@ -71,6 +73,8 @@ export interface GraphOperatorMutationReceipt {
     sourceFingerprint: string;
     detail: string;
     createdAt: number;
+    nativeDecisionId?: string;
+    nativeDecisionReceiptId?: string;
 }
 
 export interface GraphOperatorMutationJournalCounters {
@@ -186,6 +190,27 @@ export function graphOperatorMutationJournalFromTruthCommits(
         updatedAt,
         intents,
         receipts,
+    });
+}
+
+export function mergeGraphOperatorMutationJournals(
+    canonical: GraphOperatorMutationJournal,
+    operator: GraphOperatorMutationJournal | undefined,
+): GraphOperatorMutationJournal {
+    if (!operator) return canonical;
+    if (canonical.scopeId !== operator.scopeId) {
+        throw new Error('Cannot merge operator mutation journals from different scopes.');
+    }
+    const intents = new Map(canonical.intents.map((intent) => [intent.id, intent]));
+    const receipts = new Map(canonical.receipts.map((receipt) => [receipt.id, receipt]));
+    for (const intent of operator.intents) intents.set(intent.id, intent);
+    for (const receipt of operator.receipts) receipts.set(receipt.id, receipt);
+    return withJournalCounters({
+        schemaVersion: GRAPH_OPERATOR_MUTATION_JOURNAL_SCHEMA_VERSION,
+        scopeId: canonical.scopeId,
+        updatedAt: Math.max(canonical.updatedAt, operator.updatedAt),
+        intents: [...intents.values()].sort((left, right) => left.createdAt - right.createdAt || left.id.localeCompare(right.id)),
+        receipts: [...receipts.values()].sort((left, right) => left.createdAt - right.createdAt || left.id.localeCompare(right.id)),
     });
 }
 

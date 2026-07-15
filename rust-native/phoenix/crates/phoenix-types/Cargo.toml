@@ -13,3 +13,4 @@ compact_str.workspace = true
 rowan.workspace = true
 slotmap.workspace = true
 smallvec.workspace = true
+blake3 = "1.8"

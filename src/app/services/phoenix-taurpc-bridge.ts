@@ -97,6 +97,16 @@ function auditToken(value: unknown): string {
         .slice(0, 64);
 }
 
+export function canonicalRewardObserverDelayMs(report: unknown, now = Date.now()): number {
+    const row = objectRecord(report);
+    const nextEligibleAt = typeof row?.['nextEligibleAt'] === 'number'
+        ? row['nextEligibleAt']
+        : null;
+    return nextEligibleAt === null
+        ? 5 * 60 * 1_000
+        : Math.min(Math.max(nextEligibleAt - now, 1_000), 2_147_483_647);
+}
+
 export function graphAnalysisResidentDocumentRequest(
     request: unknown,
     residentDocuments: Map<string, { text: string; textHash: string }>,
@@ -139,6 +149,7 @@ class PhoenixTaurpcBridge implements PhoenixNativeBridge {
     private readonly residentGraphDocuments = new Map<string, { text: string; textHash: string }>();
     private pendingGraphRun: { runHandle: string; signature: string } | null = null;
     private reportedBuild = '';
+    private rewardHorizonTimer: ReturnType<typeof setTimeout> | null = null;
 
     constructor(private readonly rpc: PhoenixRpc) {}
 
@@ -164,6 +175,10 @@ class PhoenixTaurpcBridge implements PhoenixNativeBridge {
     async initRuntime(forceReset = false): Promise<any> {
         if (forceReset) {
             this.loading = null;
+            if (this.rewardHorizonTimer !== null) {
+                clearTimeout(this.rewardHorizonTimer);
+                this.rewardHorizonTimer = null;
+            }
         }
         const request = {
             forceReset,
@@ -179,6 +194,7 @@ class PhoenixTaurpcBridge implements PhoenixNativeBridge {
             this.reportedBuild = build;
             console.info(`[PhoenixNative] ${info.buildProfile} ${info.buildGitSha.slice(0, 12)}`);
         }
+        await this.observeNativeRewardHorizons();
         this.markReady(Boolean(info.ready));
         return info;
     }
@@ -301,6 +317,61 @@ class PhoenixTaurpcBridge implements PhoenixNativeBridge {
             'phoenix.persist_graph_run',
             () => this.rpc.phoenix.persist_graph_run({ runHandle }),
         );
+    }
+
+    async beginNativeOperatorDecision(request: unknown): Promise<unknown> {
+        await this.loadRuntime();
+        const response = await this.rpc.phoenix.begin_native_operator_decision_json(
+            JSON.stringify(request),
+        );
+        return JSON.parse(response);
+    }
+
+    async completeNativeOperatorDecision(request: unknown): Promise<unknown> {
+        await this.loadRuntime();
+        const response = await this.rpc.phoenix.complete_native_operator_decision_json(
+            JSON.stringify(request),
+        );
+        return JSON.parse(response);
+    }
+
+    async nativeDecisionCensus(): Promise<unknown> {
+        await this.loadRuntime();
+        const response = await this.rpc.phoenix.native_decision_census_json();
+        return JSON.parse(response);
+    }
+
+    async linkNativeOperatorDecisionGraphTruth(request: unknown): Promise<unknown> {
+        await this.loadRuntime();
+        const response = await this.rpc.phoenix.link_native_operator_decision_graph_truth_json(
+            JSON.stringify(request),
+        );
+        return JSON.parse(response);
+    }
+
+    async recordNativeRewardObservation(request: unknown): Promise<unknown> {
+        await this.loadRuntime();
+        const response = await this.rpc.phoenix.record_native_reward_observation_json(
+            JSON.stringify(request),
+        );
+        return JSON.parse(response);
+    }
+
+    async nativeRewardObservationCensus(): Promise<unknown> {
+        await this.loadRuntime();
+        const response = await this.rpc.phoenix.native_reward_observation_census_json();
+        return JSON.parse(response);
+    }
+
+    private async observeNativeRewardHorizons(): Promise<void> {
+        const response = await this.rpc.phoenix.observe_native_reward_horizons_json();
+        const delayMs = canonicalRewardObserverDelayMs(JSON.parse(response));
+        if (this.rewardHorizonTimer !== null) clearTimeout(this.rewardHorizonTimer);
+        this.rewardHorizonTimer = setTimeout(() => {
+            this.observeNativeRewardHorizons().catch((error) => {
+                console.error('[PhoenixNative] canonical reward horizon observer failed', error);
+            });
+        }, delayMs);
     }
 
     async closeGraphRun(runHandle: string): Promise<boolean> {

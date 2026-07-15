@@ -9,10 +9,7 @@ import { PhoenixMachineControlService } from '../../../../services/phoenix-machi
 import { PhoenixProjectionService } from '../../../../services/phoenix-projection.service';
 import { AtlasControlContractService } from '../../../../services/atlas-control-contract.service';
 import { GraphRebuildService } from '../../../../graph-rebuild/graph-rebuild.service';
-import {
-    applyGraphDocumentReviewDecisionToSnapshot,
-    type GraphDocumentReviewDecision,
-} from '../../../../graph-rebuild/graph-document-review-snapshot';
+import type { GraphDocumentReviewDecision } from '../../../../graph-rebuild/graph-document-review-snapshot';
 import { SearchPanelComponent } from '../../../search-panel/search-panel.component';
 import {
     EntityCreatorData,
@@ -188,12 +185,7 @@ export class AttributesTabComponent implements OnDestroy {
         const decision = reviewDecisionForAction(request.action);
         if (decision) {
             const targetId = row.sourceIds[0] ?? row.identity.rawId;
-            const next = applyGraphDocumentReviewDecisionToSnapshot(
-                this.graphSnapshot(),
-                [targetId],
-                decision,
-            );
-            if (next) await this.graphRebuild.restorePersistedSnapshot(next);
+            await this.graphRebuild.applyOperatorReviewDecision(targetId, decision);
             return;
         }
         this.requestRowFocus(row);
@@ -244,7 +236,7 @@ function reviewDecisionForAction(action: AtlasControlRoomActionRequest['action']
         reject_review_row: 'rejected',
         promote_to_anchor: 'promoted_to_anchor',
         merge_duplicates: 'accepted',
-        demote_to_sidecar: 'deferred',
+        demote_to_sidecar: 'ledger_only',
         mute_pattern: 'muted',
         compile_to_graph: 'compiled_to_graph',
     };

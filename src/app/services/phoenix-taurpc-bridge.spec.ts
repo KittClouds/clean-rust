@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
-import { graphAnalysisResidentDocumentRequest, utf8MentionOffsets } from './phoenix-taurpc-bridge';
+import {
+    canonicalRewardObserverDelayMs,
+    graphAnalysisResidentDocumentRequest,
+    utf8MentionOffsets,
+} from './phoenix-taurpc-bridge';
 
 describe('Phoenix TauRPC compact mention projection', () => {
     it('maps UTF-8 byte ranges to JavaScript UTF-16 offsets without changing wire ranges', () => {
@@ -25,5 +29,13 @@ describe('Phoenix TauRPC compact mention projection', () => {
             runHandle: 'graph-run:1',
             documents: [{ noteId: 'note-1', text: null, textHash: 'text:abc' }],
         });
+    });
+});
+
+describe('canonical reward horizon scheduling', () => {
+    it('sleeps to the exact pending horizon and polls conservatively when none is installed', () => {
+        expect(canonicalRewardObserverDelayMs({ nextEligibleAt: 12_000 }, 10_000)).toBe(2_000);
+        expect(canonicalRewardObserverDelayMs({ nextEligibleAt: 9_000 }, 10_000)).toBe(1_000);
+        expect(canonicalRewardObserverDelayMs({ nextEligibleAt: null }, 10_000)).toBe(300_000);
     });
 });

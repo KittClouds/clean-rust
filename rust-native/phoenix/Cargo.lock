@@ -2545,6 +2545,7 @@ dependencies = [
 name = "phoenix-api"
 version = "0.1.1"
 dependencies = [
+ "blake3",
  "phoenix-alex",
  "phoenix-causal-post",
  "phoenix-chunker",
@@ -2570,6 +2571,7 @@ dependencies = [
  "rmp-serde",
  "serde",
  "serde_json",
+ "tempfile",
  "thiserror 1.0.69",
 ]
 
@@ -3054,6 +3056,7 @@ name = "phoenix-store-overgraph"
 version = "0.1.1"
 dependencies = [
  "arc-swap",
+ "blake3",
  "bm25_turbo",
  "compact_str 0.8.1",
  "hashbrown 0.15.5",
@@ -3071,6 +3074,7 @@ dependencies = [
  "serde",
  "serde_json",
  "smallvec",
+ "tempfile",
  "zerocopy 0.7.35",
 ]
 
@@ -3129,6 +3133,7 @@ dependencies = [
 name = "phoenix-types"
 version = "0.1.1"
 dependencies = [
+ "blake3",
  "compact_str 0.8.1",
  "rowan",
  "serde",

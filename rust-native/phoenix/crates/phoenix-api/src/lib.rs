@@ -2,7 +2,12 @@
 //! pipeline stages.
 
 pub mod depth_audit;
+mod native_operator_decision;
+mod native_reward_observation;
 mod pipeline_scheduler;
+
+pub use native_operator_decision::*;
+pub use native_reward_observation::*;
 
 use serde::{Deserialize, Serialize};
 
@@ -26,14 +31,19 @@ use phoenix_memory_post::api as memory_api;
 use phoenix_rel_post::api as rel_api;
 use phoenix_state_schema_post::api as state_schema_api;
 use phoenix_store_native_core::{
-    PhoenixArchiveStoreV2, PhoenixCausalPatchStore, PhoenixErPatchStore,
-    PhoenixEventIdentityPatchStore, PhoenixGraphKernelStoreV2, PhoenixGraphLearningStore,
-    PhoenixGraphPatchStore, PhoenixLexicalQueryStore, PhoenixMemoryPatchStore,
-    PhoenixRelationPatchStore, PhoenixScopeRuntimeStore, PhoenixSemanticGraphPatchStore,
-    PhoenixSemanticIndexStore, PhoenixStateSchemaPatchStore, PhoenixTemporalPatchStore, StoreError,
+    NativeDecisionReceiptAppend, PhoenixArchiveStoreV2, PhoenixCausalPatchStore,
+    PhoenixErPatchStore, PhoenixEventIdentityPatchStore, PhoenixGraphKernelStoreV2,
+    PhoenixGraphLearningStore, PhoenixGraphPatchStore, PhoenixLexicalQueryStore,
+    PhoenixMemoryPatchStore, PhoenixNativeDecisionStore, PhoenixRelationPatchStore,
+    PhoenixScopeRuntimeStore, PhoenixSemanticGraphPatchStore, PhoenixSemanticIndexStore,
+    PhoenixStateSchemaPatchStore, PhoenixTemporalPatchStore, StoreError,
 };
 use phoenix_temporal_post::api as temporal_api;
-use phoenix_types::{LexiconEntry, ScopeKey, SessionId};
+use phoenix_types::{
+    resolve_complete_native_decision_outcomes, LexiconEntry, NativeDecisionOutcomeReceipt,
+    NativeDecisionReceipt, NativeDecisionReceiptError, NativeResolvedDecisionCandidate, ScopeKey,
+    SessionId,
+};
 pub use pipeline_scheduler::{
     PipelineGenerationContext, PipelineRunMetrics, PipelineRunRequest, PipelineRunShape,
     PipelineStage, PipelineStageStatus, ScopeGenerationKey, StageProductEnvelope,
@@ -48,6 +58,8 @@ pub enum PipelineApiError {
     Alex(#[from] AlexError),
     #[error(transparent)]
     Relation(#[from] phoenix_rel_post::GlirelWorkerError),
+    #[error(transparent)]
+    DecisionReceipt(#[from] NativeDecisionReceiptError),
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -649,6 +661,56 @@ where
         let commits = self.store.load_graph_truth_commits()?;
         project_graph_proposal_outcomes(&receipts, &commits)
             .map_err(|error| StoreError::Schema(error.to_string()))
+    }
+
+    pub fn record_native_decision(
+        &self,
+        receipt: &NativeDecisionReceipt,
+    ) -> Result<NativeDecisionReceiptAppend, StoreError>
+    where
+        S: PhoenixNativeDecisionStore,
+    {
+        self.store.append_native_decision_receipt(receipt)
+    }
+
+    pub fn record_native_decision_outcome(
+        &self,
+        receipt: &NativeDecisionOutcomeReceipt,
+    ) -> Result<NativeDecisionReceiptAppend, StoreError>
+    where
+        S: PhoenixNativeDecisionStore,
+    {
+        self.store.append_native_decision_outcome_receipt(receipt)
+    }
+
+    pub fn native_decisions(&self) -> Result<Vec<NativeDecisionReceipt>, StoreError>
+    where
+        S: PhoenixNativeDecisionStore,
+    {
+        self.store.load_native_decision_receipts()
+    }
+
+    pub fn resolved_native_decision_outcomes(
+        &self,
+        decision_receipt_id: &str,
+        frozen_at: i64,
+    ) -> Result<Vec<NativeResolvedDecisionCandidate>, PipelineApiError>
+    where
+        S: PhoenixNativeDecisionStore,
+    {
+        let decision = self
+            .store
+            .load_native_decision_receipt(decision_receipt_id)?
+            .ok_or_else(|| {
+                StoreError::Query(format!(
+                    "native decision receipt '{decision_receipt_id}' was not found"
+                ))
+            })?;
+        let outcomes = self
+            .store
+            .load_native_decision_outcome_receipts(decision_receipt_id)?;
+        resolve_complete_native_decision_outcomes(&decision, &outcomes, frozen_at)
+            .map_err(Into::into)
     }
 
     pub fn freeze_research_snapshot(

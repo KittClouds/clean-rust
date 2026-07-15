@@ -166,6 +166,12 @@ export type PhoenixNativeBridge = Pick<PhoenixWasmService, 'isReady' | PhoenixNa
     analyzeGraphSnapshot?(request: unknown): Promise<unknown>;
     readGraphRunPage?(request: { runHandle: string; offset: number; limit: number }): Promise<unknown>;
     persistGraphRun?(runHandle: string): Promise<unknown>;
+    beginNativeOperatorDecision?(request: unknown): Promise<unknown>;
+    completeNativeOperatorDecision?(request: unknown): Promise<unknown>;
+    nativeDecisionCensus?(): Promise<unknown>;
+    linkNativeOperatorDecisionGraphTruth?(request: unknown): Promise<unknown>;
+    recordNativeRewardObservation?(request: unknown): Promise<unknown>;
+    nativeRewardObservationCensus?(): Promise<unknown>;
     closeGraphRun?(runHandle: string): Promise<boolean>;
     graphScenePacket?(request: PhoenixGraphScenePacketRequest): Promise<PhoenixGraphScenePacket>;
     nliAdjudicateClaims?(request: Record<string, unknown>): Promise<any>;
@@ -350,6 +356,70 @@ export class PhoenixBackendService {
         const bridge = this.requireNativeBridge();
         if (!bridge.persistGraphRun) throw new Error('Native graph run persistence RPC is unavailable.');
         return bridge.persistGraphRun(runHandle);
+    }
+
+    async beginNativeOperatorDecision(request: unknown): Promise<unknown> {
+        if (this.target !== 'native') {
+            throw new Error('PhoenixBackendService.beginNativeOperatorDecision() requires the native runtime.');
+        }
+        const bridge = this.requireNativeBridge();
+        if (!bridge.beginNativeOperatorDecision) {
+            throw new Error('Native operator decision begin RPC is unavailable.');
+        }
+        return bridge.beginNativeOperatorDecision(request);
+    }
+
+    async completeNativeOperatorDecision(request: unknown): Promise<unknown> {
+        if (this.target !== 'native') {
+            throw new Error('PhoenixBackendService.completeNativeOperatorDecision() requires the native runtime.');
+        }
+        const bridge = this.requireNativeBridge();
+        if (!bridge.completeNativeOperatorDecision) {
+            throw new Error('Native operator decision completion RPC is unavailable.');
+        }
+        return bridge.completeNativeOperatorDecision(request);
+    }
+
+    async nativeDecisionCensus(): Promise<unknown> {
+        if (this.target !== 'native') {
+            throw new Error('PhoenixBackendService.nativeDecisionCensus() requires the native runtime.');
+        }
+        const bridge = this.requireNativeBridge();
+        if (!bridge.nativeDecisionCensus) throw new Error('Native decision census RPC is unavailable.');
+        return bridge.nativeDecisionCensus();
+    }
+
+    async linkNativeOperatorDecisionGraphTruth(request: unknown): Promise<unknown> {
+        if (this.target !== 'native') {
+            throw new Error('PhoenixBackendService.linkNativeOperatorDecisionGraphTruth() requires the native runtime.');
+        }
+        const bridge = this.requireNativeBridge();
+        if (!bridge.linkNativeOperatorDecisionGraphTruth) {
+            throw new Error('Native decision graph-truth link RPC is unavailable.');
+        }
+        return bridge.linkNativeOperatorDecisionGraphTruth(request);
+    }
+
+    async recordNativeRewardObservation(request: unknown): Promise<unknown> {
+        if (this.target !== 'native') {
+            throw new Error('PhoenixBackendService.recordNativeRewardObservation() requires the native runtime.');
+        }
+        const bridge = this.requireNativeBridge();
+        if (!bridge.recordNativeRewardObservation) {
+            throw new Error('Native reward observation RPC is unavailable.');
+        }
+        return bridge.recordNativeRewardObservation(request);
+    }
+
+    async nativeRewardObservationCensus(): Promise<unknown> {
+        if (this.target !== 'native') {
+            throw new Error('PhoenixBackendService.nativeRewardObservationCensus() requires the native runtime.');
+        }
+        const bridge = this.requireNativeBridge();
+        if (!bridge.nativeRewardObservationCensus) {
+            throw new Error('Native reward observation census RPC is unavailable.');
+        }
+        return bridge.nativeRewardObservationCensus();
     }
 
     async closeGraphRun(runHandle: string): Promise<boolean> {

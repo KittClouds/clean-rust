@@ -402,6 +402,7 @@ dependencies = [
  "cfg-if 1.0.4",
  "constant_time_eq",
  "cpufeatures 0.3.0",
+ "rayon-core",
 ]
 
 [[package]]
@@ -4061,6 +4062,39 @@ dependencies = [
 ]
 
 [[package]]
+name = "phoenix-api"
+version = "0.1.1"
+dependencies = [
+ "blake3",
+ "phoenix-alex 0.1.1",
+ "phoenix-causal-post",
+ "phoenix-chunker 0.1.1",
+ "phoenix-dynamic-ner 0.1.1",
+ "phoenix-embed",
+ "phoenix-er-post",
+ "phoenix-event-identity-post",
+ "phoenix-evidence-graph",
+ "phoenix-graph-kernel 0.1.1",
+ "phoenix-graph-post",
+ "phoenix-graph-rebuild",
+ "phoenix-graph-research",
+ "phoenix-ingest-overgraph",
+ "phoenix-memory-post",
+ "phoenix-rel-post 0.1.1",
+ "phoenix-scope-analysis",
+ "phoenix-semantic-v2 0.1.1",
+ "phoenix-state-schema-post",
+ "phoenix-store-native-core 0.1.1",
+ "phoenix-store-overgraph 0.1.1",
+ "phoenix-temporal-post",
+ "phoenix-types 0.1.1",
+ "rmp-serde",
+ "serde",
+ "serde_json",
+ "thiserror 1.0.69",
+]
+
+[[package]]
 name = "phoenix-automata"
 version = "0.1.0"
 dependencies = [
@@ -4074,15 +4108,58 @@ dependencies = [
 ]
 
 [[package]]
+name = "phoenix-automata"
+version = "0.1.1"
+dependencies = [
+ "aho-corasick",
+ "compact_str 0.8.1",
+ "fst",
+ "phoenix-alex 0.1.1",
+ "phoenix-types 0.1.1",
+ "serde",
+ "thiserror 1.0.69",
+]
+
+[[package]]
+name = "phoenix-causal-post"
+version = "0.1.1"
+dependencies = [
+ "phoenix-chunker 0.1.1",
+ "phoenix-scope-analysis",
+ "phoenix-semantic-v2 0.1.1",
+ "phoenix-store-native-core 0.1.1",
+ "phoenix-store-overgraph 0.1.1",
+ "phoenix-types 0.1.1",
+ "rustc-hash 1.1.0",
+ "serde",
+ "serde_json",
+ "smallvec",
+ "thiserror 1.0.69",
+]
+
+[[package]]
 name = "phoenix-causality"
 version = "0.1.0"
 dependencies = [
  "compact_str 0.8.1",
- "phoenix-automata",
+ "phoenix-automata 0.1.0",
  "phoenix-machine 0.1.0",
  "phoenix-semantics",
- "phoenix-time",
+ "phoenix-time 0.1.0",
  "phoenix-types 0.1.0",
+ "rustc-hash 1.1.0",
+ "smallvec",
+]
+
+[[package]]
+name = "phoenix-causality"
+version = "0.1.1"
+dependencies = [
+ "compact_str 0.8.1",
+ "phoenix-automata 0.1.1",
+ "phoenix-machine 0.1.1",
+ "phoenix-time 0.1.1",
+ "phoenix-types 0.1.1",
  "rustc-hash 1.1.0",
  "smallvec",
 ]
@@ -4158,12 +4235,76 @@ dependencies = [
 ]
 
 [[package]]
+name = "phoenix-dynamic-ner"
+version = "0.1.1"
+dependencies = [
+ "compact_str 0.8.1",
+ "daachorse",
+ "memchr",
+ "phoenix-alex 0.1.1",
+ "phoenix-types 0.1.1",
+ "rustc-hash 1.1.0",
+ "serde",
+ "smallvec",
+ "thiserror 1.0.69",
+]
+
+[[package]]
 name = "phoenix-embed"
 version = "0.1.1"
 dependencies = [
  "ort",
  "thiserror 1.0.69",
  "tokenizers 0.22.2",
+]
+
+[[package]]
+name = "phoenix-er-post"
+version = "0.1.1"
+dependencies = [
+ "phoenix-chunker 0.1.1",
+ "phoenix-embed",
+ "phoenix-ingest-overgraph",
+ "phoenix-kernel 0.1.1",
+ "phoenix-semantic-v2 0.1.1",
+ "phoenix-store-native-core 0.1.1",
+ "phoenix-store-overgraph 0.1.1",
+ "phoenix-types 0.1.1",
+ "rustc-hash 1.1.0",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "phoenix-event-identity-post"
+version = "0.1.1"
+dependencies = [
+ "phoenix-chunker 0.1.1",
+ "phoenix-scope-analysis",
+ "phoenix-semantic-v2 0.1.1",
+ "phoenix-store-native-core 0.1.1",
+ "phoenix-store-overgraph 0.1.1",
+ "phoenix-types 0.1.1",
+ "rustc-hash 1.1.0",
+ "serde",
+ "serde_json",
+ "thiserror 1.0.69",
+]
+
+[[package]]
+name = "phoenix-evidence-graph"
+version = "0.1.1"
+dependencies = [
+ "compact_str 0.8.1",
+ "memchr",
+ "phoenix-chunker 0.1.1",
+ "phoenix-dynamic-ner 0.1.1",
+ "phoenix-machine 0.1.1",
+ "phoenix-types 0.1.1",
+ "rustc-hash 1.1.0",
+ "serde",
+ "smallvec",
+ "thiserror 1.0.69",
 ]
 
 [[package]]
@@ -4263,6 +4404,26 @@ dependencies = [
 ]
 
 [[package]]
+name = "phoenix-graph-research"
+version = "0.1.1"
+dependencies = [
+ "blake3",
+ "compact_str 0.8.1",
+ "hashbrown 0.15.5",
+ "memchr",
+ "memmap2",
+ "phoenix-graph-kernel 0.1.1",
+ "phoenix-graph-rebuild",
+ "phoenix-types 0.1.1",
+ "rayon",
+ "serde",
+ "serde_json",
+ "thiserror 1.0.69",
+ "wide 0.7.33",
+ "zerocopy 0.7.35",
+]
+
+[[package]]
 name = "phoenix-hyperbolic"
 version = "0.1.0"
 dependencies = [
@@ -4321,6 +4482,36 @@ dependencies = [
  "serde",
  "serde_json",
  "smallvec",
+ "thiserror 1.0.69",
+]
+
+[[package]]
+name = "phoenix-ingest-overgraph"
+version = "0.1.1"
+dependencies = [
+ "daachorse",
+ "lz4_flex",
+ "memchr",
+ "phoenix-alex 0.1.1",
+ "phoenix-causality 0.1.1",
+ "phoenix-chunker 0.1.1",
+ "phoenix-document-index",
+ "phoenix-graph 0.1.1",
+ "phoenix-kernel 0.1.1",
+ "phoenix-machine 0.1.1",
+ "phoenix-proposition 0.1.1",
+ "phoenix-semantic-v2 0.1.1",
+ "phoenix-store-native-core 0.1.1",
+ "phoenix-time 0.1.1",
+ "phoenix-types 0.1.1",
+ "rayon",
+ "rmp-serde",
+ "rustc-hash 1.1.0",
+ "scirs2-text",
+ "serde",
+ "serde_json",
+ "smallvec",
+ "stop-words",
  "thiserror 1.0.69",
 ]
 
@@ -4403,6 +4594,22 @@ dependencies = [
  "serde",
  "serde_json",
  "smallvec",
+ "thiserror 1.0.69",
+]
+
+[[package]]
+name = "phoenix-memory-post"
+version = "0.1.1"
+dependencies = [
+ "phoenix-chunker 0.1.1",
+ "phoenix-scope-analysis",
+ "phoenix-semantic-v2 0.1.1",
+ "phoenix-store-native-core 0.1.1",
+ "phoenix-store-overgraph 0.1.1",
+ "phoenix-types 0.1.1",
+ "rustc-hash 1.1.0",
+ "serde",
+ "serde_json",
  "thiserror 1.0.69",
 ]
 
@@ -4541,7 +4748,7 @@ dependencies = [
  "phoenix-analytics",
  "phoenix-chat",
  "phoenix-chunker 0.1.0",
- "phoenix-dynamic-ner",
+ "phoenix-dynamic-ner 0.1.0",
  "phoenix-graph 0.1.0",
  "phoenix-hyperbolic 0.1.0",
  "phoenix-invarant-v2",
@@ -4568,7 +4775,7 @@ name = "phoenix-runtime-native"
 version = "0.1.0"
 dependencies = [
  "phoenix-analytics",
- "phoenix-causality",
+ "phoenix-causality 0.1.0",
  "phoenix-ingest-native",
  "phoenix-kernel 0.1.0",
  "phoenix-machine 0.1.0",
@@ -4578,7 +4785,7 @@ dependencies = [
  "phoenix-semantic-v2 0.1.0",
  "phoenix-semantics",
  "phoenix-store-native-core 0.1.0",
- "phoenix-time",
+ "phoenix-time 0.1.0",
  "phoenix-types 0.1.0",
  "rustc-hash 1.1.0",
  "serde",
@@ -4640,6 +4847,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "phoenix-state-schema-post"
+version = "0.1.1"
+dependencies = [
+ "phoenix-chunker 0.1.1",
+ "phoenix-scope-analysis",
+ "phoenix-semantic-v2 0.1.1",
+ "phoenix-store-native-core 0.1.1",
+ "phoenix-store-overgraph 0.1.1",
+ "phoenix-types 0.1.1",
+ "rustc-hash 1.1.0",
+ "serde",
+ "serde_json",
+ "thiserror 1.0.69",
+]
+
+[[package]]
 name = "phoenix-store-native"
 version = "0.1.0"
 dependencies = [
@@ -4694,6 +4917,7 @@ name = "phoenix-store-overgraph"
 version = "0.1.1"
 dependencies = [
  "arc-swap",
+ "blake3",
  "bm25_turbo",
  "compact_str 0.8.1",
  "hashbrown 0.15.5",
@@ -4736,6 +4960,7 @@ dependencies = [
  "memmap2",
  "ort",
  "ort-sys",
+ "phoenix-api",
  "phoenix-document-index",
  "phoenix-graph-kernel 0.1.1",
  "phoenix-graph-post",
@@ -4752,9 +4977,30 @@ dependencies = [
  "tauri",
  "tauri-build",
  "taurpc",
+ "tempfile",
  "tokenizers 0.22.2",
  "tokio",
  "zstd",
+]
+
+[[package]]
+name = "phoenix-temporal-post"
+version = "0.1.1"
+dependencies = [
+ "hashbrown 0.15.5",
+ "memchr",
+ "memmap2",
+ "phoenix-chunker 0.1.1",
+ "phoenix-scope-analysis",
+ "phoenix-semantic-v2 0.1.1",
+ "phoenix-store-native-core 0.1.1",
+ "phoenix-store-overgraph 0.1.1",
+ "phoenix-time 0.1.1",
+ "phoenix-types 0.1.1",
+ "rustc-hash 1.1.0",
+ "serde",
+ "serde_json",
+ "thiserror 1.0.69",
 ]
 
 [[package]]
@@ -4763,6 +5009,15 @@ version = "0.1.0"
 dependencies = [
  "compact_str 0.8.1",
  "phoenix-types 0.1.0",
+ "serde",
+]
+
+[[package]]
+name = "phoenix-time"
+version = "0.1.1"
+dependencies = [
+ "compact_str 0.8.1",
+ "phoenix-types 0.1.1",
  "serde",
 ]
 
@@ -4800,6 +5055,7 @@ dependencies = [
 name = "phoenix-types"
 version = "0.1.1"
 dependencies = [
+ "blake3",
  "compact_str 0.8.1",
  "rowan",
  "serde",

@@ -4,6 +4,17 @@ mod artifact;
 mod baselines;
 #[cfg(feature = "graph-build")]
 mod build;
+mod counterfactual_artifact;
+mod counterfactual_build;
+mod counterfactual_model;
+mod decision_baseline_ladder;
+mod decision_candidate_generator;
+mod decision_evaluation;
+mod decision_evaluation_artifact;
+mod decision_evaluation_model;
+mod decision_trajectory_artifact;
+mod decision_trajectory_binary;
+mod decision_trajectory_model;
 mod evaluation;
 mod evaluation_artifact;
 mod evaluation_model;
@@ -30,10 +41,15 @@ mod link_prediction_model;
 mod model;
 mod model_selection;
 mod model_selection_model;
+mod native_decision_bridge;
+mod native_rgcn_feature_derive;
+mod native_rgcn_feature_model;
+mod native_rgcn_multitask_contract;
 mod ranking;
 mod ranking_artifact;
 mod ranking_model;
 mod rgcn;
+mod supervised_action_policy;
 mod temporal_compgcn;
 mod temporal_compgcn_artifact;
 mod temporal_compgcn_model;
@@ -53,6 +69,16 @@ pub use artifact::{FrozenGraphResearchBundle, FrozenGraphResearchMapped};
 pub use baselines::{run_baseline_ladder, run_baseline_ladder_for_protocol};
 #[cfg(feature = "graph-build")]
 pub use build::{freeze_graph_research_snapshot, FrozenGraphResearchInput};
+pub use counterfactual_artifact::*;
+pub use counterfactual_build::*;
+pub use counterfactual_model::*;
+pub use decision_baseline_ladder::*;
+pub use decision_candidate_generator::*;
+pub use decision_evaluation::*;
+pub use decision_evaluation_artifact::*;
+pub use decision_evaluation_model::*;
+pub use decision_trajectory_artifact::*;
+pub use decision_trajectory_model::*;
 pub use evaluation::{certify_evaluation_protocol, evaluate_binary_scores};
 pub use evaluation_artifact::ResearchEvaluationBundle;
 pub use evaluation_model::*;
@@ -101,10 +127,15 @@ pub use model_selection::{
     finalize_frozen_model_selection, open_frozen_model_selection_ledger, select_frozen_models,
 };
 pub use model_selection_model::*;
+pub use native_decision_bridge::*;
+pub use native_rgcn_feature_derive::*;
+pub use native_rgcn_feature_model::*;
+pub use native_rgcn_multitask_contract::*;
 pub use ranking::{evaluate_ranking_scores, run_structural_ranking_baselines};
 pub use ranking_artifact::RankingEvaluationBundle;
 pub use ranking_model::*;
 pub use rgcn::*;
+pub use supervised_action_policy::*;
 pub use temporal_compgcn::{encode_temporal_compgcn, encode_temporal_compgcn_weights};
 pub use temporal_compgcn_artifact::{
     temporal_compgcn_model_identity, temporal_compgcn_weights_identity, write_temporal_compgcn,
@@ -146,3 +177,15 @@ mod link_prediction_tests;
 
 #[cfg(test)]
 mod hyper_relational_tests;
+
+#[cfg(test)]
+mod decision_trajectory_tests;
+
+#[cfg(test)]
+mod decision_evaluation_tests;
+
+#[cfg(test)]
+mod native_rgcn_feature_tests;
+
+#[cfg(test)]
+mod counterfactual_tests;

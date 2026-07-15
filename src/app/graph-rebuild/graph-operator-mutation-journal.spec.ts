@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
     applyGraphOperatorMutationDecisionToSnapshot,
     graphOperatorMutationJournalFromTruthCommits,
+    mergeGraphOperatorMutationJournals,
     replayGraphOperatorMutationJournal,
 } from './graph-operator-mutation-journal';
 import { buildGraphRebuildSnapshot } from './graph-rebuild-builder';
@@ -99,6 +100,30 @@ describe('graph operator mutation journal', () => {
             canonicalState: 'superseded',
             canonicalCommitId: 'commit-old',
         });
+    });
+
+    it('retains native decision links when canonical truth is projected', () => {
+        const base = snapshotFixture(110);
+        const factId = firstFactObjectId(base);
+        const mutated = applyGraphOperatorMutationDecisionToSnapshot(base, [factId], 'accepted', 111)!;
+        const operator = structuredClone(mutated.operatorMutationJournal!);
+        operator.intents[0].nativeDecisionId = 'decision-native-1';
+        operator.intents[0].nativeDecisionReceiptId = 'receipt-native-1';
+        operator.receipts[0].nativeDecisionId = 'decision-native-1';
+        operator.receipts[0].nativeDecisionReceiptId = 'receipt-native-1';
+
+        const canonical = graphOperatorMutationJournalFromTruthCommits(base.scopeId, graphTruthFixtures(), 112);
+        const merged = mergeGraphOperatorMutationJournals(canonical, operator);
+
+        expect(merged.intents.find((intent) => intent.id === operator.intents[0].id)).toMatchObject({
+            nativeDecisionId: 'decision-native-1',
+            nativeDecisionReceiptId: 'receipt-native-1',
+        });
+        expect(merged.receipts.find((receipt) => receipt.id === operator.receipts[0].id)).toMatchObject({
+            nativeDecisionId: 'decision-native-1',
+            nativeDecisionReceiptId: 'receipt-native-1',
+        });
+        expect(merged.counters.intents).toBe(canonical.counters.intents + 1);
     });
 });
 

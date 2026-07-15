@@ -11,7 +11,11 @@ use phoenix_semantic_v2::{
     RelationScopePatchSidecar, ScopeLexSidecar, ScopeOrd, SemanticGraphScopeSidecar,
     SessionArchive, SessionOrd, StateSchemaScopeSidecar, TemporalScopeSidecar,
 };
-use phoenix_types::{IndexedSpan, IngestDocument, ScopeKey, SessionId};
+use phoenix_types::{
+    IndexedSpan, IngestDocument, NativeDecisionOutcomeReceipt, NativeDecisionReceipt,
+    NativeDecisionRewardEvidenceReceipt, NativeDecisionRewardObservationReceipt, ScopeKey,
+    SessionId,
+};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::{BTreeSet, HashMap};
@@ -1119,6 +1123,58 @@ pub trait PhoenixGraphLearningStore {
     fn load_graph_proposal_receipts(&self) -> Result<Vec<GraphProposalBatchReceipt>, StoreError>;
 }
 
+pub trait PhoenixNativeDecisionStore {
+    fn append_native_decision_receipt(
+        &self,
+        receipt: &NativeDecisionReceipt,
+    ) -> Result<NativeDecisionReceiptAppend, StoreError>;
+    fn append_native_decision_outcome_receipt(
+        &self,
+        receipt: &NativeDecisionOutcomeReceipt,
+    ) -> Result<NativeDecisionReceiptAppend, StoreError>;
+    fn load_native_decision_receipt(
+        &self,
+        receipt_id: &str,
+    ) -> Result<Option<NativeDecisionReceipt>, StoreError>;
+    fn load_native_decision_receipt_by_decision_id(
+        &self,
+        decision_id: &str,
+    ) -> Result<Option<NativeDecisionReceipt>, StoreError>;
+    fn load_native_decision_receipts(&self) -> Result<Vec<NativeDecisionReceipt>, StoreError>;
+    fn load_native_decision_outcome_receipt(
+        &self,
+        receipt_id: &str,
+    ) -> Result<Option<NativeDecisionOutcomeReceipt>, StoreError>;
+    fn load_native_decision_outcome_receipts(
+        &self,
+        decision_receipt_id: &str,
+    ) -> Result<Vec<NativeDecisionOutcomeReceipt>, StoreError>;
+    fn append_native_decision_reward_evidence(
+        &self,
+        receipt: &NativeDecisionRewardEvidenceReceipt,
+    ) -> Result<NativeDecisionReceiptAppend, StoreError>;
+    fn load_native_decision_reward_evidence(
+        &self,
+        receipt_id: &str,
+    ) -> Result<Option<NativeDecisionRewardEvidenceReceipt>, StoreError>;
+    fn load_native_decision_reward_evidence_for_decision(
+        &self,
+        decision_receipt_id: &str,
+    ) -> Result<Vec<NativeDecisionRewardEvidenceReceipt>, StoreError>;
+    fn append_native_decision_reward_observation(
+        &self,
+        receipt: &NativeDecisionRewardObservationReceipt,
+    ) -> Result<NativeDecisionReceiptAppend, StoreError>;
+    fn load_native_decision_reward_observation(
+        &self,
+        receipt_id: &str,
+    ) -> Result<Option<NativeDecisionRewardObservationReceipt>, StoreError>;
+    fn load_native_decision_reward_observations(
+        &self,
+        decision_receipt_id: &str,
+    ) -> Result<Vec<NativeDecisionRewardObservationReceipt>, StoreError>;
+}
+
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum GraphTruthCommitAppend {
     Appended,
@@ -1127,6 +1183,12 @@ pub enum GraphTruthCommitAppend {
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum GraphProposalReceiptAppend {
+    Appended { byte_len: usize },
+    AlreadyPresent { receipt_id: String },
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum NativeDecisionReceiptAppend {
     Appended { byte_len: usize },
     AlreadyPresent { receipt_id: String },
 }

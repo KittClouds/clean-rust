@@ -51,6 +51,9 @@ use phoenix_types::{IndexedSpan, IngestDocument, ScopeKey, SessionId};
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use serde_json::Value;
 
+mod canonical_reward_producer;
+#[cfg(test)]
+mod canonical_reward_producer_tests;
 mod graph_checkpoint_policy;
 mod graph_kernel_replay_audit;
 #[cfg(test)]
@@ -63,8 +66,15 @@ mod graph_truth_persistence;
 #[cfg(test)]
 mod graph_truth_persistence_tests;
 mod lexical_query;
+mod native_decision_evidence_persistence;
+mod native_decision_persistence;
+#[cfg(test)]
+mod native_decision_persistence_tests;
+mod native_decision_reward_persistence;
+mod native_decision_store_impl;
 mod prepared_segment_payload;
 mod scope_runtime;
+pub use canonical_reward_producer::CanonicalRewardProducerReport;
 use graph_checkpoint_policy::{
     KernelCheckpointDecision, KernelCheckpointPolicy, KernelCheckpointPolicyInput,
 };
@@ -330,6 +340,7 @@ pub struct PhoenixOvergraphStore {
     live_kernel_generation: AtomicU64,
     live_kernel_snapshot: Mutex<Option<KernelGraphSnapshot>>,
     graph_proposal_receipt_index: Mutex<graph_learning_persistence::GraphProposalReceiptIndex>,
+    native_decision_receipt_index: Mutex<native_decision_persistence::NativeDecisionReceiptIndex>,
 }
 
 impl PhoenixOvergraphStore {
@@ -358,6 +369,7 @@ impl PhoenixOvergraphStore {
             live_kernel_generation: AtomicU64::new(u64::MAX),
             live_kernel_snapshot: Mutex::new(None),
             graph_proposal_receipt_index: Mutex::new(Default::default()),
+            native_decision_receipt_index: Mutex::new(Default::default()),
         })
     }
 
@@ -4994,9 +5006,14 @@ impl PhoenixGraphKernelStoreV2 for PhoenixOvergraphStore {
     ) -> Result<GraphTruthCommitAppend, StoreError> {
         let result = self.with_engine(|engine| {
             graph_truth_persistence::append_graph_truth_commit_with_engine(self, engine, commit)
-        });
-        if matches!(result, Ok(GraphTruthCommitAppend::Appended)) {
+        })?;
+        if matches!(result, GraphTruthCommitAppend::Appended) {
             self.invalidate_live_kernel_snapshot();
+        }
+        self.live_kernel_generation
+            .store(commit.header.generation, Ordering::Release);
+        self.after_canonical_graph_truth_commit(commit, commit.header.committed_at)?;
+        if matches!(result, GraphTruthCommitAppend::Appended) {
             let _ = self.with_engine(|engine| {
                 self.maybe_checkpoint_kernel_journal_with_engine(
                     engine,
@@ -5004,11 +5021,7 @@ impl PhoenixGraphKernelStoreV2 for PhoenixOvergraphStore {
                 )
             });
         }
-        if result.is_ok() {
-            self.live_kernel_generation
-                .store(commit.header.generation, Ordering::Release);
-        }
-        result
+        Ok(result)
     }
 
     fn load_graph_truth_commit(

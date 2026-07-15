@@ -28,10 +28,21 @@ import {
     type GraphDocumentSemanticSummary,
 } from './graph-document-semantic';
 import {
+    applyGraphOperatorMutationDecisionToSnapshot,
     isGraphOperatorMutationJournal,
     graphOperatorMutationJournalFromTruthCommits,
+    mergeGraphOperatorMutationJournals,
+    type GraphOperatorMutationDecision,
     type GraphOperatorMutationJournal,
 } from './graph-operator-mutation-journal';
+import {
+    bindNativeDecisionToOperatorMutation,
+    isNativeOperatorDecisionBeginResponse,
+    isNativeOperatorDecisionCompleteResponse,
+    nativeOperatorDecisionBeginRequest,
+    nativeOperatorDecisionCompleteRequest,
+    pendingNativeOperatorDecisionCompletions,
+} from './graph-native-decision-capture';
 import {
     applyNativeMemoryGovernanceCandidates,
     applyNativeMemoryGovernanceRetrievalExperiment,
@@ -1096,6 +1107,7 @@ export class GraphRebuildService {
             trimOldestMapEntries(this.contentManifestByScope, 64);
         }
         this.snapshotState.set(authorized);
+        await this.recoverNativeOperatorDecisionOutcomes(authorized);
         return authorized;
     }
 
@@ -1166,6 +1178,62 @@ export class GraphRebuildService {
         await this.persistSnapshot(reconciled);
     }
 
+    async applyOperatorReviewDecision(
+        targetObjectId: string,
+        decision: GraphOperatorMutationDecision,
+    ): Promise<boolean> {
+        const current = this.snapshotState();
+        const row = current?.documentReviewSummary?.rows.find(
+            (candidate) => candidate.objectId === targetObjectId,
+        );
+        if (!current || !row) return false;
+        const decidedAt = Date.now();
+        const next = applyGraphOperatorMutationDecisionToSnapshot(
+            current,
+            [targetObjectId],
+            decision,
+            decidedAt,
+        );
+        if (!next) return false;
+        if (this.phoenix.target !== 'native') {
+            await this.restorePersistedSnapshot(next);
+            return true;
+        }
+
+        const beginValue = await this.phoenix.beginNativeOperatorDecision(
+            nativeOperatorDecisionBeginRequest(current, row, decision, decidedAt),
+        );
+        if (!isNativeOperatorDecisionBeginResponse(beginValue)) {
+            throw new Error('Native operator decision begin returned an invalid receipt.');
+        }
+        const journalReceipt = bindNativeDecisionToOperatorMutation(
+            next,
+            targetObjectId,
+            decidedAt,
+            beginValue,
+        );
+        await this.restorePersistedSnapshot(next);
+        const completionValue = await this.phoenix.completeNativeOperatorDecision(
+            nativeOperatorDecisionCompleteRequest(next, journalReceipt),
+        );
+        if (!isNativeOperatorDecisionCompleteResponse(completionValue)
+            || completionValue.decisionReceiptId !== beginValue.decisionReceiptId) {
+            throw new Error('Native operator decision completion returned a stale receipt.');
+        }
+        return true;
+    }
+
+    private async recoverNativeOperatorDecisionOutcomes(snapshot: GraphRebuildSnapshot): Promise<void> {
+        if (this.phoenix.target !== 'native') return;
+        for (const request of pendingNativeOperatorDecisionCompletions(snapshot)) {
+            const value = await this.phoenix.completeNativeOperatorDecision(request);
+            if (!isNativeOperatorDecisionCompleteResponse(value)
+                || value.decisionReceiptId !== request.decisionReceiptId) {
+                throw new Error('Native operator decision recovery returned a stale receipt.');
+            }
+        }
+    }
+
     async loadPersistedOperatorMutationJournal(scopeId: string): Promise<GraphOperatorMutationJournal | null> {
         return this.loadOperatorMutationJournal(scopeId);
     }
@@ -1196,11 +1264,11 @@ export class GraphRebuildService {
         if (truthProjection) {
             snapshot.graphTruthCommitLedger = truthProjection.ledger;
             snapshot.documentGraphMutationLedger = graphDocumentGraphMutationLedgerFromTruthCommits(truthProjection.commits);
-            snapshot.operatorMutationJournal = graphOperatorMutationJournalFromTruthCommits(
+            snapshot.operatorMutationJournal = mergeGraphOperatorMutationJournals(graphOperatorMutationJournalFromTruthCommits(
                 snapshot.scopeId,
                 truthProjection.commits,
                 snapshot.builtAt,
-            );
+            ), snapshot.operatorMutationJournal);
             snapshot.counters = {
                 ...snapshot.counters,
                 operatorMutationIntents: snapshot.operatorMutationJournal.counters.intents,

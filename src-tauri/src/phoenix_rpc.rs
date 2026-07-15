@@ -52,9 +52,7 @@ use phoenix_hyperbolic::lorentz_tree::{
 use phoenix_hyperbolic::siegel_finsler::{
     run_siegel_finsler_kernel, SiegelKernelRunReceipt, SiegelKernelRunRequest,
 };
-use phoenix_native::{
-    runtime_banner, PhoenixNativeConfig, PhoenixNativeHost, SnapshotPartition,
-};
+use phoenix_native::{runtime_banner, PhoenixNativeConfig, PhoenixNativeHost, SnapshotPartition};
 use phoenix_store_native_core::{PhoenixGraphKernelStoreV2, PhoenixGraphLearningStore};
 use phoenix_store_overgraph::PhoenixOvergraphStore;
 use phoenix_types::{
@@ -1453,6 +1451,16 @@ pub trait PhoenixApi {
     async fn persist_graph_run(
         request: DesktopGraphRunPersistRequest,
     ) -> Result<DesktopGraphRunPersistReceipt, String>;
+    async fn begin_native_operator_decision_json(request_json: String) -> Result<String, String>;
+    async fn complete_native_operator_decision_json(request_json: String)
+        -> Result<String, String>;
+    async fn native_decision_census_json() -> Result<String, String>;
+    async fn link_native_operator_decision_graph_truth_json(
+        request_json: String,
+    ) -> Result<String, String>;
+    async fn record_native_reward_observation_json(request_json: String) -> Result<String, String>;
+    async fn native_reward_observation_census_json() -> Result<String, String>;
+    async fn observe_native_reward_horizons_json() -> Result<String, String>;
     async fn close_graph_run(run_handle: String) -> bool;
     async fn atlas_rich_scan_json(request_json: String) -> Result<String, String>;
     async fn nli_adjudicate_claims_json(request_json: String) -> Result<String, String>;
@@ -1911,6 +1919,53 @@ impl PhoenixApi for PhoenixApiImpl {
         Ok(desktop_durable_graph_run_receipt(receipt))
     }
 
+    async fn begin_native_operator_decision_json(
+        self,
+        request_json: String,
+    ) -> Result<String, String> {
+        let root = self.native_decision_store_path()?;
+        crate::native_decision_rpc::begin(&root, &request_json)
+    }
+
+    async fn complete_native_operator_decision_json(
+        self,
+        request_json: String,
+    ) -> Result<String, String> {
+        let root = self.native_decision_store_path()?;
+        crate::native_decision_rpc::complete(&root, &request_json)
+    }
+
+    async fn native_decision_census_json(self) -> Result<String, String> {
+        let root = self.native_decision_store_path()?;
+        crate::native_decision_rpc::census(&root)
+    }
+
+    async fn link_native_operator_decision_graph_truth_json(
+        self,
+        request_json: String,
+    ) -> Result<String, String> {
+        let root = self.native_decision_store_path()?;
+        crate::native_decision_rpc::link_graph_truth(&root, &request_json)
+    }
+
+    async fn record_native_reward_observation_json(
+        self,
+        request_json: String,
+    ) -> Result<String, String> {
+        let root = self.native_decision_store_path()?;
+        crate::native_decision_rpc::record_reward_observation(&root, &request_json)
+    }
+
+    async fn native_reward_observation_census_json(self) -> Result<String, String> {
+        let root = self.native_decision_store_path()?;
+        crate::native_decision_rpc::reward_observation_census(&root)
+    }
+
+    async fn observe_native_reward_horizons_json(self) -> Result<String, String> {
+        let root = self.native_decision_store_path()?;
+        crate::native_decision_rpc::observe_reward_horizons(&root)
+    }
+
     async fn close_graph_run(self, run_handle: String) -> bool {
         self.graph_runs
             .lock()
@@ -2246,6 +2301,14 @@ impl PhoenixApiImpl {
         self.state
             .lock()
             .map_err(|_| "phoenix desktop state lock poisoned".to_owned())
+    }
+
+    fn native_decision_store_path(&self) -> Result<PathBuf, String> {
+        let config = self.lock_state()?.host.config().cloned();
+        config
+            .as_ref()
+            .and_then(desktop_overgraph_store_path)
+            .ok_or_else(|| "native decision receipt storage is unavailable".to_owned())
     }
 
     fn graph_run_page(
