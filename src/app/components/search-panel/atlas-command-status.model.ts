@@ -322,6 +322,10 @@ function capabilityDetail(
     input: AtlasCommandStatusInput,
     counts: AtlasInventoryCounts,
 ): string {
+    if (!capability.runnable && capability.backendRoute.startsWith('QUARANTINED:')) {
+        return capability.backendRoute;
+    }
+
     if (capability.uiCoverage === 'sleeping') {
         return `${capability.mutationPolicy}; backend types/sidecars detected, not exposed as a runnable recipe yet`;
     }

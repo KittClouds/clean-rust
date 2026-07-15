@@ -35,6 +35,7 @@ vi.mock('../lib/dexie/db', () => ({
 }));
 
 import { AtlasCapabilityRuntimeService } from './atlas-capability-runtime.service';
+import { ATLAS_RICH_SCAN_QUARANTINE_MESSAGE } from './atlas-rich-scan-quarantine';
 import { PhoenixMachineControlService } from './phoenix-machine-control.service';
 import { NerService } from './ner.service';
 import { AtlasScanCoordinatorService } from './atlas-scan-coordinator.service';
@@ -105,79 +106,20 @@ describe('AtlasCapabilityRuntimeService', () => {
         vi.clearAllMocks();
     });
 
-    it('plans Text Graph as an entity-anchored graph build preset', async () => {
+    it('blocks Text Graph before warming a model or scanning a document', async () => {
         const plan = service.recipePlan('textGraph', {
             buildScope: { mode: 'multiNote', noteIds: ['note-2', 'note-3'] },
             buildPolicy: 'dirty-only',
         });
 
-        expect(plan.requiredModels.map((model) => model.id)).toEqual(['dynamicNer']);
-        expect(plan.operations.map((operation) => operation.kind)).toEqual(['warmModel', 'dynamicNerScan', 'richTextGraphScan']);
-        expect(plan.backendRoute).toContain('includeSemanticAtlas=false');
-
-        const result = await service.runRecipe('textGraph', {
+        expect(plan.runnable).toBe(false);
+        expect(plan.blockedReason).toBe(ATLAS_RICH_SCAN_QUARANTINE_MESSAGE);
+        await expect(service.runRecipe('textGraph', {
             buildScope: { mode: 'multiNote', noteIds: ['note-2', 'note-3'] },
-            buildPolicy: 'dirty-only',
-        });
-
-        expect(result.contract).toEqual(expect.objectContaining({
-            recipeId: 'textGraph',
-            scope: { mode: 'multiNote', noteIds: ['note-2', 'note-3'] },
-            policy: 'dirty-only',
-            requiredStages: expect.arrayContaining(['dynamicNer', 'assertedKernel']),
-            exportableMentionStatuses: ['AcceptedKnown', 'AcceptedNew', 'AliasCandidate'],
-            modelLanes: ['dynamicNer'],
-        }));
-        expect(result.contract.bridgeCommands).toEqual(expect.arrayContaining([
-            expect.objectContaining({
-                stageId: 'dynamicNer',
-                backendCommand: 'scanDiscovery',
-                backendRoute: expect.stringContaining('scan_json'),
-            }),
-            expect.objectContaining({
-                stageId: 'assertedKernel',
-                backendCommand: 'atlasRichScan',
-                backendRoute: expect.stringContaining('includeSemanticAtlas=false'),
-            }),
-        ]));
-        expect(result.receipt.stageReceipts.map((stage) => stage.stageId)).toEqual(expect.arrayContaining([
-            'dynamicNer',
-            'assertedKernel',
-        ]));
-        expect(result.receipt.stageReceipts.find((stage) => stage.stageId === 'dynamicNer' && stage.operationKind === 'dynamicNerScan'))
-            .toEqual(expect.objectContaining({
-                frontendService: 'NerService.runDynamicScan',
-                backendCommand: 'scanDiscovery',
-                commandKind: 'native',
-                counts: expect.objectContaining({
-                    exportableMentions: 1,
-                    suggestions: 1,
-                }),
-            }));
-        expect(result.receipt.stageReceipts.find((stage) => stage.stageId === 'assertedKernel'))
-            .toEqual(expect.objectContaining({
-                frontendService: 'AtlasScanCoordinatorService.runRichEmbeddingScan',
-                backendCommand: 'atlasRichScan',
-                backendRoute: expect.stringContaining('atlas_rich_scan_json'),
-            }));
-        expect(result.receipt.stageReceipts.find((stage) => stage.stageId === 'assertedKernel')?.counts)
-            .toEqual(expect.objectContaining({
-                processedDocuments: 2,
-                'graph.vertices': 3,
-            }));
-        expect(service.lastBuildContract()).toBe(result.contract);
-        expect(service.lastBuildReceipt()).toBe(result.receipt);
-        expect(ner.warmProvider).toHaveBeenCalledWith('dynamic_ner');
-        expect(ner.runDynamicScan).toHaveBeenCalledWith(expect.objectContaining({
-            noteTitle: '2 selected notes',
-            plainText: expect.stringContaining('Branna crossed the bridge'),
-        }));
-        expect(atlasScan.runRichEmbeddingScan).toHaveBeenCalledWith(expect.objectContaining({
-            includeSemanticAtlas: false,
-            policy: 'dirty-only',
-            noteIds: ['note-2', 'note-3'],
-            buildScope: { mode: 'multiNote', noteIds: ['note-2', 'note-3'] },
-        }));
+        })).rejects.toThrow(ATLAS_RICH_SCAN_QUARANTINE_MESSAGE);
+        expect(ner.warmProvider).not.toHaveBeenCalled();
+        expect(ner.runDynamicScan).not.toHaveBeenCalled();
+        expect(atlasScan.runRichEmbeddingScan).not.toHaveBeenCalled();
         expect(machine.loadSemanticModel).not.toHaveBeenCalled();
         expect(nli.initialize).not.toHaveBeenCalled();
     });
@@ -248,12 +190,13 @@ describe('AtlasCapabilityRuntimeService', () => {
                 stageId: 'semanticEmbedding',
                 frontendService: 'PhoenixMachineControlService.loadSemanticModel',
                 backendCommand: 'none',
-                backendRoute: expect.stringContaining('atlasRichScan embeds'),
+                backendRoute: expect.stringContaining('model only'),
             }),
             expect.objectContaining({
                 stageId: 'semanticAtlas',
-                backendCommand: 'atlasRichScan',
-                backendRoute: expect.stringContaining('includeSemanticAtlas=true'),
+                frontendService: 'none',
+                backendCommand: 'none',
+                backendRoute: expect.stringContaining('QUARANTINED:'),
             }),
             expect.objectContaining({
                 stageId: 'hybridManifold',
@@ -286,7 +229,9 @@ describe('AtlasCapabilityRuntimeService', () => {
             }),
             expect.objectContaining({
                 stageId: 'semanticAtlas',
-                backendCommand: 'atlasRichScan',
+                frontendService: 'none',
+                backendCommand: 'none',
+                backendRoute: expect.stringContaining('QUARANTINED:'),
             }),
             expect.objectContaining({
                 stageId: 'nliAdjudication',
@@ -316,7 +261,7 @@ describe('AtlasCapabilityRuntimeService', () => {
         ]));
     });
 
-    it('plans Semantic Graph with embedding warm and explicit folder scope', async () => {
+    it('blocks Semantic Graph before model warm or native execution', async () => {
         const options = {
             selectedModel: 'mongodb-leaf-mt' as const,
             selectedModelLabel: 'MDBR Leaf MT',
@@ -326,63 +271,26 @@ describe('AtlasCapabilityRuntimeService', () => {
         };
 
         const plan = service.recipePlan('semanticGraph', options);
-        expect(plan.requiredModels.map((model) => model.id)).toEqual(['dynamicNer', 'semanticEmbedding']);
-
-        await service.runRecipe('semanticGraph', options);
-
-        expect(ner.runDynamicScan).toHaveBeenCalledWith(expect.objectContaining({
-            noteTitle: 'Folder scope (3 notes)',
-            plainText: expect.stringContaining('Branna crossed the bridge'),
-        }));
-        expect(machine.loadSemanticModel).toHaveBeenCalledWith('mongodb-leaf-mt', 'MDBR Leaf MT', '384d');
-        expect(atlasScan.runRichEmbeddingScan).toHaveBeenCalledWith(expect.objectContaining({
-            includeSemanticAtlas: true,
-            policy: 'force',
-            buildScope: { mode: 'folder', folderId: 'folder-1' },
-        }));
-        expect(phoenixUiApi.loadManifoldAtlasSnapshot.mock.calls.map((call) => call[0])).toEqual([
-            'hybrid',
-            'hopf',
-            'lorentz',
-            'product',
-        ]);
+        expect(plan.runnable).toBe(false);
+        expect(plan.blockedReason).toBe(ATLAS_RICH_SCAN_QUARANTINE_MESSAGE);
+        await expect(service.runRecipe('semanticGraph', options)).rejects.toThrow(ATLAS_RICH_SCAN_QUARANTINE_MESSAGE);
+        expect(machine.loadSemanticModel).not.toHaveBeenCalled();
+        expect(atlasScan.runRichEmbeddingScan).not.toHaveBeenCalled();
+        expect(phoenixUiApi.loadManifoldAtlasSnapshot).not.toHaveBeenCalled();
     });
 
-    it('plans Adjudicated Semantic Graph as semantic build followed by native NLI apply', async () => {
-        await service.runRecipe('adjudicatedSemanticGraph', {
+    it('blocks Adjudicated Semantic Graph before NLI initialization', async () => {
+        await expect(service.runRecipe('adjudicatedSemanticGraph', {
             selectedModel: 'mongodb-leaf-mt',
             selectedModelLabel: 'MDBR Leaf MT',
             dimensionLabel: '384d',
             buildScope: { mode: 'note', noteId: 'note-1' },
-        });
-
-        expect(ner.runDynamicScan).toHaveBeenCalledWith(expect.objectContaining({
-            noteId: 'note-1',
-            plainText: expect.stringContaining('Aella'),
-        }));
-        expect(machine.loadSemanticModel).toHaveBeenCalled();
-        expect(atlasScan.runRichEmbeddingScan).toHaveBeenCalledWith(expect.objectContaining({
-            includeSemanticAtlas: true,
-            noteIds: ['note-1'],
-        }));
-        expect(phoenixUiApi.loadManifoldAtlasSnapshot.mock.calls.map((call) => call[0])).toEqual([
-            'hybrid',
-            'hopf',
-            'lorentz',
-            'product',
-        ]);
-        expect(nli.initialize).toHaveBeenCalledWith('onnx-community/ModernBERT-base-nli-ONNX');
-        expect(phoenix.storeCommand).toHaveBeenNthCalledWith(1, 'semantic:listNliJudgmentInputs', expect.objectContaining({
-            documentIds: ['note-1'],
-            modelId: 'onnx-community/ModernBERT-base-nli-ONNX',
-            embeddingModelId: 'mongodb-leaf-mt',
-            dimensionLabel: '384d',
-            dimension: 384,
-        }));
-        expect(phoenix.storeCommand).toHaveBeenNthCalledWith(2, 'semantic:applyNliJudgments', expect.any(Object));
+        })).rejects.toThrow(ATLAS_RICH_SCAN_QUARANTINE_MESSAGE);
+        expect(nli.initialize).not.toHaveBeenCalled();
+        expect(phoenix.storeCommand).not.toHaveBeenCalled();
     });
 
-    it('loads the selected embedding model inside the Semantic Graph contract', async () => {
+    it('does not load a selected embedding model for a quarantined recipe', async () => {
         const options = {
             selectedModel: 'mongodb-leaf-mt' as const,
             selectedModelLabel: 'MDBR Leaf MT',
@@ -391,68 +299,26 @@ describe('AtlasCapabilityRuntimeService', () => {
         };
 
         const plan = service.recipePlan('semanticGraph', options);
-        expect(plan.requiredModels.map((model) => model.id)).toEqual(['dynamicNer', 'semanticEmbedding']);
-        expect(plan.requiredServices.map((route) => route.service)).toContain('PhoenixMachineControlService.loadSemanticModel');
-
-        await service.runRecipe('semanticGraph', options);
-
-        expect(ner.warmProvider).toHaveBeenCalledWith('dynamic_ner');
-        expect(machine.loadSemanticModel).toHaveBeenCalledWith('mongodb-leaf-mt', 'MDBR Leaf MT', '384d');
-        expect(atlasScan.runRichEmbeddingScan).toHaveBeenCalledWith(expect.objectContaining({
-            includeSemanticAtlas: true,
-            modelId: 'mongodb-leaf-mt',
-            modelLabel: 'MDBR Leaf MT',
-            dimensionLabel: '384d',
-            policy: 'dirty-only',
-        }));
-        expect(phoenixUiApi.loadManifoldAtlasSnapshot).toHaveBeenCalledTimes(4);
-        expect(machine.loadSemanticModel.mock.invocationCallOrder[0])
-            .toBeLessThan(atlasScan.runRichEmbeddingScan.mock.invocationCallOrder[0]);
-        expect(atlasScan.runRichEmbeddingScan.mock.invocationCallOrder[0])
-            .toBeLessThan(phoenixUiApi.loadManifoldAtlasSnapshot.mock.invocationCallOrder[0]);
+        expect(plan.runnable).toBe(false);
+        await expect(service.runRecipe('semanticGraph', options)).rejects.toThrow(ATLAS_RICH_SCAN_QUARANTINE_MESSAGE);
+        expect(ner.warmProvider).not.toHaveBeenCalled();
+        expect(machine.loadSemanticModel).not.toHaveBeenCalled();
+        expect(atlasScan.runRichEmbeddingScan).not.toHaveBeenCalled();
+        expect(phoenixUiApi.loadManifoldAtlasSnapshot).not.toHaveBeenCalled();
         expect(nli.initialize).not.toHaveBeenCalled();
     });
 
-    it('runs Reasoning Graph only after entity, semantic, and NLI prerequisites', async () => {
-        await service.runRecipe('reasoningGraph', {
+    it('blocks Reasoning Graph before any dependent stage starts', async () => {
+        await expect(service.runRecipe('reasoningGraph', {
             selectedModel: 'mongodb-leaf-mt',
             selectedModelLabel: 'MDBR Leaf MT',
             dimensionLabel: '384d',
             buildScope: { mode: 'note', noteId: 'note-1' },
-        });
-
-        expect(ner.warmProvider).toHaveBeenCalledWith('dynamic_ner');
-        expect(ner.runDynamicScan).toHaveBeenCalledWith(expect.objectContaining({
-            noteId: 'note-1',
-        }));
-        expect(machine.loadSemanticModel).toHaveBeenCalledWith('mongodb-leaf-mt', 'MDBR Leaf MT', '384d');
-        expect(nli.initialize).toHaveBeenCalledWith('onnx-community/ModernBERT-base-nli-ONNX');
-        expect(atlasScan.runRichEmbeddingScan).toHaveBeenCalledWith(expect.objectContaining({
-            includeSemanticAtlas: true,
-            noteIds: ['note-1'],
-        }));
-        expect(phoenixUiApi.loadManifoldAtlasSnapshot.mock.calls.map((call) => call[0])).toEqual([
-            'hybrid',
-            'hopf',
-            'lorentz',
-            'product',
-        ]);
-        expect(phoenixUiApi.loadManifoldAtlasSnapshot.mock.invocationCallOrder[2])
-            .toBeLessThan(nli.classifyStream.mock.invocationCallOrder[0]);
-        expect(phoenix.storeCommand).toHaveBeenCalledWith('relation:list', expect.objectContaining({
-            relation: 'graph_candidate_edges',
-        }));
-        expect(phoenix.storeCommand).toHaveBeenCalledWith('relation:list', expect.objectContaining({
-            relation: 'graph_edges',
-            filter: expect.objectContaining({ edge_type: 'active_during' }),
-        }));
-        expect(phoenix.storeCommand).toHaveBeenCalledWith('relation:list', expect.objectContaining({
-            relation: 'memories',
-        }));
-        expect(phoenix.storeCommand).toHaveBeenCalledWith('relation:list', expect.objectContaining({
-            relation: 'graph_edges',
-            filter: expect.objectContaining({ edge_type: 'causal_link' }),
-        }));
+        })).rejects.toThrow(ATLAS_RICH_SCAN_QUARANTINE_MESSAGE);
+        expect(ner.warmProvider).not.toHaveBeenCalled();
+        expect(machine.loadSemanticModel).not.toHaveBeenCalled();
+        expect(nli.initialize).not.toHaveBeenCalled();
+        expect(phoenix.storeCommand).not.toHaveBeenCalled();
     });
 
     it('runs Dynamic NER through NerService using the open note when no scope is provided', async () => {
@@ -501,7 +367,7 @@ describe('AtlasCapabilityRuntimeService', () => {
         ]);
     });
 
-    it('reports text graph capabilities as runnable while Dynamic NER owns the model lane', () => {
+    it('reports legacy text graph capabilities as blocked while Dynamic NER remains runnable', () => {
         const textGraphCapabilities: AtlasCapabilityId[] = [
             'dynamicSurface',
             'dynamicChunking',
@@ -514,7 +380,9 @@ describe('AtlasCapabilityRuntimeService', () => {
         for (const capabilityId of textGraphCapabilities) {
             const state = service.capabilityState(capabilityId);
 
-            expect(state.runnable).toBe(true);
+            expect(state.runnable).toBe(false);
+            expect(state.status).toBe('blocked');
+            expect(state.blockedReason).toBe(ATLAS_RICH_SCAN_QUARANTINE_MESSAGE);
             expect(state.operationKind).toBe('richTextGraphScan');
             expect(state.requiredModels).toEqual([]);
             expect(service.modelRequirementLabel(state.requiredModels)).toBe('none');

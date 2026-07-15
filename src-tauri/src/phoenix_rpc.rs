@@ -56,7 +56,7 @@ use phoenix_native::{runtime_banner, PhoenixNativeConfig, PhoenixNativeHost, Sna
 use phoenix_store_native_core::{PhoenixGraphKernelStoreV2, PhoenixGraphLearningStore};
 use phoenix_store_overgraph::PhoenixOvergraphStore;
 use phoenix_types::{
-    AnalyzeTextRequest, AtlasRichScanRequest, CommitRequest, CreateSessionRequest, EntityId,
+    AnalyzeTextRequest, CommitRequest, CreateSessionRequest, EntityId,
     EntityKind, GraphDeltaRequest, IngestRequest, MentionEntityRef, MentionSource, QueryRequest,
     RebuildRequest, ResolverEntitySeed, RuntimeConfig, RuntimeInitRequest, RuntimeInitResult,
     RuntimeTarget, ScanRequest, ScopeKey, SessionId, SessionStateRequest, SessionStatsRequest,
@@ -1985,9 +1985,9 @@ impl PhoenixApi for PhoenixApiImpl {
     }
 
     async fn atlas_rich_scan_json(self, request_json: String) -> Result<String, String> {
-        self.with_host_json::<AtlasRichScanRequest, _, _>(request_json, |host, request| {
-            host.atlas_rich_scan(request)
-        })
+        let _ = request_json;
+        Err("Legacy Atlas rich scan is quarantined. Use the content-addressed graph-run pipeline."
+            .to_owned())
     }
 
     async fn nli_adjudicate_claims_json(self, request_json: String) -> Result<String, String> {

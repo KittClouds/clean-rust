@@ -43,9 +43,8 @@ vi.mock('../../../../lib/dexie/settings.service', () => ({
 
 import {
     GraphLensWorkspaceComponent,
-    graphSnapshotRenderIdentity,
-    sameGraphRenderIdentity,
 } from './graph-lens-workspace.component';
+import { graphSnapshotRenderIdentity, sameGraphRenderIdentity } from './graph-render-identity';
 import { GraphRebuildService } from '../../../../graph-rebuild/graph-rebuild.service';
 import { PhoenixProjectionService } from '../../../../services/phoenix-projection.service';
 import { NoteEditorStore } from '../../../../lib/store/note-editor.store';

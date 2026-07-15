@@ -17,10 +17,8 @@ import { NerService } from '../../../../services/ner.service';
 import { PhoenixProjectionService } from '../../../../services/phoenix-projection.service';
 import { PhoenixMachineControlService } from '../../../../services/phoenix-machine-control.service';
 import { EntitySelectionService } from '../../../../lib/services/entity-selection.service';
-import { AtlasScanCoordinatorService } from '../../../../services/atlas-scan-coordinator.service';
 import type { AtlasMode } from './graph-atlas-preview/graph-atlas-preview.component';
 import type { GraphLensState } from './graph-lens';
-import { buildGraphAtlasReadContext } from './graph-atlas-preview/graph-atlas-read-context';
 
 @Component({
     selector: 'app-graph-tab',
@@ -44,7 +42,6 @@ export class GraphTabComponent {
     private projection = inject(PhoenixProjectionService);
     private machine = inject(PhoenixMachineControlService);
     private entitySelection = inject(EntitySelectionService);
-    private atlasScan = inject(AtlasScanCoordinatorService);
 
     // State — entities now derived from ScopeService signal
     entities = computed(() => this.projection.entities());
@@ -63,9 +60,9 @@ export class GraphTabComponent {
     activeScope = this.scopeService.activeScope;
 
     suggestions = this.nerService.suggestions;
-    isScanningSuggestions = computed(() => this.nerService.isAnalyzing() || this.atlasScan.running());
+    isScanningSuggestions = computed(() => this.nerService.isAnalyzing());
     activeSuggestionProvider = this.nerService.activeProvider;
-    suggestionError = computed(() => this.atlasScan.error() || this.nerService.errorMessage());
+    suggestionError = computed(() => this.nerService.errorMessage());
 
     activeEntity = computed(() => {
         const local = this.selectedEntity();
@@ -223,22 +220,9 @@ export class GraphTabComponent {
             });
             return;
         }
-        try {
-            const context = buildGraphAtlasReadContext(lens || {
-                mode: this.graphLensMode(),
-                primaryNoteId: null,
-                selectedNoteIds: [],
-            });
-            this.machine.setScope(context.noteIds[0] || 'global');
-            await this.atlasScan.runRichEmbeddingScan({
-                source,
-                requireActiveNote: false,
-                lensMode: context.lensMode,
-                noteIds: context.noteIds,
-            });
-        } catch (err) {
-            console.error('[GraphTab] Semantic Atlas scan failed', err);
-        }
+        void source;
+        void lens;
+        this.machine.setNotice('Legacy Atlas scan is quarantined. Run Full Atlas to refresh the graph safely.');
     }
 
     getColor(kind: string): string {

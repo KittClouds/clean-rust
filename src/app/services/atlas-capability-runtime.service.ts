@@ -24,7 +24,7 @@ import {
     type NliClassificationResult,
     type NliPairClassificationInput,
 } from '../lib/services/nli-worker.service';
-import { AtlasScanCoordinatorService } from './atlas-scan-coordinator.service';
+import { ATLAS_RICH_SCAN_QUARANTINE_MESSAGE, rejectAtlasRichScan } from './atlas-rich-scan-quarantine';
 import { NerService } from './ner.service';
 import { PhoenixBackendService } from './phoenix-backend.service';
 import { ATLAS_EXPORTABLE_MENTION_STATUSES } from './atlas-capability-runtime.model';
@@ -72,6 +72,13 @@ const SEMANTIC_SCAN_CAPABILITIES: AtlasCapabilityId[] = [
     'semanticAtlas',
     'semanticCandidate',
 ];
+
+const QUARANTINED_RICH_SCAN_CAPABILITIES = new Set<AtlasCapabilityId>([
+    ...TEXT_GRAPH_CAPABILITIES.filter((id) => id !== 'dynamicNer'),
+    ...SEMANTIC_SCAN_CAPABILITIES,
+]);
+
+const QUARANTINED_RICH_SCAN_ROUTE = 'QUARANTINED: legacy atlas_rich_scan has no runtime binding';
 
 const NATIVE_STORE_PROBE_CAPABILITIES: AtlasCapabilityId[] = [
     'relationGraph',
@@ -186,7 +193,6 @@ interface AtlasRuntimeRecipeDefinition {
 export class AtlasCapabilityRuntimeService {
     private readonly machine = inject(PhoenixMachineControlService);
     private readonly ner = inject(NerService);
-    private readonly atlasScan = inject(AtlasScanCoordinatorService);
     private readonly nli = inject(NliWorkerService);
     private readonly hub = inject(BlueprintHubService);
     private readonly noteStore = inject(NoteEditorStore);
@@ -581,26 +587,15 @@ export class AtlasCapabilityRuntimeService {
     }
 
     private runTextGraphScan(policy: 'dirty-only' | 'force', options: AtlasRunOptions): Promise<unknown> {
-        return this.atlasScan.runRichEmbeddingScan({
-            source: 'search-panel',
-            requireActiveNote: false,
-            policy,
-            includeSemanticAtlas: false,
-            ...this.scanScopeOptions(options),
-        });
+        void policy;
+        void options;
+        return rejectAtlasRichScan();
     }
 
     private runSemanticAtlasScan(options: AtlasRunOptions, policy: 'dirty-only' | 'force' = 'dirty-only'): Promise<unknown> {
-        return this.atlasScan.runRichEmbeddingScan({
-            source: 'search-panel',
-            requireActiveNote: false,
-            modelId: this.embeddingModelId(options),
-            modelLabel: this.embeddingModelLabel(options),
-            dimensionLabel: this.embeddingDimensionLabel(options),
-            policy,
-            includeSemanticAtlas: true,
-            ...this.scanScopeOptions(options),
-        });
+        void options;
+        void policy;
+        return rejectAtlasRichScan();
     }
 
     private async runManifoldSnapshot(manifold: AtlasManifoldMode, options: AtlasRunOptions): Promise<unknown> {
@@ -888,6 +883,7 @@ export class AtlasCapabilityRuntimeService {
         const nli = this.nliRequirement(true);
         const buildPolicy = options.buildPolicy === 'force' ? 'force' : 'dirty-only';
         const buildMutationPolicy = buildPolicy === 'force' ? 'force rebuild' : 'dirty-only';
+        const richScanBlockedReason = ATLAS_RICH_SCAN_QUARANTINE_MESSAGE;
         const semanticCoreCapabilities: AtlasCapabilityId[] = [
             ...TEXT_GRAPH_CAPABILITIES,
             'semanticEmbedding',
@@ -917,7 +913,7 @@ export class AtlasCapabilityRuntimeService {
         const semanticOperations: AtlasRuntimeOperation[] = [
             ...entityAnchorOperations,
             warmOperation('semanticEmbedding'),
-            { kind: 'semanticAtlasScan', service: 'AtlasScanCoordinatorService.runRichEmbeddingScan', policy: buildPolicy },
+            { kind: 'semanticAtlasScan', service: 'quarantined', policy: buildPolicy },
             ...MANIFOLD_PROJECTION_OPERATIONS,
         ];
         const adjudicationOperations: AtlasRuntimeOperation[] = [
@@ -937,7 +933,7 @@ export class AtlasCapabilityRuntimeService {
                     optionalModels: [],
                     operations: [
                         ...entityAnchorOperations,
-                        { kind: 'richTextGraphScan', service: 'AtlasScanCoordinatorService.runRichEmbeddingScan', policy: buildPolicy },
+                        { kind: 'richTextGraphScan', service: 'quarantined', policy: buildPolicy },
                     ] as AtlasRuntimeOperation[],
                     expectedOutputs: [
                         expected('candidateSuggestions', 'entity anchors', 'NerService.suggestions()'),
@@ -947,8 +943,9 @@ export class AtlasCapabilityRuntimeService {
                     ],
                     mutationPolicy: buildMutationPolicy as AtlasCapabilityMutationPolicy,
                     runPolicy: buildPolicy as AtlasCapabilityRunPolicy,
-                    backendRoute: `NerService.runDynamicScan -> AtlasScanCoordinatorService.runRichEmbeddingScan(includeSemanticAtlas=false, policy=${buildPolicy})`,
-                    runnable: true,
+                    backendRoute: QUARANTINED_RICH_SCAN_ROUTE,
+                    runnable: false,
+                    blockedReason: richScanBlockedReason,
                     skippedLanes: ['semanticEmbedding', 'nli', 'manifoldProjection'] as AtlasModelLaneId[],
                 };
             case 'semanticGraph':
@@ -972,8 +969,9 @@ export class AtlasCapabilityRuntimeService {
                     ],
                     mutationPolicy: buildMutationPolicy as AtlasCapabilityMutationPolicy,
                     runPolicy: buildPolicy as AtlasCapabilityRunPolicy,
-                    backendRoute: `NerService.runDynamicScan -> PhoenixMachineControlService.loadSemanticModel -> AtlasScanCoordinatorService.runRichEmbeddingScan(includeSemanticAtlas=true, policy=${buildPolicy}) -> manifoldSnapshot(hybrid/hopf/lorentz/product)`,
-                    runnable: true,
+                    backendRoute: QUARANTINED_RICH_SCAN_ROUTE,
+                    runnable: false,
+                    blockedReason: richScanBlockedReason,
                     skippedLanes: ['nli'] as AtlasModelLaneId[],
                 };
             case 'adjudicatedSemanticGraph':
@@ -998,7 +996,8 @@ export class AtlasCapabilityRuntimeService {
                     mutationPolicy: buildMutationPolicy as AtlasCapabilityMutationPolicy,
                     runPolicy: buildPolicy as AtlasCapabilityRunPolicy,
                     backendRoute: `Semantic graph -> semantic:listNliJudgmentInputs -> semantic:applyNliJudgments`,
-                    runnable: true,
+                    runnable: false,
+                    blockedReason: richScanBlockedReason,
                     skippedLanes: [] as AtlasModelLaneId[],
                 };
             case 'reasoningGraph':
@@ -1031,7 +1030,8 @@ export class AtlasCapabilityRuntimeService {
                     mutationPolicy: 'native-only' as AtlasCapabilityMutationPolicy,
                     runPolicy: 'native-only' as AtlasCapabilityRunPolicy,
                     backendRoute: 'Adjudicated semantic graph -> relation/event/temporal/memory/causal native probes',
-                    runnable: true,
+                    runnable: false,
+                    blockedReason: richScanBlockedReason,
                     skippedLanes: [] as AtlasModelLaneId[],
                 };
             case 'runNer':
@@ -1079,6 +1079,10 @@ export class AtlasCapabilityRuntimeService {
     }
 
     private requiredServicesForCapability(id: AtlasCapabilityId, options: AtlasRunOptions): AtlasServiceRequirement[] {
+        const blockedReason = this.blockedReasonForCapability(id);
+        if (blockedReason) {
+            return [service('atlas-rich-scan-quarantine', 'Quarantined legacy scan', 'none', 'none', false, blockedReason)];
+        }
         if (id === 'nliAdjudication') {
             return [
                 service('nli-worker', 'NLI worker classify/apply', 'NliWorkerService.classifyStream', NLI_MODEL_ID, true),
@@ -1090,12 +1094,9 @@ export class AtlasCapabilityRuntimeService {
             case 'dynamicNerScan':
                 return [service('dynamic-ner', 'Dynamic NER scan', 'NerService.runDynamicScan', 'PhoenixUiApi.scanDiscovery / scan_json', true)];
             case 'richTextGraphScan':
-                return [service('rich-text-graph', 'Rich text graph scan', 'AtlasScanCoordinatorService.runRichEmbeddingScan', 'PhoenixUiApi.atlasRichScan / atlas_rich_scan_json', true)];
+                return [service('atlas-rich-scan-quarantine', 'Quarantined legacy scan', 'none', 'none', false, ATLAS_RICH_SCAN_QUARANTINE_MESSAGE)];
             case 'semanticAtlasScan':
-                return [
-                    service('semantic-model', 'Semantic model loader', 'PhoenixMachineControlService.loadSemanticModel', this.embeddingModelLabel(options), true),
-                    service('semantic-atlas', 'Semantic Atlas scan', 'AtlasScanCoordinatorService.runRichEmbeddingScan', 'PhoenixUiApi.atlasRichScan / atlas_rich_scan_json', true),
-                ];
+                return [service('atlas-rich-scan-quarantine', 'Quarantined legacy scan', 'none', 'none', false, ATLAS_RICH_SCAN_QUARANTINE_MESSAGE)];
             case 'nativeStoreProbe': {
                 const config = NATIVE_STORE_PROBES[id];
                 return [service('native-store-probe', config?.label || 'Native store probe', 'PhoenixBackendService.storeCommand', config ? `relation:list(${config.relation})` : 'relation:list', true)];
@@ -1145,7 +1146,9 @@ export class AtlasCapabilityRuntimeService {
     }
 
     private blockedReasonForCapability(id: AtlasCapabilityId): string | undefined {
-        void id;
+        if (QUARANTINED_RICH_SCAN_CAPABILITIES.has(id)) {
+            return ATLAS_RICH_SCAN_QUARANTINE_MESSAGE;
+        }
         return undefined;
     }
 
@@ -1208,15 +1211,13 @@ export class AtlasCapabilityRuntimeService {
     }
 
     private outputProbeForCapability(id: AtlasCapabilityId, operationKind: AtlasCapabilityOperationKind): AtlasOutputProbe {
-        const last = this.atlasScan.lastResult()?.nativeResult || null;
         switch (operationKind) {
             case 'dynamicNerScan':
                 return output('Candidate suggestions', 'NerService.suggestions()', `${this.ner.suggestions().length} current candidates`, this.ner.suggestions().length);
             case 'richTextGraphScan':
                 return output('Graph audit + delta counts', 'AtlasRichScanResult.graphDeltaCounts + GraphAuditService.snapshot', `${this.machine.graphNodes()} nodes / ${this.machine.graphEdges()} edges`, this.machine.graphNodes() + this.machine.graphEdges());
             case 'semanticAtlasScan': {
-                const vectors = last ? (last.embeddingCounts?.leaf || 0) + (last.embeddingCounts?.entity || 0) + (last.embeddingCounts?.lens || 0) : 0;
-                return output('Semantic sidecar output', 'AtlasRichScanResult.embeddingCounts', `${vectors} vectors; ${last?.relationCandidateCount || 0} relation candidates`, vectors);
+                return output('Quarantined legacy output', 'AtlasCapabilityRuntimeService', ATLAS_RICH_SCAN_QUARANTINE_MESSAGE, null);
             }
             case 'nativeStoreProbe': {
                 const config = NATIVE_STORE_PROBES[id];
@@ -1372,16 +1373,6 @@ export class AtlasCapabilityRuntimeService {
         return scope === 'global' ? undefined : { folderId: scope, folderPath: scope };
     }
 
-    private scanScopeOptions(options: AtlasRunOptions): { buildScope?: AtlasBuildScope; noteIds?: string[] } {
-        const noteIds = options.noteIds?.length
-            ? options.noteIds
-            : noteIdsFromBuildScope(options.buildScope);
-        return {
-            ...(options.buildScope ? { buildScope: options.buildScope } : {}),
-            ...(noteIds.length ? { noteIds } : {}),
-        };
-    }
-
     private contractScope(options: AtlasRunOptions): AtlasBuildScope {
         if (options.buildScope) return options.buildScope;
         const noteIds = uniqueIds(options.noteIds || []);
@@ -1499,9 +1490,9 @@ function bridgeCommandForOperation(
         case 'dynamicNerScan':
             return bridge(stageId, capabilityId, operation, 'NerService.runDynamicScan', 'scanDiscovery', 'PhoenixUiApi.scanDiscovery -> PhoenixBackendService.scanDiscovery -> scan_json', 'native');
         case 'richTextGraphScan':
-            return bridge(stageId, capabilityId, operation, 'AtlasScanCoordinatorService.runRichEmbeddingScan', 'atlasRichScan', `PhoenixUiApi.atlasRichScan(includeSemanticAtlas=false, policy=${operation.policy || 'dirty-only'}) -> atlas_rich_scan_json`, 'native');
+            return bridge(stageId, capabilityId, operation, 'none', 'none', QUARANTINED_RICH_SCAN_ROUTE, 'frontend');
         case 'semanticAtlasScan':
-            return bridge(stageId, capabilityId, operation, 'AtlasScanCoordinatorService.runRichEmbeddingScan', 'atlasRichScan', `PhoenixUiApi.atlasRichScan(includeSemanticAtlas=true, policy=${operation.policy || 'dirty-only'}) -> atlas_rich_scan_json`, 'native');
+            return bridge(stageId, capabilityId, operation, 'none', 'none', QUARANTINED_RICH_SCAN_ROUTE, 'frontend');
         case 'nliAdjudication':
             return bridge(stageId, capabilityId, operation, 'PhoenixBackendService.storeCommand + NliWorkerService.classifyStream', 'semantic:listNliJudgmentInputs -> semantic:applyNliJudgments', 'native queue -> browser NLI worker -> native apply', 'mixed');
         case 'nativeStoreProbe': {
@@ -1525,7 +1516,7 @@ function bridgeCommandForOperation(
                 return bridge(stageId, capabilityId, operation, 'NerService.warmProvider(dynamic_ner)', 'none', 'provider readiness only; scanDiscovery runs during Dynamic NER scan', 'frontend');
             }
             if (operation.model === 'semanticEmbedding') {
-                return bridge(stageId, capabilityId, operation, 'PhoenixMachineControlService.loadSemanticModel', 'none', 'selects native Rust semantic runner options; atlasRichScan embeds during graph build', 'frontend');
+                return bridge(stageId, capabilityId, operation, 'PhoenixMachineControlService.loadSemanticModel', 'none', 'warms the semantic model only; graph compilation remains quarantined', 'frontend');
             }
             if (operation.model === 'nli') {
                 return bridge(stageId, capabilityId, operation, 'NliWorkerService.initialize', 'none', 'browser ONNX worker warm; native queue/apply run during NLI adjudication', 'worker');

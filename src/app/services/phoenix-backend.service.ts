@@ -27,6 +27,7 @@ import type {
 import type {
     DesktopMentionBatchRequest,
 } from '../generated/phoenix-taurpc';
+import { rejectAtlasRichScan } from './atlas-rich-scan-quarantine';
 
 export type PhoenixMentionBatchRequest = DesktopMentionBatchRequest;
 export interface PhoenixMentionBatchResult {
@@ -452,9 +453,8 @@ export class PhoenixBackendService {
     }
 
     async atlasRichScan(request: Record<string, unknown>): Promise<any> {
-        return this.target === 'native'
-            ? this.requireNativeBridge().atlasRichScan(request)
-            : this.wasm.atlasRichScan(request);
+        void request;
+        return rejectAtlasRichScan();
     }
 
     async manifoldSnapshot(request: Record<string, unknown>): Promise<any> {

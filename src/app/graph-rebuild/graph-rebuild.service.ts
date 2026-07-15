@@ -479,6 +479,7 @@ export class GraphRebuildService {
     private readonly contentManifestByScope = new Map<string, GraphRebuildContentManifest>();
     private readonly documentSemanticSummaryByIdentity = new Map<string, GraphDocumentSemanticSummary>();
     private readonly documentSemanticArtifactHandleByIdentity = new Map<string, string>();
+    private readonly persistedSnapshotLoads = new Map<string, Promise<GraphRebuildSnapshot | null>>();
     private activeNativeGraphRun: { snapshotId: string; runHandle: string } | null = null;
     private nativeSiegelReceiptState: { snapshotId: string; receipt: unknown } | null = null;
     private primarySnapshotRunSerial = 0;
@@ -1099,6 +1100,20 @@ export class GraphRebuildService {
             if (authorizedCurrent) return authorizedCurrent;
             this.snapshotState.set(null);
         }
+        const activeLoad = this.persistedSnapshotLoads.get(scopeId);
+        if (activeLoad) return activeLoad;
+        const load = this.loadPersistedSnapshotFromStore(scopeId);
+        this.persistedSnapshotLoads.set(scopeId, load);
+        try {
+            return await load;
+        } finally {
+            if (this.persistedSnapshotLoads.get(scopeId) === load) {
+                this.persistedSnapshotLoads.delete(scopeId);
+            }
+        }
+    }
+
+    private async loadPersistedSnapshotFromStore(scopeId: string): Promise<GraphRebuildSnapshot | null> {
         const document = await this.store.getScopedDocument(scopeId, GRAPH_REBUILD_NAMESPACE, SNAPSHOT_DOCUMENT_KEY);
         const persisted = document ? scopedDocumentToGraphRebuildSnapshot(document) : null;
         if (!persisted) return null;

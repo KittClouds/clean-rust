@@ -2,6 +2,7 @@
 
 import { entityColorStore } from '../../../../../lib/store/entityColorStore';
 import { buildGalaxyScene, type GalaxyInputEdge, type GalaxyRenderableNode, type GalaxyRenderSettings } from './graph-galaxy-engine';
+import { compactGalaxySceneForTransfer } from './graph-galaxy-worker-scene';
 
 interface GalaxySceneWorkerRequest {
     id: number;
@@ -18,7 +19,7 @@ addEventListener('message', ({ data }: MessageEvent<GalaxySceneWorkerRequest>) =
         for (const [kind, hsl] of Object.entries(data.graphNodeColors)) {
             entityColorStore.setGraphNodeColor(kind, hsl);
         }
-        postMessage({ id: data.id, scene: buildGalaxyScene(data.entities, data.edges, data.settings) });
+        postMessage({ id: data.id, scene: compactGalaxySceneForTransfer(buildGalaxyScene(data.entities, data.edges, data.settings)) });
     } catch (error) {
         postMessage({ id: data.id, error: error instanceof Error ? error.message : String(error) });
     }

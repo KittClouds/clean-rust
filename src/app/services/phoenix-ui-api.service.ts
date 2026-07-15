@@ -13,6 +13,7 @@ import {
     type PhoenixLineSearchScope,
 } from '../lib/search/phoenix-line-search';
 import { PhoenixBackendService } from './phoenix-backend.service';
+import { rejectAtlasRichScan } from './atlas-rich-scan-quarantine';
 import {
     PhoenixStoreService,
     type StoreEntity,
@@ -949,49 +950,8 @@ export class PhoenixUiApiService {
     }
 
     async atlasRichScan(request: AtlasRichScanRequest): Promise<AtlasRichScanResult> {
-        await this.loadRuntime();
-        if (!this.dictionary.length) {
-            await this.hydrateWithEntitiesInternal();
-        }
-        const scope = this.toPhoenixScope(request.scope);
-        const result = await this.phoenix.atlasRichScan({
-            scanId: request.scanId ?? null,
-            sessionId: await this.ensureMainSession(),
-            scope: {
-                mode: request.scope?.mode || (request.scope?.noteId ? 'note' : request.scope?.folderId ? 'folder' : request.scope?.narrativeId ? 'narrative' : 'global'),
-                ...scope,
-                noteId: request.scope?.noteId || null,
-                noteIds: request.scope?.noteIds || [],
-            },
-            documents: (request.documents || []).map((document) => ({
-                documentId: document.documentId,
-                noteId: document.noteId || document.documentId,
-                title: document.title || document.documentId,
-                text: document.text || '',
-                scope: this.toPhoenixScope(document.scope || request.scope),
-            })),
-            changedDocumentIds: request.changedDocumentIds || [],
-            resolverSeed: this.buildResolverSeed(request.scope),
-            acceptedCandidateIds: [],
-            rejectedCandidateKeys: [],
-            options: {
-                policy: request.policy || 'dirty-only',
-                embeddingModelId: request.embeddingModelId || null,
-                embeddingDimension: request.embeddingDimension || null,
-                surfaceConfigHash: request.surfaceConfigHash || null,
-                graphConfigHash: request.graphConfigHash || null,
-                returnCandidateSuggestions: request.returnCandidateSuggestions !== false,
-                includeSemanticAtlas: request.includeSemanticAtlas !== false,
-            },
-        }) as AtlasRichScanResult;
-        this.invalidateKnowledgeGraphCache();
-        this.store.markDerivedDirty();
-        await this.store.triggerSnapshot();
-        if (typeof window !== 'undefined') {
-            window.dispatchEvent(new CustomEvent('phoenix-projection-invalidated'));
-            window.dispatchEvent(new CustomEvent('phoenix-semantic-atlas-updated', { detail: result }));
-        }
-        return result;
+        void request;
+        return rejectAtlasRichScan();
     }
 
     async loadSemanticAtlasEmbeddings(scope?: SearchScope): Promise<SemanticAtlasEmbeddingAtlas | null> {

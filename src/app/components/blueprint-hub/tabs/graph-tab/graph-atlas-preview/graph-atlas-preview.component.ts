@@ -16,7 +16,8 @@ import type { GraphRebuildCounters, GraphRebuildSnapshot } from '../../../../../
 import { buildGraphProjectionContractReport } from '../../../../../graph-rebuild/graph-projection-contract-report';
 import { type EmbeddingAtlasData, type EmbeddingQueryTrace, type EmbeddingSourcePreview } from './graph-embedding-atlas';
 import { manifoldAdapter } from './graph-manifold-atlas';
-import { buildGraphRebuildEmbeddingAtlas, graphRebuildEmbeddingTargetCount } from './graph-rebuild-embedding-atlas';
+import { cachedGraphRebuildEmbeddingAtlas, graphRebuildEmbeddingTargetCount } from './graph-rebuild-embedding-atlas';
+import { loadManifoldProjection, manifoldProjectionRequestKey } from './graph-manifold-projection-loader';
 import {
     completeRegistryEntityProjection,
     registryEntityKindOrder,
@@ -56,6 +57,7 @@ import { buildGraphAtlasReadContext, graphLensState, type GraphAtlasReadContext 
 import { projectionSummaryRequestsRefresh } from './graph-atlas-refresh-summary';
 import { getSetting, setSetting } from '../../../../../lib/dexie/settings.service';
 import { buildGraphCanvasInventory } from './graph-canvas-inventory';
+import { graphSnapshotRenderIdentity } from '../graph-render-identity';
 import { graphProjectionParityApplies, graphProjectionParitySlice } from './graph-projection-parity';
 
 export interface AtlasPreviewEdge extends GalaxyInputEdge {}
@@ -982,6 +984,7 @@ export class GraphAtlasPreviewComponent implements OnInit, OnDestroy {
     private _selectedNoteIds: string[] = [];
     private readonly readContextEpoch = signal(0);
     private readonly graphSnapshotSignal = signal<GraphRebuildSnapshot | null>(null);
+    private graphSnapshotIdentity = '';
     private readonly unsubscribeColors = entityColorStore.subscribe(() => this.refreshGraphInventoryFromSnapshot());
 
     @Input() entities: GalaxyRenderableNode[] = [];
@@ -989,8 +992,13 @@ export class GraphAtlasPreviewComponent implements OnInit, OnDestroy {
     @Input() sourceLabel = 'registry graph';
     @Input() graphCounters: GraphRebuildCounters | null = null;
     @Input() set graphSnapshot(value: GraphRebuildSnapshot | null | undefined) {
-        this.graphSnapshotSignal.set(value ?? null);
-        this.refreshGraphInventoryFromSnapshot();
+        const snapshot = value ?? null;
+        const identity = graphSnapshotRenderIdentity(snapshot);
+        if (snapshot === this.graphSnapshotSignal() || (identity && identity === this.graphSnapshotIdentity)) return;
+        this.graphSnapshotIdentity = identity;
+        this.graphSnapshotSignal.set(snapshot);
+        if (snapshot) this.refreshGraphInventoryFromSnapshot();
+        else this.graphInventory.set(EMPTY_GRAPH_INVENTORY);
         this.activeGraphCache = null;
     }
     @Input() set committedGraphInventory(value: GraphInventory | null | undefined) {
@@ -1059,7 +1067,7 @@ export class GraphAtlasPreviewComponent implements OnInit, OnDestroy {
         const snapshot = this.graphSnapshotSignal();
         if (!snapshot) return null;
         return graphRebuildEmbeddingTargetCount(snapshot) > 0
-            ? buildGraphRebuildEmbeddingAtlas(snapshot, this.manifoldMode())
+            ? cachedGraphRebuildEmbeddingAtlas(snapshot, this.manifoldMode())
             : null;
     });
     graphInventory = signal<GraphInventory>(EMPTY_GRAPH_INVENTORY);
@@ -2100,7 +2108,7 @@ export class GraphAtlasPreviewComponent implements OnInit, OnDestroy {
     }
 
     private async refreshEmbeddingAtlas(context: GraphAtlasReadContext, manifold: AtlasManifoldMode, force = false): Promise<void> {
-        const requestKey = `${manifold}:${context.key}`;
+        const requestKey = manifoldProjectionRequestKey(this.graphSnapshotSignal(), manifold, context.key);
         if (!force && this.atlasLoadingKeys.get(manifold) === requestKey) return;
         if (!force && this.atlasLoadedKeys.get(manifold) === requestKey && this.machine.manifoldStatuses()[manifold] === 'ready') return;
 
@@ -2108,9 +2116,16 @@ export class GraphAtlasPreviewComponent implements OnInit, OnDestroy {
         const load = this.machine.beginManifoldLoad(manifold);
         try {
             const adapter = manifoldAdapter(manifold);
-            const atlas = await adapter.load(this.phoenixUiApi, context.searchScope);
+            const projection = await loadManifoldProjection(
+                this.graphSnapshotSignal(),
+                manifold,
+                () => adapter.load(this.phoenixUiApi, context.searchScope),
+            );
+            const atlas = projection.atlas;
             if (this.machine.isCurrentManifoldLoad(load)) {
-                this.setEmbeddingAtlasForMode(manifold, atlas);
+                if (projection.source === 'native-manifold-snapshot') {
+                    this.setEmbeddingAtlasForMode(manifold, atlas);
+                }
                 this.atlasLoadedKeys.set(manifold, requestKey);
                 if (this.manifoldMode() === manifold) {
                     this.queryTrace.set(adapter.trace(this.queryText(), atlas));
@@ -2120,6 +2135,8 @@ export class GraphAtlasPreviewComponent implements OnInit, OnDestroy {
                     nodes: atlas.nodes.length,
                     edges: atlas.edges.length,
                     sourceLabel: atlas.sourceLabel,
+                    projectionSource: projection.source,
+                    nativeRoundTrips: projection.source === 'graph-rebuild-snapshot' ? 0 : 1,
                 });
             }
         } catch (error) {

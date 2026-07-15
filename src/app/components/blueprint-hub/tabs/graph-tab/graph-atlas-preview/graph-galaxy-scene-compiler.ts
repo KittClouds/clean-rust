@@ -12,6 +12,10 @@ import {
     type GalaxyScene,
 } from './graph-galaxy-engine';
 import { graphGalaxyRuntimeMeter } from './graph-galaxy-runtime-meter';
+import {
+    hydrateGalaxySceneFromTransfer,
+    type CompactGalaxyScene,
+} from './graph-galaxy-worker-scene';
 
 let warnedNativeFallback = false;
 let warnedWorkerFallback = false;
@@ -22,6 +26,7 @@ let nextWorkerRequestId = 0;
 const workerRequests = new Map<number, {
     resolve: (scene: GalaxyScene) => void;
     reject: (error: Error) => void;
+    entities: GalaxyRenderableNode[];
 }>();
 
 entityColorStore.subscribe(() => sceneCache.clear());
@@ -136,7 +141,7 @@ function compileGalaxySceneInWorker(
         Object.keys(DEFAULT_GRAPH_NODE_COLORS).map((kind) => [kind, entityColorStore.getRawGraphNodeHsl(kind)]),
     );
     return new Promise<GalaxyScene>((resolve, reject) => {
-        workerRequests.set(id, { resolve, reject });
+        workerRequests.set(id, { resolve, reject, entities });
         worker.postMessage({
             id,
             entities,
@@ -156,11 +161,13 @@ function galaxySceneWorker(): Worker | null {
     }
     try {
         const worker = new Worker(new URL('./graph-galaxy-scene.worker', import.meta.url), { type: 'module' });
-        worker.onmessage = ({ data }: MessageEvent<{ id: number; scene?: GalaxyScene; error?: string }>) => {
+        worker.onmessage = ({ data }: MessageEvent<{ id: number; scene?: CompactGalaxyScene; error?: string }>) => {
             const pending = workerRequests.get(data.id);
             if (!pending) return;
             workerRequests.delete(data.id);
-            data.scene ? pending.resolve(data.scene) : pending.reject(new Error(data.error || 'Scene worker failed'));
+            data.scene
+                ? pending.resolve(hydrateGalaxySceneFromTransfer(data.scene, pending.entities))
+                : pending.reject(new Error(data.error || 'Scene worker failed'));
         };
         worker.onerror = (event) => {
             const error = new Error(event.message || 'Scene worker failed');

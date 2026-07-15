@@ -131,6 +131,24 @@ type ProductTraversalBuild = {
     edgeMetadata: Map<string, Record<string, unknown>>;
 };
 
+const projectionCache = new WeakMap<GraphRebuildSnapshot, Map<AtlasManifoldMode, EmbeddingAtlasData>>();
+
+export function cachedGraphRebuildEmbeddingAtlas(
+    snapshot: GraphRebuildSnapshot,
+    manifold: AtlasManifoldMode,
+): EmbeddingAtlasData {
+    let projections = projectionCache.get(snapshot);
+    if (!projections) {
+        projections = new Map();
+        projectionCache.set(snapshot, projections);
+    }
+    const cached = projections.get(manifold);
+    if (cached) return cached;
+    const atlas = buildGraphRebuildEmbeddingAtlas(snapshot, manifold);
+    projections.set(manifold, atlas);
+    return atlas;
+}
+
 export function buildGraphRebuildEmbeddingAtlas(
     snapshot: GraphRebuildSnapshot,
     manifold: AtlasManifoldMode,

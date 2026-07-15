@@ -271,7 +271,77 @@ describe('graph canvas inventory', () => {
         expect(inventory.edges).toEqual([]);
         expect(inventory.sourceLabel).toBe('rust atlas packet missing');
     });
+
+    it('returns the same frozen inventory for an unchanged 5,119-target receipt', () => {
+        const large = largeSnapshot(5_119);
+        const first = buildGraphCanvasInventory(large);
+        const second = buildGraphCanvasInventory({ ...large, buildTimings: { totalMs: 99 } } as GraphRebuildSnapshot);
+
+        expect(first.nodes).toHaveLength(5_119);
+        expect(second).toBe(first);
+    });
 });
+
+function largeSnapshot(count: number): GraphRebuildSnapshot {
+    const objects = Array.from({ length: count }, (_, index) => ({
+        id: `object:${index}`,
+        family: 'structure',
+        status: 'accepted',
+        kind: 'chunk',
+        label: `Object ${index}`,
+        noteIds: ['note-1'],
+        chunkIds: [`note-1:${index}`],
+        anchorIds: [],
+        evidenceIds: [],
+        sourceIds: [`source:${index}`],
+        targetIds: [],
+    }));
+    const manifoldTargets = objects.map((object, index) => ({
+        id: `embed:${object.id}`,
+        objectId: object.id,
+        family: 'structure',
+        admission: 'admitted',
+        status: 'accepted',
+        vectorStatus: 'missing',
+        coordinateSource: 'packet-row',
+        kind: 'chunk',
+        label: object.label,
+        sourceId: object.sourceIds[0],
+        noteId: 'note-1',
+        chunkId: `note-1:${index}`,
+        evidenceIds: [],
+        parentIds: [],
+    }));
+    return {
+        id: 'snapshot-large',
+        scopeId: 'global',
+        authorityContract: { contentHash: 'authority-large' },
+        embeddingTargets: [],
+        atlasPacket: {
+            schemaVersion: 'phoenix-atlas-packet/v1',
+            snapshotId: 'snapshot-large',
+            scopeKind: 'global',
+            scopeId: 'global',
+            builtAt: 1,
+            sourceContract: {
+                authority: 'rust-atlas-packet',
+                identityAuthority: 'registry-entities-and-accepted-anchors',
+                vectorContract: 'no model vectors persisted',
+                tsGraphBuilderRole: 'native-atlas-packet-authority',
+            },
+            objects,
+            manifoldTargets,
+            counters: {
+                objects: count,
+                manifoldTargets: count,
+                registryEntities: 0,
+                evidenceAnchors: 0,
+                modelVectors: 0,
+                families: [],
+            },
+        },
+    } as unknown as GraphRebuildSnapshot;
+}
 
 function snapshot(): GraphRebuildSnapshot {
     return {

@@ -11,7 +11,6 @@ import { NoteEditorStore } from '../../../../lib/store/note-editor.store';
 import { EditorService } from '../../../../services/editor.service';
 import { BlueprintHubService } from '../../blueprint-hub.service';
 import { GraphAtlasPreviewComponent, type AtlasMode, type AtlasPreviewEdge } from './graph-atlas-preview/graph-atlas-preview.component';
-import { buildGraphCanvasInventory } from './graph-atlas-preview/graph-canvas-inventory';
 import type { GraphCanvasSourceRequest } from './graph-atlas-preview/graph-canvas-interaction';
 import type { EntitySuggestionProviderId } from '../../../../lib/entity-suggestions/entity-suggestion.types';
 import { getSetting, setSetting } from '../../../../lib/dexie/settings.service';
@@ -24,6 +23,7 @@ import {
     type GraphLensNote,
     type GraphLensState,
 } from './graph-lens';
+import { sameGraphRenderIdentity } from './graph-render-identity';
 
 const GRAPH_LENS_STATE_KEY = 'graph.lens.state.v1';
 const GRAPH_LENS_MODES = new Set<GraphLensMode>(['global', 'narrative', 'note', 'multiNote']);
@@ -91,7 +91,6 @@ function readPersistedGraphLensState(): GraphLensState {
             <app-graph-atlas-preview class="block min-h-0 flex-1"
                 [entities]="lensedGraph().entities"
                 [edges]="lensedGraph().edges"
-                [committedGraphInventory]="graphRebuildInventory()"
                 [graphCounters]="graphRebuildCounters()"
                 [graphSnapshot]="graphRebuildSnapshot()"
                 [sourceLabel]="lensedGraph().sourceLabel"
@@ -186,7 +185,6 @@ export class GraphLensWorkspaceComponent implements OnDestroy {
         narrativeEdges: this.narrativeEdgesSignal(),
         memberships: this.memberships(),
     }));
-    readonly graphRebuildInventory = computed(() => buildGraphCanvasInventory(this.graphRebuildSnapshotSignal()));
     readonly graphRebuildCounters = computed(() => this.graphRebuildSnapshotSignal()?.counters ?? null);
     readonly graphRebuildSnapshot = computed(() => this.graphRebuildSnapshotSignal());
     readonly graphSnapshotStale = computed(() => this.graphSnapshotStaleSignal());
@@ -344,22 +342,6 @@ export class GraphLensWorkspaceComponent implements OnDestroy {
             window.removeEventListener('graph-index-run-completed', reload);
         };
     }
-}
-
-export function graphSnapshotRenderIdentity(
-    snapshot: GraphRebuildSnapshot | null | undefined,
-): string {
-    if (!snapshot) return '';
-    const authority = snapshot.authorityContract?.contentHash || '';
-    return `${snapshot.scopeId}\u0000${snapshot.id}\u0000${authority}`;
-}
-
-export function sameGraphRenderIdentity(
-    current: GraphRebuildSnapshot | null | undefined,
-    next: GraphRebuildSnapshot | null | undefined,
-): boolean {
-    const currentIdentity = graphSnapshotRenderIdentity(current);
-    return Boolean(currentIdentity && currentIdentity === graphSnapshotRenderIdentity(next));
 }
 
 export function graphSnapshotEventMatchesCurrent(

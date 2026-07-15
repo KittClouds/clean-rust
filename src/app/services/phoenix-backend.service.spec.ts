@@ -11,6 +11,7 @@ import {
     PhoenixBackendService,
     withPhoenixStoreCommandTimeout,
 } from './phoenix-backend.service';
+import { ATLAS_RICH_SCAN_QUARANTINE_MESSAGE } from './atlas-rich-scan-quarantine';
 
 describe('Phoenix store command watchdog', () => {
     it('returns completed commands without waiting for the watchdog', async () => {
@@ -55,5 +56,12 @@ describe('PhoenixBackendService native runtime guard', () => {
         const service = runInInjectionContext(injector, () => new PhoenixBackendService());
 
         await expect(service.loadWasm()).rejects.toThrow('disabled in native desktop');
+    });
+
+    it('rejects the legacy Atlas rich scan before consulting the native bridge', async () => {
+        const service = runInInjectionContext(injector, () => new PhoenixBackendService());
+
+        await expect(service.atlasRichScan({ documents: [{ text: 'must not cross' }] }))
+            .rejects.toThrow(ATLAS_RICH_SCAN_QUARANTINE_MESSAGE);
     });
 });

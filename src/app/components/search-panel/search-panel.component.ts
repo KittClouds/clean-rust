@@ -32,7 +32,6 @@ import * as ops from '../../lib/operations';
 import { type RetrievalLane } from '../../services/retrieval-workbench-state.service';
 import { PhoenixMachineControlService } from '../../services/phoenix-machine-control.service';
 import { NerService } from '../../services/ner.service';
-import { AtlasScanCoordinatorService } from '../../services/atlas-scan-coordinator.service';
 import { BlueprintHubService } from '../blueprint-hub/blueprint-hub.service';
 import { NliWorkerService } from '../../lib/services/nli-worker.service';
 import { AtlasCapabilityRuntimeService } from '../../services/atlas-capability-runtime.service';
@@ -340,7 +339,6 @@ export class SearchPanelComponent implements OnInit {
   private readonly noteStore = inject(NoteEditorStore);
   private readonly machine = inject(PhoenixMachineControlService);
   private readonly nerService = inject(NerService);
-  private readonly atlasScan = inject(AtlasScanCoordinatorService);
   private readonly hubService = inject(BlueprintHubService);
   private readonly nli = inject(NliWorkerService);
   private readonly atlasRuntime = inject(AtlasCapabilityRuntimeService);
@@ -367,7 +365,7 @@ export class SearchPanelComponent implements OnInit {
   readonly activeJob = this.machine.activeJob;
   readonly lastSummary = this.machine.lastSummary;
   readonly nerStatus = this.nerService.providerStatuses;
-  readonly isDynamicScanning = computed(() => this.nerService.isAnalyzing() || this.atlasScan.running());
+  readonly isDynamicScanning = computed(() => this.nerService.isAnalyzing());
 
   readonly selectedModel = signal<ModelId>(DEFAULT_SEARCH_MODEL_ID);
   readonly activeLaneWarm = signal<AtlasModelLaneId | null>(null);
@@ -390,9 +388,7 @@ export class SearchPanelComponent implements OnInit {
   readonly laneOptions = RETRIEVAL_LANE_OPTIONS;
   readonly models = EMBEDDING_MODELS;
   readonly buildScopeModes: AtlasBuildScope['mode'][] = ['global', 'folder', 'note', 'multiNote'];
-  readonly atlasPhase = this.atlasScan.phase;
-  readonly atlasMessage = this.atlasScan.message;
-  readonly lastAtlasResult = this.atlasScan.lastResult;
+  readonly atlasMessage = signal<string | null>(null);
 
   readonly selectedBuildScope = computed<AtlasBuildScope>(() => {
     const mode = this.buildScopeMode();
@@ -477,7 +473,7 @@ export class SearchPanelComponent implements OnInit {
     stages: this.machineStages(),
     activeJob: this.activeJob(),
     lastSummary: this.lastSummary(),
-    lastRichScan: this.lastAtlasResult()?.nativeResult || null,
+    lastRichScan: null,
     vectorStatus: this.vectorStatus(),
     graphStatus: this.graphStatus(),
     manifoldMode: this.machine.manifoldMode(),

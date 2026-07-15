@@ -7,6 +7,7 @@ import type {
     PhoenixGraphScenePacketRequest,
 } from './phoenix-graph-scene-packet.model';
 import { phoenixTransportAudit } from './phoenix-transport-audit';
+import { rejectAtlasRichScan } from './atlas-rich-scan-quarantine';
 import type { PhoenixSnapshotPartition } from './phoenix-wasm.service';
 import type {
     PhoenixMentionBatchRequest,
@@ -390,7 +391,8 @@ class PhoenixTaurpcBridge implements PhoenixNativeBridge {
     }
 
     async atlasRichScan(request: Record<string, unknown>): Promise<any> {
-        return this.callJson('atlas_rich_scan_json', request);
+        void request;
+        return rejectAtlasRichScan();
     }
 
     async manifoldSnapshot(request: Record<string, unknown>): Promise<any> {
