@@ -1980,6 +1980,17 @@ impl ChatRunStatus {
 
 #[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
+pub struct CanvasRunTarget {
+    pub note_uri: String,
+    pub note_id: String,
+    pub base_revision: i64,
+    pub editor_revision: i64,
+    pub from: i64,
+    pub to: i64,
+}
+
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct RunOptions {
     pub final_provider: String,
     pub final_model: String,
@@ -1996,6 +2007,7 @@ pub struct RunOptions {
     pub scope_id: Option<String>,
     pub base_system_prompt: Option<String>,
     pub initial_external_context: Option<String>,
+    pub canvas_target: Option<CanvasRunTarget>,
 }
 
 #[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
@@ -2048,6 +2060,8 @@ pub struct ChatRun {
 pub struct ChatRunEvent {
     pub id: String,
     pub run_id: String,
+    #[serde(default)]
+    pub sequence: u64,
     pub phase: String,
     pub kind: String,
     pub label: String,

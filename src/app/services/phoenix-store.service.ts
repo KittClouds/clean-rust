@@ -301,6 +301,36 @@ export interface PhoenixContentMutationTiming {
     runtimeReloaded: number;
 }
 
+export interface PhoenixNoteTransactionCommit {
+    transactionId: string;
+    status: 'committed' | 'already_committed' | 'conflict';
+    note: StoreNote;
+    expectedRevision: number;
+    actualRevision: number;
+    timing: PhoenixContentMutationTiming;
+}
+
+export interface PhoenixMultiNoteMutation {
+    noteId: string;
+    expectedRevision: number | null;
+    after: StoreNote;
+}
+
+export interface PhoenixMultiNoteConflict {
+    noteId: string;
+    expectedRevision: number | null;
+    actualRevision: number | null;
+    reason: 'revision_changed' | 'already_exists' | 'missing' | 'scope_changed' | 'partial_state';
+}
+
+export interface PhoenixMultiNoteTransactionCommit {
+    transactionId: string;
+    status: 'committed' | 'already_committed' | 'conflict';
+    notes: StoreNote[];
+    conflicts: PhoenixMultiNoteConflict[];
+    timing: PhoenixContentMutationTiming;
+}
+
 type DerivedLoadState = 'cold' | 'loading' | 'ready';
 
 @Injectable({ providedIn: 'root' })
@@ -504,6 +534,187 @@ export class PhoenixStoreService {
 
     async upsertNote(note: StoreNote): Promise<void> {
         await this.runContentMutation([{ command: 'note:upsert', payload: { row: noteToRow(note) } }]);
+    }
+
+    async commitNoteTransaction(input: {
+        transactionId: string;
+        noteId: string;
+        expectedRevision: number;
+        content: string;
+        markdownContent: string;
+    }): Promise<PhoenixNoteTransactionCommit> {
+        await this.ensureInitialized();
+        const queuedAt = performance.now();
+        return this.runSerialized(async () => {
+            const row = await this.phoenix.storeCommand('note:get', {
+                id: input.noteId,
+                includeBody: true,
+            });
+            if (!row) {
+                throw new Error(`Canvas transaction note not found: ${input.noteId}`);
+            }
+
+            const current = rowToNote(row);
+            const actualRevision = current.version ?? current.updatedAt;
+            if (current.content === input.content && current.markdownContent === input.markdownContent) {
+                return {
+                    transactionId: input.transactionId,
+                    status: 'already_committed',
+                    note: current,
+                    expectedRevision: input.expectedRevision,
+                    actualRevision,
+                    timing: emptyContentMutationTiming(),
+                };
+            }
+            if (actualRevision !== input.expectedRevision) {
+                return {
+                    transactionId: input.transactionId,
+                    status: 'conflict',
+                    note: current,
+                    expectedRevision: input.expectedRevision,
+                    actualRevision,
+                    timing: emptyContentMutationTiming(),
+                };
+            }
+
+            const nextRevision = Math.max(Date.now(), actualRevision + 1);
+            const next: StoreNote = {
+                ...current,
+                content: input.content,
+                markdownContent: input.markdownContent,
+                updatedAt: nextRevision,
+                version: nextRevision,
+            };
+            const timing = await this.runContentMutationLocked(
+                [{ command: 'note:upsert', payload: { row: noteToRow(next) } }],
+                queuedAt,
+            );
+            return {
+                transactionId: input.transactionId,
+                status: 'committed',
+                note: next,
+                expectedRevision: input.expectedRevision,
+                actualRevision: nextRevision,
+                timing,
+            };
+        });
+    }
+
+    async commitMultiNoteTransaction(input: {
+        transactionId: string;
+        mutations: PhoenixMultiNoteMutation[];
+        signal?: AbortSignal;
+    }): Promise<PhoenixMultiNoteTransactionCommit> {
+        await this.ensureInitialized();
+        if (!input.mutations.length) throw new Error('Multi-note transaction requires at least one mutation.');
+        const noteIds = new Set(input.mutations.map((mutation) => mutation.noteId));
+        if (noteIds.size !== input.mutations.length) throw new Error('Multi-note transaction contains duplicate note ids.');
+        input.signal?.throwIfAborted();
+        const queuedAt = performance.now();
+        return this.runSerialized(async () => {
+            input.signal?.throwIfAborted();
+            const marker = await this.phoenix.storeCommand('relation:getFirst', {
+                relation: 'canvas_note_transactions',
+                filter: { transaction_id: input.transactionId },
+            });
+            const current = new Map<string, StoreNote | null>();
+            for (const mutation of input.mutations) {
+                const row = await this.phoenix.storeCommand('note:get', {
+                    id: mutation.noteId,
+                    includeBody: true,
+                });
+                current.set(mutation.noteId, row ? rowToNote(row) : null);
+            }
+
+            const matches = input.mutations.map((mutation) => {
+                const existing = current.get(mutation.noteId) || null;
+                return existing ? sameNoteState(existing, mutation.after) : false;
+            });
+            if (marker && matches.every(Boolean)) {
+                return {
+                    transactionId: input.transactionId,
+                    status: 'already_committed',
+                    notes: input.mutations.map((mutation) => current.get(mutation.noteId)!),
+                    conflicts: [],
+                    timing: emptyContentMutationTiming(),
+                };
+            }
+            if (marker && matches.some(Boolean)) {
+                return {
+                    transactionId: input.transactionId,
+                    status: 'conflict',
+                    notes: [],
+                    conflicts: input.mutations.map((mutation) => ({
+                        noteId: mutation.noteId,
+                        expectedRevision: mutation.expectedRevision,
+                        actualRevision: noteRevision(current.get(mutation.noteId) || null),
+                        reason: 'partial_state' as const,
+                    })),
+                    timing: emptyContentMutationTiming(),
+                };
+            }
+
+            const conflicts: PhoenixMultiNoteConflict[] = [];
+            for (const mutation of input.mutations) {
+                const existing = current.get(mutation.noteId) || null;
+                const actualRevision = noteRevision(existing);
+                if (mutation.expectedRevision === null && existing) {
+                    conflicts.push({ noteId: mutation.noteId, expectedRevision: null, actualRevision, reason: 'already_exists' });
+                } else if (mutation.expectedRevision !== null && !existing) {
+                    conflicts.push({ noteId: mutation.noteId, expectedRevision: mutation.expectedRevision, actualRevision: null, reason: 'missing' });
+                } else if (existing && existing.narrativeId !== mutation.after.narrativeId) {
+                    conflicts.push({ noteId: mutation.noteId, expectedRevision: mutation.expectedRevision, actualRevision, reason: 'scope_changed' });
+                } else if (mutation.expectedRevision !== actualRevision) {
+                    conflicts.push({ noteId: mutation.noteId, expectedRevision: mutation.expectedRevision, actualRevision, reason: 'revision_changed' });
+                }
+            }
+            if (conflicts.length) {
+                return {
+                    transactionId: input.transactionId,
+                    status: 'conflict',
+                    notes: [],
+                    conflicts,
+                    timing: emptyContentMutationTiming(),
+                };
+            }
+
+            input.signal?.throwIfAborted();
+            const nextRevision = Math.max(
+                Date.now(),
+                ...input.mutations.map((mutation) => (noteRevision(current.get(mutation.noteId) || null) || 0) + 1),
+            );
+            const notes = input.mutations.map((mutation) => ({
+                ...mutation.after,
+                createdAt: current.get(mutation.noteId)?.createdAt ?? mutation.after.createdAt,
+                updatedAt: nextRevision,
+                version: nextRevision,
+            }));
+            const mutations: ContentWalMutation[] = notes.map((note) => ({
+                command: 'note:upsert',
+                payload: { row: noteToRow(note) },
+            }));
+            mutations.push({
+                command: 'relation:upsert',
+                payload: {
+                    relation: 'canvas_note_transactions',
+                    row: {
+                        id: input.transactionId,
+                        transaction_id: input.transactionId,
+                        note_ids: notes.map((note) => note.id),
+                        revision: nextRevision,
+                        committed_at: Date.now(),
+                    },
+                },
+            });
+            const timing = await this.runContentMutationLocked(mutations, queuedAt);
+            return {
+                transactionId: input.transactionId,
+                status: 'committed',
+                notes,
+                conflicts: [],
+                timing,
+            };
+        });
     }
 
     async getNote(id: string): Promise<StoreNote | null> {
@@ -1425,60 +1636,65 @@ export class PhoenixStoreService {
         }
         await this.ensureInitialized();
         const queuedAt = performance.now();
-        return this.runSerialized(async () => {
-            const totalStarted = performance.now();
-            const timing = contentMutationTimingSeed(mutations);
-            timing.serializedWaitMs = elapsedPhoenixStoreMs(queuedAt);
-            const manifest = this.requireManifest();
-            const batch = this.buildWalBatch(mutations, manifest.content.nextSeq);
-            let stepStarted = performance.now();
-            const appendResult = await this.persistence.appendWalBatch(batch);
-            timing.appendWalMs = elapsedPhoenixStoreMs(stepStarted);
-            const nextManifest = nextManifestWithWalAppend(manifest, batch, appendResult);
+        return this.runSerialized(() => this.runContentMutationLocked(mutations, queuedAt));
+    }
 
+    private async runContentMutationLocked(
+        mutations: ContentWalMutation[],
+        queuedAt: number,
+    ): Promise<PhoenixContentMutationTiming> {
+        const totalStarted = performance.now();
+        const timing = contentMutationTimingSeed(mutations);
+        timing.serializedWaitMs = elapsedPhoenixStoreMs(queuedAt);
+        const manifest = this.requireManifest();
+        const batch = this.buildWalBatch(mutations, manifest.content.nextSeq);
+        let stepStarted = performance.now();
+        const appendResult = await this.persistence.appendWalBatch(batch);
+        timing.appendWalMs = elapsedPhoenixStoreMs(stepStarted);
+        const nextManifest = nextManifestWithWalAppend(manifest, batch, appendResult);
+
+        stepStarted = performance.now();
+        await this.persistence.commitManifest(nextManifest);
+        timing.manifestCommitMs = elapsedPhoenixStoreMs(stepStarted);
+
+        try {
             stepStarted = performance.now();
-            await this.persistence.commitManifest(nextManifest);
-            timing.manifestCommitMs = elapsedPhoenixStoreMs(stepStarted);
-
-            try {
-                stepStarted = performance.now();
-                await this.phoenix.storeCommand('persistence:applyWalBatch', { records: batch.records });
-                timing.runtimeApplyMs = elapsedPhoenixStoreMs(stepStarted);
-            } catch (error) {
-                timing.runtimeApplyMs = elapsedPhoenixStoreMs(stepStarted);
-                if (isPhoenixStoreCommandTimeout(error)) {
-                    this.manifest = nextManifest;
-                    console.error(
-                        '[PhoenixStoreService] Runtime apply timed out after durable WAL commit. Shell restart required.',
-                        error,
-                    );
-                    throw error;
-                }
-                console.error('[PhoenixStoreService] Runtime apply failed after WAL commit. Rebuilding runtime.', error);
-                stepStarted = performance.now();
-                await this.reloadRuntimeFromPersistence();
-                timing.runtimeReloadMs = elapsedPhoenixStoreMs(stepStarted);
-                timing.runtimeReloaded = 1;
-                timing.checkpointScheduled = this.scheduleContentCheckpoint() ? 1 : 0;
-                timing.totalMs = elapsedPhoenixStoreMs(totalStarted);
-                return timing;
+            await this.phoenix.storeCommand('persistence:applyWalBatch', { records: batch.records });
+            timing.runtimeApplyMs = elapsedPhoenixStoreMs(stepStarted);
+        } catch (error) {
+            timing.runtimeApplyMs = elapsedPhoenixStoreMs(stepStarted);
+            if (isPhoenixStoreCommandTimeout(error)) {
+                this.manifest = nextManifest;
+                console.error(
+                    '[PhoenixStoreService] Runtime apply timed out after durable WAL commit. Shell restart required.',
+                    error,
+                );
+                throw error;
             }
-
-            this.manifest = nextManifest;
-            if (mutations.some((mutation) => mutation.command.startsWith('note:'))) {
-                this.invalidateLineSearchIndex();
-            }
-            this.recoveryState = {
-                ...this.recoveryState,
-                contentRecovered: true,
-                replayedRecords: this.recoveryState.replayedRecords + batch.records.length,
-                lastRecoveredSeq: batch.records[batch.records.length - 1]?.seq || this.recoveryState.lastRecoveredSeq,
-                manifestGeneration: nextManifest.generation,
-            };
+            console.error('[PhoenixStoreService] Runtime apply failed after WAL commit. Rebuilding runtime.', error);
+            stepStarted = performance.now();
+            await this.reloadRuntimeFromPersistence();
+            timing.runtimeReloadMs = elapsedPhoenixStoreMs(stepStarted);
+            timing.runtimeReloaded = 1;
             timing.checkpointScheduled = this.scheduleContentCheckpoint() ? 1 : 0;
             timing.totalMs = elapsedPhoenixStoreMs(totalStarted);
             return timing;
-        });
+        }
+
+        this.manifest = nextManifest;
+        if (mutations.some((mutation) => mutation.command.startsWith('note:'))) {
+            this.invalidateLineSearchIndex();
+        }
+        this.recoveryState = {
+            ...this.recoveryState,
+            contentRecovered: true,
+            replayedRecords: this.recoveryState.replayedRecords + batch.records.length,
+            lastRecoveredSeq: batch.records[batch.records.length - 1]?.seq || this.recoveryState.lastRecoveredSeq,
+            manifestGeneration: nextManifest.generation,
+        };
+        timing.checkpointScheduled = this.scheduleContentCheckpoint() ? 1 : 0;
+        timing.totalMs = elapsedPhoenixStoreMs(totalStarted);
+        return timing;
     }
 
     private buildWalBatch(mutations: ContentWalMutation[], nextSeq: number): PhoenixWalBatch {
@@ -1811,6 +2027,28 @@ function noteToRow(note: StoreNote): Record<string, unknown> {
         is_current: true,
         change_reason: null,
     };
+}
+
+function noteRevision(note: StoreNote | null): number | null {
+    if (!note) return null;
+    return note.version ?? note.updatedAt;
+}
+
+function sameNoteState(left: StoreNote, right: StoreNote): boolean {
+    return left.id === right.id
+        && left.worldId === right.worldId
+        && left.title === right.title
+        && left.content === right.content
+        && left.markdownContent === right.markdownContent
+        && left.folderId === right.folderId
+        && left.entityKind === right.entityKind
+        && left.entitySubtype === right.entitySubtype
+        && left.isEntity === right.isEntity
+        && left.isPinned === right.isPinned
+        && left.favorite === right.favorite
+        && left.ownerId === right.ownerId
+        && left.narrativeId === right.narrativeId
+        && left.order === right.order;
 }
 
 function rowToNote(row: any): StoreNote {

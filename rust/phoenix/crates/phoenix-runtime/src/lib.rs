@@ -93,7 +93,10 @@ use phoenix_types::{
     StoreCommandRequest, StoreCommandResult, StructureArtifact, StructureRequest, TextRange,
     Thread, ThreadMessage, ToolResultSubmission, UmrLiteArgument, UmrLiteRole,
 };
-use planner::{list_run_artifacts, set_artifact_pinned, ChatPlannerRunner};
+use planner::{
+    compact_run_context, list_run_artifacts, persist_run_artifact, set_artifact_pinned,
+    ChatPlannerRunner,
+};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Map, Value};
 pub use view::{
@@ -6572,9 +6575,66 @@ impl PhoenixRuntime {
                         .unwrap_or(Value::Null),
                 )
                 .map_err(|error| StoreError::Query(error.to_string()))?;
+                let canvas_target_event = options
+                    .canvas_target
+                    .as_ref()
+                    .map(|target| {
+                        let note = self
+                            .get_note_value(&target.note_id, true)?
+                            .ok_or_else(|| {
+                                StoreError::Query(format!(
+                                    "Canvas target note not found: {}",
+                                    target.note_id
+                                ))
+                            })?;
+                        let actual_revision = note
+                            .get("version")
+                            .and_then(Value::as_i64)
+                            .or_else(|| note.get("updated_at").and_then(Value::as_i64))
+                            .unwrap_or_default();
+                        if actual_revision != target.base_revision {
+                            return Err(StoreError::Query(format!(
+                                "Canvas target revision conflict for {}: expected {}, got {}",
+                                target.note_id, target.base_revision, actual_revision
+                            )));
+                        }
+                        Ok(json!({
+                            "noteUri": target.note_uri,
+                            "noteId": target.note_id,
+                            "baseRevision": actual_revision,
+                            "editorRevision": target.editor_revision,
+                            "from": target.from,
+                            "to": target.to,
+                            "contentChars": note.get("content").and_then(Value::as_str).map(str::len).unwrap_or(0),
+                            "markdownChars": note.get("markdown_content").and_then(Value::as_str).map(str::len).unwrap_or(0),
+                        }))
+                    })
+                    .transpose()?;
                 let run = self
                     .chat
                     .start_run(self.chat_store()?, thread_id, prompt, options)?;
+                if let Some(payload) = canvas_target_event {
+                    let now = now_ms();
+                    self.chat.persist_event(
+                        self.chat_store()?,
+                        &ChatRunEvent {
+                            id: format!("canvas-target:{}:{now}", run.id),
+                            run_id: run.id.clone(),
+                            sequence: 0,
+                            phase: "workspace".to_owned(),
+                            kind: "tool".to_owned(),
+                            label: "Opened Canvas note target".to_owned(),
+                            detail: payload
+                                .get("noteUri")
+                                .and_then(Value::as_str)
+                                .map(str::to_owned),
+                            status: Some("done".to_owned()),
+                            payload: Some(payload.to_string()),
+                            latency_ms: None,
+                            created_at: now,
+                        },
+                    )?;
+                }
                 Ok(StoreCommandResult {
                     success: true,
                     payload: Some(
@@ -6813,6 +6873,131 @@ impl PhoenixRuntime {
                         serde_json::to_value(artifacts)
                             .map_err(|error| StoreError::Query(error.to_string()))?,
                     ),
+                    error: None,
+                })
+            }
+            "chat:putPlannerArtifact" => {
+                let run_id = require_payload_str(&request.payload, "runId")?;
+                let kind = require_payload_str(&request.payload, "kind")?;
+                let run = self
+                    .chat
+                    .get_run(self.chat_store()?, run_id)?
+                    .ok_or_else(|| StoreError::Query(format!("run not found: {run_id}")))?;
+                let payload = request
+                    .payload
+                    .get("payload")
+                    .cloned()
+                    .unwrap_or(Value::Null);
+                let payload_bytes = serde_json::to_vec(&payload)
+                    .map_err(|error| StoreError::Query(error.to_string()))?
+                    .len();
+                if payload_bytes > 8_000_000 {
+                    return Err(StoreError::Query(format!(
+                        "artifact output exceeds 8000000 byte budget: {payload_bytes}"
+                    )));
+                }
+                let pinned = request
+                    .payload
+                    .get("pinned")
+                    .and_then(Value::as_bool)
+                    .unwrap_or(false);
+                let artifact = persist_run_artifact(
+                    self,
+                    &run,
+                    request.payload.get("key").and_then(Value::as_str),
+                    kind,
+                    payload,
+                    pinned,
+                )?;
+                Ok(StoreCommandResult {
+                    success: true,
+                    payload: Some(
+                        serde_json::to_value(artifact)
+                            .map_err(|error| StoreError::Query(error.to_string()))?,
+                    ),
+                    error: None,
+                })
+            }
+            "chat:appendRunEvent" => {
+                let run_id = require_payload_str(&request.payload, "runId")?;
+                self.chat
+                    .get_run(self.chat_store()?, run_id)?
+                    .ok_or_else(|| StoreError::Query(format!("run not found: {run_id}")))?;
+                let now = now_ms();
+                let event = self.chat.persist_ordered_event(
+                    self.chat_store()?,
+                    &ChatRunEvent {
+                        id: String::new(),
+                        run_id: run_id.to_owned(),
+                        sequence: 0,
+                        phase: request
+                            .payload
+                            .get("phase")
+                            .and_then(Value::as_str)
+                            .unwrap_or("tool_running")
+                            .to_owned(),
+                        kind: request
+                            .payload
+                            .get("kind")
+                            .and_then(Value::as_str)
+                            .unwrap_or("tool")
+                            .to_owned(),
+                        label: request
+                            .payload
+                            .get("label")
+                            .and_then(Value::as_str)
+                            .unwrap_or("App command")
+                            .to_owned(),
+                        detail: request
+                            .payload
+                            .get("detail")
+                            .and_then(Value::as_str)
+                            .map(str::to_owned),
+                        status: request
+                            .payload
+                            .get("status")
+                            .and_then(Value::as_str)
+                            .map(str::to_owned),
+                        payload: request
+                            .payload
+                            .get("payload")
+                            .and_then(Value::as_str)
+                            .map(str::to_owned),
+                        latency_ms: request.payload.get("latencyMs").and_then(Value::as_i64),
+                        created_at: now,
+                    },
+                )?;
+                Ok(StoreCommandResult {
+                    success: true,
+                    payload: Some(
+                        serde_json::to_value(event)
+                            .map_err(|error| StoreError::Query(error.to_string()))?,
+                    ),
+                    error: None,
+                })
+            }
+            "chat:compactContext" => {
+                let run_id = require_payload_str(&request.payload, "runId")?;
+                let run = self
+                    .chat
+                    .get_run(self.chat_store()?, run_id)?
+                    .ok_or_else(|| StoreError::Query(format!("run not found: {run_id}")))?;
+                let max_bytes = request
+                    .payload
+                    .get("maxBytes")
+                    .and_then(Value::as_u64)
+                    .unwrap_or(24_000)
+                    .clamp(4_096, 2_000_000) as usize;
+                let summary = request
+                    .payload
+                    .get("summary")
+                    .cloned()
+                    .unwrap_or(Value::Null);
+                let receipt = compact_run_context(self, &run, max_bytes, summary)?;
+                self.planner.drop_session(run_id);
+                Ok(StoreCommandResult {
+                    success: true,
+                    payload: Some(receipt),
                     error: None,
                 })
             }
@@ -12972,10 +13157,338 @@ pub fn try_fixture_body(fixture: &GoldenFixture) -> Result<String, std::io::Erro
 #[cfg(test)]
 mod tests {
     use super::*;
+    use phoenix_types::{ChatPlannerMessage, ChatPlannerModelResponse};
     #[cfg(feature = "legacy-cozo-graph")]
-    use phoenix_types::{
-        ChatPlannerModelResponse, ChatPlannerStep, ChatRunSnapshot, ChatWorkspaceArtifact,
-    };
+    use phoenix_types::{ChatPlannerStep, ChatRunSnapshot, ChatWorkspaceArtifact};
+
+    #[test]
+    fn canvas_run_opens_a_revision_bound_note_target_and_rejects_stale_revisions() {
+        let runtime = native_test_runtime();
+        runtime.init().expect("init");
+        runtime
+            .store_command(StoreCommandRequest {
+                command: "note:upsert".to_owned(),
+                payload: json!({
+                    "row": {
+                        "id": "note-shortrun-b",
+                        "version": 41,
+                        "world_id": "world-1",
+                        "title": "Shortrun B",
+                        "content": "{\"type\":\"doc\",\"content\":[]}",
+                        "markdown_content": "their cars like monkeys",
+                        "folder_id": "folder-1",
+                        "entity_kind": "",
+                        "entity_subtype": "",
+                        "is_entity": false,
+                        "is_pinned": false,
+                        "favorite": false,
+                        "owner_id": "",
+                        "narrative_id": "story-1",
+                        "order": 0,
+                        "created_at": 40,
+                        "updated_at": 41
+                    }
+                }),
+            })
+            .expect("note upsert");
+        let thread = runtime
+            .store_command(StoreCommandRequest {
+                command: "chat:createThread".to_owned(),
+                payload: json!({ "worldId": "world-1", "narrativeId": "story-1" }),
+            })
+            .expect("thread")
+            .payload
+            .expect("thread payload");
+        let thread_id = thread.get("id").and_then(Value::as_str).expect("thread id");
+
+        let start = |base_revision| {
+            runtime.store_command(StoreCommandRequest {
+                command: "chat:startRun".to_owned(),
+                payload: json!({
+                    "threadId": thread_id,
+                    "prompt": "Improve the selected text",
+                    "options": {
+                        "finalProvider": "go-openrouter",
+                        "finalModel": "test-model",
+                        "plannerEnabled": false,
+                        "omEnabled": false,
+                        "workspaceEnabled": true,
+                        "mutationsEnabled": true,
+                        "deadlineMs": 60_000,
+                        "mutationPolicy": "confirm",
+                        "narrativeId": "story-1",
+                        "canvasTarget": {
+                            "noteUri": "note://story-1/note-shortrun-b",
+                            "noteId": "note-shortrun-b",
+                            "baseRevision": base_revision,
+                            "editorRevision": 9,
+                            "from": 8,
+                            "to": 19
+                        }
+                    }
+                }),
+            })
+        };
+
+        let run = start(41)
+            .expect("revision-bound Canvas run")
+            .payload
+            .expect("run");
+        let run_id = run.get("id").and_then(Value::as_str).expect("run id");
+        let snapshot = runtime
+            .store_command(StoreCommandRequest {
+                command: "chat:pollRun".to_owned(),
+                payload: json!({ "runId": run_id }),
+            })
+            .expect("snapshot")
+            .payload
+            .expect("snapshot payload");
+        assert!(snapshot
+            .get("events")
+            .and_then(Value::as_array)
+            .expect("events")
+            .iter()
+            .any(|event| event.get("label").and_then(Value::as_str)
+                == Some("Opened Canvas note target")));
+
+        let conflict = start(40).expect_err("stale Canvas target should fail closed");
+        assert!(conflict.to_string().contains("expected 40, got 41"));
+    }
+
+    #[test]
+    fn app_ide_context_compaction_retains_full_history_as_artifacts() {
+        let runtime = native_test_runtime();
+        runtime.init().expect("init");
+        let thread = runtime
+            .chat
+            .create_thread(
+                runtime.chat_store().expect("chat store"),
+                Some("world-1"),
+                Some("story-1"),
+                Some("Read-only app IDE"),
+            )
+            .expect("thread");
+        let mut run = runtime
+            .chat
+            .start_run(
+                runtime.chat_store().expect("chat store"),
+                &thread.id.0,
+                "Inspect the app without mutations",
+                run_options("story-1", true, false),
+            )
+            .expect("run");
+        let messages = (0..12)
+            .map(|index| ChatPlannerMessage {
+                role: if index == 0 {
+                    "system".to_owned()
+                } else if index == 1 {
+                    "user".to_owned()
+                } else {
+                    "tool".to_owned()
+                },
+                content: format!("message-{index}:{}", "x".repeat(1_500)),
+                name: None,
+                tool_call_id: None,
+                tool_calls: Vec::new(),
+            })
+            .collect::<Vec<_>>();
+        run.planner_messages_json = serde_json::to_string(&messages).expect("messages");
+        runtime
+            .chat
+            .persist_run(runtime.chat_store().expect("chat store"), &run)
+            .expect("persist run");
+        let run_id = run.id.clone();
+        runtime
+            .store_command(StoreCommandRequest {
+                command: "chat:putPlannerArtifact".to_owned(),
+                payload: json!({
+                    "runId": &run_id,
+                    "key": "artifact:keep-me",
+                    "kind": "app_ide/test/v1",
+                    "payload": { "summary": "retain across compaction" },
+                    "pinned": true
+                }),
+            })
+            .expect("pinned artifact");
+
+        let receipt = runtime
+            .store_command(StoreCommandRequest {
+                command: "chat:compactContext".to_owned(),
+                payload: json!({
+                    "runId": &run_id,
+                    "maxBytes": 4_096,
+                    "summary": {
+                        "activeGoal": "Inspect the app without mutations",
+                        "pendingPermissions": [],
+                        "transactionState": [],
+                        "definitionOfDone": "read-only answer"
+                    }
+                }),
+            })
+            .expect("compact context")
+            .payload
+            .expect("receipt");
+        assert_eq!(receipt.get("compacted"), Some(&Value::Bool(true)));
+        assert!(
+            receipt
+                .get("beforeBytes")
+                .and_then(Value::as_u64)
+                .unwrap_or(0)
+                > receipt
+                    .get("afterBytes")
+                    .and_then(Value::as_u64)
+                    .unwrap_or(0)
+        );
+
+        let snapshot = runtime
+            .store_command(StoreCommandRequest {
+                command: "chat:pollRun".to_owned(),
+                payload: json!({ "runId": &run_id }),
+            })
+            .expect("poll run")
+            .payload
+            .expect("snapshot");
+        let artifacts = snapshot
+            .get("artifacts")
+            .and_then(Value::as_array)
+            .expect("artifacts");
+        assert!(artifacts
+            .iter()
+            .any(|artifact| artifact.get("kind").and_then(Value::as_str)
+                == Some("context_history/v1")));
+        assert!(artifacts.iter().any(|artifact| {
+            artifact.get("kind").and_then(Value::as_str) == Some("context_compaction/v1")
+                && artifact.get("pinned").and_then(Value::as_bool) == Some(true)
+        }));
+        assert!(artifacts.iter().any(|artifact| {
+            artifact.get("key").and_then(Value::as_str) == Some("artifact:keep-me")
+                && artifact.get("pinned").and_then(Value::as_bool) == Some(true)
+        }));
+        let events = snapshot
+            .get("events")
+            .and_then(Value::as_array)
+            .expect("events");
+        assert!(events.windows(2).all(|pair| {
+            pair[0].get("sequence").and_then(Value::as_u64)
+                < pair[1].get("sequence").and_then(Value::as_u64)
+        }));
+    }
+
+    #[test]
+    fn app_ide_planner_exposes_only_policy_host_and_rejects_hidden_tools() {
+        let runtime = native_test_runtime();
+        runtime.init().expect("init");
+        let thread = runtime
+            .chat
+            .create_thread(
+                runtime.chat_store().expect("chat store"),
+                Some("world-1"),
+                Some("story-1"),
+                Some("Read-only app IDE"),
+            )
+            .expect("thread");
+        let run = runtime
+            .chat
+            .start_run(
+                runtime.chat_store().expect("chat store"),
+                &thread.id.0,
+                "Inspect the app",
+                run_options("story-1", true, false),
+            )
+            .expect("run");
+        let step = runtime
+            .store_command(StoreCommandRequest {
+                command: "chat:getPlannerStep".to_owned(),
+                payload: json!({ "runId": &run.id }),
+            })
+            .expect("planner step")
+            .payload
+            .expect("step");
+        let tools = step
+            .get("request")
+            .and_then(|request| request.get("tools"))
+            .and_then(Value::as_array)
+            .expect("tools");
+        assert_eq!(tools.len(), 1);
+        assert_eq!(
+            tools[0].get("name").and_then(Value::as_str),
+            Some("app_exec")
+        );
+
+        runtime
+            .store_command(StoreCommandRequest {
+                command: "chat:submitPlannerModelResponse".to_owned(),
+                payload: json!({
+                    "runId": &run.id,
+                    "response": ChatPlannerModelResponse {
+                        content: String::new(),
+                        tool_calls: vec![phoenix_types::ChatPlannerToolCall {
+                            id: "hidden-call".to_owned(),
+                            name: "note_list".to_owned(),
+                            arguments_json: "{}".to_owned(),
+                        }],
+                    }
+                }),
+            })
+            .expect("hidden tool handled");
+        let snapshot = runtime
+            .chat
+            .poll_run(runtime.chat_store().expect("chat store"), &run.id)
+            .expect("snapshot")
+            .expect("run");
+        assert_eq!(snapshot.run.status, ChatRunStatus::Degraded);
+        assert!(snapshot
+            .run
+            .error
+            .as_deref()
+            .unwrap_or_default()
+            .contains("hidden by policy: note_list"));
+    }
+
+    #[test]
+    fn canvas_multi_note_planner_exposes_one_atomic_proposal_without_graph_writes() {
+        let runtime = native_test_runtime();
+        runtime.init().expect("init");
+        let thread = runtime
+            .chat
+            .create_thread(
+                runtime.chat_store().expect("chat store"),
+                Some("world-1"),
+                Some("story-1"),
+                Some("Multi-note Canvas"),
+            )
+            .expect("thread");
+        let run = runtime
+            .chat
+            .start_run(
+                runtime.chat_store().expect("chat store"),
+                &thread.id.0,
+                "Rename and patch two notes",
+                run_options("story-1", true, true),
+            )
+            .expect("run");
+        let step = runtime
+            .store_command(StoreCommandRequest {
+                command: "chat:getPlannerStep".to_owned(),
+                payload: json!({ "runId": &run.id }),
+            })
+            .expect("planner step")
+            .payload
+            .expect("step");
+        let tools = step
+            .pointer("/request/tools")
+            .and_then(Value::as_array)
+            .expect("tools");
+        assert!(tools
+            .iter()
+            .any(|tool| tool.get("name").and_then(Value::as_str) == Some("multi_note_proposal")));
+        assert!(tools.iter().all(|tool| {
+            !matches!(
+                tool.get("name").and_then(Value::as_str),
+                Some("graph_upsert" | "graph_delete" | "assert_graph")
+            )
+        }));
+    }
 
     #[test]
     fn atlas_rich_scan_can_skip_semantic_sidecar() {
@@ -16546,6 +17059,7 @@ Bright embers glowed beside the ember-lit grate. Bright embers hissed in the ash
             scope_id: Some(narrative_id.to_owned()),
             base_system_prompt: Some("You are Kammi.".to_owned()),
             initial_external_context: None,
+            canvas_target: None,
         }
     }
 

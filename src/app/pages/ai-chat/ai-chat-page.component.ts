@@ -40,6 +40,7 @@ import {
 } from '../../lib/services/google-genai.service';
 import { ChatContextClipStore } from '../../lib/store/chat-context-clip.store';
 import { KammiChatUiService } from '../../lib/services/kammi-chat-ui.service';
+import { CanvasRunInspectorComponent } from '../../lib/components/canvas-run-inspector.component';
 
 // Re-export types from the installed package for compatibility
 import type { ChatMessage, ChatOptions, ChatConfig as PkgChatConfig } from '@neurodevworks/angular-chatbot';
@@ -78,7 +79,7 @@ Keep responses concise but helpful. If you don't know something specific about t
 @Component({
     selector: 'app-ai-chat-page',
     standalone: true,
-    imports: [CommonModule, FormsModule, LucideAngularModule],
+    imports: [CommonModule, FormsModule, LucideAngularModule, CanvasRunInspectorComponent],
     template: `
         <div class="h-full flex flex-col bg-background text-foreground">
             <!-- Top Toolbar -->
@@ -142,6 +143,8 @@ Keep responses concise but helpful. If you don't know something specific about t
                     </button>
                 </div>
             </div>
+
+            <app-canvas-run-inspector />
 
             <!-- Main Content -->
             <div class="flex-1 flex overflow-hidden relative">

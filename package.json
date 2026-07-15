@@ -24,6 +24,14 @@
     "bench:graph:desktop-two-doc": "node scripts/run-graph-build-desktop-baseline.mjs",
     "audit:graph-taxonomy": "node scripts/graph-atlas-taxonomy-audit.mjs",
     "test": "vitest run",
+    "test:canvas": "vitest run src/app/lib/services/canvas-note-transaction.spec.ts src/app/lib/services/canvas-note-transaction.service.spec.ts src/app/lib/services/canvas-agent-run.service.spec.ts src/app/lib/services/canvas-surface-parity.spec.ts src/app/lib/services/chat-tool-host.service.spec.ts src/app/lib/operations.spec.ts src/app/services/phoenix-store.service.spec.ts",
+    "test:canvas:native": "set CARGO_TARGET_DIR=D:\\phoenix-target-overgraph\\canvas-slice1&& cargo test --manifest-path rust/phoenix/Cargo.toml -p phoenix-runtime canvas_run_opens_a_revision_bound_note_target_and_rejects_stale_revisions --lib",
+    "bench:canvas:shortrun": "vitest run src/app/lib/services/canvas-shortrun.performance.spec.ts --reporter=verbose",
+    "test:app-ide": "vitest run src/app/lib/services/app-ide-command.contract.spec.ts src/app/lib/services/app-ide-command.service.spec.ts src/app/lib/services/chat-tool-host.service.spec.ts src/app/lib/services/canvas-surface-parity.spec.ts",
+    "test:app-ide:native": "set CARGO_TARGET_DIR=D:\\phoenix-target-overgraph\\canvas-slice1&& cargo test --manifest-path rust/phoenix/Cargo.toml -p phoenix-chat run_events_receive_durable_monotonic_sequences_even_at_the_same_timestamp --lib && cargo test --manifest-path rust/phoenix/Cargo.toml -p phoenix-runtime app_ide_ --lib",
+    "test:canvas:multi": "vitest run src/app/lib/services/canvas-multi-note-transaction.spec.ts src/app/lib/services/canvas-multi-note-transaction.service.spec.ts src/app/lib/services/canvas-trusted-grant.service.spec.ts src/app/lib/services/chat-tool-host.service.spec.ts src/app/lib/services/canvas-agent-run.service.spec.ts src/app/lib/services/canvas-surface-parity.spec.ts src/app/services/phoenix-store.service.spec.ts",
+    "test:canvas:multi:native": "set CARGO_TARGET_DIR=D:\\phoenix-target-overgraph\\canvas-slice3&& cargo test --manifest-path rust/phoenix/Cargo.toml -p phoenix-runtime canvas_multi_note_planner_ --lib",
+    "bench:canvas:multi-shortrun": "vitest run src/app/lib/services/canvas-multi-note-shortrun.performance.spec.ts --reporter=verbose",
     "test:watch": "vitest"
   },
   "prettier": {

@@ -32,6 +32,8 @@ import { ChatToolHostService } from '../../../lib/services/chat-tool-host.servic
 import { AiSidebarModeService, type AiSidebarMode } from '../../../lib/services/ai-sidebar-mode.service';
 import { EditorAgentWorkspaceService } from '../../../lib/services/editor-agent-workspace.service';
 import { NoteEditorStore } from '../../../lib/store/note-editor.store';
+import { CanvasAgentRunService } from '../../../lib/services/canvas-agent-run.service';
+import { CanvasRunInspectorComponent } from '../../../lib/components/canvas-run-inspector.component';
 
 interface SessionInfo {
     id: string;
@@ -77,7 +79,7 @@ Keep responses concise but helpful. If you don't know something specific about t
 @Component({
     selector: 'app-ai-chat-panel',
     standalone: true,
-    imports: [CommonModule, FormsModule, LucideAngularModule],
+    imports: [CommonModule, FormsModule, LucideAngularModule, CanvasRunInspectorComponent],
     template: `
         <div class="ai-chat-wrapper h-full flex flex-col overflow-hidden">
             <!-- Chat Header -->
@@ -188,6 +190,7 @@ Keep responses concise but helpful. If you don't know something specific about t
                                 </div>
                             }
                         </div>
+                        <app-canvas-run-inspector />
                     }
                 </div>
             }
@@ -740,7 +743,7 @@ Keep responses concise but helpful. If you don't know something specific about t
                         <textarea #messageInput class="w-full pl-3 pr-10 py-2.5 text-[13px] rounded-xl border border-border bg-background focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500/30 resize-none transition-all placeholder:text-muted-foreground/60 shadow-sm"
                             [placeholder]="aiMode() === 'canvas' ? 'Ask Kammi to inspect or edit the open note...' : 'Ask Kammi anything...'" [(ngModel)]="currentMessage" (keydown.enter)="onEnterKey($event)" [disabled]="isStreaming()" rows="1" style="max-height: 120px"></textarea>
                         <button class="absolute right-1.5 bottom-1.5 w-7 h-7 rounded-lg flex items-center justify-center transition-all send-btn"
-                            [class.active]="currentMessage.trim() && !isStreaming()" [disabled]="!currentMessage.trim() || isStreaming()" (click)="sendMessage()">
+                            [class.active]="currentMessage.trim() && !isStreaming() && !canvasRuns.busy()" [disabled]="!currentMessage.trim() || isStreaming() || canvasRuns.busy()" (click)="sendMessage()">
                             <lucide-icon [img]="SendIcon" class="h-3.5 w-3.5"></lucide-icon>
                         </button>
                     </div>
@@ -1182,6 +1185,7 @@ export class AiChatPanelComponent implements AfterViewInit, OnDestroy {
     private readonly aiSidebarMode = inject(AiSidebarModeService);
     private readonly workspace = inject(EditorAgentWorkspaceService);
     private readonly noteEditorStore = inject(NoteEditorStore);
+    readonly canvasRuns = inject(CanvasAgentRunService);
     private goChatInitialized = false;
     readonly aiMode = this.aiSidebarMode.mode;
     readonly canvasSelectionContext = this.aiSidebarMode.selectionContext;
@@ -1200,7 +1204,7 @@ export class AiChatPanelComponent implements AfterViewInit, OnDestroy {
         if (!selection) {
             return 'No attached note range';
         }
-        return `Attached range ${selection.from}-${selection.to}${selection.autoApplyEligible ? ' • auto-apply ready' : ''}`;
+        return `Attached range ${selection.from}-${selection.to} • approval required`;
     });
 
     // Icon references for template
@@ -1642,7 +1646,18 @@ export class AiChatPanelComponent implements AfterViewInit, OnDestroy {
 
     async sendMessage(): Promise<void> {
         const text = this.currentMessage.trim();
-        if (!text || this.isStreaming() || (this.currentRunId() && this.pendingApprovals().length > 0)) return;
+        if (!text || this.isStreaming() || this.canvasRuns.busy() || (this.currentRunId() && this.pendingApprovals().length > 0)) return;
+
+        if (this.aiMode() === 'canvas') {
+            this.currentMessage = '';
+            if (this.canvasSelectionContext()?.text?.trim()) {
+                await this.canvasRuns.startSelectionRun(text, undefined, 'side-panel');
+            } else {
+                await this.canvasRuns.startWorkspaceRun(text, 'side-panel');
+            }
+            this.scrollToBottom();
+            return;
+        }
 
         this.currentMessage = '';
         this.isStreaming.set(true);
