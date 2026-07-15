@@ -276,3 +276,11 @@ the UI mutation and a censored execution observation after durable application.
 This changes future capture, not the historical counts above: no operator row,
 graph commit, or candidate projection was backfilled. Reward-complete research
 rows remain locked until genuine later outcomes are observed.
+
+Canonical Episode Assignment now has its first end-to-end producer. Exact, unambiguous continuity
+event memberships can be accepted in Atlas Control; the native runtime freezes the complete episode
+candidate group, appends the operator decision and outcome, commits the asserted membership, and
+opens the canonical reward horizon. See
+[`canonical-episode-assignment-producer-v1.md`](canonical-episode-assignment-producer-v1.md).
+This opens future task capture only. The frozen dataset gate still depends on a nonzero live census
+and certified chronological/leakage coverage.

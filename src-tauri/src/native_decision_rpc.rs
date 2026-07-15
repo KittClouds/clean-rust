@@ -2,8 +2,9 @@ use std::path::Path;
 
 use phoenix_graph_api::{
     begin_native_operator_decision, certify_native_decision_graph_truth_link,
-    complete_native_operator_decision, native_decision_census, native_reward_observation_census,
-    record_native_reward_observation, NativeDecisionGraphTruthLinkRequest,
+    commit_canonical_episode_assignment, complete_native_operator_decision, native_decision_census,
+    native_reward_observation_census, record_native_reward_observation,
+    CanonicalEpisodeAssignmentCommitRequest, NativeDecisionGraphTruthLinkRequest,
     NativeOperatorDecisionBeginRequest, NativeOperatorDecisionCompleteRequest,
     NativeRewardObservationRequest,
 };
@@ -21,6 +22,14 @@ pub fn complete(store_path: &Path, request_json: &str) -> Result<String, String>
     let store = open_store(store_path)?;
     let request = parse::<NativeOperatorDecisionCompleteRequest>(request_json)?;
     encode(&complete_native_operator_decision(&store, request).map_err(decision_error)?)
+}
+
+pub fn commit_episode_assignment(store_path: &Path, request_json: &str) -> Result<String, String> {
+    let store = open_store(store_path)?;
+    let request = parse::<CanonicalEpisodeAssignmentCommitRequest>(request_json)?;
+    encode(
+        &commit_canonical_episode_assignment(&store, request).map_err(|error| error.to_string())?,
+    )
 }
 
 pub fn census(store_path: &Path) -> Result<String, String> {
@@ -173,5 +182,61 @@ mod tests {
         );
         assert_eq!(observer["humanObservationsAppended"], 0);
         assert_eq!(observer["stabilityObservationsAppended"], 0);
+    }
+
+    #[test]
+    fn episode_assignment_rpc_commits_the_selected_candidate_and_reward_lineage() {
+        let root = tempdir().expect("episode RPC store");
+        let request = json!({
+            "schemaVersion": "phoenix-canonical-episode-assignment-commit/v1",
+            "scopeKey": "scope:episode-rpc",
+            "sourceSnapshotId": "snapshot:episode-rpc:1",
+            "sourceSnapshotBuiltAt": 90,
+            "sourceAuthorityContentHash": "authority:episode-rpc:1",
+            "event": {
+                "id": "event:rpc:1",
+                "noteId": "note:rpc:1",
+                "chunkId": "chunk:rpc:1",
+                "sourceStart": 10,
+                "sourceEnd": 20,
+                "predicate": "arrives",
+                "participantEntityIds": ["entity:rpc:1"],
+                "evidenceIds": ["evidence:rpc:1"],
+                "factuality": "asserted",
+                "confidenceMillis": 900,
+                "noTopologyCommit": true
+            },
+            "episodes": [{
+                "id": "episode:rpc:1",
+                "noteId": "note:rpc:1",
+                "label": "Arrival",
+                "sourceStart": 0,
+                "sourceEnd": 30,
+                "chunkIds": ["chunk:rpc:1"],
+                "eventIds": ["event:rpc:1"],
+                "entityIds": ["entity:rpc:1"],
+                "boundaryReceiptIds": ["boundary:rpc:1"],
+                "confidenceMillis": 850,
+                "status": "candidate",
+                "noTopologyCommit": true
+            }],
+            "selectedAction": { "kind": "attach_to_episode", "episodeId": "episode:rpc:1" },
+            "decidedAt": 100,
+            "operatorId": "operator:local-user"
+        });
+        let value: Value = serde_json::from_str(
+            &commit_episode_assignment(root.path(), &request.to_string())
+                .expect("episode assignment RPC"),
+        )
+        .expect("decode response");
+        assert_eq!(value["commitStatus"], "appended");
+        assert_eq!(value["chosenActionKind"], "attach_to_episode");
+        assert_eq!(value["candidateCount"], 3);
+        let census: Value =
+            serde_json::from_str(&census(root.path()).expect("census")).expect("decode census");
+        assert_eq!(census["behaviorLabels"], 1);
+        assert_eq!(census["canonicalEpisodeAssignmentLabels"], 1);
+        assert_eq!(census["canonicalEpisodeAttachLabels"], 1);
+        assert_eq!(census["graphTruthLinkedDecisions"], 1);
     }
 }

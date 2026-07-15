@@ -168,10 +168,12 @@ export type PhoenixNativeBridge = Pick<PhoenixWasmService, 'isReady' | PhoenixNa
     persistGraphRun?(runHandle: string): Promise<unknown>;
     beginNativeOperatorDecision?(request: unknown): Promise<unknown>;
     completeNativeOperatorDecision?(request: unknown): Promise<unknown>;
+    commitCanonicalEpisodeAssignment?(request: unknown): Promise<unknown>;
     nativeDecisionCensus?(): Promise<unknown>;
     linkNativeOperatorDecisionGraphTruth?(request: unknown): Promise<unknown>;
     recordNativeRewardObservation?(request: unknown): Promise<unknown>;
     nativeRewardObservationCensus?(): Promise<unknown>;
+    observeNativeRewardHorizons?(): Promise<unknown>;
     closeGraphRun?(runHandle: string): Promise<boolean>;
     graphScenePacket?(request: PhoenixGraphScenePacketRequest): Promise<PhoenixGraphScenePacket>;
     nliAdjudicateClaims?(request: Record<string, unknown>): Promise<any>;
@@ -380,6 +382,17 @@ export class PhoenixBackendService {
         return bridge.completeNativeOperatorDecision(request);
     }
 
+    async commitCanonicalEpisodeAssignment(request: unknown): Promise<unknown> {
+        if (this.target !== 'native') {
+            throw new Error('PhoenixBackendService.commitCanonicalEpisodeAssignment() requires the native runtime.');
+        }
+        const bridge = this.requireNativeBridge();
+        if (!bridge.commitCanonicalEpisodeAssignment) {
+            throw new Error('Native canonical episode assignment RPC is unavailable.');
+        }
+        return bridge.commitCanonicalEpisodeAssignment(request);
+    }
+
     async nativeDecisionCensus(): Promise<unknown> {
         if (this.target !== 'native') {
             throw new Error('PhoenixBackendService.nativeDecisionCensus() requires the native runtime.');
@@ -420,6 +433,17 @@ export class PhoenixBackendService {
             throw new Error('Native reward observation census RPC is unavailable.');
         }
         return bridge.nativeRewardObservationCensus();
+    }
+
+    async observeNativeRewardHorizons(): Promise<unknown> {
+        if (this.target !== 'native') {
+            throw new Error('PhoenixBackendService.observeNativeRewardHorizons() requires the native runtime.');
+        }
+        const bridge = this.requireNativeBridge();
+        if (!bridge.observeNativeRewardHorizons) {
+            throw new Error('Native reward horizon observer RPC is unavailable.');
+        }
+        return bridge.observeNativeRewardHorizons();
     }
 
     async closeGraphRun(runHandle: string): Promise<boolean> {

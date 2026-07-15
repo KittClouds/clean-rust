@@ -80,6 +80,15 @@ export interface NativeOperatorDecisionCompleteResponse {
 export interface NativeDecisionCensus {
     schemaVersion: 'phoenix-native-decision-census/v1';
     behaviorLabels: number;
+    canonicalEpisodeAssignmentLabels: number;
+    canonicalEpisodeAttachLabels: number;
+    canonicalEpisodeCreateLabels: number;
+    canonicalEpisodeAbstainLabels: number;
+    canonicalEpisodeFirstObservedAt: number | null;
+    canonicalEpisodeLastObservedAt: number | null;
+    canonicalEpisodeCandidateCountTotal: number;
+    canonicalEpisodeCandidateCountMin: number;
+    canonicalEpisodeCandidateCountMax: number;
     operatorPreferenceLabels: number;
     executionOutcomes: number;
     rewardCompleteOutcomes: number;
@@ -158,6 +167,12 @@ export interface NativeRewardObservationCensus {
     observationReceipts: number;
     activeHumanAcceptance: number;
     activeFutureStability: number;
+    positiveFutureStability: number;
+    negativeFutureStability: number;
+    matureCanonicalEpisodeAssignments: number;
+    positiveCanonicalEpisodeStability: number;
+    negativeCanonicalEpisodeStability: number;
+    pendingCanonicalEpisodeHorizons: number;
     retractedDimensions: number;
     partiallyObservedDecisions: number;
     fullyObservedDecisions: number;

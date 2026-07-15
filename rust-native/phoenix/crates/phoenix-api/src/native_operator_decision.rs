@@ -106,6 +106,15 @@ pub struct NativeOperatorDecisionCompleteResponse {
 pub struct NativeDecisionCensus {
     pub schema_version: String,
     pub behavior_labels: u64,
+    pub canonical_episode_assignment_labels: u64,
+    pub canonical_episode_attach_labels: u64,
+    pub canonical_episode_create_labels: u64,
+    pub canonical_episode_abstain_labels: u64,
+    pub canonical_episode_first_observed_at: Option<i64>,
+    pub canonical_episode_last_observed_at: Option<i64>,
+    pub canonical_episode_candidate_count_total: u64,
+    pub canonical_episode_candidate_count_min: u64,
+    pub canonical_episode_candidate_count_max: u64,
     pub operator_preference_labels: u64,
     pub execution_outcomes: u64,
     pub reward_complete_outcomes: u64,
@@ -467,6 +476,12 @@ where
     let mut census = NativeDecisionCensus {
         schema_version: NATIVE_DECISION_CENSUS_SCHEMA.to_owned(),
         behavior_labels: decisions.len() as u64,
+        canonical_episode_assignment_labels: decisions
+            .iter()
+            .filter(|decision| {
+                decision.task_family == NativeDecisionTaskFamily::CanonicalEpisodeAssignment
+            })
+            .count() as u64,
         operator_preference_labels: decisions
             .iter()
             .filter(|decision| {
@@ -478,6 +493,47 @@ where
     for decision in &decisions {
         let outcomes = store.load_native_decision_outcome_receipts(&decision.receipt_id)?;
         let chosen = &decision.candidates[decision.chosen_candidate_ordinal as usize];
+        if decision.task_family == NativeDecisionTaskFamily::CanonicalEpisodeAssignment {
+            census.canonical_episode_first_observed_at = Some(
+                census
+                    .canonical_episode_first_observed_at
+                    .map_or(decision.observed_at, |prior| {
+                        prior.min(decision.observed_at)
+                    }),
+            );
+            census.canonical_episode_last_observed_at = Some(
+                census
+                    .canonical_episode_last_observed_at
+                    .map_or(decision.observed_at, |prior| {
+                        prior.max(decision.observed_at)
+                    }),
+            );
+            let candidate_count = decision.candidates.len() as u64;
+            census.canonical_episode_candidate_count_total = census
+                .canonical_episode_candidate_count_total
+                .saturating_add(candidate_count);
+            census.canonical_episode_candidate_count_min =
+                if census.canonical_episode_candidate_count_min == 0 {
+                    candidate_count
+                } else {
+                    census
+                        .canonical_episode_candidate_count_min
+                        .min(candidate_count)
+                };
+            census.canonical_episode_candidate_count_max = census
+                .canonical_episode_candidate_count_max
+                .max(candidate_count);
+            match &chosen.action {
+                GraphDecisionAction::AttachToEpisode(_) => {
+                    census.canonical_episode_attach_labels += 1
+                }
+                GraphDecisionAction::CreateEpisode(_) => {
+                    census.canonical_episode_create_labels += 1
+                }
+                GraphDecisionAction::Abstain(_) => census.canonical_episode_abstain_labels += 1,
+                _ => {}
+            }
+        }
         let chosen_terminal = outcomes
             .iter()
             .filter(|outcome| outcome.candidate_action_identity == chosen.action_identity)

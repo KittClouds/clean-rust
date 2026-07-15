@@ -25,6 +25,7 @@ import type { GraphReviewAdjudicationRunCertificate } from './graph-review-adjud
 import type {
     GraphContinuityCausalCandidate,
     GraphContinuityConflictCandidate,
+    GraphContinuityEvent,
     GraphContinuityStateIntervalCandidate,
     GraphContinuityTemporalCandidate,
     GraphEpisodeBoundaryReceipt,
@@ -39,6 +40,7 @@ import type {
 import type {
     AtlasControlAction,
     AtlasControlEntityInput,
+    AtlasEpisodeAssignmentOption,
     AtlasControlLane,
     AtlasControlReceiptKind,
     AtlasControlReceiptPolicy,
@@ -58,6 +60,7 @@ interface AtlasControlRowTrace {
     sourceExcerpt?: string;
     targetExcerpt?: string;
     targetDocumentId?: string;
+    episodeAssignmentOptions?: AtlasEpisodeAssignmentOption[];
 }
 
 export function buildAtlasControlRows(
@@ -141,6 +144,9 @@ export function buildAtlasNativeProofRows(
     for (const row of projection.governance.candidates) rows.push(governanceRow(snapshotId, row));
     for (const row of projection.promotion.certificate?.rows ?? []) rows.push(promotionRow(snapshotId, row));
     const continuity = projection.continuity.contract;
+    for (const row of continuity?.events ?? []) {
+        rows.push(continuityEventRow(snapshotId, row, continuity?.episodes ?? []));
+    }
     for (const row of continuity?.boundaryReceipts ?? []) rows.push(continuityBoundaryRow(snapshotId, row));
     for (const row of continuity?.episodes ?? []) rows.push(continuityEpisodeRow(snapshotId, row));
     for (const row of continuity?.episodeConnections ?? []) rows.push(continuityConnectionRow(snapshotId, row));
@@ -160,6 +166,53 @@ export function buildAtlasNativeProofRows(
         rows.push(crossDocumentCandidateRow(snapshotId, row, false));
     }
     return rows;
+}
+
+function continuityEventRow(
+    snapshotId: string,
+    row: GraphContinuityEvent,
+    episodes: GraphStoryEpisode[],
+): AtlasControlRow {
+    const compatible = episodes.filter((episode) => episode.noteId === row.noteId
+        && episode.status !== 'blocked' && episode.noTopologyCommit);
+    const decisionReady = row.noTopologyCommit;
+    const actions: AtlasControlAction[] = decisionReady
+        ? ['inspect', 'jump_to_source', 'commit_episode_assignment']
+        : ['inspect', 'jump_to_source'];
+    return typedRow(snapshotId, 'story_continuity', 'continuity_episode_map', row.id,
+        'continuity_event_assignment', row.predicate,
+        compatible.length === 1 ? `Proposed episode: ${compatible[0].label}` : `${compatible.length} compatible episode candidates`,
+        decisionReady ? 'decision_ready' : 'review_required', row.confidenceMillis / 1000, actions,
+        decisionReady ? canonicalEpisodeAssignmentReceipt() : noReceipt(), [], {
+            noteId: row.noteId, sourceStart: row.sourceStart, sourceEnd: row.sourceEnd,
+            sourceIds: [row.chunkId], targetIds: compatible.map((episode) => episode.id),
+            entityIds: row.participantEntityIds, evidenceIds: row.evidenceIds,
+            tags: ['continuity', 'episode_assignment', compatible.length === 1 ? 'exact_proposal' : 'operator_choice',
+                'candidate_source', 'no_topology_commit'],
+            episodeAssignmentOptions: [
+                ...compatible.map((episode) => ({
+                    kind: 'attach_to_episode' as const,
+                    episodeId: episode.id,
+                    label: episode.label,
+                    detail: `${episode.eventIds.length} events / ${Math.round(episode.confidenceMillis / 10)}% confidence`,
+                    proposed: episode.eventIds.includes(row.id),
+                })),
+                {
+                    kind: 'create_episode' as const,
+                    episodeId: null,
+                    label: 'Create a new episode',
+                    detail: 'Commit a canonical episode rooted at this event.',
+                    proposed: false,
+                },
+                {
+                    kind: 'abstain' as const,
+                    episodeId: null,
+                    label: 'Abstain',
+                    detail: 'Record insufficient evidence without changing graph truth.',
+                    proposed: false,
+                },
+            ],
+        });
 }
 
 function continuityBoundaryRow(snapshotId: string, row: GraphEpisodeBoundaryReceipt): AtlasControlRow {
@@ -283,6 +336,15 @@ function continuityReceipt(): AtlasControlReceiptPolicy {
         kind: 'continuity_action_receipt',
         reversible: true,
         topologyMutationAllowed: false,
+    };
+}
+
+function canonicalEpisodeAssignmentReceipt(): AtlasControlReceiptPolicy {
+    return {
+        required: true,
+        kind: 'native_decision_receipt',
+        reversible: true,
+        topologyMutationAllowed: true,
     };
 }
 
@@ -463,6 +525,7 @@ function typedRow(
         sourceExcerpt: trace.sourceExcerpt ?? null,
         targetExcerpt: trace.targetExcerpt ?? null,
         targetDocumentId: trace.targetDocumentId ?? null,
+        episodeAssignmentOptions: trace.episodeAssignmentOptions ?? [],
     };
 }
 

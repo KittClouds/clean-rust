@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, ViewChild, computed, inject, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild, computed, inject, signal } from '@angular/core';
 
 import { smartGraphRegistry, type RegisteredEntity } from '../../../../lib/registry';
 import { EntitySelectionService } from '../../../../lib/services/entity-selection.service';
@@ -7,6 +7,7 @@ import { ScopeService } from '../../../../lib/services/scope.service';
 import { NoteEditorStore } from '../../../../lib/store/note-editor.store';
 import { PhoenixMachineControlService } from '../../../../services/phoenix-machine-control.service';
 import { PhoenixProjectionService } from '../../../../services/phoenix-projection.service';
+import { PhoenixBackendService } from '../../../../services/phoenix-backend.service';
 import { AtlasControlContractService } from '../../../../services/atlas-control-contract.service';
 import { GraphRebuildService } from '../../../../graph-rebuild/graph-rebuild.service';
 import type { GraphDocumentReviewDecision } from '../../../../graph-rebuild/graph-document-review-snapshot';
@@ -25,6 +26,10 @@ import {
     type GraphContinuityAction,
 } from '../../../../graph-rebuild/graph-story-continuity';
 import { AtlasControlRoomsComponent } from './atlas-control-rooms.component';
+import {
+    loadCanonicalEpisodeAssignmentReadiness,
+    type CanonicalEpisodeAssignmentReadiness,
+} from '../../../../graph-rebuild/graph-canonical-episode-readiness';
 
 type AtlasWorkflowTone = 'ready' | 'review' | 'warning' | 'quiet';
 
@@ -51,7 +56,7 @@ interface AtlasWorkflowStep {
         './attributes-tab-workflow.component.css',
     ],
 })
-export class AttributesTabComponent implements OnDestroy {
+export class AttributesTabComponent implements OnDestroy, OnInit {
     @ViewChild(SearchPanelComponent) private searchPanel?: SearchPanelComponent;
 
     private readonly scopeService = inject(ScopeService);
@@ -61,6 +66,7 @@ export class AttributesTabComponent implements OnDestroy {
     private readonly graphRebuild = inject(GraphRebuildService);
     private readonly machine = inject(PhoenixMachineControlService);
     private readonly entitySelection = inject(EntitySelectionService);
+    private readonly phoenix = inject(PhoenixBackendService);
 
     readonly entities = computed(() => this.projection.entities());
     readonly graphSnapshot = this.graphRebuild.snapshot;
@@ -69,6 +75,10 @@ export class AttributesTabComponent implements OnDestroy {
     readonly editingEntity = signal<EntityCreatorData | undefined>(undefined);
     readonly selectedRoomId = signal<AtlasControlRoomId>('review');
     readonly activeScope = this.scopeService.activeScope;
+    readonly assignmentReadiness = signal<CanonicalEpisodeAssignmentReadiness | null>(null);
+    readonly assignmentReadinessState = signal<'idle' | 'loading' | 'ready' | 'error' | 'unavailable'>('idle');
+    readonly assignmentBusyRowId = signal<string | null>(null);
+    readonly committedAssignmentRowIds = signal<ReadonlySet<string>>(new Set());
 
     readonly atlasControlContract = this.atlasControl.contract;
     readonly atlasProofPaging = this.atlasControl.proofPaging;
@@ -84,6 +94,10 @@ export class AttributesTabComponent implements OnDestroy {
     });
     setOperatingRoom(room: AtlasControlRoomId): void {
         this.selectedRoomId.set(room);
+    }
+
+    ngOnInit(): void {
+        void this.refreshAssignmentReadiness();
     }
 
     loadNextAtlasProofPage(): void {
@@ -169,6 +183,24 @@ export class AttributesTabComponent implements OnDestroy {
             return;
         }
         if (!row) return;
+        if (request.action === 'commit_episode_assignment') {
+            if (!request.episodeSelection) {
+                throw new Error('Canonical episode assignment requires an explicit operator choice.');
+            }
+            if (this.assignmentBusyRowId() || this.committedAssignmentRowIds().has(row.identity.id)) return;
+            this.assignmentBusyRowId.set(row.identity.id);
+            try {
+                await this.graphRebuild.commitCanonicalEpisodeAssignment(
+                    row.identity.rawId,
+                    request.episodeSelection,
+                );
+                this.committedAssignmentRowIds.update((current) => new Set(current).add(row.identity.id));
+                await this.refreshAssignmentReadiness();
+            } finally {
+                this.assignmentBusyRowId.set(null);
+            }
+            return;
+        }
         if (isContinuityAction(request.action)) {
             const current = this.graphSnapshot();
             if (!current) return;
@@ -195,6 +227,22 @@ export class AttributesTabComponent implements OnDestroy {
         const scope = this.activeScope();
         if (scope.type === 'global' || scope.scopeFolderId === 'vault:global') return 'global';
         return scope.scopeFolderId || scope.id || 'global';
+    }
+
+    async refreshAssignmentReadiness(): Promise<void> {
+        if (this.phoenix.target !== 'native') {
+            this.assignmentReadinessState.set('unavailable');
+            return;
+        }
+        if (this.assignmentReadinessState() === 'loading') return;
+        this.assignmentReadinessState.set('loading');
+        try {
+            this.assignmentReadiness.set(await loadCanonicalEpisodeAssignmentReadiness(this.phoenix));
+            this.assignmentReadinessState.set('ready');
+        } catch (error) {
+            console.error('[AtlasControl] canonical assignment readiness failed', error);
+            this.assignmentReadinessState.set('error');
+        }
     }
 
     private manualEntityContext(): { noteId: string; narrativeId?: string } {

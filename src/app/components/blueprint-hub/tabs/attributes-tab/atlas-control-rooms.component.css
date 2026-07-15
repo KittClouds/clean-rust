@@ -509,6 +509,75 @@
     line-height: 1.55;
 }
 
+.atlas-assignment-options {
+    display: grid;
+    gap: 8px;
+    margin: 18px 0;
+    padding: 12px;
+    border: 1px solid #1b3035;
+    background: #050b0f;
+}
+
+.atlas-assignment-options header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 2px;
+}
+
+.atlas-assignment-options header span,
+.atlas-assignment-options button span {
+    color: #63d8cb;
+    font-size: 9px;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.atlas-assignment-options header strong {
+    color: #a7b1b9;
+    font-size: 10px;
+}
+
+.atlas-assignment-options button {
+    display: grid;
+    gap: 4px;
+    padding: 10px 11px;
+    text-align: left;
+    color: #dce3e7;
+    background: #091116;
+    border: 1px solid #1d2a32;
+    cursor: pointer;
+}
+
+.atlas-assignment-options button:hover,
+.atlas-assignment-options button.atlas-assignment-proposed:hover {
+    border-color: #42cbbd;
+    background: #0b1d1d;
+}
+
+.atlas-assignment-options button:disabled {
+    cursor: default;
+    opacity: 0.44;
+}
+
+.atlas-assignment-options button.atlas-assignment-proposed {
+    border-color: #226c65;
+    box-shadow: inset 2px 0 0 #22c7b6;
+}
+
+.atlas-assignment-options button strong {
+    font-size: 12px;
+}
+
+.atlas-assignment-options button small,
+.atlas-assignment-options p {
+    margin: 0;
+    color: #7d8992;
+    font-size: 10px;
+    line-height: 1.45;
+}
+
 .atlas-room-proofs {
     display: flex;
     flex-wrap: wrap;

@@ -335,6 +335,14 @@ class PhoenixTaurpcBridge implements PhoenixNativeBridge {
         return JSON.parse(response);
     }
 
+    async commitCanonicalEpisodeAssignment(request: unknown): Promise<unknown> {
+        await this.loadRuntime();
+        const response = await this.rpc.phoenix.commit_canonical_episode_assignment_json(
+            JSON.stringify(request),
+        );
+        return JSON.parse(response);
+    }
+
     async nativeDecisionCensus(): Promise<unknown> {
         await this.loadRuntime();
         const response = await this.rpc.phoenix.native_decision_census_json();
@@ -363,15 +371,17 @@ class PhoenixTaurpcBridge implements PhoenixNativeBridge {
         return JSON.parse(response);
     }
 
-    private async observeNativeRewardHorizons(): Promise<void> {
+    async observeNativeRewardHorizons(): Promise<unknown> {
         const response = await this.rpc.phoenix.observe_native_reward_horizons_json();
-        const delayMs = canonicalRewardObserverDelayMs(JSON.parse(response));
+        const report = JSON.parse(response);
+        const delayMs = canonicalRewardObserverDelayMs(report);
         if (this.rewardHorizonTimer !== null) clearTimeout(this.rewardHorizonTimer);
         this.rewardHorizonTimer = setTimeout(() => {
             this.observeNativeRewardHorizons().catch((error) => {
                 console.error('[PhoenixNative] canonical reward horizon observer failed', error);
             });
         }, delayMs);
+        return report;
     }
 
     async closeGraphRun(runHandle: string): Promise<boolean> {

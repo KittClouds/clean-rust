@@ -6,6 +6,7 @@ import type {
     AtlasControlAction,
     AtlasControlContract,
     AtlasControlInventoryCategoryId,
+    AtlasEpisodeAssignmentOption,
     AtlasControlRow,
 } from '../../../../graph-rebuild/atlas-control-contract';
 import type {
@@ -35,6 +36,8 @@ export class AtlasControlRoomsComponent {
         error: null,
     });
     readonly selectedRoomId = input<AtlasControlRoomId>('entities');
+    readonly assignmentBusyRowId = input<string | null>(null);
+    readonly committedAssignmentRowIds = input<ReadonlySet<string>>(new Set());
     readonly roomChange = output<AtlasControlRoomId>();
     readonly actionRequested = output<AtlasControlRoomActionRequest>();
     readonly nextPageRequested = output<void>();
@@ -53,7 +56,9 @@ export class AtlasControlRoomsComponent {
     readonly roomActions = computed(() => this.activeRoom().actionIds
         .map((id) => this.contract().roomActionsById[id])
         .filter((action): action is AtlasControlRoomActionDescriptor => !!action)
-        .filter((action) => !['inspect', 'jump_to_source', 'compare_context', 'show_reason'].includes(action.action)));
+        .filter((action) => ![
+            'inspect', 'jump_to_source', 'compare_context', 'show_reason', 'commit_episode_assignment',
+        ].includes(action.action)));
     readonly filteredRowIds = computed(() => {
         const room = this.activeRoom();
         const inventoryId = this.selectedInventoryId();
@@ -78,7 +83,9 @@ export class AtlasControlRoomsComponent {
         const row = this.selectedRow();
         if (!row) return [];
         return row.allowedActions.map((action) => this.actionDescriptor(action))
-            .filter((item): item is AtlasControlRoomActionDescriptor => !!item);
+            .filter((item): item is AtlasControlRoomActionDescriptor => !!item)
+            .filter((item) => item.action !== 'commit_episode_assignment'
+                || row.episodeAssignmentOptions.length === 0);
     });
 
     readonly PlusIcon = Plus;
@@ -126,6 +133,19 @@ export class AtlasControlRoomsComponent {
         if (!action.enabled) return;
         if (action.action === 'inspect' && rowId) this.selectedRowId.set(rowId);
         this.actionRequested.emit({ roomId: this.activeRoom().id, action: action.action, rowId });
+    }
+
+    dispatchAssignment(row: AtlasControlRow, option: AtlasEpisodeAssignmentOption): void {
+        if (this.assignmentBusyRowId() || this.committedAssignmentRowIds().has(row.identity.id)) return;
+        const episodeSelection = option.kind === 'attach_to_episode'
+            ? { kind: option.kind, episodeId: option.episodeId! } as const
+            : { kind: option.kind } as const;
+        this.actionRequested.emit({
+            roomId: this.activeRoom().id,
+            action: 'commit_episode_assignment',
+            rowId: row.identity.id,
+            episodeSelection,
+        });
     }
 
     percent(value: number | null): string {

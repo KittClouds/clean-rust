@@ -1454,6 +1454,9 @@ pub trait PhoenixApi {
     async fn begin_native_operator_decision_json(request_json: String) -> Result<String, String>;
     async fn complete_native_operator_decision_json(request_json: String)
         -> Result<String, String>;
+    async fn commit_canonical_episode_assignment_json(
+        request_json: String,
+    ) -> Result<String, String>;
     async fn native_decision_census_json() -> Result<String, String>;
     async fn link_native_operator_decision_graph_truth_json(
         request_json: String,
@@ -1933,6 +1936,14 @@ impl PhoenixApi for PhoenixApiImpl {
     ) -> Result<String, String> {
         let root = self.native_decision_store_path()?;
         crate::native_decision_rpc::complete(&root, &request_json)
+    }
+
+    async fn commit_canonical_episode_assignment_json(
+        self,
+        request_json: String,
+    ) -> Result<String, String> {
+        let root = self.native_decision_store_path()?;
+        crate::native_decision_rpc::commit_episode_assignment(&root, &request_json)
     }
 
     async fn native_decision_census_json(self) -> Result<String, String> {

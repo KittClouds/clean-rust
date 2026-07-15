@@ -7,6 +7,92 @@
     padding: 12px 18px;
 }
 
+.atlas-research-readiness {
+    display: grid;
+    gap: 9px;
+    padding: 10px 18px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(2, 8, 12, 0.86);
+}
+
+.atlas-research-readiness > header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.atlas-research-readiness > header div {
+    display: grid;
+    gap: 2px;
+}
+
+.atlas-research-readiness span,
+.atlas-research-readiness small {
+    color: #73818a;
+    font-size: 9px;
+    font-weight: 850;
+    text-transform: uppercase;
+}
+
+.atlas-research-readiness > header strong {
+    color: #dfe8e8;
+    font-size: 12px;
+}
+
+.atlas-research-readiness > header button {
+    min-height: 30px;
+    padding: 0 11px;
+    color: #8ce9dc;
+    background: #091416;
+    border: 1px solid #1c4b48;
+    cursor: pointer;
+}
+
+.atlas-readiness-metrics {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 6px;
+}
+
+.atlas-readiness-metrics article {
+    display: grid;
+    min-width: 0;
+    gap: 2px;
+    padding: 7px 9px;
+    background: #070e13;
+    border: 1px solid #18252c;
+}
+
+.atlas-readiness-metrics article strong {
+    overflow: hidden;
+    color: #f3f8f7;
+    font-size: 16px;
+    font-variant-numeric: tabular-nums;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.atlas-readiness-metrics article[data-gate='passed'] {
+    border-color: #216f65;
+    box-shadow: inset 2px 0 0 #22c7b6;
+}
+
+.atlas-readiness-metrics article[data-gate='passed'] strong {
+    color: #78ead9;
+}
+
+.atlas-readiness-metrics small {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.atlas-readiness-empty {
+    color: #7f8c94;
+    font-size: 11px;
+}
+
 .atlas-workflow-step {
     display: grid;
     min-width: 0;
@@ -85,6 +171,10 @@
 }
 
 @media (max-width: 1120px) {
+    .atlas-readiness-metrics {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
     .atlas-workflow-strip {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }

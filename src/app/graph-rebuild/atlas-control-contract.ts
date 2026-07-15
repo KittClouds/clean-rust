@@ -82,6 +82,7 @@ export type AtlasControlInventoryCategoryId =
     | 'governance_candidate_rows'
     | 'promotion_verdict_rows'
     | 'metrics_rows'
+    | 'continuity_assignment_rows'
     | 'continuity_episode_rows'
     | 'continuity_temporal_rows'
     | 'continuity_causal_rows'
@@ -133,6 +134,7 @@ export type AtlasControlAction =
     | 'add_entity'
     | 'edit_entity'
     | 'delete_entity'
+    | 'commit_episode_assignment'
     | 'split_episode'
     | 'merge_episodes'
     | 'confirm_boundary'
@@ -148,6 +150,7 @@ export type AtlasControlReceiptKind =
     | 'document_review_action_receipt'
     | 'review_adjudication_run_certificate'
     | 'promotion_proposal_receipt'
+    | 'native_decision_receipt'
     | 'continuity_action_receipt';
 
 export interface AtlasControlReceiptPolicy {
@@ -164,6 +167,14 @@ export interface AtlasControlRowIdentity {
     sourceContract: AtlasControlSourceContract;
     lane: AtlasControlLane;
     kind: string;
+}
+
+export interface AtlasEpisodeAssignmentOption {
+    kind: 'attach_to_episode' | 'create_episode' | 'abstain';
+    episodeId: string | null;
+    label: string;
+    detail: string;
+    proposed: boolean;
 }
 
 export interface AtlasControlRow {
@@ -186,6 +197,7 @@ export interface AtlasControlRow {
     sourceExcerpt: string | null;
     targetExcerpt: string | null;
     targetDocumentId: string | null;
+    episodeAssignmentOptions: AtlasEpisodeAssignmentOption[];
 }
 
 export interface AtlasControlEntityInput {
@@ -288,6 +300,7 @@ export interface AtlasNativeProofCounts {
     crossDocumentPairCoverage: number;
     crossDocumentSelected: number;
     crossDocumentRejected: number;
+    continuityEvents?: number;
     continuityBoundaries: number;
     continuityEpisodes: number;
     continuityTemporal: number;
@@ -402,6 +415,8 @@ function buildInventory(input: {
     const topologyRows = laneRows('graph_topology');
     const entityRows = topologyRows.filter((row) => row.identity.kind.startsWith('entity:'));
     const edgeRows = topologyRows.filter((row) => row.identity.kind.startsWith('edge:'));
+    const assignmentRows = laneRows('continuity_episode_map')
+        .filter((row) => row.identity.kind === 'continuity_event_assignment');
     return [
         inventory('entities', 'Entities', 'graph', 'graph_topology', 'graph_build', input.entityCount, entityRows, 'inspect_only', ['inspect'], noReceipt()),
         inventory('graph_edges', 'Graph edges', 'graph', 'graph_topology', 'graph_build', input.edgeCount, edgeRows, 'inspect_only', ['inspect'], noReceipt()),
@@ -417,8 +432,10 @@ function buildInventory(input: {
         inventory('governance_candidate_rows', 'Governance candidates', 'governance', 'governance_candidate', 'memory_governance', input.governanceCount, laneRows('governance_candidate'), 'inspect_only', ['inspect'], noReceipt()),
         inventory('promotion_verdict_rows', 'Promotion verdicts', 'promotion', 'promotion_verdict', 'promotion_verdict', input.promotionCount, laneRows('promotion_verdict'), input.promotionCount ? 'promotion_preview' : 'none', input.promotionCount ? ['preview_promotion'] : [], receipt('promotion_proposal_receipt', true, true)),
         inventory('metrics_rows', 'Metric rows', 'metrics', 'metrics_ledger', 'metrics', input.metricsRows, laneRows('metrics_ledger'), 'inspect_only', ['inspect'], noReceipt()),
+        continuityInventory('continuity_assignment_rows', 'Assignment inbox', 'continuity_episode_map', assignmentRows),
         continuityInventory('continuity_episode_rows', 'Episode map', 'continuity_episode_map', laneRows('continuity_episode_map'),
-            nonNegative(input.nativeProofCounts?.continuityBoundaries)
+            nonNegative(input.nativeProofCounts?.continuityEvents)
+                + nonNegative(input.nativeProofCounts?.continuityBoundaries)
                 + nonNegative(input.nativeProofCounts?.continuityEpisodes)
                 + nonNegative(input.nativeProofCounts?.continuityConnections)),
         continuityInventory('continuity_temporal_rows', 'Timeline', 'continuity_timeline', laneRows('continuity_timeline'),
@@ -448,11 +465,12 @@ function continuityInventory(
     rows: AtlasControlRow[],
     completeRows = rows.length,
 ): AtlasControlInventoryCategory {
+    const canonical = rows.some((row) => row.receiptPolicy.kind === 'native_decision_receipt');
     return inventory(
         id, label, 'continuity', lane, 'story_continuity', Math.max(completeRows, rows.length), rows,
         rows.some((row) => row.receiptPolicy.required) ? 'manual_receipt' : 'inspect_only',
         [...new Set(rows.flatMap((row) => row.allowedActions))],
-        receipt('continuity_action_receipt', true, false),
+        receipt(canonical ? 'native_decision_receipt' : 'continuity_action_receipt', true, canonical),
     );
 }
 

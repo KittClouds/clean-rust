@@ -11,6 +11,35 @@
         </div>
     </header>
 
+    <section class="atlas-research-readiness" aria-label="Canonical episode research readiness">
+        <header>
+            <div>
+                <span>Chronological decision corpus</span>
+                <strong>Episode assignment readiness</strong>
+            </div>
+            <button
+                type="button"
+                [disabled]="assignmentReadinessState() === 'loading'"
+                (click)="refreshAssignmentReadiness()">
+                {{ assignmentReadinessState() === 'loading' ? 'Reconciling…' : 'Refresh census' }}
+            </button>
+        </header>
+        @if (assignmentReadiness(); as readiness) {
+        <div class="atlas-readiness-metrics">
+            <article><span>Decisions</span><strong>{{ readiness.decisions }}</strong><small>{{ readiness.attached }} attach / {{ readiness.created }} create / {{ readiness.abstained }} abstain</small></article>
+            <article><span>Mature</span><strong>{{ readiness.mature }}</strong><small>{{ readiness.stable }} stable / {{ readiness.revised }} revised</small></article>
+            <article><span>Pending 24h</span><strong>{{ readiness.pendingHorizons }}</strong><small>{{ readiness.nextEligibleAt ? (readiness.nextEligibleAt | date:'MMM d, h:mm a') : 'No pending horizon' }}</small></article>
+            <article [attr.data-gate]="readiness.plumbingGate"><span>Plumbing</span><strong>{{ readiness.mature }}/10</strong><small>{{ readiness.plumbingGate }}</small></article>
+            <article [attr.data-gate]="readiness.pilotGate"><span>Pilot</span><strong>{{ readiness.mature }}/100</strong><small>{{ readiness.pilotGate }}</small></article>
+            <article [attr.data-gate]="readiness.researchCountGate"><span>Research count</span><strong>{{ readiness.mature }}/1000</strong><small>{{ readiness.chronologicalSpanDays }}d span / {{ readiness.averageCandidates | number:'1.1-1' }} avg candidates / {{ readiness.candidateCountRange }} range</small></article>
+        </div>
+        } @else {
+        <div class="atlas-readiness-empty">
+            {{ assignmentReadinessState() === 'unavailable' ? 'Native decision authority is available in Phoenix Desktop.' : assignmentReadinessState() === 'error' ? 'Native readiness census unavailable.' : 'Loading native decision authority…' }}
+        </div>
+        }
+    </section>
+
     <section class="atlas-workflow-strip" aria-label="Atlas workflow status">
         @for (step of workflowSteps(); track step.id) {
         <article
@@ -37,6 +66,8 @@
                 [contract]="atlasControlContract()"
                 [paging]="atlasProofPaging()"
                 [selectedRoomId]="selectedRoomId()"
+                [assignmentBusyRowId]="assignmentBusyRowId()"
+                [committedAssignmentRowIds]="committedAssignmentRowIds()"
                 (roomChange)="setOperatingRoom($event)"
                 (nextPageRequested)="loadNextAtlasProofPage()"
                 (actionRequested)="dispatchRoomAction($event)">

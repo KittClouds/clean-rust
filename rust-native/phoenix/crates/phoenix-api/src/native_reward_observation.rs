@@ -61,6 +61,12 @@ pub struct NativeRewardObservationCensus {
     pub observation_receipts: u64,
     pub active_human_acceptance: u64,
     pub active_future_stability: u64,
+    pub positive_future_stability: u64,
+    pub negative_future_stability: u64,
+    pub mature_canonical_episode_assignments: u64,
+    pub positive_canonical_episode_stability: u64,
+    pub negative_canonical_episode_stability: u64,
+    pub pending_canonical_episode_horizons: u64,
     pub retracted_dimensions: u64,
     pub partially_observed_decisions: u64,
     pub fully_observed_decisions: u64,
@@ -194,10 +200,36 @@ pub fn native_reward_observation_census<S: PhoenixNativeDecisionStore + ?Sized>(
                     census.active_human_acceptance += 1
                 }
                 GraphDecisionRewardDimension::FutureStability => {
-                    census.active_future_stability += 1
+                    census.active_future_stability += 1;
+                    match observation.score_micros {
+                        Some(score) if score > 0 => census.positive_future_stability += 1,
+                        Some(score) if score < 0 => census.negative_future_stability += 1,
+                        _ => {}
+                    }
+                    if decision.task_family
+                        == phoenix_types::NativeDecisionTaskFamily::CanonicalEpisodeAssignment
+                    {
+                        census.mature_canonical_episode_assignments += 1;
+                        match observation.score_micros {
+                            Some(score) if score > 0 => {
+                                census.positive_canonical_episode_stability += 1
+                            }
+                            Some(score) if score < 0 => {
+                                census.negative_canonical_episode_stability += 1
+                            }
+                            _ => {}
+                        }
+                    }
                 }
                 _ => {}
             }
+        }
+        if decision.task_family
+            == phoenix_types::NativeDecisionTaskFamily::CanonicalEpisodeAssignment
+            && active.contains(&GraphDecisionRewardDimension::HumanAcceptance)
+            && !active.contains(&GraphDecisionRewardDimension::FutureStability)
+        {
+            census.pending_canonical_episode_horizons += 1;
         }
         if active.len() == GraphDecisionRewardDimension::ALL.len() {
             census.fully_observed_decisions += 1;

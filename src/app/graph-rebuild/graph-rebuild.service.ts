@@ -44,6 +44,12 @@ import {
     pendingNativeOperatorDecisionCompletions,
 } from './graph-native-decision-capture';
 import {
+    canonicalEpisodeAssignmentCommitRequest,
+    isCanonicalEpisodeAssignmentCommitResponse,
+    type CanonicalEpisodeAssignmentCommitResponse,
+    type CanonicalEpisodeAssignmentSelection,
+} from './graph-canonical-episode-assignment';
+import {
     applyNativeMemoryGovernanceCandidates,
     applyNativeMemoryGovernanceRetrievalExperiment,
     memoryGovernanceRetrievalCandidatesFromSnapshot,
@@ -1221,6 +1227,24 @@ export class GraphRebuildService {
             throw new Error('Native operator decision completion returned a stale receipt.');
         }
         return true;
+    }
+
+    async commitCanonicalEpisodeAssignment(
+        eventId: string,
+        selectedAction: CanonicalEpisodeAssignmentSelection,
+    ): Promise<CanonicalEpisodeAssignmentCommitResponse | null> {
+        const current = this.snapshotState();
+        if (!current) return null;
+        if (this.phoenix.target !== 'native') {
+            throw new Error('Canonical episode assignment requires native durable graph authority.');
+        }
+        const value = await this.phoenix.commitCanonicalEpisodeAssignment(
+            canonicalEpisodeAssignmentCommitRequest(current, eventId, selectedAction),
+        );
+        if (!isCanonicalEpisodeAssignmentCommitResponse(value)) {
+            throw new Error('Canonical episode assignment returned an invalid authority receipt.');
+        }
+        return value;
     }
 
     private async recoverNativeOperatorDecisionOutcomes(snapshot: GraphRebuildSnapshot): Promise<void> {

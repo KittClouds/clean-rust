@@ -1,11 +1,13 @@
 //! Canonical discovery and orchestration façade for Phoenix post-ingest
 //! pipeline stages.
 
+mod canonical_episode_assignment;
 pub mod depth_audit;
 mod native_operator_decision;
 mod native_reward_observation;
 mod pipeline_scheduler;
 
+pub use canonical_episode_assignment::*;
 pub use native_operator_decision::*;
 pub use native_reward_observation::*;
 

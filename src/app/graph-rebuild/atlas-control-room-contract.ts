@@ -8,6 +8,7 @@ import type {
     AtlasControlRow,
     AtlasControlTone,
 } from './atlas-control-contract';
+import type { CanonicalEpisodeAssignmentSelection } from './graph-canonical-episode-assignment';
 
 export type AtlasControlRoomId = 'entities' | 'structure' | 'facts' | 'continuity' | 'review' | 'discourse' | 'metrics';
 export type AtlasControlRoomState = 'unavailable' | 'empty' | 'ready' | 'blocked' | 'error';
@@ -27,6 +28,7 @@ export interface AtlasControlRoomActionRequest {
     roomId: AtlasControlRoomId;
     action: AtlasControlAction;
     rowId: string | null;
+    episodeSelection?: CanonicalEpisodeAssignmentSelection;
 }
 
 export interface AtlasControlRoomEmptyState {
@@ -120,8 +122,9 @@ const ROOM_DEFINITIONS: RoomDefinition[] = [
         id: 'continuity',
         label: 'Continuity',
         purpose: 'Source-derived episodes, temporal order, causality, state history, and conflicts.',
-        primary: 'continuity_episode_rows',
+        primary: 'continuity_assignment_rows',
         inventories: [
+            'continuity_assignment_rows',
             'continuity_episode_rows',
             'continuity_temporal_rows',
             'continuity_causal_rows',
@@ -299,6 +302,7 @@ function actionLabel(action: AtlasControlAction): string {
         add_entity: 'Add entity',
         edit_entity: 'Edit entity',
         delete_entity: 'Delete entity',
+        commit_episode_assignment: 'Commit assignment',
         split_episode: 'Split episode',
         merge_episodes: 'Merge episodes',
         confirm_boundary: 'Confirm boundary',
