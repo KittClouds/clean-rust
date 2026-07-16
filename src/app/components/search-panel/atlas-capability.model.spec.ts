@@ -113,4 +113,22 @@ describe('atlas capability registry', () => {
             'semanticEmbedding',
         ].sort());
     });
+
+    it('treats only Hybrid as the embedding manifold authority', () => {
+        const byId = new Map(ATLAS_CAPABILITY_REGISTRY.map((capability) => [capability.id, capability]));
+
+        expect(byId.get('hybridManifold')).toEqual(expect.objectContaining({
+            label: 'Hybrid Embedding Manifold',
+            inputs: ['semantic atlas vectors'],
+            outputs: expect.arrayContaining([
+                'embedding space contract',
+                'cosine top-k semantic neighborhoods',
+                'candidate-only topology hints',
+            ]),
+            mutationPolicy: 'read-only',
+        }));
+        expect(byId.get('hopfProjection')?.description).toContain('projection lane');
+        expect(byId.get('lorentzForest')?.description).toContain('forest');
+        expect(byId.get('productManifold')?.description).toContain('product atlas');
+    });
 });

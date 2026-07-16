@@ -3,14 +3,14 @@ import { CommonModule } from '@angular/common';
 import { LucideAngularModule, User, Users, MapPin, Calendar, Hash, FileText, Zap, Tag, Shield, Package, Lightbulb, Globe } from 'lucide-angular';
 import { EntityKind } from '../../../../../../lib/Scanner/types';
 import { RegisteredEntity } from '../../../../../../lib/registry';
-import { entityColorStore } from '../../../../../../lib/store/entityColorStore';
+import { entityColorStore, normalizeEntityKind } from '../../../../../../lib/store/entityColorStore';
 
 // Entity icons (colors come from entityColorStore)
 const ENTITY_ICONS: Record<string, any> = {
     'CHARACTER': User,
     'NPC': Users,
     'CREATURE': Users,
-    'FACTION': Users,
+    'FACTION': Globe,
     'ORGANIZATION': Shield,
     'NETWORK': Globe,
     'LOCATION': MapPin,
@@ -78,7 +78,7 @@ export interface ConnectionGroup {
                             <div class="flex items-start justify-between gap-3">
                                 <div class="min-w-0">
                                     <p class="truncate text-sm font-semibold text-white">{{ conn.entity.label }}</p>
-                                    <p class="mt-1 text-[11px] uppercase tracking-[0.18em] text-zinc-500">{{ conn.entity.kind }}</p>
+                                    <p class="mt-1 text-[11px] uppercase tracking-[0.18em] text-zinc-500">{{ displayKind(conn.entity.kind) }}</p>
                                 </div>
                                 <span class="rounded-full border border-white/10 bg-black/20 px-2 py-0.5 text-[10px] uppercase tracking-[0.16em] text-zinc-400">
                                     {{ conn.direction }}
@@ -122,7 +122,11 @@ export class ConnectionGroupComponent {
     }
 
     getIcon(kind: string): any {
-        return ENTITY_ICONS[kind as EntityKind] || ENTITY_ICONS['UNKNOWN'];
+        return ENTITY_ICONS[this.displayKind(kind) as EntityKind] || ENTITY_ICONS['UNKNOWN'];
+    }
+
+    displayKind(kind: string): string {
+        return normalizeEntityKind(kind) || String(kind || 'UNKNOWN').toUpperCase();
     }
 
     confidencePercent(confidence: number): number {

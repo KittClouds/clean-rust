@@ -2,9 +2,15 @@ pub mod api;
 
 mod anchor;
 mod belief;
+pub mod calendar_registry_sidecar;
 mod graph;
 mod lens_consumer;
 mod normalize;
+pub mod registry;
+mod registry_lexicon;
+pub mod registry_sidecar;
+#[cfg(test)]
+mod registry_tests;
 mod solve;
 #[cfg(test)]
 mod tests;

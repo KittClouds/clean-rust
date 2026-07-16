@@ -6,13 +6,13 @@ license.workspace = true
 authors.workspace = true
 
 [lib]
+name = "phoenix_chunker_native"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 memchr.workspace = true
 rustc-hash.workspace = true
 smallvec.workspace = true
-wasm-bindgen = "0.2"
 serde = { workspace = true, features = ["derive"] }
 serde_json.workspace = true
 
@@ -21,6 +21,7 @@ phoenix-types = { path = "../phoenix-types" }
 scirs2-text = "0.4.1"
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
+wasm-bindgen = "0.2"
 wee_alloc = "0.4"
 
 [package.metadata.wasm-pack.profile.release]

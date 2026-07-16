@@ -19,27 +19,32 @@ export interface TtsVoice {
     url: string;
 }
 
-// Available voices from Supertonic TTS
-// https://supertone-inc.github.io/supertonic-py/voices/
-const VOICE_BASE = 'https://huggingface.co/onnx-community/Supertonic-TTS-2-ONNX/resolve/main/voices';
+export const SUPERTONIC3_MODEL_ID = 'Supertone/supertonic-3';
+
+// Browser Supertonic still uses the Transformers.js v2 ONNX community package,
+// whose voice files are binary embeddings. Native Rust uses Supertonic 3 JSON
+// styles from the local model root.
+const BROWSER_SUPERTONIC_VOICE_BASE = 'https://huggingface.co/onnx-community/Supertonic-TTS-2-ONNX/resolve/main/voices';
 
 export const TTS_VOICES: TtsVoice[] = [
-    { id: 'F1', name: 'Sofia', gender: 'female', url: `${VOICE_BASE}/F1.bin` },
-    { id: 'F2', name: 'Elena', gender: 'female', url: `${VOICE_BASE}/F2.bin` },
-    { id: 'F3', name: 'Maya', gender: 'female', url: `${VOICE_BASE}/F3.bin` },
-    { id: 'F4', name: 'Luna', gender: 'female', url: `${VOICE_BASE}/F4.bin` },
-    { id: 'M1', name: 'James', gender: 'male', url: `${VOICE_BASE}/M1.bin` },
-    { id: 'M2', name: 'Oliver', gender: 'male', url: `${VOICE_BASE}/M2.bin` },
-    { id: 'M3', name: 'Daniel', gender: 'male', url: `${VOICE_BASE}/M3.bin` },
-    { id: 'M4', name: 'Henry', gender: 'male', url: `${VOICE_BASE}/M4.bin` },
+    { id: 'F1', name: 'Sofia', gender: 'female', url: `${BROWSER_SUPERTONIC_VOICE_BASE}/F1.bin` },
+    { id: 'F2', name: 'Elena', gender: 'female', url: `${BROWSER_SUPERTONIC_VOICE_BASE}/F2.bin` },
+    { id: 'F3', name: 'Maya', gender: 'female', url: `${BROWSER_SUPERTONIC_VOICE_BASE}/F3.bin` },
+    { id: 'F4', name: 'Luna', gender: 'female', url: `${BROWSER_SUPERTONIC_VOICE_BASE}/F4.bin` },
+    { id: 'F5', name: 'Iris', gender: 'female', url: `${BROWSER_SUPERTONIC_VOICE_BASE}/F5.bin` },
+    { id: 'M1', name: 'James', gender: 'male', url: `${BROWSER_SUPERTONIC_VOICE_BASE}/M1.bin` },
+    { id: 'M2', name: 'Oliver', gender: 'male', url: `${BROWSER_SUPERTONIC_VOICE_BASE}/M2.bin` },
+    { id: 'M3', name: 'Daniel', gender: 'male', url: `${BROWSER_SUPERTONIC_VOICE_BASE}/M3.bin` },
+    { id: 'M4', name: 'Henry', gender: 'male', url: `${BROWSER_SUPERTONIC_VOICE_BASE}/M4.bin` },
+    { id: 'M5', name: 'Noah', gender: 'male', url: `${BROWSER_SUPERTONIC_VOICE_BASE}/M5.bin` },
 ];
 
 export const NATIVE_TTS_MODEL_ROOT = 'G:\\phoenix-tts\\chatterbox-turbo-onnx';
 export const NATIVE_TTS_REFERENCE_WAV = 'G:\\phoenix-tts\\reference-sapi.wav';
 export const NATIVE_TTS_MAX_NEW_TOKENS = 1024;
-export const NATIVE_SUPERTONIC_RUNNER = 'G:\\phoenix-tts\\supertonic-rust\\example_onnx.exe';
-export const NATIVE_SUPERTONIC_MODEL_ROOT = 'G:\\phoenix-tts\\supertonic-2';
-export const NATIVE_SUPERTONIC_OUTPUT_ROOT = 'G:\\phoenix-tts\\supertonic-rust-outputs';
+export const NATIVE_SUPERTONIC_RUNNER = 'C:\\phoenix-tts\\supertonic-rust\\example_onnx.exe';
+export const NATIVE_SUPERTONIC_MODEL_ROOT = 'C:\\phoenix-tts\\supertonic-3';
+export const NATIVE_SUPERTONIC_OUTPUT_ROOT = 'C:\\phoenix-tts\\supertonic-rust-outputs';
 export const NATIVE_SUPERTONIC_TOTAL_STEP = 5;
 export const NATIVE_SUPERTONIC_SPEED = 1.05;
 export const NATIVE_QWEN_RUNNER = 'G:\\phoenix-tts\\qwen3-tts-rs\\bin\\qwen-tts.exe';

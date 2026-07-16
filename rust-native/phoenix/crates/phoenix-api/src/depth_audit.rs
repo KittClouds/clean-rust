@@ -12,7 +12,7 @@ use phoenix_graph_kernel::{
     KernelEdge, KernelGraphSnapshot, KernelVertex, KernelViewRequest, PhoenixGraphKernel,
 };
 use phoenix_graph_post::api::{
-    open_scope_query_session_from_sidecars, retrieved_causal_explanation,
+    open_scope_query_session, retrieved_causal_explanation,
     retrieved_causal_explanation_with_session, retrieved_history, retrieved_history_with_session,
     retrieved_world_state, retrieved_world_state_with_session,
     GraphRetrievedCausalExplanationAnswer, GraphRetrievedCausalExplanationQueryRequest,
@@ -602,18 +602,16 @@ fn audit_scope(
             summary: sidecar.summary.clone(),
         }),
     };
-    let query_session = graph_sidecar
-        .as_ref()
-        .map(|sidecar| {
-            let started = Instant::now();
-            let session = open_scope_query_session_from_sidecars(&scope, sidecar, semantic_sidecar)
-                .map_err(|error| error.to_string());
-            instrumentation
-                .open_graph_query_session
-                .record(elapsed_us(started));
-            session
-        })
-        .transpose()?;
+    let query_session = if graph_sidecar.is_some() {
+        let started = Instant::now();
+        let session = open_scope_query_session(store, &scope).map_err(|error| error.to_string())?;
+        instrumentation
+            .open_graph_query_session
+            .record(elapsed_us(started));
+        session
+    } else {
+        None
+    };
     let causal_targets = graph_sidecar
         .as_ref()
         .map(|sidecar| {
@@ -982,6 +980,7 @@ fn run_scope_probes(
             valid_at: Some(probe_now),
             recorded_at: None,
             include_candidate_graph: true,
+            truth_plane: GraphTruthPlane::WorldState,
             seed_limit: config.seed_limit,
             oversample: config.oversample,
             expansion_hops: config.expansion_hops,

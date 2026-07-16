@@ -21,12 +21,16 @@ describe('getDecorationStyle', () => {
         expect(style).toContain('text-decoration: none');
     });
 
-    it('renders subtle entity mode as solid inline text', () => {
+    it('renders subtle entity mode as a static gradient', () => {
         const style = getDecorationStyle(entitySpan, 'subtle');
 
-        expect(style).toContain('color: hsl(var(--entity-character-text))');
-        expect(style).not.toContain('background-image: linear-gradient');
-        expect(style).not.toContain('-webkit-text-fill-color: transparent');
+        expect(style).toContain('background-image: linear-gradient');
+        expect(style).toContain('background-clip: text');
+        expect(style).toContain('-webkit-text-fill-color: transparent');
+        expect(style).toContain('background-position: center');
+        expect(style).toContain('background-size: 100% 100%');
+        expect(style).toContain('animation: none');
+        expect(style).not.toContain('entity-gradient-oscillate');
     });
 
     it('renders gradient entity mode as gradient inline text', () => {

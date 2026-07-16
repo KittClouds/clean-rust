@@ -1,252 +1,104 @@
-<aside class="atlas-sidebar" [class.atlas-sidebar-closed]="!isOpen()">
-    <div class="atlas-header">
+<aside class="entity-sidebar" [class.entity-sidebar-closed]="!isOpen()">
+    <header class="entity-sidebar-header">
         @if (isOpen()) {
-        <div class="min-w-0 flex-1">
-            <div class="flex items-center gap-2">
-                <span class="atlas-kicker">Atlas</span>
-                <span class="atlas-pill">{{ entities.length }} entities</span>
-            </div>
+        <div class="entity-sidebar-title">
+            <span>Atlas entities</span>
+            <strong>{{ entities.length }}</strong>
         </div>
-        <button type="button" class="atlas-soft-button atlas-header-pill" (click)="styleRequested.emit()">Style Lab</button>
+        <button type="button" class="entity-text-button" (click)="styleRequested.emit()">Style Lab</button>
         }
-        <button type="button" class="atlas-icon-button" [title]="isOpen() ? 'Collapse graph sidebar' : 'Expand graph sidebar'" (click)="toggleOpen()">
+        <button
+            type="button"
+            class="entity-icon-button"
+            [title]="isOpen() ? 'Collapse entity sidebar' : 'Expand entity sidebar'"
+            (click)="toggleOpen()">
             <lucide-icon [img]="isOpen() ? PanelLeftCloseIcon : PanelLeftIcon" class="h-4 w-4"></lucide-icon>
         </button>
-    </div>
+    </header>
 
     @if (isOpen()) {
-    <div class="atlas-control-stack">
-        <section class="atlas-panel">
-            <button type="button" class="atlas-action-trigger" (click)="toggleControls()">
-                <lucide-icon [img]="SparklesIcon" class="h-4 w-4"></lucide-icon>
-                Product Diagnostics
-                <lucide-icon [img]="ChevronDownIcon" class="h-4 w-4 transition" [class.rotate-180]="controlsOpen()"></lucide-icon>
+    <section class="entity-toolbar" aria-label="Entity tools">
+        <label class="entity-search">
+            <lucide-icon [img]="SearchIcon" class="h-4 w-4"></lucide-icon>
+            <input
+                type="search"
+                aria-label="Search entities"
+                placeholder="Search names, aliases, or kinds"
+                [value]="entitySearch()"
+                (input)="updateEntitySearch($any($event.target).value)" />
+            @if (entitySearch()) {
+            <button type="button" class="entity-search-clear" title="Clear entity search" (click)="clearSearch()">
+                <lucide-icon [img]="XIcon" class="h-3.5 w-3.5"></lucide-icon>
             </button>
-            @if (scanError) {
-            <p class="atlas-error">{{ scanError }}</p>
             }
-        </section>
+        </label>
+        <button type="button" class="entity-add-button" (click)="addEntityRequested.emit()">
+            <lucide-icon [img]="PlusIcon" class="h-4 w-4"></lucide-icon>
+            <span>Add</span>
+        </button>
+    </section>
+
+    <div class="entity-filter-summary">
+        <span>{{ entitySearch() ? visibleEntityCount() + ' matches' : entities.length + ' entities' }}</span>
+        <span>Registry</span>
     </div>
 
-    @if (controlsOpen()) {
-    <div class="atlas-controls-shell">
-        @if (diagnosticsLoading()) {
-        <div class="atlas-empty atlas-control-empty">
-            <lucide-icon [img]="SparklesIcon" class="h-5 w-5"></lucide-icon>
-            <p>Loading diagnostics</p>
-            <span>Reading the latest graph rebuild snapshot.</span>
-        </div>
-        } @else if (diagnosticsError()) {
-        <p class="atlas-error">{{ diagnosticsError() }}</p>
-        } @else if (productDiagnostics(); as diagnostics) {
-        <section class="diagnostics-panel">
-            <div class="diagnostics-header">
-                <div>
-                    <span class="diagnostics-kicker">Product manifold</span>
-                    <h3>{{ selectedEntity?.label || 'Topology summary' }}</h3>
-                </div>
-                <span class="diagnostics-pill">{{ diagnostics.dimensionLabel }}</span>
-            </div>
-
-            @if (stage8Diagnostics(); as quality) {
-            <div class="diagnostics-quality-strip">
-                <div class="diagnostics-quality-head">
-                    <span class="diagnostics-kicker">Stage 8</span>
-                    <strong>{{ quality.modelLabel }}</strong>
-                    <small>{{ quality.summary }}</small>
-                </div>
-                <div class="diagnostics-quality-grid">
-                    @for (lane of quality.lanes; track lane.id) {
-                    <div class="diagnostics-quality-lane" [class]="'diagnostics-quality-lane quality-tone-' + lane.tone">
-                        <span>{{ lane.label }}</span>
-                        <strong>{{ lane.value }}</strong>
-                        <small>{{ lane.detail }}</small>
-                    </div>
-                    }
-                </div>
-                @if (quality.receipts.length) {
-                <div class="diagnostics-receipt-strip">
-                    @for (receipt of quality.receipts; track receipt.id) {
-                    <div class="diagnostics-receipt-row" [class]="'diagnostics-receipt-row quality-tone-' + receipt.tone">
-                        <strong>{{ receipt.label }}</strong>
-                        <small>{{ receipt.detail }}</small>
-                    </div>
-                    }
-                </div>
-                }
-            </div>
-            }
-
-            @if (diagnostics.selected; as target) {
-            <div class="diagnostics-grid">
-                <div class="diagnostic-tile"><span>Region</span><strong>{{ target.region }}</strong></div>
-                <div class="diagnostic-tile"><span>Lane</span><strong>{{ target.lane }}</strong></div>
-                <div class="diagnostic-tile diagnostic-wide"><span>Cluster</span><strong>{{ target.cluster }}</strong></div>
-                <div class="diagnostic-tile diagnostic-wide"><span>Medoid</span><strong>{{ target.medoid }}</strong></div>
-                <div class="diagnostic-tile"><span>Outlier</span><strong>{{ scorePercent(target.outlierScore) }}%</strong></div>
-                <div class="diagnostic-tile"><span>Hub</span><strong>{{ scorePercent(target.hubScore) }}%</strong></div>
-            </div>
-
-            <div class="diagnostic-lanes">
-                <span class="diagnostics-kicker">Lane weights</span>
-                @for (weight of target.laneWeights.slice(0, 5); track weight.lane) {
-                <div class="lane-row">
-                    <span>{{ weight.lane }}</span>
-                    <div class="lane-meter"><i [style.width.%]="scorePercent(weight.value)"></i></div>
-                    <strong>{{ scorePercent(weight.value) }}%</strong>
-                </div>
-                }
+    <cdk-virtual-scroll-viewport class="entity-list" [itemSize]="72" [minBufferPx]="720" [maxBufferPx]="1440">
+        <ng-container *cdkVirtualFor="let row of rows(); trackBy: trackRow">
+            @if (row.type === 'group') {
+            <div class="entity-family-row">
+                <button type="button" class="entity-family-main" (click)="toggleKind(row.kind)">
+                    <lucide-icon [img]="row.expanded ? ChevronDownIcon : ChevronRightIcon" class="h-4 w-4"></lucide-icon>
+                    <lucide-icon [img]="getIcon(row.kind)" class="h-4 w-4" [style.color]="getColor(row.kind)"></lucide-icon>
+                    <strong [style.color]="getColor(row.kind)">{{ displayKind(row.kind) }}</strong>
+                    <span>{{ row.count }}</span>
+                </button>
+                <label class="entity-color-control" [title]="'Set ' + displayKind(row.kind) + ' color'">
+                    <input
+                        type="color"
+                        [value]="getHexColor(row.kind)"
+                        (click)="$event.stopPropagation()"
+                        (input)="updateKindColor(row.kind, $any($event.target).value, $event)" />
+                </label>
             </div>
             } @else {
-            <div class="diagnostics-grid">
-                <div class="diagnostic-tile"><span>Targets</span><strong>{{ diagnostics.summary.targetCount }}</strong></div>
-                <div class="diagnostic-tile"><span>Clusters</span><strong>{{ diagnostics.summary.clusterCount }}</strong></div>
-                <div class="diagnostic-tile"><span>Regions</span><strong>{{ diagnostics.summary.regionCount }}</strong></div>
-                <div class="diagnostic-tile"><span>Outliers</span><strong>{{ diagnostics.summary.outliers }}</strong></div>
-                <div class="diagnostic-tile"><span>Backbone</span><strong>{{ diagnostics.summary.backboneEdges }}</strong></div>
-                <div class="diagnostic-tile"><span>Bridges</span><strong>{{ diagnostics.summary.bridgeEdges }}</strong></div>
-            </div>
-            <div class="diagnostic-lanes">
-                <span class="diagnostics-kicker">Region pressure</span>
-                @for (region of diagnostics.summary.topRegions; track region.role + ':' + region.lane) {
-                <div class="region-row">
-                    <strong>{{ region.role }}</strong>
-                    <span>{{ region.lane }}</span>
-                    <em>{{ region.count }}</em>
+            <div class="entity-row" [class.entity-row-selected]="isSelected(row.entity)">
+                <button type="button" class="entity-row-main" (click)="entitySelected.emit(row.entity)">
+                    <span
+                        class="entity-dot"
+                        [style.background]="getEntityBadgeColor(row.entity)"
+                        [style.box-shadow]="'0 0 0 3px ' + getEntityBadgeBgColor(row.entity)">
+                    </span>
+                    <span class="entity-row-copy">
+                        <strong>{{ row.entity.label }}</strong>
+                        <small>{{ aliasLabel(row.entity) }} / {{ getEntitySourceLabel(row.entity) }}</small>
+                    </span>
+                    <em
+                        [style.color]="getEntityBadgeColor(row.entity)"
+                        [style.background]="getEntityBadgeBgColor(row.entity)"
+                        [style.border-color]="getEntityBadgeBorderColor(row.entity)">
+                        {{ displayKind(row.entity.kind) }}
+                    </em>
+                </button>
+                <div class="entity-row-actions">
+                    <button type="button" [title]="'Edit ' + row.entity.label" (click)="editClicked(row.entity, $event)">
+                        <lucide-icon [img]="PencilIcon" class="h-3.5 w-3.5"></lucide-icon>
+                    </button>
+                    <button type="button" [title]="'Delete ' + row.entity.label" (click)="deleteClicked(row.entity, $event)">
+                        <lucide-icon [img]="TrashIcon" class="h-3.5 w-3.5"></lucide-icon>
+                    </button>
                 </div>
-                }
             </div>
             }
+        </ng-container>
+    </cdk-virtual-scroll-viewport>
 
-            <div class="diagnostic-review-clusters">
-                <div class="diagnostic-section-head">
-                    <span class="diagnostics-kicker">Review clusters</span>
-                    <strong>{{ diagnostics.reviewClusters.length }} families</strong>
-                </div>
-                @for (cluster of diagnostics.reviewClusters; track cluster.id) {
-                <article class="diagnostic-review-cluster" [class.review-conflict]="cluster.conflicts > 0">
-                    <div class="review-cluster-top">
-                        <span>{{ cluster.kind === 'entity-link' ? 'Entity' : 'Graph' }}</span>
-                        <strong>{{ cluster.label }}</strong>
-                        <em>{{ cluster.count }} items</em>
-                    </div>
-                    <div class="review-cluster-metrics">
-                        <span>{{ scorePercent(cluster.confidence) }}% confidence</span>
-                        <span>{{ scorePercent(cluster.impact) }}% impact</span>
-                        <span>{{ cluster.conflicts }} conflicts</span>
-                        <b>{{ cluster.action }}</b>
-                    </div>
-                    <div class="review-cluster-examples">
-                        @for (example of cluster.examples; track example) {
-                        <small>{{ example }}</small>
-                        }
-                    </div>
-                    <p>{{ cluster.signals.slice(0, 4).join(' | ') || 'clustered by matching decision shape' }}</p>
-                </article>
-                } @empty {
-                <div class="empty-row">No review clusters for this scope yet.</div>
-                }
-            </div>
-
-            <div class="diagnostic-suggestions">
-                <span class="diagnostics-kicker">Rerank signals</span>
-                @for (suggestion of diagnostics.suggestions; track suggestion.id) {
-                <article class="diagnostic-suggestion">
-                    <div>
-                        <strong>{{ suggestion.label }}</strong>
-                        <span>{{ suggestion.region }} / {{ suggestion.lane }} / {{ scorePercent(suggestion.confidence) }}%</span>
-                    </div>
-                    <p>{{ suggestion.signals.slice(0, 4).join(' | ') || 'no rerank signals' }}</p>
-                </article>
-                } @empty {
-                <div class="empty-row">No graph-aware rerank signals for this scope yet.</div>
-                }
-            </div>
-        </section>
-        } @else {
-        <div class="atlas-empty atlas-control-empty">
-            <lucide-icon [img]="SparklesIcon" class="h-5 w-5"></lucide-icon>
-            <p>No Product diagnostics yet</p>
-            <span>Run Full Atlas so topology, lanes, and rerank signals can be inspected here.</span>
-        </div>
-        }
-    </div>
-    } @else {
-    <div class="atlas-list-shell">
-        @if (rows().length === 0) {
-        <div class="atlas-empty">
-            <lucide-icon [img]="SearchIcon" class="h-5 w-5"></lucide-icon>
-            <p>{{ entitySearch() ? 'No matching entities' : 'No entities registered yet' }}</p>
-            <span>{{ entitySearch() ? 'Try a different label, alias, or kind.' : 'Create one manually or let extraction seed the atlas.' }}</span>
-        </div>
-        } @else {
-        <cdk-virtual-scroll-viewport itemSize="54" class="graph-entity-viewport">
-            <ng-container *cdkVirtualFor="let row of rows(); trackBy: trackRow">
-                @if (row.type === 'suggestion-group') {
-                <div class="atlas-group-row suggestion-group">
-                    <lucide-icon [img]="SparklesIcon" class="h-4 w-4 text-amber-200"></lucide-icon>
-                    <span>Suggestions</span>
-                    <strong>{{ row.count }}</strong>
-                </div>
-                } @else if (row.type === 'suggestion') {
-                <div class="atlas-suggestion-row">
-                    <span class="suggestion-dot"></span>
-                    <span class="min-w-0 flex-1">
-                        <span class="block truncate text-sm font-medium text-amber-100">{{ row.suggestion.label }}</span>
-                        <span class="block truncate text-[11px] text-amber-100/45">{{ sourceLabel(row.suggestion.source) }} - {{ row.suggestion.kind }} - {{ confidencePercent(row.suggestion.confidence) }}%</span>
-                    </span>
-                    <button type="button" class="row-icon-button text-emerald-300" title="Accept suggestion" (click)="acceptSuggestionClicked(row.suggestion.id, $event)">
-                        <lucide-icon [img]="CheckIcon" class="h-3.5 w-3.5"></lucide-icon>
-                    </button>
-                    <button type="button" class="row-icon-button text-red-300" title="Reject suggestion" (click)="rejectSuggestionClicked(row.suggestion.id, $event)">
-                        <lucide-icon [img]="XIcon" class="h-3.5 w-3.5"></lucide-icon>
-                    </button>
-                </div>
-                } @else if (row.type === 'group') {
-                <button type="button" class="atlas-group-row" (click)="toggleKind(row.kind)">
-                    <lucide-icon [img]="row.expanded ? ChevronDownIcon : ChevronRightIcon" class="h-4 w-4 text-zinc-500"></lucide-icon>
-                    <lucide-icon [img]="getIcon(row.kind)" class="h-4 w-4" [style.color]="getColor(row.kind)"></lucide-icon>
-                    <span [style.color]="getColor(row.kind)">{{ row.kind }}</span>
-                    <strong>{{ row.count }}</strong>
-                </button>
-                } @else {
-                <button type="button" class="atlas-entity-row" [class.atlas-entity-selected]="selectedEntity?.id === row.entity.id" (click)="entitySelected.emit(row.entity)">
-                    <span class="entity-dot entity-source-ring" [style.backgroundColor]="getColor(row.entity.kind)" [style.borderColor]="getEntityBadgeColor(row.entity)"></span>
-                    <span class="min-w-0 flex-1">
-                        <span class="block truncate text-sm font-medium text-white">{{ row.entity.label }}</span>
-                        <span class="flex min-w-0 items-center gap-2 text-[11px] text-zinc-500">
-                            <span class="truncate">{{ row.entity.aliases.length }} aliases</span>
-                            <span class="entity-source-badge" [style.color]="getEntityBadgeColor(row.entity)" [style.backgroundColor]="getEntityBadgeBgColor(row.entity)" [style.borderColor]="getEntityBadgeBorderColor(row.entity)">
-                                {{ getEntitySourceLabel(row.entity) }}
-                            </span>
-                        </span>
-                    </span>
-                    <span class="row-actions">
-                        <span class="row-icon-button" (click)="editClicked(row.entity, $event)">
-                            <lucide-icon [img]="PencilIcon" class="h-3.5 w-3.5"></lucide-icon>
-                        </span>
-                        <span class="row-icon-button row-delete" (click)="deleteClicked(row.entity, $event)">
-                            <lucide-icon [img]="TrashIcon" class="h-3.5 w-3.5"></lucide-icon>
-                        </span>
-                    </span>
-                </button>
-                }
-            </ng-container>
-        </cdk-virtual-scroll-viewport>
-        }
+    @if (!rows().length) {
+    <div class="entity-empty">
+        <lucide-icon [img]="SearchIcon" class="h-5 w-5"></lucide-icon>
+        <strong>{{ entitySearch() ? 'No matching entities' : 'No entities indexed' }}</strong>
+        <span>{{ entitySearch() ? 'Try a name, alias, or entity kind.' : 'Add an entity or index the active note.' }}</span>
     </div>
     }
-    } @else {
-    <div class="atlas-rail">
-        <button type="button" class="graph-rail-button text-cyan-200" title="Expand graph sidebar" (click)="toggleOpen()">
-            <lucide-icon [img]="BookIcon" class="h-4 w-4"></lucide-icon>
-        </button>
-        <button type="button" class="graph-rail-button text-cyan-200" title="Add entity" (click)="addEntityRequested.emit()">
-            <lucide-icon [img]="PlusIcon" class="h-4 w-4"></lucide-icon>
-        </button>
-        <button type="button" class="graph-rail-button text-violet-200" title="Style Lab" (click)="styleRequested.emit()">
-            <lucide-icon [img]="SparklesIcon" class="h-4 w-4"></lucide-icon>
-        </button>
-    </div>
     }
 </aside>

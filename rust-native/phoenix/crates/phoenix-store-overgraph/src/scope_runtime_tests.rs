@@ -1,6 +1,7 @@
 use lz4_flex::compress_prepend_size;
 use std::sync::Arc;
 
+use phoenix_document_index::{build_document_index_shard, DocumentIndexInput};
 use phoenix_semantic_v2::{
     scope_storage_key, DirtyScopeRecord, DocumentManifest, DocumentOrd, DocumentOrdinalAssignment,
     DocumentSegmentHeader, DocumentSegmentKind, DocumentSegmentRef, DocumentVersionId,
@@ -204,8 +205,66 @@ fn sample_document(
         },
         manifest,
         segments,
+        document_index_shard: None,
         kernel_batch: Default::default(),
     }
+}
+
+#[test]
+fn prepared_document_index_shards_publish_once_and_reuse_by_hash() {
+    let store = temp_store("document-index-shard");
+    store.init_archive_schema().expect("init archive schema");
+    let scope = phoenix_types::ScopeKey::default();
+    let scope_ord = ScopeOrd(6);
+    let document_ord = DocumentOrd(1);
+    let mut document = sample_document(&scope, scope_ord, document_ord, "doc-index", 10);
+    document.document_index_shard = Some(
+        build_document_index_shard(DocumentIndexInput {
+            document_id: "doc-index",
+            note_id: Some("note-index"),
+            title: "Index",
+            text: "# Index\n\nMapped paragraph.",
+        })
+        .expect("build document index"),
+    );
+    let dirty = DirtyScopeRecord {
+        scope: scope.clone(),
+        scope_key: scope_storage_key(&scope),
+        scope_ord,
+        document_ords: vec![document_ord],
+        updated_at: 10,
+    };
+
+    let first = store
+        .persist_prepared_documents_with_telemetry(
+            std::slice::from_ref(&document),
+            None,
+            std::slice::from_ref(&dirty),
+            10,
+        )
+        .expect("first persist");
+    assert_eq!(first.document_index_shard_count, 1);
+    assert_eq!(first.document_index_shards_written, 1);
+    assert_eq!(first.document_index_shards_reused, 0);
+
+    let warm = store
+        .persist_prepared_documents_with_telemetry(
+            std::slice::from_ref(&document),
+            None,
+            std::slice::from_ref(&dirty),
+            20,
+        )
+        .expect("warm persist");
+    assert_eq!(warm.document_index_shards_written, 0);
+    assert_eq!(warm.document_index_shards_reused, 1);
+    let reference = store
+        .load_latest_document_index_ref(scope_ord, document_ord)
+        .expect("load latest ref")
+        .expect("latest ref");
+    let mapped = store
+        .open_document_index_shard(&reference)
+        .expect("mmap latest shard");
+    assert_eq!(mapped.note_id().expect("note id"), Some("note-index"));
 }
 
 #[test]
@@ -257,6 +316,53 @@ fn scope_runtime_image_prefers_dirty_ords_and_masks_archive_segments() {
     assert_eq!(post_ingest.archives[0].entities.len(), 1);
     assert_eq!(post_ingest.archives[0].relations.len(), 1);
     assert_eq!(post_ingest.archives[0].relation_candidates.len(), 1);
+}
+
+#[test]
+fn prepared_document_segments_reopen_from_external_payloads() {
+    let store = temp_store("external-segment-restart");
+    store.init_archive_schema().expect("init archive schema");
+
+    let scope = phoenix_types::ScopeKey::default();
+    let scope_ord = ScopeOrd(17);
+    let dirty = DirtyScopeRecord {
+        scope: scope.clone(),
+        scope_key: scope_storage_key(&scope),
+        scope_ord,
+        document_ords: vec![DocumentOrd(3)],
+        updated_at: 79,
+    };
+    let doc = sample_document(&scope, scope_ord, DocumentOrd(3), "doc-external", 12);
+    let expected_segment_bytes = doc
+        .segments
+        .iter()
+        .map(|segment| segment.payload.len())
+        .sum::<usize>();
+    let telemetry = store
+        .persist_prepared_documents_with_telemetry(&[doc], None, std::slice::from_ref(&dirty), 79)
+        .expect("persist external prepared document");
+    assert_eq!(telemetry.segment_external_bytes, expected_segment_bytes);
+    assert_eq!(telemetry.segment_inline_bytes, 0);
+    assert!(telemetry
+        .segments
+        .iter()
+        .all(|segment| segment.storage == "external"));
+
+    let path = store.path.clone();
+    drop(store);
+    let reopened = PhoenixOvergraphStore::open(path).expect("reopen overgraph store");
+    let archives = reopened
+        .load_latest_document_archives(Some(&scope))
+        .expect("load mmap-backed document archive");
+    assert_eq!(archives.len(), 1);
+    assert_eq!(archives[0].manifest.document_id, "doc-external");
+    assert_eq!(archives[0].sentences.len(), 1);
+    assert_eq!(archives[0].mentions.len(), 1);
+    assert_eq!(archives[0].resolved_mentions.len(), 1);
+    assert_eq!(archives[0].chunks.len(), 1);
+    assert_eq!(archives[0].entities.len(), 1);
+    assert_eq!(archives[0].relations.len(), 1);
+    assert_eq!(archives[0].relation_candidates.len(), 1);
 }
 
 #[test]

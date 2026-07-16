@@ -39,7 +39,6 @@ export class PhoenixProjectionService {
     }));
 
     constructor() {
-        void this.refresh('construct');
         this.bindBrowserEvents();
     }
 
@@ -96,9 +95,7 @@ export class PhoenixProjectionService {
             }
             void this.refresh(event.type);
         };
-        window.addEventListener('phoenix-ready', refresh);
         window.addEventListener('entities-changed', liveRegistryRefresh);
-        window.addEventListener('dictionary-rebuilt', refresh);
         window.addEventListener('phoenix-projection-invalidated', refresh);
     }
 

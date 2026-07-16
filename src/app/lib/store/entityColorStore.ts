@@ -19,13 +19,19 @@ export type GraphNodeColorKind =
     | 'temporal'
     | 'relationship'
     | 'document'
+    | 'episode'
     | 'chunk'
     | 'anchor'
     | 'graphFact'
     | 'eventNode'
     | 'temporalFact'
     | 'causalFact'
-    | 'memoryState';
+    | 'memoryState'
+    | 'decisionState'
+    | 'rankStatus'
+    | 'serviceContext'
+    | 'affiliationContext'
+    | 'familyContext';
 
 // ============================================
 // DEFAULT COLORS (HSL VALUES)
@@ -95,6 +101,7 @@ export const DEFAULT_GRAPH_NODE_COLORS: Record<GraphNodeColorKind, string> = {
     temporal: '64 84% 52%',
     relationship: '292 76% 65%',
     document: '210 82% 58%',
+    episode: '188 72% 56%',
     chunk: '176 70% 46%',
     anchor: '262 78% 66%',
     graphFact: '38 92% 57%',
@@ -102,11 +109,65 @@ export const DEFAULT_GRAPH_NODE_COLORS: Record<GraphNodeColorKind, string> = {
     temporalFact: '199 80% 58%',
     causalFact: '345 82% 61%',
     memoryState: '145 70% 50%',
+    decisionState: '88 84% 56%',
+    rankStatus: '246 82% 58%',
+    serviceContext: '32 88% 58%',
+    affiliationContext: '176 70% 48%',
+    familyContext: '326 76% 62%',
 };
 
 export function normalizeEntityKind(kind: EntityKind | string | null | undefined): EntityKind | null {
     const normalized = String(kind || '').trim().toUpperCase().replace(/[-\s]+/g, '_') as EntityKind;
+    if (normalized === 'FACTION') return 'NETWORK' as EntityKind;
     return Object.prototype.hasOwnProperty.call(DEFAULT_ENTITY_COLORS, normalized) ? normalized : null;
+}
+
+export function hslColorToHex(hslString: string): string {
+    const [hueValue, saturationValue, lightnessValue] = hslString.split(' ');
+    const hue = Number.parseFloat(hueValue);
+    const saturation = Number.parseFloat(saturationValue?.replace('%', '')) / 100;
+    const lightness = Number.parseFloat(lightnessValue?.replace('%', '')) / 100;
+    if (![hue, saturation, lightness].every(Number.isFinite)) return '#888888';
+
+    const chroma = (1 - Math.abs(2 * lightness - 1)) * saturation;
+    const secondary = chroma * (1 - Math.abs((hue / 60) % 2 - 1));
+    const match = lightness - chroma / 2;
+    let red = 0;
+    let green = 0;
+    let blue = 0;
+    if (hue < 60) { red = chroma; green = secondary; }
+    else if (hue < 120) { red = secondary; green = chroma; }
+    else if (hue < 180) { green = chroma; blue = secondary; }
+    else if (hue < 240) { green = secondary; blue = chroma; }
+    else if (hue < 300) { red = secondary; blue = chroma; }
+    else { red = chroma; blue = secondary; }
+
+    const toHex = (value: number) => Math.round((value + match) * 255).toString(16).padStart(2, '0');
+    return `#${toHex(red)}${toHex(green)}${toHex(blue)}`;
+}
+
+export function hexColorToHsl(hex: string): string {
+    const match = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    if (!match) return '220 10% 50%';
+
+    const red = Number.parseInt(match[1], 16) / 255;
+    const green = Number.parseInt(match[2], 16) / 255;
+    const blue = Number.parseInt(match[3], 16) / 255;
+    const max = Math.max(red, green, blue);
+    const min = Math.min(red, green, blue);
+    const delta = max - min;
+    const lightness = (max + min) / 2;
+    let hue = 0;
+    let saturation = 0;
+
+    if (delta !== 0) {
+        saturation = lightness > 0.5 ? delta / (2 - max - min) : delta / (max + min);
+        if (max === red) hue = ((green - blue) / delta + (green < blue ? 6 : 0)) * 60;
+        else if (max === green) hue = ((blue - red) / delta + 2) * 60;
+        else hue = ((red - green) / delta + 4) * 60;
+    }
+
+    return `${hue.toFixed(3)} ${(saturation * 100).toFixed(3)}% ${(lightness * 100).toFixed(3)}%`;
 }
 
 const GRAPH_NODE_KIND_ALIASES: Record<string, GraphNodeColorKind> = {
@@ -133,6 +194,28 @@ const GRAPH_NODE_KIND_ALIASES: Record<string, GraphNodeColorKind> = {
     causal_fact: 'causalFact',
     causalfact: 'causalFact',
     state: 'memoryState',
+    decision: 'decisionState',
+    decision_state: 'decisionState',
+    decisionstate: 'decisionState',
+    rank: 'rankStatus',
+    rank_status: 'rankStatus',
+    rankstatus: 'rankStatus',
+    rank_or_status: 'rankStatus',
+    rankorstatus: 'rankStatus',
+    service: 'serviceContext',
+    service_context: 'serviceContext',
+    servicecontext: 'serviceContext',
+    service_rank: 'serviceContext',
+    servicerank: 'serviceContext',
+    affiliation: 'affiliationContext',
+    affiliate_context: 'affiliationContext',
+    affiliatecontext: 'affiliationContext',
+    affiliant_context: 'affiliationContext',
+    affiliantcontext: 'affiliationContext',
+    affiliation_context: 'affiliationContext',
+    affiliationcontext: 'affiliationContext',
+    family_context: 'familyContext',
+    familycontext: 'familyContext',
     temporal: 'temporal',
     temporal_fact: 'temporalFact',
     temporalfact: 'temporalFact',
@@ -141,6 +224,7 @@ const GRAPH_NODE_KIND_ALIASES: Record<string, GraphNodeColorKind> = {
     relationship: 'relationship',
     document: 'document',
     note: 'document',
+    episode: 'episode',
     chunk: 'chunk',
     leaf: 'chunk',
     anchor: 'anchor',
@@ -162,9 +246,17 @@ export function normalizeGraphNodeColorKind(kind: GraphNodeColorKind | string | 
 }
 
 // ============================================
-// STORE CLASS - PURE RUNTIME REGISTRY
-// No localStorage persistence - CSS variables are the source of truth
+// STORE CLASS - PERSISTED RUNTIME REGISTRY
+// CSS variables are the live source of truth; localStorage restores user choices.
 // ============================================
+
+const STORAGE_KEY = 'graph-style-lab:entity-colors:v1';
+
+interface PersistedEntityColors {
+    colors?: Partial<Record<EntityKind, string>>;
+    textColors?: Partial<Record<EntityKind, string>>;
+    graphNodeColors?: Partial<Record<GraphNodeColorKind, string>>;
+}
 
 class EntityColorStore {
     private colors: Record<EntityKind, string>;
@@ -185,17 +277,16 @@ class EntityColorStore {
     }
 
     /**
-     * Initialize store - must be called after DOM is ready
-     * Always uses DEFAULT colors and syncs to CSS variables
-     * NO localStorage loading - pure runtime defaults
+     * Initialize store - must be called after DOM is ready.
+     * Defaults are overlaid with any persisted Style Lab choices.
      */
     initialize(): void {
         if (this.initialized) return;
 
-        // Always start with defaults - no stale state
         this.colors = { ...DEFAULT_ENTITY_COLORS };
         this.textColors = { ...DEFAULT_ENTITY_TEXT_COLORS };
         this.graphNodeColors = { ...DEFAULT_GRAPH_NODE_COLORS };
+        this.loadPersistedColors();
         this.snapshot = { ...this.colors };
         this.textSnapshot = { ...this.textColors };
 
@@ -310,25 +401,25 @@ class EntityColorStore {
 
     /**
      * Set pill color for a kind - updates CSS variable immediately
-     * Changes are session-only, NOT persisted to localStorage
      */
     setColor(kind: EntityKind | string, hslValue: string): void {
         const normalized = normalizeEntityKind(kind);
         if (!normalized) return;
         this.colors[normalized] = hslValue;
         this.setCssVar(normalized, hslValue);
+        this.persist();
         this.notify();
     }
 
     /**
      * Set text color for a kind - updates CSS variable immediately
-     * Changes are session-only, NOT persisted to localStorage
      */
     setTextColor(kind: EntityKind | string, hslValue: string): void {
         const normalized = normalizeEntityKind(kind);
         if (!normalized) return;
         this.textColors[normalized] = hslValue;
         this.setTextCssVar(normalized, hslValue);
+        this.persist();
         this.notify();
     }
 
@@ -337,6 +428,7 @@ class EntityColorStore {
         if (!normalized) return;
         this.graphNodeColors[normalized] = hslValue;
         this.setGraphNodeCssVar(normalized, hslValue);
+        this.persist();
         this.notify();
     }
 
@@ -345,11 +437,12 @@ class EntityColorStore {
      */
     setColors(colors: Partial<Record<EntityKind, string>>): void {
         for (const [kind, hsl] of Object.entries(colors)) {
-            if (hsl) {
-                this.colors[kind as EntityKind] = hsl;
-                this.setCssVar(kind as EntityKind, hsl);
-            }
+            const normalized = normalizeEntityKind(kind);
+            if (!normalized || !hsl) continue;
+            this.colors[normalized] = hsl;
+            this.setCssVar(normalized, hsl);
         }
+        this.persist();
         this.notify();
     }
 
@@ -358,11 +451,12 @@ class EntityColorStore {
      */
     setTextColors(colors: Partial<Record<EntityKind, string>>): void {
         for (const [kind, hsl] of Object.entries(colors)) {
-            if (hsl) {
-                this.textColors[kind as EntityKind] = hsl;
-                this.setTextCssVar(kind as EntityKind, hsl);
-            }
+            const normalized = normalizeEntityKind(kind);
+            if (!normalized || !hsl) continue;
+            this.textColors[normalized] = hsl;
+            this.setTextCssVar(normalized, hsl);
         }
+        this.persist();
         this.notify();
     }
 
@@ -374,7 +468,69 @@ class EntityColorStore {
         this.textColors = { ...DEFAULT_ENTITY_TEXT_COLORS };
         this.graphNodeColors = { ...DEFAULT_GRAPH_NODE_COLORS };
         this.syncAllToCssVars();
+        this.persist();
         this.notify();
+    }
+
+    private loadPersistedColors(): void {
+        const persisted = this.readPersistedColors();
+        if (!persisted) return;
+        this.applyPersistedEntityColors(this.colors, persisted.colors);
+        this.applyPersistedEntityColors(this.textColors, persisted.textColors);
+        this.applyPersistedGraphNodeColors(persisted.graphNodeColors);
+    }
+
+    private readPersistedColors(): PersistedEntityColors | null {
+        if (typeof localStorage === 'undefined') return null;
+        try {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (!raw) return null;
+            const parsed = JSON.parse(raw) as PersistedEntityColors;
+            return parsed && typeof parsed === 'object' ? parsed : null;
+        } catch {
+            return null;
+        }
+    }
+
+    private applyPersistedEntityColors(
+        target: Record<EntityKind, string>,
+        colors: Partial<Record<EntityKind, string>> | undefined,
+    ): void {
+        if (!colors) return;
+        for (const [kind, hsl] of Object.entries(colors)) {
+            const normalized = normalizeEntityKind(kind);
+            if (!normalized || !this.isValidHsl(hsl)) continue;
+            target[normalized] = hsl;
+        }
+    }
+
+    private applyPersistedGraphNodeColors(
+        colors: Partial<Record<GraphNodeColorKind, string>> | undefined,
+    ): void {
+        if (!colors) return;
+        for (const [kind, hsl] of Object.entries(colors)) {
+            const normalized = normalizeGraphNodeColorKind(kind);
+            if (!normalized || !this.isValidHsl(hsl)) continue;
+            this.graphNodeColors[normalized] = hsl;
+        }
+    }
+
+    private persist(): void {
+        if (typeof localStorage === 'undefined') return;
+        try {
+            const payload: PersistedEntityColors = {
+                colors: this.colors,
+                textColors: this.textColors,
+                graphNodeColors: this.graphNodeColors,
+            };
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+        } catch {
+            // Color choices are non-critical; keep live CSS updates even if storage is unavailable.
+        }
+    }
+
+    private isValidHsl(value: unknown): value is string {
+        return typeof value === 'string' && /^\d{1,3}(?:\.\d+)?\s+\d{1,3}(?:\.\d+)?%\s+\d{1,3}(?:\.\d+)?%$/.test(value.trim());
     }
 
     // ============================================

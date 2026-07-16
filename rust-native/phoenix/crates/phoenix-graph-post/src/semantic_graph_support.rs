@@ -188,14 +188,14 @@ fn document_claim_prototype(
     let proposition = proposition_by_id
         .get(claim.proposition_id.as_str())
         .copied();
-    Some(document_semantic_unit_prototype(
+    document_semantic_unit_prototype(
         archive,
         CLAIM_KIND,
         SemanticGraphNodeKind::Claim,
         claim_id,
         claim.label.as_str(),
         proposition,
-    ))
+    )
 }
 
 fn document_state_prototype(
@@ -207,14 +207,14 @@ fn document_state_prototype(
     let proposition = proposition_by_id
         .get(state.proposition_id.as_str())
         .copied();
-    Some(document_semantic_unit_prototype(
+    document_semantic_unit_prototype(
         archive,
         STATE_KIND,
         SemanticGraphNodeKind::State,
         state_id,
         state.label.as_str(),
         proposition,
-    ))
+    )
 }
 
 fn document_event_prototype(
@@ -226,14 +226,14 @@ fn document_event_prototype(
     let proposition = proposition_by_id
         .get(event.proposition_id.as_str())
         .copied();
-    Some(document_semantic_unit_prototype(
+    document_semantic_unit_prototype(
         archive,
         EVENT_KIND,
         SemanticGraphNodeKind::Event,
         event_id,
         event.label.as_str(),
         proposition,
-    ))
+    )
 }
 
 fn document_semantic_unit_prototype(
@@ -243,19 +243,18 @@ fn document_semantic_unit_prototype(
     raw_id: &str,
     fallback_label: &str,
     proposition: Option<&Proposition>,
-) -> Prototype {
+) -> Option<Prototype> {
+    let proposition = proposition.filter(|value| has_complete_situation_frame(value))?;
     let document_id = archive.manifest.document_id.as_str();
     let node_id = format!("{SEMANTIC_UNIT_PREFIX}{ann_kind}::{document_id}::{raw_id}");
-    let text = proposition
-        .map(|value| proposition_unit_text(value, fallback_label))
-        .unwrap_or_else(|| truncate_unit_text(fallback_label));
-    let slot_key = proposition.map(proposition_slot_key);
-    let value_key = proposition.and_then(proposition_value_key);
-    let primary_entity_id = proposition.and_then(|value| proposition_entity_id(value, 0));
-    let secondary_entity_id = proposition.and_then(|value| proposition_entity_id(value, 1));
-    let truth_plane = proposition.map(proposition_truth_plane);
+    let text = proposition_unit_text(proposition, fallback_label);
+    let slot_key = Some(proposition_slot_key(proposition));
+    let value_key = proposition_value_key(proposition);
+    let primary_entity_id = proposition_entity_id(proposition, 0);
+    let secondary_entity_id = proposition_entity_id(proposition, 1);
+    let truth_plane = Some(proposition_truth_plane(proposition));
     let evidence_refs = semantic_unit_evidence_refs(ann_kind, document_id, raw_id, proposition);
-    prototype(
+    Some(prototype(
         node_id,
         ann_kind,
         node_kind,
@@ -276,7 +275,19 @@ fn document_semantic_unit_prototype(
         value_key,
         primary_entity_id,
         secondary_entity_id,
-    )
+    ))
+}
+
+fn has_complete_situation_frame(proposition: &Proposition) -> bool {
+    let has_predicate = !proposition.predicate.predicate.trim().is_empty();
+    let has_role = proposition.arguments.iter().any(|argument| {
+        !argument.role.trim().is_empty()
+            && (argument.entity_id.is_some() || argument.range.is_some())
+    });
+    let has_evidence = !proposition.evidence.is_empty();
+    let has_plane = !proposition_truth_plane(proposition).is_empty();
+    let has_time = proposition_unit_range(proposition).is_some();
+    has_predicate && has_role && has_evidence && has_plane && has_time
 }
 
 fn proposition_unit_text(proposition: &Proposition, fallback_label: &str) -> String {
@@ -353,12 +364,9 @@ fn semantic_unit_evidence_refs(
     ann_kind: &str,
     document_id: &str,
     raw_id: &str,
-    proposition: Option<&Proposition>,
+    proposition: &Proposition,
 ) -> Vec<String> {
     let mut refs = vec![format!("semantic-unit:{ann_kind}:{document_id}:{raw_id}")];
-    let Some(proposition) = proposition else {
-        return refs;
-    };
     refs.push(format!("proposition:{}", proposition.proposition_id));
     if let Some(range) = proposition_unit_range(proposition) {
         refs.push(format!(

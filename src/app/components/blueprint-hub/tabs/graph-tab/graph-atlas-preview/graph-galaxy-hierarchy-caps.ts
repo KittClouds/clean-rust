@@ -15,7 +15,12 @@ const KIND_HSL: Record<string, string> = {
     causal: '24 82% 62%',
     evidence: '136 70% 62%',
     document: '214 78% 62%',
+    documentRoot: '214 72% 58%',
     documentStructure: '214 78% 62%',
+    chunk: '178 66% 58%',
+    character: '286 74% 66%',
+    entityOther: '184 62% 58%',
+    stateContext: '146 72% 56%',
     semantic: '176 72% 58%',
     abstraction: '228 66% 66%',
     bridge: '302 76% 66%',
@@ -28,6 +33,16 @@ export interface Vec3 {
     y: number;
     z: number;
 }
+
+export interface HierarchyShellBand {
+    id: 'document' | 'documentRoot' | 'chunk' | 'entity' | 'event' | 'fact' | 'memory' | 'evidence';
+    rank: number;
+    radius: number;
+    min: number;
+    max: number;
+}
+
+export type CapsHierarchyRole = HierarchyShellBand['id'];
 
 interface BridgeInfo {
     capId: string;
@@ -97,8 +112,11 @@ export function rawDirection(node: GalaxyNode, lorentz: Record<string, unknown>)
 export function laneDirection(lane: string): Vec3 {
     switch (normalizeLane(lane)) {
         case 'document':
+        case 'documentRoot':
         case 'documentStructure':
             return normalize({ x: -0.3, y: 0.18, z: 0.94 }, { x: 0, y: 0, z: 1 });
+        case 'chunk':
+            return normalize({ x: -0.24, y: 0.62, z: 0.74 }, { x: 0, y: 1, z: 0 });
         case 'temporal':
             return normalize({ x: 0.2, y: 0.88, z: -0.28 }, { x: 0, y: 1, z: 0 });
         case 'causal':
@@ -107,9 +125,16 @@ export function laneDirection(lane: string): Vec3 {
             return normalize({ x: 0.54, y: 0.36, z: -0.76 }, { x: 0, y: 0, z: -1 });
         case 'evidence':
             return normalize({ x: -0.58, y: -0.1, z: 0.8 }, { x: -1, y: 0, z: 0 });
+        case 'location':
+            return normalize({ x: 0.14, y: 0.74, z: 0.66 }, { x: 0, y: 1, z: 0 });
+        case 'character':
+            return normalize({ x: 0.36, y: 0.34, z: -0.86 }, { x: 0, y: 0, z: -1 });
         case 'relationship':
             return normalize({ x: 0.56, y: -0.62, z: -0.2 }, { x: 1, y: -1, z: 0 });
+        case 'stateContext':
+            return normalize({ x: 0.52, y: -0.18, z: -0.84 }, { x: 1, y: 0, z: -1 });
         case 'entity':
+        case 'entityOther':
             return normalize({ x: -0.62, y: 0.58, z: 0.22 }, { x: -1, y: 1, z: 0 });
         default:
             return normalize({ x: 0.18, y: 0.48, z: 0.86 }, { x: 0, y: 0, z: 1 });
@@ -137,6 +162,7 @@ export function fallbackLane(node: GalaxyNode): string {
     if (/causal|cause|effect/.test(text)) return 'causal';
     if (/temporal|timeline|time/.test(text)) return 'temporal';
     if (/event|scene/.test(text)) return 'event';
+    if (/decision|rank|service|affiliation|affiliate|family-context|memory|state/.test(text)) return 'stateContext';
     if (/memory|evidence|source|provenance/.test(text)) return 'evidence';
     if (/relationship|relation|graph-fact|graphfact|fact/.test(text)) return 'relationship';
     if (/chunk|anchor|note|document|doc/.test(text)) return 'document';
@@ -191,6 +217,74 @@ export function projectNodeToRadius(node: GalaxyNode, radius: number): void {
     node.x = direction.x * radius;
     node.y = direction.y * radius;
     node.z = direction.z * radius;
+}
+
+export function contractShellRadiusForNode(node: GalaxyNode, fallback: number): number {
+    const band = hierarchyShellBandForNode(node);
+    return band ? clamp(fallback || band.radius, band.min, band.max) : fallback;
+}
+
+export function enforceHierarchyShellContract(nodes: GalaxyNode[]): void {
+    for (const node of nodes) {
+        const band = hierarchyShellBandForNode(node);
+        if (!band) continue;
+        const radius = contractShellRadiusForNode(node, length(vectorOf(node)) || band.radius);
+        projectNodeToRadius(node, radius);
+        node.depth = clamp(radius / 2.18, 0, 1);
+    }
+}
+
+export function validateHierarchyShellContract(nodes: GalaxyNode[]): string[] {
+    const violations: string[] = [];
+    for (const node of nodes) {
+        const band = hierarchyShellBandForNode(node);
+        if (!band) continue;
+        const radius = length(vectorOf(node));
+        if (radius < band.min - 0.0001 || radius > band.max + 0.0001) {
+            violations.push(`${node.entity.id}:${band.id}:radius:${radius.toFixed(3)} not in ${band.min}-${band.max}`);
+        }
+    }
+    return violations;
+}
+
+export function hierarchyShellBandForNode(node: GalaxyNode): HierarchyShellBand | null {
+    const explicit = explicitHierarchyRoleForNode(node);
+    if (explicit) return HIERARCHY_SHELL_BANDS[explicit];
+    const text = hierarchyKindText(node);
+    if (/embed:structure-root:|structure.?root|document.?root|lane.?root/.test(text)) {
+        return HIERARCHY_SHELL_BANDS.documentRoot;
+    }
+    if (/embed:note:|source:note|kind:note|document(?!_spine)|source:doc|kind:doc/.test(text)) {
+        return HIERARCHY_SHELL_BANDS.document;
+    }
+    if (/embed:anchor:|anchor_evidence|source:anchor|kind:anchor|evidence|mention|provenance/.test(text)) {
+        return HIERARCHY_SHELL_BANDS.evidence;
+    }
+    if (/embed:chunk:|source:chunk|kind:chunk|chunk_spine/.test(text)) {
+        return HIERARCHY_SHELL_BANDS.chunk;
+    }
+    if (/memory_state|memory|state|context|rank.?status|service|affiliation/.test(text)) {
+        return HIERARCHY_SHELL_BANDS.memory;
+    }
+    if (/event_identity|source:event|kind:event|temporal_fact|causal_fact|temporal|causal/.test(text)) {
+        return HIERARCHY_SHELL_BANDS.event;
+    }
+    if (/relationship_fact|graph.?fact|relation.?fact|relationship|relation/.test(text)) {
+        return HIERARCHY_SHELL_BANDS.fact;
+    }
+    if (/embed:entity:|entity_anchor|source:entity|kind:entity|character|location|creature|concept/.test(text)) {
+        return HIERARCHY_SHELL_BANDS.entity;
+    }
+    return null;
+}
+
+export function hierarchyShellBandForRole(role: string | null | undefined): HierarchyShellBand | null {
+    const normalized = normalizeHierarchyRole(role);
+    return normalized ? HIERARCHY_SHELL_BANDS[normalized] : null;
+}
+
+export function hierarchyShellBandsInOrder(): HierarchyShellBand[] {
+    return HIERARCHY_SHELL_ORDER.map((role) => HIERARCHY_SHELL_BANDS[role]);
 }
 
 export function vectorOf(node: GalaxyNode): Vec3 {
@@ -264,6 +358,96 @@ export function clamp(value: number, min: number, max: number): number {
 export function finite(value: unknown): number {
     const number = Number(value);
     return Number.isFinite(number) ? number : 0;
+}
+
+export const HIERARCHY_SHELL_BANDS: Record<HierarchyShellBand['id'], HierarchyShellBand> = {
+    document: { id: 'document', rank: 0, radius: 2.1, min: 2.04, max: 2.14 },
+    documentRoot: { id: 'documentRoot', rank: 1, radius: 1.78, min: 1.7, max: 1.86 },
+    chunk: { id: 'chunk', rank: 2, radius: 1.46, min: 1.38, max: 1.54 },
+    evidence: { id: 'evidence', rank: 3, radius: 1.14, min: 1.06, max: 1.22 },
+    event: { id: 'event', rank: 4, radius: 1.06, min: 0.98, max: 1.16 },
+    fact: { id: 'fact', rank: 5, radius: 0.98, min: 0.9, max: 1.08 },
+    entity: { id: 'entity', rank: 6, radius: 0.86, min: 0.76, max: 0.94 },
+    memory: { id: 'memory', rank: 7, radius: 0.58, min: 0.46, max: 0.68 },
+};
+
+export const HIERARCHY_SHELL_ORDER: readonly CapsHierarchyRole[] = [
+    'document',
+    'documentRoot',
+    'chunk',
+    'evidence',
+    'event',
+    'fact',
+    'entity',
+    'memory',
+];
+
+function explicitHierarchyRoleForNode(node: GalaxyNode): CapsHierarchyRole | null {
+    const metadata = node.entity.metadata || {};
+    const lorentz = record(metadata['lorentz']);
+    return normalizeHierarchyRole(
+        metadata['capsHierarchyRole']
+            || metadata['hierarchyRole']
+            || lorentz['capsHierarchyRole']
+            || lorentz['hierarchyRole'],
+    );
+}
+
+function normalizeHierarchyRole(value: unknown): CapsHierarchyRole | null {
+    const text = String(value || '').trim().replace(/[-_\s]+/g, '').toLowerCase();
+    switch (text) {
+        case 'document':
+        case 'note':
+        case 'doc':
+            return 'document';
+        case 'documentroot':
+        case 'root':
+        case 'structureroot':
+            return 'documentRoot';
+        case 'chunk':
+        case 'documentunit':
+            return 'chunk';
+        case 'evidence':
+        case 'anchor':
+        case 'evidencespan':
+            return 'evidence';
+        case 'entity':
+        case 'identity':
+            return 'entity';
+        case 'event':
+            return 'event';
+        case 'fact':
+        case 'graphfact':
+        case 'relationshipfact':
+            return 'fact';
+        case 'memory':
+        case 'memorystate':
+        case 'state':
+        case 'context':
+            return 'memory';
+        default:
+            return null;
+    }
+}
+
+function hierarchyKindText(node: GalaxyNode): string {
+    const metadata = node.entity.metadata || {};
+    const lorentz = record(metadata['lorentz']);
+    return [
+        node.entity.id,
+        `kind:${node.entity.kind || ''}`,
+        `source:${metadata['sourceType'] || ''}`,
+        metadata['signalLane'],
+        lorentz['signalLane'],
+        metadata['signalStructuralRole'],
+        lorentz['structuralRole'],
+        metadata['atlasStructuralRole'],
+        metadata['atlasDocumentUnitKind'],
+        metadata['atlasStateContextKind'],
+        metadata['styleKey'],
+        metadata['graphKind'],
+        metadata['graphColorKind'],
+    ].join(' ').toLowerCase();
 }
 
 function quadraticSegments(a: Vec3, b: Vec3, c: Vec3, steps: number): Float32Array {

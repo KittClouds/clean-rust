@@ -326,7 +326,7 @@ impl GlirelModel {
             let chunk_outputs =
                 match self.run_schema_batch(rows, relation_specs, &labels, threshold) {
                     Ok(value) => value,
-                    Err(error) if rows.len() > 1 => rows
+                    Err(_error) if rows.len() > 1 => rows
                         .iter()
                         .map(|row| {
                             self.extract_with_schema(

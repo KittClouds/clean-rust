@@ -106,6 +106,20 @@ describe('operations note recovery', () => {
         expect(notes.map((note) => note.id)).toEqual(['cached-note', 'native-note']);
         expect(notes.map((note) => note.markdownContent)).toEqual(['cached body', 'native']);
     });
+
+    it('warms Dexie with native batch note bodies', async () => {
+        const store = createStoreMock();
+        store.getNotesByIds.mockResolvedValue([storeNote({ id: 'native-note', markdownContent: 'full body' })]);
+        setPhoenixStoreBridge(store as any);
+
+        await getNotesByIds(['native-note']);
+
+        expect(notesMock.put).toHaveBeenCalledWith(expect.objectContaining({
+            id: 'native-note',
+            markdownContent: 'full body',
+            hasBody: true,
+        }));
+    });
 });
 
 function createStoreMock() {
@@ -115,6 +129,7 @@ function createStoreMock() {
         getNote: vi.fn(async () => null),
         getNotesByIds: vi.fn(async () => []),
         upsertNote: vi.fn(async () => undefined),
+        scheduleDocumentSemanticMaterialization: vi.fn(),
     };
 }
 

@@ -23,6 +23,7 @@ orp = { version = "0.9", optional = true }
 phoenix-chunker = { path = "../phoenix-chunker" }
 phoenix-alex = { path = "../phoenix-alex" }
 phoenix-causality = { path = "../phoenix-causality" }
+phoenix-document-index = { path = "../phoenix-document-index" }
 phoenix-graph = { path = "../phoenix-graph" }
 phoenix-kernel = { path = "../phoenix-kernel" }
 phoenix-machine = { path = "../phoenix-machine" }

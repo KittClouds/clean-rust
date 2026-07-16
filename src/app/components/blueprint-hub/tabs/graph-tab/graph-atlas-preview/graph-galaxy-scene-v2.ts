@@ -1,15 +1,22 @@
-import { entityColorStore } from '../../../../../lib/store/entityColorStore';
+import { entityColorStore, normalizeGraphNodeColorKind } from '../../../../../lib/store/entityColorStore';
 import {
     hslToRgb,
+    isAtlasChunkRenderableNode,
     type GalaxyGroup,
     type GalaxyHopfRibbon,
     type GalaxyLayoutMode,
     type GalaxyLorentzGuide,
+    type GalaxyHybridBusemannReceipt,
+    type GalaxyHybridShellReceipt,
     type GalaxyNode,
+    type GalaxyRelationControl,
     type GalaxyScene,
     type GalaxyBusemannHorosphereSpec,
 } from './graph-galaxy-engine';
+import { hierarchyShellBandForNode } from './graph-galaxy-hierarchy-caps';
 import { relationFamilyFromText } from './graph-relation-visual-style';
+import type { TransitPlan } from './graph-transit-plan';
+import type { PhoenixGraphScenePacketHierarchyHint } from '../../../../../services/phoenix-graph-scene-packet.model';
 
 export type GalaxySceneSourceMode = 'entities' | 'graph' | 'embeddings';
 
@@ -33,6 +40,12 @@ export interface GalaxyHopfRibbonView {
     importance: number;
     guideKind: GalaxyHopfRibbon['guideKind'];
     guideWeight: number;
+    /**
+     * Source-node color resolved from `nodeIds[0]` at scene compile.
+     * Source-node color is the guide color contract; optional only for older
+     * persisted scenes whose guide source is missing.
+     */
+    sourceColor?: { r: number; g: number; b: number };
 }
 
 export interface GalaxyLorentzGuideView {
@@ -47,6 +60,10 @@ export interface GalaxyLorentzGuideView {
     level: number;
     guideKind: GalaxyLorentzGuide['guideKind'];
     guideWeight: number;
+    /**
+     * Source-node color resolved from `nodeIds[0]` at scene compile.
+     */
+    sourceColor?: { r: number; g: number; b: number };
 }
 
 export interface GalaxyBusemannHorosphereView {
@@ -58,6 +75,59 @@ export interface GalaxyBusemannHorosphereView {
     radius: number;
     color: { r: number; g: number; b: number };
     opacity: number;
+}
+
+export interface GalaxyRelationControlView {
+    id: string;
+    label: string;
+    kind: string;
+    family: string;
+    noteIds: string[];
+    chunkIds: string[];
+    entityIds: string[];
+    eventIds: string[];
+    ownerEntityId: string;
+    regionId: string;
+    sourceNodeIds: string[];
+    targetNodeIds: string[];
+    evidenceNodeIds: string[];
+    participantNodeIds: string[];
+    edgeIds: string[];
+    position3d: [number, number, number];
+    color: { r: number; g: number; b: number };
+    confidence: number;
+}
+
+export interface GalaxyHybridShellReceiptView {
+    lane: string;
+    phase: number;
+    specificity: number;
+    ambiguity: number;
+    level: number;
+    strength: number;
+    baseRadius: number;
+    shellRadius: number;
+    laneStrength: number;
+    sourceSignals: string[];
+}
+
+export interface GalaxyHybridCommitmentReceiptView {
+    family: string;
+    topPrototypeId: string;
+    entropy: number;
+    margin: number;
+    confidence: number;
+    promotionReady: boolean;
+    radialStrength: number;
+    source: GalaxyHybridBusemannReceipt['source'];
+    radius: number;
+}
+
+export interface GalaxyHybridNodeReceiptView {
+    nodeId: string;
+    shell?: GalaxyHybridShellReceiptView;
+    commitment?: GalaxyHybridCommitmentReceiptView;
+    renderRadius: number;
 }
 
 export interface GalaxySceneV2 {
@@ -72,15 +142,31 @@ export interface GalaxySceneV2 {
     groups: GalaxySceneGroupView[];
     hopfRibbons: GalaxyHopfRibbonView[];
     lorentzGuides: GalaxyLorentzGuideView[];
+    transitPlan?: TransitPlan;
+    relationControls?: GalaxyRelationControlView[];
     busemannHorospheres?: GalaxyBusemannHorosphereView[];
+    hybridShellPositions?: Float32Array;
+    hybridCommitmentPositions?: Float32Array;
+    hybridReceipts?: GalaxyHybridNodeReceiptView[];
+    hierarchyShellRadii?: Float32Array;
+    hierarchyShellRanks?: Uint8Array;
+    hierarchyHints?: PhoenixGraphScenePacketHierarchyHint[];
     positions3d: Float32Array;
     positions2d: Float32Array;
     radii: Float32Array;
     colors: Float32Array;
     edgePairs: Uint32Array;
+    edgeIds: string[];
+    edgeTypes: string[];
     edgeColors: Float32Array;
     edgeAlpha: Float32Array;
     edgeKinds: Uint8Array;
+    runtimeIndex?: GalaxySceneRuntimeIndex;
+}
+
+export interface GalaxySceneRuntimeIndex {
+    nodeById: Map<string, number>;
+    incidentEdges: number[][];
 }
 
 export function galaxySceneToV2(scene: GalaxyScene, sourceMode: GalaxySceneSourceMode = 'entities'): GalaxySceneV2 {
@@ -95,6 +181,14 @@ export function galaxySceneToV2(scene: GalaxyScene, sourceMode: GalaxySceneSourc
     const positions2d = new Float32Array(nodeCount * 3);
     const radii = new Float32Array(nodeCount);
     const colors = new Float32Array(nodeCount * 3);
+    const hasHybridShell = scene.nodes.some((node) => !!node.hybridShellPoint || !!node.hybridShell);
+    const hasHybridCommitment = scene.nodes.some((node) => !!node.hybridCommitmentPoint || !!node.hybridCommitment);
+    const hasHierarchyShells = scene.nodes.some((node) => hierarchyShellBandForNode(node));
+    const hybridShellPositions = hasHybridShell ? new Float32Array(nodeCount * 3) : undefined;
+    const hybridCommitmentPositions = hasHybridCommitment ? new Float32Array(nodeCount * 3) : undefined;
+    const hierarchyShellRadii = hasHierarchyShells ? new Float32Array(nodeCount) : undefined;
+    const hierarchyShellRanks = hasHierarchyShells ? new Uint8Array(nodeCount) : undefined;
+    const hybridReceipts: GalaxyHybridNodeReceiptView[] = [];
 
     for (let index = 0; index < nodeCount; index++) {
         const node = scene.nodes[index];
@@ -109,9 +203,30 @@ export function galaxySceneToV2(scene: GalaxyScene, sourceMode: GalaxySceneSourc
         writePosition(positions2d, index, node.x, node.y, 0);
         radii[index] = node.radius;
         writeColor(colors, index, node);
+        if (hybridShellPositions) {
+            const point = node.hybridShellPoint ?? node.hybridShell?.point ?? node;
+            writePosition(hybridShellPositions, index, point.x, point.y, point.z);
+        }
+        if (hybridCommitmentPositions) {
+            const point = node.hybridCommitmentPoint ?? node.hybridCommitment?.point ?? node;
+            writePosition(hybridCommitmentPositions, index, point.x, point.y, point.z);
+        }
+        const hybridReceipt = hybridNodeReceiptView(node);
+        if (hybridReceipt) {
+            hybridReceipts.push(hybridReceipt);
+        }
+        if (hierarchyShellRadii && hierarchyShellRanks) {
+            const band = hierarchyShellBandForNode(node);
+            if (band) {
+                hierarchyShellRadii[index] = band.radius;
+                hierarchyShellRanks[index] = band.rank + 1;
+            }
+        }
     }
 
     const edgePairs = new Uint32Array(scene.links.length * 2);
+    const edgeIds = new Array<string>(scene.links.length);
+    const edgeTypes = new Array<string>(scene.links.length);
     const edgeColors = new Float32Array(scene.links.length * 6);
     const edgeAlpha = new Float32Array(scene.links.length);
     const edgeKinds = new Uint8Array(scene.links.length);
@@ -121,7 +236,9 @@ export function galaxySceneToV2(scene: GalaxyScene, sourceMode: GalaxySceneSourc
         const target = scene.nodes[edge.target];
         edgePairs[index * 2] = edge.source;
         edgePairs[index * 2 + 1] = edge.target;
-        const relationColor = relationEdgeColor(edge.type, source, target);
+        edgeIds[index] = edge.id;
+        edgeTypes[index] = edge.type;
+        const relationColor = relationEdgeColor(edge, source, target);
         if (relationColor) {
             writeRgbColor(edgeColors, index * 2, relationColor);
             writeRgbColor(edgeColors, index * 2 + 1, relationColor);
@@ -133,7 +250,7 @@ export function galaxySceneToV2(scene: GalaxyScene, sourceMode: GalaxySceneSourc
         edgeKinds[index] = edge.interGalaxy ? 1 : hierarchyEdgeKind(edge.type);
     }
 
-    return {
+    return attachGalaxySceneRuntimeIndex({
         sourceMode,
         layoutMode: scene.layoutMode,
         ids,
@@ -143,17 +260,144 @@ export function galaxySceneToV2(scene: GalaxyScene, sourceMode: GalaxySceneSourc
         hopfBaseIds,
         hopfRoles,
         groups: scene.groups.map(groupView),
-        hopfRibbons: (scene.hopfRibbons ?? []).map(hopfRibbonView),
-        lorentzGuides: (scene.lorentzGuides ?? []).map(lorentzGuideView),
+        hopfRibbons: attachSourceColors((scene.hopfRibbons ?? []).map(hopfRibbonView), ids, colors),
+        lorentzGuides: attachSourceColors((scene.lorentzGuides ?? []).map(lorentzGuideView), ids, colors, {
+            skip: isTransitLaneOrRouteGuideView,
+        }),
+        transitPlan: scene.transitPlan,
+        relationControls: scene.relationControls?.map(relationControlView),
         busemannHorospheres: (scene.busemannHorospheres ?? []).map(busemannHorosphereView),
+        hybridShellPositions,
+        hybridCommitmentPositions,
+        hybridReceipts: hybridReceipts.length ? hybridReceipts : undefined,
+        hierarchyShellRadii,
+        hierarchyShellRanks,
         positions3d,
         positions2d,
         radii,
         colors,
         edgePairs,
+        edgeIds,
+        edgeTypes,
         edgeColors,
         edgeAlpha,
         edgeKinds,
+    });
+}
+
+export function attachGalaxySceneRuntimeIndex(scene: GalaxySceneV2): GalaxySceneV2 {
+    const nodeById = new Map<string, number>();
+    const incidentEdges = Array.from({ length: scene.ids.length }, () => [] as number[]);
+    for (let index = 0; index < scene.ids.length; index++) nodeById.set(scene.ids[index], index);
+    for (let edge = 0; edge < scene.edgePairs.length / 2; edge++) {
+        const source = scene.edgePairs[edge * 2];
+        const target = scene.edgePairs[edge * 2 + 1];
+        if (source < incidentEdges.length) incidentEdges[source].push(edge);
+        if (target < incidentEdges.length && target !== source) incidentEdges[target].push(edge);
+    }
+    scene.runtimeIndex = { nodeById, incidentEdges };
+    return scene;
+}
+
+/**
+ * Resolves `sourceColor` from each guide/ribbon's `nodeIds[0]` against the
+ * compiled node color buffer. Transit lane/route guides already carry Style
+ * Lab colors, while per-station hub/stop guides still inherit node color.
+ */
+function attachSourceColors<T extends { id?: string; treeId?: string; nodeIds: string[]; sourceColor?: { r: number; g: number; b: number } }>(
+    views: T[],
+    ids: string[],
+    colors: Float32Array,
+    options: { skip?: (view: T) => boolean } = {},
+): T[] {
+    if (!views.length) return views;
+    const indexById = new Map<string, number>();
+    for (let index = 0; index < ids.length; index++) indexById.set(ids[index], index);
+    for (const view of views) {
+        if (options.skip?.(view)) {
+            delete view.sourceColor;
+            continue;
+        }
+        const sourceId = view.nodeIds[0];
+        const index = sourceId ? indexById.get(sourceId) : undefined;
+        if (index === undefined) continue;
+        const offset = index * 3;
+        view.sourceColor = { r: colors[offset], g: colors[offset + 1], b: colors[offset + 2] };
+    }
+    return views;
+}
+
+function isTransitLaneOrRouteGuideView(view: { id?: string; treeId?: string }): boolean {
+    const id = String(view.id || '');
+    return id.startsWith('transit:backbone:lane:')
+        || id.startsWith('transit:backbone:route:')
+        || id.startsWith('transit:plan:lane:')
+        || id.startsWith('transit:plan:route:');
+}
+
+function relationControlView(control: GalaxyRelationControl): GalaxyRelationControlView {
+    return {
+        id: control.id,
+        label: control.label,
+        kind: control.kind,
+        family: control.family,
+        noteIds: control.noteIds,
+        chunkIds: control.chunkIds,
+        entityIds: control.entityIds,
+        eventIds: control.eventIds,
+        ownerEntityId: control.ownerEntityId,
+        regionId: control.regionId,
+        sourceNodeIds: control.sourceNodeIds,
+        targetNodeIds: control.targetNodeIds,
+        evidenceNodeIds: control.evidenceNodeIds,
+        participantNodeIds: control.participantNodeIds,
+        edgeIds: control.edgeIds,
+        position3d: [control.x, control.y, control.z],
+        color: { r: control.r / 255, g: control.g / 255, b: control.b / 255 },
+        confidence: control.confidence,
+    };
+}
+
+function hybridNodeReceiptView(node: GalaxyNode): GalaxyHybridNodeReceiptView | null {
+    if (!node.hybridShell && !node.hybridCommitment && !node.hybridRenderPoint) {
+        return null;
+    }
+
+    const renderRadius = node.hybridRenderPoint?.radius ?? Math.hypot(node.x, node.y, node.z);
+    return {
+        nodeId: node.entity.id,
+        shell: node.hybridShell ? hybridShellReceiptView(node.hybridShell) : undefined,
+        commitment: node.hybridCommitment ? hybridCommitmentReceiptView(node.hybridCommitment) : undefined,
+        renderRadius,
+    };
+}
+
+function hybridShellReceiptView(receipt: GalaxyHybridShellReceipt): GalaxyHybridShellReceiptView {
+    return {
+        lane: receipt.lane,
+        phase: receipt.phase,
+        specificity: receipt.specificity,
+        ambiguity: receipt.ambiguity,
+        level: receipt.level,
+        strength: receipt.strength,
+        baseRadius: receipt.baseRadius,
+        shellRadius: receipt.shellRadius,
+        laneStrength: receipt.laneStrength,
+        sourceSignals: receipt.sourceSignals,
+    };
+}
+
+function hybridCommitmentReceiptView(receipt: GalaxyHybridBusemannReceipt): GalaxyHybridCommitmentReceiptView {
+    return {
+        family: receipt.family,
+        topPrototypeId: receipt.topPrototypeId,
+        entropy: receipt.entropy,
+        margin: receipt.margin,
+        confidence: receipt.confidence,
+        promotionReady: receipt.promotionReady,
+        radialStrength: receipt.radialStrength,
+        source: receipt.source,
+        radius: receipt.point.radius,
     };
 }
 
@@ -175,8 +419,14 @@ function hierarchyEdgeKind(type: string): number {
     return /target-parent|note-chunk|chunk-anchor|chunk-entity|anchor-entity|event-chunk|event-entity|memory-entity/i.test(type) ? 2 : 0;
 }
 
-function relationEdgeColor(type: string, source: GalaxyNode, target: GalaxyNode): { r: number; g: number; b: number } | null {
+function relationEdgeColor(edge: GalaxyScene['links'][number], source: GalaxyNode, target: GalaxyNode): { r: number; g: number; b: number } | null {
+    const type = edge.type;
     if (hierarchyEdgeKind(type) !== 0) return null;
+    const metadata = edge.metadata || {};
+    const explicit = normalizeGraphNodeColorKind(
+        String(metadata['graphColorKind'] || metadata['graphRelationFamily'] || metadata['relationFamily'] || ''),
+    );
+    if (explicit) return hslToRgb(entityColorStore.getRawGraphNodeHsl(explicit));
     const family = relationFamilyFromText(
         type,
         source.entity.label,
@@ -247,6 +497,13 @@ function writePosition(buffer: Float32Array, index: number, x: number, y: number
 
 function writeColor(buffer: Float32Array, index: number, node: GalaxyNode): void {
     const offset = index * 3;
+    if (isAtlasChunkRenderableNode(node.entity)) {
+        const color = hslToRgb(entityColorStore.getRawGraphNodeHsl('chunk'));
+        buffer[offset] = color.r / 255;
+        buffer[offset + 1] = color.g / 255;
+        buffer[offset + 2] = color.b / 255;
+        return;
+    }
     buffer[offset] = node.r / 255;
     buffer[offset + 1] = node.g / 255;
     buffer[offset + 2] = node.b / 255;

@@ -1,4 +1,4 @@
-use phoenix_chunker::{
+use phoenix_chunker_native::{
     build_graph_delta_for_lens, ChunkLens, GraphBuildContext, GraphDelta, LensChunk,
     LensChunkConsumer,
 };

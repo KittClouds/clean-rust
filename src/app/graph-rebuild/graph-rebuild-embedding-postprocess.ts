@@ -18,6 +18,7 @@ import {
     sparseEmbeddingSignature,
     type SparseEmbeddingSignature,
 } from './graph-rebuild-embedding-signatures';
+import type { GraphRebuildCpuProfiler } from './graph-rebuild-cpu-profile';
 
 const NEIGHBOR_LIMIT = 6;
 const BACKBONE_MIN_SCORE = 0.18;
@@ -40,13 +41,23 @@ interface PairPlan {
 export function buildGraphRebuildEmbeddingGraphPostProcess(
     targets: GraphRebuildEmbeddingTarget[],
     profileInput?: Partial<GraphRebuildEmbeddingProfile>,
+    cpuProfiler?: GraphRebuildCpuProfiler,
 ): GraphRebuildEmbeddingGraphPostProcess {
     const profile = normalizeEmbeddingProfile(profileInput);
     const adapter = embeddingModelAdapterFromProfile(profile);
+    let phaseStarted = performance.now();
     const signatures = targets.map((target) => sparseEmbeddingSignature(target, profile.selectedDimensions));
+    cpuProfiler?.add('snapshotEmbeddingSignaturesMs', phaseStarted);
+    phaseStarted = performance.now();
     const plan = buildNeighborPairPlan(targets);
+    cpuProfiler?.add('snapshotEmbeddingPairPlanMs', phaseStarted);
+    phaseStarted = performance.now();
     const neighbors = buildMutualNeighbors(signatures, plan);
+    cpuProfiler?.add('snapshotEmbeddingNeighborsMs', phaseStarted);
+    phaseStarted = performance.now();
     const clusters = clusterTargets(targets, neighbors);
+    cpuProfiler?.add('snapshotEmbeddingClustersMs', phaseStarted);
+    phaseStarted = performance.now();
     const baseTargetRows = buildTargetRows(targets, clusters, neighbors);
     const backboneEdges = buildBackboneEdges(targets, baseTargetRows, neighbors);
     const { rows: targetRows, regions: productTopologyRegions } = attachProductTopologyRegions(
@@ -60,6 +71,7 @@ export function buildGraphRebuildEmbeddingGraphPostProcess(
     const meanNeighborCount = targetRows.length
         ? targetRows.reduce((sum, row) => sum + row.neighborCount, 0) / targetRows.length
         : 0;
+    cpuProfiler?.add('snapshotEmbeddingRowsEdgesMs', phaseStarted);
 
     return {
         schemaVersion: 'phoenix-embedding-graph-postprocess/v1',
@@ -104,16 +116,19 @@ function buildMutualNeighbors(signatures: SparseEmbeddingSignature[], plan: Pair
 }
 
 function buildNeighborPairPlan(targets: GraphRebuildEmbeddingTarget[]): PairPlan {
-    const theoreticalPairCount = Math.max(0, Math.floor((targets.length * (targets.length - 1)) / 2));
+    const targetCount = targets.length;
+    const theoreticalPairCount = Math.max(0, Math.floor((targetCount * (targetCount - 1)) / 2));
     const pairs: Array<[number, number]> = [];
-    const seen = new Set<string>();
-    const degree = new Uint16Array(targets.length);
+    const seen = new Set<number>();
+    const degree = new Uint16Array(targetCount);
+    const normalizedKinds = targets.map((target) => normalizeKind(target.kind));
+    const signalScores = targets.map(targetSignalScore);
     const add = (left: number, right: number, force = false) => {
         if (left < 0 || right < 0) return;
         if (left === right) return;
         const a = Math.min(left, right);
         const b = Math.max(left, right);
-        const key = `${a}:${b}`;
+        const key = a * targetCount + b;
         if (seen.has(key)) return;
         if (!force && degree[a] >= PAIRS_PER_TARGET_LIMIT && degree[b] >= PAIRS_PER_TARGET_LIMIT) return;
         seen.add(key);
@@ -122,27 +137,27 @@ function buildNeighborPairPlan(targets: GraphRebuildEmbeddingTarget[]): PairPlan
         pairs.push([a, b]);
     };
 
-    if (targets.length <= FULL_PAIR_TARGET_LIMIT) {
-        for (let i = 0; i < targets.length; i += 1) {
-            for (let j = i + 1; j < targets.length; j += 1) add(i, j, true);
+    if (targetCount <= FULL_PAIR_TARGET_LIMIT) {
+        for (let i = 0; i < targetCount; i += 1) {
+            for (let j = i + 1; j < targetCount; j += 1) add(i, j, true);
         }
         return { pairs, theoreticalPairCount };
     }
 
     const byId = new Map(targets.map((target, index) => [target.id, index]));
     const buckets = new Map<string, number[]>();
-    for (let index = 0; index < targets.length; index += 1) {
+    for (let index = 0; index < targetCount; index += 1) {
         const target = targets[index];
         if (target.noteId) mapArray(buckets, `note:${target.noteId}`).push(index);
         if (target.chunkId) mapArray(buckets, `chunk:${target.chunkId}`).push(index);
         if (target.entityId) mapArray(buckets, `entity:${target.entityId}`).push(index);
-        const kind = normalizeKind(target.kind);
+        const kind = normalizedKinds[index];
         mapArray(buckets, `kind:${kind}`).push(index);
         if (/event|temporal|causal/.test(kind)) mapArray(buckets, 'lane:story').push(index);
         if (/fact|memory/.test(kind)) mapArray(buckets, 'lane:evidence').push(index);
     }
 
-    for (let index = 0; index < targets.length; index += 1) {
+    for (let index = 0; index < targetCount; index += 1) {
         const target = targets[index];
         if (target.noteId) add(index, byId.get(`embed:note:${target.noteId}`) ?? -1, true);
         if (target.chunkId) add(index, byId.get(`embed:chunk:${target.chunkId}`) ?? -1, true);
@@ -151,13 +166,13 @@ function buildNeighborPairPlan(targets: GraphRebuildEmbeddingTarget[]): PairPlan
 
     for (const [key, values] of buckets) {
         const limit = key.startsWith('lane:') || key.startsWith('kind:') ? LANE_BUCKET_SAMPLE_LIMIT : Math.floor(LANE_BUCKET_SAMPLE_LIMIT * 0.7);
-        addBucketPairs(spreadRanked(values, targets, limit), add);
+        addBucketPairs(spreadRanked(values, targets, limit, signalScores), add);
     }
 
-    const representatives = representativeIndicesByKind(targets);
-    for (let index = 0; index < targets.length; index += 1) {
+    const representatives = representativeIndicesByKind(targets, normalizedKinds, signalScores);
+    for (let index = 0; index < targetCount; index += 1) {
         for (const rep of representatives) {
-            if (normalizeKind(targets[index].kind) === normalizeKind(targets[rep].kind)) continue;
+            if (normalizedKinds[index] === normalizedKinds[rep]) continue;
             add(index, rep);
         }
     }
@@ -170,9 +185,14 @@ function addBucketPairs(indices: number[], add: (left: number, right: number) =>
     }
 }
 
-function spreadRanked(indices: number[], targets: GraphRebuildEmbeddingTarget[], limit: number): number[] {
+function spreadRanked(
+    indices: number[],
+    targets: GraphRebuildEmbeddingTarget[],
+    limit: number,
+    signalScores: number[],
+): number[] {
     const ranked = [...indices].sort((left, right) =>
-        targetSignalScore(targets[right]) - targetSignalScore(targets[left])
+        signalScores[right] - signalScores[left]
         || targets[left].id.localeCompare(targets[right].id),
     );
     if (ranked.length <= limit) return ranked;
@@ -182,13 +202,17 @@ function spreadRanked(indices: number[], targets: GraphRebuildEmbeddingTarget[],
     return out;
 }
 
-function representativeIndicesByKind(targets: GraphRebuildEmbeddingTarget[]): number[] {
+function representativeIndicesByKind(
+    targets: GraphRebuildEmbeddingTarget[],
+    normalizedKinds: string[],
+    signalScores: number[],
+): number[] {
     const byKind = new Map<string, number[]>();
     for (let index = 0; index < targets.length; index += 1) {
-        mapArray(byKind, normalizeKind(targets[index].kind)).push(index);
+        mapArray(byKind, normalizedKinds[index]).push(index);
     }
     return [...byKind.values()].flatMap((indices) =>
-        spreadRanked(indices, targets, BRIDGE_REPRESENTATIVE_LIMIT),
+        spreadRanked(indices, targets, BRIDGE_REPRESENTATIVE_LIMIT, signalScores),
     );
 }
 

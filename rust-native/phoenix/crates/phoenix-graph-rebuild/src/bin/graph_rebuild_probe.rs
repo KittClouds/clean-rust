@@ -18,26 +18,29 @@ fn main() {
     let scope_id = format!("note:{}", args.note_id);
     let started = Instant::now();
     let mut snapshot = None;
+    let mut memory_governance_build_us = 0_u64;
     for _ in 0..repeat {
-        snapshot = Some(
-            build_graph_rebuild_snapshot(GraphRebuildInput {
-                scope_kind: GraphScopeKind::Note,
-                scope_id: &scope_id,
-                note_id: &args.note_id,
-                text: &text,
-                scope: ScopeKey::default(),
-                entities: &entities,
-                candidate_count: 0,
-                built_at: Some(1),
-            })
-            .unwrap_or_else(|error| {
-                eprintln!("graph rebuild failed: {error}");
-                process::exit(1);
-            }),
-        );
+        let built = build_graph_rebuild_snapshot(GraphRebuildInput {
+            scope_kind: GraphScopeKind::Note,
+            scope_id: &scope_id,
+            note_id: &args.note_id,
+            text: &text,
+            scope: ScopeKey::default(),
+            entities: &entities,
+            candidate_count: 0,
+            built_at: Some(1),
+        })
+        .unwrap_or_else(|error| {
+            eprintln!("graph rebuild failed: {error}");
+            process::exit(1);
+        });
+        memory_governance_build_us = memory_governance_build_us
+            .saturating_add(built.counters.memory_governance_build_micros);
+        snapshot = Some(built);
     }
     let elapsed_us = started.elapsed().as_micros() as u64;
     let mean_us = elapsed_us / repeat as u64;
+    let memory_governance_build_mean_us = memory_governance_build_us / repeat as u64;
     let snapshot = snapshot.expect("repeat always runs at least once");
 
     if args.json {
@@ -83,6 +86,36 @@ fn main() {
     println!("temporal_edges={}", snapshot.counters.temporal_edges);
     println!("causal_edges={}", snapshot.counters.causal_edges);
     println!("memory_state={}", snapshot.counters.memory_state);
+    println!(
+        "memory_governance_build_us={}",
+        snapshot.counters.memory_governance_build_micros
+    );
+    println!("memory_governance_build_elapsed_us={memory_governance_build_us}");
+    println!("memory_governance_build_mean_us={memory_governance_build_mean_us}");
+    println!(
+        "memory_governance_candidates={}",
+        snapshot.counters.memory_governance_candidates
+    );
+    println!(
+        "memory_governance_retain={}",
+        snapshot.counters.memory_governance_retain
+    );
+    println!(
+        "memory_governance_attenuate={}",
+        snapshot.counters.memory_governance_attenuate
+    );
+    println!(
+        "memory_governance_compress={}",
+        snapshot.counters.memory_governance_compress
+    );
+    println!(
+        "memory_governance_quarantine={}",
+        snapshot.counters.memory_governance_quarantine
+    );
+    println!(
+        "memory_governance_retire={}",
+        snapshot.counters.memory_governance_retire
+    );
     println!("embedding_targets={}", snapshot.counters.embedding_targets);
     println!("nodes={}", snapshot.counters.nodes);
     println!("edges={}", snapshot.counters.edges);

@@ -4,8 +4,8 @@ use phoenix_graph_kernel::{
     KernelWhatChangedRequest,
 };
 use phoenix_store_native_core::{
-    PhoenixGraphPatchStore, PhoenixLexicalQueryStore, PhoenixSemanticGraphPatchStore,
-    PhoenixSemanticIndexStore,
+    PhoenixGraphKernelStoreV2, PhoenixGraphPatchStore, PhoenixLexicalQueryStore,
+    PhoenixSemanticGraphPatchStore, PhoenixSemanticIndexStore,
 };
 use phoenix_types::ScopeKey;
 
@@ -32,6 +32,7 @@ pub(crate) fn retrieved_history_impl<S>(
 ) -> Result<Option<GraphRetrievedHistoryAnswer>, GraphQueryError>
 where
     S: PhoenixGraphPatchStore
+        + PhoenixGraphKernelStoreV2
         + PhoenixLexicalQueryStore
         + PhoenixSemanticGraphPatchStore
         + PhoenixSemanticIndexStore,

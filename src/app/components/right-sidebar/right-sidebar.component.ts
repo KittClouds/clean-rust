@@ -28,22 +28,26 @@ const VIEW_OPTIONS: ViewOption[] = [
     { value: 'ai', label: 'AI', icon: Bot },
 ];
 
+const RIGHT_SIDEBAR_SNAP_MS = 150;
+const RIGHT_SIDEBAR_CONTENT_READY_MS = 32;
+
 @Component({
     selector: 'app-right-sidebar',
     standalone: true,
     imports: [CommonModule, FormsModule, LucideAngularModule, FactSheetContainerComponent, AnalyticsPanelComponent, TimelineViewComponent, AiChatPanelComponent, NoteHistoryPanelComponent],
     template: `
         <aside
-            class="h-full border-l border-sidebar-border bg-sidebar text-sidebar-foreground flex flex-col overflow-hidden relative"
-            [class.transition-all]="!isResizing" [class.duration-300]="!isResizing" [class.ease-in-out]="!isResizing"
-            [style.width.px]="service.isOpen() ? rightSidebarWidth : 0">
+            class="right-sidebar-panel h-full border-l border-sidebar-border bg-sidebar text-sidebar-foreground flex flex-col overflow-hidden relative"
+            [class.right-sidebar-panel--open]="service.isOpen()"
+            [class.right-sidebar-panel--resizing]="isResizing"
+            [style.width.px]="rightPanelVisible() ? rightSidebarWidth : 0">
 
             @if (service.isOpen()) {
                 <div class="absolute top-0 left-0 bottom-0 w-1.5 cursor-col-resize z-50 hover:bg-primary/50 transition-colors"
                 (mousedown)="startResize($event)"></div>
             }
             
-            @if (service.isOpen()) {
+            @if (rightPanelVisible()) {
                 <!-- View Selector Header -->
                 <div class="shrink-0 h-10 border-b border-white/10 bg-gradient-to-b from-zinc-800 to-zinc-950 px-2 flex items-center shadow-sm text-white">
                     <div class="view-selector-wrapper h-8 relative">
@@ -80,6 +84,7 @@ const VIEW_OPTIONS: ViewOption[] = [
 
                 <!-- Content Area -->
                 <div class="flex-1 min-h-0 overflow-hidden flex flex-col">
+                    @if (rightPanelContentReady()) {
                     @switch (activeView()) {
                         @case ('entities') {
                             <!-- Entity Selector (only for entities view) -->
@@ -154,6 +159,7 @@ const VIEW_OPTIONS: ViewOption[] = [
                             </div>
                         }
                     }
+                    }
                 </div>
 
                 <!-- Footer -->
@@ -172,6 +178,24 @@ const VIEW_OPTIONS: ViewOption[] = [
         </aside>
     `,
     styles: [`
+        .right-sidebar-panel {
+            flex: 0 0 auto;
+            transform: translateX(100%);
+            transform-origin: right center;
+            transition: transform 150ms cubic-bezier(0.22, 1, 0.36, 1);
+            will-change: transform;
+            contain: paint;
+        }
+
+        .right-sidebar-panel--open,
+        .right-sidebar-panel--resizing {
+            transform: translateX(0);
+        }
+
+        .right-sidebar-panel--resizing {
+            transition: none;
+        }
+
         .view-selector-wrapper {
             position: relative;
             width: 100%;
@@ -220,6 +244,12 @@ const VIEW_OPTIONS: ViewOption[] = [
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
             background-color: rgba(255, 255, 255, 0.2);
         }
+
+        @media (prefers-reduced-motion: reduce) {
+            .right-sidebar-panel {
+                transition: none;
+            }
+        }
     `]
 })
 export class RightSidebarComponent implements OnInit, OnDestroy {
@@ -243,6 +273,10 @@ export class RightSidebarComponent implements OnInit, OnDestroy {
     isResizing = false;
     private startX = 0;
     private startWidth = 0;
+    rightPanelVisible = signal(this.service.isOpen());
+    rightPanelContentReady = signal(this.service.isOpen());
+    private rightCloseTimer: ReturnType<typeof setTimeout> | null = null;
+    private rightContentTimer: ReturnType<typeof setTimeout> | null = null;
 
     /**
      * Entities derived from ScopeService's reactive signal.
@@ -287,6 +321,9 @@ export class RightSidebarComponent implements OnInit, OnDestroy {
             const ents = this.entities();
             this.entitySelection.ensureValid(ents.map((entity) => entity.id));
         });
+        effect(() => {
+            this.syncRightSidebarMotion(this.service.isOpen());
+        });
     }
 
     ngOnInit() {
@@ -294,7 +331,36 @@ export class RightSidebarComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy() {
-        // No cleanup needed — signals are garbage collected
+        this.clearRightSidebarMotionTimers();
+    }
+
+    private syncRightSidebarMotion(open: boolean): void {
+        this.clearRightSidebarMotionTimers();
+        if (open) {
+            this.rightPanelVisible.set(true);
+            this.rightContentTimer = setTimeout(() => {
+                this.rightPanelContentReady.set(true);
+                this.rightContentTimer = null;
+            }, RIGHT_SIDEBAR_CONTENT_READY_MS);
+            return;
+        }
+        this.isDropdownOpen.set(false);
+        this.rightPanelContentReady.set(false);
+        this.rightCloseTimer = setTimeout(() => {
+            this.rightPanelVisible.set(false);
+            this.rightCloseTimer = null;
+        }, RIGHT_SIDEBAR_SNAP_MS);
+    }
+
+    private clearRightSidebarMotionTimers(): void {
+        if (this.rightCloseTimer) {
+            clearTimeout(this.rightCloseTimer);
+            this.rightCloseTimer = null;
+        }
+        if (this.rightContentTimer) {
+            clearTimeout(this.rightContentTimer);
+            this.rightContentTimer = null;
+        }
     }
 
     onViewChange(view: SidebarView) {

@@ -9,4 +9,5 @@ authors.workspace = true
 serde.workspace = true
 zerocopy.workspace = true
 phoenix-graph-kernel = { path = "../phoenix-graph-kernel" }
+phoenix-document-index = { path = "../phoenix-document-index" }
 phoenix-types = { path = "../phoenix-types" }

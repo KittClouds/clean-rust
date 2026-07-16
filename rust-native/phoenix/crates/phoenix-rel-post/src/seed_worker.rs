@@ -1,6 +1,6 @@
 use std::collections::{BTreeMap, BTreeSet};
 
-use phoenix_chunker::{build_chunks, split_sentence_ranges, ChunkerConfig};
+use phoenix_chunker_native::{build_chunks, split_sentence_ranges, ChunkerConfig};
 use phoenix_semantic_v2::{
     scope_storage_key, DirtyScopeRecord, DocumentArchive, ErScopePatchSidecar,
     RelationMentionSeedRecord, RelationMentionSeedScopeSidecar, ScopeLexSidecar, SessionArchive,
@@ -276,7 +276,7 @@ fn build_microchunks(
     let mut microchunks = Vec::new();
     for chunk in chunks {
         let mut chunk_windows = if split_sentence_ranges(&chunk.text).is_empty() {
-            vec![phoenix_chunker::Chunk {
+            vec![phoenix_chunker_native::Chunk {
                 start: 0,
                 end: chunk.text.len(),
             }]
@@ -290,7 +290,7 @@ fn build_microchunks(
             )
         };
         if chunk_windows.is_empty() {
-            chunk_windows.push(phoenix_chunker::Chunk {
+            chunk_windows.push(phoenix_chunker_native::Chunk {
                 start: 0,
                 end: chunk.text.len(),
             });

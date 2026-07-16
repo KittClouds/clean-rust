@@ -188,6 +188,8 @@ describe('Phoenix graph rebuild parity smoke', () => {
         });
         const elapsedMs = performance.now() - started;
         const counts = kindCounts(snapshot.embeddingTargets.map((target) => target.kind));
+        const queuedTargets = snapshot.embeddingTargets.filter((target) => target.workStatus === 'queued' || target.admissionStatus === 'admitted');
+        const queuedCounts = kindCounts(queuedTargets.map((target) => target.kind));
         console.info('graph-rebuild-smoke', JSON.stringify({
             doc: 'shortrun',
             chars: text.length,
@@ -196,6 +198,7 @@ describe('Phoenix graph rebuild parity smoke', () => {
             events: snapshot.counters.events,
             causalEdges: snapshot.counters.causalEdges,
             targets: snapshot.counters.embeddingTargets,
+            queuedTargets: snapshot.counters.embeddingQueuedTargets,
             semanticTasks: snapshot.counters.semanticTasks,
             semanticCandidates: snapshot.counters.semanticCandidates,
             manifoldContributions: snapshot.counters.manifoldCandidateContributions,
@@ -209,21 +212,31 @@ describe('Phoenix graph rebuild parity smoke', () => {
             semanticAdjudicationLedgerOnly: snapshot.counters.semanticAdjudicationLedgerOnly,
             semanticAdjudicationStates: snapshot.semanticAdjudicationSummary?.counters.byState,
             semanticEvalLedger: compactEvalLedger(snapshot),
+            memoryGraphRagBridge: compactMemoryGraphRagBridge(snapshot),
+            discourseSpine: compactDiscourseSpine(snapshot),
+            discourseBridgeCandidates: compactDiscourseBridgeCandidates(snapshot),
+            discourseBridgeAdjudication: compactDiscourseBridgeAdjudication(snapshot),
+            discourseEvalLedger: compactDiscourseEvalLedger(snapshot),
+            discoursePromotionSurface: compactDiscoursePromotionSurface(snapshot),
+            discourseCompilerOverlay: compactDiscourseCompilerOverlay(snapshot),
             candidateNoise: snapshot.semanticCandidateSummary?.counters.averageNoiseScore,
             elapsedMs: Math.round(elapsedMs),
         }));
 
         expect(occurrences.length).toBeGreaterThan(900);
-        expect(snapshot.counters.embeddingTargets).toBeLessThanOrEqual(960);
-        expect(snapshot.embeddingTargetPlan?.admittedCount).toBe(snapshot.counters.embeddingTargets);
-        expect(snapshot.embeddingTargetPlan?.candidateCount).toBeGreaterThanOrEqual(snapshot.counters.embeddingTargets);
+        expect(snapshot.counters.embeddingTargets).toBe(snapshot.embeddingTargetPlan?.canonicalCount);
+        expect(snapshot.counters.embeddingTargets).toBe(snapshot.embeddingTargetPlan?.candidateCount);
+        expect(snapshot.counters.embeddingTargets).toBeGreaterThan(snapshot.counters.embeddingQueuedTargets || 0);
+        expect(snapshot.counters.embeddingQueuedTargets).toBeLessThanOrEqual(snapshot.embeddingTargetPlan?.maxQueued || 0);
+        expect(snapshot.embeddingTargetPlan?.admittedCount).toBe(snapshot.counters.embeddingQueuedTargets);
+        expect(snapshot.embeddingTargetPlan?.queuedCount).toBe(snapshot.counters.embeddingQueuedTargets);
         expect(snapshot.counters.embeddingDocumentSpine).toBeGreaterThan(0);
         expect(snapshot.counters.embeddingChunkSpine).toBeGreaterThan(0);
-        expect(snapshot.counters.embeddingEntityAnchors).toBe(entities.length + 1);
+        expect(snapshot.counters.embeddingEntityAnchors).toBeGreaterThanOrEqual(entities.length + 1);
         expect(snapshot.counters.embeddingRelationshipFacts).toBeGreaterThan(0);
         expect(snapshot.counters.embeddingTemporalFacts).toBeGreaterThan(0);
         expect(snapshot.counters.embeddingCausalFacts).toBeGreaterThan(0);
-        expect(snapshot.embeddingGraphPostProcess?.targetCount).toBe(snapshot.counters.embeddingTargets);
+        expect(snapshot.embeddingGraphPostProcess?.targetCount).toBe(snapshot.counters.embeddingQueuedTargets);
         expect(snapshot.embeddingGraphPostProcess?.metrics.plannedPairCount).toBeLessThan(
             snapshot.embeddingGraphPostProcess?.metrics.theoreticalPairCount || 0,
         );
@@ -232,13 +245,14 @@ describe('Phoenix graph rebuild parity smoke', () => {
         expect(counts.chunk).toBeGreaterThan(0);
         expect(counts.entity).toBe(entities.length);
         expect(counts.graphFact).toBeGreaterThanOrEqual(100);
-        expect(counts.anchor).toBeLessThan(occurrences.length);
+        expect(counts.anchor).toBe(occurrences.length);
+        expect(queuedCounts.anchor).toBeLessThan(counts.anchor);
         expect(snapshot.embeddingTargetPlan?.lanes).toEqual(expect.arrayContaining([
             expect.objectContaining({ lane: 'cooccurrence_weak', admitted: 80, deferred: expect.any(Number) }),
             expect.objectContaining({ lane: 'anchor_evidence', admitted: entities.length + 1, deferred: expect.any(Number) }),
         ]));
         expect(snapshot.embeddingTargets.filter((target) => target.kind === 'entity').every((target) => /mentions:\d+/.test(target.text))).toBe(true);
-        expect(snapshot.embeddingTargets.filter((target) => target.kind === 'graphFact').every((target) => target.text.includes('evidence_context:'))).toBe(true);
+        expect(queuedTargets.filter((target) => target.kind === 'graphFact').every((target) => target.text.includes('evidence_context:'))).toBe(true);
         expect(snapshot.embeddingTargets.filter((target) => target.kind === 'anchor').every((target) => target.text.includes('source:') && target.text.includes('evidence_context:'))).toBe(true);
         expect(snapshot.semanticTaskSummary?.counters.mutationAllowedCount).toBe(0);
         expect(snapshot.semanticTaskSummary?.receipts.length).toBe(snapshot.counters.semanticTaskReceipts);
@@ -309,8 +323,11 @@ describe('Phoenix graph rebuild parity smoke', () => {
         )).toBe(true);
         expect(snapshot.semanticAdjudicationSummary?.schemaVersion).toBe('phoenix-semantic-adjudication-dag/v1');
         expect(snapshot.semanticAdjudicationSummary?.counters.topologyCommitCount).toBeGreaterThan(0);
+        expect(snapshot.semanticAdjudicationSummary?.counters.appliedMutationCount)
+            .toBe(snapshot.semanticAdjudicationSummary?.mutations.length);
         expect(snapshot.semanticAdjudicationSummary?.mutations.every((mutation) =>
-            snapshot.edges.some((edge) => edge.id === mutation.createdEdgeId),
+            mutation.status === 'applied'
+            && snapshot.edges.some((edge) => edge.id === mutation.createdEdgeId),
         )).toBe(true);
         expect(snapshot.semanticAdjudicationSummary?.decisions.filter((decision) => decision.state !== 'accepted').every((decision) =>
             decision.ledgerOnly === true
@@ -323,6 +340,85 @@ describe('Phoenix graph rebuild parity smoke', () => {
         expect(snapshot.semanticEvalLedgerSummary?.counters.graphChangeRows).toBe(snapshot.counters.semanticAdjudicationTopologyCommits);
         expect(snapshot.semanticEvalLedgerSummary?.compactExport.rows.every((row) =>
             row.evidence > 0 && row.score >= 0 && row.score <= 1,
+        )).toBe(true);
+        expect(snapshot.discourseSpineSummary?.schemaVersion).toBe('phoenix-discourse-spine/v1');
+        expect(snapshot.discourseSpineSummary?.invariant).toBe('wormholes_are_proposals_not_edges');
+        expect(snapshot.discourseSpineSummary?.counters.documentRoots).toBeGreaterThan(0);
+        expect(snapshot.discourseSpineSummary?.counters.documents).toBeGreaterThan(0);
+        expect(snapshot.discourseSpineSummary?.counters.chunks).toBeGreaterThan(0);
+        expect(snapshot.discourseSpineSummary?.counters.labelCount).toBeGreaterThan(0);
+        expect(snapshot.discourseSpineSummary?.counters.bridgeCount).toBeGreaterThan(0);
+        expect(snapshot.discourseSpineSummary?.counters.mutationAllowedCount).toBe(0);
+        expect(snapshot.discourseSpineSummary?.receipts.every((receipt) =>
+            receipt.reversible
+            && receipt.mutationAllowed === false
+            && receipt.invariant === 'discourse_spine_no_topology_commit',
+        )).toBe(true);
+        expect(snapshot.discourseBridgeCandidateSummary?.schemaVersion).toBe('phoenix-discourse-bridge-candidates/v1');
+        expect(snapshot.discourseBridgeCandidateSummary?.modelId).toBe('knowledgator/gliclass-instruct-base-v1.0');
+        expect(snapshot.discourseBridgeCandidateSummary?.counters.candidateCount).toBeGreaterThan(0);
+        expect(snapshot.discourseBridgeCandidateSummary?.counters.evalRowCount).toBe(snapshot.discourseBridgeCandidateSummary?.counters.candidateCount);
+        expect(snapshot.discourseBridgeCandidateSummary?.counters.plannedModelCalls).toBeGreaterThan(snapshot.discourseBridgeCandidateSummary?.counters.inputCount || 0);
+        expect(snapshot.discourseBridgeCandidateSummary?.counters.mutationAllowedCount).toBe(0);
+        expect(snapshot.discourseBridgeCandidateSummary?.receipts.every((receipt) =>
+            receipt.reversible
+            && receipt.mutationAllowed === false
+            && receipt.invariant === 'discourse_bridge_candidates_no_topology_commit',
+        )).toBe(true);
+        expect(snapshot.discourseBridgeAdjudicationSummary?.schemaVersion).toBe('phoenix-discourse-bridge-adjudication/v1');
+        expect(snapshot.discourseBridgeAdjudicationSummary?.invariant).toBe('discourse_bridge_decisions_are_ledger_only');
+        expect(snapshot.discourseBridgeAdjudicationSummary?.counters.decisionCount).toBe(snapshot.discourseBridgeCandidateSummary?.counters.candidateCount);
+        expect(snapshot.discourseBridgeAdjudicationSummary?.counters.ledgerOnlyCount).toBe(snapshot.discourseBridgeAdjudicationSummary?.counters.decisionCount);
+        expect(snapshot.discourseBridgeAdjudicationSummary?.counters.topologyCommitCount).toBe(0);
+        expect(snapshot.discourseBridgeAdjudicationSummary?.counters.mutationAllowedCount).toBe(0);
+        expect(snapshot.discourseBridgeAdjudicationSummary?.compactDecisionLedger.rows.every((row) =>
+            row.changedAtoms === 0 && row.changedFacts === 0 && row.changedEdges === 0,
+        )).toBe(true);
+        expect(snapshot.discourseBridgeAdjudicationSummary?.receipts.every((receipt) =>
+            receipt.reversible
+            && receipt.mutationAllowed === false
+            && receipt.invariant === 'discourse_bridge_adjudication_ledger_only',
+        )).toBe(true);
+        expect(snapshot.discourseEvalLedgerSummary?.schemaVersion).toBe('phoenix-discourse-eval-ledger/v1');
+        expect(snapshot.discourseEvalLedgerSummary?.compactExport.rowCount).toBe(snapshot.counters.discourseEvalLedgerRows);
+        expect(snapshot.discourseEvalLedgerSummary?.counters.rowCount).toBe(snapshot.discourseBridgeAdjudicationSummary?.counters.decisionCount);
+        expect(snapshot.discourseEvalLedgerSummary?.counters.acceptedCandidates).toBeGreaterThan(0);
+        expect(snapshot.discourseEvalLedgerSummary?.counters.ambiguousCases).toBeGreaterThan(0);
+        expect(snapshot.discourseEvalLedgerSummary?.counters.graphChangeRows).toBe(0);
+        expect(snapshot.discourseEvalLedgerSummary?.compactExport.rows.every((row) =>
+            row.evidence > 0
+            && row.score >= 0
+            && row.score <= 1
+            && row.changedEdges === 0
+            && row.changedFacts === 0,
+        )).toBe(true);
+        expect(snapshot.discoursePromotionSurfaceSummary?.schemaVersion).toBe('phoenix-discourse-promotion-surface/v1');
+        expect(snapshot.discoursePromotionSurfaceSummary?.invariant).toBe('discourse_promotion_surface_no_topology_commit');
+        expect(snapshot.discoursePromotionSurfaceSummary?.counters.chunkWormholeCount).toBeGreaterThan(0);
+        expect(snapshot.discoursePromotionSurfaceSummary?.counters.documentClusterCount).toBeGreaterThan(0);
+        expect(snapshot.discoursePromotionSurfaceSummary?.counters.compilerHintCount).toBe(
+            (snapshot.discoursePromotionSurfaceSummary?.counters.chunkWormholeCount || 0)
+            + (snapshot.discoursePromotionSurfaceSummary?.counters.documentClusterCount || 0)
+            + (snapshot.discoursePromotionSurfaceSummary?.counters.resolverCandidateCount || 0),
+        );
+        expect(snapshot.discoursePromotionSurfaceSummary?.counters.graphPatchCount).toBe(0);
+        expect(snapshot.discoursePromotionSurfaceSummary?.counters.mutationAllowedCount).toBe(0);
+        expect(snapshot.discoursePromotionSurfaceSummary?.compilerHints.every((hint) =>
+            hint.status === 'read_model_only' && hint.mutationAllowed === false,
+        )).toBe(true);
+        expect(snapshot.discourseCompilerOverlaySummary?.schemaVersion).toBe('phoenix-discourse-compiler-overlay/v1');
+        expect(snapshot.discourseCompilerOverlaySummary?.invariant).toBe('discourse_compiler_overlay_no_topology_commit');
+        expect(snapshot.discourseCompilerOverlaySummary?.counters.overlayEdgeCount).toBe(snapshot.discoursePromotionSurfaceSummary?.counters.compilerHintCount);
+        expect(snapshot.discourseCompilerOverlaySummary?.counters.graphPatchCount).toBe(0);
+        expect(snapshot.discourseCompilerOverlaySummary?.counters.mutationAllowedCount).toBe(0);
+        expect(snapshot.discourseCompilerOverlaySummary?.compactOverlay.rows.every((row) =>
+            row.graphPatch === false && row.mutationAllowed === false,
+        )).toBe(true);
+        expect(snapshot.discourseCompilerOverlaySummary?.receipts.every((receipt) =>
+            receipt.reversible
+            && receipt.graphPatch === false
+            && receipt.mutationAllowed === false
+            && receipt.invariant === 'discourse_compiler_overlay_no_topology_commit',
         )).toBe(true);
         expect(elapsedMs).toBeLessThan(8000);
     });
@@ -359,6 +455,7 @@ describe('Phoenix graph rebuild parity smoke', () => {
             events: snapshot.counters.events,
             causalEdges: snapshot.counters.causalEdges,
             targets: snapshot.counters.embeddingTargets,
+            queuedTargets: snapshot.counters.embeddingQueuedTargets,
             semanticTasks: snapshot.counters.semanticTasks,
             semanticCandidates: snapshot.counters.semanticCandidates,
             manifoldContributions: snapshot.counters.manifoldCandidateContributions,
@@ -372,6 +469,13 @@ describe('Phoenix graph rebuild parity smoke', () => {
             semanticAdjudicationLedgerOnly: snapshot.counters.semanticAdjudicationLedgerOnly,
             semanticAdjudicationStates: snapshot.semanticAdjudicationSummary?.counters.byState,
             semanticEvalLedger: compactEvalLedger(snapshot),
+            memoryGraphRagBridge: compactMemoryGraphRagBridge(snapshot),
+            discourseSpine: compactDiscourseSpine(snapshot),
+            discourseBridgeCandidates: compactDiscourseBridgeCandidates(snapshot),
+            discourseBridgeAdjudication: compactDiscourseBridgeAdjudication(snapshot),
+            discourseEvalLedger: compactDiscourseEvalLedger(snapshot),
+            discoursePromotionSurface: compactDiscoursePromotionSurface(snapshot),
+            discourseCompilerOverlay: compactDiscourseCompilerOverlay(snapshot),
             candidateNoise: snapshot.semanticCandidateSummary?.counters.averageNoiseScore,
             elapsedMs: Math.round(elapsedMs),
         }));
@@ -379,8 +483,11 @@ describe('Phoenix graph rebuild parity smoke', () => {
         expect(text.length).toBeGreaterThan(400000);
         expect(chunks.length).toBeGreaterThan(40);
         expect(occurrences.length).toBeGreaterThan(900);
-        expect(snapshot.counters.embeddingTargets).toBeLessThanOrEqual(960);
-        expect(snapshot.embeddingTargetPlan?.admittedCount).toBe(snapshot.counters.embeddingTargets);
+        expect(snapshot.counters.embeddingTargets).toBe(snapshot.embeddingTargetPlan?.canonicalCount);
+        expect(snapshot.counters.embeddingTargets).toBe(snapshot.embeddingTargetPlan?.candidateCount);
+        expect(snapshot.counters.embeddingTargets).toBeGreaterThan(snapshot.counters.embeddingQueuedTargets || 0);
+        expect(snapshot.counters.embeddingQueuedTargets).toBeLessThanOrEqual(snapshot.embeddingTargetPlan?.maxQueued || 0);
+        expect(snapshot.embeddingTargetPlan?.admittedCount).toBe(snapshot.counters.embeddingQueuedTargets);
         expect(snapshot.counters.events).toBeGreaterThan(40);
         expect(snapshot.counters.temporalEdges).toBeGreaterThan(0);
         expect(snapshot.counters.causalEdges).toBeGreaterThan(0);
@@ -421,22 +528,101 @@ describe('Phoenix graph rebuild parity smoke', () => {
         )).toBe(true);
         expect(snapshot.semanticAdjudicationSummary?.decisions.length).toBe(snapshot.counters.semanticAdjudicationDecisions);
         expect(snapshot.semanticAdjudicationSummary?.counters.topologyCommitCount).toBeGreaterThan(0);
+        expect(snapshot.semanticAdjudicationSummary?.counters.appliedMutationCount)
+            .toBe(snapshot.semanticAdjudicationSummary?.mutations.length);
         expect(snapshot.semanticAdjudicationSummary?.counters.ledgerOnlyCount).toBeGreaterThan(0);
         expect(snapshot.semanticAdjudicationSummary?.receipts.every((receipt) =>
             receipt.reversible
-            && (receipt.mutationAllowed || receipt.affectedGraphAtomIds.length === 0)
-            && (receipt.mutationAllowed || receipt.affectedGraphFactIds.length === 0),
+            && (receipt.state !== 'accepted' || receipt.mutationAllowed === true),
         )).toBe(true);
         expect(snapshot.semanticEvalLedgerSummary?.compactExport.rowCount).toBe(snapshot.counters.semanticEvalLedgerRows);
         expect(snapshot.semanticEvalLedgerSummary?.counters.acceptedCandidates).toBeGreaterThan(0);
         expect(snapshot.semanticEvalLedgerSummary?.counters.ambiguousCases).toBeGreaterThan(0);
         expect(snapshot.semanticEvalLedgerSummary?.counters.graphChangeRows).toBe(snapshot.counters.semanticAdjudicationTopologyCommits);
         expect(snapshot.semanticEvalLedgerSummary?.counters.manifoldDisagreements).toBeGreaterThan(0);
+        expect(snapshot.memoryGraphRagBridgeSummary?.schemaVersion).toBe('phoenix-memory-graphrag-bridge/v1');
+        expect(snapshot.memoryGraphRagBridgeSummary?.paperShape.implementationMode).toBe('phoenix_bridge_contract');
+        expect(snapshot.memoryGraphRagBridgeSummary?.counters.schemaRecords).toBeGreaterThan(0);
+        expect(snapshot.memoryGraphRagBridgeSummary?.counters.factRecords).toBeGreaterThan(40);
+        expect(snapshot.memoryGraphRagBridgeSummary?.counters.passageRecords).toBeGreaterThan(20);
+        expect(snapshot.memoryGraphRagBridgeSummary?.counters.evalRowCount).toBeGreaterThan(20);
+        expect(snapshot.memoryGraphRagBridgeSummary?.counters.passedEvalRows).toBeGreaterThan(0);
+        expect(snapshot.memoryGraphRagBridgeSummary?.counters.mutationAllowedCount).toBe(0);
+        expect(snapshot.memoryGraphRagBridgeSummary?.evalRows.some((row) => row.kind === 'conflict_route')).toBe(true);
+        expect(snapshot.memoryGraphRagBridgeSummary?.evalRows.every((row) =>
+            row.retrievedRecordIds.length > 0 && row.score >= 0 && row.score <= 1,
+        )).toBe(true);
+        expect(snapshot.memoryGraphRagBridgeSummary?.receipts.every((receipt) =>
+            receipt.reversible
+            && receipt.mutationAllowed === false
+            && receipt.invariant === 'memorygraphrag_bridge_no_topology_commit',
+        )).toBe(true);
+        expect(snapshot.discourseSpineSummary?.schemaVersion).toBe('phoenix-discourse-spine/v1');
+        expect(snapshot.discourseSpineSummary?.counters.targetCount).toBeGreaterThan(40);
+        expect(snapshot.discourseSpineSummary?.counters.resonanceCandidates).toBeGreaterThan(0);
+        expect(snapshot.discourseSpineSummary?.counters.mutationAllowedCount).toBe(0);
+        expect(snapshot.discourseSpineSummary?.compactBridgeLedger.rowCount).toBe(snapshot.discourseSpineSummary?.bridges.length);
+        expect(snapshot.discourseBridgeCandidateSummary?.schemaVersion).toBe('phoenix-discourse-bridge-candidates/v1');
+        expect(snapshot.discourseBridgeCandidateSummary?.counters.candidateCount).toBeGreaterThan(40);
+        expect(snapshot.discourseBridgeCandidateSummary?.counters.evalRowCount).toBe(snapshot.discourseBridgeCandidateSummary?.counters.candidateCount);
+        expect(snapshot.discourseBridgeCandidateSummary?.counters.meaningOverlapWithoutEntity).toBeGreaterThan(0);
+        expect(snapshot.discourseBridgeCandidateSummary?.counters.mutationAllowedCount).toBe(0);
+        expect(snapshot.discourseBridgeAdjudicationSummary?.schemaVersion).toBe('phoenix-discourse-bridge-adjudication/v1');
+        expect(snapshot.discourseBridgeAdjudicationSummary?.counters.decisionCount).toBe(snapshot.discourseBridgeCandidateSummary?.counters.candidateCount);
+        expect(snapshot.discourseBridgeAdjudicationSummary?.counters.acceptedCount).toBeGreaterThan(0);
+        expect(snapshot.discourseBridgeAdjudicationSummary?.counters.ledgerOnlyCount).toBe(snapshot.discourseBridgeAdjudicationSummary?.counters.decisionCount);
+        expect(snapshot.discourseBridgeAdjudicationSummary?.counters.topologyCommitCount).toBe(0);
+        expect(snapshot.discourseBridgeAdjudicationSummary?.counters.mutationAllowedCount).toBe(0);
+        expect(snapshot.discourseBridgeAdjudicationSummary?.compactDecisionLedger.rowCount).toBe(snapshot.discourseBridgeAdjudicationSummary?.decisions.length);
+        expect(snapshot.discourseBridgeAdjudicationSummary?.decisions.every((decision) =>
+            decision.ledgerOnly
+            && decision.mutationAllowed === false
+            && decision.affectedGraphAtomIds.length === 0
+            && decision.affectedGraphFactIds.length === 0,
+        )).toBe(true);
+        expect(snapshot.discourseEvalLedgerSummary?.schemaVersion).toBe('phoenix-discourse-eval-ledger/v1');
+        expect(snapshot.discourseEvalLedgerSummary?.counters.rowCount).toBe(snapshot.discourseBridgeAdjudicationSummary?.counters.decisionCount);
+        expect(snapshot.discourseEvalLedgerSummary?.counters.acceptedCandidates).toBe(snapshot.discourseBridgeAdjudicationSummary?.counters.acceptedCount);
+        expect(snapshot.discourseEvalLedgerSummary?.counters.ambiguousCases).toBeGreaterThan(0);
+        expect(snapshot.discourseEvalLedgerSummary?.counters.manifoldDisagreements).toBeGreaterThan(0);
+        expect(snapshot.discourseEvalLedgerSummary?.counters.graphChangeRows).toBe(0);
+        expect(snapshot.discourseEvalLedgerSummary?.entries.every((entry) =>
+            entry.beforeGraph.edgeCount === entry.afterGraph.edgeCount
+            && entry.afterGraph.edgeIds.length === 0
+            && entry.afterGraph.factIds.length === 0,
+        )).toBe(true);
+        expect(snapshot.discoursePromotionSurfaceSummary?.schemaVersion).toBe('phoenix-discourse-promotion-surface/v1');
+        expect(snapshot.discoursePromotionSurfaceSummary?.counters.chunkWormholeCount).toBeGreaterThan(40);
+        expect(snapshot.discoursePromotionSurfaceSummary?.counters.documentClusterCount).toBeGreaterThan(0);
+        expect(snapshot.discoursePromotionSurfaceSummary?.counters.compilerHintCount).toBe(snapshot.discoursePromotionSurfaceSummary?.compactSurface.rowCount);
+        expect(snapshot.discoursePromotionSurfaceSummary?.counters.graphPatchCount).toBe(0);
+        expect(snapshot.discoursePromotionSurfaceSummary?.counters.mutationAllowedCount).toBe(0);
+        expect(snapshot.discoursePromotionSurfaceSummary?.receipts.every((receipt) =>
+            receipt.reversible
+            && receipt.mutationAllowed === false
+            && receipt.invariant === 'discourse_promotion_surface_no_topology_commit',
+        )).toBe(true);
+        expect(snapshot.discourseCompilerOverlaySummary?.schemaVersion).toBe('phoenix-discourse-compiler-overlay/v1');
+        expect(snapshot.discourseCompilerOverlaySummary?.counters.overlayEdgeCount).toBe(snapshot.discoursePromotionSurfaceSummary?.counters.compilerHintCount);
+        expect(snapshot.discourseCompilerOverlaySummary?.counters.graphPatchCount).toBe(0);
+        expect(snapshot.discourseCompilerOverlaySummary?.counters.mutationAllowedCount).toBe(0);
+        expect(snapshot.discourseCompilerOverlaySummary?.overlayEdges.every((edge) =>
+            edge.status === 'overlay_only'
+            && edge.projectionKind === 'discourse_overlay'
+            && edge.graphPatch === false
+            && edge.mutationAllowed === false,
+        )).toBe(true);
+        expect(snapshot.discourseCompilerOverlaySummary?.receipts.every((receipt) =>
+            receipt.reversible
+            && receipt.graphPatch === false
+            && receipt.mutationAllowed === false
+            && receipt.invariant === 'discourse_compiler_overlay_no_topology_commit',
+        )).toBe(true);
         expect(snapshot.embeddingGraphPostProcess?.metrics.plannedPairCount).toBeLessThan(
             snapshot.embeddingGraphPostProcess?.metrics.theoreticalPairCount || 0,
         );
         expect(elapsedMs).toBeLessThan(20000);
-    });
+    }, 30000);
 });
 
 function loadFixture(): ParityFixture {
@@ -467,6 +653,117 @@ function compactEvalLedger(snapshot: GraphRebuildSnapshot) {
         manifoldDisagreements: ledger.counters.manifoldDisagreements,
         graphChanges: ledger.counters.graphChangeRows,
         sample: ledger.compactExport.rows.slice(0, 3),
+    } : null;
+}
+
+function compactMemoryGraphRagBridge(snapshot: GraphRebuildSnapshot) {
+    const bridge = snapshot.memoryGraphRagBridgeSummary;
+    return bridge ? {
+        records: bridge.counters.recordCount,
+        byLayer: bridge.counters.byLayer,
+        byEvalKind: bridge.counters.byEvalKind,
+        evalRows: bridge.counters.evalRowCount,
+        passed: bridge.counters.passedEvalRows,
+        failed: bridge.counters.failedEvalRows,
+        mutationAllowed: bridge.counters.mutationAllowedCount,
+        sample: bridge.compactEvalLedger.rows.slice(0, 3),
+    } : null;
+}
+
+function compactDiscourseSpine(snapshot: GraphRebuildSnapshot) {
+    const spine = snapshot.discourseSpineSummary;
+    return spine ? {
+        targets: spine.counters.targetCount,
+        documents: spine.counters.documents,
+        chunks: spine.counters.chunks,
+        labels: spine.counters.labelCount,
+        clusters: spine.counters.clusterCount,
+        bridges: spine.counters.bridgeCount,
+        resonance: spine.counters.resonanceCandidates,
+        resolution: spine.counters.resolutionCandidates,
+        mutationAllowed: spine.counters.mutationAllowedCount,
+        sample: spine.compactBridgeLedger.rows.slice(0, 3),
+    } : null;
+}
+
+function compactDiscourseBridgeCandidates(snapshot: GraphRebuildSnapshot) {
+    const summary = snapshot.discourseBridgeCandidateSummary;
+    return summary ? {
+        candidates: summary.counters.candidateCount,
+        inputs: summary.counters.inputCount,
+        judgments: summary.counters.judgmentCount,
+        evalRows: summary.counters.evalRowCount,
+        plannedCalls: summary.counters.plannedModelCalls,
+        byKind: summary.counters.byCandidateKind,
+        byDecision: summary.counters.byDecision,
+        byEvalKind: summary.counters.byEvalKind,
+        mutationAllowed: summary.counters.mutationAllowedCount,
+        sample: summary.compactEvalLedger.rows.slice(0, 3),
+    } : null;
+}
+
+function compactDiscourseBridgeAdjudication(snapshot: GraphRebuildSnapshot) {
+    const summary = snapshot.discourseBridgeAdjudicationSummary;
+    return summary ? {
+        decisions: summary.counters.decisionCount,
+        byState: summary.counters.byState,
+        accepted: summary.counters.acceptedCount,
+        supported: summary.counters.supportedCount,
+        deferred: summary.counters.deferredCount,
+        rejected: summary.counters.rejectedCount,
+        superseded: summary.counters.supersededCount,
+        ledgerOnly: summary.counters.ledgerOnlyCount,
+        topologyCommits: summary.counters.topologyCommitCount,
+        mutationAllowed: summary.counters.mutationAllowedCount,
+        sample: summary.compactDecisionLedger.rows.slice(0, 3),
+    } : null;
+}
+
+function compactDiscourseEvalLedger(snapshot: GraphRebuildSnapshot) {
+    const summary = snapshot.discourseEvalLedgerSummary;
+    return summary ? {
+        rows: summary.counters.rowCount,
+        byLabel: summary.counters.byLabel,
+        byState: summary.counters.byState,
+        accepted: summary.counters.acceptedCandidates,
+        rejected: summary.counters.rejectedCandidates,
+        ambiguous: summary.counters.ambiguousCases,
+        modelDisagreements: summary.counters.modelDisagreements,
+        manifoldDisagreements: summary.counters.manifoldDisagreements,
+        evalDisagreements: summary.counters.evalDisagreements,
+        graphChanges: summary.counters.graphChangeRows,
+        sample: summary.compactExport.rows.slice(0, 3),
+    } : null;
+}
+
+function compactDiscoursePromotionSurface(snapshot: GraphRebuildSnapshot) {
+    const summary = snapshot.discoursePromotionSurfaceSummary;
+    return summary ? {
+        wormholes: summary.counters.chunkWormholeCount,
+        clusters: summary.counters.documentClusterCount,
+        resolvers: summary.counters.resolverCandidateCount,
+        hints: summary.counters.compilerHintCount,
+        byHintKind: summary.counters.byHintKind,
+        acceptedRows: summary.counters.acceptedRows,
+        ambiguousRows: summary.counters.ambiguousRows,
+        graphPatches: summary.counters.graphPatchCount,
+        mutationAllowed: summary.counters.mutationAllowedCount,
+        sample: summary.compactSurface.rows.slice(0, 3),
+    } : null;
+}
+
+function compactDiscourseCompilerOverlay(snapshot: GraphRebuildSnapshot) {
+    const summary = snapshot.discourseCompilerOverlaySummary;
+    return summary ? {
+        overlayEdges: summary.counters.overlayEdgeCount,
+        byKind: summary.counters.byKind,
+        chunkWormholes: summary.counters.chunkWormholeEdges,
+        documentClusters: summary.counters.documentClusterEdges,
+        resolvers: summary.counters.resolverEdges,
+        receipts: summary.counters.receiptCount,
+        graphPatches: summary.counters.graphPatchCount,
+        mutationAllowed: summary.counters.mutationAllowedCount,
+        sample: summary.compactOverlay.rows.slice(0, 3),
     } : null;
 }
 

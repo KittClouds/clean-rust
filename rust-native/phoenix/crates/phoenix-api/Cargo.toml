@@ -6,15 +6,19 @@ license.workspace = true
 authors.workspace = true
 
 [dependencies]
+blake3 = "1.8"
 phoenix-alex = { path = "../phoenix-alex" }
 phoenix-causal-post = { path = "../phoenix-causal-post" }
 phoenix-chunker = { path = "../phoenix-chunker" }
 phoenix-dynamic-ner = { path = "../phoenix-dynamic-ner" }
+phoenix-embed = { path = "../phoenix-embed" }
 phoenix-er-post = { path = "../phoenix-er-post" }
 phoenix-evidence-graph = { path = "../phoenix-evidence-graph" }
 phoenix-event-identity-post = { path = "../phoenix-event-identity-post" }
 phoenix-graph-kernel = { path = "../phoenix-graph-kernel" }
 phoenix-graph-post = { path = "../phoenix-graph-post" }
+phoenix-graph-research = { path = "../phoenix-graph-research" }
+phoenix-graph-rebuild = { path = "../phoenix-graph-rebuild" }
 phoenix-ingest-overgraph = { path = "../phoenix-ingest-overgraph" }
 phoenix-memory-post = { path = "../phoenix-memory-post" }
 phoenix-rel-post = { path = "../phoenix-rel-post" }
@@ -27,4 +31,8 @@ phoenix-store-overgraph = { path = "../phoenix-store-overgraph" }
 phoenix-types = { path = "../phoenix-types" }
 serde.workspace = true
 serde_json.workspace = true
+rmp-serde.workspace = true
 thiserror.workspace = true
+
+[dev-dependencies]
+tempfile = "3"

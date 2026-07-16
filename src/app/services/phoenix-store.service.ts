@@ -29,7 +29,10 @@ import {
     type PhoenixLineSearchOptions,
 } from '../lib/search/phoenix-line-search';
 import type { PhoenixBootSnapshotRows } from './phoenix-boot-snapshot.model';
-import { PhoenixBackendService } from './phoenix-backend.service';
+import {
+    isPhoenixStoreCommandTimeout,
+    PhoenixBackendService,
+} from './phoenix-backend.service';
 import { PhoenixSnapshotPartition } from './phoenix-wasm.service';
 
 export interface StoreNote {
@@ -274,6 +277,30 @@ interface ContentWalMutation {
     payload: Record<string, unknown>;
 }
 
+export interface PhoenixNativeStoreFlushReport {
+    flushed: boolean;
+    walBytesBefore: number;
+    walBytesAfter: number;
+    segmentCount: number;
+}
+
+export interface PhoenixContentMutationTiming {
+    records: number;
+    noteMutations: number;
+    relationUpserts: number;
+    relationDeletes: number;
+    scopedDocumentUpserts: number;
+    payloadChars: number;
+    serializedWaitMs: number;
+    appendWalMs: number;
+    manifestCommitMs: number;
+    runtimeApplyMs: number;
+    runtimeReloadMs: number;
+    totalMs: number;
+    checkpointScheduled: number;
+    runtimeReloaded: number;
+}
+
 type DerivedLoadState = 'cold' | 'loading' | 'ready';
 
 @Injectable({ providedIn: 'root' })
@@ -287,6 +314,7 @@ export class PhoenixStoreService {
     private contentCheckpointTimeout: ReturnType<typeof setTimeout> | null = null;
     private derivedCheckpointTimeout: ReturnType<typeof setTimeout> | null = null;
     private snapshotsPaused = false;
+    private snapshotPauseDepth = 0;
     private manifest: PersistenceManifest | null = null;
     private manifestMeta: LoadedPhoenixManifestState | null = null;
     private derivedDirty = false;
@@ -294,6 +322,8 @@ export class PhoenixStoreService {
     private derivedLoadPromise: Promise<void> | null = null;
     private lineSearchIndex: PhoenixLineSearchIndex | null = null;
     private lineSearchGenerationKey = '';
+    private readonly semanticMaterializationPending = new Map<string, StoreNote>();
+    private semanticMaterializationRunning = false;
     private recoveryState: RecoveryState = {
         contentRecovered: false,
         derivedRecovered: false,
@@ -338,11 +368,18 @@ export class PhoenixStoreService {
     }
 
     pauseSnapshots(): void {
+        this.snapshotPauseDepth += 1;
         this.snapshotsPaused = true;
         this.clearCheckpointTimers();
     }
 
     resumeSnapshots(): void {
+        if (this.snapshotPauseDepth > 0) {
+            this.snapshotPauseDepth -= 1;
+        }
+        if (this.snapshotPauseDepth > 0 || !this.snapshotsPaused) {
+            return;
+        }
         this.snapshotsPaused = false;
         if (this.initialized) {
             this.scheduleContentCheckpoint();
@@ -629,8 +666,92 @@ export class PhoenixStoreService {
             .sort((left, right) => left.folderOrder - right.folderOrder || left.name.localeCompare(right.name));
     }
 
-    async upsertScopedDocument(document: StoreScopedDocument): Promise<void> {
-        await this.runContentRelationUpsert('scoped_documents', scopedDocumentToRow(document));
+    async upsertScopedDocument(document: StoreScopedDocument): Promise<PhoenixContentMutationTiming> {
+        return this.runContentRelationUpsert('scoped_documents', scopedDocumentToRow(document));
+    }
+
+    async checkpointContentIfNeeded(): Promise<void> {
+        await this.ensureInitialized();
+        if (this.snapshotsPaused) {
+            return;
+        }
+        await this.runSerialized(() => this.flushContentCheckpoint(false));
+    }
+
+    async flushNativeStore(): Promise<PhoenixNativeStoreFlushReport | null> {
+        await this.ensureInitialized();
+        if (this.phoenix.target !== 'native') {
+            return null;
+        }
+        return this.runSerialized(async () => {
+            const payload = await this.phoenix.storeCommand('persistence:flushNativeStore');
+            const report = payload && typeof payload === 'object'
+                ? payload as Record<string, unknown>
+                : {};
+            return {
+                flushed: Boolean(report['flushed']),
+                walBytesBefore: Number(report['walBytesBefore'] || 0),
+                walBytesAfter: Number(report['walBytesAfter'] || 0),
+                segmentCount: Number(report['segmentCount'] || 0),
+            };
+        });
+    }
+
+    scheduleDocumentSemanticMaterialization(note: StoreNote): void {
+        const text = note.markdownContent || note.content || '';
+        if (this.phoenix.target !== 'native' || !text.trim()) return;
+        this.semanticMaterializationPending.set(note.id, note);
+        if (!this.semanticMaterializationRunning) {
+            queueMicrotask(() => void this.drainDocumentSemanticMaterialization());
+        }
+    }
+
+    async settleDocumentSemanticMaterialization(): Promise<void> {
+        while (this.semanticMaterializationRunning || this.semanticMaterializationPending.size) {
+            if (!this.semanticMaterializationRunning) {
+                await this.drainDocumentSemanticMaterialization();
+            } else {
+                await new Promise<void>((resolve) => setTimeout(resolve, 25));
+            }
+        }
+    }
+
+    private async drainDocumentSemanticMaterialization(): Promise<void> {
+        if (this.semanticMaterializationRunning || !this.semanticMaterializationPending.size) return;
+        this.semanticMaterializationRunning = true;
+        try {
+            while (this.semanticMaterializationPending.size) {
+                const notes = [...this.semanticMaterializationPending.values()];
+                this.semanticMaterializationPending.clear();
+                const entities = await this.listEntities();
+                await this.phoenix.storeCommand('documentSemantic:materialize', {
+                    documents: notes.map((note) => ({
+                        noteId: note.id,
+                        text: note.markdownContent || note.content || '',
+                    })),
+                    entities: entities.map((entity) => ({
+                        id: entity.id,
+                        label: entity.label,
+                        aliases: entity.aliases || [],
+                        kind: entity.kind,
+                    })),
+                });
+            }
+        } catch (error) {
+            console.warn('[PhoenixStore] Document semantic materialization failed', error);
+        } finally {
+            this.semanticMaterializationRunning = false;
+            if (this.semanticMaterializationPending.size) {
+                queueMicrotask(() => void this.drainDocumentSemanticMaterialization());
+            }
+        }
+    }
+
+    async upsertScopedDocuments(documents: StoreScopedDocument[]): Promise<PhoenixContentMutationTiming> {
+        return this.runContentMutation(documents.map((document) => ({
+            command: 'relation:upsert',
+            payload: { relation: 'scoped_documents', row: scopedDocumentToRow(document) },
+        })));
     }
 
     async getScopedDocument(
@@ -1169,14 +1290,14 @@ export class PhoenixStoreService {
         }
     }
 
-    private scheduleContentCheckpoint(delayMs = PHOENIX_WAL_IDLE_CHECKPOINT_MS): void {
+    private scheduleContentCheckpoint(delayMs = PHOENIX_WAL_IDLE_CHECKPOINT_MS): boolean {
         const manifest = this.manifest;
         if (!manifest || this.snapshotsPaused) {
-            return;
+            return false;
         }
         const lastSeq = manifest.content.nextSeq - 1;
         if (lastSeq <= manifest.content.lastCheckpointSeq && !shouldCheckpointContent(manifest)) {
-            return;
+            return false;
         }
         if (shouldCheckpointContent(manifest)) {
             delayMs = 0;
@@ -1193,6 +1314,7 @@ export class PhoenixStoreService {
                 }
             });
         }, delayMs);
+        return true;
     }
 
     private scheduleDerivedCheckpoint(delayMs = PHOENIX_DERIVED_CHECKPOINT_MS): void {
@@ -1270,8 +1392,11 @@ export class PhoenixStoreService {
         return Array.isArray(payload) ? payload : [];
     }
 
-    private async runContentRelationUpsert(relation: string, row: Record<string, unknown>): Promise<void> {
-        await this.runContentMutation([{ command: 'relation:upsert', payload: { relation, row } }]);
+    private async runContentRelationUpsert(
+        relation: string,
+        row: Record<string, unknown>,
+    ): Promise<PhoenixContentMutationTiming> {
+        return this.runContentMutation([{ command: 'relation:upsert', payload: { relation, row } }]);
     }
 
     private async relationGetFirst<T>(relation: string, filter: Record<string, unknown>): Promise<T | null> {
@@ -1287,30 +1412,56 @@ export class PhoenixStoreService {
         return Array.isArray(payload) ? (payload as T[]) : [];
     }
 
-    private async runContentRelationDelete(relation: string, filter: Record<string, unknown>): Promise<void> {
-        await this.runContentMutation([{ command: 'relation:delete', payload: { relation, filter } }]);
+    private async runContentRelationDelete(
+        relation: string,
+        filter: Record<string, unknown>,
+    ): Promise<PhoenixContentMutationTiming> {
+        return this.runContentMutation([{ command: 'relation:delete', payload: { relation, filter } }]);
     }
 
-    private async runContentMutation(mutations: ContentWalMutation[]): Promise<void> {
+    private async runContentMutation(mutations: ContentWalMutation[]): Promise<PhoenixContentMutationTiming> {
         if (!mutations.length) {
-            return;
+            return emptyContentMutationTiming();
         }
         await this.ensureInitialized();
-        await this.runSerialized(async () => {
+        const queuedAt = performance.now();
+        return this.runSerialized(async () => {
+            const totalStarted = performance.now();
+            const timing = contentMutationTimingSeed(mutations);
+            timing.serializedWaitMs = elapsedPhoenixStoreMs(queuedAt);
             const manifest = this.requireManifest();
             const batch = this.buildWalBatch(mutations, manifest.content.nextSeq);
+            let stepStarted = performance.now();
             const appendResult = await this.persistence.appendWalBatch(batch);
+            timing.appendWalMs = elapsedPhoenixStoreMs(stepStarted);
             const nextManifest = nextManifestWithWalAppend(manifest, batch, appendResult);
 
+            stepStarted = performance.now();
             await this.persistence.commitManifest(nextManifest);
+            timing.manifestCommitMs = elapsedPhoenixStoreMs(stepStarted);
 
             try {
+                stepStarted = performance.now();
                 await this.phoenix.storeCommand('persistence:applyWalBatch', { records: batch.records });
+                timing.runtimeApplyMs = elapsedPhoenixStoreMs(stepStarted);
             } catch (error) {
+                timing.runtimeApplyMs = elapsedPhoenixStoreMs(stepStarted);
+                if (isPhoenixStoreCommandTimeout(error)) {
+                    this.manifest = nextManifest;
+                    console.error(
+                        '[PhoenixStoreService] Runtime apply timed out after durable WAL commit. Shell restart required.',
+                        error,
+                    );
+                    throw error;
+                }
                 console.error('[PhoenixStoreService] Runtime apply failed after WAL commit. Rebuilding runtime.', error);
+                stepStarted = performance.now();
                 await this.reloadRuntimeFromPersistence();
-                this.scheduleContentCheckpoint();
-                return;
+                timing.runtimeReloadMs = elapsedPhoenixStoreMs(stepStarted);
+                timing.runtimeReloaded = 1;
+                timing.checkpointScheduled = this.scheduleContentCheckpoint() ? 1 : 0;
+                timing.totalMs = elapsedPhoenixStoreMs(totalStarted);
+                return timing;
             }
 
             this.manifest = nextManifest;
@@ -1324,7 +1475,9 @@ export class PhoenixStoreService {
                 lastRecoveredSeq: batch.records[batch.records.length - 1]?.seq || this.recoveryState.lastRecoveredSeq,
                 manifestGeneration: nextManifest.generation,
             };
-            this.scheduleContentCheckpoint();
+            timing.checkpointScheduled = this.scheduleContentCheckpoint() ? 1 : 0;
+            timing.totalMs = elapsedPhoenixStoreMs(totalStarted);
+            return timing;
         });
     }
 
@@ -1571,6 +1724,65 @@ export class PhoenixStoreService {
     private async resetPhoenixPersistence(manifest: PersistenceManifest): Promise<void> {
         await this.persistence.pruneFiles(collectManifestFiles(manifest));
     }
+}
+
+function emptyContentMutationTiming(): PhoenixContentMutationTiming {
+    return {
+        records: 0,
+        noteMutations: 0,
+        relationUpserts: 0,
+        relationDeletes: 0,
+        scopedDocumentUpserts: 0,
+        payloadChars: 0,
+        serializedWaitMs: 0,
+        appendWalMs: 0,
+        manifestCommitMs: 0,
+        runtimeApplyMs: 0,
+        runtimeReloadMs: 0,
+        totalMs: 0,
+        checkpointScheduled: 0,
+        runtimeReloaded: 0,
+    };
+}
+
+function contentMutationTimingSeed(mutations: ContentWalMutation[]): PhoenixContentMutationTiming {
+    const timing = emptyContentMutationTiming();
+    timing.records = mutations.length;
+    for (const mutation of mutations) {
+        if (mutation.command.startsWith('note:')) {
+            timing.noteMutations += 1;
+        }
+        if (mutation.command === 'relation:upsert') {
+            timing.relationUpserts += 1;
+            if (mutation.payload['relation'] === 'scoped_documents') {
+                timing.scopedDocumentUpserts += 1;
+            }
+        }
+        if (mutation.command === 'relation:delete') {
+            timing.relationDeletes += 1;
+        }
+        timing.payloadChars += estimateMutationPayloadChars(mutation);
+    }
+    return timing;
+}
+
+function estimateMutationPayloadChars(mutation: ContentWalMutation): number {
+    const row = mutation.payload['row'];
+    if (row && typeof row === 'object') {
+        const payload = (row as Record<string, unknown>)['payload'];
+        if (typeof payload === 'string') {
+            return payload.length;
+        }
+    }
+    try {
+        return JSON.stringify(mutation.payload ?? null).length;
+    } catch {
+        return 0;
+    }
+}
+
+function elapsedPhoenixStoreMs(started: number): number {
+    return Math.max(0, Math.round(performance.now() - started));
 }
 
 function noteToRow(note: StoreNote): Record<string, unknown> {

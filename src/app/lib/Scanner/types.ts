@@ -142,15 +142,13 @@ export interface ScanResult {
 /**
  * Highlighting mode
  */
-export type HighlightMode = 'vivid' | 'clean' | 'subtle' | 'gradient' | 'focus' | 'off';
+export type HighlightMode = 'vivid' | 'clean' | 'subtle' | 'gradient' | 'off';
 
 /**
  * Configuration for the highlighter
  */
 export interface HighlighterConfig {
     mode: HighlightMode;
-    /** Entity kinds to highlight in focus mode (empty = all) */
-    focusKinds?: EntityKind[];
     /** Enable wikilinks [[]] */
     enableWikilinks?: boolean;
     /** Enable entity refs <<>> */

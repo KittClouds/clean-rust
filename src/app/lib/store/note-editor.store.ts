@@ -33,6 +33,11 @@ export class NoteEditorStore {
     private readonly isBrowser: boolean;
     private editorSessionState: EditorSessionState = { activeNoteId: null };
     private legacyKeysMigrated = false;
+    private initialSession: {
+        session: EditorSessionState | null;
+        fallbackNoteId: string | null;
+        legacyPosition?: LegacyEditorPosition;
+    } | null = null;
 
     /** ID of the currently open note (null = no note open) */
     readonly activeNoteId = signal<string | null>(null);
@@ -183,6 +188,12 @@ export class NoteEditorStore {
         const position = this.pendingPosition;
         this.pendingPosition = null;
         return position;
+    }
+
+    async hasStoredActiveNoteIntent(): Promise<boolean> {
+        if (!this.isBrowser) return false;
+        const resolved = await this.loadInitialEditorSession();
+        return Boolean(resolved.session?.activeNoteId ?? resolved.fallbackNoteId);
     }
 
     /**
@@ -404,14 +415,18 @@ export class NoteEditorStore {
         fallbackNoteId: string | null;
         legacyPosition?: LegacyEditorPosition;
     }> {
+        if (this.initialSession) {
+            return this.initialSession;
+        }
         const sessionSetting = await db.settings.get(EDITOR_SESSION_KEY);
         const normalizedSession = normalizeEditorSessionState(sessionSetting?.value);
         if (normalizedSession) {
             this.legacyKeysMigrated = true;
-            return {
+            this.initialSession = {
                 session: normalizedSession,
                 fallbackNoteId: null,
             };
+            return this.initialSession;
         }
 
         const legacyActiveSetting = await db.settings.get(LEGACY_ACTIVE_NOTE_KEY);
@@ -422,17 +437,19 @@ export class NoteEditorStore {
         const legacyPosition = normalizeLegacyEditorPosition(legacyPositionSetting?.value);
 
         if (legacyActiveNoteId) {
-            return {
+            this.initialSession = {
                 session: { activeNoteId: legacyActiveNoteId },
                 fallbackNoteId: null,
                 legacyPosition,
             };
+            return this.initialSession;
         }
 
         const tabsSetting = await db.settings.get(OPEN_TABS_STORAGE_KEY);
-        return {
+        this.initialSession = {
             session: null,
             fallbackNoteId: getFallbackActiveNoteIdFromTabs(tabsSetting?.value),
         };
+        return this.initialSession;
     }
 }

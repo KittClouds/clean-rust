@@ -7,9 +7,9 @@ use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 use super::audio::{pcm_s16le, read_reference_wav, SAMPLE_RATE};
 use super::{NativeSupertonicSpeakRequest, NativeTtsSynthResult, NativeTtsTimings};
 
-const DEFAULT_RUNNER_PATH: &str = r"G:\phoenix-tts\supertonic-rust\example_onnx.exe";
-const DEFAULT_MODEL_ROOT: &str = r"G:\phoenix-tts\supertonic-2";
-const DEFAULT_OUTPUT_DIR: &str = r"G:\phoenix-tts\supertonic-rust-outputs";
+const DEFAULT_RUNNER_PATH: &str = r"C:\phoenix-tts\supertonic-rust\example_onnx.exe";
+const DEFAULT_MODEL_ROOT: &str = r"C:\phoenix-tts\supertonic-3";
+const DEFAULT_OUTPUT_DIR: &str = r"C:\phoenix-tts\supertonic-rust-outputs";
 const DEFAULT_LANG: &str = "en";
 const DEFAULT_TOTAL_STEP: u32 = 5;
 const DEFAULT_SPEED: f32 = 1.05;
@@ -220,12 +220,12 @@ fn resolve_voice_style(value: Option<&str>, model_root: &Path) -> Result<PathBuf
 }
 
 fn normalize_lang(value: Option<&str>) -> String {
-    match value.unwrap_or(DEFAULT_LANG).trim() {
-        "ko" => "ko".to_owned(),
-        "es" => "es".to_owned(),
-        "pt" => "pt".to_owned(),
-        "fr" => "fr".to_owned(),
-        _ => "en".to_owned(),
+    let lang = value.unwrap_or(DEFAULT_LANG).trim().to_ascii_lowercase();
+    match lang.as_str() {
+        "ar" | "bg" | "cs" | "da" | "de" | "el" | "en" | "es" | "et" | "fi" | "fr" | "hi"
+        | "hr" | "hu" | "id" | "it" | "ja" | "ko" | "lt" | "lv" | "nl" | "pl" | "pt" | "ro"
+        | "ru" | "sk" | "sl" | "sv" | "tr" | "uk" | "vi" => lang,
+        _ => DEFAULT_LANG.to_owned(),
     }
 }
 
@@ -287,7 +287,21 @@ mod tests {
     #[test]
     fn normalizes_unknown_language_to_english() {
         assert_eq!(normalize_lang(Some("en")), "en");
+        assert_eq!(normalize_lang(Some("JA")), "ja");
+        assert_eq!(normalize_lang(Some("uk")), "uk");
+        assert_eq!(normalize_lang(Some("vi")), "vi");
         assert_eq!(normalize_lang(Some("not-a-lang")), "en");
+    }
+
+    #[test]
+    fn accepts_supertonic_3_language_set() {
+        for lang in [
+            "ar", "bg", "cs", "da", "de", "el", "en", "es", "et", "fi", "fr", "hi", "hr", "hu",
+            "id", "it", "ja", "ko", "lt", "lv", "nl", "pl", "pt", "ro", "ru", "sk", "sl", "sv",
+            "tr", "uk", "vi",
+        ] {
+            assert_eq!(normalize_lang(Some(lang)), lang);
+        }
     }
 
     #[test]

@@ -16,7 +16,8 @@
         "title": "Phoenix Desktop",
         "width": 1440,
         "height": 960,
-        "resizable": true
+        "resizable": true,
+        "devtools": true
       }
     ]
   },

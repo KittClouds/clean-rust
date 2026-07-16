@@ -28,6 +28,12 @@ interface SpanFrame {
     paragraphBreakBefore: boolean;
 }
 
+export interface GraphRebuildChunkRange {
+    start: number;
+    end: number;
+    ordinal?: number;
+}
+
 export function buildAdaptiveGraphRebuildChunks(noteId: string, text: string): GraphRebuildChunk[] {
     if (!text.trim()) return [];
     const spans = sentenceSpans(text).map((span, index, all) =>
@@ -63,6 +69,28 @@ export function buildAdaptiveGraphRebuildChunks(noteId: string, text: string): G
     }
     emit(pendingReason);
     return chunks;
+}
+
+export function buildGraphRebuildChunksFromRanges(
+    noteId: string,
+    text: string,
+    ranges: GraphRebuildChunkRange[],
+): GraphRebuildChunk[] {
+    if (!text.trim() || !ranges.length) return [];
+    const sourceSpans = sentenceSpans(text).map((span, index, all) =>
+        analyzeSpan(text, span.start, span.end, index > 0 ? text.slice(all[index - 1].end, span.start) : ''),
+    );
+    return ranges
+        .filter((range) => range.start >= 0 && range.end > range.start && range.end <= text.length)
+        .sort((left, right) => (left.ordinal ?? left.start) - (right.ordinal ?? right.start))
+        .map((range, ordinal) => {
+            const spans = sourceSpans.filter((span) => span.end > range.start && span.start < range.end);
+            const framed = spans.length
+                ? spans
+                : [analyzeSpan(text, range.start, range.end, range.start > 0 ? text.slice(Math.max(0, range.start - 2), range.start) : '')];
+            const chunk = chunkFromSpans(noteId, ordinal, framed, 'native-sentence-window');
+            return { ...chunk, start: range.start, end: range.end };
+        });
 }
 
 export function summarizeMeaningFrame(frame: GraphRebuildMeaningFrame | undefined): string {

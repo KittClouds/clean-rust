@@ -5,12 +5,20 @@ import type {
     GraphRebuildEmbeddingTarget,
     GraphRebuildEmbeddingTargetPlan,
     GraphRebuildEntityAnchor,
+    GraphRebuildEpisode,
+    GraphRebuildEpisodeConnection,
     GraphRebuildEvent,
     GraphRebuildMemoryState,
     GraphRebuildNode,
     GraphRebuildRelationship,
     GraphRebuildTemporalEdge,
 } from './graph-rebuild-snapshot';
+import type {
+    GraphDocumentCompilerSummary,
+    GraphDocumentHyperedge,
+    GraphDocumentHyperedgeRole,
+} from './graph-document-compiler-types';
+import { graphEpisodeTargetId } from './graph-episode-projection';
 import { selectGraphRebuildEmbeddingTargetPlan } from './graph-rebuild-embedding-target-policy';
 import { summarizeMeaningFrame } from './graph-rebuild-meaning-frames';
 
@@ -31,9 +39,12 @@ export function buildGraphRebuildEmbeddingTargetPlan(
     nodes: GraphRebuildNode[],
     relationships: GraphRebuildRelationship[],
     events: GraphRebuildEvent[],
+    episodes: GraphRebuildEpisode[],
+    _episodeConnections: GraphRebuildEpisodeConnection[],
     temporalEdges: GraphRebuildTemporalEdge[],
     causalEdges: GraphRebuildCausalEdge[],
     memoryState: GraphRebuildMemoryState[],
+    documentCompiler?: GraphDocumentCompilerSummary,
 ): GraphRebuildEmbeddingTargetPlan & { targets: GraphRebuildEmbeddingTarget[] } {
     const targets: GraphRebuildEmbeddingTarget[] = [];
     const nodeByEntityId = new Map(nodes.map((node) => [node.entityId, node]));
@@ -41,6 +52,7 @@ export function buildGraphRebuildEmbeddingTargetPlan(
     const anchorsByEntityId = groupAnchorsByEntity(anchors);
     const anchorsByChunkId = groupAnchorsByChunk(anchors);
     const eventById = new Map(events.map((event) => [event.id, event]));
+    const episodeByEventId = groupEpisodesByEvent(episodes);
     const noteIds = input.noteIds?.length ? input.noteIds : unique([...chunks.map((chunk) => chunk.noteId), ...anchors.map((anchor) => anchor.noteId)]);
     for (const noteId of noteIds) targets.push({
         id: `embed:note:${noteId}`,
@@ -78,6 +90,17 @@ export function buildGraphRebuildEmbeddingTargetPlan(
         text: chunkText(input, chunk, anchorsByChunkId.get(chunk.id) || [], nodeByEntityId),
         evidenceIds: [],
         parentIds: [structureRootId(chunk.noteId, 'document-structure')],
+    });
+    for (const episode of episodes) targets.push({
+        id: graphEpisodeTargetId(episode.id),
+        kind: 'episode',
+        sourceId: episode.id,
+        noteId: episode.noteId,
+        ...folderFields(input, episode.noteId),
+        label: episode.label,
+        text: episodeText(input, episode, eventById, nodeByEntityId, anchorById),
+        evidenceIds: episodeEvidenceIds(episode, eventById),
+        parentIds: [structureRootId(episode.noteId, 'document-structure')],
     });
     for (const node of nodes) {
         const entityAnchors = anchorsByEntityId.get(node.entityId) || [];
@@ -134,7 +157,7 @@ export function buildGraphRebuildEmbeddingTargetPlan(
         label: event.label,
         text: eventText(input, event, nodeByEntityId, anchorById),
         evidenceIds: event.evidenceAnchorIds,
-        parentIds: eventParentIds(event),
+        parentIds: eventParentIds(event, episodeByEventId),
     });
     for (const edge of temporalEdges) targets.push(temporalTarget(input, edge, 'temporalFact', eventById, anchorById));
     for (const edge of causalEdges) targets.push(temporalTarget(input, edge, 'causalFact', eventById, anchorById));
@@ -150,6 +173,18 @@ export function buildGraphRebuildEmbeddingTargetPlan(
         evidenceIds: state.evidenceIds,
         parentIds: state.noteId ? [structureRootId(state.noteId, 'identity')] : [],
     });
+    const targetIds = new Set(targets.map((target) => target.id));
+    const committedEntityIds = new Set(nodes.map((node) => node.entityId));
+    const committedAnchorIds = new Set(anchors.map((anchor) => anchor.id));
+    for (const hyperedge of documentCompiler?.hyperedges || []) {
+        if (!isNativeDocumentSituationCandidate(hyperedge)) continue;
+        if (!hasCommittedDocumentSituationSupport(hyperedge, committedEntityIds, committedAnchorIds)) continue;
+        for (const target of documentSituationTargets(input, hyperedge)) {
+            if (targetIds.has(target.id)) continue;
+            targetIds.add(target.id);
+            targets.push(target);
+        }
+    }
     return selectGraphRebuildEmbeddingTargetPlan(targets, relationships, temporalEdges, causalEdges, input.embeddingStagePolicy);
 }
 
@@ -163,8 +198,129 @@ export function buildGraphRebuildEmbeddingTargets(
     temporalEdges: GraphRebuildTemporalEdge[],
     causalEdges: GraphRebuildCausalEdge[],
     memoryState: GraphRebuildMemoryState[],
+    documentCompiler?: GraphDocumentCompilerSummary,
 ): GraphRebuildEmbeddingTarget[] {
-    return buildGraphRebuildEmbeddingTargetPlan(input, chunks, anchors, nodes, relationships, events, temporalEdges, causalEdges, memoryState).targets;
+    return buildGraphRebuildEmbeddingTargetPlan(
+        input,
+        chunks,
+        anchors,
+        nodes,
+        relationships,
+        events,
+        [],
+        [],
+        temporalEdges,
+        causalEdges,
+        memoryState,
+        documentCompiler,
+    ).targets;
+}
+
+function documentSituationTargets(
+    input: BuildGraphRebuildSnapshotInput,
+    hyperedge: GraphDocumentHyperedge,
+): GraphRebuildEmbeddingTarget[] {
+    const factId = `fact:document-hyperedge:${hyperedge.id}`;
+    const noteId = hyperedge.provenance.noteId;
+    const source = input.noteTexts?.[noteId]?.slice(
+        hyperedge.provenance.sourceStart,
+        hyperedge.provenance.sourceEnd,
+    ).trim();
+    const roleTargetIds = hyperedge.roles.map(documentRoleEmbeddingTargetId);
+    const roleSummary = hyperedge.roles
+        .map((role) => `${role.semanticRole || role.role}:${role.surface || role.targetId}`)
+        .join(' | ');
+    const roleTargets = hyperedge.roles
+        .map((role) => documentRoleTarget(hyperedge, role))
+        .filter((target): target is GraphRebuildEmbeddingTarget => !!target);
+    const situationTarget: GraphRebuildEmbeddingTarget = {
+        id: `embed:${factId}`,
+        kind: 'graphFact',
+        sourceId: factId,
+        noteId,
+        ...folderFields(input, noteId),
+        label: hyperedge.frame || hyperedge.triggerPredicate || hyperedge.predicate,
+        text: limitText([
+            `semantic_situation:${hyperedge.semanticSituationId || hyperedge.id}`,
+            `frame:${hyperedge.frame || hyperedge.predicate}`,
+            hyperedge.frameFamily ? `frame_family:${hyperedge.frameFamily}` : '',
+            hyperedge.factuality ? `factuality:${hyperedge.factuality}` : '',
+            hyperedge.speechAct ? `speech_act:${hyperedge.speechAct}` : '',
+            `confidence:${hyperedge.confidence.toFixed(2)}`,
+            `roles:${roleSummary}`,
+            source ? `evidence_context:${source}` : '',
+        ].filter(Boolean).join('\n'), 2200),
+        evidenceIds: hyperedge.evidenceSpanIds,
+        parentIds: unique([
+            structureRootId(noteId, hyperedge.situationKind === 'state' ? 'identity' : 'temporal'),
+            ...roleTargetIds,
+        ]),
+    };
+    return [...roleTargets, situationTarget];
+}
+
+function isNativeDocumentSituationCandidate(hyperedge: GraphDocumentHyperedge): boolean {
+    return hyperedge.status === 'pending_commit'
+        && hyperedge.compilationBasis === 'semantic_situation_frame'
+        && Boolean(hyperedge.semanticSituationId)
+        && Boolean(hyperedge.frame)
+        && !(hyperedge.temporalConflictIds?.length);
+}
+
+function hasCommittedDocumentSituationSupport(
+    hyperedge: GraphDocumentHyperedge,
+    committedEntityIds: Set<string>,
+    committedAnchorIds: Set<string>,
+): boolean {
+    if (!committedAnchorIds.size) return false;
+    return hyperedge.roles
+        .filter((role) => role.targetKind === 'entity')
+        .every((role) => committedEntityIds.has(role.targetId));
+}
+
+function documentRoleEmbeddingTargetId(role: GraphDocumentHyperedgeRole): string {
+    if (role.targetKind === 'entity') return `embed:entity:${role.targetId}`;
+    if (role.targetKind === 'entity_mention') return `embed:atom:documentMention:${role.targetId}`;
+    if (role.targetKind === 'evidence_span') return `embed:atom:documentEvidence:${role.targetId}`;
+    return `embed:atom:documentUnit:${role.targetId}`;
+}
+
+function documentRoleTarget(
+    hyperedge: GraphDocumentHyperedge,
+    role: GraphDocumentHyperedgeRole,
+): GraphRebuildEmbeddingTarget | null {
+    if (role.targetKind === 'entity') return null;
+    const noteId = hyperedge.provenance.noteId;
+    const semanticRole = role.semanticRole || role.role;
+    const kind = role.targetKind === 'entity_mention'
+        ? 'concept'
+        : role.targetKind === 'evidence_span'
+            ? 'evidenceSpan'
+            : 'documentUnit';
+    const root = role.targetKind === 'evidence_span'
+        ? 'evidence'
+        : role.targetKind === 'entity_mention'
+            ? 'identity'
+            : 'document-structure';
+    return {
+        id: documentRoleEmbeddingTargetId(role),
+        kind,
+        sourceId: role.targetId,
+        noteId,
+        label: role.surface || semanticRole,
+        text: limitText([
+            `hypergraph_role:${semanticRole}`,
+            `target_kind:${role.targetKind}`,
+            `slot_type:${role.slotType || 'participant'}`,
+            `resolved:${role.resolved !== false}`,
+            `confidence:${role.confidence.toFixed(2)}`,
+            role.surface ? `surface:${role.surface}` : '',
+        ].filter(Boolean).join('\n'), 640),
+        evidenceIds: role.targetKind === 'evidence_span'
+            ? [role.targetId]
+            : hyperedge.evidenceSpanIds,
+        parentIds: [structureRootId(noteId, root)],
+    };
 }
 
 function temporalTarget(
@@ -314,6 +470,34 @@ function eventText(
     ].filter(Boolean).join('\n'), 1800);
 }
 
+function episodeText(
+    input: BuildGraphRebuildSnapshotInput,
+    episode: GraphRebuildEpisode,
+    eventById: Map<string, GraphRebuildEvent>,
+    nodeByEntityId: Map<string, GraphRebuildNode>,
+    anchorById: Map<string, GraphRebuildEntityAnchor>,
+): string {
+    const events = episode.eventIds
+        .map((eventId) => eventById.get(eventId))
+        .filter((event): event is GraphRebuildEvent => !!event);
+    const entitySummary = episode.entityIds
+        .map((entityId) => entityLabel(entityId, nodeByEntityId))
+        .slice(0, 16)
+        .join(', ');
+    const eventSummary = events
+        .map((event) => event.label)
+        .slice(0, 8)
+        .join(' | ');
+    const evidenceIds = unique(events.flatMap((event) => event.evidenceAnchorIds));
+    return limitText([
+        `episode:${episode.label}`,
+        `event_count:${events.length}`,
+        entitySummary ? `entities:${entitySummary}` : '',
+        eventSummary ? `events:${eventSummary}` : '',
+        ...evidenceContexts(input, evidenceIds, anchorById, 4).map((context) => `evidence_context:${context}`),
+    ].filter(Boolean).join('\n'), 2200);
+}
+
 function memoryText(
     input: BuildGraphRebuildSnapshotInput,
     state: GraphRebuildMemoryState,
@@ -374,8 +558,23 @@ function groupAnchorsByChunk(anchors: GraphRebuildEntityAnchor[]): Map<string, G
     return groups;
 }
 
+function groupEpisodesByEvent(episodes: GraphRebuildEpisode[]): Map<string, GraphRebuildEpisode> {
+    const out = new Map<string, GraphRebuildEpisode>();
+    for (const episode of episodes) {
+        for (const eventId of episode.eventIds) out.set(eventId, episode);
+    }
+    return out;
+}
+
 function structureRootId(noteId: string, key: StructuralRootKey): string {
     return `embed:structure-root:${noteId}:${key}`;
+}
+
+function episodeEvidenceIds(
+    episode: GraphRebuildEpisode,
+    eventById: Map<string, GraphRebuildEvent>,
+): string[] {
+    return unique(episode.eventIds.flatMap((eventId) => eventById.get(eventId)?.evidenceAnchorIds || []));
 }
 
 function entityParentIds(anchors: GraphRebuildEntityAnchor[]): string[] {
@@ -399,8 +598,13 @@ function relationshipParentIds(
     ]);
 }
 
-function eventParentIds(event: GraphRebuildEvent): string[] {
+function eventParentIds(
+    event: GraphRebuildEvent,
+    episodeByEventId: Map<string, GraphRebuildEpisode>,
+): string[] {
+    const episode = episodeByEventId.get(event.id);
     return unique([
+        ...(episode ? [graphEpisodeTargetId(episode.id)] : []),
         structureRootId(event.noteId, 'temporal'),
         ...(event.chunkId ? [`embed:chunk:${event.chunkId}`] : []),
         ...event.entityIds.map((entityId) => `embed:entity:${entityId}`),

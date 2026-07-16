@@ -12,12 +12,16 @@ use phoenix_types::{
     ProvenanceRef, ScopeKey, SourceRange,
 };
 
-use crate::semantic_graph::{compile_candidate_graph_batch, summarize};
+use crate::semantic_graph::{
+    compile_candidate_graph_batch, dedupe_embedding_texts, retain_configured_prototypes, summarize,
+    SemanticGraphConfig,
+};
 use crate::semantic_graph_lifecycle::{
     default_candidate_lifecycle_policy, retain_live_candidates, SemanticCandidateLifecycleStats,
 };
 use crate::semantic_graph_support::{
-    build_prototypes, Prototype, ENTITY_KIND, EVENT_KIND, SEMANTIC_UNIT_PREFIX, STATE_KIND,
+    build_prototypes, Prototype, CHUNK_KIND, CLAIM_KIND, ENTITY_KIND, EVENT_KIND,
+    SEMANTIC_UNIT_PREFIX, STATE_KIND,
 };
 
 fn prototype(node_id: &str, ann_kind: &'static str, node_kind: SemanticGraphNodeKind) -> Prototype {
@@ -130,6 +134,77 @@ fn build_prototypes_surfaces_document_semantic_units() {
 }
 
 #[test]
+fn dedupe_embedding_texts_maps_duplicate_rows_to_one_embedding() {
+    let texts = vec!["alpha", "beta", "alpha", "gamma", "beta"];
+    let (unique, row_map) = dedupe_embedding_texts(&texts);
+
+    assert_eq!(unique, vec!["alpha", "beta", "gamma"]);
+    assert_eq!(row_map, vec![0, 1, 0, 2, 1]);
+}
+
+#[test]
+fn retain_configured_prototypes_can_stage_heavy_kinds_out() {
+    let mut prototypes = vec![
+        prototype("chunk::1", CHUNK_KIND, SemanticGraphNodeKind::Chunk),
+        prototype("claim::1", CLAIM_KIND, SemanticGraphNodeKind::Claim),
+        prototype("event::1", EVENT_KIND, SemanticGraphNodeKind::Event),
+        prototype("state::1", STATE_KIND, SemanticGraphNodeKind::State),
+    ];
+    let config = SemanticGraphConfig {
+        include_chunk_nodes: false,
+        include_event_nodes: false,
+        ..SemanticGraphConfig::default()
+    };
+
+    retain_configured_prototypes(&mut prototypes, &config);
+
+    let node_kinds = prototypes
+        .iter()
+        .map(|prototype| prototype.node_kind)
+        .collect::<Vec<_>>();
+    assert_eq!(
+        node_kinds,
+        vec![SemanticGraphNodeKind::Claim, SemanticGraphNodeKind::State]
+    );
+}
+
+#[test]
+fn discourse_semantic_units_require_complete_situation_frame() {
+    let proposition = Proposition {
+        proposition_id: "prop:missing".into(),
+        predicate: PredicateFrame {
+            predicate: "moved".into(),
+            trigger_range: SourceRange::new(6, 11),
+            relation_type: "relates_to".into(),
+        },
+        ..Default::default()
+    };
+    let archive = DocumentArchive {
+        manifest: DocumentManifest {
+            document_id: "doc-1".to_owned(),
+            ..Default::default()
+        },
+        causal_substrate: Some(DocumentCausalSubstrate {
+            propositions: vec![proposition],
+            semantic_events: vec![EventRecord {
+                event_id: Some(EventId("event:missing".to_owned())),
+                label: "moved".into(),
+                proposition_id: "prop:missing".into(),
+                ..Default::default()
+            }],
+            ..Default::default()
+        }),
+        ..Default::default()
+    };
+
+    let prototypes = build_prototypes(&[archive], None, None);
+
+    assert!(!prototypes
+        .iter()
+        .any(|prototype| prototype.node_id.starts_with(SEMANTIC_UNIT_PREFIX)));
+}
+
+#[test]
 fn compile_candidate_graph_batch_skips_rejected_edges() {
     let prototypes = vec![
         prototype("entity::alice", ENTITY_KIND, SemanticGraphNodeKind::Entity),
@@ -169,7 +244,8 @@ fn compile_candidate_graph_batch_skips_rejected_edges() {
         },
     ];
 
-    let batch = compile_candidate_graph_batch("scope-key", &prototypes, &candidates, 42);
+    let batch =
+        compile_candidate_graph_batch("scope-key", &prototypes, &candidates, 42, "test-model");
 
     assert_eq!(batch.edges.len(), 1);
     assert!(matches!(
@@ -192,7 +268,7 @@ fn compile_candidate_graph_batch_materializes_semantic_unit_vertices() {
         EVENT_KIND,
         SemanticGraphNodeKind::Event,
     )];
-    let batch = compile_candidate_graph_batch("scope-key", &prototypes, &[], 42);
+    let batch = compile_candidate_graph_batch("scope-key", &prototypes, &[], 42, "test-model");
 
     assert_eq!(batch.vertices.len(), 1);
     assert_eq!(batch.vertices[0].kind, "event");

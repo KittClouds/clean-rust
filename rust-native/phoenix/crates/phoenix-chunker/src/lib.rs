@@ -3,10 +3,12 @@ pub mod api;
 #[cfg(not(target_arch = "wasm32"))]
 mod lens;
 mod normalize;
+mod profile;
 mod sentence;
 mod structural;
 
 use serde::{Deserialize, Serialize};
+#[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
 #[cfg(not(target_arch = "wasm32"))]
@@ -17,6 +19,11 @@ pub use lens::{
     LensMentionGraph, LensMentionKind, LensSurfaceHit, LensSurfaceHitKind, LensVoteReason,
 };
 pub use normalize::{is_sentence_guard, normalize_raw};
+pub use profile::{
+    classify_document_profiles, DocumentProfile, DocumentProfileCounters, DocumentProfileInput,
+    DocumentProfileKind, DocumentProfileRequest, DocumentProfileSignal, DocumentProfileSummary,
+    DocumentProfileWeight, DocumentRegionProfile, DocumentUnitWeight,
+};
 pub use sentence::split_sentence_ranges;
 pub use structural::{
     build_structural_substrate, BaseChunk, ChapterSpan, DialogueBoundaryHint, ParagraphSpan,
@@ -110,7 +117,8 @@ pub fn build_chunks(text: &str, config: &ChunkerConfig) -> Vec<Chunk> {
 
 /// WASM entry point: takes text, chunk_size and overlap,
 /// returns JSON-serialized array of `{ start, end }` byte ranges.
-#[wasm_bindgen]
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen)]
+#[cfg(target_arch = "wasm32")]
 pub fn chunk_text(text: &str, chunk_size: usize, overlap: usize) -> String {
     let config = ChunkerConfig {
         chunk_size,
@@ -121,7 +129,8 @@ pub fn chunk_text(text: &str, chunk_size: usize, overlap: usize) -> String {
 }
 
 /// WASM entry point: returns just the sentence byte ranges (no windowing).
-#[wasm_bindgen]
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen)]
+#[cfg(target_arch = "wasm32")]
 pub fn sentence_ranges(text: &str) -> String {
     let ranges: Vec<Chunk> = split_sentence_ranges(text)
         .into_iter()

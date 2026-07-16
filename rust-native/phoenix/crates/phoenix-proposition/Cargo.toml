@@ -10,3 +10,4 @@ compact_str.workspace = true
 phoenix-machine = { path = "../phoenix-machine" }
 phoenix-types = { path = "../phoenix-types" }
 serde.workspace = true
+smallvec.workspace = true

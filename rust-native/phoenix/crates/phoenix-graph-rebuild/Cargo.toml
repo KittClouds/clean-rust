@@ -12,8 +12,30 @@ memchr.workspace = true
 phoenix-alex = { path = "../phoenix-alex" }
 phoenix-chunker = { path = "../phoenix-chunker" }
 phoenix-hyperbolic = { path = "../phoenix-hyperbolic" }
+phoenix-machine = { path = "../phoenix-machine" }
+phoenix-proposition = { path = "../phoenix-proposition" }
 phoenix-types = { path = "../phoenix-types" }
 serde.workspace = true
 serde_json.workspace = true
 smallvec.workspace = true
 thiserror.workspace = true
+
+[[example]]
+name = "semantic_audit"
+path = "examples/semantic_audit.rs"
+
+[[example]]
+name = "atlas_packet_from_snapshot"
+path = "examples/atlas_packet_from_snapshot.rs"
+
+[[example]]
+name = "chunk_bridge_shortrun_parity"
+path = "examples/chunk_bridge_shortrun_parity.rs"
+
+[[example]]
+name = "memory_governance_adversarial_certificate"
+path = "examples/memory_governance_adversarial_certificate.rs"
+
+[[example]]
+name = "story_continuity_audit"
+path = "examples/story_continuity_audit.rs"

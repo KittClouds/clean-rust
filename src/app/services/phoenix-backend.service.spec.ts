@@ -7,7 +7,24 @@ import {
 } from '@angular/core';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-import { PhoenixBackendService } from './phoenix-backend.service';
+import {
+    PhoenixBackendService,
+    withPhoenixStoreCommandTimeout,
+} from './phoenix-backend.service';
+import { ATLAS_RICH_SCAN_QUARANTINE_MESSAGE } from './atlas-rich-scan-quarantine';
+
+describe('Phoenix store command watchdog', () => {
+    it('returns completed commands without waiting for the watchdog', async () => {
+        await expect(withPhoenixStoreCommandTimeout('note:list', Promise.resolve(['n1']), 25))
+            .resolves.toEqual(['n1']);
+    });
+
+    it('rejects a wedged command with its command identity', async () => {
+        const never = new Promise<never>(() => undefined);
+        await expect(withPhoenixStoreCommandTimeout('note:list', never, 1))
+            .rejects.toThrow('Phoenix store command timed out after 1 ms: note:list');
+    });
+});
 
 describe('PhoenixBackendService native runtime guard', () => {
     let injector: EnvironmentInjector;
@@ -39,5 +56,12 @@ describe('PhoenixBackendService native runtime guard', () => {
         const service = runInInjectionContext(injector, () => new PhoenixBackendService());
 
         await expect(service.loadWasm()).rejects.toThrow('disabled in native desktop');
+    });
+
+    it('rejects the legacy Atlas rich scan before consulting the native bridge', async () => {
+        const service = runInInjectionContext(injector, () => new PhoenixBackendService());
+
+        await expect(service.atlasRichScan({ documents: [{ text: 'must not cross' }] }))
+            .rejects.toThrow(ATLAS_RICH_SCAN_QUARANTINE_MESSAGE);
     });
 });

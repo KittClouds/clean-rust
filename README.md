@@ -18,9 +18,10 @@ Open `http://localhost:4200` for browser development.
 Run this in another terminal while `npm start` is running:
 
 ```powershell
-$env:CARGO_TARGET_DIR='D:\cargo-targets\Angular-build\tauri-dev'
 npm run desktop:dev
 ```
+
+The desktop scripts pin Cargo outputs to `D:\cargo-targets\Angular-build\tauri-dev` so every developer command launches the same binary family. Use `npm run desktop:contract` before committing native RPC changes.
 
 ## Native Rust Work
 

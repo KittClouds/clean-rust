@@ -6,6 +6,9 @@ import {
     DEFAULT_ENTITY_TEXT_COLORS,
     DEFAULT_GRAPH_NODE_COLORS,
     entityColorStore,
+    hexColorToHsl,
+    hslColorToHex,
+    normalizeGraphNodeColorKind,
     type GraphNodeColorKind,
 } from '../../../../../lib/store/entityColorStore';
 import {
@@ -36,9 +39,10 @@ const ENTITY_CATEGORIES: EntityCategory[] = [
 ];
 
 const GRAPH_NODE_COLOR_CATEGORIES: GraphNodeColorCategory[] = [
-    { name: 'Fact families', kinds: ['cooccurrence', 'observation', 'communication', 'authority', 'approval', 'relationship'] },
-    { name: 'Narrative facts', kinds: ['family', 'intimacy', 'transfer', 'causal', 'temporal', 'scenePresence'] },
-    { name: 'Projection structure', kinds: ['document', 'chunk', 'anchor', 'graphFact', 'eventNode', 'temporalFact', 'causalFact', 'memoryState'] },
+    { name: 'Relationship colors', kinds: ['cooccurrence', 'observation', 'communication', 'authority', 'approval', 'relationship'] },
+    { name: 'Story relationships', kinds: ['family', 'intimacy', 'transfer', 'causal', 'temporal', 'scenePresence'] },
+    { name: 'Story structure', kinds: ['document', 'episode', 'chunk', 'anchor', 'graphFact', 'eventNode', 'temporalFact', 'causalFact'] },
+    { name: 'State and context', kinds: ['memoryState', 'decisionState', 'rankStatus', 'serviceContext', 'affiliationContext', 'familyContext'] },
 ];
 
 const GRAPH_NODE_COLOR_LABELS: Record<GraphNodeColorKind, string> = {
@@ -54,70 +58,23 @@ const GRAPH_NODE_COLOR_LABELS: Record<GraphNodeColorKind, string> = {
     causal: 'Causal',
     temporal: 'Temporal',
     relationship: 'Relationship',
-    document: 'Document atom',
-    chunk: 'Chunk atom',
-    anchor: 'Evidence anchor',
-    graphFact: 'Fact vertex',
-    eventNode: 'Event atom',
-    temporalFact: 'Temporal fact vertex',
-    causalFact: 'Causal fact vertex',
-    memoryState: 'Memory state atom',
+    document: 'Document',
+    episode: 'Episode',
+    chunk: 'Chunk',
+    anchor: 'Evidence',
+    graphFact: 'Relationship midpoint',
+    eventNode: 'Event',
+    temporalFact: 'Timeline midpoint',
+    causalFact: 'Cause midpoint',
+    memoryState: 'Memory state',
+    decisionState: 'Decision state',
+    rankStatus: 'Rank/status',
+    serviceContext: 'Service context',
+    affiliationContext: 'Affiliation context',
+    familyContext: 'Family context',
 };
 
-const MODE_ORDER: HighlightMode[] = ['vivid', 'gradient', 'subtle', 'clean', 'focus', 'off'];
-
-function hslToHex(hslString: string): string {
-    try {
-        const [h, s, l] = hslString.split(' ').map((value, index) => (
-            index === 0 ? parseFloat(value) : parseFloat(value.replace('%', ''))
-        ));
-        const sNorm = s / 100;
-        const lNorm = l / 100;
-        const chroma = (1 - Math.abs(2 * lNorm - 1)) * sNorm;
-        const secondary = chroma * (1 - Math.abs((h / 60) % 2 - 1));
-        const match = lNorm - chroma / 2;
-        let r = 0;
-        let g = 0;
-        let b = 0;
-        if (h < 60) { r = chroma; g = secondary; }
-        else if (h < 120) { r = secondary; g = chroma; }
-        else if (h < 180) { g = chroma; b = secondary; }
-        else if (h < 240) { g = secondary; b = chroma; }
-        else if (h < 300) { r = secondary; b = chroma; }
-        else { r = chroma; b = secondary; }
-        const toHex = (value: number) => Math.round((value + match) * 255).toString(16).padStart(2, '0');
-        return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
-    } catch {
-        return '#888888';
-    }
-}
-
-function hexToHsl(hex: string): string {
-    try {
-        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-        if (!result) return '220 10% 50%';
-        const r = parseInt(result[1], 16) / 255;
-        const g = parseInt(result[2], 16) / 255;
-        const b = parseInt(result[3], 16) / 255;
-        const max = Math.max(r, g, b);
-        const min = Math.min(r, g, b);
-        const delta = max - min;
-        const lightness = (max + min) / 2;
-        let hue = 0;
-        let saturation = 0;
-        if (delta !== 0) {
-            saturation = lightness > 0.5 ? delta / (2 - max - min) : delta / (max + min);
-            switch (max) {
-                case r: hue = ((g - b) / delta + (g < b ? 6 : 0)) * 60; break;
-                case g: hue = ((b - r) / delta + 2) * 60; break;
-                default: hue = ((r - g) / delta + 4) * 60; break;
-            }
-        }
-        return `${Math.round(hue)} ${Math.round(saturation * 100)}% ${Math.round(lightness * 100)}%`;
-    } catch {
-        return '220 10% 50%';
-    }
-}
+const MODE_ORDER: HighlightMode[] = ['vivid', 'gradient', 'subtle', 'clean', 'off'];
 
 function mixHex(hexA: string, hexB: string, ratio: number): string {
     const parse = (hex: string) => {
@@ -147,7 +104,6 @@ export class GraphStyleDrawerComponent implements OnDestroy {
     private readonly unsubscribeHighlighting = highlightingStore.subscribe(() => {
         const settings = highlightingStore.getSnapshot();
         this.mode.set(settings.mode);
-        this.focusKinds.set(settings.focusEntityKinds);
     });
     private readonly unsubscribeColors = entityColorStore.subscribe(() => {
         this.colorRevision.update((revision) => revision + 1);
@@ -163,7 +119,6 @@ export class GraphStyleDrawerComponent implements OnDestroy {
     readonly selectedKind = signal<EntityKind>('CHARACTER');
     readonly selectedGraphNodeKind = signal<GraphNodeColorKind>('cooccurrence');
     readonly mode = signal<HighlightMode>(highlightingStore.getSnapshot().mode);
-    readonly focusKinds = signal<EntityKind[]>(highlightingStore.getSnapshot().focusEntityKinds);
 
     @Input() set initialKind(value: EntityKind | string | null | undefined) {
         if (!value) return;
@@ -171,6 +126,11 @@ export class GraphStyleDrawerComponent implements OnDestroy {
         if (Object.prototype.hasOwnProperty.call(DEFAULT_ENTITY_COLORS, normalized)) {
             this.selectedKind.set(normalized);
         }
+    }
+
+    @Input() set initialGraphNodeKind(value: GraphNodeColorKind | string | null | undefined) {
+        const normalized = normalizeGraphNodeColorKind(value);
+        if (normalized) this.selectedGraphNodeKind.set(normalized);
     }
 
     ngOnDestroy(): void {
@@ -190,39 +150,31 @@ export class GraphStyleDrawerComponent implements OnDestroy {
         highlightingStore.setMode(mode);
     }
 
-    toggleFocusKind(kind: EntityKind): void {
-        highlightingStore.toggleFocusKind(kind);
-    }
-
-    isFocusKindSelected(kind: EntityKind): boolean {
-        return this.focusKinds().includes(kind);
-    }
-
     getHexColor(kind: EntityKind): string {
         this.colorRevision();
-        return hslToHex(entityColorStore.getRawHsl(kind) || DEFAULT_ENTITY_COLORS[kind]);
+        return hslColorToHex(entityColorStore.getRawHsl(kind) || DEFAULT_ENTITY_COLORS[kind]);
     }
 
     getHexTextColor(kind: EntityKind): string {
         this.colorRevision();
-        return hslToHex(entityColorStore.getRawTextHsl(kind) || DEFAULT_ENTITY_TEXT_COLORS[kind]);
+        return hslColorToHex(entityColorStore.getRawTextHsl(kind) || DEFAULT_ENTITY_TEXT_COLORS[kind]);
     }
 
     getHexGraphNodeColor(kind: GraphNodeColorKind): string {
         this.colorRevision();
-        return hslToHex(entityColorStore.getRawGraphNodeHsl(kind) || DEFAULT_GRAPH_NODE_COLORS[kind]);
+        return hslColorToHex(entityColorStore.getRawGraphNodeHsl(kind) || DEFAULT_GRAPH_NODE_COLORS[kind]);
     }
 
     updateColor(kind: EntityKind, hexColor: string): void {
-        entityColorStore.setColor(kind, hexToHsl(hexColor));
+        entityColorStore.setColor(kind, hexColorToHsl(hexColor));
     }
 
     updateTextColor(kind: EntityKind, hexColor: string): void {
-        entityColorStore.setTextColor(kind, hexToHsl(hexColor));
+        entityColorStore.setTextColor(kind, hexColorToHsl(hexColor));
     }
 
     updateGraphNodeColor(kind: GraphNodeColorKind, hexColor: string): void {
-        entityColorStore.setGraphNodeColor(kind, hexToHsl(hexColor));
+        entityColorStore.setGraphNodeColor(kind, hexColorToHsl(hexColor));
     }
 
     resetSelected(): void {
@@ -240,7 +192,6 @@ export class GraphStyleDrawerComponent implements OnDestroy {
         entityColorStore.reset();
         highlightingStore.reset();
         this.mode.set(DEFAULT_HIGHLIGHT_SETTINGS.mode);
-        this.focusKinds.set(DEFAULT_HIGHLIGHT_SETTINGS.focusEntityKinds);
     }
 
     applyToCategory(): void {
@@ -273,7 +224,6 @@ export class GraphStyleDrawerComponent implements OnDestroy {
             case 'gradient': return 'border-cyan-400/40 bg-cyan-500/10 text-cyan-100';
             case 'subtle': return 'border-sky-400/40 bg-sky-500/10 text-sky-100';
             case 'clean': return 'border-teal-400/40 bg-teal-500/10 text-teal-100';
-            case 'focus': return 'border-emerald-400/40 bg-emerald-500/10 text-emerald-100';
             default: return 'border-zinc-700 bg-zinc-900 text-zinc-300';
         }
     }

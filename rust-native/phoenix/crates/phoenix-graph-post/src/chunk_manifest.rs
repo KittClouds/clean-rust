@@ -1,4 +1,4 @@
-use phoenix_chunker::ChunkLens;
+use phoenix_chunker_native::ChunkLens;
 use phoenix_store_native_core::{ChunkManifest, ChunkManifestDirtyPlan};
 use serde::{Deserialize, Serialize};
 

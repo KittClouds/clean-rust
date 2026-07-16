@@ -34,6 +34,10 @@ const TYPED_RELATION_MAX_GAP_CHARS: u32 = 260;
 const FAMILY_CUES: &[&str] = &[" father", " daughter", " grandfather", " family"];
 const COMMAND_CUES: &[&str] = &["command", "admiral", "phantom", "military"];
 const ACCEPTANCE_CUES: &[&str] = &["approved", "approval", "accepted", "agreed", "proceed"];
+const OPPOSITION_CUES: &[&str] = &["opposed", "opposes", "opposition", "against"];
+const THREAT_CUES: &[&str] = &["threatened", "threatens", "threat", "menaced"];
+const BETRAYAL_CUES: &[&str] = &["betrayed", "betrays", "betrayal", "turned on"];
+const REJECTION_CUES: &[&str] = &["rejected", "rejects", "refused", "refuses"];
 const RELEASE_CUES: &[&str] = &["packet", "release", "terms", "warning", "coercion"];
 const CONTACT_CUES: &[&str] = &["kiss", "took his hand", "stood beside", "close enough"];
 const OBSERVATION_CUES: &[&str] = &["looked at", "watched", "saw ", "noticed"];
@@ -43,6 +47,10 @@ const RELATION_CUE_GROUPS: &[&[&str]] = &[
     FAMILY_CUES,
     COMMAND_CUES,
     ACCEPTANCE_CUES,
+    OPPOSITION_CUES,
+    THREAT_CUES,
+    BETRAYAL_CUES,
+    REJECTION_CUES,
     RELEASE_CUES,
     CONTACT_CUES,
     OBSERVATION_CUES,
@@ -171,6 +179,7 @@ fn derive_typed_relationships(
             continue;
         };
         let confidence = relation_confidence(&relation_type);
+        let status = relation_status(&relation_type);
         let evidence = pair_evidence(left, right);
         let id = format_compact!(
             "typed:{}:{}:{}:{}:{}",
@@ -187,19 +196,18 @@ fn derive_typed_relationships(
             relation_type: relation_type.clone(),
             evidence_anchor_ids: evidence.clone(),
             confidence,
-            status: "accepted".into(),
-            adjudication_source: "graph-rebuild-typed-cue-policy".into(),
+            status: status.into(),
+            adjudication_source: relation_adjudication_source(&relation_type).into(),
             adjudication_score: confidence,
-            rationale: format_compact!(
-                "accepted: anchored chunk cue promoted {} fact",
-                relation_type
-            ),
+            rationale: relation_rationale(&relation_type),
             decision_evidence: vec![
                 format_compact!("chunk:{}", chunk.id),
                 format_compact!("cue:{}", relation_type),
             ],
         });
-        upsert_typed_edge(edges, left, right, &relation_type, &evidence, &chunk.id);
+        if status == "accepted" {
+            upsert_typed_edge(edges, left, right, &relation_type, &evidence, &chunk.id);
+        }
     }
 }
 
@@ -248,6 +256,14 @@ fn infer_relation_type(window: PairWindow<'_>) -> Option<CompactString> {
         "command_or_service_tie"
     } else if has_any(between, ACCEPTANCE_CUES) {
         "approves_or_accepts"
+    } else if has_any(between, OPPOSITION_CUES) {
+        "opposes"
+    } else if has_any(between, THREAT_CUES) {
+        "threatens"
+    } else if has_any(between, BETRAYAL_CUES) {
+        "betrays"
+    } else if has_any(between, REJECTION_CUES) {
+        "rejects"
     } else if has_any(between, RELEASE_CUES) {
         "discusses_release_terms"
     } else if has_any(between, CONTACT_CUES) {
@@ -267,10 +283,44 @@ fn infer_relation_type(window: PairWindow<'_>) -> Option<CompactString> {
 fn relation_confidence(relation_type: &str) -> f32 {
     match relation_type {
         "family_or_house_tie" | "command_or_service_tie" | "approves_or_accepts" => 0.82,
+        "opposes" | "threatens" | "betrays" | "rejects" => 0.68,
         "transfers_or_receives" | "intimate_or_close_contact" => 0.76,
         "discusses_release_terms" => 0.70,
         _ => 0.64,
     }
+}
+
+fn relation_status(relation_type: &str) -> &'static str {
+    if is_negative_review_relation(relation_type) {
+        "review"
+    } else {
+        "accepted"
+    }
+}
+
+fn relation_adjudication_source(relation_type: &str) -> &'static str {
+    if is_negative_review_relation(relation_type) {
+        "graph-rebuild-negative-cue-review-policy"
+    } else {
+        "graph-rebuild-typed-cue-policy"
+    }
+}
+
+fn relation_rationale(relation_type: &str) -> CompactString {
+    if is_negative_review_relation(relation_type) {
+        format_compact!(
+            "review: negative relation cue requires confirmation before promotion: {relation_type}"
+        )
+    } else {
+        format_compact!("accepted: anchored chunk cue promoted {relation_type} fact")
+    }
+}
+
+fn is_negative_review_relation(relation_type: &str) -> bool {
+    matches!(
+        relation_type,
+        "opposes" | "threatens" | "betrays" | "rejects"
+    )
 }
 
 fn pair_evidence(left: &EntityInChunk, right: &EntityInChunk) -> Vec<CompactString> {

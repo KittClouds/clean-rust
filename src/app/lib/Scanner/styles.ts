@@ -182,18 +182,18 @@ function getEntityStyle(kind: EntityKind, mode: HighlightMode): string {
   }
 
   if (mode === 'subtle') {
-    return getSubtleInlineStyle(textColorVar);
+    return getGradientInlineStyle(colorVar, false);
   }
 
   if (mode === 'gradient') {
-    return getGradientInlineStyle(colorVar, textColorVar);
+    return getGradientInlineStyle(colorVar, true);
   }
 
   if (mode === 'clean') {
     return getPlainInlineStyle();
   }
 
-  // Focus mode is filtered upstream; Off bails out before styling.
+  // Off bails out before styling.
   return '';
 }
 
@@ -267,7 +267,7 @@ function getEntityRefStyle(kind: EntityKind | undefined, resolved: boolean, mode
   return `border-bottom: 2px solid ${bg}; padding-bottom: 1px; cursor: pointer;`;
 }
 
-function getGradientInlineStyle(colorVar: string, textColorVar: string): string {
+function getGradientInlineStyle(colorVar: string, animated: boolean): string {
   return `
     background-image: linear-gradient(
       to right,
@@ -277,24 +277,14 @@ function getGradientInlineStyle(colorVar: string, textColorVar: string): string 
       hsl(var(${colorVar}))
     );
     background-repeat: no-repeat;
-    background-position: 0% 0;
-    background-size: 300% 100%;
+    background-position: ${animated ? '0% 0' : 'center'};
+    background-size: ${animated ? '300% 100%' : '100% 100%'};
     background-clip: text;
     -webkit-background-clip: text;
     color: transparent;
     -webkit-text-fill-color: transparent;
     font-weight: 600;
-    animation: entity-gradient-oscillate 8s linear infinite;
-  `;
-}
-
-function getSubtleInlineStyle(textColorVar: string): string {
-  return `
-    background: transparent;
-    border: none;
-    color: hsl(var(${textColorVar}));
-    font-weight: 500;
-    padding: 0;
+    ${animated ? 'animation: entity-gradient-oscillate 8s linear infinite;' : 'animation: none;'}
   `;
 }
 

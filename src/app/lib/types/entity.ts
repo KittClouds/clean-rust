@@ -73,5 +73,6 @@ export function isEntityKind(value: string): value is EntityKind {
  * Get display label for an entity kind.
  */
 export function getEntityKindLabel(kind: EntityKind): string {
+    if (kind === 'FACTION') return 'Network';
     return kind.charAt(0) + kind.slice(1).toLowerCase();
 }

@@ -96,6 +96,15 @@ fn relationship_contract(
     };
     let entity_pair = row.contains("source") && row.contains("target");
     let mention_pair = row.contains("leftMention") && row.contains("rightMention");
+    if fact.semantic_situation_id.is_some() {
+        let participant_roles = row
+            .iter()
+            .filter(|role| role.as_str() != "evidence")
+            .count();
+        if fact.semantic_frame.is_some() && row.contains("evidence") && participant_roles >= 2 {
+            return;
+        }
+    }
     if !entity_pair && !mention_pair {
         failures.push(format_compact!(
             "relationship fact {} lacks pair roles",

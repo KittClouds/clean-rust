@@ -16,6 +16,87 @@ import {
 } from './phoenix-wasm.service';
 import type { PhoenixBootSnapshotRows as PhoenixBootSnapshotPayload } from './phoenix-boot-snapshot.model';
 import type { PhoenixGalaxyScene, PhoenixGalaxySceneRequest } from './phoenix-galaxy-scene.model';
+import type {
+    PhoenixGraphScenePacket,
+    PhoenixGraphScenePacketRequest,
+} from './phoenix-graph-scene-packet.model';
+import type {
+    PhoenixDocumentIndexReadRequest,
+    PhoenixDocumentIndexReadResponse,
+} from './phoenix-document-index.model';
+import type {
+    DesktopMentionBatchRequest,
+} from '../generated/phoenix-taurpc';
+import { rejectAtlasRichScan } from './atlas-rich-scan-quarantine';
+
+export type PhoenixMentionBatchRequest = DesktopMentionBatchRequest;
+export interface PhoenixMentionBatchResult {
+    documentId: string;
+    mentions: Array<{
+        range: { start: number; end: number };
+        surface: string;
+        kind: string | null;
+        entityRef: string | null;
+        source: 'discovery';
+        confidence: number;
+        sentenceIndex: number;
+    }>;
+}
+export interface PhoenixGraphRunOpenResult {
+    runHandle: string;
+    documentsBuilt?: number;
+    documentsReused?: number;
+    documents: Array<{
+        documentId: string;
+        textHash: string;
+        candidates: Array<{ key: string; token: string; kind: string; score: number; count: number; status: number }>;
+    }>;
+}
+
+const PHOENIX_CONTENT_COMMAND_TIMEOUT_MS = 10_000;
+
+export class PhoenixStoreCommandTimeoutError extends Error {
+    readonly code = 'PHOENIX_STORE_COMMAND_TIMEOUT';
+
+    constructor(readonly command: string, readonly timeoutMs: number) {
+        super(`Phoenix store command timed out after ${timeoutMs} ms: ${command}`);
+        this.name = 'PhoenixStoreCommandTimeoutError';
+    }
+}
+
+export function isPhoenixStoreCommandTimeout(error: unknown): error is PhoenixStoreCommandTimeoutError {
+    return error instanceof PhoenixStoreCommandTimeoutError;
+}
+
+export function withPhoenixStoreCommandTimeout<T>(
+    command: string,
+    operation: Promise<T>,
+    timeoutMs: number = PHOENIX_CONTENT_COMMAND_TIMEOUT_MS,
+): Promise<T> {
+    return new Promise<T>((resolve, reject) => {
+        const timeout = setTimeout(
+            () => reject(new PhoenixStoreCommandTimeoutError(command, timeoutMs)),
+            timeoutMs,
+        );
+        operation.then(
+            value => {
+                clearTimeout(timeout);
+                resolve(value);
+            },
+            error => {
+                clearTimeout(timeout);
+                reject(error);
+            },
+        );
+    });
+}
+
+function isContentStoreCommand(command: string): boolean {
+    return command.startsWith('note:')
+        || command.startsWith('folder:')
+        || command.startsWith('relation:')
+        || command === 'persistence:applyWalBatch';
+}
 
 type PhoenixTransportMethodName =
     | 'onReady'
@@ -81,6 +162,22 @@ export type PhoenixNativeBridge = Pick<PhoenixWasmService, 'isReady' | PhoenixNa
     loadRuntime(): Promise<void>;
     bootSnapshot(): Promise<PhoenixBootSnapshotPayload>;
     compileGalaxyScene(request: PhoenixGalaxySceneRequest): Promise<PhoenixGalaxyScene>;
+    scanMentionsBatch?(request: PhoenixMentionBatchRequest): Promise<PhoenixMentionBatchResult[]>;
+    openGraphRun?(request: PhoenixMentionBatchRequest): Promise<PhoenixGraphRunOpenResult>;
+    analyzeGraphSnapshot?(request: unknown): Promise<unknown>;
+    readGraphRunPage?(request: { runHandle: string; offset: number; limit: number }): Promise<unknown>;
+    persistGraphRun?(runHandle: string): Promise<unknown>;
+    beginNativeOperatorDecision?(request: unknown): Promise<unknown>;
+    completeNativeOperatorDecision?(request: unknown): Promise<unknown>;
+    commitCanonicalEpisodeAssignment?(request: unknown): Promise<unknown>;
+    nativeDecisionCensus?(): Promise<unknown>;
+    linkNativeOperatorDecisionGraphTruth?(request: unknown): Promise<unknown>;
+    recordNativeRewardObservation?(request: unknown): Promise<unknown>;
+    nativeRewardObservationCensus?(): Promise<unknown>;
+    observeNativeRewardHorizons?(): Promise<unknown>;
+    closeGraphRun?(runHandle: string): Promise<boolean>;
+    graphScenePacket?(request: PhoenixGraphScenePacketRequest): Promise<PhoenixGraphScenePacket>;
+    nliAdjudicateClaims?(request: Record<string, unknown>): Promise<any>;
     siegelFinslerReceipt?(request: Record<string, unknown>): Promise<any>;
 };
 
@@ -205,10 +302,159 @@ export class PhoenixBackendService {
             : this.wasm.scan(request);
     }
 
+    async scanMentionsBatch(request: PhoenixMentionBatchRequest): Promise<PhoenixMentionBatchResult[]> {
+        if (this.target === 'native') {
+            const bridge = this.requireNativeBridge();
+            if (bridge.scanMentionsBatch) {
+                return bridge.scanMentionsBatch(request);
+            }
+        }
+        return Promise.all(request.documents.map(async (document) => {
+            const scan = await this.scan({
+                text: document.text,
+                scope: {},
+                sessionId: 'phoenix-ui-discovery-batch',
+                resolverSeed: request.resolverSeed,
+            });
+            return {
+                documentId: document.documentId,
+                mentions: Array.isArray(scan?.mentions) ? scan.mentions : [],
+            };
+        }));
+    }
+
+    async openGraphRun(request: PhoenixMentionBatchRequest): Promise<PhoenixGraphRunOpenResult> {
+        if (this.target !== 'native') {
+            throw new Error('PhoenixBackendService.openGraphRun() requires the native runtime.');
+        }
+        const bridge = this.requireNativeBridge();
+        if (!bridge.openGraphRun) throw new Error('Native graph run open RPC is unavailable.');
+        return bridge.openGraphRun(request);
+    }
+
+    async analyzeGraphSnapshot(request: unknown): Promise<unknown> {
+        if (this.target !== 'native') {
+            throw new Error('PhoenixBackendService.analyzeGraphSnapshot() requires the native runtime.');
+        }
+        const bridge = this.requireNativeBridge();
+        if (!bridge.analyzeGraphSnapshot) {
+            throw new Error('Native graph snapshot analysis RPC is unavailable.');
+        }
+        return bridge.analyzeGraphSnapshot(request);
+    }
+
+    async readGraphRunPage(request: { runHandle: string; offset: number; limit: number }): Promise<unknown> {
+        if (this.target !== 'native') {
+            throw new Error('PhoenixBackendService.readGraphRunPage() requires the native runtime.');
+        }
+        const bridge = this.requireNativeBridge();
+        if (!bridge.readGraphRunPage) throw new Error('Native graph run paging RPC is unavailable.');
+        return bridge.readGraphRunPage(request);
+    }
+
+    async persistGraphRun(runHandle: string): Promise<unknown> {
+        if (this.target !== 'native') {
+            throw new Error('PhoenixBackendService.persistGraphRun() requires the native runtime.');
+        }
+        const bridge = this.requireNativeBridge();
+        if (!bridge.persistGraphRun) throw new Error('Native graph run persistence RPC is unavailable.');
+        return bridge.persistGraphRun(runHandle);
+    }
+
+    async beginNativeOperatorDecision(request: unknown): Promise<unknown> {
+        if (this.target !== 'native') {
+            throw new Error('PhoenixBackendService.beginNativeOperatorDecision() requires the native runtime.');
+        }
+        const bridge = this.requireNativeBridge();
+        if (!bridge.beginNativeOperatorDecision) {
+            throw new Error('Native operator decision begin RPC is unavailable.');
+        }
+        return bridge.beginNativeOperatorDecision(request);
+    }
+
+    async completeNativeOperatorDecision(request: unknown): Promise<unknown> {
+        if (this.target !== 'native') {
+            throw new Error('PhoenixBackendService.completeNativeOperatorDecision() requires the native runtime.');
+        }
+        const bridge = this.requireNativeBridge();
+        if (!bridge.completeNativeOperatorDecision) {
+            throw new Error('Native operator decision completion RPC is unavailable.');
+        }
+        return bridge.completeNativeOperatorDecision(request);
+    }
+
+    async commitCanonicalEpisodeAssignment(request: unknown): Promise<unknown> {
+        if (this.target !== 'native') {
+            throw new Error('PhoenixBackendService.commitCanonicalEpisodeAssignment() requires the native runtime.');
+        }
+        const bridge = this.requireNativeBridge();
+        if (!bridge.commitCanonicalEpisodeAssignment) {
+            throw new Error('Native canonical episode assignment RPC is unavailable.');
+        }
+        return bridge.commitCanonicalEpisodeAssignment(request);
+    }
+
+    async nativeDecisionCensus(): Promise<unknown> {
+        if (this.target !== 'native') {
+            throw new Error('PhoenixBackendService.nativeDecisionCensus() requires the native runtime.');
+        }
+        const bridge = this.requireNativeBridge();
+        if (!bridge.nativeDecisionCensus) throw new Error('Native decision census RPC is unavailable.');
+        return bridge.nativeDecisionCensus();
+    }
+
+    async linkNativeOperatorDecisionGraphTruth(request: unknown): Promise<unknown> {
+        if (this.target !== 'native') {
+            throw new Error('PhoenixBackendService.linkNativeOperatorDecisionGraphTruth() requires the native runtime.');
+        }
+        const bridge = this.requireNativeBridge();
+        if (!bridge.linkNativeOperatorDecisionGraphTruth) {
+            throw new Error('Native decision graph-truth link RPC is unavailable.');
+        }
+        return bridge.linkNativeOperatorDecisionGraphTruth(request);
+    }
+
+    async recordNativeRewardObservation(request: unknown): Promise<unknown> {
+        if (this.target !== 'native') {
+            throw new Error('PhoenixBackendService.recordNativeRewardObservation() requires the native runtime.');
+        }
+        const bridge = this.requireNativeBridge();
+        if (!bridge.recordNativeRewardObservation) {
+            throw new Error('Native reward observation RPC is unavailable.');
+        }
+        return bridge.recordNativeRewardObservation(request);
+    }
+
+    async nativeRewardObservationCensus(): Promise<unknown> {
+        if (this.target !== 'native') {
+            throw new Error('PhoenixBackendService.nativeRewardObservationCensus() requires the native runtime.');
+        }
+        const bridge = this.requireNativeBridge();
+        if (!bridge.nativeRewardObservationCensus) {
+            throw new Error('Native reward observation census RPC is unavailable.');
+        }
+        return bridge.nativeRewardObservationCensus();
+    }
+
+    async observeNativeRewardHorizons(): Promise<unknown> {
+        if (this.target !== 'native') {
+            throw new Error('PhoenixBackendService.observeNativeRewardHorizons() requires the native runtime.');
+        }
+        const bridge = this.requireNativeBridge();
+        if (!bridge.observeNativeRewardHorizons) {
+            throw new Error('Native reward horizon observer RPC is unavailable.');
+        }
+        return bridge.observeNativeRewardHorizons();
+    }
+
+    async closeGraphRun(runHandle: string): Promise<boolean> {
+        if (this.target !== 'native') return false;
+        return this.requireNativeBridge().closeGraphRun?.(runHandle) ?? false;
+    }
+
     async atlasRichScan(request: Record<string, unknown>): Promise<any> {
-        return this.target === 'native'
-            ? this.requireNativeBridge().atlasRichScan(request)
-            : this.wasm.atlasRichScan(request);
+        void request;
+        return rejectAtlasRichScan();
     }
 
     async manifoldSnapshot(request: Record<string, unknown>): Promise<any> {
@@ -315,10 +561,41 @@ export class PhoenixBackendService {
         return this.requireNativeBridge().compileGalaxyScene(request);
     }
 
+    async graphScenePacket(request: PhoenixGraphScenePacketRequest): Promise<PhoenixGraphScenePacket> {
+        if (this.target !== 'native') {
+            throw new Error('Phoenix graph scene packets are only available on native desktop.');
+        }
+        const bridge = this.requireNativeBridge();
+        if (!bridge.graphScenePacket) {
+            throw new Error('Phoenix native graph scene packet compiler is unavailable.');
+        }
+        return bridge.graphScenePacket(request);
+    }
+
+    async nliAdjudicateClaims(request: Record<string, unknown>): Promise<any> {
+        if (this.target !== 'native') {
+            throw new Error('Phoenix NLI claim adjudication is only available on native desktop.');
+        }
+        const bridge = this.requireNativeBridge();
+        if (!bridge.nliAdjudicateClaims) {
+            throw new Error('Phoenix native NLI claim adjudication is unavailable.');
+        }
+        return bridge.nliAdjudicateClaims(request);
+    }
+
     async storeCommand(command: string, payload: Record<string, unknown> = {}): Promise<any> {
-        return this.target === 'native'
+        const operation = this.target === 'native'
             ? this.requireNativeBridge().storeCommand(command, payload)
             : this.wasm.storeCommand(command, payload);
+        return this.target === 'native' && isContentStoreCommand(command)
+            ? withPhoenixStoreCommandTimeout(command, operation)
+            : operation;
+    }
+
+    async readDocumentIndex(
+        request: PhoenixDocumentIndexReadRequest,
+    ): Promise<PhoenixDocumentIndexReadResponse> {
+        return this.storeCommand('documentIndex:read', request as unknown as Record<string, unknown>);
     }
 
     async chatInit(config: Record<string, unknown>): Promise<any> {

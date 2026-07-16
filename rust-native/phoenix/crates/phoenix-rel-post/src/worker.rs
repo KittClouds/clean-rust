@@ -1,7 +1,7 @@
 use std::collections::{BTreeMap, BTreeSet};
 
 use phoenix_alex::{api as alex_api, AlexError, Lexicon};
-use phoenix_chunker::split_sentence_ranges;
+use phoenix_chunker_native::split_sentence_ranges;
 use phoenix_scope_analysis::{ScopeAnalysisContext, ScopeEntityProfile};
 use phoenix_semantic_v2::{
     scope_storage_key, DirtyScopeRecord, DocumentArchive, DocumentRevisionRef, ErScopePatchSidecar,
@@ -983,6 +983,13 @@ pub fn adjudicate_relation_decisions_with_nli(
     relation_specs: &[GlirelRelationTypeSpec],
     nli: &NliModel,
 ) -> Result<Vec<RelationDecision>, GlirelWorkerError> {
+    let staged_judgments = crate::nli_stage::stage_relation_judgments(
+        batch,
+        decisions,
+        relation_specs,
+        nli,
+        crate::nli_stage::NliAdjudicationBatchOptions::default(),
+    )?;
     let spec_by_label = relation_specs
         .iter()
         .map(|spec| (spec.label.as_str(), spec))
@@ -991,11 +998,6 @@ pub fn adjudicate_relation_decisions_with_nli(
         .review_cases
         .iter()
         .map(|case| (case.case_id.as_str(), case))
-        .collect::<FxHashMap<_, _>>();
-    let window_text_by_id = batch
-        .windows
-        .iter()
-        .map(|window| (window.window_id.as_str(), window.text.as_str()))
         .collect::<FxHashMap<_, _>>();
     let mut adjudicated = Vec::with_capacity(decisions.len());
     for decision in decisions {
@@ -1015,22 +1017,10 @@ pub fn adjudicate_relation_decisions_with_nli(
             adjudicated.push(decision.clone());
             continue;
         }
-        let forward_templates =
-            build_relation_hypotheses(edge_type, &case.source_name, &case.target_name);
-        let reverse_templates = if spec.directed {
-            build_relation_hypotheses(edge_type, &case.target_name, &case.source_name)
-        } else {
-            Vec::new()
+        let Some(judgment) = staged_judgments.get(decision.case_id.as_str()) else {
+            adjudicated.push(decision.clone());
+            continue;
         };
-        let window_text = if case.window_text.is_empty() {
-            window_text_by_id
-                .get(case.window_id.as_str())
-                .copied()
-                .unwrap_or_default()
-        } else {
-            case.window_text.as_str()
-        };
-        let judgment = nli.judge_relation(window_text, &forward_templates, &reverse_templates)?;
         let chosen_scores = if judgment.used_reverse {
             judgment.reverse.unwrap_or(judgment.forward)
         } else {

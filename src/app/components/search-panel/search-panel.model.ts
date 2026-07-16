@@ -16,7 +16,7 @@ export type { AtlasGraphTargetId } from './atlas-capability.model';
 export type SearchMode = 'notes' | 'vector' | 'graph';
 export type VectorStatus = 'idle' | 'loading' | 'ready' | 'indexing' | 'error';
 export type GraphIndexStatus = 'idle' | 'building' | 'ready' | 'searching' | 'error';
-export type ModelId = 'mongodb-leaf-mt' | 'bge-small-en' | 'jina-v5-nano-retrieval';
+export type ModelId = 'mongodb-leaf-mt' | 'bge-small-en' | 'jina-v5-nano-retrieval' | 'embeddinggemma-300m';
 export const DEFAULT_SEARCH_MODEL_ID = DEFAULT_GRAPH_EMBEDDING_MODEL_ID as ModelId;
 export const DEFAULT_SEARCH_MODEL_LABEL = DEFAULT_GRAPH_EMBEDDING_MODEL_LABEL;
 export const DEFAULT_SEARCH_DIMENSION_LABEL = DEFAULT_GRAPH_EMBEDDING_DIMENSION_LABEL;
@@ -83,6 +83,7 @@ export const RETRIEVAL_LANE_OPTIONS: Array<{ id: RetrievalLane; label: string; i
 
 export const EMBEDDING_MODELS: Array<{ id: ModelId; label: string; dims: number; desc: string }> = [
     { id: 'jina-v5-nano-retrieval', label: 'Jina v5 Nano', dims: 768, desc: 'Primary graph compiler semantic runner target.' },
+    { id: 'embeddinggemma-300m', label: 'EmbeddingGemma 300M', dims: 768, desc: 'High-accuracy semantic topology candidate target.' },
     { id: 'mongodb-leaf-mt', label: 'MDBR Leaf MT', dims: 384, desc: 'Fast multi-task native runner target.' },
     { id: 'bge-small-en', label: 'BGE-small', dims: 384, desc: 'Native Rust semantic runner target.' },
 ];

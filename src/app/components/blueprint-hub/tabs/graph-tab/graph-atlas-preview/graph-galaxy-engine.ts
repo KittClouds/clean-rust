@@ -10,8 +10,16 @@ import {
     readBusemannSignature,
 } from './graph-galaxy-hybrid-busemann-layout';
 import { applyLorentzTreeLayout } from './graph-galaxy-lorentz-layout';
-import { applyProductConsensusLayout } from './graph-galaxy-product-layout';
 import { applySiegelFinslerLayout } from './graph-galaxy-siegel-layout';
+import {
+    buildHopfReceiptRibbons,
+    hopfDirectionFromMetadata,
+    type HopfReceiptBase,
+} from './graph-galaxy-hopf-receipts';
+import { relationFamilyFromText } from './graph-relation-visual-style';
+import { buildTransitBackboneGuides } from './graph-transit-backbone-guides';
+import { applyTransitLayout } from './graph-transit-layout';
+import { buildTransitPlan, type TransitPlan } from './graph-transit-plan';
 
 export type GalaxyLabelMode = 'hover' | 'selected' | 'important' | 'always' | 'off';
 export type GalaxyEdgeMode = 'curved' | 'straight' | 'tube' | 'hidden';
@@ -19,8 +27,12 @@ export type GalaxyEdgeColorMode = 'aqua' | 'orchid' | 'gold' | 'entityBlend' | '
 export type GalaxyBackgroundMode = 'nebula' | 'grid' | 'quiet' | 'void';
 export type GalaxyNodeDragMode = 'stretch' | 'force' | 'pin' | 'camera';
 export type GalaxyNodeShapeMode = 'atom' | 'halo' | 'sphere';
-export type GalaxyLayoutMode = 'single' | 'multiGalaxy' | 'hybridSpace' | 'hopfProjection' | 'lorentzTree' | 'productManifold' | 'siegelFinsler';
+export type GalaxySphereSurfaceMode = 'solid' | 'glass' | 'spellglass' | 'obsidian' | 'starcore';
+// Guides adopt the Style Lab color of their source node.
+export type GalaxyGuideColorMode = 'sourceNode';
+export type GalaxyLayoutMode = 'single' | 'multiGalaxy' | 'hybridSpace' | 'hopfProjection' | 'lorentzTree' | 'transitManifold' | 'productManifold' | 'siegelFinsler';
 export type GalaxyEmbeddingTopologyMode = 'off' | 'clusters' | 'regions' | 'lanes' | 'medoids' | 'outliers' | 'backbone' | 'bridges';
+export type GalaxyRenderSourceMode = 'entities' | 'graph' | 'embeddings';
 
 export type GalaxyHybridInteriorMode = 'busemannCommitment';
 
@@ -96,6 +108,40 @@ export interface GalaxyHybridInteriorState {
     signature?: GalaxyBusemannSignature;
 }
 
+export interface GalaxyHybridPlacementPoint extends GalaxyVec3 {
+    radius: number;
+}
+
+export interface GalaxyHybridShellReceipt {
+    mode: 'hybridShell';
+    geometryVersion: 'hybrid_shell_anatomy_v1';
+    lane: string;
+    phase: number;
+    specificity: number;
+    ambiguity: number;
+    level: number;
+    strength: number;
+    baseRadius: number;
+    shellRadius: number;
+    laneStrength: number;
+    direction: GalaxyVec3;
+    point: GalaxyHybridPlacementPoint;
+    sourceSignals: string[];
+}
+
+export interface GalaxyHybridBusemannReceipt {
+    mode: 'busemannCommitment';
+    family: GalaxyPrototypeFamily;
+    topPrototypeId: string;
+    entropy: number;
+    margin: number;
+    confidence: number;
+    promotionReady: boolean;
+    radialStrength: number;
+    point: GalaxyHybridPlacementPoint;
+    source: 'backendPoint' | 'frontendCommitment';
+}
+
 export interface GalaxyBusemannHorosphereSpec {
     prototypeId: string;
     family: string;
@@ -118,6 +164,7 @@ export interface GalaxyRenderSettings {
     edgeCurveStrength: number;
     nodeDistance: number;
     particleFlow: boolean;
+    particleFlowMode?: GalaxyParticleFlowMode;
     particleSize: number;
     particleSpeed: number;
     particleOpacity: number;
@@ -125,7 +172,9 @@ export interface GalaxyRenderSettings {
     backgroundMode: GalaxyBackgroundMode;
     nodeDragMode: GalaxyNodeDragMode;
     nodeShape: GalaxyNodeShapeMode;
+    sphereSurface?: GalaxySphereSurfaceMode;
     clickFocus: boolean;
+    detailCardsVisible: boolean;
     labelLimit: number;
     selectedPulse: boolean;
     layoutMode: GalaxyLayoutMode;
@@ -150,8 +199,21 @@ export interface GalaxyRenderSettings {
     hopfSpaceIntensity: number;
     lorentzSpaceVisible: boolean;
     lorentzSpaceIntensity: number;
-    productKleinVisible: boolean;
     embeddingTopologyMode: GalaxyEmbeddingTopologyMode;
+    sourceMode: GalaxyRenderSourceMode;
+
+    /**
+     * Dedicated guide visibility + color controls.
+     *
+     * These are intentionally separate from the space visibility controls so
+     * routes and fibers can each be turned off on their own regardless of layout
+     * mode. When undefined the renderer falls back to the matching space flag,
+     * preserving prior behavior for persisted settings.
+     */
+    guideRoutesVisible?: boolean;
+    guideFibersVisible?: boolean;
+    /** See {@link GalaxyGuideColorMode}. */
+    guideColorMode?: GalaxyGuideColorMode;
 }
 
 export interface GalaxyInputEdge {
@@ -216,7 +278,14 @@ export interface GalaxyNode extends Rgb {
     depth: number;
     galaxyOpacity: number;
     groupId?: string;
+    hybridShell?: GalaxyHybridShellReceipt;
+    hybridShellPoint?: GalaxyHybridPlacementPoint;
+    hybridCommitment?: GalaxyHybridBusemannReceipt;
+    hybridCommitmentPoint?: GalaxyHybridPlacementPoint;
+    hybridRenderPoint?: GalaxyHybridPlacementPoint;
 }
+
+export type GalaxyParticleFlowMode = 'swarm' | 'walk';
 
 export interface GalaxyEdge {
     id: string;
@@ -229,6 +298,28 @@ export interface GalaxyEdge {
     flowOffset: number;
     interGalaxy?: boolean;
     metadata?: Record<string, unknown>;
+}
+
+export interface GalaxyRelationControl extends Rgb {
+    id: string;
+    label: string;
+    kind: string;
+    family: string;
+    noteIds: string[];
+    chunkIds: string[];
+    entityIds: string[];
+    eventIds: string[];
+    ownerEntityId: string;
+    regionId: string;
+    sourceNodeIds: string[];
+    targetNodeIds: string[];
+    evidenceNodeIds: string[];
+    participantNodeIds: string[];
+    edgeIds: string[];
+    x: number;
+    y: number;
+    z: number;
+    confidence: number;
 }
 
 export interface GalaxyGroup extends Rgb {
@@ -267,6 +358,8 @@ export interface GalaxyScene {
     links: GalaxyEdge[];
     layoutMode: GalaxyLayoutMode;
     groups: GalaxyGroup[];
+    transitPlan?: TransitPlan;
+    relationControls?: GalaxyRelationControl[];
     hopfRibbons?: GalaxyHopfRibbon[];
     lorentzGuides?: GalaxyLorentzGuide[];
     busemannHorospheres?: GalaxyBusemannHorosphereSpec[];
@@ -283,6 +376,7 @@ export const DEFAULT_GALAXY_SETTINGS: GalaxyRenderSettings = {
     edgeCurveStrength: 0.55,
     nodeDistance: 1,
     particleFlow: false,
+    particleFlowMode: 'swarm',
     particleSize: 1,
     particleSpeed: 1,
     particleOpacity: 0.72,
@@ -290,7 +384,9 @@ export const DEFAULT_GALAXY_SETTINGS: GalaxyRenderSettings = {
     backgroundMode: 'nebula',
     nodeDragMode: 'stretch',
     nodeShape: 'atom',
+    sphereSurface: 'solid',
     clickFocus: false,
+    detailCardsVisible: true,
     labelLimit: 14,
     selectedPulse: true,
     layoutMode: 'single',
@@ -309,12 +405,24 @@ export const DEFAULT_GALAXY_SETTINGS: GalaxyRenderSettings = {
     hopfSpaceIntensity: 1,
     lorentzSpaceVisible: true,
     lorentzSpaceIntensity: 1,
-    productKleinVisible: true,
     embeddingTopologyMode: 'off',
+    sourceMode: 'entities',
+    guideRoutesVisible: true,
+    guideFibersVisible: true,
+    guideColorMode: 'sourceNode',
 };
 
 export function mergeGalaxySettings(settings?: Partial<GalaxyRenderSettings> | null): GalaxyRenderSettings {
     const merged = { ...DEFAULT_GALAXY_SETTINGS, ...settings };
+    if (merged.layoutMode === 'productManifold') merged.layoutMode = 'transitManifold';
+    if (merged.particleFlowMode !== 'walk') merged.particleFlowMode = 'swarm';
+    if ((merged.sphereSurface as string) === 'lattice') merged.sphereSurface = 'starcore';
+    if (!['solid', 'glass', 'spellglass', 'obsidian', 'starcore'].includes(merged.sphereSurface || '')) {
+        merged.sphereSurface = 'solid';
+    }
+    merged.guideColorMode = 'sourceNode';
+    if (typeof merged.guideRoutesVisible !== 'boolean') merged.guideRoutesVisible = merged.lorentzSpaceVisible !== false;
+    if (typeof merged.guideFibersVisible !== 'boolean') merged.guideFibersVisible = merged.hopfSpaceVisible !== false;
     if (merged.edgeColorMode === 'cyan') merged.edgeColorMode = 'aqua';
     merged.edgeCurveStrength = Math.min(1.2, Math.max(0.25, merged.edgeCurveStrength));
     merged.edgeWidth = Math.min(1.1, Math.max(0.15, merged.edgeWidth));
@@ -327,12 +435,20 @@ export function mergeGalaxySettings(settings?: Partial<GalaxyRenderSettings> | n
     return merged;
 }
 
+export function isTransitLayoutMode(mode: GalaxyLayoutMode | string | null | undefined): boolean {
+    return mode === 'transitManifold' || mode === 'productManifold';
+}
+
 export function buildGalaxyScene(
     entitiesInput: GalaxyRenderableNode[],
     edges: GalaxyInputEdge[],
     settings: GalaxyRenderSettings,
 ): GalaxyScene {
-    const entities = prioritizeEntities(entitiesInput);
+    const relationPlan = settings.sourceMode === 'embeddings'
+        ? { nodes: entitiesInput, edges, controls: [] }
+        : compileRelationControlPlan(entitiesInput, edges);
+    const entities = orderEntitiesForStableRender(relationPlan.nodes);
+    assertNoImplicitNodeDrop(relationPlan.nodes.length, entities.length);
     const preserveAtlasLayout = shouldPreserveAtlasLayout(entities);
     const idToIndex = new Map<string, number>();
     const nodes = entities.map((entity, index) => {
@@ -363,51 +479,53 @@ export function buildGalaxyScene(
         };
     });
 
-    const links = buildLinks(edges, idToIndex);
+    const links = buildLinks(relationPlan.edges, idToIndex);
     applyEmbeddingTopologyLens(nodes, links, settings);
     if (settings.layoutMode === 'hybridSpace') {
         applyGalaxyMetadata(nodes);
         applyHybridSpaceLayout(nodes, links);
         const busemannHorospheres = applyBusemannCommitmentOverlay(nodes, settings);
-        return { nodes, links, layoutMode: 'hybridSpace', groups: [], busemannHorospheres };
+        return attachRelationControls({ nodes, links, layoutMode: 'hybridSpace', groups: [], busemannHorospheres }, relationPlan.controls);
     }
 
     if (settings.layoutMode === 'hopfProjection') {
         applyGalaxyMetadata(nodes);
         const hopfRibbons = applyHopfProjectionLayout(nodes, links);
-        return { nodes, links, layoutMode: 'hopfProjection', groups: [], hopfRibbons };
+        return attachRelationControls({ nodes, links, layoutMode: 'hopfProjection', groups: [], hopfRibbons }, relationPlan.controls);
     }
 
     if (settings.layoutMode === 'lorentzTree') {
         applyGalaxyMetadata(nodes);
-        const lorentzGuides = applyLorentzTreeLayout(nodes, links);
-        return { nodes, links, layoutMode: 'lorentzTree', groups: [], lorentzGuides };
+        const lorentzGuides = applyLorentzTreeLayout(nodes, links, { sourceMode: settings.sourceMode });
+        return attachRelationControls({ nodes, links, layoutMode: 'lorentzTree', groups: [], lorentzGuides }, relationPlan.controls);
     }
 
-    if (settings.layoutMode === 'productManifold') {
+    if (isTransitLayoutMode(settings.layoutMode)) {
+        const transitPlan = buildTransitPlan(entitiesInput, edges);
         applyGalaxyMetadata(nodes);
-        const lorentzGuides = applyProductConsensusLayout(nodes, links);
-        return { nodes, links, layoutMode: 'productManifold', groups: [], lorentzGuides };
+        applyTransitLayout(nodes, links, transitPlan);
+        const lorentzGuides = buildTransitBackboneGuides(transitPlan);
+        return attachRelationControls({ nodes, links, layoutMode: 'transitManifold', groups: [], transitPlan, lorentzGuides }, relationPlan.controls);
     }
 
     if (settings.layoutMode === 'siegelFinsler') {
         applyGalaxyMetadata(nodes);
         const lorentzGuides = applySiegelFinslerLayout(nodes, links);
-        return { nodes, links, layoutMode: 'siegelFinsler', groups: [], lorentzGuides };
+        return attachRelationControls({ nodes, links, layoutMode: 'siegelFinsler', groups: [], lorentzGuides }, relationPlan.controls);
     }
 
     const groupPlan = settings.layoutMode === 'multiGalaxy' ? buildGroupPlan(nodes) : [];
     if (groupPlan.length > 1) {
         applyGalaxyMetadata(nodes);
         const groups = applyMultiGalaxyLayout(nodes, links, groupPlan);
-        return { nodes, links, layoutMode: 'multiGalaxy', groups };
+        return attachRelationControls({ nodes, links, layoutMode: 'multiGalaxy', groups }, relationPlan.controls);
     }
 
     if (!preserveAtlasLayout) {
         relaxNodes(nodes, links, settings);
     }
     applyGalaxyMetadata(nodes);
-    return { nodes, links, layoutMode: 'single', groups: [] };
+    return attachRelationControls({ nodes, links, layoutMode: 'single', groups: [] }, relationPlan.controls);
 }
 
 function hasAtlasSeed(entity: GalaxyRenderableNode): boolean {
@@ -416,6 +534,305 @@ function hasAtlasSeed(entity: GalaxyRenderableNode): boolean {
 
 function shouldPreserveAtlasLayout(entities: GalaxyRenderableNode[]): boolean {
     return entities.length > 0 && entities.every(hasAtlasSeed);
+}
+
+interface RelationControlDraft {
+    id: string;
+    label: string;
+    kind: string;
+    family: string;
+    noteIds: string[];
+    chunkIds: string[];
+    entityIds: string[];
+    eventIds: string[];
+    ownerEntityId: string;
+    sourceNodeIds: string[];
+    targetNodeIds: string[];
+    evidenceNodeIds: string[];
+    participantNodeIds: string[];
+    edgeIds: string[];
+    confidence: number;
+}
+
+interface RelationControlPlan {
+    nodes: GalaxyRenderableNode[];
+    edges: GalaxyInputEdge[];
+    controls: RelationControlDraft[];
+}
+
+export function hasRelationControlNodes(entities: GalaxyRenderableNode[]): boolean {
+    return entities.some(isRelationControlNode);
+}
+
+function compileRelationControlPlan(entities: GalaxyRenderableNode[], edges: GalaxyInputEdge[]): RelationControlPlan {
+    const factNodes = new Map(entities.filter(isRelationControlNode).map((node) => [node.id, node]));
+    if (!factNodes.size) return { nodes: entities, edges, controls: [] };
+    const controls = new Map<string, RelationControlDraft>();
+    for (const fact of factNodes.values()) controls.set(fact.id, relationControlDraft(fact));
+    const topologyEdges: GalaxyInputEdge[] = [];
+    for (const edge of edges) {
+        const sourceFact = factNodes.has(edge.sourceId);
+        const targetFact = factNodes.has(edge.targetId);
+        if (!sourceFact && !targetFact) {
+            topologyEdges.push(edge);
+            continue;
+        }
+        if (sourceFact && !targetFact) addRelationRole(controls.get(edge.sourceId), edge, edge.targetId, edge.type);
+        if (targetFact && !sourceFact) addRelationRole(controls.get(edge.targetId), edge, edge.sourceId, edge.type);
+    }
+    const activeControls = [...controls.values()].filter((control) => uniqueControlIds(control.participantNodeIds).length > 1);
+    for (const control of activeControls) {
+        for (const [sourceId, targetId] of relationEndpointPairs(control)) {
+            topologyEdges.push({
+                id: `relation-control:${control.id}:${sourceId}:${targetId}`,
+                sourceId,
+                targetId,
+                type: control.family || control.label || 'relationship',
+                confidence: control.confidence,
+                metadata: {
+                    relationControl: true,
+                    relationControlId: control.id,
+                    relationFamily: control.family,
+                    relationLabel: control.label,
+                    noteIds: control.noteIds,
+                    chunkIds: control.chunkIds,
+                    entityIds: control.entityIds,
+                    eventIds: control.eventIds,
+                    ownerEntityId: control.ownerEntityId,
+                    sourceNodeIds: control.sourceNodeIds,
+                    targetNodeIds: control.targetNodeIds,
+                    evidenceNodeIds: control.evidenceNodeIds,
+                },
+            });
+        }
+    }
+    return {
+        nodes: entities.filter((node) => !factNodes.has(node.id)),
+        edges: topologyEdges,
+        controls: activeControls,
+    };
+}
+
+function isRelationControlNode(entity: GalaxyRenderableNode): boolean {
+    const rawSourceType = stringValue(entity.metadata?.['sourceType']);
+    const sourceType = relationKindKey(rawSourceType || stringValue(entity.kind));
+    if (sourceType === 'graph-fact' || sourceType === 'temporal-fact' || sourceType === 'causal-fact') return true;
+    return !rawSourceType && /^embed:(graph-fact|temporalFact|causalFact):/.test(entity.id);
+}
+
+function relationControlDraft(fact: GalaxyRenderableNode): RelationControlDraft {
+    const metadata = fact.metadata || {};
+    const family = firstGraphNodeColorKind(
+        stringValue(metadata['graphRelationFamily']),
+        stringValue(metadata['graphColorKind']),
+        stringValue(metadata['signalLane']),
+        stringValue(metadata['productLaneKind']),
+        relationFamilyFromText(fact.label, metadata['preview']) || undefined,
+        fact.kind,
+    ) || 'graphFact';
+    const draft: RelationControlDraft = {
+        id: fact.id,
+        label: fact.label || fact.id,
+        kind: relationKindKey(stringValue(metadata['sourceType'] || fact.kind)),
+        family,
+        noteIds: uniqueControlIds([stringValue(metadata['noteId']), ...arrayStringValues(metadata['supportNoteIds'])]),
+        chunkIds: uniqueControlIds([stringValue(metadata['chunkId']), ...arrayStringValues(metadata['supportChunkIds'])]),
+        entityIds: uniqueControlIds([stringValue(metadata['sourceEntityId']), stringValue(metadata['entityId']), stringValue(metadata['canonicalEntityId'])]),
+        eventIds: uniqueControlIds([stringValue(metadata['eventId']), stringValue(metadata['sourceEventId']), stringValue(metadata['targetEventId'])]),
+        ownerEntityId: stringValue(metadata['sourceEntityId'] || metadata['entityId'] || metadata['canonicalEntityId']),
+        sourceNodeIds: [],
+        targetNodeIds: [],
+        evidenceNodeIds: [],
+        participantNodeIds: [],
+        edgeIds: [],
+        confidence: 0,
+    };
+    for (const parentId of relationParentIds(fact)) {
+        addControlId(draft.participantNodeIds, parentId);
+        addControlContext(draft, parentId);
+        if (/^embed:(entity|event):/.test(parentId)) addControlId(draft.sourceNodeIds, parentId);
+        if (/^embed:(chunk|anchor):/.test(parentId)) addControlId(draft.evidenceNodeIds, parentId);
+    }
+    return draft;
+}
+
+function relationParentIds(fact: GalaxyRenderableNode): string[] {
+    const metadata = fact.metadata || {};
+    const lorentz = (metadata['lorentz'] || {}) as Record<string, unknown>;
+    return uniqueControlIds([
+        ...arrayStringValues(metadata['signalParentIds']),
+        ...arrayStringValues(metadata['parentIds']),
+        stringValue(lorentz['parentNodeId']),
+    ]);
+}
+
+function addRelationRole(control: RelationControlDraft | undefined, edge: GalaxyInputEdge, nodeId: string, roleValue: string): void {
+    if (!control || isRelationControlId(nodeId)) return;
+    const role = relationRole(roleValue);
+    addControlId(control.participantNodeIds, nodeId);
+    addControlId(control.edgeIds, edge.id);
+    addControlContext(control, nodeId);
+    control.confidence = Math.max(control.confidence, edge.confidence || 0.55);
+    if (role === 'source') addControlId(control.sourceNodeIds, nodeId);
+    else if (role === 'target') addControlId(control.targetNodeIds, nodeId);
+    else if (role === 'evidence') addControlId(control.evidenceNodeIds, nodeId);
+}
+
+function relationRole(value: string): 'source' | 'target' | 'evidence' | 'other' {
+    const role = String(value || '').toLowerCase();
+    if (/evidence|anchor|support/.test(role)) return 'evidence';
+    if (/target|effect|listener|object|state|location|time/.test(role)) return 'target';
+    if (/source|cause|subject|actor|speaker|left/.test(role)) return 'source';
+    return 'other';
+}
+
+function relationEndpointPairs(control: RelationControlDraft): Array<[string, string]> {
+    const sources = uniqueControlIds(control.sourceNodeIds.length ? control.sourceNodeIds : control.participantNodeIds);
+    const targets = uniqueControlIds(control.targetNodeIds);
+    const pairs: Array<[string, string]> = [];
+    if (sources.length && targets.length) {
+        for (const source of sources) {
+            for (const target of targets) {
+                if (source !== target) pairs.push([source, target]);
+                if (pairs.length >= 16) return pairs;
+            }
+        }
+        return pairs;
+    }
+    const participants = uniqueControlIds(control.participantNodeIds);
+    for (let left = 0; left < participants.length; left++) {
+        for (let right = left + 1; right < participants.length; right++) {
+            pairs.push([participants[left], participants[right]]);
+            if (pairs.length >= 16) return pairs;
+        }
+    }
+    return pairs;
+}
+
+function attachRelationControls(scene: GalaxyScene, drafts: RelationControlDraft[]): GalaxyScene {
+    if (!drafts.length) return scene;
+    const byId = new Map(scene.nodes.map((node) => [node.entity.id, node]));
+    const controls = drafts
+        .map((draft) => materializeRelationControl(draft, byId))
+        .filter((control): control is GalaxyRelationControl => !!control);
+    return controls.length ? { ...scene, relationControls: controls } : scene;
+}
+
+function materializeRelationControl(draft: RelationControlDraft, byId: Map<string, GalaxyNode>): GalaxyRelationControl | null {
+    const participantIds = uniqueControlIds(draft.participantNodeIds).filter((id) => byId.has(id));
+    if (participantIds.length < 2) return null;
+    const anchors = uniqueControlIds([...draft.sourceNodeIds, ...draft.targetNodeIds]).filter((id) => byId.has(id));
+    const positionIds = anchors.length >= 2 ? anchors : participantIds;
+    const point = averageNodePosition(positionIds, byId);
+    const color = hslToRgb(entityColorStore.getRawGraphNodeHsl(draft.family));
+    const context = materializeRelationContext(draft, participantIds, byId);
+    return {
+        ...color,
+        ...draft,
+        ...context,
+        sourceNodeIds: draft.sourceNodeIds.filter((id) => byId.has(id)),
+        targetNodeIds: draft.targetNodeIds.filter((id) => byId.has(id)),
+        evidenceNodeIds: draft.evidenceNodeIds.filter((id) => byId.has(id)),
+        participantNodeIds: participantIds,
+        x: point.x,
+        y: point.y,
+        z: point.z,
+        confidence: draft.confidence || 0.55,
+    };
+}
+
+function addControlContext(control: RelationControlDraft, nodeId: string): void {
+    addControlId(control.noteIds, nodeId.match(/^embed:note:(.+)$/)?.[1] || nodeId.match(/^embed:structure-root:([^:]+)/)?.[1] || '');
+    addControlId(control.chunkIds, nodeId.match(/^embed:chunk:(.+)$/)?.[1] || '');
+    addControlId(control.entityIds, entityIdFromNodeId(nodeId));
+    addControlId(control.eventIds, nodeId.match(/^embed:event:(.+)$/)?.[1] || '');
+}
+
+function materializeRelationContext(
+    draft: RelationControlDraft,
+    participantIds: string[],
+    byId: Map<string, GalaxyNode>,
+): Pick<GalaxyRelationControl, 'noteIds' | 'chunkIds' | 'entityIds' | 'eventIds' | 'ownerEntityId' | 'regionId'> {
+    const noteIds = [...draft.noteIds];
+    const chunkIds = [...draft.chunkIds];
+    const entityIds = [...draft.entityIds];
+    const eventIds = [...draft.eventIds];
+    let ownerEntityId = draft.ownerEntityId;
+    for (const id of participantIds) {
+        const node = byId.get(id);
+        const ownership = (node?.entity.metadata?.['productOwnership'] || {}) as Record<string, unknown>;
+        mergeControlContext(noteIds, arrayStringValues(ownership['noteIds']));
+        mergeControlContext(chunkIds, arrayStringValues(ownership['chunkIds']));
+        mergeControlContext(entityIds, arrayStringValues(ownership['entityIds']));
+        mergeControlContext(eventIds, arrayStringValues(ownership['eventIds']));
+        addControlId(noteIds, stringValue(node?.entity.metadata?.['noteId']));
+        addControlId(chunkIds, stringValue(node?.entity.metadata?.['chunkId']));
+        addControlId(entityIds, stringValue(node?.entity.metadata?.['sourceEntityId'] || node?.entity.metadata?.['entityId'] || node?.entity.metadata?.['canonicalEntityId']));
+        addControlId(entityIds, entityIdFromNodeId(id));
+        addControlId(eventIds, id.match(/^embed:event:(.+)$/)?.[1] || '');
+        if (!ownerEntityId) ownerEntityId = stringValue(ownership['ownerEntityId']) || entityIdFromNodeId(id);
+    }
+    const note = uniqueControlIds(noteIds)[0] || 'global';
+    const chunk = uniqueControlIds(chunkIds)[0] || '';
+    const owner = ownerEntityId || uniqueControlIds(entityIds)[0] || '';
+    const regionId = chunk
+        ? `transit:story:${note}:chunk:${chunk}${owner ? `:owner:${owner}` : ''}`
+        : owner
+            ? `transit:story:${note}:owner:${owner}`
+            : `transit:story:${note}:signals:${draft.family || draft.kind || 'relationship'}`;
+    return {
+        noteIds: uniqueControlIds(noteIds),
+        chunkIds: uniqueControlIds(chunkIds),
+        entityIds: uniqueControlIds(entityIds),
+        eventIds: uniqueControlIds(eventIds),
+        ownerEntityId: owner,
+        regionId,
+    };
+}
+
+function mergeControlContext(target: string[], source: string[]): void {
+    for (const item of source) addControlId(target, item);
+}
+
+function entityIdFromNodeId(id: string): string {
+    return id.match(/^embed:entity:(.+)$/)?.[1] || '';
+}
+
+function averageNodePosition(ids: string[], byId: Map<string, GalaxyNode>): { x: number; y: number; z: number } {
+    let x = 0, y = 0, z = 0, count = 0;
+    for (const id of ids) {
+        const node = byId.get(id);
+        if (!node) continue;
+        x += node.x;
+        y += node.y;
+        z += node.z;
+        count += 1;
+    }
+    return count ? { x: x / count, y: y / count, z: z / count } : { x: 0, y: 0, z: 0 };
+}
+
+function addControlId(ids: string[], id: string): void {
+    if (id && !ids.includes(id)) ids.push(id);
+}
+
+function uniqueControlIds(ids: string[]): string[] {
+    return [...new Set(ids.filter(Boolean))].sort();
+}
+
+function arrayStringValues(value: unknown): string[] {
+    return Array.isArray(value) ? value.map((item) => stringValue(item)).filter(Boolean) : [];
+}
+
+function isRelationControlId(id: string): boolean {
+    return /^embed:(graph-fact|temporalFact|causalFact):/.test(id);
+}
+
+function relationKindKey(value: string): string {
+    const key = String(value || '').replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+    if (/graph[-_]?fact|relationship/.test(key)) return 'graph-fact';
+    if (/temporal[-_]?fact/.test(key)) return 'temporal-fact';
+    if (/causal[-_]?fact/.test(key)) return 'causal-fact';
+    return key.replace(/_/g, '-');
 }
 
 export function stableUnit(value: string): number {
@@ -434,14 +851,20 @@ export function clamp(value: number, min: number, max: number): number {
 function buildLinks(edges: GalaxyInputEdge[], idToIndex: Map<string, number>): GalaxyEdge[] {
     const seen = new Set<string>();
     const links: GalaxyEdge[] = [];
-    const maxLinks = Math.min(900, Math.max(180, idToIndex.size * 5));
-    for (const edge of edges) {
+    const orderedEdges = [...edges].sort((left, right) =>
+        galaxyEdgePriority(right) - galaxyEdgePriority(left)
+        || right.confidence - left.confidence
+        || left.id.localeCompare(right.id),
+    );
+    for (const edge of orderedEdges) {
         const source = idToIndex.get(edge.sourceId);
         const target = idToIndex.get(edge.targetId);
         if (source === undefined || target === undefined || source === target) {
             continue;
         }
-        const key = source < target ? `${source}:${target}` : `${target}:${source}`;
+        const key = source < target
+            ? `${source}:${target}:${edge.type}`
+            : `${target}:${source}:${edge.type}`;
         if (seen.has(key)) {
             continue;
         }
@@ -457,11 +880,22 @@ function buildLinks(edges: GalaxyInputEdge[], idToIndex: Map<string, number>): G
             flowOffset: stableUnit(`${edge.id}:flow`),
             metadata: edge.metadata,
         });
-        if (links.length >= maxLinks) {
-            break;
-        }
     }
     return links;
+}
+
+function galaxyEdgePriority(edge: GalaxyInputEdge): number {
+    if (isStructuralGalaxyInputEdge(edge)) return 100;
+    const type = String(edge.type || '').toLowerCase();
+    if (type === 'embedding-backbone') return 80;
+    if (type === 'embedding-bridge') return 70;
+    if (/temporal|causal|event/.test(type)) return 60;
+    if (/relationship|relation|fact/.test(type)) return 45;
+    return 20;
+}
+
+function isStructuralGalaxyInputEdge(edge: GalaxyInputEdge): boolean {
+    return /target-parent|note-chunk|chunk-anchor|chunk-entity|anchor-entity|event-chunk|event-entity|memory-entity/i.test(String(edge.type || ''));
 }
 
 function applyEmbeddingTopologyLens(
@@ -485,15 +919,17 @@ function applyEmbeddingTopologyLens(
         else if (mode === 'lanes') boost = 0.72 + productLaneWeight(meta) * 0.58;
         else if (incident.has(index)) boost = 1.32;
         node.radius *= boost;
-        if (mode === 'clusters' && meta['embeddingClusterId']) {
-            const color = hslToRgb(clusterLensHsl(String(meta['embeddingClusterId'])));
-            node.r = Math.round(node.r * 0.58 + color.r * 0.42);
-            node.g = Math.round(node.g * 0.58 + color.g * 0.42);
-            node.b = Math.round(node.b * 0.58 + color.b * 0.42);
-        } else if (mode === 'regions' && meta['productRegionRole']) {
-            mixNodeColor(node, productRegionHsl(String(meta['productRegionRole'])), 0.48);
-        } else if (mode === 'lanes' && meta['productLaneKind']) {
-            mixNodeColor(node, productLaneHsl(String(meta['productLaneKind'])), 0.5);
+        if (embeddingLensMayRecolor(node)) {
+            if (mode === 'clusters' && meta['embeddingClusterId']) {
+                const color = hslToRgb(clusterLensHsl(String(meta['embeddingClusterId'])));
+                node.r = Math.round(node.r * 0.58 + color.r * 0.42);
+                node.g = Math.round(node.g * 0.58 + color.g * 0.42);
+                node.b = Math.round(node.b * 0.58 + color.b * 0.42);
+            } else if (mode === 'regions' && meta['productRegionRole']) {
+                mixNodeColor(node, productRegionHsl(String(meta['productRegionRole'])), 0.48);
+            } else if (mode === 'lanes' && meta['productLaneKind']) {
+                mixNodeColor(node, productLaneHsl(String(meta['productLaneKind'])), 0.5);
+            }
         }
     }
     for (const link of links) {
@@ -534,6 +970,18 @@ function embeddingEdgeRole(link: GalaxyEdge): 'local' | 'backbone' | 'bridge' | 
     if (type === 'embedding-bridge') return 'bridge';
     if (type === 'embedding-local') return 'local';
     return '';
+}
+
+function embeddingLensMayRecolor(node: GalaxyNode): boolean {
+    if (isAtlasChunkRenderableNode(node.entity)) return false;
+    return firstGraphNodeColorKind(
+        stringValue(node.entity.metadata?.['graphColorKind']),
+        stringValue(node.entity.metadata?.['graphKind']),
+        stringValue(node.entity.metadata?.['styleKey']),
+        stringValue(node.entity.metadata?.['atlasKind']),
+        stringValue(node.entity.metadata?.['sourceType']),
+        node.entity.kind,
+    ) !== 'chunk';
 }
 
 function clusterLensHsl(clusterId: string): string {
@@ -710,6 +1158,15 @@ function groupInfoForNode(entity: GalaxyRenderableNode): Pick<GalaxyGroupPlan, '
         return { id: 'group:query', label: 'Query Trace', kind: 'query' };
     }
 
+    const galaxyId = stringValue(metadata.galaxyId);
+    if (galaxyId) {
+        return {
+            id: galaxyId,
+            label: stringValue(metadata['galaxyLabel']) || sourceTitleFromLabel(entity.label) || titleCase(entity.kind),
+            kind: sourceType === 'entity' ? 'entity-cluster' : 'semantic-cluster',
+        };
+    }
+
     const noteId = stringValue(metadata.noteId) || (sourceType === 'doc' ? stringValue(metadata.sourceId) : '');
     if (noteId) {
         const title = stringValue(metadata.sourceTitle) || sourceTitleFromLabel(entity.label) || `Note ${noteId.slice(0, 6)}`;
@@ -800,6 +1257,9 @@ interface HopfBaseInfo extends Rgb {
     phases: number[];
     nodeIds: string[];
     fiberKinds: Set<string>;
+    secondaryCellIds: Set<string>;
+    backendReceiptCount: number;
+    documentChartCount: number;
     importance: number;
 }
 
@@ -935,15 +1395,43 @@ function applyHybridSpaceLayout(nodes: GalaxyNode[], links: GalaxyEdge[]): void 
     for (const node of nodes) {
         const hierarchy = hybridHierarchyInfo(node);
         const direction = hybridHierarchyDirection(node, hierarchy);
-        const radius = hybridHierarchyRadius(node, hybridRadius(node), hierarchy);
-        node.x = direction.x * radius * HYBRID_SHELL_RADIUS;
-        node.y = direction.y * radius * HYBRID_SHELL_RADIUS;
-        node.z = direction.z * radius * HYBRID_SHELL_RADIUS;
+        const baseRadius = hybridRadius(node);
+        const radius = hybridHierarchyRadius(node, baseRadius, hierarchy);
+        const point = hybridPlacementPoint(direction, radius);
+        node.x = point.x;
+        node.y = point.y;
+        node.z = point.z;
         node.baseX = node.x;
         node.baseY = node.y;
         node.baseZ = node.z;
         node.depth = radius;
         node.radius *= hybridNodeScale(node, radius);
+        const receipt: GalaxyHybridShellReceipt = {
+            mode: 'hybridShell',
+            geometryVersion: 'hybrid_shell_anatomy_v1',
+            lane: hierarchy.lane,
+            phase: hierarchy.phase,
+            specificity: hierarchy.specificity,
+            ambiguity: hierarchy.ambiguity,
+            level: hierarchy.level,
+            strength: hierarchy.strength,
+            baseRadius,
+            shellRadius: radius,
+            laneStrength: hybridLaneStrength(hierarchy),
+            direction,
+            point,
+            sourceSignals: hybridHierarchySourceSignals(node),
+        };
+        node.hybridShell = receipt;
+        node.hybridShellPoint = point;
+        node.hybridRenderPoint = point;
+        const metadata = node.entity.metadata ?? {};
+        node.entity.metadata = {
+            ...metadata,
+            hybridShell: receipt,
+            hybridShellPoint: point,
+            hybridRenderPoint: point,
+        };
     }
 
     for (const link of links) {
@@ -1028,17 +1516,32 @@ function hybridHierarchyInfo(node: GalaxyNode): HybridHierarchyInfo {
 function hybridHierarchyDirection(node: GalaxyNode, hierarchy: HybridHierarchyInfo): { x: number; y: number; z: number } {
     const base = normalizedDirection(node);
     const lane = hybridLaneDirection(hierarchy);
-    const laneStrength =
-        hierarchy.lane === 'temporal' ? hierarchy.strength * 1.08 :
-        hierarchy.lane === 'causal' ? hierarchy.strength * 1.02 :
-        hierarchy.lane === 'document' ? hierarchy.strength * 0.94 :
-        hierarchy.strength * 0.72;
+    const laneStrength = hybridLaneStrength(hierarchy);
     const mixed = {
         x: base.x * (1 - laneStrength) + lane.x * laneStrength,
         y: base.y * (1 - laneStrength) + lane.y * laneStrength,
         z: base.z * (1 - laneStrength) + lane.z * laneStrength,
     };
     return normalizeVector(mixed, base);
+}
+
+function hybridLaneStrength(hierarchy: HybridHierarchyInfo): number {
+    if (hierarchy.lane === 'temporal') return hierarchy.strength * 1.08;
+    if (hierarchy.lane === 'causal') return hierarchy.strength * 1.02;
+    if (hierarchy.lane === 'document') return hierarchy.strength * 0.94;
+    return hierarchy.strength * 0.72;
+}
+
+function hybridPlacementPoint(
+    direction: { x: number; y: number; z: number },
+    radius: number,
+): GalaxyHybridPlacementPoint {
+    return {
+        x: direction.x * radius * HYBRID_SHELL_RADIUS,
+        y: direction.y * radius * HYBRID_SHELL_RADIUS,
+        z: direction.z * radius * HYBRID_SHELL_RADIUS,
+        radius,
+    };
 }
 
 function hybridLaneDirection(hierarchy: HybridHierarchyInfo): { x: number; y: number; z: number } {
@@ -1135,6 +1638,31 @@ function normalizeHierarchyLane(value: string): string {
     return 'semantic';
 }
 
+function hybridHierarchySourceSignals(node: GalaxyNode): string[] {
+    const metadata = node.entity.metadata || {};
+    const product = recordValue(metadata['product']);
+    const region = recordValue(product['region']);
+    const lanes = recordValue(product['lanes']);
+    const lorentz = recordValue(metadata['lorentz']);
+    const signals: string[] = [];
+    appendSourceSignal(signals, 'productLaneKind', metadata['productLaneKind']);
+    appendSourceSignal(signals, 'product.region.laneKind', region['laneKind']);
+    appendSourceSignal(signals, 'product.dominantLane', product['dominantLane']);
+    appendSourceSignal(signals, 'product.lanes.dominantLane', lanes['dominantLane']);
+    appendSourceSignal(signals, 'lorentz.dominantLane', lorentz['dominantLane']);
+    appendSourceSignal(signals, 'lorentz.primaryTreeKind', lorentz['primaryTreeKind']);
+    appendSourceSignal(signals, 'graphRelationFamily', metadata['graphRelationFamily']);
+    appendSourceSignal(signals, 'graphKind', metadata['graphKind']);
+    appendSourceSignal(signals, 'sourceType', metadata['sourceType']);
+    appendSourceSignal(signals, 'kind', node.entity.kind);
+    return signals;
+}
+
+function appendSourceSignal(signals: string[], label: string, value: unknown): void {
+    if (typeof value !== 'string' || !value.trim()) return;
+    signals.push(`${label}=${value.trim()}`);
+}
+
 function recordValue(value: unknown): Record<string, unknown> {
     return value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : {};
 }
@@ -1222,18 +1750,24 @@ function applyHopfProjectionLayout(nodes: GalaxyNode[], links: GalaxyEdge[]): Ga
         }
     }
 
-    return [...buildHopfRibbons(baseInfos), ...crossFiberBraids];
+    return [
+        ...buildHopfReceiptRibbons(hopfReceiptBases(baseInfos)),
+        ...buildHopfRibbons(baseInfos),
+        ...crossFiberBraids,
+    ];
 }
 
 function registerHopfBase(baseInfos: Map<string, HopfBaseInfo>, baseKey: string, node: GalaxyNode, anchor: boolean): void {
     const existing = baseInfos.get(baseKey);
-    const direction = normalizedDirection(node);
+    const metadata = hopfMetadata(node);
+    const direction = hopfDirectionFromMetadata(metadata?.['direction']) || normalizedDirection(node);
     const weight = anchor ? 1.35 : 1;
     if (existing) {
         existing.direction.x += direction.x * weight;
         existing.direction.y += direction.y * weight;
         existing.direction.z += direction.z * weight;
         existing.directionWeight += weight;
+        recordHopfReceiptMetadata(existing, node, metadata);
         if (anchor) {
             existing.r = node.r;
             existing.g = node.g;
@@ -1252,11 +1786,15 @@ function registerHopfBase(baseInfos: Map<string, HopfBaseInfo>, baseKey: string,
         phases: [],
         nodeIds: [],
         fiberKinds: new Set<string>(),
+        secondaryCellIds: new Set<string>(),
+        backendReceiptCount: 0,
+        documentChartCount: 0,
         importance: 0,
         r: node.r,
         g: node.g,
         b: node.b,
     });
+    recordHopfReceiptMetadata(baseInfos.get(baseKey)!, node, metadata);
 }
 
 function normalizeHopfBaseDirections(baseInfos: Map<string, HopfBaseInfo>): void {
@@ -1371,6 +1909,37 @@ function hopfBraidPoint(
         y: direction.y * radius,
         z: direction.z * radius,
     };
+}
+
+function recordHopfReceiptMetadata(info: HopfBaseInfo, node: GalaxyNode, metadata: Record<string, unknown> | null): void {
+    if (!metadata || metadata['resonanceSource'] !== 'snapshot-hopf-resonance-space') return;
+    info.backendReceiptCount += 1;
+    const secondaryCellIds = metadata['secondaryCellIds'];
+    if (Array.isArray(secondaryCellIds)) {
+        for (const cellId of secondaryCellIds) {
+            if (typeof cellId === 'string' && cellId) info.secondaryCellIds.add(cellId);
+        }
+    }
+    const fiberKind = String(metadata['fiberKind'] || '').toLowerCase();
+    const role = String(metadata['role'] || '').toLowerCase();
+    if (fiberKind === 'document_chart' || role === 'document-chart') {
+        info.documentChartCount += Math.max(1, Number(node.entity.totalMentions || 1));
+    }
+}
+
+function hopfReceiptBases(baseInfos: Map<string, HopfBaseInfo>): HopfReceiptBase[] {
+    return [...baseInfos.values()].map((info): HopfReceiptBase => ({
+        key: info.key,
+        direction: info.direction,
+        phases: info.phases,
+        nodeIds: info.nodeIds,
+        secondaryCellIds: [...info.secondaryCellIds],
+        fiberKinds: [...info.fiberKinds],
+        importance: info.importance,
+        backendReceiptCount: info.backendReceiptCount,
+        documentChartCount: info.documentChartCount,
+        color: { r: info.r, g: info.g, b: info.b },
+    }));
 }
 
 function hopfBraidNormal(
@@ -1605,14 +2174,15 @@ function groupColor(id: string, index: number): Rgb {
     return hslToRgb(`${hue} 76% 58%`);
 }
 
-function prioritizeEntities(entities: GalaxyRenderableNode[]): GalaxyRenderableNode[] {
-    const maxNodes =
-        entities.length > 1200 ? 180 :
-        entities.length > 640 ? 210 :
-        entities.length > 320 ? 240 : 260;
+function orderEntitiesForStableRender(entities: GalaxyRenderableNode[]): GalaxyRenderableNode[] {
+    // Scene assembly must not downsample graph atoms; explicit lenses must filter upstream with receipts.
     return [...entities]
-        .sort((left, right) => entityPriority(right) - entityPriority(left) || left.label.localeCompare(right.label))
-        .slice(0, maxNodes);
+        .sort((left, right) => entityPriority(right) - entityPriority(left) || left.label.localeCompare(right.label));
+}
+
+function assertNoImplicitNodeDrop(inputCount: number, outputCount: number): void {
+    if (inputCount === outputCount) return;
+    throw new Error(`[GraphGalaxy] Scene assembly dropped ${inputCount - outputCount} renderable nodes. Use an explicit atlas lens upstream instead.`);
 }
 
 function entityPriority(entity: GalaxyRenderableNode): number {
@@ -1646,7 +2216,18 @@ function normalizeRenderKind(kind: string): string {
 }
 
 export function resolveGalaxyNodeColorHsl(entity: GalaxyRenderableNode): string {
+    if (isAtlasChunkRenderableNode(entity)) return entityColorStore.getRawGraphNodeHsl('chunk');
+
     const metadata = entity.metadata || {};
+    const structuralColorKind = firstGraphNodeColorKind(
+        stringValue(metadata['styleKey']),
+        stringValue(metadata['atlasKind']),
+        stringValue(metadata['sourceType']),
+        stringValue(metadata['graphKind']),
+        entity.kind,
+    );
+    if (structuralColorKind === 'chunk') return entityColorStore.getRawGraphNodeHsl('chunk');
+
     const graphColorKind = firstGraphNodeColorKind(
         stringValue(metadata['graphColorKind']),
         stringValue(metadata['graphRelationFamily']),
@@ -1662,13 +2243,54 @@ export function resolveGalaxyNodeColorHsl(entity: GalaxyRenderableNode): string 
     );
     if (entityKind) return entityColorStore.getRawHsl(entityKind);
 
-    const fallbackGraphColorKind = firstGraphNodeColorKind(
+    return entity.colorHsl || entityColorStore.getRawHsl(entity.kind);
+}
+
+export function isAtlasChunkRenderableNode(entity: Pick<GalaxyRenderableNode, 'id' | 'kind' | 'metadata'>): boolean {
+    const metadata = entity.metadata || {};
+    const trace = chunkRecordValue(metadata['visualTrace']);
+    const directKind = firstGraphNodeColorKind(
+        stringValue(metadata['graphColorKind']),
+        stringValue(metadata['styleKey']),
+        stringValue(metadata['atlasKind']),
         stringValue(metadata['sourceType']),
+        stringValue(metadata['graphKind']),
         entity.kind,
     );
-    if (fallbackGraphColorKind) return entityColorStore.getRawGraphNodeHsl(fallbackGraphColorKind);
+    if (directKind === 'chunk') return true;
+    return [
+        entity.id,
+        entity.kind,
+        stringValue(metadata['atlasDocumentUnitKind']),
+        stringValue(metadata['atlasStructuralRole']),
+        stringValue(metadata['signalLane']),
+        stringValue(metadata['signalStructuralRole']),
+        stringValue(metadata['productLaneKind']),
+        stringValue(metadata['atlasObjectId']),
+        stringValue(metadata['atlasTargetId']),
+        stringValue(metadata['visualSourceId']),
+        stringValue(trace['objectKind']),
+        stringValue(trace['targetKind']),
+        stringValue(trace['packetTargetId']),
+        stringValue(trace['packetObjectId']),
+    ].some(isChunkRenderToken);
+}
 
-    return entity.colorHsl || entityColorStore.getRawHsl(entity.kind);
+function chunkRecordValue(value: unknown): Record<string, unknown> {
+    return value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : {};
+}
+
+function isChunkRenderToken(value: string): boolean {
+    const raw = value.trim().toLowerCase();
+    if (!raw) return false;
+    if (/^(embed|target|source)[:_]chunk[:_-]/.test(raw) || /^chunk[:_]/.test(raw)) return true;
+    const token = raw.replace(/[^a-z0-9]+/g, '');
+    return token === 'chunk'
+        || token === 'leaf'
+        || token === 'leafchunk'
+        || token === 'chunkatom'
+        || token === 'documentunit'
+        || token === 'documentchunk';
 }
 
 function firstGraphNodeColorKind(...values: Array<string | null | undefined>) {

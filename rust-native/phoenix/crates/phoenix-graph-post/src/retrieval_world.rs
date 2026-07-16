@@ -3,8 +3,8 @@ use phoenix_graph_kernel::{
     KernelViewRequest,
 };
 use phoenix_store_native_core::{
-    PhoenixGraphPatchStore, PhoenixLexicalQueryStore, PhoenixSemanticGraphPatchStore,
-    PhoenixSemanticIndexStore,
+    PhoenixGraphKernelStoreV2, PhoenixGraphPatchStore, PhoenixLexicalQueryStore,
+    PhoenixSemanticGraphPatchStore, PhoenixSemanticIndexStore,
 };
 use phoenix_types::ScopeKey;
 
@@ -31,6 +31,7 @@ pub(crate) fn retrieved_world_state_impl<S>(
 ) -> Result<Option<GraphRetrievedWorldStateAnswer>, GraphQueryError>
 where
     S: PhoenixGraphPatchStore
+        + PhoenixGraphKernelStoreV2
         + PhoenixLexicalQueryStore
         + PhoenixSemanticGraphPatchStore
         + PhoenixSemanticIndexStore,
@@ -185,6 +186,7 @@ pub(crate) fn answer_world_state_from_view(
     let ranked = {
         let _timer = measure_graph_runtime(GraphRuntimeMetric::RankedWorldState);
         let mut ranked = rank_world_state_answer(
+            request.truth_plane,
             &region_snapshot.vertices,
             &region_snapshot.candidate_edges,
             &answer,
@@ -205,6 +207,7 @@ pub(crate) fn answer_world_state_from_view(
             valid_at: request.valid_at,
             recorded_at: request.recorded_at,
             include_candidate_graph: request.include_candidate_graph,
+            truth_plane: request.truth_plane,
         },
         answer: ranked,
         seeds,

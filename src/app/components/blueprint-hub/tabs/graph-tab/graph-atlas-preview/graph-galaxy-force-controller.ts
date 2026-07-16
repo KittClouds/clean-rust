@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 
 import {
+    isTransitLayoutMode,
     mergeGalaxySettings,
     type GalaxyNodeDragMode,
     type GalaxyRenderSettings,
@@ -18,8 +19,8 @@ const HOPF_DEFAULT_BOUNDARY_RADIUS = 1.95;
 const HOPF_BOUNDARY_PADDING = 1.04;
 const HOPF_ANCHOR_RAIL_PULL = 0.08;
 const HOPF_FIBER_RAIL_PULL = 0.16;
-const PRODUCT_DEFAULT_BOUNDARY_RADIUS = 2.32;
-const PRODUCT_BOUNDARY_PADDING = 1.1;
+const TRANSIT_DEFAULT_BOUNDARY_RADIUS = 2.32;
+const TRANSIT_BOUNDARY_PADDING = 1.1;
 
 export class GraphGalaxyForceController {
     private base3d = new Float32Array(0);
@@ -27,6 +28,7 @@ export class GraphGalaxyForceController {
     private hybridShellLocked = new Uint8Array(0);
     private hybridShellRadius3d = new Float32Array(0);
     private hybridShellRadius2d = new Float32Array(0);
+    private hierarchyShellRadii = new Float32Array(0);
     private hopfRailStrength = new Float32Array(0);
     private vx = new Float32Array(0);
     private vy = new Float32Array(0);
@@ -45,8 +47,8 @@ export class GraphGalaxyForceController {
     private hybridBoundaryRadius2d = HYBRID_DEFAULT_BOUNDARY_RADIUS;
     private hopfBoundaryRadius3d = HOPF_DEFAULT_BOUNDARY_RADIUS;
     private hopfBoundaryRadius2d = HOPF_DEFAULT_BOUNDARY_RADIUS;
-    private productBoundaryRadius3d = PRODUCT_DEFAULT_BOUNDARY_RADIUS;
-    private productBoundaryRadius2d = PRODUCT_DEFAULT_BOUNDARY_RADIUS;
+    private transitBoundaryRadius3d = TRANSIT_DEFAULT_BOUNDARY_RADIUS;
+    private transitBoundaryRadius2d = TRANSIT_DEFAULT_BOUNDARY_RADIUS;
 
     bind(scene: GalaxySceneV2): void {
         this.scene = scene;
@@ -55,6 +57,7 @@ export class GraphGalaxyForceController {
         this.hybridShellLocked = new Uint8Array(scene.ids.length);
         this.hybridShellRadius3d = new Float32Array(scene.ids.length);
         this.hybridShellRadius2d = new Float32Array(scene.ids.length);
+        this.hierarchyShellRadii = scene.hierarchyShellRadii?.slice() ?? new Float32Array(scene.ids.length);
         this.hopfRailStrength = new Float32Array(scene.ids.length);
         this.vx = new Float32Array(scene.ids.length);
         this.vy = new Float32Array(scene.ids.length);
@@ -62,7 +65,8 @@ export class GraphGalaxyForceController {
         this.fixed = new Uint8Array(scene.ids.length);
         this.rebuildHybridConstraints(scene);
         this.rebuildHopfConstraints(scene);
-        this.rebuildProductConstraints(scene);
+        this.rebuildTransitConstraints(scene);
+        this.constrainManifoldScene(scene);
         this.neighbors.length = scene.ids.length;
         for (let i = 0; i < scene.ids.length; i++) this.neighbors[i] = [];
         for (let i = 0; i < scene.edgePairs.length; i += 2) {
@@ -84,8 +88,8 @@ export class GraphGalaxyForceController {
         this.settings = mergeGalaxySettings(settings ?? undefined);
         const layoutChanged = previous.edgeLength !== this.settings.edgeLength || previous.nodeDistance !== this.settings.nodeDistance;
         if (!layoutChanged || !this.scene || this.scene.ids.length < 2) return;
-        if (this.scene.layoutMode === 'productManifold') {
-            this.applyProductVolume(this.scene);
+        if (isTransitLayoutMode(this.scene.layoutMode)) {
+            this.applyTransitVolume(this.scene);
             this.forceActive = false;
             this.relaxing = false;
             this.alpha = 0;
@@ -378,6 +382,13 @@ export class GraphGalaxyForceController {
 
         const shellCutoff = this.hybridBoundaryRadius3d * HYBRID_SHELL_LOCK_RATIO;
         for (let i = 0; i < scene.ids.length; i++) {
+            const contractRadius = this.hierarchyShellRadii[i] || 0;
+            if (scene.layoutMode === 'lorentzTree' && contractRadius > 0) {
+                this.hybridShellRadius3d[i] = contractRadius;
+                this.hybridShellRadius2d[i] = contractRadius;
+                this.hybridShellLocked[i] = 1;
+                continue;
+            }
             this.hybridShellLocked[i] = this.hybridShellRadius3d[i] >= shellCutoff ? 1 : 0;
         }
     }
@@ -396,7 +407,7 @@ export class GraphGalaxyForceController {
     private constrainManifoldBuffer(scene: GalaxySceneV2, buffer: Float32Array): void {
         this.constrainHybridBuffer(scene, buffer);
         this.constrainHopfBuffer(scene, buffer);
-        this.constrainProductBuffer(scene, buffer);
+        this.constrainTransitBuffer(scene, buffer);
     }
 
     private constrainHybridBuffer(scene: GalaxySceneV2, buffer: Float32Array): void {
@@ -483,25 +494,25 @@ export class GraphGalaxyForceController {
         }
     }
 
-    private rebuildProductConstraints(scene: GalaxySceneV2): void {
-        this.productBoundaryRadius3d = PRODUCT_DEFAULT_BOUNDARY_RADIUS;
-        this.productBoundaryRadius2d = PRODUCT_DEFAULT_BOUNDARY_RADIUS;
-        if (scene.layoutMode !== 'productManifold') return;
-        const expansion = productManifoldExpansionScale(this.settings);
+    private rebuildTransitConstraints(scene: GalaxySceneV2): void {
+        this.transitBoundaryRadius3d = TRANSIT_DEFAULT_BOUNDARY_RADIUS;
+        this.transitBoundaryRadius2d = TRANSIT_DEFAULT_BOUNDARY_RADIUS;
+        if (!isTransitLayoutMode(scene.layoutMode)) return;
+        const expansion = transitManifoldExpansionScale(this.settings);
         for (let i = 0; i < scene.ids.length; i++) {
             const radius3d = pointRadius(this.base3d, i, true);
             const radius2d = pointRadius(this.base2d, i, false);
-            if (Number.isFinite(radius3d)) this.productBoundaryRadius3d = Math.max(this.productBoundaryRadius3d, radius3d * expansion * PRODUCT_BOUNDARY_PADDING);
-            if (Number.isFinite(radius2d)) this.productBoundaryRadius2d = Math.max(this.productBoundaryRadius2d, radius2d * expansion * PRODUCT_BOUNDARY_PADDING);
+            if (Number.isFinite(radius3d)) this.transitBoundaryRadius3d = Math.max(this.transitBoundaryRadius3d, radius3d * expansion * TRANSIT_BOUNDARY_PADDING);
+            if (Number.isFinite(radius2d)) this.transitBoundaryRadius2d = Math.max(this.transitBoundaryRadius2d, radius2d * expansion * TRANSIT_BOUNDARY_PADDING);
         }
     }
 
-    private applyProductVolume(scene: GalaxySceneV2): void {
-        if (scene.layoutMode !== 'productManifold') return;
-        const expansion = productManifoldExpansionScale(this.settings);
+    private applyTransitVolume(scene: GalaxySceneV2): void {
+        if (!isTransitLayoutMode(scene.layoutMode)) return;
+        const expansion = transitManifoldExpansionScale(this.settings);
         this.scaleFromBase(this.base3d, scene.positions3d, expansion, true);
         this.scaleFromBase(this.base2d, scene.positions2d, expansion, false);
-        this.rebuildProductConstraints(scene);
+        this.rebuildTransitConstraints(scene);
         this.vx.fill(0);
         this.vy.fill(0);
         this.vz.fill(0);
@@ -515,10 +526,10 @@ export class GraphGalaxyForceController {
         }
     }
 
-    private constrainProductBuffer(scene: GalaxySceneV2, buffer: Float32Array): void {
-        if (scene.layoutMode !== 'productManifold') return;
+    private constrainTransitBuffer(scene: GalaxySceneV2, buffer: Float32Array): void {
+        if (!isTransitLayoutMode(scene.layoutMode)) return;
         const is3d = buffer === scene.positions3d && this.mode !== '2d';
-        const boundaryRadius = is3d ? this.productBoundaryRadius3d : this.productBoundaryRadius2d;
+        const boundaryRadius = is3d ? this.transitBoundaryRadius3d : this.transitBoundaryRadius2d;
         for (let i = 0; i < scene.ids.length; i++) {
             const offset = i * 3;
             const x = buffer[offset];
@@ -571,7 +582,7 @@ export class GraphGalaxyForceController {
     }
 }
 
-export function productManifoldExpansionScale(settings: Pick<GalaxyRenderSettings, 'edgeLength' | 'nodeDistance'>): number {
+export function transitManifoldExpansionScale(settings: Pick<GalaxyRenderSettings, 'edgeLength' | 'nodeDistance'>): number {
     const distance = clamp(settings.nodeDistance, 0.15, 3.2);
     const edgeLength = clamp(settings.edgeLength, 0.15, 3.4);
     return clamp(1 + (distance - 1) * 0.28 + (edgeLength - 1) * 0.16, 0.68, 1.82);

@@ -13,6 +13,7 @@ mod binary;
 mod dynamic_gliclass;
 #[cfg(not(target_arch = "wasm32"))]
 mod dynamic_gliner;
+mod document_graph_commit;
 mod evidence_ledger;
 mod frame_extraction;
 #[cfg(not(target_arch = "wasm32"))]
@@ -70,7 +71,7 @@ use phoenix_store_native_core::{
     SEMANTIC_MODEL_ID, SEMANTIC_VECTOR_DIM,
 };
 #[cfg(not(target_arch = "wasm32"))]
-use phoenix_store_overgraph::PhoenixOvergraphStore;
+use phoenix_store_overgraph::{OvergraphFlushReport, PhoenixOvergraphStore};
 use phoenix_structure::PhoenixStructure;
 use phoenix_triverse_v2::PhoenixTriverseV2;
 use phoenix_types as dynamic_types;
@@ -164,14 +165,18 @@ const RUNTIME_CAPABILITIES: &[&str] = &[
     "graph:repairLiveTopology",
     "graph:upsertNode",
     "graph:upsertEdge",
+    "documentGraph:commit",
+    "documentGraph:undo",
     "note:list",
     "note:get",
     "note:listByIds",
     "note:upsert",
     "note:delete",
     "persistence:applyWalBatch",
+    "persistence:flushNativeStore",
     "persistence:clearDerived",
     "persistence:clearDerivedEphemera",
+    "semantic:runEmbedderTruthReview",
     "semantic:listNliJudgmentInputs",
     "semantic:applyNliJudgments",
     "session:close",
@@ -196,6 +201,23 @@ struct PersistenceWalRecord {
     partition: String,
     #[serde(rename = "writtenAt")]
     written_at: Option<u64>,
+}
+
+#[derive(Clone, Debug, Default, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct PersistenceWalApplyReport {
+    records: usize,
+    note_upserts: usize,
+    note_deletes: usize,
+    relation_upserts: usize,
+    relation_deletes: usize,
+    scoped_document_upserts: usize,
+    lex_rebuilt: bool,
+    parse_ms: u64,
+    note_ms: u64,
+    relation_ms: u64,
+    lex_ms: u64,
+    total_ms: u64,
 }
 
 #[derive(Clone, Debug)]
@@ -283,6 +305,116 @@ struct Phase2CandidateEdgeRecord {
     edge_type: String,
     document_id: Option<String>,
     base_score: f64,
+}
+
+#[derive(Clone, Debug, Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct SemanticTruthReviewScopeHint {
+    scope_id: Option<String>,
+    label: Option<String>,
+}
+
+#[derive(Clone, Debug, Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct SemanticTruthReviewModelRequest {
+    ui_model_id: Option<String>,
+    model_id: Option<String>,
+    model_label: Option<String>,
+    embedding_profile: Option<String>,
+    execution_provider: Option<String>,
+    dimension: Option<usize>,
+}
+
+#[derive(Clone, Debug, Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct SemanticTruthReviewRequest {
+    lane_mode: Option<String>,
+    cache_policy: Option<String>,
+    edge_preview_limit: Option<usize>,
+    #[serde(default)]
+    document_ids: Vec<String>,
+    #[serde(default)]
+    node_ids: Vec<String>,
+    scope_hint: Option<SemanticTruthReviewScopeHint>,
+    #[serde(default)]
+    model: SemanticTruthReviewModelRequest,
+}
+
+#[derive(Clone, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct SemanticTruthReviewResponse {
+    contract_version: u32,
+    candidate_only: bool,
+    lane_mode: String,
+    model_id: String,
+    model_label: String,
+    embedding_profile: String,
+    dimension: usize,
+    execution_provider: String,
+    cache: SemanticTruthReviewCacheStats,
+    timings: SemanticTruthReviewTimings,
+    output: SemanticTruthReviewOutput,
+    sidecar: Value,
+}
+
+#[derive(Clone, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct SemanticTruthReviewCacheStats {
+    hits: usize,
+    misses: usize,
+}
+
+#[derive(Clone, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct SemanticTruthReviewTimings {
+    derive_ms: u128,
+    total_ms: u128,
+}
+
+#[derive(Clone, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct SemanticTruthReviewOutput {
+    scope_key: String,
+    summary: SemanticTruthReviewSummary,
+    candidate_node_count: usize,
+    candidate_edge_count: usize,
+    candidate_graph_vertex_count: usize,
+    candidate_graph_edge_count: usize,
+    candidate_graph_scope: String,
+    committed_topology_writes: usize,
+    preview: Vec<SemanticTruthReviewPreview>,
+}
+
+#[derive(Clone, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct SemanticTruthReviewSummary {
+    node_count: usize,
+    edge_count: usize,
+}
+
+#[derive(Clone, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct SemanticTruthReviewPreview {
+    edge_id: String,
+    family: String,
+    status: String,
+    score_millis: u32,
+    source_node_id: String,
+    target_node_id: String,
+    nli_support_millis: u32,
+    nli_contradiction_millis: u32,
+}
+
+#[derive(Clone, Debug)]
+struct SemanticTruthReviewCandidateRow {
+    edge_id: String,
+    source_node_id: String,
+    target_node_id: String,
+    family: String,
+    status: String,
+    score: f64,
+    nli_support_millis: u32,
+    nli_contradiction_millis: u32,
 }
 
 #[derive(Clone, Debug, Default)]
@@ -651,21 +783,12 @@ impl PhoenixRuntime {
         }
     }
 
-    fn replace_native_relation_rows_with_keys(
+    fn upsert_native_relation_rows(
         &self,
         relation: &str,
         rows: &[Value],
-        key_fields: &[&str],
     ) -> Result<(), StoreError> {
-        let store = self.native_row_store()?;
-        let mut existing = store.fetch_rows(relation)?;
-        existing.retain(|existing_row| {
-            !rows
-                .iter()
-                .any(|candidate| relation_rows_match_keys(existing_row, candidate, key_fields))
-        });
-        existing.extend(rows.iter().cloned());
-        store.replace_relation_rows(relation, &existing)
+        self.native_row_store()?.put_rows(relation, rows)
     }
 
     pub(crate) fn put_relation_row(&self, relation: &str, row: Value) -> Result<(), StoreError> {
@@ -769,6 +892,14 @@ impl PhoenixRuntime {
                 Err(self.legacy_graph_disabled("legacy relation names"))
             }
         }
+    }
+
+    #[cfg(not(target_arch = "wasm32"))]
+    pub fn flush_native_store(&self) -> Result<OvergraphFlushReport, StoreError> {
+        self.overgraph_store
+            .as_ref()
+            .ok_or_else(|| self.native_unsupported("native store flush"))?
+            .flush()
     }
 
     fn fetch_store_command_relation_rows(&self, relation: &str) -> Result<Vec<Value>, StoreError> {
@@ -2941,6 +3072,233 @@ impl PhoenixRuntime {
         Ok(inputs)
     }
 
+    fn run_embedder_truth_review(
+        &self,
+        request: SemanticTruthReviewRequest,
+    ) -> Result<SemanticTruthReviewResponse, StoreError> {
+        let total_started = Instant::now();
+        let graph = self.phase2_graph_view(true)?;
+        let rows = self.candidate_edge_rows()?;
+        let keep_docs = request
+            .document_ids
+            .iter()
+            .map(String::as_str)
+            .collect::<HashSet<_>>();
+        let keep_nodes = request
+            .node_ids
+            .iter()
+            .map(String::as_str)
+            .collect::<HashSet<_>>();
+        let scoped = !keep_docs.is_empty() || !keep_nodes.is_empty();
+        let preview_limit = request.edge_preview_limit.unwrap_or(16).min(64);
+        let derive_started = Instant::now();
+        let mut node_ids = BTreeSet::<String>::new();
+        let mut candidates = Vec::<SemanticTruthReviewCandidateRow>::new();
+
+        for row in rows {
+            let Some(source_id) = row.get("source_id").and_then(Value::as_str) else {
+                continue;
+            };
+            let Some(target_id) = row.get("target_id").and_then(Value::as_str) else {
+                continue;
+            };
+            let edge_type = row
+                .get("edge_type")
+                .and_then(Value::as_str)
+                .unwrap_or("candidate");
+            let attributes = row.get("attributes").unwrap_or(&Value::Null);
+            if !phase2_candidate_row_is_active(attributes) {
+                continue;
+            }
+
+            let row_document_id = row
+                .get("document_id")
+                .and_then(Value::as_str)
+                .or_else(|| attributes.get("documentId").and_then(Value::as_str));
+            let source_document_id = graph
+                .vertices
+                .get(source_id)
+                .and_then(|vertex| vertex.document_id.as_deref());
+            let target_document_id = graph
+                .vertices
+                .get(target_id)
+                .and_then(|vertex| vertex.document_id.as_deref());
+            let touched = !scoped
+                || row_document_id
+                    .map(|document_id| keep_docs.contains(document_id))
+                    .unwrap_or(false)
+                || source_document_id
+                    .map(|document_id| keep_docs.contains(document_id))
+                    .unwrap_or(false)
+                || target_document_id
+                    .map(|document_id| keep_docs.contains(document_id))
+                    .unwrap_or(false)
+                || keep_nodes.contains(source_id)
+                || keep_nodes.contains(target_id);
+            if !touched {
+                continue;
+            }
+
+            let data = row.get("data");
+            let score = phase2_candidate_row_base_score(data, Some(attributes));
+            let edge_id = row
+                .get("id")
+                .or_else(|| row.get("edge_id"))
+                .and_then(Value::as_str)
+                .map(str::to_owned)
+                .unwrap_or_else(|| format!("{source_id}->{target_id}:{edge_type}"));
+            let status = phase2_candidate_graph_status(attributes)
+                .or_else(|| row.get("status").and_then(Value::as_str))
+                .unwrap_or("candidate")
+                .to_owned();
+            node_ids.insert(source_id.to_owned());
+            node_ids.insert(target_id.to_owned());
+            candidates.push(SemanticTruthReviewCandidateRow {
+                edge_id,
+                source_node_id: source_id.to_owned(),
+                target_node_id: target_id.to_owned(),
+                family: edge_type.to_owned(),
+                status,
+                score,
+                nli_support_millis: phase2_optional_score_millis(phase2_json_path_f64(
+                    data,
+                    &["nli", "aggregated", "entailment"],
+                )),
+                nli_contradiction_millis: phase2_optional_score_millis(phase2_json_path_f64(
+                    data,
+                    &["nli", "aggregated", "contradiction"],
+                )),
+            });
+        }
+
+        candidates.sort_by(|left, right| {
+            right
+                .score
+                .partial_cmp(&left.score)
+                .unwrap_or(std::cmp::Ordering::Equal)
+                .then_with(|| {
+                    (
+                        left.family.as_str(),
+                        left.source_node_id.as_str(),
+                        left.target_node_id.as_str(),
+                    )
+                        .cmp(&(
+                            right.family.as_str(),
+                            right.source_node_id.as_str(),
+                            right.target_node_id.as_str(),
+                        ))
+                })
+        });
+
+        let preview = candidates
+            .iter()
+            .take(preview_limit)
+            .map(|row| SemanticTruthReviewPreview {
+                edge_id: row.edge_id.clone(),
+                family: row.family.clone(),
+                status: row.status.clone(),
+                score_millis: phase2_optional_score_millis(Some(row.score)),
+                source_node_id: row.source_node_id.clone(),
+                target_node_id: row.target_node_id.clone(),
+                nli_support_millis: row.nli_support_millis,
+                nli_contradiction_millis: row.nli_contradiction_millis,
+            })
+            .collect::<Vec<_>>();
+        let derive_ms = derive_started.elapsed().as_millis();
+        let scope_key = request
+            .scope_hint
+            .as_ref()
+            .and_then(|hint| hint.scope_id.as_deref())
+            .filter(|value| !value.is_empty())
+            .unwrap_or("global")
+            .to_owned();
+        let scope_label = request
+            .scope_hint
+            .as_ref()
+            .and_then(|hint| hint.label.as_deref())
+            .filter(|value| !value.is_empty())
+            .unwrap_or(scope_key.as_str())
+            .to_owned();
+        let lane_mode = request
+            .lane_mode
+            .as_deref()
+            .filter(|value| !value.is_empty())
+            .unwrap_or("truth-review")
+            .to_owned();
+        let model_id = request
+            .model
+            .model_id
+            .as_deref()
+            .filter(|value| !value.is_empty())
+            .unwrap_or(SEMANTIC_MODEL_ID)
+            .to_owned();
+        let model_label = request
+            .model
+            .model_label
+            .as_deref()
+            .filter(|value| !value.is_empty())
+            .unwrap_or(model_id.as_str())
+            .to_owned();
+        let embedding_profile = request
+            .model
+            .embedding_profile
+            .as_deref()
+            .filter(|value| !value.is_empty())
+            .unwrap_or("768")
+            .to_owned();
+        let execution_provider = request
+            .model
+            .execution_provider
+            .as_deref()
+            .filter(|value| !value.is_empty())
+            .unwrap_or("runtime")
+            .to_owned();
+        let dimension = request.model.dimension.unwrap_or(SEMANTIC_VECTOR_DIM);
+        let candidate_edge_count = candidates.len();
+        let candidate_node_count = node_ids.len();
+
+        Ok(SemanticTruthReviewResponse {
+            contract_version: 1,
+            candidate_only: true,
+            lane_mode,
+            model_id,
+            model_label,
+            embedding_profile,
+            dimension,
+            execution_provider,
+            cache: SemanticTruthReviewCacheStats {
+                hits: candidate_edge_count,
+                misses: 0,
+            },
+            timings: SemanticTruthReviewTimings {
+                derive_ms,
+                total_ms: total_started.elapsed().as_millis(),
+            },
+            output: SemanticTruthReviewOutput {
+                scope_key,
+                summary: SemanticTruthReviewSummary {
+                    node_count: candidate_node_count,
+                    edge_count: candidate_edge_count,
+                },
+                candidate_node_count,
+                candidate_edge_count,
+                candidate_graph_vertex_count: graph.vertices.len(),
+                candidate_graph_edge_count: candidate_edge_count,
+                candidate_graph_scope: scope_label,
+                committed_topology_writes: 0,
+                preview,
+            },
+            sidecar: json!({
+                "source": "phoenix-runtime",
+                "cachePolicy": request.cache_policy.unwrap_or_else(|| "persistent".to_owned()),
+                "uiModelId": request.model.ui_model_id,
+                "candidateRows": candidate_edge_count,
+                "candidateOnly": true,
+                "committedTopologyWrites": 0,
+            }),
+        })
+    }
+
     pub(crate) fn semantic_leaf_chunks_for_documents(
         &self,
         document_ids: &[String],
@@ -4249,11 +4607,7 @@ impl PhoenixRuntime {
                     })
                 })
                 .collect::<Vec<_>>();
-            self.replace_native_relation_rows_with_keys(
-                "semantic_documents",
-                &semantic_document_rows,
-                &["document_id"],
-            )?;
+            self.upsert_native_relation_rows("semantic_documents", &semantic_document_rows)?;
 
             let prototype_inputs = self.list_candidate_prototype_inputs(&document_ids)?;
             semantic_node_rows = prototype_inputs
@@ -4274,10 +4628,9 @@ impl PhoenixRuntime {
                 })
                 .collect::<Vec<_>>();
             if !semantic_node_rows.is_empty() {
-                self.replace_native_relation_rows_with_keys(
+                self.upsert_native_relation_rows(
                     "semantic_node_prototypes",
                     &semantic_node_rows,
-                    &["node_id"],
                 )?;
             }
         } else if request.options.include_semantic_atlas {
@@ -4841,45 +5194,33 @@ impl PhoenixRuntime {
             evidence_ledger::build_dataset_factory(scan_id, &evidence_receipts, created_at);
         if self.native_graph_enabled() {
             if !receipt_rows.is_empty() {
-                self.replace_native_relation_rows_with_keys(
-                    "evidence_ledger",
-                    &receipt_rows,
-                    &["receipt_id"],
-                )?;
+                self.upsert_native_relation_rows("evidence_ledger", &receipt_rows)?;
             }
             if !dataset_build.snapshot_rows.is_empty() {
-                self.replace_native_relation_rows_with_keys(
+                self.upsert_native_relation_rows(
                     "dataset_snapshots",
                     &dataset_build.snapshot_rows,
-                    &["snapshot_id"],
                 )?;
             }
             if !dataset_build.example_rows.is_empty() {
-                self.replace_native_relation_rows_with_keys(
+                self.upsert_native_relation_rows(
                     "dataset_examples",
                     &dataset_build.example_rows,
-                    &["example_id"],
                 )?;
             }
             if !semantic_frame_rows.is_empty() {
-                self.replace_native_relation_rows_with_keys(
-                    "semantic_frames",
-                    &semantic_frame_rows,
-                    &["frame_id"],
-                )?;
+                self.upsert_native_relation_rows("semantic_frames", &semantic_frame_rows)?;
             }
             if !semantic_frame_argument_rows.is_empty() {
-                self.replace_native_relation_rows_with_keys(
+                self.upsert_native_relation_rows(
                     "semantic_frame_arguments",
                     &semantic_frame_argument_rows,
-                    &["argument_id"],
                 )?;
             }
             if !semantic_frame_fact_rows.is_empty() {
-                self.replace_native_relation_rows_with_keys(
+                self.upsert_native_relation_rows(
                     "semantic_frame_facts",
                     &semantic_frame_fact_rows,
-                    &["fact_id"],
                 )?;
             }
         } else {
@@ -5178,11 +5519,7 @@ impl PhoenixRuntime {
     pub fn upsert_entity_cards_batch(&self, cards: &[EntityCard]) -> Result<(), StoreError> {
         if self.native_graph_enabled() {
             let rows = cards.iter().map(entity_card_row).collect::<Vec<_>>();
-            self.replace_native_relation_rows_with_keys(
-                "entity_cards",
-                &rows,
-                &["entity_id", "card_id"],
-            )?;
+            self.upsert_native_relation_rows("entity_cards", &rows)?;
         } else {
             #[cfg(feature = "legacy-cozo-graph")]
             {
@@ -5232,7 +5569,7 @@ impl PhoenixRuntime {
     pub fn upsert_folder_schema(&self, schema: &FolderSchema) -> Result<(), StoreError> {
         if self.native_graph_enabled() {
             let row = folder_schema_row(schema);
-            self.replace_native_relation_rows_with_keys("folder_schemas", &[row], &["id"])?;
+            self.upsert_native_relation_rows("folder_schemas", &[row])?;
         } else {
             #[cfg(feature = "legacy-cozo-graph")]
             {
@@ -5590,7 +5927,13 @@ impl PhoenixRuntime {
     fn apply_persistence_wal_batch(
         &self,
         records: &[PersistenceWalRecord],
-    ) -> Result<(), StoreError> {
+    ) -> Result<PersistenceWalApplyReport, StoreError> {
+        let total_started = Instant::now();
+        let mut report = PersistenceWalApplyReport {
+            records: records.len(),
+            ..PersistenceWalApplyReport::default()
+        };
+        let mut lex_dirty = false;
         for record in records {
             if record.seq == 0 {
                 return Err(StoreError::Query("invalid WAL seq: 0".to_owned()));
@@ -5605,20 +5948,36 @@ impl PhoenixRuntime {
 
             match record.command.as_str() {
                 "note:upsert" => {
+                    let started = Instant::now();
                     let row = require_payload_value(&record.payload, "row")?;
                     self.upsert_note_row(row)?;
+                    report.note_upserts += 1;
+                    report.note_ms += elapsed_millis(started);
+                    lex_dirty = true;
                 }
                 "note:delete" => {
+                    let started = Instant::now();
                     let id = require_payload_str(&record.payload, "id")?;
                     self.delete_note_rows(id)?;
+                    report.note_deletes += 1;
+                    report.note_ms += elapsed_millis(started);
+                    lex_dirty = true;
                 }
                 "relation:upsert" => {
+                    let started = Instant::now();
                     let relation = require_payload_str(&record.payload, "relation")?;
                     ensure_allowed_content_relation(relation)?;
                     let row = require_payload_value(&record.payload, "row")?;
                     self.put_relation_row(relation, row.clone())?;
+                    report.relation_upserts += 1;
+                    if relation == "scoped_documents" {
+                        report.scoped_document_upserts += 1;
+                    }
+                    report.relation_ms += elapsed_millis(started);
+                    lex_dirty |= relation_touches_lex_index(relation);
                 }
                 "relation:delete" => {
+                    let started = Instant::now();
                     let relation = require_payload_str(&record.payload, "relation")?;
                     ensure_allowed_content_relation(relation)?;
                     let filter = payload_object(record.payload.get("filter"));
@@ -5628,6 +5987,9 @@ impl PhoenixRuntime {
                         .filter(|row| row_matches_filter(row, filter))
                         .collect::<Vec<_>>();
                     let _ = self.delete_relation_rows(relation, &matched)?;
+                    report.relation_deletes += 1;
+                    report.relation_ms += elapsed_millis(started);
+                    lex_dirty |= relation_touches_lex_index(relation);
                 }
                 "entityCards:upsertBatch" => {
                     let cards: Vec<EntityCard> = serde_json::from_value(
@@ -5666,8 +6028,14 @@ impl PhoenixRuntime {
             }
         }
 
-        self.rebuild_lex_index()?;
-        Ok(())
+        if lex_dirty {
+            let started = Instant::now();
+            self.rebuild_lex_index()?;
+            report.lex_rebuilt = true;
+            report.lex_ms = elapsed_millis(started);
+        }
+        report.total_ms = elapsed_millis(total_started);
+        Ok(report)
     }
 
     pub fn boot_snapshot_rows(&self) -> Result<PhoenixBootSnapshotRows, StoreError> {
@@ -5697,9 +6065,7 @@ impl PhoenixRuntime {
     ) -> Result<StoreCommandResult, StoreError> {
         if self.native_graph_enabled()
             && request.command != "runtime:capabilities"
-            && ["chat:", "om:"]
-                .iter()
-                .any(|prefix| request.command.starts_with(prefix))
+            && request.command.starts_with("om:")
         {
             return Ok(StoreCommandResult {
                 success: false,
@@ -5711,6 +6077,8 @@ impl PhoenixRuntime {
             });
         }
         match request.command.as_str() {
+            "documentGraph:commit" => document_graph_commit::commit(self, &request.payload),
+            "documentGraph:undo" => document_graph_commit::undo(self, &request.payload),
             "relation:upsert" => {
                 let relation = require_payload_str(&request.payload, "relation")?;
                 let row = require_payload_value(&request.payload, "row")?;
@@ -5952,14 +6320,42 @@ impl PhoenixRuntime {
                 })
             }
             "persistence:applyWalBatch" => {
+                let parse_started = Instant::now();
                 let batch: PersistenceWalBatchRequest = serde_json::from_value(request.payload)
                     .map_err(|error| StoreError::Query(error.to_string()))?;
-                self.apply_persistence_wal_batch(&batch.records)?;
+                let parse_ms = elapsed_millis(parse_started);
+                let mut report = self.apply_persistence_wal_batch(&batch.records)?;
+                report.parse_ms = parse_ms;
                 Ok(StoreCommandResult {
                     success: true,
-                    payload: Some(serde_json::json!({ "replayed": batch.records.len() })),
+                    payload: Some(serde_json::json!({
+                        "replayed": batch.records.len(),
+                        "timings": report,
+                    })),
                     error: None,
                 })
+            }
+            "persistence:flushNativeStore" => {
+                #[cfg(not(target_arch = "wasm32"))]
+                {
+                    let report = self.flush_native_store()?;
+                    Ok(StoreCommandResult {
+                        success: true,
+                        payload: Some(serde_json::json!({
+                            "flushed": report.flushed,
+                            "walBytesBefore": report.wal_bytes_before,
+                            "walBytesAfter": report.wal_bytes_after,
+                            "segmentCount": report.segment_count,
+                        })),
+                        error: None,
+                    })
+                }
+                #[cfg(target_arch = "wasm32")]
+                {
+                    Err(StoreError::Query(
+                        "native store flush is unavailable on wasm".to_owned(),
+                    ))
+                }
             }
             "persistence:clearDerived" => {
                 self.clear_derived_partition()?;
@@ -6651,6 +7047,21 @@ impl PhoenixRuntime {
                     error: None,
                 })
             }
+            "semantic:runEmbedderTruthReview" => {
+                let review_request: SemanticTruthReviewRequest =
+                    serde_json::from_value(request.payload).map_err(|error| {
+                        StoreError::Query(format!("invalid semantic truth review request: {error}"))
+                    })?;
+                let response = self.run_embedder_truth_review(review_request)?;
+                Ok(StoreCommandResult {
+                    success: true,
+                    payload: Some(
+                        serde_json::to_value(response)
+                            .map_err(|error| StoreError::Query(error.to_string()))?,
+                    ),
+                    error: None,
+                })
+            }
             "semantic:listLeafChunks" => {
                 let document_ids = request
                     .payload
@@ -6757,11 +7168,7 @@ impl PhoenixRuntime {
                             })
                         })
                         .collect::<Vec<_>>();
-                    self.replace_native_relation_rows_with_keys(
-                        "semantic_documents",
-                        &values,
-                        &["document_id"],
-                    )?;
+                    self.upsert_native_relation_rows("semantic_documents", &values)?;
                 } else {
                     #[cfg(feature = "legacy-cozo-graph")]
                     {
@@ -6821,11 +7228,7 @@ impl PhoenixRuntime {
                             })
                         })
                         .collect::<Vec<_>>();
-                    self.replace_native_relation_rows_with_keys(
-                        "semantic_node_prototypes",
-                        &values,
-                        &["node_id"],
-                    )?;
+                    self.upsert_native_relation_rows("semantic_node_prototypes", &values)?;
                 } else {
                     #[cfg(feature = "legacy-cozo-graph")]
                     {
@@ -7100,7 +7503,7 @@ impl PhoenixRuntime {
             .and_then(Value::as_str)
             .ok_or_else(|| StoreError::Query("missing store command field: row.id".to_owned()))?;
         if self.native_graph_enabled() {
-            self.replace_native_relation_rows_with_keys("notes", &[row.clone()], NOTE_KEY_COLUMNS)?;
+            self.native_row_store()?.put_row("notes", row.clone())?;
         } else {
             #[cfg(feature = "legacy-cozo-graph")]
             {
@@ -11039,6 +11442,20 @@ fn phase2_candidate_row_base_score(data: Option<&Value>, attributes: Option<&Val
         .unwrap_or(0.0)
 }
 
+fn phase2_json_path_f64(value: Option<&Value>, path: &[&str]) -> Option<f64> {
+    let mut current = value?;
+    for key in path {
+        current = current.get(*key)?;
+    }
+    current.as_f64()
+}
+
+fn phase2_optional_score_millis(value: Option<f64>) -> u32 {
+    value
+        .map(|score| (score.clamp(0.0, 1.0) * 1000.0).round() as u32)
+        .unwrap_or(0)
+}
+
 fn phase2_similarity_score(distance: f64) -> f64 {
     1.0 / (1.0 + distance.max(0.0))
 }
@@ -11608,6 +12025,7 @@ fn om_record_from_value(row: Value) -> Result<OmRecord, StoreError> {
     })
 }
 
+#[cfg(feature = "legacy-cozo-graph")]
 const NOTE_KEY_COLUMNS: &[&str] = &["id", "version"];
 const ALLOWED_WAL_RELATIONS: &[&str] = &[
     "entities",
@@ -11868,12 +12286,6 @@ fn note_values_from_rows(
         })
     });
     values
-}
-
-fn relation_rows_match_keys(left: &Value, right: &Value, key_fields: &[&str]) -> bool {
-    key_fields
-        .iter()
-        .all(|field| left.get(*field) == right.get(*field))
 }
 
 fn entity_card_row(card: &EntityCard) -> Value {
@@ -12414,6 +12826,14 @@ fn ensure_allowed_content_relation(relation: &str) -> Result<(), StoreError> {
     Err(StoreError::Query(format!(
         "unsupported WAL relation: {relation}"
     )))
+}
+
+fn relation_touches_lex_index(relation: &str) -> bool {
+    relation == "notes"
+}
+
+fn elapsed_millis(started: Instant) -> u64 {
+    started.elapsed().as_millis().min(u128::from(u64::MAX)) as u64
 }
 
 fn row_matches_filter(row: &Value, filter: Option<&serde_json::Map<String, Value>>) -> bool {
@@ -13172,10 +13592,10 @@ mod tests {
         }
     }
     use phoenix_types::{
-        AtlasAliasProposalTarget, AtlasAliasRelation, ChatRunStatus, CreateSessionRequest,
-        DocumentId, EntityId, EntityKind, GenderHint, GraphDeltaRequest, MentionEntityRef, NoteId,
-        QueryResultHeader, QueryTarget, RunOptions, ScopeKey, SessionStateResultHeader,
-        SessionStatsResultHeader, TextRange,
+        AtlasAliasProposalTarget, AtlasAliasRelation, ChatRunStatus, ChatRuntimeConfig,
+        CreateSessionRequest, DocumentId, EntityId, EntityKind, GenderHint, GraphDeltaRequest,
+        MentionEntityRef, NoteId, QueryResultHeader, QueryTarget, RunOptions, ScopeKey,
+        SessionStateResultHeader, SessionStatsResultHeader, TextRange,
     };
     use serde_json::{json, Value};
 
@@ -13288,22 +13708,131 @@ mod tests {
     }
 
     #[test]
-    fn native_store_command_rejects_legacy_namespaces() {
+    fn document_graph_commit_is_idempotent_and_undo_preserves_entities() {
+        let runtime = native_test_runtime();
+        runtime.init().expect("init");
+        let commit_id = "document-graph-commit:test-diff";
+        let payload = json!({
+            "schemaVersion": "phoenix-document-graph-commit/v1",
+            "commitId": commit_id,
+            "scopeId": "note:test",
+            "topologyDiffId": "test-diff",
+            "sourceObjectId": "fact-candidate:test",
+            "receiptId": "receipt:test",
+            "builtAt": 10,
+            "vertices": [
+                {
+                    "id": "entity:amara",
+                    "kind": "entity",
+                    "label": "Amara",
+                    "removeOnUndo": false,
+                    "attributes": { "registeredEntityReference": true }
+                },
+                {
+                    "id": "document-fact:test",
+                    "kind": "document_fact",
+                    "label": "relation_bundle",
+                    "removeOnUndo": true,
+                    "attributes": { "confidence": 0.94 }
+                },
+                {
+                    "id": "document-evidence:test",
+                    "kind": "evidence_span",
+                    "label": "Amara reached Halcyon.",
+                    "removeOnUndo": true,
+                    "attributes": { "noteId": "test" }
+                }
+            ],
+            "edges": [
+                {
+                    "source": "document-fact:test",
+                    "target": "entity:amara",
+                    "edgeType": "document_fact_role",
+                    "weight": 940,
+                    "attributes": { "roles": ["subject"] }
+                },
+                {
+                    "source": "document-fact:test",
+                    "target": "document-evidence:test",
+                    "edgeType": "supported_by_evidence_span",
+                    "weight": 940,
+                    "attributes": {}
+                }
+            ]
+        });
+
+        let first = runtime
+            .store_command(StoreCommandRequest {
+                command: "documentGraph:commit".to_owned(),
+                payload: payload.clone(),
+            })
+            .expect("commit");
+        assert!(first.success);
+        assert_eq!(
+            first.payload.as_ref().and_then(|value| value.get("idempotent")),
+            Some(&Value::Bool(false))
+        );
+        let second = runtime
+            .store_command(StoreCommandRequest {
+                command: "documentGraph:commit".to_owned(),
+                payload,
+            })
+            .expect("idempotent commit");
+        assert_eq!(
+            second.payload.as_ref().and_then(|value| value.get("idempotent")),
+            Some(&Value::Bool(true))
+        );
+
+        let undo = runtime
+            .store_command(StoreCommandRequest {
+                command: "documentGraph:undo".to_owned(),
+                payload: json!({
+                    "schemaVersion": "phoenix-document-graph-undo/v1",
+                    "commitId": commit_id,
+                    "undoneAt": 11
+                }),
+            })
+            .expect("undo");
+        assert!(undo.success);
+        let vertices = runtime
+            .fetch_relation_rows("graph_vertices")
+            .expect("vertices");
+        assert!(vertices.iter().any(|row| row.get("id") == Some(&json!("entity:amara"))));
+        assert!(!vertices
+            .iter()
+            .any(|row| row.get("id") == Some(&json!("document-fact:test"))));
+        assert!(!vertices
+            .iter()
+            .any(|row| row.get("id") == Some(&json!("document-evidence:test"))));
+        assert!(runtime
+            .fetch_relation_rows("graph_edges")
+            .expect("edges")
+            .is_empty());
+    }
+
+    #[test]
+    fn native_store_command_accepts_chat_namespace() {
         let runtime = native_test_runtime();
         runtime.init().expect("init");
 
-        let result = runtime
+        let init = runtime
+            .store_command(StoreCommandRequest {
+                command: "chat:init".to_owned(),
+                payload: json!({ "config": ChatRuntimeConfig::default() }),
+            })
+            .expect("chat init");
+
+        assert!(init.success);
+
+        let threads = runtime
             .store_command(StoreCommandRequest {
                 command: "chat:listThreads".to_owned(),
                 payload: json!({}),
             })
-            .expect("store command");
+            .expect("list threads");
 
-        assert!(!result.success);
-        assert_eq!(
-            result.error.as_deref(),
-            Some("chat:listThreads is unavailable on the native runtime path")
-        );
+        assert!(threads.success);
+        assert_eq!(threads.payload, Some(json!([])));
     }
 
     #[test]
@@ -13782,6 +14311,116 @@ mod tests {
                 && row.get("target_id").and_then(Value::as_str) == Some("doc::doc-sem-b")
                 && row.get("edge_type").and_then(Value::as_str) == Some("similar_to")
         }));
+    }
+
+    #[test]
+    fn native_semantic_truth_review_command_reports_candidate_only_edges() {
+        let runtime = native_test_runtime();
+        runtime.init().expect("init");
+        let session = runtime
+            .create_session(CreateSessionRequest {
+                session_id: None,
+                label: "Native truth review".to_owned(),
+                scope: ScopeKey::default(),
+            })
+            .expect("session");
+
+        runtime
+            .ingest(IngestRequest {
+                session_id: Some(session.session_id.clone()),
+                documents: vec![
+                    phoenix_types::IngestDocument {
+                        document_id: DocumentId("doc-review-a".to_owned()),
+                        note_id: None,
+                        title: "Review A".to_owned(),
+                        text: "Ryan mapped dock alpha before dawn.".to_owned(),
+                        scope: ScopeKey::default(),
+                    },
+                    phoenix_types::IngestDocument {
+                        document_id: DocumentId("doc-review-b".to_owned()),
+                        note_id: None,
+                        title: "Review B".to_owned(),
+                        text: "Rian mapped dock beta before dawn.".to_owned(),
+                        scope: ScopeKey::default(),
+                    },
+                ],
+                commit: false,
+            })
+            .expect("ingest");
+
+        runtime
+            .store_command(StoreCommandRequest {
+                command: "semantic:upsertDocumentVectors".to_owned(),
+                payload: json!({
+                    "rows": [
+                        {
+                            "documentId": "doc-review-a",
+                            "values": semantic_test_vector(0),
+                            "leafCount": 1,
+                            "evidenceRefs": ["span:doc-review-a"]
+                        },
+                        {
+                            "documentId": "doc-review-b",
+                            "values": semantic_test_vector(0),
+                            "leafCount": 1,
+                            "evidenceRefs": ["span:doc-review-b"]
+                        }
+                    ]
+                }),
+            })
+            .expect("upsert document vectors");
+
+        runtime
+            .store_command(StoreCommandRequest {
+                command: "semantic:refreshCandidateGraphEdges".to_owned(),
+                payload: json!({
+                    "documentIds": ["doc-review-a", "doc-review-b"],
+                    "nodeIds": [],
+                }),
+            })
+            .expect("refresh candidate graph");
+
+        let payload = runtime
+            .store_command(StoreCommandRequest {
+                command: "semantic:runEmbedderTruthReview".to_owned(),
+                payload: json!({
+                    "laneMode": "truth-review",
+                    "documentIds": ["doc-review-a", "doc-review-b"],
+                    "nodeIds": [],
+                    "edgePreviewLimit": 4,
+                    "model": {
+                        "modelId": "jinaai/jina-embeddings-v5-text-nano-retrieval",
+                        "modelLabel": "Jina v5 Nano",
+                        "embeddingProfile": "768",
+                        "executionProvider": "directml"
+                    }
+                }),
+            })
+            .expect("truth review")
+            .payload
+            .expect("payload");
+
+        assert_eq!(
+            payload.get("candidateOnly").and_then(Value::as_bool),
+            Some(true)
+        );
+        assert_eq!(
+            payload
+                .pointer("/output/committedTopologyWrites")
+                .and_then(Value::as_u64),
+            Some(0)
+        );
+        assert!(
+            payload
+                .pointer("/output/candidateEdgeCount")
+                .and_then(Value::as_u64)
+                .unwrap_or(0)
+                >= 1
+        );
+        assert_eq!(
+            payload.pointer("/cache/misses").and_then(Value::as_u64),
+            Some(0)
+        );
     }
 
     #[cfg(feature = "legacy-cozo-graph")]
@@ -14754,6 +15393,19 @@ mod tests {
                 },
             ])
             .expect("cards");
+        runtime
+            .upsert_entity_cards_batch(&[phoenix_types::EntityCard {
+                entity_id: EntityId("CHARACTER".to_owned()),
+                card_id: "traits".to_owned(),
+                name: "Updated Traits".to_owned(),
+                color: "#00aaff".to_owned(),
+                icon: "bolt".to_owned(),
+                display_order: 1,
+                is_collapsed: true,
+                created_at: 11,
+                updated_at: 12,
+            }])
+            .expect("update one card");
 
         runtime
             .upsert_folder_schema(&phoenix_types::FolderSchema {
@@ -14784,6 +15436,7 @@ mod tests {
 
         assert_eq!(cards.len(), 2);
         assert_eq!(cards[0].card_id, "traits");
+        assert_eq!(cards[0].name, "Updated Traits");
         assert_eq!(schema.allowed_subfolders, "[\"profiles\",\"chapters\"]");
         assert_eq!(schema.allowed_note_types, "[\"bio\",\"scene\"]");
     }
@@ -14977,6 +15630,50 @@ mod tests {
             Some("Alpha".to_owned())
         );
         assert!(entity.is_some());
+        assert!(runtime.lex.borrow().is_some());
+    }
+
+    #[test]
+    fn scoped_document_wal_replay_does_not_rebuild_lex_index() {
+        let runtime = native_test_runtime();
+        runtime.init().expect("init");
+        assert!(runtime.lex.borrow().is_none());
+
+        let result = runtime
+            .store_command(StoreCommandRequest {
+                command: "persistence:applyWalBatch".to_owned(),
+                payload: json!({
+                    "records": [
+                        {
+                            "seq": 1,
+                            "command": "relation:upsert",
+                            "partition": "content",
+                            "writtenAt": 100,
+                            "payload": {
+                                "relation": "scoped_documents",
+                                "row": {
+                                    "id": "phoenix.graph.rebuild:scope:latest",
+                                    "scope_folder_id": "scope",
+                                    "narrative_id": "",
+                                    "namespace": "phoenix.graph.rebuild",
+                                    "document_key": "latest",
+                                    "payload": "{\"ok\":true}",
+                                    "created_at": 100,
+                                    "updated_at": 100
+                                }
+                            }
+                        }
+                    ]
+                }),
+            })
+            .expect("scoped document wal batch");
+
+        assert!(result.success);
+        assert!(runtime.lex.borrow().is_none());
+        let rows = runtime
+            .fetch_relation_rows("scoped_documents")
+            .expect("scoped documents");
+        assert_eq!(rows.len(), 1);
     }
 
     #[test]

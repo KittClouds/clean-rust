@@ -1,4 +1,4 @@
-import { Component, computed, DestroyRef, ElementRef, inject, OnInit, signal, ViewChild } from '@angular/core';
+import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -32,11 +32,18 @@ import * as ops from '../../lib/operations';
 import { type RetrievalLane } from '../../services/retrieval-workbench-state.service';
 import { PhoenixMachineControlService } from '../../services/phoenix-machine-control.service';
 import { NerService } from '../../services/ner.service';
-import { AtlasScanCoordinatorService } from '../../services/atlas-scan-coordinator.service';
 import { BlueprintHubService } from '../blueprint-hub/blueprint-hub.service';
 import { NliWorkerService } from '../../lib/services/nli-worker.service';
 import { AtlasCapabilityRuntimeService } from '../../services/atlas-capability-runtime.service';
+import { AtlasControlContractService } from '../../services/atlas-control-contract.service';
 import { GraphRebuildPipelineService } from '../../graph-rebuild/graph-rebuild-pipeline.service';
+import { GraphRebuildService } from '../../graph-rebuild/graph-rebuild.service';
+import {
+  type GraphReviewAdjudicationViewContract,
+} from '../../graph-rebuild/graph-review-adjudication-certificate';
+import { CalendarService } from '../../services/calendar.service';
+import { PhoenixBackendService } from '../../services/phoenix-backend.service';
+import { EmbeddingModelRegistry } from '../../lib/embeddings/models/ModelRegistry';
 import type {
   GraphIndexProjectionReceipt,
   GraphIndexModelReadiness,
@@ -52,13 +59,9 @@ import type {
 } from '../../graph-rebuild/graph-rebuild-snapshot';
 import { smartGraphRegistry } from '../../lib/registry';
 import type {
-  AtlasCapabilityRuntimeState,
   AtlasBuildScope,
   AtlasBuildReceipt,
-  AtlasExpectedOutput,
-  AtlasModelRequirement,
   AtlasRunOptions,
-  AtlasServiceRequirement,
 } from '../../services/atlas-capability-runtime.model';
 import {
   EMBEDDING_MODELS,
@@ -73,44 +76,20 @@ import {
 import {
   buildAtlasCommandStatus,
   estimateDynamicChunks,
-  type AtlasRecipeId,
 } from './atlas-command-status.model';
 import {
   buildAtlasModelLaneViews,
-  buildAtlasRecipeLifecycle,
-  laneListLabel,
   type AtlasModelLaneId,
-  type AtlasRecipeLifecycleId,
 } from './atlas-model-recipe.model';
-import {
-  ATLAS_GRAPH_BUILD_RECIPE_IDS,
-  ATLAS_CAPABILITY_LAYERS,
-  ATLAS_CAPABILITY_REGISTRY,
-  atlasCapabilityById,
-  atlasRecipeDefinitionById,
-  capabilityListLabel,
-  type AtlasCapability,
-  type AtlasCapabilityId,
-} from './atlas-capability.model';
 import {
   buildReviewClusterViews,
   type ProductDiagnosticsReviewCluster,
 } from '../blueprint-hub/tabs/graph-tab/graph-product-diagnostics';
-
-type BuilderCapabilityCard = {
-  capability: AtlasCapability;
-  state: AtlasCapabilityRuntimeState;
-  layerLabel: string;
-  chain: AtlasCapabilityId[];
-};
-
-type BuilderCapabilityGroup = {
-  id: string;
-  label: string;
-  count: number;
-  selectedCount: number;
-  targets: BuilderCapabilityCard[];
-};
+import type { AtlasControlTone } from '../../graph-rebuild/atlas-control-contract';
+import {
+  buildGraphProjectionContractReport,
+  type GraphProjectionContractReport,
+} from '../../graph-rebuild/graph-projection-contract-report';
 
 interface LastRunReceiptRow {
   id: string;
@@ -141,6 +120,13 @@ interface PostprocessStagingView {
 }
 
 type CompilerTone = 'ready' | 'review' | 'danger' | 'quiet';
+
+function atlasToneToCompilerTone(tone: AtlasControlTone | CompilerTone | string): CompilerTone {
+  if (tone === 'danger') return 'danger';
+  if (tone === 'ready') return 'ready';
+  if (tone === 'review' || tone === 'warning') return 'review';
+  return 'quiet';
+}
 
 interface CompilerMetricView {
   id: string;
@@ -215,6 +201,48 @@ interface Stage8RouterView {
   tone: CompilerTone;
 }
 
+type SemanticTruthReviewStatus = 'idle' | 'running' | 'ready' | 'error';
+
+interface SemanticTruthReviewLaneState {
+  status: SemanticTruthReviewStatus;
+  tone: CompilerTone;
+  modelId: string;
+  modelLabel: string;
+  dimensionLabel: string;
+  executionProvider: string;
+  candidateOnly: boolean;
+  committedTopologyWrites: number;
+  nodeCount: number;
+  edgeCount: number;
+  cacheHits: number;
+  cacheMisses: number;
+  deriveMs: number;
+  totalMs: number;
+  detail: string;
+  error?: string;
+}
+
+interface Stage8TruthReviewView extends SemanticTruthReviewLaneState {
+  cacheDetail: string;
+  timingDetail: string;
+  candidateDetail: string;
+  contractDetail: string;
+}
+
+interface Stage8ReviewAdjudicationView {
+  status: string;
+  tone: CompilerTone;
+  totalDetail: string;
+  eligibleDetail: string;
+  excludedDetail: string;
+  judgedDetail: string;
+  inputDetail: string;
+  reasonDetail: string;
+  actionLabel: string;
+  actionDisabled: boolean;
+  actionReason: string;
+}
+
 interface Stage8LaneView {
   id: Stage8LaneId;
   label: string;
@@ -240,6 +268,9 @@ interface Stage8WorkbenchView {
   label: string;
   detail: string;
   router: Stage8RouterView;
+  truthReview: Stage8TruthReviewView;
+  reviewAdjudication: Stage8ReviewAdjudicationView;
+  contract: GraphProjectionContractReport;
   lanes: Stage8LaneView[];
   reviewItems: Stage8ReviewItemView[];
   receipts: LastRunReceiptRow[];
@@ -257,6 +288,9 @@ const EMBEDDING_STAGE_LANES: Array<{ id: GraphRebuildSignalTargetLane; label: st
   { id: 'anchor_evidence', label: 'Anchor evidence' },
   { id: 'cooccurrence_weak', label: 'Co-occurrence' },
 ];
+
+const SEMANTIC_TRUTH_REVIEW_COMMAND = 'semantic:runEmbedderTruthReview';
+const SEMANTIC_TRUTH_REVIEW_EXECUTION_PROVIDER = 'directml';
 
 @Component({
   selector: 'app-search-panel',
@@ -300,18 +334,19 @@ const EMBEDDING_STAGE_LANES: Array<{ id: GraphRebuildSignalTargetLane; label: st
   ],
 })
 export class SearchPanelComponent implements OnInit {
-  @ViewChild('workbenchScroll') private workbenchScroll?: ElementRef<HTMLElement>;
-
   private readonly destroyRef = inject(DestroyRef);
   private readonly notesService = inject(NotesService);
   private readonly noteStore = inject(NoteEditorStore);
   private readonly machine = inject(PhoenixMachineControlService);
   private readonly nerService = inject(NerService);
-  private readonly atlasScan = inject(AtlasScanCoordinatorService);
   private readonly hubService = inject(BlueprintHubService);
   private readonly nli = inject(NliWorkerService);
   private readonly atlasRuntime = inject(AtlasCapabilityRuntimeService);
+  private readonly atlasControl = inject(AtlasControlContractService);
   private readonly fullAtlasPipeline = inject(GraphRebuildPipelineService);
+  private readonly graphRebuild = inject(GraphRebuildService);
+  private readonly calendar = inject(CalendarService);
+  private readonly phoenix = inject(PhoenixBackendService);
 
   readonly query = this.machine.query;
   readonly indexScope = this.machine.scope;
@@ -330,91 +365,30 @@ export class SearchPanelComponent implements OnInit {
   readonly activeJob = this.machine.activeJob;
   readonly lastSummary = this.machine.lastSummary;
   readonly nerStatus = this.nerService.providerStatuses;
-  readonly isDynamicScanning = computed(() => this.nerService.isAnalyzing() || this.atlasScan.running());
+  readonly isDynamicScanning = computed(() => this.nerService.isAnalyzing());
 
   readonly selectedModel = signal<ModelId>(DEFAULT_SEARCH_MODEL_ID);
-  readonly selectedRecipe = signal<AtlasRecipeId>('textGraph');
-  readonly selectedCapabilityId = signal<AtlasCapabilityId>('assertedKernel');
-  readonly selectedCapabilityIds = signal<AtlasCapabilityId[]>(capabilityIdsForRecipe('textGraph'));
-  readonly activeRecipe = signal<AtlasRecipeId | null>(null);
   readonly activeLaneWarm = signal<AtlasModelLaneId | null>(null);
-  readonly activeRecipeStep = signal<AtlasRecipeLifecycleId | null>(null);
-  readonly completedRecipeSteps = signal<AtlasRecipeLifecycleId[]>([]);
-  readonly failedRecipeStep = signal<AtlasRecipeLifecycleId | null>(null);
   readonly folders = signal<Array<{ id: string; name: string }>>([]);
   readonly notes = signal<SearchPanelNote[]>([]);
   readonly buildScopeMode = signal<AtlasBuildScope['mode']>('global');
   readonly selectedBuildFolderId = signal('');
   readonly selectedBuildNoteIds = signal<string[]>([]);
   readonly buildNoteQuery = signal('');
-  readonly graphTargetQuery = signal('');
-  readonly collapsedCapabilityGroups = signal<string[]>([]);
+  readonly hydratedBuildScopeNotes = signal<SearchPanelNote[]>([]);
   readonly buildPolicy = signal<'dirty-only' | 'force'>('dirty-only');
   readonly linkSuggestionDecisions = signal<Record<string, 'accepted' | 'rejected'>>({});
   readonly activeCompilerQueue = signal<CompilerQueueId>('lanes');
   readonly compilerQueueDecisions = signal<Record<string, CompilerQueueDecision>>({});
+  readonly truthReviewLane = signal<SemanticTruthReviewLaneState>(semanticTruthReviewIdleState());
+  readonly truthReviewLaneBusy = computed(() => this.truthReviewLane().status === 'running');
+  readonly nliReviewRunning = this.atlasControl.nliRunning;
+  readonly nerSuggestionRunning = signal(false);
 
   readonly laneOptions = RETRIEVAL_LANE_OPTIONS;
   readonly models = EMBEDDING_MODELS;
   readonly buildScopeModes: AtlasBuildScope['mode'][] = ['global', 'folder', 'note', 'multiNote'];
-  readonly graphBuildRecipes = ATLAS_GRAPH_BUILD_RECIPE_IDS.map((id) => {
-    const recipe = atlasRecipeDefinitionById(id);
-    return {
-      id: recipe.id,
-      label: recipe.label,
-      subtitle: recipe.subtitle,
-      output: recipe.outputLabel,
-      icon: recipe.icon,
-    };
-  });
-  readonly backendGraphTargets = computed<BuilderCapabilityCard[]>(() => {
-    const options = this.atlasRunOptions();
-    return BUILDER_CAPABILITY_IDS.map((id) => {
-      const capability = atlasCapabilityById(id);
-      return {
-        capability,
-        state: this.atlasRuntime.capabilityState(id, options),
-        layerLabel: layerLabelForCapability(id),
-        chain: expandCapabilityChain(id),
-      };
-    });
-  });
-  readonly filteredBackendGraphTargets = computed(() => {
-    const query = this.graphTargetQuery().trim().toLowerCase();
-    const targets = this.backendGraphTargets();
-    if (!query) return targets;
-    return targets.filter((target) => {
-      const haystack = [
-        target.capability.label,
-        target.capability.graphTargetLabel || '',
-        target.layerLabel,
-        target.capability.family,
-        target.capability.backendRoute,
-        target.state.runPolicy,
-        target.state.operationKind,
-      ].join(' ').toLowerCase();
-      return haystack.includes(query);
-    });
-  });
-  readonly backendGraphTargetGroups = computed<BuilderCapabilityGroup[]>(() => {
-    const targets = this.filteredBackendGraphTargets();
-    const selected = new Set(this.selectedCapabilityIds());
-    return ATLAS_CAPABILITY_LAYERS
-      .map((layer) => {
-        const layerTargets = targets.filter((target) => layer.capabilityIds.includes(target.capability.id));
-        return {
-          id: layer.id,
-          label: layer.label,
-          count: layerTargets.length,
-          selectedCount: layerTargets.filter((target) => selected.has(target.capability.id)).length,
-          targets: layerTargets,
-        };
-      })
-      .filter((group) => group.count > 0);
-  });
-  readonly atlasPhase = this.atlasScan.phase;
-  readonly atlasMessage = this.atlasScan.message;
-  readonly lastAtlasResult = this.atlasScan.lastResult;
+  readonly atlasMessage = signal<string | null>(null);
 
   readonly selectedBuildScope = computed<AtlasBuildScope>(() => {
     const mode = this.buildScopeMode();
@@ -441,6 +415,7 @@ export class SearchPanelComponent implements OnInit {
     const ids = new Set(noteIdsFromBuildScope(scope));
     return notes.filter((note) => ids.has(note.id));
   });
+  private buildScopeHydrationGeneration = 0;
   readonly buildScopeLabel = computed(() => {
     const scope = this.selectedBuildScope();
     if (scope.mode === 'global') return 'Global';
@@ -476,6 +451,10 @@ export class SearchPanelComponent implements OnInit {
     const labels = this.enabledLaneLabels();
     return labels.length ? labels.join(' + ') : 'Lexical retrieval';
   });
+  readonly buildScopeNotesForEstimate = computed(() => {
+    const hydrated = this.hydratedBuildScopeNotes();
+    return hydrated.length ? hydrated : this.scopedNotes();
+  });
   readonly vectorRouteLabel = computed(() =>
     this.embeddingsReady() ? 'Native Rust semantic runner ready' : 'Native Rust semantic runner idle'
   );
@@ -489,12 +468,12 @@ export class SearchPanelComponent implements OnInit {
   readonly commandStatus = computed(() => buildAtlasCommandStatus({
     scopeLabel: this.scopeLabel(),
     noteCount: this.scopedNotes().length,
-    estimatedChunks: estimateDynamicChunks(this.scopedNotes()),
+    estimatedChunks: estimateDynamicChunks(this.buildScopeNotesForEstimate()),
     audit: this.graphAudit(),
     stages: this.machineStages(),
     activeJob: this.activeJob(),
     lastSummary: this.lastSummary(),
-    lastRichScan: this.lastAtlasResult()?.nativeResult || null,
+    lastRichScan: null,
     vectorStatus: this.vectorStatus(),
     graphStatus: this.graphStatus(),
     manifoldMode: this.machine.manifoldMode(),
@@ -505,12 +484,6 @@ export class SearchPanelComponent implements OnInit {
     embeddingModelLabel: this.currentModelLabel(),
     embeddingDimensionLabel: this.activeEmbeddingDimensionLabel(),
   }));
-  readonly ledgerGroups = computed(() => this.commandStatus().ledgerGroups);
-  readonly inventoryMetrics = computed(() => this.commandStatus().metrics);
-  readonly pipelineStages = computed(() => this.commandStatus().stages);
-  readonly capabilityLayers = computed(() => this.commandStatus().capabilityLayers);
-  readonly sleepingCapabilities = computed(() => this.commandStatus().sleepingCapabilities);
-  readonly sidecarMetrics = computed(() => this.commandStatus().sidecars);
   readonly chunkingStatus = computed(() => this.commandStatus().chunking);
   readonly lastRunStatus = computed(() => {
     const fullAtlasReceipt = this.fullAtlasPipeline.lastReceipt();
@@ -531,6 +504,13 @@ export class SearchPanelComponent implements OnInit {
     }
     return this.commandStatus().lastRun;
   });
+  readonly lastRunHeading = computed(() =>
+    this.machine.lastSummary()?.kind === 'manifold-load'
+      && !this.fullAtlasPipeline.lastReceipt()
+      && !this.atlasRuntime.lastBuildReceipt()
+      ? 'Last projection switch'
+      : 'Last run'
+  );
   readonly lastRunReceiptRows = computed(() =>
     buildLastRunReceiptRows(this.fullAtlasPipeline.lastReceipt())
   );
@@ -578,6 +558,9 @@ export class SearchPanelComponent implements OnInit {
   readonly reviewClusters = computed<ProductDiagnosticsReviewCluster[]>(() =>
     buildReviewClusterViews(this.fullAtlasPipeline.lastSnapshot())
   );
+  readonly reviewAdjudicationCertificate = this.atlasControl.reviewCertificate;
+  readonly reviewAdjudicationContract = this.atlasControl.reviewView;
+  readonly atlasControlContract = this.atlasControl.contract;
   readonly compilerWorkbench = computed<CompilerWorkbenchView | null>(() =>
     buildCompilerWorkbenchView(
       this.fullAtlasPipeline.lastSnapshot(),
@@ -600,27 +583,11 @@ export class SearchPanelComponent implements OnInit {
       this.activeEmbeddingDimensionLabel(),
       this.vectorStatus(),
       this.dynamicNerLabel(),
+      this.truthReviewLane(),
+      this.atlasControlContract().certificates.reviewAdjudication,
       this.reviewClusters(),
       this.graphAwareLinkSuggestions(),
     )
-  );
-  readonly selectedRecipePlan = computed(() => this.atlasRuntime.recipeState(this.selectedRecipe(), this.atlasRunOptions()));
-  readonly selectedCapability = computed(() => atlasCapabilityById(this.selectedCapabilityId()));
-  readonly selectedCapabilityState = computed(() =>
-    this.atlasRuntime.capabilityState(this.selectedCapabilityId(), this.atlasRunOptions())
-  );
-  readonly selectedCapabilityChain = computed(() =>
-    this.selectedCapabilityIds().map((id) => ({
-      capability: atlasCapabilityById(id),
-      state: this.atlasRuntime.capabilityState(id, this.atlasRunOptions()),
-    }))
-  );
-  readonly selectedPipelineRail = computed(() => this.buildSelectedPipelineRail());
-  readonly runtimeCapabilities = computed(() =>
-    ATLAS_CAPABILITY_REGISTRY.map((capability) => this.atlasRuntime.capabilityState(capability.id, this.atlasRunOptions()))
-  );
-  readonly blockedRuntimeCapabilities = computed(() =>
-    this.runtimeCapabilities().filter((capability) => !capability.runnable || capability.blockedReason)
   );
   readonly modelLaneViews = computed(() => {
     const statuses = this.nerStatus();
@@ -639,6 +606,15 @@ export class SearchPanelComponent implements OnInit {
       manifoldStatuses: this.machine.manifoldStatuses(),
     });
   });
+  readonly nliModelLane = computed(() =>
+    this.modelLaneViews().find((lane) => lane.id === 'nli') || {
+      id: 'nli' as AtlasModelLaneId,
+      label: 'NLI',
+      status: 'idle' as const,
+      detail: 'ModernBERT NLI',
+      usedBy: 'truth review',
+    }
+  );
   readonly fullAtlasRequest = computed<GraphIndexRunRequest>(() => ({
     scope: this.graphIndexScope(),
     policy: this.buildPolicy() === 'force' ? 'force' : 'delta',
@@ -653,17 +629,17 @@ export class SearchPanelComponent implements OnInit {
       enabledLanes: this.selectedEmbeddingStageLanes(),
       entityLinkerEnabled: this.entityLinkerStageEnabled(),
     },
+    calendarRegistrySnapshot: this.calendar.calendarRegistrySnapshot(),
     entities: smartGraphRegistry.getAllEntities(),
   }));
   readonly fullAtlasModelReadiness = computed(() => this.fullAtlasPipeline.modelReadiness(this.fullAtlasRequest()));
-  readonly fullAtlasModelsReady = computed(() => this.fullAtlasPipeline.modelsReady(this.fullAtlasRequest()));
-  readonly fullAtlasCoreReady = computed(() => this.fullAtlasPipeline.coreModelsReady(this.fullAtlasRequest()));
+  readonly graphModelsReady = computed(() => this.fullAtlasPipeline.graphModelsReady(this.fullAtlasRequest()));
+  readonly embeddingModelReady = computed(() =>
+    this.fullAtlasPipeline.embeddingModelReady(this.fullAtlasRequest())
+    || this.embeddingsReady()
+    || this.vectorStatus() === 'ready'
+  );
   readonly fullAtlasBusy = this.fullAtlasPipeline.running;
-  readonly recipeLifecycle = computed(() => buildAtlasRecipeLifecycle(
-    this.activeRecipeStep(),
-    this.completedRecipeSteps(),
-    this.failedRecipeStep(),
-  ));
   readonly pipelineStateLabel = computed(() => {
     const activeJob = this.activeJob();
     if (activeJob && activeJob !== 'manifold-load' && activeJob !== 'graph-focus') return 'running';
@@ -695,6 +671,7 @@ export class SearchPanelComponent implements OnInit {
           folderId: note.folderId || '',
           hasBody: !!note.hasBody,
         })));
+        this.queueBuildScopeHydration();
       });
 
     this.notesService.getAllFolders$()
@@ -759,6 +736,7 @@ export class SearchPanelComponent implements OnInit {
     if (mode === 'global') {
       this.machine.setScope('global');
       void this.machine.refreshAuditSafe();
+      this.queueBuildScopeHydration();
       return;
     }
     if (mode === 'folder') {
@@ -768,17 +746,20 @@ export class SearchPanelComponent implements OnInit {
         this.machine.setScope(folderId);
         void this.machine.refreshAuditSafe();
       }
+      this.queueBuildScopeHydration();
       return;
     }
     if (mode === 'note') {
       const noteId = this.noteStore.currentNote()?.id || this.notes()[0]?.id || '';
       if (noteId) this.selectedBuildNoteIds.set([noteId]);
+      this.queueBuildScopeHydration();
       return;
     }
     if (!this.selectedBuildNoteIds().length) {
       const noteId = this.noteStore.currentNote()?.id || this.notes()[0]?.id || '';
       if (noteId) this.selectedBuildNoteIds.set([noteId]);
     }
+    this.queueBuildScopeHydration();
   }
 
   onBuildFolderChange(folderId: string): void {
@@ -786,6 +767,7 @@ export class SearchPanelComponent implements OnInit {
     this.buildScopeMode.set('folder');
     this.machine.setScope(folderId || 'global');
     void this.machine.refreshAuditSafe();
+    this.queueBuildScopeHydration();
   }
 
   toggleBuildNote(noteId: string): void {
@@ -798,6 +780,7 @@ export class SearchPanelComponent implements OnInit {
     this.selectedBuildNoteIds.update((ids) =>
       ids.includes(noteId) ? ids.filter((id) => id !== noteId) : [...ids, noteId],
     );
+    this.queueBuildScopeHydration();
   }
 
   isBuildNoteSelected(noteId: string): boolean {
@@ -835,12 +818,12 @@ export class SearchPanelComponent implements OnInit {
     }
   }
 
-  async loadFullAtlasModels(): Promise<void> {
+  async loadGraphModels(): Promise<void> {
     if (this.fullAtlasBusy()) return;
     this.error.set(null);
     try {
-      await this.fullAtlasPipeline.loadModels(this.fullAtlasRequest());
-      this.notice.set('Full Atlas Index models are warm. No graph data was built.');
+      await this.fullAtlasPipeline.loadGraphModels(this.fullAtlasRequest());
+      this.notice.set('Graph build models are warm: Dynamic NER and NLI. Jina is still idle until Embed Atlas.');
     } catch (err) {
       this.error.set(this.toErrorMessage(err));
     }
@@ -857,32 +840,14 @@ export class SearchPanelComponent implements OnInit {
     }
   }
 
-  async buildFullAtlas(): Promise<void> {
-    await this.buildCoreAtlas();
-  }
-
-  async buildCoreAtlas(): Promise<void> {
-    if (this.isFullAtlasBuildDisabled()) return;
+  async buildGraphAtlas(): Promise<void> {
+    if (this.isGraphBuildDisabled()) return;
     this.error.set(null);
     try {
-      const result = await this.fullAtlasPipeline.buildCoreGraph({
-        ...this.fullAtlasRequest(),
-        postProcessMode: 'core',
-      });
-      this.notice.set(result.receipt.message);
-      this.openGraphLens();
-    } catch (err) {
-      this.error.set(this.toErrorMessage(err));
-    }
-  }
-
-  async postProcessAtlas(): Promise<void> {
-    if (this.isPostProcessDisabled()) return;
-    this.error.set(null);
-    try {
-      const result = await this.fullAtlasPipeline.postProcessAtlas({
+      const result = await this.fullAtlasPipeline.buildGraph({
         ...this.fullAtlasRequest(),
         postProcessMode: 'full',
+        durabilityMode: 'interactive',
       });
       this.notice.set(result.receipt.message);
       this.openGraphLens();
@@ -891,29 +856,220 @@ export class SearchPanelComponent implements OnInit {
     }
   }
 
-  isFullAtlasBuildDisabled(): boolean {
-    return this.fullAtlasBusy() || !this.fullAtlasCoreReady() || !this.hasRunnableBuildScope();
+  async embedAtlas(): Promise<void> {
+    if (this.isEmbedAtlasDisabled()) return;
+    this.error.set(null);
+    try {
+      if (!this.embeddingModelReady()) {
+        await this.loadVectorModel();
+      }
+      if (!this.embeddingModelReady()) return;
+      await this.indexVectorNotes();
+      this.notice.set(`${this.currentModelLabel()} is staged for Atlas embeddings. Graph topology was not rebuilt.`);
+    } catch (err) {
+      this.error.set(this.toErrorMessage(err));
+    }
   }
 
-  isPostProcessDisabled(): boolean {
-    return this.fullAtlasBusy() || !this.fullAtlasModelsReady() || !this.hasRunnableBuildScope();
+  async runTruthReviewLane(): Promise<void> {
+    if (this.isTruthReviewLaneDisabled()) return;
+    this.error.set(null);
+    const started = performance.now();
+    const fallback = this.semanticTruthReviewFallback();
+    this.truthReviewLane.set(runningSemanticTruthReviewLaneState(fallback));
+    try {
+      const raw = await this.phoenix.storeCommand(
+        SEMANTIC_TRUTH_REVIEW_COMMAND,
+        this.semanticTruthReviewPayload(),
+      );
+      const elapsedMs = Math.round(performance.now() - started);
+      const state = normalizeSemanticTruthReviewResponse(raw, fallback, elapsedMs);
+      this.truthReviewLane.set(state);
+      this.notice.set(
+        `Truth review lane complete: ${formatCount(state.edgeCount)} candidate edges, `
+        + `${formatCount(state.cacheHits)} cache hits, 0 topology writes.`,
+      );
+    } catch (err) {
+      const elapsedMs = Math.round(performance.now() - started);
+      const message = this.toErrorMessage(err);
+      this.truthReviewLane.set(failedSemanticTruthReviewLaneState(fallback, message, elapsedMs));
+      this.error.set(message);
+    }
+  }
+
+  async loadModernBertNli(): Promise<void> {
+    if (this.isModernBertNliLoadDisabled()) return;
+    this.error.set(null);
+    this.activeLaneWarm.set('nli');
+    this.atlasControl.setNliOperationState('loading');
+    try {
+      await this.atlasRuntime.warmModelLane('nli', this.atlasRunOptions());
+      this.notice.set('ModernBERT NLI is loaded for Stage 8 review. No graph topology was written.');
+    } catch (err) {
+      this.error.set(this.toErrorMessage(err));
+    } finally {
+      this.activeLaneWarm.set(null);
+      this.atlasControl.setNliOperationState('idle');
+    }
+  }
+
+  async runModernBertNliReview(): Promise<void> {
+    if (this.isModernBertNliReviewDisabled()) return;
+    this.error.set(null);
+    this.atlasControl.setNliOperationState('running');
+    try {
+      const options = this.atlasRunOptions();
+      const result = await this.atlasRuntime.runCapability('nliAdjudication', options);
+      const certificate = this.atlasControl.publishReviewRun(result.rawResult);
+      const total = certificate.queue.ledgerRows;
+      const eligible = certificate.queue.nliPairRows;
+      const judged = certificate.queue.judgedRows;
+      const applied = certificate.queue.appliedRows;
+      const duplicate = certificate.queue.duplicatePairs;
+      this.notice.set(eligible
+        ? `ModernBERT review: ${eligible.toLocaleString()} NLI-eligible of ${total.toLocaleString()} review row${total === 1 ? '' : 's'}; `
+          + `${judged.toLocaleString()} judged / ${applied.toLocaleString()} applied; `
+          + `${duplicate.toLocaleString()} duplicate${duplicate === 1 ? '' : 's'} skipped; 0 topology writes.`
+        : `ModernBERT review found no NLI-eligible rows among ${total.toLocaleString()} review row${total === 1 ? '' : 's'}. No graph topology was written.`);
+    } catch (err) {
+      const message = this.toErrorMessage(err);
+      this.truthReviewLane.set(failedSemanticTruthReviewLaneState(
+        this.semanticTruthReviewFallback(),
+        message,
+        0,
+        'NLI review unavailable',
+      ));
+      this.error.set(message);
+    } finally {
+      this.atlasControl.setNliOperationState('idle');
+    }
+  }
+
+  isGraphBuildDisabled(): boolean {
+    return this.fullAtlasBusy() || !this.graphModelsReady() || !this.hasRunnableBuildScope();
+  }
+
+  isEmbedAtlasDisabled(): boolean {
+    return this.fullAtlasBusy() || !this.hasRunnableBuildScope()
+      || this.vectorStatus() === 'loading'
+      || this.vectorStatus() === 'indexing';
+  }
+
+  isTruthReviewLaneDisabled(): boolean {
+    return this.truthReviewLaneBusy() || this.fullAtlasBusy() || !this.hasRunnableBuildScope();
+  }
+
+  isModernBertNliLoadDisabled(): boolean {
+    return this.fullAtlasBusy()
+      || !!this.activeLaneWarm()
+      || this.nliReviewRunning()
+      || this.nli.isInitialized();
+  }
+
+  isModernBertNliReviewDisabled(): boolean {
+    const card = this.atlasControlCard('workflow-nli-pairs');
+    return card?.actionability !== 'model_run' || !card.allowedActions.includes('run_nli');
   }
 
   fullAtlasBuildButtonLabel(): string {
-    if (this.fullAtlasBusy()) return 'Building Core';
-    if (!this.fullAtlasCoreReady()) return 'Load NER First';
-    return this.buildPolicy() === 'force' ? 'Force Build Core' : 'Build Clean Graph';
-  }
-
-  postProcessButtonLabel(): string {
-    if (this.fullAtlasBusy()) return 'Working';
-    if (!this.fullAtlasModelsReady()) return 'Load Models First';
-    return this.buildPolicy() === 'force' ? 'Force Postprocess' : 'Postprocess';
+    if (this.fullAtlasBusy()) return 'Building Graph';
+    return this.buildPolicy() === 'force' ? 'Force Build Graph' : 'Build Graph';
   }
 
   loadModelsButtonLabel(): string {
     if (this.fullAtlasBusy()) return 'Working';
-    return this.fullAtlasModelsReady() ? 'Models Warm' : 'Load Models';
+    return this.graphModelsReady() ? 'Graph Models Warm' : 'Stage Graph Models';
+  }
+
+  embedAtlasButtonLabel(): string {
+    if (this.vectorStatus() === 'loading') return 'Loading Jina';
+    if (this.vectorStatus() === 'indexing') return 'Embedding Atlas';
+    if (!this.embeddingModelReady()) return 'Load Jina + Embed';
+    return 'Embed Atlas';
+  }
+
+  truthReviewLaneButtonLabel(): string {
+    if (this.truthReviewLaneBusy()) return 'Reviewing';
+    if (!this.hasRunnableBuildScope()) return 'Pick Scope';
+    const status = this.truthReviewLane().status;
+    if (status === 'ready') return 'Refresh Review';
+    if (status === 'error') return 'Retry Review';
+    return 'Run Review';
+  }
+
+  modernBertNliLoadButtonLabel(): string {
+    if (this.activeLaneWarm() === 'nli') return 'Loading NLI';
+    return this.nli.isInitialized() ? 'NLI Ready' : 'Load NLI';
+  }
+
+  modernBertNliReviewButtonLabel(): string {
+    return this.reviewAdjudicationContract().action.label;
+  }
+
+  modernBertNliStatusLabel(): string {
+    if (this.nliReviewRunning()) return 'running';
+    if (this.activeLaneWarm() === 'nli') return 'warming';
+    return this.nliModelLane().status;
+  }
+
+  modernBertNliTone(): CompilerTone {
+    return atlasToneToCompilerTone(
+      this.atlasControlCard('workflow-nli-pairs')?.tone
+      ?? this.reviewAdjudicationContract().action.tone,
+    );
+  }
+
+  modernBertNliDetail(): string {
+    return this.atlasControlCard('workflow-nli-pairs')?.detail
+      || this.reviewAdjudicationContract().model.classifierDetail;
+  }
+
+  atlasControlCard(id: string) {
+    return this.atlasControlContract().cardsById[id] ?? null;
+  }
+
+  atlasControlCardValue(id: string): string {
+    return this.atlasControlCard(id)?.valueLabel ?? '0';
+  }
+
+  atlasControlCardDetail(id: string): string {
+    return this.atlasControlCard(id)?.detail ?? '';
+  }
+
+  stage8ContractStepClass(id: string): string {
+    return `stage8-step-${atlasToneToCompilerTone(this.atlasControlCard(id)?.tone ?? 'quiet')}`;
+  }
+
+  async runEntitySuggestionStage(): Promise<void> {
+    if (this.isRunNerDisabled()) return;
+    this.nerSuggestionRunning.set(true);
+    this.error.set(null);
+    try {
+      const options = this.atlasRunOptions();
+      const plan = this.atlasRuntime.recipePlan('runNer', options);
+      await this.atlasRuntime.warmRequiredModels(plan, options);
+      await this.atlasRuntime.runRecipe('runNer', { ...options, skipModelWarm: true });
+      this.notice.set('Dynamic NER suggestions refreshed. Graph topology was not rebuilt.');
+    } catch (err) {
+      this.error.set(this.toErrorMessage(err));
+    } finally {
+      this.nerSuggestionRunning.set(false);
+    }
+  }
+
+  isRunNerDisabled(): boolean {
+    const activeJob = this.activeJob();
+    const blockingJob = activeJob && activeJob !== 'manifold-load' && activeJob !== 'graph-focus';
+    return this.nerSuggestionRunning()
+      || !!blockingJob
+      || this.isDynamicScanning()
+      || !this.hasRunnableBuildScope();
+  }
+
+  nerSuggestionsButtonLabel(): string {
+    if (this.nerSuggestionRunning()) return 'Scanning NER';
+    if (!this.hasRunnableBuildScope()) return 'Pick Scope';
+    return 'Run NER';
   }
 
   modelReadinessTone(status: string): string {
@@ -921,33 +1077,6 @@ export class SearchPanelComponent implements OnInit {
     if (status === 'warming' || status === 'running') return 'running';
     if (status === 'error') return 'error';
     return 'idle';
-  }
-
-  async runAtlasRecipe(recipeId: AtlasRecipeId): Promise<void> {
-    if (this.activeRecipe()) return;
-    this.applyRecipeSelection(recipeId);
-    this.activeRecipe.set(recipeId);
-    this.error.set(null);
-    try {
-      const options = this.atlasRunOptions();
-      const plan = this.atlasRuntime.recipePlan(recipeId, options);
-      this.beginRecipeStep('scope');
-      this.completeRecipeStep('scope');
-      this.beginRecipeStep('warm');
-      await this.atlasRuntime.warmRequiredModels(plan, options);
-      this.completeRecipeStep('warm');
-      this.beginRecipeStep('run');
-      await this.atlasRuntime.runRecipe(recipeId, { ...options, skipModelWarm: true });
-      this.completeRecipeStep('run');
-      this.beginRecipeStep('refresh');
-      this.completeRecipeStep('refresh');
-    } catch (err) {
-      this.failRecipeStep(this.activeRecipeStep() || 'run');
-      this.error.set(this.toErrorMessage(err));
-    } finally {
-      this.activeRecipe.set(null);
-      this.activeRecipeStep.set(null);
-    }
   }
 
   openGraphLens(): void {
@@ -1011,132 +1140,6 @@ export class SearchPanelComponent implements OnInit {
 
   countLabel(value: number | null): string {
     return value === null ? 'unavailable' : value.toLocaleString();
-  }
-
-  modelRequirementLabel(models: AtlasModelRequirement[]): string {
-    return this.atlasRuntime.modelRequirementLabel(models);
-  }
-
-  serviceRequirementLabel(services: AtlasServiceRequirement[]): string {
-    return this.atlasRuntime.serviceRequirementLabel(services);
-  }
-
-  expectedOutputLabel(outputs: AtlasExpectedOutput[]): string {
-    return this.atlasRuntime.expectedOutputLabel(outputs);
-  }
-
-  capabilityRuntimeLabel(state: AtlasCapabilityRuntimeState): string {
-    return ATLAS_CAPABILITY_REGISTRY.find((capability) => capability.id === state.capabilityId)?.label || state.capabilityId;
-  }
-
-  trackCapabilityGroup(_index: number, group: BuilderCapabilityGroup): string {
-    return group.id;
-  }
-
-  trackCapabilityTarget(_index: number, target: BuilderCapabilityCard): AtlasCapabilityId {
-    return target.capability.id;
-  }
-
-  selectCapability(capabilityId: AtlasCapabilityId): void {
-    if (this.activeRecipe()) return;
-    this.preserveWorkbenchScroll(() => {
-      const recipeId = recipeForCapability(capabilityId);
-      this.selectedCapabilityId.set(capabilityId);
-      this.selectedRecipe.set(recipeId);
-      this.selectedCapabilityIds.set(capabilityIdsForRecipe(recipeId, capabilityId));
-      this.resetRecipeProgress();
-    });
-  }
-
-  isCapabilitySelected(capabilityId: AtlasCapabilityId): boolean {
-    return this.selectedCapabilityIds().includes(capabilityId);
-  }
-
-  toggleCapabilityGroup(groupId: string): void {
-    this.preserveWorkbenchScroll(() => {
-      this.collapsedCapabilityGroups.update((ids) =>
-        ids.includes(groupId) ? ids.filter((id) => id !== groupId) : [...ids, groupId],
-      );
-    });
-  }
-
-  isCapabilityGroupCollapsed(groupId: string): boolean {
-    return this.collapsedCapabilityGroups().includes(groupId);
-  }
-
-  selectRecipe(recipeId: AtlasRecipeId): void {
-    if (this.activeRecipe()) return;
-    this.preserveWorkbenchScroll(() => {
-      this.applyRecipeSelection(recipeId);
-    });
-  }
-
-  private applyRecipeSelection(recipeId: AtlasRecipeId): void {
-    this.selectedRecipe.set(recipeId);
-    this.selectedCapabilityId.set(capabilityForRecipe(recipeId));
-    this.selectedCapabilityIds.set(capabilityIdsForRecipe(recipeId));
-    this.resetRecipeProgress();
-  }
-
-  private preserveWorkbenchScroll(update: () => void): void {
-    const scrollContainer = this.workbenchScroll?.nativeElement;
-    const scrollTop = scrollContainer?.scrollTop ?? 0;
-    update();
-    if (!scrollContainer) return;
-
-    const restore = () => {
-      scrollContainer.scrollTop = scrollTop;
-    };
-    queueMicrotask(restore);
-    if (typeof requestAnimationFrame === 'function') {
-      requestAnimationFrame(restore);
-    }
-  }
-
-  async runSelectedRecipe(): Promise<void> {
-    await this.runAtlasRecipe(this.selectedRecipe());
-  }
-
-  async warmSelectedRecipeModels(): Promise<void> {
-    if (this.activeRecipe()) return;
-    const recipeId = this.selectedRecipe();
-    this.activeRecipe.set(recipeId);
-    this.resetRecipeProgress();
-    this.error.set(null);
-    try {
-      this.beginRecipeStep('scope');
-      this.completeRecipeStep('scope');
-      this.beginRecipeStep('warm');
-      await this.prepareRecipeModels(recipeId);
-      this.completeRecipeStep('warm');
-      this.notice.set(`${this.selectedRecipePlan().label} required runtime models are warm. No graph data was mutated.`);
-    } catch (err) {
-      this.failRecipeStep(this.activeRecipeStep() || 'warm');
-      this.error.set(this.toErrorMessage(err));
-    } finally {
-      this.activeRecipe.set(null);
-      this.activeRecipeStep.set(null);
-    }
-  }
-
-  async warmModelLaneFromCard(laneId: AtlasModelLaneId): Promise<void> {
-    if (this.activeRecipe() || this.activeLaneWarm() || laneId === 'manifoldProjection') return;
-    this.error.set(null);
-    this.activeLaneWarm.set(laneId);
-    try {
-      await this.atlasRuntime.warmModelLane(laneId, this.atlasRunOptions());
-      this.notice.set(`${laneListLabel([laneId])} is warm.`);
-    } catch (err) {
-      this.error.set(this.toErrorMessage(err));
-    } finally {
-      this.activeLaneWarm.set(null);
-    }
-  }
-
-  laneCardActionLabel(laneId: AtlasModelLaneId, status: string): string {
-    if (this.activeLaneWarm() === laneId) return 'warming';
-    if (laneId === 'manifoldProjection') return 'read-only';
-    return status === 'ready' ? 'warm' : 'click to warm';
   }
 
   linkSuggestionKindLabel(kind: GraphRebuildLinkSuggestion['kind']): string {
@@ -1265,18 +1268,6 @@ export class SearchPanelComponent implements OnInit {
     return `${this.fullAtlasPipeline.lastSnapshot()?.id || 'latest'}:${suggestion.id}`;
   }
 
-  isLaneCardDisabled(laneId: AtlasModelLaneId): boolean {
-    return laneId === 'manifoldProjection' || !!this.activeRecipe() || !!this.activeLaneWarm();
-  }
-
-  laneListLabel(lanes: AtlasModelLaneId[]): string {
-    return laneListLabel(lanes);
-  }
-
-  capabilityListLabel(capabilities: AtlasCapabilityId[]): string {
-    return capabilityListLabel(capabilities);
-  }
-
   buildScopeModeLabel(mode: AtlasBuildScope['mode']): string {
     switch (mode) {
       case 'global':
@@ -1288,103 +1279,6 @@ export class SearchPanelComponent implements OnInit {
       case 'multiNote':
         return 'Multi-note';
     }
-  }
-
-  isRecipeBusy(recipeId: AtlasRecipeId): boolean {
-    return this.activeRecipe() === recipeId || (!!this.activeJob() && this.activeRecipe() === recipeId);
-  }
-
-  capabilityStatusClass(state: AtlasCapabilityRuntimeState): string {
-    return `capability-${state.status}`;
-  }
-
-  capabilityIconName(capability: AtlasCapability): string {
-    switch (capability.family) {
-      case 'surface':
-        return 'lucideFileText';
-      case 'entity':
-        return 'lucideCpu';
-      case 'graph':
-      case 'manifold':
-      case 'visualization':
-        return 'lucideLayers';
-      case 'semantic':
-        return 'lucideMicrochip';
-      case 'reasoning':
-        return 'lucideSparkles';
-      case 'retrieval':
-        return 'lucideSearch';
-    }
-  }
-
-  compactPolicyLabel(policy: string): string {
-    switch (policy) {
-      case 'dirty-only':
-        return 'Dirty';
-      case 'read-only':
-        return 'RO';
-      case 'warm-only':
-        return 'Warm';
-      case 'native-only':
-        return 'Native';
-      default:
-        return policy;
-    }
-  }
-
-  compactOperationLabel(kind: string): string {
-    return kind
-      .replace('richTextGraphScan', 'Rich')
-      .replace('semanticAtlasScan', 'Semantic')
-      .replace('dynamicNerScan', 'Dynamic')
-      .replace('nativeStoreProbe', 'Native')
-      .replace('nliAdjudication', 'NLI')
-      .replace('manifoldSnapshot', 'Manifold')
-      .replace('graphVisualization', 'Graph View')
-      .replace('retrievalWalk', 'Retrieve')
-      .replace('modelWarm', 'Model');
-  }
-
-  isRecipeDisabled(recipeId: AtlasRecipeId): boolean {
-    const activeJob = this.activeJob();
-    const blockingJob = activeJob && activeJob !== 'manifold-load' && activeJob !== 'graph-focus';
-    return !!this.activeRecipe() || !!blockingJob || this.isDynamicScanning() || !this.hasRunnableBuildScope();
-  }
-
-  isWarmDisabled(): boolean {
-    const activeJob = this.activeJob();
-    const blockingJob = activeJob && activeJob !== 'manifold-load' && activeJob !== 'graph-focus';
-    return !!this.activeRecipe() || !!blockingJob || !this.selectedRecipePlan().requiredModels.length;
-  }
-
-  selectedCapabilityModelSummary(): string {
-    const models = this.selectedRecipePlan().requiredModels;
-    const chain = this.selectedCapabilityChain().map((item) => item.capability.id);
-    const labels = models.map((model) => model.dims ? `${model.label} ${model.dims}` : model.label);
-    if (chain.includes('dynamicNer')) {
-      labels.unshift('Native GLiNER BI-small auto-load');
-    }
-    if (!labels.length) return 'none';
-    return Array.from(new Set(labels)).join(' / ');
-  }
-
-  warmButtonLabel(): string {
-    const required = this.selectedRecipePlan().requiredModels;
-    if (!required.length) return 'No Warm Needed';
-    if (this.activeRecipeStep() === 'warm') return 'Warming';
-    if (this.requiredRecipeModelsReady()) return 'Warmed';
-    const ids = required.map((model) => model.id);
-    if (ids.includes('semanticEmbedding') && ids.includes('nli')) return 'Warm Embedding + NLI';
-    if (ids.includes('semanticEmbedding')) return 'Warm Embedding';
-    if (ids.includes('dynamicNer')) return 'Warm Dynamic NER';
-    return 'Warm Required';
-  }
-
-  warmButtonTone(): string {
-    const required = this.selectedRecipePlan().requiredModels;
-    if (!required.length) return 'warm-neutral';
-    if (this.activeRecipeStep() === 'warm') return 'warm-running';
-    return this.requiredRecipeModelsReady() ? 'warm-ready' : 'warm-required';
   }
 
   laneStatusLabel(lane: RetrievalLane): string {
@@ -1454,20 +1348,6 @@ export class SearchPanelComponent implements OnInit {
     this.results.set(await this.mapGoResults(rawResults, this.resultSource(), enabled));
   }
 
-  private async prepareRecipeModels(recipeId: AtlasRecipeId): Promise<void> {
-    const options = this.atlasRunOptions();
-    await this.atlasRuntime.warmRequiredModels(
-      this.atlasRuntime.recipePlan(recipeId, options),
-      options,
-    );
-  }
-
-  private requiredRecipeModelsReady(): boolean {
-    const required = this.selectedRecipePlan().requiredModels;
-    if (!required.length) return false;
-    return required.every((model) => model.readiness === 'ready');
-  }
-
   private hasRunnableBuildScope(): boolean {
     const scope = this.selectedBuildScope();
     if (scope.mode === 'note') return !!scope.noteId;
@@ -1476,54 +1356,70 @@ export class SearchPanelComponent implements OnInit {
     return true;
   }
 
-  private buildSelectedPipelineRail(): Array<{ id: string; label: string; status: string }> {
-    const rail: Array<{ id: string; label: string; status: string }> = [
-      { id: 'scope', label: this.buildScopeLabel(), status: this.hasRunnableBuildScope() ? 'ready' : 'idle' },
-    ];
-    for (const item of this.selectedCapabilityChain()) {
-      rail.push({
-        id: item.capability.id,
-        label: item.capability.label,
-        status: item.state.status,
-      });
-    }
-    return rail;
-  }
-
-  private resetRecipeProgress(): void {
-    this.activeRecipeStep.set(null);
-    this.completedRecipeSteps.set([]);
-    this.failedRecipeStep.set(null);
-  }
-
-  private beginRecipeStep(step: AtlasRecipeLifecycleId): void {
-    this.activeRecipeStep.set(step);
-    this.failedRecipeStep.set(null);
-  }
-
-  private completeRecipeStep(step: AtlasRecipeLifecycleId): void {
-    this.completedRecipeSteps.update((steps) => Array.from(new Set([...steps, step])));
-    if (this.activeRecipeStep() === step) {
-      this.activeRecipeStep.set(null);
-    }
-  }
-
-  private failRecipeStep(step: AtlasRecipeLifecycleId): void {
-    this.failedRecipeStep.set(step);
-    this.activeRecipeStep.set(null);
-  }
-
   private atlasRunOptions(): AtlasRunOptions {
     return {
       selectedModel: this.selectedModel(),
       selectedModelLabel: this.currentModelLabel(),
       dimensionLabel: this.activeEmbeddingDimensionLabel(),
+      embeddingDimension: numericFromDimensionLabel(this.activeEmbeddingDimensionLabel()),
       scope: this.indexScope(),
       buildScope: this.selectedBuildScope(),
       buildPolicy: this.buildPolicy(),
       noteIds: this.buildDocumentIdsForRun(),
       query: this.query().trim(),
     };
+  }
+
+  private semanticTruthReviewPayload(): Record<string, unknown> {
+    const graphScope = this.graphIndexScope();
+    const fallback = this.semanticTruthReviewFallback();
+    return {
+      laneMode: 'truth-review',
+      cachePolicy: 'persistent',
+      skipEvents: true,
+      skipChunks: true,
+      skipVectorIndex: true,
+      indexNodeVectors: false,
+      edgePreviewLimit: 8,
+      scope: this.semanticTruthReviewScopeKey(),
+      scopeHint: {
+        kind: graphScope.kind,
+        scopeId: graphScope.scopeId,
+        label: graphScope.label,
+        noteIds: graphScope.noteIds,
+      },
+      documentIds: graphScope.noteIds,
+      model: {
+        uiModelId: this.selectedModel(),
+        modelId: fallback.modelId,
+        modelLabel: fallback.modelLabel,
+        embeddingProfile: embeddingProfileFromDimensionLabel(fallback.dimensionLabel),
+        dimensionLabel: fallback.dimensionLabel,
+        dimension: numericFromDimensionLabel(fallback.dimensionLabel),
+        executionProvider: fallback.executionProvider,
+      },
+    };
+  }
+
+  private semanticTruthReviewFallback(): Pick<
+    SemanticTruthReviewLaneState,
+    'modelId' | 'modelLabel' | 'dimensionLabel' | 'executionProvider'
+  > {
+    const model = EmbeddingModelRegistry.getModel(this.selectedModel());
+    return {
+      modelId: model?.localModel?.modelId || this.selectedModel(),
+      modelLabel: this.currentModelLabel(),
+      dimensionLabel: this.activeEmbeddingDimensionLabel(),
+      executionProvider: SEMANTIC_TRUTH_REVIEW_EXECUTION_PROVIDER,
+    };
+  }
+
+  private semanticTruthReviewScopeKey(): Record<string, string> {
+    const scope = this.selectedBuildScope();
+    if (scope.mode === 'folder' && scope.folderId) {
+      return { folderId: scope.folderId, folderPath: scope.folderId };
+    }
+    return {};
   }
 
   private graphIndexScope(): GraphIndexRunScope {
@@ -1630,6 +1526,28 @@ export class SearchPanelComponent implements OnInit {
     return this.loadNotesByIds(this.scopedNotes().map((note) => note.id));
   }
 
+  private async hydrateBuildScopeNotes(notes: SearchPanelNote[]): Promise<void> {
+    const generation = ++this.buildScopeHydrationGeneration;
+    if (!notes.length) {
+      this.hydratedBuildScopeNotes.set([]);
+      return;
+    }
+    const ids = notes.map((note) => note.id).filter(Boolean);
+    const hydrated = await this.loadNotesByIds(ids);
+    if (generation !== this.buildScopeHydrationGeneration) return;
+    const hydratedById = new Map(hydrated.map((note) => [note.id, note]));
+    const merged: SearchPanelNote[] = [];
+    for (const id of ids) {
+      const note = hydratedById.get(id) || notes.find((candidate) => candidate.id === id);
+      if (note) merged.push(note);
+    }
+    this.hydratedBuildScopeNotes.set(merged);
+  }
+
+  private queueBuildScopeHydration(): void {
+    void this.hydrateBuildScopeNotes(this.scopedNotes());
+  }
+
   private async loadNoteMapByIds(ids: string[]): Promise<Map<string, SearchPanelNote>> {
     const notes = await this.loadNotesByIds(ids);
     return new Map(notes.map((note) => [note.id, note]));
@@ -1665,80 +1583,6 @@ function noteIdsFromBuildScope(scope: AtlasBuildScope): string[] {
   if (scope.mode === 'note') return scope.noteId ? [scope.noteId] : [];
   if (scope.mode === 'multiNote') return scope.noteIds.filter(Boolean);
   return [];
-}
-
-const BUILDER_CAPABILITY_IDS: AtlasCapabilityId[] = [
-  'dynamicSurface',
-  'dynamicChunking',
-  'dynamicNer',
-  'mentionGraph',
-  'evidenceGraph',
-  'surfaceGraph',
-  'assertedKernel',
-  'relationGraph',
-  'temporalGraph',
-  'eventIdentity',
-  'memoryState',
-  'causalGraph',
-  'semanticEmbedding',
-  'semanticAtlas',
-  'semanticCandidate',
-  'nliAdjudication',
-  'hybridManifold',
-  'hopfProjection',
-  'lorentzForest',
-  'productManifold',
-  'retrievalWalk',
-  'galaxyVisualization',
-];
-
-function expandCapabilityChain(id: AtlasCapabilityId, seen = new Set<AtlasCapabilityId>()): AtlasCapabilityId[] {
-  if (seen.has(id)) return [];
-  seen.add(id);
-  const capability = atlasCapabilityById(id);
-  const chain = capability.dependencies.flatMap((dependency) => expandCapabilityChain(dependency, seen));
-  return [...chain, id].filter((capabilityId, index, values) => values.indexOf(capabilityId) === index);
-}
-
-function capabilityIdsForRecipe(recipeId: AtlasRecipeId, focusCapabilityId?: AtlasCapabilityId): AtlasCapabilityId[] {
-  const recipe = atlasRecipeDefinitionById(recipeId);
-  const skipped = new Set(recipe.skippedCapabilities);
-  const requiredChain = recipe.requiredCapabilities.flatMap((id) => expandCapabilityChain(id));
-  const focusChain = focusCapabilityId ? expandCapabilityChain(focusCapabilityId) : [];
-  const selected = new Set(requiredChain.filter((id) => !skipped.has(id)));
-  for (const id of focusChain) {
-    if (!skipped.has(id)) selected.add(id);
-  }
-  return BUILDER_CAPABILITY_IDS.filter((id) => selected.has(id));
-}
-
-function layerLabelForCapability(id: AtlasCapabilityId): string {
-  return ATLAS_CAPABILITY_LAYERS.find((layer) => layer.capabilityIds.includes(id))?.label || atlasCapabilityById(id).family;
-}
-
-function recipeForCapability(id: AtlasCapabilityId): AtlasRecipeId {
-  if (id === 'relationGraph' || id === 'temporalGraph' || id === 'eventIdentity' || id === 'memoryState' || id === 'causalGraph') {
-    return 'reasoningGraph';
-  }
-  if (id === 'nliAdjudication') return 'adjudicatedSemanticGraph';
-  if (id === 'semanticEmbedding' || id === 'semanticAtlas' || id === 'semanticCandidate') return 'semanticGraph';
-  if (id === 'hybridManifold' || id === 'hopfProjection' || id === 'lorentzForest' || id === 'productManifold') return 'semanticGraph';
-  return 'textGraph';
-}
-
-function capabilityForRecipe(id: AtlasRecipeId): AtlasCapabilityId {
-  switch (id) {
-    case 'semanticGraph':
-      return 'semanticAtlas';
-    case 'adjudicatedSemanticGraph':
-      return 'nliAdjudication';
-    case 'reasoningGraph':
-      return 'relationGraph';
-    case 'runNer':
-      return 'dynamicNer';
-    case 'textGraph':
-      return 'assertedKernel';
-  }
 }
 
 function buildReceiptDetail(receipt: AtlasBuildReceipt): string {
@@ -1781,7 +1625,7 @@ function buildPostprocessStagingView(
     return {
       title: mode === 'budget' ? 'Lane Budget Matrix' : 'Lane Plan Matrix',
       mode,
-      targets: plan.admittedCount,
+      targets: plan.canonicalCount || plan.candidateCount,
       candidates: plan.candidateCount,
       deferred: plan.deferredCount,
       lanes,
@@ -1832,6 +1676,8 @@ function buildStage8WorkbenchView(
   dimensionLabel: string,
   vectorStatus: string,
   dynamicNerStatus: string,
+  truthReview: SemanticTruthReviewLaneState,
+  reviewAdjudication: GraphReviewAdjudicationViewContract,
   reviewClusters: ProductDiagnosticsReviewCluster[],
   graphLinks: GraphRebuildLinkSuggestion[],
 ): Stage8WorkbenchView {
@@ -1860,6 +1706,7 @@ function buildStage8WorkbenchView(
   const embeddingVectors = counters?.embeddingVectors ?? snapshot?.embeddingVectors.length ?? 0;
   const receiptFailures = counters?.finalLinkReceiptFailures ?? snapshot?.finalLinkPatchLog?.counters.failedReceipts ?? 0;
   const routerStage = stage8RouterStage(receipt);
+  const contract = buildGraphProjectionContractReport(snapshot, { receipt });
   const semanticReady = vectorStatus === 'ready'
     || receipt?.modelReadiness?.some((model) => model.id === 'semanticEmbedding' && model.status === 'ready')
     || false;
@@ -1886,6 +1733,9 @@ function buildStage8WorkbenchView(
       timing: routerStage ? `${routerStage.durationMs.toLocaleString()} ms` : 'pending',
       tone: routerTone,
     },
+    truthReview: buildStage8TruthReviewView(truthReview, modelLabel, dimensionLabel),
+    reviewAdjudication: buildStage8ReviewAdjudicationView(reviewAdjudication, truthReview),
+    contract,
     lanes: [
       stage8Lane('identity', 'Identity', identityReviews, `${entityLinking?.sameEntity || 0} same / ${entityLinking?.ambiguous || 0} ambiguous`, identityReviews ? 'review' : 'quiet', 'identity'),
       stage8Lane('aliases', 'Aliases', counters?.aliases || 0, `${aliasPatches} alias patches / ${entityLinking?.aliasOf || 0} linker votes`, aliasPatches ? 'review' : 'ready', 'identity'),
@@ -1899,6 +1749,152 @@ function buildStage8WorkbenchView(
     ],
     reviewItems: buildStage8ReviewItems(snapshot, reviewClusters, graphLinks),
     receipts: buildLastRunReceiptRows(receipt).slice(0, 4),
+  };
+}
+
+function buildStage8ReviewAdjudicationView(
+  contract: GraphReviewAdjudicationViewContract,
+  truthReview: SemanticTruthReviewLaneState,
+): Stage8ReviewAdjudicationView {
+  if (contract.source === 'missing') {
+    return {
+      status: truthReview.status === 'running' ? 'running' : 'idle',
+      tone: truthReview.tone,
+      totalDetail: '0 review rows',
+      eligibleDetail: '0 NLI eligible',
+      excludedDetail: '0 excluded',
+      judgedDetail: '0 judged / 0 applied',
+      inputDetail: 'premise + hypothesis / certificate pending',
+      reasonDetail: 'run Build Graph to publish the shared review contract',
+      actionLabel: contract.action.label,
+      actionDisabled: contract.action.disabled,
+      actionReason: contract.action.reason,
+    };
+  }
+  return {
+    status: contract.proof.status,
+    tone: contract.proof.tone as CompilerTone,
+    totalDetail: contract.queue.totalLabel,
+    eligibleDetail: contract.queue.eligibleLabel,
+    excludedDetail: contract.queue.excludedLabel,
+    judgedDetail: contract.queue.judgedLabel,
+    inputDetail: `${contract.model.inputDetail} / ${contract.proof.inputContract.status}`,
+    reasonDetail: contract.reason
+      ? `${contract.reason.label}: ${formatCount(contract.reason.count)}`
+      : contract.action.reason,
+    actionLabel: contract.action.label,
+    actionDisabled: contract.action.disabled,
+    actionReason: contract.action.reason,
+  };
+}
+
+function semanticTruthReviewIdleState(): SemanticTruthReviewLaneState {
+  return {
+    status: 'idle',
+    tone: 'quiet',
+    modelId: '',
+    modelLabel: '',
+    dimensionLabel: '',
+    executionProvider: SEMANTIC_TRUTH_REVIEW_EXECUTION_PROVIDER,
+    candidateOnly: true,
+    committedTopologyWrites: 0,
+    nodeCount: 0,
+    edgeCount: 0,
+    cacheHits: 0,
+    cacheMisses: 0,
+    deriveMs: 0,
+    totalMs: 0,
+    detail: 'truth-review lane idle',
+  };
+}
+
+function runningSemanticTruthReviewLaneState(
+  fallback: Pick<SemanticTruthReviewLaneState, 'modelId' | 'modelLabel' | 'dimensionLabel' | 'executionProvider'>,
+): SemanticTruthReviewLaneState {
+  return {
+    ...semanticTruthReviewIdleState(),
+    ...fallback,
+    status: 'running',
+    tone: 'review',
+    detail: 'truth-review lane running',
+  };
+}
+
+function failedSemanticTruthReviewLaneState(
+  fallback: Pick<SemanticTruthReviewLaneState, 'modelId' | 'modelLabel' | 'dimensionLabel' | 'executionProvider'>,
+  message: string,
+  elapsedMs: number,
+  detail = 'truth-review lane unavailable',
+): SemanticTruthReviewLaneState {
+  return {
+    ...semanticTruthReviewIdleState(),
+    ...fallback,
+    status: 'error',
+    tone: 'danger',
+    totalMs: elapsedMs,
+    detail,
+    error: message,
+  };
+}
+
+function buildStage8TruthReviewView(
+  state: SemanticTruthReviewLaneState,
+  modelLabel: string,
+  dimensionLabel: string,
+): Stage8TruthReviewView {
+  const view = {
+    ...state,
+    modelLabel: state.modelLabel || modelLabel,
+    dimensionLabel: state.dimensionLabel || dimensionLabel,
+    executionProvider: state.executionProvider || SEMANTIC_TRUTH_REVIEW_EXECUTION_PROVIDER,
+  };
+  const cacheDetail = `${formatCount(view.cacheHits)} hits / ${formatCount(view.cacheMisses)} misses`;
+  const timingDetail = view.status === 'running'
+    ? 'running'
+    : `${formatDuration(view.deriveMs)} derive / ${formatDuration(view.totalMs)} total`;
+  const candidateDetail = view.candidateOnly
+    ? `${formatCount(view.nodeCount)} nodes / ${formatCount(view.edgeCount)} candidate edges`
+    : 'candidate-only contract missing';
+  const contractDetail = `${view.executionProvider} / persistent cache / `
+    + `${formatCount(view.committedTopologyWrites)} topology writes`;
+  return { ...view, cacheDetail, timingDetail, candidateDetail, contractDetail };
+}
+
+function normalizeSemanticTruthReviewResponse(
+  raw: unknown,
+  fallback: Pick<SemanticTruthReviewLaneState, 'modelId' | 'modelLabel' | 'dimensionLabel' | 'executionProvider'>,
+  elapsedMs: number,
+): SemanticTruthReviewLaneState {
+  const response = asRecord(raw);
+  const cache = asRecord(response['cache']);
+  const timings = asRecord(response['timings']);
+  const output = asRecord(response['output']);
+  const summary = asRecord(output['summary']);
+  const committedTopologyWrites = numericField(output, 0, 'committedTopologyWrites', 'committed_topology_writes');
+  const candidateOnly = booleanField(response, true, 'candidateOnly', 'candidate_only');
+  const expectedDimension = numericFromDimensionLabel(fallback.dimensionLabel);
+  const responseDimension = numericField(response, expectedDimension, 'dimension');
+  const dimensionMatches = !expectedDimension || !responseDimension || expectedDimension === responseDimension;
+  const healthy = candidateOnly && committedTopologyWrites === 0 && dimensionMatches;
+  return {
+    status: healthy ? 'ready' : 'error',
+    tone: healthy ? 'ready' : 'danger',
+    modelId: stringField(response, fallback.modelId, 'modelId', 'model_id'),
+    modelLabel: fallback.modelLabel,
+    dimensionLabel: fallback.dimensionLabel,
+    executionProvider: stringField(response, fallback.executionProvider, 'executionProvider', 'execution_provider'),
+    candidateOnly,
+    committedTopologyWrites,
+    nodeCount: numericField(output, numericField(summary, 0, 'nodeCount', 'nodes'), 'candidateNodeCount', 'candidate_node_count'),
+    edgeCount: numericField(output, numericField(summary, 0, 'edgeCount', 'edges'), 'candidateEdgeCount', 'candidate_edge_count'),
+    cacheHits: numericField(cache, 0, 'hits'),
+    cacheMisses: numericField(cache, 0, 'misses'),
+    deriveMs: numericField(timings, 0, 'deriveMs', 'derive_ms'),
+    totalMs: numericField(timings, elapsedMs, 'totalMs', 'total_ms'),
+    detail: dimensionMatches
+      ? stringField(response, 'truth-review lane complete', 'message', 'detail')
+      : `dimension mismatch: expected ${expectedDimension}d, got ${responseDimension}d`,
+    error: dimensionMatches ? undefined : `dimension mismatch: expected ${expectedDimension}d, got ${responseDimension}d`,
   };
 }
 
@@ -2383,6 +2379,46 @@ function counterValue(counters: Record<string, number> | undefined, key: string)
   return Number.isFinite(value) ? Number(value) : 0;
 }
 
+function asRecord(value: unknown): Record<string, unknown> {
+  return value && typeof value === 'object' && !Array.isArray(value)
+    ? value as Record<string, unknown>
+    : {};
+}
+
+function numericField(record: Record<string, unknown>, fallback: number, ...keys: string[]): number {
+  for (const key of keys) {
+    const value = Number(record[key]);
+    if (Number.isFinite(value)) return value;
+  }
+  return fallback;
+}
+
+function stringField(record: Record<string, unknown>, fallback: string, ...keys: string[]): string {
+  for (const key of keys) {
+    const value = record[key];
+    if (typeof value === 'string' && value.trim()) return value;
+  }
+  return fallback;
+}
+
+function booleanField(record: Record<string, unknown>, fallback: boolean, ...keys: string[]): boolean {
+  for (const key of keys) {
+    const value = record[key];
+    if (typeof value === 'boolean') return value;
+  }
+  return fallback;
+}
+
+function numericFromDimensionLabel(label: string): number {
+  const match = label.match(/\d+/);
+  return match ? Number(match[0]) : 0;
+}
+
+function embeddingProfileFromDimensionLabel(label: string): string {
+  const numeric = numericFromDimensionLabel(label);
+  return numeric > 0 ? String(numeric) : '768';
+}
+
 function zeroVisiblePostprocessLane(id: string): boolean {
   const lane = normalizeSignalLaneId(id);
   return lane === 'relationship_fact'
@@ -2402,6 +2438,7 @@ function graphIndexReceiptNoun(receipt: GraphIndexRunReceipt): string {
   const message = receipt.message || '';
   if (id.startsWith('postprocess-atlas') || message.startsWith('Postprocess')) return 'Postprocess';
   if (id.startsWith('core-atlas') || message.startsWith('Clean graph')) return 'Clean graph';
+  if (id.startsWith('graph-atlas') || message.startsWith('Build Graph')) return 'Graph build';
   return 'Full Atlas Index';
 }
 
@@ -2474,6 +2511,21 @@ function receiptRowDetail(
   counters: Record<string, number>,
   stageId = '',
 ): string {
+  if (stageId === 'receiptDbOps') {
+    return receiptDbOpsDetail(status, outputCount, counters);
+  }
+  if (stageId === 'snapshotDbOps') {
+    return snapshotDbOpsDetail(status, outputCount, counters);
+  }
+  if (stageId === 'snapshotPayloadProfile') {
+    return snapshotPayloadProfileDetail(status, outputCount, counters);
+  }
+  if (stageId === 'transportOps') {
+    return transportOpsDetail(status, outputCount, counters);
+  }
+  if (stageId === 'stagedNativeScenePacket') {
+    return stagedNativeScenePacketDetail(status, outputCount, counters);
+  }
   const entries = Object.entries(counters || {})
     .filter(([key, value]) => isVisibleReceiptCounter(key, value, stageId));
   const orderedEntries = prioritizeReceiptCounters(entries, receiptCounterPriority(stageId));
@@ -2484,6 +2536,217 @@ function receiptRowDetail(
     .join(' / ');
   const outputText = valueLabel(outputCount, 'output');
   return counterText ? `${status} / ${outputText} / ${counterText}` : `${status} / ${outputText}`;
+}
+
+function receiptDbOpsDetail(
+  status: string,
+  outputCount: number,
+  counters: Record<string, number>,
+): string {
+  const parts = [status, valueLabel(outputCount, 'output')];
+  const storeCountersPresent = Object.keys(counters || {}).some((key) => key.startsWith('receiptStore'));
+  const addMs = (label: string, key: string, includeZero = false): void => {
+    const value = counterValue(counters, key);
+    if (includeZero || value > 0) parts.push(`${label} ${formatDuration(value)}`);
+  };
+
+  if (counterValue(counters, 'receiptPersistenceQueued') > 0) parts.push('queued');
+  addMs('persist', 'receiptPersistMs');
+  addMs('async queue', 'receiptPersistenceQueueWaitMs');
+  if (storeCountersPresent) {
+    addMs('store', 'receiptStoreTotalMs', true);
+    addMs('queue', 'receiptStoreQueueWaitMs', true);
+    addMs('append', 'receiptStoreAppendWalMs', true);
+    addMs('manifest', 'receiptStoreManifestMs', true);
+    addMs('native', 'receiptStoreNativeApplyMs', true);
+  }
+
+  const rpcCalls = counterValue(counters, 'receiptJsonRpcCalls');
+  if (rpcCalls > 0) parts.push(`rpc ${formatCount(rpcCalls)}`);
+  const walBytes = counterValue(counters, 'receiptApplyWalBatchRequestBytes');
+  if (walBytes > 0) {
+    parts.push(`wal ${formatBytes(walBytes)}`);
+  } else {
+    const payloadChars = counterValue(counters, 'receiptPayloadChars')
+      || counterValue(counters, 'receiptStorePayloadChars');
+    if (payloadChars > 0) parts.push(`payload ${formatCount(payloadChars)} chars`);
+  }
+  return parts.join(' / ');
+}
+
+function snapshotDbOpsDetail(
+  status: string,
+  outputCount: number,
+  counters: Record<string, number>,
+): string {
+  const parts = [status, valueLabel(outputCount, 'output')];
+  const addMs = (label: string, key: string): void => {
+    const value = counterValue(counters, key);
+    if (value > 0) parts.push(`${label} ${formatDuration(value)}`);
+  };
+  const addChars = (label: string, key: string): void => {
+    const value = counterValue(counters, key);
+    if (value > 0) parts.push(`${label} ${formatCount(value)} chars`);
+  };
+  const addCount = (label: string, key: string): void => {
+    const value = counterValue(counters, key);
+    if (value > 0) parts.push(`${label} ${formatCount(value)}`);
+  };
+
+  addMs('db load', 'dbLoadMs');
+  addMs('snapshot persist', 'snapshotPersistMs');
+  addMs('snapshot serialize', 'snapshotSerializeMs');
+  addMs('primary encode', 'snapshotPrimaryEncodeMs');
+  addMs('overgraph encode', 'snapshotOverGraphEncodeMs');
+  addMs('payload profile', 'snapshotPayloadProfileMs');
+  addMs('snapshot store', 'snapshotStoreMs');
+  addMs('primary store', 'snapshotPrimaryStoreMs');
+  addMs('overgraph store', 'snapshotOverGraphStoreMs');
+  addCount('store docs', 'snapshotStoreDocuments');
+  addCount('blobs written', 'snapshotWrittenContentBlobs');
+  addCount('blobs reused', 'snapshotReusedContentBlobs');
+  addChars('payload', 'snapshotPayloadChars');
+  return parts.join(' / ');
+}
+
+const SNAPSHOT_PAYLOAD_SECTION_LIMIT = 8;
+
+function snapshotPayloadProfileDetail(
+  status: string,
+  outputCount: number,
+  counters: Record<string, number>,
+): string {
+  const parts = [status, valueLabel(outputCount, 'output')];
+  const aggregateCounters: Array<[string, string]> = [
+    ['primary', 'snapshotPrimaryPayloadChars'],
+    ['raw', 'snapshotPrimaryRawPayloadChars'],
+    ['saved', 'snapshotCompressionSavedChars'],
+    ['ratio', 'snapshotCompressionRatioPct'],
+    ['overgraph', 'snapshotOverGraphPayloadChars'],
+    ['overgraph raw', 'snapshotOverGraphRawPayloadChars'],
+    ['overgraph saved', 'snapshotOverGraphCompressionSavedChars'],
+    ['overgraph ratio', 'snapshotOverGraphCompressionRatioPct'],
+    ['total', 'snapshotTotalScopedPayloadChars'],
+  ];
+  for (const [label, key] of aggregateCounters) {
+    const value = counterValue(counters, key);
+    if (value <= 0) continue;
+    if (key === 'snapshotCompressionRatioPct' || key === 'snapshotOverGraphCompressionRatioPct') {
+      parts.push(`${label} ${formatCount(value)}%`);
+    } else {
+      parts.push(`${label} ${formatCount(value)} chars`);
+    }
+  }
+  const sectionEntries = Object.entries(counters || {})
+    .filter(([key, value]) => isSnapshotPayloadSectionCounter(key, value))
+    .sort((left, right) => right[1] - left[1] || left[0].localeCompare(right[0]))
+    .slice(0, SNAPSHOT_PAYLOAD_SECTION_LIMIT);
+  for (const [key, value] of sectionEntries) {
+    parts.push(`${snapshotPayloadSectionLabel(key)} ${formatCount(value)} chars`);
+  }
+  return parts.join(' / ');
+}
+
+function transportOpsDetail(
+  status: string,
+  outputCount: number,
+  counters: Record<string, number>,
+): string {
+  const parts = [status, valueLabel(outputCount, 'output')];
+  const addCount = (label: string, key: string): void => {
+    const value = counterValue(counters, key);
+    if (value > 0) parts.push(`${label} ${formatCount(value)}`);
+  };
+  const addDuration = (label: string, key: string): void => {
+    const value = counterValue(counters, key);
+    if (value > 0) parts.push(`${label} ${formatDuration(value)}`);
+  };
+  const addBytes = (label: string, key: string): void => {
+    const value = counterValue(counters, key);
+    if (value > 0) parts.push(`${label} ${formatBytes(value)}`);
+  };
+
+  addCount('calls', 'transportCalls');
+  addDuration('total', 'transportTotalMs');
+  addDuration('max', 'transportMaxMs');
+  addBytes('request', 'transportRequestBytes');
+  addBytes('response', 'transportResponseBytes');
+  addBytes('json response', 'jsonRpcResponseBytes');
+  addBytes('typed response', 'typedRpcResponseBytes');
+  addBytes('boot snapshot response', 'bootSnapshotJsonResponseBytes');
+  addBytes('scan response', 'scanJsonResponseBytes');
+  addBytes('atlas scan response', 'atlasRichScanJsonResponseBytes');
+  addBytes('graph delta response', 'graphDeltaJsonResponseBytes');
+  addBytes('init response', 'initRuntimeResponseBytes');
+  addCount('store', 'storeCommandCalls');
+  addBytes('store request', 'storeCommandRequestBytes');
+  addBytes('store response', 'storeCommandResponseBytes');
+  addBytes('relation list response', 'relationListResponseBytes');
+  addCount('scoped reads', 'scopedDocumentReadCalls');
+  addBytes('scoped read response', 'scopedDocumentReadResponseBytes');
+  addBytes('snapshot read response', 'snapshotDocumentReadResponseBytes');
+  addBytes('receipt read response', 'receiptDocumentReadResponseBytes');
+  addBytes('cache read response', 'postprocessCacheReadResponseBytes');
+  addBytes('overgraph read response', 'overGraphDocumentReadResponseBytes');
+  addBytes('note body response', 'noteBodyReadResponseBytes');
+  addCount('wal calls', 'applyWalBatchCalls');
+  addBytes('wal request', 'applyWalBatchRequestBytes');
+  addBytes('wal response', 'applyWalBatchResponseBytes');
+  addCount('compile calls', 'compileDualWriteCalls');
+  addBytes('compile request', 'compileDualWriteRequestBytes');
+  addBytes('compile response', 'compileDualWriteResponseBytes');
+  addBytes('compile raw', 'compileDualWriteRawBytes');
+  addBytes('compile zipped', 'compileDualWriteCompressedBytes');
+  addCount('scene packet calls', 'graphScenePacketCalls');
+  addBytes('scene packet request', 'graphScenePacketRequestBytes');
+  addBytes('scene packet response', 'graphScenePacketResponseBytes');
+  addBytes('galaxy request', 'compileGalaxySceneRequestBytes');
+  addBytes('galaxy response', 'compileGalaxySceneResponseBytes');
+  return parts.join(' / ');
+}
+
+function stagedNativeScenePacketDetail(
+  status: string,
+  outputCount: number,
+  counters: Record<string, number>,
+): string {
+  const parts = [status];
+  const packetNodes = counterValue(counters, 'packetNodes');
+  const packetEdges = counterValue(counters, 'packetEdges');
+  const expectedNodes = counterValue(counters, 'expectedNodes');
+  const nodeDelta = counterValue(counters, 'nodeDelta');
+  const loadMs = counterValue(counters, 'packetLoadMs');
+  const decodeMs = counterValue(counters, 'packetDecodeMs');
+  const packetOutputs = outputCount || packetNodes + packetEdges;
+
+  parts.push(valueLabel(packetOutputs, 'output'));
+  if (packetNodes > 0 || packetEdges > 0) {
+    parts.push(`packet ${formatCount(packetNodes)}n/${formatCount(packetEdges)}e`);
+  }
+  if (counterValue(counters, 'sourceScopedSnapshot') > 0) parts.push('scoped snapshot');
+  if (counterValue(counters, 'sourceInlineSnapshot') > 0) parts.push('inline snapshot');
+  if (expectedNodes > 0) parts.push(`expected ${formatCount(expectedNodes)} nodes`);
+  parts.push(nodeDelta === 0 ? 'node parity ok' : `node delta ${formatCount(nodeDelta)}`);
+  if (loadMs > 0) parts.push(`load ${formatDuration(loadMs)}`);
+  if (decodeMs > 0) parts.push(`decode ${formatDuration(decodeMs)}`);
+  const bufferBytes = counterValue(counters, 'packetBufferBytes');
+  if (bufferBytes > 0) parts.push(`buffers ${formatBytes(bufferBytes)}`);
+  const encodedChars = counterValue(counters, 'packetEncodedChars');
+  if (encodedChars > 0) parts.push(`encoded ${formatCount(encodedChars)} chars`);
+  if (counterValue(counters, 'hierarchyShellRanks') > 0) parts.push('hierarchy shells');
+  if (counterValue(counters, 'rendererWired') === 0) parts.push('renderer staged');
+  return parts.join(' / ');
+}
+
+function isSnapshotPayloadSectionCounter(key: string, value: number): boolean {
+  return key.startsWith('payload')
+    && key.endsWith('Chars')
+    && Number.isFinite(value)
+    && value > 0;
+}
+
+function snapshotPayloadSectionLabel(key: string): string {
+  return labelFromKey(key.replace(/^payload/, '').replace(/Chars$/i, ''));
 }
 
 function prioritizeReceiptCounters(
@@ -2515,7 +2778,51 @@ function receiptCounterPriority(stageId: string): string[] {
     return ['embeddingTargets', 'embeddingPlannedPairs', 'embeddingPrunedPairs', 'embeddingBackboneEdges', 'embeddingClusters', 'linkSuggestions', 'entityLinks'];
   }
   if (stageId === 'snapshotDbOps') {
-    return ['dbLoadMs', 'snapshotPersistMs', 'snapshotStoreMs', 'snapshotSerializeMs', 'snapshotPayloadChars'];
+    return ['dbLoadMs', 'snapshotPersistMs', 'snapshotStoreMs', 'snapshotSerializeMs', 'snapshotPayloadProfileMs', 'snapshotPayloadChars', 'snapshotPrimaryRawPayloadChars', 'snapshotCompressionSavedChars', 'snapshotCompressionRatioPct', 'snapshotOverGraphPayloadChars', 'snapshotOverGraphRawPayloadChars', 'snapshotOverGraphCompressionSavedChars', 'snapshotOverGraphCompressionRatioPct', 'snapshotTotalPayloadChars'];
+  }
+  if (stageId === 'snapshotPayloadProfile') {
+    return [
+      'snapshotPrimaryPayloadChars',
+      'snapshotPrimaryRawPayloadChars',
+      'snapshotCompressionSavedChars',
+      'snapshotCompressionRatioPct',
+      'snapshotOverGraphPayloadChars',
+      'snapshotOverGraphRawPayloadChars',
+      'snapshotOverGraphCompressionSavedChars',
+      'snapshotOverGraphCompressionRatioPct',
+      'snapshotTotalScopedPayloadChars',
+      'snapshotTotalScopedRawPayloadChars',
+      'payloadEmbeddingTargetsChars',
+      'payloadEmbeddingTargetPlanChars',
+      'payloadEmbeddingGraphPostProcessChars',
+      'payloadHopfResonanceSpaceChars',
+      'payloadGraphModelV2Chars',
+      'payloadGraphCompilerChars',
+      'payloadProjectedUiGraphChars',
+      'payloadSemanticRerankSummaryChars',
+      'payloadSemanticAdjudicationSummaryChars',
+      'payloadSemanticEvalLedgerSummaryChars',
+      'payloadMemoryGraphRagBridgeSummaryChars',
+      'payloadDiscourseSpineSummaryChars',
+      'payloadDiscourseBridgeCandidateSummaryChars',
+      'payloadDiscourseBridgeAdjudicationSummaryChars',
+      'payloadDiscourseEvalLedgerSummaryChars',
+      'payloadDiscoursePromotionSurfaceSummaryChars',
+      'payloadDiscourseCompilerOverlaySummaryChars',
+      'payloadGraphAwareLinkSuggestionsChars',
+      'payloadEntityLinkSuggestionsChars',
+      'payloadShadowLinkSuggestionsChars',
+      'payloadChunksChars',
+      'payloadMentionsChars',
+      'payloadEntityAnchorsChars',
+      'payloadRelationshipsChars',
+      'payloadEventsChars',
+      'payloadTemporalEdgesChars',
+      'payloadCausalEdgesChars',
+      'payloadMemoryStateChars',
+      'payloadNodesChars',
+      'payloadEdgesChars',
+    ];
   }
   if (stageId === 'signalCandidatePlan') {
     return ['documents', 'documentChars', 'entities', 'discoverySkipped', 'discoveryCandidates', 'exportableMentions', 'discoveryCacheHit', 'priorTargets', 'plannedModelCalls'];
@@ -2583,6 +2890,7 @@ function valueLabel(value: number, singular: string): string {
 }
 
 function formatReceiptCounterValue(key: string, value: number): string {
+  if (/bytes$/i.test(key)) return formatBytes(value);
   return /ms$/i.test(key) ? formatDuration(value) : formatCount(value);
 }
 

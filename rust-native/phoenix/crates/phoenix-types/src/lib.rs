@@ -6,10 +6,24 @@ use serde_json::Value;
 mod binary;
 mod deterministic;
 mod evidence;
+mod graph_decision;
+mod graph_decision_contract;
+mod graph_decision_receipt;
+mod graph_decision_reward_evidence;
+mod graph_decision_reward_observation;
+mod graph_decision_truth_link;
+mod graph_truth;
 
 pub use binary::*;
 pub use deterministic::*;
 pub use evidence::*;
+pub use graph_decision::*;
+pub use graph_decision_contract::*;
+pub use graph_decision_receipt::*;
+pub use graph_decision_reward_evidence::*;
+pub use graph_decision_reward_observation::*;
+pub use graph_decision_truth_link::*;
+pub use graph_truth::*;
 
 macro_rules! string_id {
     ($name:ident) => {

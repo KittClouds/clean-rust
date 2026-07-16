@@ -1695,9 +1695,7 @@ pub fn busemann_signature(
     }
 
     if !(x_norm_sq.is_finite() && x_norm_sq < 1.0 - config.eps) {
-        return Err(HybridSpaceError::BusemannPointOutsideBall {
-            norm_sq: x_norm_sq,
-        });
+        return Err(HybridSpaceError::BusemannPointOutsideBall { norm_sq: x_norm_sq });
     }
 
     let mut scores = Vec::with_capacity(prototypes.len());
@@ -1717,12 +1715,7 @@ pub fn busemann_signature(
             });
         }
 
-        let score = busemann_score_unit_ball(
-            &x_unit,
-            x_norm_sq,
-            prototype,
-            config.eps,
-        )?;
+        let score = busemann_score_unit_ball(&x_unit, x_norm_sq, prototype, config.eps)?;
 
         scores.push(BusemannPrototypeScore {
             prototype_id: prototype.prototype_id,
@@ -1952,10 +1945,7 @@ mod busemann_tests {
 
         let point = vec![0.45, 0.0];
 
-        let prototypes = vec![
-            proto(1, 1.0, 0.0),
-            proto(2, -1.0, 0.0),
-        ];
+        let prototypes = vec![proto(1, 1.0, 0.0), proto(2, -1.0, 0.0)];
 
         let sig = busemann_signature(&point, 1.0, &prototypes, config)?;
 
@@ -1980,10 +1970,7 @@ mod busemann_tests {
 
         let point = vec![0.0, 0.0];
 
-        let prototypes = vec![
-            proto(1, 1.0, 0.0),
-            proto(2, -1.0, 0.0),
-        ];
+        let prototypes = vec![proto(1, 1.0, 0.0), proto(2, -1.0, 0.0)];
 
         let sig = busemann_signature(&point, 1.0, &prototypes, config)?;
 
@@ -2000,10 +1987,7 @@ mod busemann_tests {
 
         let point = vec![1.2, 0.0];
 
-        let prototypes = vec![
-            proto(1, 1.0, 0.0),
-            proto(2, -1.0, 0.0),
-        ];
+        let prototypes = vec![proto(1, 1.0, 0.0), proto(2, -1.0, 0.0)];
 
         let err = busemann_signature(&point, 1.0, &prototypes, config);
 

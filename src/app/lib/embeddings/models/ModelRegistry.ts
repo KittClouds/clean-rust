@@ -73,6 +73,25 @@ export class EmbeddingModelRegistry {
             },
         ],
         [
+            'embeddinggemma-300m',
+            {
+                id: 'embeddinggemma-300m',
+                name: 'EmbeddingGemma 300M (768d)',
+                provider: 'rust',
+                dimensions: 768,
+                maxTokens: 2048,
+                speed: 'medium',
+                quality: 'high',
+                costPer1kTokens: 0,
+                localModel: {
+                    modelId: 'onnx-community/embeddinggemma-300m-ONNX',
+                    quantization: 'fp16',
+                    memoryMB: 920,
+                },
+                description: 'EmbeddingGemma 300M through the native Phoenix Rust semantic runner for high-accuracy semantic topology candidates.',
+            },
+        ],
+        [
             'bge-small-en',
             {
                 id: 'bge-small-en',

@@ -1,10 +1,12 @@
 import * as THREE from 'three';
 
-import type { GalaxyRenderSettings } from './graph-galaxy-engine';
+import { isTransitLayoutMode, type GalaxyRenderSettings } from './graph-galaxy-engine';
 import type { GalaxyFocusMask } from './graph-galaxy-focus';
 import type { GalaxyLorentzGuideView, GalaxySceneV2 } from './graph-galaxy-scene-v2';
+import { buildGalaxyWalkBranches, type GalaxyWalkBranch } from './graph-galaxy-walk-flow';
+import { setHopfEdgeCurvePoint, type GalaxyCurvePoint } from './graph-galaxy-edge-curves';
 
-const MAX_FLOW_PARTICLES = 1800;
+const MAX_FLOW_PARTICLES = 4096;
 const EMPTY_VEC3 = new Float32Array(0);
 const EMPTY_SCALAR = new Float32Array(0);
 const CAPS_SURFACE_EDGE_MIN_RADIUS = 0.34;
@@ -12,6 +14,7 @@ const CAPS_SURFACE_EDGE_MAX_RADIUS_DELTA = 0.36;
 const CAPS_SHELL_RADII = [0.54, 0.98, 1.22, 1.34, 1.48, 1.68, 1.92];
 const HYBRID_SURFACE_EDGE_MIN_RADIUS = 2.32 * 0.92;
 const HYBRID_SURFACE_EDGE_MAX_RADIUS_DELTA = 0.42;
+const TREE_FILAMENT_FLOW_LAYOUTS = new Set(['lorentzTree', 'transitManifold', 'productManifold', 'siegelFinsler']);
 type FlowSource = { kind: 'edge'; index: number } | { kind: 'guide'; index: number };
 
 export class GraphGalaxyParticles {
@@ -57,8 +60,12 @@ export class GraphGalaxyParticles {
         `,
     });
     private readonly flowSources: FlowSource[] = [];
+    private readonly walkBranches: GalaxyWalkBranch[] = [];
     private readonly seeds: number[] = [];
     private readonly speeds: number[] = [];
+    private readonly hopfEdgePoint: GalaxyCurvePoint = { x: 0, y: 0, z: 0 };
+    private walkStartedAt: number | null = null;
+    private walkTreeDepth = 0;
 
     constructor() {
         this.points = new THREE.Points(this.geometry, this.material);
@@ -67,8 +74,18 @@ export class GraphGalaxyParticles {
 
     bind(data: GalaxySceneV2, settings: GalaxyRenderSettings): void {
         this.flowSources.length = 0;
+        this.walkBranches.length = 0;
         this.seeds.length = 0;
         this.speeds.length = 0;
+        this.walkStartedAt = null;
+        this.walkTreeDepth = 0;
+        if (settings.particleFlow && settings.particleFlowMode === 'walk') {
+            this.walkBranches.push(...buildGalaxyWalkBranches(data, MAX_FLOW_PARTICLES));
+            this.walkTreeDepth = this.walkBranches.reduce((max, branch) => Math.max(max, branch.treeDepth), 0);
+            this.allocateParticles(this.walkBranches.length);
+            this.updateSettings(settings);
+            return;
+        }
         const edgeCount = data.edgePairs.length / 2;
         const guideIndexes = this.guideFlowIndexes(data);
         const sourceCount = edgeCount + guideIndexes.length;
@@ -92,18 +109,14 @@ export class GraphGalaxyParticles {
             this.speeds.push(0.23 + this.stableUnit(seedKey * 31 + 11) * 0.32);
         }
 
-        const count = this.flowSources.length;
-        this.geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(count * 3), 3));
-        this.geometry.setAttribute('color', new THREE.BufferAttribute(new Float32Array(count * 3), 3));
-        this.geometry.setAttribute('alpha', new THREE.BufferAttribute(new Float32Array(count), 1));
-        this.geometry.setAttribute('flowSize', new THREE.BufferAttribute(new Float32Array(count), 1));
+        this.allocateParticles(this.flowSources.length);
         this.updateSettings(settings);
         this.points.visible = true;
     }
 
     updateSettings(settings: GalaxyRenderSettings): void {
         this.material.uniforms['uBaseSize'].value = 3.35 + settings.particleSize * 0.95;
-        this.points.visible = settings.particleFlow && this.flowSources.length > 0;
+        this.points.visible = settings.particleFlow && (this.flowSources.length > 0 || this.walkBranches.length > 0);
     }
 
     update(
@@ -118,9 +131,14 @@ export class GraphGalaxyParticles {
         const colorAttr = this.geometry.getAttribute('color') as THREE.BufferAttribute;
         const alphaAttr = this.geometry.getAttribute('alpha') as THREE.BufferAttribute;
         const sizeAttr = this.geometry.getAttribute('flowSize') as THREE.BufferAttribute;
+        if (settings.particleFlowMode === 'walk') {
+            this.updateWalk(data, positions, settings, time, positionAttr, colorAttr, alphaAttr, sizeAttr, focus);
+            return;
+        }
         const baseAlpha = settings.particleOpacity * (focus?.hasFocus ? 0.72 : 0.42);
         const flowSize = 0.62 + settings.particleSize * 0.1;
         const curved = settings.edgeMode === 'curved' || settings.edgeMode === 'tube';
+        const hopfCurves = data.layoutMode === 'hopfProjection' && settings.edgeMode === 'curved' && positions === data.positions3d;
         for (let i = 0; i < this.flowSources.length; i++) {
             const flowSource = this.flowSources[i];
             const t = (this.seeds[i] + time * 0.001 * this.speeds[i] * settings.particleSpeed) % 1;
@@ -128,11 +146,14 @@ export class GraphGalaxyParticles {
                 const edge = flowSource.index;
                 const source = data.edgePairs[edge * 2];
                 const target = data.edgePairs[edge * 2 + 1];
+                const hopfCrossBase = hopfCurves && this.isHopfCrossBaseEdge(data, source, target);
                 const lift = settings.edgeMode === 'tube'
                     ? this.edgeTubeLift(data, settings, edge, source, target)
-                    : curved ? this.edgeLift(data, settings, edge, source, target) : 0;
+                    : curved ? this.edgeLift(data, settings, edge, source, target, hopfCrossBase) : 0;
                 if (settings.edgeMode === 'tube') {
-                    this.writeTubeEdgePosition(positionAttr, i, positions, edge, source, target, lift, t);
+                    this.writeTubeEdgePosition(positionAttr, i, data, positions, edge, source, target, lift, t);
+                } else if (hopfCurves) {
+                    this.writeHopfEdgePosition(positionAttr, i, positions, edge, source, target, lift, t, settings.edgeCurveStrength, hopfCrossBase);
                 } else {
                     this.writeEdgePosition(positionAttr, i, data, positions, source, target, lift, t);
                 }
@@ -165,6 +186,120 @@ export class GraphGalaxyParticles {
         this.geometry.setAttribute('flowSize', new THREE.BufferAttribute(EMPTY_SCALAR, 1));
     }
 
+    private allocateParticles(count: number): void {
+        if (count === 0) {
+            this.setEmptyAttributes();
+            this.points.visible = false;
+            return;
+        }
+        this.geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(count * 3), 3));
+        this.geometry.setAttribute('color', new THREE.BufferAttribute(new Float32Array(count * 3), 3));
+        this.geometry.setAttribute('alpha', new THREE.BufferAttribute(new Float32Array(count), 1));
+        this.geometry.setAttribute('flowSize', new THREE.BufferAttribute(new Float32Array(count), 1));
+    }
+
+    private updateWalk(
+        data: GalaxySceneV2,
+        positions: Float32Array,
+        settings: GalaxyRenderSettings,
+        time: number,
+        positionAttr: THREE.BufferAttribute,
+        colorAttr: THREE.BufferAttribute,
+        alphaAttr: THREE.BufferAttribute,
+        sizeAttr: THREE.BufferAttribute,
+        focus?: GalaxyFocusMask | null,
+    ): void {
+        if (this.walkBranches.length === 0) return;
+        this.walkStartedAt ??= time;
+        const elapsed = Math.max(0, time - this.walkStartedAt) * 0.001 * Math.max(0.05, settings.particleSpeed);
+        const baseAlpha = settings.particleOpacity * (focus?.hasFocus ? 0.78 : 0.88);
+        const flowSize = 0.76 + settings.particleSize * 0.12;
+        const launchHold = 0.72;
+        const travelDuration = 1.28;
+        const nodeHold = 0.22;
+        const hopDuration = travelDuration + nodeHold;
+        const arrivalHold = 1.15;
+        const cycleDuration = launchHold + this.walkTreeDepth * hopDuration + arrivalHold;
+        const phase = elapsed % cycleDuration;
+
+        for (let particle = 0; particle < this.walkBranches.length; particle++) {
+            const branch = this.walkBranches[particle];
+            const localPhase = phase - launchHold - branch.depth * hopDuration;
+            let edgeT = 0;
+            let visibility = 0;
+
+            if (phase < launchHold && branch.depth === 0) {
+                visibility = THREE.MathUtils.smoothstep(phase, 0, 0.16);
+            } else if (localPhase >= 0 && localPhase <= travelDuration) {
+                edgeT = THREE.MathUtils.smoothstep(localPhase / travelDuration, 0.06, 0.94);
+                visibility = 1;
+            } else if (localPhase > travelDuration && localPhase <= hopDuration) {
+                edgeT = 1;
+                visibility = 1 - THREE.MathUtils.smoothstep(localPhase, travelDuration + nodeHold * 0.35, hopDuration);
+            } else if (branch.depth === branch.treeDepth - 1 && phase > launchHold + branch.treeDepth * hopDuration) {
+                edgeT = 1;
+                visibility = 1 - THREE.MathUtils.smoothstep(
+                    phase,
+                    launchHold + branch.treeDepth * hopDuration,
+                    cycleDuration,
+                );
+            }
+
+            this.writeWalkEdgePosition(positionAttr, particle, data, positions, settings, branch, edgeT);
+            this.writeNodeBlendColor(colorAttr, data, branch.source, branch.target, edgeT, particle);
+            const focusAlpha = focus?.hasFocus && focus.edgeLevels[branch.edge] === 0 ? 0.08 : 1;
+            alphaAttr.setX(particle, baseAlpha * visibility * focusAlpha);
+            sizeAttr.setX(particle, flowSize * (settings.edgeMode === 'tube' ? 1.08 : 1));
+        }
+
+        positionAttr.needsUpdate = true;
+        colorAttr.needsUpdate = true;
+        alphaAttr.needsUpdate = true;
+        sizeAttr.needsUpdate = true;
+    }
+
+    private writeWalkEdgePosition(
+        positionAttr: THREE.BufferAttribute,
+        particle: number,
+        data: GalaxySceneV2,
+        positions: Float32Array,
+        settings: GalaxyRenderSettings,
+        step: { edge: number; source: number; target: number },
+        t: number,
+    ): void {
+        const hopfCurves = data.layoutMode === 'hopfProjection' && settings.edgeMode === 'curved' && positions === data.positions3d;
+        const hopfCrossBase = hopfCurves && this.isHopfCrossBaseEdge(data, step.source, step.target);
+        const curved = settings.edgeMode === 'curved' || settings.edgeMode === 'tube';
+        const lift = settings.edgeMode === 'tube'
+            ? this.edgeTubeLift(data, settings, step.edge, step.source, step.target)
+            : curved ? this.edgeLift(data, settings, step.edge, step.source, step.target, hopfCrossBase) : 0;
+        if (settings.edgeMode === 'tube') {
+            this.writeTubeEdgePosition(positionAttr, particle, data, positions, step.edge, step.source, step.target, lift, t);
+        } else if (hopfCurves) {
+            this.writeHopfEdgePosition(positionAttr, particle, positions, step.edge, step.source, step.target, lift, t, settings.edgeCurveStrength, hopfCrossBase);
+        } else {
+            this.writeEdgePosition(positionAttr, particle, data, positions, step.source, step.target, lift, t);
+        }
+    }
+
+    private writeNodeBlendColor(
+        colorAttr: THREE.BufferAttribute,
+        data: GalaxySceneV2,
+        source: number,
+        target: number,
+        t: number,
+        particle: number,
+    ): void {
+        const sourceOffset = source * 3;
+        const targetOffset = target * 3;
+        colorAttr.setXYZ(
+            particle,
+            THREE.MathUtils.lerp(data.colors[sourceOffset], data.colors[targetOffset], t),
+            THREE.MathUtils.lerp(data.colors[sourceOffset + 1], data.colors[targetOffset + 1], t),
+            THREE.MathUtils.lerp(data.colors[sourceOffset + 2], data.colors[targetOffset + 2], t),
+        );
+    }
+
     private guideFlowIndexes(data: GalaxySceneV2): number[] {
         if (!this.liveGuideFlow(data)) return [];
         const indexes: number[] = [];
@@ -176,20 +311,28 @@ export class GraphGalaxyParticles {
     }
 
     private liveGuideFlow(data: GalaxySceneV2): boolean {
-        return data.layoutMode === 'lorentzTree' || data.layoutMode === 'productManifold' || data.layoutMode === 'siegelFinsler';
+        return data.layoutMode === 'lorentzTree' || isTransitLayoutMode(data.layoutMode) || data.layoutMode === 'siegelFinsler';
     }
 
-    private edgeLift(data: GalaxySceneV2, settings: GalaxyRenderSettings, edge: number, source: number, target: number): number {
+    private edgeLift(data: GalaxySceneV2, settings: GalaxyRenderSettings, edge: number, source: number, target: number, hopfCrossBase = false): number {
         const interGalaxy = data.edgeKinds[edge] === 1;
         const curveScale = THREE.MathUtils.clamp(settings.edgeCurveStrength, 0.25, 1.2) * (interGalaxy ? 0.92 : 0.58);
-        return (0.08 + Math.abs(source - target) * 0.002) * curveScale + (interGalaxy ? 0.18 : 0);
+        if (this.usesTreeFilamentFlow(data)) {
+            return this.treeFilamentEdgeLift(data, edge, source, target, curveScale);
+        }
+        return (0.08 + Math.abs(source - target) * 0.002) * curveScale + (interGalaxy ? 0.18 : 0) + (hopfCrossBase ? 0.1 : 0);
     }
 
     private edgeTubeLift(data: GalaxySceneV2, settings: GalaxyRenderSettings, edge: number, source: number, target: number): number {
+        const curveScale = THREE.MathUtils.clamp(settings.edgeCurveStrength, 0.25, 1.2);
+        if (this.usesTreeFilamentFlow(data)) {
+            const kindScale = data.edgeKinds[edge] === 1 ? 0.74 : data.edgeKinds[edge] === 2 ? 0.68 : 0.62;
+            return this.treeFilamentEdgeLift(data, edge, source, target, curveScale * kindScale);
+        }
         const confidence = THREE.MathUtils.clamp(data.edgeAlpha[edge] ?? 0.45, 0.12, 1);
         const bridgeBoost = data.edgeKinds[edge] === 1 ? 1.38 : 1;
         const span = Math.sqrt(Math.max(1, Math.abs(source - target)));
-        return (0.045 + confidence * 0.13 + span * 0.004) * bridgeBoost * THREE.MathUtils.clamp(settings.edgeCurveStrength, 0.25, 1.2);
+        return (0.045 + confidence * 0.13 + span * 0.004) * bridgeBoost * curveScale;
     }
 
     private writeEdgePosition(
@@ -212,7 +355,7 @@ export class GraphGalaxyParticles {
         positionAttr.setXYZ(particle, this.edgeX(positions, source, target, t), this.edgeY(positions, source, target, lift, t), this.edgeZ(positions, source, target, t));
     }
 
-    private writeTubeEdgePosition(
+    private writeHopfEdgePosition(
         positionAttr: THREE.BufferAttribute,
         particle: number,
         positions: Float32Array,
@@ -221,22 +364,60 @@ export class GraphGalaxyParticles {
         target: number,
         lift: number,
         t: number,
+        edgeCurveStrength: number,
+        crossBase: boolean,
     ): void {
+        const sourceOffset = source * 3;
+        const targetOffset = target * 3;
+        const ax = positions[sourceOffset], ay = positions[sourceOffset + 1], az = positions[sourceOffset + 2];
+        const bx = positions[targetOffset], by = positions[targetOffset + 1], bz = positions[targetOffset + 2];
+        const seed = this.stableUnit(`hopf-edge:${edge}`);
+        setHopfEdgeCurvePoint(this.hopfEdgePoint, ax, ay, az, bx, by, bz, lift, t, edgeCurveStrength, seed, crossBase);
+        positionAttr.setXYZ(particle, this.hopfEdgePoint.x, this.hopfEdgePoint.y, this.hopfEdgePoint.z);
+    }
+
+    private writeTubeEdgePosition(
+        positionAttr: THREE.BufferAttribute,
+        particle: number,
+        data: GalaxySceneV2,
+        positions: Float32Array,
+        edge: number,
+        source: number,
+        target: number,
+        lift: number,
+        t: number,
+    ): void {
+        if (this.capsSurfaceParticle(data, positions, source, target)) {
+            const point = this.capsSurfacePoint(positions, source, target, t);
+            if (point) {
+                positionAttr.setXYZ(particle, point.x, point.y, point.z);
+                return;
+            }
+        }
         const ax = positions[source * 3], ay = positions[source * 3 + 1], az = positions[source * 3 + 2];
         const bx = positions[target * 3], by = positions[target * 3 + 1], bz = positions[target * 3 + 2];
         const dx = bx - ax;
         const dy = by - ay;
         const xy = Math.hypot(dx, dy) || 1;
-        const sign = this.stableUnit(edge * 41 + 7) < 0.5 ? -1 : 1;
+        const sign = this.stableUnit(`tube-edge:${edge}`) < 0.5 ? -1 : 1;
         const sweep = Math.sin(Math.PI * t);
         const braid = Math.sin(Math.PI * 2 * t + sign * 0.72) * lift * 0.08;
-        const lateral = lift * 0.34 * sweep * sign;
+        const flourish = this.tubeEdgeTerminalFlourish(data, t, lift, sign);
+        const lateral = lift * 0.34 * sweep * sign + flourish;
         positionAttr.setXYZ(
             particle,
             THREE.MathUtils.lerp(ax, bx, t) + (-dy / xy) * lateral,
-            THREE.MathUtils.lerp(ay, by, t) + (dx / xy) * lateral + lift * 0.38 * sweep,
-            THREE.MathUtils.lerp(az, bz, t) + lift * 0.24 * sweep * sign + braid,
+            THREE.MathUtils.lerp(ay, by, t) + (dx / xy) * lateral + lift * 0.38 * sweep + Math.abs(flourish) * 0.08,
+            THREE.MathUtils.lerp(az, bz, t) + lift * 0.24 * sweep * sign + braid + flourish * 0.42,
         );
+    }
+
+    private tubeEdgeTerminalFlourish(data: GalaxySceneV2, t: number, lift: number, sign: number): number {
+        if (!this.usesTreeFilamentFlow(data)) return 0;
+        const width = isTransitLayoutMode(data.layoutMode) ? 0.3 : 0.26;
+        const end = t > 1 - width ? Math.sin(Math.PI * (1 - t) / width) : 0;
+        const style = data.layoutMode === 'siegelFinsler' ? 0.21 : data.layoutMode === 'lorentzTree' ? 0.18 : 0.16;
+        return lift * style * sign * end;
     }
 
     private writeGuidePosition(
@@ -247,7 +428,9 @@ export class GraphGalaxyParticles {
         guide: GalaxyLorentzGuideView,
         t: number,
     ): void {
-        const point = this.reanchoredGuidePoint(data, positions, guide, t) ?? this.staticGuidePoint(guide, t);
+        const point = guide.guideKind === 'rootLane' && this.usesTreeFilamentFlow(data)
+            ? this.slantedRootLanePoint(guide, t)
+            : this.reanchoredGuidePoint(data, positions, guide, t) ?? this.staticGuidePoint(guide, t);
         positionAttr.setXYZ(particle, point.x, point.y, point.z);
     }
 
@@ -261,23 +444,89 @@ export class GraphGalaxyParticles {
         const sourceIndex = data.ids.indexOf(guide.nodeIds[0] || '');
         const targetIndex = data.ids.indexOf(guide.nodeIds[1] || '');
         if (sourceIndex < 0 || targetIndex < 0 || guide.guideKind !== 'membership') return null;
-        const last = guide.positions3d.length - 3;
-        const oldA = { x: guide.positions3d[0], y: guide.positions3d[1], z: guide.positions3d[2] };
-        const oldB = { x: guide.positions3d[last], y: guide.positions3d[last + 1], z: guide.positions3d[last + 2] };
+        const source = guide.positions3d;
+        const segments = Math.floor(source.length / 6);
+        if (segments < 1 || segments * 6 !== source.length) return null;
+        const last = source.length - 3;
+        const oldAx = source[0], oldAy = source[1], oldAz = source[2];
+        const oldBx = source[last], oldBy = source[last + 1], oldBz = source[last + 2];
         const point = this.staticGuidePoint(guide, t);
-        const odx = oldB.x - oldA.x, ody = oldB.y - oldA.y, odz = oldB.z - oldA.z;
+        const odx = oldBx - oldAx, ody = oldBy - oldAy, odz = oldBz - oldAz;
         const oldLenSq = Math.max(0.000001, odx * odx + ody * ody + odz * odz);
-        const newA = { x: positions[sourceIndex * 3], y: positions[sourceIndex * 3 + 1], z: positions[sourceIndex * 3 + 2] };
-        const newB = { x: positions[targetIndex * 3], y: positions[targetIndex * 3 + 1], z: positions[targetIndex * 3 + 2] };
-        const ndx = newB.x - newA.x, ndy = newB.y - newA.y, ndz = newB.z - newA.z;
-        const offsetScale = THREE.MathUtils.clamp(Math.sqrt((ndx * ndx + ndy * ndy + ndz * ndz) / oldLenSq), 0.25, 2.4);
-        const localT = THREE.MathUtils.clamp(((point.x - oldA.x) * odx + (point.y - oldA.y) * ody + (point.z - oldA.z) * odz) / oldLenSq, 0, 1);
-        const oldBase = { x: oldA.x + odx * localT, y: oldA.y + ody * localT, z: oldA.z + odz * localT };
+        const newA = sourceIndex * 3;
+        const newB = targetIndex * 3;
+        const newAx = positions[newA], newAy = positions[newA + 1], newAz = positions[newA + 2];
+        const newBx = positions[newB], newBy = positions[newB + 1], newBz = positions[newB + 2];
+        const ndx = newBx - newAx, ndy = newBy - newAy, ndz = newBz - newAz;
+        const offsetScale =
+            THREE.MathUtils.clamp(Math.sqrt((ndx * ndx + ndy * ndy + ndz * ndz) / oldLenSq), 0.25, 1.65) * (this.usesTreeFilamentFlow(data) ? 0.92 : 1);
+        let liftX = 0, liftY = 0, liftZ = 0, weightSum = 0;
+        for (let index = 0; index < source.length; index += 3) {
+            const px = source[index], py = source[index + 1], pz = source[index + 2];
+            const projectedT = THREE.MathUtils.clamp(((px - oldAx) * odx + (py - oldAy) * ody + (pz - oldAz) * odz) / oldLenSq, 0, 1);
+            const oldBaseX = oldAx + odx * projectedT;
+            const oldBaseY = oldAy + ody * projectedT;
+            const oldBaseZ = oldAz + odz * projectedT;
+            const weight = Math.sin(Math.PI * projectedT);
+            if (weight <= 0.000001) continue;
+            liftX += (px - oldBaseX) * weight;
+            liftY += (py - oldBaseY) * weight;
+            liftZ += (pz - oldBaseZ) * weight;
+            weightSum += weight;
+        }
+        const liftScale = weightSum > 0 ? offsetScale / weightSum : 0;
+        liftX *= liftScale;
+        liftY *= liftScale;
+        liftZ *= liftScale;
+        const localT = THREE.MathUtils.clamp(((point.x - oldAx) * odx + (point.y - oldAy) * ody + (point.z - oldAz) * odz) / oldLenSq, 0, 1);
+        const left = (1 - localT) * (1 - localT);
+        const mid = 2 * (1 - localT) * localT;
+        const right = localT * localT;
+        const cx = (newAx + newBx) * 0.5 + liftX * 2;
+        const cy = (newAy + newBy) * 0.5 + liftY * 2;
+        const cz = (newAz + newBz) * 0.5 + liftZ * 2;
         return {
-            x: newA.x + ndx * localT + (point.x - oldBase.x) * offsetScale,
-            y: newA.y + ndy * localT + (point.y - oldBase.y) * offsetScale,
-            z: newA.z + ndz * localT + (point.z - oldBase.z) * offsetScale,
+            x: left * newAx + mid * cx + right * newBx,
+            y: left * newAy + mid * cy + right * newBy,
+            z: left * newAz + mid * cz + right * newBz,
         };
+    }
+
+    private slantedRootLanePoint(guide: GalaxyLorentzGuideView, t: number): { x: number; y: number; z: number } {
+        const point = this.staticGuidePoint(guide, t);
+        const seed = this.stableUnit(`root-lane-slant:${guide.id}`);
+        const slope = 0.1 + seed * 0.08;
+        const depthSlope = 0.025 + seed * 0.035;
+        const phase = (seed - 0.5) * 0.12;
+        return {
+            x: point.x,
+            y: point.y + point.x * slope + phase,
+            z: point.z + point.x * depthSlope,
+        };
+    }
+
+    private usesTreeFilamentFlow(data: Pick<GalaxySceneV2, 'layoutMode'>): boolean {
+        return TREE_FILAMENT_FLOW_LAYOUTS.has(data.layoutMode);
+    }
+
+    private normalizedEdgeSignal(data: Pick<GalaxySceneV2, 'edgeAlpha'>, edge = 0): number {
+        const alpha = data.edgeAlpha[edge] ?? 0.18;
+        return THREE.MathUtils.clamp((alpha - 0.052) / 0.288, 0, 1);
+    }
+
+    private treeFilamentEdgeLift(data: Pick<GalaxySceneV2, 'edgeAlpha' | 'edgeKinds'>, edge: number, source: number, target: number, curveScale: number): number {
+        const signal = this.normalizedEdgeSignal(data, edge);
+        const span = Math.sqrt(Math.max(1, Math.abs(source - target)));
+        const spanLift = THREE.MathUtils.clamp(span * 0.022, 0.045, 0.42);
+        const kindBoost = data.edgeKinds[edge] === 1 ? 1.42 : data.edgeKinds[edge] === 2 ? 1.24 : 1;
+        const signalBoost = 0.82 + signal * 0.55;
+        return (0.11 + spanLift + signal * 0.14) * curveScale * kindBoost * signalBoost;
+    }
+
+    private treeFilamentTerminalTaper(t: number): number {
+        const start = THREE.MathUtils.smoothstep(t, 0.02, 0.16);
+        const end = 1 - THREE.MathUtils.smoothstep(t, 0.58, 0.96);
+        return THREE.MathUtils.clamp(start * end, 0, 1);
     }
 
     private staticGuidePoint(guide: GalaxyLorentzGuideView, t: number): { x: number; y: number; z: number } {
@@ -371,6 +620,12 @@ export class GraphGalaxyParticles {
         return THREE.MathUtils.lerp(positions[source * 3 + 2], positions[target * 3 + 2], t);
     }
 
+    private isHopfCrossBaseEdge(data: GalaxySceneV2, source: number, target: number): boolean {
+        const sourceBase = data.hopfBaseIds?.[source] || '';
+        const targetBase = data.hopfBaseIds?.[target] || '';
+        return Boolean(sourceBase && targetBase && sourceBase !== targetBase);
+    }
+
     private writeTargetColor(colorAttr: THREE.BufferAttribute, data: GalaxySceneV2, edge: number, particle: number): void {
         const offset = edge * 6 + 3;
         colorAttr.setXYZ(particle, data.edgeColors[offset], data.edgeColors[offset + 1], data.edgeColors[offset + 2]);
@@ -392,7 +647,15 @@ export class GraphGalaxyParticles {
         return guide.nodeIds.includes(focusId) ? 1.08 : 0.08;
     }
 
-    private stableUnit(value: number): number {
+    private stableUnit(value: number | string): number {
+        if (typeof value === 'string') {
+            let hash = 2166136261;
+            for (let index = 0; index < value.length; index++) {
+                hash ^= value.charCodeAt(index);
+                hash = Math.imul(hash, 16777619);
+            }
+            return (hash >>> 0) / 4294967295;
+        }
         const raw = Math.sin((value + 1) * 12.9898) * 43758.5453;
         return raw - Math.floor(raw);
     }

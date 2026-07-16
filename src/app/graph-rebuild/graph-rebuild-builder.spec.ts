@@ -5,10 +5,18 @@ import {
     buildGraphRebuildSnapshot,
     normalizeGraphRebuildCandidate,
 } from './graph-rebuild-builder';
+import { applyNativeChunkSemanticBridgeCandidates } from './graph-rebuild-derived-facts';
+import {
+    GRAPH_REBUILD_CHUNK_SEMANTIC_BRIDGE_COMMIT_POLICY,
+    GRAPH_REBUILD_CHUNK_SEMANTIC_BRIDGE_NO_TOPOLOGY_COMMIT,
+    GRAPH_REBUILD_CHUNK_SEMANTIC_BRIDGE_SCHEMA_VERSION,
+} from './graph-rebuild-snapshot';
+import type { GraphRebuildChunkSemanticBridge } from './graph-rebuild-snapshot';
 import {
     embeddingModelAdapterFromSelection,
     normalizeEmbeddingProfile,
 } from './graph-rebuild-embedding-signatures';
+import { auditChunkSemanticBridgeFalsePositives } from './graph-rebuild-chunk-semantic-bridge-audit';
 import type { EntityOccurrence } from '../lib/dexie/db';
 import type { RegisteredEntity } from '../lib/registry';
 import type { GraphCompilerDualWriteSidecar } from './graph-compiler-read-model';
@@ -99,20 +107,25 @@ describe('Phoenix graph rebuild builder', () => {
             anchor: 3,
             chunk: 1,
             entity: 3,
+            episode: 1,
             event: 1,
-            graphFact: 2,
+            graphFact: 5,
             memoryState: 3,
             note: 1,
             structureRoot: 5,
         });
         expect(snapshot.embeddingTargetPlan).toMatchObject({
             schemaVersion: 'phoenix-signal-target-plan/v1',
-            candidateCount: 22,
-            admittedCount: 19,
+            candidateCount: 23,
+            canonicalCount: 23,
+            admittedCount: 20,
+            queuedCount: 20,
             deferredCount: 3,
+            schedulerDeferredCount: 3,
+            policyDeferredCount: 0,
         });
         expect(snapshot.embeddingTargetPlan?.lanes).toEqual(expect.arrayContaining([
-            expect.objectContaining({ lane: 'document_spine', admitted: 2 }),
+            expect.objectContaining({ lane: 'document_spine', admitted: 3 }),
             expect.objectContaining({ lane: 'chunk_spine', admitted: 1 }),
             expect.objectContaining({ lane: 'entity_anchor', admitted: 4 }),
             expect.objectContaining({ lane: 'temporal_fact', admitted: 1, tier: 0 }),
@@ -128,6 +141,14 @@ describe('Phoenix graph rebuild builder', () => {
             .toContain('evidence_context:Kai approved the packet');
         expect(snapshot.embeddingTargets.find((target) => target.id === 'embed:entity:e-kai')?.parentIds)
             .toEqual(expect.arrayContaining(['embed:chunk:note-1:block:0', 'embed:structure-root:note-1:identity']));
+        expect(snapshot.embeddingTargets.find((target) => target.id === 'embed:episode:episode:note-1:0'))
+            .toMatchObject({
+                kind: 'episode',
+                lane: 'document_spine',
+                parentIds: expect.arrayContaining(['embed:structure-root:note-1:document-structure']),
+            });
+        expect(snapshot.embeddingTargets.find((target) => target.id === 'embed:event:event:note-1:0:approval_event')?.parentIds)
+            .toEqual(expect.arrayContaining(['embed:episode:episode:note-1:0']));
         const approvedFact = snapshot.embeddingTargets.find((target) => target.id.includes('approves_or_accepts'));
         expect(approvedFact?.label).toContain('Kai approves_or_accepts Rift');
         expect(approvedFact?.text).toContain('confidence:');
@@ -144,11 +165,27 @@ describe('Phoenix graph rebuild builder', () => {
             chunks: 1,
             events: 1,
             episodes: 1,
+            chunkSemanticBridges: 0,
+            chunkSetupPayoffBridges: 0,
+            chunkCauseEffectBridges: 0,
+            chunkStateDeltaBridges: 0,
+            chunkRelationshipDeltaBridges: 0,
+            chunkTopicContinuationBridges: 0,
+            chunkEvidenceReframeBridges: 0,
+            chunkMotifEchoBridges: 0,
+            chunkRouteContinuityBridges: 0,
+            episodeConnections: 0,
+            episodeTemporalConnections: 0,
+            episodeCausalConnections: 0,
+            episodeWormholeConnections: 0,
             memoryState: 3,
-            embeddingTargets: 19,
-            embeddingTargetCandidates: 22,
+            embeddingTargets: 23,
+            embeddingTargetCandidates: 23,
+            embeddingQueuedTargets: 20,
             embeddingTargetDeferred: 3,
-            embeddingDocumentSpine: 2,
+            embeddingSchedulerDeferredTargets: 3,
+            embeddingPolicyDeferredTargets: 0,
+            embeddingDocumentSpine: 3,
             embeddingChunkSpine: 1,
             embeddingEntityAnchors: 4,
             embeddingRelationshipFacts: 2,
@@ -166,6 +203,163 @@ describe('Phoenix graph rebuild builder', () => {
             hubEntityIds: ['e-hazel', 'e-kai', 'e-rift'],
         });
         expect(snapshot.structuralPostProcess?.components).toHaveLength(1);
+    });
+
+    it('keeps registry-only Alex entities out of graph truth nodes and targets', () => {
+        const snapshot = buildGraphRebuildSnapshot({
+            scopeKind: 'note',
+            scopeId: 'note:registry',
+            noteIds: ['note-1'],
+            entities: [
+                entity('e-kai', 'Kai', ['Captain Kai']),
+                entity('e-hazel', 'Hazel', []),
+            ],
+            chunks: [
+                { id: 'note-1:block:0', noteId: 'note-1', start: 0, end: 40, ordinal: 0, source: 'note-block' },
+            ],
+            occurrences: [
+                occurrence('note-1', 'e-kai', 'Kai', 0, 3),
+            ],
+            noteTexts: {
+                'note-1': 'Kai checked the registry before leaving.',
+            },
+            builtAt: 20,
+        });
+
+        expect(snapshot.nodes.map((node) => [node.entityId, node.totalMentions]).sort()).toEqual([
+            ['e-kai', 1],
+        ]);
+        expect(snapshot.embeddingTargets.find((target) => target.id === 'embed:entity:e-hazel')).toBeUndefined();
+        expect(snapshot.counters.entities).toBe(2);
+        expect(snapshot.counters.nodes).toBe(1);
+        expect(snapshot.counters.embeddingTargets).toBeGreaterThan(0);
+    });
+
+    it('derives episode ownership and overlay-only wormholes from event sequences', () => {
+        const parts = Array.from({ length: 26 }, (_, index) =>
+            `Kai warned Rift before crossing marker ${index}. Rift said Kai should remember marker ${index}.`,
+        );
+        const text = parts.join('\n');
+        let cursor = 0;
+        const chunks = parts.map((part, ordinal) => {
+            const start = cursor;
+            const end = start + part.length;
+            cursor = end + 1;
+            return { id: `note-1:block:${ordinal}`, noteId: 'note-1', start, end, ordinal, source: 'note-block' as const };
+        });
+        const occurrences = chunks.flatMap((chunk, index) => {
+            const part = parts[index];
+            const kai = chunk.start + part.indexOf('Kai');
+            const rift = chunk.start + part.indexOf('Rift');
+            return [
+                occurrence('note-1', 'e-kai', 'Kai', kai, kai + 3, chunk.id),
+                occurrence('note-1', 'e-rift', 'Rift', rift, rift + 4, chunk.id),
+            ];
+        });
+
+        const snapshot = buildGraphRebuildSnapshot({
+            scopeKind: 'note',
+            scopeId: 'note:episodes',
+            noteIds: ['note-1'],
+            entities: [
+                entity('e-kai', 'Kai', []),
+                entity('e-rift', 'Rift', []),
+            ],
+            chunks,
+            occurrences,
+            noteTexts: { 'note-1': text },
+            builtAt: 30,
+        });
+
+        expect(snapshot.episodes.map((episode) => episode.eventIds.length)).toEqual([12, 12, 2]);
+        expect(snapshot.episodeConnections?.filter((connection) => connection.kind === 'episode_temporal'))
+            .toHaveLength(2);
+        expect(snapshot.episodeProjectionEdges?.filter((edge) => edge.kind === 'document_contains_episode'))
+            .toHaveLength(3);
+        expect(snapshot.episodeProjectionEdges?.filter((edge) => edge.kind === 'episode_contains_event'))
+            .toHaveLength(26);
+        expect(snapshot.episodeProjectionEdges?.filter((edge) => edge.kind === 'episode_contains_chunk'))
+            .toHaveLength(26);
+        expect(snapshot.episodeProjectionEdges?.filter((edge) => edge.kind === 'episode_temporal'))
+            .toHaveLength(2);
+        expect(snapshot.episodeProjectionEdges?.every((edge) => edge.noTopologyCommit)).toBe(true);
+        expect(snapshot.chunkSemanticBridges).toEqual([]);
+        expect(snapshot.episodeConnections?.filter((connection) => connection.kind === 'episode_wormhole'))
+            .toHaveLength(0);
+
+        applyNativeChunkSemanticBridgeCandidates(snapshot, [chunkBridgeCandidate({
+            sourceChunkId: chunks[0].id,
+            targetChunkId: chunks[24].id,
+            sourceEpisodeId: 'episode:note-1:0',
+            targetEpisodeId: 'episode:note-1:2',
+            supportingEntityIds: ['e-kai', 'e-rift'],
+        })]);
+
+        for (const bridge of snapshot.chunkSemanticBridges || []) {
+            expect(bridge).toMatchObject({
+                schemaVersion: GRAPH_REBUILD_CHUNK_SEMANTIC_BRIDGE_SCHEMA_VERSION,
+                status: 'candidate',
+                commitPolicy: GRAPH_REBUILD_CHUNK_SEMANTIC_BRIDGE_COMMIT_POLICY,
+            });
+            expect(bridge.rationale).toContain(GRAPH_REBUILD_CHUNK_SEMANTIC_BRIDGE_NO_TOPOLOGY_COMMIT);
+            expect(bridge.sourceEpisodeId).toMatch(/^episode:note-1:/);
+            expect(bridge.targetEpisodeId).toMatch(/^episode:note-1:/);
+        }
+        expect(auditChunkSemanticBridgeFalsePositives(snapshot.chunkSemanticBridges || []).sameEntityOnlySuspectCount)
+            .toBe(0);
+        const wormholes = snapshot.episodeConnections?.filter((connection) => connection.kind === 'episode_wormhole') || [];
+        expect(wormholes).toHaveLength(1);
+        expect(wormholes[0]).toMatchObject({
+            sourceEpisodeId: 'episode:note-1:0',
+            targetEpisodeId: 'episode:note-1:2',
+            status: 'overlay_only',
+            sharedEntityIds: ['e-kai', 'e-rift'],
+            chunkBridgeIds: expect.arrayContaining([expect.stringContaining('chunk_semantic_bridge:')]),
+            claim: expect.stringContaining('Chunk'),
+            semanticVerbs: expect.arrayContaining([expect.any(String)]),
+            rationale: expect.arrayContaining([
+                'episode_wormhole_overlay:no_topology_commit',
+                'chunk_semantic_bridge_rollup',
+            ]),
+        });
+        expect(wormholes[0].relationType).not.toBe('episode_wormhole_shared_entities');
+        expect(wormholes[0].bridgeType).toBeTruthy();
+        const projectionWormholes = snapshot.episodeProjectionEdges?.filter((edge) => edge.kind === 'episode_wormhole_candidate') || [];
+        expect(projectionWormholes).toHaveLength(1);
+        expect(projectionWormholes[0]).toMatchObject({
+            sourceTargetId: 'embed:episode:episode:note-1:0',
+            targetTargetId: 'embed:episode:episode:note-1:2',
+            status: 'candidate_overlay',
+            noTopologyCommit: true,
+            relationType: 'episode_route_continuity',
+        });
+        expect(snapshot.nodes.some((node) => node.id.includes('chunk_semantic_bridge'))).toBe(false);
+        expect(snapshot.edges.some((edge) =>
+            edge.id.includes('chunk_semantic_bridge') || edge.type.includes('chunk_semantic_bridge'),
+        )).toBe(false);
+        expect(snapshot.edges.some((edge) =>
+            edge.id.includes('episode_projection') || edge.type.includes('episode_'),
+        )).toBe(false);
+        expect(snapshot.counters.promotedFacts).toBe(
+            snapshot.counters.acceptedRelationships
+            + snapshot.counters.events
+            + snapshot.counters.temporalEdges
+            + snapshot.counters.causalEdges
+            + snapshot.counters.memoryState,
+        );
+        expect(snapshot.counters).toMatchObject({
+            episodes: 3,
+            chunkSemanticBridges: 1,
+            episodeConnections: 3,
+            episodeTemporalConnections: 2,
+            episodeWormholeConnections: 1,
+            episodeProjectionEdges: 58,
+            episodeProjectionStructuralEdges: 55,
+            episodeProjectionDerivedEdges: 2,
+            episodeProjectionCandidateEdges: 1,
+        });
+        expect(snapshot.embeddingTargets.find((target) => target.id === 'embed:event:event:note-1:12:warning_event')?.parentIds)
+            .toEqual(expect.arrayContaining(['embed:episode:episode:note-1:1']));
     });
 
     it('uses an injected Rust compiler sidecar as the graph model authority', () => {
@@ -278,6 +472,29 @@ describe('Phoenix graph rebuild builder', () => {
                 relatedBundleIds: ['bundle:rust:co-duplicate', 'bundle:rust:co'],
             }),
         ]));
+
+        const compactSidecar = {
+            factGraph: graphCompilerSidecar.factGraph,
+            receipts,
+        } satisfies GraphCompilerDualWriteSidecar;
+        const compactSnapshot = buildGraphRebuildSnapshot({
+            scopeKind: 'note',
+            scopeId: 'note:rust',
+            noteIds: ['note-1'],
+            entities: [entity('kai', 'Kai', []), entity('hazel', 'Hazel', [])],
+            chunks: [{ id: 'chunk-1', noteId: 'note-1', start: 0, end: 18, ordinal: 0, source: 'note-block' }],
+            occurrences: [occurrence('note-1', 'kai', 'Kai', 0, 3), occurrence('note-1', 'hazel', 'Hazel', 8, 13)],
+            graphCompilerSidecar: compactSidecar,
+            builtAt: 77,
+        });
+        expect(compactSnapshot.projectedUiGraph).toEqual([
+            expect.objectContaining({
+                sourceId: 'kai',
+                targetId: 'hazel',
+                edgeType: 'co_occurs_with',
+                evidenceAnchorIds: ['bundle:rust:co'],
+            }),
+        ]);
     });
 
     it('defers disabled embedding lanes without hiding their candidates', () => {
@@ -299,10 +516,14 @@ describe('Phoenix graph rebuild builder', () => {
 
         expect(snapshot.embeddingTargetPlan).toMatchObject({
             candidateCount: 9,
+            canonicalCount: 9,
             admittedCount: 8,
+            queuedCount: 8,
             deferredCount: 1,
+            policyDeferredCount: 1,
         });
         expect(snapshot.embeddingTargets.map((target) => target.kind).sort()).toEqual([
+            'anchor',
             'chunk',
             'entity',
             'note',
@@ -312,6 +533,11 @@ describe('Phoenix graph rebuild builder', () => {
             'structureRoot',
             'structureRoot',
         ]);
+        expect(snapshot.embeddingTargets.find((target) => target.kind === 'anchor')).toMatchObject({
+            admissionStatus: 'deferred',
+            workStatus: 'deferred_by_policy',
+            deferReason: 'lane_disabled_by_stage_policy',
+        });
         expect(snapshot.embeddingTargetPlan?.lanes).toEqual(expect.arrayContaining([
             expect.objectContaining({ lane: 'anchor_evidence', candidates: 2, admitted: 1, deferred: 1 }),
             expect.objectContaining({ lane: 'causal_fact', candidates: 1, admitted: 1, deferred: 0 }),
@@ -772,6 +998,7 @@ describe('Phoenix graph rebuild builder', () => {
         expect(adjudication.counters.topologyCommitCount).toBe(snapshot.counters.semanticAdjudicationTopologyCommits);
         expect(adjudication.counters.ledgerOnlyCount).toBe(snapshot.counters.semanticAdjudicationLedgerOnly);
         expect(adjudication.counters.topologyCommitCount).toBeGreaterThan(0);
+        expect(adjudication.counters.appliedMutationCount).toBe(adjudication.mutations.length);
         expect(adjudication.receipts.every((receipt) => receipt.reversible)).toBe(true);
         expect(adjudication.decisions.filter((decision) => decision.state === 'accepted').every((decision) =>
             Boolean(decision.sourceHypothesis)
@@ -785,8 +1012,17 @@ describe('Phoenix graph rebuild builder', () => {
         )).toBe(true);
         expect(adjudication.mutations.every((mutation) =>
             snapshot.edges.some((edge) => edge.id === mutation.createdEdgeId)
+            && mutation.status === 'applied'
             && mutation.reversiblePatch.undoOperation === 'remove_semantic_edge_and_fact',
         )).toBe(true);
+        expect(adjudication.mutations.every((mutation) =>
+            mutation.createdEdge
+            && Number.isInteger(mutation.createdEdge.weight)
+            && mutation.createdEdge.weight >= 1
+            && mutation.createdEdge.confidence >= 0
+            && mutation.createdEdge.confidence <= 1,
+        )).toBe(true);
+        expect(snapshot.edges.every((edge) => Number.isInteger(edge.weight))).toBe(true);
         const evalLedger = snapshot.semanticEvalLedgerSummary!;
         expect(evalLedger.schemaVersion).toBe('phoenix-semantic-eval-ledger/v1');
         expect(evalLedger.sourceSnapshotId).toBe(snapshot.id);
@@ -806,6 +1042,31 @@ describe('Phoenix graph rebuild builder', () => {
             && entry.evidenceTargetIds.length > 0
             && entry.scoringBundle.scoreParts.length > 0,
         )).toBe(true);
+        const memoryBridge = snapshot.memoryGraphRagBridgeSummary!;
+        expect(memoryBridge.schemaVersion).toBe('phoenix-memory-graphrag-bridge/v1');
+        expect(memoryBridge.sourceSnapshotId).toBe(snapshot.id);
+        expect(memoryBridge.paperShape.implementationMode).toBe('phoenix_bridge_contract');
+        expect(memoryBridge.paperShape.arxivId).toBe('2606.00610');
+        expect(memoryBridge.counters.schemaRecords).toBeGreaterThan(0);
+        expect(memoryBridge.counters.factRecords).toBeGreaterThan(0);
+        expect(memoryBridge.counters.passageRecords).toBeGreaterThan(0);
+        expect(memoryBridge.counters.evalRowCount).toBe(snapshot.counters.memoryGraphRagEvalRows);
+        expect(memoryBridge.counters.passedEvalRows).toBe(snapshot.counters.memoryGraphRagPassedEvalRows);
+        expect(memoryBridge.counters.mutationAllowedCount).toBe(0);
+        expect(memoryBridge.receipts.every((receipt) =>
+            receipt.reversible
+            && receipt.mutationAllowed === false
+            && receipt.invariant === 'memorygraphrag_bridge_no_topology_commit',
+        )).toBe(true);
+        expect(memoryBridge.agentContracts.map((contract) => contract.surface)).toEqual([
+            'observer_extraction',
+            'reflector_compression',
+            'retrieval_context',
+            'conflict_resolution',
+        ]);
+        expect(memoryBridge.compactEvalLedger.rowCount).toBe(memoryBridge.evalRows.length);
+        expect(memoryBridge.evalRows.some((row) => row.kind === 'hierarchical_retrieval')).toBe(true);
+        expect(memoryBridge.evalRows.some((row) => row.kind === 'reflection_seed')).toBe(true);
     });
 
     it('keeps rejected adjudication decisions in the ledger without mutating topology', () => {
@@ -1054,4 +1315,32 @@ function kindCounts(kinds: string[]): Record<string, number> {
     const counts = new Map<string, number>();
     for (const kind of kinds) counts.set(kind, (counts.get(kind) || 0) + 1);
     return Object.fromEntries([...counts.entries()].sort(([left], [right]) => left.localeCompare(right)));
+}
+
+function chunkBridgeCandidate(
+    overrides: Partial<GraphRebuildChunkSemanticBridge>,
+): GraphRebuildChunkSemanticBridge {
+    return {
+        schemaVersion: GRAPH_REBUILD_CHUNK_SEMANTIC_BRIDGE_SCHEMA_VERSION,
+        id: 'chunk_semantic_bridge:route_continuity:note-1-block-0:note-1-block-24',
+        bridgeType: 'route_continuity',
+        sourceChunkId: 'note-1:block:0',
+        targetChunkId: 'note-1:block:24',
+        claim: 'Chunk 1 continues the route, threshold, or spatial transition opened by Chunk 25; supporting_entities:2.',
+        evidenceIds: ['note-1:block:0', 'note-1:block:24'],
+        supportingEntityIds: ['e-kai', 'e-rift'],
+        confidence: 0.72,
+        status: 'candidate',
+        commitPolicy: GRAPH_REBUILD_CHUNK_SEMANTIC_BRIDGE_COMMIT_POLICY,
+        semanticVerbs: ['continues', 'crosses', 'moves'],
+        sourceCue: 'warned',
+        targetCue: 'crossing',
+        rationale: [
+            GRAPH_REBUILD_CHUNK_SEMANTIC_BRIDGE_NO_TOPOLOGY_COMMIT,
+            'bridge_type:route_continuity',
+            'supporting_entities:2',
+            'route_or_threshold_cue_spans_chunks',
+        ],
+        ...overrides,
+    };
 }

@@ -79,9 +79,9 @@ import {
                                 [class.text-slate-400]="ttsService.selectedEngine() !== 'nativeSupertonicRust'"
                                 [disabled]="!ttsService.nativeAvailable() || !ttsService.nativeSupertonicRustAvailable()"
                                 [class.opacity-40]="!ttsService.nativeAvailable() || !ttsService.nativeSupertonicRustAvailable()"
-                                title="Native Supertonic Rust runner">
+                                title="Native Supertonic 3 Rust runner">
                                 <i class="pi pi-bolt text-[9px]"></i>
-                                <span class="font-medium">Rust</span>
+                                <span class="font-medium">S3 Rust</span>
                             </button>
                         </div>
                     </div>

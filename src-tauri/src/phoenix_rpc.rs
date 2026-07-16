@@ -1,30 +1,551 @@
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet, VecDeque};
 use std::hash::{Hash, Hasher};
-use std::path::PathBuf;
-use std::sync::{Arc, Mutex};
+use std::io::{Read, Write};
+use std::path::{Path, PathBuf};
+use std::sync::{Arc, Mutex, OnceLock};
+use std::time::Instant;
 
+use crate::document_index_read::{read_document_index, DesktopDocumentIndexReadRequest};
 use crate::graph_galaxy::{compile_scene, DesktopGalaxyScene, DesktopGalaxySceneRequest};
+use crate::graph_run_store::{
+    load_immutable_artifact, load_manifest_for_handle, load_section, persist_immutable_artifact,
+    section_identity, DurableGraphRunReceipt, GraphRunStoreTxn,
+};
+use crate::graph_scene_packet::{
+    compile_packet, GraphScenePacket, GraphScenePacketEdgeInput, GraphScenePacketInput,
+    GraphScenePacketNodeInput, GraphScenePacketRequest, GraphScenePacketSettings,
+};
 use crate::tts::{
     NativeQwenSpeakRequest, NativeSupertonicSpeakRequest, NativeTtsLoadRequest, NativeTtsService,
     NativeTtsSpeakRequest, NativeTtsStatus, NativeTtsSynthResult,
 };
-use phoenix_graph_rebuild::{compile_dual_write_snapshot, GraphRebuildSnapshot};
+use base64::{engine::general_purpose::STANDARD as BASE64_STANDARD, Engine as _};
+use flate2::{read::GzDecoder, write::GzEncoder, Compression};
+use hashbrown::HashMap as FastHashMap;
+use phoenix_graph_kernel::{GraphProposalBatchReceipt, GraphTruthCommit};
+use phoenix_graph_post::promotion_verdict::{
+    build_graph_promotion_verdict_certificate, GraphPromotionUserOverride,
+    GraphPromotionVerdictCertificate,
+};
+use phoenix_graph_rebuild::{
+    assert_chunk_semantic_bridge_candidate_only, assert_memory_governance_candidate_only,
+    assert_story_continuity_candidate_only, audit_chunk_semantic_bridge_quality_gate,
+    build_atlas_packet, build_chunk_semantic_bridge_run_from_snapshot, build_chunks,
+    build_document_semantic_document, build_memory_governance_candidates_from_snapshot,
+    build_memory_governance_retrieval_weighting_experiment, build_snapshot_embedding_target_report,
+    build_story_continuity_contract, classify_document_profiles, compile_legacy_snapshot,
+    merge_document_semantic_documents, AtlasPacket, Chunk, ChunkSemanticBridgeCandidate,
+    ChunkSemanticBridgeSnapshotDocument, ChunkerConfig, CrossDocumentBridgeRunCertificate,
+    DocumentProfileRequest, DocumentSemanticDocument, DocumentSemanticRequest,
+    DocumentSemanticSummary, GraphEmbeddingTarget, GraphEmbeddingTargetOriginCount,
+    GraphMemoryGovernanceCandidate, GraphRebuildSnapshot,
+    MemoryGovernanceCompressionDominanceProof, MemoryGovernanceRetrievalCandidate,
+    MemoryGovernanceRetrievalFullRowProof, MemoryGovernanceRetrievalPreviewInput,
+    MemoryGovernanceRetrievalWeightingExperiment, MemoryGovernanceRetrievalWeightingVariant,
+    StoryContinuityContract, StoryContinuityDocument, StoryContinuityInput,
+};
 use phoenix_hyperbolic::lorentz_tree::{
     HyperboloidPoint, LorentzForest, LorentzForestIndex, LorentzNode, LorentzQueryMode,
     LorentzScoreConfig, LorentzTree, LorentzTreeKind, LorentzTreeMembership, LorentzTreeQuery,
     MmapLorentzForestIndex,
 };
-use phoenix_hyperbolic::siegel_finsler::{run_siegel_finsler_kernel, SiegelKernelRunRequest};
-use phoenix_native::{runtime_banner, PhoenixNativeHost, SnapshotPartition};
+use phoenix_hyperbolic::siegel_finsler::{
+    run_siegel_finsler_kernel, SiegelKernelRunReceipt, SiegelKernelRunRequest,
+};
+use phoenix_native::{runtime_banner, PhoenixNativeConfig, PhoenixNativeHost, SnapshotPartition};
+use phoenix_store_native_core::{PhoenixGraphKernelStoreV2, PhoenixGraphLearningStore};
+use phoenix_store_overgraph::PhoenixOvergraphStore;
 use phoenix_types::{
-    AnalyzeTextRequest, AtlasRichScanRequest, CommitRequest, CreateSessionRequest,
-    GraphDeltaRequest, IngestRequest, QueryRequest, RebuildRequest, RuntimeConfig,
-    RuntimeInitRequest, RuntimeInitResult, RuntimeTarget, ScanRequest, SessionStateRequest,
-    SessionStatsRequest, SnapshotPolicy, StorageMode, StoreCommandRequest,
+    AnalyzeTextRequest, CommitRequest, CreateSessionRequest, EntityId,
+    EntityKind, GraphDeltaRequest, IngestRequest, MentionEntityRef, MentionSource, QueryRequest,
+    RebuildRequest, ResolverEntitySeed, RuntimeConfig, RuntimeInitRequest, RuntimeInitResult,
+    RuntimeTarget, ScanRequest, ScopeKey, SessionId, SessionStateRequest, SessionStatsRequest,
+    SnapshotPolicy, StorageMode, StoreCommandRequest,
 };
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
+
+const GRAPH_RUN_ARENA_CAPACITY: usize = 8;
+const GRAPH_RUN_ARENA_RESIDENT_BYTES: usize = 256 * 1024 * 1024;
+const GRAPH_RUN_DEFAULT_PAGE_ROWS: usize = 8;
+const GRAPH_RUN_MAX_PAGE_ROWS: usize = 64;
+const DOCUMENT_SEMANTIC_CACHE_CAPACITY: usize = 8;
+const DOCUMENT_SEMANTIC_DOCUMENT_CACHE_CAPACITY: usize = 32;
+const DOCUMENT_SEMANTIC_COMPRESSED_SCHEMA: &str = "phoenix-document-semantics/gzip-base64/v1";
+const DOCUMENT_SEMANTIC_ARTIFACT_NAMESPACE: &str = "document-semantics-v1";
+const DOCUMENT_SEMANTIC_SUMMARY_NAMESPACE: &str = "document-semantic-summaries-v1";
+const DOCUMENT_DISCOVERY_ARTIFACT_NAMESPACE: &str = "document-discovery-v1";
+
+#[derive(Default, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct DocumentSemanticArtifactStats {
+    documents_built: usize,
+    documents_reused: usize,
+    raw_bytes_written: usize,
+    compressed_bytes_written: usize,
+    summary_cache_hit: bool,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+struct NativeAtlasSeed<'a> {
+    atlas_packet: &'a AtlasPacket,
+    embedding_targets: &'a [GraphEmbeddingTarget],
+    originating_families: &'a [GraphEmbeddingTargetOriginCount],
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct DocumentChunkRequest {
+    documents: Vec<DocumentChunkInput>,
+    #[serde(default = "default_document_chunk_size")]
+    chunk_size: usize,
+    #[serde(default = "default_document_chunk_overlap")]
+    overlap: usize,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct DocumentChunkInput {
+    note_id: String,
+    text: String,
+}
+
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct DocumentChunkOutput {
+    note_id: String,
+    chunks: Vec<DocumentChunkRange>,
+}
+
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct DocumentChunkRange {
+    start: usize,
+    end: usize,
+    ordinal: usize,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct ChunkSemanticBridgeTiming {
+    bridge_build_micros: u128,
+    total_micros: u128,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct ChunkSemanticBridgeResponse {
+    schema_version: String,
+    source: String,
+    candidates: Vec<ChunkSemanticBridgeCandidate>,
+    cross_document_certificate: CrossDocumentBridgeRunCertificate,
+    quality_gate: phoenix_graph_rebuild::BridgeQualityGateAudit,
+    timing: ChunkSemanticBridgeTiming,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct StoryContinuityTiming {
+    continuity_build_micros: u128,
+    total_micros: u128,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct StoryContinuityResponse {
+    schema_version: String,
+    source: String,
+    contract: StoryContinuityContract,
+    timing: StoryContinuityTiming,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct MemoryGovernanceTiming {
+    governance_build_micros: u128,
+    total_micros: u128,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct MemoryGovernanceResponse {
+    schema_version: String,
+    source: String,
+    candidates: Vec<GraphMemoryGovernanceCandidate>,
+    timing: MemoryGovernanceTiming,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct MemoryGovernanceRetrievalExperimentTiming {
+    governance_build_micros: u128,
+    experiment_build_micros: u128,
+    total_micros: u128,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct MemoryGovernanceRetrievalExperimentResponse {
+    schema_version: String,
+    source: String,
+    experiment: MemoryGovernanceRetrievalWeightingExperiment,
+    timing: MemoryGovernanceRetrievalExperimentTiming,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct PromotionVerdictTiming {
+    verdict_build_micros: u128,
+    total_micros: u128,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct PromotionVerdictResponse {
+    schema_version: String,
+    source: String,
+    certificate: GraphPromotionVerdictCertificate,
+    timing: PromotionVerdictTiming,
+}
+
+#[taurpc::ipc_type]
+#[serde(rename_all = "camelCase")]
+pub struct DesktopSnapshotAnalysisRequest {
+    #[serde(default)]
+    run_handle: Option<String>,
+    #[specta(type = serde_json::Value)]
+    snapshot: GraphRebuildSnapshot,
+    #[specta(type = serde_json::Value)]
+    documents: Vec<DesktopSnapshotAnalysisDocument>,
+    #[serde(default)]
+    #[specta(type = serde_json::Value)]
+    document_semantic_summary: Option<DocumentSemanticSummary>,
+    #[serde(default)]
+    document_semantic_handle: Option<String>,
+    #[serde(default)]
+    #[specta(type = serde_json::Value)]
+    retrieval_candidates: Vec<MemoryGovernanceRetrievalCandidate>,
+    #[serde(default)]
+    #[specta(type = serde_json::Value)]
+    receipts: Vec<GraphProposalBatchReceipt>,
+    #[serde(default)]
+    #[specta(type = serde_json::Value)]
+    commits: Vec<GraphTruthCommit>,
+    #[serde(default)]
+    #[specta(type = serde_json::Value)]
+    user_overrides: Vec<GraphPromotionUserOverride>,
+    #[serde(default)]
+    #[specta(type = serde_json::Value)]
+    siegel: Option<SiegelKernelRunRequest>,
+}
+
+#[taurpc::ipc_type]
+#[serde(rename_all = "camelCase")]
+pub struct DesktopSnapshotAnalysisDocument {
+    note_id: String,
+    text: Option<String>,
+    text_hash: Option<String>,
+}
+
+#[taurpc::ipc_type]
+#[serde(rename_all = "camelCase")]
+pub struct DesktopSnapshotAnalysisTiming {
+    bridge_build_micros: f64,
+    continuity_build_micros: f64,
+    governance_build_micros: f64,
+    retrieval_build_micros: f64,
+    verdict_build_micros: f64,
+    total_micros: f64,
+}
+
+#[taurpc::ipc_type]
+#[serde(rename_all = "camelCase")]
+pub struct DesktopSnapshotAnalysisResponse {
+    schema_version: &'static str,
+    source: &'static str,
+    #[specta(type = serde_json::Value)]
+    bridge: ChunkSemanticBridgeResponse,
+    #[specta(type = serde_json::Value)]
+    continuity: StoryContinuityResponse,
+    #[specta(type = serde_json::Value)]
+    governance: MemoryGovernanceResponse,
+    #[specta(type = serde_json::Value)]
+    retrieval: Option<MemoryGovernanceRetrievalExperimentResponse>,
+    #[specta(type = serde_json::Value)]
+    promotion: PromotionVerdictResponse,
+    #[specta(type = serde_json::Value)]
+    siegel: Option<SiegelKernelRunReceipt>,
+    no_topology_writes: bool,
+    timing: DesktopSnapshotAnalysisTiming,
+}
+
+struct GraphRunEntry {
+    scope_id: String,
+    snapshot_id: String,
+    content: Arc<GraphRunContent>,
+}
+
+struct GraphRunContent {
+    section_roots: BTreeMap<String, String>,
+    document_compiler: Option<phoenix_graph_rebuild::GraphDocumentCompilerSummary>,
+    analysis: Arc<DesktopSnapshotAnalysisResponse>,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+struct GraphAnalysisIdentity {
+    digest: String,
+    canonical: Arc<[u8]>,
+}
+
+struct GraphRunLease {
+    content_id: String,
+    entry: Arc<GraphRunEntry>,
+    reused: bool,
+}
+
+struct SharedGraphRunContent {
+    canonical_identity: Arc<[u8]>,
+    content: Arc<GraphRunContent>,
+    resident_bytes: usize,
+    active_leases: usize,
+}
+
+struct PendingGraphRunContent {
+    canonical_identity: Arc<[u8]>,
+    slot: Arc<OnceLock<Result<Arc<GraphRunContent>, String>>>,
+}
+
+struct GraphRunLeaseStats {
+    content_id: String,
+    resident_bytes: usize,
+    active_leases: usize,
+    reused: bool,
+}
+
+#[derive(Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct DurableAnalysisMetadata {
+    schema_version: String,
+    source: String,
+    no_topology_writes: bool,
+}
+
+#[taurpc::ipc_type]
+#[serde(rename_all = "camelCase")]
+pub struct DesktopGraphRunPageRequest {
+    run_handle: String,
+    offset: u32,
+    limit: u32,
+}
+
+#[taurpc::ipc_type]
+#[serde(rename_all = "camelCase")]
+pub struct DesktopGraphRunPersistRequest {
+    run_handle: String,
+}
+
+#[taurpc::ipc_type]
+#[serde(rename_all = "camelCase")]
+pub struct DesktopGraphRunPersistReceipt {
+    schema_version: String,
+    run_handle: String,
+    scope_id: String,
+    snapshot_id: String,
+    manifest_id: String,
+    committed_at: f64,
+    changed_sections: u32,
+    reused_sections: u32,
+    encoded_sections: u32,
+    compressed_sections: u32,
+    raw_bytes_written: f64,
+    compressed_bytes_written: f64,
+}
+
+#[taurpc::ipc_type]
+#[serde(rename_all = "camelCase")]
+pub struct DesktopGraphRunPage {
+    schema_version: &'static str,
+    source: &'static str,
+    run_handle: String,
+    offset: u32,
+    limit: u32,
+    detail_rows: u32,
+    returned_detail_rows: u32,
+    next_offset: Option<u32>,
+    arena: DesktopGraphRunArenaStats,
+    counts: DesktopGraphRunCounts,
+    #[specta(type = serde_json::Value)]
+    projection: DesktopSnapshotAnalysisResponse,
+}
+
+#[taurpc::ipc_type]
+#[serde(rename_all = "camelCase")]
+pub struct DesktopGraphRunArenaStats {
+    analysis_identity: String,
+    reused: bool,
+    resident_bytes: f64,
+    active_leases: u32,
+    projection_micros: f64,
+}
+
+#[taurpc::ipc_type]
+#[serde(rename_all = "camelCase")]
+pub struct DesktopGraphRunCounts {
+    bridge_candidates: u32,
+    bridge_by_type: BTreeMap<String, u32>,
+    cross_document_pair_coverage: u32,
+    cross_document_selected: u32,
+    cross_document_rejected: u32,
+    cross_document_weakest: u32,
+    promotion_rows: u32,
+    continuity_events: u32,
+    continuity_boundaries: u32,
+    continuity_episodes: u32,
+    continuity_temporal: u32,
+    continuity_states: u32,
+    continuity_causal: u32,
+    continuity_connections: u32,
+    continuity_conflicts: u32,
+    governance_candidates: u32,
+    governance_by_action: BTreeMap<String, u32>,
+    retrieval_top_rows: u32,
+    retrieval_violations: u32,
+}
+
+#[taurpc::ipc_type]
+#[serde(rename_all = "camelCase")]
+pub struct DesktopMentionBatchDocument {
+    pub document_id: String,
+    pub text: String,
+}
+
+#[taurpc::ipc_type]
+#[serde(rename_all = "camelCase")]
+pub struct DesktopMentionBatchScope {
+    pub world_id: Option<String>,
+    pub narrative_id: Option<String>,
+    pub folder_id: Option<String>,
+    pub folder_path: Option<String>,
+}
+
+#[taurpc::ipc_type]
+#[serde(rename_all = "camelCase")]
+pub struct DesktopMentionBatchResolverSeed {
+    pub entity_id: String,
+    pub canonical_name: String,
+    pub aliases: Vec<String>,
+    pub kind: Option<String>,
+    pub scope: DesktopMentionBatchScope,
+}
+
+#[taurpc::ipc_type]
+#[serde(rename_all = "camelCase")]
+pub struct DesktopMentionBatchRequest {
+    pub documents: Vec<DesktopMentionBatchDocument>,
+    pub resolver_seed: Vec<DesktopMentionBatchResolverSeed>,
+}
+
+#[taurpc::ipc_type]
+#[serde(rename_all = "camelCase")]
+pub struct DesktopMentionBatchResult {
+    pub document_id: String,
+    pub text_hash: String,
+    pub mentions: Vec<Vec<f64>>,
+}
+
+#[taurpc::ipc_type]
+#[serde(rename_all = "camelCase")]
+pub struct DesktopMentionBatchResponse {
+    pub schema_version: &'static str,
+    pub kinds: Vec<String>,
+    pub entity_refs: Vec<String>,
+    pub documents: Vec<DesktopMentionBatchResult>,
+}
+
+#[taurpc::ipc_type]
+#[serde(rename_all = "camelCase")]
+pub struct DesktopGraphRunOpenRequest {
+    pub documents: Vec<DesktopMentionBatchDocument>,
+    pub resolver_seed: Vec<DesktopMentionBatchResolverSeed>,
+}
+
+#[taurpc::ipc_type]
+#[serde(rename_all = "camelCase")]
+pub struct DesktopDiscoveryCandidate {
+    pub key: String,
+    pub token: String,
+    pub kind: String,
+    pub score: f64,
+    pub count: u32,
+    pub status: u32,
+}
+
+#[taurpc::ipc_type]
+#[serde(rename_all = "camelCase")]
+pub struct DesktopGraphRunOpenDocument {
+    pub document_id: String,
+    pub text_hash: String,
+    pub candidates: Vec<DesktopDiscoveryCandidate>,
+}
+
+#[taurpc::ipc_type]
+#[serde(rename_all = "camelCase")]
+pub struct DesktopGraphRunOpenResponse {
+    pub schema_version: &'static str,
+    pub run_handle: String,
+    pub documents: Vec<DesktopGraphRunOpenDocument>,
+    pub documents_built: u32,
+    pub documents_reused: u32,
+}
+
+struct ResidentMentionDocument {
+    text_hash: String,
+}
+
+#[derive(Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct DocumentDiscoveryArtifact {
+    text_hash: String,
+    candidates: Vec<DesktopDiscoveryCandidate>,
+}
+
+struct ResidentDiscoveryRun {
+    documents: Vec<ResidentMentionDocument>,
+}
+
+struct DurablePromotionVerdictInputs {
+    receipts: Vec<GraphProposalBatchReceipt>,
+    commits: Vec<GraphTruthCommit>,
+}
+
+fn default_document_chunk_size() -> usize {
+    1_840
+}
+
+fn default_document_chunk_overlap() -> usize {
+    256
+}
+
+fn utf16_offsets_for_chunks(text: &str, chunks: &[Chunk]) -> HashMap<usize, usize> {
+    let endpoints = chunks
+        .iter()
+        .flat_map(|chunk| [chunk.start, chunk.end])
+        .collect::<HashSet<_>>();
+    let mut offsets = HashMap::with_capacity(endpoints.len());
+    let mut utf16_offset = 0usize;
+    for (byte_offset, character) in text.char_indices() {
+        if endpoints.contains(&byte_offset) {
+            offsets.insert(byte_offset, utf16_offset);
+        }
+        utf16_offset += character.len_utf16();
+    }
+    if endpoints.contains(&text.len()) {
+        offsets.insert(text.len(), utf16_offset);
+    }
+    offsets
+}
 
 #[derive(Default)]
 struct PhoenixDesktopState {
@@ -32,9 +553,348 @@ struct PhoenixDesktopState {
     last_init: Option<RuntimeInitResult>,
 }
 
+struct GraphRunCoordinator {
+    leases: HashMap<String, GraphRunLease>,
+    contents: HashMap<String, SharedGraphRunContent>,
+    pending: HashMap<String, PendingGraphRunContent>,
+    discovery_runs: HashMap<String, Arc<ResidentDiscoveryRun>>,
+    discovery_order: VecDeque<String>,
+    content_order: VecDeque<String>,
+    resident_documents: HashMap<String, Arc<str>>,
+    semantic_summaries: HashMap<String, Arc<DocumentSemanticSummary>>,
+    semantic_order: VecDeque<String>,
+    semantic_documents:
+        HashMap<String, Arc<OnceLock<Result<Arc<DocumentSemanticArtifact>, String>>>>,
+    semantic_document_order: VecDeque<String>,
+    resident_content_bytes: usize,
+    resident_byte_limit: usize,
+    next_sequence: u64,
+}
+
+impl Default for GraphRunCoordinator {
+    fn default() -> Self {
+        Self {
+            leases: HashMap::new(),
+            contents: HashMap::new(),
+            pending: HashMap::new(),
+            discovery_runs: HashMap::new(),
+            discovery_order: VecDeque::new(),
+            content_order: VecDeque::new(),
+            resident_documents: HashMap::new(),
+            semantic_summaries: HashMap::new(),
+            semantic_order: VecDeque::new(),
+            semantic_documents: HashMap::new(),
+            semantic_document_order: VecDeque::new(),
+            resident_content_bytes: 0,
+            resident_byte_limit: GRAPH_RUN_ARENA_RESIDENT_BYTES,
+            next_sequence: 0,
+        }
+    }
+}
+
+impl GraphRunCoordinator {
+    fn open(&mut self, discovery: ResidentDiscoveryRun) -> String {
+        self.next_sequence = self.next_sequence.wrapping_add(1);
+        let mut hasher = std::collections::hash_map::DefaultHasher::new();
+        for document in &discovery.documents {
+            document.text_hash.hash(&mut hasher);
+        }
+        self.next_sequence.hash(&mut hasher);
+        let handle = format!("graph-run:{:016x}", hasher.finish());
+        self.discovery_runs
+            .insert(handle.clone(), Arc::new(discovery));
+        self.discovery_order.push_back(handle.clone());
+        while self.discovery_order.len() > GRAPH_RUN_ARENA_CAPACITY {
+            if let Some(expired) = self.discovery_order.pop_front() {
+                self.discovery_runs.remove(&expired);
+            }
+        }
+        handle
+    }
+
+    fn new_lease_handle(&mut self, content_id: &str) -> String {
+        self.next_sequence = self.next_sequence.wrapping_add(1);
+        let mut hasher = blake3::Hasher::new();
+        graph_digest_part(&mut hasher, b"phoenix-graph-run-lease/v1");
+        graph_digest_part(&mut hasher, content_id.as_bytes());
+        graph_digest_part(&mut hasher, &self.next_sequence.to_le_bytes());
+        format!("graph-run:v1:{}", hasher.finalize().to_hex())
+    }
+
+    fn reusable(
+        &mut self,
+        identity: &GraphAnalysisIdentity,
+    ) -> Result<Option<Arc<GraphRunContent>>, String> {
+        let Some(content) = self.contents.get(&identity.digest) else {
+            return Ok(None);
+        };
+        if content.canonical_identity.as_ref() != identity.canonical.as_ref() {
+            return Err(format!(
+                "graph analysis identity collision: {}",
+                identity.digest
+            ));
+        }
+        let entry = Arc::clone(&content.content);
+        self.touch_content(&identity.digest);
+        Ok(Some(entry))
+    }
+
+    fn analysis_slot(
+        &mut self,
+        identity: &GraphAnalysisIdentity,
+    ) -> Result<Arc<OnceLock<Result<Arc<GraphRunContent>, String>>>, String> {
+        if let Some(pending) = self.pending.get(&identity.digest) {
+            if pending.canonical_identity.as_ref() != identity.canonical.as_ref() {
+                return Err(format!(
+                    "pending graph analysis identity collision: {}",
+                    identity.digest
+                ));
+            }
+            return Ok(Arc::clone(&pending.slot));
+        }
+        let slot = Arc::new(OnceLock::new());
+        self.pending.insert(
+            identity.digest.clone(),
+            PendingGraphRunContent {
+                canonical_identity: Arc::clone(&identity.canonical),
+                slot: Arc::clone(&slot),
+            },
+        );
+        Ok(slot)
+    }
+
+    fn lease(
+        &mut self,
+        identity: &GraphAnalysisIdentity,
+        candidate: Arc<GraphRunContent>,
+        resident_bytes: usize,
+        scope_id: String,
+        snapshot_id: String,
+        preferred_handle: Option<&str>,
+    ) -> Result<(String, bool), String> {
+        let reused = self.contents.contains_key(&identity.digest);
+        if let Some(content) = self.contents.get(&identity.digest) {
+            if content.canonical_identity.as_ref() != identity.canonical.as_ref() {
+                return Err(format!(
+                    "graph analysis identity collision: {}",
+                    identity.digest
+                ));
+            }
+        } else {
+            self.resident_content_bytes =
+                self.resident_content_bytes.saturating_add(resident_bytes);
+            self.contents.insert(
+                identity.digest.clone(),
+                SharedGraphRunContent {
+                    canonical_identity: Arc::clone(&identity.canonical),
+                    content: candidate,
+                    resident_bytes,
+                    active_leases: 0,
+                },
+            );
+        }
+        let content = Arc::clone(&self.contents[&identity.digest].content);
+        let handle = if let Some(handle) = preferred_handle {
+            if !self.discovery_runs.contains_key(handle) {
+                return Err(format!("graph run is closed or expired: {handle}"));
+            }
+            self.discovery_runs.remove(handle);
+            self.discovery_order.retain(|candidate| candidate != handle);
+            handle.to_owned()
+        } else {
+            self.new_lease_handle(&identity.digest)
+        };
+        let entry = Arc::new(GraphRunEntry {
+            scope_id,
+            snapshot_id,
+            content,
+        });
+        self.contents
+            .get_mut(&identity.digest)
+            .expect("content inserted")
+            .active_leases += 1;
+        self.leases.insert(
+            handle.clone(),
+            GraphRunLease {
+                content_id: identity.digest.clone(),
+                entry,
+                reused,
+            },
+        );
+        self.pending.remove(&identity.digest);
+        self.touch_content(&identity.digest);
+        self.evict_inactive();
+        Ok((handle, reused))
+    }
+
+    fn get(&mut self, handle: &str) -> Option<Arc<GraphRunEntry>> {
+        let lease = self.leases.get(handle)?;
+        let content_id = lease.content_id.clone();
+        let entry = Arc::clone(&lease.entry);
+        self.touch_content(&content_id);
+        Some(entry)
+    }
+
+    fn stats(&self, handle: &str) -> Option<GraphRunLeaseStats> {
+        let lease = self.leases.get(handle)?;
+        let content = self.contents.get(&lease.content_id)?;
+        Some(GraphRunLeaseStats {
+            content_id: lease.content_id.clone(),
+            resident_bytes: content.resident_bytes,
+            active_leases: content.active_leases,
+            reused: lease.reused,
+        })
+    }
+
+    fn close(&mut self, handle: &str) -> bool {
+        let removed = self.leases.remove(handle);
+        if let Some(lease) = removed.as_ref() {
+            if let Some(content) = self.contents.get_mut(&lease.content_id) {
+                content.active_leases = content.active_leases.saturating_sub(1);
+            }
+        }
+        let discovery_removed = self.discovery_runs.remove(handle).is_some();
+        if discovery_removed {
+            self.discovery_order.retain(|candidate| candidate != handle);
+        }
+        self.evict_inactive();
+        removed.is_some() || discovery_removed
+    }
+
+    fn clear(&mut self) {
+        self.leases.clear();
+        self.contents.clear();
+        self.pending.clear();
+        self.discovery_runs.clear();
+        self.discovery_order.clear();
+        self.content_order.clear();
+        self.resident_documents.clear();
+        self.resident_content_bytes = 0;
+    }
+
+    fn touch_content(&mut self, content_id: &str) {
+        self.content_order
+            .retain(|candidate| candidate != content_id);
+        self.content_order.push_back(content_id.to_owned());
+    }
+
+    fn evict_inactive(&mut self) {
+        while self.contents.len() > GRAPH_RUN_ARENA_CAPACITY
+            || self.resident_content_bytes > self.resident_byte_limit
+        {
+            let Some(index) = self.content_order.iter().position(|content_id| {
+                self.contents
+                    .get(content_id)
+                    .is_some_and(|content| content.active_leases == 0)
+            }) else {
+                break;
+            };
+            let Some(content_id) = self.content_order.remove(index) else {
+                break;
+            };
+            if let Some(content) = self.contents.remove(&content_id) {
+                self.resident_content_bytes = self
+                    .resident_content_bytes
+                    .saturating_sub(content.resident_bytes);
+            }
+        }
+    }
+
+    fn retain_document(&mut self, text_hash: String, text: Arc<str>) {
+        self.resident_documents.entry(text_hash).or_insert(text);
+    }
+
+    fn document(&self, text_hash: &str) -> Option<Arc<str>> {
+        self.resident_documents.get(text_hash).cloned()
+    }
+
+    fn semantic_summary(&mut self, identity: &str) -> Option<Arc<DocumentSemanticSummary>> {
+        let summary = self.semantic_summaries.get(identity)?.clone();
+        if let Some(index) = self
+            .semantic_order
+            .iter()
+            .position(|value| value == identity)
+        {
+            self.semantic_order.remove(index);
+        }
+        self.semantic_order.push_back(identity.to_owned());
+        Some(summary)
+    }
+
+    fn retain_semantic_summary(&mut self, identity: String, summary: Arc<DocumentSemanticSummary>) {
+        self.semantic_summaries.insert(identity.clone(), summary);
+        if let Some(index) = self
+            .semantic_order
+            .iter()
+            .position(|value| value == &identity)
+        {
+            self.semantic_order.remove(index);
+        }
+        self.semantic_order.push_back(identity);
+        while self.semantic_order.len() > DOCUMENT_SEMANTIC_CACHE_CAPACITY {
+            if let Some(expired) = self.semantic_order.pop_front() {
+                self.semantic_summaries.remove(&expired);
+            }
+        }
+    }
+
+    fn semantic_document_slot(
+        &mut self,
+        identity: &str,
+    ) -> (
+        Arc<OnceLock<Result<Arc<DocumentSemanticArtifact>, String>>>,
+        bool,
+    ) {
+        if let Some(slot) = self.semantic_documents.get(identity) {
+            let slot = slot.clone();
+            self.touch_semantic_document(identity);
+            return (slot, false);
+        }
+        let slot = Arc::new(OnceLock::new());
+        self.semantic_documents
+            .insert(identity.to_owned(), slot.clone());
+        self.semantic_document_order.push_back(identity.to_owned());
+        while self.semantic_document_order.len() > DOCUMENT_SEMANTIC_DOCUMENT_CACHE_CAPACITY {
+            let Some(expired) = self.semantic_document_order.pop_front() else {
+                break;
+            };
+            let complete = self
+                .semantic_documents
+                .get(&expired)
+                .is_some_and(|entry| entry.get().is_some());
+            if complete {
+                self.semantic_documents.remove(&expired);
+            } else {
+                self.semantic_document_order.push_back(expired);
+                break;
+            }
+        }
+        (slot, true)
+    }
+
+    fn touch_semantic_document(&mut self, identity: &str) {
+        if let Some(index) = self
+            .semantic_document_order
+            .iter()
+            .position(|value| value == identity)
+        {
+            self.semantic_document_order.remove(index);
+        }
+        self.semantic_document_order.push_back(identity.to_owned());
+    }
+}
+
+struct DocumentSemanticArtifact {
+    document: DocumentSemanticDocument,
+    built: bool,
+    raw_bytes_written: usize,
+    compressed_bytes_written: usize,
+}
+
 #[derive(Clone, Default)]
 pub struct PhoenixApiImpl {
     state: Arc<Mutex<PhoenixDesktopState>>,
+    graph_runs: Arc<Mutex<GraphRunCoordinator>>,
     tts: NativeTtsService,
 }
 
@@ -75,6 +935,8 @@ pub struct DesktopDiagnostic {
 #[serde(rename_all = "camelCase")]
 pub struct DesktopRuntimeInfo {
     pub banner: String,
+    pub build_git_sha: String,
+    pub build_profile: String,
     pub target: String,
     pub ready: bool,
     pub storage: String,
@@ -501,6 +1363,12 @@ const HOPF_GEOMETRY_VERSION: &str = "hopf_ico_r5_v1";
 const HOPF_PROJECTION_VERSION: &str = "hopf_stereographic_v1";
 const LORENTZ_GEOMETRY_VERSION: &str = "lorentz_h4_forest_v1";
 const PRODUCT_GEOMETRY_VERSION: &str = "product_lorentz_hopf_v1";
+const GRAPH_REBUILD_NAMESPACE: &str = "phoenix_graph_rebuild_v1";
+const GRAPH_MODEL_V2_OVERGRAPH_DOCUMENT_KEY: &str = "graph-model-v2-overgraph";
+const GRAPH_REBUILD_COMPRESSED_JSON_SCHEMA: &str =
+    "phoenix-graph-rebuild-json-payload/gzip-base64/v1";
+const GRAPH_REBUILD_COMPRESSED_SNAPSHOT_SCHEMA: &str =
+    "phoenix-graph-rebuild-payload/gzip-base64/v1";
 const HOPF_ICO_RESOLUTION: u32 = 5;
 const HOPF_CHART_RESOLUTION: u32 = 3;
 const HOPF_CONE_APERTURE_COS: f64 = 0.573_576_436_351_046;
@@ -521,7 +1389,6 @@ struct IcoCellInternal {
 
 #[derive(Clone, Debug)]
 struct IcoTopology {
-    resolution: u32,
     cells: Vec<IcoCellInternal>,
     by_id: HashMap<String, usize>,
 }
@@ -538,7 +1405,6 @@ struct IcoProjection {
 #[derive(Clone, Debug)]
 struct HopfAnchorAssignment {
     anchor_id: String,
-    fiber_id: String,
     fiber_kind: String,
     cell_id: String,
     chart_id: String,
@@ -546,7 +1412,6 @@ struct HopfAnchorAssignment {
     center_vector: [f64; 3],
     cell_distance: f64,
     boundary_score: f64,
-    phase: f64,
 }
 
 #[derive(Default)]
@@ -571,8 +1436,39 @@ pub trait PhoenixApi {
     async fn commit_json(request_json: String) -> Result<String, String>;
     async fn rebuild_json(request_json: String) -> Result<String, String>;
     async fn scan_json(request_json: String) -> Result<String, String>;
+    async fn scan_mentions_batch(
+        request: DesktopMentionBatchRequest,
+    ) -> Result<DesktopMentionBatchResponse, String>;
+    async fn open_graph_run(
+        request: DesktopGraphRunOpenRequest,
+    ) -> Result<DesktopGraphRunOpenResponse, String>;
+    async fn analyze_graph_snapshot(
+        request: DesktopSnapshotAnalysisRequest,
+    ) -> Result<DesktopGraphRunPage, String>;
+    async fn read_graph_run_page(
+        request: DesktopGraphRunPageRequest,
+    ) -> Result<DesktopGraphRunPage, String>;
+    async fn persist_graph_run(
+        request: DesktopGraphRunPersistRequest,
+    ) -> Result<DesktopGraphRunPersistReceipt, String>;
+    async fn begin_native_operator_decision_json(request_json: String) -> Result<String, String>;
+    async fn complete_native_operator_decision_json(request_json: String)
+        -> Result<String, String>;
+    async fn commit_canonical_episode_assignment_json(
+        request_json: String,
+    ) -> Result<String, String>;
+    async fn native_decision_census_json() -> Result<String, String>;
+    async fn link_native_operator_decision_graph_truth_json(
+        request_json: String,
+    ) -> Result<String, String>;
+    async fn record_native_reward_observation_json(request_json: String) -> Result<String, String>;
+    async fn native_reward_observation_census_json() -> Result<String, String>;
+    async fn observe_native_reward_horizons_json() -> Result<String, String>;
+    async fn close_graph_run(run_handle: String) -> bool;
     async fn atlas_rich_scan_json(request_json: String) -> Result<String, String>;
+    async fn nli_adjudicate_claims_json(request_json: String) -> Result<String, String>;
     async fn manifold_snapshot_json(request_json: String) -> Result<String, String>;
+    async fn graph_scene_packet_json(request_json: String) -> Result<String, String>;
     async fn lorentz_forest_cache_json(request_json: String) -> Result<String, String>;
     async fn lorentz_forest_build_json(request_json: String) -> Result<String, String>;
     async fn lorentz_forest_query_json(request_json: String) -> Result<String, String>;
@@ -609,11 +1505,21 @@ impl PhoenixApi for PhoenixApiImpl {
 
     async fn init_runtime(self, request: DesktopInitRequest) -> Result<DesktopRuntimeInfo, String> {
         let mut guard = self.lock_state()?;
+        let init_request = build_init_request(&request);
+        let requested_config = PhoenixNativeConfig::from_init_request(&init_request);
+        if !request.force_reset
+            && guard.host.config() == Some(&requested_config)
+            && guard.last_init.as_ref().is_some_and(|result| result.ready)
+        {
+            return Ok(desktop_runtime_info(
+                guard.host.config(),
+                guard.last_init.as_ref(),
+            ));
+        }
         if request.force_reset {
             let _ = guard.host.close();
         }
 
-        let init_request = build_init_request(&request);
         let result = guard
             .host
             .open(init_request)
@@ -626,6 +1532,9 @@ impl PhoenixApi for PhoenixApiImpl {
     }
 
     async fn close_runtime(self) -> bool {
+        if let Ok(mut runs) = self.graph_runs.lock() {
+            runs.clear();
+        }
         match self.state.lock() {
             Ok(mut guard) => {
                 guard.last_init = None;
@@ -685,10 +1594,408 @@ impl PhoenixApi for PhoenixApiImpl {
         self.with_host_json::<ScanRequest, _, _>(request_json, |host, request| host.scan(request))
     }
 
-    async fn atlas_rich_scan_json(self, request_json: String) -> Result<String, String> {
-        self.with_host_json::<AtlasRichScanRequest, _, _>(request_json, |host, request| {
-            host.atlas_rich_scan(request)
+    async fn scan_mentions_batch(
+        self,
+        request: DesktopMentionBatchRequest,
+    ) -> Result<DesktopMentionBatchResponse, String> {
+        let resolver_seed = request
+            .resolver_seed
+            .into_iter()
+            .map(desktop_resolver_seed)
+            .collect::<Vec<_>>();
+        let guard = self.lock_state()?;
+        let mut kinds = Vec::new();
+        let mut kind_indexes = HashMap::new();
+        let mut entity_refs = Vec::new();
+        let mut entity_ref_indexes = HashMap::new();
+        let mut documents = Vec::with_capacity(request.documents.len());
+        let mut resident_documents = Vec::with_capacity(request.documents.len());
+        for document in request.documents {
+            let text_hash = document_text_hash(&document.text);
+            let resident_text = Arc::<str>::from(document.text.as_str());
+            resident_documents.push((text_hash.clone(), resident_text.clone()));
+            let scan = guard
+                .host
+                .scan(ScanRequest {
+                    text: document.text,
+                    scope: ScopeKey::default(),
+                    session_id: Some(SessionId::from("phoenix-ui-discovery-batch")),
+                    resolver_seed: resolver_seed.clone(),
+                })
+                .map_err(|error| error.to_string())?;
+            let mentions = scan
+                .mentions
+                .into_iter()
+                .filter(|mention| mention.source == Some(MentionSource::Discovery))
+                .map(|mention| {
+                    let kind = mention
+                        .kind
+                        .map(desktop_entity_kind)
+                        .map(|kind| intern_batch_string(&kind, &mut kinds, &mut kind_indexes));
+                    let entity_ref =
+                        mention
+                            .entity_ref
+                            .map(desktop_mention_entity_ref)
+                            .map(|entity_ref| {
+                                intern_batch_string(
+                                    &entity_ref,
+                                    &mut entity_refs,
+                                    &mut entity_ref_indexes,
+                                )
+                            });
+                    vec![
+                        mention.range.start as f64,
+                        mention.range.end as f64,
+                        kind.map(|index| index as f64).unwrap_or(-1.0),
+                        entity_ref.map(|index| index as f64).unwrap_or(-1.0),
+                        mention.confidence as f64,
+                        mention.sentence_index as f64,
+                    ]
+                })
+                .collect();
+            documents.push(DesktopMentionBatchResult {
+                document_id: document.document_id,
+                text_hash,
+                mentions,
+            });
+        }
+        drop(guard);
+        let mut coordinator = self
+            .graph_runs
+            .lock()
+            .map_err(|_| "graph run coordinator lock poisoned".to_owned())?;
+        for (text_hash, text) in resident_documents {
+            coordinator.retain_document(text_hash, text);
+        }
+        Ok(DesktopMentionBatchResponse {
+            schema_version: "phoenix-compact-mention-batch/v1",
+            kinds,
+            entity_refs,
+            documents,
         })
+    }
+
+    async fn open_graph_run(
+        self,
+        request: DesktopGraphRunOpenRequest,
+    ) -> Result<DesktopGraphRunOpenResponse, String> {
+        let resolver_bytes = serde_json::to_vec(&request.resolver_seed)
+            .map_err(|error| format!("identify graph discovery resolver: {error}"))?;
+        let resolver_seed = request
+            .resolver_seed
+            .into_iter()
+            .map(desktop_resolver_seed)
+            .collect::<Vec<_>>();
+        let guard = self.lock_state()?;
+        let root = desktop_graph_run_store_path(guard.host.config());
+        let mut response_documents = Vec::with_capacity(request.documents.len());
+        let mut resident_documents = Vec::with_capacity(request.documents.len());
+        let mut discovery_documents = Vec::with_capacity(request.documents.len());
+        let mut documents_built = 0_u32;
+        let mut documents_reused = 0_u32;
+        for document in request.documents {
+            let text_hash = document_text_hash(&document.text);
+            let resident_text = Arc::<str>::from(document.text.as_str());
+            let artifact_identity =
+                document_discovery_artifact_identity(&document.text, &resolver_bytes);
+            let cached = match root.as_deref() {
+                Some(root) => load_immutable_artifact::<DocumentDiscoveryArtifact>(
+                    root,
+                    DOCUMENT_DISCOVERY_ARTIFACT_NAMESPACE,
+                    &artifact_identity,
+                )?,
+                None => None,
+            };
+            if let Some(artifact) = cached {
+                resident_documents.push((artifact.text_hash.clone(), resident_text));
+                discovery_documents.push(ResidentMentionDocument {
+                    text_hash: artifact.text_hash.clone(),
+                });
+                response_documents.push(DesktopGraphRunOpenDocument {
+                    document_id: document.document_id,
+                    text_hash: artifact.text_hash,
+                    candidates: artifact.candidates,
+                });
+                documents_reused += 1;
+                continue;
+            }
+            let scan = guard
+                .host
+                .scan(ScanRequest {
+                    text: document.text,
+                    scope: ScopeKey::default(),
+                    session_id: Some(SessionId::from("phoenix-graph-run-open")),
+                    resolver_seed: resolver_seed.clone(),
+                })
+                .map_err(|error| error.to_string())?;
+            let mut candidate_states: FastHashMap<String, DiscoveryCandidateState> =
+                FastHashMap::new();
+            for (index, mention) in scan.mentions.into_iter().enumerate() {
+                if mention.source != Some(MentionSource::Discovery) {
+                    continue;
+                }
+                let surface = mention.surface.trim().to_owned();
+                let kind = mention.kind.map(desktop_entity_kind);
+                let entity_ref = mention.entity_ref.map(desktop_mention_entity_ref);
+                let key = normalize_discovery_key(entity_ref.as_deref().unwrap_or(&surface));
+                if !key.is_empty() && !surface.is_empty() {
+                    update_discovery_candidate(
+                        &mut candidate_states,
+                        key,
+                        surface,
+                        kind.as_deref().unwrap_or("UNKNOWN"),
+                        mention.confidence as f64,
+                        index,
+                    );
+                }
+            }
+            let candidates = finish_discovery_candidates(candidate_states);
+            if let Some(root) = root.as_deref() {
+                let artifact = DocumentDiscoveryArtifact {
+                    text_hash: text_hash.clone(),
+                    candidates: candidates.clone(),
+                };
+                let _ = persist_immutable_artifact(
+                    root,
+                    DOCUMENT_DISCOVERY_ARTIFACT_NAMESPACE,
+                    &artifact_identity,
+                    &artifact,
+                )?;
+            }
+            resident_documents.push((text_hash.clone(), resident_text));
+            discovery_documents.push(ResidentMentionDocument {
+                text_hash: text_hash.clone(),
+            });
+            response_documents.push(DesktopGraphRunOpenDocument {
+                document_id: document.document_id,
+                text_hash,
+                candidates,
+            });
+            documents_built += 1;
+        }
+        drop(guard);
+        let mut coordinator = self
+            .graph_runs
+            .lock()
+            .map_err(|_| "graph run coordinator lock poisoned".to_owned())?;
+        for (text_hash, text) in resident_documents {
+            coordinator.retain_document(text_hash, text);
+        }
+        let run_handle = coordinator.open(ResidentDiscoveryRun {
+            documents: discovery_documents,
+        });
+        Ok(DesktopGraphRunOpenResponse {
+            schema_version: "phoenix-graph-run-open/v1",
+            run_handle,
+            documents: response_documents,
+            documents_built,
+            documents_reused,
+        })
+    }
+
+    async fn analyze_graph_snapshot(
+        self,
+        mut request: DesktopSnapshotAnalysisRequest,
+    ) -> Result<DesktopGraphRunPage, String> {
+        if request.receipts.is_empty() || request.commits.is_empty() {
+            let config = {
+                let guard = self.lock_state()?;
+                guard.host.config().cloned()
+            };
+            if let Some(durable) = load_durable_promotion_verdict_inputs(config.as_ref())? {
+                if request.receipts.is_empty() {
+                    request.receipts = durable.receipts;
+                }
+                if request.commits.is_empty() {
+                    request.commits = durable.commits;
+                }
+            }
+        }
+        if request.document_semantic_summary.is_none() {
+            if let Some(handle) = request.document_semantic_handle.as_deref() {
+                let resident = self
+                    .graph_runs
+                    .lock()
+                    .map_err(|_| "graph run coordinator lock poisoned".to_owned())?
+                    .semantic_summary(handle);
+                request.document_semantic_summary = if let Some(summary) = resident {
+                    Some(summary.as_ref().clone())
+                } else {
+                    let config = {
+                        let guard = self.lock_state()?;
+                        guard.host.config().cloned()
+                    };
+                    let root = desktop_graph_run_store_path(config.as_ref()).ok_or_else(|| {
+                        "document semantic handle requires native durable storage".to_owned()
+                    })?;
+                    let summary = load_immutable_artifact::<DocumentSemanticSummary>(
+                        &root,
+                        DOCUMENT_SEMANTIC_SUMMARY_NAMESPACE,
+                        handle,
+                    )?
+                    .ok_or_else(|| format!("document semantic handle is missing: {handle}"))?;
+                    self.graph_runs
+                        .lock()
+                        .map_err(|_| "graph run coordinator lock poisoned".to_owned())?
+                        .retain_semantic_summary(handle.to_owned(), Arc::new(summary.clone()));
+                    Some(summary)
+                };
+            }
+        }
+        let snapshot_id = request.snapshot.id.to_string();
+        let scope_id = request.snapshot.scope_id.to_string();
+        let requested_run_handle = request.run_handle.clone();
+        let documents = self.resolve_graph_run_documents(&request.documents)?;
+        let section_roots = graph_analysis_section_roots(&request, &documents)?;
+        let document_compiler = request.snapshot.document_compiler_summary.clone();
+        let identity = graph_analysis_identity(&section_roots);
+        let (reusable, slot) = {
+            let mut coordinator = self
+                .graph_runs
+                .lock()
+                .map_err(|_| "graph run coordinator lock poisoned".to_owned())?;
+            if let Some(content) = coordinator.reusable(&identity)? {
+                (Some(content), None)
+            } else {
+                (None, Some(coordinator.analysis_slot(&identity)?))
+            }
+        };
+        let content = if let Some(content) = reusable {
+            content
+        } else {
+            let slot = slot.expect("analysis slot exists for a cache miss");
+            slot.get_or_init(|| {
+                let analysis = self.analyze_graph_snapshot_request(request, &documents)?;
+                Ok(Arc::new(GraphRunContent {
+                    section_roots,
+                    document_compiler,
+                    analysis: Arc::new(analysis),
+                }))
+            })
+            .clone()?
+        };
+        let resident_bytes = graph_run_resident_bytes(content.analysis.as_ref());
+        let mut coordinator = self
+            .graph_runs
+            .lock()
+            .map_err(|_| "graph run coordinator lock poisoned".to_owned())?;
+        let (run_handle, _) = coordinator.lease(
+            &identity,
+            content,
+            resident_bytes,
+            scope_id,
+            snapshot_id.clone(),
+            requested_run_handle.as_deref(),
+        )?;
+        drop(coordinator);
+        self.graph_run_page(&run_handle, 0, GRAPH_RUN_DEFAULT_PAGE_ROWS)
+    }
+
+    async fn read_graph_run_page(
+        self,
+        request: DesktopGraphRunPageRequest,
+    ) -> Result<DesktopGraphRunPage, String> {
+        self.graph_run_page(
+            &request.run_handle,
+            request.offset as usize,
+            request.limit as usize,
+        )
+    }
+
+    async fn persist_graph_run(
+        self,
+        request: DesktopGraphRunPersistRequest,
+    ) -> Result<DesktopGraphRunPersistReceipt, String> {
+        let config = {
+            let guard = self.lock_state()?;
+            guard.host.config().cloned()
+        };
+        let root = desktop_graph_run_store_path(config.as_ref())
+            .ok_or_else(|| "durable graph run storage is unavailable".to_owned())?;
+        let entry = self
+            .graph_runs
+            .lock()
+            .map_err(|_| "graph run coordinator lock poisoned".to_owned())?
+            .get(&request.run_handle)
+            .ok_or_else(|| format!("graph run is closed or expired: {}", request.run_handle))?;
+        let receipt = persist_graph_run_entry(&root, &request.run_handle, entry.as_ref())?;
+        Ok(desktop_durable_graph_run_receipt(receipt))
+    }
+
+    async fn begin_native_operator_decision_json(
+        self,
+        request_json: String,
+    ) -> Result<String, String> {
+        let root = self.native_decision_store_path()?;
+        crate::native_decision_rpc::begin(&root, &request_json)
+    }
+
+    async fn complete_native_operator_decision_json(
+        self,
+        request_json: String,
+    ) -> Result<String, String> {
+        let root = self.native_decision_store_path()?;
+        crate::native_decision_rpc::complete(&root, &request_json)
+    }
+
+    async fn commit_canonical_episode_assignment_json(
+        self,
+        request_json: String,
+    ) -> Result<String, String> {
+        let root = self.native_decision_store_path()?;
+        crate::native_decision_rpc::commit_episode_assignment(&root, &request_json)
+    }
+
+    async fn native_decision_census_json(self) -> Result<String, String> {
+        let root = self.native_decision_store_path()?;
+        crate::native_decision_rpc::census(&root)
+    }
+
+    async fn link_native_operator_decision_graph_truth_json(
+        self,
+        request_json: String,
+    ) -> Result<String, String> {
+        let root = self.native_decision_store_path()?;
+        crate::native_decision_rpc::link_graph_truth(&root, &request_json)
+    }
+
+    async fn record_native_reward_observation_json(
+        self,
+        request_json: String,
+    ) -> Result<String, String> {
+        let root = self.native_decision_store_path()?;
+        crate::native_decision_rpc::record_reward_observation(&root, &request_json)
+    }
+
+    async fn native_reward_observation_census_json(self) -> Result<String, String> {
+        let root = self.native_decision_store_path()?;
+        crate::native_decision_rpc::reward_observation_census(&root)
+    }
+
+    async fn observe_native_reward_horizons_json(self) -> Result<String, String> {
+        let root = self.native_decision_store_path()?;
+        crate::native_decision_rpc::observe_reward_horizons(&root)
+    }
+
+    async fn close_graph_run(self, run_handle: String) -> bool {
+        self.graph_runs
+            .lock()
+            .map(|mut coordinator| coordinator.close(&run_handle))
+            .unwrap_or(false)
+    }
+
+    async fn atlas_rich_scan_json(self, request_json: String) -> Result<String, String> {
+        let _ = request_json;
+        Err("Legacy Atlas rich scan is quarantined. Use the content-addressed graph-run pipeline."
+            .to_owned())
+    }
+
+    async fn nli_adjudicate_claims_json(self, request_json: String) -> Result<String, String> {
+        tokio::task::spawn_blocking(move || {
+            crate::nli_claim_rpc::adjudicate_claims_json(&request_json)
+        })
+        .await
+        .map_err(|error| format!("native NLI task failed: {error}"))?
     }
 
     async fn manifold_snapshot_json(self, request_json: String) -> Result<String, String> {
@@ -696,6 +2003,13 @@ impl PhoenixApi for PhoenixApiImpl {
         let guard = self.lock_state()?;
         let snapshot = build_manifold_snapshot(&guard.host, request)?;
         serialize_json(&snapshot)
+    }
+
+    async fn graph_scene_packet_json(self, request_json: String) -> Result<String, String> {
+        let request = parse_json::<GraphScenePacketRequest>(&request_json)?;
+        let guard = self.lock_state()?;
+        let packet = build_graph_scene_packet(&guard.host, request)?;
+        serialize_json(&packet)
     }
 
     async fn lorentz_forest_cache_json(self, request_json: String) -> Result<String, String> {
@@ -790,16 +2104,148 @@ impl PhoenixApi for PhoenixApiImpl {
 
         if command == "graphRebuild:compileDualWrite" {
             let snapshot_value = payload.get("snapshot").cloned().unwrap_or(payload);
-            let snapshot = serde_json::from_value::<GraphRebuildSnapshot>(snapshot_value)
+            let mut snapshot = serde_json::from_value::<GraphRebuildSnapshot>(snapshot_value)
                 .map_err(|error| format!("invalid graph rebuild snapshot: {error}"))?;
-            let dual = compile_dual_write_snapshot(&snapshot);
+            let fact_graph = compile_legacy_snapshot(&snapshot);
+            let fact_graph_payload = compressed_json_payload(
+                &fact_graph,
+                "phoenix-graph-compiler-payload/gzip-base64/v1",
+                fact_graph.schema_version.as_str(),
+            )?;
+            let target_report = build_snapshot_embedding_target_report(&snapshot);
+            snapshot.embedding_targets.clear();
+            let atlas_packet = build_atlas_packet(&snapshot);
+            let atlas_seed_payload = compressed_json_payload(
+                &NativeAtlasSeed {
+                    atlas_packet: &atlas_packet,
+                    embedding_targets: &target_report.targets,
+                    originating_families: &target_report.originating_families,
+                },
+                "phoenix-atlas-seed-payload/gzip-base64/v1",
+                "phoenix-atlas-seed/v1",
+            )?;
             return serialize_json(&json!({
                 "success": true,
                 "payload": {
-                    "factGraph": dual.fact_graph,
-                    "projectedUiGraph": dual.projected_ui_graph,
-                    "receipts": dual.receipts,
+                    "factGraphPayload": fact_graph_payload,
+                    "atlasSeedPayload": atlas_seed_payload,
+                    "embeddingTargetSource": "rust-graph-family-targets/v1",
                 },
+                "error": null,
+            }));
+        }
+        if command == "documentProfile:classify" {
+            let request = serde_json::from_value::<DocumentProfileRequest>(payload)
+                .map_err(|error| format!("invalid document profile request: {error}"))?;
+            let summary = classify_document_profiles(&request);
+            return serialize_json(&json!({
+                "success": true,
+                "payload": summary,
+                "error": null,
+            }));
+        }
+        if command == "documentChunk:build" {
+            let request = serde_json::from_value::<DocumentChunkRequest>(payload)
+                .map_err(|error| format!("invalid document chunk request: {error}"))?;
+            let config = ChunkerConfig {
+                chunk_size: request.chunk_size.max(256),
+                overlap: request.overlap.min(request.chunk_size.saturating_sub(1)),
+            };
+            let documents = request
+                .documents
+                .into_iter()
+                .map(|document| {
+                    let chunks = build_chunks(&document.text, &config);
+                    let offsets = utf16_offsets_for_chunks(&document.text, &chunks);
+                    DocumentChunkOutput {
+                        note_id: document.note_id,
+                        chunks: chunks
+                            .iter()
+                            .enumerate()
+                            .map(|(ordinal, chunk)| DocumentChunkRange {
+                                start: offsets.get(&chunk.start).copied().unwrap_or_default(),
+                                end: offsets.get(&chunk.end).copied().unwrap_or_default(),
+                                ordinal,
+                            })
+                            .collect(),
+                    }
+                })
+                .collect::<Vec<_>>();
+            return serialize_json(&json!({
+                "success": true,
+                "payload": {
+                    "schemaVersion": "phoenix-document-chunks/v1",
+                    "source": "native_rust",
+                    "documents": documents,
+                },
+                "error": null,
+            }));
+        }
+        if command == "documentSemantic:build" {
+            let request = serde_json::from_value::<DocumentSemanticRequest>(payload)
+                .map_err(|error| format!("invalid document semantic request: {error}"))?;
+            let config = {
+                let guard = self.lock_state()?;
+                guard.host.config().cloned()
+            };
+            let root = desktop_graph_run_store_path(config.as_ref());
+            let (summary, artifact_stats, artifact_handle) =
+                build_or_load_document_semantics(&request, root.as_deref(), &self.graph_runs)?;
+            let mut compressed = compressed_json_payload(
+                summary.as_ref(),
+                DOCUMENT_SEMANTIC_COMPRESSED_SCHEMA,
+                &summary.schema_version,
+            )?;
+            compressed
+                .as_object_mut()
+                .ok_or_else(|| {
+                    "compressed document semantic envelope was not an object".to_owned()
+                })?
+                .insert(
+                    "artifactStats".to_owned(),
+                    serde_json::to_value(artifact_stats)
+                        .map_err(|error| format!("encode semantic artifact stats: {error}"))?,
+                );
+            compressed
+                .as_object_mut()
+                .expect("compressed semantic envelope object")
+                .insert("artifactHandle".to_owned(), Value::String(artifact_handle));
+            return serialize_json(&json!({
+                "success": true,
+                "payload": compressed,
+                "error": null,
+            }));
+        }
+        if command == "documentSemantic:materialize" {
+            let request =
+                serde_json::from_value::<DocumentSemanticRequest>(payload).map_err(|error| {
+                    format!("invalid document semantic materialize request: {error}")
+                })?;
+            let config = {
+                let guard = self.lock_state()?;
+                guard.host.config().cloned()
+            };
+            let root = desktop_graph_run_store_path(config.as_ref());
+            let (summary, artifact_stats, artifact_handle) =
+                build_or_load_document_semantics(&request, root.as_deref(), &self.graph_runs)?;
+            return serialize_json(&json!({
+                "success": true,
+                "payload": {
+                    "schemaVersion": "phoenix-document-semantics-materialized/v1",
+                    "artifactHandle": artifact_handle,
+                    "artifactStats": artifact_stats,
+                    "counters": summary.counters,
+                },
+                "error": null,
+            }));
+        }
+        if command == "documentIndex:read" {
+            let request = serde_json::from_value::<DesktopDocumentIndexReadRequest>(payload)
+                .map_err(|error| format!("invalid document index read request: {error}"))?;
+            let response = read_document_index(request)?;
+            return serialize_json(&json!({
+                "success": true,
+                "payload": response,
                 "error": null,
             }));
         }
@@ -868,6 +2314,299 @@ impl PhoenixApiImpl {
             .map_err(|_| "phoenix desktop state lock poisoned".to_owned())
     }
 
+    fn native_decision_store_path(&self) -> Result<PathBuf, String> {
+        let config = self.lock_state()?.host.config().cloned();
+        config
+            .as_ref()
+            .and_then(desktop_overgraph_store_path)
+            .ok_or_else(|| "native decision receipt storage is unavailable".to_owned())
+    }
+
+    fn graph_run_page(
+        &self,
+        run_handle: &str,
+        offset: usize,
+        requested_limit: usize,
+    ) -> Result<DesktopGraphRunPage, String> {
+        let (resident, arena) = {
+            let mut coordinator = self
+                .graph_runs
+                .lock()
+                .map_err(|_| "graph run coordinator lock poisoned".to_owned())?;
+            (coordinator.get(run_handle), coordinator.stats(run_handle))
+        };
+        let durable;
+        let analysis = if let Some(entry) = resident.as_ref() {
+            entry.content.analysis.as_ref()
+        } else {
+            let config = {
+                let guard = self.lock_state()?;
+                guard.host.config().cloned()
+            };
+            let root = desktop_graph_run_store_path(config.as_ref())
+                .ok_or_else(|| format!("graph run is closed or expired: {run_handle}"))?;
+            durable = load_durable_graph_run(&root, run_handle)?
+                .ok_or_else(|| format!("graph run is closed or expired: {run_handle}"))?;
+            &durable
+        };
+        let limit = requested_limit.clamp(1, GRAPH_RUN_MAX_PAGE_ROWS);
+        let projection_started = Instant::now();
+        let (mut projection, detail_rows, returned_detail_rows, max_rows) =
+            project_graph_run_page(analysis, offset, limit);
+        let projection_micros = projection_started.elapsed().as_micros() as f64;
+        if arena.as_ref().is_some_and(|stats| stats.reused) {
+            projection.timing = DesktopSnapshotAnalysisTiming {
+                bridge_build_micros: 0.0,
+                continuity_build_micros: 0.0,
+                governance_build_micros: 0.0,
+                retrieval_build_micros: 0.0,
+                verdict_build_micros: 0.0,
+                total_micros: 0.0,
+            };
+            projection.bridge.timing.bridge_build_micros = 0;
+            projection.bridge.timing.total_micros = 0;
+            projection.continuity.timing.continuity_build_micros = 0;
+            projection.continuity.timing.total_micros = 0;
+            projection.governance.timing.governance_build_micros = 0;
+            projection.governance.timing.total_micros = 0;
+            if let Some(retrieval) = projection.retrieval.as_mut() {
+                retrieval.timing.governance_build_micros = 0;
+                retrieval.timing.experiment_build_micros = 0;
+                retrieval.timing.total_micros = 0;
+            }
+            projection.promotion.timing.verdict_build_micros = 0;
+            projection.promotion.timing.total_micros = 0;
+        }
+        let next_offset = (offset.saturating_add(returned_detail_rows) < max_rows)
+            .then_some(offset.saturating_add(returned_detail_rows) as u32);
+        Ok(DesktopGraphRunPage {
+            schema_version: "phoenix-graph-run-page/v1",
+            source: "rust",
+            run_handle: run_handle.to_owned(),
+            offset: offset as u32,
+            limit: limit as u32,
+            detail_rows: detail_rows as u32,
+            returned_detail_rows: returned_detail_rows as u32,
+            next_offset,
+            arena: arena.map_or_else(
+                || DesktopGraphRunArenaStats {
+                    analysis_identity: "durable".to_owned(),
+                    reused: false,
+                    resident_bytes: 0.0,
+                    active_leases: 0,
+                    projection_micros,
+                },
+                |stats| DesktopGraphRunArenaStats {
+                    analysis_identity: stats.content_id,
+                    reused: stats.reused,
+                    resident_bytes: stats.resident_bytes as f64,
+                    active_leases: count_for_wire(stats.active_leases),
+                    projection_micros,
+                },
+            ),
+            counts: graph_run_counts(analysis),
+            projection,
+        })
+    }
+
+    fn analyze_graph_snapshot_request(
+        &self,
+        request: DesktopSnapshotAnalysisRequest,
+        resolved_documents: &[DocumentChunkInput],
+    ) -> Result<DesktopSnapshotAnalysisResponse, String> {
+        let started = Instant::now();
+        let documents = resolved_documents
+            .iter()
+            .map(|document| ChunkSemanticBridgeSnapshotDocument {
+                note_id: document.note_id.as_str(),
+                text: document.text.as_str(),
+            })
+            .collect::<Vec<_>>();
+
+        let bridge_started = Instant::now();
+        let bridge_run =
+            build_chunk_semantic_bridge_run_from_snapshot(&request.snapshot, &documents);
+        assert_chunk_semantic_bridge_candidate_only(&bridge_run.candidates)
+            .map_err(|error| error.to_string())?;
+        let bridge_build_micros = bridge_started.elapsed().as_micros();
+        let bridge_quality_gate = audit_chunk_semantic_bridge_quality_gate(&bridge_run.candidates);
+
+        let continuity_documents = resolved_documents
+            .iter()
+            .map(|document| StoryContinuityDocument {
+                note_id: document.note_id.as_str().into(),
+                text: document.text.clone(),
+            })
+            .collect::<Vec<_>>();
+        let continuity_started = Instant::now();
+        let continuity_contract = build_story_continuity_contract(StoryContinuityInput {
+            snapshot: &request.snapshot,
+            documents: &continuity_documents,
+            semantic_summary: request.document_semantic_summary.as_ref(),
+            bridge_candidates: &bridge_run.candidates,
+        });
+        assert_story_continuity_candidate_only(&continuity_contract)
+            .map_err(|error| error.to_string())?;
+        let continuity_build_micros = continuity_started.elapsed().as_micros();
+
+        let governance_started = Instant::now();
+        let governance_candidates =
+            build_memory_governance_candidates_from_snapshot(&request.snapshot);
+        assert_memory_governance_candidate_only(&governance_candidates)
+            .map_err(|error| error.to_string())?;
+        let governance_build_micros = governance_started.elapsed().as_micros();
+
+        let retrieval_started = Instant::now();
+        let retrieval_experiment = (!request.retrieval_candidates.is_empty()).then(|| {
+            build_memory_governance_retrieval_weighting_experiment(
+                MemoryGovernanceRetrievalPreviewInput {
+                    retrieval_candidates: &request.retrieval_candidates,
+                    governance_candidates: &governance_candidates,
+                },
+            )
+        });
+        let retrieval_build_micros = retrieval_started.elapsed().as_micros();
+
+        let durable = if request.receipts.is_empty() || request.commits.is_empty() {
+            let config = {
+                let guard = self.lock_state()?;
+                guard.host.config().cloned()
+            };
+            load_durable_promotion_verdict_inputs(config.as_ref())?
+        } else {
+            None
+        };
+        let receipts = if request.receipts.is_empty() {
+            durable
+                .as_ref()
+                .map(|input| input.receipts.as_slice())
+                .unwrap_or_default()
+        } else {
+            request.receipts.as_slice()
+        };
+        let commits = if request.commits.is_empty() {
+            durable
+                .as_ref()
+                .map(|input| input.commits.as_slice())
+                .unwrap_or_default()
+        } else {
+            request.commits.as_slice()
+        };
+        let verdict_started = Instant::now();
+        let verdict_certificate =
+            build_graph_promotion_verdict_certificate(receipts, commits, &request.user_overrides)
+                .map_err(|error| error.to_string())?;
+        if !verdict_certificate.no_topology_writes {
+            return Err("snapshot analysis attempted topology writes".to_owned());
+        }
+        let verdict_build_micros = verdict_started.elapsed().as_micros();
+        let siegel = request.siegel.as_ref().map(run_siegel_finsler_kernel);
+        let total_micros = started.elapsed().as_micros();
+
+        Ok(
+            DesktopSnapshotAnalysisResponse {
+                schema_version: "phoenix-graph-snapshot-analysis-native-output/v1",
+                source: "rust",
+                bridge: ChunkSemanticBridgeResponse {
+                    schema_version: "phoenix-chunk-semantic-bridge-native-output/v1".to_owned(),
+                    source: "rust".to_owned(),
+                    candidates: bridge_run.candidates,
+                    cross_document_certificate: bridge_run.cross_document_certificate,
+                    quality_gate: bridge_quality_gate,
+                    timing: ChunkSemanticBridgeTiming {
+                        bridge_build_micros,
+                        total_micros: bridge_build_micros,
+                    },
+                },
+                continuity: StoryContinuityResponse {
+                    schema_version: "phoenix-story-continuity-native-output/v1".to_owned(),
+                    source: "rust".to_owned(),
+                    contract: continuity_contract,
+                    timing: StoryContinuityTiming {
+                        continuity_build_micros,
+                        total_micros: continuity_build_micros,
+                    },
+                },
+                governance: MemoryGovernanceResponse {
+                    schema_version: "phoenix-memory-governance-native-output/v1".to_owned(),
+                    source: "rust".to_owned(),
+                    candidates: governance_candidates,
+                    timing: MemoryGovernanceTiming {
+                        governance_build_micros,
+                        total_micros: governance_build_micros,
+                    },
+                },
+                retrieval: retrieval_experiment.map(|experiment| {
+                    MemoryGovernanceRetrievalExperimentResponse {
+                        schema_version:
+                            "phoenix-memory-governance-retrieval-experiment-native-output/v1"
+                                .to_owned(),
+                        source: "rust".to_owned(),
+                        experiment,
+                        timing: MemoryGovernanceRetrievalExperimentTiming {
+                            governance_build_micros: 0,
+                            experiment_build_micros: retrieval_build_micros,
+                            total_micros: retrieval_build_micros,
+                        },
+                    }
+                }),
+                promotion: PromotionVerdictResponse {
+                    schema_version: "phoenix-graph-promotion-verdict-native-output/v1".to_owned(),
+                    source: "rust".to_owned(),
+                    certificate: verdict_certificate,
+                    timing: PromotionVerdictTiming {
+                        verdict_build_micros,
+                        total_micros: verdict_build_micros,
+                    },
+                },
+                siegel,
+                no_topology_writes: true,
+                timing: DesktopSnapshotAnalysisTiming {
+                    bridge_build_micros: bridge_build_micros as f64,
+                    continuity_build_micros: continuity_build_micros as f64,
+                    governance_build_micros: governance_build_micros as f64,
+                    retrieval_build_micros: retrieval_build_micros as f64,
+                    verdict_build_micros: verdict_build_micros as f64,
+                    total_micros: total_micros as f64,
+                },
+            },
+        )
+    }
+
+    fn resolve_graph_run_documents(
+        &self,
+        documents: &[DesktopSnapshotAnalysisDocument],
+    ) -> Result<Vec<DocumentChunkInput>, String> {
+        let coordinator = self
+            .graph_runs
+            .lock()
+            .map_err(|_| "graph run coordinator lock poisoned".to_owned())?;
+        documents
+            .iter()
+            .map(|document| {
+                let text = match (&document.text, &document.text_hash) {
+                    (Some(text), _) => text.clone(),
+                    (None, Some(text_hash)) => coordinator
+                        .document(text_hash)
+                        .map(|text| text.to_string())
+                        .ok_or_else(|| {
+                            format!("resident graph document is unavailable: {text_hash}")
+                        })?,
+                    (None, None) => {
+                        return Err(format!(
+                            "graph analysis document has neither text nor textHash: {}",
+                            document.note_id
+                        ));
+                    }
+                };
+                Ok(DocumentChunkInput {
+                    note_id: document.note_id.clone(),
+                    text,
+                })
+            })
+            .collect()
+    }
+
     fn with_host_json<Request, Response, F>(
         &self,
         request_json: String,
@@ -886,6 +2625,1029 @@ impl PhoenixApiImpl {
         let response = op(&guard.host, request).map_err(|error| error.to_string())?;
         serialize_json(&response)
     }
+}
+
+fn project_graph_run_page(
+    analysis: &DesktopSnapshotAnalysisResponse,
+    offset: usize,
+    limit: usize,
+) -> (DesktopSnapshotAnalysisResponse, usize, usize, usize) {
+    let mut page = GraphRunPageCursor::new(offset, limit);
+    let bridge = &analysis.bridge;
+    let cross_document = &bridge.cross_document_certificate;
+    let projected_bridge = ChunkSemanticBridgeResponse {
+        schema_version: bridge.schema_version.clone(),
+        source: bridge.source.clone(),
+        candidates: page.take(&bridge.candidates),
+        cross_document_certificate: CrossDocumentBridgeRunCertificate {
+            schema_version: cross_document.schema_version.clone(),
+            source_document_ids: cross_document.source_document_ids.clone(),
+            generated_candidates: cross_document.generated_candidates,
+            eligible_candidates: cross_document.eligible_candidates,
+            selected_candidates: cross_document.selected_candidates,
+            rejected_candidates: cross_document.rejected_candidates,
+            pair_coverage: page.take(&cross_document.pair_coverage),
+            rejection_counts: cross_document.rejection_counts.clone(),
+            selected_rows: page.take(&cross_document.selected_rows),
+            rejected_rows: page.take(&cross_document.rejected_rows),
+            weakest_rows: page.take(&cross_document.weakest_rows),
+            no_topology_writes: cross_document.no_topology_writes,
+            invariant_receipts: cross_document.invariant_receipts.clone(),
+        },
+        quality_gate: bridge.quality_gate.clone(),
+        timing: bridge.timing.clone(),
+    };
+
+    let continuity = &analysis.continuity;
+    let contract = &continuity.contract;
+    let projected_continuity = StoryContinuityResponse {
+        schema_version: continuity.schema_version.clone(),
+        source: continuity.source.clone(),
+        contract: StoryContinuityContract {
+            schema_version: contract.schema_version.clone(),
+            source: contract.source.clone(),
+            source_snapshot_id: contract.source_snapshot_id.clone(),
+            generated_at: contract.generated_at,
+            commit_policy: contract.commit_policy.clone(),
+            no_topology_commit: contract.no_topology_commit,
+            events: page.take(&contract.events),
+            boundary_receipts: page.take(&contract.boundary_receipts),
+            episodes: page.take(&contract.episodes),
+            temporal_candidates: page.take(&contract.temporal_candidates),
+            state_intervals: page.take(&contract.state_intervals),
+            causal_candidates: page.take(&contract.causal_candidates),
+            episode_connections: page.take(&contract.episode_connections),
+            conflicts: page.take(&contract.conflicts),
+            certificate: contract.certificate.clone(),
+        },
+        timing: continuity.timing.clone(),
+    };
+
+    let governance = &analysis.governance;
+    let projected_governance = MemoryGovernanceResponse {
+        schema_version: governance.schema_version.clone(),
+        source: governance.source.clone(),
+        candidates: page.take(&governance.candidates),
+        timing: governance.timing.clone(),
+    };
+    let projected_retrieval = analysis.retrieval.as_ref().map(|retrieval| {
+        let variants = retrieval
+            .experiment
+            .variants
+            .iter()
+            .map(|variant| MemoryGovernanceRetrievalWeightingVariant {
+                policy: variant.policy.clone(),
+                summary: variant.summary.clone(),
+                full_row_proof: MemoryGovernanceRetrievalFullRowProof {
+                    row_count: variant.full_row_proof.row_count,
+                    no_topology_rows: variant.full_row_proof.no_topology_rows,
+                    compression_dominance: MemoryGovernanceCompressionDominanceProof {
+                        passed: variant.full_row_proof.compression_dominance.passed,
+                        compressed_rows: variant
+                            .full_row_proof
+                            .compression_dominance
+                            .compressed_rows,
+                        policy_rows: variant.full_row_proof.compression_dominance.policy_rows,
+                        bounded_rows: variant.full_row_proof.compression_dominance.bounded_rows,
+                        max_positive_delta: variant
+                            .full_row_proof
+                            .compression_dominance
+                            .max_positive_delta,
+                        max_adjusted_score: variant
+                            .full_row_proof
+                            .compression_dominance
+                            .max_adjusted_score,
+                        violation_count: variant
+                            .full_row_proof
+                            .compression_dominance
+                            .violation_count,
+                        violations: page
+                            .take(&variant.full_row_proof.compression_dominance.violations),
+                    },
+                },
+                top_rows: page.take(&variant.top_rows),
+                mean_abs_rank_delta_millis: variant.mean_abs_rank_delta_millis,
+                retained_mean_score_delta_millis: variant.retained_mean_score_delta_millis,
+                compressed_mean_score_delta_millis: variant.compressed_mean_score_delta_millis,
+                attenuated_mean_score_delta_millis: variant.attenuated_mean_score_delta_millis,
+            })
+            .collect();
+        MemoryGovernanceRetrievalExperimentResponse {
+            schema_version: retrieval.schema_version.clone(),
+            source: retrieval.source.clone(),
+            experiment: MemoryGovernanceRetrievalWeightingExperiment {
+                schema_version: retrieval.experiment.schema_version.clone(),
+                baseline_policy_id: retrieval.experiment.baseline_policy_id.clone(),
+                variants,
+                no_topology_commit: retrieval.experiment.no_topology_commit,
+            },
+            timing: retrieval.timing.clone(),
+        }
+    });
+
+    let promotion = &analysis.promotion;
+    let certificate = &promotion.certificate;
+    let projected_promotion = PromotionVerdictResponse {
+        schema_version: promotion.schema_version.clone(),
+        source: promotion.source.clone(),
+        certificate: GraphPromotionVerdictCertificate {
+            schema_version: certificate.schema_version.clone(),
+            source: certificate.source.clone(),
+            no_topology_writes: certificate.no_topology_writes,
+            receipt_count: certificate.receipt_count,
+            commit_count: certificate.commit_count,
+            audit: certificate.audit.clone(),
+            rows: page.take(&certificate.rows),
+        },
+        timing: promotion.timing.clone(),
+    };
+
+    let projection = DesktopSnapshotAnalysisResponse {
+        schema_version: analysis.schema_version,
+        source: analysis.source,
+        bridge: projected_bridge,
+        continuity: projected_continuity,
+        governance: projected_governance,
+        retrieval: projected_retrieval,
+        promotion: projected_promotion,
+        siegel: analysis.siegel.clone(),
+        no_topology_writes: analysis.no_topology_writes,
+        timing: analysis.timing.clone(),
+    };
+    (projection, page.seen, page.returned, page.seen)
+}
+
+struct GraphRunPageCursor {
+    offset: usize,
+    limit: usize,
+    seen: usize,
+    returned: usize,
+}
+
+impl GraphRunPageCursor {
+    fn new(offset: usize, limit: usize) -> Self {
+        Self {
+            offset,
+            limit,
+            seen: 0,
+            returned: 0,
+        }
+    }
+
+    fn take<T: Clone>(&mut self, rows: &[T]) -> Vec<T> {
+        let family_start = self.seen;
+        self.seen = self.seen.saturating_add(rows.len());
+        if self.returned >= self.limit || self.offset >= self.seen {
+            return Vec::new();
+        }
+        let start = self.offset.saturating_sub(family_start).min(rows.len());
+        let remaining = self.limit.saturating_sub(self.returned);
+        let selected = rows
+            .iter()
+            .skip(start)
+            .take(remaining)
+            .cloned()
+            .collect::<Vec<_>>();
+        self.returned = self.returned.saturating_add(selected.len());
+        selected
+    }
+}
+
+fn graph_run_counts(analysis: &DesktopSnapshotAnalysisResponse) -> DesktopGraphRunCounts {
+    let mut bridge_by_type = BTreeMap::new();
+    for candidate in &analysis.bridge.candidates {
+        *bridge_by_type
+            .entry(candidate.bridge_type.as_str().to_owned())
+            .or_insert(0) += 1;
+    }
+    let mut governance_by_action = BTreeMap::new();
+    for candidate in &analysis.governance.candidates {
+        *governance_by_action
+            .entry(candidate.action.as_str().to_owned())
+            .or_insert(0) += 1;
+    }
+    DesktopGraphRunCounts {
+        bridge_candidates: analysis.bridge.candidates.len() as u32,
+        bridge_by_type,
+        cross_document_pair_coverage: count_for_wire(
+            analysis
+                .bridge
+                .cross_document_certificate
+                .pair_coverage
+                .len(),
+        ),
+        cross_document_selected: count_for_wire(
+            analysis
+                .bridge
+                .cross_document_certificate
+                .selected_rows
+                .len(),
+        ),
+        cross_document_rejected: count_for_wire(
+            analysis
+                .bridge
+                .cross_document_certificate
+                .rejected_rows
+                .len(),
+        ),
+        cross_document_weakest: count_for_wire(
+            analysis
+                .bridge
+                .cross_document_certificate
+                .weakest_rows
+                .len(),
+        ),
+        promotion_rows: count_for_wire(analysis.promotion.certificate.rows.len()),
+        continuity_events: count_for_wire(analysis.continuity.contract.events.len()),
+        continuity_boundaries: count_for_wire(analysis.continuity.contract.boundary_receipts.len()),
+        continuity_episodes: count_for_wire(analysis.continuity.contract.episodes.len()),
+        continuity_temporal: count_for_wire(analysis.continuity.contract.temporal_candidates.len()),
+        continuity_states: count_for_wire(analysis.continuity.contract.state_intervals.len()),
+        continuity_causal: count_for_wire(analysis.continuity.contract.causal_candidates.len()),
+        continuity_connections: count_for_wire(
+            analysis.continuity.contract.episode_connections.len(),
+        ),
+        continuity_conflicts: count_for_wire(analysis.continuity.contract.conflicts.len()),
+        governance_candidates: analysis.governance.candidates.len() as u32,
+        governance_by_action,
+        retrieval_top_rows: count_for_wire(analysis.retrieval.as_ref().map_or(0, |retrieval| {
+            retrieval
+                .experiment
+                .variants
+                .iter()
+                .map(|variant| variant.top_rows.len())
+                .sum()
+        })),
+        retrieval_violations: count_for_wire(analysis.retrieval.as_ref().map_or(0, |retrieval| {
+            retrieval
+                .experiment
+                .variants
+                .iter()
+                .map(|variant| {
+                    variant
+                        .full_row_proof
+                        .compression_dominance
+                        .violations
+                        .len()
+                })
+                .sum()
+        })),
+    }
+}
+
+fn graph_run_resident_bytes(analysis: &DesktopSnapshotAnalysisResponse) -> usize {
+    let continuity = &analysis.continuity.contract;
+    let mut rows = analysis.bridge.candidates.len()
+        + analysis
+            .bridge
+            .cross_document_certificate
+            .selected_rows
+            .len()
+        + analysis
+            .bridge
+            .cross_document_certificate
+            .rejected_rows
+            .len()
+        + analysis
+            .bridge
+            .cross_document_certificate
+            .weakest_rows
+            .len()
+        + analysis.promotion.certificate.rows.len()
+        + continuity.events.len()
+        + continuity.boundary_receipts.len()
+        + continuity.episodes.len()
+        + continuity.temporal_candidates.len()
+        + continuity.state_intervals.len()
+        + continuity.causal_candidates.len()
+        + continuity.episode_connections.len()
+        + continuity.conflicts.len()
+        + analysis.governance.candidates.len();
+    if let Some(retrieval) = analysis.retrieval.as_ref() {
+        for variant in &retrieval.experiment.variants {
+            rows = rows.saturating_add(variant.top_rows.len()).saturating_add(
+                variant
+                    .full_row_proof
+                    .compression_dominance
+                    .violations
+                    .len(),
+            );
+        }
+    }
+    std::mem::size_of_val(analysis)
+        .saturating_add(4 * 1024)
+        .saturating_add(rows.saturating_mul(512))
+}
+
+struct DiscoveryCandidateState {
+    key: String,
+    token: String,
+    kind: String,
+    score: f64,
+    count: u32,
+    surfaces: FastHashMap<String, (u32, usize)>,
+}
+
+fn normalize_discovery_key(value: &str) -> String {
+    value
+        .split_whitespace()
+        .collect::<Vec<_>>()
+        .join(" ")
+        .to_lowercase()
+}
+
+fn update_discovery_candidate(
+    states: &mut FastHashMap<String, DiscoveryCandidateState>,
+    key: String,
+    surface: String,
+    kind: &str,
+    score: f64,
+    index: usize,
+) {
+    let state = states
+        .entry(key.clone())
+        .or_insert_with(|| DiscoveryCandidateState {
+            key,
+            token: surface.clone(),
+            kind: kind.to_owned(),
+            score,
+            count: 0,
+            surfaces: FastHashMap::new(),
+        });
+    state.count += 1;
+    state.score = state.score.max(score);
+    if state.kind == "UNKNOWN" && kind != "UNKNOWN" {
+        state.kind = kind.to_owned();
+    }
+    let stats = state.surfaces.entry(surface).or_insert((0, index));
+    stats.0 += 1;
+    if let Some((preferred, _)) = state.surfaces.iter().max_by(|left, right| {
+        left.1
+             .0
+            .cmp(&right.1 .0)
+            .then_with(|| left.0.len().cmp(&right.0.len()))
+            .then_with(|| right.1 .1.cmp(&left.1 .1))
+    }) {
+        state.token.clone_from(preferred);
+    }
+}
+
+fn finish_discovery_candidates(
+    states: FastHashMap<String, DiscoveryCandidateState>,
+) -> Vec<DesktopDiscoveryCandidate> {
+    let mut candidates = states
+        .into_values()
+        .map(|state| DesktopDiscoveryCandidate {
+            key: state.key,
+            token: state.token,
+            kind: state.kind,
+            score: state.score,
+            count: state.count,
+            status: 0,
+        })
+        .collect::<Vec<_>>();
+    candidates.sort_by(|left, right| {
+        right
+            .count
+            .cmp(&left.count)
+            .then_with(|| right.score.total_cmp(&left.score))
+            .then_with(|| left.token.cmp(&right.token))
+    });
+    candidates
+}
+
+fn intern_batch_string(
+    value: &str,
+    values: &mut Vec<String>,
+    indexes: &mut HashMap<String, u32>,
+) -> u32 {
+    if let Some(index) = indexes.get(value) {
+        return *index;
+    }
+    let index = values.len() as u32;
+    let owned = value.to_owned();
+    values.push(owned.clone());
+    indexes.insert(owned, index);
+    index
+}
+
+fn document_text_hash(text: &str) -> String {
+    let mut hasher = std::collections::hash_map::DefaultHasher::new();
+    text.as_bytes().hash(&mut hasher);
+    format!("text:{:016x}", hasher.finish())
+}
+
+fn graph_analysis_section_roots(
+    request: &DesktopSnapshotAnalysisRequest,
+    documents: &[DocumentChunkInput],
+) -> Result<BTreeMap<String, String>, String> {
+    let snapshot_content = graph_snapshot_dependency_digest(&request.snapshot);
+    let mut hasher = blake3::Hasher::new();
+    graph_digest_part(&mut hasher, b"phoenix-graph-analysis-core/v1");
+    graph_digest_part(&mut hasher, snapshot_content.as_bytes());
+    graph_digest_part(&mut hasher, request.snapshot.scope_id.as_bytes());
+    for document in documents {
+        graph_digest_part(&mut hasher, document.note_id.as_bytes());
+        graph_digest_part(&mut hasher, document_text_hash(&document.text).as_bytes());
+    }
+    let core = format!("b3-{}", hasher.finalize().to_hex());
+    let semantic = if let Some(handle) = &request.document_semantic_handle {
+        dependency_digest("semantic-handle", &[handle.as_bytes()])
+    } else {
+        dependency_json(&request.document_semantic_summary)?
+    };
+    let hyperedges = dependency_json(&request.snapshot.document_compiler_summary)?;
+    let retrieval_inputs = dependency_json(&request.retrieval_candidates)?;
+    let promotion = promotion_dependency_digest(
+        &snapshot_content,
+        &request.receipts,
+        &request.commits,
+        &request.user_overrides,
+    )?;
+    let siegel = dependency_json(&request.siegel)?;
+    let governance = dependency_digest("governance", &[snapshot_content.as_bytes()]);
+    Ok(BTreeMap::from([
+        ("bridge".to_owned(), core.clone()),
+        (
+            "hyperedges".to_owned(),
+            dependency_digest("hyperedges", &[hyperedges.as_bytes()]),
+        ),
+        (
+            "continuity".to_owned(),
+            dependency_digest("continuity", &[core.as_bytes(), semantic.as_bytes()]),
+        ),
+        ("governance".to_owned(), governance.clone()),
+        (
+            "retrieval".to_owned(),
+            dependency_digest(
+                "retrieval",
+                &[governance.as_bytes(), retrieval_inputs.as_bytes()],
+            ),
+        ),
+        ("promotion".to_owned(), promotion),
+        ("siegel".to_owned(), siegel),
+        (
+            "metadata".to_owned(),
+            dependency_digest("metadata", &[b"candidate-only"]),
+        ),
+    ]))
+}
+
+fn graph_analysis_identity(section_roots: &BTreeMap<String, String>) -> GraphAnalysisIdentity {
+    let mut canonical = Vec::with_capacity(512);
+    push_graph_identity_part(
+        &mut canonical,
+        b"phoenix-graph-analysis-content-identity/v1",
+    );
+    push_graph_identity_part(
+        &mut canonical,
+        b"phoenix-graph-snapshot-analysis-native-output/v1",
+    );
+    for (name, root) in section_roots {
+        push_graph_identity_part(&mut canonical, name.as_bytes());
+        push_graph_identity_part(&mut canonical, root.as_bytes());
+    }
+    let digest = format!("b3-{}", blake3::hash(&canonical).to_hex());
+    GraphAnalysisIdentity {
+        digest,
+        canonical: Arc::from(canonical),
+    }
+}
+
+fn push_graph_identity_part(target: &mut Vec<u8>, bytes: &[u8]) {
+    target.extend_from_slice(&(bytes.len() as u64).to_le_bytes());
+    target.extend_from_slice(bytes);
+}
+
+fn graph_snapshot_dependency_digest(snapshot: &GraphRebuildSnapshot) -> String {
+    let mut hasher = blake3::Hasher::new();
+    graph_digest_part(&mut hasher, b"phoenix-graph-snapshot-semantic-content/v1");
+    graph_digest_part(&mut hasher, snapshot.schema_version.as_bytes());
+    graph_digest_part(&mut hasher, snapshot.scope_id.as_bytes());
+    macro_rules! text {
+        ($value:expr) => {
+            graph_digest_part(&mut hasher, $value.as_bytes())
+        };
+    }
+    macro_rules! float {
+        ($value:expr) => {
+            graph_digest_part(&mut hasher, &$value.to_bits().to_le_bytes())
+        };
+    }
+    for row in &snapshot.chunks {
+        text!(row.id);
+        text!(row.note_id);
+        graph_digest_part(&mut hasher, &row.start.to_le_bytes());
+        graph_digest_part(&mut hasher, &row.end.to_le_bytes());
+    }
+    for row in &snapshot.mentions {
+        text!(row.id);
+        text!(row.note_id);
+        text!(row.surface);
+        graph_digest_part(&mut hasher, &row.source_start.to_le_bytes());
+        graph_digest_part(&mut hasher, &row.source_end.to_le_bytes());
+        if let Some(id) = &row.entity_id {
+            text!(id.0);
+        }
+        text!(row.status);
+        float!(row.confidence);
+    }
+    for row in &snapshot.entity_anchors {
+        text!(row.id);
+        text!(row.entity_id.0);
+        text!(row.note_id);
+        graph_digest_part(&mut hasher, &row.source_start.to_le_bytes());
+        graph_digest_part(&mut hasher, &row.source_end.to_le_bytes());
+        float!(row.confidence);
+    }
+    for row in &snapshot.relationships {
+        text!(row.id);
+        text!(row.source_entity_id.0);
+        text!(row.target_entity_id.0);
+        text!(row.relation_type);
+        text!(row.status);
+        float!(row.confidence);
+    }
+    for row in &snapshot.events {
+        text!(row.id);
+        text!(row.note_id);
+        text!(row.label);
+        for id in &row.entity_ids {
+            text!(id.0);
+        }
+        for id in &row.evidence_anchor_ids {
+            text!(id);
+        }
+        float!(row.confidence);
+    }
+    for row in &snapshot.episodes {
+        text!(row.id);
+        text!(row.note_id);
+        text!(row.label);
+        for id in &row.event_ids {
+            text!(id);
+        }
+        for id in &row.entity_ids {
+            text!(id.0);
+        }
+    }
+    for row in snapshot.temporal_edges.iter().chain(&snapshot.causal_edges) {
+        text!(row.id);
+        text!(row.source_id);
+        text!(row.target_id);
+        text!(row.relation_type);
+        for id in &row.evidence_ids {
+            text!(id);
+        }
+        float!(row.confidence);
+    }
+    for row in &snapshot.memory_state {
+        text!(row.id);
+        text!(row.entity_id.0);
+        text!(row.key);
+        text!(row.value);
+        for id in &row.evidence_ids {
+            text!(id);
+        }
+    }
+    for row in &snapshot.embedding_targets {
+        text!(row.id);
+        text!(row.kind);
+        text!(row.source_id);
+        text!(row.label);
+        text!(row.text);
+        for id in &row.evidence_ids {
+            text!(id);
+        }
+        for id in &row.parent_ids {
+            text!(id);
+        }
+    }
+    for row in &snapshot.nodes {
+        text!(row.id.0);
+        text!(row.label);
+        text!(row.kind);
+        for id in &row.anchor_ids {
+            text!(id);
+        }
+        for id in &row.note_ids {
+            text!(id);
+        }
+    }
+    for row in &snapshot.edges {
+        text!(row.id);
+        text!(row.source_id.0);
+        text!(row.target_id.0);
+        text!(row.edge_type);
+        graph_digest_part(&mut hasher, &row.weight.to_le_bytes());
+        float!(row.confidence);
+        for id in &row.evidence_anchor_ids {
+            text!(id);
+        }
+    }
+    format!("b3-{}", hasher.finalize().to_hex())
+}
+
+fn promotion_dependency_digest(
+    snapshot_content: &str,
+    receipts: &[GraphProposalBatchReceipt],
+    commits: &[GraphTruthCommit],
+    overrides: &[GraphPromotionUserOverride],
+) -> Result<String, String> {
+    let mut hasher = blake3::Hasher::new();
+    graph_digest_part(&mut hasher, b"phoenix-graph-promotion-dependency/v1");
+    graph_digest_part(&mut hasher, snapshot_content.as_bytes());
+    let receipts = serde_json::to_vec(receipts)
+        .map_err(|error| format!("hash promotion receipts: {error}"))?;
+    graph_digest_part(&mut hasher, &receipts);
+    for commit in commits {
+        graph_digest_part(&mut hasher, commit.commit_id().as_bytes());
+    }
+    let overrides = serde_json::to_vec(overrides)
+        .map_err(|error| format!("hash promotion overrides: {error}"))?;
+    graph_digest_part(&mut hasher, &overrides);
+    Ok(format!("b3-{}", hasher.finalize().to_hex()))
+}
+
+fn dependency_json<T: Serialize>(value: &T) -> Result<String, String> {
+    let bytes = serde_json::to_vec(value)
+        .map_err(|error| format!("hash graph analysis dependency: {error}"))?;
+    Ok(dependency_digest("json", &[&bytes]))
+}
+
+fn dependency_digest(domain: &str, parts: &[&[u8]]) -> String {
+    let mut hasher = blake3::Hasher::new();
+    graph_digest_part(&mut hasher, b"phoenix-graph-analysis-dependency/v1");
+    graph_digest_part(&mut hasher, domain.as_bytes());
+    for part in parts {
+        graph_digest_part(&mut hasher, part);
+    }
+    format!("b3-{}", hasher.finalize().to_hex())
+}
+
+fn graph_digest_part(hasher: &mut blake3::Hasher, bytes: &[u8]) {
+    hasher.update(&(bytes.len() as u64).to_le_bytes());
+    hasher.update(bytes);
+}
+
+fn build_or_load_document_semantics(
+    request: &DocumentSemanticRequest,
+    root: Option<&Path>,
+    coordinator: &Arc<Mutex<GraphRunCoordinator>>,
+) -> Result<
+    (
+        Arc<DocumentSemanticSummary>,
+        DocumentSemanticArtifactStats,
+        String,
+    ),
+    String,
+> {
+    let canonical = canonical_document_semantic_request(request);
+    let summary_identity = document_semantic_summary_identity(&canonical)?;
+    if let Some(summary) = coordinator
+        .lock()
+        .map_err(|_| "graph run coordinator lock poisoned".to_owned())?
+        .semantic_summary(&summary_identity)
+    {
+        return Ok((
+            summary,
+            DocumentSemanticArtifactStats {
+                documents_reused: request.documents.len(),
+                summary_cache_hit: true,
+                ..DocumentSemanticArtifactStats::default()
+            },
+            summary_identity,
+        ));
+    }
+
+    let entity_bytes = serde_json::to_vec(&canonical.entities)
+        .map_err(|error| format!("identify document semantic entity binding: {error}"))?;
+    let mut documents = Vec::<DocumentSemanticDocument>::with_capacity(request.documents.len());
+    let mut stats = DocumentSemanticArtifactStats::default();
+    for document in &canonical.documents {
+        let text_identity = document_semantic_text_identity(document);
+        let identity = document_semantic_binding_identity(&text_identity, &entity_bytes);
+        let (slot, owns_build) = coordinator
+            .lock()
+            .map_err(|_| "graph run coordinator lock poisoned".to_owned())?
+            .semantic_document_slot(&identity);
+        let artifact = slot
+            .get_or_init(|| {
+                let cached = match root {
+                    Some(root) => load_immutable_artifact::<DocumentSemanticDocument>(
+                        root,
+                        DOCUMENT_SEMANTIC_ARTIFACT_NAMESPACE,
+                        &identity,
+                    )?,
+                    None => None,
+                };
+                if let Some(document) = cached {
+                    return Ok(Arc::new(DocumentSemanticArtifact {
+                        document,
+                        built: false,
+                        raw_bytes_written: 0,
+                        compressed_bytes_written: 0,
+                    }));
+                }
+                let semantic = build_document_semantic_document(document, &canonical.entities);
+                let (raw_bytes_written, compressed_bytes_written) = if let Some(root) = root {
+                    let (raw, compressed, _) = persist_immutable_artifact(
+                        root,
+                        DOCUMENT_SEMANTIC_ARTIFACT_NAMESPACE,
+                        &identity,
+                        &semantic,
+                    )?;
+                    (raw, compressed)
+                } else {
+                    (0, 0)
+                };
+                Ok(Arc::new(DocumentSemanticArtifact {
+                    document: semantic,
+                    built: true,
+                    raw_bytes_written,
+                    compressed_bytes_written,
+                }))
+            })
+            .clone()?;
+        documents.push(artifact.document.clone());
+        if !owns_build || !artifact.built {
+            stats.documents_reused += 1;
+        } else {
+            stats.documents_built += 1;
+            stats.raw_bytes_written += artifact.raw_bytes_written;
+            stats.compressed_bytes_written += artifact.compressed_bytes_written;
+        }
+    }
+
+    let summary = Arc::new(merge_document_semantic_documents(documents));
+    if let Some(root) = root {
+        let _ = persist_immutable_artifact(
+            root,
+            DOCUMENT_SEMANTIC_SUMMARY_NAMESPACE,
+            &summary_identity,
+            summary.as_ref(),
+        )?;
+    }
+    coordinator
+        .lock()
+        .map_err(|_| "graph run coordinator lock poisoned".to_owned())?
+        .retain_semantic_summary(summary_identity.clone(), summary.clone());
+    Ok((summary, stats, summary_identity))
+}
+
+fn canonical_document_semantic_request(
+    request: &DocumentSemanticRequest,
+) -> DocumentSemanticRequest {
+    let mut canonical = request.clone();
+    canonical
+        .documents
+        .sort_by(|left, right| left.note_id.cmp(&right.note_id));
+    for entity in &mut canonical.entities {
+        entity.aliases.sort();
+        entity.aliases.dedup();
+    }
+    canonical
+        .entities
+        .sort_by(|left, right| left.id.cmp(&right.id));
+    canonical
+}
+
+fn document_semantic_summary_identity(request: &DocumentSemanticRequest) -> Result<String, String> {
+    let bytes = serde_json::to_vec(request)
+        .map_err(|error| format!("identify document semantic summary: {error}"))?;
+    let mut hasher = blake3::Hasher::new();
+    graph_digest_part(&mut hasher, b"phoenix-document-semantic-summary/v2");
+    graph_digest_part(&mut hasher, &bytes);
+    Ok(format!("b3-{}", hasher.finalize().to_hex()))
+}
+
+fn document_semantic_text_identity(
+    document: &phoenix_graph_rebuild::DocumentSemanticInput,
+) -> String {
+    let mut hasher = blake3::Hasher::new();
+    graph_digest_part(&mut hasher, b"phoenix-document-semantic-text/v1");
+    graph_digest_part(&mut hasher, document.note_id.as_bytes());
+    graph_digest_part(&mut hasher, document.text.as_bytes());
+    format!("b3-{}", hasher.finalize().to_hex())
+}
+
+fn document_semantic_binding_identity(text_identity: &str, entity_bytes: &[u8]) -> String {
+    let mut hasher = blake3::Hasher::new();
+    graph_digest_part(&mut hasher, b"phoenix-document-semantic-binding/v1");
+    graph_digest_part(&mut hasher, text_identity.as_bytes());
+    graph_digest_part(&mut hasher, entity_bytes);
+    format!("b3-{}", hasher.finalize().to_hex())
+}
+
+fn document_discovery_artifact_identity(text: &str, resolver_bytes: &[u8]) -> String {
+    let mut hasher = blake3::Hasher::new();
+    graph_digest_part(&mut hasher, b"phoenix-document-discovery-artifact/v1");
+    graph_digest_part(&mut hasher, text.as_bytes());
+    graph_digest_part(&mut hasher, resolver_bytes);
+    format!("b3-{}", hasher.finalize().to_hex())
+}
+
+fn desktop_graph_run_store_path(
+    config: Option<&phoenix_native::PhoenixNativeConfig>,
+) -> Option<PathBuf> {
+    let config = config?;
+    if config.runtime.target != RuntimeTarget::Native
+        || config.runtime.storage == StorageMode::NativeEphemeral
+    {
+        return None;
+    }
+    if let Some(path) = &config.storage_path {
+        return Some(path.join("graph-runs"));
+    }
+    platform_data_dir().map(|path| path.join("Phoenix Desktop").join("graph-runs"))
+}
+
+fn persist_graph_run_entry(
+    root: &std::path::Path,
+    run_handle: &str,
+    entry: &GraphRunEntry,
+) -> Result<DurableGraphRunReceipt, String> {
+    let mut transaction = GraphRunStoreTxn::open(
+        root.to_path_buf(),
+        run_handle,
+        &entry.scope_id,
+        &entry.snapshot_id,
+    )?;
+    macro_rules! persist {
+        ($name:literal, $rows:expr, $value:expr) => {{
+            let root = entry
+                .content
+                .section_roots
+                .get($name)
+                .ok_or_else(|| format!("graph run section dependency is missing: {}", $name))?;
+            let dependencies = vec![root.clone()];
+            transaction.persist_section(
+                $name,
+                section_identity(root, $name, &dependencies),
+                $rows,
+                dependencies,
+                $value,
+            )?;
+        }};
+    }
+    let analysis = entry.content.analysis.as_ref();
+    persist!(
+        "hyperedges",
+        entry
+            .content
+            .document_compiler
+            .as_ref()
+            .map_or(0, |summary| summary.hyperedges.len()),
+        &entry.content.document_compiler
+    );
+    persist!("bridge", analysis.bridge.candidates.len(), &analysis.bridge);
+    persist!(
+        "continuity",
+        analysis.continuity.contract.events.len()
+            + analysis.continuity.contract.episodes.len()
+            + analysis.continuity.contract.temporal_candidates.len()
+            + analysis.continuity.contract.causal_candidates.len()
+            + analysis.continuity.contract.conflicts.len(),
+        &analysis.continuity
+    );
+    persist!(
+        "governance",
+        analysis.governance.candidates.len(),
+        &analysis.governance
+    );
+    persist!(
+        "retrieval",
+        analysis
+            .retrieval
+            .as_ref()
+            .map_or(0, |row| row.experiment.variants.len()),
+        &analysis.retrieval
+    );
+    persist!(
+        "promotion",
+        analysis.promotion.certificate.rows.len(),
+        &analysis.promotion
+    );
+    persist!(
+        "siegel",
+        usize::from(analysis.siegel.is_some()),
+        &analysis.siegel
+    );
+    let metadata = DurableAnalysisMetadata {
+        schema_version: analysis.schema_version.to_owned(),
+        source: analysis.source.to_owned(),
+        no_topology_writes: analysis.no_topology_writes,
+    };
+    persist!("metadata", 1, &metadata);
+    transaction.commit()
+}
+
+fn load_durable_graph_run(
+    root: &std::path::Path,
+    run_handle: &str,
+) -> Result<Option<DesktopSnapshotAnalysisResponse>, String> {
+    let Some(manifest) = load_manifest_for_handle(root, run_handle)? else {
+        return Ok(None);
+    };
+    fn decode<T: DeserializeOwned>(
+        root: &std::path::Path,
+        manifest: &crate::graph_run_store::DurableGraphRunManifest,
+        name: &str,
+    ) -> Result<T, String> {
+        let section = manifest
+            .sections
+            .get(name)
+            .ok_or_else(|| format!("durable graph run section is missing: {name}"))?;
+        let bytes = load_section(root, section)?;
+        serde_json::from_slice(&bytes)
+            .map_err(|error| format!("decode durable graph run section {name}: {error}"))
+    }
+    let metadata: DurableAnalysisMetadata = decode(root, &manifest, "metadata")?;
+    if metadata.schema_version != "phoenix-graph-snapshot-analysis-native-output/v1"
+        || metadata.source != "rust"
+    {
+        return Err("durable graph run metadata contract mismatch".to_owned());
+    }
+    Ok(Some(DesktopSnapshotAnalysisResponse {
+        schema_version: "phoenix-graph-snapshot-analysis-native-output/v1",
+        source: "rust",
+        bridge: decode(root, &manifest, "bridge")?,
+        continuity: decode(root, &manifest, "continuity")?,
+        governance: decode(root, &manifest, "governance")?,
+        retrieval: decode(root, &manifest, "retrieval")?,
+        promotion: decode(root, &manifest, "promotion")?,
+        siegel: decode(root, &manifest, "siegel")?,
+        no_topology_writes: metadata.no_topology_writes,
+        timing: DesktopSnapshotAnalysisTiming {
+            bridge_build_micros: 0.0,
+            continuity_build_micros: 0.0,
+            governance_build_micros: 0.0,
+            retrieval_build_micros: 0.0,
+            verdict_build_micros: 0.0,
+            total_micros: 0.0,
+        },
+    }))
+}
+
+fn desktop_durable_graph_run_receipt(
+    receipt: DurableGraphRunReceipt,
+) -> DesktopGraphRunPersistReceipt {
+    DesktopGraphRunPersistReceipt {
+        schema_version: receipt.schema_version,
+        run_handle: receipt.run_handle,
+        scope_id: receipt.scope_id,
+        snapshot_id: receipt.snapshot_id,
+        manifest_id: receipt.manifest_id,
+        committed_at: receipt.committed_at as f64,
+        changed_sections: receipt.changed_sections,
+        reused_sections: receipt.reused_sections,
+        encoded_sections: receipt.encoded_sections,
+        compressed_sections: receipt.compressed_sections,
+        raw_bytes_written: receipt.raw_bytes_written as f64,
+        compressed_bytes_written: receipt.compressed_bytes_written as f64,
+    }
+}
+
+fn load_durable_promotion_verdict_inputs(
+    config: Option<&phoenix_native::PhoenixNativeConfig>,
+) -> Result<Option<DurablePromotionVerdictInputs>, String> {
+    let Some(config) = config else {
+        return Ok(None);
+    };
+    let Some(store_path) = desktop_overgraph_store_path(config) else {
+        return Ok(None);
+    };
+    if !store_path.exists() {
+        return Ok(None);
+    }
+    let store = PhoenixOvergraphStore::open(&store_path)
+        .map_err(|error| format!("open graph proposal receipt store: {error}"))?;
+    let receipts = store
+        .load_graph_proposal_receipts()
+        .map_err(|error| format!("load graph proposal receipts: {error}"))?;
+    let commits = store
+        .load_graph_truth_commits()
+        .map_err(|error| format!("load graph truth commits: {error}"))?;
+    Ok(Some(DurablePromotionVerdictInputs { receipts, commits }))
+}
+
+fn desktop_overgraph_store_path(config: &phoenix_native::PhoenixNativeConfig) -> Option<PathBuf> {
+    if config.runtime.target != RuntimeTarget::Native {
+        return None;
+    }
+    if let Some(path) = &config.storage_path {
+        return Some(path.join("phoenix-overgraph"));
+    }
+    if config.runtime.storage == StorageMode::NativeEphemeral {
+        return None;
+    }
+    platform_data_dir().map(|path| path.join("Phoenix Desktop").join("phoenix-overgraph"))
+}
+
+fn platform_data_dir() -> Option<PathBuf> {
+    std::env::var_os("LOCALAPPDATA")
+        .or_else(|| std::env::var_os("APPDATA"))
+        .map(PathBuf::from)
 }
 
 fn build_init_request(request: &DesktopInitRequest) -> RuntimeInitRequest {
@@ -929,6 +3691,13 @@ fn desktop_runtime_info(
         .unwrap_or_else(default_runtime_config);
     DesktopRuntimeInfo {
         banner: runtime_banner().to_owned(),
+        build_git_sha: env!("PHOENIX_BUILD_GIT_SHA").to_owned(),
+        build_profile: if cfg!(debug_assertions) {
+            "debug"
+        } else {
+            "release"
+        }
+        .to_owned(),
         target: runtime_target_name(runtime.target).to_owned(),
         ready: init_result.map(|result| result.ready).unwrap_or(false),
         storage: storage_mode_name(runtime.storage).to_owned(),
@@ -1097,6 +3866,412 @@ fn build_manifold_snapshot(
         },
         payload,
     })
+}
+
+fn build_graph_scene_packet(
+    host: &PhoenixNativeHost,
+    request: GraphScenePacketRequest,
+) -> Result<GraphScenePacket, String> {
+    let manifold = request
+        .manifold
+        .clone()
+        .unwrap_or_else(|| "hybrid".to_owned());
+    let layout_mode = request
+        .layout_mode
+        .clone()
+        .unwrap_or_else(|| layout_mode_for_manifold(&manifold).to_owned());
+    let source_mode = request
+        .source_mode
+        .clone()
+        .unwrap_or_else(|| "embeddings".to_owned());
+    let limit = request.limit.unwrap_or(4096).max(1);
+    let settings = request.settings.unwrap_or_default();
+    let requested_source = request.source.clone();
+
+    if is_scoped_snapshot_packet_source(requested_source.as_deref()) {
+        return Ok(compile_packet(
+            graph_scene_packet_input_from_scoped_snapshot(
+                host,
+                request.scope.as_ref(),
+                requested_source.unwrap_or_else(|| "scopedSnapshot".to_owned()),
+                manifold,
+                layout_mode,
+                source_mode,
+                limit,
+                settings,
+            )?,
+        ));
+    }
+
+    if let Some(nodes) = request.nodes {
+        let edges = request.edges.unwrap_or_default();
+        return Ok(compile_packet(GraphScenePacketInput {
+            source: request.source.unwrap_or_else(|| "inline".to_owned()),
+            manifold,
+            layout_mode,
+            source_mode,
+            source_label: "inline graph scene packet".to_owned(),
+            limit,
+            settings,
+            nodes,
+            edges,
+        }));
+    }
+
+    let snapshot = build_manifold_snapshot(
+        host,
+        DesktopManifoldSnapshotRequest {
+            manifold: Some(manifold.clone()),
+            scope: request.scope,
+            limit: Some(limit),
+        },
+    )?;
+    let nodes = snapshot
+        .payload
+        .nodes
+        .iter()
+        .map(scene_packet_node_from_desktop)
+        .collect::<Vec<_>>();
+    let edges = snapshot
+        .payload
+        .edges
+        .iter()
+        .map(scene_packet_edge_from_desktop)
+        .collect::<Vec<_>>();
+
+    Ok(compile_packet(GraphScenePacketInput {
+        source: request
+            .source
+            .unwrap_or_else(|| "manifoldSnapshot".to_owned()),
+        manifold: snapshot.manifold.to_owned(),
+        layout_mode,
+        source_mode,
+        source_label: snapshot.source_label.to_owned(),
+        limit,
+        settings,
+        nodes,
+        edges,
+    }))
+}
+
+fn layout_mode_for_manifold(manifold: &str) -> &'static str {
+    match manifold {
+        "hopf" => "hopfProjection",
+        "lorentz" => "lorentzTree",
+        "product" => "productManifold",
+        "siegel" => "siegelFinsler",
+        _ => "hybridSpace",
+    }
+}
+
+fn scene_packet_node_from_desktop(node: &DesktopManifoldNode) -> GraphScenePacketNodeInput {
+    GraphScenePacketNodeInput {
+        id: node.id.clone(),
+        label: node.label.clone(),
+        kind: node.kind.clone(),
+        source_type: node.source_type.clone(),
+        vector: node.vector.iter().map(|value| *value as f32).collect(),
+        base_vector: node
+            .base_vector
+            .map(|value| [value[0] as f32, value[1] as f32, value[2] as f32]),
+        total_mentions: None,
+        hierarchy_hint: None,
+    }
+}
+
+fn scene_packet_edge_from_desktop(edge: &DesktopManifoldEdge) -> GraphScenePacketEdgeInput {
+    GraphScenePacketEdgeInput {
+        id: edge.id.clone(),
+        source_id: edge.source_id.clone(),
+        target_id: edge.target_id.clone(),
+        edge_type: edge.edge_type.clone(),
+        confidence: edge.confidence as f32,
+    }
+}
+
+fn is_scoped_snapshot_packet_source(source: Option<&str>) -> bool {
+    matches!(
+        source,
+        Some("scopedSnapshot") | Some("graphRebuildSnapshot") | Some("scopedGraphRebuildSnapshot")
+    )
+}
+
+fn graph_scene_packet_input_from_scoped_snapshot(
+    host: &PhoenixNativeHost,
+    scope: Option<&Value>,
+    source: String,
+    manifold: String,
+    layout_mode: String,
+    _source_mode: String,
+    limit: usize,
+    settings: GraphScenePacketSettings,
+) -> Result<GraphScenePacketInput, String> {
+    let scope_id = scope
+        .map(|value| str_field(value, "scope_id", "scopeId"))
+        .filter(|value| !value.is_empty())
+        .ok_or_else(|| "graph scene packet scoped snapshot requires scope.scopeId".to_owned())?;
+    let row = store_relation_first(
+        host,
+        "scoped_documents",
+        json!({
+            "scope_folder_id": scope_id,
+            "namespace": GRAPH_REBUILD_NAMESPACE,
+            "document_key": GRAPH_MODEL_V2_OVERGRAPH_DOCUMENT_KEY,
+        }),
+    )?
+    .ok_or_else(|| format!("graph model v2 OverGraph document missing for scope {scope_id}"))?;
+    let payload = row
+        .get("payload")
+        .and_then(Value::as_str)
+        .map(str::to_owned)
+        .unwrap_or_else(|| row.get("payload").map(Value::to_string).unwrap_or_default());
+    if payload.is_empty() {
+        return Err(format!(
+            "graph model v2 OverGraph document for scope {scope_id} had no payload"
+        ));
+    }
+    let overgraph = decode_graph_rebuild_scoped_payload(&payload)?;
+    graph_scene_packet_input_from_overgraph_value(
+        &overgraph,
+        source,
+        manifold,
+        layout_mode,
+        limit,
+        settings,
+    )
+}
+
+fn graph_scene_packet_input_from_overgraph_value(
+    overgraph: &Value,
+    source: String,
+    manifold: String,
+    layout_mode: String,
+    limit: usize,
+    settings: GraphScenePacketSettings,
+) -> Result<GraphScenePacketInput, String> {
+    let graph_batch = overgraph
+        .get("graphBatch")
+        .ok_or_else(|| "graph model v2 OverGraph payload missing graphBatch".to_owned())?;
+    let vertices = graph_batch
+        .get("vertices")
+        .and_then(Value::as_array)
+        .ok_or_else(|| "graph model v2 OverGraph payload missing graphBatch.vertices".to_owned())?;
+    let edge_rows = graph_batch
+        .get("edges")
+        .and_then(Value::as_array)
+        .map(Vec::as_slice)
+        .unwrap_or(&[]);
+    let mut node_ids = HashSet::with_capacity(vertices.len());
+    let mut nodes = Vec::with_capacity(vertices.len());
+    for vertex in vertices {
+        let id = str_field(vertex, "id", "id");
+        if id.is_empty() {
+            continue;
+        }
+        node_ids.insert(id.to_owned());
+        let class_name = str_field(vertex, "class", "class");
+        let kind = str_field(vertex, "kind", "kind");
+        let label = overgraph_vertex_label(vertex, id);
+        nodes.push(GraphScenePacketNodeInput {
+            id: id.to_owned(),
+            label,
+            kind: if kind.is_empty() {
+                class_name.to_owned()
+            } else {
+                kind.to_owned()
+            },
+            source_type: overgraph_vertex_source_type(vertex).to_owned(),
+            vector: Vec::new(),
+            base_vector: None,
+            total_mentions: Some(overgraph_vertex_total_mentions(vertex)),
+            hierarchy_hint: None,
+        });
+    }
+
+    let mut edges = Vec::with_capacity(edge_rows.len());
+    let mut seen_edges = HashSet::with_capacity(edge_rows.len());
+    for edge in edge_rows {
+        let source_id = str_field(edge, "source_id", "sourceId");
+        let target_id = str_field(edge, "target_id", "targetId");
+        if source_id.is_empty()
+            || target_id.is_empty()
+            || !node_ids.contains(source_id)
+            || !node_ids.contains(target_id)
+        {
+            continue;
+        }
+        let edge_type = str_field(edge, "edge_type", "edgeType");
+        let edge_id = overgraph_edge_id(source_id, target_id, edge_type);
+        if !seen_edges.insert(edge_id.clone()) {
+            continue;
+        }
+        edges.push(GraphScenePacketEdgeInput {
+            id: edge_id,
+            source_id: source_id.to_owned(),
+            target_id: target_id.to_owned(),
+            edge_type: if edge_type.is_empty() {
+                "overgraph-edge".to_owned()
+            } else {
+                edge_type.to_owned()
+            },
+            confidence: overgraph_edge_confidence(edge),
+        });
+    }
+
+    Ok(GraphScenePacketInput {
+        source,
+        manifold,
+        layout_mode,
+        source_mode: "graph".to_owned(),
+        source_label: "Rust OverGraph rows (no synthetic vectors)".to_owned(),
+        limit,
+        settings,
+        nodes,
+        edges,
+    })
+}
+
+fn overgraph_vertex_label(vertex: &Value, id: &str) -> String {
+    if let Some(label) = vertex
+        .get("labels")
+        .and_then(Value::as_array)
+        .and_then(|labels| labels.iter().find_map(Value::as_str))
+        .filter(|label| !label.is_empty())
+    {
+        return label.to_owned();
+    }
+    let value_label = vertex
+        .get("value")
+        .and_then(|value| value.get("label"))
+        .and_then(Value::as_str)
+        .unwrap_or_default();
+    if value_label.is_empty() {
+        id.to_owned()
+    } else {
+        value_label.to_owned()
+    }
+}
+
+fn overgraph_vertex_source_type(vertex: &Value) -> &'static str {
+    match str_field(vertex, "class", "class") {
+        "document" => "document",
+        "chunk" => "chunk",
+        "entity" => "entity",
+        "mention" => "mention",
+        "timeAnchor" => "temporal",
+        "memory" | "state" => "memory",
+        "event" => "event",
+        "generic" => "graph",
+        _ => "overgraph",
+    }
+}
+
+fn overgraph_vertex_total_mentions(vertex: &Value) -> u32 {
+    let labels = vertex
+        .get("labels")
+        .and_then(Value::as_array)
+        .map(Vec::len)
+        .unwrap_or(0);
+    let evidence = vertex
+        .get("provenance")
+        .and_then(|provenance| provenance.get("evidenceRefs"))
+        .or_else(|| {
+            vertex
+                .get("provenance")
+                .and_then(|provenance| provenance.get("evidence_refs"))
+        })
+        .and_then(Value::as_array)
+        .map(Vec::len)
+        .unwrap_or(0);
+    let weight = f32_field(vertex, "weight")
+        .map(|value| (value.abs() / 200.0).ceil() as usize)
+        .unwrap_or(0);
+    count_for_wire(labels.max(evidence).max(weight).max(1))
+}
+
+fn overgraph_edge_id(source_id: &str, target_id: &str, edge_type: &str) -> String {
+    if edge_type.is_empty() {
+        format!("overgraph:{source_id}->{target_id}:edge")
+    } else {
+        format!("overgraph:{source_id}->{target_id}:{edge_type}")
+    }
+}
+
+fn overgraph_edge_confidence(edge: &Value) -> f32 {
+    edge.get("provenance")
+        .and_then(|provenance| provenance.get("confidence"))
+        .and_then(Value::as_f64)
+        .filter(|value| value.is_finite())
+        .map(|value| value as f32)
+        .or_else(|| {
+            f32_field(edge, "weight").map(|weight| (weight.abs() / 1000.0).clamp(0.05, 1.0))
+        })
+        .unwrap_or(0.62)
+}
+
+fn decode_graph_rebuild_scoped_payload(payload: &str) -> Result<Value, String> {
+    let parsed = serde_json::from_str::<Value>(payload)
+        .map_err(|error| format!("invalid graph rebuild snapshot payload JSON: {error}"))?;
+    let schema = parsed
+        .get("schemaVersion")
+        .and_then(Value::as_str)
+        .unwrap_or_default();
+    if schema != GRAPH_REBUILD_COMPRESSED_JSON_SCHEMA
+        && schema != GRAPH_REBUILD_COMPRESSED_SNAPSHOT_SCHEMA
+    {
+        return Ok(parsed);
+    }
+    let encoded = parsed
+        .get("payload")
+        .and_then(Value::as_str)
+        .ok_or_else(|| "compressed graph rebuild snapshot payload missing payload".to_owned())?;
+    let compressed = BASE64_STANDARD
+        .decode(encoded)
+        .map_err(|error| format!("invalid compressed graph rebuild snapshot base64: {error}"))?;
+    let mut decoder = GzDecoder::new(compressed.as_slice());
+    let mut decoded = String::new();
+    decoder
+        .read_to_string(&mut decoded)
+        .map_err(|error| format!("failed to decompress graph rebuild snapshot payload: {error}"))?;
+    serde_json::from_str::<Value>(&decoded)
+        .map_err(|error| format!("invalid decompressed graph rebuild snapshot JSON: {error}"))
+}
+
+fn store_relation_first(
+    host: &PhoenixNativeHost,
+    relation: &str,
+    filter: Value,
+) -> Result<Option<Value>, String> {
+    let result = host
+        .store_command(StoreCommandRequest {
+            command: "relation:getFirst".to_owned(),
+            payload: json!({ "relation": relation, "filter": filter }),
+        })
+        .map_err(|error| error.to_string())?;
+    let value = serde_json::to_value(result)
+        .map_err(|error| format!("failed to encode relation row: {error}"))?;
+    let success = value
+        .get("success")
+        .and_then(Value::as_bool)
+        .unwrap_or(false);
+    if !success {
+        let error = value
+            .get("error")
+            .and_then(Value::as_str)
+            .unwrap_or("store command failed");
+        return Err(format!("failed to load relation {relation}: {error}"));
+    }
+    Ok(value
+        .get("payload")
+        .cloned()
+        .filter(|payload| !payload.is_null()))
+}
+
+fn f32_field(row: &Value, key: &str) -> Option<f32> {
+    row.get(key)
+        .and_then(Value::as_f64)
+        .filter(|value| value.is_finite())
+        .map(|value| value as f32)
 }
 
 fn store_relation_rows(host: &PhoenixNativeHost, relation: &str) -> Result<Vec<Value>, String> {
@@ -1308,7 +4483,6 @@ fn semantic_payload_to_hopf_payload(semantic: &DesktopManifoldPayload) -> Deskto
         };
         assignments.push(HopfAnchorAssignment {
             anchor_id: anchor_id.clone(),
-            fiber_id: fiber_id.clone(),
             fiber_kind: fiber_kind.to_owned(),
             cell_id: projection.primary_cell_id.clone(),
             chart_id: chart_projection.primary_cell_id.clone(),
@@ -1316,7 +4490,6 @@ fn semantic_payload_to_hopf_payload(semantic: &DesktopManifoldPayload) -> Deskto
             center_vector: projection.center_vector,
             cell_distance: projection.cell_distance,
             boundary_score: projection.boundary_score,
-            phase,
         });
         nodes.push(DesktopManifoldNode {
             id: anchor_id.clone(),
@@ -1780,7 +4953,6 @@ fn product_index_to_payload(
         let phase = hopf_phase_for_kind(fiber_kind, &semantic_node.id, *index);
         assignments.push(HopfAnchorAssignment {
             anchor_id: node.id.clone(),
-            fiber_id: format!("product:fiber:{}:{fiber_kind}", node.id),
             fiber_kind: fiber_kind.to_owned(),
             cell_id: projection.primary_cell_id.clone(),
             chart_id: chart_projection.primary_cell_id,
@@ -1788,7 +4960,6 @@ fn product_index_to_payload(
             center_vector: projection.center_vector,
             cell_distance: projection.cell_distance,
             boundary_score: projection.boundary_score,
-            phase,
         });
         node.source_type = "product_node".to_owned();
         node.base_vector = Some(projection.center_vector);
@@ -2642,11 +5813,7 @@ impl IcoTopology {
             cell.neighbor_cell_ids.sort();
             cell.neighbor_cell_ids.dedup();
         }
-        Self {
-            resolution,
-            cells,
-            by_id,
-        }
+        Self { cells, by_id }
     }
 
     fn cell(&self, cell_id: &str) -> Option<&IcoCellInternal> {
@@ -3475,13 +6642,6 @@ fn hash_unit_parts(kind: &str, index: usize) -> f64 {
     f64::from(hash) / f64::from(u32::MAX)
 }
 
-fn now_millis_for_snapshot() -> u64 {
-    std::time::SystemTime::now()
-        .duration_since(std::time::UNIX_EPOCH)
-        .map(|duration| duration.as_millis() as u64)
-        .unwrap_or_default()
-}
-
 fn parse_json<T: DeserializeOwned>(json: &str) -> Result<T, String> {
     serde_json::from_str(json).map_err(|error| format!("invalid Phoenix JSON payload: {error}"))
 }
@@ -3491,9 +6651,322 @@ fn serialize_json<T: Serialize>(value: &T) -> Result<String, String> {
         .map_err(|error| format!("failed to serialize Phoenix result: {error}"))
 }
 
+fn desktop_resolver_seed(seed: DesktopMentionBatchResolverSeed) -> ResolverEntitySeed {
+    ResolverEntitySeed {
+        entity_id: EntityId::from(seed.entity_id),
+        canonical_name: seed.canonical_name,
+        aliases: seed.aliases,
+        kind: seed.kind.as_deref().and_then(parse_desktop_entity_kind),
+        gender: None,
+        number: None,
+        scope: ScopeKey {
+            world_id: seed.scope.world_id,
+            narrative_id: seed.scope.narrative_id,
+            folder_id: seed.scope.folder_id,
+            folder_path: seed.scope.folder_path,
+        },
+    }
+}
+
+fn parse_desktop_entity_kind(kind: &str) -> Option<EntityKind> {
+    match kind.to_ascii_lowercase().as_str() {
+        "character" => Some(EntityKind::Character),
+        "location" => Some(EntityKind::Location),
+        "npc" => Some(EntityKind::Npc),
+        "item" => Some(EntityKind::Item),
+        "faction" => Some(EntityKind::Faction),
+        "organization" => Some(EntityKind::Organization),
+        "event" => Some(EntityKind::Event),
+        "concept" => Some(EntityKind::Concept),
+        "other" => Some(EntityKind::Other),
+        _ => None,
+    }
+}
+
+fn desktop_entity_kind(kind: EntityKind) -> String {
+    match kind {
+        EntityKind::Character => "character",
+        EntityKind::Location => "location",
+        EntityKind::Npc => "npc",
+        EntityKind::Item => "item",
+        EntityKind::Faction => "faction",
+        EntityKind::Organization => "organization",
+        EntityKind::Event => "event",
+        EntityKind::Concept => "concept",
+        EntityKind::Other => "other",
+    }
+    .to_owned()
+}
+
+fn desktop_mention_entity_ref(entity_ref: MentionEntityRef) -> String {
+    match entity_ref {
+        MentionEntityRef::Known(entity_id) => entity_id.0,
+        MentionEntityRef::Speculative(key) => key,
+    }
+}
+
+fn compressed_json_payload<T: Serialize>(
+    value: &T,
+    schema_version: &str,
+    source_schema_version: &str,
+) -> Result<Value, String> {
+    let raw = serde_json::to_vec(value)
+        .map_err(|error| format!("failed to serialize compressed Phoenix payload: {error}"))?;
+    let mut encoder = GzEncoder::new(Vec::with_capacity(raw.len() / 4), Compression::fast());
+    encoder
+        .write_all(&raw)
+        .map_err(|error| format!("failed to compress Phoenix payload: {error}"))?;
+    let compressed = encoder
+        .finish()
+        .map_err(|error| format!("failed to finish Phoenix payload compression: {error}"))?;
+    Ok(json!({
+        "schemaVersion": schema_version,
+        "sourceSchemaVersion": source_schema_version,
+        "encoding": "gzip+base64",
+        "rawBytes": raw.len(),
+        "compressedBytes": compressed.len(),
+        "payload": BASE64_STANDARD.encode(compressed),
+    }))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn semantic_test_root(name: &str) -> PathBuf {
+        let nonce = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap_or_default()
+            .as_nanos();
+        std::env::temp_dir().join(format!(
+            "phoenix-semantic-artifact-{name}-{}-{nonce}",
+            std::process::id()
+        ))
+    }
+
+    #[test]
+    fn document_semantics_reuse_unchanged_documents_across_restart_and_localize_edits() {
+        let root = semantic_test_root("restart-locality");
+        let mut request = DocumentSemanticRequest {
+            documents: vec![
+                phoenix_graph_rebuild::DocumentSemanticInput {
+                    note_id: "note-a".to_owned(),
+                    text: "Kai gave Hazel the key.".to_owned(),
+                },
+                phoenix_graph_rebuild::DocumentSemanticInput {
+                    note_id: "note-b".to_owned(),
+                    text: "Hazel returned before Kai departed.".to_owned(),
+                },
+            ],
+            entities: vec![phoenix_graph_rebuild::DocumentSemanticEntity {
+                id: "entity-kai".to_owned(),
+                label: "Kai".to_owned(),
+                aliases: Vec::new(),
+                kind: "character".to_owned(),
+            }],
+        };
+        let first_coordinator = Arc::new(Mutex::new(GraphRunCoordinator::default()));
+        let (first, first_stats, first_handle) =
+            build_or_load_document_semantics(&request, Some(&root), &first_coordinator).unwrap();
+        assert_eq!(first_stats.documents_built, 2);
+        assert_eq!(first_stats.documents_reused, 0);
+
+        let restarted = Arc::new(Mutex::new(GraphRunCoordinator::default()));
+        let (warm, warm_stats, warm_handle) =
+            build_or_load_document_semantics(&request, Some(&root), &restarted).unwrap();
+        assert_eq!(warm_stats.documents_built, 0);
+        assert_eq!(warm_stats.documents_reused, 2);
+        assert_eq!(warm_handle, first_handle);
+        let durable_summary = load_immutable_artifact::<DocumentSemanticSummary>(
+            &root,
+            DOCUMENT_SEMANTIC_SUMMARY_NAMESPACE,
+            &first_handle,
+        )
+        .unwrap()
+        .unwrap();
+        assert_eq!(
+            serde_json::to_value(first.as_ref()).unwrap(),
+            serde_json::to_value(warm.as_ref()).unwrap()
+        );
+        assert_eq!(
+            serde_json::to_value(first.as_ref()).unwrap(),
+            serde_json::to_value(durable_summary).unwrap()
+        );
+
+        request.documents[1].text.push_str(" Kai stayed.");
+        let changed = Arc::new(Mutex::new(GraphRunCoordinator::default()));
+        let (_, changed_stats, changed_handle) =
+            build_or_load_document_semantics(&request, Some(&root), &changed).unwrap();
+        assert_eq!(changed_stats.documents_built, 1);
+        assert_eq!(changed_stats.documents_reused, 1);
+        assert_ne!(changed_handle, first_handle);
+        let _ = std::fs::remove_dir_all(root);
+    }
+
+    #[test]
+    fn document_semantic_text_identity_is_independent_from_entity_binding() {
+        let document = phoenix_graph_rebuild::DocumentSemanticInput {
+            note_id: "note-a".to_owned(),
+            text: "Kai gave Hazel the key.".to_owned(),
+        };
+        let text_identity = document_semantic_text_identity(&document);
+        let first = document_semantic_binding_identity(&text_identity, b"entity-set-a");
+        let second = document_semantic_binding_identity(&text_identity, b"entity-set-b");
+
+        assert_eq!(text_identity, document_semantic_text_identity(&document));
+        assert_ne!(first, second);
+    }
+
+    #[test]
+    fn document_semantic_identity_ignores_input_and_alias_order() {
+        let mut first = DocumentSemanticRequest {
+            documents: vec![
+                phoenix_graph_rebuild::DocumentSemanticInput {
+                    note_id: "note-b".to_owned(),
+                    text: "Hazel returned.".to_owned(),
+                },
+                phoenix_graph_rebuild::DocumentSemanticInput {
+                    note_id: "note-a".to_owned(),
+                    text: "Kai departed.".to_owned(),
+                },
+            ],
+            entities: vec![
+                phoenix_graph_rebuild::DocumentSemanticEntity {
+                    id: "hazel".to_owned(),
+                    label: "Hazel".to_owned(),
+                    aliases: vec!["H".to_owned(), "Haz".to_owned()],
+                    kind: "character".to_owned(),
+                },
+                phoenix_graph_rebuild::DocumentSemanticEntity {
+                    id: "kai".to_owned(),
+                    label: "Kai".to_owned(),
+                    aliases: vec!["K".to_owned()],
+                    kind: "character".to_owned(),
+                },
+            ],
+        };
+        let expected = canonical_document_semantic_request(&first);
+        first.documents.reverse();
+        first.entities.reverse();
+        first.entities[1].aliases.reverse();
+        let reordered = canonical_document_semantic_request(&first);
+
+        assert_eq!(
+            document_semantic_summary_identity(&expected).unwrap(),
+            document_semantic_summary_identity(&reordered).unwrap(),
+        );
+        assert_eq!(
+            serde_json::to_vec(&expected.entities).unwrap(),
+            serde_json::to_vec(&reordered.entities).unwrap(),
+        );
+    }
+
+    #[test]
+    fn compressed_document_semantics_round_trip_exactly() {
+        let summary = json!({
+            "schemaVersion": "phoenix-document-semantics/v1",
+            "source": "native_rust",
+            "documents": [],
+            "counters": { "documents": 0, "propositions": 0, "situations": 0 }
+        });
+        let envelope = compressed_json_payload(
+            &summary,
+            DOCUMENT_SEMANTIC_COMPRESSED_SCHEMA,
+            "phoenix-document-semantics/v1",
+        )
+        .unwrap();
+        let compressed = BASE64_STANDARD
+            .decode(envelope["payload"].as_str().unwrap())
+            .unwrap();
+        let mut decoder = GzDecoder::new(compressed.as_slice());
+        let mut raw = Vec::new();
+        decoder.read_to_end(&mut raw).unwrap();
+
+        assert_eq!(
+            envelope["schemaVersion"],
+            DOCUMENT_SEMANTIC_COMPRESSED_SCHEMA
+        );
+        assert_eq!(serde_json::from_slice::<Value>(&raw).unwrap(), summary);
+    }
+
+    #[test]
+    fn graph_run_page_cursor_spans_families_without_duplicates() {
+        let mut first = GraphRunPageCursor::new(1, 4);
+        assert_eq!(first.take(&[0, 1]), vec![1]);
+        assert_eq!(first.take(&[2, 3, 4]), vec![2, 3, 4]);
+        assert!(first.take(&[5, 6]).is_empty());
+        assert_eq!(first.returned, 4);
+        assert_eq!(first.seen, 7);
+
+        let mut second = GraphRunPageCursor::new(5, 4);
+        assert!(second.take(&[0, 1]).is_empty());
+        assert!(second.take(&[2, 3, 4]).is_empty());
+        assert_eq!(second.take(&[5, 6]), vec![5, 6]);
+        assert_eq!(second.returned, 2);
+    }
+
+    #[test]
+    fn graph_analysis_identity_is_content_addressed_and_domain_separated() {
+        let roots = BTreeMap::from([
+            ("bridge".to_owned(), "b3-bridge".to_owned()),
+            ("promotion".to_owned(), "b3-promotion".to_owned()),
+        ]);
+        let same = graph_analysis_identity(&roots);
+        let mut changed = roots.clone();
+        changed.insert("promotion".to_owned(), "b3-other".to_owned());
+        let changed = graph_analysis_identity(&changed);
+
+        assert_eq!(same, graph_analysis_identity(&roots));
+        assert_ne!(same.digest, changed.digest);
+        assert_ne!(same.canonical, changed.canonical);
+    }
+
+    #[test]
+    fn concurrent_identical_analysis_claims_share_one_build_slot() {
+        let identity = graph_analysis_identity(&BTreeMap::from([(
+            "bridge".to_owned(),
+            "b3-bridge".to_owned(),
+        )]));
+        let mut coordinator = GraphRunCoordinator::default();
+
+        let first = coordinator.analysis_slot(&identity).unwrap();
+        let second = coordinator.analysis_slot(&identity).unwrap();
+
+        assert!(Arc::ptr_eq(&first, &second));
+    }
+
+    #[test]
+    fn graph_analysis_digest_collision_fails_closed() {
+        let mut coordinator = GraphRunCoordinator::default();
+        let first = GraphAnalysisIdentity {
+            digest: "forced-collision".to_owned(),
+            canonical: Arc::from(&b"identity-a"[..]),
+        };
+        let second = GraphAnalysisIdentity {
+            digest: "forced-collision".to_owned(),
+            canonical: Arc::from(&b"identity-b"[..]),
+        };
+
+        coordinator.analysis_slot(&first).unwrap();
+        let error = match coordinator.analysis_slot(&second) {
+            Ok(_) => panic!("forced collision must fail closed"),
+            Err(error) => error,
+        };
+
+        assert!(error.contains("identity collision"));
+    }
+
+    #[test]
+    fn graph_run_lease_tokens_are_generation_checked_not_raw_digests() {
+        let mut coordinator = GraphRunCoordinator::default();
+
+        let first = coordinator.new_lease_handle("b3-content");
+        let second = coordinator.new_lease_handle("b3-content");
+
+        assert!(first.starts_with("graph-run:v1:"));
+        assert_ne!(first, second);
+        assert!(!coordinator.close(&first));
+    }
 
     #[test]
     fn desktop_runtime_defaults_to_native_graph_lane() {
@@ -3516,8 +6989,71 @@ mod tests {
 
         assert_eq!(info.target, "native");
         assert_eq!(info.storage, "nativeLocal");
+        assert!(!info.build_git_sha.is_empty());
+        assert!(matches!(info.build_profile.as_str(), "debug" | "release"));
         assert!(!info.feature_flags.graptor);
         assert!(!info.feature_flags.gldr);
+    }
+
+    #[test]
+    fn mention_batch_entity_kinds_match_existing_json_enum_names() {
+        assert_eq!(desktop_entity_kind(EntityKind::Character), "character");
+        assert_eq!(desktop_entity_kind(EntityKind::Npc), "npc");
+        assert_eq!(
+            parse_desktop_entity_kind("CHARACTER"),
+            Some(EntityKind::Character)
+        );
+        assert_eq!(parse_desktop_entity_kind("unknown"), None);
+    }
+
+    #[test]
+    fn graph_run_discovery_projection_groups_mentions_without_exporting_spans() {
+        let mut states = FastHashMap::new();
+        update_discovery_candidate(
+            &mut states,
+            normalize_discovery_key("Kai Gearlock"),
+            "Kai".to_owned(),
+            "UNKNOWN",
+            0.72,
+            0,
+        );
+        update_discovery_candidate(
+            &mut states,
+            normalize_discovery_key("Kai Gearlock"),
+            "Kai Gearlock".to_owned(),
+            "character",
+            0.91,
+            1,
+        );
+        update_discovery_candidate(
+            &mut states,
+            normalize_discovery_key("Kai Gearlock"),
+            "Kai Gearlock".to_owned(),
+            "character",
+            0.88,
+            2,
+        );
+
+        let candidates = finish_discovery_candidates(states);
+        assert_eq!(candidates.len(), 1);
+        assert_eq!(candidates[0].key, "kai gearlock");
+        assert_eq!(candidates[0].token, "Kai Gearlock");
+        assert_eq!(candidates[0].kind, "character");
+        assert_eq!(candidates[0].count, 3);
+        assert_eq!(candidates[0].score, 0.91);
+    }
+
+    #[test]
+    fn native_chunk_offsets_are_utf16_safe_for_frontend_ranges() {
+        let text = "A😀B. Café follows.";
+        let chunks = vec![Chunk {
+            start: "A😀".len(),
+            end: text.len(),
+        }];
+        let offsets = utf16_offsets_for_chunks(text, &chunks);
+
+        assert_eq!(offsets.get(&chunks[0].start), Some(&3));
+        assert_eq!(offsets.get(&chunks[0].end), Some(&19));
     }
 
     #[test]
@@ -3543,5 +7079,115 @@ mod tests {
                 assert!(neighbor.neighbor_cell_ids.contains(&cell.cell_id));
             }
         }
+    }
+
+    #[test]
+    fn graph_rebuild_scoped_snapshot_payload_decodes_compressed_json() {
+        let raw = json!({
+            "schemaVersion": "phoenix-graph-rebuild/v1",
+            "embeddingTargets": [],
+        });
+        let raw_json = serde_json::to_vec(&raw).unwrap();
+        let mut encoder = GzEncoder::new(Vec::new(), Compression::fast());
+        encoder.write_all(&raw_json).unwrap();
+        let compressed = encoder.finish().unwrap();
+        let envelope = json!({
+            "schemaVersion": GRAPH_REBUILD_COMPRESSED_JSON_SCHEMA,
+            "sourceSchemaVersion": "phoenix-graph-rebuild/v1",
+            "encoding": "gzip+base64",
+            "rawChars": raw_json.len(),
+            "compressedBytes": compressed.len(),
+            "payload": BASE64_STANDARD.encode(compressed),
+        });
+
+        let decoded = decode_graph_rebuild_scoped_payload(&envelope.to_string()).unwrap();
+
+        assert_eq!(
+            decoded.get("schemaVersion").and_then(Value::as_str),
+            Some("phoenix-graph-rebuild/v1")
+        );
+    }
+
+    #[test]
+    fn graph_model_v2_overgraph_value_builds_packet_input_without_fake_vectors() {
+        let overgraph = json!({
+            "schemaVersion": "phoenix-graph-model-v2-overgraph/v1",
+            "graphBatch": {
+                "vertices": [
+                    {
+                        "id": "atom:document:note-1",
+                        "kind": "graphModelV2Atom:document",
+                        "class": "document",
+                        "labels": ["Note 1"],
+                        "weight": 400,
+                        "value": { "label": "Note 1" },
+                        "provenance": { "confidence": 0.91, "evidenceRefs": [] }
+                    },
+                    {
+                        "id": "atom:chunk:note-1:0",
+                        "kind": "graphModelV2Atom:chunk",
+                        "class": "chunk",
+                        "labels": ["Chunk 1"],
+                        "weight": 200,
+                        "value": { "label": "Chunk 1" },
+                        "provenance": { "confidence": 0.88, "evidenceRefs": ["evidence:1"] }
+                    },
+                    {
+                        "id": "fact:rel-1",
+                        "kind": "graphModelV2Fact:causal",
+                        "class": "generic",
+                        "labels": [],
+                        "weight": 700,
+                        "value": { "label": "causes_or_explains" },
+                        "provenance": { "confidence": 0.76, "evidenceRefs": ["evidence:1"] }
+                    }
+                ],
+                "edges": [
+                    {
+                        "sourceId": "atom:document:note-1",
+                        "targetId": "atom:chunk:note-1:0",
+                        "edgeType": "contains",
+                        "weight": 910,
+                        "provenance": { "confidence": 0.91, "evidenceRefs": [] }
+                    },
+                    {
+                        "sourceId": "missing",
+                        "targetId": "fact:rel-1",
+                        "edgeType": "dropped",
+                        "weight": 900,
+                        "provenance": { "confidence": 0.9, "evidenceRefs": [] }
+                    }
+                ]
+            }
+        });
+
+        let input = graph_scene_packet_input_from_overgraph_value(
+            &overgraph,
+            "scopedSnapshot".to_owned(),
+            "siegel".to_owned(),
+            "siegelFinsler".to_owned(),
+            4096,
+            GraphScenePacketSettings::default(),
+        )
+        .unwrap();
+
+        assert_eq!(input.nodes.len(), 3);
+        assert_eq!(input.edges.len(), 1);
+        assert_eq!(input.source_mode, "graph");
+        assert_eq!(
+            input.source_label,
+            "Rust OverGraph rows (no synthetic vectors)"
+        );
+        assert_eq!(input.nodes[0].source_type, "document");
+        assert_eq!(input.nodes[1].source_type, "chunk");
+        assert_eq!(input.nodes[2].source_type, "graph");
+        assert!(input.nodes.iter().all(|node| node.vector.is_empty()));
+        assert!(input.nodes.iter().all(|node| node.base_vector.is_none()));
+        assert!(input.nodes.iter().all(|node| node.hierarchy_hint.is_none()));
+        assert_eq!(
+            input.edges[0].id,
+            "overgraph:atom:document:note-1->atom:chunk:note-1:0:contains"
+        );
+        assert_eq!(input.edges[0].confidence, 0.91);
     }
 }

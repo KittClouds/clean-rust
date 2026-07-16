@@ -29,7 +29,7 @@ export class BlueprintHubService {
         { id: 'patterns', label: 'Patterns', icon: 'pi pi-code' },
         { id: 'plot-threads', label: 'Plot Threads', icon: 'pi pi-sitemap' },
         { id: 'worldbuilding', label: 'Worldbuilding', icon: 'pi pi-globe' },
-        { id: 'attributes', label: 'Attributes', icon: 'pi pi-database' },
+        { id: 'attributes', label: 'Atlas Control', icon: 'pi pi-database' },
     ];
 
     /** Whether the hub is currently open (signal) */

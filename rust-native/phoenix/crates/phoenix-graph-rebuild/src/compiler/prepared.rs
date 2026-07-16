@@ -1,7 +1,7 @@
 use compact_str::{format_compact, CompactString};
 use hashbrown::HashSet;
 use phoenix_alex::{SurfaceHit, SurfaceHitKind};
-use phoenix_chunker::{LensChunk, LensKind, LensMentionEdgeKind, LensMentionGraph};
+use phoenix_chunker_native::{LensChunk, LensKind, LensMentionEdgeKind, LensMentionGraph};
 use phoenix_types::TextRange;
 
 use super::ids::mention_evidence_id;
@@ -161,6 +161,12 @@ fn mention_graph_facts(
             status: "prepared".into(),
             evidence_ids: vec![evidence_id.clone()],
             confidence: edge.weight,
+            semantic_situation_id: None,
+            semantic_frame: None,
+            factuality: None,
+            state_interval_ids: Vec::new(),
+            event_ordering_ids: Vec::new(),
+            temporal_conflict_ids: Vec::new(),
         });
 
         output.roles.push(FactRole {
@@ -168,18 +174,30 @@ fn mention_graph_facts(
             role: "leftMention".into(),
             atom_id: left_evidence.clone(),
             confidence: edge.weight,
+            semantic_role: None,
+            slot_type: None,
+            required: None,
+            resolved: None,
         });
         output.roles.push(FactRole {
             fact_id: fact_id.clone(),
             role: "rightMention".into(),
             atom_id: right_evidence.clone(),
             confidence: edge.weight,
+            semantic_role: None,
+            slot_type: None,
+            required: None,
+            resolved: None,
         });
         output.roles.push(FactRole {
             fact_id: fact_id.clone(),
             role: "evidence".into(),
             atom_id: evidence_id,
             confidence: edge.weight,
+            semantic_role: None,
+            slot_type: None,
+            required: None,
+            resolved: None,
         });
         output.projected_edges.push(ProjectedGraphEdge {
             id: format_compact!("projection:{}", fact_id),

@@ -43,6 +43,7 @@ phoenix-store-overgraph = { path = "../phoenix-store-overgraph" }
 phoenix-structure = { path = "../phoenix-structure" }
 phoenix-triverse-v2 = { path = "../phoenix-triverse-v2" }
 phoenix-types = { path = "../phoenix-types" }
+hashbrown.workspace = true
 rustc-hash.workspace = true
 serde.workspace = true
 serde_json.workspace = true

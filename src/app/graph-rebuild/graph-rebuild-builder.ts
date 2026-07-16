@@ -2,6 +2,8 @@ import type { RegisteredEntity } from '../lib/registry';
 import type {
     BuildGraphRebuildSnapshotInput,
     GraphRebuildChunk,
+    GraphRebuildChunkSemanticBridge,
+    GraphRebuildChunkSemanticBridgeType,
     GraphRebuildDropReasons,
     GraphRebuildEdge,
     GraphRebuildEntityAnchor,
@@ -36,13 +38,30 @@ import {
     buildGraphSemanticAdjudicationDAGSummary,
 } from './graph-semantic-adjudication';
 import { buildGraphSemanticEvalLedgerSummary } from './graph-semantic-eval-ledger';
+import { GraphSemanticDerivationContext } from './graph-semantic-derivation-context';
+import { buildGraphCalendarRegistryBridgeSummary } from './graph-calendar-registry-bridge';
+import { buildGraphMemoryGraphRagBridgeSummary } from './graph-memory-graphrag-bridge';
+import { episodeProjectionEdgeCounters } from './graph-episode-projection';
+import { buildGraphDiscourseSpineSummary } from './graph-discourse-spine';
+import { buildGraphDiscourseBridgeCandidateSummary } from './graph-discourse-bridge-candidates';
+import { buildGraphDiscourseBridgeAdjudicationSummary } from './graph-discourse-bridge-adjudication';
+import { buildGraphDiscourseEvalLedgerSummary } from './graph-discourse-eval-ledger';
+import { buildGraphDiscoursePromotionSurfaceSummary } from './graph-discourse-promotion-surface';
+import { buildGraphDiscourseCompilerOverlaySummary } from './graph-discourse-compiler-overlay';
+import { buildHopfResonanceSpace } from './graph-hopf-resonance-space';
+import { buildGraphDocumentSidecar } from './graph-document-sidecar';
+import { buildGraphDocumentReviewSummary } from './graph-document-review';
+import { buildGraphDocumentCompilePlanSummary } from './graph-document-compiler';
+import { replayGraphOperatorMutationJournalReview } from './graph-operator-mutation-journal';
 
 export { buildGraphRebuildAliasResolver, normalizeGraphRebuildCandidate };
 
 const CO_OCCURRENCE_MAX_GAP_CHARS = 720;
 const CO_OCCURRENCE_LINKS_PER_ANCHOR = 4;
 
+/** Builds the source-evidence snapshot rows that the Rust Atlas packet seals. */
 export function buildGraphRebuildSnapshot(input: BuildGraphRebuildSnapshotInput): GraphRebuildSnapshot {
+    input.cpuProfiler?.begin();
     const builtAt = input.builtAt ?? Date.now();
     const chunks = normalizeChunks(input.chunks || []);
     const chunksByNote = groupChunksByNote(chunks);
@@ -58,6 +77,7 @@ export function buildGraphRebuildSnapshot(input: BuildGraphRebuildSnapshotInput)
         builtAt,
     });
     const { mentions, entityAnchors, dropReasons: drops } = hygiene;
+    input.cpuProfiler?.mark('snapshotAnchorsMs');
 
     const nodes = buildNodes(entityAnchors, entitiesById);
     const cooccurrenceEdges = buildEdges(entityAnchors, drops);
@@ -69,6 +89,46 @@ export function buildGraphRebuildSnapshot(input: BuildGraphRebuildSnapshotInput)
     const acceptedRelationships = relationships.filter((relationship) => relationship.status === 'accepted').length;
     const reviewRelationships = relationships.filter((relationship) => relationship.status === 'review').length;
     const rejectedRelationships = relationships.filter((relationship) => relationship.status === 'rejected').length;
+    const noteIds = input.noteIds ? [...input.noteIds] : unique([
+        ...chunks.map((chunk) => chunk.noteId),
+        ...entityAnchors.map((anchor) => anchor.noteId),
+    ]);
+    input.cpuProfiler?.mark('snapshotFactsMs');
+    const documentSidecarSummary = buildGraphDocumentSidecar({
+        noteIds,
+        noteTexts: input.noteTexts || {},
+        chunks,
+        builtAt,
+        documentProfileSummary: input.documentProfileSummary,
+        documentSemanticSummary: input.documentSemanticSummary,
+    });
+    const baseDocumentReviewSummary = buildGraphDocumentReviewSummary(documentSidecarSummary, builtAt);
+    const operatorReplay = input.operatorMutationJournal
+        ? replayGraphOperatorMutationJournalReview(
+            baseDocumentReviewSummary,
+            input.operatorMutationJournal,
+            input.scopeId,
+            builtAt,
+        )
+        : null;
+    const documentReviewSummary = operatorReplay?.review || baseDocumentReviewSummary;
+    const operatorMutationJournal = operatorReplay?.journal;
+    const documentCompilerSummary = buildGraphDocumentCompilePlanSummary({
+        sidecar: documentSidecarSummary,
+        review: documentReviewSummary,
+        builtAt,
+        entities: nodes.map((node) => ({ id: node.entityId, label: node.label, aliases: node.aliases })),
+        baseline: {
+            atomCount: nodes.length,
+            factCount: relationships.length
+                + derived.events.length
+                + derived.temporalEdges.length
+                + derived.causalEdges.length
+                + derived.memoryState.length,
+            edgeCount: edges.length,
+        },
+    });
+    input.cpuProfiler?.mark('snapshotCompatibilityViewsMs');
     const embeddingTargetPlan = buildGraphRebuildEmbeddingTargetPlan(
         input,
         chunks,
@@ -76,18 +136,31 @@ export function buildGraphRebuildSnapshot(input: BuildGraphRebuildSnapshotInput)
         nodes,
         relationships,
         derived.events,
+        derived.episodes,
+        derived.episodeConnections,
         derived.temporalEdges,
         derived.causalEdges,
         derived.memoryState,
+        documentCompilerSummary,
     );
     const embeddingTargets = embeddingTargetPlan.targets;
+    const queuedTargetIds = new Set(embeddingTargetPlan.queuedTargetIds || []);
+    const embeddingWorkTargets = embeddingTargets.filter((target) =>
+        queuedTargetIds.size ? queuedTargetIds.has(target.id) : target.admissionStatus === 'admitted',
+    );
     const postProcessMode = input.postProcessMode || 'full';
+    const includeDiagnosticArms = input.durabilityMode !== 'interactive';
+    input.cpuProfiler?.mark('snapshotTargetsMs');
+    const embeddingPostProcessStarted = performance.now();
     const embeddingGraphPostProcess = postProcessMode === 'full'
         ? buildGraphRebuildEmbeddingGraphPostProcess(
-            embeddingTargets,
+            embeddingWorkTargets,
             input.embeddingProfile,
+            input.cpuProfiler,
         )
         : undefined;
+    input.cpuProfiler?.add('snapshotEmbeddingPostProcessMs', embeddingPostProcessStarted);
+    const graphAwareLinksStarted = performance.now();
     const graphAwareLinkSuggestions = postProcessMode === 'full'
         ? buildGraphAwareLinkSuggestions(
             nodes,
@@ -97,7 +170,9 @@ export function buildGraphRebuildSnapshot(input: BuildGraphRebuildSnapshotInput)
             embeddingGraphPostProcess,
         )
         : [];
+    input.cpuProfiler?.add('snapshotGraphAwareLinksMs', graphAwareLinksStarted);
     const entityLinkerEnabled = input.embeddingStagePolicy?.entityLinkerEnabled !== false;
+    const entityLinkingStarted = performance.now();
     const entityLinking = postProcessMode === 'full' && entityLinkerEnabled
         ? buildGraphRebuildEntityLinkSuggestions({
             mentions,
@@ -109,12 +184,9 @@ export function buildGraphRebuildSnapshot(input: BuildGraphRebuildSnapshotInput)
             embeddingGraphPostProcess,
         })
         : { suggestions: [], counters: emptyEntityLinkCounters(mentions) };
-    const noteIds = input.noteIds ? [...input.noteIds] : unique([
-        ...chunks.map((chunk) => chunk.noteId),
-        ...entityAnchors.map((anchor) => anchor.noteId),
-    ]);
-
-    const snapshot: GraphRebuildSnapshot = {
+    input.cpuProfiler?.add('snapshotEntityLinkingMs', entityLinkingStarted);
+    input.cpuProfiler?.mark('snapshotPostProcessMs');
+    let snapshot: GraphRebuildSnapshot = {
         schemaVersion: 'phoenix-graph-rebuild/v1',
         id: `graph-rebuild:${input.scopeKind}:${input.scopeId}:${builtAt}`,
         source: 'phoenix-graph-rebuild',
@@ -128,9 +200,13 @@ export function buildGraphRebuildSnapshot(input: BuildGraphRebuildSnapshotInput)
         relationships,
         events: derived.events,
         episodes: derived.episodes,
+        chunkSemanticBridges: derived.chunkSemanticBridges,
+        episodeConnections: derived.episodeConnections,
+        episodeProjectionEdges: derived.episodeProjectionEdges,
         temporalEdges: derived.temporalEdges,
         causalEdges: derived.causalEdges,
         memoryState: derived.memoryState,
+        memoryGovernanceCandidates: [],
         embeddingTargets,
         embeddingTargetPlan,
         embeddingVectors: [],
@@ -143,6 +219,11 @@ export function buildGraphRebuildSnapshot(input: BuildGraphRebuildSnapshotInput)
         structuralPostProcess,
         graphAwareLinkSuggestions,
         entityLinkSuggestions: entityLinking.suggestions,
+        documentSidecarSummary,
+        documentSemanticSummary: input.documentSemanticSummary,
+        documentReviewSummary,
+        documentCompilerSummary,
+        operatorMutationJournal,
         counters: {
             entities: input.entities.length,
             aliases: resolver.aliasCount,
@@ -164,21 +245,54 @@ export function buildGraphRebuildSnapshot(input: BuildGraphRebuildSnapshotInput)
             rejectedRelationships,
             events: derived.events.length,
             episodes: derived.episodes.length,
+            chunkSemanticBridges: derived.chunkSemanticBridges.length,
+            chunkSetupPayoffBridges: countChunkSemanticBridges(derived.chunkSemanticBridges, 'setup_payoff'),
+            chunkCauseEffectBridges: countChunkSemanticBridges(derived.chunkSemanticBridges, 'cause_effect'),
+            chunkStateDeltaBridges: countChunkSemanticBridges(derived.chunkSemanticBridges, 'state_delta'),
+            chunkRelationshipDeltaBridges: countChunkSemanticBridges(derived.chunkSemanticBridges, 'relationship_delta'),
+            chunkTopicContinuationBridges: countChunkSemanticBridges(derived.chunkSemanticBridges, 'topic_continuation'),
+            chunkEvidenceReframeBridges: countChunkSemanticBridges(derived.chunkSemanticBridges, 'evidence_reframe'),
+            chunkMotifEchoBridges: countChunkSemanticBridges(derived.chunkSemanticBridges, 'motif_echo'),
+            chunkRouteContinuityBridges: countChunkSemanticBridges(derived.chunkSemanticBridges, 'route_continuity'),
+            episodeConnections: derived.episodeConnections.length,
+            episodeTemporalConnections: derived.episodeConnections.filter((connection) => connection.kind === 'episode_temporal').length,
+            episodeCausalConnections: derived.episodeConnections.filter((connection) => connection.kind === 'episode_causal').length,
+            episodeWormholeConnections: derived.episodeConnections.filter((connection) => connection.kind === 'episode_wormhole').length,
+            ...episodeProjectionEdgeCounters(derived.episodeProjectionEdges),
             temporalEdges: derived.temporalEdges.length,
             causalEdges: derived.causalEdges.length,
             memoryState: derived.memoryState.length,
+            memoryGovernanceCandidates: 0,
+            memoryGovernanceBuildMicros: 0,
+            memoryGovernanceRetain: 0,
+            memoryGovernanceAttenuate: 0,
+            memoryGovernanceCompress: 0,
+            memoryGovernanceQuarantine: 0,
+            memoryGovernanceRetire: 0,
+            memoryGovernanceRetrievalCandidates: 0,
+            memoryGovernanceRetrievalGoverned: 0,
+            memoryGovernanceRetrievalChangedRanks: 0,
+            memoryGovernanceRetrievalPolicies: 0,
+            promotionVerdictRows: 0,
+            promotionVerdictAcceptable: 0,
+            promotionVerdictBlocked: 0,
+            promotionVerdictAlreadyCommitted: 0,
+            promotionVerdictRollbackAvailable: 0,
             embeddingTargets: embeddingTargets.length,
             embeddingTargetCandidates: embeddingTargetPlan.candidateCount,
+            embeddingQueuedTargets: embeddingWorkTargets.length,
             embeddingTargetDeferred: embeddingTargetPlan.deferredCount,
-            embeddingDocumentSpine: planLaneAdmitted(embeddingTargetPlan, 'document_spine'),
-            embeddingChunkSpine: planLaneAdmitted(embeddingTargetPlan, 'chunk_spine'),
-            embeddingEntityAnchors: planLaneAdmitted(embeddingTargetPlan, 'entity_anchor'),
-            embeddingRelationshipFacts: planLaneAdmitted(embeddingTargetPlan, 'relationship_fact'),
-            embeddingTemporalFacts: planLaneAdmitted(embeddingTargetPlan, 'temporal_fact'),
-            embeddingCausalFacts: planLaneAdmitted(embeddingTargetPlan, 'causal_fact'),
-            embeddingMemoryStates: planLaneAdmitted(embeddingTargetPlan, 'memory_state'),
-            embeddingEventIdentities: planLaneAdmitted(embeddingTargetPlan, 'event_identity'),
-            embeddingAnchorEvidence: planLaneAdmitted(embeddingTargetPlan, 'anchor_evidence'),
+            embeddingSchedulerDeferredTargets: embeddingTargetPlan.schedulerDeferredCount,
+            embeddingPolicyDeferredTargets: embeddingTargetPlan.policyDeferredCount,
+            embeddingDocumentSpine: planLaneCandidates(embeddingTargetPlan, 'document_spine'),
+            embeddingChunkSpine: planLaneCandidates(embeddingTargetPlan, 'chunk_spine'),
+            embeddingEntityAnchors: planLaneCandidates(embeddingTargetPlan, 'entity_anchor'),
+            embeddingRelationshipFacts: planLaneCandidates(embeddingTargetPlan, 'relationship_fact'),
+            embeddingTemporalFacts: planLaneCandidates(embeddingTargetPlan, 'temporal_fact'),
+            embeddingCausalFacts: planLaneCandidates(embeddingTargetPlan, 'causal_fact'),
+            embeddingMemoryStates: planLaneCandidates(embeddingTargetPlan, 'memory_state'),
+            embeddingEventIdentities: planLaneCandidates(embeddingTargetPlan, 'event_identity'),
+            embeddingAnchorEvidence: planLaneCandidates(embeddingTargetPlan, 'anchor_evidence'),
             embeddingVectors: 0,
             projectionRefs: 0,
             nodes: nodes.length,
@@ -198,12 +312,128 @@ export function buildGraphRebuildSnapshot(input: BuildGraphRebuildSnapshotInput)
             entityLinkSuggestions: entityLinking.suggestions.length,
             entityLinking: entityLinking.counters,
             meaningFrameChunks: chunks.filter((chunk) => Boolean(chunk.meaningFrame)).length,
+            documentSidecarUnits: documentSidecarSummary.counters.units,
+            documentSidecarSections: documentSidecarSummary.counters.sections,
+            documentSidecarRegions: documentSidecarSummary.counters.regions,
+            documentSidecarRhetoricalUnits: documentSidecarSummary.counters.rhetoricalUnits,
+            documentSidecarRetrievalUnits: documentSidecarSummary.counters.retrievalUnits,
+            documentSidecarGraphFacts: documentSidecarSummary.counters.graphFactCandidates,
+            documentSidecarSituationInstances: documentSidecarSummary.counters.situationInstances,
+            documentSidecarStateIntervals: documentSidecarSummary.counters.stateIntervals,
+            documentSidecarEventOrderings: documentSidecarSummary.counters.eventOrderings,
+            documentSidecarTemporalConflicts: documentSidecarSummary.counters.temporalConflicts,
+            documentSidecarEvidenceSpans: documentSidecarSummary.counters.evidenceSpans,
+            documentSidecarAnchorPromotions: documentSidecarSummary.counters.userAnchorPromotions,
+            documentSemanticPropositions: input.documentSemanticSummary?.counters.propositions || 0,
+            documentSemanticArguments: input.documentSemanticSummary?.counters.arguments || 0,
+            documentSemanticResolvedArguments: input.documentSemanticSummary?.counters.resolvedArguments || 0,
+            documentSemanticRoleAnnotations: input.documentSemanticSummary?.counters.roleAnnotations || 0,
+            documentSemanticUnresolvedRoleSurfaces: input.documentSemanticSummary?.counters.unresolvedRoleSurfaces || 0,
+            documentSemanticRoleFailureReasons: input.documentSemanticSummary?.counters.roleFailureReasons || 0,
+            documentSemanticFrameAnnotations: input.documentSemanticSummary?.counters.frameAnnotations || 0,
+            documentSemanticLexicalFrames: input.documentSemanticSummary?.counters.lexicalFrameMatches || 0,
+            documentSemanticFallbackFrames: input.documentSemanticSummary?.counters.fallbackFrameMatches || 0,
+            documentSemanticLowConfidenceFrames: input.documentSemanticSummary?.counters.lowConfidenceFrames || 0,
+            documentSemanticFrameFailureReasons: input.documentSemanticSummary?.counters.frameFailureReasons || 0,
+            documentSemanticFactualityAnnotations: input.documentSemanticSummary?.counters.factualityAnnotations || 0,
+            documentSemanticScopedFactuality: input.documentSemanticSummary?.counters.scopedFactuality || 0,
+            documentSemanticAttributedFactuality: input.documentSemanticSummary?.counters.attributedFactuality || 0,
+            documentSemanticQuotedFactuality: input.documentSemanticSummary?.counters.quotedFactuality || 0,
+            documentSemanticConditionalFactuality: input.documentSemanticSummary?.counters.conditionalFactuality || 0,
+            documentSemanticSpeechOrBeliefFrames: input.documentSemanticSummary?.counters.speechOrBeliefFrames || 0,
+            documentSemanticLowConfidenceFactuality: input.documentSemanticSummary?.counters.lowConfidenceFactuality || 0,
+            documentSemanticFactualityFailureReasons: input.documentSemanticSummary?.counters.factualityFailureReasons || 0,
+            documentSemanticArgumentRecoveries: input.documentSemanticSummary?.counters.documentArgumentRecoveries || 0,
+            documentSemanticLocalCoreferenceRecoveries: input.documentSemanticSummary?.counters.localCoreferenceRecoveries || 0,
+            documentSemanticAliasContinuityRecoveries: input.documentSemanticSummary?.counters.aliasContinuityRecoveries || 0,
+            documentSemanticOmittedSubjectRecoveries: input.documentSemanticSummary?.counters.omittedSubjectRecoveries || 0,
+            documentSemanticQuoteSpeakerRecoveries: input.documentSemanticSummary?.counters.quoteSpeakerRecoveries || 0,
+            documentSemanticRepeatedEventLinks: input.documentSemanticSummary?.counters.repeatedEventLinks || 0,
+            documentSemanticWindowArgumentCompletions: input.documentSemanticSummary?.counters.windowArgumentCompletions || 0,
+            documentSemanticLowConfidenceRecoveries: input.documentSemanticSummary?.counters.lowConfidenceRecoveries || 0,
+            documentSemanticRecoveryFailureReasons: input.documentSemanticSummary?.counters.recoveryFailureReasons || 0,
+            documentSemanticSituationInstances: input.documentSemanticSummary?.counters.situationInstances || 0,
+            documentSemanticStateIntervals: input.documentSemanticSummary?.counters.stateIntervals || 0,
+            documentSemanticEventOrderings: input.documentSemanticSummary?.counters.eventOrderings || 0,
+            documentSemanticExplicitEventOrderings: input.documentSemanticSummary?.counters.explicitEventOrderings || 0,
+            documentSemanticRecurrenceOrderings: input.documentSemanticSummary?.counters.recurrenceOrderings || 0,
+            documentSemanticPersistentStateIntervals: input.documentSemanticSummary?.counters.persistentStateIntervals || 0,
+            documentSemanticTerminatedStateIntervals: input.documentSemanticSummary?.counters.terminatedStateIntervals || 0,
+            documentSemanticTemporalConflicts: input.documentSemanticSummary?.counters.temporalConflicts || 0,
+            documentSemanticWorldStateIneligibleSituations: input.documentSemanticSummary?.counters.worldStateIneligibleSituations || 0,
+            documentSemanticNegated: input.documentSemanticSummary?.counters.negated || 0,
+            documentSemanticModal: input.documentSemanticSummary?.counters.modal || 0,
+            documentSemanticConditional: input.documentSemanticSummary?.counters.conditional || 0,
+            documentSemanticAttributed: input.documentSemanticSummary?.counters.attributed || 0,
+            documentSemanticQuoted: input.documentSemanticSummary?.counters.quoted || 0,
+            documentSemanticQuestions: input.documentSemanticSummary?.counters.questions || 0,
+            documentSemanticDirectives: input.documentSemanticSummary?.counters.directives || 0,
+            documentSemanticNary: input.documentSemanticSummary?.counters.nAry || 0,
+            documentSemanticReviewable: input.documentSemanticSummary?.counters.reviewable || 0,
+            documentSemanticLedgerOnly: input.documentSemanticSummary?.counters.ledgerOnly || 0,
+            documentSemanticPredicateModifiers: input.documentSemanticSummary?.counters.predicateModifiers || 0,
+            documentSemanticPredicateNoise: input.documentSemanticSummary?.counters.predicateNoise || 0,
+            documentReviewRows: documentReviewSummary.counters.rows,
+            documentReviewActionableRows: documentReviewSummary.counters.actionableRows,
+            documentReviewStateRecords: documentReviewSummary.counters.stateRecords,
+            documentReviewActions: documentReviewSummary.counters.actions,
+            documentReviewReceipts: documentReviewSummary.counters.receipts,
+            documentReviewReversibleReceipts: documentReviewSummary.counters.reversibleReceipts,
+            documentReviewProposedRows: documentReviewSummary.counters.proposedRows,
+            documentReviewAcceptedRows: documentReviewSummary.counters.acceptedRows,
+            documentReviewRejectedRows: documentReviewSummary.counters.rejectedRows,
+            documentReviewMutedRows: documentReviewSummary.counters.mutedRows,
+            documentReviewPromotedToAnchorRows: documentReviewSummary.counters.promotedToAnchorRows,
+            documentReviewCompiledToGraphRows: documentReviewSummary.counters.compiledToGraphRows,
+            documentReviewLedgerOnlyRows: documentReviewSummary.counters.ledgerOnlyRows,
+            documentCompilerEntityMentions: documentCompilerSummary.counters.entityMentions,
+            documentCompilerRelationCandidates: documentCompilerSummary.counters.relationCandidates,
+            documentCompilerHyperedges: documentCompilerSummary.counters.hyperedges,
+            documentCompilerNaryHyperedges: documentCompilerSummary.counters.naryHyperedges,
+            documentCompilerEvidenceEdges: documentCompilerSummary.counters.evidenceBackedEdges,
+            documentCompilerCrossDocBridges: documentCompilerSummary.counters.crossDocBridges,
+            documentCompilerStructureEdges: documentCompilerSummary.counters.documentStructureEdges,
+            documentCompilerRetrievalOverlays: documentCompilerSummary.counters.retrievalOverlays,
+            documentCompilerTopologyDiffs: documentCompilerSummary.counters.topologyDiffs,
+            documentCompilerTopologyCommits: documentCompilerSummary.counters.topologyCommits,
+            documentCompilerNativeCompileCandidates: documentCompilerSummary.counters.nativeCompileCandidates || 0,
+            documentCompilerLedgerOnly: documentCompilerSummary.counters.ledgerOnly,
+            documentCompilerOverlayOnly: documentCompilerSummary.counters.overlayOnly,
+            documentCompilerReviewable: documentCompilerSummary.counters.reviewable,
+            documentCompilerBlocked: documentCompilerSummary.counters.blocked,
+            documentCompilerReceipts: documentCompilerSummary.counters.receipts,
+            documentCompilerReversibleReceipts: documentCompilerSummary.counters.reversibleReceipts,
+            documentCompilerMutationAllowed: documentCompilerSummary.counters.mutationAllowed,
+            documentCompilerHighConfidenceFacts: documentCompilerSummary.counters.highConfidenceFacts,
+            documentCompilerReviewedFacts: documentCompilerSummary.counters.reviewedFacts,
+            documentCompilerAmbiguousFacts: documentCompilerSummary.counters.ambiguousFacts,
+            operatorMutationIntents: operatorMutationJournal?.counters.intents || 0,
+            operatorMutationActive: operatorMutationJournal?.counters.active || 0,
+            operatorMutationApplied: operatorMutationJournal?.counters.applied || 0,
+            operatorMutationConflicted: operatorMutationJournal?.counters.conflicted || 0,
+            operatorMutationUndone: operatorMutationJournal?.counters.undone || 0,
+            operatorMutationReceipts: operatorMutationJournal?.counters.receipts || 0,
             eventAspects: derived.events.filter((event) => Boolean(event.aspect)).length,
             dropReasons: drops,
             resolution: hygiene.resolution,
         },
         resolutionSuggestions: hygiene.suggestions,
     };
+    input.cpuProfiler?.mark('snapshotAssemblyMs');
+    const hopfResonanceSpace = buildHopfResonanceSpace(snapshot, { generatedAt: builtAt });
+    if (hopfResonanceSpace.assignments.length !== snapshot.embeddingTargets.length) {
+        throw new Error(
+            `Hopf resonance space contract failed: ${hopfResonanceSpace.assignments.length} assignments for ${snapshot.embeddingTargets.length} embedding targets`,
+        );
+    }
+    snapshot.hopfResonanceSpace = hopfResonanceSpace;
+    snapshot.counters.hopfResonanceAssignments = hopfResonanceSpace.assignments.length;
+    snapshot.counters.hopfResonanceOccupiedCells = hopfResonanceSpace.counters.occupiedCellCount;
+    snapshot.counters.hopfResonanceFibers = hopfResonanceSpace.fibers.length;
+    snapshot.counters.hopfResonanceDocCharts = hopfResonanceSpace.docCharts.length;
+    snapshot.counters.hopfResonanceBraids = hopfResonanceSpace.braids.length;
+    snapshot.counters.hopfResonanceDroppedTargets = hopfResonanceSpace.counters.droppedTargets;
+    snapshot.counters.hopfResonanceMutationAllowed = hopfResonanceSpace.counters.mutationAllowedCount;
     attachGraphCompilerReadModels(
         snapshot,
         input.graphCompilerSidecar || buildCompatibilityGraphCompilerSidecar(snapshot),
@@ -220,41 +450,63 @@ export function buildGraphRebuildSnapshot(input: BuildGraphRebuildSnapshotInput)
     snapshot.counters.shadowLinkSuggestions = shadowLinkSuggestions.length;
     snapshot.counters.finalLinkPatches = finalLinkPatchLog.counters.planned;
     snapshot.counters.finalLinkReceiptFailures = finalLinkPatchLog.counters.failedReceipts;
-    const semanticTaskSummary = buildGraphSemanticTaskSummary(snapshot, builtAt);
+    const semanticLedgersStarted = performance.now();
+    input.cpuProfiler?.checkpoint();
+    const semanticContext = new GraphSemanticDerivationContext(snapshot);
+    const semanticTaskSummary = buildGraphSemanticTaskSummary(snapshot, builtAt, semanticContext);
+    input.cpuProfiler?.mark('snapshotSemanticTasksMs');
     snapshot.semanticTaskSummary = semanticTaskSummary;
     snapshot.counters.semanticTasks = semanticTaskSummary.tasks.length;
     snapshot.counters.semanticTaskReceipts = semanticTaskSummary.receipts.length;
     snapshot.counters.semanticTaskMutationAllowed = semanticTaskSummary.counters.mutationAllowedCount;
-    const semanticCandidateSummary = buildGraphSemanticCandidateSummary(snapshot, semanticTaskSummary, builtAt);
+    const semanticCandidateSummary = buildGraphSemanticCandidateSummary(snapshot, semanticTaskSummary, builtAt, semanticContext);
+    input.cpuProfiler?.mark('snapshotSemanticCandidatesMs');
     snapshot.semanticCandidateSummary = semanticCandidateSummary;
     snapshot.counters.semanticCandidates = semanticCandidateSummary.candidates.length;
     snapshot.counters.semanticCandidateReceipts = semanticCandidateSummary.receipts.length;
     snapshot.counters.semanticCandidateMutationAllowed = semanticCandidateSummary.counters.mutationAllowedCount;
     snapshot.counters.semanticCandidateDeferred = semanticCandidateSummary.counters.deferredCount;
-    const manifoldSpecializationSummary = buildGraphManifoldSpecializationSummary(snapshot, semanticCandidateSummary, builtAt);
+    const manifoldSpecializationSummary = buildGraphManifoldSpecializationSummary(
+        snapshot,
+        semanticCandidateSummary,
+        builtAt,
+        semanticContext,
+    );
+    semanticContext.indexContributions(manifoldSpecializationSummary.contributions);
+    input.cpuProfiler?.mark('snapshotManifoldSpecializationMs');
     snapshot.manifoldSpecializationSummary = manifoldSpecializationSummary;
     snapshot.counters.manifoldSpecializations = manifoldSpecializationSummary.profiles.length;
     snapshot.counters.manifoldCandidateContributions = manifoldSpecializationSummary.contributions.length;
     snapshot.counters.manifoldContributionReceipts = manifoldSpecializationSummary.receipts.length;
     snapshot.counters.manifoldCandidateExplained = manifoldSpecializationSummary.counters.explainedCandidateCount;
     snapshot.counters.manifoldSpecializationMutationAllowed = manifoldSpecializationSummary.counters.mutationAllowedCount;
-    const semanticRerankSummary = buildGraphSemanticRerankSummary(snapshot, semanticCandidateSummary, manifoldSpecializationSummary, builtAt);
+    const semanticRerankSummary = buildGraphSemanticRerankSummary(
+        snapshot,
+        semanticCandidateSummary,
+        manifoldSpecializationSummary,
+        builtAt,
+        semanticContext,
+    );
+    semanticContext.indexJudgments(semanticRerankSummary.judgments);
+    input.cpuProfiler?.mark('snapshotSemanticRerankMs');
     snapshot.semanticRerankSummary = semanticRerankSummary;
     snapshot.counters.semanticRerankInputs = semanticRerankSummary.inputs.length;
     snapshot.counters.semanticRerankJudgments = semanticRerankSummary.judgments.length;
     snapshot.counters.semanticRerankReceipts = semanticRerankSummary.receipts.length;
     snapshot.counters.semanticRerankPlannedModelCalls = semanticRerankSummary.counters.plannedModelCalls;
     snapshot.counters.semanticRerankMutationAllowed = semanticRerankSummary.counters.mutationAllowedCount;
-    const semanticAdjudicationSummary = buildGraphSemanticAdjudicationDAGSummary(snapshot, builtAt);
+    const semanticAdjudicationSummary = buildGraphSemanticAdjudicationDAGSummary(snapshot, builtAt, semanticContext);
     snapshot.semanticAdjudicationSummary = semanticAdjudicationSummary;
     applyGraphSemanticAdjudicationMutations(snapshot, semanticAdjudicationSummary);
+    input.cpuProfiler?.mark('snapshotSemanticAdjudicationMs');
     snapshot.counters.edges = snapshot.edges.length;
     snapshot.counters.semanticAdjudicationDecisions = semanticAdjudicationSummary.decisions.length;
     snapshot.counters.semanticAdjudicationMutations = semanticAdjudicationSummary.mutations.length;
     snapshot.counters.semanticAdjudicationReceipts = semanticAdjudicationSummary.receipts.length;
     snapshot.counters.semanticAdjudicationTopologyCommits = semanticAdjudicationSummary.counters.topologyCommitCount;
     snapshot.counters.semanticAdjudicationLedgerOnly = semanticAdjudicationSummary.counters.ledgerOnlyCount;
-    const semanticEvalLedgerSummary = buildGraphSemanticEvalLedgerSummary(snapshot, builtAt);
+    const semanticEvalLedgerSummary = buildGraphSemanticEvalLedgerSummary(snapshot, builtAt, semanticContext);
+    input.cpuProfiler?.mark('snapshotSemanticEvalLedgerMs');
     snapshot.semanticEvalLedgerSummary = semanticEvalLedgerSummary;
     snapshot.counters.semanticEvalLedgerRows = semanticEvalLedgerSummary.entries.length;
     snapshot.counters.semanticEvalAcceptedCandidates = semanticEvalLedgerSummary.counters.acceptedCandidates;
@@ -263,14 +515,109 @@ export function buildGraphRebuildSnapshot(input: BuildGraphRebuildSnapshotInput)
     snapshot.counters.semanticEvalModelDisagreements = semanticEvalLedgerSummary.counters.modelDisagreements;
     snapshot.counters.semanticEvalManifoldDisagreements = semanticEvalLedgerSummary.counters.manifoldDisagreements;
     snapshot.counters.semanticEvalGraphChangeRows = semanticEvalLedgerSummary.counters.graphChangeRows;
+    input.cpuProfiler?.setSemanticIndexStats(semanticContext.stats());
+    if (includeDiagnosticArms) {
+        const memoryGraphRagBridgeSummary = buildGraphMemoryGraphRagBridgeSummary(snapshot, builtAt);
+        snapshot.memoryGraphRagBridgeSummary = memoryGraphRagBridgeSummary;
+        snapshot.counters.memoryGraphRagRecords = memoryGraphRagBridgeSummary.counters.recordCount;
+        snapshot.counters.memoryGraphRagSchemaRecords = memoryGraphRagBridgeSummary.counters.schemaRecords;
+        snapshot.counters.memoryGraphRagFactRecords = memoryGraphRagBridgeSummary.counters.factRecords;
+        snapshot.counters.memoryGraphRagPassageRecords = memoryGraphRagBridgeSummary.counters.passageRecords;
+        snapshot.counters.memoryGraphRagEvalRows = memoryGraphRagBridgeSummary.counters.evalRowCount;
+        snapshot.counters.memoryGraphRagPassedEvalRows = memoryGraphRagBridgeSummary.counters.passedEvalRows;
+        snapshot.counters.memoryGraphRagReceipts = memoryGraphRagBridgeSummary.counters.receiptCount;
+        snapshot.counters.memoryGraphRagMutationAllowed = memoryGraphRagBridgeSummary.counters.mutationAllowedCount;
+        const discourseSpineSummary = buildGraphDiscourseSpineSummary(snapshot, builtAt);
+        snapshot.discourseSpineSummary = discourseSpineSummary;
+        snapshot.counters.discourseSpineTargets = discourseSpineSummary.counters.targetCount;
+        snapshot.counters.discourseSpineLabels = discourseSpineSummary.counters.labelCount;
+        snapshot.counters.discourseSpineClusters = discourseSpineSummary.counters.clusterCount;
+        snapshot.counters.discourseSpineBridges = discourseSpineSummary.counters.bridgeCount;
+        snapshot.counters.discourseSpineResonance = discourseSpineSummary.counters.resonanceCandidates;
+        snapshot.counters.discourseSpineResolution = discourseSpineSummary.counters.resolutionCandidates;
+        snapshot.counters.discourseSpineReceipts = discourseSpineSummary.counters.receiptCount;
+        snapshot.counters.discourseSpineMutationAllowed = discourseSpineSummary.counters.mutationAllowedCount;
+        const discourseBridgeCandidateSummary = buildGraphDiscourseBridgeCandidateSummary(snapshot, discourseSpineSummary, builtAt);
+        snapshot.discourseBridgeCandidateSummary = discourseBridgeCandidateSummary;
+        snapshot.counters.discourseBridgeCandidates = discourseBridgeCandidateSummary.counters.candidateCount;
+        snapshot.counters.discourseBridgeInputs = discourseBridgeCandidateSummary.counters.inputCount;
+        snapshot.counters.discourseBridgeJudgments = discourseBridgeCandidateSummary.counters.judgmentCount;
+        snapshot.counters.discourseBridgeEvalRows = discourseBridgeCandidateSummary.counters.evalRowCount;
+        snapshot.counters.discourseBridgeReceipts = discourseBridgeCandidateSummary.counters.receiptCount;
+        snapshot.counters.discourseBridgePlannedModelCalls = discourseBridgeCandidateSummary.counters.plannedModelCalls;
+        snapshot.counters.discourseBridgeMutationAllowed = discourseBridgeCandidateSummary.counters.mutationAllowedCount;
+        const discourseBridgeAdjudicationSummary = buildGraphDiscourseBridgeAdjudicationSummary(snapshot, discourseBridgeCandidateSummary, builtAt);
+        snapshot.discourseBridgeAdjudicationSummary = discourseBridgeAdjudicationSummary;
+        snapshot.counters.discourseBridgeAdjudicationDecisions = discourseBridgeAdjudicationSummary.counters.decisionCount;
+        snapshot.counters.discourseBridgeAdjudicationAccepted = discourseBridgeAdjudicationSummary.counters.acceptedCount;
+        snapshot.counters.discourseBridgeAdjudicationSupported = discourseBridgeAdjudicationSummary.counters.supportedCount;
+        snapshot.counters.discourseBridgeAdjudicationDeferred = discourseBridgeAdjudicationSummary.counters.deferredCount;
+        snapshot.counters.discourseBridgeAdjudicationRejected = discourseBridgeAdjudicationSummary.counters.rejectedCount;
+        snapshot.counters.discourseBridgeAdjudicationReceipts = discourseBridgeAdjudicationSummary.counters.receiptCount;
+        snapshot.counters.discourseBridgeAdjudicationLedgerOnly = discourseBridgeAdjudicationSummary.counters.ledgerOnlyCount;
+        snapshot.counters.discourseBridgeAdjudicationTopologyCommits = discourseBridgeAdjudicationSummary.counters.topologyCommitCount;
+        snapshot.counters.discourseBridgeAdjudicationMutationAllowed = discourseBridgeAdjudicationSummary.counters.mutationAllowedCount;
+        const discourseEvalLedgerSummary = buildGraphDiscourseEvalLedgerSummary(snapshot, builtAt);
+        snapshot.discourseEvalLedgerSummary = discourseEvalLedgerSummary;
+        snapshot.counters.discourseEvalLedgerRows = discourseEvalLedgerSummary.counters.rowCount;
+        snapshot.counters.discourseEvalAcceptedCandidates = discourseEvalLedgerSummary.counters.acceptedCandidates;
+        snapshot.counters.discourseEvalRejectedCandidates = discourseEvalLedgerSummary.counters.rejectedCandidates;
+        snapshot.counters.discourseEvalAmbiguousCases = discourseEvalLedgerSummary.counters.ambiguousCases;
+        snapshot.counters.discourseEvalModelDisagreements = discourseEvalLedgerSummary.counters.modelDisagreements;
+        snapshot.counters.discourseEvalManifoldDisagreements = discourseEvalLedgerSummary.counters.manifoldDisagreements;
+        snapshot.counters.discourseEvalGraphChangeRows = discourseEvalLedgerSummary.counters.graphChangeRows;
+        const discoursePromotionSurfaceSummary = buildGraphDiscoursePromotionSurfaceSummary(snapshot, builtAt);
+        snapshot.discoursePromotionSurfaceSummary = discoursePromotionSurfaceSummary;
+        snapshot.counters.discoursePromotionChunkWormholes = discoursePromotionSurfaceSummary.counters.chunkWormholeCount;
+        snapshot.counters.discoursePromotionDocumentClusters = discoursePromotionSurfaceSummary.counters.documentClusterCount;
+        snapshot.counters.discoursePromotionResolverCandidates = discoursePromotionSurfaceSummary.counters.resolverCandidateCount;
+        snapshot.counters.discoursePromotionCompilerHints = discoursePromotionSurfaceSummary.counters.compilerHintCount;
+        snapshot.counters.discoursePromotionReceipts = discoursePromotionSurfaceSummary.counters.receiptCount;
+        snapshot.counters.discoursePromotionGraphPatches = discoursePromotionSurfaceSummary.counters.graphPatchCount;
+        snapshot.counters.discoursePromotionMutationAllowed = discoursePromotionSurfaceSummary.counters.mutationAllowedCount;
+        const discourseCompilerOverlaySummary = buildGraphDiscourseCompilerOverlaySummary(snapshot, builtAt);
+        snapshot.discourseCompilerOverlaySummary = discourseCompilerOverlaySummary;
+        snapshot.counters.discourseCompilerOverlayEdges = discourseCompilerOverlaySummary.counters.overlayEdgeCount;
+        snapshot.counters.discourseCompilerOverlayChunkWormholes = discourseCompilerOverlaySummary.counters.chunkWormholeEdges;
+        snapshot.counters.discourseCompilerOverlayDocumentClusters = discourseCompilerOverlaySummary.counters.documentClusterEdges;
+        snapshot.counters.discourseCompilerOverlayResolvers = discourseCompilerOverlaySummary.counters.resolverEdges;
+        snapshot.counters.discourseCompilerOverlayReceipts = discourseCompilerOverlaySummary.counters.receiptCount;
+        snapshot.counters.discourseCompilerOverlayGraphPatches = discourseCompilerOverlaySummary.counters.graphPatchCount;
+        snapshot.counters.discourseCompilerOverlayMutationAllowed = discourseCompilerOverlaySummary.counters.mutationAllowedCount;
+    }
+    const calendarRegistrySummary = buildGraphCalendarRegistryBridgeSummary({
+        calendarRegistry: input.calendarRegistrySnapshot,
+        sourceSnapshotId: snapshot.id,
+        scopeKind: input.scopeKind,
+        scopeId: input.scopeId,
+        noteIds,
+        generatedAt: builtAt,
+    });
+    if (calendarRegistrySummary) {
+        snapshot.calendarRegistrySummary = calendarRegistrySummary;
+        snapshot.counters.calendarRegistryAnchors = calendarRegistrySummary.counters.anchorCount;
+        snapshot.counters.calendarRegistryReceipts = calendarRegistrySummary.counters.receiptCount;
+        snapshot.counters.calendarRegistryAcceptedTemporalReceipts = calendarRegistrySummary.counters.acceptedTemporalReceipts;
+        snapshot.counters.calendarRegistryRealEpochReceipts = calendarRegistrySummary.counters.realEpochReceipts;
+        snapshot.counters.calendarRegistryCustomOrdinalReceipts = calendarRegistrySummary.counters.customOrdinalReceipts;
+        snapshot.counters.calendarRegistryMutationAllowed = calendarRegistrySummary.counters.mutationAllowedCount;
+    }
+    input.cpuProfiler?.add('snapshotSemanticLedgersMs', semanticLedgersStarted);
     return snapshot;
 }
 
-function planLaneAdmitted(
-    plan: { lanes: Array<{ lane: GraphRebuildSignalTargetLane; admitted: number }> },
+function planLaneCandidates(
+    plan: { lanes: Array<{ lane: GraphRebuildSignalTargetLane; candidates: number }> },
     lane: GraphRebuildSignalTargetLane,
 ): number {
-    return plan.lanes.find((row) => row.lane === lane)?.admitted || 0;
+    return plan.lanes.find((row) => row.lane === lane)?.candidates || 0;
+}
+
+function countChunkSemanticBridges(
+    bridges: GraphRebuildChunkSemanticBridge[],
+    bridgeType: GraphRebuildChunkSemanticBridgeType,
+): number {
+    return bridges.filter((bridge) => bridge.bridgeType === bridgeType).length;
 }
 
 function buildNodes(anchors: GraphRebuildEntityAnchor[], entitiesById: Map<string, RegisteredEntity>): GraphRebuildNode[] {
@@ -293,7 +640,11 @@ function buildNodes(anchors: GraphRebuildEntityAnchor[], entitiesById: Map<strin
         node.totalMentions += 1;
         byEntity.set(entity.id, node);
     }
-    return [...byEntity.values()].sort((left, right) => right.totalMentions - left.totalMentions || left.label.localeCompare(right.label));
+    return [...byEntity.values()].sort((left, right) =>
+        right.totalMentions - left.totalMentions
+        || left.kind.localeCompare(right.kind)
+        || left.label.localeCompare(right.label),
+    );
 }
 
 function buildEdges(anchors: GraphRebuildEntityAnchor[], drops: GraphRebuildDropReasons): GraphRebuildEdge[] {

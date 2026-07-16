@@ -2,7 +2,7 @@
  * CrepeModelCache - Isolated IndexedDB for ML Model Storage
  * 
  * This is a stripped-down Dexie instance used ONLY for caching:
- * - TTS models (Supertonic-TTS-2-ONNX)
+ * - TTS models (browser Supertonic v2 compatibility ONNX)
  * - Embedding models (@xenova/transformers)
  * - Voice files (.bin)
  * 

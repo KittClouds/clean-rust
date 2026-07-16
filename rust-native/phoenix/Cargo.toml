@@ -10,11 +10,13 @@ members = [
     "crates/phoenix-event-identity-post",
     "crates/phoenix-chunker",
     "crates/phoenix-dynamic-ner",
+    "crates/phoenix-document-index",
     "crates/phoenix-evidence-graph",
     "crates/phoenix-embed",
     "crates/phoenix-er-post",
     "crates/phoenix-graph-post",
     "crates/phoenix-graph-rebuild",
+    "crates/phoenix-graph-research",
     "crates/phoenix-graph",
     "crates/phoenix-graph-kernel",
     "crates/phoenix-hyperbolic",
@@ -46,6 +48,7 @@ default-members = [
     "crates/phoenix-graph-kernel",
     "crates/phoenix-graph-post",
     "crates/phoenix-graph-rebuild",
+    "crates/phoenix-graph-research",
     "crates/phoenix-hyperbolic",
     "crates/phoenix-ingest-overgraph",
     "crates/phoenix-memory-post",
@@ -83,6 +86,7 @@ rustling = { version = "0.8.0", default-features = false, features = ["parallel"
 zerocopy = { version = "0.7", features = ["derive"] }
 memchr = "2.7"
 memmap2 = "0.9"
+wide = "0.7.33"
 stop-words = "0.9"
 openrouter-rs = "0.4.7"
 compact_str = { version = "0.8", features = ["serde"] }
@@ -96,6 +100,7 @@ bstr = "1.11"
 arc-swap = "1.7"
 overgraph = "0.4.1"
 bm25_turbo = "0.2.0"
+xxhash-rust = { version = "0.8", features = ["xxh3"] }
 
 [profile.release]
 opt-level = 3

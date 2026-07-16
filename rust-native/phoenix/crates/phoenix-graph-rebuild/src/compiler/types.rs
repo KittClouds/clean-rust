@@ -1,12 +1,13 @@
 use compact_str::CompactString;
 use phoenix_alex::SurfaceHit;
-use phoenix_chunker::{LensChunk, LensMentionGraph};
+use phoenix_chunker_native::{LensChunk, LensMentionGraph};
 use phoenix_types::{EntityId, TextRange};
 use serde::{Deserialize, Serialize};
 
 use crate::types::{
-    GraphAnchor, GraphChunk, GraphEdge, GraphEvent, GraphMemoryState, GraphMention, GraphNode,
-    GraphRelationship, GraphScopeKind, GraphTemporalEdge,
+    GraphAnchor, GraphCalendarRegistryBridgeSummary, GraphChunk, GraphEdge, GraphEvent,
+    GraphMemoryState, GraphMention, GraphNode, GraphRelationship, GraphScopeKind,
+    GraphTemporalEdge,
 };
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize)]
@@ -57,6 +58,7 @@ pub enum EvidenceKind {
     ModelVote,
     AdjudicationVote,
     EventReference,
+    CalendarRegistry,
     MentionGraphEdge,
 }
 
@@ -249,6 +251,18 @@ pub struct RelationFact {
     pub status: CompactString,
     pub evidence_ids: Vec<CompactString>,
     pub confidence: f32,
+    #[serde(default)]
+    pub semantic_situation_id: Option<CompactString>,
+    #[serde(default)]
+    pub semantic_frame: Option<CompactString>,
+    #[serde(default)]
+    pub factuality: Option<CompactString>,
+    #[serde(default)]
+    pub state_interval_ids: Vec<CompactString>,
+    #[serde(default)]
+    pub event_ordering_ids: Vec<CompactString>,
+    #[serde(default)]
+    pub temporal_conflict_ids: Vec<CompactString>,
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
@@ -274,6 +288,14 @@ pub struct FactRole {
     pub role: CompactString,
     pub atom_id: CompactString,
     pub confidence: f32,
+    #[serde(default)]
+    pub semantic_role: Option<CompactString>,
+    #[serde(default)]
+    pub slot_type: Option<CompactString>,
+    #[serde(default)]
+    pub required: Option<bool>,
+    #[serde(default)]
+    pub resolved: Option<bool>,
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
@@ -354,6 +376,9 @@ pub struct GraphCompilerInput<'a> {
     pub temporal_edges: &'a [GraphTemporalEdge],
     pub causal_edges: &'a [GraphTemporalEdge],
     pub memory_state: &'a [GraphMemoryState],
+    pub calendar_registry: Option<&'a GraphCalendarRegistryBridgeSummary>,
+    pub document_sidecar: Option<&'a crate::types::GraphDocumentSidecarSummary>,
+    pub document_compiler: Option<&'a crate::types::GraphDocumentCompilerSummary>,
     pub legacy_edges: &'a [GraphEdge],
     pub bundle_compression: Option<&'a BundleCompressionInput<'a>>,
     pub bundle_commitment: Option<&'a BundleCommitmentInput<'a>>,

@@ -1,7 +1,6 @@
 use std::cmp::Ordering;
 
 use hashbrown::HashMap;
-use phoenix_embed::TextEmbeddingBatch;
 use phoenix_hyperbolic::{AnnMetric, HnswBuildParams, HyperbolicHnswBuilder};
 use phoenix_store_native_core::SemanticNodeNeighbor;
 
@@ -21,15 +20,6 @@ pub(crate) struct EmbeddingRows<'a> {
 }
 
 impl<'a> EmbeddingRows<'a> {
-    pub(crate) fn from_batch(batch: &'a TextEmbeddingBatch) -> Self {
-        Self {
-            values: batch.values(),
-            rows: batch.rows(),
-            dims: batch.dims(),
-        }
-    }
-
-    #[cfg(test)]
     pub(crate) fn from_flat(values: &'a [f32], rows: usize, dims: usize) -> Option<Self> {
         if rows == 0 {
             return values.is_empty().then_some(Self { values, rows, dims });

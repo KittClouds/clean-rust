@@ -178,7 +178,7 @@ export class CentralRegistry {
             // Without this, ScopeService (and other subscribers) never learn
             // that entities are available after boot cache hydration.
             if (this.entityCache.size > 0) {
-                this.notify(true); // Entity change → triggers dictionary rebuild too
+                this.notify(false);
             }
 
         } catch (err) {
@@ -670,7 +670,7 @@ export class CentralRegistry {
         // Debounce: wait 500ms after last change before rebuilding
         this.dictionaryRebuildTimer = setTimeout(() => {
             if (this.pendingDictionaryRebuild) {
-                this.performDictionaryRebuild();
+                this.rebuildDictionaryNow();
                 this.pendingDictionaryRebuild = false;
             }
         }, 500);
@@ -680,7 +680,7 @@ export class CentralRegistry {
      * Perform the actual dictionary rebuild.
      * Collects all entities and sends them to Phoenix for scanner dictionary refresh.
      */
-    private async performDictionaryRebuild(): Promise<void> {
+    async rebuildDictionaryNow(): Promise<void> {
         // Guard: Prevent concurrent rebuilds
         if (this.isRebuildingDictionary) {
             console.log('[CentralRegistry] Dictionary rebuild already in progress, skipping');
@@ -704,7 +704,12 @@ export class CentralRegistry {
             }
 
             console.log('[CentralRegistry] Triggering dictionary rebuild from native projection');
-            await phoenixUiApi.hydrateWithEntities();
+            await phoenixUiApi.hydrateWithEntityRows(this.snapshot.map((entity) => ({
+                id: entity.id,
+                label: entity.label,
+                kind: entity.kind,
+                aliases: entity.aliases,
+            })));
             console.log(`[CentralRegistry] ✅ Dictionary rebuild complete`);
 
             // Dispatch a state event only. The machine controller owns explicit scans.

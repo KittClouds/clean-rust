@@ -1,0 +1,129 @@
+:host {
+    display: block;
+    height: 100%;
+    min-height: 0;
+}
+
+.atlas-control-shell {
+    display: flex;
+    height: 100%;
+    min-height: 0;
+    flex-direction: column;
+    overflow: hidden;
+    background:
+        radial-gradient(circle at 18% 0%, rgba(34, 211, 238, 0.08), transparent 28%),
+        radial-gradient(circle at 86% 10%, rgba(168, 85, 247, 0.07), transparent 28%),
+        linear-gradient(180deg, #05070b 0%, #06080e 54%, #05070b 100%);
+    color: rgb(244 244 245);
+}
+
+.atlas-control-header {
+    display: flex;
+    min-height: 72px;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(0, 0, 0, 0.24);
+    padding: 14px 18px;
+}
+
+.atlas-control-header span {
+    color: var(--ui-accent-bright);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+}
+
+.atlas-control-header h2 {
+    margin: 3px 0 0;
+    color: white;
+    font-size: 24px;
+    font-weight: 850;
+    letter-spacing: 0;
+}
+
+.atlas-control-ledger {
+    display: flex;
+    min-width: 0;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.atlas-control-ledger span {
+    display: inline-flex;
+    min-height: 32px;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid rgba(var(--ui-accent-rgb), 0.28);
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.22);
+    padding: 0 10px;
+    color: rgb(161 161 170);
+    font-size: 10px;
+    white-space: nowrap;
+}
+
+.atlas-control-ledger strong {
+    color: var(--ui-accent-bright);
+    font-size: 13px;
+}
+
+.atlas-control-grid {
+    display: grid;
+    min-height: 0;
+    flex: 1 1 auto;
+    grid-template-columns: minmax(360px, 0.92fr) minmax(480px, 1.08fr);
+    gap: 12px;
+    overflow: hidden;
+    padding: 12px;
+}
+
+.atlas-control-pane {
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.075);
+    border-radius: 8px;
+    background: linear-gradient(180deg, rgba(11, 15, 24, 0.72), rgba(5, 7, 11, 0.82));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.035);
+}
+
+.atlas-control-panel-fill {
+    display: block;
+    height: 100%;
+    min-height: 0;
+}
+
+.atlas-control-rooms app-atlas-control-rooms {
+    width: 100%;
+}
+
+@media (max-width: 1100px) {
+    .atlas-control-shell {
+        overflow-y: auto;
+    }
+
+    .atlas-control-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .atlas-control-ledger {
+        justify-content: flex-start;
+    }
+
+    .atlas-control-grid {
+        min-height: 1240px;
+        flex: 0 0 auto;
+        grid-template-columns: 1fr;
+        overflow: visible;
+    }
+
+    .atlas-control-pane {
+        min-height: 600px;
+    }
+}

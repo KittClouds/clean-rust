@@ -402,11 +402,6 @@ class PrettyTextAPI implements PrettyTextApi {
         const filteredSpans = allSpans.filter(span => {
             // @ts-ignore
             if (span.type === 'entity_ref' && !this.enableEntityRefs) return false;
-            // @ts-ignore
-            if (settings.mode === 'focus' && span.type === 'entity' && span.kind) {
-                // @ts-ignore
-                return settings.focusEntityKinds.includes(span.kind as EntityKind);
-            }
             return true;
         });
 
@@ -481,7 +476,6 @@ class PrettyTextAPI implements PrettyTextApi {
         const settings = highlightingStore.getSettings();
         return {
             mode: settings.mode,
-            focusKinds: settings.focusEntityKinds.length > 0 ? settings.focusEntityKinds : undefined,
             enableWikilinks: true, // Always on in Highlighter C
             enableEntityRefs: this.enableEntityRefs,
         };
