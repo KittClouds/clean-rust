@@ -224,7 +224,8 @@ struct PersistenceWalApplyReport {
     total_ms: u64,
 }
 
-fn homogeneous_scoped_document_upserts(
+/// Batches only independent scoped-document keys. Duplicate keys retain ordered WAL replay.
+fn batchable_scoped_document_upserts(
     records: &[PersistenceWalRecord],
 ) -> Result<Option<Vec<Value>>, StoreError> {
     if records.len() < 2 {
@@ -5980,7 +5981,7 @@ impl PhoenixRuntime {
             records: records.len(),
             ..PersistenceWalApplyReport::default()
         };
-        if let Some(rows) = homogeneous_scoped_document_upserts(records)? {
+        if let Some(rows) = batchable_scoped_document_upserts(records)? {
             let started = Instant::now();
             self.upsert_native_relation_rows("scoped_documents", &rows)?;
             report.relation_upserts = rows.len();
@@ -16269,6 +16270,70 @@ mod tests {
                 .and_then(Value::as_u64),
             Some(1)
         );
+
+        let duplicate_result = runtime
+            .store_command(StoreCommandRequest {
+                command: "persistence:applyWalBatch".to_owned(),
+                payload: json!({
+                    "records": [
+                        {
+                            "seq": 3,
+                            "command": "relation:upsert",
+                            "partition": "content",
+                            "writtenAt": 102,
+                            "payload": {
+                                "relation": "scoped_documents",
+                                "row": {
+                                    "id": "phoenix.graph.rebuild:scope:content:anchors",
+                                    "scope_folder_id": "scope",
+                                    "narrative_id": "",
+                                    "namespace": "phoenix.graph.rebuild",
+                                    "document_key": "content:anchors",
+                                    "payload": "{\"anchors\":[1]}",
+                                    "created_at": 100,
+                                    "updated_at": 102
+                                }
+                            }
+                        },
+                        {
+                            "seq": 4,
+                            "command": "relation:upsert",
+                            "partition": "content",
+                            "writtenAt": 103,
+                            "payload": {
+                                "relation": "scoped_documents",
+                                "row": {
+                                    "id": "phoenix.graph.rebuild:scope:content:anchors",
+                                    "scope_folder_id": "scope",
+                                    "narrative_id": "",
+                                    "namespace": "phoenix.graph.rebuild",
+                                    "document_key": "content:anchors",
+                                    "payload": "{\"anchors\":[2]}",
+                                    "created_at": 100,
+                                    "updated_at": 103
+                                }
+                            }
+                        }
+                    ]
+                }),
+            })
+            .expect("duplicate scoped document wal batch");
+
+        assert_eq!(
+            duplicate_result
+                .payload
+                .as_ref()
+                .and_then(|payload| payload.pointer("/timings/relationUpsertBatches"))
+                .and_then(Value::as_u64),
+            Some(2)
+        );
+        let anchor_payload = runtime
+            .fetch_relation_rows("scoped_documents")
+            .expect("scoped documents after ordered replay")
+            .into_iter()
+            .find(|row| row.get("document_key").and_then(Value::as_str) == Some("content:anchors"))
+            .and_then(|row| row.get("payload").and_then(Value::as_str).map(str::to_owned));
+        assert_eq!(anchor_payload.as_deref(), Some("{\"anchors\":[2]}"));
     }
 
     #[test]

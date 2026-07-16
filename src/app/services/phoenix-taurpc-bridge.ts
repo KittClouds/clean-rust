@@ -108,14 +108,16 @@ export function canonicalRewardObserverDelayMs(report: unknown, now = Date.now()
         : Math.min(Math.max(nextEligibleAt - now, 1_000), 2_147_483_647);
 }
 
-export function graphAnalysisResidentDocumentRequest(
+type PendingGraphRun = { runHandle: string; signature: string };
+
+export function prepareGraphAnalysisResidentRequest(
     request: unknown,
     residentDocuments: Map<string, { text: string; textHash: string }>,
-    pendingRun: { runHandle: string; signature: string } | null,
-): unknown {
+    pendingRun: PendingGraphRun | null,
+): { request: unknown; pendingRun: PendingGraphRun | null } {
     const record = objectRecord(request);
     const documents = Array.isArray(record?.['documents']) ? record['documents'] : null;
-    if (!record || !documents) return request;
+    if (!record || !documents) return { request, pendingRun };
     let changed = false;
     const compactDocuments = documents.map((value) => {
         const document = objectRecord(value);
@@ -128,18 +130,13 @@ export function graphAnalysisResidentDocumentRequest(
     });
     const compactRequest = changed ? { ...record, documents: compactDocuments } : record;
     const signature = graphRunDocumentSignature(compactDocuments, 'noteId');
-    return pendingRun?.signature === signature
-        ? { ...compactRequest, runHandle: pendingRun.runHandle }
-        : compactRequest;
-}
-
-export function graphAnalysisPendingRunAfterRequest(
-    pendingRun: { runHandle: string; signature: string } | null,
-    request: unknown,
-): { runHandle: string; signature: string } | null {
-    return pendingRun && objectRecord(request)?.['runHandle'] === pendingRun.runHandle
-        ? null
-        : pendingRun;
+    if (pendingRun?.signature !== signature) {
+        return { request: compactRequest, pendingRun };
+    }
+    return {
+        request: { ...compactRequest, runHandle: pendingRun.runHandle },
+        pendingRun: null,
+    };
 }
 
 function graphRunDocumentSignature(documents: unknown[], idField: 'documentId' | 'noteId'): string {
@@ -302,16 +299,15 @@ class PhoenixTaurpcBridge implements PhoenixNativeBridge {
 
     async analyzeGraphSnapshot(request: unknown): Promise<unknown> {
         await this.loadRuntime();
-        const pendingRun = this.pendingGraphRun;
-        const residentRequest = graphAnalysisResidentDocumentRequest(
+        const prepared = prepareGraphAnalysisResidentRequest(
             request,
             this.residentGraphDocuments,
-            pendingRun,
+            this.pendingGraphRun,
         );
-        this.pendingGraphRun = graphAnalysisPendingRunAfterRequest(pendingRun, residentRequest);
+        this.pendingGraphRun = prepared.pendingRun;
         return phoenixTransportAudit.measureTypedRpc(
             'phoenix.analyze_graph_snapshot',
-            () => this.rpc.phoenix.analyze_graph_snapshot(residentRequest as never),
+            () => this.rpc.phoenix.analyze_graph_snapshot(prepared.request as never),
         );
     }
 

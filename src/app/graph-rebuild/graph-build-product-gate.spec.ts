@@ -288,6 +288,16 @@ describeBaseline('product graph build gate', () => {
         expect(backend.snapshotAnalyses).toHaveLength(1);
         expect(backend.persistGraphRun).toHaveBeenCalledTimes(2);
         expect(backend.closeGraphRun).toHaveBeenCalledTimes(0);
+        expect(cold.receipt.stageReceipts.find((stage) => stage.id === 'snapshotCpu')?.counters)
+            .toEqual(expect.objectContaining({
+                nativeSnapshotAnalysisMs: expect.any(Number),
+                nativeAnalysisRustMs: expect.any(Number),
+                nativeBridgeRustMs: expect.any(Number),
+                nativeContinuityRustMs: expect.any(Number),
+                nativeGovernanceRustMs: expect.any(Number),
+                nativeRetrievalRustMs: expect.any(Number),
+                nativeVerdictRustMs: expect.any(Number),
+            }));
         expect(backend.commands.filter((row) => row.command === 'graphRebuild:analyzeSnapshot'))
             .toHaveLength(0);
         expect(backend.commands.filter((row) => [
