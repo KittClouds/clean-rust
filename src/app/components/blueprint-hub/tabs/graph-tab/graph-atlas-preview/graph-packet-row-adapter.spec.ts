@@ -6,7 +6,11 @@ import type {
     GraphRebuildVisualTrace,
 } from '../../../../../graph-rebuild/graph-rebuild-snapshot';
 import type { GalaxyRenderableNode } from './graph-galaxy-engine';
-import { buildGraphPacketRowAdapter, graphPacketEmbeddingTargetCount } from './graph-packet-row-adapter';
+import {
+    buildGraphPacketEmbeddingTargets,
+    buildGraphPacketRowAdapter,
+    graphPacketEmbeddingTargetCount,
+} from './graph-packet-row-adapter';
 import {
     graphTopologyReviewStateForStatus,
     graphTopologyStyleForEmbeddingTarget,
@@ -82,7 +86,72 @@ describe('graph packet row adapter', () => {
             }),
         });
     });
+
+    it('adapts a 6,000-row shared-reference packet below one second without losing exact matches', () => {
+        const fixture = sharedReferencePacket(6_000);
+        const startedAt = performance.now();
+
+        const rows = buildGraphPacketRowAdapter(fixture);
+        const durationMs = performance.now() - startedAt;
+
+        expect(durationMs).toBeLessThan(1_000);
+        expect(rows.graphNodes).toHaveLength(6_000);
+        expect(rows.embeddingTargets).toHaveLength(6_000);
+        expect(rows.embeddingTargets[5_999].visualTrace).toMatchObject({
+            packetObjectId: 'fact:5999',
+            packetTargetId: 'embed:fact:5999',
+        });
+    });
+
+    it('projects only embedding rows without constructing the graph surface', () => {
+        const fixture = sharedReferencePacket(6_000);
+        const expected = buildGraphPacketRowAdapter(fixture).embeddingTargets;
+        const startedAt = performance.now();
+
+        const targets = buildGraphPacketEmbeddingTargets(fixture);
+        const durationMs = performance.now() - startedAt;
+
+        expect(durationMs).toBeLessThan(500);
+        expect(targets).toEqual(expected);
+    });
 });
+
+function sharedReferencePacket(count: number): GraphAtlasPacket {
+    const fixture = packet();
+    fixture.objects = Array.from({ length: count }, (_, index) => ({
+        id: `fact:${index}`,
+        family: 'fact' as const,
+        status: 'accepted' as const,
+        kind: 'relationshipFact',
+        label: `Fact ${index}`,
+        noteIds: ['note-shared'],
+        chunkIds: ['chunk-shared'],
+        anchorIds: [],
+        evidenceIds: ['evidence-shared'],
+        sourceIds: [`source:${index}`],
+        targetIds: [],
+    }));
+    fixture.manifoldTargets = fixture.objects.map((object, index) => ({
+        id: `embed:fact:${index}`,
+        objectId: object.id,
+        family: 'fact' as const,
+        admission: 'admitted' as const,
+        status: 'accepted' as const,
+        vectorStatus: 'missing' as const,
+        coordinateSource: 'deterministic-signature',
+        kind: object.kind,
+        label: object.label,
+        sourceId: object.sourceIds[0],
+        noteId: 'note-shared',
+        chunkId: 'chunk-shared',
+        evidenceIds: ['evidence-shared'],
+        parentIds: [],
+    }));
+    fixture.counters.objects = count;
+    fixture.counters.manifoldTargets = count;
+    fixture.counters.families = [{ family: 'fact', count }];
+    return fixture;
+}
 
 function packet(): GraphAtlasPacket {
     return {

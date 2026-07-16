@@ -1410,8 +1410,15 @@ export class PhoenixStoreService {
         const startedAt = Date.now();
         const runtimeTarget = this.phoenix.target;
         console.log('[PhoenixStoreService] initialize:start');
+        console.log('[PhoenixStoreService] initialize:persistence.load:start');
+        const persistenceLoadPromise = this.persistence.loadManifestMeta();
         console.log(`[PhoenixStoreService] initialize:${runtimeTarget}.load:start`);
-        await this.phoenix.loadRuntime();
+        try {
+            await this.phoenix.loadRuntime();
+        } catch (error) {
+            await persistenceLoadPromise.catch(() => undefined);
+            throw error;
+        }
         console.log(`[PhoenixStoreService] initialize:${runtimeTarget}.load:complete (${Date.now() - startedAt}ms)`);
         if (runtimeTarget === 'native') {
             console.log('[PhoenixStoreService] initialize:initRuntime:skipped (native runtime already initialized)');
@@ -1424,8 +1431,7 @@ export class PhoenixStoreService {
         await this.ensureRuntimeCompatibility();
         console.log(`[PhoenixStoreService] initialize:runtime.compat:complete (${Date.now() - startedAt}ms)`);
 
-        console.log('[PhoenixStoreService] initialize:persistence.load:start');
-        const persisted = await this.persistence.loadManifestMeta();
+        const persisted = await persistenceLoadPromise;
         this.manifestMeta = persisted;
         const closedWalBytes = persisted.closedSegments.reduce((sum, segment) => sum + segment.bytes, 0);
         console.log(

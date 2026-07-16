@@ -31,6 +31,7 @@ export interface EmbeddingAtlasManifoldMetadata extends ManifoldTopologyPayload 
     sourceLabel: string;
     capabilities: ManifoldCapabilities;
     projectionSource?: ManifoldProjectionSource | string;
+    compileTimings?: Record<string, number>;
 }
 
 export interface EmbeddingAtlasSearchItem {

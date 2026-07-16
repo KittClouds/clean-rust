@@ -1,10 +1,16 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import {
     canonicalRewardObserverDelayMs,
+    NATIVE_REWARD_OBSERVER_BOOT_DELAY_MS,
     prepareGraphAnalysisResidentRequest,
+    scheduleNativeRewardHorizonObservation,
     utf8MentionOffsets,
 } from './phoenix-taurpc-bridge';
+
+afterEach(() => {
+    vi.useRealTimers();
+});
 
 describe('Phoenix TauRPC compact mention projection', () => {
     it('maps UTF-8 byte ranges to JavaScript UTF-16 offsets without changing wire ranges', () => {
@@ -51,5 +57,17 @@ describe('canonical reward horizon scheduling', () => {
         expect(canonicalRewardObserverDelayMs({ nextEligibleAt: 12_000 }, 10_000)).toBe(2_000);
         expect(canonicalRewardObserverDelayMs({ nextEligibleAt: 9_000 }, 10_000)).toBe(1_000);
         expect(canonicalRewardObserverDelayMs({ nextEligibleAt: null }, 10_000)).toBe(300_000);
+    });
+
+    it('defers the initial observer until after the boot-critical window', async () => {
+        vi.useFakeTimers();
+        const observe = vi.fn().mockResolvedValue({ nextEligibleAt: null });
+
+        scheduleNativeRewardHorizonObservation(observe);
+        await vi.advanceTimersByTimeAsync(NATIVE_REWARD_OBSERVER_BOOT_DELAY_MS - 1);
+        expect(observe).not.toHaveBeenCalled();
+
+        await vi.advanceTimersByTimeAsync(1);
+        expect(observe).toHaveBeenCalledOnce();
     });
 });

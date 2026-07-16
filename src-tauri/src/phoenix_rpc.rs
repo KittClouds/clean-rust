@@ -56,8 +56,8 @@ use phoenix_native::{runtime_banner, PhoenixNativeConfig, PhoenixNativeHost, Sna
 use phoenix_store_native_core::{PhoenixGraphKernelStoreV2, PhoenixGraphLearningStore};
 use phoenix_store_overgraph::PhoenixOvergraphStore;
 use phoenix_types::{
-    AnalyzeTextRequest, CommitRequest, CreateSessionRequest, EntityId,
-    EntityKind, GraphDeltaRequest, IngestRequest, MentionEntityRef, MentionSource, QueryRequest,
+    AnalyzeTextRequest, CommitRequest, CreateSessionRequest, EntityId, EntityKind,
+    GraphDeltaRequest, IngestRequest, MentionEntityRef, MentionSource, QueryRequest,
     RebuildRequest, ResolverEntitySeed, RuntimeConfig, RuntimeInitRequest, RuntimeInitResult,
     RuntimeTarget, ScanRequest, ScopeKey, SessionId, SessionStateRequest, SessionStatsRequest,
     SnapshotPolicy, StorageMode, StoreCommandRequest,
@@ -69,7 +69,9 @@ use serde_json::{json, Value};
 const GRAPH_RUN_ARENA_CAPACITY: usize = 8;
 const GRAPH_RUN_ARENA_RESIDENT_BYTES: usize = 256 * 1024 * 1024;
 const GRAPH_RUN_DEFAULT_PAGE_ROWS: usize = 8;
-const GRAPH_RUN_MAX_PAGE_ROWS: usize = 64;
+const GRAPH_RUN_MAX_PAGE_ROWS: usize = 512;
+const GRAPH_RUN_PAGE_SECTION_ALL: &str = "all";
+const GRAPH_RUN_PAGE_SECTION_STORY_CONTINUITY: &str = "storyContinuity";
 const DOCUMENT_SEMANTIC_CACHE_CAPACITY: usize = 8;
 const DOCUMENT_SEMANTIC_DOCUMENT_CACHE_CAPACITY: usize = 32;
 const DOCUMENT_SEMANTIC_COMPRESSED_SCHEMA: &str = "phoenix-document-semantics/gzip-base64/v1";
@@ -332,12 +334,19 @@ struct DurableAnalysisMetadata {
     no_topology_writes: bool,
 }
 
+struct DurableGraphRunLoad {
+    snapshot_id: String,
+    analysis: DesktopSnapshotAnalysisResponse,
+}
+
 #[taurpc::ipc_type]
 #[serde(rename_all = "camelCase")]
 pub struct DesktopGraphRunPageRequest {
     run_handle: String,
     offset: u32,
     limit: u32,
+    #[serde(default)]
+    section: Option<String>,
 }
 
 #[taurpc::ipc_type]
@@ -368,6 +377,7 @@ pub struct DesktopGraphRunPersistReceipt {
 pub struct DesktopGraphRunPage {
     schema_version: &'static str,
     source: &'static str,
+    section: &'static str,
     run_handle: String,
     offset: u32,
     limit: u32,
@@ -1457,6 +1467,9 @@ pub trait PhoenixApi {
     async fn commit_canonical_episode_assignment_json(
         request_json: String,
     ) -> Result<String, String>;
+    async fn commit_canonical_episode_assignments_batch_json(
+        request_json: String,
+    ) -> Result<String, String>;
     async fn native_decision_census_json() -> Result<String, String>;
     async fn link_native_operator_decision_graph_truth_json(
         request_json: String,
@@ -1888,7 +1901,12 @@ impl PhoenixApi for PhoenixApiImpl {
             requested_run_handle.as_deref(),
         )?;
         drop(coordinator);
-        self.graph_run_page(&run_handle, 0, GRAPH_RUN_DEFAULT_PAGE_ROWS)
+        self.graph_run_page(
+            &run_handle,
+            0,
+            GRAPH_RUN_DEFAULT_PAGE_ROWS,
+            GRAPH_RUN_PAGE_SECTION_ALL,
+        )
     }
 
     async fn read_graph_run_page(
@@ -1899,6 +1917,10 @@ impl PhoenixApi for PhoenixApiImpl {
             &request.run_handle,
             request.offset as usize,
             request.limit as usize,
+            request
+                .section
+                .as_deref()
+                .unwrap_or(GRAPH_RUN_PAGE_SECTION_ALL),
         )
     }
 
@@ -1946,6 +1968,14 @@ impl PhoenixApi for PhoenixApiImpl {
         crate::native_decision_rpc::commit_episode_assignment(&root, &request_json)
     }
 
+    async fn commit_canonical_episode_assignments_batch_json(
+        self,
+        request_json: String,
+    ) -> Result<String, String> {
+        let root = self.native_decision_store_path()?;
+        crate::native_decision_rpc::commit_episode_assignments_batch(&root, &request_json)
+    }
+
     async fn native_decision_census_json(self) -> Result<String, String> {
         let root = self.native_decision_store_path()?;
         crate::native_decision_rpc::census(&root)
@@ -1986,8 +2016,10 @@ impl PhoenixApi for PhoenixApiImpl {
 
     async fn atlas_rich_scan_json(self, request_json: String) -> Result<String, String> {
         let _ = request_json;
-        Err("Legacy Atlas rich scan is quarantined. Use the content-addressed graph-run pipeline."
-            .to_owned())
+        Err(
+            "Legacy Atlas rich scan is quarantined. Use the content-addressed graph-run pipeline."
+                .to_owned(),
+        )
     }
 
     async fn nli_adjudicate_claims_json(self, request_json: String) -> Result<String, String> {
@@ -2327,6 +2359,7 @@ impl PhoenixApiImpl {
         run_handle: &str,
         offset: usize,
         requested_limit: usize,
+        section: &str,
     ) -> Result<DesktopGraphRunPage, String> {
         let (resident, arena) = {
             let mut coordinator = self
@@ -2336,7 +2369,9 @@ impl PhoenixApiImpl {
             (coordinator.get(run_handle), coordinator.stats(run_handle))
         };
         let durable;
+        let source_snapshot_id;
         let analysis = if let Some(entry) = resident.as_ref() {
+            source_snapshot_id = entry.snapshot_id.as_str();
             entry.content.analysis.as_ref()
         } else {
             let config = {
@@ -2347,12 +2382,19 @@ impl PhoenixApiImpl {
                 .ok_or_else(|| format!("graph run is closed or expired: {run_handle}"))?;
             durable = load_durable_graph_run(&root, run_handle)?
                 .ok_or_else(|| format!("graph run is closed or expired: {run_handle}"))?;
-            &durable
+            source_snapshot_id = durable.snapshot_id.as_str();
+            &durable.analysis
         };
         let limit = requested_limit.clamp(1, GRAPH_RUN_MAX_PAGE_ROWS);
         let projection_started = Instant::now();
-        let (mut projection, detail_rows, returned_detail_rows, max_rows) =
-            project_graph_run_page(analysis, offset, limit);
+        let (mut projection, detail_rows, returned_detail_rows, max_rows) = match section {
+            GRAPH_RUN_PAGE_SECTION_ALL => project_graph_run_page(analysis, offset, limit),
+            GRAPH_RUN_PAGE_SECTION_STORY_CONTINUITY => {
+                project_story_continuity_page(analysis, offset, limit)
+            }
+            other => return Err(format!("unknown graph run page section: {other}")),
+        };
+        projection.continuity.contract.source_snapshot_id = source_snapshot_id.to_owned().into();
         let projection_micros = projection_started.elapsed().as_micros() as f64;
         if arena.as_ref().is_some_and(|stats| stats.reused) {
             projection.timing = DesktopSnapshotAnalysisTiming {
@@ -2382,6 +2424,11 @@ impl PhoenixApiImpl {
         Ok(DesktopGraphRunPage {
             schema_version: "phoenix-graph-run-page/v1",
             source: "rust",
+            section: if section == GRAPH_RUN_PAGE_SECTION_STORY_CONTINUITY {
+                GRAPH_RUN_PAGE_SECTION_STORY_CONTINUITY
+            } else {
+                GRAPH_RUN_PAGE_SECTION_ALL
+            },
             run_handle: run_handle.to_owned(),
             offset: offset as u32,
             limit: limit as u32,
@@ -2774,6 +2821,26 @@ fn project_graph_run_page(
         no_topology_writes: analysis.no_topology_writes,
         timing: analysis.timing.clone(),
     };
+    (projection, page.seen, page.returned, page.seen)
+}
+
+fn project_story_continuity_page(
+    analysis: &DesktopSnapshotAnalysisResponse,
+    offset: usize,
+    limit: usize,
+) -> (DesktopSnapshotAnalysisResponse, usize, usize, usize) {
+    let (mut projection, _, _, _) = project_graph_run_page(analysis, 0, 0);
+    let source = &analysis.continuity.contract;
+    let mut page = GraphRunPageCursor::new(offset, limit);
+    let contract = &mut projection.continuity.contract;
+    contract.events = page.take(&source.events);
+    contract.boundary_receipts = page.take(&source.boundary_receipts);
+    contract.episodes = page.take(&source.episodes);
+    contract.temporal_candidates = page.take(&source.temporal_candidates);
+    contract.state_intervals = page.take(&source.state_intervals);
+    contract.causal_candidates = page.take(&source.causal_candidates);
+    contract.episode_connections = page.take(&source.episode_connections);
+    contract.conflicts = page.take(&source.conflicts);
     (projection, page.seen, page.returned, page.seen)
 }
 
@@ -3545,7 +3612,7 @@ fn persist_graph_run_entry(
 fn load_durable_graph_run(
     root: &std::path::Path,
     run_handle: &str,
-) -> Result<Option<DesktopSnapshotAnalysisResponse>, String> {
+) -> Result<Option<DurableGraphRunLoad>, String> {
     let Some(manifest) = load_manifest_for_handle(root, run_handle)? else {
         return Ok(None);
     };
@@ -3568,23 +3635,26 @@ fn load_durable_graph_run(
     {
         return Err("durable graph run metadata contract mismatch".to_owned());
     }
-    Ok(Some(DesktopSnapshotAnalysisResponse {
-        schema_version: "phoenix-graph-snapshot-analysis-native-output/v1",
-        source: "rust",
-        bridge: decode(root, &manifest, "bridge")?,
-        continuity: decode(root, &manifest, "continuity")?,
-        governance: decode(root, &manifest, "governance")?,
-        retrieval: decode(root, &manifest, "retrieval")?,
-        promotion: decode(root, &manifest, "promotion")?,
-        siegel: decode(root, &manifest, "siegel")?,
-        no_topology_writes: metadata.no_topology_writes,
-        timing: DesktopSnapshotAnalysisTiming {
-            bridge_build_micros: 0.0,
-            continuity_build_micros: 0.0,
-            governance_build_micros: 0.0,
-            retrieval_build_micros: 0.0,
-            verdict_build_micros: 0.0,
-            total_micros: 0.0,
+    Ok(Some(DurableGraphRunLoad {
+        snapshot_id: manifest.snapshot_id.clone(),
+        analysis: DesktopSnapshotAnalysisResponse {
+            schema_version: "phoenix-graph-snapshot-analysis-native-output/v1",
+            source: "rust",
+            bridge: decode(root, &manifest, "bridge")?,
+            continuity: decode(root, &manifest, "continuity")?,
+            governance: decode(root, &manifest, "governance")?,
+            retrieval: decode(root, &manifest, "retrieval")?,
+            promotion: decode(root, &manifest, "promotion")?,
+            siegel: decode(root, &manifest, "siegel")?,
+            no_topology_writes: metadata.no_topology_writes,
+            timing: DesktopSnapshotAnalysisTiming {
+                bridge_build_micros: 0.0,
+                continuity_build_micros: 0.0,
+                governance_build_micros: 0.0,
+                retrieval_build_micros: 0.0,
+                verdict_build_micros: 0.0,
+                total_micros: 0.0,
+            },
         },
     }))
 }

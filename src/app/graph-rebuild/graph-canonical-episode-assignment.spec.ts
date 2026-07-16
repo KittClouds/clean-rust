@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { buildAtlasNativeProofRows } from './atlas-control-rows';
 import {
     canonicalEpisodeAssignmentCommitRequest,
+    isCanonicalEpisodeAssignmentBatchCommitResponse,
     isCanonicalEpisodeAssignmentCommitResponse,
 } from './graph-canonical-episode-assignment';
 import type { GraphRebuildSnapshot } from './graph-rebuild-snapshot';
@@ -63,7 +64,7 @@ describe('canonical episode assignment producer', () => {
     });
 
     it('accepts only complete native authority responses', () => {
-        expect(isCanonicalEpisodeAssignmentCommitResponse({
+        const response = {
             schemaVersion: 'phoenix-canonical-episode-assignment-commit/v1',
             decisionId: 'decision:1',
             decisionReceiptId: 'b3-a',
@@ -78,7 +79,22 @@ describe('canonical episode assignment producer', () => {
             commitStatus: 'appended',
             decisionAppended: true,
             outcomeAppended: true,
+        } as const;
+        expect(isCanonicalEpisodeAssignmentCommitResponse(response)).toBe(true);
+        expect(isCanonicalEpisodeAssignmentBatchCommitResponse({
+            schemaVersion: 'phoenix-canonical-episode-assignment-batch-result/v1',
+            requested: 1,
+            completed: 1,
+            elapsedNs: 42,
+            responses: [response],
         })).toBe(true);
+        expect(isCanonicalEpisodeAssignmentBatchCommitResponse({
+            schemaVersion: 'phoenix-canonical-episode-assignment-batch-result/v1',
+            requested: 2,
+            completed: 1,
+            elapsedNs: 42,
+            responses: [response],
+        })).toBe(false);
         expect(isCanonicalEpisodeAssignmentCommitResponse({
             schemaVersion: 'phoenix-canonical-episode-assignment-commit/v1',
             candidateCount: 1,

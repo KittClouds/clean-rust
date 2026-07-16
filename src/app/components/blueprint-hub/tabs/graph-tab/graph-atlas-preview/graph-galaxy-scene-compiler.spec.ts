@@ -27,6 +27,43 @@ describe('graph galaxy compiled scene cache', () => {
         expect(second).not.toBe(first);
     });
 
+    it('keeps renderer-only styling on the retained scene path', async () => {
+        const backend = { target: 'web' } as PhoenixBackendService;
+        const entities: GalaxyRenderableNode[] = [{ id: 'style', label: 'Style', kind: 'concept' }];
+
+        const first = await compileGalaxyScene(
+            backend,
+            entities,
+            [],
+            mergeGalaxySettings({ labelMode: 'hover' }),
+            'receipt:renderer-only',
+        );
+        const second = await compileGalaxyScene(
+            backend,
+            entities,
+            [],
+            mergeGalaxySettings({ labelMode: 'always' }),
+            'receipt:renderer-only',
+        );
+
+        expect(second).toBe(first);
+    });
+
+    it('retains all five manifold scenes alongside one transient scene', async () => {
+        const backend = { target: 'web' } as PhoenixBackendService;
+        const entities: GalaxyRenderableNode[] = [{ id: 'resident', label: 'Resident', kind: 'concept' }];
+        const settings = mergeGalaxySettings({ layoutMode: 'single' });
+        const identities = ['hybrid', 'hopf', 'lorentz', 'product', 'siegel', 'query'];
+
+        const first = await compileGalaxyScene(backend, entities, [], settings, `resident:${identities[0]}`);
+        for (const identity of identities.slice(1)) {
+            await compileGalaxyScene(backend, entities, [], settings, `resident:${identity}`);
+        }
+        const returned = await compileGalaxyScene(backend, entities, [], settings, `resident:${identities[0]}`);
+
+        expect(returned).toBe(first);
+    });
+
     it('returns only compact geometry across the worker boundary at the 5,119-node target scale', () => {
         const entities = Array.from({ length: 5_119 }, (_, index): GalaxyRenderableNode => ({
             id: `node:${index}`,

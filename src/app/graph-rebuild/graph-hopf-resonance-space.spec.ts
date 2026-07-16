@@ -105,17 +105,17 @@ describe('Hopf resonance space contract', () => {
         });
     });
 
-    it('does not downsample full-scale target sets at the space-contract layer', () => {
-        const targets = Array.from({ length: 1500 }, (_, index) =>
+    it('does not downsample a 5,981-target graph at the space-contract layer', () => {
+        const targets = Array.from({ length: 5981 }, (_, index) =>
             target(`embed:chunk:bulk:${index}`, 'chunk', `note-${index % 9}`, `Chunk ${index}`, `bulk theme ${index % 41} lane ${index % 13}`, {
                 chunkId: `bulk:${index}`,
             }),
         );
 
-        const space = buildHopfResonanceSpace(snapshot(targets), { generatedAt: 14, cellResolution: 2 });
+        const space = buildHopfResonanceSpace(snapshot(targets), { generatedAt: 14 });
 
-        expect(space.targetCount).toBe(1500);
-        expect(space.assignments).toHaveLength(1500);
+        expect(space.targetCount).toBe(5981);
+        expect(space.assignments).toHaveLength(5981);
         expect(space.counters.droppedTargets).toBe(0);
         expect(space.counters.occupiedCellCount).toBeGreaterThan(1);
     });

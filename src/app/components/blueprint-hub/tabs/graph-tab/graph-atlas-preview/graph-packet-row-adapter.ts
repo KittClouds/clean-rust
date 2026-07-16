@@ -32,6 +32,7 @@ interface GraphPacketRowMaps {
     targetByObjectId: Map<string, GraphAtlasManifoldTarget>;
     targetIdByObjectRef: Map<string, string>;
     targetObjectById: Map<string, string>;
+    objectForTargetById: Map<string, GraphAtlasObject>;
     representedObjectIds: Set<string>;
 }
 
@@ -58,6 +59,13 @@ export function buildGraphPacketRowAdapter(
         kindCounts: graphKindCounts(graphNodes),
         sourceLabel: `${packet.sourceContract.authority} / ${packet.sourceContract.vectorContract}`,
     };
+}
+
+export function buildGraphPacketEmbeddingTargets(
+    packet: GraphAtlasPacket,
+    displayTargets: GraphRebuildEmbeddingTarget[] = [],
+): GraphRebuildEmbeddingTarget[] {
+    return graphPacketEmbeddingTargets(packet, graphPacketRowMaps(packet, displayTargets));
 }
 
 export function graphPacketEmbeddingTargetCount(packet: GraphAtlasPacket): number {
@@ -88,6 +96,11 @@ function graphPacketRowMaps(
         targetByObjectId.set(target.objectId, target);
         if (target.sourceId) objectIdBySourceId.set(target.sourceId, target.objectId);
     }
+    const objectForTargetById = new Map<string, GraphAtlasObject>();
+    for (const target of packet.manifoldTargets) {
+        const object = graphPacketObjectForTarget(target, objectById, objectsBySourceRef);
+        if (object) objectForTargetById.set(target.id, object);
+    }
 
     return {
         displayById: new Map(displayTargets.map((target) => [target.id, target])),
@@ -97,7 +110,8 @@ function graphPacketRowMaps(
         targetByObjectId,
         targetIdByObjectRef,
         targetObjectById,
-        representedObjectIds: graphPacketRepresentedObjectIds(packet, objectById, objectsBySourceRef),
+        objectForTargetById,
+        representedObjectIds: graphPacketRepresentedObjectIds(packet, objectForTargetById),
     };
 }
 
@@ -168,7 +182,7 @@ function graphPacketEmbeddingTargets(
 ): GraphRebuildEmbeddingTarget[] {
     const targets = packet.manifoldTargets.map((target): GraphRebuildEmbeddingTarget => {
         const display = maps.displayById.get(target.id);
-        const object = graphPacketObjectForTarget(target, maps.objectById, maps.objectsBySourceRef);
+        const object = maps.objectForTargetById.get(target.id);
         const style = graphPacketStyleForTarget(target, object, display);
         return {
             ...display,
@@ -470,7 +484,7 @@ function graphPacketObjectsBySourceRef(objects: GraphAtlasObject[]): Map<string,
     const add = (ref: string | undefined, object: GraphAtlasObject) => {
         if (!ref) return;
         const candidates = refs.get(ref) || [];
-        if (!candidates.some((candidate) => candidate.id === object.id)) candidates.push(object);
+        if (candidates[candidates.length - 1]?.id !== object.id) candidates.push(object);
         refs.set(ref, candidates);
     };
     for (const object of objects) {
@@ -487,11 +501,10 @@ function graphPacketObjectsBySourceRef(objects: GraphAtlasObject[]): Map<string,
 
 function graphPacketRepresentedObjectIds(
     packet: GraphAtlasPacket,
-    objectById: Map<string, GraphAtlasObject>,
-    objectsBySourceRef: Map<string, GraphAtlasObject[]>,
+    objectForTargetById: Map<string, GraphAtlasObject>,
 ): Set<string> {
     return new Set(packet.manifoldTargets
-        .map((target) => graphPacketObjectForTarget(target, objectById, objectsBySourceRef)?.id || target.objectId)
+        .map((target) => objectForTargetById.get(target.id)?.id || target.objectId)
         .filter(Boolean));
 }
 
@@ -500,16 +513,24 @@ function graphPacketObjectForTarget(
     objectById: Map<string, GraphAtlasObject>,
     objectsBySourceRef: Map<string, GraphAtlasObject[]>,
 ): GraphAtlasObject | undefined {
-    const candidates = new Map<string, GraphAtlasObject>();
-    const exact = objectById.get(target.objectId);
-    if (exact) candidates.set(exact.id, exact);
-    for (const object of objectsBySourceRef.get(target.sourceId) || []) candidates.set(object.id, object);
+    const seen = new Set<string>();
+    let best: GraphAtlasObject | undefined;
+    let bestScore = Number.NEGATIVE_INFINITY;
+    const consider = (object: GraphAtlasObject | undefined) => {
+        if (!object || seen.has(object.id)) return;
+        seen.add(object.id);
+        const score = graphPacketObjectMatchScore(target, object);
+        if (score > bestScore || (score === bestScore && (!best || object.id.localeCompare(best.id) < 0))) {
+            best = object;
+            bestScore = score;
+        }
+    };
+    consider(objectById.get(target.objectId));
+    for (const object of objectsBySourceRef.get(target.sourceId) || []) consider(object);
     if (target.registryEntityId) {
-        for (const object of objectsBySourceRef.get(target.registryEntityId) || []) candidates.set(object.id, object);
+        for (const object of objectsBySourceRef.get(target.registryEntityId) || []) consider(object);
     }
-    return [...candidates.values()].sort((left, right) =>
-        graphPacketObjectMatchScore(target, right) - graphPacketObjectMatchScore(target, left)
-        || left.id.localeCompare(right.id))[0];
+    return best;
 }
 
 function graphPacketObjectMatchScore(target: GraphAtlasManifoldTarget, object: GraphAtlasObject): number {

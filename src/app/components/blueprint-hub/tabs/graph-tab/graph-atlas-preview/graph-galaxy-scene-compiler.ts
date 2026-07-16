@@ -20,7 +20,9 @@ import {
 let warnedNativeFallback = false;
 let warnedWorkerFallback = false;
 const sceneCache = new Map<string, Promise<GalaxyScene>>();
-const MAX_CACHED_SCENES = 4;
+// Five authoritative manifold lenses plus one transient query/inspection scene.
+// A smaller cache guarantees eviction while simply cycling the projection rail.
+const MAX_CACHED_SCENES = 6;
 let sceneWorker: Worker | null | undefined;
 let nextWorkerRequestId = 0;
 const workerRequests = new Map<number, {
@@ -38,7 +40,7 @@ export async function compileGalaxyScene(
     settings: GalaxyRenderSettings,
     renderIdentity = '',
 ): Promise<GalaxyScene> {
-    const cacheKey = renderIdentity ? `${renderIdentity}\u0000${JSON.stringify(settings)}` : '';
+    const cacheKey = renderIdentity ? `${renderIdentity}\u0000${galaxySceneCompilationSettingsKey(settings)}` : '';
     const cached = cacheKey ? sceneCache.get(cacheKey) : undefined;
     if (cached) {
         sceneCache.delete(cacheKey);
@@ -48,11 +50,30 @@ export async function compileGalaxyScene(
     }
     const pending = compileChangedGalaxyScene(backend, entities, edges, settings);
     if (cacheKey) {
+        evictStaleSceneVariant(renderIdentity, cacheKey);
         sceneCache.set(cacheKey, pending);
         while (sceneCache.size > MAX_CACHED_SCENES) sceneCache.delete(sceneCache.keys().next().value!);
         pending.catch(() => sceneCache.delete(cacheKey));
     }
     return pending;
+}
+
+export function galaxySceneCompilationSettingsKey(settings: GalaxyRenderSettings): string {
+    return JSON.stringify({
+        layoutMode: settings.layoutMode,
+        sourceMode: settings.sourceMode,
+        embeddingTopologyMode: settings.embeddingTopologyMode,
+        nodeDistance: settings.nodeDistance,
+        edgeLength: settings.edgeLength,
+        edgeCurveStrength: settings.edgeCurveStrength,
+    });
+}
+
+function evictStaleSceneVariant(renderIdentity: string, nextKey: string): void {
+    const prefix = `${renderIdentity}\u0000`;
+    for (const key of sceneCache.keys()) {
+        if (key !== nextKey && key.startsWith(prefix)) sceneCache.delete(key);
+    }
 }
 
 async function compileChangedGalaxyScene(

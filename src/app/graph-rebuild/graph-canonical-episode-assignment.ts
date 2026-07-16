@@ -3,6 +3,10 @@ import type { GraphRebuildSnapshot } from './graph-rebuild-snapshot';
 
 export const CANONICAL_EPISODE_ASSIGNMENT_COMMIT_SCHEMA =
     'phoenix-canonical-episode-assignment-commit/v1' as const;
+export const CANONICAL_EPISODE_ASSIGNMENT_BATCH_COMMIT_SCHEMA =
+    'phoenix-canonical-episode-assignment-batch-commit/v1' as const;
+export const CANONICAL_EPISODE_ASSIGNMENT_BATCH_RESULT_SCHEMA =
+    'phoenix-canonical-episode-assignment-batch-result/v1' as const;
 
 export type CanonicalEpisodeAssignmentSelection =
     | { kind: 'attach_to_episode'; episodeId: string }
@@ -62,6 +66,14 @@ export interface CanonicalEpisodeAssignmentCommitResponse {
     commitStatus: 'appended' | 'already_present' | 'already_canonical' | 'no_change';
     decisionAppended: boolean;
     outcomeAppended: boolean;
+}
+
+export interface CanonicalEpisodeAssignmentBatchCommitResponse {
+    schemaVersion: typeof CANONICAL_EPISODE_ASSIGNMENT_BATCH_RESULT_SCHEMA;
+    requested: number;
+    completed: number;
+    elapsedNs: number;
+    responses: CanonicalEpisodeAssignmentCommitResponse[];
 }
 
 export function canonicalEpisodeAssignmentCommitRequest(
@@ -156,4 +168,20 @@ export function isCanonicalEpisodeAssignmentCommitResponse(
             || row.commitStatus === 'no_change')
         && typeof row.decisionAppended === 'boolean'
         && typeof row.outcomeAppended === 'boolean';
+}
+
+export function isCanonicalEpisodeAssignmentBatchCommitResponse(
+    value: unknown,
+): value is CanonicalEpisodeAssignmentBatchCommitResponse {
+    const row = value as Partial<CanonicalEpisodeAssignmentBatchCommitResponse> | null;
+    return !!row
+        && row.schemaVersion === CANONICAL_EPISODE_ASSIGNMENT_BATCH_RESULT_SCHEMA
+        && Number.isInteger(row.requested)
+        && Number.isInteger(row.completed)
+        && typeof row.elapsedNs === 'number'
+        && row.elapsedNs >= 0
+        && Array.isArray(row.responses)
+        && row.requested === row.completed
+        && row.completed === row.responses.length
+        && row.responses.every(isCanonicalEpisodeAssignmentCommitResponse);
 }

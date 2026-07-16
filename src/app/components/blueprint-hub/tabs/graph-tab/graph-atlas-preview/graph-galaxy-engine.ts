@@ -1247,7 +1247,6 @@ const HOPF_PROJECTION_RADIUS = 0.88;
 const HOPF_MAX_RADIUS = 2.05;
 const TAU = Math.PI * 2;
 const HOPF_RIBBON_SEGMENTS = 96;
-const HOPF_DATA_FIBER_GUIDE_LIMIT = 48;
 const HOPF_CROSS_FIBER_BRAID_LIMIT = 96;
 const HOPF_CROSS_FIBER_BRAID_SEGMENTS = 48;
 interface HopfBaseInfo extends Rgb {
@@ -1824,29 +1823,9 @@ function buildHopfRibbons(baseInfos: Map<string, HopfBaseInfo>): GalaxyHopfRibbo
 }
 
 function selectHopfDataFibers(baseInfos: Map<string, HopfBaseInfo>): HopfBaseInfo[] {
-    const candidates = [...baseInfos.values()]
+    return [...baseInfos.values()]
         .filter((info) => info.nodeIds.length > 0)
         .sort((left, right) => right.importance - left.importance || left.key.localeCompare(right.key));
-    const selected = new Map<string, HopfBaseInfo>();
-    const add = (info: HopfBaseInfo | undefined) => {
-        if (!info || selected.size >= HOPF_DATA_FIBER_GUIDE_LIMIT) return;
-        selected.set(info.key, info);
-    };
-
-    const bySemanticKind = new Map<string, HopfBaseInfo>();
-    for (const info of candidates) {
-        const kind = primaryHopfFiberKind(info);
-        const current = bySemanticKind.get(kind);
-        if (!current || info.importance > current.importance) bySemanticKind.set(kind, info);
-    }
-    for (const info of [...bySemanticKind.values()].sort((left, right) => right.importance - left.importance)) add(info);
-    for (const info of candidates) add(info);
-    return [...selected.values()].sort((left, right) => right.importance - left.importance || left.key.localeCompare(right.key));
-}
-
-function primaryHopfFiberKind(info: HopfBaseInfo): string {
-    const kinds = [...info.fiberKinds].sort();
-    return kinds.find((kind) => kind !== 'identity' && kind !== 'entity') || kinds[0] || 'identity';
 }
 
 function buildHopfCrossFiberBraid(source: GalaxyNode, target: GalaxyNode, link: GalaxyEdge): GalaxyHopfRibbon {

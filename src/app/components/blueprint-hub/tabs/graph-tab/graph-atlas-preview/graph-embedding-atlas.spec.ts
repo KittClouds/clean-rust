@@ -1296,6 +1296,21 @@ describe('embedding atlas projection', () => {
         expect(idSet.has('embed:document-unit:style-sentence-1')).toBe(false);
         expect(idSet.has('embed:graph-fact:weak-co')).toBe(false);
         expect(idSet.has('embed:raw-mention:kai')).toBe(false);
+
+        const hopf = buildGraphRebuildEmbeddingAtlas(snapshot, 'hopf');
+        expect(hopf.nodes).toHaveLength(snapshot.embeddingTargets.length);
+        expect(new Set(hopf.nodes.map((node) => node.id))).toEqual(
+            new Set(snapshot.embeddingTargets.map((target: { id: string }) => target.id)),
+        );
+        expect(hopf.nodes.every((node) => {
+            const metadata = node.metadata?.hopf;
+            return metadata?.['resonanceSource'] === 'snapshot-hopf-resonance-space'
+                && metadata?.['resonanceAdmitted'] === true
+                && typeof metadata?.['baseId'] === 'string'
+                && metadata['baseId'].length > 0
+                && metadata?.['role'] !== 'loose';
+        })).toBe(true);
+        expect(hopf.manifold?.compileTimings?.['completeHopfTargetSet']).toBe(1);
     });
 
     it('audits sentence and paragraph style keys as explicit Embed exclusions', () => {
@@ -2226,7 +2241,7 @@ describe('embedding atlas projection', () => {
         expect(atlas.edges.map((edge) => edge.type)).toContain('target-parent');
     });
 
-    it('forms Hopf bases from point resonance instead of postprocess medoids', () => {
+    it('reconstructs the complete Hopf assignment universe instead of trusting postprocess medoids', () => {
         const atlas = buildGraphRebuildEmbeddingAtlas({
             schemaVersion: 'phoenix-graph-rebuild/v1',
             id: 'snapshot-hopf',
@@ -2276,18 +2291,21 @@ describe('embedding atlas projection', () => {
         const rowan = atlas.nodes.find((node) => node.id === 'embed:entity:rowan')!;
         expect(kai.metadata?.hopf).toMatchObject({
             role: 'anchor',
-            baseId: 'hopf:resonance:embed-entity-kai',
-            phase: 0,
-            resonanceSource: 'point-formed',
+            resonanceSource: 'snapshot-hopf-resonance-space',
             resonanceAdmitted: true,
+            noTopologyMutation: true,
         });
         expect(rowan.metadata?.hopf).toMatchObject({
-            role: 'fiber',
-            baseId: 'hopf:resonance:embed-entity-kai',
-            fiberKind: 'identity',
+            role: 'anchor',
+            fiberKind: 'entity_sample',
             clusterId: 'embedding-cluster:0',
-            resonanceSource: 'point-formed',
+            resonanceSource: 'snapshot-hopf-resonance-space',
+            resonanceAdmitted: true,
         });
+        expect(String(kai.metadata?.hopf?.['baseId'] || '')).not.toBe('');
+        expect(String(rowan.metadata?.hopf?.['baseId'] || '')).not.toBe('');
+        expect(kai.metadata?.hopf?.['role']).not.toBe('loose');
+        expect(rowan.metadata?.hopf?.['role']).not.toBe('loose');
         expect(rowan.metadata?.hopf?.['phase']).not.toBe(0.8);
     });
 
@@ -2424,7 +2442,7 @@ describe('embedding atlas projection', () => {
         });
     });
 
-    it('splits overloaded graph-rebuild Hopf bases into semantic subfibers', () => {
+    it('assigns every node in an overloaded graph-rebuild Hopf universe', () => {
         const rootId = 'embed:entity:kai';
         const targets = [
             { id: rootId, kind: 'entity', sourceId: 'kai', entityId: 'kai', entityKind: 'CHARACTER', label: 'Kai', text: 'Kai maps Red Mesa', evidenceIds: [] },
@@ -2503,9 +2521,12 @@ describe('embedding atlas projection', () => {
             if (!baseId) continue;
             counts.set(baseId, (counts.get(baseId) || 0) + 1);
         }
+        expect(atlas.nodes).toHaveLength(targets.length);
+        expect(atlas.nodes.every((node) => Boolean(node.metadata?.hopf?.['baseId']))).toBe(true);
+        expect(atlas.nodes.every((node) => node.metadata?.hopf?.['role'] !== 'loose')).toBe(true);
+        expect(atlas.nodes.every((node) => node.metadata?.hopf?.['resonanceSource'] === 'snapshot-hopf-resonance-space')).toBe(true);
         expect(counts.size).toBeGreaterThan(1);
-        expect(Math.max(...counts.values())).toBeLessThanOrEqual(9);
-        expect(atlas.nodes.some((node) => String(node.metadata?.hopf?.['fiberKind'] || '').includes('observation'))).toBe(true);
+        expect(atlas.nodes.some((node) => node.metadata?.hopf?.['fiberKind'] === 'fact_sample')).toBe(true);
     });
 
     it('keeps story structure targets visible when multi-note targets exceed the render cap', () => {

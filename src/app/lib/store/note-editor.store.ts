@@ -19,6 +19,7 @@ import {
     LEGACY_ACTIVE_NOTE_KEY,
     LEGACY_EDITOR_POSITION_KEY,
     OPEN_TABS_STORAGE_KEY,
+    canRevealCachedEditorNote,
     createSessionPositionFromLegacy,
     getFallbackActiveNoteIdFromTabs,
     normalizeEditorSessionState,
@@ -81,8 +82,8 @@ export class NoteEditorStore {
         this.isBrowser = isPlatformBrowser(platformId);
         console.log('[NoteEditorStore] Constructor called');
 
-        // NOTE: restoreActiveNote() is NOT called here.
-        // It must be called AFTER Dexie hydration completes (by app.component).
+        // AppComponent may reveal a revisioned Dexie body immediately, then
+        // restoreActiveNote() reconciles it after native hydration completes.
 
         this.saveSubject.pipe(
             debounceTime(300)
@@ -138,6 +139,30 @@ export class NoteEditorStore {
     }
 
     /**
+     * Reveal a complete cached active note without waiting for native recovery.
+     * The authoritative restore still runs after hydration and may replace it.
+     */
+    async restoreCachedActiveNote(): Promise<boolean> {
+        if (!this.isBrowser) return false;
+
+        const resolved = await this.loadInitialEditorSession();
+        const targetNoteId = resolved.session?.activeNoteId ?? resolved.fallbackNoteId;
+        if (!targetNoteId) return false;
+
+        const cachedNote = await db.notes.get(targetNoteId);
+        if (!canRevealCachedEditorNote(cachedNote)) return false;
+
+        const resolvedPosition = this.resolveRestorablePosition(cachedNote, resolved.legacyPosition);
+        this.pendingPosition = resolvedPosition;
+        this.editorSessionState = resolvedPosition
+            ? { activeNoteId: targetNoteId, position: resolvedPosition }
+            : { activeNoteId: targetNoteId };
+        this.activeNoteId.set(targetNoteId);
+        console.log(`[NoteEditorStore] Revealed cached active note: ${targetNoteId}`);
+        return true;
+    }
+
+    /**
      * Restore the previously-active note from Dexie settings.
      * MUST be called AFTER Dexie hydration from Phoenix is complete.
      */
@@ -161,6 +186,7 @@ export class NoteEditorStore {
             if (!noteHeader) {
                 console.log(`[NoteEditorStore] Note ${targetNoteId} no longer exists; clearing editor session`);
                 this.clearStoredEditorSession();
+                this.activeNoteId.set(null);
                 return;
             }
 

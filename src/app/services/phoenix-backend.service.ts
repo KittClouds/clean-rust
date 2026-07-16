@@ -30,6 +30,13 @@ import type {
 import { rejectAtlasRichScan } from './atlas-rich-scan-quarantine';
 
 export type PhoenixMentionBatchRequest = DesktopMentionBatchRequest;
+export type PhoenixGraphRunPageSection = 'all' | 'storyContinuity';
+export interface PhoenixGraphRunPageRequest {
+    runHandle: string;
+    offset: number;
+    limit: number;
+    section?: PhoenixGraphRunPageSection;
+}
 export interface PhoenixMentionBatchResult {
     documentId: string;
     mentions: Array<{
@@ -165,11 +172,12 @@ export type PhoenixNativeBridge = Pick<PhoenixWasmService, 'isReady' | PhoenixNa
     scanMentionsBatch?(request: PhoenixMentionBatchRequest): Promise<PhoenixMentionBatchResult[]>;
     openGraphRun?(request: PhoenixMentionBatchRequest): Promise<PhoenixGraphRunOpenResult>;
     analyzeGraphSnapshot?(request: unknown): Promise<unknown>;
-    readGraphRunPage?(request: { runHandle: string; offset: number; limit: number }): Promise<unknown>;
+    readGraphRunPage?(request: PhoenixGraphRunPageRequest): Promise<unknown>;
     persistGraphRun?(runHandle: string): Promise<unknown>;
     beginNativeOperatorDecision?(request: unknown): Promise<unknown>;
     completeNativeOperatorDecision?(request: unknown): Promise<unknown>;
     commitCanonicalEpisodeAssignment?(request: unknown): Promise<unknown>;
+    commitCanonicalEpisodeAssignmentsBatch?(request: unknown): Promise<unknown>;
     nativeDecisionCensus?(): Promise<unknown>;
     linkNativeOperatorDecisionGraphTruth?(request: unknown): Promise<unknown>;
     recordNativeRewardObservation?(request: unknown): Promise<unknown>;
@@ -343,7 +351,7 @@ export class PhoenixBackendService {
         return bridge.analyzeGraphSnapshot(request);
     }
 
-    async readGraphRunPage(request: { runHandle: string; offset: number; limit: number }): Promise<unknown> {
+    async readGraphRunPage(request: PhoenixGraphRunPageRequest): Promise<unknown> {
         if (this.target !== 'native') {
             throw new Error('PhoenixBackendService.readGraphRunPage() requires the native runtime.');
         }
@@ -392,6 +400,17 @@ export class PhoenixBackendService {
             throw new Error('Native canonical episode assignment RPC is unavailable.');
         }
         return bridge.commitCanonicalEpisodeAssignment(request);
+    }
+
+    async commitCanonicalEpisodeAssignmentsBatch(request: unknown): Promise<unknown> {
+        if (this.target !== 'native') {
+            throw new Error('PhoenixBackendService.commitCanonicalEpisodeAssignmentsBatch() requires the native runtime.');
+        }
+        const bridge = this.requireNativeBridge();
+        if (!bridge.commitCanonicalEpisodeAssignmentsBatch) {
+            throw new Error('Native canonical episode assignment batch RPC is unavailable.');
+        }
+        return bridge.commitCanonicalEpisodeAssignmentsBatch(request);
     }
 
     async nativeDecisionCensus(): Promise<unknown> {

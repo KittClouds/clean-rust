@@ -10,6 +10,7 @@ import { phoenixTransportAudit } from './phoenix-transport-audit';
 import { rejectAtlasRichScan } from './atlas-rich-scan-quarantine';
 import type { PhoenixSnapshotPartition } from './phoenix-wasm.service';
 import type {
+    PhoenixGraphRunPageRequest,
     PhoenixMentionBatchRequest,
     PhoenixMentionBatchResult,
     PhoenixGraphRunOpenResult,
@@ -108,6 +109,19 @@ export function canonicalRewardObserverDelayMs(report: unknown, now = Date.now()
         : Math.min(Math.max(nextEligibleAt - now, 1_000), 2_147_483_647);
 }
 
+export const NATIVE_REWARD_OBSERVER_BOOT_DELAY_MS = 10_000;
+
+export function scheduleNativeRewardHorizonObservation(
+    observe: () => Promise<unknown>,
+    delayMs = NATIVE_REWARD_OBSERVER_BOOT_DELAY_MS,
+): ReturnType<typeof setTimeout> {
+    return setTimeout(() => {
+        void observe().catch((error) => {
+            console.error('[PhoenixNative] canonical reward horizon observer failed', error);
+        });
+    }, delayMs);
+}
+
 type PendingGraphRun = { runHandle: string; signature: string };
 
 export function prepareGraphAnalysisResidentRequest(
@@ -201,8 +215,8 @@ class PhoenixTaurpcBridge implements PhoenixNativeBridge {
             this.reportedBuild = build;
             console.info(`[PhoenixNative] ${info.buildProfile} ${info.buildGitSha.slice(0, 12)}`);
         }
-        await this.observeNativeRewardHorizons();
         this.markReady(Boolean(info.ready));
+        this.deferNativeRewardHorizonObservation();
         return info;
     }
 
@@ -311,7 +325,7 @@ class PhoenixTaurpcBridge implements PhoenixNativeBridge {
         );
     }
 
-    async readGraphRunPage(request: { runHandle: string; offset: number; limit: number }): Promise<unknown> {
+    async readGraphRunPage(request: PhoenixGraphRunPageRequest): Promise<unknown> {
         await this.loadRuntime();
         return phoenixTransportAudit.measureTypedRpc(
             'phoenix.read_graph_run_page',
@@ -346,6 +360,14 @@ class PhoenixTaurpcBridge implements PhoenixNativeBridge {
     async commitCanonicalEpisodeAssignment(request: unknown): Promise<unknown> {
         await this.loadRuntime();
         const response = await this.rpc.phoenix.commit_canonical_episode_assignment_json(
+            JSON.stringify(request),
+        );
+        return JSON.parse(response);
+    }
+
+    async commitCanonicalEpisodeAssignmentsBatch(request: unknown): Promise<unknown> {
+        await this.loadRuntime();
+        const response = await this.rpc.phoenix.commit_canonical_episode_assignments_batch_json(
             JSON.stringify(request),
         );
         return JSON.parse(response);
@@ -390,6 +412,13 @@ class PhoenixTaurpcBridge implements PhoenixNativeBridge {
             });
         }, delayMs);
         return report;
+    }
+
+    private deferNativeRewardHorizonObservation(): void {
+        if (this.rewardHorizonTimer !== null) clearTimeout(this.rewardHorizonTimer);
+        this.rewardHorizonTimer = scheduleNativeRewardHorizonObservation(
+            () => this.observeNativeRewardHorizons(),
+        );
     }
 
     async closeGraphRun(runHandle: string): Promise<boolean> {

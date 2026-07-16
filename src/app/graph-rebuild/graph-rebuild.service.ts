@@ -11,7 +11,10 @@ import {
 import { parseContentToPlainText } from '../lib/analytics';
 import * as ops from '../lib/operations';
 import type { RegisteredEntity } from '../lib/registry';
-import { PhoenixBackendService } from '../services/phoenix-backend.service';
+import {
+    PhoenixBackendService,
+    type PhoenixGraphRunPageSection,
+} from '../services/phoenix-backend.service';
 import {
     PhoenixStoreService,
     type PhoenixContentMutationTiming,
@@ -44,8 +47,11 @@ import {
     pendingNativeOperatorDecisionCompletions,
 } from './graph-native-decision-capture';
 import {
+    CANONICAL_EPISODE_ASSIGNMENT_BATCH_COMMIT_SCHEMA,
     canonicalEpisodeAssignmentCommitRequest,
+    isCanonicalEpisodeAssignmentBatchCommitResponse,
     isCanonicalEpisodeAssignmentCommitResponse,
+    type CanonicalEpisodeAssignmentBatchCommitResponse,
     type CanonicalEpisodeAssignmentCommitResponse,
     type CanonicalEpisodeAssignmentSelection,
 } from './graph-canonical-episode-assignment';
@@ -86,6 +92,7 @@ import {
 import {
     applyNativeStoryContinuityContract,
     isNativeStoryContinuityOutput,
+    type GraphStoryContinuityContract,
     type NativeStoryContinuityOutput,
 } from './graph-story-continuity';
 import { finalizeGraphRebuildSnapshot } from './graph-snapshot-finalizer';
@@ -323,6 +330,7 @@ export interface NativeSnapshotAnalysisOutput {
 export interface NativeGraphRunPage {
     schemaVersion: 'phoenix-graph-run-page/v1';
     source: 'rust';
+    section?: PhoenixGraphRunPageSection;
     runHandle: string;
     offset: number;
     limit: number;
@@ -382,6 +390,16 @@ export interface NativeGraphRunPersistReceipt {
     rawBytesWritten: number;
     compressedBytesWritten: number;
 }
+
+type StoryContinuityRows = Pick<GraphStoryContinuityContract,
+    | 'events'
+    | 'boundaryReceipts'
+    | 'episodes'
+    | 'temporalCandidates'
+    | 'stateIntervals'
+    | 'causalCandidates'
+    | 'episodeConnections'
+    | 'conflicts'>;
 
 interface CompressedNativeAtlasSeedPayload {
     schemaVersion: 'phoenix-atlas-seed-payload/gzip-base64/v1';
@@ -481,6 +499,11 @@ export class GraphRebuildService {
     private readonly documentSemanticArtifactHandleByIdentity = new Map<string, string>();
     private readonly persistedSnapshotLoads = new Map<string, Promise<GraphRebuildSnapshot | null>>();
     private activeNativeGraphRun: { snapshotId: string; runHandle: string } | null = null;
+    private nativeStoryContinuityHydration: {
+        snapshotId: string;
+        runHandle: string;
+        promise: Promise<GraphStoryContinuityContract>;
+    } | null = null;
     private nativeSiegelReceiptState: { snapshotId: string; receipt: unknown } | null = null;
     private primarySnapshotRunSerial = 0;
 
@@ -526,21 +549,27 @@ export class GraphRebuildService {
         return durable;
     }
 
-    async readNativeGraphRunPage(offset: number, limit = 32): Promise<NativeGraphRunPage | null> {
+    async readNativeGraphRunPage(
+        offset: number,
+        limit = 32,
+        section: PhoenixGraphRunPageSection = 'all',
+    ): Promise<NativeGraphRunPage | null> {
         const active = this.activeNativeGraphRun;
         if (!active) return null;
-        return this.readNativeGraphRunPageForHandle(active.runHandle, offset, limit);
+        return this.readNativeGraphRunPageForHandle(active.runHandle, offset, limit, section);
     }
 
     async readNativeGraphRunPageForHandle(
         runHandle: string,
         offset: number,
         limit = 32,
+        section: PhoenixGraphRunPageSection = 'all',
     ): Promise<NativeGraphRunPage> {
         const page = await this.phoenix.readGraphRunPage({
             runHandle,
             offset,
             limit,
+            section,
         }) as NativeGraphRunPage | null;
         if (!isNativeGraphRunPage(page)) {
             throw new Error('Rust graph run page returned an invalid v1 payload.');
@@ -548,7 +577,130 @@ export class GraphRebuildService {
         if (page.runHandle !== runHandle) {
             throw new Error('Rust graph run page returned a stale lease.');
         }
+        if ((page.section ?? 'all') !== section) {
+            throw new Error(`Rust graph run page returned the wrong section: ${page.section ?? 'all'}.`);
+        }
         return page;
+    }
+
+    async hydrateNativeStoryContinuity(): Promise<GraphStoryContinuityContract | null> {
+        const snapshot = this.snapshotState();
+        if (!snapshot) return null;
+        const existing = snapshot.storyContinuity;
+        if (existing && isCompleteStoryContinuityContract(existing)) return existing;
+        const active = this.activeNativeGraphRun;
+        if (!active || active.snapshotId !== snapshot.id) {
+            throw new Error('Complete native story continuity requires the resident graph run.');
+        }
+        if (this.nativeStoryContinuityHydration?.snapshotId === snapshot.id
+            && this.nativeStoryContinuityHydration.runHandle === active.runHandle) {
+            return this.nativeStoryContinuityHydration.promise;
+        }
+        const promise = this.hydrateNativeStoryContinuityFromRun(snapshot, active.runHandle);
+        this.nativeStoryContinuityHydration = {
+            snapshotId: snapshot.id,
+            runHandle: active.runHandle,
+            promise,
+        };
+        try {
+            return await promise;
+        } finally {
+            if (this.nativeStoryContinuityHydration?.promise === promise) {
+                this.nativeStoryContinuityHydration = null;
+            }
+        }
+    }
+
+    private async hydrateNativeStoryContinuityFromRun(
+        sourceSnapshot: GraphRebuildSnapshot,
+        runHandle: string,
+    ): Promise<GraphStoryContinuityContract> {
+        const contract = await this.readCompleteNativeStoryContinuity(sourceSnapshot, runHandle);
+
+        const current = this.snapshotState();
+        const active = this.activeNativeGraphRun;
+        if (!current || current.id !== sourceSnapshot.id || current.scopeId !== sourceSnapshot.scopeId
+            || current.authorityContract?.contentHash !== sourceSnapshot.authorityContract?.contentHash
+            || active?.runHandle !== runHandle || active.snapshotId !== sourceSnapshot.id) {
+            throw new Error('Graph snapshot changed while native story continuity was paging.');
+        }
+        const hydrated: GraphRebuildSnapshot = {
+            ...current,
+            counters: { ...current.counters },
+        };
+        applyNativeStoryContinuityContract(hydrated, contract);
+        await this.persistSnapshot(hydrated, undefined, false, {
+            durabilityMode: 'interactive',
+            previousContentManifest: current.contentManifest,
+        });
+        this.snapshotState.set(hydrated);
+        dispatchGraphRebuildEvent('graph-rebuild-snapshot-updated', {
+            scopeId: hydrated.scopeId,
+            snapshotId: hydrated.id,
+        });
+        return contract;
+    }
+
+    private async readCompleteNativeStoryContinuity(
+        sourceSnapshot: GraphRebuildSnapshot,
+        runHandle: string,
+    ): Promise<GraphStoryContinuityContract> {
+        const rows: StoryContinuityRows = {
+            events: [],
+            boundaryReceipts: [],
+            episodes: [],
+            temporalCandidates: [],
+            stateIntervals: [],
+            causalCandidates: [],
+            episodeConnections: [],
+            conflicts: [],
+        };
+        const rowIds = new Set<string>();
+        let offset = 0;
+        let contractHeader: GraphStoryContinuityContract | null = null;
+        let expectedDetailRows: number | null = null;
+        do {
+            const page = await this.readNativeGraphRunPageForHandle(
+                runHandle,
+                offset,
+                512,
+                'storyContinuity',
+            );
+            if (page.offset !== offset || page.section !== 'storyContinuity') {
+                throw new Error('Native story continuity paging returned a stale cursor or section.');
+            }
+            const contract = page.projection.continuity.contract;
+            if (contract.sourceSnapshotId !== sourceSnapshot.id) {
+                throw new Error('Native story continuity paging returned a stale snapshot.');
+            }
+            if (!contractHeader) {
+                contractHeader = contract;
+                expectedDetailRows = page.detailRows;
+            } else if (!sameStoryContinuityHeader(contractHeader, contract)
+                || page.detailRows !== expectedDetailRows) {
+                throw new Error('Native story continuity metadata changed during paging.');
+            }
+            appendUniqueStoryContinuityRows(rows, contract, rowIds);
+            const nextOffset = page.nextOffset ?? null;
+            if (nextOffset !== null && nextOffset <= offset) {
+                throw new Error('Native story continuity paging did not advance.');
+            }
+            offset = nextOffset ?? -1;
+        } while (offset >= 0);
+        if (!contractHeader || expectedDetailRows === null) {
+            throw new Error('Native story continuity paging returned no contract.');
+        }
+        const contract: GraphStoryContinuityContract = {
+            ...contractHeader,
+            ...rows,
+            actionReceipts: sourceSnapshot.storyContinuity?.actionReceipts,
+            certificate: {
+                ...contractHeader.certificate,
+                counters: { ...contractHeader.certificate.counters },
+            },
+        };
+        assertCompleteStoryContinuityContract(contract, expectedDetailRows);
+        return contract;
     }
 
     async closeNativeGraphRun(): Promise<boolean> {
@@ -848,6 +1000,10 @@ export class GraphRebuildService {
             native.bridge.crossDocumentCertificate,
         );
         applyNativeStoryContinuityContract(snapshot, native.continuity.contract);
+        if (!isCompleteStoryContinuityContract(native.continuity.contract)) {
+            const continuity = await this.readCompleteNativeStoryContinuity(snapshot, page.runHandle);
+            applyNativeStoryContinuityContract(snapshot, continuity);
+        }
         applyNativeMemoryGovernanceCandidates(snapshot, native.governance.candidates);
         if (native.retrieval) {
             applyNativeMemoryGovernanceRetrievalExperiment(snapshot, native.retrieval.experiment);
@@ -1248,6 +1404,7 @@ export class GraphRebuildService {
         eventId: string,
         selectedAction: CanonicalEpisodeAssignmentSelection,
     ): Promise<CanonicalEpisodeAssignmentCommitResponse | null> {
+        await this.hydrateNativeStoryContinuity();
         const current = this.snapshotState();
         if (!current) return null;
         if (this.phoenix.target !== 'native') {
@@ -1258,6 +1415,37 @@ export class GraphRebuildService {
         );
         if (!isCanonicalEpisodeAssignmentCommitResponse(value)) {
             throw new Error('Canonical episode assignment returned an invalid authority receipt.');
+        }
+        return value;
+    }
+
+    async commitCanonicalEpisodeAssignmentsBatch(
+        selections: ReadonlyArray<{
+            eventId: string;
+            selectedAction: CanonicalEpisodeAssignmentSelection;
+        }>,
+    ): Promise<CanonicalEpisodeAssignmentBatchCommitResponse | null> {
+        await this.hydrateNativeStoryContinuity();
+        const current = this.snapshotState();
+        if (!current) return null;
+        if (this.phoenix.target !== 'native') {
+            throw new Error('Canonical episode assignment batching requires native durable graph authority.');
+        }
+        if (selections.length === 0 || selections.length > 4_096) {
+            throw new Error('Canonical episode assignment batch must contain 1..=4096 selections.');
+        }
+        const decidedAt = Date.now();
+        const value = await this.phoenix.commitCanonicalEpisodeAssignmentsBatch({
+            schemaVersion: CANONICAL_EPISODE_ASSIGNMENT_BATCH_COMMIT_SCHEMA,
+            requests: selections.map((selection, index) => canonicalEpisodeAssignmentCommitRequest(
+                current,
+                selection.eventId,
+                selection.selectedAction,
+                decidedAt + index,
+            )),
+        });
+        if (!isCanonicalEpisodeAssignmentBatchCommitResponse(value)) {
+            throw new Error('Canonical episode assignment batch returned an invalid authority receipt.');
         }
         return value;
     }
@@ -1803,6 +1991,7 @@ function isNativeGraphRunPage(
 ): value is NativeGraphRunPage {
     return value?.schemaVersion === 'phoenix-graph-run-page/v1'
         && value.source === 'rust'
+        && (value.section === undefined || value.section === 'all' || value.section === 'storyContinuity')
         && typeof value.runHandle === 'string'
         && value.runHandle.startsWith('graph-run:')
         && Number.isInteger(value.offset)
@@ -1838,6 +2027,79 @@ function isNativeGraphRunPage(
         && !!value.counts.governanceByAction
         && (!value.nextOffset || Number.isInteger(value.nextOffset))
         && isNativeSnapshotAnalysisOutput(value.projection);
+}
+
+function isCompleteStoryContinuityContract(contract: GraphStoryContinuityContract): boolean {
+    const counts = contract.certificate.counters;
+    return contract.events.length === counts.events
+        && contract.boundaryReceipts.length === counts.boundaryReceipts
+        && contract.episodes.length === counts.episodes
+        && contract.temporalCandidates.length === counts.temporalCandidates
+        && contract.stateIntervals.length === counts.stateIntervals
+        && contract.causalCandidates.length === counts.causalCandidates
+        && contract.episodeConnections.length === counts.episodeConnections
+        && contract.conflicts.length === counts.conflicts;
+}
+
+function assertCompleteStoryContinuityContract(
+    contract: GraphStoryContinuityContract,
+    expectedDetailRows: number,
+): void {
+    const rows = contract.events.length
+        + contract.boundaryReceipts.length
+        + contract.episodes.length
+        + contract.temporalCandidates.length
+        + contract.stateIntervals.length
+        + contract.causalCandidates.length
+        + contract.episodeConnections.length
+        + contract.conflicts.length;
+    if (!isCompleteStoryContinuityContract(contract) || rows !== expectedDetailRows) {
+        throw new Error(
+            `Native story continuity count mismatch: ${rows}/${expectedDetailRows} rows do not match the certificate.`,
+        );
+    }
+}
+
+function sameStoryContinuityHeader(
+    left: GraphStoryContinuityContract,
+    right: GraphStoryContinuityContract,
+): boolean {
+    return left.schemaVersion === right.schemaVersion
+        && left.source === right.source
+        && left.sourceSnapshotId === right.sourceSnapshotId
+        && left.generatedAt === right.generatedAt
+        && left.commitPolicy === right.commitPolicy
+        && left.noTopologyCommit === right.noTopologyCommit
+        && JSON.stringify(left.certificate) === JSON.stringify(right.certificate);
+}
+
+function appendUniqueStoryContinuityRows(
+    target: StoryContinuityRows,
+    source: GraphStoryContinuityContract,
+    rowIds: Set<string>,
+): void {
+    appendUniqueRows(target.events, source.events, rowIds);
+    appendUniqueRows(target.boundaryReceipts, source.boundaryReceipts, rowIds);
+    appendUniqueRows(target.episodes, source.episodes, rowIds);
+    appendUniqueRows(target.temporalCandidates, source.temporalCandidates, rowIds);
+    appendUniqueRows(target.stateIntervals, source.stateIntervals, rowIds);
+    appendUniqueRows(target.causalCandidates, source.causalCandidates, rowIds);
+    appendUniqueRows(target.episodeConnections, source.episodeConnections, rowIds);
+    appendUniqueRows(target.conflicts, source.conflicts, rowIds);
+}
+
+function appendUniqueRows<T extends { id: string }>(
+    target: T[],
+    source: readonly T[],
+    rowIds: Set<string>,
+): void {
+    for (const row of source) {
+        if (rowIds.has(row.id)) {
+            throw new Error(`Native story continuity returned a duplicate row: ${row.id}`);
+        }
+        rowIds.add(row.id);
+        target.push(row);
+    }
 }
 
 function nativeCompilerDocumentReviewSummary(

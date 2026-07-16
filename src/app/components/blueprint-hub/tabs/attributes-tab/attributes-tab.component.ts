@@ -94,6 +94,11 @@ export class AttributesTabComponent implements OnDestroy, OnInit {
     });
     setOperatingRoom(room: AtlasControlRoomId): void {
         this.selectedRoomId.set(room);
+        if (room === 'continuity') {
+            void this.graphRebuild.hydrateNativeStoryContinuity().catch((error) => {
+                console.error('[AtlasControl] native story continuity hydration failed', error);
+            });
+        }
     }
 
     ngOnInit(): void {

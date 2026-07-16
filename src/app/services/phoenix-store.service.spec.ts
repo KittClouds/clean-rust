@@ -19,6 +19,10 @@ import { PhoenixBackendService } from './phoenix-backend.service';
 import { SqlitePersistenceService } from '../lib/sqlite/persistence/SqlitePersistenceService';
 import type { LoadedPhoenixManifestState } from '../lib/sqlite/persistence/phoenix-wal';
 import { createEmptyPhoenixManifest } from '../lib/sqlite/persistence/phoenix-wal';
+import {
+    PHOENIX_STORE_API_VERSION,
+    REQUIRED_PHOENIX_RUNTIME_CAPABILITIES,
+} from '../lib/phoenix/phoenix-runtime-compat';
 
 try {
     getTestBed().initTestEnvironment(
@@ -99,6 +103,49 @@ describe('PhoenixStoreService persistence diagnostics helpers', () => {
 
         expect(row['payload']).toBe(payload);
         expect(rowToScopedDocument(row).payload).toBe(payload);
+    });
+});
+
+describe('PhoenixStoreService boot ordering', () => {
+    it('starts persistence metadata loading before native runtime readiness resolves', async () => {
+        const events: string[] = [];
+        let resolveRuntime!: () => void;
+        const runtimeReady = new Promise<void>((resolve) => { resolveRuntime = resolve; });
+        const backend = {
+            target: 'native',
+            loadRuntime: () => {
+                events.push('runtime:start');
+                return runtimeReady;
+            },
+            storeCommand: async (command: string) => {
+                expect(command).toBe('runtime:capabilities');
+                return {
+                    storeApiVersion: PHOENIX_STORE_API_VERSION,
+                    capabilities: [...REQUIRED_PHOENIX_RUNTIME_CAPABILITIES],
+                };
+            },
+        };
+        const persistence = {
+            loadManifestMeta: async () => {
+                events.push('persistence:start');
+                return createLoadedState();
+            },
+        };
+        TestBed.resetTestingModule();
+        TestBed.configureTestingModule({ providers: [
+            PhoenixStoreService,
+            { provide: PhoenixBackendService, useValue: backend },
+            { provide: SqlitePersistenceService, useValue: persistence },
+        ] });
+        const service = TestBed.inject(PhoenixStoreService);
+
+        const initialization = service.initialize();
+        await Promise.resolve();
+        expect(events).toEqual(['persistence:start', 'runtime:start']);
+
+        resolveRuntime();
+        await initialization;
+        expect(service.isReady).toBe(true);
     });
 });
 

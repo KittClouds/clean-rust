@@ -112,7 +112,7 @@ describe('Hopf galaxy visualization data', () => {
         expect(receiptBraid?.nodeIds).toEqual(expect.arrayContaining(['embed:note:one', 'embed:note:two']));
     });
 
-    it('keeps low-count semantic fibers visible when high-importance fibers fill the guide budget', () => {
+    it('draws every data-formed fiber so no assigned node floats without its curve', () => {
         const crowded = Array.from({ length: 64 }, (_, index) =>
             hopfTarget(`embed:entity:busy-${index}`, `Busy ${index}`, 'anchor', `embed:entity:busy-${index}`, index / 64),
         );
@@ -126,7 +126,10 @@ describe('Hopf galaxy visualization data', () => {
         const scene = buildGalaxyScene([...crowded, status], [], mergeGalaxySettings({ layoutMode: 'hopfProjection' }));
 
         const dataRibbons = scene.hopfRibbons?.filter((ribbon) => ribbon.guideKind === 'dataFiber') || [];
-        expect(dataRibbons.length).toBeLessThanOrEqual(48);
+        expect(dataRibbons).toHaveLength(65);
+        const coveredNodeIds = new Set(dataRibbons.flatMap((ribbon) => ribbon.nodeIds));
+        expect(coveredNodeIds.size).toBe(65);
+        expect(crowded.every((node) => coveredNodeIds.has(node.id))).toBe(true);
         expect(dataRibbons.some((ribbon) => ribbon.nodeIds.includes('embed:memory:kai-status'))).toBe(true);
     });
 

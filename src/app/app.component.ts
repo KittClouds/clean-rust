@@ -14,6 +14,7 @@ import { KnowledgeService } from './services/knowledge.service';
 import { getNavigationApi } from './api/navigation-api';
 import { NotesService } from './lib/dexie/notes.service';
 import { NoteEditorStore } from './lib/store/note-editor.store';
+import { cachedEditorBodyMatchesAuthoritativeHeader } from './lib/store/note-editor-session';
 import { DiscoveryStore } from './lib/store/discoveryStore';
 import { setPhoenixStoreBridge } from './lib/operations';
 import * as ops from './lib/operations';
@@ -100,12 +101,18 @@ export class AppComponent implements OnInit, OnDestroy {
 
       await settingsPromise;
       this.setBootStep('settings:complete');
-      if (!await this.noteEditorStore.hasStoredActiveNoteIntent()) {
-        this.shellRevealed = true;
-        this.spinner.hide();
-        this.setBootStep('shell:cached-no-note:interactive');
-        console.log('[AppComponent] Cached no-note shell revealed before native hydration.');
-      }
+      const hasStoredActiveNote = await this.noteEditorStore.hasStoredActiveNoteIntent();
+      const cachedActiveNoteRevealed = hasStoredActiveNote
+        ? await this.noteEditorStore.restoreCachedActiveNote()
+        : false;
+      this.shellRevealed = true;
+      this.spinner.hide();
+      this.setBootStep(cachedActiveNoteRevealed
+        ? 'shell:cached-active-note:interactive'
+        : 'shell:cached:interactive');
+      console.log(cachedActiveNoteRevealed
+        ? '[AppComponent] Cached active note revealed before native hydration.'
+        : '[AppComponent] Cached shell revealed before native hydration.');
 
       this.setBootStep('seed:start');
       if (!runtimeLoadPromise) {
@@ -215,14 +222,18 @@ export class AppComponent implements OnInit, OnDestroy {
         'dexie.snapshotFetch',
         () => this.phoenixStore.getBootSnapshot(),
       );
-      const localEntities = await db.entities.toArray();
+      const [localEntities, localNotes] = await Promise.all([
+        db.entities.toArray(),
+        db.notes.toArray(),
+      ]);
       const phoenixEntities = snapshot.entities.map(e => this.toEntity(e));
       const {
         entities: mergedEntities,
         repairs: entityRepairs,
       } = this.mergeHydratedEntities(phoenixEntities, localEntities);
       const eventNoteMap = new Map(snapshot.eventNotes.map(note => [note.id, note] as const));
-      const localNoteCount = await db.notes.count();
+      const localNoteMap = new Map(localNotes.map(note => [note.id, note] as const));
+      const localNoteCount = localNotes.length;
       const preserveLocalContent =
         this.phoenixUiApi.runtimeTarget === 'native' &&
         snapshot.noteHeaders.length === 0 &&
@@ -237,7 +248,16 @@ export class AppComponent implements OnInit, OnDestroy {
           await Promise.all(clears);
 
           if (!preserveLocalContent && snapshot.noteHeaders.length > 0) {
-            await db.notes.bulkPut(snapshot.noteHeaders.map(n => this.toNote(n, eventNoteMap.get(n.id))));
+            await db.notes.bulkPut(snapshot.noteHeaders.map((note) => {
+              const authoritativeBody = eventNoteMap.get(note.id);
+              const cachedBody = localNoteMap.get(note.id);
+              const reusableBody = authoritativeBody ?? (
+                cachedEditorBodyMatchesAuthoritativeHeader(note, cachedBody)
+                  ? cachedBody
+                  : undefined
+              );
+              return this.toNote(note, reusableBody);
+            }));
           }
           if (mergedEntities.length > 0) await db.entities.bulkPut(mergedEntities);
           if (!preserveLocalContent && snapshot.edges.length > 0) await db.edges.bulkPut(snapshot.edges.map(e => this.toEdge(e)));

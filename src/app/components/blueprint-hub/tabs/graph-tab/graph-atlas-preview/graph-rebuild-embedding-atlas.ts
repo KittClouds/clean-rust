@@ -25,10 +25,11 @@ import {
     sparseEmbeddingSignature,
     sparseToDenseVector,
 } from '../../../../../graph-rebuild/graph-rebuild-embedding-signatures';
-import type {
-    HopfResonanceAssignment,
-    HopfResonanceFiber,
-    HopfResonanceSpace,
+import {
+    buildHopfResonanceSpace,
+    type HopfResonanceAssignment,
+    type HopfResonanceFiber,
+    type HopfResonanceSpace,
 } from '../../../../../graph-rebuild/graph-hopf-resonance-space';
 import type { GraphModelV2FactBundleCommitment } from '../../../../../graph-rebuild/graph-model-v2';
 import { createGraphModelV2ReadModel } from '../../../../../graph-rebuild/graph-model-v2-read-model';
@@ -45,10 +46,11 @@ import {
     graphTopologyTraceForEmbeddingTarget,
 } from './graph-topology-style-contract';
 import {
-    buildGraphPacketRowAdapter,
+    buildGraphPacketEmbeddingTargets,
     graphPacketEmbeddingTargetCount,
 } from './graph-packet-row-adapter';
 import { episodeProjectionEmbeddingEdge } from './graph-episode-projection-canvas';
+import { graphSnapshotRenderIdentity } from '../graph-render-identity';
 
 const HOPF_RESONANCE_DIMS = 96;
 const HOPF_RESONANCE_NEIGHBORS = 8;
@@ -131,21 +133,43 @@ type ProductTraversalBuild = {
     edgeMetadata: Map<string, Record<string, unknown>>;
 };
 
-const projectionCache = new WeakMap<GraphRebuildSnapshot, Map<AtlasManifoldMode, EmbeddingAtlasData>>();
+type GraphRebuildProjectionSubstrate = {
+    snapshot: GraphRebuildSnapshot;
+    selected: GraphRebuildEmbeddingTarget[];
+    vectors: Float32Array[];
+    postByTarget: Map<string, GraphRebuildEmbeddingTargetPostProcess>;
+    hierarchyByTarget: Map<string, TargetHierarchyContext>;
+    truthByTarget: Map<string, GraphSignalTruthRecord>;
+    commitmentBySourceId: Map<string, GraphModelV2FactBundleCommitment>;
+    mentionCompaction: MentionCompactionSelection;
+    traceByTargetId: Map<string, GraphRebuildVisualTrace>;
+    rawEdges: GalaxyInputEdge[];
+    compileTimings: Record<string, number>;
+};
+
+type GraphRebuildProjectionCacheEntry = {
+    substrates: Map<GraphRebuildProjectionTargetSet, GraphRebuildProjectionSubstrate>;
+    projections: Map<AtlasManifoldMode, EmbeddingAtlasData>;
+};
+
+type GraphRebuildProjectionTargetSet = 'compact' | 'hopf-complete';
+
+const projectionCacheBySnapshot = new WeakMap<GraphRebuildSnapshot, GraphRebuildProjectionCacheEntry>();
+const projectionCacheByIdentity = new Map<string, GraphRebuildProjectionCacheEntry>();
+const MAX_RESIDENT_PROJECTION_IDENTITIES = 1;
 
 export function cachedGraphRebuildEmbeddingAtlas(
     snapshot: GraphRebuildSnapshot,
     manifold: AtlasManifoldMode,
 ): EmbeddingAtlasData {
-    let projections = projectionCache.get(snapshot);
-    if (!projections) {
-        projections = new Map();
-        projectionCache.set(snapshot, projections);
-    }
-    const cached = projections.get(manifold);
+    const entry = projectionCacheEntry(snapshot);
+    const cached = entry.projections.get(manifold);
     if (cached) return cached;
-    const atlas = buildGraphRebuildEmbeddingAtlas(snapshot, manifold);
-    projections.set(manifold, atlas);
+    const atlas = buildGraphRebuildEmbeddingAtlasFromSubstrate(
+        projectionSubstrate(entry, snapshot, manifold),
+        manifold,
+    );
+    entry.projections.set(manifold, atlas);
     return atlas;
 }
 
@@ -153,29 +177,51 @@ export function buildGraphRebuildEmbeddingAtlas(
     snapshot: GraphRebuildSnapshot,
     manifold: AtlasManifoldMode,
 ): EmbeddingAtlasData {
-    // Compatibility adapter: Rust Atlas packets own target membership/coordinates.
-    const atlasSnapshot = snapshotWithAtlasPacketTargets(snapshot);
-    const entityKindById = new Map(atlasSnapshot.nodes.map((node) => [node.entityId, node.kind]));
-    const profile = normalizeEmbeddingProfile(atlasSnapshot.embeddingProfile);
-    const postByTarget = new Map((atlasSnapshot.embeddingGraphPostProcess?.targets || []).map((row) => [row.targetId, row]));
-    const mentionCompaction = compactEntityMentionTargets(atlasSnapshot, selectEmbeddingTargets(atlasSnapshot));
-    const selected = mentionCompaction.targets
-        .map((target) => hydrateTargetEntityKind(target, entityKindById));
-    const hierarchyByTarget = buildTargetHierarchyContext(atlasSnapshot);
-    const truthByTarget = buildGraphSignalTruthIndex(atlasSnapshot);
-    const commitmentBySourceId = buildBundleCommitmentIndex(atlasSnapshot);
-    const vectors = selected.map((target) => textVector(target, profile.selectedDimensions));
-    const capsDocumentDirections = buildCapsDocumentDirections(selected, vectors, manifold);
-    const hopfBasePlan = manifold === 'hopf' ? buildHopfAtlasAssignmentPlan(atlasSnapshot, selected, vectors, postByTarget) : undefined;
-    const rawNodes = selected.map((target, index) =>
-        targetNode(target, vectors[index], index, selected.length, manifold, postByTarget.get(target.id), hopfBasePlan?.get(target.id), hierarchyByTarget.get(target.id), truthByTarget.get(target.id), commitmentBySourceId.get(target.sourceId) || commitmentBySourceId.get(target.id), mentionCompaction.receiptsByEntityTargetId.get(target.id), capsDocumentDirections),
+    const entry = projectionCacheEntry(snapshot);
+    const cached = entry.projections.get(manifold);
+    if (cached) return cached;
+    const atlas = buildGraphRebuildEmbeddingAtlasFromSubstrate(
+        projectionSubstrate(entry, snapshot, manifold),
+        manifold,
     );
-    const nodeIds = new Set(rawNodes.map((node) => node.id));
-    const traceByTargetId = new Map(selected.map((target) => [target.id, graphTopologyTraceForEmbeddingTarget(target)]));
-    const rawEdges = buildTargetEdges(atlasSnapshot)
-        .filter((edge) => nodeIds.has(edge.sourceId) && nodeIds.has(edge.targetId))
-        .map((edge) => edgeWithVisualTrace(edge, traceByTargetId));
+    entry.projections.set(manifold, atlas);
+    return atlas;
+}
+
+function buildGraphRebuildEmbeddingAtlasFromSubstrate(
+    substrate: GraphRebuildProjectionSubstrate,
+    manifold: AtlasManifoldMode,
+): EmbeddingAtlasData {
+    const projectionStarted = performance.now();
+    // Compatibility adapter: Rust Atlas packets own target membership/coordinates.
+    const {
+        snapshot: atlasSnapshot,
+        selected,
+        vectors,
+        postByTarget,
+        hierarchyByTarget,
+        truthByTarget,
+        commitmentBySourceId,
+        mentionCompaction,
+        traceByTargetId,
+        rawEdges,
+        compileTimings,
+    } = substrate;
+    const capsStarted = performance.now();
+    const capsDocumentDirections = buildCapsDocumentDirections(selected, vectors, manifold);
+    const capsDirectionsMs = performance.now() - capsStarted;
+    const hopfStarted = performance.now();
+    const hopfBasePlan = manifold === 'hopf' ? buildHopfAtlasAssignmentPlan(atlasSnapshot, selected, vectors, postByTarget) : undefined;
+    const hopfPlanMs = performance.now() - hopfStarted;
+    const nodeStarted = performance.now();
+    const rawNodes = selected.map((target, index) =>
+        targetNode(target, vectors[index], index, selected.length, manifold, postByTarget.get(target.id), hopfBasePlan?.get(target.id), hierarchyByTarget.get(target.id), truthByTarget.get(target.id), commitmentBySourceId.get(target.sourceId) || commitmentBySourceId.get(target.id), mentionCompaction.receiptsByEntityTargetId.get(target.id), capsDocumentDirections, traceByTargetId.get(target.id)),
+    );
+    const nodesMs = performance.now() - nodeStarted;
+    const traversalStarted = performance.now();
     const traversal = manifold === 'product' ? buildGraphRebuildProductTraversal(selected, rawEdges) : emptyProductTraversal();
+    const traversalMs = performance.now() - traversalStarted;
+    const nodeMetadataStarted = performance.now();
     const nodes = rawNodes.map((node) => {
         const productTraversal = traversal.nodeMetadata.get(node.id);
         if (!productTraversal) return node;
@@ -187,6 +233,8 @@ export function buildGraphRebuildEmbeddingAtlas(
             },
         };
     });
+    const nodeMetadataMs = performance.now() - nodeMetadataStarted;
+    const edgeMetadataStarted = performance.now();
     const edges = rawEdges.map((edge) => {
         const productTraversal = traversal.edgeMetadata.get(edge.id);
         if (!productTraversal) return edge;
@@ -198,6 +246,8 @@ export function buildGraphRebuildEmbeddingAtlas(
             },
         };
     });
+    const edgeMetadataMs = performance.now() - edgeMetadataStarted;
+    const totalMs = performance.now() - projectionStarted;
     return {
         nodes,
         edges,
@@ -212,6 +262,17 @@ export function buildGraphRebuildEmbeddingAtlas(
             sourceLabel: atlasProjectionSourceLabel(atlasSnapshot),
             capabilities: graphRebuildCapabilities(manifold),
             projectionSource: atlasSnapshot.atlasPacket ? 'rust_atlas_packet_manifold_targets' : 'graph_rebuild_embedding_targets',
+            compileTimings: {
+                ...compileTimings,
+                capsDirectionsMs,
+                hopfPlanMs,
+                nodesMs,
+                traversalMs,
+                nodeMetadataMs,
+                edgeMetadataMs,
+                projectionMs: totalMs,
+                totalMs: compileTimings['substrateMs'] + totalMs,
+            },
             cells: [],
             charts: [],
             seams: [],
@@ -226,6 +287,114 @@ export function buildGraphRebuildEmbeddingAtlas(
     };
 }
 
+function projectionCacheEntry(snapshot: GraphRebuildSnapshot): GraphRebuildProjectionCacheEntry {
+    const identity = graphSnapshotRenderIdentity(snapshot);
+    if (!identity) {
+        let entry = projectionCacheBySnapshot.get(snapshot);
+        if (!entry) {
+            entry = { substrates: new Map(), projections: new Map() };
+            projectionCacheBySnapshot.set(snapshot, entry);
+        }
+        return entry;
+    }
+
+    const resident = projectionCacheByIdentity.get(identity);
+    if (resident) {
+        projectionCacheByIdentity.delete(identity);
+        projectionCacheByIdentity.set(identity, resident);
+        return resident;
+    }
+
+    const entry: GraphRebuildProjectionCacheEntry = { substrates: new Map(), projections: new Map() };
+    projectionCacheByIdentity.set(identity, entry);
+    while (projectionCacheByIdentity.size > MAX_RESIDENT_PROJECTION_IDENTITIES) {
+        const oldest = projectionCacheByIdentity.keys().next().value as string | undefined;
+        if (!oldest) break;
+        projectionCacheByIdentity.delete(oldest);
+    }
+    return entry;
+}
+
+function projectionSubstrate(
+    entry: GraphRebuildProjectionCacheEntry,
+    snapshot: GraphRebuildSnapshot,
+    manifold: AtlasManifoldMode,
+): GraphRebuildProjectionSubstrate {
+    const targetSet: GraphRebuildProjectionTargetSet = manifold === 'hopf' ? 'hopf-complete' : 'compact';
+    const cached = entry.substrates.get(targetSet);
+    if (cached) return cached;
+    const substrate = buildGraphRebuildProjectionSubstrate(snapshot, targetSet);
+    entry.substrates.set(targetSet, substrate);
+    return substrate;
+}
+
+function buildGraphRebuildProjectionSubstrate(
+    snapshot: GraphRebuildSnapshot,
+    targetSet: GraphRebuildProjectionTargetSet,
+): GraphRebuildProjectionSubstrate {
+    const substrateStarted = performance.now();
+    let stageStarted = performance.now();
+    const packetSnapshot = snapshotWithAtlasPacketTargets(snapshot);
+    const atlasSnapshot = targetSet === 'hopf-complete'
+        ? snapshotWithCompleteHopfAssignments(packetSnapshot)
+        : packetSnapshot;
+    const packetAdapterMs = performance.now() - stageStarted;
+    stageStarted = performance.now();
+    const entityKindById = new Map(atlasSnapshot.nodes.map((node) => [node.entityId, node.kind]));
+    const profile = normalizeEmbeddingProfile(atlasSnapshot.embeddingProfile);
+    const postByTarget = new Map((atlasSnapshot.embeddingGraphPostProcess?.targets || []).map((row) => [row.targetId, row]));
+    const compactSelection = compactEntityMentionTargets(atlasSnapshot, selectEmbeddingTargets(atlasSnapshot));
+    const selectedTargets = targetSet === 'hopf-complete'
+        ? selectHopfEmbeddingTargets(atlasSnapshot)
+        : compactSelection.targets;
+    const mentionCompaction: MentionCompactionSelection = {
+        targets: selectedTargets,
+        receiptsByEntityTargetId: compactSelection.receiptsByEntityTargetId,
+    };
+    const selected = selectedTargets
+        .map((target) => hydrateTargetEntityKind(target, entityKindById));
+    const targetSelectionMs = performance.now() - stageStarted;
+    stageStarted = performance.now();
+    const vectors = selected.map((target) => textVector(target, profile.selectedDimensions));
+    const vectorsMs = performance.now() - stageStarted;
+    stageStarted = performance.now();
+    const hierarchyByTarget = buildTargetHierarchyContext(atlasSnapshot);
+    const hierarchyMs = performance.now() - stageStarted;
+    stageStarted = performance.now();
+    const truthByTarget = buildGraphSignalTruthIndex(atlasSnapshot);
+    const commitmentBySourceId = buildBundleCommitmentIndex(atlasSnapshot);
+    const traceByTargetId = new Map(selected.map((target) => [target.id, graphTopologyTraceForEmbeddingTarget(target)]));
+    const truthAndTraceMs = performance.now() - stageStarted;
+    stageStarted = performance.now();
+    const nodeIds = new Set(selected.map((target) => target.id));
+    const rawEdges = buildTargetEdges(atlasSnapshot)
+        .filter((edge) => nodeIds.has(edge.sourceId) && nodeIds.has(edge.targetId))
+        .map((edge) => edgeWithVisualTrace(edge, traceByTargetId));
+    const edgesMs = performance.now() - stageStarted;
+    return {
+        snapshot: atlasSnapshot,
+        selected,
+        vectors,
+        postByTarget,
+        hierarchyByTarget,
+        truthByTarget,
+        commitmentBySourceId,
+        mentionCompaction,
+        traceByTargetId,
+        rawEdges,
+        compileTimings: {
+            packetAdapterMs,
+            targetSelectionMs,
+            vectorsMs,
+            hierarchyMs,
+            truthAndTraceMs,
+            edgesMs,
+            completeHopfTargetSet: targetSet === 'hopf-complete' ? 1 : 0,
+            substrateMs: performance.now() - substrateStarted,
+        },
+    };
+}
+
 export function graphRebuildEmbeddingTargetCount(snapshot: GraphRebuildSnapshot | null | undefined): number {
     return snapshot?.embeddingTargets.length
         || (snapshot?.atlasPacket ? graphPacketEmbeddingTargetCount(snapshot.atlasPacket) : 0)
@@ -236,8 +405,7 @@ export function graphRebuildEmbeddingTargetCount(snapshot: GraphRebuildSnapshot 
 function snapshotWithAtlasPacketTargets(snapshot: GraphRebuildSnapshot): GraphRebuildSnapshot {
     const packet = snapshot.atlasPacket;
     if (!packet?.manifoldTargets?.length && !packet?.objects?.length) return snapshot;
-    const rows = buildGraphPacketRowAdapter(packet, snapshot.embeddingTargets);
-    const targets = normalizeEmbedStructureParents(rows.embeddingTargets);
+    const targets = normalizeEmbedStructureParents(buildGraphPacketEmbeddingTargets(packet, snapshot.embeddingTargets));
     return { ...snapshot, embeddingTargets: targets };
 }
 
@@ -1006,6 +1174,7 @@ function targetNode(
     commitment?: GraphModelV2FactBundleCommitment,
     mentionCompaction?: MentionCompactionReceipt,
     capsDocumentDirections?: Map<string, CapsVec3>,
+    cachedVisualTrace?: GraphRebuildVisualTrace,
 ): GalaxyRenderableNode {
     const point = manifold === 'siegel'
         ? projectSiegelVector(vector, target, index, total, hierarchyContext)
@@ -1017,7 +1186,7 @@ function targetNode(
     const lorentzMetadata = manifold === 'lorentz' || post
         ? productLorentzMetadata(target, point, post, hierarchyContext, capsDocumentDirections)
         : undefined;
-    const visualTrace = graphTopologyTraceForEmbeddingTarget(target);
+    const visualTrace = cachedVisualTrace || graphTopologyTraceForEmbeddingTarget(target);
     const capsHierarchyRole = typeof lorentzMetadata?.['capsHierarchyRole'] === 'string'
         ? lorentzMetadata['capsHierarchyRole']
         : undefined;
@@ -1390,6 +1559,7 @@ type HopfResonanceEntry = {
     vector: Float32Array;
     norm: number;
     kind: string;
+    parentIds?: ReadonlySet<string>;
 };
 
 type HopfResonanceEdge = {
@@ -1502,6 +1672,7 @@ function buildHopfResonancePlan(
             vector: vectors[index],
             norm: vectorNorm(vectors[index], dims),
             kind: hopfResonanceKind(target, post),
+            parentIds: target.parentIds?.length ? new Set(target.parentIds) : undefined,
         };
     });
     const neighbors: HopfResonanceEdge[][] = Array.from({ length: count }, () => []);
@@ -1643,9 +1814,33 @@ function looseHopfAssignment(entry: HopfResonanceEntry, neighbors: HopfResonance
 }
 
 function pushHopfNeighbor(bucket: HopfResonanceEdge[], edge: HopfResonanceEdge): void {
-    bucket.push(edge);
-    bucket.sort((left, right) => right.weight - left.weight || left.other - right.other);
-    if (bucket.length > HOPF_RESONANCE_NEIGHBORS) bucket.length = HOPF_RESONANCE_NEIGHBORS;
+    let insertAt = 0;
+    while (insertAt < bucket.length && compareHopfNeighbors(bucket[insertAt], edge) <= 0) insertAt += 1;
+    if (insertAt >= HOPF_RESONANCE_NEIGHBORS) return;
+    bucket.splice(insertAt, 0, edge);
+    if (bucket.length > HOPF_RESONANCE_NEIGHBORS) bucket.pop();
+}
+
+function selectHopfEmbeddingTargets(snapshot: GraphRebuildSnapshot): GraphRebuildEmbeddingTarget[] {
+    return coverageOrderedTargets(snapshot.embeddingTargets);
+}
+
+function snapshotWithCompleteHopfAssignments(snapshot: GraphRebuildSnapshot): GraphRebuildSnapshot {
+    const targetIds = new Set(snapshot.embeddingTargets.map((target) => target.id));
+    const assignments = snapshot.hopfResonanceSpace?.assignments || [];
+    const assignmentIds = new Set(assignments.map((assignment) => assignment.targetId));
+    const complete = assignments.length === snapshot.embeddingTargets.length
+        && assignmentIds.size === targetIds.size
+        && [...targetIds].every((targetId) => assignmentIds.has(targetId));
+    if (complete) return snapshot;
+    return {
+        ...snapshot,
+        hopfResonanceSpace: buildHopfResonanceSpace(snapshot, { generatedAt: snapshot.builtAt }),
+    };
+}
+
+function compareHopfNeighbors(left: HopfResonanceEdge, right: HopfResonanceEdge): number {
+    return right.weight - left.weight || left.other - right.other;
 }
 
 function vectorNorm(vector: Float32Array, dims: number): number {
@@ -1671,7 +1866,7 @@ function hopfPairSupport(left: HopfResonanceEntry, right: HopfResonanceEntry): n
     if (left.target.lane && left.target.lane === right.target.lane) support += 0.06;
     if (left.post?.clusterId && left.post.clusterId === right.post?.clusterId) support += 0.1;
     if (left.post?.productTopologyRegion.laneKind && left.post.productTopologyRegion.laneKind === right.post?.productTopologyRegion.laneKind) support += 0.05;
-    if (parentOverlap(left.target, right.target)) support += 0.08;
+    if (hopfParentOverlap(left, right)) support += 0.08;
     return Math.min(0.34, support);
 }
 
@@ -1679,13 +1874,16 @@ function hopfCrossKindCompatible(left: HopfResonanceEntry, right: HopfResonanceE
     if (left.kind === right.kind) return true;
     if (left.target.entityId && left.target.entityId === right.target.entityId) return true;
     if (left.target.chunkId && left.target.chunkId === right.target.chunkId) return true;
-    if (parentOverlap(left.target, right.target)) return true;
+    if (hopfParentOverlap(left, right)) return true;
     return semantic > 0.82;
 }
 
-function parentOverlap(left: GraphRebuildEmbeddingTarget, right: GraphRebuildEmbeddingTarget): boolean {
-    const parents = new Set(left.parentIds || []);
-    return Boolean(parents.size && (right.parentIds || []).some((parent) => parents.has(parent)));
+function hopfParentOverlap(left: HopfResonanceEntry, right: HopfResonanceEntry): boolean {
+    if (!left.parentIds?.size || !right.parentIds?.size) return false;
+    for (const parentId of right.parentIds) {
+        if (left.parentIds.has(parentId)) return true;
+    }
+    return false;
 }
 
 function componentSupport(memberIndexes: number[], neighbors: HopfResonanceEdge[][]): number {

@@ -32,9 +32,28 @@ describe('manifold projection switching', () => {
         const snapshot = projectionSnapshot(64);
         const loadNative = vi.fn<() => Promise<EmbeddingAtlasData>>();
         const first = await loadManifoldProjection(snapshot, 'siegel', loadNative);
-        const second = await loadManifoldProjection(snapshot, 'siegel', loadNative);
+        const rehydratedReceipt = structuredClone(snapshot);
+        const second = await loadManifoldProjection(rehydratedReceipt, 'siegel', loadNative);
 
         expect(second.atlas).toBe(first.atlas);
+        expect(loadNative).not.toHaveBeenCalled();
+    });
+
+    it('keeps cold current-corpus and every subsequent manifold below one second', async () => {
+        const snapshot = projectionSnapshot(6_000);
+        const loadNative = vi.fn<() => Promise<EmbeddingAtlasData>>();
+        const durations = new Map<AtlasManifoldMode, number>();
+
+        for (const mode of MODES) {
+            const startedAt = performance.now();
+            const projection = await loadManifoldProjection(snapshot, mode, loadNative);
+            durations.set(mode, performance.now() - startedAt);
+            expect(projection.atlas.nodes).toHaveLength(6_000);
+        }
+
+        for (const [mode, durationMs] of durations) {
+            expect(durationMs, `${mode} current-corpus projection took ${durationMs.toFixed(2)} ms`).toBeLessThan(1_000);
+        }
         expect(loadNative).not.toHaveBeenCalled();
     });
 
@@ -83,6 +102,9 @@ function projectionSnapshot(targetCount: number): GraphRebuildSnapshot {
     return {
         schemaVersion: 'phoenix-graph-rebuild/v1',
         id: `projection-performance-${targetCount}`,
+        authorityContract: {
+            contentHash: `projection-authority-${targetCount}`,
+        },
         source: 'phoenix-graph-rebuild',
         scopeKind: 'global',
         scopeId: 'global',

@@ -1,16 +1,39 @@
-use std::path::Path;
+use std::{path::Path, time::Instant};
 
 use phoenix_graph_api::{
     begin_native_operator_decision, certify_native_decision_graph_truth_link,
     commit_canonical_episode_assignment, complete_native_operator_decision, native_decision_census,
     native_reward_observation_census, record_native_reward_observation,
-    CanonicalEpisodeAssignmentCommitRequest, NativeDecisionGraphTruthLinkRequest,
-    NativeOperatorDecisionBeginRequest, NativeOperatorDecisionCompleteRequest,
-    NativeRewardObservationRequest,
+    CanonicalEpisodeAssignmentCommitRequest, CanonicalEpisodeAssignmentCommitResponse,
+    NativeDecisionGraphTruthLinkRequest, NativeOperatorDecisionBeginRequest,
+    NativeOperatorDecisionCompleteRequest, NativeRewardObservationRequest,
 };
 use phoenix_store_overgraph::PhoenixOvergraphStore;
 use serde::de::DeserializeOwned;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
+
+const CANONICAL_EPISODE_ASSIGNMENT_BATCH_REQUEST_SCHEMA: &str =
+    "phoenix-canonical-episode-assignment-batch-commit/v1";
+const CANONICAL_EPISODE_ASSIGNMENT_BATCH_RESPONSE_SCHEMA: &str =
+    "phoenix-canonical-episode-assignment-batch-result/v1";
+const MAX_CANONICAL_EPISODE_ASSIGNMENT_BATCH: usize = 4_096;
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+struct CanonicalEpisodeAssignmentBatchRequest {
+    schema_version: String,
+    requests: Vec<CanonicalEpisodeAssignmentCommitRequest>,
+}
+
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct CanonicalEpisodeAssignmentBatchResponse {
+    schema_version: &'static str,
+    requested: u32,
+    completed: u32,
+    elapsed_ns: u64,
+    responses: Vec<CanonicalEpisodeAssignmentCommitResponse>,
+}
 
 pub fn begin(store_path: &Path, request_json: &str) -> Result<String, String> {
     let store = open_store(store_path)?;
@@ -27,9 +50,67 @@ pub fn complete(store_path: &Path, request_json: &str) -> Result<String, String>
 pub fn commit_episode_assignment(store_path: &Path, request_json: &str) -> Result<String, String> {
     let store = open_store(store_path)?;
     let request = parse::<CanonicalEpisodeAssignmentCommitRequest>(request_json)?;
-    encode(
-        &commit_canonical_episode_assignment(&store, request).map_err(|error| error.to_string())?,
-    )
+    let result =
+        commit_canonical_episode_assignment(&store, request).map_err(|error| error.to_string());
+    let publish = store.publish_and_close().map_err(|error| error.to_string());
+    match (result, publish) {
+        (Ok(response), Ok(())) => encode(&response),
+        (Err(error), Ok(())) => Err(error),
+        (Ok(_), Err(error)) => Err(format!("publish canonical episode assignment: {error}")),
+        (Err(error), Err(publish_error)) => Err(format!(
+            "{error}; publish canonical episode assignment recovery: {publish_error}"
+        )),
+    }
+}
+
+pub fn commit_episode_assignments_batch(
+    store_path: &Path,
+    request_json: &str,
+) -> Result<String, String> {
+    let request = parse::<CanonicalEpisodeAssignmentBatchRequest>(request_json)?;
+    if request.schema_version != CANONICAL_EPISODE_ASSIGNMENT_BATCH_REQUEST_SCHEMA {
+        return Err("canonical episode assignment batch schema mismatch".to_owned());
+    }
+    if request.requests.is_empty()
+        || request.requests.len() > MAX_CANONICAL_EPISODE_ASSIGNMENT_BATCH
+    {
+        return Err(format!(
+            "canonical episode assignment batch must contain 1..={MAX_CANONICAL_EPISODE_ASSIGNMENT_BATCH} requests"
+        ));
+    }
+
+    let store = open_store(store_path)?;
+    let requested = request.requests.len();
+    let started = Instant::now();
+    let mut responses = Vec::with_capacity(requested);
+    for (index, item) in request.requests.into_iter().enumerate() {
+        let response = match commit_canonical_episode_assignment(&store, item) {
+            Ok(response) => response,
+            Err(error) => {
+                let completed = responses.len();
+                store.publish_and_close().map_err(|publish_error| {
+                    format!(
+                        "canonical episode assignment batch failed at index {index} after {completed} completed requests: {error}; publish durable prefix: {publish_error}"
+                    )
+                })?;
+                return Err(format!(
+                "canonical episode assignment batch failed at index {index} after {} completed requests: {error}",
+                    responses.len()
+                ));
+            }
+        };
+        responses.push(response);
+    }
+    store
+        .publish_and_close()
+        .map_err(|error| format!("publish canonical episode assignment batch: {error}"))?;
+    encode(&CanonicalEpisodeAssignmentBatchResponse {
+        schema_version: CANONICAL_EPISODE_ASSIGNMENT_BATCH_RESPONSE_SCHEMA,
+        requested: requested as u32,
+        completed: responses.len() as u32,
+        elapsed_ns: started.elapsed().as_nanos().min(u64::MAX as u128) as u64,
+        responses,
+    })
 }
 
 pub fn census(store_path: &Path) -> Result<String, String> {
@@ -238,5 +319,92 @@ mod tests {
         assert_eq!(census["canonicalEpisodeAssignmentLabels"], 1);
         assert_eq!(census["canonicalEpisodeAttachLabels"], 1);
         assert_eq!(census["graphTruthLinkedDecisions"], 1);
+    }
+
+    #[test]
+    fn episode_assignment_batch_reuses_one_store_and_stops_at_the_first_invalid_request() {
+        fn request(event_id: &str, evidence_id: &str, decided_at: i64) -> Value {
+            json!({
+                "schemaVersion": "phoenix-canonical-episode-assignment-commit/v1",
+                "scopeKey": "scope:episode-batch-rpc",
+                "sourceSnapshotId": "snapshot:episode-batch-rpc:1",
+                "sourceSnapshotBuiltAt": 90,
+                "sourceAuthorityContentHash": "authority:episode-batch-rpc:1",
+                "event": {
+                    "id": event_id,
+                    "noteId": "note:rpc:1",
+                    "chunkId": "chunk:rpc:1",
+                    "sourceStart": 10,
+                    "sourceEnd": 20,
+                    "predicate": "arrives",
+                    "participantEntityIds": ["entity:rpc:1"],
+                    "evidenceIds": [evidence_id],
+                    "factuality": "asserted",
+                    "confidenceMillis": 900,
+                    "noTopologyCommit": true
+                },
+                "episodes": [{
+                    "id": "episode:rpc:1",
+                    "noteId": "note:rpc:1",
+                    "label": "Arrival",
+                    "sourceStart": 0,
+                    "sourceEnd": 30,
+                    "chunkIds": ["chunk:rpc:1"],
+                    "eventIds": [event_id],
+                    "entityIds": ["entity:rpc:1"],
+                    "boundaryReceiptIds": ["boundary:rpc:1"],
+                    "confidenceMillis": 850,
+                    "status": "candidate",
+                    "noTopologyCommit": true
+                }],
+                "selectedAction": { "kind": "attach_to_episode", "episodeId": "episode:rpc:1" },
+                "decidedAt": decided_at,
+                "operatorId": "operator:local-user"
+            })
+        }
+
+        let root = tempdir().expect("episode batch RPC store");
+        let first = request("event:rpc:batch:1", "evidence:rpc:batch:1", 100);
+        let second = request("event:rpc:batch:2", "evidence:rpc:batch:2", 101);
+        let batch = json!({
+            "schemaVersion": "phoenix-canonical-episode-assignment-batch-commit/v1",
+            "requests": [first.clone(), second]
+        });
+        let value: Value = serde_json::from_str(
+            &commit_episode_assignments_batch(root.path(), &batch.to_string())
+                .expect("episode assignment batch RPC"),
+        )
+        .expect("decode batch response");
+        assert_eq!(
+            value["schemaVersion"],
+            "phoenix-canonical-episode-assignment-batch-result/v1"
+        );
+        assert_eq!(value["requested"], 2);
+        assert_eq!(value["completed"], 2);
+        assert_eq!(value["responses"].as_array().map(Vec::len), Some(2));
+
+        let retry: Value = serde_json::from_str(
+            &commit_episode_assignments_batch(root.path(), &batch.to_string())
+                .expect("retry episode assignment batch RPC"),
+        )
+        .expect("decode retry batch response");
+        assert_eq!(retry["completed"], 2);
+        assert_eq!(retry["responses"][0]["commitStatus"], "already_present");
+        let batch_census: Value = serde_json::from_str(&census(root.path()).expect("batch census"))
+            .expect("decode batch census");
+        assert_eq!(batch_census["canonicalEpisodeAssignmentLabels"], 2);
+
+        let mut invalid = request("event:rpc:batch:3", "evidence:rpc:batch:3", 102);
+        invalid["selectedAction"]["episodeId"] = json!("episode:missing");
+        let fail_first = json!({
+            "schemaVersion": "phoenix-canonical-episode-assignment-batch-commit/v1",
+            "requests": [request("event:rpc:batch:4", "evidence:rpc:batch:4", 103), invalid]
+        });
+        let error = commit_episode_assignments_batch(root.path(), &fail_first.to_string())
+            .expect_err("invalid second request must stop the batch");
+        assert!(error.contains("failed at index 1 after 1 completed requests"));
+        let failure_census: Value = serde_json::from_str(&census(root.path()).expect("fail-first census"))
+            .expect("decode fail-first census");
+        assert_eq!(failure_census["canonicalEpisodeAssignmentLabels"], 3);
     }
 }

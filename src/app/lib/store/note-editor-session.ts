@@ -24,6 +24,10 @@ export interface EditorSessionNoteMeta {
     updatedAt: number;
 }
 
+export interface CachedEditorNoteMeta extends EditorSessionNoteMeta {
+    hasBody?: boolean;
+}
+
 export interface LegacyEditorPosition {
     noteId: string;
     scrollTop: number;
@@ -160,6 +164,24 @@ export function shouldRestoreStoredPosition(
     }
 
     return position.noteUpdatedAt === note.updatedAt;
+}
+
+export function canRevealCachedEditorNote(
+    note: CachedEditorNoteMeta | null | undefined,
+): note is CachedEditorNoteMeta & { hasBody: true } {
+    return note?.hasBody === true;
+}
+
+export function cachedEditorBodyMatchesAuthoritativeHeader(
+    authoritative: EditorSessionNoteMeta,
+    cached: CachedEditorNoteMeta | null | undefined,
+): boolean {
+    if (!canRevealCachedEditorNote(cached) || cached.id !== authoritative.id) {
+        return false;
+    }
+    const authoritativeRevision = authoritative.version ?? authoritative.updatedAt;
+    const cachedRevision = cached.version ?? cached.updatedAt;
+    return authoritativeRevision === cachedRevision;
 }
 
 export function getFallbackActiveNoteIdFromTabs(value: unknown): string | null {
