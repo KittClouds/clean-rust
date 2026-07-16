@@ -133,6 +133,15 @@ export function graphAnalysisResidentDocumentRequest(
         : compactRequest;
 }
 
+export function graphAnalysisPendingRunAfterRequest(
+    pendingRun: { runHandle: string; signature: string } | null,
+    request: unknown,
+): { runHandle: string; signature: string } | null {
+    return pendingRun && objectRecord(request)?.['runHandle'] === pendingRun.runHandle
+        ? null
+        : pendingRun;
+}
+
 function graphRunDocumentSignature(documents: unknown[], idField: 'documentId' | 'noteId'): string {
     return documents
         .map((value) => {
@@ -293,11 +302,13 @@ class PhoenixTaurpcBridge implements PhoenixNativeBridge {
 
     async analyzeGraphSnapshot(request: unknown): Promise<unknown> {
         await this.loadRuntime();
+        const pendingRun = this.pendingGraphRun;
         const residentRequest = graphAnalysisResidentDocumentRequest(
             request,
             this.residentGraphDocuments,
-            this.pendingGraphRun,
+            pendingRun,
         );
+        this.pendingGraphRun = graphAnalysisPendingRunAfterRequest(pendingRun, residentRequest);
         return phoenixTransportAudit.measureTypedRpc(
             'phoenix.analyze_graph_snapshot',
             () => this.rpc.phoenix.analyze_graph_snapshot(residentRequest as never),

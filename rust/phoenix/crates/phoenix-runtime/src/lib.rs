@@ -213,6 +213,7 @@ struct PersistenceWalApplyReport {
     note_upserts: usize,
     note_deletes: usize,
     relation_upserts: usize,
+    relation_upsert_batches: usize,
     relation_deletes: usize,
     scoped_document_upserts: usize,
     lex_rebuilt: bool,
@@ -221,6 +222,49 @@ struct PersistenceWalApplyReport {
     relation_ms: u64,
     lex_ms: u64,
     total_ms: u64,
+}
+
+fn homogeneous_scoped_document_upserts(
+    records: &[PersistenceWalRecord],
+) -> Result<Option<Vec<Value>>, StoreError> {
+    if records.len() < 2 {
+        return Ok(None);
+    }
+    let mut rows = Vec::with_capacity(records.len());
+    let mut keys = HashSet::with_capacity(records.len());
+    for record in records {
+        if record.seq == 0 {
+            return Err(StoreError::Query("invalid WAL seq: 0".to_owned()));
+        }
+        if record.partition != "content" {
+            return Err(StoreError::Query(format!(
+                "unsupported WAL partition: {}",
+                record.partition
+            )));
+        }
+        if record.command != "relation:upsert"
+            || record.payload.get("relation").and_then(Value::as_str) != Some("scoped_documents")
+        {
+            return Ok(None);
+        }
+        let row = require_payload_value(&record.payload, "row")?;
+        let Some(key) = scoped_document_wal_key(row) else {
+            return Ok(None);
+        };
+        if !keys.insert(key) {
+            return Ok(None);
+        }
+        rows.push(row.clone());
+    }
+    Ok(Some(rows))
+}
+
+fn scoped_document_wal_key(row: &Value) -> Option<(&str, &str, &str)> {
+    Some((
+        row.get("scope_folder_id")?.as_str()?,
+        row.get("namespace")?.as_str()?,
+        row.get("document_key")?.as_str()?,
+    ))
 }
 
 #[derive(Clone, Debug)]
@@ -5936,6 +5980,16 @@ impl PhoenixRuntime {
             records: records.len(),
             ..PersistenceWalApplyReport::default()
         };
+        if let Some(rows) = homogeneous_scoped_document_upserts(records)? {
+            let started = Instant::now();
+            self.upsert_native_relation_rows("scoped_documents", &rows)?;
+            report.relation_upserts = rows.len();
+            report.relation_upsert_batches = 1;
+            report.scoped_document_upserts = rows.len();
+            report.relation_ms = elapsed_millis(started);
+            report.total_ms = elapsed_millis(total_started);
+            return Ok(report);
+        }
         let mut lex_dirty = false;
         for record in records {
             if record.seq == 0 {
@@ -5973,6 +6027,7 @@ impl PhoenixRuntime {
                     let row = require_payload_value(&record.payload, "row")?;
                     self.put_relation_row(relation, row.clone())?;
                     report.relation_upserts += 1;
+                    report.relation_upsert_batches += 1;
                     if relation == "scoped_documents" {
                         report.scoped_document_upserts += 1;
                     }
@@ -16175,6 +16230,25 @@ mod tests {
                                     "updated_at": 100
                                 }
                             }
+                        },
+                        {
+                            "seq": 2,
+                            "command": "relation:upsert",
+                            "partition": "content",
+                            "writtenAt": 101,
+                            "payload": {
+                                "relation": "scoped_documents",
+                                "row": {
+                                    "id": "phoenix.graph.rebuild:scope:content:anchors",
+                                    "scope_folder_id": "scope",
+                                    "narrative_id": "",
+                                    "namespace": "phoenix.graph.rebuild",
+                                    "document_key": "content:anchors",
+                                    "payload": "{\"anchors\":[]}",
+                                    "created_at": 100,
+                                    "updated_at": 101
+                                }
+                            }
                         }
                     ]
                 }),
@@ -16186,7 +16260,15 @@ mod tests {
         let rows = runtime
             .fetch_relation_rows("scoped_documents")
             .expect("scoped documents");
-        assert_eq!(rows.len(), 1);
+        assert_eq!(rows.len(), 2);
+        assert_eq!(
+            result
+                .payload
+                .as_ref()
+                .and_then(|payload| payload.pointer("/timings/relationUpsertBatches"))
+                .and_then(Value::as_u64),
+            Some(1)
+        );
     }
 
     #[test]

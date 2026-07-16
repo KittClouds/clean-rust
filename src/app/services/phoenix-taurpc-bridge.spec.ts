@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
     canonicalRewardObserverDelayMs,
+    graphAnalysisPendingRunAfterRequest,
     graphAnalysisResidentDocumentRequest,
     utf8MentionOffsets,
 } from './phoenix-taurpc-bridge';
@@ -29,6 +30,17 @@ describe('Phoenix TauRPC compact mention projection', () => {
             runHandle: 'graph-run:1',
             documents: [{ noteId: 'note-1', text: null, textHash: 'text:abc' }],
         });
+        expect(graphAnalysisPendingRunAfterRequest(
+            { runHandle: 'graph-run:1', signature: 'note-1:text:abc' },
+            compact,
+        )).toBeNull();
+    });
+
+    it('retains an unmatched discovery lease for its matching analysis request', () => {
+        const pending = { runHandle: 'graph-run:2', signature: 'note-2:text:def' };
+
+        expect(graphAnalysisPendingRunAfterRequest(pending, { runHandle: 'graph-run:1' }))
+            .toBe(pending);
     });
 });
 

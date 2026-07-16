@@ -1131,7 +1131,8 @@ function appendSnapshotTimingStages(
         'snapshotCpu',
         'Snapshot CPU',
         Math.round(
-            (timings.nativeCompilerMs || 0)
+            (timings.nativeSnapshotAnalysisMs || 0)
+            + (timings.nativeCompilerMs || 0)
             + timings.occurrenceRecoverMs
             + timings.snapshotBuildMs
             + (timings.authoritySealMs || 0)
@@ -1140,6 +1141,15 @@ function appendSnapshotTimingStages(
         {
             occurrenceRecoverMs: timings.occurrenceRecoverMs,
             snapshotBuildMs: timings.snapshotBuildMs,
+            nativeSnapshotAnalysisMs: timings.nativeSnapshotAnalysisMs || 0,
+            nativeAnalysisRustMs: Math.round((timings.nativeSnapshotAnalysisRustMicros || 0) / 1_000),
+            nativeBridgeRustMs: Math.round((timings.nativeChunkSemanticBridgeRustMicros || 0) / 1_000),
+            nativeContinuityRustMs: Math.round((timings.nativeStoryContinuityRustMicros || 0) / 1_000),
+            nativeGovernanceRustMs: Math.round((timings.nativeMemoryGovernanceRustMicros || 0) / 1_000),
+            nativeRetrievalRustMs: Math.round(
+                (timings.nativeMemoryGovernanceRetrievalExperimentRustMicros || 0) / 1_000,
+            ),
+            nativeVerdictRustMs: Math.round((timings.nativePromotionVerdictRustMicros || 0) / 1_000),
             nativeCompilerMs: timings.nativeCompilerMs || 0,
             nativeCompilerSkipped: timings.nativeCompilerSkipped || 0,
             authoritySealMs: timings.authoritySealMs || 0,
