@@ -150,6 +150,26 @@ describe('CanvasAgentRunService', () => {
             }),
         );
     });
+
+    it('launches deep research as the same durable note run with a larger bounded deadline', async () => {
+        const run = runRecord('run-research', 'planning');
+        chat.startRun.mockResolvedValue(run);
+        chat.pollRun.mockResolvedValue(snapshot(runRecord('run-research', 'awaiting_approval')));
+        const service = TestBed.inject(CanvasAgentRunService);
+
+        await service.startWorkspaceRun('Research durable Rust agent harnesses.', 'side-panel', 'deep_research');
+
+        expect(chat.startRun).toHaveBeenCalledWith(
+            'Research durable Rust agent harnesses.',
+            expect.objectContaining({
+                strategy: 'deep_research',
+                deadlineMs: 240_000,
+                mutationPolicy: 'confirm',
+                baseSystemPrompt: expect.stringContaining('Rust harness owns web policy'),
+                canvasTarget: expect.objectContaining({ noteUri: 'note://story-1/note-1', baseRevision: 41 }),
+            }),
+        );
+    });
 });
 
 function runRecord(id: string, status: ChatRun['status']): ChatRun {

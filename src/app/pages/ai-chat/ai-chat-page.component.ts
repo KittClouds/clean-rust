@@ -41,6 +41,7 @@ import {
 import { ChatContextClipStore } from '../../lib/store/chat-context-clip.store';
 import { KammiChatUiService } from '../../lib/services/kammi-chat-ui.service';
 import { CanvasRunInspectorComponent } from '../../lib/components/canvas-run-inspector.component';
+import { CanvasAgentRunService } from '../../lib/services/canvas-agent-run.service';
 
 // Re-export types from the installed package for compatibility
 import type { ChatMessage, ChatOptions, ChatConfig as PkgChatConfig } from '@neurodevworks/angular-chatbot';
@@ -276,7 +277,7 @@ Keep responses concise but helpful. If you don't know something specific about t
                                 <textarea
                                     #messageInput
                                     class="w-full px-4 py-3 pr-12 text-sm rounded-xl border border-zinc-700 bg-zinc-900 text-white placeholder:text-slate-500 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500/30 resize-none transition-all"
-                                    [placeholder]="'Ask Kammi anything...'"
+                                    [placeholder]="researchToNote() ? 'Deep research a question and write the verified report to the open note...' : 'Ask Kammi anything...'"
                                     [(ngModel)]="currentMessage"
                                     (keydown.enter)="onEnterKey($event)"
                                     [disabled]="isStreaming()"
@@ -303,6 +304,15 @@ Keep responses concise but helpful. If you don't know something specific about t
                                     (click)="toggleIndexMode()">
                                     <lucide-icon [img]="DatabaseIcon" size="10"></lucide-icon>
                                     Index {{ indexEnabled() ? 'ON' : 'OFF' }}
+                                </button>
+                                <button
+                                    class="flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-medium transition-colors"
+                                    [class.bg-amber-500]="researchToNote()"
+                                    [class.text-black]="researchToNote()"
+                                    [class.text-slate-500]="!researchToNote()"
+                                    (click)="toggleResearchToNote()">
+                                    <lucide-icon [img]="BrainIcon" size="10"></lucide-icon>
+                                    Research to note {{ researchToNote() ? 'ON' : 'OFF' }}
                                 </button>
                             </div>
                             <span class="text-[10px] text-slate-600">{{ goChatService.messageCount() }} messages in thread</span>
@@ -783,6 +793,8 @@ export class AiChatPageComponent implements OnInit, OnDestroy, AfterViewInit {
 
     // Index mode
     indexEnabled = this.chatUi.indexEnabled;
+    readonly researchToNote = signal(false);
+    readonly canvasRuns = inject(CanvasAgentRunService);
 
     // Models
     savedModels = this.chatUi.savedModels;
@@ -849,6 +861,10 @@ export class AiChatPageComponent implements OnInit, OnDestroy, AfterViewInit {
         this.chatUi.toggleIndexMode();
     }
 
+    toggleResearchToNote(): void {
+        this.researchToNote.update(value => !value);
+    }
+
     // ---- Models ----
     private loadSavedModels(): string[] {
         return this.savedModels();
@@ -908,6 +924,10 @@ export class AiChatPageComponent implements OnInit, OnDestroy, AfterViewInit {
         const text = this.currentMessage;
         if (!text.trim()) return;
         this.currentMessage = '';
+        if (this.researchToNote()) {
+            await this.canvasRuns.startWorkspaceRun(text, 'ai-page', 'deep_research');
+            return;
+        }
         await this.chatUi.sendMessage(text);
     }
 

@@ -104,6 +104,7 @@ export type ChatRunStatus =
     | 'cancelled';
 
 export interface RunOptions {
+    strategy?: 'agent' | 'deep_research';
     finalProvider: string;
     finalModel: string;
     plannerModel?: string;
@@ -1272,6 +1273,7 @@ function toCapabilityProfile(raw: any): CapabilityProfile {
 
 function toRunOptions(raw: any): RunOptions {
     return {
+        strategy: raw?.strategy === 'deep_research' ? 'deep_research' : 'agent',
         finalProvider: stringValue(raw?.finalProvider),
         finalModel: stringValue(raw?.finalModel),
         plannerModel: raw?.plannerModel ? String(raw.plannerModel) : undefined,

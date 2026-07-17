@@ -1992,6 +1992,8 @@ pub struct CanvasRunTarget {
 #[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct RunOptions {
+    #[serde(default)]
+    pub strategy: Option<String>,
     pub final_provider: String,
     pub final_model: String,
     pub planner_model: Option<String>,

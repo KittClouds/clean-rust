@@ -25,6 +25,7 @@ export type CanvasHarnessReceipt = CanvasTransactionReceipt | CanvasMultiNoteRec
 
 const ACTIVE_CANVAS_RUN_KEY = 'ai-harness:active-canvas-run';
 const CANVAS_RUN_DEADLINE_MS = 60_000;
+const RESEARCH_RUN_DEADLINE_MS = 240_000;
 
 @Injectable({ providedIn: 'root' })
 export class CanvasAgentRunService {
@@ -105,6 +106,7 @@ export class CanvasAgentRunService {
     async startWorkspaceRun(
         instruction: string,
         initiator: CanvasRunInitiator = 'side-panel',
+        strategy: 'agent' | 'deep_research' = 'agent',
     ): Promise<ChatRunSnapshot | null> {
         if (this.busySignal()) return this.snapshotSignal();
         const document = this.workspace.getSnapshot();
@@ -128,7 +130,7 @@ export class CanvasAgentRunService {
             await this.chat.addUserMessage(instruction);
             const run = await this.chat.startRun(
                 instruction.trim(),
-                this.runOptions(document, document.selection, config, true),
+                this.runOptions(document, document.selection, config, true, strategy),
             );
             if (!run) throw new Error('Failed to create durable Canvas workspace run.');
             this.setActiveRun(run.id);
@@ -333,12 +335,14 @@ export class CanvasAgentRunService {
         selection: WorkspaceSelectionSnapshot,
         config: ChatConfig,
         workspaceTransaction = false,
+        strategy: 'agent' | 'deep_research' = 'agent',
     ): RunOptions {
         const note = this.workspace.getSnapshot();
         const currentNote = note && document.noteId === note.noteId ? note : document;
         const storeRevision = this.currentStoreRevision();
         const noteUri = this.noteUri(currentNote.noteId);
         return {
+            strategy,
             finalProvider: 'go-openrouter',
             finalModel: config.model,
             plannerModel: config.model,
@@ -346,11 +350,11 @@ export class CanvasAgentRunService {
             plannerEnabled: true,
             workspaceEnabled: true,
             mutationsEnabled: true,
-            deadlineMs: CANVAS_RUN_DEADLINE_MS,
+            deadlineMs: strategy === 'deep_research' ? RESEARCH_RUN_DEADLINE_MS : CANVAS_RUN_DEADLINE_MS,
             mutationPolicy: 'confirm',
             narrativeId: this.currentNarrativeId(),
             scopeId: this.currentNarrativeId(),
-            baseSystemPrompt: this.systemPrompt(noteUri, storeRevision, document.revision, selection, workspaceTransaction),
+            baseSystemPrompt: this.systemPrompt(noteUri, storeRevision, document.revision, selection, workspaceTransaction, strategy),
             initialExternalContext: this.targetContext(noteUri, storeRevision, document, selection, workspaceTransaction),
             canvasTarget: {
                 noteUri,
@@ -373,7 +377,15 @@ export class CanvasAgentRunService {
         editorRevision: number,
         selection: WorkspaceSelectionSnapshot,
         workspaceTransaction = false,
+        strategy: 'agent' | 'deep_research' = 'agent',
     ): string {
+        if (strategy === 'deep_research') {
+            return `You are executing one Phoenix deep-research-to-note run.
+Target note: ${noteUri}
+Target store revision: ${storeRevision}
+
+The Rust harness owns web policy, budgets, source/claim/citation/gap ledgers, compaction, and verification. Follow its research tools in order. After research_verify returns noteProposalUnlocked=true, call exactly one multi_note_proposal that appends or replaces the target note with the verified Markdown synthesis, using the exact target revision. Never cite an uncaptured source or claim a commit before the durable approval receipt.`;
+        }
         if (workspaceTransaction) {
             return `You are executing one Phoenix multi-note transaction in the active narrative.
 Anchor: ${noteUri}

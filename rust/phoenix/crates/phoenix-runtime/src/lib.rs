@@ -19,6 +19,7 @@ mod frame_extraction;
 #[cfg(not(target_arch = "wasm32"))]
 mod overgraph_lane;
 mod planner;
+mod research;
 mod view;
 
 #[cfg(not(target_arch = "wasm32"))]
@@ -6739,6 +6740,7 @@ impl PhoenixRuntime {
             }
             "chat:cancelRun" => {
                 let run_id = require_payload_str(&request.payload, "runId")?;
+                research::cancel_session(self, run_id)?;
                 self.planner.drop_session(run_id);
                 let run = self.chat.cancel_run(self.chat_store()?, run_id)?;
                 Ok(StoreCommandResult {
@@ -7616,6 +7618,7 @@ impl PhoenixRuntime {
                         }
                         snapshot
                     })?;
+                research::finalize_note_decision(self, run_id, approved)?;
                 Ok(StoreCommandResult {
                     success: true,
                     payload: Some(
@@ -17191,6 +17194,7 @@ Bright embers glowed beside the ember-lit grate. Bright embers hissed in the ash
         mutations_enabled: bool,
     ) -> RunOptions {
         RunOptions {
+            strategy: None,
             final_provider: "openrouter".to_owned(),
             final_model: "meta-llama/llama-3.3-70b-instruct:free".to_owned(),
             planner_model: Some("meta-llama/llama-3.3-70b-instruct:free".to_owned()),

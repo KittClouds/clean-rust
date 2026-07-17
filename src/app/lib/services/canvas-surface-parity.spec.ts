@@ -11,6 +11,7 @@ describe('Canvas run surface parity contract', () => {
         expect(page).toContain('<app-canvas-run-inspector />');
         expect(panel).toContain('<app-canvas-run-inspector />');
         expect(panel).toContain("this.canvasRuns.startSelectionRun(text, undefined, 'side-panel')");
+        expect(page).toContain("this.canvasRuns.startWorkspaceRun(text, 'ai-page', 'deep_research')");
     });
 
     it('routes toolbar edits through the same run and removes direct model-to-editor streaming', () => {
@@ -44,6 +45,20 @@ describe('Canvas run surface parity contract', () => {
         expect(panel).toContain("this.canvasRuns.startWorkspaceRun(text, 'side-panel')");
         expect(planner).toContain('name: "multi_note_proposal"');
         expect(planner).not.toContain('name: "assert_graph"');
+    });
+
+    it('launches Rust deep research through the shared Canvas run without asserted graph writes', () => {
+        const panel = source('src/app/components/right-sidebar/ai-chat-panel/ai-chat-panel.component.ts');
+        const service = source('src/app/lib/services/canvas-agent-run.service.ts');
+        const planner = source('rust/phoenix/crates/phoenix-runtime/src/planner.rs');
+        const research = source('rust/phoenix/crates/phoenix-runtime/src/research.rs');
+
+        expect(panel).toContain("startWorkspaceRun(text, 'side-panel', 'deep_research')");
+        expect(service).toContain("strategy: 'agent' | 'deep_research'");
+        expect(planner).toContain('research::tool_specs()');
+        expect(research).toContain('research_web_search');
+        expect(research).toContain('research_verify');
+        expect(research).not.toContain('graph:upsert');
     });
 });
 

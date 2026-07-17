@@ -156,6 +156,18 @@ Keep responses concise but helpful. If you don't know something specific about t
 
                     @if (aiMode() === 'canvas') {
                         <div class="rounded-xl border border-teal-500/20 bg-teal-950/15 p-3 space-y-2">
+                            <div class="grid grid-cols-2 gap-1 rounded-lg bg-black/20 p-1" data-testid="canvas-agent-mode">
+                                <button class="rounded-md px-2 py-1.5 text-[10px] font-semibold uppercase tracking-[0.12em]"
+                                    [class.bg-teal-700]="canvasIntent() === 'agent'"
+                                    [class.text-white]="canvasIntent() === 'agent'"
+                                    [class.text-muted-foreground]="canvasIntent() !== 'agent'"
+                                    (click)="canvasIntent.set('agent')">App agent</button>
+                                <button class="rounded-md px-2 py-1.5 text-[10px] font-semibold uppercase tracking-[0.12em]"
+                                    [class.bg-amber-500]="canvasIntent() === 'research'"
+                                    [class.text-black]="canvasIntent() === 'research'"
+                                    [class.text-muted-foreground]="canvasIntent() !== 'research'"
+                                    (click)="canvasIntent.set('research')">Deep research</button>
+                            </div>
                             <div class="flex items-center justify-between gap-2">
                                 <div class="min-w-0">
                                     <div class="text-[10px] uppercase tracking-[0.14em] text-teal-300/80">Active Note</div>
@@ -741,7 +753,7 @@ Keep responses concise but helpful. If you don't know something specific about t
                 <div class="shrink-0 border-t border-border/50 p-3 chat-input-area bg-gradient-to-t from-teal-900/10 to-transparent">
                     <div class="flex items-end gap-2 relative">
                         <textarea #messageInput class="w-full pl-3 pr-10 py-2.5 text-[13px] rounded-xl border border-border bg-background focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500/30 resize-none transition-all placeholder:text-muted-foreground/60 shadow-sm"
-                            [placeholder]="aiMode() === 'canvas' ? 'Ask Kammi to inspect or edit the open note...' : 'Ask Kammi anything...'" [(ngModel)]="currentMessage" (keydown.enter)="onEnterKey($event)" [disabled]="isStreaming()" rows="1" style="max-height: 120px"></textarea>
+                            [placeholder]="aiMode() === 'canvas' ? (canvasIntent() === 'research' ? 'Research a question and write the verified result to this note...' : 'Ask Kammi to inspect or edit the open note...') : 'Ask Kammi anything...'" [(ngModel)]="currentMessage" (keydown.enter)="onEnterKey($event)" [disabled]="isStreaming()" rows="1" style="max-height: 120px"></textarea>
                         <button class="absolute right-1.5 bottom-1.5 w-7 h-7 rounded-lg flex items-center justify-center transition-all send-btn"
                             [class.active]="currentMessage.trim() && !isStreaming() && !canvasRuns.busy()" [disabled]="!currentMessage.trim() || isStreaming() || canvasRuns.busy()" (click)="sendMessage()">
                             <lucide-icon [img]="SendIcon" class="h-3.5 w-3.5"></lucide-icon>
@@ -1186,6 +1198,7 @@ export class AiChatPanelComponent implements AfterViewInit, OnDestroy {
     private readonly workspace = inject(EditorAgentWorkspaceService);
     private readonly noteEditorStore = inject(NoteEditorStore);
     readonly canvasRuns = inject(CanvasAgentRunService);
+    readonly canvasIntent = signal<'agent' | 'research'>('agent');
     private goChatInitialized = false;
     readonly aiMode = this.aiSidebarMode.mode;
     readonly canvasSelectionContext = this.aiSidebarMode.selectionContext;
@@ -1650,7 +1663,9 @@ export class AiChatPanelComponent implements AfterViewInit, OnDestroy {
 
         if (this.aiMode() === 'canvas') {
             this.currentMessage = '';
-            if (this.canvasSelectionContext()?.text?.trim()) {
+            if (this.canvasIntent() === 'research') {
+                await this.canvasRuns.startWorkspaceRun(text, 'side-panel', 'deep_research');
+            } else if (this.canvasSelectionContext()?.text?.trim()) {
                 await this.canvasRuns.startSelectionRun(text, undefined, 'side-panel');
             } else {
                 await this.canvasRuns.startWorkspaceRun(text, 'side-panel');
