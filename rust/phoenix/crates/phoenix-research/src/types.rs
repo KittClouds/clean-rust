@@ -64,6 +64,10 @@ pub struct QueryRecord {
     pub rationale: String,
     pub status: String,
     pub result_count: usize,
+    #[serde(default)]
+    pub provider: String,
+    #[serde(default)]
+    pub search_elapsed_ms: i64,
     pub created_at: i64,
 }
 
@@ -80,6 +84,18 @@ pub struct SourceRecord {
     pub fetched: bool,
     pub fetch_status: u16,
     pub content_type: String,
+    #[serde(default)]
+    pub fetch_backend: String,
+    #[serde(default)]
+    pub requested_fetch_mode: String,
+    #[serde(default)]
+    pub resolved_fetch_mode: String,
+    #[serde(default)]
+    pub extraction: String,
+    #[serde(default)]
+    pub rendered: bool,
+    #[serde(default)]
+    pub fetch_elapsed_ms: i64,
     pub discovered_by: Vec<String>,
     pub created_at: i64,
     pub updated_at: i64,

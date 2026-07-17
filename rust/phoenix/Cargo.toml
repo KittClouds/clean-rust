@@ -44,6 +44,7 @@ members = [
     "crates/phoenix-index",
     "crates/phoenix-kernel",
 ]
+exclude = ["sidecars/phoenix-obscura-worker"]
 resolver = "2"
 
 [workspace.package]

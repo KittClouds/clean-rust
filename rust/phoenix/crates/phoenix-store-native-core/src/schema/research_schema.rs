@@ -1,6 +1,11 @@
 use super::{PhoenixColumnSpec, PhoenixColumnType};
 
-const fn col(name: &'static str, ty: PhoenixColumnType, optional: bool, key: bool) -> PhoenixColumnSpec {
+const fn col(
+    name: &'static str,
+    ty: PhoenixColumnType,
+    optional: bool,
+    key: bool,
+) -> PhoenixColumnSpec {
     PhoenixColumnSpec::new(name, ty, optional, key)
 }
 
@@ -23,6 +28,8 @@ pub(super) const RESEARCH_QUERIES: &[PhoenixColumnSpec] = &[
     col("rationale", PhoenixColumnType::String, false, false),
     col("status", PhoenixColumnType::String, false, false),
     col("result_count", PhoenixColumnType::Int, false, false),
+    col("provider", PhoenixColumnType::String, true, false),
+    col("search_elapsed_ms", PhoenixColumnType::Int, true, false),
     col("created_at", PhoenixColumnType::Int, false, false),
 ];
 
@@ -38,6 +45,22 @@ pub(super) const RESEARCH_SOURCES: &[PhoenixColumnSpec] = &[
     col("fetched", PhoenixColumnType::Bool, false, false),
     col("fetch_status", PhoenixColumnType::Int, false, false),
     col("content_type", PhoenixColumnType::String, false, false),
+    col("fetch_backend", PhoenixColumnType::String, true, false),
+    col(
+        "requested_fetch_mode",
+        PhoenixColumnType::String,
+        true,
+        false,
+    ),
+    col(
+        "resolved_fetch_mode",
+        PhoenixColumnType::String,
+        true,
+        false,
+    ),
+    col("extraction", PhoenixColumnType::String, true, false),
+    col("rendered", PhoenixColumnType::Bool, true, false),
+    col("fetch_elapsed_ms", PhoenixColumnType::Int, true, false),
     col("discovered_by_json", PhoenixColumnType::Json, false, false),
     col("created_at", PhoenixColumnType::Int, false, false),
     col("updated_at", PhoenixColumnType::Int, false, false),
@@ -71,7 +94,12 @@ pub(super) const RESEARCH_GAPS: &[PhoenixColumnSpec] = &[
     col("run_id", PhoenixColumnType::String, false, false),
     col("description", PhoenixColumnType::String, false, false),
     col("priority", PhoenixColumnType::Int, false, false),
-    col("suggested_queries_json", PhoenixColumnType::Json, false, false),
+    col(
+        "suggested_queries_json",
+        PhoenixColumnType::Json,
+        false,
+        false,
+    ),
     col("status", PhoenixColumnType::String, false, false),
     col("cycle", PhoenixColumnType::Int, false, false),
     col("created_at", PhoenixColumnType::Int, false, false),

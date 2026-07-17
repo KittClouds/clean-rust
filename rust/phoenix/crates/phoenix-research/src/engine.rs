@@ -137,6 +137,8 @@ impl ResearchSession {
             rationale: rationale.trim().to_owned(),
             status: "running".to_owned(),
             result_count: 0,
+            provider: String::new(),
+            search_elapsed_ms: 0,
             created_at: now,
         });
         self.phase = ResearchPhase::Searching;
@@ -158,6 +160,8 @@ impl ResearchSession {
             .ok_or_else(|| ResearchError::Invalid(format!("unknown query id: {query_id}")))?;
         query.status = "completed".to_owned();
         query.result_count = results.hits.len();
+        query.provider = results.provider.clone();
+        query.search_elapsed_ms = results.elapsed_ms;
         let mut added = 0usize;
         for hit in results.hits {
             if self.sources.len() >= self.budget.max_sources as usize {
@@ -189,6 +193,12 @@ impl ResearchSession {
                 fetched: false,
                 fetch_status: 0,
                 content_type: String::new(),
+                fetch_backend: String::new(),
+                requested_fetch_mode: String::new(),
+                resolved_fetch_mode: String::new(),
+                extraction: String::new(),
+                rendered: false,
+                fetch_elapsed_ms: 0,
                 discovered_by: vec![query_id.to_owned()],
                 created_at: now,
                 updated_at: now,
@@ -215,6 +225,8 @@ impl ResearchSession {
 
     pub fn finish_fetch(&mut self, fetched: WebFetch, now: i64) -> Result<String, ResearchError> {
         self.guard(now)?;
+        let receipt = fetched.receipt.clone();
+        let fetch_elapsed_ms = fetched.elapsed_ms;
         let canonical = canonical_url(&fetched.final_url);
         let bytes = fetched.content.len();
         if bytes > self.budget.max_source_bytes {
@@ -244,6 +256,12 @@ impl ResearchSession {
             existing.fetched = true;
             existing.fetch_status = fetched.status;
             existing.content_type = fetched.content_type;
+            existing.fetch_backend = receipt.backend;
+            existing.requested_fetch_mode = receipt.requested_mode.as_str().to_owned();
+            existing.resolved_fetch_mode = receipt.resolved_mode.as_str().to_owned();
+            existing.extraction = receipt.extraction;
+            existing.rendered = receipt.rendered;
+            existing.fetch_elapsed_ms = fetch_elapsed_ms;
             existing.updated_at = now;
         } else {
             if self.sources.len() >= self.budget.max_sources as usize {
@@ -260,6 +278,12 @@ impl ResearchSession {
                 fetched: true,
                 fetch_status: fetched.status,
                 content_type: fetched.content_type,
+                fetch_backend: receipt.backend,
+                requested_fetch_mode: receipt.requested_mode.as_str().to_owned(),
+                resolved_fetch_mode: receipt.resolved_mode.as_str().to_owned(),
+                extraction: receipt.extraction,
+                rendered: receipt.rendered,
+                fetch_elapsed_ms,
                 discovered_by: Vec::new(),
                 created_at: now,
                 updated_at: now,

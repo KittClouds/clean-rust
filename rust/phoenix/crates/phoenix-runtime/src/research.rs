@@ -84,8 +84,8 @@ pub(crate) fn tool_specs() -> Vec<ChatPlannerToolSpec> {
         tool("research_web_search", "Search the public web through the native policy-bound provider. Results are durably ledgered.", json!({
             "type":"object","properties":{"query":{"type":"string","minLength":3},"rationale":{"type":"string"},"maxResults":{"type":"integer","minimum":1,"maximum":10}},"required":["query"],"additionalProperties":false
         })),
-        tool("research_web_fetch", "Fetch one public http(s) source through native SSRF, redirect, time, type, and byte policies.", json!({
-            "type":"object","properties":{"url":{"type":"string","minLength":8}},"required":["url"],"additionalProperties":false
+        tool("research_web_fetch", "Fetch one public http(s) source through native SSRF, redirect, time, type, and byte policies. Use rendered mode for JavaScript pages; auto preserves the direct fast path and escalates recognized app shells.", json!({
+            "type":"object","properties":{"url":{"type":"string","minLength":8},"mode":{"type":"string","enum":["auto","direct","rendered"]}},"required":["url"],"additionalProperties":false
         })),
         tool("research_record_claims", "Record atomic factual claims with source URL, locator, and exact supporting quote before synthesis.", json!({
             "type":"object","properties":{"claims":{"type":"array","minItems":1,"maxItems":24,"items":{"type":"object","properties":{"text":{"type":"string","minLength":8},"confidenceBps":{"type":"integer","minimum":0,"maximum":10000},"citations":{"type":"array","items":{"type":"object","properties":{"url":{"type":"string"},"locator":{"type":"string"},"quote":{"type":"string"}},"required":["url"]}}},"required":["text","citations"]}}},"required":["claims"],"additionalProperties":false
@@ -149,28 +149,36 @@ pub(crate) fn execute_tool(
                 }
             };
             let response_hits = results.hits.clone();
+            let provider = results.provider.clone();
+            let search_elapsed_ms = results.elapsed_ms;
             let added = session
                 .finish_search(&query_id, results, now_ms())
                 .map_err(research_error)?;
-            json!({ "queryId": query_id, "addedSources": added, "hits": response_hits, "phase": session.phase })
+            json!({ "queryId": query_id, "provider": provider, "addedSources": added, "hits": response_hits, "phase": session.phase, "elapsedMs": search_elapsed_ms })
         }
         "research_web_fetch" => {
             let url = required_str(args, "url")?;
+            let mode = phoenix_research::WebFetchMode::parse(
+                args.get("mode").and_then(Value::as_str).unwrap_or("auto"),
+            )
+            .map_err(research_error)?;
             session.begin_fetch(now).map_err(research_error)?;
             persist_session(runtime, run, &session)?;
             let client = NativeWebClient::from_env(session.budget.max_source_bytes)
                 .map_err(research_error)?;
-            let fetched = client.fetch(url).map_err(research_error)?;
+            let fetched = phoenix_research::WebFetcher::fetch_mode(&client, url, mode)
+                .map_err(research_error)?;
             let preview = fetched
                 .content
                 .chars()
                 .take(MAX_TOOL_TEXT_CHARS)
                 .collect::<String>();
             let elapsed_ms = fetched.elapsed_ms;
+            let fetch_receipt = fetched.receipt.clone();
             let source_id = session
                 .finish_fetch(fetched, now_ms())
                 .map_err(research_error)?;
-            json!({ "sourceId": source_id, "url": url, "content": preview, "truncated": session.sources.iter().find(|source| source.id == source_id).is_some_and(|source| source.content.chars().count() > MAX_TOOL_TEXT_CHARS), "elapsedMs": elapsed_ms })
+            json!({ "sourceId": source_id, "url": url, "content": preview, "truncated": session.sources.iter().find(|source| source.id == source_id).is_some_and(|source| source.content.chars().count() > MAX_TOOL_TEXT_CHARS), "elapsedMs": elapsed_ms, "fetchReceipt": fetch_receipt })
         }
         "research_record_claims" => {
             let claims: Vec<ClaimInput> =
@@ -311,6 +319,7 @@ fn persist_session(
         runtime.put_relation_row("research_queries", json!({
             "id": query.id, "run_id": session.id, "ordinal": query.ordinal, "query": query.query,
             "rationale": query.rationale, "status": query.status, "result_count": query.result_count, "created_at": query.created_at,
+            "provider": query.provider, "search_elapsed_ms": query.search_elapsed_ms,
         }))?;
     }
     for source in &session.sources {
@@ -318,6 +327,9 @@ fn persist_session(
             persist_run_artifact(runtime, run, Some(&format!("research-source:{}", source.id)), "research_source/v1", json!({
                 "sourceId": source.id, "url": source.url, "title": source.title, "contentHash": source.content_hash,
                 "contentType": source.content_type, "content": source.content,
+                "fetchBackend": source.fetch_backend, "requestedFetchMode": source.requested_fetch_mode,
+                "resolvedFetchMode": source.resolved_fetch_mode, "extraction": source.extraction,
+                "rendered": source.rendered, "fetchElapsedMs": source.fetch_elapsed_ms,
             }), false)?.key
         } else {
             String::new()
@@ -327,6 +339,9 @@ fn persist_session(
             "title": source.title, "excerpt": source.excerpt, "content_hash": source.content_hash,
             "artifact_key": artifact_key, "fetched": source.fetched, "fetch_status": source.fetch_status,
             "content_type": source.content_type, "discovered_by_json": source.discovered_by,
+            "fetch_backend": source.fetch_backend, "requested_fetch_mode": source.requested_fetch_mode,
+            "resolved_fetch_mode": source.resolved_fetch_mode, "extraction": source.extraction,
+            "rendered": source.rendered, "fetch_elapsed_ms": source.fetch_elapsed_ms,
             "created_at": source.created_at, "updated_at": source.updated_at,
         }))?;
     }

@@ -1,15 +1,16 @@
-use std::env;
 use std::io::Read;
 use std::net::{IpAddr, ToSocketAddrs};
 use std::time::Duration;
 
-use memchr::memchr;
+use memchr::{memchr, memmem};
 use reqwest::blocking::{Client, Response};
 use reqwest::header::{CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
 use serde::{Deserialize, Serialize};
-use serde_json::json;
 use thiserror::Error;
 use url::Url;
+
+use crate::provider::SearchProviderRegistry;
+use crate::renderer::ObscuraRenderer;
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -28,6 +29,66 @@ pub struct WebSearchResults {
     pub elapsed_ms: i64,
 }
 
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum WebFetchMode {
+    #[default]
+    Auto,
+    Direct,
+    Rendered,
+}
+
+impl WebFetchMode {
+    pub fn parse(value: &str) -> Result<Self, WebError> {
+        match value.trim().to_ascii_lowercase().as_str() {
+            "auto" | "" => Ok(Self::Auto),
+            "direct" => Ok(Self::Direct),
+            "rendered" => Ok(Self::Rendered),
+            other => Err(WebError::InvalidFetchMode(other.to_owned())),
+        }
+    }
+
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::Auto => "auto",
+            Self::Direct => "direct",
+            Self::Rendered => "rendered",
+        }
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct WebFetchReceipt {
+    pub schema_version: String,
+    pub requested_mode: WebFetchMode,
+    pub resolved_mode: WebFetchMode,
+    pub backend: String,
+    pub extraction: String,
+    pub rendered: bool,
+    pub direct_ms: i64,
+    pub render_ms: i64,
+    pub total_ms: i64,
+    pub response_bytes: usize,
+}
+
+impl Default for WebFetchReceipt {
+    fn default() -> Self {
+        Self {
+            schema_version: "phoenix-web-fetch-receipt/v1".to_owned(),
+            requested_mode: WebFetchMode::Auto,
+            resolved_mode: WebFetchMode::Direct,
+            backend: "unknown".to_owned(),
+            extraction: "unknown".to_owned(),
+            rendered: false,
+            direct_ms: 0,
+            render_ms: 0,
+            total_ms: 0,
+            response_bytes: 0,
+        }
+    }
+}
+
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct WebFetch {
@@ -39,12 +100,22 @@ pub struct WebFetch {
     pub content: String,
     pub bytes: usize,
     pub elapsed_ms: i64,
+    #[serde(default)]
+    pub receipt: WebFetchReceipt,
+}
+
+pub trait WebFetcher: Send + Sync {
+    fn fetch_mode(&self, input: &str, mode: WebFetchMode) -> Result<WebFetch, WebError>;
 }
 
 #[derive(Debug, Error)]
 pub enum WebError {
-    #[error("web search capability missing: set PHOENIX_TAVILY_API_KEY")]
+    #[error("web search capability missing: configure PHOENIX_WEB_SEARCH_PROVIDER")]
     MissingSearchCapability,
+    #[error("unknown web search provider: {0}")]
+    UnknownSearchProvider(String),
+    #[error("invalid web fetch mode: {0}")]
+    InvalidFetchMode(String),
     #[error("unsafe web URL rejected: {0}")]
     UnsafeUrl(String),
     #[error("web request failed: {0}")]
@@ -53,11 +124,19 @@ pub enum WebError {
     ResponseTooLarge(usize),
     #[error("web response was not valid UTF-8 text")]
     InvalidText,
+    #[error("Obscura renderer is unavailable: {0}")]
+    RendererUnavailable(String),
+    #[error("Obscura renderer timed out after {0} ms")]
+    RendererTimeout(u64),
+    #[error("Obscura renderer protocol failed: {0}")]
+    RendererProtocol(String),
+    #[error("Obscura renderer failed: {0}")]
+    Renderer(String),
 }
 
 pub struct NativeWebClient {
-    api_key: Option<String>,
-    search_endpoint: Url,
+    search: SearchProviderRegistry,
+    renderer: ObscuraRenderer,
     timeout: Duration,
     max_source_bytes: usize,
     max_redirects: usize,
@@ -65,21 +144,9 @@ pub struct NativeWebClient {
 
 impl NativeWebClient {
     pub fn from_env(max_source_bytes: usize) -> Result<Self, WebError> {
-        let endpoint = env::var("PHOENIX_TAVILY_ENDPOINT")
-            .unwrap_or_else(|_| "https://api.tavily.com/search".to_owned());
-        let search_endpoint =
-            Url::parse(&endpoint).map_err(|error| WebError::UnsafeUrl(error.to_string()))?;
-        validate_public_url(&search_endpoint)?;
-        if search_endpoint.scheme() != "https" {
-            return Err(WebError::UnsafeUrl(
-                "search provider must use https".to_owned(),
-            ));
-        }
         Ok(Self {
-            api_key: env::var("PHOENIX_TAVILY_API_KEY")
-                .ok()
-                .filter(|value| !value.trim().is_empty()),
-            search_endpoint,
+            search: SearchProviderRegistry::from_env(max_source_bytes)?,
+            renderer: ObscuraRenderer::from_env(max_source_bytes),
             timeout: Duration::from_secs(18),
             max_source_bytes,
             max_redirects: 5,
@@ -87,46 +154,18 @@ impl NativeWebClient {
     }
 
     pub fn search(&self, query: &str, max_results: usize) -> Result<WebSearchResults, WebError> {
-        let api_key = self
-            .api_key
-            .as_deref()
-            .ok_or(WebError::MissingSearchCapability)?;
-        let started = std::time::Instant::now();
-        let client = pinned_client(&self.search_endpoint, self.timeout)?;
-        let response = client
-            .post(self.search_endpoint.clone())
-            .header(USER_AGENT, phoenix_user_agent())
-            .json(&json!({
-                "api_key": api_key,
-                "query": query,
-                "search_depth": "advanced",
-                "max_results": max_results.clamp(1, 10),
-                "include_answer": false,
-                "include_raw_content": false
-            }))
-            .send()
-            .map_err(request_error)?
-            .error_for_status()
-            .map_err(request_error)?;
-        let payload = response.json::<TavilyResponse>().map_err(request_error)?;
-        Ok(WebSearchResults {
-            provider: "tavily".to_owned(),
-            query: query.to_owned(),
-            hits: payload
-                .results
-                .into_iter()
-                .take(max_results)
-                .map(|hit| WebSearchHit {
-                    url: hit.url,
-                    title: hit.title,
-                    excerpt: truncate_chars(&hit.content, 2_000),
-                })
-                .collect(),
-            elapsed_ms: started.elapsed().as_millis().min(i64::MAX as u128) as i64,
-        })
+        self.search.search(query, max_results)
     }
 
     pub fn fetch(&self, input: &str) -> Result<WebFetch, WebError> {
+        self.fetch_mode(input, WebFetchMode::Auto)
+    }
+
+    fn fetch_direct(
+        &self,
+        input: &str,
+        requested: WebFetchMode,
+    ) -> Result<DirectOutcome, WebError> {
         if input.len() > 4_096 {
             return Err(WebError::UnsafeUrl("URL exceeds 4096 bytes".to_owned()));
         }
@@ -157,7 +196,13 @@ impl NativeWebClient {
                     .map_err(|error| WebError::UnsafeUrl(error.to_string()))?;
                 continue;
             }
-            return self.read_response(requested_url.as_str(), current.as_str(), response, started);
+            return self.read_response(
+                requested_url.as_str(),
+                current.as_str(),
+                response,
+                started,
+                requested,
+            );
         }
         Err(WebError::Request("redirect limit reached".to_owned()))
     }
@@ -168,7 +213,8 @@ impl NativeWebClient {
         final_url: &str,
         mut response: Response,
         started: std::time::Instant,
-    ) -> Result<WebFetch, WebError> {
+        requested: WebFetchMode,
+    ) -> Result<DirectOutcome, WebError> {
         let status = response.status().as_u16();
         if !(200..300).contains(&status) {
             return Err(WebError::Request(format!("HTTP status {status}")));
@@ -205,42 +251,67 @@ impl NativeWebClient {
         }
         let raw = String::from_utf8(bytes).map_err(|_| WebError::InvalidText)?;
         let title = extract_title(&raw);
-        let content = if content_type.to_ascii_lowercase().contains("html") {
-            html_to_text(&raw)
-        } else {
-            raw
-        };
+        let is_html = content_type.to_ascii_lowercase().contains("html");
+        let script_shell = is_html && looks_script_rendered(raw.as_bytes());
+        let content = if is_html { html_to_text(&raw) } else { raw };
         let bytes = content.len();
-        Ok(WebFetch {
-            requested_url: requested_url.to_owned(),
-            final_url: final_url.to_owned(),
-            status,
-            title,
-            content_type,
-            content,
-            bytes,
-            elapsed_ms: started.elapsed().as_millis().min(i64::MAX as u128) as i64,
+        let elapsed_ms = started.elapsed().as_millis().min(i64::MAX as u128) as i64;
+        let render_recommended = script_shell && bytes < 384;
+        Ok(DirectOutcome {
+            render_recommended,
+            fetched: WebFetch {
+                requested_url: requested_url.to_owned(),
+                final_url: final_url.to_owned(),
+                status,
+                title,
+                content_type,
+                content,
+                bytes,
+                elapsed_ms,
+                receipt: WebFetchReceipt {
+                    requested_mode: requested,
+                    resolved_mode: WebFetchMode::Direct,
+                    backend: "phoenix-direct".to_owned(),
+                    extraction: "bounded_html_text".to_owned(),
+                    direct_ms: elapsed_ms,
+                    total_ms: elapsed_ms,
+                    response_bytes: bytes,
+                    ..WebFetchReceipt::default()
+                },
+            },
         })
     }
 }
 
-#[derive(Deserialize)]
-struct TavilyResponse {
-    #[serde(default)]
-    results: Vec<TavilyHit>,
+impl WebFetcher for NativeWebClient {
+    fn fetch_mode(&self, input: &str, mode: WebFetchMode) -> Result<WebFetch, WebError> {
+        validate_input_url(input)?;
+        match mode {
+            WebFetchMode::Rendered => self.renderer.render(input, mode),
+            WebFetchMode::Direct => self
+                .fetch_direct(input, mode)
+                .map(|outcome| outcome.fetched),
+            WebFetchMode::Auto => {
+                let direct = self.fetch_direct(input, mode)?;
+                if !direct.render_recommended {
+                    return Ok(direct.fetched);
+                }
+                match self.renderer.render(input, mode) {
+                    Ok(rendered) => Ok(rendered),
+                    Err(WebError::RendererUnavailable(_)) => Ok(direct.fetched),
+                    Err(error) => Err(error),
+                }
+            }
+        }
+    }
 }
 
-#[derive(Deserialize)]
-struct TavilyHit {
-    #[serde(default)]
-    url: String,
-    #[serde(default)]
-    title: String,
-    #[serde(default)]
-    content: String,
+struct DirectOutcome {
+    fetched: WebFetch,
+    render_recommended: bool,
 }
 
-fn pinned_client(url: &Url, timeout: Duration) -> Result<Client, WebError> {
+pub(crate) fn pinned_client(url: &Url, timeout: Duration) -> Result<Client, WebError> {
     let host = url
         .host_str()
         .ok_or_else(|| WebError::UnsafeUrl("URL has no host".to_owned()))?;
@@ -266,7 +337,7 @@ fn pinned_client(url: &Url, timeout: Duration) -> Result<Client, WebError> {
         .map_err(request_error)
 }
 
-fn validate_public_url(url: &Url) -> Result<(), WebError> {
+pub(crate) fn validate_public_url(url: &Url) -> Result<(), WebError> {
     if !matches!(url.scheme(), "http" | "https") {
         return Err(WebError::UnsafeUrl(
             "only http and https are allowed".to_owned(),
@@ -296,6 +367,29 @@ fn validate_public_url(url: &Url) -> Result<(), WebError> {
         }
     }
     Ok(())
+}
+
+fn validate_input_url(input: &str) -> Result<Url, WebError> {
+    if input.len() > 4_096 {
+        return Err(WebError::UnsafeUrl("URL exceeds 4096 bytes".to_owned()));
+    }
+    let url = Url::parse(input).map_err(|error| WebError::UnsafeUrl(error.to_string()))?;
+    validate_public_url(&url)?;
+    Ok(url)
+}
+
+fn looks_script_rendered(content: &[u8]) -> bool {
+    if memmem::find(content, b"<script").is_none() {
+        return false;
+    }
+    [
+        b"id=\"app\"".as_slice(),
+        b"id='app'",
+        b"id=\"root\"",
+        b"__next",
+    ]
+    .iter()
+    .any(|needle| memmem::find(content, needle).is_some())
 }
 
 fn is_public_ip(ip: IpAddr) -> bool {
@@ -397,13 +491,10 @@ fn decode_entities(input: &str) -> String {
         .replace("&#39;", "'")
 }
 
-fn truncate_chars(input: &str, limit: usize) -> String {
-    input.chars().take(limit).collect()
-}
-fn phoenix_user_agent() -> &'static str {
+pub(crate) fn phoenix_user_agent() -> &'static str {
     "PhoenixResearch/1.0 (+native note research harness)"
 }
-fn request_error(error: reqwest::Error) -> WebError {
+pub(crate) fn request_error(error: reqwest::Error) -> WebError {
     WebError::Request(error.to_string())
 }
 
@@ -411,4 +502,30 @@ fn request_error(error: reqwest::Error) -> WebError {
 pub(crate) fn validate_url_for_test(input: &str) -> Result<(), WebError> {
     let url = Url::parse(input).map_err(|error| WebError::UnsafeUrl(error.to_string()))?;
     validate_public_url(&url)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn fetch_modes_are_strict_and_stable() {
+        assert_eq!(WebFetchMode::parse("auto").unwrap(), WebFetchMode::Auto);
+        assert_eq!(
+            WebFetchMode::parse("rendered").unwrap(),
+            WebFetchMode::Rendered
+        );
+        assert!(WebFetchMode::parse("browser").is_err());
+        assert_eq!(WebFetchMode::Rendered.as_str(), "rendered");
+    }
+
+    #[test]
+    fn auto_render_detection_only_flags_script_application_shells() {
+        assert!(looks_script_rendered(
+            br#"<html><body><main id="app"></main><script>boot()</script></body></html>"#
+        ));
+        assert!(!looks_script_rendered(
+            br#"<html><body><main>Static evidence</main></body></html>"#
+        ));
+    }
 }

@@ -1,6 +1,6 @@
 use crate::{
     web::validate_url_for_test, CitationInput, ClaimInput, GapInput, ResearchBudget, ResearchPhase,
-    ResearchSession, WebFetch, WebSearchHit, WebSearchResults,
+    ResearchSession, WebFetch, WebFetchMode, WebFetchReceipt, WebSearchHit, WebSearchResults,
 };
 
 fn session() -> ResearchSession {
@@ -42,6 +42,8 @@ fn enforces_plan_search_gap_synthesis_verification_note_gate() {
         1_003,
     )
     .unwrap();
+    assert_eq!(run.queries[0].provider, "mock");
+    assert_eq!(run.queries[0].search_elapsed_ms, 4);
     run.begin_fetch(1_004).unwrap();
     run.finish_fetch(
         WebFetch {
@@ -54,6 +56,7 @@ fn enforces_plan_search_gap_synthesis_verification_note_gate() {
                 .to_owned(),
             bytes: 67,
             elapsed_ms: 5,
+            receipt: Default::default(),
         },
         1_005,
     )
@@ -135,6 +138,53 @@ fn recovery_round_trip_preserves_budget_and_gate_state() {
 }
 
 #[test]
+fn rendered_fetch_receipt_survives_session_relaunch() {
+    let mut run = session();
+    run.plan(vec!["What did the rendered source say?".to_owned()], 1_001)
+        .unwrap();
+    run.begin_fetch(1_002).unwrap();
+    let source_id = run
+        .finish_fetch(
+            WebFetch {
+                requested_url: "https://example.com/app".to_owned(),
+                final_url: "https://example.com/app".to_owned(),
+                status: 200,
+                title: "Rendered".to_owned(),
+                content_type: "text/html".to_owned(),
+                content: "# Rendered\n\nDurable evidence.".to_owned(),
+                bytes: 29,
+                elapsed_ms: 42,
+                receipt: WebFetchReceipt {
+                    requested_mode: WebFetchMode::Auto,
+                    resolved_mode: WebFetchMode::Rendered,
+                    backend: "obscura-sidecar".to_owned(),
+                    extraction: "rendered_markdown".to_owned(),
+                    rendered: true,
+                    render_ms: 40,
+                    total_ms: 42,
+                    response_bytes: 29,
+                    ..WebFetchReceipt::default()
+                },
+            },
+            1_003,
+        )
+        .unwrap();
+    let restored: ResearchSession =
+        serde_json::from_str(&serde_json::to_string(&run).unwrap()).unwrap();
+    let source = restored
+        .sources
+        .iter()
+        .find(|source| source.id == source_id)
+        .unwrap();
+    assert_eq!(source.fetch_backend, "obscura-sidecar");
+    assert_eq!(source.requested_fetch_mode, "auto");
+    assert_eq!(source.resolved_fetch_mode, "rendered");
+    assert_eq!(source.extraction, "rendered_markdown");
+    assert!(source.rendered);
+    assert_eq!(source.fetch_elapsed_ms, 42);
+}
+
+#[test]
 fn repeated_gap_cycles_stop_on_stagnation() {
     let mut run = session();
     run.plan(vec!["Where are the gaps?".to_owned()], 1_001)
@@ -203,6 +253,7 @@ fn shortrun_b_ledger_and_verifier_emit_a_bounded_timing_receipt() {
             content: "Approval-gated commits preserve note truth with durable receipts and exact revisions. ".repeat(128),
             bytes: 10_000,
             elapsed_ms: 1,
+            receipt: Default::default(),
         },
         10_005,
     )
