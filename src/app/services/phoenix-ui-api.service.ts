@@ -54,6 +54,7 @@ import type {
     PhoenixGraphScenePacketRequest,
 } from './phoenix-graph-scene-packet.model';
 import type { PhoenixGraphDeltaBinaryResult } from './phoenix-wasm.service';
+import { withGraphConsumerAuthority } from '../graph-rebuild/graph-consumer-authority';
 
 export interface ProvenanceContext {
     vaultId?: string;
@@ -997,12 +998,12 @@ export class PhoenixUiApiService {
                     scope,
                     'native',
                 );
-                return withManifoldLoadTimings(contracted, {
+                return withGraphConsumerAuthority('manifold', manifoldSourceIdentity(contracted), withManifoldLoadTimings(contracted, {
                     runtimeLoadMs,
                     nativeSnapshotMs: elapsedMs(nativeStarted),
                     totalMs: elapsedMs(totalStarted),
                     source: 'native',
-                });
+                }));
             }
         } catch (error) {
             console.warn('[PhoenixUiApi] Native manifold snapshot unavailable; using Semantic Atlas fallback.', error);
@@ -1049,12 +1050,12 @@ export class PhoenixUiApiService {
             },
         };
         const contracted = await this.withPersistentHybridEmbeddingSpaceContract(snapshot, scope, 'fallback');
-        return withManifoldLoadTimings(contracted, {
+        return withGraphConsumerAuthority('manifold', manifoldSourceIdentity(contracted), withManifoldLoadTimings(contracted, {
             runtimeLoadMs,
             fallbackLoadMs: elapsedMs(fallbackStarted),
             totalMs: elapsedMs(totalStarted),
             source: 'fallback',
-        });
+        }));
     }
 
     async loadStagedGraphScenePacket(request: PhoenixGraphScenePacketRequest): Promise<PhoenixGraphScenePacket | null> {
@@ -1910,6 +1911,12 @@ function withManifoldLoadTimings<TPayload>(
             ...timings,
         },
     };
+}
+
+function manifoldSourceIdentity(snapshot: ManifoldAtlasSnapshot<unknown>): string {
+    const payload = asRecord(snapshot.payload);
+    const snapshotId = typeof payload['snapshotId'] === 'string' ? payload['snapshotId'] : '';
+    return snapshotId || `${snapshot.manifold}:${snapshot.geometryVersion}:${snapshot.sourceLabel}`;
 }
 
 function mentionBatchScope(value: unknown): {

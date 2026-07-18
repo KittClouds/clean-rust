@@ -1,3 +1,5 @@
+import type { GraphConsumerAuthorityReceipt } from '../graph-rebuild/graph-consumer-authority';
+
 export type AtlasManifoldMode = 'hybrid' | 'hopf' | 'lorentz' | 'product' | 'siegel';
 export type ManifoldProjectionSource =
     | 'real_snapshot_vectors'
@@ -115,6 +117,7 @@ export interface ManifoldAtlasSnapshot<TPayload> {
     sourceLabel: string;
     capabilities: ManifoldCapabilities;
     payload: TPayload;
+    consumerAuthority?: GraphConsumerAuthorityReceipt;
     timings?: {
         runtimeLoadMs?: number;
         nativeSnapshotMs?: number;

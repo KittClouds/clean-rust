@@ -1,0 +1,524 @@
+import type {
+    GraphEncoderCandidateNeighborhood,
+    GraphEncoderVectorIndexContract,
+    GraphRebuildSnapshot,
+} from './graph-rebuild-snapshot';
+import { assertGraphEvidenceTargetRegistry } from './graph-evidence-target-registry';
+
+const DEFAULT_K = 8;
+const DEFAULT_MINIMUM_SIMILARITY = 0.2;
+const DEFAULT_LSH_BANDS = 4;
+const DEFAULT_LSH_BITS = 10;
+const DEFAULT_MAX_CANDIDATES = 96;
+
+export interface GraphEncoderVectorPage {
+    modelId: string;
+    modelVersion: string;
+    executionProvider: GraphEncoderVectorIndexContract['executionProvider'];
+    dimensions: number;
+    generation: number;
+    targetIds: readonly string[];
+    values: Float32Array;
+    normalized: boolean;
+}
+
+export interface GraphEncoderVectorIndexOptions {
+    neighborhoodK?: number;
+    minimumSimilarity?: number;
+    lshBands?: number;
+    lshBits?: number;
+    maxCandidatesPerTarget?: number;
+    requireCompleteRegistry?: boolean;
+}
+
+export interface GraphEncoderVectorQueryOptions {
+    limit?: number;
+    minimumSimilarity?: number;
+    maxCandidates?: number;
+}
+
+export interface GraphEncoderVectorQueryResult {
+    neighbors: GraphEncoderCandidateNeighborhood['neighbors'];
+    evaluatedCandidates: number;
+    truncated: boolean;
+}
+
+export interface GraphEncoderVectorIndex {
+    readonly contract: GraphEncoderVectorIndexContract;
+    readonly targetIds: readonly string[];
+    readonly values: Float32Array;
+    readonly neighborhoods: readonly GraphEncoderCandidateNeighborhood[];
+    vector(targetId: string): Float32Array | undefined;
+    neighborhood(targetId: string): GraphEncoderCandidateNeighborhood | undefined;
+    query(vector: Float32Array, options?: GraphEncoderVectorQueryOptions): GraphEncoderVectorQueryResult;
+}
+
+export function buildGraphEncoderVectorIndex(
+    snapshot: GraphRebuildSnapshot,
+    page: GraphEncoderVectorPage,
+    options: GraphEncoderVectorIndexOptions = {},
+): GraphEncoderVectorIndex {
+    const registry = assertGraphEvidenceTargetRegistry(snapshot);
+    const config = normalizeOptions(options);
+    assertPageShape(page);
+    const exposedIds = new Set(registry.exposedTargets.map((target) => target.id));
+    const rowByTargetId = new Map<string, number>();
+    for (let row = 0; row < page.targetIds.length; row += 1) {
+        const targetId = page.targetIds[row];
+        if (!exposedIds.has(targetId)) {
+            throw new Error(`Encoder vector target is outside the evidence registry: ${targetId}`);
+        }
+        if (rowByTargetId.has(targetId)) {
+            throw new Error(`Encoder vector target identity collides: ${targetId}`);
+        }
+        rowByTargetId.set(targetId, row);
+    }
+    const missingRegistryTargets = Math.max(0, exposedIds.size - rowByTargetId.size);
+    if (config.requireCompleteRegistry && missingRegistryTargets) {
+        throw new Error(`Encoder vector page is missing ${missingRegistryTargets} evidence registry targets`);
+    }
+
+    const values = normalizedPageValues(page);
+    const buckets = buildLshBuckets(page.targetIds, values, page.dimensions, config);
+    const { neighborhoods, evaluatedPairs } = buildCandidateNeighborhoods(
+        page.targetIds,
+        values,
+        page.dimensions,
+        buckets,
+        config,
+    );
+    const neighborCount = neighborhoods.reduce((sum, row) => sum + row.neighbors.length, 0);
+    const contract: GraphEncoderVectorIndexContract = {
+        schemaVersion: 'phoenix-encoder-vector-index/v1',
+        authority: 'real_encoder',
+        sourceSnapshotId: snapshot.id,
+        sourceRegistryHash: registry.contract.identityHash,
+        modelId: page.modelId,
+        modelVersion: page.modelVersion,
+        executionProvider: page.executionProvider,
+        dimensions: page.dimensions,
+        generation: page.generation,
+        vectorCount: page.targetIds.length,
+        normalized: true,
+        metric: 'cosine',
+        indexMethod: 'bounded-lsh',
+        candidateOnly: true,
+        committedTopologyWrites: 0,
+        neighborhoodK: config.neighborhoodK,
+        minimumSimilarity: config.minimumSimilarity,
+        lshBands: config.lshBands,
+        lshBits: config.lshBits,
+        maxCandidatesPerTarget: config.maxCandidatesPerTarget,
+        evaluatedPairs,
+        neighborhoodCount: neighborhoods.length,
+        neighborCount,
+        missingRegistryTargets,
+        rejectedVectors: 0,
+        indexHash: vectorIndexHash(page, values, registry.contract.identityHash),
+        neighborhoodHash: neighborhoodRowsHash(neighborhoods),
+    };
+    const neighborhoodByTargetId = new Map(neighborhoods.map((row) => [row.sourceTargetId, row]));
+
+    return {
+        contract,
+        targetIds: page.targetIds,
+        values,
+        neighborhoods,
+        vector: (targetId) => {
+            const row = rowByTargetId.get(targetId);
+            return row === undefined
+                ? undefined
+                : values.subarray(row * page.dimensions, (row + 1) * page.dimensions);
+        },
+        neighborhood: (targetId) => neighborhoodByTargetId.get(targetId),
+        query: (vector, queryOptions = {}) => queryVectorIndex(
+            page.targetIds,
+            values,
+            page.dimensions,
+            buckets,
+            config,
+            vector,
+            queryOptions,
+        ),
+    };
+}
+
+export function installGraphEncoderVectorIndex(
+    snapshot: GraphRebuildSnapshot,
+    index: GraphEncoderVectorIndex,
+): void {
+    snapshot.encoderVectorIndex = index.contract;
+    snapshot.embeddingVectors = index.targetIds.map((targetId) => ({
+        targetId,
+        modelId: index.contract.modelId,
+        dims: index.contract.dimensions,
+        generation: index.contract.generation,
+    }));
+    snapshot.counters.embeddingVectors = index.contract.vectorCount;
+    snapshot.counters.encoderIndexedTargets = index.contract.vectorCount;
+    snapshot.counters.encoderCandidateNeighborhoods = index.contract.neighborhoodCount;
+    snapshot.counters.encoderCandidateNeighbors = index.contract.neighborCount;
+    snapshot.counters.encoderEvaluatedPairs = index.contract.evaluatedPairs;
+}
+
+export function assertGraphEncoderVectorIndex(snapshot: GraphRebuildSnapshot): void {
+    const contract = snapshot.encoderVectorIndex;
+    if (!contract) return;
+    if (
+        contract.authority !== 'real_encoder'
+        || !contract.candidateOnly
+        || contract.committedTopologyWrites !== 0
+    ) {
+        throw new Error(`Encoder vector index crossed the graph truth boundary for ${snapshot.id}`);
+    }
+    const registry = assertGraphEvidenceTargetRegistry(snapshot);
+    const exposedIds = new Set(registry.exposedTargets.map((target) => target.id));
+    const vectorTargetIds = new Set<string>();
+    for (const vector of snapshot.embeddingVectors) {
+        if (
+            !exposedIds.has(vector.targetId)
+            || vectorTargetIds.has(vector.targetId)
+            || vector.modelId !== contract.modelId
+            || vector.dims !== contract.dimensions
+            || vector.generation !== contract.generation
+        ) {
+            throw new Error(`Encoder vector receipt row is invalid: ${vector.targetId}`);
+        }
+        vectorTargetIds.add(vector.targetId);
+    }
+    if (
+        contract.sourceSnapshotId !== snapshot.id
+        || contract.sourceRegistryHash !== registry.contract.identityHash
+        || contract.vectorCount !== snapshot.embeddingVectors.length
+        || contract.neighborhoodCount > contract.vectorCount
+        || contract.neighborCount > contract.vectorCount * contract.neighborhoodK
+        || contract.evaluatedPairs > contract.vectorCount * contract.maxCandidatesPerTarget
+        || snapshot.counters.encoderIndexedTargets !== contract.vectorCount
+        || snapshot.counters.encoderCandidateNeighborhoods !== contract.neighborhoodCount
+        || snapshot.counters.encoderCandidateNeighbors !== contract.neighborCount
+        || snapshot.counters.encoderEvaluatedPairs !== contract.evaluatedPairs
+    ) {
+        throw new Error(`Encoder vector index receipt drift for ${snapshot.id}`);
+    }
+}
+
+interface NormalizedOptions {
+    neighborhoodK: number;
+    minimumSimilarity: number;
+    lshBands: number;
+    lshBits: number;
+    maxCandidatesPerTarget: number;
+    requireCompleteRegistry: boolean;
+}
+
+function normalizeOptions(options: GraphEncoderVectorIndexOptions): NormalizedOptions {
+    const neighborhoodK = boundedInt(options.neighborhoodK, DEFAULT_K, 1, 64);
+    return {
+        neighborhoodK,
+        minimumSimilarity: boundedNumber(options.minimumSimilarity, DEFAULT_MINIMUM_SIMILARITY, -1, 1),
+        lshBands: boundedInt(options.lshBands, DEFAULT_LSH_BANDS, 1, 12),
+        lshBits: boundedInt(options.lshBits, DEFAULT_LSH_BITS, 4, 20),
+        maxCandidatesPerTarget: boundedInt(
+            options.maxCandidatesPerTarget,
+            DEFAULT_MAX_CANDIDATES,
+            neighborhoodK,
+            512,
+        ),
+        requireCompleteRegistry: options.requireCompleteRegistry !== false,
+    };
+}
+
+function assertPageShape(page: GraphEncoderVectorPage): void {
+    if (!page.modelId.trim() || !page.modelVersion.trim()) throw new Error('Encoder identity is required');
+    if (!['native-rust', 'transformers-worker', 'external-encoder'].includes(page.executionProvider)) {
+        throw new Error(`Encoder execution provider is not real: ${page.executionProvider}`);
+    }
+    if (!Number.isInteger(page.dimensions) || page.dimensions <= 0) throw new Error('Encoder dimensions are invalid');
+    if (!Number.isInteger(page.generation) || page.generation < 0) throw new Error('Encoder generation is invalid');
+    if (page.values.length !== page.targetIds.length * page.dimensions) {
+        throw new Error('Encoder vector page shape does not match target identities');
+    }
+}
+
+function normalizedPageValues(page: GraphEncoderVectorPage): Float32Array {
+    const values = page.normalized ? page.values : new Float32Array(page.values.length);
+    for (let row = 0; row < page.targetIds.length; row += 1) {
+        const offset = row * page.dimensions;
+        let normSquared = 0;
+        for (let dim = 0; dim < page.dimensions; dim += 1) {
+            const value = page.values[offset + dim];
+            if (!Number.isFinite(value)) throw new Error(`Encoder vector is not finite: ${page.targetIds[row]}`);
+            normSquared += value * value;
+        }
+        const norm = Math.sqrt(normSquared);
+        if (!(norm > 0)) throw new Error(`Encoder vector has zero norm: ${page.targetIds[row]}`);
+        if (page.normalized) {
+            if (Math.abs(norm - 1) > 0.025) throw new Error(`Encoder vector is not unit normalized: ${page.targetIds[row]}`);
+        } else {
+            const inverse = 1 / norm;
+            for (let dim = 0; dim < page.dimensions; dim += 1) {
+                values[offset + dim] = page.values[offset + dim] * inverse;
+            }
+        }
+    }
+    return values;
+}
+
+function buildLshBuckets(
+    targetIds: readonly string[],
+    values: Float32Array,
+    dimensions: number,
+    options: NormalizedOptions,
+): Map<string, number[]> {
+    const buckets = new Map<string, number[]>();
+    for (let row = 0; row < targetIds.length; row += 1) {
+        const offset = row * dimensions;
+        for (let band = 0; band < options.lshBands; band += 1) {
+            let signature = 0;
+            for (let bit = 0; bit < options.lshBits; bit += 1) {
+                const dim = lshDimension(band, bit, dimensions);
+                if (values[offset + dim] >= 0) signature |= 1 << bit;
+            }
+            const key = `${band}:${signature}`;
+            const bucket = buckets.get(key);
+            if (bucket) bucket.push(row);
+            else buckets.set(key, [row]);
+        }
+    }
+    return buckets;
+}
+
+function buildCandidateNeighborhoods(
+    targetIds: readonly string[],
+    values: Float32Array,
+    dimensions: number,
+    buckets: Map<string, number[]>,
+    options: NormalizedOptions,
+): { neighborhoods: GraphEncoderCandidateNeighborhood[]; evaluatedPairs: number } {
+    const neighborhoods: GraphEncoderCandidateNeighborhood[] = [];
+    let evaluatedPairs = 0;
+    for (let source = 0; source < targetIds.length; source += 1) {
+        const candidates = new Set<number>();
+        const offset = source * dimensions;
+        for (let band = 0; band < options.lshBands && candidates.size < options.maxCandidatesPerTarget; band += 1) {
+            let signature = 0;
+            for (let bit = 0; bit < options.lshBits; bit += 1) {
+                const dim = lshDimension(band, bit, dimensions);
+                if (values[offset + dim] >= 0) signature |= 1 << bit;
+            }
+            addBucketCandidates(
+                candidates,
+                buckets.get(`${band}:${signature}`) || [],
+                source,
+                targetIds[source],
+                options.maxCandidatesPerTarget,
+            );
+        }
+        const scored = [...candidates].map((target) => {
+            evaluatedPairs += 1;
+            return { target, score: cosineRow(values, dimensions, source, target) };
+        }).filter((row) => row.score >= options.minimumSimilarity)
+            .sort((left, right) => right.score - left.score || targetIds[left.target].localeCompare(targetIds[right.target]))
+            .slice(0, options.neighborhoodK);
+        neighborhoods.push({
+            sourceTargetId: targetIds[source],
+            neighbors: scored.map((row, rank) => ({
+                targetId: targetIds[row.target],
+                score: roundScore(row.score),
+                rank: rank + 1,
+            })),
+        });
+    }
+    return { neighborhoods, evaluatedPairs };
+}
+
+function queryVectorIndex(
+    targetIds: readonly string[],
+    values: Float32Array,
+    dimensions: number,
+    buckets: Map<string, number[]>,
+    indexOptions: NormalizedOptions,
+    query: Float32Array,
+    options: GraphEncoderVectorQueryOptions,
+): GraphEncoderVectorQueryResult {
+    if (query.length !== dimensions) {
+        throw new Error(`Encoder query dimension drift: got ${query.length}, expected ${dimensions}`);
+    }
+    const normalized = normalizeQueryVector(query);
+    const limit = boundedInt(options.limit, indexOptions.neighborhoodK, 1, 256);
+    const minimumSimilarity = boundedNumber(
+        options.minimumSimilarity,
+        indexOptions.minimumSimilarity,
+        -1,
+        1,
+    );
+    const maxCandidates = boundedInt(
+        options.maxCandidates,
+        Math.max(indexOptions.maxCandidatesPerTarget, limit),
+        limit,
+        2048,
+    );
+    const candidates = new Set<number>();
+    const queryKey = vectorSignatureHash(normalized);
+    for (let band = 0; band < indexOptions.lshBands && candidates.size < maxCandidates; band += 1) {
+        const signature = lshSignature(normalized, 0, dimensions, band, indexOptions.lshBits);
+        addQueryBucketCandidates(
+            candidates,
+            buckets.get(`${band}:${signature}`) || [],
+            queryKey,
+            maxCandidates,
+        );
+    }
+    const scored = [...candidates]
+        .map((row) => ({ row, score: cosineVectorRow(normalized, values, dimensions, row) }))
+        .filter((candidate) => candidate.score >= minimumSimilarity)
+        .sort((left, right) => right.score - left.score || targetIds[left.row].localeCompare(targetIds[right.row]))
+        .slice(0, limit)
+        .map((candidate, rank) => ({
+            targetId: targetIds[candidate.row],
+            score: roundScore(candidate.score),
+            rank: rank + 1,
+        }));
+    return {
+        neighbors: scored,
+        evaluatedCandidates: candidates.size,
+        truncated: candidates.size >= maxCandidates,
+    };
+}
+
+function addBucketCandidates(
+    out: Set<number>,
+    bucket: readonly number[],
+    source: number,
+    sourceTargetId: string,
+    limit: number,
+): void {
+    if (bucket.length < 2 || out.size >= limit) return;
+    const start = hashText(sourceTargetId) % bucket.length;
+    for (let step = 0; step < bucket.length && out.size < limit; step += 1) {
+        const candidate = bucket[(start + step) % bucket.length];
+        if (candidate !== source) out.add(candidate);
+    }
+}
+
+function addQueryBucketCandidates(
+    out: Set<number>,
+    bucket: readonly number[],
+    queryKey: number,
+    limit: number,
+): void {
+    if (!bucket.length || out.size >= limit) return;
+    const start = queryKey % bucket.length;
+    for (let step = 0; step < bucket.length && out.size < limit; step += 1) {
+        out.add(bucket[(start + step) % bucket.length]);
+    }
+}
+
+function normalizeQueryVector(query: Float32Array): Float32Array {
+    let normSquared = 0;
+    for (const value of query) {
+        if (!Number.isFinite(value)) throw new Error('Encoder query vector is not finite');
+        normSquared += value * value;
+    }
+    const norm = Math.sqrt(normSquared);
+    if (!(norm > 0)) throw new Error('Encoder query vector has zero norm');
+    const normalized = new Float32Array(query.length);
+    const inverse = 1 / norm;
+    for (let dim = 0; dim < query.length; dim += 1) normalized[dim] = query[dim] * inverse;
+    return normalized;
+}
+
+function cosineRow(values: Float32Array, dimensions: number, left: number, right: number): number {
+    const leftOffset = left * dimensions;
+    const rightOffset = right * dimensions;
+    let dot = 0;
+    for (let dim = 0; dim < dimensions; dim += 1) {
+        dot += values[leftOffset + dim] * values[rightOffset + dim];
+    }
+    return Math.max(-1, Math.min(1, dot));
+}
+
+function cosineVectorRow(query: Float32Array, values: Float32Array, dimensions: number, row: number): number {
+    const offset = row * dimensions;
+    let dot = 0;
+    for (let dim = 0; dim < dimensions; dim += 1) dot += query[dim] * values[offset + dim];
+    return Math.max(-1, Math.min(1, dot));
+}
+
+function lshSignature(
+    values: Float32Array,
+    offset: number,
+    dimensions: number,
+    band: number,
+    bits: number,
+): number {
+    let signature = 0;
+    for (let bit = 0; bit < bits; bit += 1) {
+        const dim = lshDimension(band, bit, dimensions);
+        if (values[offset + dim] >= 0) signature |= 1 << bit;
+    }
+    return signature;
+}
+
+function vectorSignatureHash(vector: Float32Array): number {
+    let hash = 0x811c9dc5;
+    const words = new Uint32Array(vector.buffer, vector.byteOffset, vector.length);
+    for (const word of words) hash = fnvWord(hash, word);
+    return hash;
+}
+
+function lshDimension(band: number, bit: number, dimensions: number): number {
+    return ((band + 1) * 2654435761 + (bit + 1) * 2246822519) % dimensions;
+}
+
+function vectorIndexHash(page: GraphEncoderVectorPage, values: Float32Array, registryHash: string): string {
+    let hash = hashText(`${page.modelId}\0${page.modelVersion}\0${registryHash}\0${page.dimensions}`);
+    const words = new Uint32Array(values.buffer, values.byteOffset, values.length);
+    for (const targetId of page.targetIds) hash = fnvWord(hash, hashText(targetId));
+    for (let index = 0; index < words.length; index += 1) hash = fnvWord(hash, words[index]);
+    return `fnv32-${hash.toString(16).padStart(8, '0')}`;
+}
+
+function neighborhoodRowsHash(neighborhoods: readonly GraphEncoderCandidateNeighborhood[]): string {
+    let hash = 0x811c9dc5;
+    for (const row of neighborhoods) {
+        hash = fnvWord(hash, hashText(row.sourceTargetId));
+        for (const neighbor of row.neighbors) {
+            hash = fnvWord(hash, hashText(neighbor.targetId));
+            hash = fnvWord(hash, hashText(`${neighbor.rank}:${neighbor.score}`));
+        }
+    }
+    return `fnv32-${hash.toString(16).padStart(8, '0')}`;
+}
+
+function hashText(value: string): number {
+    let hash = 0x811c9dc5;
+    for (let index = 0; index < value.length; index += 1) {
+        hash ^= value.charCodeAt(index);
+        hash = Math.imul(hash, 0x01000193) >>> 0;
+    }
+    return hash;
+}
+
+function fnvWord(hash: number, word: number): number {
+    let out = hash;
+    for (let byte = 0; byte < 4; byte += 1) {
+        out ^= (word >>> (byte * 8)) & 0xff;
+        out = Math.imul(out, 0x01000193) >>> 0;
+    }
+    return out;
+}
+
+function boundedInt(value: number | undefined, fallback: number, min: number, max: number): number {
+    const normalized = Number.isFinite(value) ? Math.floor(value as number) : fallback;
+    return Math.max(min, Math.min(max, normalized));
+}
+
+function boundedNumber(value: number | undefined, fallback: number, min: number, max: number): number {
+    const normalized = Number.isFinite(value) ? Number(value) : fallback;
+    return Math.max(min, Math.min(max, normalized));
+}
+
+function roundScore(value: number): number {
+    return Math.round(value * 1_000_000) / 1_000_000;
+}

@@ -34,7 +34,6 @@ import { buildGraphSemanticCandidateSummary } from './graph-semantic-candidates'
 import { buildGraphManifoldSpecializationSummary } from './graph-manifold-specialization';
 import { buildGraphSemanticRerankSummary } from './graph-semantic-rerank';
 import {
-    applyGraphSemanticAdjudicationMutations,
     buildGraphSemanticAdjudicationDAGSummary,
 } from './graph-semantic-adjudication';
 import { buildGraphSemanticEvalLedgerSummary } from './graph-semantic-eval-ledger';
@@ -53,6 +52,8 @@ import { buildGraphDocumentSidecar } from './graph-document-sidecar';
 import { buildGraphDocumentReviewSummary } from './graph-document-review';
 import { buildGraphDocumentCompilePlanSummary } from './graph-document-compiler';
 import { replayGraphOperatorMutationJournalReview } from './graph-operator-mutation-journal';
+import { sealGraphEvidenceTargetRegistry } from './graph-evidence-target-registry';
+import { assertGraphSemanticDiscoveriesRemainCandidates } from './graph-semantic-discovery-authority';
 
 export { buildGraphRebuildAliasResolver, normalizeGraphRebuildCandidate };
 
@@ -419,6 +420,7 @@ export function buildGraphRebuildSnapshot(input: BuildGraphRebuildSnapshotInput)
         },
         resolutionSuggestions: hygiene.suggestions,
     };
+    sealGraphEvidenceTargetRegistry(snapshot);
     input.cpuProfiler?.mark('snapshotAssemblyMs');
     const hopfResonanceSpace = buildHopfResonanceSpace(snapshot, { generatedAt: builtAt });
     if (hopfResonanceSpace.assignments.length !== snapshot.embeddingTargets.length) {
@@ -497,7 +499,6 @@ export function buildGraphRebuildSnapshot(input: BuildGraphRebuildSnapshotInput)
     snapshot.counters.semanticRerankMutationAllowed = semanticRerankSummary.counters.mutationAllowedCount;
     const semanticAdjudicationSummary = buildGraphSemanticAdjudicationDAGSummary(snapshot, builtAt, semanticContext);
     snapshot.semanticAdjudicationSummary = semanticAdjudicationSummary;
-    applyGraphSemanticAdjudicationMutations(snapshot, semanticAdjudicationSummary);
     input.cpuProfiler?.mark('snapshotSemanticAdjudicationMs');
     snapshot.counters.edges = snapshot.edges.length;
     snapshot.counters.semanticAdjudicationDecisions = semanticAdjudicationSummary.decisions.length;
@@ -602,6 +603,7 @@ export function buildGraphRebuildSnapshot(input: BuildGraphRebuildSnapshotInput)
         snapshot.counters.calendarRegistryCustomOrdinalReceipts = calendarRegistrySummary.counters.customOrdinalReceipts;
         snapshot.counters.calendarRegistryMutationAllowed = calendarRegistrySummary.counters.mutationAllowedCount;
     }
+    assertGraphSemanticDiscoveriesRemainCandidates(snapshot);
     input.cpuProfiler?.add('snapshotSemanticLedgersMs', semanticLedgersStarted);
     return snapshot;
 }

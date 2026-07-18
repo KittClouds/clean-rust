@@ -11,6 +11,7 @@ import type {
 } from './graph-rebuild-snapshot';
 import type { EntityOccurrence } from '../lib/dexie/db';
 import type { RegisteredEntity } from '../lib/registry';
+import { GRAPH_SEMANTIC_DISCOVERY_POLICY } from './graph-asserted-truth-authority';
 
 interface ParityFixture {
     noteId: string;
@@ -322,14 +323,11 @@ describe('Phoenix graph rebuild parity smoke', () => {
             && judgment.scores.length >= 3,
         )).toBe(true);
         expect(snapshot.semanticAdjudicationSummary?.schemaVersion).toBe('phoenix-semantic-adjudication-dag/v1');
-        expect(snapshot.semanticAdjudicationSummary?.counters.topologyCommitCount).toBeGreaterThan(0);
-        expect(snapshot.semanticAdjudicationSummary?.counters.appliedMutationCount)
-            .toBe(snapshot.semanticAdjudicationSummary?.mutations.length);
-        expect(snapshot.semanticAdjudicationSummary?.mutations.every((mutation) =>
-            mutation.status === 'applied'
-            && snapshot.edges.some((edge) => edge.id === mutation.createdEdgeId),
-        )).toBe(true);
-        expect(snapshot.semanticAdjudicationSummary?.decisions.filter((decision) => decision.state !== 'accepted').every((decision) =>
+        expect(snapshot.semanticAdjudicationSummary?.counters.topologyCommitCount).toBe(0);
+        expect(snapshot.semanticAdjudicationSummary?.counters.appliedMutationCount).toBe(0);
+        expect(snapshot.semanticAdjudicationSummary?.mutations).toEqual([]);
+        expect(snapshot.edges.some((edge) => edge.id.startsWith('semantic-adjudication:'))).toBe(false);
+        expect(snapshot.semanticAdjudicationSummary?.decisions.every((decision) =>
             decision.ledgerOnly === true
             && decision.affectedGraphAtomIds.length === 0
             && decision.affectedGraphFactIds.length === 0,
@@ -527,14 +525,16 @@ describe('Phoenix graph rebuild parity smoke', () => {
             && judgment.calibratedScore <= 1,
         )).toBe(true);
         expect(snapshot.semanticAdjudicationSummary?.decisions.length).toBe(snapshot.counters.semanticAdjudicationDecisions);
-        expect(snapshot.semanticAdjudicationSummary?.counters.topologyCommitCount).toBeGreaterThan(0);
-        expect(snapshot.semanticAdjudicationSummary?.counters.appliedMutationCount)
-            .toBe(snapshot.semanticAdjudicationSummary?.mutations.length);
+        expect(snapshot.semanticAdjudicationSummary?.counters.topologyCommitCount).toBe(0);
+        expect(snapshot.semanticAdjudicationSummary?.counters.appliedMutationCount).toBe(0);
+        expect(snapshot.semanticAdjudicationSummary?.mutations).toEqual([]);
         expect(snapshot.semanticAdjudicationSummary?.counters.ledgerOnlyCount).toBeGreaterThan(0);
         expect(snapshot.semanticAdjudicationSummary?.receipts.every((receipt) =>
             receipt.reversible
-            && (receipt.state !== 'accepted' || receipt.mutationAllowed === true),
+            && receipt.mutationAllowed === false
+            && receipt.invariant === GRAPH_SEMANTIC_DISCOVERY_POLICY,
         )).toBe(true);
+        expect(snapshot.edges.some((edge) => edge.id.startsWith('semantic-adjudication:'))).toBe(false);
         expect(snapshot.semanticEvalLedgerSummary?.compactExport.rowCount).toBe(snapshot.counters.semanticEvalLedgerRows);
         expect(snapshot.semanticEvalLedgerSummary?.counters.acceptedCandidates).toBeGreaterThan(0);
         expect(snapshot.semanticEvalLedgerSummary?.counters.ambiguousCases).toBeGreaterThan(0);

@@ -21,6 +21,7 @@ import type { EntityOccurrence } from '../lib/dexie/db';
 import type { RegisteredEntity } from '../lib/registry';
 import type { GraphCompilerDualWriteSidecar } from './graph-compiler-read-model';
 import { buildGraphSemanticAdjudicationDAGSummary } from './graph-semantic-adjudication';
+import { GRAPH_SEMANTIC_DISCOVERY_POLICY } from './graph-asserted-truth-authority';
 
 describe('Phoenix graph rebuild builder', () => {
     it('resolves canonical Alex entities by label and alias', () => {
@@ -997,31 +998,25 @@ describe('Phoenix graph rebuild builder', () => {
         expect(adjudication.receipts.length).toBe(snapshot.counters.semanticAdjudicationReceipts);
         expect(adjudication.counters.topologyCommitCount).toBe(snapshot.counters.semanticAdjudicationTopologyCommits);
         expect(adjudication.counters.ledgerOnlyCount).toBe(snapshot.counters.semanticAdjudicationLedgerOnly);
-        expect(adjudication.counters.topologyCommitCount).toBeGreaterThan(0);
-        expect(adjudication.counters.appliedMutationCount).toBe(adjudication.mutations.length);
-        expect(adjudication.receipts.every((receipt) => receipt.reversible)).toBe(true);
+        expect(adjudication.counters.topologyCommitCount).toBe(0);
+        expect(adjudication.counters.appliedMutationCount).toBe(0);
+        expect(adjudication.mutations).toEqual([]);
+        expect(adjudication.receipts.every((receipt) =>
+            receipt.reversible
+            && receipt.mutationAllowed === false
+            && receipt.invariant === GRAPH_SEMANTIC_DISCOVERY_POLICY,
+        )).toBe(true);
         expect(adjudication.decisions.filter((decision) => decision.state === 'accepted').every((decision) =>
             Boolean(decision.sourceHypothesis)
             && decision.evidenceTargetIds.length > 0
             && decision.scoringBundle.finalScore >= 0
             && decision.rationale.length > 0
             && Boolean(decision.undoReceiptId)
-            && decision.affectedGraphAtomIds.length >= 2
-            && decision.affectedGraphFactIds.length >= 1
-            && decision.ledgerOnly === false,
+            && decision.affectedGraphAtomIds.length === 0
+            && decision.affectedGraphFactIds.length === 0
+            && decision.ledgerOnly === true,
         )).toBe(true);
-        expect(adjudication.mutations.every((mutation) =>
-            snapshot.edges.some((edge) => edge.id === mutation.createdEdgeId)
-            && mutation.status === 'applied'
-            && mutation.reversiblePatch.undoOperation === 'remove_semantic_edge_and_fact',
-        )).toBe(true);
-        expect(adjudication.mutations.every((mutation) =>
-            mutation.createdEdge
-            && Number.isInteger(mutation.createdEdge.weight)
-            && mutation.createdEdge.weight >= 1
-            && mutation.createdEdge.confidence >= 0
-            && mutation.createdEdge.confidence <= 1,
-        )).toBe(true);
+        expect(snapshot.edges.some((edge) => edge.id.startsWith('semantic-adjudication:'))).toBe(false);
         expect(snapshot.edges.every((edge) => Number.isInteger(edge.weight))).toBe(true);
         const evalLedger = snapshot.semanticEvalLedgerSummary!;
         expect(evalLedger.schemaVersion).toBe('phoenix-semantic-eval-ledger/v1');
@@ -1150,7 +1145,7 @@ describe('Phoenix graph rebuild builder', () => {
         expect(summary.mutations).toHaveLength(0);
         expect(summary.receipts[0]).toMatchObject({
             mutationAllowed: false,
-            invariant: 'phase5_ledger_only_no_topology_commit',
+            invariant: GRAPH_SEMANTIC_DISCOVERY_POLICY,
         });
     });
 

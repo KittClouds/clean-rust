@@ -1,6 +1,7 @@
 import { Injectable, Injector, inject, signal } from '@angular/core';
 
 import { GraphRebuildService } from '../graph-rebuild/graph-rebuild.service';
+import { withGraphConsumerAuthority } from '../graph-rebuild/graph-consumer-authority';
 import {
     PhoenixBackendService,
     type PhoenixGfmShadowReceipt,
@@ -46,7 +47,7 @@ export class GfmRetrievalShadowService {
                 this.failureState.set('GFM shadow authority shield rejected the receipt.');
                 return;
             }
-            this.receiptState.set(receipt);
+            this.receiptState.set(withGraphConsumerAuthority('gfm', receipt.snapshotId, receipt));
         } catch (error) {
             if (requestGeneration !== this.generation) return;
             this.failureState.set(error instanceof Error ? error.message : String(error));

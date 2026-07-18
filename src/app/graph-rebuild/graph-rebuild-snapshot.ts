@@ -698,11 +698,77 @@ export interface GraphRebuildEmbeddingTargetPlan {
     lanes: GraphRebuildSignalTargetLaneReceipt[];
 }
 
+export type GraphEvidenceTargetObjectKind =
+    | 'entity'
+    | 'relationship'
+    | 'event'
+    | 'episode'
+    | 'temporal_edge'
+    | 'causal_edge'
+    | 'memory_state';
+
+export interface GraphEvidenceTargetRegistryContract {
+    schemaVersion: 'phoenix-evidence-target-registry/v1';
+    authority: 'deterministic_graph_processing';
+    sourceSnapshotId: string;
+    sourceScopeId: string;
+    canonicalTargets: number;
+    exposedTargets: number;
+    chunks: number;
+    typedGraphObjects: number;
+    supportTargets: number;
+    evidenceLinks: number;
+    duplicateTargets: number;
+    orphanTargets: number;
+    identityHash: string;
+}
+
 export interface GraphRebuildEmbeddingVector {
     targetId: string;
     modelId: string;
     dims: number;
     generation: number;
+}
+
+export interface GraphEncoderCandidateNeighbor {
+    targetId: string;
+    score: number;
+    rank: number;
+}
+
+export interface GraphEncoderCandidateNeighborhood {
+    sourceTargetId: string;
+    neighbors: GraphEncoderCandidateNeighbor[];
+}
+
+export interface GraphEncoderVectorIndexContract {
+    schemaVersion: 'phoenix-encoder-vector-index/v1';
+    authority: 'real_encoder';
+    sourceSnapshotId: string;
+    sourceRegistryHash: string;
+    modelId: string;
+    modelVersion: string;
+    executionProvider: 'native-rust' | 'transformers-worker' | 'external-encoder';
+    dimensions: number;
+    generation: number;
+    vectorCount: number;
+    normalized: true;
+    metric: 'cosine';
+    indexMethod: 'bounded-lsh';
+    candidateOnly: true;
+    committedTopologyWrites: 0;
+    neighborhoodK: number;
+    minimumSimilarity: number;
+    lshBands: number;
+    lshBits: number;
+    maxCandidatesPerTarget: number;
+    evaluatedPairs: number;
+    neighborhoodCount: number;
+    neighborCount: number;
+    missingRegistryTargets: number;
+    rejectedVectors: number;
+    indexHash: string;
+    neighborhoodHash: string;
 }
 
 export type GraphRebuildEmbeddingTaskProfile =
@@ -1491,7 +1557,7 @@ export interface GraphSemanticAdjudicationReceipt {
     judgmentId?: string;
     state: GraphSemanticAdjudicationState;
     reversible: true;
-    mutationAllowed: boolean;
+    mutationAllowed: false;
     invariant: string;
     evidenceTargetIds: string[];
     affectedGraphAtomIds: string[];
@@ -1536,7 +1602,7 @@ export interface GraphSemanticAdjudicationDecision {
     mutationId?: string;
     affectedGraphAtomIds: string[];
     affectedGraphFactIds: string[];
-    ledgerOnly: boolean;
+    ledgerOnly: true;
     createdAt: number;
 }
 
@@ -2275,6 +2341,14 @@ export interface GraphRebuildCounters {
     continuityCrossDocumentConnections?: number;
     continuityReviewRequired?: number;
     embeddingTargets: number;
+    evidenceRegistryExposedTargets?: number;
+    evidenceRegistryChunks?: number;
+    evidenceRegistryTypedGraphObjects?: number;
+    evidenceRegistryEvidenceLinks?: number;
+    encoderIndexedTargets?: number;
+    encoderCandidateNeighborhoods?: number;
+    encoderCandidateNeighbors?: number;
+    encoderEvaluatedPairs?: number;
     embeddingTargetCandidates?: number;
     embeddingQueuedTargets?: number;
     embeddingTargetDeferred?: number;
@@ -2609,7 +2683,9 @@ export interface GraphRebuildSnapshot {
     storyContinuity?: GraphStoryContinuityContract;
     embeddingTargets: GraphRebuildEmbeddingTarget[];
     embeddingTargetPlan?: GraphRebuildEmbeddingTargetPlan;
+    evidenceTargetRegistry?: GraphEvidenceTargetRegistryContract;
     embeddingVectors: GraphRebuildEmbeddingVector[];
+    encoderVectorIndex?: GraphEncoderVectorIndexContract;
     embeddingProfile?: GraphRebuildEmbeddingProfile;
     embeddingModelAdapter?: GraphRebuildEmbeddingModelAdapter;
     embeddingGraphPostProcess?: GraphRebuildEmbeddingGraphPostProcess;

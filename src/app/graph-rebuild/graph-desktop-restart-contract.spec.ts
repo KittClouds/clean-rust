@@ -189,6 +189,24 @@ describe('desktop graph snapshot restart contract', () => {
             .toThrow(/registry-only graph node entity-registry-only/);
     });
 
+    it('finalizer refuses semantic discovery edges as asserted graph truth', () => {
+        const snapshot = restartFixture();
+        snapshot.edges.push({
+            id: 'semantic-adjudication:semantic-relation-link:leak',
+            sourceId: 'entity-kai',
+            targetId: 'entity-hazel',
+            type: 'semantic-relation-link',
+            weight: 1,
+            confidence: 0.9,
+            evidenceAnchorIds: [snapshot.entityAnchors[0].id],
+            scopeKeys: ['semantic-adjudication:global'],
+            noteIds: ['note-1'],
+        });
+
+        expect(() => finalizeGraphRebuildSnapshot({ snapshot }))
+            .toThrow(/asserted truth authority.*deterministic_graph_processing.*semantic adjudication edges/i);
+    });
+
     it('fails closed when any projection receipt diverges from the snapshot', () => {
         const snapshot = restartFixture();
         const contract = sealGraphSnapshotAuthority(snapshot);

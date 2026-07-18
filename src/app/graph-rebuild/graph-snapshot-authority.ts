@@ -13,6 +13,14 @@ import {
     GRAPH_ATLAS_PACKET_AUTHORITY,
     GRAPH_ATLAS_VECTOR_CONTRACTS,
 } from './graph-atlas-packet';
+import { assertGraphAssertedTruthAuthority } from './graph-asserted-truth-authority';
+import {
+    assertGraphEvidenceTargetRegistry,
+    sealGraphEvidenceTargetRegistry,
+} from './graph-evidence-target-registry';
+import { assertGraphEncoderVectorIndex } from './graph-encoder-vector-index';
+import { assertGraphSemanticDiscoveriesRemainCandidates } from './graph-semantic-discovery-authority';
+import { assertSnapshotGraphConsumersReadOnly } from './graph-consumer-authority';
 
 export const GRAPH_SNAPSHOT_AUTHORITY: GraphSnapshotAuthority = GRAPH_SNAPSHOT_LIVE_AUTHORITY;
 
@@ -27,6 +35,11 @@ export function sealGraphSnapshotAuthority(
     snapshot: GraphRebuildSnapshot,
     authority: GraphSnapshotAuthority = GRAPH_SNAPSHOT_AUTHORITY,
 ): GraphSnapshotAuthorityContract {
+    assertGraphAssertedTruthAuthority(snapshot);
+    assertGraphSemanticDiscoveriesRemainCandidates(snapshot);
+    assertSnapshotGraphConsumersReadOnly(snapshot);
+    sealGraphEvidenceTargetRegistry(snapshot);
+    assertGraphEncoderVectorIndex(snapshot);
     assertGraphSnapshotParity(snapshot, true);
     const contract = buildGraphSnapshotAuthorityContract(snapshot, authority);
     snapshot.authorityContract = contract;
@@ -38,6 +51,11 @@ export function assertGraphSnapshotAuthority(snapshot: GraphRebuildSnapshot): Gr
     if (!contract) {
         throw new Error(`Graph snapshot authority contract missing for ${snapshot.id}`);
     }
+    assertGraphAssertedTruthAuthority(snapshot);
+    assertGraphSemanticDiscoveriesRemainCandidates(snapshot);
+    assertSnapshotGraphConsumersReadOnly(snapshot);
+    assertGraphEvidenceTargetRegistry(snapshot);
+    assertGraphEncoderVectorIndex(snapshot);
     assertGraphSnapshotParity(snapshot, true);
     const actual = buildGraphSnapshotAuthorityContract(snapshot, contract.authority);
     const issues: string[] = [];
@@ -290,6 +308,8 @@ function authorityReceipt(
         nodes: authorityRowHashes(snapshot.nodes),
         edges: authorityRowHashes(snapshot.edges),
         embeddingTargets: authorityRowHashes(snapshot.embeddingTargets),
+        evidenceTargetRegistry: snapshot.evidenceTargetRegistry,
+        encoderVectorIndex: snapshot.encoderVectorIndex,
         projectionRefs: authorityRowHashes(snapshot.projectionRefs),
         atlasObjects: authorityRowHashes(snapshot.atlasPacket?.objects || []),
         atlasTargets: authorityRowHashes(snapshot.atlasPacket?.manifoldTargets || []),

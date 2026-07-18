@@ -65,6 +65,7 @@ export interface PhoenixGfmShadowReceipt {
     excludedRejectedEdges: number;
     noTopologyWrites: boolean;
     visibleRankingUnchanged: boolean;
+    consumerAuthority?: GraphConsumerAuthorityReceipt;
     timing: { indexMicros: number; inferenceMicros: number; totalMicros: number };
 }
 export interface PhoenixMentionBatchResult {
@@ -900,3 +901,4 @@ export class PhoenixBackendService {
         return this.wasmInstance;
     }
 }
+import type { GraphConsumerAuthorityReceipt } from '../graph-rebuild/graph-consumer-authority';

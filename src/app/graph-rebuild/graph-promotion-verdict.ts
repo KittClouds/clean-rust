@@ -375,7 +375,9 @@ function compareLinkSuggestions(
 }
 
 function promotionStatusFor(suggestion: GraphRebuildLinkSuggestion): GraphPromotionProposalStatus {
-    return suggestion.status === 'confirmed' ? 'reviewedSupport' : 'reviewedSupport';
+    // A deterministic or model-produced suggestion is not a human review.
+    // Explicit review is recorded by the reviewed-promotion boundary.
+    return 'generated';
 }
 
 function evidenceRefsFor(suggestion: GraphRebuildLinkSuggestion): string[] {

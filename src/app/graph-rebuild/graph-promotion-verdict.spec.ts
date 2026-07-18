@@ -34,7 +34,7 @@ describe('graph promotion verdict preview receipts', () => {
             }),
             modelId: null,
         }));
-        expect(receipts[0].receiptId).toBe('graph-proposal:atlas-preview:8c10da0d');
+        expect(receipts[0].receiptId).toBe('graph-proposal:atlas-preview:743e93a1');
         expect(receipts[0].proposals.map((proposal) => proposal.proposalId)).toEqual([
             'suggestion-a',
             'suggestion-b',
@@ -47,7 +47,7 @@ describe('graph promotion verdict preview receipts', () => {
                 edge_type: 'semantic::co_occurs_with',
             },
             truth: { kind: 'semantic', plane: 'worldState' },
-            status: 'reviewedSupport',
+            status: 'generated',
             evidenceRefs: ['chunk:1', 'chunk:4'],
             shadowScoreMillis: 980,
         }));
@@ -77,6 +77,14 @@ describe('graph promotion verdict preview receipts', () => {
 
     it('does not emit empty preview receipts', () => {
         expect(buildGraphPromotionPreviewReceipts(snapshotWithSuggestions([]))).toEqual([]);
+    });
+
+    it('does not reinterpret a deterministic confirmed suggestion as human review', () => {
+        const [receipt] = buildGraphPromotionPreviewReceipts(snapshotWithSuggestions([
+            linkSuggestion({ status: 'confirmed' }),
+        ]));
+
+        expect(receipt.proposals[0].status).toBe('generated');
     });
 
     it('accepts native verdict rows with promotion atoms', () => {

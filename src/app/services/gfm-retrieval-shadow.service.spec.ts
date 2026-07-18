@@ -49,6 +49,12 @@ describe('GfmRetrievalShadowService', () => {
             limit: 50,
         });
         expect(service.lastReceipt()?.visibleRankingUnchanged).toBe(true);
+        expect(service.lastReceipt()?.consumerAuthority).toMatchObject({
+            consumer: 'gfm',
+            readOnly: true,
+            mutationAllowed: false,
+            promotionAllowed: false,
+        });
         expect(service.lastFailure()).toBeNull();
     });
 
@@ -76,6 +82,18 @@ describe('GfmRetrievalShadowService', () => {
 
         expect(service.lastReceipt()).toBeNull();
         expect(service.lastFailure()).toContain('authority shield');
+    });
+
+    it('rejects a nested GFM mutation claim even when top-level booleans look safe', async () => {
+        queryGfmShadow.mockResolvedValue({
+            ...receipt(1),
+            diagnostics: { graphTruthCommitIds: ['commit:forbidden'] },
+        });
+
+        await service.observe('unsafe nested output', ['doc:a'], 5);
+
+        expect(service.lastReceipt()).toBeNull();
+        expect(service.lastFailure()).toContain('read-only authority boundary');
     });
 });
 

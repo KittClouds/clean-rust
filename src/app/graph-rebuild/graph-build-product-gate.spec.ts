@@ -212,7 +212,9 @@ describeBaseline('product graph build gate', () => {
         expect(warm.snapshot.id).toBe(cold.snapshot.id);
         expect(warm.snapshot.authorityContract?.snapshotId).toBe(cold.snapshot.id);
         expect(warm.snapshot.counters.nodes).toBe(27);
-        expect(warm.snapshot.counters.edges).toBe(233);
+        expect(warm.snapshot.counters.edges).toBe(202);
+        expect(warm.snapshot.counters.semanticAdjudicationTopologyCommits).toBe(0);
+        expect(warm.snapshot.edges.some((edge) => edge.id.startsWith('semantic-adjudication:'))).toBe(false);
         expect(warm.snapshot.counters.embeddingTargets).toBe(668);
         expect(warm.snapshot.atlasPacket?.objects.length).toBe(cold.snapshot.atlasPacket?.objects.length);
         expect(warm.snapshot.atlasPacket?.manifoldTargets.length)
