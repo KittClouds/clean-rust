@@ -7,6 +7,7 @@ use rustc_hash::FxHasher;
 use serde::{Deserialize, Serialize};
 use std::hash::BuildHasherDefault;
 use std::mem;
+use std::path::Path;
 use zerocopy::{AsBytes, FromBytes, FromZeroes};
 
 type FastBuildHasher = BuildHasherDefault<FxHasher>;
@@ -208,6 +209,15 @@ impl GalaxyGraphPack {
         let start = node.label_offset as usize;
         let end = start.checked_add(node.label_len as usize)?;
         std::str::from_utf8(self.label_slab.get(start..end)?).ok()
+    }
+
+    pub fn write_immutable_store(
+        &self,
+        manifolds: &[crate::GalaxyManifoldPositions],
+        output: impl AsRef<Path>,
+        options: crate::GalaxyGraphStoreBuildOptions,
+    ) -> Result<crate::GalaxyStoreManifest, crate::GalaxyStoreError> {
+        crate::write_galaxy_graph_store(self, manifolds, output, options)
     }
 }
 

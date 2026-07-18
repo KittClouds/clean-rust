@@ -8,7 +8,11 @@ import {
 import type { NoteBlockProjection } from '../../../../../lib/dexie/db';
 import { buildGraphAtlasTaxonomyAudit } from '../../../../../graph-rebuild/graph-atlas-taxonomy-audit';
 import { buildGraphModelV2Snapshot } from '../../../../../graph-rebuild/graph-model-v2';
-import { buildBackendEmbeddingAtlas, buildLeafEmbeddingAtlas } from './graph-embedding-atlas';
+import {
+    buildBackendEmbeddingAtlas,
+    buildLeafEmbeddingAtlas,
+    HOPF_PAIRWISE_FALLBACK_NODE_LIMIT,
+} from './graph-embedding-atlas';
 import { buildGraphRebuildEmbeddingAtlas, graphRebuildEmbeddingTargetCount } from './graph-rebuild-embedding-atlas';
 import { buildGalaxyScene, mergeGalaxySettings } from './graph-galaxy-engine';
 
@@ -178,6 +182,36 @@ describe('embedding atlas projection', () => {
         } finally {
             entityColorStore.setGraphNodeColor('chunk', original);
         }
+    });
+
+    it('fails closed above the Hopf pairwise fallback threshold without authoritative edges', () => {
+        const count = HOPF_PAIRWISE_FALLBACK_NODE_LIMIT + 1;
+        const nodes = Array.from({ length: count }, (_, index) => ({
+            id: `backend:${index}`,
+            label: `Backend ${index}`,
+            sourceType: 'semantic_atlas',
+            vector: [1, index / count, 0.25, 0.125],
+        }));
+        const withoutPlan = buildBackendEmbeddingAtlas({
+            nodes,
+            edges: [],
+            sourceLabel: 'large fallback rejection',
+        }, count);
+        const withPlan = buildBackendEmbeddingAtlas({
+            nodes,
+            edges: [{
+                id: 'authoritative:fiber:0',
+                sourceId: 'backend:0',
+                targetId: 'backend:1',
+                type: 'hopf-fiber',
+                confidence: 1,
+            }],
+            sourceLabel: 'authoritative fiber plan',
+        }, count);
+
+        expect(withoutPlan.edges).toEqual([]);
+        expect(withPlan.edges).toHaveLength(1);
+        expect(withPlan.edges[0].id).toBe('authoritative:fiber:0');
     });
 
     it('renders graph-rebuild embedding targets while compacting entity mention anchors', () => {

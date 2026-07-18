@@ -27,6 +27,7 @@ import {
 } from '../../../../../graph-rebuild/graph-rebuild-embedding-signatures';
 import {
     buildHopfResonanceSpace,
+    withHopfResonanceLanes,
     type HopfResonanceAssignment,
     type HopfResonanceFiber,
     type HopfResonanceSpace,
@@ -37,7 +38,6 @@ import { buildGraphSignalTruthIndex, type GraphSignalTruthRecord } from '../../.
 import type { GalaxyInputEdge, GalaxyRenderableNode } from './graph-galaxy-engine';
 import type { EmbeddingAtlasData, EmbeddingAtlasSearchItem } from './graph-embedding-atlas';
 import { relationFamilyFromText } from './graph-relation-visual-style';
-import { entityColorStore } from '../../../../../lib/store/entityColorStore';
 import { HIERARCHY_SHELL_BANDS, type CapsHierarchyRole, type HierarchyShellBand } from './graph-galaxy-hierarchy-caps';
 import {
     graphTopologyDisplayColorKind,
@@ -64,6 +64,10 @@ type HopfBaseAssignment = {
     baseId?: string;
     anchorTargetId?: string;
     splitKey?: string;
+    logicalFiberId?: string;
+    laneId?: string;
+    laneIndex?: number;
+    laneCount?: number;
     fiberKind: string;
     phase: number;
     support: number;
@@ -81,6 +85,7 @@ type HopfBaseAssignment = {
     phaseSpread?: number;
     direction?: readonly number[];
     tangent?: readonly number[];
+    laneDirection?: readonly number[];
     receipt?: string;
     resonanceSource?: 'point-formed' | 'snapshot-hopf-resonance-space';
     noTopologyMutation?: boolean;
@@ -147,16 +152,31 @@ type GraphRebuildProjectionSubstrate = {
     compileTimings: Record<string, number>;
 };
 
-type GraphRebuildProjectionCacheEntry = {
-    substrates: Map<GraphRebuildProjectionTargetSet, GraphRebuildProjectionSubstrate>;
-    projections: Map<AtlasManifoldMode, EmbeddingAtlasData>;
+type GraphRebuildProjectionBase = {
+    snapshot: GraphRebuildSnapshot;
+    hopfSnapshot?: GraphRebuildSnapshot;
+    allTargets: GraphRebuildEmbeddingTarget[];
+    compactSelection: MentionCompactionSelection;
+    vectorsByTargetId: Map<string, Float32Array>;
+    postByTarget: Map<string, GraphRebuildEmbeddingTargetPostProcess>;
+    hierarchyByTarget: Map<string, TargetHierarchyContext>;
+    truthByTarget: Map<string, GraphSignalTruthRecord>;
+    commitmentBySourceId: Map<string, GraphModelV2FactBundleCommitment>;
+    traceByTargetId: Map<string, GraphRebuildVisualTrace>;
+    rawEdges: GalaxyInputEdge[];
+    compileTimings: Record<string, number>;
 };
 
-type GraphRebuildProjectionTargetSet = 'compact' | 'hopf-complete';
+type GraphRebuildProjectionCacheEntry = {
+    base?: GraphRebuildProjectionBase;
+    projections: Map<AtlasManifoldMode, EmbeddingAtlasData>;
+};
 
 const projectionCacheBySnapshot = new WeakMap<GraphRebuildSnapshot, GraphRebuildProjectionCacheEntry>();
 const projectionCacheByIdentity = new Map<string, GraphRebuildProjectionCacheEntry>();
 const MAX_RESIDENT_PROJECTION_IDENTITIES = 1;
+const MAX_RESIDENT_PROJECTIONS_PER_IDENTITY = 5;
+const MAX_RESIDENT_PROJECTION_ELEMENTS = 100_000;
 
 export function cachedGraphRebuildEmbeddingAtlas(
     snapshot: GraphRebuildSnapshot,
@@ -169,7 +189,7 @@ export function cachedGraphRebuildEmbeddingAtlas(
         projectionSubstrate(entry, snapshot, manifold),
         manifold,
     );
-    entry.projections.set(manifold, atlas);
+    retainProjection(entry.projections, manifold, atlas);
     return atlas;
 }
 
@@ -184,7 +204,7 @@ export function buildGraphRebuildEmbeddingAtlas(
         projectionSubstrate(entry, snapshot, manifold),
         manifold,
     );
-    entry.projections.set(manifold, atlas);
+    retainProjection(entry.projections, manifold, atlas);
     return atlas;
 }
 
@@ -292,7 +312,7 @@ function projectionCacheEntry(snapshot: GraphRebuildSnapshot): GraphRebuildProje
     if (!identity) {
         let entry = projectionCacheBySnapshot.get(snapshot);
         if (!entry) {
-            entry = { substrates: new Map(), projections: new Map() };
+            entry = { projections: new Map() };
             projectionCacheBySnapshot.set(snapshot, entry);
         }
         return entry;
@@ -305,7 +325,7 @@ function projectionCacheEntry(snapshot: GraphRebuildSnapshot): GraphRebuildProje
         return resident;
     }
 
-    const entry: GraphRebuildProjectionCacheEntry = { substrates: new Map(), projections: new Map() };
+    const entry: GraphRebuildProjectionCacheEntry = { projections: new Map() };
     projectionCacheByIdentity.set(identity, entry);
     while (projectionCacheByIdentity.size > MAX_RESIDENT_PROJECTION_IDENTITIES) {
         const oldest = projectionCacheByIdentity.keys().next().value as string | undefined;
@@ -320,42 +340,51 @@ function projectionSubstrate(
     snapshot: GraphRebuildSnapshot,
     manifold: AtlasManifoldMode,
 ): GraphRebuildProjectionSubstrate {
-    const targetSet: GraphRebuildProjectionTargetSet = manifold === 'hopf' ? 'hopf-complete' : 'compact';
-    const cached = entry.substrates.get(targetSet);
-    if (cached) return cached;
-    const substrate = buildGraphRebuildProjectionSubstrate(snapshot, targetSet);
-    entry.substrates.set(targetSet, substrate);
-    return substrate;
+    entry.base ||= buildGraphRebuildProjectionBase(snapshot);
+    return projectionSubstrateFromBase(entry.base, manifold);
 }
 
-function buildGraphRebuildProjectionSubstrate(
-    snapshot: GraphRebuildSnapshot,
-    targetSet: GraphRebuildProjectionTargetSet,
-): GraphRebuildProjectionSubstrate {
+function retainProjection(
+    cache: Map<AtlasManifoldMode, EmbeddingAtlasData>,
+    key: AtlasManifoldMode,
+    value: EmbeddingAtlasData,
+): void {
+    cache.delete(key);
+    cache.set(key, value);
+    while (
+        cache.size > 1 &&
+        (cache.size > MAX_RESIDENT_PROJECTIONS_PER_IDENTITY || projectionElementCount(cache) > MAX_RESIDENT_PROJECTION_ELEMENTS)
+    ) {
+        cache.delete(cache.keys().next().value!);
+    }
+}
+
+function projectionElementCount(cache: Map<AtlasManifoldMode, EmbeddingAtlasData>): number {
+    let total = 0;
+    for (const projection of cache.values()) total += projection.nodes.length + projection.edges.length;
+    return total;
+}
+
+function buildGraphRebuildProjectionBase(snapshot: GraphRebuildSnapshot): GraphRebuildProjectionBase {
     const substrateStarted = performance.now();
     let stageStarted = performance.now();
-    const packetSnapshot = snapshotWithAtlasPacketTargets(snapshot);
-    const atlasSnapshot = targetSet === 'hopf-complete'
-        ? snapshotWithCompleteHopfAssignments(packetSnapshot)
-        : packetSnapshot;
+    const atlasSnapshot = snapshotWithAtlasPacketTargets(snapshot);
     const packetAdapterMs = performance.now() - stageStarted;
     stageStarted = performance.now();
     const entityKindById = new Map(atlasSnapshot.nodes.map((node) => [node.entityId, node.kind]));
     const profile = normalizeEmbeddingProfile(atlasSnapshot.embeddingProfile);
     const postByTarget = new Map((atlasSnapshot.embeddingGraphPostProcess?.targets || []).map((row) => [row.targetId, row]));
     const compactSelection = compactEntityMentionTargets(atlasSnapshot, selectEmbeddingTargets(atlasSnapshot));
-    const selectedTargets = targetSet === 'hopf-complete'
-        ? selectHopfEmbeddingTargets(atlasSnapshot)
-        : compactSelection.targets;
-    const mentionCompaction: MentionCompactionSelection = {
-        targets: selectedTargets,
-        receiptsByEntityTargetId: compactSelection.receiptsByEntityTargetId,
-    };
-    const selected = selectedTargets
+    compactSelection.targets = compactSelection.targets
+        .map((target) => hydrateTargetEntityKind(target, entityKindById));
+    const allTargets = selectHopfEmbeddingTargets(atlasSnapshot)
         .map((target) => hydrateTargetEntityKind(target, entityKindById));
     const targetSelectionMs = performance.now() - stageStarted;
     stageStarted = performance.now();
-    const vectors = selected.map((target) => textVector(target, profile.selectedDimensions));
+    const vectorsByTargetId = new Map(allTargets.map((target) => [
+        target.id,
+        textVector(target, profile.selectedDimensions),
+    ]));
     const vectorsMs = performance.now() - stageStarted;
     stageStarted = performance.now();
     const hierarchyByTarget = buildTargetHierarchyContext(atlasSnapshot);
@@ -363,23 +392,21 @@ function buildGraphRebuildProjectionSubstrate(
     stageStarted = performance.now();
     const truthByTarget = buildGraphSignalTruthIndex(atlasSnapshot);
     const commitmentBySourceId = buildBundleCommitmentIndex(atlasSnapshot);
-    const traceByTargetId = new Map(selected.map((target) => [target.id, graphTopologyTraceForEmbeddingTarget(target)]));
+    const traceByTargetId = new Map(allTargets.map((target) => [target.id, graphTopologyTraceForEmbeddingTarget(target)]));
     const truthAndTraceMs = performance.now() - stageStarted;
     stageStarted = performance.now();
-    const nodeIds = new Set(selected.map((target) => target.id));
     const rawEdges = buildTargetEdges(atlasSnapshot)
-        .filter((edge) => nodeIds.has(edge.sourceId) && nodeIds.has(edge.targetId))
         .map((edge) => edgeWithVisualTrace(edge, traceByTargetId));
     const edgesMs = performance.now() - stageStarted;
     return {
         snapshot: atlasSnapshot,
-        selected,
-        vectors,
+        allTargets,
+        compactSelection,
+        vectorsByTargetId,
         postByTarget,
         hierarchyByTarget,
         truthByTarget,
         commitmentBySourceId,
-        mentionCompaction,
         traceByTargetId,
         rawEdges,
         compileTimings: {
@@ -389,8 +416,42 @@ function buildGraphRebuildProjectionSubstrate(
             hierarchyMs,
             truthAndTraceMs,
             edgesMs,
-            completeHopfTargetSet: targetSet === 'hopf-complete' ? 1 : 0,
             substrateMs: performance.now() - substrateStarted,
+        },
+    };
+}
+
+function projectionSubstrateFromBase(
+    base: GraphRebuildProjectionBase,
+    manifold: AtlasManifoldMode,
+): GraphRebuildProjectionSubstrate {
+    const viewStarted = performance.now();
+    const completeHopfTargetSet = manifold === 'hopf';
+    if (completeHopfTargetSet && !base.hopfSnapshot) {
+        base.hopfSnapshot = snapshotWithCompleteHopfAssignments(base.snapshot);
+    }
+    const selected = completeHopfTargetSet ? base.allTargets : base.compactSelection.targets;
+    const selectedIds = new Set(selected.map((target) => target.id));
+    const vectors = selected.map((target) => base.vectorsByTargetId.get(target.id) || new Float32Array());
+    const rawEdges = base.rawEdges.filter((edge) => selectedIds.has(edge.sourceId) && selectedIds.has(edge.targetId));
+    return {
+        snapshot: completeHopfTargetSet ? base.hopfSnapshot! : base.snapshot,
+        selected,
+        vectors,
+        postByTarget: base.postByTarget,
+        hierarchyByTarget: base.hierarchyByTarget,
+        truthByTarget: base.truthByTarget,
+        commitmentBySourceId: base.commitmentBySourceId,
+        mentionCompaction: {
+            targets: selected,
+            receiptsByEntityTargetId: base.compactSelection.receiptsByEntityTargetId,
+        },
+        traceByTargetId: base.traceByTargetId,
+        rawEdges,
+        compileTimings: {
+            ...base.compileTimings,
+            completeHopfTargetSet: completeHopfTargetSet ? 1 : 0,
+            projectionViewMs: performance.now() - viewStarted,
         },
     };
 }
@@ -769,7 +830,7 @@ function buildGraphRebuildProductTraversal(
         const sourceLane = productRouteLaneForTarget(source);
         const targetLane = productRouteLaneForTarget(target);
         const lane = productPathletLane(edge, sourceLane, targetLane);
-        const obstruction = productEdgeObstruction(edge, source, target, sourceLane, targetLane);
+        const obstruction = productEdgeObstruction(edge, target, sourceLane, targetLane);
         const obstructionIds = obstruction ? [obstruction.obstructionId] : [];
         if (obstruction) {
             out.obstructions.push(obstruction);
@@ -884,7 +945,6 @@ function productTargetObstruction(target: GraphRebuildEmbeddingTarget, lane: str
 
 function productEdgeObstruction(
     edge: GalaxyInputEdge,
-    source: GraphRebuildEmbeddingTarget,
     target: GraphRebuildEmbeddingTarget,
     sourceLane: string,
     targetLane: string,
@@ -1420,6 +1480,10 @@ function graphRebuildHopfMetadata(
         laneKind: post?.productTopologyRegion.laneKind,
         rootBaseId: assignment.rootBaseId,
         splitKey: assignment.splitKey,
+        logicalFiberId: assignment.logicalFiberId,
+        laneId: assignment.laneId,
+        laneIndex: assignment.laneIndex,
+        laneCount: assignment.laneCount,
         cellId: assignment.cellId,
         secondaryCellIds: assignment.secondaryCellIds,
         assignmentScore: assignment.assignmentScore,
@@ -1431,6 +1495,7 @@ function graphRebuildHopfMetadata(
         phaseSpread: assignment.phaseSpread,
         direction: assignment.direction,
         tangent: assignment.tangent,
+        laneDirection: assignment.laneDirection,
         receipt: assignment.receipt,
         resonanceSource: assignment.resonanceSource || 'point-formed',
         resonanceAdmitted: true,
@@ -1631,6 +1696,10 @@ function hopfSnapshotAssignment(
         baseId: assignment.baseCellId,
         anchorTargetId,
         splitKey: `${assignment.baseCellId}:${assignment.fiberKind}`,
+        logicalFiberId: assignment.logicalFiberId || fiber?.id || `${assignment.baseCellId}:${assignment.fiberKind}`,
+        laneId: assignment.laneId,
+        laneIndex: assignment.laneIndex,
+        laneCount: assignment.laneCount,
         fiberKind: assignment.fiberKind,
         phase: clamp01(assignment.phase),
         support: clamp01(assignment.assignmentScore),
@@ -1648,6 +1717,7 @@ function hopfSnapshotAssignment(
         phaseSpread: assignment.phaseSpread,
         direction: assignment.direction,
         tangent: assignment.tangent,
+        laneDirection: assignment.laneDirection,
         receipt: assignment.receipt,
         resonanceSource: 'snapshot-hopf-resonance-space',
         noTopologyMutation: true,
@@ -1832,7 +1902,17 @@ function snapshotWithCompleteHopfAssignments(snapshot: GraphRebuildSnapshot): Gr
     const complete = assignments.length === snapshot.embeddingTargets.length
         && assignmentIds.size === targetIds.size
         && [...targetIds].every((targetId) => assignmentIds.has(targetId));
-    if (complete) return snapshot;
+    const laneContractComplete = assignments.every((assignment) =>
+        assignment.role === 'document-chart'
+        || Boolean(assignment.logicalFiberId && assignment.laneId && assignment.laneDirection),
+    );
+    if (complete && laneContractComplete) return snapshot;
+    if (complete && snapshot.hopfResonanceSpace) {
+        return {
+            ...snapshot,
+            hopfResonanceSpace: withHopfResonanceLanes(snapshot.hopfResonanceSpace),
+        };
+    }
     return {
         ...snapshot,
         hopfResonanceSpace: buildHopfResonanceSpace(snapshot, { generatedAt: snapshot.builtAt }),
@@ -2311,16 +2391,6 @@ function capsEventParentId(target: GraphRebuildEmbeddingTarget): string | null {
     return firstParentWithPrefix(parents, 'embed:event:') || lastParentWithPrefix(parents, 'embed:event:');
 }
 
-function productCapId(
-    target: GraphRebuildEmbeddingTarget,
-    fallback: string,
-    hierarchyContext: TargetHierarchyContext | undefined,
-    supportNoteIds: string[],
-): string {
-    const supportChunkIds = capsSupportChunkIds(target, hierarchyContext);
-    return capsHierarchyPath(target, hierarchyContext, supportNoteIds, supportChunkIds, null).capId || fallback;
-}
-
 function buildCapsDocumentDirections(
     targets: GraphRebuildEmbeddingTarget[],
     vectors: Float32Array[],
@@ -2450,15 +2520,6 @@ function capsStructureRootKey(target: GraphRebuildEmbeddingTarget): string {
     return 'document';
 }
 
-function productCapParentIds(
-    target: GraphRebuildEmbeddingTarget,
-    hierarchyContext: TargetHierarchyContext | undefined,
-    supportNoteIds: string[],
-    supportChunkIds: string[],
-): string[] {
-    return capsHierarchyPath(target, hierarchyContext, supportNoteIds, supportChunkIds, null).parentCapIds;
-}
-
 function capsParentRootKey(target: GraphRebuildEmbeddingTarget, parentIds: string[]): string {
     for (const parentId of parentIds) {
         const root = parentId.match(/^embed:structure-root:[^:]+:(.+)$/)?.[1];
@@ -2518,18 +2579,6 @@ function capsEntityCapId(
     return `identity:${entityId}`;
 }
 
-function capsEventCapId(
-    target: GraphRebuildEmbeddingTarget,
-    noteId: string | undefined,
-    chunkId: string | undefined,
-    supportNoteIds: string[],
-    supportChunkIds: string[],
-): string {
-    const entityParent = firstParentWithPrefix(target.parentIds || [], 'embed:entity:') || (target.entityId ? `embed:entity:${target.entityId}` : null);
-    const entityId = entityParent ? entityParent.slice('embed:entity:'.length) : '';
-    return capsEventCapIdFor(target.sourceId || target.id, entityId, noteId, chunkId, supportNoteIds, supportChunkIds);
-}
-
 function capsEventCapIdFor(
     eventId: string,
     entityId: string,
@@ -2582,45 +2631,6 @@ function capsStableVector(id: string): CapsVec3 {
     return { x: Math.cos(a) * radial, y, z: Math.sin(a) * radial };
 }
 
-function productCapParentId(
-    target: GraphRebuildEmbeddingTarget,
-    fallback: string | null,
-    hierarchyContext?: TargetHierarchyContext,
-): string | null {
-    const parents = target.parentIds || [];
-    const noteId = target.noteId || hierarchyContext?.noteId;
-    const chunkId = target.chunkId || hierarchyContext?.chunkId;
-    const kind = displayKind(target.kind);
-    if (kind === 'structure-root' && noteId) return `embed:note:${noteId}`;
-    if (target.kind === 'chunk' && noteId) return firstParentWithPrefix(parents, `embed:structure-root:${noteId}:document-structure`) || `embed:note:${noteId}`;
-    if (target.kind === 'entity' && chunkId) return firstParentWithPrefix(parents, 'embed:anchor:') || `embed:chunk:${chunkId}`;
-    if (target.kind === 'entity' && noteId) return firstParentWithPrefix(parents, `embed:structure-root:${noteId}:identity`) || `embed:structure-root:${noteId}:identity`;
-    if (target.kind === 'anchor' && chunkId) return `embed:chunk:${chunkId}`;
-    if (target.kind === 'anchor' && target.entityId) return `embed:entity:${target.entityId}`;
-    if (kind === 'event') return firstParentWithPrefix(parents, 'embed:entity:') || (chunkId ? `embed:chunk:${chunkId}` : fallback);
-    if (kind === 'causal-fact') return lastParentWithPrefix(parents, 'embed:event:') || firstParentWithPrefix(parents, `embed:structure-root:${noteId || ''}:causal`) || fallback;
-    if (kind === 'temporal-fact') return firstParentWithPrefix(parents, 'embed:event:') || firstParentWithPrefix(parents, `embed:structure-root:${noteId || ''}:temporal`) || fallback;
-    if (kind === 'graph-fact') return firstParentWithPrefix(parents, 'embed:entity:') || (chunkId ? `embed:chunk:${chunkId}` : fallback);
-    if (kind === 'memory-state' && target.entityId) return `embed:entity:${target.entityId}`;
-    if (parents.length) return parents[0];
-    return fallback;
-}
-
-function productCapShellRadius(
-    target: GraphRebuildEmbeddingTarget,
-    specificity: number,
-    ambiguity: number,
-): number {
-    void specificity;
-    void ambiguity;
-    return HIERARCHY_SHELL_BANDS[capsHierarchyRoleForTarget(target)].radius;
-}
-
-function productCapShellBand(target: GraphRebuildEmbeddingTarget): [number, number] {
-    const band = HIERARCHY_SHELL_BANDS[capsHierarchyRoleForTarget(target)];
-    return [band.min, band.max];
-}
-
 function productHierarchySpecificity(
     target: GraphRebuildEmbeddingTarget,
     post?: GraphRebuildEmbeddingTargetPostProcess,
@@ -2643,11 +2653,6 @@ function productHierarchyAmbiguity(post?: GraphRebuildEmbeddingTargetPostProcess
     const role = post.productTopologyRegion.role;
     const roleBoost = role === 'outlier' ? 0.22 : role === 'bridge' ? 0.12 : role === 'boundary' ? 0.08 : 0;
     return clamp01(post.productLaneFeatures.clusterRadius * 0.52 + post.outlierScore * 0.28 + roleBoost);
-}
-
-function productRegionLevel(target: GraphRebuildEmbeddingTarget, post?: GraphRebuildEmbeddingTargetPostProcess): number {
-    void post;
-    return HIERARCHY_SHELL_BANDS[capsHierarchyRoleForTarget(target)].rank;
 }
 
 function productFiberKind(role: string, laneKind?: string): string {
@@ -3030,14 +3035,6 @@ function lastParentWithPrefix(parentIds: string[], prefix: string): string | nul
         if (parentIds[index].startsWith(prefix)) return parentIds[index];
     }
     return null;
-}
-
-function capsNodeCapToken(nodeId: string): string {
-    if (nodeId.startsWith('embed:event:')) return `event:${nodeId.slice('embed:event:'.length)}`;
-    if (nodeId.startsWith('embed:entity:')) return `identity:${nodeId.slice('embed:entity:'.length)}`;
-    if (nodeId.startsWith('embed:chunk:')) return `chunk:${nodeId.slice('embed:chunk:'.length)}`;
-    if (nodeId.startsWith('embed:note:')) return `document:${nodeId.slice('embed:note:'.length)}`;
-    return normalizeHopfToken(nodeId);
 }
 
 function unitHash(value: string): number {

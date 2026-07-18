@@ -138,6 +138,9 @@ export interface GalaxySceneV2 {
     kinds: string[];
     groupIds: string[];
     hopfBaseIds?: string[];
+    hopfCellIds?: string[];
+    hopfFiberIds?: string[];
+    hopfLaneIds?: string[];
     hopfRoles?: Uint8Array;
     groups: GalaxySceneGroupView[];
     hopfRibbons: GalaxyHopfRibbonView[];
@@ -166,7 +169,8 @@ export interface GalaxySceneV2 {
 
 export interface GalaxySceneRuntimeIndex {
     nodeById: Map<string, number>;
-    incidentEdges: number[][];
+    incidentOffsets: Uint32Array;
+    incidentEdges: Uint32Array;
 }
 
 export function galaxySceneToV2(scene: GalaxyScene, sourceMode: GalaxySceneSourceMode = 'entities'): GalaxySceneV2 {
@@ -176,6 +180,9 @@ export function galaxySceneToV2(scene: GalaxyScene, sourceMode: GalaxySceneSourc
     const kinds: string[] = new Array(nodeCount);
     const groupIds: string[] = new Array(nodeCount);
     const hopfBaseIds: string[] = new Array(nodeCount);
+    const hopfCellIds: string[] = new Array(nodeCount);
+    const hopfFiberIds: string[] = new Array(nodeCount);
+    const hopfLaneIds: string[] = new Array(nodeCount);
     const hopfRoles = new Uint8Array(nodeCount);
     const positions3d = new Float32Array(nodeCount * 3);
     const positions2d = new Float32Array(nodeCount * 3);
@@ -197,7 +204,13 @@ export function galaxySceneToV2(scene: GalaxyScene, sourceMode: GalaxySceneSourc
         kinds[index] = node.entity.kind;
         groupIds[index] = node.groupId || '';
         const hopf = hopfMetadata(node);
-        hopfBaseIds[index] = String(hopf?.['baseId'] || '');
+        const cellId = String(hopf?.['cellId'] || hopf?.['baseId'] || '');
+        const fiberId = String(hopf?.['logicalFiberId'] || hopf?.['splitKey'] || hopf?.['strandKey'] || cellId);
+        const laneId = String(hopf?.['laneId'] || fiberId);
+        hopfBaseIds[index] = cellId;
+        hopfCellIds[index] = cellId;
+        hopfFiberIds[index] = fiberId;
+        hopfLaneIds[index] = laneId;
         hopfRoles[index] = hopf?.['role'] === 'anchor' ? 1 : hopf?.['role'] === 'fiber' ? 2 : 0;
         writePosition(positions3d, index, node.x, node.y, node.z);
         writePosition(positions2d, index, node.x, node.y, 0);
@@ -258,6 +271,9 @@ export function galaxySceneToV2(scene: GalaxyScene, sourceMode: GalaxySceneSourc
         kinds,
         groupIds,
         hopfBaseIds,
+        hopfCellIds,
+        hopfFiberIds,
+        hopfLaneIds,
         hopfRoles,
         groups: scene.groups.map(groupView),
         hopfRibbons: attachSourceColors((scene.hopfRibbons ?? []).map(hopfRibbonView), ids, colors),
@@ -287,17 +303,36 @@ export function galaxySceneToV2(scene: GalaxyScene, sourceMode: GalaxySceneSourc
 
 export function attachGalaxySceneRuntimeIndex(scene: GalaxySceneV2): GalaxySceneV2 {
     const nodeById = new Map<string, number>();
-    const incidentEdges = Array.from({ length: scene.ids.length }, () => [] as number[]);
+    const incidentOffsets = new Uint32Array(scene.ids.length + 1);
     for (let index = 0; index < scene.ids.length; index++) nodeById.set(scene.ids[index], index);
     for (let edge = 0; edge < scene.edgePairs.length / 2; edge++) {
         const source = scene.edgePairs[edge * 2];
         const target = scene.edgePairs[edge * 2 + 1];
-        if (source < incidentEdges.length) incidentEdges[source].push(edge);
-        if (target < incidentEdges.length && target !== source) incidentEdges[target].push(edge);
+        if (source < scene.ids.length) incidentOffsets[source + 1] += 1;
+        if (target < scene.ids.length && target !== source) incidentOffsets[target + 1] += 1;
     }
-    scene.runtimeIndex = { nodeById, incidentEdges };
+    for (let node = 1; node < incidentOffsets.length; node++) {
+        incidentOffsets[node] += incidentOffsets[node - 1];
+    }
+    const cursor = incidentOffsets.slice(0, scene.ids.length);
+    const incidentEdges = new Uint32Array(incidentOffsets[scene.ids.length]);
+    for (let edge = 0; edge < scene.edgePairs.length / 2; edge++) {
+        const source = scene.edgePairs[edge * 2];
+        const target = scene.edgePairs[edge * 2 + 1];
+        if (source < scene.ids.length) incidentEdges[cursor[source]++] = edge;
+        if (target < scene.ids.length && target !== source) incidentEdges[cursor[target]++] = edge;
+    }
+    scene.runtimeIndex = { nodeById, incidentOffsets, incidentEdges };
     return scene;
 }
+
+export function galaxyIncidentEdges(scene: GalaxySceneV2, node: number): Uint32Array {
+    const runtime = scene.runtimeIndex;
+    if (!runtime || node < 0 || node >= scene.ids.length) return EMPTY_INCIDENT_EDGES;
+    return runtime.incidentEdges.subarray(runtime.incidentOffsets[node], runtime.incidentOffsets[node + 1]);
+}
+
+const EMPTY_INCIDENT_EDGES = new Uint32Array(0);
 
 /**
  * Resolves `sourceColor` from each guide/ribbon's `nodeIds[0]` against the

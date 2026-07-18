@@ -450,8 +450,6 @@ type PhoenixSearchResult = {
     LineHits?: PhoenixLineSearchHit[];
 };
 
-const DOCUMENT_ID_PATTERN = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi;
-
 @Injectable({ providedIn: 'root' })
 export class PhoenixUiApiService {
     private readonly phoenix = inject(PhoenixBackendService);
@@ -1863,11 +1861,6 @@ function candidateConfidence(row: any): number {
     const graph = asRecord(attributes['graph']);
     const raw = Number(attributes['score'] ?? graph['confidence'] ?? Number(row?.weight || 0) / 1000);
     return Number.isFinite(raw) && raw > 0 ? raw : 0.35;
-}
-
-function extractDocumentIds(value: string): string[] {
-    if (!value) return [];
-    return Array.from(value.matchAll(DOCUMENT_ID_PATTERN), (match) => match[0].toLocaleLowerCase());
 }
 
 function asRecord(value: unknown): Record<string, unknown> {

@@ -6,6 +6,7 @@ import { describe, expect, it } from 'vitest';
 import { mergeGalaxySettings } from './graph-galaxy-engine';
 import {
     canGraphGalaxyCanvasHoldSurface,
+    galaxyResidencyGenerationId,
     galaxySceneIdentityNeedsRebuild,
     galaxySettingsNeedSceneRebuild,
 } from './graph-galaxy-canvas.component';
@@ -38,6 +39,38 @@ describe('GraphGalaxyCanvasComponent settings rebuild routing', () => {
         expect(galaxySceneIdentityNeedsRebuild('graph-a', 'graph-a', true)).toBe(false);
         expect(galaxySceneIdentityNeedsRebuild('graph-a', 'graph-b', true)).toBe(true);
         expect(galaxySceneIdentityNeedsRebuild('', '', true)).toBe(true);
+    });
+
+    it('keeps graph authority generation separate from manifold scene identity', () => {
+        expect(galaxyResidencyGenerationId('generation-a\u0000caps\u0000settings')).toBe('generation-a');
+        expect(galaxyResidencyGenerationId('')).toBe('ephemeral-current-graph');
+    });
+
+    it('routes renderer scene installation through the bounded residency controller', () => {
+        const source = readFileSync(join(here, 'graph-galaxy-canvas.component.ts'), 'utf8');
+
+        expect(source).toContain('new GalaxySceneResidencyController');
+        expect(source).toContain('await residency.install');
+        expect(source).toContain('this.residency?.updateView(this.renderer.residencyView())');
+        expect(source).toContain("import('./graph-galaxy-scene-residency-controller')");
+        expect(source).toContain('corpus</b>');
+        expect(source).toContain('aggregated</b>');
+        expect(source).toContain('scene.layoutMode');
+        expect(source).toContain("this.sceneIdentity || 'ephemeral:unreceipted-current-graph'");
+        expect(source).toContain('this.queueResidencyCounters(counters)');
+        expect(source).toContain('queueMicrotask(() => {');
+        expect(source).toContain('this.changeDetector.markForCheck()');
+        expect(source).not.toContain('this.residencyCounters = counters');
+    });
+
+    it('keeps interaction queries lazy, cancellable, and outside the renderer truth buffers', () => {
+        const source = readFileSync(join(here, 'graph-galaxy-canvas.component.ts'), 'utf8');
+
+        expect(source).toContain("import('./graph-galaxy-interaction-query')");
+        expect(source).toContain('await interaction.region(');
+        expect(source).toContain('await interaction.path(');
+        expect(source).toContain('this.renderer.setPathOverlay(overlay)');
+        expect(source).toContain('this.interaction?.dispose()');
     });
 });
 

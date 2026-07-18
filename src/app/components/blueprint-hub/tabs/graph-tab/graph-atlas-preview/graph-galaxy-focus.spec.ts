@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { buildGalaxyFocusMask } from './graph-galaxy-focus';
+import { boundedLocalGalaxyPath } from './graph-galaxy-interaction-query';
 import { attachGalaxySceneRuntimeIndex, type GalaxySceneV2 } from './graph-galaxy-scene-v2';
 
 describe('graph galaxy focus runtime index', () => {
@@ -15,12 +16,17 @@ describe('graph galaxy focus runtime index', () => {
         expect(Array.from(actual.edgeLevels)).toEqual(Array.from(expected.edgeLevels));
         expect(actual.focusIndex).toBe(expected.focusIndex);
         expect(indexed.runtimeIndex?.nodeById.get('child')).toBe(1);
-        expect(indexed.runtimeIndex?.incidentEdges[1]).toEqual([0, 1, 3]);
+        const runtime = indexed.runtimeIndex!;
+        expect(Array.from(runtime.incidentEdges.subarray(
+            runtime.incidentOffsets[1],
+            runtime.incidentOffsets[2],
+        ))).toEqual([0, 1, 3]);
     });
 
     it('finds one deterministic unweighted shortest walk and dims everything outside it', () => {
         const scene = attachGalaxySceneRuntimeIndex(focusScene());
-        const focus = buildGalaxyFocusMask(scene, ['root', 'aside'], 'remote');
+        const overlay = boundedLocalGalaxyPath(scene, authority(), 1, 'root', 'aside');
+        const focus = buildGalaxyFocusMask(scene, ['root', 'aside'], 'remote', overlay);
 
         expect(focus.pathFound).toBe(true);
         expect(Array.from(focus.pathNodeIndices)).toEqual([0, 1, 2, 3]);
@@ -38,7 +44,9 @@ describe('graph galaxy focus runtime index', () => {
         scene.edgeColors = new Float32Array(12);
         scene.edgeAlpha = new Float32Array([1, 1]);
         scene.edgeKinds = new Uint8Array([2, 2]);
-        const focus = buildGalaxyFocusMask(attachGalaxySceneRuntimeIndex(scene), ['root', 'aside'], null);
+        const indexed = attachGalaxySceneRuntimeIndex(scene);
+        const overlay = boundedLocalGalaxyPath(indexed, authority(), 2, 'root', 'aside');
+        const focus = buildGalaxyFocusMask(indexed, ['root', 'aside'], null, overlay);
 
         expect(focus.pathFound).toBe(false);
         expect(Array.from(focus.pathNodeIndices)).toEqual([0, 3]);
@@ -46,17 +54,26 @@ describe('graph galaxy focus runtime index', () => {
         expect(Array.from(focus.nodeLevels)).toEqual([3, 0, 0, 3, 0]);
     });
 
-    it('walks a 10k-node indexed chain within the interaction budget', () => {
+    it('fails closed instead of walking a 10k-node chain in the browser', () => {
         const scene = attachGalaxySceneRuntimeIndex(pathChainScene(10_000));
         const started = performance.now();
-        const focus = buildGalaxyFocusMask(scene, ['node:0', 'node:9999'], null);
+        const overlay = boundedLocalGalaxyPath(scene, authority(), 3, 'node:0', 'node:9999');
+        const focus = buildGalaxyFocusMask(scene, ['node:0', 'node:9999'], null, overlay);
 
-        expect(focus.pathFound).toBe(true);
-        expect(focus.pathNodeIndices).toHaveLength(10_000);
-        expect(focus.pathEdgeIndices).toHaveLength(9_999);
-        expect(performance.now() - started).toBeLessThan(100);
+        expect(overlay).toBeNull();
+        expect(focus.pathFound).toBe(false);
+        expect(focus.pathNodeIndices).toEqual(Uint32Array.of(0, 9_999));
+        expect(performance.now() - started).toBeLessThan(20);
     });
 });
+
+function authority() {
+    return {
+        generationId: 'generation-a',
+        manifoldId: 'single',
+        authorityReceipt: 'receipt-a',
+    };
+}
 
 function focusScene(): GalaxySceneV2 {
     return {

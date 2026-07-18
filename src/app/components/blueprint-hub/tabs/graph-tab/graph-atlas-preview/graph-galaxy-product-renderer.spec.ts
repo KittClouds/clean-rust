@@ -18,15 +18,14 @@ import * as THREE from 'three';
 import { buildGalaxyFocusMask } from './graph-galaxy-focus';
 import { buildGalaxyGlows, galaxyGlowBatch } from './graph-galaxy-objects';
 import type { GalaxySceneV2 } from './graph-galaxy-scene-v2';
+import { GalaxyGpuEdgeCurve, type GalaxyGpuEdgeSurface } from './three-galaxy-edge-surface';
 import { ThreeGalaxyRenderer } from './three-galaxy-renderer';
 
 type RendererProbe = {
     setSettings(settings: Record<string, unknown>): void;
     edgeMaterialOpacity(): number;
-    edgeMaterialBlending(data?: { layoutMode: string } | null): THREE.Blending;
     edgeColor(data: { layoutMode: string; edgeAlpha: Float32Array; edgeColors: Float32Array; edgeKinds: Uint8Array }, edge: number, t: number): THREE.Color;
-    edgeStrokeCount(data?: { layoutMode?: string; edgePairs?: Uint32Array; edgeAlpha: Float32Array; edgeKinds: Uint8Array }, edge?: number): number;
-    edgeStrokeOffset(data?: { layoutMode?: string; edgePairs?: Uint32Array; edgeAlpha: Float32Array; edgeKinds: Uint8Array }, edge?: number): number;
+    buildEdges(data: GalaxySceneV2): GalaxyGpuEdgeSurface | null;
     normalizedEdgeSignal(data?: { edgeAlpha: Float32Array }, edge?: number): number;
     treeFilamentEdgeLift(data: { edgeAlpha: Float32Array; edgeKinds: Uint8Array }, edge: number, source: number, target: number, curveScale: number): number;
     treeFilamentTerminalTaper(t: number): number;
@@ -59,9 +58,10 @@ type CameraProbe = RendererProbe & {
     panX: number;
     panY: number;
     panZ: number;
-    viewShiftX: number;
-    viewShiftY: number;
+    sceneData: GalaxySceneV2 | null;
+    hoverId: string | null;
     resetCamera(): void;
+    pan(deltaX: number, deltaY: number): void;
     rotate(deltaX: number, deltaY: number): void;
     zoomAt(delta: number, pointer: { x: number; y: number; width: number; height: number }): void;
     pointerToCameraTargetPlane(pointer: { x: number; y: number; width: number; height: number }, out: THREE.Vector3): boolean;
@@ -71,35 +71,89 @@ function mountCameraProbe(): CameraProbe {
     const renderer = new ThreeGalaxyRenderer() as unknown as CameraProbe;
     renderer.renderer = { render: vi.fn(), domElement: { clientWidth: 800, clientHeight: 600 } };
     renderer.resetCamera();
+    vi.spyOn(renderer as unknown as ThreeGalaxyRenderer, 'render').mockImplementation(() => undefined);
     return renderer;
 }
 
 describe('Galaxy camera controls', () => {
-    it('keeps wheel zoom framing separate from the 3D orbit pivot', () => {
+    it('keeps zoom-out centered on the camera target regardless of pointer position', () => {
+        const left = mountCameraProbe();
+        const right = mountCameraProbe();
+        const leftPointer = { x: 80, y: 180, width: 800, height: 600 };
+        const rightPointer = { x: 720, y: 420, width: 800, height: 600 };
+
+        left.pan(48, -24);
+        right.pan(48, -24);
+        left.zoomAt(640, leftPointer);
+        right.zoomAt(640, rightPointer);
+
+        expect(left.perspective.position.toArray()).toEqual(right.perspective.position.toArray());
+        const target = new THREE.Vector3(left.panX, left.panY, left.panZ);
+        const projected = target.clone().project(left.perspective);
+        expect(projected.x).toBeCloseTo(0, 6);
+        expect(projected.y).toBeCloseTo(0, 6);
+
+        const graphCenterBefore = new THREE.Vector3().project(left.perspective);
+        left.rotate(80, -20);
+        const graphCenterAfter = new THREE.Vector3().project(left.perspective);
+        expect(graphCenterAfter.x).toBeCloseTo(graphCenterBefore.x, 6);
+        expect(graphCenterAfter.y).toBeCloseTo(graphCenterBefore.y, 6);
+        expect(new THREE.Vector3(left.panX, left.panY, left.panZ).project(left.perspective).x).toBeCloseTo(0, 6);
+        expect(new THREE.Vector3(left.panX, left.panY, left.panZ).project(left.perspective).y).toBeCloseTo(0, 6);
+    });
+
+    it('keeps cursor zoom framing while rotation continues around the graph center', () => {
         const renderer = mountCameraProbe();
-        const pointer = { x: 620, y: 250, width: 800, height: 600 };
+        const pointer = { x: 650, y: 210, width: 800, height: 600 };
         const anchor = new THREE.Vector3();
         const pointerNdcX = (pointer.x / pointer.width) * 2 - 1;
         const pointerNdcY = -(pointer.y / pointer.height) * 2 + 1;
 
         expect(renderer.pointerToCameraTargetPlane(pointer, anchor)).toBe(true);
+        renderer.zoomAt(-360, pointer);
+
+        expect(anchor.clone().project(renderer.perspective).x).toBeCloseTo(pointerNdcX, 6);
+        expect(anchor.clone().project(renderer.perspective).y).toBeCloseTo(pointerNdcY, 6);
+        expect(Math.abs(renderer.panX) + Math.abs(renderer.panY) + Math.abs(renderer.panZ)).toBeGreaterThan(0.001);
+
+        const graphCenterBefore = new THREE.Vector3().project(renderer.perspective);
+        renderer.rotate(80, -20);
+        const graphCenterAfter = new THREE.Vector3().project(renderer.perspective);
+        expect(graphCenterAfter.x).toBeCloseTo(graphCenterBefore.x, 6);
+        expect(graphCenterAfter.y).toBeCloseTo(graphCenterBefore.y, 6);
+        expect(new THREE.Vector3(renderer.panX, renderer.panY, renderer.panZ).project(renderer.perspective).x).toBeCloseTo(0, 6);
+        expect(new THREE.Vector3(renderer.panX, renderer.panY, renderer.panZ).project(renderer.perspective).y).toBeCloseTo(0, 6);
+    });
+
+    it('uses the exact hovered node as the zoom-in anchor', () => {
+        const renderer = mountCameraProbe();
+        const node = new THREE.Vector3(1.3, 0.7, -0.4);
+        renderer.sceneData = {
+            ...emptyRendererScene(),
+            ids: ['hovered'],
+            positions3d: new Float32Array(node.toArray()),
+            positions2d: new Float32Array([node.x, node.y, 0]),
+            runtimeIndex: {
+                nodeById: new Map([['hovered', 0]]),
+                incidentOffsets: new Uint32Array(2),
+                incidentEdges: new Uint32Array(),
+            },
+        };
+        renderer.hoverId = 'hovered';
+        const before = node.clone().project(renderer.perspective);
+        const pointer = {
+            x: (before.x * 0.5 + 0.5) * 800,
+            y: (-before.y * 0.5 + 0.5) * 600,
+            width: 800,
+            height: 600,
+        };
 
         renderer.zoomAt(-360, pointer);
 
-        expect(renderer.panX).toBeCloseTo(0);
-        expect(renderer.panY).toBeCloseTo(0);
-        expect(renderer.panZ).toBeCloseTo(0);
-        expect(Math.abs(renderer.viewShiftX) + Math.abs(renderer.viewShiftY)).toBeGreaterThan(0.001);
-
-        const projected = anchor.clone().project(renderer.perspective);
-        expect(projected.x).toBeCloseTo(pointerNdcX, 4);
-        expect(projected.y).toBeCloseTo(pointerNdcY, 4);
-
-        renderer.rotate(80, -20);
-
-        expect(renderer.panX).toBeCloseTo(0);
-        expect(renderer.panY).toBeCloseTo(0);
-        expect(renderer.panZ).toBeCloseTo(0);
+        const after = node.clone().project(renderer.perspective);
+        expect(after.x).toBeCloseTo(before.x, 6);
+        expect(after.y).toBeCloseTo(before.y, 6);
+        expect(Math.abs(renderer.panZ)).toBeGreaterThan(0.001);
     });
 });
 
@@ -189,59 +243,53 @@ describe('Transit manifold guide styling', () => {
         expect(renderer.hybridShellOpacity()).toBeLessThan(lowShell * 1.5);
     });
 
-    it('keeps tube edge mode on the lightweight hybrid stroke contract', () => {
+    it('keeps tube edge mode in one bounded GPU curve bucket', () => {
         const renderer = new ThreeGalaxyRenderer() as unknown as RendererProbe;
-        const data = {
-            edgeAlpha: new Float32Array([0.18, 1]),
-            edgeKinds: new Uint8Array([0, 1]),
-        };
+        const data = gpuEdgeScene('single', 2);
+        data.edgeAlpha.set([0.18, 1]);
+        data.edgeKinds.set([0, 1]);
 
         renderer.setSettings({ edgeMode: 'tube', edgeWidth: 1.1, edgeOpacity: 0.7, glow: 1.8 });
+        const surface = renderer.buildEdges(data);
 
         expect(renderer.edgeMaterialOpacity()).toBeLessThan(0.35);
-        expect(renderer.edgeStrokeCount(data, 0)).toBeLessThanOrEqual(2);
-        expect(renderer.edgeStrokeCount(data, 1)).toBe(renderer.edgeStrokeCount(data, 0));
-        expect(renderer.edgeStrokeOffset(data, 1)).toBe(renderer.edgeStrokeOffset(data, 0));
+        expect(surface?.bucketInstanceCounts()).toEqual([0, 2, 0]);
+        expect(surface?.edgeCurve(0)).toBe(GalaxyGpuEdgeCurve.Tube);
+        expect(surface?.edgeCurve(1)).toBe(GalaxyGpuEdgeCurve.Tube);
+        surface?.dispose();
     });
 
-    it('collapses dense manifold scenes to the hybrid stroke budget without changing tree routing helpers', () => {
+    it('keeps dense manifold routing on a fixed GPU template', () => {
         const renderer = new ThreeGalaxyRenderer() as unknown as RendererProbe;
-        const denseTree = {
-            layoutMode: 'siegelFinsler',
-            edgePairs: new Uint32Array(1300 * 2),
-            edgeAlpha: new Float32Array([0.18, 1]),
-            edgeKinds: new Uint8Array([0, 2]),
-        };
-        const smallTree = { ...denseTree, edgePairs: new Uint32Array(16) };
+        const denseTree = gpuEdgeScene('siegelFinsler', 1300);
 
         renderer.setSettings({ edgeMode: 'curved', edgeWidth: 1.1, glow: 1.8 });
+        const surface = renderer.buildEdges(denseTree);
+        const line = surface?.children[0] as THREE.LineSegments;
 
-        expect(renderer.edgeStrokeCount(denseTree, 1)).toBeLessThanOrEqual(2);
-        expect(renderer.edgeStrokeCount(smallTree, 1)).toBeGreaterThan(renderer.edgeStrokeCount(denseTree, 1));
-        expect(renderer.edgeStrokeOffset(denseTree, 1)).toBeLessThan(renderer.edgeStrokeOffset(smallTree, 1));
+        expect(surface?.bucketInstanceCounts()).toEqual([0, 1300, 0]);
+        expect(line.geometry.getAttribute('position').count).toBe(24);
+        expect(line.geometry.getAttribute('aEndpoints').count).toBe(1300);
+        surface?.dispose();
     });
 
     it('keeps tree-space shape helpers without overriding edge colors', () => {
         const renderer = new ThreeGalaxyRenderer() as unknown as RendererProbe;
-        const data = {
-            layoutMode: 'lorentzTree',
-            edgeAlpha: new Float32Array([0.22, 0.34]),
-            edgeKinds: new Uint8Array([0, 2]),
-            edgeColors: new Float32Array([
+        const data = gpuEdgeScene('lorentzTree', 2);
+        data.edgeAlpha.set([0.22, 0.34]);
+        data.edgeKinds.set([0, 2]);
+        data.edgeColors.set([
                 1, 0, 0,
                 1, 0, 0,
                 0.8, 0.15, 0.9,
                 0.8, 0.15, 0.9,
-            ]),
-        };
+        ]);
         renderer.sceneData = data;
+        const surface = renderer.buildEdges(data);
 
-        expect(renderer.edgeMaterialBlending(data)).toBe(THREE.NormalBlending);
         expect(renderer.edgeMaterialOpacity()).toBeLessThan(0.35);
-        expect(renderer.edgeStrokeCount(data, 0)).toBeGreaterThanOrEqual(3);
-        expect(renderer.edgeStrokeCount({ ...data, edgeAlpha: new Float32Array([0.06, 0.34]) }, 0)).toBe(3);
-        expect(renderer.edgeStrokeCount(data, 1)).toBeGreaterThan(renderer.edgeStrokeCount(data, 0));
-        expect(renderer.edgeStrokeOffset(data, 0)).toBeGreaterThan(0.008);
+        expect(surface?.bucketInstanceCounts()).toEqual([0, 2, 0]);
+        expect(surface?.edgeCurve(0)).toBe(GalaxyGpuEdgeCurve.TreeArc);
         expect(renderer.normalizedEdgeSignal(data, 1)).toBeGreaterThan(renderer.normalizedEdgeSignal(data, 0));
         expect(renderer.treeFilamentEdgeLift(data, 1, 0, 90, 0.58)).toBeGreaterThan(renderer.treeFilamentEdgeLift(data, 0, 0, 4, 0.58));
         expect(renderer.treeFilamentTerminalTaper(0.5)).toBeCloseTo(1);
@@ -250,10 +298,7 @@ describe('Transit manifold guide styling', () => {
         const color = renderer.edgeColor(data, 0, 0.5);
         expect(color.r).toBeGreaterThan(color.g);
         expect(color.r).toBeGreaterThan(color.b);
-
-        expect(renderer.edgeMaterialBlending({ layoutMode: 'transitManifold' })).toBe(THREE.NormalBlending);
-        expect(renderer.edgeMaterialBlending({ layoutMode: 'siegelFinsler' })).toBe(THREE.NormalBlending);
-        expect(renderer.edgeMaterialBlending({ layoutMode: 'single' })).toBe(THREE.NormalBlending);
+        surface?.dispose();
     });
 
     it('carries target-side Lorentz styling into tree-space tube edges', () => {
@@ -576,6 +621,33 @@ function emptyRendererScene(): GalaxySceneV2 {
         edgeColors: new Float32Array(),
         edgeAlpha: new Float32Array(),
         edgeKinds: new Uint8Array(),
+    };
+}
+
+function gpuEdgeScene(layoutMode: GalaxySceneV2['layoutMode'], edgeCount: number): GalaxySceneV2 {
+    const nodeCount = edgeCount + 1;
+    const pairs = new Uint32Array(edgeCount * 2);
+    for (let edge = 0; edge < edgeCount; edge++) {
+        pairs[edge * 2] = edge;
+        pairs[edge * 2 + 1] = edge + 1;
+    }
+    return {
+        ...emptyRendererScene(),
+        layoutMode,
+        ids: Array.from({ length: nodeCount }, (_, index) => `node:${index}`),
+        labels: Array.from({ length: nodeCount }, (_, index) => `Node ${index}`),
+        kinds: Array.from({ length: nodeCount }, () => 'concept'),
+        groupIds: Array.from({ length: nodeCount }, () => ''),
+        positions3d: new Float32Array(nodeCount * 3),
+        positions2d: new Float32Array(nodeCount * 3),
+        radii: new Float32Array(nodeCount).fill(0.08),
+        colors: new Float32Array(nodeCount * 3).fill(0.5),
+        edgePairs: pairs,
+        edgeIds: Array.from({ length: edgeCount }, (_, index) => `edge:${index}`),
+        edgeTypes: Array.from({ length: edgeCount }, () => 'related'),
+        edgeColors: new Float32Array(edgeCount * 6).fill(0.5),
+        edgeAlpha: new Float32Array(edgeCount).fill(0.18),
+        edgeKinds: new Uint8Array(edgeCount),
     };
 }
 

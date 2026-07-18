@@ -170,6 +170,36 @@ describe('Hopf resonance space contract', () => {
         expect(space.counters.maxFiberSampleCount).toBeGreaterThan(8);
     });
 
+    it('spawns bounded deterministic lanes for genuinely overloaded logical fibers', () => {
+        const targets = [
+            target('embed:note:lanes', 'note', 'lanes', 'Lane Note', 'shared resonance note'),
+            ...Array.from({ length: 256 }, (_, index) =>
+                target(`embed:anchor:lanes:${index}`, 'anchor', 'lanes', 'Shared cue', 'same cue same evidence same local signature', {
+                    chunkId: 'same-chunk',
+                    evidenceIds: [`anchor:${index}`],
+                }),
+            ),
+        ];
+        const first = buildHopfResonanceSpace(snapshot(targets, ['lanes']), { generatedAt: 18, cellResolution: 2 });
+        const second = buildHopfResonanceSpace(snapshot([...targets].reverse(), ['lanes']), { generatedAt: 18, cellResolution: 2 });
+        const overloaded = first.assignments.filter((row) => row.fiberKind === 'evidence_sample' && (row.laneCount || 1) > 1);
+        const laneIds = new Set(overloaded.map((row) => row.laneId));
+        const firstByTarget = new Map(overloaded.map((row) => [row.targetId, row]));
+
+        expect(overloaded).toHaveLength(256);
+        expect(laneIds.size).toBeGreaterThan(1);
+        expect(laneIds.size).toBeLessThanOrEqual(4);
+        expect(overloaded.every((row) => row.logicalFiberId && row.laneId && row.laneDirection)).toBe(true);
+        expect(first.counters.overflowFiberCount).toBeGreaterThan(0);
+        expect(first.counters.maxLaneSampleCount).toBeLessThan(first.counters.maxFiberSampleCount);
+        expect(second.assignments
+            .filter((row) => firstByTarget.has(row.targetId))
+            .every((row) => row.laneId === firstByTarget.get(row.targetId)?.laneId
+                && row.phase === firstByTarget.get(row.targetId)?.phase
+                && JSON.stringify(row.laneDirection) === JSON.stringify(firstByTarget.get(row.targetId)?.laneDirection)))
+            .toBe(true);
+    });
+
     it('keeps structural roots in the document chart neighborhood', () => {
         const roots = ['document-structure', 'identity', 'temporal', 'causal', 'evidence'];
         const targets = [

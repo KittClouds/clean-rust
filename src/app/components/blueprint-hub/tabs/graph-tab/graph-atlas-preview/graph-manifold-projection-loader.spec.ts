@@ -39,6 +39,18 @@ describe('manifold projection switching', () => {
         expect(loadNative).not.toHaveBeenCalled();
     });
 
+    it('retains the bounded five-manifold projection rail for an unchanged snapshot', async () => {
+        const snapshot = projectionSnapshot(96);
+        const loadNative = vi.fn<() => Promise<EmbeddingAtlasData>>();
+        const firstHybrid = await loadManifoldProjection(snapshot, 'hybrid', loadNative);
+
+        for (const mode of MODES.slice(1)) await loadManifoldProjection(snapshot, mode, loadNative);
+        const rebuiltHybrid = await loadManifoldProjection(snapshot, 'hybrid', loadNative);
+
+        expect(rebuiltHybrid.atlas).toBe(firstHybrid.atlas);
+        expect(loadNative).not.toHaveBeenCalled();
+    });
+
     it('keeps cold current-corpus and every subsequent manifold below one second', async () => {
         const snapshot = projectionSnapshot(6_000);
         const loadNative = vi.fn<() => Promise<EmbeddingAtlasData>>();

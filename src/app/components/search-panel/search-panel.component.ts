@@ -37,7 +37,6 @@ import { NliWorkerService } from '../../lib/services/nli-worker.service';
 import { AtlasCapabilityRuntimeService } from '../../services/atlas-capability-runtime.service';
 import { AtlasControlContractService } from '../../services/atlas-control-contract.service';
 import { GraphRebuildPipelineService } from '../../graph-rebuild/graph-rebuild-pipeline.service';
-import { GraphRebuildService } from '../../graph-rebuild/graph-rebuild.service';
 import {
   type GraphReviewAdjudicationViewContract,
 } from '../../graph-rebuild/graph-review-adjudication-certificate';
@@ -344,7 +343,6 @@ export class SearchPanelComponent implements OnInit {
   private readonly atlasRuntime = inject(AtlasCapabilityRuntimeService);
   private readonly atlasControl = inject(AtlasControlContractService);
   private readonly fullAtlasPipeline = inject(GraphRebuildPipelineService);
-  private readonly graphRebuild = inject(GraphRebuildService);
   private readonly calendar = inject(CalendarService);
   private readonly phoenix = inject(PhoenixBackendService);
 
@@ -823,7 +821,7 @@ export class SearchPanelComponent implements OnInit {
     this.error.set(null);
     try {
       await this.fullAtlasPipeline.loadGraphModels(this.fullAtlasRequest());
-      this.notice.set('Graph build models are warm: Dynamic NER and NLI. Jina is still idle until Embed Atlas.');
+      this.notice.set('Graph build ready: Dynamic NER is staged. NLI loads only for adjudication and releases immediately afterward. Jina stays idle until Embed Atlas.');
     } catch (err) {
       this.error.set(this.toErrorMessage(err));
     }
@@ -978,7 +976,7 @@ export class SearchPanelComponent implements OnInit {
 
   loadModelsButtonLabel(): string {
     if (this.fullAtlasBusy()) return 'Working';
-    return this.graphModelsReady() ? 'Graph Models Warm' : 'Stage Graph Models';
+    return this.graphModelsReady() ? 'Graph Build Ready' : 'Stage Graph Models';
   }
 
   embedAtlasButtonLabel(): string {
@@ -1704,7 +1702,6 @@ function buildStage8WorkbenchView(
     + (counters?.eventAspects ?? snapshot?.events.filter((event) => !!event.aspect).length ?? 0);
   const embeddingTargets = counters?.embeddingTargets ?? snapshot?.embeddingTargets.length ?? 0;
   const embeddingVectors = counters?.embeddingVectors ?? snapshot?.embeddingVectors.length ?? 0;
-  const receiptFailures = counters?.finalLinkReceiptFailures ?? snapshot?.finalLinkPatchLog?.counters.failedReceipts ?? 0;
   const routerStage = stage8RouterStage(receipt);
   const contract = buildGraphProjectionContractReport(snapshot, { receipt });
   const semanticReady = vectorStatus === 'ready'

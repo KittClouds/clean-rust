@@ -518,10 +518,6 @@ function pullPair(source: GalaxyNode, target: GalaxyNode, ideal: number, strengt
     target.z -= dz / distance * force;
 }
 
-function writeQuadratic(buffer: Float32Array, offset: number, a: Vec3, b: Vec3, c: Vec3, t: number): void {
-    writeVec(buffer, offset, quadraticPoint(a, b, c, t));
-}
-
 function quadraticPoint(a: Vec3, b: Vec3, c: Vec3, t: number): Vec3 {
     const left = (1 - t) * (1 - t);
     const mid = 2 * (1 - t) * t;

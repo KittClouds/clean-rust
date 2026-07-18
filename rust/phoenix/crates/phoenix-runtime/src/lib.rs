@@ -8,6 +8,8 @@ use std::path::{Path, PathBuf};
 use std::sync::OnceLock;
 use std::time::Instant;
 
+use hashbrown::HashSet as FastHashSet;
+
 mod binary;
 #[cfg(not(target_arch = "wasm32"))]
 mod dynamic_gliclass;
@@ -163,6 +165,7 @@ const RUNTIME_CAPABILITIES: &[&str] = &[
     "runtime:capabilities",
     "relation:list",
     "relation:getFirst",
+    "scopedDocuments:getMany",
     "relation:upsert",
     "relation:delete",
     "graph:overgraphStatus",
@@ -6169,6 +6172,37 @@ impl PhoenixRuntime {
                     .fetch_store_command_relation_rows(relation)?
                     .into_iter()
                     .filter(|row| row_matches_filter(row, filter))
+                    .collect::<Vec<_>>();
+                Ok(StoreCommandResult {
+                    success: true,
+                    payload: Some(Value::Array(rows)),
+                    error: None,
+                })
+            }
+            "scopedDocuments:getMany" => {
+                let scope_folder_id = require_payload_str(&request.payload, "scopeFolderId")?;
+                let namespace = require_payload_str(&request.payload, "namespace")?;
+                let document_keys = payload_string_array(request.payload.get("documentKeys"));
+                if document_keys.len() > 256 {
+                    return Err(StoreError::Query(
+                        "scopedDocuments:getMany accepts at most 256 document keys".to_owned(),
+                    ));
+                }
+                let document_keys = document_keys
+                    .iter()
+                    .map(String::as_str)
+                    .collect::<FastHashSet<_>>();
+                let rows = self
+                    .fetch_store_command_relation_rows("scoped_documents")?
+                    .into_iter()
+                    .filter(|row| {
+                        row.get("scope_folder_id").and_then(Value::as_str) == Some(scope_folder_id)
+                            && row.get("namespace").and_then(Value::as_str) == Some(namespace)
+                            && row
+                                .get("document_key")
+                                .and_then(Value::as_str)
+                                .is_some_and(|key| document_keys.contains(key))
+                    })
                     .collect::<Vec<_>>();
                 Ok(StoreCommandResult {
                     success: true,
@@ -14277,6 +14311,57 @@ mod tests {
                 capability
             );
         }
+    }
+
+    #[test]
+    fn scoped_document_batch_read_returns_only_requested_authority_pages() {
+        let runtime = native_test_runtime();
+        runtime.init().expect("init");
+        for (id, scope, key) in [
+            ("doc-a", "global", "snapshot-blob:atlasPacket:a"),
+            ("doc-b", "global", "snapshot-blob:embeddingTargets:b"),
+            ("doc-c", "note:other", "snapshot-blob:atlasPacket:c"),
+        ] {
+            runtime
+                .store_command(StoreCommandRequest {
+                    command: "relation:upsert".to_owned(),
+                    payload: json!({
+                        "relation": "scoped_documents",
+                        "row": {
+                            "id": id,
+                            "scope_folder_id": scope,
+                            "narrative_id": "",
+                            "namespace": "phoenix_graph_rebuild_v1",
+                            "document_key": key,
+                            "payload": "{}",
+                            "created_at": 1,
+                            "updated_at": 1
+                        }
+                    }),
+                })
+                .expect("upsert scoped document");
+        }
+
+        let result = runtime
+            .store_command(StoreCommandRequest {
+                command: "scopedDocuments:getMany".to_owned(),
+                payload: json!({
+                    "scopeFolderId": "global",
+                    "namespace": "phoenix_graph_rebuild_v1",
+                    "documentKeys": [
+                        "snapshot-blob:embeddingTargets:b",
+                        "snapshot-blob:missing:z"
+                    ]
+                }),
+            })
+            .expect("batch scoped documents");
+        let rows = result
+            .payload
+            .and_then(|payload| payload.as_array().cloned())
+            .expect("rows");
+
+        assert_eq!(rows.len(), 1);
+        assert_eq!(rows[0].get("id").and_then(Value::as_str), Some("doc-b"));
     }
 
     #[test]

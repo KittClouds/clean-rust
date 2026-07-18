@@ -215,7 +215,6 @@ function pairWindow(lower: string, chunk: GraphRebuildChunk, left: EntityInChunk
 }
 
 function inferRelationType(window: PairWindow, chunk?: GraphRebuildChunk): string | null {
-    const text = window.text;
     const between = window.between;
     if ((chunk?.meaningFrame?.role === 'authority_chain' || chunk?.meaningFrame?.authorityCues.length) && hasAny(between, AUTHORITY_RELATION_CUES)) return 'command_or_service_tie';
     if ((chunk?.meaningFrame?.role === 'evidence_block' || chunk?.meaningFrame?.evidenceCues.length) && hasAny(between, EVIDENCE_RELATION_CUES)) return 'documented_in';

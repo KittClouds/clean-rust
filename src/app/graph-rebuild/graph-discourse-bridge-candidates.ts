@@ -3,7 +3,6 @@ import type {
     GraphDiscourseBridgeCandidateCounters,
     GraphDiscourseBridgeCandidateKind,
     GraphDiscourseBridgeCandidateReceipt,
-    GraphDiscourseBridgeCandidateStatus,
     GraphDiscourseBridgeEvalKind,
     GraphDiscourseBridgeEvalRow,
     GraphDiscourseBridgeRerankInput,

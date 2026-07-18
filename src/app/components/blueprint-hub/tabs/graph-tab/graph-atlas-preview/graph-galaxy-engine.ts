@@ -905,7 +905,7 @@ function applyEmbeddingTopologyLens(
 ): void {
     const mode = settings.embeddingTopologyMode;
     if (mode === 'off') return;
-    const incident = topologyIncidentIndexes(nodes, links, mode);
+    const incident = topologyIncidentIndexes(links, mode);
     for (const [index, node] of nodes.entries()) {
         const meta = node.entity.metadata || {};
         const isMedoid = meta['embeddingMedoidTargetId'] === node.entity.id;
@@ -949,7 +949,6 @@ function applyEmbeddingTopologyLens(
 }
 
 function topologyIncidentIndexes(
-    nodes: GalaxyNode[],
     links: GalaxyEdge[],
     mode: GalaxyEmbeddingTopologyMode,
 ): Set<number> {
@@ -1247,6 +1246,7 @@ const HOPF_PROJECTION_RADIUS = 0.88;
 const HOPF_MAX_RADIUS = 2.05;
 const TAU = Math.PI * 2;
 const HOPF_RIBBON_SEGMENTS = 96;
+const HOPF_DATA_FIBER_GUIDE_LIMIT = 128;
 const HOPF_CROSS_FIBER_BRAID_LIMIT = 96;
 const HOPF_CROSS_FIBER_BRAID_SEGMENTS = 48;
 interface HopfBaseInfo extends Rgb {
@@ -1693,18 +1693,23 @@ function hybridNodeScale(node: GalaxyNode, radius: number): number {
 }
 
 function applyHopfProjectionLayout(nodes: GalaxyNode[], links: GalaxyEdge[]): GalaxyHopfRibbon[] {
-    const baseInfos = new Map<string, HopfBaseInfo>();
+    const fiberInfos = new Map<string, HopfBaseInfo>();
+    const cellInfos = new Map<string, HopfBaseInfo>();
     for (const node of nodes) {
-        const baseKey = hopfBaseKey(node);
-        if (!baseKey) continue;
-        registerHopfBase(baseInfos, baseKey, node, isHopfAnchor(node));
+        const fiberKey = hopfFiberKey(node);
+        const cellKey = hopfCellKey(node);
+        if (fiberKey) registerHopfBase(fiberInfos, fiberKey, node, isHopfAnchor(node), true);
+        if (cellKey) registerHopfBase(cellInfos, cellKey, node, isHopfAnchor(node), false);
     }
-    normalizeHopfBaseDirections(baseInfos);
+    normalizeHopfBaseDirections(fiberInfos);
+    normalizeHopfBaseDirections(cellInfos);
     for (const node of nodes) {
-        const baseKey = hopfBaseKey(node);
-        const baseInfo = baseKey ? baseInfos.get(baseKey) : undefined;
-        const direction = baseInfo?.direction ?? normalizedDirection(node);
-        const phase = hopfPhase(node, baseKey);
+        const fiberKey = hopfFiberKey(node);
+        const cellKey = hopfCellKey(node);
+        const fiberInfo = fiberKey ? fiberInfos.get(fiberKey) : undefined;
+        const cellInfo = cellKey ? cellInfos.get(cellKey) : undefined;
+        const direction = fiberInfo?.direction ?? normalizedDirection(node);
+        const phase = hopfPhase(node, fiberKey);
         const point = hopfStereographicProjection(direction, phase, hopfPositionScale(node));
         node.x = point.x;
         node.y = point.y;
@@ -1714,12 +1719,9 @@ function applyHopfProjectionLayout(nodes: GalaxyNode[], links: GalaxyEdge[]): Ga
         node.baseZ = node.z;
         node.depth = Math.min(1, Math.hypot(node.x, node.y, node.z) / HOPF_MAX_RADIUS);
         node.radius *= hopfNodeScale(node);
-        if (baseInfo && (isHopfAnchor(node) || isHopfFiber(node))) {
-            const normalizedPhase = normalizePhaseRadians(phase);
-            baseInfo.phases.push(normalizedPhase);
-            baseInfo.nodeIds.push(node.entity.id);
-            baseInfo.fiberKinds.add(hopfFiberKind(node));
-            baseInfo.importance += Math.max(1, Number(node.entity.totalMentions || 1));
+        if (isHopfAnchor(node) || isHopfFiber(node)) {
+            recordHopfBaseNode(fiberInfo, node, phase);
+            if (cellInfo !== fiberInfo) recordHopfBaseNode(cellInfo, node, phase);
         }
     }
 
@@ -1733,8 +1735,8 @@ function applyHopfProjectionLayout(nodes: GalaxyNode[], links: GalaxyEdge[]): Ga
         }
         const sourceNode = nodes[link.source];
         const targetNode = nodes[link.target];
-        const sourceBase = sourceNode ? hopfBaseKey(sourceNode) : null;
-        const targetBase = targetNode ? hopfBaseKey(targetNode) : null;
+        const sourceBase = sourceNode ? hopfCellKey(sourceNode) : null;
+        const targetBase = targetNode ? hopfCellKey(targetNode) : null;
         if (sourceBase && targetBase && sourceBase !== targetBase) {
             link.alpha = Math.min(0.07, link.alpha * 0.32 + 0.012);
             link.curve *= 2.35;
@@ -1750,16 +1752,24 @@ function applyHopfProjectionLayout(nodes: GalaxyNode[], links: GalaxyEdge[]): Ga
     }
 
     return [
-        ...buildHopfReceiptRibbons(hopfReceiptBases(baseInfos)),
-        ...buildHopfRibbons(baseInfos),
+        ...buildHopfReceiptRibbons(hopfReceiptBases(cellInfos)),
+        ...buildHopfRibbons(fiberInfos),
         ...crossFiberBraids,
     ];
 }
 
-function registerHopfBase(baseInfos: Map<string, HopfBaseInfo>, baseKey: string, node: GalaxyNode, anchor: boolean): void {
+function registerHopfBase(
+    baseInfos: Map<string, HopfBaseInfo>,
+    baseKey: string,
+    node: GalaxyNode,
+    anchor: boolean,
+    useLaneDirection: boolean,
+): void {
     const existing = baseInfos.get(baseKey);
     const metadata = hopfMetadata(node);
-    const direction = hopfDirectionFromMetadata(metadata?.['direction']) || normalizedDirection(node);
+    const direction = hopfDirectionFromMetadata(metadata?.[useLaneDirection ? 'laneDirection' : 'direction'])
+        || hopfDirectionFromMetadata(metadata?.['direction'])
+        || normalizedDirection(node);
     const weight = anchor ? 1.35 : 1;
     if (existing) {
         existing.direction.x += direction.x * weight;
@@ -1796,6 +1806,14 @@ function registerHopfBase(baseInfos: Map<string, HopfBaseInfo>, baseKey: string,
     recordHopfReceiptMetadata(baseInfos.get(baseKey)!, node, metadata);
 }
 
+function recordHopfBaseNode(info: HopfBaseInfo | undefined, node: GalaxyNode, phase: number): void {
+    if (!info) return;
+    info.phases.push(normalizePhaseRadians(phase));
+    info.nodeIds.push(node.entity.id);
+    info.fiberKinds.add(hopfFiberKind(node));
+    info.importance += Math.max(1, Number(node.entity.totalMentions || 1));
+}
+
 function normalizeHopfBaseDirections(baseInfos: Map<string, HopfBaseInfo>): void {
     for (const info of baseInfos.values()) {
         const averaged = {
@@ -1825,7 +1843,8 @@ function buildHopfRibbons(baseInfos: Map<string, HopfBaseInfo>): GalaxyHopfRibbo
 function selectHopfDataFibers(baseInfos: Map<string, HopfBaseInfo>): HopfBaseInfo[] {
     return [...baseInfos.values()]
         .filter((info) => info.nodeIds.length > 0)
-        .sort((left, right) => right.importance - left.importance || left.key.localeCompare(right.key));
+        .sort((left, right) => right.importance - left.importance || left.key.localeCompare(right.key))
+        .slice(0, HOPF_DATA_FIBER_GUIDE_LIMIT);
 }
 
 function buildHopfCrossFiberBraid(source: GalaxyNode, target: GalaxyNode, link: GalaxyEdge): GalaxyHopfRibbon {
@@ -2049,17 +2068,6 @@ function roundPhase(value: number): number {
     return Math.round(normalizePhaseRadians(value) * 1000000) / 1000000;
 }
 
-function fibonacciUnitDirection(index: number, total: number): { x: number; y: number; z: number } {
-    const y = 1 - ((index + 0.5) / total) * 2;
-    const radial = Math.sqrt(Math.max(0, 1 - y * y));
-    const angle = index * 2.399963229728653;
-    return {
-        x: Math.cos(angle) * radial,
-        y,
-        z: Math.sin(angle) * radial,
-    };
-}
-
 function hopfNodeScale(node: GalaxyNode): number {
     const sourceType = String(node.entity.metadata?.sourceType || '').toLowerCase();
     if (sourceType === 'query') return 1.14;
@@ -2069,7 +2077,20 @@ function hopfNodeScale(node: GalaxyNode): number {
     return 0.78;
 }
 
-function hopfBaseKey(node: GalaxyNode): string | null {
+function hopfFiberKey(node: GalaxyNode): string | null {
+    const metadata = hopfMetadata(node);
+    const laneId = stringValue(metadata?.['laneId']);
+    if (laneId) return laneId;
+    const logicalFiberId = stringValue(metadata?.['logicalFiberId']);
+    if (logicalFiberId) return logicalFiberId;
+    const splitKey = stringValue(metadata?.['splitKey']);
+    if (splitKey) return splitKey;
+    const strandKey = stringValue(metadata?.['strandKey']);
+    if (strandKey) return strandKey;
+    return hopfCellKey(node);
+}
+
+function hopfCellKey(node: GalaxyNode): string | null {
     const metadata = hopfMetadata(node);
     const baseId = String(metadata?.['baseId'] || '');
     if (baseId) return baseId;

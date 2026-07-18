@@ -15,7 +15,9 @@ vi.mock('./graph-galaxy-textures', async () => {
 import { entityColorStore, hexColorToHsl } from '../../../../../lib/store/entityColorStore';
 import { buildGalaxyScene, hslToRgb, mergeGalaxySettings } from './graph-galaxy-engine';
 import { buildGalaxyFocusMask } from './graph-galaxy-focus';
-import { galaxySceneToV2, type GalaxyLorentzGuideView, type GalaxySceneV2 } from './graph-galaxy-scene-v2';
+import { boundedLocalGalaxyPath } from './graph-galaxy-interaction-query';
+import { attachGalaxySceneRuntimeIndex, galaxySceneToV2, type GalaxyLorentzGuideView, type GalaxySceneV2 } from './graph-galaxy-scene-v2';
+import { galaxyEdgeVisualAlpha, GalaxyGpuEdgeSurface } from './three-galaxy-edge-surface';
 import { ThreeGalaxyRenderer } from './three-galaxy-renderer';
 
 type RendererColorHarness = {
@@ -52,13 +54,14 @@ type RendererColorHarness = {
 type EdgeGeometryHarness = {
     settings: ReturnType<typeof mergeGalaxySettings>;
     mode: '3d';
-    edges: THREE.LineSegments | null;
+    edges: GalaxyGpuEdgeSurface | null;
     edgeSurfacePoint: THREE.Vector3;
     edgeCurvePoint: { x: number; y: number; z: number };
     color: THREE.Color;
-    buildEdges(scene: GalaxySceneV2): THREE.LineSegments | null;
+    edgeSourceColor: THREE.Color;
+    edgeTargetColor: THREE.Color;
+    buildEdges(scene: GalaxySceneV2): GalaxyGpuEdgeSurface | null;
     updateEdgeGeometry(data: GalaxySceneV2, positions: Float32Array, focus: ReturnType<typeof buildGalaxyFocusMask>): void;
-    updateEdgeColors(data: GalaxySceneV2, positions: Float32Array, focus: ReturnType<typeof buildGalaxyFocusMask>): void;
 };
 
 type GuideRetentionHarness = {
@@ -69,13 +72,6 @@ type GuideRetentionHarness = {
         positions: Float32Array,
         indexById: Map<string, number>,
     ): boolean;
-};
-
-type PickIndexHarness = {
-    pickIndexDirty: boolean;
-    pickNodeBins: number[][];
-    ensureScreenPickIndex(pointer: { x: number; y: number; width: number; height: number }): void;
-    pickCandidates(bins: number[][], x: number, y: number): readonly number[];
 };
 
 type MapPanHarness = {
@@ -223,18 +219,33 @@ describe('ThreeGalaxyRenderer Style Lab node colors', () => {
 });
 
 describe('ThreeGalaxyRenderer curved edge geometry', () => {
-    it('samples normal curved edges densely enough to avoid faceted kinks', () => {
-        const scene = rendererEdgeScene();
+    it('instances curved edges over one shared GPU segment template', () => {
+        const scene = attachGalaxySceneRuntimeIndex(rendererEdgeScene());
         const renderer = edgeGeometryHarness();
 
         renderer.edges = renderer.buildEdges(scene);
         renderer.updateEdgeGeometry(scene, scene.positions3d, buildGalaxyFocusMask(scene, null, null));
 
-        expect(renderer.edges?.geometry.drawRange.count).toBe(32);
-        expect(renderer.edges?.geometry.getAttribute('position').array.length).toBe(32 * 3);
-        expect(renderer.edges?.geometry.getAttribute('color').array.length).toBe(32 * 3);
-        renderer.edges?.geometry.dispose();
-        (renderer.edges?.material as THREE.Material | undefined)?.dispose();
+        expect(renderer.edges?.bucketInstanceCounts()).toEqual([0, 1, 0]);
+        const line = renderer.edges?.children[0] as THREE.LineSegments;
+        expect(line.geometry.getAttribute('position').count).toBe(24);
+        expect(line.geometry.getAttribute('aEndpoints').count).toBe(1);
+        expect(line.geometry.getAttribute('aSourceColor').array).toBeInstanceOf(Uint8Array);
+        renderer.edges?.dispose();
+    });
+
+    it('carries authoritative edge strength into the packed GPU appearance', () => {
+        const scene = attachGalaxySceneRuntimeIndex(rendererEdgeScene());
+        scene.edgeAlpha[0] = 0.18;
+        const renderer = edgeGeometryHarness();
+
+        renderer.edges = renderer.buildEdges(scene);
+        renderer.updateEdgeGeometry(scene, scene.positions3d, buildGalaxyFocusMask(scene, null, null));
+
+        const line = renderer.edges?.children[0] as THREE.LineSegments;
+        const colors = line.geometry.getAttribute('aSourceColor').array as Uint8Array;
+        expect(colors[3]).toBeCloseTo(Math.round(galaxyEdgeVisualAlpha(0.18) * 255), 0);
+        renderer.edges?.dispose();
     });
 
     it('allocates nothing for hidden edges', () => {
@@ -244,19 +255,43 @@ describe('ThreeGalaxyRenderer curved edge geometry', () => {
         expect(renderer.buildEdges(rendererEdgeScene())).toBeNull();
     });
 
-    it('updates focus colors without uploading edge positions', () => {
-        const scene = rendererEdgeScene();
-        const renderer = edgeGeometryHarness();
-        renderer.edges = renderer.buildEdges(scene);
-        renderer.updateEdgeGeometry(scene, scene.positions3d, buildGalaxyFocusMask(scene, null, null));
-        const position = renderer.edges?.geometry.getAttribute('position') as THREE.BufferAttribute;
-        const version = position.version;
+    it('represents selection as a small overlay without dirtying the base edge buffer', () => {
+        const renderer = new ThreeGalaxyRenderer();
+        const scene = attachGalaxySceneRuntimeIndex(rendererEdgeScene());
+        renderer.installScene(scene, mergeGalaxySettings({ edgeMode: 'curved' }), '3d');
+        const harness = renderer as unknown as {
+            edges: GalaxyGpuEdgeSurface | null;
+            selectionOverlay: THREE.Points | null;
+        };
+        const line = harness.edges?.children[0] as THREE.LineSegments;
+        const sourceColor = line.geometry.getAttribute('aSourceColor') as THREE.InstancedBufferAttribute;
+        const sourceColorVersion = sourceColor.version;
 
-        renderer.updateEdgeColors(scene, scene.positions3d, buildGalaxyFocusMask(scene, 'a', null));
+        renderer.selectNodes(['a']);
 
-        expect(position.version).toBe(version);
-        renderer.edges?.geometry.dispose();
-        (renderer.edges?.material as THREE.Material | undefined)?.dispose();
+        expect(sourceColor.version).toBe(sourceColorVersion);
+        expect(harness.selectionOverlay?.geometry.getAttribute('position').count).toBe(1);
+        renderer.dispose();
+    });
+
+    it('applies hover focus to node instances and preserves the native node shape', () => {
+        const renderer = new ThreeGalaxyRenderer() as unknown as {
+            installScene(scene: GalaxySceneV2, settings: ReturnType<typeof mergeGalaxySettings>, mode: '3d'): void;
+            hoverNode(id: string | null): void;
+            updateInstances: ReturnType<typeof vi.fn>;
+            selectionOverlay: THREE.Points | null;
+            dispose(): void;
+        };
+        const scene = attachGalaxySceneRuntimeIndex(rendererHoverScene());
+        renderer.installScene(scene, mergeGalaxySettings({ edgeMode: 'curved', nodeShape: 'atom' }), '3d');
+        renderer.updateInstances = vi.fn();
+
+        renderer.hoverNode('a');
+
+        const focus = renderer.updateInstances.mock.calls[0]?.[2] as ReturnType<typeof buildGalaxyFocusMask>;
+        expect(Array.from(focus.nodeLevels)).toEqual([3, 2, 0]);
+        expect(renderer.selectionOverlay).toBeNull();
+        renderer.dispose();
     });
 });
 
@@ -288,23 +323,20 @@ describe('ThreeGalaxyRenderer guide geometry retention', () => {
 });
 
 describe('ThreeGalaxyRenderer large-scene picking performance contract', () => {
-    it('retains the screen index and narrows a 10k-node pointer query to local bins', () => {
+    it('fails closed instead of projecting every node for a large CPU lasso fallback', () => {
         const renderer = new ThreeGalaxyRenderer();
         const scene = largePickScene(10_000);
         renderer.installScene(scene, mergeGalaxySettings({ edgeMode: 'hidden' }), '3d');
         renderer.resetCamera();
-        const harness = renderer as unknown as PickIndexHarness;
-        const pointer = { x: 400, y: 300, width: 800, height: 600 };
 
-        harness.ensureScreenPickIndex(pointer);
-        const bins = harness.pickNodeBins;
-        const centerCandidates = harness.pickCandidates(bins, pointer.x, pointer.y).length;
-        harness.ensureScreenPickIndex(pointer);
-
-        expect(harness.pickIndexDirty).toBe(false);
-        expect(harness.pickNodeBins).toBe(bins);
-        expect(centerCandidates).toBeGreaterThan(0);
-        expect(centerCandidates).toBeLessThan(1_000);
+        expect(renderer.nodesInRect({
+            left: 0,
+            top: 0,
+            right: 800,
+            bottom: 600,
+            width: 800,
+            height: 600,
+        })).toEqual([]);
         renderer.dispose();
     });
 });
@@ -312,8 +344,9 @@ describe('ThreeGalaxyRenderer large-scene picking performance contract', () => {
 describe('ThreeGalaxyRenderer shortest-path overlay', () => {
     it('allocates only the selected walk when ordinary edges are hidden', () => {
         const renderer = new ThreeGalaxyRenderer();
-        const scene = rendererEdgeScene();
+        const scene = attachGalaxySceneRuntimeIndex(rendererEdgeScene());
         renderer.installScene(scene, mergeGalaxySettings({ edgeMode: 'hidden' }), '3d', ['a', 'b']);
+        renderer.setPathOverlay(boundedLocalGalaxyPath(scene, interactionAuthority(), 1, 'a', 'b'));
         const harness = renderer as unknown as {
             edges: THREE.LineSegments | null;
             pathEdges: THREE.LineSegments | null;
@@ -340,11 +373,12 @@ describe('ThreeGalaxyRenderer shortest-path overlay', () => {
 
     it('follows a Caps shell geodesic instead of cutting a straight chord through it', () => {
         const renderer = new ThreeGalaxyRenderer();
-        const scene = rendererEdgeScene();
+        const scene = attachGalaxySceneRuntimeIndex(rendererEdgeScene());
         scene.layoutMode = 'lorentzTree';
         scene.positions3d = new Float32Array([1, 0, 0, 0, 1, 0]);
         scene.positions2d = scene.positions3d.slice();
         renderer.installScene(scene, mergeGalaxySettings({ edgeMode: 'hidden' }), '3d', ['a', 'b']);
+        renderer.setPathOverlay(boundedLocalGalaxyPath(scene, interactionAuthority(), 2, 'a', 'b'));
         const harness = renderer as unknown as { pathEdges: THREE.LineSegments | null };
         const positions = harness.pathEdges?.geometry.getAttribute('position').array as Float32Array;
         let minimumRadius = Number.POSITIVE_INFINITY;
@@ -365,7 +399,17 @@ function edgeGeometryHarness(): EdgeGeometryHarness {
     renderer.edgeSurfacePoint = new THREE.Vector3();
     renderer.edgeCurvePoint = { x: 0, y: 0, z: 0 };
     renderer.color = new THREE.Color();
+    renderer.edgeSourceColor = new THREE.Color();
+    renderer.edgeTargetColor = new THREE.Color();
     return renderer;
+}
+
+function interactionAuthority() {
+    return {
+        generationId: 'generation-a',
+        manifoldId: 'single',
+        authorityReceipt: 'receipt-a',
+    };
 }
 
 function rendererEdgeScene(): GalaxySceneV2 {
@@ -389,6 +433,20 @@ function rendererEdgeScene(): GalaxySceneV2 {
         edgeColors: new Float32Array([1, 0.2, 0.1, 0.1, 0.8, 1]),
         edgeAlpha: new Float32Array([1]),
         edgeKinds: new Uint8Array([0]),
+    };
+}
+
+function rendererHoverScene(): GalaxySceneV2 {
+    return {
+        ...rendererEdgeScene(),
+        ids: ['a', 'b', 'c'],
+        labels: ['A', 'B', 'C'],
+        kinds: ['concept', 'concept', 'concept'],
+        groupIds: ['', '', ''],
+        positions3d: new Float32Array([0, 0, 0, 2, 0, 0, 4, 0, 0]),
+        positions2d: new Float32Array([0, 0, 0, 2, 0, 0, 4, 0, 0]),
+        radii: new Float32Array([0.08, 0.08, 0.08]),
+        colors: new Float32Array([1, 0.2, 0.1, 0.1, 0.8, 1, 0.4, 1, 0.2]),
     };
 }
 

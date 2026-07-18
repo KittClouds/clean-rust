@@ -423,6 +423,14 @@ fn build_edges(anchors: &[GraphAnchor], drops: &mut GraphDropReasons) -> Vec<Gra
         }
     }
     let mut out = edges.into_values().collect::<Vec<_>>();
+    for edge in &mut out {
+        edge.evidence_anchor_ids.sort_unstable();
+        edge.evidence_anchor_ids.dedup();
+        edge.scope_keys.sort_unstable();
+        edge.scope_keys.dedup();
+        edge.note_ids.sort_unstable();
+        edge.note_ids.dedup();
+    }
     out.sort_by(|left, right| {
         right
             .weight

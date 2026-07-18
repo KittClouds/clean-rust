@@ -523,12 +523,6 @@ export class GraphGalaxyParticles {
         return (0.11 + spanLift + signal * 0.14) * curveScale * kindBoost * signalBoost;
     }
 
-    private treeFilamentTerminalTaper(t: number): number {
-        const start = THREE.MathUtils.smoothstep(t, 0.02, 0.16);
-        const end = 1 - THREE.MathUtils.smoothstep(t, 0.58, 0.96);
-        return THREE.MathUtils.clamp(start * end, 0, 1);
-    }
-
     private staticGuidePoint(guide: GalaxyLorentzGuideView, t: number): { x: number; y: number; z: number } {
         const segments = Math.max(1, Math.floor(guide.positions3d.length / 6));
         const raw = THREE.MathUtils.clamp(t, 0, 0.999999) * segments;

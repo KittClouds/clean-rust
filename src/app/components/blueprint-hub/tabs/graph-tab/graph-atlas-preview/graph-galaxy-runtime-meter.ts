@@ -5,6 +5,8 @@ export interface GraphGalaxyCanvasMeter {
     rafActive: boolean;
     surfaceActive: boolean;
     webglContext: boolean;
+    layoutMode: string | null;
+    authorityReceipt: string;
     nodes: number;
     links: number;
     lastDrawAgeMs: number | null;
@@ -61,6 +63,8 @@ interface CanvasRecord {
     rafActive: boolean;
     surfaceActive: boolean;
     webglContext: boolean;
+    layoutMode: string | null;
+    authorityReceipt: string;
     nodes: number;
     links: number;
     lastDrawAt: number;
@@ -95,6 +99,8 @@ class GraphGalaxyRuntimeMeter {
             rafActive: false,
             surfaceActive: false,
             webglContext: false,
+            layoutMode: null,
+            authorityReceipt: '',
             nodes: 0,
             links: 0,
             lastDrawAt: 0,
@@ -119,9 +125,11 @@ class GraphGalaxyRuntimeMeter {
         this.compilerSource = source;
     }
 
-    recordScene(id: number, nodes: number, links: number): void {
+    recordScene(id: number, nodes: number, links: number, layoutMode: string, authorityReceipt: string): void {
         const record = this.canvases.get(id);
         if (!this.enabled || !record) return;
+        record.layoutMode = layoutMode;
+        record.authorityReceipt = authorityReceipt;
         record.nodes = nodes;
         record.links = links;
     }
@@ -194,6 +202,8 @@ class GraphGalaxyRuntimeMeter {
                 rafActive: record.rafActive,
                 surfaceActive: record.surfaceActive,
                 webglContext: record.webglContext,
+                layoutMode: record.layoutMode,
+                authorityReceipt: record.authorityReceipt,
                 nodes: record.nodes,
                 links: record.links,
                 lastDrawAgeMs: record.lastDrawAt ? Math.round(now - record.lastDrawAt) : null,

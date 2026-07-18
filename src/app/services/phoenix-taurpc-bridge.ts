@@ -48,6 +48,10 @@ export function registerPhoenixTaurpcBackendIfAvailable(): boolean {
 
 function storeCommandAuditName(command: string, payload: Record<string, unknown> = {}): string {
     const base = `phoenix.store_command:${command}`;
+    if (command === 'scopedDocuments:getMany') {
+        const count = Array.isArray(payload['documentKeys']) ? payload['documentKeys'].length : 0;
+        return `${base}:${count}`;
+    }
     if (command === 'relation:getFirst' || command === 'relation:list') {
         const relation = auditToken(payload['relation']);
         if (!relation) return base;

@@ -3,7 +3,6 @@ import type {
     GraphRebuildEntityLinkSuggestion,
     GraphRebuildFinalLinkPatch,
     GraphRebuildLinkSuggestion,
-    GraphRebuildRelationship,
     GraphRebuildResolutionSuggestion,
     GraphRebuildShadowLink,
     GraphRebuildSnapshot,

@@ -3,7 +3,12 @@ import { describe, expect, it } from 'vitest';
 import type { PhoenixBackendService } from '../../../../../services/phoenix-backend.service';
 import { mergeGalaxySettings, type GalaxyRenderableNode } from './graph-galaxy-engine';
 import { compileGalaxyScene } from './graph-galaxy-scene-compiler';
-import { compactGalaxySceneForTransfer, hydrateGalaxySceneFromTransfer } from './graph-galaxy-worker-scene';
+import {
+    galaxyScenePacketV2TransferList,
+    packGalaxyScenePacketV2,
+    unpackGalaxyScenePacketV2,
+} from './graph-galaxy-scene-packet-v2';
+import { galaxySceneToV2 } from './graph-galaxy-scene-v2';
 
 describe('graph galaxy compiled scene cache', () => {
     it('reuses the exact compiled layout for the same render identity', async () => {
@@ -49,11 +54,11 @@ describe('graph galaxy compiled scene cache', () => {
         expect(second).toBe(first);
     });
 
-    it('retains all five manifold scenes alongside one transient scene', async () => {
+    it('retains the bounded five-manifold packed scene rail', async () => {
         const backend = { target: 'web' } as PhoenixBackendService;
         const entities: GalaxyRenderableNode[] = [{ id: 'resident', label: 'Resident', kind: 'concept' }];
         const settings = mergeGalaxySettings({ layoutMode: 'single' });
-        const identities = ['hybrid', 'hopf', 'lorentz', 'product', 'siegel', 'query'];
+        const identities = ['hybrid', 'hopf', 'lorentz', 'product', 'siegel'];
 
         const first = await compileGalaxyScene(backend, entities, [], settings, `resident:${identities[0]}`);
         for (const identity of identities.slice(1)) {
@@ -64,7 +69,20 @@ describe('graph galaxy compiled scene cache', () => {
         expect(returned).toBe(first);
     });
 
-    it('returns only compact geometry across the worker boundary at the 5,119-node target scale', () => {
+    it('evicts the oldest packed scene beyond the bounded rail', async () => {
+        const backend = { target: 'web' } as PhoenixBackendService;
+        const entities: GalaxyRenderableNode[] = [{ id: 'bounded', label: 'Bounded', kind: 'concept' }];
+        const settings = mergeGalaxySettings({ layoutMode: 'single' });
+        const first = await compileGalaxyScene(backend, entities, [], settings, 'bounded:0');
+
+        for (let index = 1; index <= 6; index++) {
+            await compileGalaxyScene(backend, entities, [], settings, `bounded:${index}`);
+        }
+
+        expect(await compileGalaxyScene(backend, entities, [], settings, 'bounded:0')).not.toBe(first);
+    });
+
+    it('returns a small manifest and transferable pages at the 5,119-node target scale', () => {
         const entities = Array.from({ length: 5_119 }, (_, index): GalaxyRenderableNode => ({
             id: `node:${index}`,
             label: `Node ${index}`,
@@ -94,14 +112,18 @@ describe('graph galaxy compiled scene cache', () => {
             groups: [],
         };
 
-        const compact = compactGalaxySceneForTransfer(scene);
-        const hydrated = hydrateGalaxySceneFromTransfer(compact, entities);
+        const source = galaxySceneToV2(scene);
+        const packet = packGalaxyScenePacketV2(source, {
+            generationId: 'snapshot:5119',
+            authorityReceipt: 'receipt:5119',
+        });
+        const hydrated = unpackGalaxyScenePacketV2(packet);
 
-        expect(compact.nodes).toHaveLength(5_119);
-        expect('entity' in compact.nodes[0]).toBe(false);
-        expect(hydrated.nodes[4_000].entity).toBe(entities[4_000]);
-        expect(hydrated.nodes[4_000].x).toBe(scene.nodes[4_000].x);
-        expect(JSON.stringify(compact).length).toBeLessThan(JSON.stringify(scene).length * 0.35);
+        expect(packet.manifest.nodeCount).toBe(5_119);
+        expect(hydrated.ids[4_000]).toBe(entities[4_000].id);
+        expect(hydrated.positions3d[4_000 * 3]).toBe(source.positions3d[4_000 * 3]);
+        expect(galaxyScenePacketV2TransferList(packet)).toHaveLength(packet.manifest.pages.length);
+        expect(JSON.stringify(packet.manifest).length).toBeLessThan(JSON.stringify(scene).length * 0.05);
     });
 
     it('compiles the 5,119-node and 987-edge Siegel workload within the one-second CPU budget', async () => {
@@ -137,8 +159,8 @@ describe('graph galaxy compiled scene cache', () => {
         );
         const elapsedMs = performance.now() - started;
 
-        expect(scene.nodes).toHaveLength(5_119);
-        expect(scene.links.length).toBeGreaterThan(900);
+        expect(scene.ids).toHaveLength(5_119);
+        expect(scene.edgePairs.length / 2).toBeGreaterThan(900);
         expect(elapsedMs).toBeLessThan(1_000);
     });
 });

@@ -13,7 +13,6 @@ import {
     dominantLane,
     enforceHierarchyShellContract,
     fallbackLane,
-    finite,
     firstNumber,
     firstText,
     laneDirection,

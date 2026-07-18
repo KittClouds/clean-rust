@@ -1,7 +1,6 @@
 import type {
     DocumentUnit,
     EvidenceSpan,
-    GraphDocumentSidecarSummary,
     GraphFactCandidate,
     RetrievalUnit,
 } from './graph-document-sidecar';

@@ -16,3 +16,5 @@ serde.workspace = true
 serde_json.workspace = true
 smallvec.workspace = true
 zerocopy.workspace = true
+memmap2.workspace = true
+xxhash-rust.workspace = true

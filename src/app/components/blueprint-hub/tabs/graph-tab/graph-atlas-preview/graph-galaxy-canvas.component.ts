@@ -1,15 +1,19 @@
-import { AfterViewInit, Component, ElementRef, EventEmitter, inject, Input, OnChanges, OnDestroy, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, EventEmitter, inject, Input, OnChanges, OnDestroy, Output, SimpleChanges, ViewChild } from '@angular/core';
 
 import { PhoenixBackendService } from '../../../../../services/phoenix-backend.service';
 import { entityColorStore } from '../../../../../lib/store/entityColorStore';
 import { compileGalaxyScene } from './graph-galaxy-scene-compiler';
 import { graphGalaxyRuntimeMeter, type GraphGalaxyCanvasTimings } from './graph-galaxy-runtime-meter';
 import { budgetGalaxySurface } from './graph-galaxy-surface-budget';
-import { galaxySceneToV2, type GalaxySceneSourceMode, type GalaxySceneV2 } from './graph-galaxy-scene-v2';
+import type { GalaxySceneSourceMode, GalaxySceneV2 } from './graph-galaxy-scene-v2';
 import { mergeGalaxySettings, type GalaxyInputEdge, type GalaxyQueryFocus, type GalaxyRenderableNode, type GalaxyRenderSettings } from './graph-galaxy-engine';
 import { ThreeGalaxyRenderer } from './three-galaxy-renderer';
 import type { GraphCanvasHit } from './graph-canvas-interaction';
 import { pathSelectionLocksCanvasFocus } from './graph-path-selection';
+import type { GalaxySceneResidencyController } from './graph-galaxy-scene-residency-controller';
+import type { GalaxyResidencyCounters } from './graph-galaxy-residency.model';
+import type { GalaxyInteractionQueryController } from './graph-galaxy-interaction-query';
+import type { GalaxyInteractionAuthority } from './graph-galaxy-interaction.model';
 
 export interface GraphGalaxySurfaceGate {
     destroyed: boolean;
@@ -47,6 +51,15 @@ export function canGraphGalaxyCanvasHoldSurface(state: GraphGalaxySurfaceGate): 
                 [style.width.px]="lassoRect.right - lassoRect.left"
                 [style.height.px]="lassoRect.bottom - lassoRect.top"></div>
             }
+            @if (residencyCounters.generationId) {
+            <div class="residency-meter" aria-label="Galaxy residency counters">
+                <span><b>corpus</b>{{ residencyTotal(residencyCounters.corpus) }}</span>
+                <span><b>resident</b>{{ residencyTotal(residencyCounters.resident) }}</span>
+                <span><b>visible</b>{{ residencyTotal(residencyCounters.visible) }}</span>
+                <span><b>drawn</b>{{ residencyTotal(residencyCounters.drawn) }}</span>
+                <span><b>aggregated</b>{{ residencyTotal(residencyCounters.aggregated) }}</span>
+            </div>
+            }
         </div>
     `,
     styles: [`
@@ -57,10 +70,14 @@ export function canGraphGalaxyCanvasHoldSurface(state: GraphGalaxySurfaceGate): 
         }
         .canvas-shell { position: relative; height: 100%; }
         .lasso-rect { position: absolute; z-index: 8; pointer-events: none; border: 1px solid rgba(94,234,212,.95); background: rgba(20,184,166,.12); box-shadow: 0 0 24px rgba(45,212,191,.18) inset; }
+        .residency-meter { position: absolute; left: 12px; bottom: 10px; z-index: 7; display: flex; gap: 10px; pointer-events: none; color: rgba(203,213,225,.68); font: 600 9px/1.1 ui-monospace, monospace; letter-spacing: .06em; text-transform: uppercase; }
+        .residency-meter span { display: inline-flex; gap: 4px; padding: 5px 7px; border: 1px solid rgba(71,85,105,.26); border-radius: 5px; background: rgba(2,6,14,.62); backdrop-filter: blur(7px); }
+        .residency-meter b { color: rgba(94,234,212,.76); font-weight: 700; }
     `],
 })
 export class GraphGalaxyCanvasComponent implements AfterViewInit, OnChanges, OnDestroy {
     private readonly phoenix = inject(PhoenixBackendService);
+    private readonly changeDetector = inject(ChangeDetectorRef);
     @Input() entities: GalaxyRenderableNode[] = [];
     @Input() edges: GalaxyInputEdge[] = [];
     @Input() settings: Partial<GalaxyRenderSettings> | null = null;
@@ -79,6 +96,13 @@ export class GraphGalaxyCanvasComponent implements AfterViewInit, OnChanges, OnD
     @ViewChild('canvas', { static: true }) private canvasRef!: ElementRef<HTMLCanvasElement>;
 
     private readonly renderer = new ThreeGalaxyRenderer();
+    residencyCounters: GalaxyResidencyCounters = emptyGalaxyResidencyCounters();
+    private residency: GalaxySceneResidencyController | null = null;
+    private residencyLoad: Promise<GalaxySceneResidencyController> | null = null;
+    private pendingResidencyCounters: GalaxyResidencyCounters | null = null;
+    private residencyCounterFlushQueued = false;
+    private interaction: GalaxyInteractionQueryController | null = null;
+    private interactionLoad: Promise<GalaxyInteractionQueryController> | null = null;
     private resizeObserver?: ResizeObserver;
     private intersectionObserver?: IntersectionObserver;
     private frameId = 0;
@@ -148,6 +172,7 @@ export class GraphGalaxyCanvasComponent implements AfterViewInit, OnChanges, OnD
         if (identityChanged || changes['sourceMode']) this.markLayoutDirty();
         if (changes['selectedEntityIds'] && this.renderer.hasContext()) {
             this.renderer.selectNodes(this.selectedEntityIds);
+            void this.refreshPathOverlay();
             this.recordRendererTimings();
         }
         if (changes['viewMode'] && this.renderer.hasContext()) this.renderer.setMode(this.viewMode === 'map' ? '2d' : '3d');
@@ -165,6 +190,8 @@ export class GraphGalaxyCanvasComponent implements AfterViewInit, OnChanges, OnD
         this.intersectionObserver?.disconnect();
         document.removeEventListener('visibilitychange', this.onVisibilityChange);
         this.unsubscribeColors?.();
+        this.interaction?.dispose();
+        this.residency?.dispose();
         this.renderer.dispose();
         const canvas = this.canvasRef?.nativeElement;
         if (canvas) { canvas.width = 0; canvas.height = 0; }
@@ -192,6 +219,10 @@ export class GraphGalaxyCanvasComponent implements AfterViewInit, OnChanges, OnD
         if (!this.renderer.hasContext()) return;
         this.renderer.clearFocus();
         this.draw();
+    }
+
+    residencyTotal(counts: { nodes: number; edges: number }): number {
+        return counts.nodes + counts.edges;
     }
 
     onPointerDown(event: PointerEvent): void {
@@ -250,10 +281,8 @@ export class GraphGalaxyCanvasComponent implements AfterViewInit, OnChanges, OnD
         if (!this.lassoSelecting) this.draw();
     }
 
-    onPointerUp(): void {
-        if (this.lassoSelecting && this.lassoRect) {
-            this.batchSelected.emit(this.renderer.nodesInRect(this.lassoRect));
-        }
+    async onPointerUp(): Promise<void> {
+        const lassoRect = this.lassoSelecting ? this.lassoRect : null;
         const relax = this.nodeDragging && this.renderer.endNodeDrag();
         this.dragging = false;
         this.nodeDragging = false;
@@ -263,6 +292,17 @@ export class GraphGalaxyCanvasComponent implements AfterViewInit, OnChanges, OnD
         this.lassoRect = null;
         if (relax) this.start();
         this.syncSurface();
+        if (lassoRect && this.scene) {
+            const interaction = await this.ensureInteraction();
+            const ids = await interaction.region(
+                this.scene,
+                this.interactionAuthority(this.scene),
+                lassoRect,
+                this.renderer.interactionViewProjection(),
+                () => this.renderer.nodesInRect(lassoRect),
+            );
+            if (!this.destroyed) this.batchSelected.emit(ids);
+        }
     }
 
     onPointerLeave(): void {
@@ -361,6 +401,7 @@ export class GraphGalaxyCanvasComponent implements AfterViewInit, OnChanges, OnD
         const budget = budgetGalaxySurface(rect.width, rect.height, window.devicePixelRatio || 1, this.shouldAnimate());
         this.currentDpr = budget.dpr;
         this.renderer.resize(Math.max(1, Math.floor(rect.width)), Math.max(1, Math.floor(rect.height)), budget.dpr);
+        if (this.renderer.hasContext()) this.residency?.updateView(this.renderer.residencyView());
         graphGalaxyRuntimeMeter.recordDraw(this.meterId, budget.backingWidth / budget.dpr, budget.backingHeight / budget.dpr, budget.dpr, performance.now(), 0);
     }
 
@@ -391,6 +432,7 @@ export class GraphGalaxyCanvasComponent implements AfterViewInit, OnChanges, OnD
 
     private draw(): void {
         if (!this.canHoldSurface()) return;
+        this.residency?.updateView(this.renderer.residencyView());
         this.renderer.render();
         this.recordRendererTimings();
         this.recordDrawMetrics();
@@ -418,25 +460,34 @@ export class GraphGalaxyCanvasComponent implements AfterViewInit, OnChanges, OnD
             this.edges,
             this.currentSettings(),
             this.sceneIdentity,
+            this.sourceMode,
         )
-            .then((scene) => {
+            .then(async (scene) => {
                 if (this.destroyed || this.layoutVersion !== version) return;
                 const sceneCompileMs = performance.now() - buildStarted;
-                const convertStarted = performance.now();
-                this.scene = galaxySceneToV2(scene, this.sourceMode);
-                const sceneConvertMs = performance.now() - convertStarted;
+                const sceneConvertMs = 0;
                 const setSceneStarted = performance.now();
                 if (!this.renderer.hasContext()) this.ensureRendererMounted();
-                else {
-                    this.renderer.installScene(
-                        this.scene,
-                        this.currentSettings(),
-                        this.viewMode === 'map' ? '2d' : '3d',
-                        this.selectedEntityIds,
-                    );
-                }
+                const residency = await this.ensureResidency();
+                await residency.install({
+                    generationId: galaxyResidencyGenerationId(this.sceneIdentity),
+                    authorityReceipt: this.sceneIdentity || 'ephemeral:unreceipted-current-graph',
+                    corpus: { nodes: this.entities.length, edges: this.edges.length },
+                    payload: {
+                        scene,
+                        settings: this.currentSettings(),
+                        mode: this.viewMode === 'map' ? '2d' : '3d',
+                        selectedIds: this.selectedEntityIds,
+                    },
+                });
                 const rendererSetSceneMs = performance.now() - setSceneStarted;
-                graphGalaxyRuntimeMeter.recordScene(this.meterId, scene.nodes.length, scene.links.length);
+                graphGalaxyRuntimeMeter.recordScene(
+                    this.meterId,
+                    scene.ids.length,
+                    scene.edgePairs.length / 2,
+                    scene.layoutMode,
+                    this.sceneIdentity || 'ephemeral:unreceipted-current-graph',
+                );
                 this.recordRendererTimings({
                     sceneCompileMs,
                     sceneConvertMs,
@@ -462,6 +513,91 @@ export class GraphGalaxyCanvasComponent implements AfterViewInit, OnChanges, OnD
             if (!pointer || this.destroyed) return;
             this.setHover(this.pickObjectAt(pointer));
         });
+    }
+
+    private ensureResidency(): Promise<GalaxySceneResidencyController> {
+        if (this.residency) return Promise.resolve(this.residency);
+        if (this.residencyLoad) return this.residencyLoad;
+        this.residencyLoad = import('./graph-galaxy-scene-residency-controller')
+            .then(({ GalaxySceneResidencyController }) => {
+                const controller = new GalaxySceneResidencyController({
+                    activate: ({ scene, settings, mode, selectedIds }) => {
+                        this.scene = scene;
+                        if (!this.renderer.hasContext()) this.ensureRendererMounted();
+                        else this.renderer.installScene(scene, settings, mode, selectedIds);
+                        void this.refreshPathOverlay();
+                    },
+                    counters: (counters) => {
+                        this.queueResidencyCounters(counters);
+                    },
+                });
+                if (this.destroyed) controller.dispose();
+                this.residency = controller;
+                return controller;
+            });
+        return this.residencyLoad;
+    }
+
+    private queueResidencyCounters(counters: GalaxyResidencyCounters): void {
+        this.pendingResidencyCounters = counters;
+        if (this.residencyCounterFlushQueued) return;
+        this.residencyCounterFlushQueued = true;
+        queueMicrotask(() => {
+            this.residencyCounterFlushQueued = false;
+            const pending = this.pendingResidencyCounters;
+            this.pendingResidencyCounters = null;
+            if (!pending || this.destroyed) return;
+            this.residencyCounters = pending;
+            this.changeDetector.markForCheck();
+        });
+    }
+
+    private ensureInteraction(): Promise<GalaxyInteractionQueryController> {
+        if (this.interaction) return Promise.resolve(this.interaction);
+        if (this.interactionLoad) return this.interactionLoad;
+        this.interactionLoad = import('./graph-galaxy-interaction-query')
+            .then(({ GalaxyInteractionQueryController }) => {
+                const controller = new GalaxyInteractionQueryController();
+                if (this.destroyed) controller.dispose();
+                this.interaction = controller;
+                return controller;
+            });
+        return this.interactionLoad;
+    }
+
+    private async refreshPathOverlay(): Promise<void> {
+        const scene = this.scene;
+        const [sourceNodeId, targetNodeId] = this.selectedEntityIds;
+        if (!scene || !sourceNodeId || !targetNodeId) {
+            this.renderer.setPathOverlay(null);
+            return;
+        }
+        const interaction = await this.ensureInteraction();
+        const overlay = await interaction.path(
+            scene,
+            this.interactionAuthority(scene),
+            sourceNodeId,
+            targetNodeId,
+        );
+        if (
+            this.destroyed
+            || this.scene !== scene
+            || this.selectedEntityIds[0] !== sourceNodeId
+            || this.selectedEntityIds[1] !== targetNodeId
+        ) {
+            return;
+        }
+        this.renderer.setPathOverlay(overlay);
+        this.draw();
+    }
+
+    private interactionAuthority(scene: GalaxySceneV2): GalaxyInteractionAuthority {
+        const generationId = galaxyResidencyGenerationId(this.sceneIdentity);
+        return {
+            generationId,
+            manifoldId: scene.layoutMode,
+            authorityReceipt: this.sceneIdentity || generationId,
+        };
     }
 
     private currentSettings(): GalaxyRenderSettings {
@@ -532,4 +668,25 @@ export function galaxySceneIdentityNeedsRebuild(
 ): boolean {
     if (previousIdentity !== currentIdentity) return true;
     return !currentIdentity && collectionsChanged;
+}
+
+export function galaxyResidencyGenerationId(sceneIdentity: string): string {
+    return sceneIdentity.split('\u0000', 1)[0] || 'ephemeral-current-graph';
+}
+
+function emptyGalaxyResidencyCounters(): GalaxyResidencyCounters {
+    return {
+        generationId: '',
+        manifoldId: '',
+        transitioning: false,
+        corpus: { nodes: 0, edges: 0 },
+        resident: { nodes: 0, edges: 0 },
+        visible: { nodes: 0, edges: 0 },
+        drawn: { nodes: 0, edges: 0 },
+        aggregated: { nodes: 0, edges: 0 },
+        residentBytes: 0,
+        residentTiles: 0,
+        queuedTiles: 0,
+        inFlightTiles: 0,
+    };
 }

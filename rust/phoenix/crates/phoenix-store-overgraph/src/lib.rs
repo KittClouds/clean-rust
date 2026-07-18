@@ -147,7 +147,9 @@ impl PhoenixNativeRowStore for PhoenixOvergraphStore {
         for row in rows {
             let key = row_key(relation, row)?;
             let (props, row_bytes) = row_props(relation, row)?;
-            logical_bytes = logical_bytes.saturating_add(key.len()).saturating_add(row_bytes);
+            logical_bytes = logical_bytes
+                .saturating_add(key.len())
+                .saturating_add(row_bytes);
             inputs.push(NodeInput {
                 type_id,
                 key,
@@ -253,7 +255,8 @@ fn row_props(
         RELATION_PROP.to_owned(),
         PropValue::String(relation.to_owned()),
     );
-    let row_json = serde_json::to_string(row).map_err(|error| StoreError::Query(error.to_string()))?;
+    let row_json =
+        serde_json::to_string(row).map_err(|error| StoreError::Query(error.to_string()))?;
     let row_bytes = row_json.len();
     props.insert(ROW_JSON_PROP.to_owned(), PropValue::String(row_json));
     Ok((props, row_bytes))

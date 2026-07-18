@@ -6,7 +6,7 @@ import {
     type GalaxyNodeDragMode,
     type GalaxyRenderSettings,
 } from './graph-galaxy-engine';
-import type { GalaxySceneV2 } from './graph-galaxy-scene-v2';
+import { galaxyIncidentEdges, type GalaxySceneV2 } from './graph-galaxy-scene-v2';
 
 const EPSILON = 0.0008;
 const MAX_XZ = 3.15;
@@ -21,6 +21,8 @@ const HOPF_ANCHOR_RAIL_PULL = 0.08;
 const HOPF_FIBER_RAIL_PULL = 0.16;
 const TRANSIT_DEFAULT_BOUNDARY_RADIUS = 2.32;
 const TRANSIT_BOUNDARY_PADDING = 1.1;
+export const GALAXY_INTERACTIVE_FORCE_NODE_LIMIT = 384;
+export const GALAXY_INTERACTIVE_FORCE_NEIGHBOR_LIMIT = 128;
 
 export class GraphGalaxyForceController {
     private base3d = new Float32Array(0);
@@ -43,6 +45,7 @@ export class GraphGalaxyForceController {
     private alpha = 0;
     private relaxing = false;
     private forceActive = false;
+    private largeGraph = false;
     private hybridBoundaryRadius3d = HYBRID_DEFAULT_BOUNDARY_RADIUS;
     private hybridBoundaryRadius2d = HYBRID_DEFAULT_BOUNDARY_RADIUS;
     private hopfBoundaryRadius3d = HOPF_DEFAULT_BOUNDARY_RADIUS;
@@ -52,6 +55,7 @@ export class GraphGalaxyForceController {
 
     bind(scene: GalaxySceneV2): void {
         this.scene = scene;
+        this.largeGraph = scene.ids.length > GALAXY_INTERACTIVE_FORCE_NODE_LIMIT;
         this.base3d = scene.positions3d.slice();
         this.base2d = scene.positions2d.slice();
         this.hybridShellLocked = new Uint8Array(scene.ids.length);
@@ -67,14 +71,16 @@ export class GraphGalaxyForceController {
         this.rebuildHopfConstraints(scene);
         this.rebuildTransitConstraints(scene);
         this.constrainManifoldScene(scene);
-        this.neighbors.length = scene.ids.length;
-        for (let i = 0; i < scene.ids.length; i++) this.neighbors[i] = [];
-        for (let i = 0; i < scene.edgePairs.length; i += 2) {
-            const a = scene.edgePairs[i];
-            const b = scene.edgePairs[i + 1];
-            if (a < this.neighbors.length && b < this.neighbors.length) {
-                this.neighbors[a].push(b);
-                this.neighbors[b].push(a);
+        this.neighbors.length = this.largeGraph ? 0 : scene.ids.length;
+        if (!this.largeGraph) {
+            for (let i = 0; i < scene.ids.length; i++) this.neighbors[i] = [];
+            for (let i = 0; i < scene.edgePairs.length; i += 2) {
+                const a = scene.edgePairs[i];
+                const b = scene.edgePairs[i + 1];
+                if (a < this.neighbors.length && b < this.neighbors.length) {
+                    this.neighbors[a].push(b);
+                    this.neighbors[b].push(a);
+                }
             }
         }
         this.activeIndex = -1;
@@ -88,6 +94,12 @@ export class GraphGalaxyForceController {
         this.settings = mergeGalaxySettings(settings ?? undefined);
         const layoutChanged = previous.edgeLength !== this.settings.edgeLength || previous.nodeDistance !== this.settings.nodeDistance;
         if (!layoutChanged || !this.scene || this.scene.ids.length < 2) return;
+        if (this.largeGraph) {
+            this.forceActive = false;
+            this.relaxing = false;
+            this.alpha = 0;
+            return;
+        }
         if (isTransitLayoutMode(this.scene.layoutMode)) {
             this.applyTransitVolume(this.scene);
             this.forceActive = false;
@@ -116,7 +128,9 @@ export class GraphGalaxyForceController {
     }
 
     begin(nodeId: string): boolean {
-        const index = this.scene?.ids.indexOf(nodeId) ?? -1;
+        const indexed = this.scene?.runtimeIndex?.nodeById.get(nodeId);
+        const index = indexed ?? (this.largeGraph ? -1 : this.scene?.ids.indexOf(nodeId) ?? -1);
+        if (this.largeGraph && this.scene?.layoutMode !== 'single') return false;
         this.activeIndex = index;
         if (index >= 0) {
             this.vx[index] = 0;
@@ -174,7 +188,7 @@ export class GraphGalaxyForceController {
         this.move(scene.positions3d, this.activeIndex, delta.x, delta.y, delta.z);
         this.move(scene.positions2d, this.activeIndex, delta.x, delta.y, 0);
         const pull = mode === 'pin' ? 0.18 : 0.14;
-        for (const neighbor of this.neighbors[this.activeIndex] ?? []) {
+        for (const neighbor of this.localNeighbors(scene, this.activeIndex)) {
             if (this.fixed[neighbor]) continue;
             this.move(scene.positions3d, neighbor, delta.x * pull, delta.y * pull, delta.z * pull);
             this.move(scene.positions2d, neighbor, delta.x * pull, delta.y * pull, 0);
@@ -188,7 +202,7 @@ export class GraphGalaxyForceController {
         const scene = this.scene;
         const dragMode = scene ? this.effectiveDragMode(scene, mode) : mode;
         if (dragMode === 'pin') this.fixed[this.activeIndex] = 1;
-        else if (dragMode === 'stretch') this.relaxing = true;
+        else if (dragMode === 'stretch') this.relaxing = !this.largeGraph;
         else if (dragMode === 'force') {
             this.forceActive = true;
             this.alpha = Math.max(this.alpha, 0.38);
@@ -200,6 +214,7 @@ export class GraphGalaxyForceController {
     tick(): boolean {
         const scene = this.scene;
         if (!scene) return false;
+        if (this.largeGraph) return false;
         if (this.forceActive && this.alpha > EPSILON) {
             this.tickForce(scene);
             return true;
@@ -213,11 +228,11 @@ export class GraphGalaxyForceController {
     }
 
     private effectiveDragMode(scene: GalaxySceneV2, mode: GalaxyNodeDragMode): GalaxyNodeDragMode {
-        return mode === 'force' && scene.layoutMode !== 'single' ? 'stretch' : mode;
+        return mode === 'force' && (scene.layoutMode !== 'single' || this.largeGraph) ? 'stretch' : mode;
     }
 
     private tickForce(scene: GalaxySceneV2): void {
-        if (scene.layoutMode !== 'single') {
+        if (scene.layoutMode !== 'single' || this.largeGraph) {
             this.forceActive = false;
             this.alpha = 0;
             return;
@@ -274,6 +289,7 @@ export class GraphGalaxyForceController {
     }
 
     private tickElastic(scene: GalaxySceneV2): boolean {
+        if (this.largeGraph) return false;
         const live = this.livePositions(scene);
         const base = this.mode === '2d' ? this.base2d : this.base3d;
         let maxDelta = 0;
@@ -344,6 +360,22 @@ export class GraphGalaxyForceController {
         this.vx[index] = 0;
         this.vy[index] = 0;
         this.vz[index] = 0;
+    }
+
+    private localNeighbors(scene: GalaxySceneV2, index: number): number[] {
+        if (!this.largeGraph) return this.neighbors[index] ?? [];
+        const neighbors: number[] = [];
+        const seen = new Set<number>();
+        for (const edge of galaxyIncidentEdges(scene, index)) {
+            const source = scene.edgePairs[edge * 2];
+            const target = scene.edgePairs[edge * 2 + 1];
+            const neighbor = source === index ? target : target === index ? source : -1;
+            if (neighbor < 0 || seen.has(neighbor)) continue;
+            seen.add(neighbor);
+            neighbors.push(neighbor);
+            if (neighbors.length >= GALAXY_INTERACTIVE_FORCE_NEIGHBOR_LIMIT) break;
+        }
+        return neighbors;
     }
 
     private livePositions(scene: GalaxySceneV2): Float32Array {

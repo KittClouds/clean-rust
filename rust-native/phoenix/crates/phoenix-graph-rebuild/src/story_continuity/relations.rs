@@ -6,7 +6,7 @@ use crate::{
     GraphRebuildSnapshot,
 };
 
-use super::events::EventBuild;
+use super::events::{EventBuild, SourceCoordinates};
 use super::types::{
     ContinuityCausalCandidate, ContinuityCausalRelation, ContinuityConflictCandidate,
     ContinuityEvidenceClass, ContinuityStateIntervalCandidate, ContinuityStatus,
@@ -29,11 +29,12 @@ pub(super) fn build_relations(
     events: &EventBuild,
     episodes: &[StoryEpisodeCandidate],
     event_episode: &HashMap<CompactString, CompactString>,
+    coordinates: &SourceCoordinates,
 ) -> RelationBuild {
     let mut temporal = semantic_temporal(semantic, events);
     append_legacy_temporal(snapshot, events, &mut temporal);
     append_episode_temporal(episodes, &mut temporal);
-    let state_intervals = semantic_state_intervals(semantic, events);
+    let state_intervals = semantic_state_intervals(semantic, events, coordinates);
     let mut causal = semantic_causal(semantic, events);
     append_legacy_causal(snapshot, events, &mut causal);
     let conflicts = semantic_conflicts(semantic, events);
@@ -172,6 +173,7 @@ fn append_episode_temporal(
 fn semantic_state_intervals(
     semantic: Option<&DocumentSemanticSummary>,
     events: &EventBuild,
+    coordinates: &SourceCoordinates,
 ) -> Vec<ContinuityStateIntervalCandidate> {
     semantic
         .into_iter()
@@ -186,6 +188,11 @@ fn semantic_state_intervals(
                 .end_situation_id
                 .as_ref()
                 .and_then(|id| events.situation_to_event.get(id.as_str()).cloned());
+            let source_start = coordinates.byte_offset(&row.note_id, row.start)?;
+            let source_end = match row.end {
+                Some(end) => Some(coordinates.byte_offset(&row.note_id, end)?),
+                None => None,
+            };
             Some(ContinuityStateIntervalCandidate {
                 id: format_compact!("continuity:state:{}", row.id),
                 note_id: row.note_id.clone().into(),
@@ -195,8 +202,8 @@ fn semantic_state_intervals(
                 polarity: row.polarity.clone().into(),
                 start_event_id,
                 end_event_id,
-                source_start: clamp_u32(row.start),
-                source_end: row.end.map(clamp_u32),
+                source_start: clamp_u32(source_start),
+                source_end: source_end.map(clamp_u32),
                 persists: row.persists,
                 confidence_millis: row.confidence_millis,
                 status: if row.failure_reasons.is_empty() {

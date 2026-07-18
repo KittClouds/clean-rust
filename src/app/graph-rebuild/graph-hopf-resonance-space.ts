@@ -82,6 +82,11 @@ export interface HopfResonanceAssignment {
     strandIndex: number;
     strandCount: number;
     phaseSpread: number;
+    logicalFiberId?: string;
+    laneId?: string;
+    laneIndex?: number;
+    laneCount?: number;
+    laneDirection?: Vec3Tuple;
     assignmentScore: number;
     residualScore: number;
     salience: number;
@@ -123,6 +128,20 @@ export interface HopfResonanceFiber {
     frustration: number;
 }
 
+export interface HopfResonanceLane {
+    id: string;
+    parentFiberId: string;
+    cellId: string;
+    fiberKind: HopfResonanceFiberKind;
+    laneIndex: number;
+    laneCount: number;
+    targetIds: string[];
+    sampleCount: number;
+    totalWeight: number;
+    phaseBinPeak: number;
+    direction: Vec3Tuple;
+}
+
 export interface HopfResonanceBraid {
     id: string;
     kind: 'cell_neighbor' | 'fiber_neighbor';
@@ -153,6 +172,10 @@ export interface HopfResonanceSpaceCounters {
     structureRootTargets: number;
     crowdedFiberCount: number;
     maxFiberSampleCount: number;
+    overflowFiberCount?: number;
+    laneCount?: number;
+    maxLaneSampleCount?: number;
+    maxLanePhaseBinPeak?: number;
     mutationAllowedCount: 0;
 }
 
@@ -166,6 +189,7 @@ export interface HopfResonanceSpace {
     assignments: HopfResonanceAssignment[];
     cells: HopfResonanceCell[];
     fibers: HopfResonanceFiber[];
+    lanes?: HopfResonanceLane[];
     docCharts: HopfDocumentChart[];
     braids: HopfResonanceBraid[];
     counters: HopfResonanceSpaceCounters;
@@ -195,6 +219,10 @@ type FiberAccumulator = {
 const DEFAULT_CELL_RESOLUTION = 3;
 const DEFAULT_NEIGHBOR_COUNT = 6;
 const DEFAULT_SECONDARY_CELL_COUNT = 3;
+const HOPF_LANE_MEMBER_CAPACITY = 64;
+const HOPF_LANE_WEIGHT_CAPACITY = 88;
+const HOPF_MAX_LANES_PER_FIBER = 4;
+const HOPF_LANE_PHASE_BINS = 32;
 export function buildHopfResonanceSpace(
     snapshot: GraphRebuildSnapshot,
     options: BuildHopfResonanceSpaceOptions = {},
@@ -206,9 +234,13 @@ export function buildHopfResonanceSpace(
     const secondaryCellCount = clampInt(options.secondaryCellCount ?? DEFAULT_SECONDARY_CELL_COUNT, 1, 8);
     const cells = buildMutableCells(cellResolution, neighborCount);
     const directions = buildContextDirections(snapshot.embeddingTargets, profile);
-    const assignments = spreadFiberPhases(snapshot.embeddingTargets.map((target) =>
-        assignTargetToHopfCell(target, profile, cells, secondaryCellCount, directions.get(target.id)),
-    ));
+    const lanePlan = planFiberLanes(
+        spreadFiberPhases(snapshot.embeddingTargets.map((target) =>
+            assignTargetToHopfCell(target, profile, cells, secondaryCellCount, directions.get(target.id)),
+        )),
+        new Map(cells.map((cell) => [cell.id, cell.center])),
+    );
+    const assignments = lanePlan.assignments;
 
     const cellById = new Map(cells.map((cell) => [cell.id, cell]));
     for (const assignment of assignments) {
@@ -240,6 +272,7 @@ export function buildHopfResonanceSpace(
         assignments,
         cells: finalizedCells,
         fibers,
+        lanes: lanePlan.lanes,
         docCharts,
         braids,
         counters: {
@@ -257,9 +290,41 @@ export function buildHopfResonanceSpace(
             structureRootTargets: assignments.filter((row) => row.role === 'structure-root').length,
             crowdedFiberCount: fibers.filter((row) => row.sampleCount >= 10).length,
             maxFiberSampleCount: fibers.reduce((max, row) => Math.max(max, row.sampleCount), 0),
+            overflowFiberCount: overflowFiberCount(lanePlan.lanes),
+            laneCount: lanePlan.lanes.length,
+            maxLaneSampleCount: lanePlan.lanes.reduce((max, lane) => Math.max(max, lane.sampleCount), 0),
+            maxLanePhaseBinPeak: lanePlan.lanes.reduce((max, lane) => Math.max(max, lane.phaseBinPeak), 0),
             mutationAllowedCount: 0,
         },
     };
+}
+
+export function withHopfResonanceLanes(space: HopfResonanceSpace): HopfResonanceSpace {
+    const complete = space.assignments.every((assignment) =>
+        assignment.role === 'document-chart'
+        || Boolean(assignment.logicalFiberId && assignment.laneId && assignment.laneDirection),
+    );
+    if (complete) return space;
+    const lanePlan = planFiberLanes(
+        space.assignments,
+        new Map(space.cells.map((cell) => [cell.id, cell.center])),
+    );
+    return {
+        ...space,
+        assignments: lanePlan.assignments,
+        lanes: lanePlan.lanes,
+        counters: {
+            ...space.counters,
+            overflowFiberCount: overflowFiberCount(lanePlan.lanes),
+            laneCount: lanePlan.lanes.length,
+            maxLaneSampleCount: lanePlan.lanes.reduce((max, lane) => Math.max(max, lane.sampleCount), 0),
+            maxLanePhaseBinPeak: lanePlan.lanes.reduce((max, lane) => Math.max(max, lane.phaseBinPeak), 0),
+        },
+    };
+}
+
+function overflowFiberCount(lanes: HopfResonanceLane[]): number {
+    return new Set(lanes.filter((lane) => lane.laneCount > 1).map((lane) => lane.parentFiberId)).size;
 }
 
 export function hopfResonanceSpaceSummary(space: HopfResonanceSpace): Record<string, unknown> {
@@ -274,6 +339,23 @@ export function hopfResonanceSpaceSummary(space: HopfResonanceSpace): Record<str
             weight: cell.totalWeight,
             kinds: cell.dominantFiberKinds,
         }));
+    const lanesByFiber = new Map<string, number>();
+    for (const lane of space.lanes || []) {
+        lanesByFiber.set(lane.parentFiberId, Math.max(lanesByFiber.get(lane.parentFiberId) || 0, lane.laneCount));
+    }
+    const topOverloadedFibers = [...space.fibers]
+        .filter((fiber) => (lanesByFiber.get(fiber.id) || 1) > 1)
+        .sort((left, right) => right.sampleCount - left.sampleCount || right.totalWeight - left.totalWeight || left.id.localeCompare(right.id))
+        .slice(0, 8)
+        .map((fiber) => ({
+            id: fiber.id,
+            cellId: fiber.cellId,
+            kind: fiber.fiberKind,
+            samples: fiber.sampleCount,
+            weight: fiber.totalWeight,
+            lanes: lanesByFiber.get(fiber.id) || 1,
+            representativeTargets: fiber.targetIds.slice(0, 4),
+        }));
     return {
         schemaVersion: space.schemaVersion,
         snapshot: space.sourceSnapshotId,
@@ -285,9 +367,15 @@ export function hopfResonanceSpaceSummary(space: HopfResonanceSpace): Record<str
         cells: space.counters.cellCount,
         occupiedCells: space.counters.occupiedCellCount,
         fibers: space.counters.fiberCount,
+        lanes: space.counters.laneCount || space.lanes?.length || space.counters.fiberCount,
+        overflowFibers: space.counters.overflowFiberCount || 0,
+        maxFiberSamples: space.counters.maxFiberSampleCount,
+        maxLaneSamples: space.counters.maxLaneSampleCount || space.counters.maxFiberSampleCount,
+        maxLanePhaseBinPeak: space.counters.maxLanePhaseBinPeak || 0,
         docCharts: space.counters.docChartCount,
         braids: space.counters.braidCount,
         topCells,
+        topOverloadedFibers,
     };
 }
 
@@ -420,6 +508,127 @@ function spreadFiberPhases(assignments: HopfResonanceAssignment[]): HopfResonanc
         }
     }
     return out;
+}
+
+function planFiberLanes(
+    assignments: HopfResonanceAssignment[],
+    cellCenters: Map<string, Vec3Tuple>,
+): { assignments: HopfResonanceAssignment[]; lanes: HopfResonanceLane[] } {
+    const out = assignments.slice();
+    const groups = new Map<string, number[]>();
+    for (let index = 0; index < out.length; index += 1) {
+        const row = out[index];
+        if (row.role === 'document-chart') continue;
+        const key = `${row.baseCellId}:${row.fiberKind}`;
+        getOrInsert(groups, key, () => []).push(index);
+    }
+
+    const lanes: HopfResonanceLane[] = [];
+    for (const [key, indexes] of groups) {
+        const sorted = [...indexes].sort((left, right) =>
+            assignmentLanePressure(out[right]) - assignmentLanePressure(out[left])
+            || strandSortKey(out[left]).localeCompare(strandSortKey(out[right])),
+        );
+        const totalWeight = sorted.reduce((sum, index) => sum + assignmentLanePressure(out[index]), 0);
+        const laneCount = clampInt(Math.max(
+            Math.ceil(sorted.length / HOPF_LANE_MEMBER_CAPACITY),
+            Math.ceil(totalWeight / HOPF_LANE_WEIGHT_CAPACITY),
+        ), 1, HOPF_MAX_LANES_PER_FIBER);
+        const laneIndexes = Array.from({ length: laneCount }, () => [] as number[]);
+        const laneWeights = new Float64Array(laneCount);
+        for (const index of sorted) {
+            let targetLane = 0;
+            for (let lane = 1; lane < laneCount; lane += 1) {
+                if (laneWeights[lane] < laneWeights[targetLane]) targetLane = lane;
+            }
+            laneIndexes[targetLane].push(index);
+            laneWeights[targetLane] += assignmentLanePressure(out[index]);
+        }
+
+        const logicalFiberId = `hopf:fiber:${safeId(key)}`;
+        const center: Vec3Tuple = cellCenters.get(out[sorted[0]]?.baseCellId || '') || [0, 1, 0];
+        for (let laneIndex = 0; laneIndex < laneIndexes.length; laneIndex += 1) {
+            const members = laneIndexes[laneIndex].sort((left, right) =>
+                strandSortKey(out[left]).localeCompare(strandSortKey(out[right])),
+            );
+            if (!members.length) continue;
+            const laneId = `${logicalFiberId}:lane:${laneIndex}`;
+            const direction = hopfLaneDirection(key, laneIndex, laneCount, members.map((index) => out[index]), center);
+            const phaseOffset = stableUnit(`${laneId}:phase-offset`) / members.length;
+            for (let rank = 0; rank < members.length; rank += 1) {
+                const row = out[members[rank]];
+                const slot = positivePhase((rank + 0.5) / members.length + phaseOffset);
+                const blend = phaseSpreadWeight(row, members.length);
+                const phase = laneCount > 1 ? circularPhaseBlend(row.phase, slot, blend) : row.phase;
+                out[members[rank]] = {
+                    ...row,
+                    phase,
+                    phaseRadians: round(phase * TAU),
+                    logicalFiberId,
+                    laneId,
+                    laneIndex,
+                    laneCount,
+                    laneDirection: direction,
+                };
+            }
+            const laneRows = members.map((index) => out[index]);
+            lanes.push({
+                id: laneId,
+                parentFiberId: logicalFiberId,
+                cellId: laneRows[0].baseCellId,
+                fiberKind: laneRows[0].fiberKind,
+                laneIndex,
+                laneCount,
+                targetIds: laneRows.map((row) => row.targetId),
+                sampleCount: laneRows.length,
+                totalWeight: round(laneWeights[laneIndex]),
+                phaseBinPeak: phaseBinPeak(laneRows),
+                direction,
+            });
+        }
+    }
+
+    return {
+        assignments: out,
+        lanes: lanes.sort((left, right) =>
+            right.totalWeight - left.totalWeight
+            || left.parentFiberId.localeCompare(right.parentFiberId)
+            || left.laneIndex - right.laneIndex,
+        ),
+    };
+}
+
+function assignmentLanePressure(row: HopfResonanceAssignment): number {
+    const evidencePressure = Math.min(4, row.evidenceIds.length) * 0.12;
+    const parentPressure = Math.min(4, row.parentIds.length) * 0.08;
+    return 1 + row.salience * 0.32 + evidencePressure + parentPressure;
+}
+
+function hopfLaneDirection(
+    key: string,
+    laneIndex: number,
+    laneCount: number,
+    rows: HopfResonanceAssignment[],
+    center: Vec3Tuple,
+): Vec3Tuple {
+    const mean = normalize3(rows.reduce<Vec3Tuple>((sum, row) => add3(sum, row.direction), [0, 0, 0]));
+    if (laneCount <= 1) return roundVec(norm3(mean) ? mean : center);
+    const frame = tangentFrame(center);
+    const angle = stableUnit(`${key}:lane-angle`) * TAU + (laneIndex / laneCount) * TAU;
+    const tangent = add3(scale3(frame.u, Math.cos(angle)), scale3(frame.v, Math.sin(angle)));
+    const offset = 0.085 + (laneCount - 2) * 0.018;
+    return roundVec(normalize3(add3(norm3(mean) ? mean : center, scale3(tangent, offset))));
+}
+
+function phaseBinPeak(rows: HopfResonanceAssignment[]): number {
+    const bins = new Uint16Array(HOPF_LANE_PHASE_BINS);
+    for (const row of rows) {
+        const bin = Math.min(HOPF_LANE_PHASE_BINS - 1, Math.floor(positivePhase(row.phase) * HOPF_LANE_PHASE_BINS));
+        bins[bin] += 1;
+    }
+    let peak = 0;
+    for (const value of bins) peak = Math.max(peak, value);
+    return peak;
 }
 
 function buildMutableCells(resolution: number, neighborCount: number): MutableCell[] {

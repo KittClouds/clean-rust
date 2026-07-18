@@ -9,7 +9,6 @@ import { AtlasCapabilityRuntimeService } from '../services/atlas-capability-runt
 import { NerService } from '../services/ner.service';
 import { phoenixTransportAudit, type PhoenixTransportAuditSnapshot } from '../services/phoenix-transport-audit';
 import { PhoenixStoreService, type PhoenixContentMutationTiming } from '../services/phoenix-store.service';
-import { PhoenixUiApiService } from '../services/phoenix-ui-api.service';
 import { buildGraphRebuildDeltaPostProcessPlan, deltaPostProcessPlanCounters, type GraphRebuildDeltaPostProcessPlan } from './graph-rebuild-delta-postprocess-plan';
 import { buildGraphRebuildEdgeJudgmentPlan, edgeJudgmentPlanCounters } from './graph-rebuild-edge-type-judgment-plan';
 import { embeddingProfileFromModelSelection } from './graph-rebuild-embedding-signatures';
@@ -43,6 +42,7 @@ import type {
     GraphRebuildRelationshipHint,
     GraphRebuildSnapshot,
 } from './graph-rebuild-snapshot';
+import { GraphCoalescingAsyncQueue } from './graph-coalescing-async-queue';
 
 const POSTPROCESS_FACT_CAPABILITIES: AtlasCapabilityId[] = [
     'nliAdjudication',
@@ -134,14 +134,15 @@ export class GraphRebuildPipelineService {
     private readonly atlasRuntime = inject(AtlasCapabilityRuntimeService);
     private readonly ner = inject(NerService);
     private readonly store = inject(PhoenixStoreService);
-    private readonly phoenixUiApi = inject(PhoenixUiApiService);
     private readonly runningState = signal(false);
     private readonly entityLinkerWarmState = signal(false);
     private readonly lastReceiptState = signal<GraphIndexRunReceipt | null>(null);
     private readonly lastSnapshotState = signal<GraphRebuildSnapshot | null>(null);
     private receiptPersistenceQueue: Promise<void> = Promise.resolve();
-    private readonly pendingReceiptPersistenceJobs = new Map<string, ReceiptPersistenceJob>();
-    private receiptPersistenceDrainScheduled = false;
+    private readonly receiptPersistence = new GraphCoalescingAsyncQueue<string, ReceiptPersistenceJob>(
+        deferReceiptPersistenceTurn,
+        (job) => this.persistRunReceiptWithTiming(job.receipt, job.persistedReceipt, job.receiptStage),
+    );
     private postCommitDiagnosticQueue: Promise<void> = Promise.resolve();
     private postCommitDiagnosticToken = 0;
     private cancelScheduledPostCommitDiagnostic: (() => void) | null = null;
@@ -165,9 +166,7 @@ export class GraphRebuildPipelineService {
 
     graphModelsReady(request: GraphIndexRunRequest): boolean {
         const readiness = this.modelReadiness(request);
-        return ['dynamicNer', 'nli'].every((id) =>
-            readiness.find((model) => model.id === id)?.status === 'ready',
-        );
+        return readiness.find((model) => model.id === 'dynamicNer')?.status === 'ready';
     }
 
     embeddingModelReady(request: GraphIndexRunRequest): boolean {
@@ -186,7 +185,6 @@ export class GraphRebuildPipelineService {
         try {
             const options = this.atlasOptions(request);
             await this.atlasRuntime.warmModelLane('dynamicNer', options);
-            await this.atlasRuntime.warmModelLane('nli', options);
         } finally {
             this.runningState.set(false);
         }
@@ -209,7 +207,7 @@ export class GraphRebuildPipelineService {
         const durabilityMode = request.durabilityMode || 'interactive';
         const modelReadiness = this.modelReadiness(request);
         const graphCold = modelReadiness
-            .filter((model) => model.id === 'dynamicNer' || model.id === 'nli')
+            .filter((model) => model.id === 'dynamicNer')
             .filter((model) => model.status !== 'ready');
         if (graphCold.length) {
             throw new Error(`Load graph models first: ${graphCold.map((model) => model.label).join(', ')}.`);
@@ -738,35 +736,10 @@ export class GraphRebuildPipelineService {
         this.refreshLayerReceipts(receipt, this.lastSnapshotState());
         this.publishReceiptUpdateIfCurrent(receipt);
         const persistedReceipt = graphIndexReceiptForPersistence(receipt);
-        this.pendingReceiptPersistenceJobs.set(receiptPersistenceKey(receipt), { receipt, persistedReceipt, receiptStage });
-        this.scheduleReceiptPersistenceDrain();
-    }
-
-    private scheduleReceiptPersistenceDrain(): void {
-        if (this.receiptPersistenceDrainScheduled) return;
-        this.receiptPersistenceDrainScheduled = true;
-        this.receiptPersistenceQueue = this.receiptPersistenceQueue.then(
-            () => this.drainReceiptPersistenceQueue(),
-            () => this.drainReceiptPersistenceQueue(),
+        this.receiptPersistenceQueue = this.receiptPersistence.enqueue(
+            receiptPersistenceKey(receipt),
+            { receipt, persistedReceipt, receiptStage },
         );
-        void this.receiptPersistenceQueue;
-    }
-
-    private async drainReceiptPersistenceQueue(): Promise<void> {
-        try {
-            while (true) {
-                await deferReceiptPersistenceTurn();
-                const jobs = [...this.pendingReceiptPersistenceJobs.values()];
-                if (!jobs.length) return;
-                this.pendingReceiptPersistenceJobs.clear();
-                for (const job of jobs) {
-                    await this.persistRunReceiptWithTiming(job.receipt, job.persistedReceipt, job.receiptStage);
-                }
-            }
-        } finally {
-            this.receiptPersistenceDrainScheduled = false;
-            if (this.pendingReceiptPersistenceJobs.size) this.scheduleReceiptPersistenceDrain();
-        }
     }
 
     private async persistRunReceiptWithTiming(
@@ -1735,51 +1708,6 @@ function appendSemanticRerankStage(stageReceipts: GraphIndexStageReceipt[], snap
     ));
 }
 
-function appendSemanticAdjudicationStage(stageReceipts: GraphIndexStageReceipt[], snapshot: GraphRebuildSnapshot): void {
-    const summary = snapshot.semanticAdjudicationSummary;
-    if (!summary) return;
-    stageReceipts.push(instrumentationStage(
-        'semanticAdjudicationDag',
-        'Semantic Adjudication DAG',
-        summary.counters.mutationCount,
-        {
-            decisions: summary.counters.decisionCount,
-            mutations: summary.counters.mutationCount,
-            appliedMutations: summary.counters.appliedMutationCount,
-            receipts: summary.counters.receiptCount,
-            ledgerOnly: summary.counters.ledgerOnlyCount,
-            accepted: summary.counters.byState['accepted'] || 0,
-            supported: summary.counters.byState['supported'] || 0,
-            deferred: summary.counters.byState['deferred'] || 0,
-            rejected: summary.counters.byState['rejected'] || 0,
-            invalidated: summary.counters.byState['invalidated'] || 0,
-            superseded: summary.counters.byState['superseded'] || 0,
-        },
-        'Accepted semantic topology is applied by the frozen graph-rebuild live contract with reversible receipts',
-    ));
-}
-
-function appendSemanticEvalLedgerStage(stageReceipts: GraphIndexStageReceipt[], snapshot: GraphRebuildSnapshot): void {
-    const summary = snapshot.semanticEvalLedgerSummary;
-    if (!summary) return;
-    stageReceipts.push(instrumentationStage(
-        'semanticEvalLedger',
-        'Semantic Eval Ledger',
-        summary.counters.rowCount,
-        {
-            rows: summary.counters.rowCount,
-            acceptedCandidates: summary.counters.acceptedCandidates,
-            rejectedCandidates: summary.counters.rejectedCandidates,
-            ambiguousCases: summary.counters.ambiguousCases,
-            userCorrections: summary.counters.userCorrections,
-            modelDisagreements: summary.counters.modelDisagreements,
-            manifoldDisagreements: summary.counters.manifoldDisagreements,
-            graphChangeRows: summary.counters.graphChangeRows,
-        },
-        'Phase 6 compact dataset export ready for classifier, reranker, router, and model-swap evals',
-    ));
-}
-
 function appendMemoryGraphRagBridgeStage(stageReceipts: GraphIndexStageReceipt[], snapshot: GraphRebuildSnapshot): void {
     const summary = snapshot.memoryGraphRagBridgeSummary;
     if (!summary) return;
@@ -2024,6 +1952,7 @@ function nliStageLabel(stage: string): string {
         case 'modelWarm': return 'NLI Model Warm';
         case 'classification': return 'NLI Classification';
         case 'apply': return 'NLI Apply';
+        case 'modelRelease': return 'NLI Model Release';
         default: return '';
     }
 }

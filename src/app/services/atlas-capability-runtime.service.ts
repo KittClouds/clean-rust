@@ -681,45 +681,58 @@ export class AtlasCapabilityRuntimeService {
             };
         }
 
-        const warmStarted = performance.now();
-        await this.warmModel('nli', options);
-        stageSummaries.push(nliStageSummary('modelWarm', warmStarted, {
-            plannedInputs: plannedInputs.length,
-        }));
-
-        const classifyStarted = performance.now();
         const results: NliClassificationResult[] = [];
-        await this.nli.classifyStream(
-            plannedInputs,
-            (batch) => results.push(...batch.results),
-            NLI_BATCH_SIZE,
-        );
-        const labelCounts = results.reduce((counts, result) => {
-            counts[result.predictedLabel] = (counts[result.predictedLabel] || 0) + 1;
-            return counts;
-        }, {} as Record<string, number>);
-        stageSummaries.push(nliStageSummary('classification', classifyStarted, {
-            plannedInputs: plannedInputs.length,
-            results: results.length,
-            batches: Math.ceil(plannedInputs.length / NLI_BATCH_SIZE),
-            entailment: labelCounts['entailment'] || 0,
-            neutral: labelCounts['neutral'] || 0,
-            contradiction: labelCounts['contradiction'] || 0,
-        }));
+        let labelCounts: Record<string, number> = {};
+        let applied: unknown = null;
+        let device = this.nli.device();
+        const warmStarted = performance.now();
+        let releaseStarted = warmStarted;
+        try {
+            await this.nli.withEphemeralSession(NLI_MODEL_ID, async () => {
+                stageSummaries.push(nliStageSummary('modelWarm', warmStarted, {
+                    plannedInputs: plannedInputs.length,
+                }));
 
-        const applyStarted = performance.now();
-        const applied = await this.phoenix.storeCommand('semantic:applyNliJudgments', {
-            modelId: NLI_MODEL_ID,
-            embeddingModelId: this.embeddingModelId(options),
-            dimensionLabel,
-            dimension,
-            device: this.nli.device(),
-            results,
-        });
-        stageSummaries.push(nliStageSummary('apply', applyStarted, {
-            results: results.length,
-            appliedRows: appliedRowCount(applied),
-        }));
+                const classifyStarted = performance.now();
+                await this.nli.classifyStream(
+                    plannedInputs,
+                    (batch) => results.push(...batch.results),
+                    NLI_BATCH_SIZE,
+                );
+                labelCounts = results.reduce((counts, result) => {
+                    counts[result.predictedLabel] = (counts[result.predictedLabel] || 0) + 1;
+                    return counts;
+                }, {} as Record<string, number>);
+                stageSummaries.push(nliStageSummary('classification', classifyStarted, {
+                    plannedInputs: plannedInputs.length,
+                    results: results.length,
+                    batches: Math.ceil(plannedInputs.length / NLI_BATCH_SIZE),
+                    entailment: labelCounts['entailment'] || 0,
+                    neutral: labelCounts['neutral'] || 0,
+                    contradiction: labelCounts['contradiction'] || 0,
+                }));
+
+                const applyStarted = performance.now();
+                device = this.nli.device();
+                applied = await this.phoenix.storeCommand('semantic:applyNliJudgments', {
+                    modelId: NLI_MODEL_ID,
+                    embeddingModelId: this.embeddingModelId(options),
+                    dimensionLabel,
+                    dimension,
+                    device,
+                    results,
+                });
+                stageSummaries.push(nliStageSummary('apply', applyStarted, {
+                    results: results.length,
+                    appliedRows: appliedRowCount(applied),
+                }));
+                releaseStarted = performance.now();
+            });
+        } finally {
+            stageSummaries.push(nliStageSummary('modelRelease', releaseStarted, {
+                released: this.nli.residencySnapshot().resident ? 0 : 1,
+            }));
+        }
         this.machine.setNotice(`NLI adjudication classified ${results.length} pair${results.length === 1 ? '' : 's'} and applied native candidate-edge judgments.`);
         return {
             inputCount: inputs.length,

@@ -38,31 +38,37 @@ export interface NliBatch {
 export type NliProgressCallback = (progress: NliProgress) => void;
 export type NliBatchCallback = (batch: NliBatch) => void;
 
+const NLI_DISPOSE_TIMEOUT_MS = 1_500;
+
+type PendingNliCallback = {
+    resolve: (value?: any) => void;
+    reject: (reason?: unknown) => void;
+    onProgress?: NliProgressCallback;
+    onBatch?: NliBatchCallback;
+};
+
 @Injectable({ providedIn: 'root' })
 export class NliWorkerService {
     private worker: Worker | null = null;
-    private pendingCallbacks = new Map<
-        number,
-        {
-            resolve: Function;
-            reject: Function;
-            onProgress?: NliProgressCallback;
-            onBatch?: NliBatchCallback;
-        }
-    >();
+    private pendingCallbacks = new Map<number, PendingNliCallback>();
+    private disposal: Promise<void> | null = null;
     private callbackId = 0;
 
     readonly isInitialized = signal(false);
     readonly modelId = signal<string | null>(null);
     readonly device = signal<string>('wasm');
     readonly isProcessing = signal(false);
+    readonly isDisposing = signal(false);
     readonly progress = signal<NliProgress | null>(null);
 
-    readonly isReady = computed(() => this.isInitialized() && !this.isProcessing());
+    readonly isReady = computed(() => this.isInitialized() && !this.isProcessing() && !this.isDisposing());
 
     constructor(private readonly ngZone: NgZone = createNoopNgZone()) {}
 
     async initialize(modelId: string, onProgress?: NliProgressCallback): Promise<void> {
+        if (this.disposal) {
+            await this.disposal;
+        }
         if (this.isInitialized() && this.modelId() === modelId) {
             return;
         }
@@ -86,20 +92,14 @@ export class NliWorkerService {
                     this.ngZone.run(() => {
                         const error = this.formatWorkerError(event);
                         console.error('[NliWorkerService] Worker error:', error);
-                        this.rejectPending(error);
-                        this.worker?.terminate();
-                        this.worker = null;
-                        this.isInitialized.set(false);
-                        this.modelId.set(null);
-                        this.device.set('wasm');
-                        this.progress.set(null);
+                        this.failWorker(worker, error);
                     });
                 };
                 worker.onmessageerror = (event) => {
                     this.ngZone.run(() => {
                         const error = new Error(`NLI worker message error: ${String(event.data)}`);
                         console.error('[NliWorkerService] Worker message error:', error);
-                        this.rejectPending(error);
+                        this.failWorker(worker, error);
                     });
                 };
             },
@@ -121,11 +121,17 @@ export class NliWorkerService {
             });
         });
 
-        this.worker.postMessage({
-            type: 'INIT',
-            payload: { modelId },
-            _id: id,
-        });
+        try {
+            this.worker.postMessage({
+                type: 'INIT',
+                payload: { modelId },
+                _id: id,
+            });
+        } catch (error) {
+            this.pendingCallbacks.delete(id);
+            this.failWorker(this.worker, asError(error));
+            throw error;
+        }
 
         return promise;
     }
@@ -153,17 +159,17 @@ export class NliWorkerService {
             this.pendingCallbacks.set(id, { resolve, reject, onBatch, onProgress });
         });
 
-        this.worker!.postMessage({
-            type: 'CLASSIFY_STREAM',
-            payload: { pairs, batchSize },
-            _id: id,
-        });
-
         try {
+            this.worker!.postMessage({
+                type: 'CLASSIFY_STREAM',
+                payload: { pairs, batchSize },
+                _id: id,
+            });
             await promise;
             this.isProcessing.set(false);
             this.progress.set({ type: 'complete', current: 1, total: 1, message: 'Complete' });
         } catch (error) {
+            this.pendingCallbacks.delete(id);
             this.isProcessing.set(false);
             this.progress.set(null);
             throw error;
@@ -182,27 +188,89 @@ export class NliWorkerService {
             },
         );
 
-        this.worker.postMessage({ type: 'GET_STATUS', _id: id });
+        try {
+            this.worker.postMessage({ type: 'GET_STATUS', _id: id });
+        } catch (error) {
+            this.pendingCallbacks.delete(id);
+            throw error;
+        }
         return promise;
     }
 
     async dispose(): Promise<void> {
-        if (!this.worker) {
+        if (this.disposal) return this.disposal;
+        const worker = this.worker;
+        if (!worker) {
+            this.resetWorkerState();
             return;
         }
 
+        const disposal = this.disposeWorker(worker);
+        this.disposal = disposal;
+        try {
+            await disposal;
+        } finally {
+            if (this.disposal === disposal) this.disposal = null;
+        }
+    }
+
+    async withEphemeralSession<T>(modelId: string, task: () => Promise<T>): Promise<T> {
+        try {
+            await this.initialize(modelId);
+            return await task();
+        } finally {
+            await this.dispose();
+        }
+    }
+
+    residencySnapshot(): { resident: boolean; initialized: boolean; disposing: boolean; pendingRequests: number } {
+        return {
+            resident: this.worker !== null,
+            initialized: this.isInitialized(),
+            disposing: this.isDisposing(),
+            pendingRequests: this.pendingCallbacks.size,
+        };
+    }
+
+    private async disposeWorker(worker: Worker): Promise<void> {
+        this.isDisposing.set(true);
         const id = this.nextId();
-        const promise = new Promise<void>((resolve, reject) => {
+        let timeoutHandle: ReturnType<typeof setTimeout> | null = null;
+        const acknowledgement = new Promise<void>((resolve, reject) => {
             this.pendingCallbacks.set(id, { resolve, reject });
+            timeoutHandle = setTimeout(
+                () => reject(new Error(`NLI worker disposal exceeded ${NLI_DISPOSE_TIMEOUT_MS} ms`)),
+                NLI_DISPOSE_TIMEOUT_MS,
+            );
         });
 
-        this.worker.postMessage({ type: 'DISPOSE', _id: id });
-        await promise;
+        try {
+            worker.postMessage({ type: 'DISPOSE', _id: id });
+            await acknowledgement;
+        } catch (error) {
+            console.warn('[NliWorkerService] Forcing worker termination after disposal failure:', asError(error));
+        } finally {
+            if (timeoutHandle !== null) clearTimeout(timeoutHandle);
+            this.pendingCallbacks.delete(id);
+            this.rejectPending(new Error('NLI worker session closed'));
+            worker.terminate();
+            if (this.worker === worker) this.worker = null;
+            this.resetWorkerState();
+        }
+    }
 
-        this.worker.terminate();
-        this.worker = null;
+    private failWorker(worker: Worker, error: Error): void {
+        this.rejectPending(error);
+        worker.terminate();
+        if (this.worker === worker) this.worker = null;
+        this.resetWorkerState();
+    }
+
+    private resetWorkerState(): void {
         this.isInitialized.set(false);
         this.modelId.set(null);
+        this.isProcessing.set(false);
+        this.isDisposing.set(false);
         this.progress.set(null);
         this.device.set('wasm');
     }
@@ -306,4 +374,8 @@ export class NliWorkerService {
             this.ngZone.run(() => resolve(payload));
         }
     }
+}
+
+function asError(value: unknown): Error {
+    return value instanceof Error ? value : new Error(String(value));
 }

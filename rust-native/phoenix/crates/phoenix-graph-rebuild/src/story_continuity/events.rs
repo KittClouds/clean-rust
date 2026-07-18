@@ -3,7 +3,89 @@ use hashbrown::{HashMap, HashSet};
 
 use crate::{DocumentSemanticSummary, GraphChunk, GraphRebuildSnapshot};
 
-use super::types::{ContinuityEventIdentity, ContinuityStatus};
+use super::types::{ContinuityEventIdentity, ContinuityStatus, StoryContinuityDocument};
+
+pub(super) struct SourceCoordinates {
+    by_note: HashMap<CompactString, SparseUtf16ByteIndex>,
+}
+
+struct SparseUtf16ByteIndex {
+    offsets: Vec<(usize, usize)>,
+}
+
+impl SourceCoordinates {
+    pub(super) fn new(
+        documents: &[StoryContinuityDocument],
+        semantic: Option<&DocumentSemanticSummary>,
+    ) -> Self {
+        let source_by_note = documents
+            .iter()
+            .map(|document| (document.note_id.as_str(), document.text.as_str()))
+            .collect::<HashMap<_, _>>();
+        let mut by_note = HashMap::new();
+        for document in semantic.into_iter().flat_map(|summary| &summary.documents) {
+            let Some(text) = source_by_note.get(document.note_id.as_str()).copied() else {
+                continue;
+            };
+            let mut required = Vec::with_capacity(
+                document.situations.len() * 2 + document.state_intervals.len() * 2,
+            );
+            for situation in &document.situations {
+                required.extend([situation.start, situation.end]);
+            }
+            for interval in &document.state_intervals {
+                required.push(interval.start);
+                if let Some(end) = interval.end {
+                    required.push(end);
+                }
+            }
+            required.sort_unstable();
+            required.dedup();
+            by_note.insert(
+                document.note_id.as_str().into(),
+                SparseUtf16ByteIndex::new(text, required),
+            );
+        }
+        Self { by_note }
+    }
+
+    pub(super) fn byte_offset(&self, note_id: &str, utf16_offset: usize) -> Option<usize> {
+        self.by_note.get(note_id)?.byte_offset(utf16_offset)
+    }
+
+    fn contains_note(&self, note_id: &str) -> bool {
+        self.by_note.contains_key(note_id)
+    }
+}
+
+impl SparseUtf16ByteIndex {
+    fn new(text: &str, required: Vec<usize>) -> Self {
+        let mut offsets = Vec::with_capacity(required.len());
+        let mut characters = text.char_indices();
+        let mut utf16 = 0usize;
+        let mut byte = 0usize;
+        for target in required {
+            while utf16 < target {
+                let Some((start, character)) = characters.next() else {
+                    break;
+                };
+                utf16 = utf16.saturating_add(character.len_utf16());
+                byte = start + character.len_utf8();
+            }
+            if utf16 == target {
+                offsets.push((target, byte));
+            }
+        }
+        Self { offsets }
+    }
+
+    fn byte_offset(&self, utf16_offset: usize) -> Option<usize> {
+        self.offsets
+            .binary_search_by_key(&utf16_offset, |(offset, _)| *offset)
+            .ok()
+            .map(|index| self.offsets[index].1)
+    }
+}
 
 pub(super) struct EventBuild {
     pub events: Vec<ContinuityEventIdentity>,
@@ -14,6 +96,7 @@ pub(super) struct EventBuild {
 pub(super) fn canonical_events(
     snapshot: &GraphRebuildSnapshot,
     semantic: Option<&DocumentSemanticSummary>,
+    coordinates: &SourceCoordinates,
 ) -> EventBuild {
     let mut events = Vec::new();
     let mut situation_to_event = HashMap::new();
@@ -21,17 +104,25 @@ pub(super) fn canonical_events(
     let mut semantic_notes = HashSet::<&str>::new();
 
     for document in semantic.into_iter().flat_map(|summary| &summary.documents) {
+        if !coordinates.contains_note(&document.note_id) {
+            continue;
+        }
         semantic_notes.insert(document.note_id.as_str());
         for situation in &document.situations {
-            let Some(chunk) =
-                chunk_for_offset(&snapshot.chunks, &situation.note_id, situation.start)
+            let Some((source_start, source_end)) = coordinates
+                .byte_offset(&situation.note_id, situation.start)
+                .zip(coordinates.byte_offset(&situation.note_id, situation.end))
+            else {
+                continue;
+            };
+            let Some(chunk) = chunk_for_offset(&snapshot.chunks, &situation.note_id, source_start)
             else {
                 continue;
             };
             let id = event_id(
                 &situation.note_id,
-                situation.start,
-                situation.end,
+                source_start,
+                source_end,
                 &situation.predicate,
                 &situation.participant_entity_ids,
             );
@@ -43,8 +134,8 @@ pub(super) fn canonical_events(
                         && ranges_overlap(
                             anchor.source_start as usize,
                             anchor.source_end as usize,
-                            situation.start,
-                            situation.end,
+                            source_start,
+                            source_end,
                         )
                 })
                 .map(|anchor| anchor.id.clone())
@@ -56,8 +147,8 @@ pub(super) fn canonical_events(
                 source_event_id: None,
                 note_id: situation.note_id.clone().into(),
                 chunk_id: chunk.id.clone(),
-                source_start: clamp_u32(situation.start),
-                source_end: clamp_u32(situation.end),
+                source_start: clamp_u32(source_start),
+                source_end: clamp_u32(source_end),
                 predicate: situation.predicate.clone().into(),
                 participant_entity_ids: sorted_unique(
                     situation

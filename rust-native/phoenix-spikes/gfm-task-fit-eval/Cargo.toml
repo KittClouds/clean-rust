@@ -1,0 +1,18 @@
+[package]
+name = "gfm-task-fit-eval"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[workspace]
+
+[dependencies]
+compact_str = "0.8"
+phoenix-revision-impact = { path = "../phoenix-revision-impact" }
+phoenix-revision-inference = { path = "../phoenix-revision-inference", features = ["encoders"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+[patch.crates-io]
+scirs2-text = { path = "../../phoenix/vendor/scirs2-text" }
+

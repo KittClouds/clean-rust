@@ -50,8 +50,7 @@ pub(super) fn build_episodes(
             .get(note_id.as_str())
             .copied()
             .unwrap_or_default();
-        let text_index = Utf16ByteIndex::new(text);
-        let boundaries = episode_boundaries(snapshot, &chunks, text, &text_index, &location_ids);
+        let boundaries = episode_boundaries(snapshot, &chunks, text, &location_ids);
         for (episode_ordinal, boundary) in boundaries.iter().enumerate() {
             let source_end = boundaries.get(episode_ordinal + 1).map_or_else(
                 || chunks.last().expect("non-empty chunks").end,
@@ -62,7 +61,9 @@ pub(super) fn build_episodes(
                 .copied()
                 .filter(|chunk| chunk.start < source_end && boundary.source_offset < chunk.end)
                 .collect::<Vec<_>>();
-            let start_chunk = group[0];
+            let Some(start_chunk) = group.first().copied() else {
+                continue;
+            };
             let episode_events = events
                 .iter()
                 .filter(|event| {
@@ -106,13 +107,7 @@ pub(super) fn build_episodes(
             episodes.push(StoryEpisodeCandidate {
                 id,
                 note_id: note_id.clone(),
-                label: episode_label(
-                    text,
-                    &text_index,
-                    boundary.source_offset,
-                    source_end,
-                    episode_ordinal,
-                ),
+                label: episode_label(text, boundary.source_offset, source_end, episode_ordinal),
                 source_start: boundary.source_offset,
                 source_end,
                 chunk_ids: group.iter().map(|chunk| chunk.id.clone()).collect(),
@@ -144,7 +139,6 @@ fn episode_boundaries(
     snapshot: &GraphRebuildSnapshot,
     chunks: &[&GraphChunk],
     text: &str,
-    text_index: &Utf16ByteIndex,
     location_ids: &HashSet<&str>,
 ) -> Vec<Boundary> {
     let mut out = vec![Boundary {
@@ -195,16 +189,15 @@ fn episode_boundaries(
     for index in 1..chunks.len() {
         let previous = chunks[index - 1];
         let current = chunks[index];
-        let preview = source_slice(
-            text,
-            text_index,
-            current.start,
-            current.end.min(current.start + 420),
-        );
+        let preview = source_slice(text, current.start, current.end.min(current.start + 420));
         let mut signals = Vec::new();
         let temporal_jump = temporal_jump(preview);
         if let Some(value) = temporal_jump {
-            signals.push(signal("temporal_jump", value, &[current.id.clone()]));
+            signals.push(signal(
+                "temporal_jump",
+                value,
+                std::slice::from_ref(&current.id),
+            ));
         }
         let previous_entities = chunk_entities(snapshot, previous);
         let current_entities = chunk_entities(snapshot, current);
@@ -302,7 +295,7 @@ fn source_headings(text: &str) -> Vec<(u32, CompactString)> {
         })
         .map(|(byte_offset, line)| {
             (
-                byte_to_utf16(text, byte_offset),
+                byte_offset.min(u32::MAX as usize) as u32,
                 line.chars().take(120).collect::<String>().into(),
             )
         })
@@ -317,7 +310,7 @@ fn source_scene_breaks(text: &str) -> Vec<u32> {
             Some((start, line.trim()))
         })
         .filter(|(_, line)| matches!(*line, "***" | "---" | "###"))
-        .map(|(byte_offset, _)| byte_to_utf16(text, byte_offset))
+        .map(|(byte_offset, _)| byte_offset.min(u32::MAX as usize) as u32)
         .collect()
 }
 
@@ -364,68 +357,23 @@ fn temporal_jump(preview: &str) -> Option<&'static str> {
     .find(|cue| lower.contains(cue))
 }
 
-fn episode_label(
-    text: &str,
-    text_index: &Utf16ByteIndex,
-    start: u32,
-    end: u32,
-    ordinal: usize,
-) -> CompactString {
-    let preview = source_slice(text, text_index, start, end.min(start + 420));
+fn episode_label(text: &str, start: u32, end: u32, ordinal: usize) -> CompactString {
+    let preview = source_slice(text, start, end.min(start + 420));
     heading_text(preview)
         .map(CompactString::from)
         .unwrap_or_else(|| format_compact!("Episode {}", ordinal + 1))
 }
 
-fn byte_to_utf16(text: &str, byte_offset: usize) -> u32 {
-    text.get(..byte_offset)
-        .unwrap_or_default()
-        .encode_utf16()
-        .count()
-        .min(u32::MAX as usize) as u32
-}
-
-fn source_slice<'a>(
-    text: &'a str,
-    index: &Utf16ByteIndex,
-    start_utf16: u32,
-    end_utf16: u32,
-) -> &'a str {
-    let start = index.byte_for(start_utf16 as usize);
-    let end = index
-        .byte_for(end_utf16 as usize)
-        .max(start)
-        .min(text.len());
+fn source_slice(text: &str, start: u32, end: u32) -> &str {
+    let mut start = (start as usize).min(text.len());
+    while start > 0 && !text.is_char_boundary(start) {
+        start -= 1;
+    }
+    let mut end = (end as usize).max(start).min(text.len());
+    while end > start && !text.is_char_boundary(end) {
+        end -= 1;
+    }
     text.get(start..end).unwrap_or_default()
-}
-
-struct Utf16ByteIndex {
-    units: Vec<usize>,
-    bytes: Vec<usize>,
-}
-
-impl Utf16ByteIndex {
-    fn new(text: &str) -> Self {
-        let mut units = Vec::with_capacity(text.chars().count() + 1);
-        let mut bytes = Vec::with_capacity(units.capacity());
-        let mut utf16 = 0;
-        for (byte, character) in text.char_indices() {
-            units.push(utf16);
-            bytes.push(byte);
-            utf16 += character.len_utf16();
-        }
-        units.push(utf16);
-        bytes.push(text.len());
-        Self { units, bytes }
-    }
-
-    fn byte_for(&self, target: usize) -> usize {
-        let index = self
-            .units
-            .partition_point(|units| *units <= target)
-            .saturating_sub(1);
-        self.bytes[index]
-    }
 }
 
 fn signal(

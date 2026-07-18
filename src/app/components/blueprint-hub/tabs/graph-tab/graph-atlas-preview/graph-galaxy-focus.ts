@@ -1,4 +1,5 @@
-import type { GalaxySceneV2 } from './graph-galaxy-scene-v2';
+import { galaxyIncidentEdges, type GalaxySceneV2 } from './graph-galaxy-scene-v2';
+import type { GalaxyPathOverlay } from './graph-galaxy-interaction.model';
 
 export interface GalaxyFocusMask {
     hasFocus: boolean;
@@ -17,6 +18,7 @@ export function buildGalaxyFocusMask(
     data: GalaxySceneV2,
     selected: string | readonly string[] | null,
     hoverId: string | null,
+    pathOverlay: GalaxyPathOverlay | null = null,
 ): GalaxyFocusMask {
     const selectedIds = typeof selected === 'string' ? [selected] : selected?.slice(0, 2) ?? [];
     const selectedValues = selectedIds
@@ -29,7 +31,14 @@ export function buildGalaxyFocusMask(
     const nodeLevels = new Uint8Array(data.ids.length);
     const edgeLevels = new Uint8Array(data.edgePairs.length / 2);
     if (selectedValues.length === 2) {
-        return shortestPathFocus(data, selectedValues[0], selectedValues[1], hoverIndex, nodeLevels, edgeLevels);
+        return selectedPairFocus(
+            selectedIds,
+            selectedValues,
+            hoverIndex,
+            nodeLevels,
+            edgeLevels,
+            pathOverlay,
+        );
     }
     const noPath = {
         selectedIndices,
@@ -63,40 +72,22 @@ export function buildGalaxyFocusMask(
     return { ...noPath, hasFocus: true, focusIndex, selectedIndex, hoverIndex, nodeLevels, edgeLevels };
 }
 
-function shortestPathFocus(
-    data: GalaxySceneV2,
-    start: number,
-    target: number,
+function selectedPairFocus(
+    selectedIds: string[],
+    selectedValues: number[],
     hoverIndex: number,
     nodeLevels: Uint8Array,
     edgeLevels: Uint8Array,
+    pathOverlay: GalaxyPathOverlay | null,
 ): GalaxyFocusMask {
-    const previousNode = new Int32Array(data.ids.length);
-    const previousEdge = new Int32Array(data.ids.length);
-    const queue = new Uint32Array(data.ids.length);
-    previousNode.fill(-1);
-    previousEdge.fill(-1);
-    previousNode[start] = start;
-    let head = 0;
-    let tail = 0;
-    queue[tail++] = start;
-
-    while (head < tail && previousNode[target] < 0) {
-        const current = queue[head++];
-        for (const edge of incidentEdgesFor(data, current)) {
-            const source = data.edgePairs[edge * 2];
-            const destination = data.edgePairs[edge * 2 + 1];
-            const next = source === current ? destination : destination === current ? source : -1;
-            if (next < 0 || previousNode[next] >= 0) continue;
-            previousNode[next] = current;
-            previousEdge[next] = edge;
-            queue[tail++] = next;
-            if (next === target) break;
-        }
-    }
-
+    const [start, target] = selectedValues;
     const selectedIndices = Uint32Array.of(start, target);
-    if (previousNode[target] < 0) {
+    const acceptedOverlay = pathOverlay
+        && pathOverlay.sourceNodeId === selectedIds[0]
+        && pathOverlay.targetNodeId === selectedIds[1]
+        ? pathOverlay
+        : null;
+    if (!acceptedOverlay?.found) {
         nodeLevels[start] = 3;
         nodeLevels[target] = 3;
         return {
@@ -112,26 +103,20 @@ function shortestPathFocus(
             edgeLevels,
         };
     }
-
-    const reversedNodes: number[] = [target];
-    const reversedEdges: number[] = [];
-    for (let node = target; node !== start;) {
-        reversedEdges.push(previousEdge[node]);
-        node = previousNode[node];
-        reversedNodes.push(node);
+    for (const node of acceptedOverlay.nodeIndices) {
+        if (node < nodeLevels.length) nodeLevels[node] = node === start || node === target ? 3 : 2;
     }
-    reversedNodes.reverse();
-    reversedEdges.reverse();
-    for (const node of reversedNodes) nodeLevels[node] = node === start || node === target ? 3 : 2;
-    for (const edge of reversedEdges) edgeLevels[edge] = 3;
+    for (const edge of acceptedOverlay.edgeIndices) {
+        if (edge < edgeLevels.length) edgeLevels[edge] = 3;
+    }
     return {
         hasFocus: true,
         focusIndex: target,
         selectedIndex: start,
         hoverIndex,
         selectedIndices,
-        pathNodeIndices: Uint32Array.from(reversedNodes),
-        pathEdgeIndices: Uint32Array.from(reversedEdges),
+        pathNodeIndices: acceptedOverlay.nodeIndices,
+        pathEdgeIndices: acceptedOverlay.edgeIndices,
         pathFound: true,
         nodeLevels,
         edgeLevels,
@@ -275,9 +260,8 @@ function galaxyNodeIndex(data: GalaxySceneV2, id: string): number {
     return data.runtimeIndex?.nodeById.get(id) ?? data.ids.indexOf(id);
 }
 
-function incidentEdgesFor(data: GalaxySceneV2, node: number): readonly number[] {
-    const indexed = data.runtimeIndex?.incidentEdges[node];
-    if (indexed) return indexed;
+function incidentEdgesFor(data: GalaxySceneV2, node: number): Iterable<number> {
+    if (data.runtimeIndex) return galaxyIncidentEdges(data, node);
     const edges: number[] = [];
     for (let edge = 0; edge < data.edgePairs.length / 2; edge++) {
         if (data.edgePairs[edge * 2] === node || data.edgePairs[edge * 2 + 1] === node) edges.push(edge);

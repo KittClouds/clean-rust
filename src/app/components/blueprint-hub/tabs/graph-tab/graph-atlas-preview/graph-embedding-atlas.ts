@@ -2,7 +2,6 @@ import type { Note, NoteBlockProjection } from '../../../../../lib/dexie/db';
 import type {
     AtlasManifoldMode,
     ConeObstructionRecord,
-    ConePathletRecord,
     ManifoldCapabilities,
     ManifoldProjectionSource,
     ManifoldTopologyPayload,
@@ -121,6 +120,8 @@ interface EmbeddingAtlasStyle {
     colorHsl: string;
     metadata: Record<string, string | undefined>;
 }
+
+export const HOPF_PAIRWISE_FALLBACK_NODE_LIMIT = 384;
 
 function embeddingAtlasStyle(input: {
     kind?: string;
@@ -578,6 +579,7 @@ function fibonacciSpherePoint(index: number, total: number, radius: number, seed
 }
 
 function buildKnnEdges(nodes: GalaxyRenderableNode[], signatures: Signature[], topK: number): GalaxyInputEdge[] {
+    if (nodes.length > HOPF_PAIRWISE_FALLBACK_NODE_LIMIT) return [];
     const seen = new Set<string>();
     const edges: GalaxyInputEdge[] = [];
     for (let source = 0; source < nodes.length; source++) {

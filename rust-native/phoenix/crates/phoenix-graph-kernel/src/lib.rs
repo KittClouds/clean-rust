@@ -18,6 +18,12 @@ mod causal;
 mod causal_view;
 mod chrono_region;
 mod galaxy;
+mod galaxy_capacity;
+mod galaxy_store;
+mod galaxy_store_build;
+mod galaxy_store_delta;
+mod galaxy_store_format;
+mod galaxy_store_query;
 mod learning;
 mod pcst_region;
 mod query_view;
@@ -40,6 +46,27 @@ pub use chrono_region::KernelRegionProfile;
 pub use galaxy::{
     galaxy_graph_from_snapshot, GalaxyBuildOptions, GalaxyEdgeRecord, GalaxyGraphPack,
     GalaxyNodeRecord, GalaxyPackStats,
+};
+pub use galaxy_capacity::{
+    galaxy_capacity_byte_accounting, GalaxyCapacityByteAccounting, GALAXY_TEN_MILLION_EDGES,
+    GALAXY_TEN_MILLION_NODES,
+};
+pub use galaxy_store::{GalaxyGraphStore, GalaxyMappedPage, GalaxyStoreError};
+pub use galaxy_store_build::{
+    write_galaxy_graph_store, GalaxyGraphStoreBuildOptions, GalaxyManifoldPositions,
+};
+pub use galaxy_store_delta::{
+    write_galaxy_delta_overlay, GalaxyDeltaBuildInput, GalaxyDeltaManifest,
+};
+pub use galaxy_store_format::{
+    GalaxyAffectedTileRecord, GalaxyCsrNeighbor, GalaxyDeltaEdgeBundleRecord,
+    GalaxyDeltaNodeRecord, GalaxyEdgeBundleRecord, GalaxyLodNodeRecord, GalaxyManifoldKind,
+    GalaxyPageHeader, GalaxyPageKind, GalaxyStoreManifest, GalaxyStringRef, GalaxyTileRecord,
+};
+pub use galaxy_store_query::{
+    GalaxyPathQuery, GalaxyPathQueryResult, GalaxyRegionQuery, GalaxyRegionQueryResult,
+    GALAXY_PATH_EDGE_LIMIT, GALAXY_PATH_VISIT_LIMIT, GALAXY_REGION_CANDIDATE_LIMIT,
+    GALAXY_REGION_RESULT_LIMIT,
 };
 pub use learning::{
     project_graph_proposal_outcomes, GraphProposalBatchReceipt, GraphProposalFeatures,
@@ -64,6 +91,12 @@ pub use truth_commit::{
 
 #[cfg(test)]
 mod causal_view_tests;
+#[cfg(test)]
+mod galaxy_capacity_tests;
+#[cfg(test)]
+mod galaxy_store_query_tests;
+#[cfg(test)]
+mod galaxy_store_tests;
 #[cfg(test)]
 mod galaxy_tests;
 #[cfg(test)]

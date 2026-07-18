@@ -91,6 +91,47 @@ describe('Hopf galaxy visualization data', () => {
         expect(polylineLength(braid!.positions3d)).toBeGreaterThan(directSegmentLength(braid!.positions3d) * 1.05);
     });
 
+    it('keeps sibling fibers geometrically distinct without treating them as cross-cell topology', () => {
+        const evidence = hopfTarget('embed:evidence:a', 'Evidence', 'fiber', 'cell:shared', 0.25);
+        const causal = hopfTarget('embed:causal:a', 'Causal', 'fiber', 'cell:shared', 0.25);
+        evidence.metadata!['hopf'] = {
+            role: 'fiber',
+            baseId: 'cell:shared',
+            cellId: 'cell:shared',
+            splitKey: 'cell:shared:evidence_sample',
+            laneId: 'hopf:fiber:evidence:lane:0',
+            fiberKind: 'evidence_sample',
+            phase: 0.25,
+            direction: [1, 0, 0],
+            laneDirection: [0.99, 0.1, 0],
+        };
+        causal.metadata!['hopf'] = {
+            role: 'fiber',
+            baseId: 'cell:shared',
+            cellId: 'cell:shared',
+            splitKey: 'cell:shared:causal_sample',
+            laneId: 'hopf:fiber:causal:lane:0',
+            fiberKind: 'causal_sample',
+            phase: 0.25,
+            direction: [1, 0, 0],
+            laneDirection: [0.99, -0.1, 0],
+        };
+        const scene = buildGalaxyScene([evidence, causal], [{
+            id: 'same-cell-different-fiber',
+            sourceId: evidence.id,
+            targetId: causal.id,
+            type: 'embedding-backbone',
+            confidence: 0.9,
+        }], mergeGalaxySettings({ layoutMode: 'hopfProjection' }));
+        const [left, right] = scene.nodes;
+        const distance = Math.hypot(left.x - right.x, left.y - right.y, left.z - right.z);
+        const dataFibers = scene.hopfRibbons?.filter((ribbon) => ribbon.guideKind === 'dataFiber') || [];
+
+        expect(distance).toBeGreaterThan(0.01);
+        expect(dataFibers).toHaveLength(2);
+        expect(scene.hopfRibbons?.some((ribbon) => ribbon.guideKind === 'crossFiberBraid')).toBe(false);
+    });
+
     it('emits Hopf receipt guides from backend cell assignments', () => {
         const nodes: GalaxyRenderableNode[] = [
             hopfReceiptTarget('embed:note:one', 'Chapter One', 'cell:a', 0.02, [1, 0, 0], ['cell:b'], 'document_chart'),
@@ -112,9 +153,9 @@ describe('Hopf galaxy visualization data', () => {
         expect(receiptBraid?.nodeIds).toEqual(expect.arrayContaining(['embed:note:one', 'embed:note:two']));
     });
 
-    it('draws every data-formed fiber so no assigned node floats without its curve', () => {
-        const crowded = Array.from({ length: 64 }, (_, index) =>
-            hopfTarget(`embed:entity:busy-${index}`, `Busy ${index}`, 'anchor', `embed:entity:busy-${index}`, index / 64),
+    it('assigns every node while bounding materialized fiber guide geometry', () => {
+        const crowded = Array.from({ length: 512 }, (_, index) =>
+            hopfTarget(`embed:entity:busy-${index}`, `Busy ${index}`, 'anchor', `embed:entity:busy-${index}`, index / 512),
         );
         const status = hopfTarget('embed:memory:kai-status', 'Kai status', 'fiber', 'embed:entity:kai:hopf:memory-status', 0.4);
         status.kind = 'memory-state';
@@ -126,11 +167,10 @@ describe('Hopf galaxy visualization data', () => {
         const scene = buildGalaxyScene([...crowded, status], [], mergeGalaxySettings({ layoutMode: 'hopfProjection' }));
 
         const dataRibbons = scene.hopfRibbons?.filter((ribbon) => ribbon.guideKind === 'dataFiber') || [];
-        expect(dataRibbons).toHaveLength(65);
-        const coveredNodeIds = new Set(dataRibbons.flatMap((ribbon) => ribbon.nodeIds));
-        expect(coveredNodeIds.size).toBe(65);
-        expect(crowded.every((node) => coveredNodeIds.has(node.id))).toBe(true);
-        expect(dataRibbons.some((ribbon) => ribbon.nodeIds.includes('embed:memory:kai-status'))).toBe(true);
+        expect(dataRibbons).toHaveLength(128);
+        expect(scene.nodes).toHaveLength(513);
+        expect(scene.nodes.every((node) => Number.isFinite(node.x) && Number.isFinite(node.y) && Number.isFinite(node.z))).toBe(true);
+        expect(scene.nodes.every((node) => Boolean(node.entity.metadata?.hopf?.['baseId']))).toBe(true);
     });
 
     it('clamps Hopf visual intensity independently of hybrid shell opacity', () => {

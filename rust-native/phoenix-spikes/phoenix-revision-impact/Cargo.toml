@@ -1,0 +1,35 @@
+[package]
+name = "phoenix-revision-impact"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+publish = false
+
+[features]
+default = []
+gold-harness = []
+
+[workspace]
+
+[dependencies]
+blake3 = "1.8"
+compact_str = { version = "0.8", features = ["serde"] }
+hashbrown = "0.15"
+memchr = "2.7"
+memmap2 = "0.9"
+phoenix-graph-rebuild = { path = "../../phoenix/crates/phoenix-graph-rebuild" }
+phoenix-semantic-v2 = { path = "../../phoenix/crates/phoenix-semantic-v2" }
+phoenix-types = { path = "../../phoenix/crates/phoenix-types" }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+sha2 = "0.10"
+smallvec = { version = "1.15", features = ["serde"] }
+thiserror = "1.0"
+windows-sys = { version = "0.59", features = ["Win32_System_ProcessStatus", "Win32_System_Threading"] }
+
+[dev-dependencies]
+g-reasoner-34m-parity = { path = "../g-reasoner-34m-parity" }
+gfm-rag-8m-parity = { path = "../gfm-rag-8m-parity" }
+
+[patch.crates-io]
+scirs2-text = { path = "../../phoenix/vendor/scirs2-text" }

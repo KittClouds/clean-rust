@@ -2,7 +2,12 @@
 
 import { entityColorStore } from '../../../../../lib/store/entityColorStore';
 import { buildGalaxyScene, type GalaxyInputEdge, type GalaxyRenderableNode, type GalaxyRenderSettings } from './graph-galaxy-engine';
-import { compactGalaxySceneForTransfer } from './graph-galaxy-worker-scene';
+import {
+    galaxyScenePacketV2TransferList,
+    packGalaxyScenePacketV2,
+} from './graph-galaxy-scene-packet-v2';
+import type { GalaxyScenePacketV2Context } from './graph-galaxy-scene-packet-v2.model';
+import { galaxySceneToV2, type GalaxySceneSourceMode } from './graph-galaxy-scene-v2';
 
 interface GalaxySceneWorkerRequest {
     id: number;
@@ -11,6 +16,8 @@ interface GalaxySceneWorkerRequest {
     settings: GalaxyRenderSettings;
     entityColors: Record<string, string>;
     graphNodeColors: Record<string, string>;
+    sourceMode: GalaxySceneSourceMode;
+    packetContext: GalaxyScenePacketV2Context;
 }
 
 addEventListener('message', ({ data }: MessageEvent<GalaxySceneWorkerRequest>) => {
@@ -19,7 +26,9 @@ addEventListener('message', ({ data }: MessageEvent<GalaxySceneWorkerRequest>) =
         for (const [kind, hsl] of Object.entries(data.graphNodeColors)) {
             entityColorStore.setGraphNodeColor(kind, hsl);
         }
-        postMessage({ id: data.id, scene: compactGalaxySceneForTransfer(buildGalaxyScene(data.entities, data.edges, data.settings)) });
+        const scene = galaxySceneToV2(buildGalaxyScene(data.entities, data.edges, data.settings), data.sourceMode);
+        const packet = packGalaxyScenePacketV2(scene, data.packetContext);
+        postMessage({ id: data.id, packet }, galaxyScenePacketV2TransferList(packet));
     } catch (error) {
         postMessage({ id: data.id, error: error instanceof Error ? error.message : String(error) });
     }

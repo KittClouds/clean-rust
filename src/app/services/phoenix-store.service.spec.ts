@@ -5,7 +5,7 @@ import {
     BrowserDynamicTestingModule,
     platformBrowserDynamicTesting,
 } from '@angular/platform-browser-dynamic/testing';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import {
     derivedGraphRepairPrunedDocuments,
@@ -103,6 +103,42 @@ describe('PhoenixStoreService persistence diagnostics helpers', () => {
 
         expect(row['payload']).toBe(payload);
         expect(rowToScopedDocument(row).payload).toBe(payload);
+    });
+
+    it('loads a bounded scoped-document key set through one native command', async () => {
+        const row = scopedDocumentToRow({
+            id: 'doc-1',
+            scopeFolderId: 'global',
+            narrativeId: '',
+            namespace: 'phoenix_graph_rebuild_v1',
+            documentKey: 'snapshot-blob:atlasPacket:hash',
+            payload: '{}',
+            createdAt: 1,
+            updatedAt: 2,
+        });
+        const backend = { storeCommand: vi.fn(async () => [row]) };
+        TestBed.resetTestingModule();
+        TestBed.configureTestingModule({ providers: [
+            PhoenixStoreService,
+            { provide: PhoenixBackendService, useValue: backend },
+            { provide: SqlitePersistenceService, useValue: {} },
+        ] });
+        const service = TestBed.inject(PhoenixStoreService);
+        Object.assign(service as any, { initialized: true });
+
+        const documents = await service.getScopedDocumentsByKeys(
+            'global',
+            'phoenix_graph_rebuild_v1',
+            ['snapshot-blob:atlasPacket:hash', 'snapshot-blob:atlasPacket:hash'],
+        );
+
+        expect(backend.storeCommand).toHaveBeenCalledOnce();
+        expect(backend.storeCommand).toHaveBeenCalledWith('scopedDocuments:getMany', {
+            scopeFolderId: 'global',
+            namespace: 'phoenix_graph_rebuild_v1',
+            documentKeys: ['snapshot-blob:atlasPacket:hash'],
+        });
+        expect(documents).toEqual([rowToScopedDocument(row)]);
     });
 });
 

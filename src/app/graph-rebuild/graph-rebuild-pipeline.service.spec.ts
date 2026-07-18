@@ -109,11 +109,11 @@ describe('GraphRebuildPipelineService', () => {
         vi.clearAllMocks();
     });
 
-    it('blocks graph builds while graph models are cold', async () => {
+    it('blocks graph builds while the dynamic NER prerequisite is cold', async () => {
         atlasRuntime.capabilityState.mockImplementation((capability: string) => ({
             requiredModels: [{
                 id: capability === 'semanticAtlas' ? 'semanticEmbedding' : capability === 'nliAdjudication' ? 'nli' : 'dynamicNer',
-                readiness: capability === 'dynamicNer' ? 'ready' : 'idle',
+                readiness: capability === 'dynamicNer' ? 'idle' : 'ready',
                 statusLabel: 'idle',
             }],
         }));
@@ -122,6 +122,14 @@ describe('GraphRebuildPipelineService', () => {
 
         expect(ner.scanDynamicBatch).not.toHaveBeenCalled();
         expect(graphRebuild.buildAndPersistSnapshot).not.toHaveBeenCalled();
+    });
+
+    it('stages only the lightweight build prerequisite and leaves NLI on demand', async () => {
+        await service.loadGraphModels(request());
+
+        expect(atlasRuntime.warmModelLane).toHaveBeenCalledTimes(1);
+        expect(atlasRuntime.warmModelLane).toHaveBeenCalledWith('dynamicNer', expect.any(Object));
+        expect(atlasRuntime.warmModelLane).not.toHaveBeenCalledWith('nli', expect.any(Object));
     });
 
     it('builds the graph in one pass without invoking Semantic Atlas', async () => {

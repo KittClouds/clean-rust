@@ -979,6 +979,21 @@ export class PhoenixStoreService {
         return row ? rowToScopedDocument(row) : null;
     }
 
+    async getScopedDocumentsByKeys(
+        scopeFolderId: string,
+        namespace: string,
+        documentKeys: readonly string[],
+    ): Promise<StoreScopedDocument[]> {
+        if (!documentKeys.length) return [];
+        await this.ensureInitialized();
+        const payload = await this.phoenix.storeCommand('scopedDocuments:getMany', {
+            scopeFolderId,
+            namespace,
+            documentKeys: [...new Set(documentKeys)],
+        });
+        return Array.isArray(payload) ? payload.map(rowToScopedDocument) : [];
+    }
+
     async listScopedDocuments(scopeFolderId: string, namespace?: string): Promise<StoreScopedDocument[]> {
         await this.ensureInitialized();
         const rows = await this.relationList<any>('scoped_documents', {

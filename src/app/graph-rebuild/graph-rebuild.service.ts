@@ -71,8 +71,6 @@ import {
     type GraphReviewAdjudicationRunCertificate,
 } from './graph-review-adjudication-certificate';
 import type {
-    GraphAtlasFamily,
-    GraphAtlasManifoldTarget,
     GraphAtlasObject,
     GraphAtlasObjectStatus,
     GraphAtlasPacket,
@@ -138,7 +136,6 @@ import type {
     GraphRebuildEmbeddingTargetPlan,
     GraphRebuildEmbeddingProfile,
     GraphMemoryGovernanceCandidate,
-    GraphMemoryGovernanceRetrievalCandidate,
     GraphMemoryGovernanceRetrievalWeightingExperiment,
     GraphRebuildNoteFolderContext,
     GraphRebuildRelationshipHint,
@@ -161,16 +158,43 @@ import {
     recordGraphCollapseNativeBoundary,
     recordGraphCollapseSnapshotBoundary,
 } from './graph-collapse-trace';
+import {
+    filterNativeEmbeddingTargetsForCommittedSources,
+    mergeNativeEmbeddingTargets,
+    normalizeNativeAtlasPacketSourceContract,
+    reconcileNativeAtlasPacketForTargets,
+} from './graph-native-atlas-packet-reconciler';
+import {
+    DIAGNOSTIC_SNAPSHOT_DOCUMENT_KEY,
+    GRAPH_MODEL_V2_OVERGRAPH_DOCUMENT_KEY,
+    GRAPH_REBUILD_NAMESPACE,
+    RECEIPT_DOCUMENT_KEY,
+    SNAPSHOT_DOCUMENT_KEY,
+    graphIndexReceiptToScopedDocument,
+    postProcessCacheDocumentKey,
+    postProcessCacheToScopedDocument,
+    scopedDocumentToGraphIndexReceipt,
+    scopedDocumentToPostProcessCache,
+    type GraphRebuildPostProcessCache,
+} from './graph-rebuild-persistence-contract';
 
 export { mergeGraphRebuildOccurrences } from './graph-snapshot-source-evidence';
+export {
+    filterNativeEmbeddingTargetsForCommittedSources,
+    mergeNativeEmbeddingTargets,
+    reconcileNativeAtlasPacketForTargets,
+} from './graph-native-atlas-packet-reconciler';
+export {
+    DIAGNOSTIC_SNAPSHOT_DOCUMENT_KEY,
+    GRAPH_MODEL_V2_OVERGRAPH_DOCUMENT_KEY,
+    GRAPH_REBUILD_NAMESPACE,
+    graphIndexReceiptToScopedDocument,
+    postProcessCacheToScopedDocument,
+    scopedDocumentToGraphIndexReceipt,
+    type GraphRebuildPostProcessCache,
+} from './graph-rebuild-persistence-contract';
 
-export const GRAPH_REBUILD_NAMESPACE = 'phoenix_graph_rebuild_v1';
-const SNAPSHOT_DOCUMENT_KEY = 'snapshot';
-export const DIAGNOSTIC_SNAPSHOT_DOCUMENT_KEY = 'snapshot:diagnostic';
-const RECEIPT_DOCUMENT_KEY = 'receipt';
 const OPERATOR_MUTATION_JOURNAL_DOCUMENT_KEY = 'operator-mutation-journal';
-export const GRAPH_MODEL_V2_OVERGRAPH_DOCUMENT_KEY = 'graph-model-v2-overgraph';
-const POST_PROCESS_CACHE_PREFIX = 'postprocess-cache';
 const SNAPSHOT_CONTENT_BLOB_PREFIX = 'snapshot-blob';
 const CONTENT_BLOB_SCHEMA_VERSION = 'phoenix-graph-rebuild-content-blob/v1';
 const COMPRESSED_JSON_SCHEMA_VERSION = 'phoenix-graph-rebuild-json-payload/gzip-base64/v1';
@@ -183,18 +207,6 @@ const NATIVE_COMPILER_DISCOURSE_CLUSTER_LIMIT = 72;
 const NATIVE_COMPILER_DISCOURSE_BRIDGE_LIMIT = 96;
 const NATIVE_COMPILER_PACKET_TEXT_LIMIT = 180;
 const NATIVE_COMPILER_PACKET_LIST_LIMIT = 12;
-
-export interface GraphRebuildPostProcessCache {
-    schemaVersion: 'phoenix-graph-postprocess-cache/v1';
-    scopeId: string;
-    scopeKind?: GraphRebuildScopeKind;
-    fingerprint: string;
-    snapshot?: GraphRebuildSnapshot;
-    snapshotId?: string;
-    receipt?: GraphIndexRunReceipt;
-    receiptId?: string;
-    updatedAt: number;
-}
 
 interface NativeDocumentChunkOutput {
     noteId: string;
@@ -1728,14 +1740,18 @@ export class GraphRebuildService {
 
     private async hydratePersistedSnapshot(persisted: GraphRebuildSnapshot): Promise<GraphRebuildSnapshot> {
         const refs = persisted.contentManifest?.refs || {};
-        const entries = await Promise.all(Object.values(refs).map(async (ref) => {
-            if (!ref) return null;
-            const blob = await this.loadPersistedSnapshotContentBlob(persisted.scopeId, ref.documentKey);
-            return blob ? [ref.field, blob] as const : null;
-        }));
+        const activeRefs = Object.values(refs).filter((ref): ref is NonNullable<typeof ref> => Boolean(ref));
+        const documents = await this.store.getScopedDocumentsByKeys(
+            persisted.scopeId,
+            GRAPH_REBUILD_NAMESPACE,
+            activeRefs.map((ref) => ref.documentKey),
+        );
+        const documentByKey = new Map(documents.map((document) => [document.documentKey, document]));
         const blobs: Partial<Record<GraphRebuildContentBlobField, GraphSnapshotHydrationBlob>> = {};
-        for (const entry of entries) {
-            if (entry) blobs[entry[0]] = entry[1];
+        for (const ref of activeRefs) {
+            const document = documentByKey.get(ref.documentKey);
+            const blob = document ? scopedDocumentToGraphRebuildContentBlob(document) : null;
+            if (blob) blobs[ref.field] = blob;
         }
         return hydrateGraphSnapshotContent(persisted, blobs);
     }
@@ -2278,273 +2294,6 @@ function updateEmbeddingTargetCounters(
     snapshot.counters.embeddingPolicyDeferredTargets = plan.policyDeferredCount;
 }
 
-export function filterNativeEmbeddingTargetsForCommittedSources(
-    snapshot: GraphRebuildSnapshot,
-    targets: GraphRebuildEmbeddingTarget[],
-): GraphRebuildEmbeddingTarget[] {
-    const committed = committedTargetSources(snapshot);
-    return targets.filter((target) => nativeTargetHasCommittedSource(target, committed));
-}
-
-export function mergeNativeEmbeddingTargets(
-    existing: GraphRebuildEmbeddingTarget[],
-    nativeTargets: GraphRebuildEmbeddingTarget[],
-): GraphRebuildEmbeddingTarget[] {
-    const nativeById = new Map(nativeTargets.map((target) => [target.id, target]));
-    const merged = existing.map((target) => nativeById.get(target.id) || target);
-    const existingIds = new Set(existing.map((target) => target.id));
-    for (const target of nativeTargets) {
-        if (!existingIds.has(target.id)) merged.push(target);
-    }
-    return merged;
-}
-
-export function reconcileNativeAtlasPacketForTargets(
-    snapshot: GraphRebuildSnapshot,
-    packet: GraphAtlasPacket,
-): GraphAtlasPacket {
-    const packetTargets = new Map(packet.manifoldTargets.map((target) => [target.id, target]));
-    const objectsById = new Map(packet.objects.map((object) => [object.id, object]));
-    const objectsBySourceId = new Map<string, GraphAtlasObject[]>();
-    const objectsByTargetId = new Map<string, GraphAtlasObject[]>();
-    for (const object of packet.objects) {
-        for (const sourceId of object.sourceIds) pushAtlasObjectLookup(objectsBySourceId, sourceId, object);
-        for (const targetId of object.targetIds) pushAtlasObjectLookup(objectsByTargetId, targetId, object);
-    }
-    const objects = new Map(packet.objects.map((object) => [object.id, object]));
-    const targets = snapshot.embeddingTargets.map((target): GraphAtlasManifoldTarget => {
-        const existingTarget = packetTargets.get(target.id);
-        const existingObject = (existingTarget && objectsById.get(existingTarget.objectId))
-            || selectAtlasObjectForTarget(target, objectsByTargetId.get(target.id))
-            || selectAtlasObjectForTarget(target, objectsBySourceId.get(target.sourceId));
-        const objectId = existingTarget?.objectId || existingObject?.id || `atlas:${target.id}`;
-        const family = existingTarget?.family || existingObject?.family || atlasFamilyForTarget(target);
-        objects.set(objectId, atlasObjectForTarget(existingObject, objectId, family, target));
-        return {
-            id: target.id,
-            objectId,
-            family,
-            admission: target.admissionStatus === 'deferred' ? 'deferred' : 'admitted',
-            vectorStatus: existingTarget?.vectorStatus || 'missing',
-            coordinateSource: existingTarget?.coordinateSource || 'none',
-            status: existingTarget?.status || 'accepted',
-            kind: target.kind,
-            label: target.label,
-            entityKind: target.entityKind,
-            styleKey: target.styleKey,
-            lane: target.lane,
-            structuralRole: target.structuralRole,
-            documentUnitKind: target.documentUnitKind || existingTarget?.documentUnitKind,
-            stateContextKind: target.stateContextKind || existingTarget?.stateContextKind,
-            sourceId: target.sourceId,
-            registryEntityId: target.entityId,
-            noteId: target.noteId,
-            chunkId: target.chunkId,
-            evidenceIds: target.evidenceIds,
-            parentIds: target.parentIds,
-        };
-    });
-    const targetIds = new Set(targets.map((target) => target.id));
-    for (const parentId of targets.flatMap((target) => target.parentIds || [])) {
-        if (targetIds.has(parentId)) continue;
-        const parent = objectsById.get(parentId) || objectsBySourceId.get(parentId)?.[0];
-        if (parent) objects.set(parent.id, parent);
-    }
-    const resolvableParents = new Set([
-        ...targets.flatMap((target) => [target.id, target.objectId, target.sourceId]),
-        ...[...objects.values()].flatMap((object) => [object.id, ...object.sourceIds]),
-    ]);
-    const reconciledTargets = targets.map((target) => ({
-        ...target,
-        parentIds: (target.parentIds || []).filter((parentId) => resolvableParents.has(parentId)),
-    }));
-    const reconciledObjects = [...objects.values()].map((object) => ({
-        ...object,
-        targetIds: object.targetIds.filter((targetId) => targetIds.has(targetId)),
-    }));
-    const families = new Map<GraphAtlasFamily, number>();
-    for (const object of reconciledObjects) {
-        families.set(object.family, (families.get(object.family) || 0) + 1);
-    }
-    const reconciledPacket: GraphAtlasPacket = {
-        ...packet,
-        objects: reconciledObjects,
-        manifoldTargets: reconciledTargets,
-        counters: {
-            ...packet.counters,
-            objects: reconciledObjects.length,
-            manifoldTargets: reconciledTargets.length,
-            registryEntities: snapshot.nodes.length,
-            evidenceAnchors: snapshot.entityAnchors.length,
-            modelVectors: reconciledTargets.filter((target) => target.vectorStatus === 'modelVector').length,
-            families: [...families.entries()]
-                .sort(([left], [right]) => left.localeCompare(right))
-                .map(([family, count]) => ({ family, count })),
-        },
-    };
-    return normalizeNativeAtlasPacketSourceContract(reconciledPacket) || reconciledPacket;
-}
-
-function normalizeNativeAtlasPacketSourceContract(packet: GraphAtlasPacket | undefined): GraphAtlasPacket | undefined {
-    if (!packet) return undefined;
-    const contract = packet.sourceContract;
-    if (contract.authority !== GRAPH_ATLAS_PACKET_AUTHORITY
-        || contract.identityAuthority !== GRAPH_ATLAS_IDENTITY_AUTHORITY) {
-        return packet;
-    }
-    if (contract.tsGraphBuilderRole === GRAPH_ATLAS_BUILDER_ROLE) return packet;
-    if (!isLegacyAtlasBuilderRole(contract.tsGraphBuilderRole)) return packet;
-    return {
-        ...packet,
-        sourceContract: {
-            ...contract,
-            tsGraphBuilderRole: GRAPH_ATLAS_BUILDER_ROLE,
-        },
-    };
-}
-
-function isLegacyAtlasBuilderRole(role: string): boolean {
-    return role === 'compatibility-only'
-        || role === 'compatibility_only'
-        || role === 'typescript-compatibility'
-        || role === 'typescript_compatibility';
-}
-
-function pushAtlasObjectLookup(
-    lookup: Map<string, GraphAtlasObject[]>,
-    key: string,
-    object: GraphAtlasObject,
-): void {
-    const objects = lookup.get(key);
-    if (objects) objects.push(object);
-    else lookup.set(key, [object]);
-}
-
-function selectAtlasObjectForTarget(
-    target: GraphRebuildEmbeddingTarget,
-    candidates: GraphAtlasObject[] | undefined,
-): GraphAtlasObject | undefined {
-    if (!candidates?.length) return undefined;
-    const preferredFamily = atlasFamilyForTarget(target);
-    return candidates.find((object) => object.family === preferredFamily) || candidates[0];
-}
-
-function atlasObjectForTarget(
-    existing: GraphAtlasObject | undefined,
-    id: string,
-    family: GraphAtlasFamily,
-    target: GraphRebuildEmbeddingTarget,
-): GraphAtlasObject {
-    return {
-        id,
-        family,
-        status: existing?.status || 'accepted',
-        kind: target.kind,
-        label: target.label,
-        styleKey: target.styleKey,
-        lane: target.lane,
-        structuralRole: target.structuralRole,
-        documentUnitKind: target.documentUnitKind || existing?.documentUnitKind,
-        stateContextKind: target.stateContextKind || existing?.stateContextKind,
-        registryEntityId: target.entityId,
-        noteIds: target.noteId ? [target.noteId] : existing?.noteIds || [],
-        chunkIds: target.chunkId ? [target.chunkId] : existing?.chunkIds || [],
-        anchorIds: target.kind === 'anchor' ? target.evidenceIds : existing?.anchorIds || [],
-        evidenceIds: target.evidenceIds,
-        sourceIds: [...new Set([target.sourceId, ...(existing?.sourceIds || [])])],
-        targetIds: [...new Set([target.id, ...(existing?.targetIds || [])])],
-    };
-}
-
-function atlasFamilyForTarget(target: GraphRebuildEmbeddingTarget): GraphAtlasFamily {
-    const kind = normalizeTargetKind(target.kind);
-    if (kind === 'entity') return 'registry';
-    if (kind === 'note' || kind === 'chunk' || kind === 'episode' || kind === 'structureroot' || kind === 'documentunit') return 'structure';
-    if (kind === 'anchor' || kind === 'evidencespan') return 'evidence';
-    if (kind === 'temporalfact') return 'temporal';
-    if (kind === 'causalfact') return 'causal';
-    if (kind === 'memorystate') return 'memory';
-    if (kind === 'graphfact' || kind === 'event') return 'fact';
-    return 'unknown';
-}
-
-function nativeTargetHasCommittedSource(
-    target: GraphRebuildEmbeddingTarget,
-    committed: ReturnType<typeof committedTargetSources>,
-): boolean {
-    const kind = normalizeTargetKind(target.kind);
-    const lane = target.lane || inferredNativeTargetLane(kind);
-    if (kind === 'note' || kind === 'chunk' || kind === 'episode' || kind === 'structureroot' || kind === 'documentunit') return true;
-    if (lane === 'entity_anchor' || kind === 'entity') {
-        return committed.entities.has(target.entityId || target.sourceId);
-    }
-    if (lane === 'anchor_evidence' || kind === 'anchor' || kind === 'evidencespan') {
-        return committed.anchors.size > 0 && targetReferencesAny(target, committed.anchors);
-    }
-    if (isNativeFactLane(lane) || ['graphfact', 'temporalfact', 'causalfact', 'memorystate', 'event'].includes(kind)) {
-        return committed.facts.size > 0 && targetReferencesAny(target, committed.facts);
-    }
-    return true;
-}
-
-function committedTargetSources(snapshot: GraphRebuildSnapshot) {
-    const anchors = new Set([
-        ...snapshot.mentions.map((row) => row.id),
-        ...snapshot.entityAnchors.map((row) => row.id),
-    ]);
-    const facts = new Set<string>();
-    for (const relationship of snapshot.relationships) {
-        addSourceVariants(facts, relationship.id, ['relationship', 'graph-fact']);
-    }
-    for (const event of snapshot.events) addSourceVariants(facts, event.id, ['event']);
-    for (const edge of snapshot.temporalEdges) addSourceVariants(facts, edge.id, ['temporalFact']);
-    for (const edge of snapshot.causalEdges) addSourceVariants(facts, edge.id, ['causalFact']);
-    for (const state of snapshot.memoryState) addSourceVariants(facts, state.id, ['memory']);
-    return {
-        anchors,
-        entities: new Set(snapshot.nodes.map((node) => node.entityId)),
-        facts,
-    };
-}
-
-function addSourceVariants(out: Set<string>, id: string, prefixes: string[]): void {
-    if (!id) return;
-    out.add(id);
-    out.add(`fact:${id}`);
-    out.add(`embed:${id}`);
-    for (const prefix of prefixes) {
-        out.add(`${prefix}:${id}`);
-        out.add(`fact:${prefix}:${id}`);
-        out.add(`embed:${prefix}:${id}`);
-    }
-}
-
-function targetReferencesAny(target: GraphRebuildEmbeddingTarget, allowed: Set<string>): boolean {
-    if (allowed.has(target.sourceId)) return true;
-    if (target.entityId && allowed.has(target.entityId)) return true;
-    return target.evidenceIds.some((id) => allowed.has(id));
-}
-
-function inferredNativeTargetLane(kind: string): string {
-    if (kind === 'episode') return 'document_spine';
-    if (kind === 'entity') return 'entity_anchor';
-    if (kind === 'anchor' || kind === 'evidencespan') return 'anchor_evidence';
-    if (kind === 'graphfact') return 'relationship_fact';
-    if (kind === 'temporalfact') return 'temporal_fact';
-    if (kind === 'causalfact') return 'causal_fact';
-    if (kind === 'memorystate') return 'memory_state';
-    if (kind === 'event') return 'event_identity';
-    return 'unknown';
-}
-
-function isNativeFactLane(lane: string): boolean {
-    return lane === 'relationship_fact'
-        || lane === 'temporal_fact'
-        || lane === 'causal_fact'
-        || lane === 'memory_state'
-        || lane === 'event_identity';
-}
-
 export function attachInteractiveAtlasPacketForSnapshotTargets(
     snapshot: GraphRebuildSnapshot,
     previousSnapshot?: GraphRebuildSnapshot | null,
@@ -2784,10 +2533,6 @@ function trimOldestMapEntries<K, V>(values: Map<K, V>, limit: number): void {
         if (oldest.done) return;
         values.delete(oldest.value);
     }
-}
-
-function normalizeTargetKind(kind: string): string {
-    return String(kind || '').replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase().replace(/[-_\s]+/g, '');
 }
 
 function refreshTargetDerivedReadModels(snapshot: GraphRebuildSnapshot): void {
@@ -3388,29 +3133,6 @@ export function scopedDocumentToGraphModelV2OverGraphExport(document: StoreScope
     }
 }
 
-export function graphIndexReceiptToScopedDocument(receipt: GraphIndexRunReceipt): StoreScopedDocument {
-    const now = Date.now();
-    return {
-        id: `${GRAPH_REBUILD_NAMESPACE}:${receipt.scope.scopeId}:${RECEIPT_DOCUMENT_KEY}`,
-        scopeFolderId: receipt.scope.scopeId,
-        narrativeId: receipt.scope.kind === 'narrative' ? receipt.scope.scopeId : '',
-        namespace: GRAPH_REBUILD_NAMESPACE,
-        documentKey: RECEIPT_DOCUMENT_KEY,
-        payload: JSON.stringify(receipt),
-        createdAt: receipt.startedAt || now,
-        updatedAt: now,
-    };
-}
-
-export function scopedDocumentToGraphIndexReceipt(document: StoreScopedDocument): GraphIndexRunReceipt | null {
-    try {
-        const parsed = JSON.parse(document.payload) as GraphIndexRunReceipt;
-        return parsed?.schemaVersion === 'phoenix-graph-index-run/v1' ? parsed : null;
-    } catch {
-        return null;
-    }
-}
-
 export function graphOperatorMutationJournalToScopedDocument(
     journal: GraphOperatorMutationJournal,
     scopeKind: GraphRebuildScopeKind,
@@ -3434,33 +3156,6 @@ export function scopedDocumentToGraphOperatorMutationJournal(
     try {
         const parsed = decodeGraphRebuildJsonPayload<GraphOperatorMutationJournal>(document.payload);
         return isGraphOperatorMutationJournal(parsed) ? parsed : null;
-    } catch {
-        return null;
-    }
-}
-
-function postProcessCacheDocumentKey(fingerprint: string): string {
-    return `${POST_PROCESS_CACHE_PREFIX}:${fingerprint}`;
-}
-
-export function postProcessCacheToScopedDocument(cache: GraphRebuildPostProcessCache): StoreScopedDocument {
-    const now = Date.now();
-    return {
-        id: `${GRAPH_REBUILD_NAMESPACE}:${cache.scopeId}:${postProcessCacheDocumentKey(cache.fingerprint)}`,
-        scopeFolderId: cache.scopeId,
-        narrativeId: cache.scopeKind === 'narrative' ? cache.scopeId : '',
-        namespace: GRAPH_REBUILD_NAMESPACE,
-        documentKey: postProcessCacheDocumentKey(cache.fingerprint),
-        payload: JSON.stringify(cache),
-        createdAt: cache.updatedAt || now,
-        updatedAt: now,
-    };
-}
-
-function scopedDocumentToPostProcessCache(document: StoreScopedDocument): GraphRebuildPostProcessCache | null {
-    try {
-        const parsed = JSON.parse(document.payload) as GraphRebuildPostProcessCache;
-        return parsed?.schemaVersion === 'phoenix-graph-postprocess-cache/v1' ? parsed : null;
     } catch {
         return null;
     }

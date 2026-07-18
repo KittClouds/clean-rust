@@ -13,6 +13,7 @@ mod graph_decision_reward_evidence;
 mod graph_decision_reward_observation;
 mod graph_decision_truth_link;
 mod graph_truth;
+mod revision_impact;
 
 pub use binary::*;
 pub use deterministic::*;
@@ -24,6 +25,7 @@ pub use graph_decision_reward_evidence::*;
 pub use graph_decision_reward_observation::*;
 pub use graph_decision_truth_link::*;
 pub use graph_truth::*;
+pub use revision_impact::*;
 
 macro_rules! string_id {
     ($name:ident) => {

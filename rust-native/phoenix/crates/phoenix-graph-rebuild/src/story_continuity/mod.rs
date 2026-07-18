@@ -12,7 +12,7 @@ use compact_str::CompactString;
 
 use crate::{ChunkSemanticBridgeCandidate, DocumentSemanticSummary, GraphRebuildSnapshot};
 use episodes::build_episodes;
-use events::canonical_events;
+use events::{canonical_events, SourceCoordinates};
 use relations::build_relations;
 
 pub use types::*;
@@ -27,7 +27,8 @@ pub struct StoryContinuityInput<'a> {
 pub fn build_story_continuity_contract(input: StoryContinuityInput<'_>) -> StoryContinuityContract {
     let started = Instant::now();
     let event_started = Instant::now();
-    let event_build = canonical_events(input.snapshot, input.semantic_summary);
+    let coordinates = SourceCoordinates::new(input.documents, input.semantic_summary);
+    let event_build = canonical_events(input.snapshot, input.semantic_summary, &coordinates);
     let event_identity_micros = elapsed_micros(event_started);
     let episode_started = Instant::now();
     let episode_build = build_episodes(input.snapshot, input.documents, &event_build.events);
@@ -40,6 +41,7 @@ pub fn build_story_continuity_contract(input: StoryContinuityInput<'_>) -> Story
         &event_build,
         &episode_build.episodes,
         &episode_build.event_episode,
+        &coordinates,
     );
     let relation_resolution_micros = elapsed_micros(relation_started);
     let review_required = event_build

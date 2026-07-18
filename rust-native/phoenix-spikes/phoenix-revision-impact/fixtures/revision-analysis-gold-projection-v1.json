@@ -1,0 +1,184 @@
+{
+  "schemaVersion": "phoenix-revision-analysis-gold-projection/v1",
+  "cases": [
+    {
+      "caseId": "gold:delayed_reveal",
+      "constraints": [
+        {
+          "constraintId": "constraint:delayed_reveal:iriane_knowledge",
+          "sourceId": "fact:silas_knows_kai",
+          "dependentId": "scene:chapter_5_iriane_assignment",
+          "kind": "requires_knowledge",
+          "validInterval": { "validFrom": 500, "validToExclusive": 501 },
+          "evidence": [{ "evidenceId": "evidence:chapter_5:iriane_assignment" }],
+          "confidenceMillis": 1000
+        },
+        {
+          "constraintId": "constraint:delayed_reveal:signature_knowledge",
+          "sourceId": "fact:silas_knows_kai",
+          "dependentId": "scene:chapter_8_temporal_signature",
+          "kind": "requires_knowledge",
+          "validInterval": { "validFrom": 800, "validToExclusive": 801 },
+          "evidence": [{ "evidenceId": "evidence:chapter_8:temporal_signature" }],
+          "confidenceMillis": 1000
+        },
+        {
+          "constraintId": "constraint:delayed_reveal:hazel_support",
+          "sourceId": "fact:silas_knows_kai",
+          "dependentId": "scene:chapter_10_hazel_assumption",
+          "kind": "causal_support",
+          "validInterval": { "validFrom": 1000, "validToExclusive": 1001 },
+          "evidence": [{ "evidenceId": "evidence:chapter_10:hazel_assumption" }],
+          "confidenceMillis": 850
+        }
+      ]
+    },
+    {
+      "caseId": "gold:earlier_death",
+      "constraints": [
+        {
+          "constraintId": "constraint:earlier_death:mara_alive",
+          "sourceId": "state:entity:mara:alive",
+          "dependentId": "scene:chapter_9_mara_warning",
+          "kind": "requires_alive",
+          "validInterval": { "validFrom": 900, "validToExclusive": 901 },
+          "evidence": [{ "evidenceId": "evidence:chapter_9:mara_warning" }],
+          "confidenceMillis": 1000
+        },
+        {
+          "constraintId": "constraint:earlier_death:faction_support",
+          "sourceId": "state:entity:mara:alive",
+          "dependentId": "scene:chapter_11_faction_response",
+          "kind": "causal_support",
+          "validInterval": { "validFrom": 1100, "validToExclusive": 1101 },
+          "evidence": [{ "evidenceId": "evidence:chapter_11:faction_response" }],
+          "confidenceMillis": 800
+        }
+      ]
+    },
+    {
+      "caseId": "gold:changed_witness",
+      "constraints": [
+        {
+          "constraintId": "constraint:changed_witness:testimony",
+          "sourceId": "fact:tamsin_witnessed_bridge_collapse",
+          "dependentId": "scene:chapter_7_tamsin_testimony",
+          "kind": "requires_witness",
+          "validInterval": { "validFrom": 700, "validToExclusive": 701 },
+          "evidence": [{ "evidenceId": "evidence:chapter_7:tamsin_testimony" }],
+          "confidenceMillis": 1000
+        },
+        {
+          "constraintId": "constraint:changed_witness:court_motivation",
+          "sourceId": "fact:tamsin_witnessed_bridge_collapse",
+          "dependentId": "scene:chapter_9_court_trusts_tamsin",
+          "kind": "motivation",
+          "validInterval": { "validFrom": 900, "validToExclusive": 901 },
+          "evidence": [{ "evidenceId": "evidence:chapter_9:court_trust" }],
+          "confidenceMillis": 800
+        }
+      ]
+    },
+    {
+      "caseId": "gold:changed_power_limitation",
+      "constraints": [
+        {
+          "constraintId": "constraint:power_limit:escape",
+          "sourceId": "fact:kai_temporal_step_limit",
+          "dependentId": "scene:chapter_6_three_step_escape",
+          "kind": "requires_state",
+          "validInterval": { "validFrom": 600, "validToExclusive": 601 },
+          "evidence": [{ "evidenceId": "evidence:chapter_6:three_step_escape" }],
+          "confidenceMillis": 1000
+        },
+        {
+          "constraintId": "constraint:power_limit:training_support",
+          "sourceId": "fact:kai_temporal_step_limit",
+          "dependentId": "scene:chapter_10_training_strategy",
+          "kind": "causal_support",
+          "validInterval": { "validFrom": 1000, "validToExclusive": 1001 },
+          "evidence": [{ "evidenceId": "evidence:chapter_10:training_strategy" }],
+          "confidenceMillis": 850
+        }
+      ]
+    },
+    {
+      "caseId": "gold:changed_travel_duration",
+      "constraints": [
+        {
+          "constraintId": "constraint:travel:arrival_reachability",
+          "sourceId": "fact:veyra_to_northern_fort_travel_minutes",
+          "dependentId": "scene:chapter_8_same_evening_arrival",
+          "kind": "requires_reachability",
+          "validInterval": { "validFrom": 800, "validToExclusive": 801 },
+          "evidence": [{ "evidenceId": "evidence:chapter_8:arrival_location" }],
+          "confidenceMillis": 1000
+        },
+        {
+          "constraintId": "constraint:travel:arrival_order",
+          "sourceId": "fact:veyra_to_northern_fort_travel_minutes",
+          "dependentId": "scene:chapter_8_same_evening_arrival",
+          "kind": "requires_temporal_order",
+          "validInterval": { "validFrom": 800, "validToExclusive": 801 },
+          "evidence": [{ "evidenceId": "evidence:chapter_8:arrival_clock" }],
+          "confidenceMillis": 1000
+        },
+        {
+          "constraintId": "constraint:travel:pursuit_foreshadowing",
+          "sourceId": "fact:veyra_to_northern_fort_travel_minutes",
+          "dependentId": "scene:chapter_9_pursuit_pressure",
+          "kind": "foreshadowing",
+          "validInterval": { "validFrom": 900, "validToExclusive": 901 },
+          "evidence": [{ "evidenceId": "evidence:chapter_9:pursuit_pressure" }],
+          "confidenceMillis": 750
+        }
+      ]
+    },
+    {
+      "caseId": "gold:removed_relationship",
+      "constraints": [
+        {
+          "constraintId": "constraint:relationship:private_channel",
+          "sourceId": "state:entity:hazel:relationship:silas",
+          "dependentId": "scene:chapter_6_hazel_uses_private_channel",
+          "kind": "requires_state",
+          "validInterval": { "validFrom": 600, "validToExclusive": 601 },
+          "evidence": [{ "evidenceId": "evidence:chapter_6:private_channel" }],
+          "confidenceMillis": 1000
+        },
+        {
+          "constraintId": "constraint:relationship:betrayal_motivation",
+          "sourceId": "state:entity:hazel:relationship:silas",
+          "dependentId": "scene:chapter_11_betrayal",
+          "kind": "motivation",
+          "validInterval": { "validFrom": 1100, "validToExclusive": 1101 },
+          "evidence": [{ "evidenceId": "evidence:chapter_11:betrayal" }],
+          "confidenceMillis": 850
+        }
+      ]
+    },
+    {
+      "caseId": "gold:changed_possession",
+      "constraints": [
+        {
+          "constraintId": "constraint:possession:vault",
+          "sourceId": "state:entity:kai:possession:chronal_key",
+          "dependentId": "scene:chapter_9_kai_opens_vault",
+          "kind": "requires_possession",
+          "validInterval": { "validFrom": 900, "validToExclusive": 901 },
+          "evidence": [{ "evidenceId": "evidence:chapter_9:vault_key" }],
+          "confidenceMillis": 1000
+        },
+        {
+          "constraintId": "constraint:possession:suspicion_support",
+          "sourceId": "state:entity:kai:possession:chronal_key",
+          "dependentId": "scene:chapter_10_silas_suspects_kai",
+          "kind": "causal_support",
+          "validInterval": { "validFrom": 1000, "validToExclusive": 1001 },
+          "evidence": [{ "evidenceId": "evidence:chapter_10:silas_suspicion" }],
+          "confidenceMillis": 850
+        }
+      ]
+    }
+  ]
+}

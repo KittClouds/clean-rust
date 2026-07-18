@@ -151,6 +151,85 @@ fn scene_break_receipt_uses_the_exact_source_offset() {
 }
 
 #[test]
+fn unicode_heading_offsets_stay_in_graph_byte_coordinates() {
+    let first_scene = (0..40)
+        .map(|index| format!("Kai said caf\u{e9} marker {index}. The witnesses remembered it. "))
+        .collect::<String>();
+    let text = format!(
+        "Chapter 1: Arrival\n{first_scene}\nChapter 2: Departure\n{}",
+        long_scene("Rift", "closed the gate")
+    );
+    let second_heading = text.find("Chapter 2:").expect("second heading") as u32;
+    let contract = build(&text);
+    let second = contract
+        .episodes
+        .iter()
+        .find(|episode| episode.label.starts_with("Chapter 2:"))
+        .expect("second heading episode");
+    assert_eq!(second.source_start, second_heading);
+    assert!(!second.chunk_ids.is_empty());
+}
+
+#[test]
+fn semantic_spans_join_byte_ranged_chunks_after_unicode() {
+    let first_scene = (0..40)
+        .map(|index| {
+            format!(
+                "Kai watched the caf\u{e9} sign \u{1f642} marker {index}. The witnesses waited. "
+            )
+        })
+        .collect::<String>();
+    let text = format!(
+        "Chapter 1: Arrival\n{first_scene}\nChapter 2: Departure\n{}",
+        long_scene("Rift", "closed the gate")
+    );
+    let contract = build_mutating_semantics(&text, |semantic| {
+        let document = &mut semantic.documents[0];
+        let situation = document.situations.last().expect("late situation").clone();
+        document
+            .state_intervals
+            .push(DocumentSemanticStateInterval {
+                id: "state:unicode-coordinate".to_owned(),
+                note_id: document.note_id.clone(),
+                state_key: "closed".to_owned(),
+                subject_key: "gate".to_owned(),
+                predicate: "close".to_owned(),
+                value: Some("closed".to_owned()),
+                polarity: "positive".to_owned(),
+                status: "active".to_owned(),
+                start_situation_id: situation.id,
+                end_situation_id: None,
+                start: situation.start,
+                end: Some(situation.end),
+                persists: true,
+                confidence_millis: 900,
+                ..Default::default()
+            });
+    });
+    let second_heading = text.find("Chapter 2:").expect("second heading") as u32;
+    let second = contract
+        .episodes
+        .iter()
+        .find(|episode| episode.label.starts_with("Chapter 2:"))
+        .expect("second heading episode");
+    let interval = contract
+        .state_intervals
+        .iter()
+        .find(|interval| interval.id == "continuity:state:state:unicode-coordinate")
+        .expect("Unicode state interval");
+    let start_event = contract
+        .events
+        .iter()
+        .find(|event| event.id == interval.start_event_id)
+        .expect("state start event");
+
+    assert!(start_event.source_start >= second_heading);
+    assert!(second.event_ids.contains(&start_event.id));
+    assert_eq!(interval.source_start, start_event.source_start);
+    assert_eq!(interval.source_end, Some(start_event.source_end));
+}
+
+#[test]
 fn recurrence_and_flashback_are_typed_episode_connections() {
     let text = format!(
         "# First\n{}\n\n# Second\n{}",

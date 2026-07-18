@@ -146,7 +146,7 @@ function computeReceipts(output: GraphCompilerOutput): GraphCompileReceipts {
     const roots = new Map<GraphCompilerFactLane, GraphRootReceipt>();
     const root = (lane: GraphCompilerFactLane) => roots.get(lane) || roots.set(lane, { lane, ...emptyCounters() }).get(lane)!;
     for (const atomRow of output.atoms) root(compilerLaneForAtom(atomRow.kind)).atoms += 1;
-    for (const evidence of output.evidenceAnchors) root('anchorEvidence').evidenceAnchors += 1;
+    root('anchorEvidence').evidenceAnchors += output.evidenceAnchors.length;
     for (const bundle of output.bundles) root(bundle.lane).bundles += 1;
     for (const fact of output.facts) root(fact.lane).facts += 1;
     const factLane = new Map(output.facts.map((fact) => [fact.id, fact.lane]));

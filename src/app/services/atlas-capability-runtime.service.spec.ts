@@ -528,6 +528,7 @@ describe('AtlasCapabilityRuntimeService', () => {
             4,
         );
         expect(nli.classifyStream.mock.calls[0][0]).toHaveLength(1);
+        expect(nli.dispose).toHaveBeenCalledTimes(1);
         expect(phoenix.storeCommand).toHaveBeenNthCalledWith(2, 'semantic:applyNliJudgments', expect.objectContaining({
             modelId: 'onnx-community/ModernBERT-base-nli-ONNX',
             embeddingModelId: 'jina-v5-nano-retrieval',
@@ -550,6 +551,7 @@ describe('AtlasCapabilityRuntimeService', () => {
                 }),
                 expect.objectContaining({ stage: 'classification' }),
                 expect.objectContaining({ stage: 'apply' }),
+                expect.objectContaining({ stage: 'modelRelease', counts: { released: 1 } }),
             ]),
         }));
     });
@@ -642,12 +644,14 @@ function createAtlasScanMock() {
 }
 
 function createNliMock() {
-    return {
+    const mock = {
         isInitialized: signal(false),
         modelId: signal<string | null>(null),
         isProcessing: signal(false),
         device: signal('wasm'),
         initialize: vi.fn(async () => undefined),
+        dispose: vi.fn(async () => undefined),
+        residencySnapshot: vi.fn(() => ({ resident: false, initialized: false, disposing: false, pendingRequests: 0 })),
         classifyStream: vi.fn(async (
             _inputs: unknown,
             onBatch: (batch: { results: unknown[] }) => void,
@@ -669,6 +673,17 @@ function createNliMock() {
                     confidence: 0.91,
                 }],
             });
+        }),
+    };
+    return {
+        ...mock,
+        withEphemeralSession: vi.fn(async (modelId: string, task: () => Promise<unknown>) => {
+            await mock.initialize(modelId);
+            try {
+                return await task();
+            } finally {
+                await mock.dispose();
+            }
         }),
     };
 }

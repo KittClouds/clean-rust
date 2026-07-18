@@ -13,25 +13,37 @@ import {
 } from './graph-galaxy-engine';
 import { graphGalaxyRuntimeMeter } from './graph-galaxy-runtime-meter';
 import {
-    hydrateGalaxySceneFromTransfer,
-    type CompactGalaxyScene,
-} from './graph-galaxy-worker-scene';
+    GalaxyScenePacketV2SharedPagePool,
+    unpackGalaxyScenePacketV2,
+} from './graph-galaxy-scene-packet-v2';
+import type { GalaxyScenePacketV2 } from './graph-galaxy-scene-packet-v2.model';
+import {
+    galaxySceneToV2,
+    type GalaxySceneSourceMode,
+    type GalaxySceneV2,
+} from './graph-galaxy-scene-v2';
 
 let warnedNativeFallback = false;
 let warnedWorkerFallback = false;
-const sceneCache = new Map<string, Promise<GalaxyScene>>();
-// Five authoritative manifold lenses plus one transient query/inspection scene.
-// A smaller cache guarantees eviction while simply cycling the projection rail.
+const sceneCache = new Map<string, Promise<GalaxySceneV2>>();
+const sceneCacheWeights = new Map<string, number>();
+const sharedScenePages = new GalaxyScenePacketV2SharedPagePool();
+// Retain the five immutable manifold scenes plus one transient query scene only while
+// their packed resident element count remains small. Large graphs fail closed toward
+// the active scene instead of multiplying corpus-sized browser state.
 const MAX_CACHED_SCENES = 6;
+const MAX_CACHED_SCENE_ELEMENTS = 100_000;
 let sceneWorker: Worker | null | undefined;
 let nextWorkerRequestId = 0;
 const workerRequests = new Map<number, {
-    resolve: (scene: GalaxyScene) => void;
+    resolve: (scene: GalaxySceneV2) => void;
     reject: (error: Error) => void;
-    entities: GalaxyRenderableNode[];
 }>();
 
-entityColorStore.subscribe(() => sceneCache.clear());
+entityColorStore.subscribe(() => {
+    sceneCache.clear();
+    sceneCacheWeights.clear();
+});
 
 export async function compileGalaxyScene(
     backend: PhoenixBackendService,
@@ -39,21 +51,33 @@ export async function compileGalaxyScene(
     edges: GalaxyInputEdge[],
     settings: GalaxyRenderSettings,
     renderIdentity = '',
-): Promise<GalaxyScene> {
-    const cacheKey = renderIdentity ? `${renderIdentity}\u0000${galaxySceneCompilationSettingsKey(settings)}` : '';
+    sourceMode: GalaxySceneSourceMode = 'entities',
+): Promise<GalaxySceneV2> {
+    const cacheKey = renderIdentity ? `${renderIdentity}\u0000${sourceMode}\u0000${galaxySceneCompilationSettingsKey(settings)}` : '';
     const cached = cacheKey ? sceneCache.get(cacheKey) : undefined;
     if (cached) {
+        const weight = sceneCacheWeights.get(cacheKey) || 0;
         sceneCache.delete(cacheKey);
+        sceneCacheWeights.delete(cacheKey);
         sceneCache.set(cacheKey, cached);
+        sceneCacheWeights.set(cacheKey, weight);
         graphGalaxyRuntimeMeter.recordCompilerSource('cache');
         return cached;
     }
-    const pending = compileChangedGalaxyScene(backend, entities, edges, settings);
+    const pending = compileChangedGalaxyScene(backend, entities, edges, settings, sourceMode, renderIdentity);
     if (cacheKey) {
         evictStaleSceneVariant(renderIdentity, cacheKey);
         sceneCache.set(cacheKey, pending);
-        while (sceneCache.size > MAX_CACHED_SCENES) sceneCache.delete(sceneCache.keys().next().value!);
-        pending.catch(() => sceneCache.delete(cacheKey));
+        sceneCacheWeights.set(cacheKey, 0);
+        trimSceneCache(cacheKey);
+        pending.then((scene) => {
+            if (sceneCache.get(cacheKey) !== pending) return;
+            sceneCacheWeights.set(cacheKey, scene.ids.length + scene.edgePairs.length / 2);
+            trimSceneCache(cacheKey);
+        }).catch(() => {
+            sceneCache.delete(cacheKey);
+            sceneCacheWeights.delete(cacheKey);
+        });
     }
     return pending;
 }
@@ -72,8 +96,29 @@ export function galaxySceneCompilationSettingsKey(settings: GalaxyRenderSettings
 function evictStaleSceneVariant(renderIdentity: string, nextKey: string): void {
     const prefix = `${renderIdentity}\u0000`;
     for (const key of sceneCache.keys()) {
-        if (key !== nextKey && key.startsWith(prefix)) sceneCache.delete(key);
+        if (key !== nextKey && key.startsWith(prefix)) {
+            sceneCache.delete(key);
+            sceneCacheWeights.delete(key);
+        }
     }
+}
+
+function trimSceneCache(currentKey: string): void {
+    while (
+        sceneCache.size > 1 &&
+        (sceneCache.size > MAX_CACHED_SCENES || cachedSceneElementCount() > MAX_CACHED_SCENE_ELEMENTS)
+    ) {
+        const oldestKey = sceneCache.keys().next().value as string | undefined;
+        if (!oldestKey || oldestKey === currentKey) break;
+        sceneCache.delete(oldestKey);
+        sceneCacheWeights.delete(oldestKey);
+    }
+}
+
+function cachedSceneElementCount(): number {
+    let total = 0;
+    for (const weight of sceneCacheWeights.values()) total += weight;
+    return total;
 }
 
 async function compileChangedGalaxyScene(
@@ -81,7 +126,9 @@ async function compileChangedGalaxyScene(
     entities: GalaxyRenderableNode[],
     edges: GalaxyInputEdge[],
     settings: GalaxyRenderSettings,
-): Promise<GalaxyScene> {
+    sourceMode: GalaxySceneSourceMode,
+    renderIdentity: string,
+): Promise<GalaxySceneV2> {
     const hasGalaxyMetadata = entities.some((entity) => Boolean(entity.metadata?.galaxyId));
     const hasAtlasLayout = entities.some((entity) =>
         Number.isFinite(entity.atlasX) && Number.isFinite(entity.atlasY) && Number.isFinite(entity.atlasZ),
@@ -89,7 +136,7 @@ async function compileChangedGalaxyScene(
     const hasRelationControls = hasRelationControlNodes(entities);
     if (backend.target !== 'native' || hasGalaxyMetadata || hasAtlasLayout || hasRelationControls || settings.layoutMode !== 'single') {
         try {
-            const scene = await compileGalaxySceneInWorker(entities, edges, settings);
+            const scene = await compileGalaxySceneInWorker(entities, edges, settings, sourceMode, renderIdentity);
             if (scene) {
                 graphGalaxyRuntimeMeter.recordCompilerSource('worker');
                 return scene;
@@ -101,7 +148,7 @@ async function compileChangedGalaxyScene(
             }
         }
         graphGalaxyRuntimeMeter.recordCompilerSource('local');
-        return buildGalaxyScene(entities, edges, settings);
+        return galaxySceneToV2(buildGalaxyScene(entities, edges, settings), sourceMode);
     }
     try {
         const entityById = new Map(entities.map((entity) => [entity.id, entity] as const));
@@ -123,7 +170,7 @@ async function compileChangedGalaxyScene(
             },
         } satisfies PhoenixGalaxySceneRequest);
         graphGalaxyRuntimeMeter.recordCompilerSource('native');
-        return {
+        const nativeScene: GalaxyScene = {
             nodes: scene.nodes.map((node) => {
                 const source = entityById.get(node.entity.id);
                 const color = hslToRgb(source ? resolveGalaxyNodeColorHsl(source) : resolveGalaxyNodeColorHsl(node.entity));
@@ -140,13 +187,14 @@ async function compileChangedGalaxyScene(
             layoutMode: 'single',
             groups: [],
         };
+        return galaxySceneToV2(nativeScene, sourceMode);
     } catch (error) {
         if (!warnedNativeFallback) {
             warnedNativeFallback = true;
             console.warn('[GraphGalaxyScene] Native scene compiler unavailable; using local scene builder.', error);
         }
         graphGalaxyRuntimeMeter.recordCompilerSource('fallback');
-        return buildGalaxyScene(entities, edges, settings);
+        return galaxySceneToV2(buildGalaxyScene(entities, edges, settings), sourceMode);
     }
 }
 
@@ -154,15 +202,17 @@ function compileGalaxySceneInWorker(
     entities: GalaxyRenderableNode[],
     edges: GalaxyInputEdge[],
     settings: GalaxyRenderSettings,
-): Promise<GalaxyScene | null> {
+    sourceMode: GalaxySceneSourceMode,
+    renderIdentity: string,
+): Promise<GalaxySceneV2 | null> {
     const worker = galaxySceneWorker();
     if (!worker) return Promise.resolve(null);
     const id = ++nextWorkerRequestId;
     const graphNodeColors = Object.fromEntries(
         Object.keys(DEFAULT_GRAPH_NODE_COLORS).map((kind) => [kind, entityColorStore.getRawGraphNodeHsl(kind)]),
     );
-    return new Promise<GalaxyScene>((resolve, reject) => {
-        workerRequests.set(id, { resolve, reject, entities });
+    return new Promise<GalaxySceneV2>((resolve, reject) => {
+        workerRequests.set(id, { resolve, reject });
         worker.postMessage({
             id,
             entities,
@@ -170,6 +220,11 @@ function compileGalaxySceneInWorker(
             settings,
             entityColors: entityColorStore.getSnapshot(),
             graphNodeColors,
+            sourceMode,
+            packetContext: {
+                generationId: galaxySceneGenerationId(renderIdentity),
+                authorityReceipt: renderIdentity || 'ephemeral:unreceipted-current-graph',
+            },
         });
     });
 }
@@ -182,12 +237,12 @@ function galaxySceneWorker(): Worker | null {
     }
     try {
         const worker = new Worker(new URL('./graph-galaxy-scene.worker', import.meta.url), { type: 'module' });
-        worker.onmessage = ({ data }: MessageEvent<{ id: number; scene?: CompactGalaxyScene; error?: string }>) => {
+        worker.onmessage = ({ data }: MessageEvent<{ id: number; packet?: GalaxyScenePacketV2; error?: string }>) => {
             const pending = workerRequests.get(data.id);
             if (!pending) return;
             workerRequests.delete(data.id);
-            data.scene
-                ? pending.resolve(hydrateGalaxySceneFromTransfer(data.scene, pending.entities))
+            data.packet
+                ? pending.resolve(unpackGalaxyScenePacketV2(sharedScenePages.reuse(data.packet)))
                 : pending.reject(new Error(data.error || 'Scene worker failed'));
         };
         worker.onerror = (event) => {
@@ -202,4 +257,8 @@ function galaxySceneWorker(): Worker | null {
         sceneWorker = null;
     }
     return sceneWorker;
+}
+
+function galaxySceneGenerationId(renderIdentity: string): string {
+    return renderIdentity.split('\u0000', 1)[0] || 'ephemeral-current-graph';
 }

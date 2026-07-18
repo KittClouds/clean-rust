@@ -8,9 +8,9 @@ use phoenix_types::{
     AnalyzeTextRequest, AtlasRichScanRequest, AtlasRichScanResult, CommitRequest, CommitResult,
     CreateSessionRequest, GraphDeltaRequest, GraphDeltaResult, IngestRequest, IngestResult,
     PhoenixBootSnapshotRows, QueryRequest, QueryResult, RebuildRequest, RebuildResult,
-    RuntimeConfig, RuntimeInitRequest, RuntimeInitResult, ScanArtifact, ScanRequest,
-    SessionRecord, SessionState, SessionStateRequest, SessionStats, SessionStatsRequest,
-    StoreCommandRequest, StoreCommandResult, StructureArtifact, StructureRequest,
+    RuntimeConfig, RuntimeInitRequest, RuntimeInitResult, ScanArtifact, ScanRequest, SessionRecord,
+    SessionState, SessionStateRequest, SessionStats, SessionStatsRequest, StoreCommandRequest,
+    StoreCommandResult, StructureArtifact, StructureRequest,
 };
 use serde::{Deserialize, Serialize};
 
