@@ -11,6 +11,8 @@ import { rejectAtlasRichScan } from './atlas-rich-scan-quarantine';
 import type { PhoenixSnapshotPartition } from './phoenix-wasm.service';
 import type {
     PhoenixGraphRunPageRequest,
+    PhoenixGfmShadowQueryRequest,
+    PhoenixGfmShadowReceipt,
     PhoenixMentionBatchRequest,
     PhoenixMentionBatchResult,
     PhoenixGraphRunOpenResult,
@@ -326,6 +328,14 @@ class PhoenixTaurpcBridge implements PhoenixNativeBridge {
         return phoenixTransportAudit.measureTypedRpc(
             'phoenix.analyze_graph_snapshot',
             () => this.rpc.phoenix.analyze_graph_snapshot(prepared.request as never),
+        );
+    }
+
+    async queryGfmShadow(request: PhoenixGfmShadowQueryRequest): Promise<PhoenixGfmShadowReceipt> {
+        await this.loadRuntime();
+        return phoenixTransportAudit.measureTypedRpc(
+            'phoenix.query_gfm_shadow',
+            () => this.rpc.phoenix.query_gfm_shadow(request),
         );
     }
 

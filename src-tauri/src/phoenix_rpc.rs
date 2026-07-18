@@ -2,10 +2,15 @@ use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet, VecDeque};
 use std::hash::{Hash, Hasher};
 use std::io::{Read, Write};
 use std::path::{Path, PathBuf};
+use std::sync::atomic::AtomicU32;
 use std::sync::{Arc, Mutex, OnceLock};
 use std::time::Instant;
 
 use crate::document_index_read::{read_document_index, DesktopDocumentIndexReadRequest};
+use crate::gfm_retrieval_shadow::{
+    build_gfm_shadow_graph, execute_gfm_shadow_query, unavailable_gfm_shadow_response,
+    DesktopGfmShadowQueryRequest, DesktopGfmShadowResponse,
+};
 use crate::graph_galaxy::{compile_scene, DesktopGalaxyScene, DesktopGalaxySceneRequest};
 use crate::graph_run_store::{
     load_immutable_artifact, load_manifest_for_handle, load_section, persist_immutable_artifact,
@@ -293,6 +298,7 @@ struct GraphRunContent {
     section_roots: BTreeMap<String, String>,
     document_compiler: Option<phoenix_graph_rebuild::GraphDocumentCompilerSummary>,
     analysis: Arc<DesktopSnapshotAnalysisResponse>,
+    gfm_graph: Option<Arc<phoenix_revision_impact::InferenceGraph>>,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -905,6 +911,7 @@ struct DocumentSemanticArtifact {
 pub struct PhoenixApiImpl {
     state: Arc<Mutex<PhoenixDesktopState>>,
     graph_runs: Arc<Mutex<GraphRunCoordinator>>,
+    gfm_shadow_generation: Arc<AtomicU32>,
     tts: NativeTtsService,
 }
 
@@ -1455,6 +1462,9 @@ pub trait PhoenixApi {
     async fn analyze_graph_snapshot(
         request: DesktopSnapshotAnalysisRequest,
     ) -> Result<DesktopGraphRunPage, String>;
+    async fn query_gfm_shadow(
+        request: DesktopGfmShadowQueryRequest,
+    ) -> Result<DesktopGfmShadowResponse, String>;
     async fn read_graph_run_page(
         request: DesktopGraphRunPageRequest,
     ) -> Result<DesktopGraphRunPage, String>;
@@ -1878,11 +1888,13 @@ impl PhoenixApi for PhoenixApiImpl {
         } else {
             let slot = slot.expect("analysis slot exists for a cache miss");
             slot.get_or_init(|| {
+                let gfm_graph = build_gfm_shadow_graph(&request.snapshot).ok().map(Arc::new);
                 let analysis = self.analyze_graph_snapshot_request(request, &documents)?;
                 Ok(Arc::new(GraphRunContent {
                     section_roots,
                     document_compiler,
                     analysis: Arc::new(analysis),
+                    gfm_graph,
                 }))
             })
             .clone()?
@@ -1907,6 +1919,36 @@ impl PhoenixApi for PhoenixApiImpl {
             GRAPH_RUN_DEFAULT_PAGE_ROWS,
             GRAPH_RUN_PAGE_SECTION_ALL,
         )
+    }
+
+    async fn query_gfm_shadow(
+        self,
+        request: DesktopGfmShadowQueryRequest,
+    ) -> Result<DesktopGfmShadowResponse, String> {
+        use std::sync::atomic::Ordering;
+
+        self.gfm_shadow_generation
+            .fetch_max(request.request_generation, Ordering::AcqRel);
+        let entry = self
+            .graph_runs
+            .lock()
+            .map_err(|_| "graph run coordinator lock poisoned".to_owned())?
+            .get(&request.run_handle)
+            .ok_or_else(|| format!("graph run is closed or expired: {}", request.run_handle))?;
+        let snapshot_id = entry.snapshot_id.clone();
+        let Some(graph) = entry.content.gfm_graph.clone() else {
+            return Ok(unavailable_gfm_shadow_response(
+                &request,
+                snapshot_id,
+                "authoritative snapshot cannot be projected into the GFM shadow contract",
+            ));
+        };
+        let latest_generation = Arc::clone(&self.gfm_shadow_generation);
+        tauri::async_runtime::spawn_blocking(move || {
+            execute_gfm_shadow_query(graph, snapshot_id, request, latest_generation)
+        })
+        .await
+        .map_err(|error| format!("GFM shadow task failed: {error}"))?
     }
 
     async fn read_graph_run_page(

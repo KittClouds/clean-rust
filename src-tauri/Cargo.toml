@@ -26,6 +26,8 @@ phoenix-store-native-core = { path = "../rust-native/phoenix/crates/phoenix-stor
 phoenix-store-overgraph = { path = "../rust-native/phoenix/crates/phoenix-store-overgraph" }
 phoenix-document-index = { path = "../rust-native/phoenix/crates/phoenix-document-index" }
 phoenix-hyperbolic = { path = "../rust/phoenix/crates/phoenix-hyperbolic" }
+phoenix-revision-impact = { path = "../rust-native/phoenix-spikes/phoenix-revision-impact" }
+phoenix-revision-inference = { path = "../rust-native/phoenix-spikes/phoenix-revision-inference", features = ["encoders"] }
 phoenix-rel-post = { path = "../rust-native/phoenix/crates/phoenix-rel-post" }
 phoenix-types = { path = "../rust/phoenix/crates/phoenix-types" }
 half = "2"

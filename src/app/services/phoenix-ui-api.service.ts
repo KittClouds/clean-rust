@@ -13,6 +13,7 @@ import {
     type PhoenixLineSearchScope,
 } from '../lib/search/phoenix-line-search';
 import { PhoenixBackendService } from './phoenix-backend.service';
+import { GfmRetrievalShadowService } from './gfm-retrieval-shadow.service';
 import { rejectAtlasRichScan } from './atlas-rich-scan-quarantine';
 import {
     PhoenixStoreService,
@@ -453,6 +454,7 @@ type PhoenixSearchResult = {
 @Injectable({ providedIn: 'root' })
 export class PhoenixUiApiService {
     private readonly phoenix = inject(PhoenixBackendService);
+    private readonly gfmShadow = inject(GfmRetrievalShadowService, { optional: true });
     private readonly store = inject(PhoenixStoreService);
 
     private ready = false;
@@ -649,11 +651,17 @@ export class PhoenixUiApiService {
                 temporal: null,
             });
 
-            return (result.chunkHits || []).map((hit: { chunkId: string; score: number }) => ({
+            const semanticResults = (result.chunkHits || []).map((hit: { chunkId: string; score: number }) => ({
                 DocID: chunkIdToDocumentId(hit.chunkId),
                 Score: hit.score,
                 ChunkID: hit.chunkId,
             }));
+            void this.gfmShadow?.observe(
+                query,
+                semanticResults.map((row: PhoenixSearchResult) => row.DocID),
+                limit,
+            );
+            return semanticResults;
         } catch (error) {
             console.warn('[PhoenixUiApi] Semantic search failed.', error);
             return [];

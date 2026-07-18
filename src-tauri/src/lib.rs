@@ -1,4 +1,5 @@
 mod document_index_read;
+mod gfm_retrieval_shadow;
 mod graph_galaxy;
 mod graph_run_store;
 mod graph_scene_packet;

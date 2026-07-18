@@ -37,6 +37,36 @@ export interface PhoenixGraphRunPageRequest {
     limit: number;
     section?: PhoenixGraphRunPageSection;
 }
+export interface PhoenixGfmShadowQueryRequest {
+    runHandle: string;
+    query: string;
+    requestGeneration: number;
+    semanticDocumentIds: string[];
+    limit: number;
+}
+export interface PhoenixGfmShadowReceipt {
+    schemaVersion: string;
+    source: string;
+    status: string;
+    reason: string | null;
+    requestGeneration: number;
+    snapshotId: string;
+    selectedSeedIds: string[];
+    results: Array<{ stableId: string; documentId: string }>;
+    evidenceEntityIds: string[];
+    semanticResultCount: number;
+    overlapCount: number;
+    uniqueGfmCount: number;
+    bundleReused: boolean;
+    encoderResidentReused: boolean;
+    relationRowsReused: number;
+    relationRowsComputed: number;
+    excludedCandidateEdges: number;
+    excludedRejectedEdges: number;
+    noTopologyWrites: boolean;
+    visibleRankingUnchanged: boolean;
+    timing: { indexMicros: number; inferenceMicros: number; totalMicros: number };
+}
 export interface PhoenixMentionBatchResult {
     documentId: string;
     mentions: Array<{
@@ -172,6 +202,7 @@ export type PhoenixNativeBridge = Pick<PhoenixWasmService, 'isReady' | PhoenixNa
     scanMentionsBatch?(request: PhoenixMentionBatchRequest): Promise<PhoenixMentionBatchResult[]>;
     openGraphRun?(request: PhoenixMentionBatchRequest): Promise<PhoenixGraphRunOpenResult>;
     analyzeGraphSnapshot?(request: unknown): Promise<unknown>;
+    queryGfmShadow?(request: PhoenixGfmShadowQueryRequest): Promise<PhoenixGfmShadowReceipt>;
     readGraphRunPage?(request: PhoenixGraphRunPageRequest): Promise<unknown>;
     persistGraphRun?(runHandle: string): Promise<unknown>;
     beginNativeOperatorDecision?(request: unknown): Promise<unknown>;
@@ -349,6 +380,15 @@ export class PhoenixBackendService {
             throw new Error('Native graph snapshot analysis RPC is unavailable.');
         }
         return bridge.analyzeGraphSnapshot(request);
+    }
+
+    async queryGfmShadow(request: PhoenixGfmShadowQueryRequest): Promise<PhoenixGfmShadowReceipt> {
+        if (this.target !== 'native') {
+            throw new Error('PhoenixBackendService.queryGfmShadow() requires the native runtime.');
+        }
+        const bridge = this.requireNativeBridge();
+        if (!bridge.queryGfmShadow) throw new Error('Native GFM shadow RPC is unavailable.');
+        return bridge.queryGfmShadow(request);
     }
 
     async readGraphRunPage(request: PhoenixGraphRunPageRequest): Promise<unknown> {
