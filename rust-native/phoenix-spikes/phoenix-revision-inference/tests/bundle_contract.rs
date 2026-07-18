@@ -3,8 +3,8 @@ use phoenix_revision_impact::{
     InferenceProjectionInput, RevisionAnalysisViews,
 };
 use phoenix_revision_inference::{
-    GfmBundle, ModelProvenance, ReasonerBundle, project_gfm, project_reasoner, write_gfm_bundle,
-    write_reasoner_bundle,
+    GfmBundle, ModelKind, ModelProvenance, ReasonerBundle, probe_bundle_authority, project_gfm,
+    project_reasoner, write_gfm_bundle, write_reasoner_bundle,
 };
 
 fn node(id: &str, node_type: &str) -> InferenceNodeSeed {
@@ -98,6 +98,26 @@ fn both_immutable_bundles_round_trip_without_candidate_leakage() {
         vec![0.25; gfm.view.relation_names.len() * gfm_rag_8m_parity::constants::EMBEDDING_DIM];
     write_gfm_bundle(&gfm_root, 77, gfm, &relation_values, provenance()).unwrap();
     let gfm = GfmBundle::open(&gfm_root).unwrap();
+    assert!(
+        probe_bundle_authority(
+            &gfm_root,
+            ModelKind::GfmRag8M,
+            77,
+            &gfm.manifest.snapshot_digest,
+            &provenance(),
+        )
+        .unwrap()
+    );
+    assert!(
+        !probe_bundle_authority(
+            &gfm_root,
+            ModelKind::GfmRag8M,
+            78,
+            &gfm.manifest.snapshot_digest,
+            &provenance(),
+        )
+        .unwrap()
+    );
     assert_eq!(gfm.manifest.authority.excluded_candidate_edges, 1);
     assert_eq!(gfm.manifest.authority.admitted_candidate_edges, 0);
     assert!(

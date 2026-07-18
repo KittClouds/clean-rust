@@ -14,7 +14,9 @@ use crate::{
 };
 
 pub const BUNDLE_SCHEMA: &str = "phoenix.revision-inference-bundle/v1";
+pub const BUNDLE_SEAL_SCHEMA: &str = "phoenix.revision-inference-bundle-seal/v1";
 const MANIFEST_FILE: &str = "manifest.json";
+const SEAL_FILE: &str = "authority-seal.json";
 const GRAPH_FILE: &str = "graph.csr";
 const RELATIONS_FILE: &str = "relation-embeddings.f32m";
 const NODES_FILE: &str = "node-embeddings.f32m";
@@ -65,6 +67,16 @@ pub struct ModelBundleManifest {
     pub relation_embeddings: MatrixArtifact,
     pub node_embeddings: Option<MatrixArtifact>,
     pub authority: ProjectionAuthorityReceipt,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct BundleAuthoritySeal {
+    pub schema: String,
+    pub model: ModelKind,
+    pub generation: u64,
+    pub snapshot_digest: String,
+    pub provenance: ModelProvenance,
 }
 
 pub struct GfmBundle {
@@ -301,6 +313,26 @@ fn publish(stage: tempfile::TempDir, output: &Path, manifest: &ModelBundleManife
         .sync_all()
         .map_err(|source| io_error(&path, source))?;
     drop(writer);
+    let seal = BundleAuthoritySeal {
+        schema: BUNDLE_SEAL_SCHEMA.into(),
+        model: manifest.model,
+        generation: manifest.generation,
+        snapshot_digest: manifest.snapshot_digest.clone(),
+        provenance: manifest.provenance.clone(),
+    };
+    let seal_path = stage.path().join(SEAL_FILE);
+    let seal_file = OpenOptions::new()
+        .create_new(true)
+        .write(true)
+        .open(&seal_path)
+        .map_err(|source| io_error(&seal_path, source))?;
+    let mut seal_writer = BufWriter::new(seal_file);
+    serde_json::to_writer(&mut seal_writer, &seal)?;
+    seal_writer
+        .flush()
+        .and_then(|_| seal_writer.get_ref().sync_all())
+        .map_err(|source| io_error(&seal_path, source))?;
+    drop(seal_writer);
     for entry in std::fs::read_dir(stage.path()).map_err(|source| io_error(stage.path(), source))? {
         let entry = entry.map_err(|source| io_error(stage.path(), source))?;
         let mut permissions = entry
@@ -313,6 +345,37 @@ fn publish(stage: tempfile::TempDir, output: &Path, manifest: &ModelBundleManife
     }
     let stage_path = stage.keep();
     std::fs::rename(&stage_path, output).map_err(|source| io_error(output, source))
+}
+
+pub fn probe_bundle_authority(
+    root: impl AsRef<Path>,
+    model: ModelKind,
+    generation: u64,
+    snapshot_digest: &str,
+    provenance: &ModelProvenance,
+) -> Result<bool> {
+    let root = root.as_ref();
+    if !root.exists() {
+        return Ok(false);
+    }
+    let path = root.join(SEAL_FILE);
+    let metadata = path.metadata().map_err(|source| io_error(&path, source))?;
+    if metadata.len() > 4_096 {
+        return Err(InferenceArtifactError::InvalidArtifact(
+            "bundle authority seal exceeds its fixed envelope".into(),
+        ));
+    }
+    let seal: BundleAuthoritySeal =
+        serde_json::from_reader(File::open(&path).map_err(|source| io_error(&path, source))?)?;
+    if seal.schema != BUNDLE_SEAL_SCHEMA {
+        return Err(InferenceArtifactError::InvalidArtifact(
+            "bundle authority seal schema mismatch".into(),
+        ));
+    }
+    Ok(seal.model == model
+        && seal.generation == generation
+        && seal.snapshot_digest == snapshot_digest
+        && &seal.provenance == provenance)
 }
 
 fn read_manifest(root: &Path, expected: ModelKind) -> Result<ModelBundleManifest> {

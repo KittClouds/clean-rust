@@ -2,6 +2,11 @@ use std::path::{Path, PathBuf};
 use std::sync::{Mutex, MutexGuard};
 use std::time::{Duration, Instant};
 
+use crate::{
+    ArtifactHotCacheReceipt, CacheReuseReceipt, EncoderExecutionBackend, GfmBundle,
+    InferenceArtifactError, InferencePerformanceReceipt, ModelKind, ModelProvenance,
+    PeakMemorySampler, ReasonerBundle, Result,
+};
 use candle_core::{Device, Tensor};
 use g_reasoner_34m_parity::checkpoint::MappedCheckpoint as ReasonerCheckpoint;
 use g_reasoner_34m_parity::constants::{
@@ -21,17 +26,8 @@ use gfm_rag_8m_parity::mpnet::MpnetEmbedder;
 use gfm_rag_8m_parity::ranker::{RankedDocuments, reciprocal_frequency_rank};
 use hashbrown::HashMap;
 use phoenix_model_hot_cache::{MaterializedArtifact, MaterializedBundle, ModelHotCache};
-use serde::{Deserialize, Serialize};
-
-use crate::{
-    ArtifactHotCacheReceipt, CacheReuseReceipt, EncoderExecutionBackend, GfmBundle, GfmProjection,
-    InferenceArtifactError, InferencePerformanceReceipt, ModelKind, ModelProvenance,
-    PeakMemorySampler, ReasonerBundle, ReasonerProjection, Result, write_gfm_bundle,
-    write_reasoner_bundle,
-};
 
 const HOT_CACHE_CHUNK_BYTES: usize = 16 * 1024 * 1024;
-const MPNET_EMBEDDING_CHUNK_ROWS: usize = 32;
 const QWEN_CANDLE_CHUNK_ROWS: usize = 4;
 const QWEN_ONNX_CHUNK_ROWS: usize = 4;
 
@@ -67,6 +63,29 @@ pub struct ReasonerQueryEmbedding {
     pub artifact_hot_cache: ArtifactHotCacheReceipt,
 }
 
+#[derive(Clone, Debug)]
+pub struct GfmEncoderPrewarmReceipt {
+    pub encoder_resident_reused: bool,
+    pub prepare_micros: u64,
+    pub peak_resident_bytes: u64,
+    pub artifact_hot_cache: ArtifactHotCacheReceipt,
+}
+
+pub fn prewarm_gfm_encoder(assets: &GfmAssets) -> Result<GfmEncoderPrewarmReceipt> {
+    let sampler = PeakMemorySampler::start(Duration::from_millis(5));
+    let hot_cache = model_hot_cache(&assets.hot_cache)?;
+    let started = Instant::now();
+    let (artifact, resident, encoder_resident_reused) = prepare_gfm_encoder(assets, &hot_cache)?;
+    let prepare_micros = micros(started.elapsed());
+    drop(resident);
+    Ok(GfmEncoderPrewarmReceipt {
+        encoder_resident_reused,
+        prepare_micros,
+        peak_resident_bytes: sampler.finish(),
+        artifact_hot_cache: ArtifactHotCacheReceipt::from_materializations([artifact.receipt()]),
+    })
+}
+
 pub fn prepare_reasoner_query_embedding(
     assets: &ReasonerAssets,
     query: &str,
@@ -95,22 +114,6 @@ pub fn prepare_reasoner_query_embedding(
     })
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase", deny_unknown_fields)]
-pub struct BundleBuildReceipt {
-    pub model: ModelKind,
-    pub encoder_backend: EncoderExecutionBackend,
-    pub encoder_resident_reused: bool,
-    pub encoder_artifact_bundle_reused: bool,
-    pub encoder_load_micros: u64,
-    pub embedding_compute_micros: u64,
-    pub artifact_write_micros: u64,
-    pub peak_resident_bytes: u64,
-    pub relation_rows_computed: u64,
-    pub node_rows_computed: u64,
-    pub artifact_hot_cache: ArtifactHotCacheReceipt,
-}
-
 #[derive(Debug)]
 pub struct GfmInferenceOutput {
     pub logits: Box<[f32]>,
@@ -126,117 +129,6 @@ pub struct ReasonerInferenceOutput {
     pub receipt: InferencePerformanceReceipt,
 }
 
-pub fn build_gfm_bundle_with_encoder(
-    output: impl AsRef<Path>,
-    generation: u64,
-    projection: GfmProjection,
-    assets: &GfmAssets,
-) -> Result<BundleBuildReceipt> {
-    initialize_onnx_runtime(&assets.onnx_runtime)?;
-    let sampler = PeakMemorySampler::start(Duration::from_millis(10));
-    let started = Instant::now();
-    let hot_cache = model_hot_cache(&assets.hot_cache)?;
-    let mpnet = hot_cache.materialize(&assets.mpnet_model, MPNET_ONNX_SHA256)?;
-    let mut encoder = MpnetEmbedder::open_materialized(&mpnet, &assets.mpnet_tokenizer)?;
-    let encoder_load_micros = micros(started.elapsed());
-    let relation_count = projection.view.relation_names.len();
-    let relation_text = projection
-        .view
-        .relation_names
-        .iter()
-        .map(String::as_str)
-        .collect::<Vec<_>>();
-    let started = Instant::now();
-    let relation_embeddings = encoder
-        .embed_unnormalized_chunked(&relation_text, MPNET_EMBEDDING_CHUNK_ROWS)?
-        .into_iter()
-        .flatten()
-        .collect::<Vec<_>>();
-    let embedding_compute_micros = micros(started.elapsed());
-    let started = Instant::now();
-    write_gfm_bundle(
-        output,
-        generation,
-        projection,
-        &relation_embeddings,
-        gfm_provenance(),
-    )?;
-    let artifact_write_micros = micros(started.elapsed());
-    let peak_resident_bytes = sampler.finish();
-    Ok(BundleBuildReceipt {
-        model: ModelKind::GfmRag8M,
-        encoder_backend: EncoderExecutionBackend::MpnetOnnxFp32,
-        encoder_resident_reused: false,
-        encoder_artifact_bundle_reused: false,
-        encoder_load_micros,
-        embedding_compute_micros,
-        artifact_write_micros,
-        peak_resident_bytes,
-        relation_rows_computed: relation_count as u64,
-        node_rows_computed: 0,
-        artifact_hot_cache: ArtifactHotCacheReceipt::from_materializations([mpnet.receipt()]),
-    })
-}
-
-pub fn build_reasoner_bundle_with_encoder(
-    output: impl AsRef<Path>,
-    generation: u64,
-    projection: ReasonerProjection,
-    assets: &ReasonerAssets,
-) -> Result<BundleBuildReceipt> {
-    let sampler = PeakMemorySampler::start(Duration::from_millis(10));
-    let started = Instant::now();
-    let hot_cache = model_hot_cache(&assets.hot_cache)?;
-    let (encoder_artifacts, mut resident, encoder_resident_reused) =
-        prepare_reasoner_encoder(assets, &hot_cache)?;
-    let encoder_load_micros = micros(started.elapsed());
-    let relation_count = projection.view.relation_names.len();
-    let node_count = projection.embedding_texts.len();
-    let mut text = Vec::with_capacity(relation_count + node_count);
-    text.extend(projection.view.relation_names.iter().map(String::as_str));
-    text.extend(projection.embedding_texts.iter().map(String::as_str));
-    let started = Instant::now();
-    let encoder = &mut resident
-        .as_mut()
-        .expect("resident encoder initialized")
-        .encoder;
-    let chunk_rows = encoder.chunk_rows();
-    let encoded = encoder.embed_passages_chunked(&text, chunk_rows)?;
-    let embedding_compute_micros = micros(started.elapsed());
-    drop(resident);
-    let mut encoded = encoded.into_iter();
-    let relation_embeddings = encoded
-        .by_ref()
-        .take(relation_count)
-        .flatten()
-        .collect::<Vec<_>>();
-    let node_embeddings = encoded.flatten().collect::<Vec<_>>();
-    let started = Instant::now();
-    write_reasoner_bundle(
-        output,
-        generation,
-        projection,
-        &relation_embeddings,
-        &node_embeddings,
-        reasoner_provenance(assets.encoder_backend),
-    )?;
-    let artifact_write_micros = micros(started.elapsed());
-    let peak_resident_bytes = sampler.finish();
-    Ok(BundleBuildReceipt {
-        model: ModelKind::GReasoner34M,
-        encoder_backend: assets.encoder_backend,
-        encoder_resident_reused,
-        encoder_artifact_bundle_reused: encoder_artifacts.bundle_reused(),
-        encoder_load_micros,
-        embedding_compute_micros,
-        artifact_write_micros,
-        peak_resident_bytes,
-        relation_rows_computed: relation_count as u64,
-        node_rows_computed: node_count as u64,
-        artifact_hot_cache: encoder_artifacts.hot_cache_receipt(None),
-    })
-}
-
 pub fn run_gfm_complete(
     bundle_root: impl AsRef<Path>,
     assets: &GfmAssets,
@@ -244,7 +136,6 @@ pub fn run_gfm_complete(
     start_entity_ids: &[&str],
     top_k: usize,
 ) -> Result<GfmInferenceOutput> {
-    initialize_onnx_runtime(&assets.onnx_runtime)?;
     let sampler = PeakMemorySampler::start(Duration::from_millis(5));
     let hot_cache = model_hot_cache(&assets.hot_cache)?;
     let started = Instant::now();
@@ -252,14 +143,22 @@ pub fn run_gfm_complete(
     let bundle_open_micros = micros(started.elapsed());
 
     let started = Instant::now();
-    let mpnet = hot_cache.materialize(&assets.mpnet_model, MPNET_ONNX_SHA256)?;
-    let mut encoder = MpnetEmbedder::open_materialized(&mpnet, &assets.mpnet_tokenizer)?;
-    let question = encoder.embed_unnormalized(query)?;
+    let (mpnet, mut resident, encoder_resident_reused) = prepare_gfm_encoder(assets, &hot_cache)?;
+    let question = resident
+        .as_mut()
+        .expect("resident GFM encoder initialized")
+        .encoder
+        .embed_unnormalized(query)?;
     let encoder_cold_micros = micros(started.elapsed());
     let started = Instant::now();
-    let warm_question = encoder.embed_unnormalized(query)?;
+    let warm_question = resident
+        .as_mut()
+        .expect("resident GFM encoder initialized")
+        .encoder
+        .embed_unnormalized(query)?;
     let encoder_warm_micros = micros(started.elapsed());
     ensure_same_embedding(&question, &warm_question, "MPNet cold/warm")?;
+    drop(resident);
 
     let started = Instant::now();
     let checkpoint_artifact = hot_cache.materialize(&assets.checkpoint, GFM_CHECKPOINT_SHA256)?;
@@ -330,7 +229,7 @@ pub fn run_gfm_complete(
         model: ModelKind::GfmRag8M,
         snapshot_digest: bundle.manifest.snapshot_digest.clone(),
         encoder_backend: EncoderExecutionBackend::MpnetOnnxFp32,
-        encoder_resident_reused: false,
+        encoder_resident_reused,
         encoder_artifact_bundle_reused: false,
         bundle_open_micros,
         encoder_cold_micros,
@@ -362,20 +261,51 @@ pub fn run_gfm_complete(
 }
 
 static ONNX_RUNTIME: Mutex<Option<PathBuf>> = Mutex::new(None);
+static GFM_ENCODER: Mutex<Option<ResidentGfmEncoder>> = Mutex::new(None);
 static REASONER_ENCODER: Mutex<Option<ResidentReasonerEncoder>> = Mutex::new(None);
 
-struct ResidentReasonerEncoder {
+pub(crate) struct ResidentGfmEncoder {
     key: String,
-    encoder: ReasonerEncoder,
+    pub(crate) encoder: MpnetEmbedder,
 }
 
-enum ReasonerEncoder {
+pub(crate) fn prepare_gfm_encoder(
+    assets: &GfmAssets,
+    hot_cache: &ModelHotCache,
+) -> Result<(
+    MaterializedArtifact,
+    MutexGuard<'static, Option<ResidentGfmEncoder>>,
+    bool,
+)> {
+    initialize_onnx_runtime(&assets.onnx_runtime)?;
+    let artifact = hot_cache.materialize(&assets.mpnet_model, MPNET_ONNX_SHA256)?;
+    let (_, tokenizer_digest) = crate::matrix::digest_file(&assets.mpnet_tokenizer)?;
+    let key = format!("mpnet-onnx-fp32:{}:{tokenizer_digest}", artifact.sha256());
+    let mut resident = GFM_ENCODER.lock().map_err(|_| {
+        InferenceArtifactError::InvalidArtifact("GFM encoder lock was poisoned".into())
+    })?;
+    let reused = resident.as_ref().is_some_and(|active| active.key == key);
+    if !reused {
+        resident.replace(ResidentGfmEncoder {
+            key,
+            encoder: MpnetEmbedder::open_materialized(&artifact, &assets.mpnet_tokenizer)?,
+        });
+    }
+    Ok((artifact, resident, reused))
+}
+
+pub(crate) struct ResidentReasonerEncoder {
+    key: String,
+    pub(crate) encoder: ReasonerEncoder,
+}
+
+pub(crate) enum ReasonerEncoder {
     Candle(QwenEmbedder),
     Onnx(QwenOnnxEmbedder),
 }
 
 impl ReasonerEncoder {
-    fn chunk_rows(&self) -> usize {
+    pub(crate) fn chunk_rows(&self) -> usize {
         match self {
             Self::Candle(_) => QWEN_CANDLE_CHUNK_ROWS,
             Self::Onnx(_) => QWEN_ONNX_CHUNK_ROWS,
@@ -389,7 +319,7 @@ impl ReasonerEncoder {
         }
     }
 
-    fn embed_passages_chunked(
+    pub(crate) fn embed_passages_chunked(
         &mut self,
         texts: &[&str],
         max_rows: usize,
@@ -401,12 +331,12 @@ impl ReasonerEncoder {
     }
 }
 
-enum PreparedReasonerArtifacts {
+pub(crate) enum PreparedReasonerArtifacts {
     Candle { weights: MaterializedArtifact },
     Onnx(Box<PreparedOnnxArtifacts>),
 }
 
-struct PreparedOnnxArtifacts {
+pub(crate) struct PreparedOnnxArtifacts {
     model: MaterializedArtifact,
     data: MaterializedArtifact,
     bundle: MaterializedBundle,
@@ -422,7 +352,7 @@ impl PreparedReasonerArtifacts {
         }
     }
 
-    fn bundle_reused(&self) -> bool {
+    pub(crate) fn bundle_reused(&self) -> bool {
         matches!(self, Self::Onnx(artifacts) if artifacts.bundle.reused())
     }
 
@@ -443,7 +373,7 @@ impl PreparedReasonerArtifacts {
         }
     }
 
-    fn hot_cache_receipt(
+    pub(crate) fn hot_cache_receipt(
         &self,
         checkpoint: Option<&MaterializedArtifact>,
     ) -> ArtifactHotCacheReceipt {
@@ -472,7 +402,7 @@ impl PreparedReasonerArtifacts {
     }
 }
 
-fn prepare_reasoner_encoder(
+pub(crate) fn prepare_reasoner_encoder(
     assets: &ReasonerAssets,
     hot_cache: &ModelHotCache,
 ) -> Result<(
@@ -525,11 +455,11 @@ fn prepare_reasoner_encoder(
     Ok((artifacts, resident, reused))
 }
 
-fn model_hot_cache(root: &Path) -> Result<ModelHotCache> {
+pub(crate) fn model_hot_cache(root: &Path) -> Result<ModelHotCache> {
     ModelHotCache::new(root, HOT_CACHE_CHUNK_BYTES).map_err(Into::into)
 }
 
-fn initialize_onnx_runtime(path: &Path) -> Result<()> {
+pub(crate) fn initialize_onnx_runtime(path: &Path) -> Result<()> {
     let canonical = std::fs::canonicalize(path).map_err(|source| crate::io_error(path, source))?;
     let mut configured = ONNX_RUNTIME.lock().map_err(|_| {
         InferenceArtifactError::InvalidArtifact("ONNX Runtime lock was poisoned".into())
@@ -753,7 +683,7 @@ fn ensure_same_embedding(left: &[f32], right: &[f32], label: &str) -> Result<()>
     Ok(())
 }
 
-fn gfm_provenance() -> ModelProvenance {
+pub(crate) fn gfm_provenance() -> ModelProvenance {
     ModelProvenance {
         checkpoint_revision: gfm_rag_8m_parity::constants::CHECKPOINT_REVISION.into(),
         checkpoint_digest: gfm_rag_8m_parity::constants::CHECKPOINT_SAFETENSORS_SHA256.into(),
@@ -762,7 +692,7 @@ fn gfm_provenance() -> ModelProvenance {
     }
 }
 
-fn reasoner_provenance(backend: EncoderExecutionBackend) -> ModelProvenance {
+pub(crate) fn reasoner_provenance(backend: EncoderExecutionBackend) -> ModelProvenance {
     let encoder_digest = match backend {
         EncoderExecutionBackend::QwenOnnxFp32 => {
             g_reasoner_34m_parity::constants::QWEN_ONNX_BUNDLE_BLAKE3
@@ -779,6 +709,6 @@ fn reasoner_provenance(backend: EncoderExecutionBackend) -> ModelProvenance {
     }
 }
 
-fn micros(duration: Duration) -> u64 {
+pub(crate) fn micros(duration: Duration) -> u64 {
     u64::try_from(duration.as_micros()).unwrap_or(u64::MAX)
 }

@@ -10,9 +10,13 @@ pub mod cached_reasoner;
 pub mod duel;
 #[cfg(feature = "duel")]
 pub mod duel_runtime;
+#[cfg(feature = "encoders")]
+pub mod embedding_cache;
 pub mod error;
 #[cfg(feature = "duel")]
 pub mod focused_metrics;
+#[cfg(feature = "encoders")]
+pub mod index_builder;
 pub mod matrix;
 pub mod metrics;
 pub mod projection;
@@ -28,9 +32,13 @@ pub use cached_reasoner::*;
 pub use duel::*;
 #[cfg(feature = "duel")]
 pub use duel_runtime::*;
+#[cfg(feature = "encoders")]
+pub use embedding_cache::*;
 pub use error::*;
 #[cfg(feature = "duel")]
 pub use focused_metrics::*;
+#[cfg(feature = "encoders")]
+pub use index_builder::*;
 pub use matrix::*;
 pub use metrics::*;
 pub use projection::*;

@@ -17,7 +17,6 @@ use crate::{GfmError, Result};
 pub struct MpnetEmbedder {
     session: Session,
     tokenizer: Tokenizer,
-    cpu_memory: MemoryInfo,
 }
 
 impl MpnetEmbedder {
@@ -71,18 +70,7 @@ impl MpnetEmbedder {
             .map_err(|error| GfmError::Ort(error.to_string()))?
             .commit_from_file(model_path)
             .map_err(|error| GfmError::Ort(error.to_string()))?;
-        let cpu_memory = MemoryInfo::new(
-            AllocationDevice::CPU,
-            0,
-            AllocatorType::Arena,
-            MemoryType::CPUInput,
-        )
-        .map_err(|error| GfmError::Ort(error.to_string()))?;
-        Ok(Self {
-            session,
-            tokenizer,
-            cpu_memory,
-        })
+        Ok(Self { session, tokenizer })
     }
 
     pub fn embed_unnormalized(&mut self, text: &str) -> Result<Vec<f32>> {
@@ -127,8 +115,15 @@ impl MpnetEmbedder {
             }
         }
         let shape = [batch as i64, sequence as i64];
-        let ids = tensor_ref(&self.cpu_memory, &mut input_ids, shape, "input_ids")?;
-        let mask = tensor_ref(&self.cpu_memory, &mut attention, shape, "attention_mask")?;
+        let cpu_memory = MemoryInfo::new(
+            AllocationDevice::CPU,
+            0,
+            AllocatorType::Arena,
+            MemoryType::CPUInput,
+        )
+        .map_err(|error| GfmError::Ort(error.to_string()))?;
+        let ids = tensor_ref(&cpu_memory, &mut input_ids, shape, "input_ids")?;
+        let mask = tensor_ref(&cpu_memory, &mut attention, shape, "attention_mask")?;
         let outputs = self
             .session
             .run([SessionInputValue::from(ids), SessionInputValue::from(mask)])

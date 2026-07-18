@@ -3,6 +3,7 @@ name = "gfm-task-fit-eval"
 version = "0.1.0"
 edition = "2024"
 publish = false
+default-run = "gfm-task-fit-eval"
 
 [workspace]
 
@@ -15,4 +16,3 @@ serde_json = "1.0"
 
 [patch.crates-io]
 scirs2-text = { path = "../../phoenix/vendor/scirs2-text" }
-

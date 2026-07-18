@@ -31,19 +31,41 @@ pub struct GoldTask {
     pub gold_ids: &'static [&'static str],
 }
 
+#[cfg(test)]
 pub fn graph() -> phoenix_revision_impact::InferenceGraph {
+    graph_with_first_embedding_suffix("")
+}
+
+pub fn graph_with_first_embedding_suffix(suffix: &str) -> phoenix_revision_impact::InferenceGraph {
+    graph_with_first_dirty_suffix(suffix, "")
+}
+
+pub fn graph_with_first_dirty_suffix(
+    embedding_suffix: &str,
+    relation_suffix: &str,
+) -> phoenix_revision_impact::InferenceGraph {
     let mut input = InferenceProjectionInput::default();
-    for (id, kind, text) in NODES {
+    for (index, (id, kind, text)) in NODES.iter().enumerate() {
+        let embedding_text = if index == 0 && !embedding_suffix.is_empty() {
+            format!("{text}{embedding_suffix}")
+        } else {
+            (*text).to_string()
+        };
         input.accepted_nodes.push(InferenceNodeSeed {
             node_id: (*id).into(),
             node_type: (*kind).into(),
-            embedding_text: (*text).into(),
+            embedding_text: embedding_text.into(),
         });
     }
     for (index, (source, relation, target)) in RELATIONS.iter().enumerate() {
+        let relation = if index == 0 && !relation_suffix.is_empty() {
+            format!("{relation}{relation_suffix}")
+        } else {
+            (*relation).to_string()
+        };
         input
             .relations
-            .push(edge(format!("relation:{index}"), source, relation, target));
+            .push(edge(format!("relation:{index}"), source, &relation, target));
     }
     for (index, (document, entity)) in MEMBERSHIPS.iter().enumerate() {
         input.memberships.push(edge(

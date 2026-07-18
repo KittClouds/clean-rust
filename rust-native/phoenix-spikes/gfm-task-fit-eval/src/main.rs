@@ -9,8 +9,9 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use corpus::{GoldTask, TASKS, TaskTarget};
 use metrics::{MetricsAccumulator, RetrievalMetrics};
 use phoenix_revision_inference::{
-    EncoderExecutionBackend, GfmAssets, ReasonerAssets, build_gfm_bundle_with_encoder,
-    build_reasoner_bundle_with_encoder, project_gfm, project_reasoner, run_gfm_complete,
+    BundleBuildReceipt, EncoderExecutionBackend, GfmAssets, ReasonerAssets,
+    build_gfm_bundle_with_encoder, build_reasoner_bundle_with_encoder,
+    prepare_reasoner_query_embedding, project_gfm, project_reasoner, run_gfm_complete,
     run_reasoner_complete,
 };
 use serde::Serialize;
@@ -45,22 +46,34 @@ struct EvaluationReceipt {
     candidate_edges_admitted: u64,
     gfm_bundle_build_micros: u64,
     reasoner_bundle_build_micros: u64,
+    reasoner_prewarm_micros: u64,
+    gfm_build: BundleBuildReceipt,
+    reasoner_build: BundleBuildReceipt,
     models: Vec<ModelReceipt>,
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let root = PathBuf::from(r"D:\phoenix-target-gfm-task-fit");
-    let bundles = root.join("bundles");
+    let root = std::env::var_os("PHOENIX_GFM_TASK_FIT_ROOT")
+        .map(PathBuf::from)
+        .unwrap_or_else(|| PathBuf::from(r"D:\phoenix-target-gfm-task-fit"));
+    let bundle_tag = std::env::var("PHOENIX_GFM_BUNDLE_TAG").unwrap_or_else(|_| "default".into());
+    let bundles = root.join("bundles").join(bundle_tag);
     let receipts = root.join("receipts");
     fs::create_dir_all(&bundles)?;
     fs::create_dir_all(&receipts)?;
 
-    let graph = corpus::graph();
+    let dirty_suffix = std::env::var("PHOENIX_GFM_DIRTY_TEXT_SUFFIX").unwrap_or_default();
+    let graph = corpus::graph_with_first_embedding_suffix(&dirty_suffix);
     let candidate_edges_admitted = 0;
     let gfm_projection = project_gfm(&graph)?;
     let reasoner_projection = project_reasoner(&graph)?;
     let gfm_assets = gfm_assets(&root);
     let reasoner_assets = reasoner_assets(&root);
+    let reasoner_prewarm_micros = if std::env::var_os("PHOENIX_GFM_PREWARM_REASONER").is_some() {
+        prepare_reasoner_query_embedding(&reasoner_assets, "index encoder prewarm")?.prepare_micros
+    } else {
+        0
+    };
     let gfm_root = bundles.join("gfm-rag-8m");
     let reasoner_root = bundles.join("g-reasoner-34m");
 
@@ -72,8 +85,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         &reasoner_assets,
     )?;
 
-    let gfm = evaluate_gfm(&gfm_root, &gfm_assets)?;
-    let reasoner = evaluate_reasoner(&reasoner_root, &reasoner_assets)?;
+    let models = if std::env::var_os("PHOENIX_GFM_INDEX_ONLY").is_some() {
+        Vec::new()
+    } else {
+        vec![
+            evaluate_gfm(&gfm_root, &gfm_assets)?,
+            evaluate_reasoner(&reasoner_root, &reasoner_assets)?,
+        ]
+    };
     let receipt = EvaluationReceipt {
         schema: "phoenix.gfm-task-fit-evaluation/v1",
         generated_at_unix_ms: SystemTime::now().duration_since(UNIX_EPOCH)?.as_millis(),
@@ -81,7 +100,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         candidate_edges_admitted,
         gfm_bundle_build_micros: build_total_micros(&gfm_build),
         reasoner_bundle_build_micros: build_total_micros(&reasoner_build),
-        models: vec![gfm, reasoner],
+        reasoner_prewarm_micros,
+        gfm_build,
+        reasoner_build,
+        models,
     };
     let encoded = serde_json::to_vec_pretty(&receipt)?;
     let path = receipts.join("task-fit-v1.json");
@@ -177,7 +199,12 @@ fn model_receipt(model: &str, targets: Vec<String>, cases: Vec<CaseReceipt>) -> 
 }
 
 fn build_total_micros(receipt: &phoenix_revision_inference::BundleBuildReceipt) -> u64 {
-    receipt.encoder_load_micros + receipt.embedding_compute_micros + receipt.artifact_write_micros
+    receipt.bundle_probe_micros
+        + receipt.embedding_cache_probe_micros
+        + receipt.encoder_load_micros
+        + receipt.embedding_compute_micros
+        + receipt.embedding_cache_write_micros
+        + receipt.artifact_write_micros
 }
 
 fn gfm_assets(root: &Path) -> GfmAssets {
