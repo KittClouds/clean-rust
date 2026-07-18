@@ -8,11 +8,13 @@ default-run = "gfm-task-fit-eval"
 [workspace]
 
 [dependencies]
+blake3 = "1.8"
 compact_str = "0.8"
 phoenix-revision-impact = { path = "../phoenix-revision-impact" }
 phoenix-revision-inference = { path = "../phoenix-revision-inference", features = ["encoders"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
+wide = "0.7.33"
 
 [patch.crates-io]
 scirs2-text = { path = "../../phoenix/vendor/scirs2-text" }

@@ -71,6 +71,21 @@ pub struct GfmEncoderPrewarmReceipt {
     pub artifact_hot_cache: ArtifactHotCacheReceipt,
 }
 
+#[derive(Clone, Debug)]
+pub struct GfmEmbeddingBatchReceipt {
+    pub encoder_resident_reused: bool,
+    pub prepare_micros: u64,
+    pub embedding_micros: u64,
+    pub peak_resident_bytes: u64,
+    pub artifact_hot_cache: ArtifactHotCacheReceipt,
+}
+
+#[derive(Debug)]
+pub struct GfmEmbeddingBatch {
+    pub rows: Vec<Vec<f32>>,
+    pub receipt: GfmEmbeddingBatchReceipt,
+}
+
 pub fn prewarm_gfm_encoder(assets: &GfmAssets) -> Result<GfmEncoderPrewarmReceipt> {
     let sampler = PeakMemorySampler::start(Duration::from_millis(5));
     let hot_cache = model_hot_cache(&assets.hot_cache)?;
@@ -83,6 +98,35 @@ pub fn prewarm_gfm_encoder(assets: &GfmAssets) -> Result<GfmEncoderPrewarmReceip
         prepare_micros,
         peak_resident_bytes: sampler.finish(),
         artifact_hot_cache: ArtifactHotCacheReceipt::from_materializations([artifact.receipt()]),
+    })
+}
+
+pub fn embed_gfm_texts(assets: &GfmAssets, texts: &[&str]) -> Result<GfmEmbeddingBatch> {
+    let sampler = PeakMemorySampler::start(Duration::from_millis(5));
+    let hot_cache = model_hot_cache(&assets.hot_cache)?;
+    let started = Instant::now();
+    let (artifact, mut resident, encoder_resident_reused) =
+        prepare_gfm_encoder(assets, &hot_cache)?;
+    let prepare_micros = micros(started.elapsed());
+    let started = Instant::now();
+    let rows = resident
+        .as_mut()
+        .expect("resident GFM encoder initialized")
+        .encoder
+        .embed_unnormalized_chunked(texts, 32)?;
+    let embedding_micros = micros(started.elapsed());
+    drop(resident);
+    Ok(GfmEmbeddingBatch {
+        rows,
+        receipt: GfmEmbeddingBatchReceipt {
+            encoder_resident_reused,
+            prepare_micros,
+            embedding_micros,
+            peak_resident_bytes: sampler.finish(),
+            artifact_hot_cache: ArtifactHotCacheReceipt::from_materializations(
+                [artifact.receipt()],
+            ),
+        },
     })
 }
 

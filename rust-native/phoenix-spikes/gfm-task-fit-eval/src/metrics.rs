@@ -8,6 +8,7 @@ pub struct RetrievalMetrics {
     pub recall_at_3: f64,
     pub recall_at_5: f64,
     pub mean_reciprocal_rank: f64,
+    pub mean_ndcg_at_5: f64,
     pub full_support_at_5: f64,
 }
 
@@ -18,6 +19,7 @@ pub struct MetricsAccumulator {
     recall_at_3: f64,
     recall_at_5: f64,
     reciprocal_rank: f64,
+    ndcg_at_5: f64,
     full_support_at_5: f64,
 }
 
@@ -28,6 +30,7 @@ impl MetricsAccumulator {
         self.recall_at_3 += recall_at(ranking, gold, 3);
         self.recall_at_5 += recall_at(ranking, gold, 5);
         self.reciprocal_rank += reciprocal_rank(ranking, gold);
+        self.ndcg_at_5 += ndcg_at(ranking, gold, 5);
         self.full_support_at_5 += f64::from(full_support_at(ranking, gold, 5));
     }
 
@@ -42,9 +45,27 @@ impl MetricsAccumulator {
             recall_at_3: self.recall_at_3 / denominator,
             recall_at_5: self.recall_at_5 / denominator,
             mean_reciprocal_rank: self.reciprocal_rank / denominator,
+            mean_ndcg_at_5: self.ndcg_at_5 / denominator,
             full_support_at_5: self.full_support_at_5 / denominator,
         }
     }
+}
+
+fn ndcg_at(ranking: &[String], gold: &[String], k: usize) -> f64 {
+    if gold.is_empty() {
+        return 0.0;
+    }
+    let dcg = ranking
+        .iter()
+        .take(k)
+        .enumerate()
+        .filter(|(_, id)| gold.iter().any(|gold_id| gold_id == *id))
+        .map(|(index, _)| 1.0 / ((index + 2) as f64).log2())
+        .sum::<f64>();
+    let ideal = (0..gold.len().min(k))
+        .map(|index| 1.0 / ((index + 2) as f64).log2())
+        .sum::<f64>();
+    dcg / ideal
 }
 
 fn recall_at(ranking: &[String], gold: &[String], k: usize) -> f64 {
@@ -87,6 +108,7 @@ mod tests {
         assert_eq!(metrics.recall_at_1, 0.5);
         assert_eq!(metrics.recall_at_3, 1.0);
         assert_eq!(metrics.mean_reciprocal_rank, 1.0);
+        assert!(metrics.mean_ndcg_at_5 > 0.9);
         assert_eq!(metrics.full_support_at_5, 1.0);
     }
 }

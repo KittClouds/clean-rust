@@ -80,6 +80,11 @@ pub fn graph_with_first_dirty_suffix(
         .inference_graph
 }
 
+#[allow(dead_code)]
+pub fn node_rows() -> &'static [(&'static str, &'static str, &'static str)] {
+    NODES
+}
+
 fn edge(id: String, source: &str, relation: &str, target: &str) -> InferenceEdgeSeed {
     InferenceEdgeSeed {
         edge_id: CompactString::from(id),
