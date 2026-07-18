@@ -3,6 +3,8 @@
 //! This crate can read authoritative Phoenix projections, but it has no graph
 //! persistence dependency and exposes no mutation API.
 
+#[cfg(feature = "encoders")]
+pub mod bounded_reasoner;
 pub mod bundle;
 #[cfg(feature = "duel")]
 pub mod cached_reasoner;
@@ -25,6 +27,8 @@ pub mod review;
 #[cfg(feature = "encoders")]
 pub mod runner;
 
+#[cfg(feature = "encoders")]
+pub use bounded_reasoner::*;
 pub use bundle::*;
 #[cfg(feature = "duel")]
 pub use cached_reasoner::*;

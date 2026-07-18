@@ -24,7 +24,7 @@ use gfm_rag_8m_parity::constants::{
 use gfm_rag_8m_parity::model::{AggregationBackend as GfmBackend, GfmModel};
 use gfm_rag_8m_parity::mpnet::MpnetEmbedder;
 use gfm_rag_8m_parity::ranker::{RankedDocuments, reciprocal_frequency_rank};
-use hashbrown::HashMap;
+use hashbrown::{HashMap, HashSet};
 use phoenix_model_hot_cache::{MaterializedArtifact, MaterializedBundle, ModelHotCache};
 
 const HOT_CACHE_CHUNK_BYTES: usize = 16 * 1024 * 1024;
@@ -539,6 +539,48 @@ pub fn run_reasoner_complete(
     requested_type: &str,
     top_k: usize,
 ) -> Result<ReasonerInferenceOutput> {
+    run_reasoner_impl(
+        bundle_root,
+        assets,
+        query,
+        start_node_ids,
+        requested_type,
+        None,
+        top_k,
+    )
+}
+
+#[allow(clippy::too_many_arguments)]
+pub(crate) fn run_reasoner_candidate_set(
+    bundle_root: impl AsRef<Path>,
+    assets: &ReasonerAssets,
+    query: &str,
+    start_node_ids: &[&str],
+    requested_type: &str,
+    candidate_node_ids: &[&str],
+    top_k: usize,
+) -> Result<ReasonerInferenceOutput> {
+    run_reasoner_impl(
+        bundle_root,
+        assets,
+        query,
+        start_node_ids,
+        requested_type,
+        Some(candidate_node_ids),
+        top_k,
+    )
+}
+
+#[allow(clippy::too_many_arguments)]
+fn run_reasoner_impl(
+    bundle_root: impl AsRef<Path>,
+    assets: &ReasonerAssets,
+    query: &str,
+    start_node_ids: &[&str],
+    requested_type: &str,
+    candidate_node_ids: Option<&[&str]>,
+    top_k: usize,
+) -> Result<ReasonerInferenceOutput> {
     let sampler = PeakMemorySampler::start(Duration::from_millis(10));
     let hot_cache = model_hot_cache(&assets.hot_cache)?;
     let started = Instant::now();
@@ -592,7 +634,10 @@ pub fn run_reasoner_complete(
         &device,
     )?;
     let start_mask = reasoner_start_mask(&bundle, start_node_ids)?;
-    let requested_nodes = typed_nodes(&bundle, requested_type);
+    let requested_nodes = match candidate_node_ids {
+        Some(candidate_ids) => typed_candidate_nodes(&bundle, requested_type, candidate_ids)?,
+        None => typed_nodes(&bundle, requested_type),
+    };
     if requested_nodes.is_empty() {
         return Err(InferenceArtifactError::InvalidProjection(format!(
             "bundle has no nodes of requested type {requested_type}"
@@ -703,6 +748,42 @@ fn typed_nodes(bundle: &ReasonerBundle, requested_type: &str) -> Vec<u32> {
         .enumerate()
         .filter_map(|(index, node_type)| (node_type == requested_type).then_some(index as u32))
         .collect()
+}
+
+fn typed_candidate_nodes(
+    bundle: &ReasonerBundle,
+    requested_type: &str,
+    requested: &[&str],
+) -> Result<Vec<u32>> {
+    let index = bundle
+        .manifest
+        .node_ids
+        .iter()
+        .enumerate()
+        .map(|(index, id)| (id.as_str(), index))
+        .collect::<HashMap<_, _>>();
+    let mut seen = HashSet::with_capacity(requested.len());
+    let mut nodes = Vec::with_capacity(requested.len());
+    for id in requested {
+        if !seen.insert(*id) {
+            return Err(InferenceArtifactError::InvalidProjection(format!(
+                "duplicate bounded reasoner candidate {id}"
+            )));
+        }
+        let node = *index.get(id).ok_or_else(|| {
+            InferenceArtifactError::InvalidProjection(format!(
+                "unknown bounded reasoner candidate {id}"
+            ))
+        })?;
+        if bundle.manifest.node_types[node] != requested_type {
+            return Err(InferenceArtifactError::InvalidProjection(format!(
+                "bounded reasoner candidate {id} is not type {requested_type}"
+            )));
+        }
+        nodes.push(node as u32);
+    }
+    nodes.sort_unstable();
+    Ok(nodes)
 }
 
 fn default_start_ids<'a>(all: &'a [String], requested: &'a [&str]) -> Vec<&'a str> {
