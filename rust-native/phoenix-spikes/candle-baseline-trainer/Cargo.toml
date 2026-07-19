@@ -6,15 +6,21 @@ publish = false
 
 [dependencies]
 blake3 = "1.8"
+bytemuck = "1.23"
 candle-core = "=0.11.0"
 candle-nn = "=0.11.0"
 compact_str = { version = "0.8", features = ["serde"] }
 hashbrown = "0.14"
+memmap2 = "0.9"
 phoenix-graph-research = { path = "../../phoenix/crates/phoenix-graph-research", default-features = false }
+phoenix-store-native-core = { path = "../../phoenix/crates/phoenix-store-native-core" }
+phoenix-store-overgraph = { path = "../../phoenix/crates/phoenix-store-overgraph" }
+phoenix-types = { path = "../../phoenix/crates/phoenix-types" }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 thiserror = "2.0"
 wide = "0.7"
+zerocopy = { version = "0.8", features = ["derive"] }
 
 [target.'cfg(windows)'.dependencies]
 windows-sys = { version = "0.61", features = ["Win32_System_ProcessStatus", "Win32_System_Threading"] }
@@ -66,3 +72,7 @@ path = "src/optimization_envelope_main.rs"
 [[bin]]
 name = "gradient-pressure-audit-v1"
 path = "src/gradient_pressure_main.rs"
+
+[[bin]]
+name = "native-rgcn-calibration-760"
+path = "src/native_rgcn_calibration_main.rs"

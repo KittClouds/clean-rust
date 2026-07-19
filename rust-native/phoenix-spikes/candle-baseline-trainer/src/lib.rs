@@ -16,6 +16,10 @@ mod hyper_learning_gates;
 mod hyper_optimizer;
 #[cfg(test)]
 mod hyper_optimizer_tests;
+mod native_rgcn_calibration;
+#[cfg(test)]
+mod native_rgcn_calibration_tests;
+mod native_rgcn_fused;
 mod optimization_envelope;
 mod optimization_envelope_eval;
 mod optimization_envelope_model;
@@ -35,6 +39,7 @@ pub use hyper_encoder_trainer::*;
 pub use hyper_learning_gate_receipt::open_hyper_learning_gates;
 pub use hyper_learning_gates::*;
 pub use hyper_optimizer::*;
+pub use native_rgcn_calibration::*;
 pub use optimization_envelope::*;
 pub use optimization_envelope_model::*;
 pub use qualifier_matrix::*;

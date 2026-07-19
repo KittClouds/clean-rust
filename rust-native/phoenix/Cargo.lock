@@ -1483,6 +1483,10 @@ name = "hashbrown"
 version = "0.14.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e5274423e17b7c9fc20b6e7e208532f9b19825d82dfd615708b70edd83df41f1"
+dependencies = [
+ "ahash",
+ "allocator-api2",
+]
 
 [[package]]
 name = "hashbrown"
@@ -2546,6 +2550,8 @@ name = "phoenix-api"
 version = "0.1.1"
 dependencies = [
  "blake3",
+ "hashbrown 0.14.5",
+ "memmap2",
  "phoenix-alex",
  "phoenix-causal-post",
  "phoenix-chunker",
@@ -2573,6 +2579,7 @@ dependencies = [
  "serde_json",
  "tempfile",
  "thiserror 1.0.69",
+ "zstd",
 ]
 
 [[package]]

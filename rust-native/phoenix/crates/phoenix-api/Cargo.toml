@@ -7,6 +7,8 @@ authors.workspace = true
 
 [dependencies]
 blake3 = "1.8"
+hashbrown = "0.14"
+memmap2 = "0.9"
 phoenix-alex = { path = "../phoenix-alex" }
 phoenix-causal-post = { path = "../phoenix-causal-post" }
 phoenix-chunker = { path = "../phoenix-chunker" }
@@ -33,6 +35,7 @@ serde.workspace = true
 serde_json.workspace = true
 rmp-serde.workspace = true
 thiserror.workspace = true
+zstd = "0.13"
 
 [dev-dependencies]
 tempfile = "3"
