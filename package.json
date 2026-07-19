@@ -22,6 +22,7 @@
     "hopf:space": "node scripts/hopf-resonance-space-smoke.mjs",
     "bench:graph:zeroshot": "node scripts/graph-build-zeroshot-baseline.mjs",
     "bench:graph:desktop-two-doc": "node scripts/run-graph-build-desktop-baseline.mjs",
+    "bench:graph:retrieval": "node scripts/graph-retrieval-baseline.mjs",
     "audit:graph-taxonomy": "node scripts/graph-atlas-taxonomy-audit.mjs",
     "test": "vitest run",
     "test:graph:unused": "node scripts/check-graph-fast-lane-unused.mjs",

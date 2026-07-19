@@ -200,7 +200,7 @@ describeBaseline('product graph build gate', () => {
         const upsertsBeforeWarm = store.upserts.length;
         const operatorJournalReadsBeforeWarm = operatorJournalReadCount(store);
         const started = performance.now();
-        const warm = await pipeline.buildGraph(request);
+        const warm = await pipeline.buildGraph({ ...request, policy: 'delta' });
         const warmWallMs = elapsed(started);
         const warmScopedWrites = store.upserts.length - upsertsBeforeWarm;
         const warmOperatorJournalReads = operatorJournalReadCount(store) - operatorJournalReadsBeforeWarm;
@@ -331,11 +331,13 @@ describeBaseline('product graph build gate', () => {
         const firstInteractive = await graphRebuild.buildAndPersistSnapshot({
             ...buildRequest,
             durabilityMode: 'interactive',
+            buildPolicy: 'force',
         });
         const firstInteractiveRunSerial = graphRebuild.currentSnapshotRunSerial();
         const diagnostic = await graphRebuild.buildAndPersistSnapshot({
             ...buildRequest,
             durabilityMode: 'diagnostic',
+            buildPolicy: 'force',
             diagnosticBaseSnapshotId: firstInteractive.id,
             diagnosticBaseSnapshotRunSerial: firstInteractiveRunSerial,
         });
@@ -349,11 +351,13 @@ describeBaseline('product graph build gate', () => {
         const secondInteractive = await graphRebuild.buildAndPersistSnapshot({
             ...buildRequest,
             durabilityMode: 'interactive',
+            buildPolicy: 'force',
         });
         const diagnosticIdBeforeStaleRun = persistedSnapshotId(store, DIAGNOSTIC_SNAPSHOT_DOCUMENT_KEY);
         await graphRebuild.buildAndPersistSnapshot({
             ...buildRequest,
             durabilityMode: 'diagnostic',
+            buildPolicy: 'force',
             diagnosticBaseSnapshotId: firstInteractive.id,
             diagnosticBaseSnapshotRunSerial: firstInteractiveRunSerial,
         });
@@ -379,6 +383,7 @@ describeBaseline('product graph build gate', () => {
             entities: harnessState.entities,
             postProcessMode: 'full',
             durabilityMode: 'interactive',
+            buildPolicy: 'force',
         })).rejects.toThrow('unsupported store command: graphRebuild:analyzeSnapshot');
 
         expect(backend.snapshotAnalyses).toHaveLength(1);

@@ -9,6 +9,7 @@ import { entityColorStore } from '../../../../../lib/store/entityColorStore';
 import type { EntitySuggestionProviderId } from '../../../../../lib/entity-suggestions/entity-suggestion.types';
 import { PhoenixUiApiService } from '../../../../../services/phoenix-ui-api.service';
 import { PhoenixMachineControlService } from '../../../../../services/phoenix-machine-control.service';
+import { GraphCanvasColdStartService } from '../../../../../services/graph-canvas-cold-start.service';
 import type { AtlasManifoldMode } from '../../../../../services/manifold-atlas.types';
 import { buildAtlasCountReconciliation } from '../../../../../services/atlas-count-ledger.model';
 import { BlueprintHubService } from '../../../blueprint-hub.service';
@@ -25,6 +26,12 @@ import {
     REGISTRY_ENTITY_PROJECTION_SPACE,
 } from './graph-registry-entity-projection';
 import { GraphGalaxyCanvasComponent } from './graph-galaxy-canvas.component';
+import { GraphGalaxyCanvasV3Component } from './v3/graph-galaxy-canvas-v3.component';
+import {
+    isGalaxyRendererLegacyVisible,
+    isGalaxyRendererV3Enabled,
+    resolveGalaxyRendererAuthority,
+} from './v3/galaxy-renderer-v3-authority';
 import { GraphCanvasInspectorComponent } from './graph-canvas-inspector.component';
 import { boundedPathSelection, nextPathSelection } from './graph-path-selection';
 import {
@@ -61,6 +68,12 @@ import { graphProjectionParityApplies } from './graph-projection-parity';
 import { buildActiveAtlasSlice, normalizeGraphKind } from './graph-active-atlas-slice';
 
 export interface AtlasPreviewEdge extends GalaxyInputEdge {}
+
+interface GraphGalaxyCanvasControl {
+    focusEntity(entityId: string): void;
+    resetCamera(): void;
+    fitToGraph(): void;
+}
 
 const SPHERE_SURFACE_CYCLE: readonly GalaxySphereSurfaceMode[] = [
     'solid',
@@ -147,7 +160,14 @@ function readPersistedAtlasViewState(): PersistedAtlasViewState {
 @Component({
     selector: 'app-graph-atlas-preview',
     standalone: true,
-    imports: [CommonModule, FormsModule, LucideAngularModule, GraphGalaxyCanvasComponent, GraphCanvasInspectorComponent],
+    imports: [
+        CommonModule,
+        FormsModule,
+        LucideAngularModule,
+        GraphGalaxyCanvasComponent,
+        GraphGalaxyCanvasV3Component,
+        GraphCanvasInspectorComponent,
+    ],
     template: `
         <section class="atlas-preview-surface relative h-full min-h-[520px] overflow-hidden rounded-none border border-white/5 bg-[#02040a] shadow-[0_24px_80px_rgba(0,0,0,0.24)]" [attr.data-backdrop]="settings.backgroundMode">
             <div class="relative z-10 flex h-full min-h-[520px] flex-col p-px">
@@ -314,6 +334,7 @@ function readPersistedAtlasViewState(): PersistedAtlasViewState {
                         </div>
                     </div>
                     } @else {
+                    @if (rendererLegacyVisible) {
                     <app-graph-galaxy-canvas #galaxyCanvas class="block h-full min-h-0 w-full"
                         [entities]="activeNodes()" [edges]="activeEdges()" [settings]="settings" [selectedEntityIds]="canvasSelectedNodeIds()"
                         [sceneIdentity]="activeSceneIdentity()"
@@ -322,6 +343,21 @@ function readPersistedAtlasViewState(): PersistedAtlasViewState {
                         (entityHovered)="hoveredEntity = $event"
                         (objectSelected)="onCanvasObjectSelected($event)" (objectHovered)="hoveredCanvasHit.set($event)"
                         (batchSelected)="onCanvasBatchSelected($event)"></app-graph-galaxy-canvas>
+                    }
+                    @if (rendererV3Enabled) {
+                    <app-graph-galaxy-canvas-v3 #galaxyCanvas
+                        class="block h-full min-h-0 w-full"
+                        [class.absolute]="rendererAuthority === 'v3-shadow'"
+                        [class.inset-0]="rendererAuthority === 'v3-shadow'"
+                        [class.pointer-events-none]="rendererAuthority === 'v3-shadow'"
+                        [entities]="activeNodes()" [edges]="activeEdges()" [settings]="settings" [selectedEntityIds]="canvasSelectedNodeIds()"
+                        [sceneIdentity]="activeSceneIdentity()"
+                        [queryFocus]="canvasQueryFocus()" [viewMode]="viewMode" [sourceMode]="atlasMode" [surfaceActive]="isAtlasSurfaceActive()"
+                        [lassoEnabled]="lassoEnabled()" [shadowMode]="rendererAuthority === 'v3-shadow'"
+                        (entityHovered)="hoveredEntity = $event"
+                        (objectSelected)="onCanvasObjectSelected($event)" (objectHovered)="hoveredCanvasHit.set($event)"
+                        (batchSelected)="onCanvasBatchSelected($event)"></app-graph-galaxy-canvas-v3>
+                    }
                     @if (settings.detailCardsVisible) {
                     <app-graph-canvas-inspector
                         [record]="canvasInspectorRecord()"
@@ -977,6 +1013,7 @@ export class GraphAtlasPreviewComponent implements OnInit, OnDestroy {
     private readonly phoenixUiApi = inject(PhoenixUiApiService);
     private readonly machine = inject(PhoenixMachineControlService);
     private readonly hubService = inject(BlueprintHubService);
+    private readonly graphCanvasColdStart = inject(GraphCanvasColdStartService);
     private readonly atlasLoadedKeys = new Map<AtlasManifoldMode, string>();
     private readonly atlasLoadingKeys = new Map<AtlasManifoldMode, string>();
     private activeGraphCache: ActiveAtlasGraph | null = null;
@@ -1034,9 +1071,12 @@ export class GraphAtlasPreviewComponent implements OnInit, OnDestroy {
     @Output() lensModeChange = new EventEmitter<GraphLensMode>();
     @Output() atlasSearchChange = new EventEmitter<string>();
     @Output() sourceRequested = new EventEmitter<GraphCanvasSourceRequest>();
-    @ViewChild('galaxyCanvas') private galaxyCanvas?: GraphGalaxyCanvasComponent;
+    @ViewChild('galaxyCanvas') private galaxyCanvas?: GraphGalaxyCanvasControl;
 
     private readonly persistedViewState = readPersistedAtlasViewState();
+    readonly rendererAuthority = resolveGalaxyRendererAuthority();
+    readonly rendererLegacyVisible = isGalaxyRendererLegacyVisible(this.rendererAuthority);
+    readonly rendererV3Enabled = isGalaxyRendererV3Enabled(this.rendererAuthority);
     viewMode: AtlasViewMode = this.persistedViewState.viewMode;
     atlasMode: AtlasMode = this.persistedViewState.atlasMode;
     settings: GalaxyRenderSettings = mergeGalaxySettings(this.persistedViewState.settings);
@@ -2090,8 +2130,12 @@ export class GraphAtlasPreviewComponent implements OnInit, OnDestroy {
         const load = this.machine.beginManifoldLoad(manifold);
         try {
             const adapter = manifoldAdapter(manifold);
+            const snapshot = this.graphSnapshotSignal();
+            if (snapshot && graphRebuildEmbeddingTargetCount(snapshot) > 0) {
+                await this.graphCanvasColdStart.prepareManifold(snapshot, manifold);
+            }
             const projection = await loadManifoldProjection(
-                this.graphSnapshotSignal(),
+                snapshot,
                 manifold,
                 () => adapter.load(this.phoenixUiApi, context.searchScope),
             );

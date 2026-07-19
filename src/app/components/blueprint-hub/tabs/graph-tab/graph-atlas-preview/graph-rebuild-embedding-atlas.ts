@@ -175,22 +175,33 @@ type GraphRebuildProjectionCacheEntry = {
 const projectionCacheBySnapshot = new WeakMap<GraphRebuildSnapshot, GraphRebuildProjectionCacheEntry>();
 const projectionCacheByIdentity = new Map<string, GraphRebuildProjectionCacheEntry>();
 const MAX_RESIDENT_PROJECTION_IDENTITIES = 1;
-const MAX_RESIDENT_PROJECTIONS_PER_IDENTITY = 5;
-const MAX_RESIDENT_PROJECTION_ELEMENTS = 100_000;
+const MAX_RESIDENT_PROJECTIONS_PER_IDENTITY = 1;
+const MAX_RESIDENT_PROJECTION_ELEMENTS = 40_000;
 
 export function cachedGraphRebuildEmbeddingAtlas(
     snapshot: GraphRebuildSnapshot,
     manifold: AtlasManifoldMode,
-): EmbeddingAtlasData {
+): EmbeddingAtlasData | null {
     const entry = projectionCacheEntry(snapshot);
-    const cached = entry.projections.get(manifold);
-    if (cached) return cached;
-    const atlas = buildGraphRebuildEmbeddingAtlasFromSubstrate(
-        projectionSubstrate(entry, snapshot, manifold),
-        manifold,
-    );
-    retainProjection(entry.projections, manifold, atlas);
-    return atlas;
+    return entry.projections.get(manifold) || null;
+}
+
+export function requireCachedGraphRebuildEmbeddingAtlas(
+    snapshot: GraphRebuildSnapshot,
+    manifold: AtlasManifoldMode,
+): EmbeddingAtlasData {
+    const atlas = cachedGraphRebuildEmbeddingAtlas(snapshot, manifold);
+    if (atlas) return atlas;
+    const identity = snapshot.authorityContract?.contentHash || snapshot.id;
+    throw new Error(`Authoritative ${manifold} projection is not resident for ${identity}; synchronous rebuild is forbidden.`);
+}
+
+export function seedGraphRebuildEmbeddingAtlas(
+    snapshot: GraphRebuildSnapshot,
+    manifold: AtlasManifoldMode,
+    atlas: EmbeddingAtlasData,
+): void {
+    retainProjection(projectionCacheEntry(snapshot).projections, manifold, atlas);
 }
 
 export function buildGraphRebuildEmbeddingAtlas(

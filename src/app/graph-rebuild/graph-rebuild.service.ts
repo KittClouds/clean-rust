@@ -126,6 +126,7 @@ import type {
     GraphIndexRunReceipt,
     GraphIndexPostProcessMode,
     GraphIndexEmbeddingStagePolicy,
+    GraphIndexPolicy,
     GraphBuildDurabilityMode,
     GraphRebuildBuildTimings,
     GraphRebuildChunk,
@@ -485,6 +486,8 @@ export interface GraphRebuildBuildRequest {
     postProcessMode?: GraphIndexPostProcessMode;
     embeddingStagePolicy?: GraphIndexEmbeddingStagePolicy;
     durabilityMode?: GraphBuildDurabilityMode;
+    buildPolicy: GraphIndexPolicy;
+    interactiveInputIdentity?: string;
     diagnosticBaseSnapshotId?: string;
     diagnosticBaseSnapshotRunSerial?: number;
     candidateCount?: number;
@@ -510,6 +513,7 @@ export class GraphRebuildService {
     private readonly documentSemanticSummaryByIdentity = new Map<string, GraphDocumentSemanticSummary>();
     private readonly documentSemanticArtifactHandleByIdentity = new Map<string, string>();
     private readonly persistedSnapshotLoads = new Map<string, Promise<GraphRebuildSnapshot | null>>();
+    private readonly rejectedPersistedSnapshotScopes = new Map<string, string>();
     private activeNativeGraphRun: { snapshotId: string; runHandle: string } | null = null;
     private nativeStoryContinuityHydration: {
         snapshotId: string;
@@ -559,6 +563,42 @@ export class GraphRebuildService {
         const durable = await this.phoenix.persistGraphRun(runHandle) as NativeGraphRunPersistReceipt;
         this.assertNativeGraphRunPersistReceipt(durable, snapshot, runHandle);
         return durable;
+    }
+
+    async restorePersistedNativeGraphRun(
+        snapshot: GraphRebuildSnapshot,
+        inputIdentity: string,
+    ): Promise<NativeGraphRunPersistReceipt | null> {
+        const authority = snapshot.interactiveRunAuthority;
+        if (!authority || authority.inputIdentity !== inputIdentity) return null;
+        if (authority.snapshotId !== snapshot.id || authority.scopeId !== snapshot.scopeId
+            || authority.durable.snapshotId !== snapshot.id
+            || authority.durable.scopeId !== snapshot.scopeId) {
+            throw new Error('Persisted interactive graph-run authority receipt does not match its snapshot.');
+        }
+        const page = await this.readNativeGraphRunPageForHandle(authority.durable.runHandle, 0, 1);
+        if (page.projection.continuity.contract.sourceSnapshotId !== snapshot.id) {
+            throw new Error('Durable native graph run does not match the persisted authoritative snapshot.');
+        }
+        this.activeNativeGraphRun = { snapshotId: snapshot.id, runHandle: page.runHandle };
+        this.nativeGraphRunPagingState.set({
+            snapshotId: snapshot.id,
+            runHandle: page.runHandle,
+            totalRows: page.detailRows,
+            loadedRows: page.returnedDetailRows,
+            nextOffset: page.nextOffset ?? null,
+            counts: page.counts,
+        });
+        const sectionCount = authority.durable.changedSections + authority.durable.reusedSections;
+        return {
+            ...authority.durable,
+            changedSections: 0,
+            reusedSections: sectionCount,
+            encodedSections: 0,
+            compressedSections: 0,
+            rawBytesWritten: 0,
+            compressedBytesWritten: 0,
+        };
     }
 
     async readNativeGraphRunPage(
@@ -742,6 +782,13 @@ export class GraphRebuildService {
 
     async buildAndPersistSnapshot(request: GraphRebuildBuildRequest): Promise<GraphRebuildSnapshot> {
         const durabilityMode = request.durabilityMode || 'durable';
+        this.assertBuildPolicyAuthorized(request.scopeId, request.buildPolicy);
+        if (request.buildPolicy !== 'force') {
+            throw new Error(
+                'Snapshot reconstruction requires explicit Force Rebuild. '
+                + 'Delta is authority-reuse only and cannot enter the snapshot builder.',
+            );
+        }
         const commitsPrimarySnapshot = durabilityMode !== 'diagnostic';
         if (commitsPrimarySnapshot) this.buildingState.set(true);
         const totalStarted = performance.now();
@@ -869,7 +916,13 @@ export class GraphRebuildService {
             });
             recordGraphCollapseSnapshotBoundary(snapshot, 'typescript_snapshot');
             snapshot = await this.reconcileDocumentGraphMutations(snapshot, durabilityMode === 'interactive');
-            await this.attachNativeSnapshotAnalysis(snapshot, noteTexts, timings, durabilityMode);
+            await this.attachNativeSnapshotAnalysis(
+                snapshot,
+                noteTexts,
+                timings,
+                durabilityMode,
+                request.interactiveInputIdentity,
+            );
             const packetConstructionStarted = performance.now();
             const interactivePacketAttached = durabilityMode === 'interactive'
                 && attachInteractiveAtlasPacketForSnapshotTargets(
@@ -931,7 +984,10 @@ export class GraphRebuildService {
                     || previousSnapshot?.contentManifest,
                 skipPrimarySnapshotWrite,
             }).then(() => {
-                if (commitsPrimarySnapshot) this.errorState.set(null);
+                if (commitsPrimarySnapshot) {
+                    this.errorState.set(null);
+                    this.rejectedPersistedSnapshotScopes.delete(request.scopeId);
+                }
             }).catch((error) => {
                 const message = error instanceof Error ? error.message : String(error);
                 if (commitsPrimarySnapshot) {
@@ -955,6 +1011,7 @@ export class GraphRebuildService {
         noteTexts: Record<string, string>,
         timings: GraphRebuildBuildTimings,
         durabilityMode: GraphBuildDurabilityMode,
+        interactiveInputIdentity?: string,
     ): Promise<void> {
         const started = performance.now();
         if (this.phoenix.target !== 'native') {
@@ -1087,6 +1144,15 @@ export class GraphRebuildService {
             const persistStarted = performance.now();
             const durable = await this.phoenix.persistGraphRun(page.runHandle) as NativeGraphRunPersistReceipt;
             this.assertNativeGraphRunPersistReceipt(durable, snapshot, page.runHandle);
+            if (interactiveInputIdentity) {
+                snapshot.interactiveRunAuthority = {
+                    schemaVersion: 'phoenix-interactive-graph-run-authority/v1',
+                    inputIdentity: interactiveInputIdentity,
+                    snapshotId: snapshot.id,
+                    scopeId: snapshot.scopeId,
+                    durable,
+                };
+            }
             timings.nativeGraphRunPersistMs = elapsedMs(persistStarted);
             timings.nativeGraphRunChangedSections = durable.changedSections;
             timings.nativeGraphRunReusedSections = durable.reusedSections;
@@ -1262,9 +1328,10 @@ export class GraphRebuildService {
     async loadPersistedSnapshot(scopeId: string): Promise<GraphRebuildSnapshot | null> {
         const current = this.snapshotState();
         if (current?.scopeId === scopeId) {
-            const authorizedCurrent = authorizeGraphRebuildSnapshotForLoad(current, (error) =>
-                console.warn('[GraphRebuild] Ignoring in-memory graph rebuild snapshot that failed authority parity', error),
-            );
+            const authorizedCurrent = authorizeGraphRebuildSnapshotForLoad(current, (error) => {
+                this.rejectPersistedSnapshot(scopeId, error);
+                console.warn('[GraphRebuild] Ignoring in-memory graph rebuild snapshot that failed authority parity', error);
+            });
             if (authorizedCurrent) return authorizedCurrent;
             this.snapshotState.set(null);
         }
@@ -1284,13 +1351,24 @@ export class GraphRebuildService {
     private async loadPersistedSnapshotFromStore(scopeId: string): Promise<GraphRebuildSnapshot | null> {
         const document = await this.store.getScopedDocument(scopeId, GRAPH_REBUILD_NAMESPACE, SNAPSHOT_DOCUMENT_KEY);
         const persisted = document ? scopedDocumentToGraphRebuildSnapshot(document) : null;
-        if (!persisted) return null;
-        const hydrated = await this.hydratePersistedSnapshot(persisted);
-        recordGraphCollapseSnapshotBoundary(hydrated, 'persisted_snapshot', { loadedFromStore: 1 });
-        const authorized = authorizeGraphRebuildSnapshotForLoad(hydrated, (error) =>
-            console.warn('[GraphRebuild] Ignoring persisted graph rebuild snapshot that failed authority parity', error),
-        );
+        if (!persisted) {
+            this.rejectedPersistedSnapshotScopes.delete(scopeId);
+            return null;
+        }
+        let authorized: GraphRebuildSnapshot | null = null;
+        try {
+            const hydrated = await this.hydratePersistedSnapshot(persisted);
+            recordGraphCollapseSnapshotBoundary(hydrated, 'persisted_snapshot', { loadedFromStore: 1 });
+            authorized = authorizeGraphRebuildSnapshotForLoad(hydrated, (error) => {
+                throw error;
+            });
+        } catch (error) {
+            this.rejectPersistedSnapshot(scopeId, error);
+            console.warn('[GraphRebuild] Rejecting persisted graph rebuild snapshot that failed authority parity', error);
+            return null;
+        }
         if (!authorized) return null;
+        this.rejectedPersistedSnapshotScopes.delete(scopeId);
         if (authorized.contentManifest) {
             this.contentManifestByScope.set(scopeId, authorized.contentManifest);
             trimOldestMapEntries(this.contentManifestByScope, 64);
@@ -1298,6 +1376,20 @@ export class GraphRebuildService {
         this.snapshotState.set(authorized);
         await this.recoverNativeOperatorDecisionOutcomes(authorized);
         return authorized;
+    }
+
+    assertBuildPolicyAuthorized(scopeId: string, policy: GraphIndexPolicy): void {
+        const rejection = this.rejectedPersistedSnapshotScopes.get(scopeId);
+        if (!rejection || policy === 'force') return;
+        throw new Error(
+            `Graph rebuild authority invariant: persisted snapshot for ${scopeId} was rejected (${rejection}). `
+            + 'Automatic cold fallback is disabled; use explicit Force Rebuild to replace it.',
+        );
+    }
+
+    private rejectPersistedSnapshot(scopeId: string, error: unknown): void {
+        const message = error instanceof Error ? error.message : String(error);
+        this.rejectedPersistedSnapshotScopes.set(scopeId, message);
     }
 
     async loadPersistedGraphModelV2OverGraph(scopeId: string): Promise<GraphModelV2OverGraphExport | null> {
@@ -2488,6 +2580,8 @@ function reuseInteractivePrimarySnapshotIdentity(
     previousSnapshot?: GraphRebuildSnapshot | null,
 ): boolean {
     if (!previousSnapshot?.authorityContract || !snapshot.authorityContract) return false;
+    if (JSON.stringify(previousSnapshot.interactiveRunAuthority)
+        !== JSON.stringify(snapshot.interactiveRunAuthority)) return false;
     if (previousSnapshot.scopeId !== snapshot.scopeId) return false;
     if (previousSnapshot.authorityContract.contentHash !== snapshot.authorityContract.contentHash) return false;
     if (JSON.stringify(previousSnapshot.authorityContract.counts) !== JSON.stringify(snapshot.authorityContract.counts)) {

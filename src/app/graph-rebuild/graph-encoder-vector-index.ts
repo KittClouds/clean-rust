@@ -31,6 +31,11 @@ export interface GraphEncoderVectorIndexOptions {
     requireCompleteRegistry?: boolean;
 }
 
+export interface GraphEncoderNeighborhoodBuild {
+    neighborhoods: readonly GraphEncoderCandidateNeighborhood[];
+    evaluatedPairs: number;
+}
+
 export interface GraphEncoderVectorQueryOptions {
     limit?: number;
     minimumSimilarity?: number;
@@ -57,9 +62,10 @@ export function buildGraphEncoderVectorIndex(
     snapshot: GraphRebuildSnapshot,
     page: GraphEncoderVectorPage,
     options: GraphEncoderVectorIndexOptions = {},
+    prebuiltNeighborhoods?: GraphEncoderNeighborhoodBuild,
 ): GraphEncoderVectorIndex {
     const registry = assertGraphEvidenceTargetRegistry(snapshot);
-    const config = normalizeOptions(options);
+    const config = normalizeGraphEncoderVectorIndexOptions(options);
     assertPageShape(page);
     const exposedIds = new Set(registry.exposedTargets.map((target) => target.id));
     const rowByTargetId = new Map<string, number>();
@@ -79,14 +85,10 @@ export function buildGraphEncoderVectorIndex(
     }
 
     const values = normalizedPageValues(page);
-    const buckets = buildLshBuckets(page.targetIds, values, page.dimensions, config);
-    const { neighborhoods, evaluatedPairs } = buildCandidateNeighborhoods(
-        page.targetIds,
-        values,
-        page.dimensions,
-        buckets,
-        config,
-    );
+    const lsh = buildLshBuckets(page.targetIds, values, page.dimensions, config);
+    const { neighborhoods, evaluatedPairs } = prebuiltNeighborhoods
+        ? validatePrebuiltNeighborhoods(prebuiltNeighborhoods, page.targetIds, rowByTargetId, config)
+        : buildCandidateNeighborhoods(page.targetIds, values, page.dimensions, lsh, config);
     const neighborCount = neighborhoods.reduce((sum, row) => sum + row.neighbors.length, 0);
     const contract: GraphEncoderVectorIndexContract = {
         schemaVersion: 'phoenix-encoder-vector-index/v1',
@@ -135,12 +137,62 @@ export function buildGraphEncoderVectorIndex(
             page.targetIds,
             values,
             page.dimensions,
-            buckets,
+            lsh.buckets,
+            lsh.signatureSpace,
             config,
             vector,
             queryOptions,
         ),
     };
+}
+
+function validatePrebuiltNeighborhoods(
+    build: GraphEncoderNeighborhoodBuild,
+    targetIds: readonly string[],
+    rowByTargetId: ReadonlyMap<string, number>,
+    options: NormalizedGraphEncoderVectorIndexOptions,
+): { neighborhoods: GraphEncoderCandidateNeighborhood[]; evaluatedPairs: number } {
+    if (
+        !Number.isInteger(build.evaluatedPairs)
+        || build.evaluatedPairs < 0
+        || build.evaluatedPairs > targetIds.length * options.maxCandidatesPerTarget
+    ) {
+        throw new Error('Prebuilt encoder neighborhood work exceeded its bounded contract');
+    }
+    if (build.neighborhoods.length !== targetIds.length) {
+        throw new Error('Prebuilt encoder neighborhood rows do not match the vector page');
+    }
+    const neighborhoods = build.neighborhoods.map((row, sourceRow) => {
+        if (row.sourceTargetId !== targetIds[sourceRow]) {
+            throw new Error(`Prebuilt encoder source identity drift: ${row.sourceTargetId}`);
+        }
+        if (row.neighbors.length > options.neighborhoodK) {
+            throw new Error(`Prebuilt encoder neighborhood exceeded K: ${row.sourceTargetId}`);
+        }
+        const seen = new Set<string>();
+        let previousScore = Number.POSITIVE_INFINITY;
+        const neighbors = row.neighbors.map((neighbor, rank) => {
+            const targetRow = rowByTargetId.get(neighbor.targetId);
+            if (
+                targetRow === undefined
+                || targetRow === sourceRow
+                || seen.has(neighbor.targetId)
+                || neighbor.rank !== rank + 1
+                || !Number.isFinite(neighbor.score)
+                || neighbor.score < options.minimumSimilarity
+                || neighbor.score > 1
+                || neighbor.score < -1
+                || neighbor.score > previousScore
+            ) {
+                throw new Error(`Prebuilt encoder neighbor receipt is invalid: ${neighbor.targetId}`);
+            }
+            seen.add(neighbor.targetId);
+            previousScore = neighbor.score;
+            return { ...neighbor };
+        });
+        return { sourceTargetId: row.sourceTargetId, neighbors };
+    });
+    return { neighborhoods, evaluatedPairs: build.evaluatedPairs };
 }
 
 export function installGraphEncoderVectorIndex(
@@ -202,7 +254,7 @@ export function assertGraphEncoderVectorIndex(snapshot: GraphRebuildSnapshot): v
     }
 }
 
-interface NormalizedOptions {
+export interface NormalizedGraphEncoderVectorIndexOptions {
     neighborhoodK: number;
     minimumSimilarity: number;
     lshBands: number;
@@ -211,7 +263,9 @@ interface NormalizedOptions {
     requireCompleteRegistry: boolean;
 }
 
-function normalizeOptions(options: GraphEncoderVectorIndexOptions): NormalizedOptions {
+export function normalizeGraphEncoderVectorIndexOptions(
+    options: GraphEncoderVectorIndexOptions,
+): NormalizedGraphEncoderVectorIndexOptions {
     const neighborhoodK = boundedInt(options.neighborhoodK, DEFAULT_K, 1, 64);
     return {
         neighborhoodK,
@@ -264,13 +318,21 @@ function normalizedPageValues(page: GraphEncoderVectorPage): Float32Array {
     return values;
 }
 
+interface PackedLshBuckets {
+    buckets: Map<number, number[]>;
+    signatures: Uint32Array;
+    signatureSpace: number;
+}
+
 function buildLshBuckets(
     targetIds: readonly string[],
     values: Float32Array,
     dimensions: number,
-    options: NormalizedOptions,
-): Map<string, number[]> {
-    const buckets = new Map<string, number[]>();
+    options: NormalizedGraphEncoderVectorIndexOptions,
+): PackedLshBuckets {
+    const buckets = new Map<number, number[]>();
+    const signatures = new Uint32Array(targetIds.length * options.lshBands);
+    const signatureSpace = 2 ** options.lshBits;
     for (let row = 0; row < targetIds.length; row += 1) {
         const offset = row * dimensions;
         for (let band = 0; band < options.lshBands; band += 1) {
@@ -279,54 +341,71 @@ function buildLshBuckets(
                 const dim = lshDimension(band, bit, dimensions);
                 if (values[offset + dim] >= 0) signature |= 1 << bit;
             }
-            const key = `${band}:${signature}`;
+            signatures[row * options.lshBands + band] = signature;
+            const key = band * signatureSpace + signature;
             const bucket = buckets.get(key);
             if (bucket) bucket.push(row);
             else buckets.set(key, [row]);
         }
     }
-    return buckets;
+    return { buckets, signatures, signatureSpace };
 }
 
 function buildCandidateNeighborhoods(
     targetIds: readonly string[],
     values: Float32Array,
     dimensions: number,
-    buckets: Map<string, number[]>,
-    options: NormalizedOptions,
+    lsh: PackedLshBuckets,
+    options: NormalizedGraphEncoderVectorIndexOptions,
 ): { neighborhoods: GraphEncoderCandidateNeighborhood[]; evaluatedPairs: number } {
     const neighborhoods: GraphEncoderCandidateNeighborhood[] = [];
+    const candidateRows = new Uint32Array(options.maxCandidatesPerTarget);
+    const candidateMarks = new Uint32Array(targetIds.length);
+    const topRows = new Uint32Array(options.neighborhoodK);
+    const topScores = new Float64Array(options.neighborhoodK);
     let evaluatedPairs = 0;
     for (let source = 0; source < targetIds.length; source += 1) {
-        const candidates = new Set<number>();
-        const offset = source * dimensions;
-        for (let band = 0; band < options.lshBands && candidates.size < options.maxCandidatesPerTarget; band += 1) {
-            let signature = 0;
-            for (let bit = 0; bit < options.lshBits; bit += 1) {
-                const dim = lshDimension(band, bit, dimensions);
-                if (values[offset + dim] >= 0) signature |= 1 << bit;
-            }
-            addBucketCandidates(
-                candidates,
-                buckets.get(`${band}:${signature}`) || [],
+        let candidateCount = 0;
+        const mark = source + 1;
+        for (let band = 0; band < options.lshBands && candidateCount < options.maxCandidatesPerTarget; band += 1) {
+            const signature = lsh.signatures[source * options.lshBands + band];
+            candidateCount = addPackedBucketCandidates(
+                candidateRows,
+                candidateMarks,
+                candidateCount,
+                lsh.buckets.get(band * lsh.signatureSpace + signature) || [],
                 source,
                 targetIds[source],
                 options.maxCandidatesPerTarget,
+                mark,
             );
         }
-        const scored = [...candidates].map((target) => {
+        let topCount = 0;
+        for (let candidateIndex = 0; candidateIndex < candidateCount; candidateIndex += 1) {
+            const target = candidateRows[candidateIndex];
             evaluatedPairs += 1;
-            return { target, score: cosineRow(values, dimensions, source, target) };
-        }).filter((row) => row.score >= options.minimumSimilarity)
-            .sort((left, right) => right.score - left.score || targetIds[left.target].localeCompare(targetIds[right.target]))
-            .slice(0, options.neighborhoodK);
+            const score = cosineRow(values, dimensions, source, target);
+            if (score < options.minimumSimilarity) continue;
+            topCount = insertBoundedNeighbor(
+                topRows,
+                topScores,
+                topCount,
+                target,
+                score,
+                targetIds,
+            );
+        }
+        const neighbors = new Array(topCount);
+        for (let rank = 0; rank < topCount; rank += 1) {
+            neighbors[rank] = {
+                targetId: targetIds[topRows[rank]],
+                score: roundScore(topScores[rank]),
+                rank: rank + 1,
+            };
+        }
         neighborhoods.push({
             sourceTargetId: targetIds[source],
-            neighbors: scored.map((row, rank) => ({
-                targetId: targetIds[row.target],
-                score: roundScore(row.score),
-                rank: rank + 1,
-            })),
+            neighbors,
         });
     }
     return { neighborhoods, evaluatedPairs };
@@ -336,8 +415,9 @@ function queryVectorIndex(
     targetIds: readonly string[],
     values: Float32Array,
     dimensions: number,
-    buckets: Map<string, number[]>,
-    indexOptions: NormalizedOptions,
+    buckets: Map<number, number[]>,
+    signatureSpace: number,
+    indexOptions: NormalizedGraphEncoderVectorIndexOptions,
     query: Float32Array,
     options: GraphEncoderVectorQueryOptions,
 ): GraphEncoderVectorQueryResult {
@@ -364,7 +444,7 @@ function queryVectorIndex(
         const signature = lshSignature(normalized, 0, dimensions, band, indexOptions.lshBits);
         addQueryBucketCandidates(
             candidates,
-            buckets.get(`${band}:${signature}`) || [],
+            buckets.get(band * signatureSpace + signature) || [],
             queryKey,
             maxCandidates,
         );
@@ -386,19 +466,63 @@ function queryVectorIndex(
     };
 }
 
-function addBucketCandidates(
-    out: Set<number>,
+function addPackedBucketCandidates(
+    out: Uint32Array,
+    marks: Uint32Array,
+    count: number,
     bucket: readonly number[],
     source: number,
     sourceTargetId: string,
     limit: number,
-): void {
-    if (bucket.length < 2 || out.size >= limit) return;
+    mark: number,
+): number {
+    if (bucket.length < 2 || count >= limit) return count;
     const start = hashText(sourceTargetId) % bucket.length;
-    for (let step = 0; step < bucket.length && out.size < limit; step += 1) {
+    for (let step = 0; step < bucket.length && count < limit; step += 1) {
         const candidate = bucket[(start + step) % bucket.length];
-        if (candidate !== source) out.add(candidate);
+        if (candidate === source || marks[candidate] === mark) continue;
+        marks[candidate] = mark;
+        out[count++] = candidate;
     }
+    return count;
+}
+
+function insertBoundedNeighbor(
+    rows: Uint32Array,
+    scores: Float64Array,
+    count: number,
+    row: number,
+    score: number,
+    targetIds: readonly string[],
+): number {
+    let insertion = count;
+    while (insertion > 0 && neighborRanksBefore(
+        score,
+        row,
+        scores[insertion - 1],
+        rows[insertion - 1],
+        targetIds,
+    )) insertion -= 1;
+    if (insertion >= rows.length) return count;
+    const nextCount = Math.min(rows.length, count + 1);
+    for (let index = nextCount - 1; index > insertion; index -= 1) {
+        rows[index] = rows[index - 1];
+        scores[index] = scores[index - 1];
+    }
+    rows[insertion] = row;
+    scores[insertion] = score;
+    return nextCount;
+}
+
+function neighborRanksBefore(
+    score: number,
+    row: number,
+    otherScore: number,
+    otherRow: number,
+    targetIds: readonly string[],
+): boolean {
+    return score > otherScore
+        || (score === otherScore && targetIds[row].localeCompare(targetIds[otherRow]) < 0);
 }
 
 function addQueryBucketCandidates(
@@ -432,16 +556,38 @@ function cosineRow(values: Float32Array, dimensions: number, left: number, right
     const leftOffset = left * dimensions;
     const rightOffset = right * dimensions;
     let dot = 0;
-    for (let dim = 0; dim < dimensions; dim += 1) {
+    let dim = 0;
+    const wideEnd = dimensions - (dimensions % 8);
+    for (; dim < wideEnd; dim += 8) {
         dot += values[leftOffset + dim] * values[rightOffset + dim];
+        dot += values[leftOffset + dim + 1] * values[rightOffset + dim + 1];
+        dot += values[leftOffset + dim + 2] * values[rightOffset + dim + 2];
+        dot += values[leftOffset + dim + 3] * values[rightOffset + dim + 3];
+        dot += values[leftOffset + dim + 4] * values[rightOffset + dim + 4];
+        dot += values[leftOffset + dim + 5] * values[rightOffset + dim + 5];
+        dot += values[leftOffset + dim + 6] * values[rightOffset + dim + 6];
+        dot += values[leftOffset + dim + 7] * values[rightOffset + dim + 7];
     }
+    for (; dim < dimensions; dim += 1) dot += values[leftOffset + dim] * values[rightOffset + dim];
     return Math.max(-1, Math.min(1, dot));
 }
 
 function cosineVectorRow(query: Float32Array, values: Float32Array, dimensions: number, row: number): number {
     const offset = row * dimensions;
     let dot = 0;
-    for (let dim = 0; dim < dimensions; dim += 1) dot += query[dim] * values[offset + dim];
+    let dim = 0;
+    const wideEnd = dimensions - (dimensions % 8);
+    for (; dim < wideEnd; dim += 8) {
+        dot += query[dim] * values[offset + dim];
+        dot += query[dim + 1] * values[offset + dim + 1];
+        dot += query[dim + 2] * values[offset + dim + 2];
+        dot += query[dim + 3] * values[offset + dim + 3];
+        dot += query[dim + 4] * values[offset + dim + 4];
+        dot += query[dim + 5] * values[offset + dim + 5];
+        dot += query[dim + 6] * values[offset + dim + 6];
+        dot += query[dim + 7] * values[offset + dim + 7];
+    }
+    for (; dim < dimensions; dim += 1) dot += query[dim] * values[offset + dim];
     return Math.max(-1, Math.min(1, dot));
 }
 

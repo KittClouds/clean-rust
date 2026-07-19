@@ -4426,6 +4426,8 @@ name = "phoenix-api"
 version = "0.1.1"
 dependencies = [
  "blake3",
+ "hashbrown 0.14.5",
+ "memmap2",
  "phoenix-alex 0.1.1",
  "phoenix-causal-post",
  "phoenix-chunker 0.1.1",
@@ -4452,6 +4454,7 @@ dependencies = [
  "serde",
  "serde_json",
  "thiserror 1.0.69",
+ "zstd",
 ]
 
 [[package]]

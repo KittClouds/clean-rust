@@ -12,6 +12,7 @@ import {
     attachInteractiveAtlasPacketForSnapshotTargets,
     graphRebuildSnapshotContentBlobDocuments,
     graphRebuildSnapshotToScopedDocument,
+    scopedDocumentToGraphRebuildSnapshot,
 } from './graph-rebuild.service';
 
 describe('GraphRebuildService persisted snapshot loading', () => {
@@ -68,6 +69,67 @@ describe('GraphRebuildService persisted snapshot loading', () => {
             blobs.map((blob) => blob.documentKey),
         );
         expect(store.getScopedDocument).toHaveBeenCalledTimes(1);
+        injector.destroy();
+    });
+
+    it('rejects every direct Delta attempt at the snapshot reconstruction boundary', async () => {
+        const store = { getScopedDocument: vi.fn() };
+        const backend = { target: 'web', executeStoreCommand: vi.fn() };
+        const injector = createEnvironmentInjector([
+            { provide: PhoenixStoreService, useValue: store },
+            { provide: PhoenixBackendService, useValue: backend },
+        ], Injector.create({ providers: [] }));
+        const service = runInInjectionContext(injector, () => new GraphRebuildService());
+
+        await expect(service.buildAndPersistSnapshot({
+            scopeKind: 'global',
+            scopeId: 'global',
+            noteIds: ['note-1'],
+            entities: [entity('entity-kai', 'Kai')],
+            buildPolicy: 'delta',
+        })).rejects.toThrow('Delta is authority-reuse only');
+
+        expect(store.getScopedDocument).not.toHaveBeenCalled();
+        expect(backend.executeStoreCommand).not.toHaveBeenCalled();
+        injector.destroy();
+    });
+
+    it('preserves rejected persisted authority and blocks automatic cold fallback', async () => {
+        const snapshot = buildGraphRebuildSnapshot({
+            scopeKind: 'global',
+            scopeId: 'global',
+            noteIds: ['note-1'],
+            entities: [entity('entity-kai', 'Kai')],
+            chunks: [{ id: 'note-1:chunk:0', noteId: 'note-1', start: 0, end: 3, ordinal: 0, source: 'dynamic-chunking' }],
+            occurrences: [occurrence('note-1', 'entity-kai', 0, 3)],
+            noteTexts: { 'note-1': 'Kai' },
+            builtAt: 42,
+        });
+        attachInteractiveAtlasPacketForSnapshotTargets(snapshot);
+        const primary = graphRebuildSnapshotToScopedDocument(snapshot);
+        const persisted = scopedDocumentToGraphRebuildSnapshot(primary)!;
+        persisted.counters = { ...persisted.counters, edges: persisted.counters.edges + 1 };
+        const rejectedPrimary = graphRebuildSnapshotToScopedDocument(persisted);
+        const blobs = graphRebuildSnapshotContentBlobDocuments(snapshot);
+        const store = {
+            getScopedDocument: vi.fn(async () => rejectedPrimary),
+            getScopedDocumentsByKeys: vi.fn(async () => blobs),
+        };
+        const injector = createEnvironmentInjector([
+            { provide: PhoenixStoreService, useValue: store },
+            { provide: PhoenixBackendService, useValue: { target: 'web' } },
+        ], Injector.create({ providers: [] }));
+        const service = runInInjectionContext(injector, () => new GraphRebuildService());
+
+        await expect(service.loadPersistedSnapshot('global')).resolves.toBeNull();
+        await expect(service.buildAndPersistSnapshot({
+            scopeKind: 'global',
+            scopeId: 'global',
+            noteIds: ['note-1'],
+            entities: [entity('entity-kai', 'Kai')],
+            buildPolicy: 'delta',
+        })).rejects.toThrow('Automatic cold fallback is disabled');
+
         injector.destroy();
     });
 });

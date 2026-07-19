@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 import type { GraphRebuildSnapshot } from '../../../../../graph-rebuild/graph-rebuild-snapshot';
 import type { AtlasManifoldMode } from '../../../../../services/manifold-atlas.types';
 import type { EmbeddingAtlasData } from './graph-embedding-atlas';
+import { buildGraphRebuildEmbeddingAtlas } from './graph-rebuild-embedding-atlas';
 import { loadManifoldProjection, manifoldProjectionRequestKey } from './graph-manifold-projection-loader';
 
 const MODES: readonly AtlasManifoldMode[] = ['hybrid', 'hopf', 'lorentz', 'product', 'siegel'];
@@ -11,10 +12,10 @@ describe('manifold projection switching', () => {
     it('uses the frozen graph snapshot for every manifold without a native round trip', async () => {
         const snapshot = projectionSnapshot(1_500);
         const loadNative = vi.fn<() => Promise<EmbeddingAtlasData>>();
-        await loadManifoldProjection(projectionSnapshot(1), 'hybrid', loadNative);
         const durations = new Map<AtlasManifoldMode, number>();
 
         for (const mode of MODES) {
+            buildGraphRebuildEmbeddingAtlas(snapshot, mode);
             const startedAt = performance.now();
             const projection = await loadManifoldProjection(snapshot, mode, loadNative);
             durations.set(mode, performance.now() - startedAt);
@@ -31,6 +32,7 @@ describe('manifold projection switching', () => {
     it('reuses the exact compiled projection for an unchanged snapshot identity', async () => {
         const snapshot = projectionSnapshot(64);
         const loadNative = vi.fn<() => Promise<EmbeddingAtlasData>>();
+        buildGraphRebuildEmbeddingAtlas(snapshot, 'siegel');
         const first = await loadManifoldProjection(snapshot, 'siegel', loadNative);
         const rehydratedReceipt = structuredClone(snapshot);
         const second = await loadManifoldProjection(rehydratedReceipt, 'siegel', loadNative);
@@ -39,24 +41,26 @@ describe('manifold projection switching', () => {
         expect(loadNative).not.toHaveBeenCalled();
     });
 
-    it('retains the bounded five-manifold projection rail for an unchanged snapshot', async () => {
+    it('evicts inactive expanded projections for an unchanged snapshot', async () => {
         const snapshot = projectionSnapshot(96);
         const loadNative = vi.fn<() => Promise<EmbeddingAtlasData>>();
+        buildGraphRebuildEmbeddingAtlas(snapshot, 'hybrid');
         const firstHybrid = await loadManifoldProjection(snapshot, 'hybrid', loadNative);
 
-        for (const mode of MODES.slice(1)) await loadManifoldProjection(snapshot, mode, loadNative);
-        const rebuiltHybrid = await loadManifoldProjection(snapshot, 'hybrid', loadNative);
-
-        expect(rebuiltHybrid.atlas).toBe(firstHybrid.atlas);
+        for (const mode of MODES.slice(1)) buildGraphRebuildEmbeddingAtlas(snapshot, mode);
+        await expect(loadManifoldProjection(snapshot, 'hybrid', loadNative)).rejects.toThrow(
+            'synchronous rebuild is forbidden',
+        );
+        expect(firstHybrid.atlas.nodes).toHaveLength(96);
         expect(loadNative).not.toHaveBeenCalled();
     });
 
-    it('keeps cold current-corpus and every subsequent manifold below one second', async () => {
+    it('keeps every authoritative current-corpus manifold cache read below one second', async () => {
         const snapshot = projectionSnapshot(6_000);
         const loadNative = vi.fn<() => Promise<EmbeddingAtlasData>>();
         const durations = new Map<AtlasManifoldMode, number>();
-
         for (const mode of MODES) {
+            buildGraphRebuildEmbeddingAtlas(snapshot, mode);
             const startedAt = performance.now();
             const projection = await loadManifoldProjection(snapshot, mode, loadNative);
             durations.set(mode, performance.now() - startedAt);
@@ -66,6 +70,16 @@ describe('manifold projection switching', () => {
         for (const [mode, durationMs] of durations) {
             expect(durationMs, `${mode} current-corpus projection took ${durationMs.toFixed(2)} ms`).toBeLessThan(1_000);
         }
+        expect(loadNative).not.toHaveBeenCalled();
+    });
+
+    it('fails closed instead of rebuilding or invoking native loading on an authoritative cache miss', async () => {
+        const snapshot = projectionSnapshot(32);
+        const loadNative = vi.fn<() => Promise<EmbeddingAtlasData>>();
+
+        await expect(loadManifoldProjection(snapshot, 'product', loadNative)).rejects.toThrow(
+            'synchronous rebuild is forbidden',
+        );
         expect(loadNative).not.toHaveBeenCalled();
     });
 

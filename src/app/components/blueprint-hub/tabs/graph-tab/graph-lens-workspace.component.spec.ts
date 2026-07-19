@@ -50,6 +50,7 @@ import { PhoenixProjectionService } from '../../../../services/phoenix-projectio
 import { NoteEditorStore } from '../../../../lib/store/note-editor.store';
 import { EditorService } from '../../../../services/editor.service';
 import { BlueprintHubService } from '../../blueprint-hub.service';
+import { GraphCanvasColdStartService } from '../../../../services/graph-canvas-cold-start.service';
 
 let latestEffectScheduler: ReturnType<typeof createImmediateEffectScheduler> | null = null;
 
@@ -68,6 +69,7 @@ describe('GraphLensWorkspaceComponent read-only snapshot loading', () => {
         latestEffectScheduler = effectScheduler;
         injector = createEnvironmentInjector([
             { provide: GraphRebuildService, useValue: graphRebuild },
+            { provide: GraphCanvasColdStartService, useValue: createColdStartMock() },
             { provide: PhoenixProjectionService, useValue: createProjectionMock() },
             ...sourceNavigationProviders(),
             { provide: ChangeDetectionScheduler, useValue: { notify: vi.fn(), runningTick: false } },
@@ -121,6 +123,7 @@ describe('GraphLensWorkspaceComponent read-only snapshot loading', () => {
         latestEffectScheduler = effectScheduler;
         injector = createEnvironmentInjector([
             { provide: GraphRebuildService, useValue: graphRebuild },
+            { provide: GraphCanvasColdStartService, useValue: createColdStartMock() },
             { provide: PhoenixProjectionService, useValue: createProjectionMock() },
             ...sourceNavigationProviders(),
             { provide: ChangeDetectionScheduler, useValue: { notify: vi.fn(), runningTick: false } },
@@ -172,6 +175,10 @@ describe('GraphLensWorkspaceComponent read-only snapshot loading', () => {
             loadPersistedSnapshot: vi.fn(async () => snapshotToLoad),
             buildAndPersistSnapshot: vi.fn(async () => null),
         };
+    }
+
+    function createColdStartMock() {
+        return { preparePersistedManifold: vi.fn(async () => undefined) };
     }
 });
 

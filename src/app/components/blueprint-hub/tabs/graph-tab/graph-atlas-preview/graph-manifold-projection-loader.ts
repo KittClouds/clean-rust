@@ -2,8 +2,8 @@ import type { GraphRebuildSnapshot } from '../../../../../graph-rebuild/graph-re
 import type { AtlasManifoldMode } from '../../../../../services/manifold-atlas.types';
 import type { EmbeddingAtlasData } from './graph-embedding-atlas';
 import {
-    cachedGraphRebuildEmbeddingAtlas,
     graphRebuildEmbeddingTargetCount,
+    requireCachedGraphRebuildEmbeddingAtlas,
 } from './graph-rebuild-embedding-atlas';
 
 export type ManifoldProjectionSource = 'graph-rebuild-snapshot' | 'native-manifold-snapshot';
@@ -28,7 +28,7 @@ export async function loadManifoldProjection(
 ): Promise<ManifoldProjectionResolution> {
     if (snapshot && graphRebuildEmbeddingTargetCount(snapshot) > 0) {
         return {
-            atlas: cachedGraphRebuildEmbeddingAtlas(snapshot, manifold),
+            atlas: requireCachedGraphRebuildEmbeddingAtlas(snapshot, manifold),
             source: 'graph-rebuild-snapshot',
         };
     }

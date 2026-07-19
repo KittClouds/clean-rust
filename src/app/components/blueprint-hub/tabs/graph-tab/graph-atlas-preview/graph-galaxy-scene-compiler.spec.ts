@@ -2,7 +2,11 @@ import { describe, expect, it } from 'vitest';
 
 import type { PhoenixBackendService } from '../../../../../services/phoenix-backend.service';
 import { mergeGalaxySettings, type GalaxyRenderableNode } from './graph-galaxy-engine';
-import { compileGalaxyScene } from './graph-galaxy-scene-compiler';
+import {
+    compileAuthoritativeGalaxyScene,
+    compileGalaxyScene,
+    seedAuthoritativeGalaxyScenePacket,
+} from './graph-galaxy-scene-compiler';
 import {
     galaxyScenePacketV2TransferList,
     packGalaxyScenePacketV2,
@@ -54,7 +58,7 @@ describe('graph galaxy compiled scene cache', () => {
         expect(second).toBe(first);
     });
 
-    it('retains the bounded five-manifold packed scene rail', async () => {
+    it('evicts an inactive expanded manifold scene', async () => {
         const backend = { target: 'web' } as PhoenixBackendService;
         const entities: GalaxyRenderableNode[] = [{ id: 'resident', label: 'Resident', kind: 'concept' }];
         const settings = mergeGalaxySettings({ layoutMode: 'single' });
@@ -66,20 +70,98 @@ describe('graph galaxy compiled scene cache', () => {
         }
         const returned = await compileGalaxyScene(backend, entities, [], settings, `resident:${identities[0]}`);
 
-        expect(returned).toBe(first);
+        expect(returned).not.toBe(first);
     });
 
-    it('evicts the oldest packed scene beyond the bounded rail', async () => {
+    it('retains the active expanded scene', async () => {
         const backend = { target: 'web' } as PhoenixBackendService;
         const entities: GalaxyRenderableNode[] = [{ id: 'bounded', label: 'Bounded', kind: 'concept' }];
         const settings = mergeGalaxySettings({ layoutMode: 'single' });
-        const first = await compileGalaxyScene(backend, entities, [], settings, 'bounded:0');
+        await compileGalaxyScene(backend, entities, [], settings, 'bounded:0');
+        const active = await compileGalaxyScene(backend, entities, [], settings, 'bounded:1');
 
-        for (let index = 1; index <= 6; index++) {
-            await compileGalaxyScene(backend, entities, [], settings, `bounded:${index}`);
-        }
+        expect(await compileGalaxyScene(backend, entities, [], settings, 'bounded:1')).toBe(active);
+    });
 
-        expect(await compileGalaxyScene(backend, entities, [], settings, 'bounded:0')).not.toBe(first);
+    it('fails closed when an authoritative packed worker is unavailable', async () => {
+        const backend = { target: 'web' } as PhoenixBackendService;
+        const entities: GalaxyRenderableNode[] = [{ id: 'strict', label: 'Strict', kind: 'concept' }];
+
+        await expect(compileAuthoritativeGalaxyScene(
+            backend,
+            entities,
+            [],
+            mergeGalaxySettings({ layoutMode: 'hybridSpace' }),
+            'authority:strict-worker',
+            'embeddings',
+        )).rejects.toThrow('main-thread compilation is forbidden');
+    });
+
+    it('installs a fused prewarm packet into the authoritative scene cache', async () => {
+        const backend = { target: 'web' } as PhoenixBackendService;
+        const entities: GalaxyRenderableNode[] = [{ id: 'fused', label: 'Fused', kind: 'concept' }];
+        const settings = mergeGalaxySettings({ layoutMode: 'hybridSpace', sourceMode: 'embeddings' });
+        const renderIdentity = 'generation:fused\u0000embeddings\u0000hybrid\u0000entities\u0000all\u0000';
+        const source = galaxySceneToV2({
+            nodes: [{
+                entity: entities[0],
+                x: 1,
+                y: 2,
+                z: 3,
+                baseX: 1,
+                baseY: 2,
+                baseZ: 3,
+                radius: 2,
+                r: 20,
+                g: 30,
+                b: 40,
+                sx: 0,
+                sy: 0,
+                depth: 0,
+                galaxyOpacity: 1,
+            }],
+            links: [],
+            layoutMode: 'hybridSpace',
+            groups: [],
+        }, 'embeddings');
+        const packet = packGalaxyScenePacketV2(source, {
+            generationId: 'generation:fused',
+            authorityReceipt: renderIdentity,
+        });
+
+        const installed = seedAuthoritativeGalaxyScenePacket(
+            packet,
+            settings,
+            renderIdentity,
+            'embeddings',
+        );
+        const returned = await compileAuthoritativeGalaxyScene(
+            backend,
+            entities,
+            [],
+            settings,
+            renderIdentity,
+            'embeddings',
+        );
+
+        expect(returned).toBe(installed);
+        expect(returned.positions3d).toEqual(new Float32Array([1, 2, 3]));
+    });
+
+    it('rejects a fused prewarm packet with a mismatched authority receipt', () => {
+        const settings = mergeGalaxySettings({ layoutMode: 'hybridSpace', sourceMode: 'embeddings' });
+        const source = galaxySceneToV2({ nodes: [], links: [], layoutMode: 'hybridSpace', groups: [] }, 'embeddings');
+        const packet = packGalaxyScenePacketV2(source, {
+            generationId: 'generation:receipt',
+            authorityReceipt: 'wrong-receipt',
+        });
+
+        expect(() => seedAuthoritativeGalaxyScenePacket(
+            packet,
+            settings,
+            'generation:receipt\u0000embeddings\u0000hybrid',
+            'embeddings',
+        )).toThrow('receipt does not match');
     });
 
     it('returns a small manifest and transferable pages at the 5,119-node target scale', () => {

@@ -19,7 +19,10 @@ import {
     sealGraphEvidenceTargetRegistry,
 } from './graph-evidence-target-registry';
 import { assertGraphEncoderVectorIndex } from './graph-encoder-vector-index';
-import { assertGraphSemanticDiscoveriesRemainCandidates } from './graph-semantic-discovery-authority';
+import {
+    assertGraphSemanticDiscoveriesRemainCandidates,
+    bindGraphSemanticDiscoverySnapshotIdentity,
+} from './graph-semantic-discovery-authority';
 import { assertSnapshotGraphConsumersReadOnly } from './graph-consumer-authority';
 
 export const GRAPH_SNAPSHOT_AUTHORITY: GraphSnapshotAuthority = GRAPH_SNAPSHOT_LIVE_AUTHORITY;
@@ -99,6 +102,9 @@ export function hydrateGraphSnapshotContent(
             targets: snapshot.embeddingTargets,
         } as GraphRebuildEmbeddingTargetPlan;
     }
+    // Content blobs are keyed by stable semantic content, so a newer snapshot may
+    // legitimately reuse a blob written under an older snapshot identity.
+    bindGraphSemanticDiscoverySnapshotIdentity(snapshot);
     return snapshot;
 }
 

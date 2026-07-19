@@ -2,7 +2,7 @@ import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, EventEmitter, 
 
 import { PhoenixBackendService } from '../../../../../services/phoenix-backend.service';
 import { entityColorStore } from '../../../../../lib/store/entityColorStore';
-import { compileGalaxyScene } from './graph-galaxy-scene-compiler';
+import { compileAuthoritativeGalaxyScene, compileGalaxyScene } from './graph-galaxy-scene-compiler';
 import { graphGalaxyRuntimeMeter, type GraphGalaxyCanvasTimings } from './graph-galaxy-runtime-meter';
 import { budgetGalaxySurface } from './graph-galaxy-surface-budget';
 import type { GalaxySceneSourceMode, GalaxySceneV2 } from './graph-galaxy-scene-v2';
@@ -454,7 +454,8 @@ export class GraphGalaxyCanvasComponent implements AfterViewInit, OnChanges, OnD
         this.needsLayout = false;
         const version = this.layoutVersion;
         const buildStarted = performance.now();
-        this.sceneBuildPromise = compileGalaxyScene(
+        const compile = this.sceneIdentity ? compileAuthoritativeGalaxyScene : compileGalaxyScene;
+        this.sceneBuildPromise = compile(
             this.phoenix,
             this.entities,
             this.edges,

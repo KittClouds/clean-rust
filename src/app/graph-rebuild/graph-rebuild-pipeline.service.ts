@@ -204,6 +204,10 @@ export class GraphRebuildPipelineService {
         if (this.runningState()) {
             throw new Error('Full Atlas Index is already running.');
         }
+        this.graphRebuild.assertBuildPolicyAuthorized?.(request.scope.scopeId, request.policy);
+        if (request.policy === 'delta') {
+            return this.reuseAuthoritativeInteractiveGraph(request);
+        }
         const durabilityMode = request.durabilityMode || 'interactive';
         const modelReadiness = this.modelReadiness(request);
         const graphCold = modelReadiness
@@ -237,16 +241,6 @@ export class GraphRebuildPipelineService {
             postProcessFingerprintValue = fingerprint;
             if (durabilityMode === 'interactive') {
                 interactiveIdentityValue = await interactiveRunIdentity(scope, docs, entities, request);
-                const reused = await this.tryReuseInteractiveRun({
-                    identity: interactiveIdentityValue,
-                    fingerprint,
-                    request,
-                    scope,
-                    runStarted,
-                    transportStarted,
-                    modelReadiness,
-                });
-                if (reused) return reused;
             }
 
             const nerStage = await this.runStage('dynamicNer', 'Dynamic NER + Alex Deltas', async () => {
@@ -316,6 +310,8 @@ export class GraphRebuildPipelineService {
                     embeddingProfile: embeddingProfileFromModelSelection(request.modelSelection),
                     postProcessMode: 'full',
                     durabilityMode,
+                    buildPolicy: request.policy,
+                    interactiveInputIdentity: interactiveIdentityValue,
                     embeddingStagePolicy: request.embeddingStagePolicy,
                     candidateCount: nerStage.counters['candidates'] || 0,
                     calendarRegistrySnapshot: request.calendarRegistrySnapshot,
@@ -467,7 +463,64 @@ export class GraphRebuildPipelineService {
         }
     }
 
-    private async tryReuseInteractiveRun(input: {
+    private async reuseAuthoritativeInteractiveGraph(request: GraphIndexRunRequest): Promise<PipelineResult> {
+        const durabilityMode = request.durabilityMode || 'interactive';
+        if (durabilityMode !== 'interactive') {
+            throw new Error('Delta Graph Build is an interactive authority-reuse operation. Use explicit Force Rebuild for reconstruction.');
+        }
+
+        this.runningState.set(true);
+        const runStarted = Date.now();
+        const transportStarted = phoenixTransportAudit.snapshot();
+        try {
+            const docs = await this.loadScopedDocuments(request.scope.noteIds);
+            const scope = expandScopeNoteIds(request.scope, docs);
+            const entities = smartGraphRegistry.getAllEntities().length
+                ? smartGraphRegistry.getAllEntities()
+                : request.entities;
+            const fingerprint = postProcessFingerprint(
+                scope,
+                docs,
+                entities,
+                request.modelSelection,
+                request.embeddingStagePolicy,
+            );
+            const identity = await interactiveRunIdentity(scope, docs, entities, request);
+            return await this.reuseAuthoritativeInteractiveRun({
+                identity,
+                fingerprint,
+                request,
+                scope,
+                runStarted,
+                transportStarted,
+                modelReadiness: this.modelReadiness({ ...request, scope }),
+            });
+        } catch (error) {
+            const completedAt = Date.now();
+            const failedReceipt = this.buildRunReceipt({
+                idPrefix: 'graph-atlas:delta-rejected',
+                scope: request.scope,
+                policy: 'delta',
+                postProcessMode: 'full',
+                durabilityMode,
+                modelSelection: request.modelSelection,
+                modelReadiness: this.modelReadiness(request),
+                startedAt: runStarted,
+                completedAt,
+                stageReceipts: [],
+                projectionReceipts: [],
+                snapshot: null,
+                status: 'failed',
+                message: error instanceof Error ? error.message : String(error),
+            });
+            this.lastReceiptState.set(failedReceipt);
+            throw error;
+        } finally {
+            this.runningState.set(false);
+        }
+    }
+
+    private async reuseAuthoritativeInteractiveRun(input: {
         identity: string;
         fingerprint: string;
         request: GraphIndexRunRequest;
@@ -475,26 +528,57 @@ export class GraphRebuildPipelineService {
         runStarted: number;
         transportStarted: PhoenixTransportAuditSnapshot;
         modelReadiness: GraphIndexModelReadiness[];
-    }): Promise<PipelineResult | null> {
+    }): Promise<PipelineResult> {
         const state = this.interactiveRunReuseState;
-        if (!state
-            || state.identity !== input.identity
-            || this.lastSnapshotState()?.id !== state.snapshot.id
-            || this.lastSnapshotState()?.authorityContract?.contentHash
-                !== state.snapshot.authorityContract?.contentHash) {
-            return null;
+        const residentSnapshot = state
+            && state.identity === input.identity
+            && this.lastSnapshotState()?.id === state.snapshot.id
+            && this.lastSnapshotState()?.authorityContract?.contentHash
+                === state.snapshot.authorityContract?.contentHash
+            ? state.snapshot
+            : null;
+        const persistedSnapshot = this.graphRebuild.snapshot?.() || null;
+        const restoredSnapshot = !residentSnapshot
+            && persistedSnapshot?.interactiveRunAuthority?.inputIdentity === input.identity
+            ? persistedSnapshot
+            : null;
+        const snapshot = residentSnapshot || restoredSnapshot;
+        if (!snapshot) {
+            if (persistedSnapshot && !persistedSnapshot.interactiveRunAuthority) {
+                throw new Error(
+                    'Persisted graph predates the authoritative restart fast lane. '
+                    + 'Automatic cold fallback is disabled; run one explicit Force Rebuild to migrate it.',
+                );
+            }
+            if (persistedSnapshot) {
+                throw new Error(
+                    'Graph inputs changed and no sealed graph matches them. '
+                    + 'Delta cannot reconstruct; use explicit Force Rebuild.',
+                );
+            }
+            throw new Error(
+                'No authoritative sealed graph exists for this scope. '
+                + 'Delta cannot reconstruct; use explicit Force Rebuild.',
+            );
         }
 
         const reuseStarted = performance.now();
-        const authority = assertGraphSnapshotAuthority(state.snapshot);
+        const authority = assertGraphSnapshotAuthority(snapshot);
         const persistStarted = performance.now();
-        const durable = await this.graphRebuild.persistResidentNativeGraphRun?.(state.snapshot);
-        if (!durable) return null;
+        const durable = residentSnapshot
+            ? await this.graphRebuild.persistResidentNativeGraphRun?.(snapshot)
+            : await this.graphRebuild.restorePersistedNativeGraphRun?.(snapshot, input.identity);
+        if (!durable) {
+            throw new Error(
+                'Authoritative graph fast lane is unavailable. Automatic cold fallback is disabled; '
+                + 'use explicit Force Rebuild to replace the durable run.',
+            );
+        }
         const persistMs = elapsedTimingMs(persistStarted);
         const reusedSnapshot: GraphRebuildSnapshot = {
-            ...state.snapshot,
+            ...snapshot,
             buildTimings: reusedGraphBuildTimings(
-                state.snapshot.buildTimings,
+                snapshot.buildTimings,
                 durable,
                 elapsedTimingMs(reuseStarted),
                 persistMs,
@@ -688,6 +772,7 @@ export class GraphRebuildPipelineService {
                 embeddingProfile: embeddingProfileFromModelSelection(input.request.modelSelection),
                 postProcessMode: 'full',
                 durabilityMode: 'diagnostic',
+                buildPolicy: 'force',
                 diagnosticBaseSnapshotId: input.snapshotId,
                 diagnosticBaseSnapshotRunSerial: input.baseRunSerial,
                 embeddingStagePolicy: input.request.embeddingStagePolicy,
@@ -2448,8 +2533,6 @@ function postProcessFingerprint(
         docs: docs
             .map((doc) => ({
                 id: doc.id,
-                version: doc.version || 0,
-                updatedAt: doc.updatedAt || 0,
                 textHash: simpleHash(doc.plainText),
             }))
             .sort((left, right) => left.id.localeCompare(right.id)),
@@ -2475,8 +2558,6 @@ async function interactiveRunIdentity(
 ): Promise<string> {
     const documentRows = await Promise.all(docs.map(async (doc) => ({
         id: doc.id,
-        version: doc.version || 0,
-        updatedAt: doc.updatedAt || 0,
         textSha256: await sha256Text(doc.plainText),
     })));
     const payload = canonicalJson({
@@ -2487,13 +2568,29 @@ async function interactiveRunIdentity(
             noteIds: [...scope.noteIds].sort(),
         },
         documents: documentRows.sort((left, right) => left.id.localeCompare(right.id)),
-        entities: [...entities].sort((left, right) => left.id.localeCompare(right.id)),
+        entities: entities
+            .map((entity) => ({
+                id: entity.id,
+                label: entity.label,
+                aliases: [...(entity.aliases || [])].sort(),
+                kind: entity.kind,
+                firstNote: entity.firstNote || null,
+            }))
+            .sort((left, right) => left.id.localeCompare(right.id)),
         modelSelection: request.modelSelection,
         embeddingStagePolicy: normalizedEmbeddingStagePolicy(request.embeddingStagePolicy),
-        calendarRegistrySnapshot: request.calendarRegistrySnapshot || null,
+        calendarRegistrySnapshot: stableCalendarRegistryIdentity(request.calendarRegistrySnapshot),
         postProcessMode: 'full',
     });
     return sha256Text(payload);
+}
+
+function stableCalendarRegistryIdentity(
+    snapshot: GraphIndexRunRequest['calendarRegistrySnapshot'],
+): unknown {
+    if (!snapshot) return null;
+    const { id: _volatileId, builtAt: _volatileBuiltAt, ...stable } = snapshot;
+    return stable;
 }
 
 function reusedGraphBuildTimings(

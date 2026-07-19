@@ -4,7 +4,9 @@ import { describe, expect, it } from 'vitest';
 import { buildGraphRebuildSnapshot } from './graph-rebuild-builder';
 import { assertRunReceiptParity } from './graph-rebuild-pipeline.service';
 import {
+    graphRebuildSnapshotContentBlobEntries,
     graphRebuildSnapshotContentBlobDocuments,
+    graphRebuildSnapshotPersistenceView,
     graphRebuildSnapshotToScopedDocument,
     scopedDocumentToGraphRebuildContentBlob,
     scopedDocumentToGraphRebuildSnapshot,
@@ -16,6 +18,7 @@ import {
     sealGraphSnapshotAuthority,
     type GraphSnapshotHydrationBlob,
 } from './graph-snapshot-authority';
+import { bindGraphSemanticDiscoverySnapshotIdentity } from './graph-semantic-discovery-authority';
 import { finalizeGraphRebuildSnapshot } from './graph-snapshot-finalizer';
 import type {
     GraphRebuildContentBlobField,
@@ -60,6 +63,43 @@ describe('desktop graph snapshot restart contract', () => {
         expect(embed.nodes.every((node) => packetTargetIds.has(node.id))).toBe(true);
         expect(embed.edges.length).toBeGreaterThan(0);
         expect(embed.nodes.some((node) => node.metadata?.['signalParentIds'])).toBe(true);
+    });
+
+    it('rebinds stable candidate blobs to the authoritative snapshot identity', () => {
+        const first = restartFixture();
+        bindGraphSemanticDiscoverySnapshotIdentity(first);
+        sealGraphSnapshotAuthority(first);
+        const firstEntries = graphRebuildSnapshotContentBlobEntries(first);
+
+        const next = restartFixture();
+        next.id = `${first.id}:next`;
+        next.builtAt += 1;
+        if (next.atlasPacket) {
+            next.atlasPacket = { ...next.atlasPacket, snapshotId: next.id, builtAt: next.builtAt };
+        }
+        bindGraphSemanticDiscoverySnapshotIdentity(next);
+        sealGraphSnapshotAuthority(next);
+        const nextEntries = graphRebuildSnapshotContentBlobEntries(next);
+        const persisted = graphRebuildSnapshotPersistenceView(next, nextEntries);
+        const firstEntryByField = new Map(firstEntries.map((entry) => [entry.field, entry]));
+        const blobs = Object.fromEntries(nextEntries.map((entry) => {
+            const stored = firstEntryByField.get(entry.field) || entry;
+            return [entry.field, {
+                scopeId: next.scopeId,
+                field: entry.field,
+                hash: entry.ref.hash,
+                value: scopedDocumentToGraphRebuildContentBlob(
+                    graphRebuildSnapshotContentBlobDocuments(first, [stored])[0],
+                )!.value,
+            }];
+        })) as Partial<Record<GraphRebuildContentBlobField, GraphSnapshotHydrationBlob>>;
+
+        expect(firstEntryByField.get('semanticCandidateSummary')?.documentKey)
+            .toBe(nextEntries.find((entry) => entry.field === 'semanticCandidateSummary')?.documentKey);
+        const hydrated = hydrateGraphSnapshotContent(persisted, blobs);
+        expect(hydrated.semanticCandidateSummary?.sourceSnapshotId).toBe(next.id);
+        expect(hydrated.manifoldSpecializationSummary?.sourceSnapshotId).toBe(next.id);
+        expect(() => assertGraphSnapshotAuthority(hydrated)).not.toThrow();
     });
 
     it('fails closed when a persisted content blob is changed', () => {

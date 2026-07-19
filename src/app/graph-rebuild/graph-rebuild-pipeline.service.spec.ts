@@ -118,8 +118,21 @@ describe('GraphRebuildPipelineService', () => {
             }],
         }));
 
-        await expect(service.buildGraph(request())).rejects.toThrow('Load graph models first');
+        await expect(service.buildGraph({ ...request(), policy: 'force' })).rejects.toThrow('Load graph models first');
 
+        expect(ner.scanDynamicBatch).not.toHaveBeenCalled();
+        expect(graphRebuild.buildAndPersistSnapshot).not.toHaveBeenCalled();
+    });
+
+    it('rejects a quarantined persisted scope before documents or models run', async () => {
+        graphRebuild.assertBuildPolicyAuthorized.mockImplementation(() => {
+            throw new Error('Automatic cold fallback is disabled');
+        });
+
+        await expect(service.buildGraph({ ...request(), policy: 'delta' }))
+            .rejects.toThrow('Automatic cold fallback is disabled');
+
+        expect(notesMock.bulkGet).not.toHaveBeenCalled();
         expect(ner.scanDynamicBatch).not.toHaveBeenCalled();
         expect(graphRebuild.buildAndPersistSnapshot).not.toHaveBeenCalled();
     });
@@ -261,7 +274,74 @@ describe('GraphRebuildPipelineService', () => {
         expect(graphRebuild.persistResidentNativeGraphRun).toHaveBeenCalledTimes(1);
     });
 
-    it('fails closed to a full build when unchanged identity cannot be durably reused', async () => {
+    it('makes Delta structurally reuse-only when no authoritative graph exists', async () => {
+        atlasRuntime.capabilityState.mockImplementation((capability: string) => ({
+            requiredModels: [{
+                id: capability === 'semanticAtlas' ? 'semanticEmbedding' : capability === 'nliAdjudication' ? 'nli' : 'dynamicNer',
+                readiness: 'idle',
+                statusLabel: 'idle',
+            }],
+        }));
+
+        await expect(service.buildGraph({ ...request(), policy: 'delta' }))
+            .rejects.toThrow('Delta cannot reconstruct');
+
+        expect(ner.scanDynamicBatch).not.toHaveBeenCalled();
+        expect(atlasRuntime.runCapability).not.toHaveBeenCalled();
+        expect(graphRebuild.buildAndPersistSnapshot).not.toHaveBeenCalled();
+    });
+
+    it('restores the authoritative unchanged fast lane after a frontend restart', async () => {
+        const buildRequest = { ...request(), policy: 'force' as const };
+        const first = await service.buildGraph(buildRequest);
+        graphRebuild.snapshot.mockReturnValue(first.snapshot);
+        graphRebuild.restorePersistedNativeGraphRun.mockResolvedValue(nativeDurableReuseReceipt());
+        const restarted = runInInjectionContext(injector, () => new GraphRebuildPipelineService());
+        notesMock.rows[0] = {
+            ...notesMock.rows[0],
+            version: 999,
+            updatedAt: 999,
+        };
+        const restartedRequest = {
+            ...buildRequest,
+            calendarRegistrySnapshot: {
+                ...buildRequest.calendarRegistrySnapshot!,
+                id: 'calendar-registry:rebuilt-envelope',
+                builtAt: 999,
+            },
+            entities: buildRequest.entities.map((entity) => ({
+                ...entity,
+                registeredAt: 999,
+                totalMentions: 999,
+                lastSeenDate: new Date(999),
+            })),
+        };
+
+        const second = await restarted.buildGraph({ ...restartedRequest, policy: 'delta' });
+        await flushReceiptPersistence(restarted);
+
+        expect(second.snapshot.id).toBe(first.snapshot.id);
+        expect(second.receipt.stageReceipts).toEqual(expect.arrayContaining([
+            expect.objectContaining({ id: 'interactiveIdentityReuse' }),
+        ]));
+        expect(graphRebuild.restorePersistedNativeGraphRun).toHaveBeenCalledTimes(1);
+        expect(graphRebuild.buildAndPersistSnapshot).toHaveBeenCalledTimes(1);
+        expect(ner.scanDynamicBatch).toHaveBeenCalledTimes(1);
+    });
+
+    it('fails closed when unchanged identity cannot be durably reused', async () => {
+        graphRebuild.persistResidentNativeGraphRun.mockResolvedValue(null);
+        const buildRequest = { ...request(), policy: 'force' as const };
+
+        await service.buildGraph(buildRequest);
+        await expect(service.buildGraph({ ...buildRequest, policy: 'delta' }))
+            .rejects.toThrow('Automatic cold fallback is disabled');
+
+        expect(ner.scanDynamicBatch).toHaveBeenCalledTimes(1);
+        expect(graphRebuild.buildAndPersistSnapshot).toHaveBeenCalledTimes(1);
+    });
+
+    it('allows only explicit force policy to replace an unavailable durable fast lane', async () => {
         graphRebuild.persistResidentNativeGraphRun.mockResolvedValue(null);
         const buildRequest = { ...request(), policy: 'force' as const };
 
@@ -288,6 +368,24 @@ describe('GraphRebuildPipelineService', () => {
         expect(graphRebuild.persistResidentNativeGraphRun).not.toHaveBeenCalled();
         expect(ner.scanDynamicBatch).toHaveBeenCalledTimes(2);
         expect(graphRebuild.buildAndPersistSnapshot).toHaveBeenCalledTimes(2);
+    });
+
+    it('rejects changed Delta inputs without crossing into cold reconstruction', async () => {
+        const buildRequest = { ...request(), policy: 'force' as const };
+        const first = await service.buildGraph(buildRequest);
+        graphRebuild.snapshot.mockReturnValue(first.snapshot);
+        notesMock.rows[0] = {
+            ...notesMock.rows[0],
+            markdownContent: 'Kai met Hazel. Hazel contradicted Kai.',
+            version: 3,
+            updatedAt: 11,
+        };
+
+        await expect(service.buildGraph({ ...buildRequest, policy: 'delta' }))
+            .rejects.toThrow('Delta cannot reconstruct');
+
+        expect(ner.scanDynamicBatch).toHaveBeenCalledTimes(1);
+        expect(graphRebuild.buildAndPersistSnapshot).toHaveBeenCalledTimes(1);
     });
 
     it('debounces post-commit work and cancels stale diagnostics before they start', async () => {
@@ -653,7 +751,7 @@ describe('GraphRebuildPipelineService', () => {
 function request(): GraphIndexRunRequest {
     return {
         scope: { kind: 'note', scopeId: 'note:note-1', label: 'Short Run', noteIds: ['note-1'] },
-        policy: 'delta',
+        policy: 'force',
         modelSelection: {
             dynamicNerId: 'dynamic_ner',
             embeddingModelId: 'mongodb-leaf-mt',
@@ -1050,7 +1148,8 @@ function receiptForPersistenceTest(
 
 function createGraphRebuildMock() {
     return {
-        buildAndPersistSnapshot: vi.fn(async () => authorityReadySnapshot({
+        assertBuildPolicyAuthorized: vi.fn(),
+        buildAndPersistSnapshot: vi.fn(async (request: { interactiveInputIdentity?: string }) => authorityReadySnapshot({
             id: 'snapshot-1',
             scopeId: 'note:note-1',
             scopeKind: 'note',
@@ -1171,7 +1270,15 @@ function createGraphRebuildMock() {
                 dbOpsMs: 18,
                 totalMs: 27,
             },
+            interactiveRunAuthority: request.interactiveInputIdentity ? {
+                schemaVersion: 'phoenix-interactive-graph-run-authority/v1',
+                inputIdentity: request.interactiveInputIdentity,
+                snapshotId: 'snapshot-1',
+                scopeId: 'note:note-1',
+                durable: nativeDurableReuseReceipt(),
+            } : undefined,
         })),
+        snapshot: vi.fn(() => null as GraphRebuildSnapshot | null),
         loadPersistedSnapshot: vi.fn(async () => null),
         loadPersistedRunReceipt: vi.fn(async () => null),
         loadPostProcessCache: vi.fn(async () => null),
@@ -1179,6 +1286,7 @@ function createGraphRebuildMock() {
         persistPostProcessCache: vi.fn(async () => undefined),
         restorePersistedSnapshot: vi.fn(async () => undefined),
         persistResidentNativeGraphRun: vi.fn(async () => null as ReturnType<typeof nativeDurableReuseReceipt> | null),
+        restorePersistedNativeGraphRun: vi.fn(async () => null as ReturnType<typeof nativeDurableReuseReceipt> | null),
     };
 }
 

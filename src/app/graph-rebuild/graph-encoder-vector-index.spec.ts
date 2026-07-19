@@ -63,8 +63,9 @@ describe('real encoder vector index', () => {
             maxCandidatesPerTarget: 12,
             minimumSimilarity: -1,
         });
-
         expect(index.contract.vectorCount).toBe(240);
+        expect(index.contract.indexHash).toBe('fnv32-ad90204d');
+        expect(index.contract.neighborhoodHash).toBe('fnv32-64dbfb68');
         expect(index.contract.evaluatedPairs).toBeLessThanOrEqual(240 * 12);
         expect(index.contract.evaluatedPairs).toBeLessThan((240 * 239) / 2);
     });
@@ -87,6 +88,47 @@ describe('real encoder vector index', () => {
         expect(result.neighbors).toHaveLength(5);
         expect(result.evaluatedCandidates).toBeLessThanOrEqual(9);
         expect(result.evaluatedCandidates).toBeLessThan(targetIds.length);
+    });
+
+    it('accepts an equivalent packed-native receipt without changing index identity', () => {
+        const snapshot = chunkFixture(240);
+        const targetIds = assertGraphEvidenceTargetRegistry(snapshot).exposedTargets.map((target) => target.id);
+        const page = vectorPage(targetIds, 8);
+        const options = {
+            neighborhoodK: 4,
+            maxCandidatesPerTarget: 12,
+            minimumSimilarity: -1,
+        };
+        const oracle = buildGraphEncoderVectorIndex(snapshot, page, options);
+        const packed = buildGraphEncoderVectorIndex(snapshot, page, options, {
+            neighborhoods: oracle.neighborhoods,
+            evaluatedPairs: oracle.contract.evaluatedPairs,
+        });
+
+        expect(packed.contract.indexHash).toBe(oracle.contract.indexHash);
+        expect(packed.contract.neighborhoodHash).toBe(oracle.contract.neighborhoodHash);
+        expect(packed.neighborhoods).toEqual(oracle.neighborhoods);
+    });
+
+    it('rejects packed-native receipts that drift identity, rank, or work bounds', () => {
+        const snapshot = chunkFixture(12);
+        const targetIds = assertGraphEvidenceTargetRegistry(snapshot).exposedTargets.map((target) => target.id);
+        const page = vectorPage(targetIds, 8);
+        const options = { neighborhoodK: 2, maxCandidatesPerTarget: 4, minimumSimilarity: -1 };
+        const oracle = buildGraphEncoderVectorIndex(snapshot, page, options);
+        const drifted = oracle.neighborhoods.map((row, source) => source ? row : {
+            ...row,
+            neighbors: row.neighbors.map((neighbor, rank) => rank ? neighbor : { ...neighbor, rank: 2 }),
+        });
+
+        expect(() => buildGraphEncoderVectorIndex(snapshot, page, options, {
+            neighborhoods: drifted,
+            evaluatedPairs: oracle.contract.evaluatedPairs,
+        })).toThrow(/neighbor receipt is invalid/);
+        expect(() => buildGraphEncoderVectorIndex(snapshot, page, options, {
+            neighborhoods: oracle.neighborhoods,
+            evaluatedPairs: targetIds.length * 4 + 1,
+        })).toThrow(/exceeded its bounded contract/);
     });
 });
 

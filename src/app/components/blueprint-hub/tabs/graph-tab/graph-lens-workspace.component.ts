@@ -24,6 +24,7 @@ import {
     type GraphLensState,
 } from './graph-lens';
 import { sameGraphRenderIdentity } from './graph-render-identity';
+import { GraphCanvasColdStartService } from '../../../../services/graph-canvas-cold-start.service';
 
 const GRAPH_LENS_STATE_KEY = 'graph.lens.state.v1';
 const GRAPH_LENS_MODES = new Set<GraphLensMode>(['global', 'narrative', 'note', 'multiNote']);
@@ -88,6 +89,17 @@ function readPersistedGraphLensState(): GraphLensState {
             </section>
             }
 
+            @if (graphSnapshotLoading()) {
+            <section data-testid="graph-canvas-authority-loading"
+                class="grid min-h-0 flex-1 place-items-center border border-white/5 bg-black/20 text-xs font-semibold uppercase tracking-[0.16em] text-cyan-200/70">
+                Preparing authoritative canvas…
+            </section>
+            } @else if (graphSnapshotFailure()) {
+            <section data-testid="graph-canvas-authority-failure"
+                class="grid min-h-0 flex-1 place-items-center border border-red-400/15 bg-red-500/5 px-6 text-center text-sm font-semibold text-red-100">
+                {{ graphSnapshotFailure() }}
+            </section>
+            } @else {
             <app-graph-atlas-preview class="block min-h-0 flex-1"
                 [entities]="lensedGraph().entities"
                 [edges]="lensedGraph().edges"
@@ -109,6 +121,7 @@ function readPersistedGraphLensState(): GraphLensState {
                 (sourceRequested)="jumpToCanvasSource($event)"
                 (lensModeChange)="setLensMode($event)">
             </app-graph-atlas-preview>
+            }
         </div>
     `,
 })
@@ -118,10 +131,13 @@ export class GraphLensWorkspaceComponent implements OnDestroy {
     private readonly noteEditor = inject(NoteEditorStore);
     private readonly editor = inject(EditorService);
     private readonly hub = inject(BlueprintHubService);
+    private readonly graphCanvasColdStart = inject(GraphCanvasColdStartService);
     private readonly narrativeEntitiesSignal = signal<RegisteredEntity[]>([]);
     private readonly narrativeEdgesSignal = signal<AtlasPreviewEdge[]>([]);
     private readonly graphRebuildSnapshotSignal = signal<GraphRebuildSnapshot | null>(null);
     private readonly graphSnapshotStaleSignal = signal(false);
+    readonly graphSnapshotLoading = signal(true);
+    readonly graphSnapshotFailure = signal<string | null>(null);
     private readonly memberships = signal<GraphLensMembership[]>([]);
     private membershipToken = 0;
     private noteToken = 0;
@@ -306,8 +322,13 @@ export class GraphLensWorkspaceComponent implements OnDestroy {
     private async loadPersistedGraphSnapshot(lens: GraphLensState): Promise<void> {
         const token = ++this.graphSnapshotLoadToken;
         const normalized = normalizeGraphLensForBuild(lens);
+        this.graphSnapshotLoading.set(true);
+        this.graphSnapshotFailure.set(null);
         try {
             const snapshot = await this.graphRebuild.loadPersistedSnapshot(normalized.scopeId);
+            if (snapshot) {
+                await this.graphCanvasColdStart.preparePersistedManifold(snapshot);
+            }
             if (token === this.graphSnapshotLoadToken) {
                 if (!sameGraphRenderIdentity(this.graphRebuildSnapshotSignal(), snapshot)) {
                     this.graphRebuildSnapshotSignal.set(snapshot);
@@ -315,7 +336,13 @@ export class GraphLensWorkspaceComponent implements OnDestroy {
                 this.graphSnapshotStaleSignal.set(false);
             }
         } catch (error) {
-            console.warn('[GraphLensWorkspace] Failed to load graph rebuild snapshot', error);
+            if (token === this.graphSnapshotLoadToken) {
+                const message = error instanceof Error ? error.message : String(error);
+                this.graphSnapshotFailure.set(`Authoritative canvas unavailable: ${message}`);
+            }
+            console.error('[GraphLensWorkspace] Authoritative canvas load failed closed.', error);
+        } finally {
+            if (token === this.graphSnapshotLoadToken) this.graphSnapshotLoading.set(false);
         }
     }
 

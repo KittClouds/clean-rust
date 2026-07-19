@@ -24,6 +24,7 @@ import { PhoenixUiApiService } from './services/phoenix-ui-api.service';
 import { PhoenixStoreService, type StoreBootSnapshot } from './services/phoenix-store.service';
 import { detectPhoenixRuntimeTarget } from './services/phoenix-backend.service';
 import { phoenixTransportAudit } from './services/phoenix-transport-audit';
+import { GraphCanvasColdStartService } from './services/graph-canvas-cold-start.service';
 import {
   PhoenixWasmMismatchError,
   isPhoenixWasmMismatchError,
@@ -53,6 +54,7 @@ export class AppComponent implements OnInit, OnDestroy {
   private noteEditorStore = inject(NoteEditorStore);
   private knowledgeService = inject(KnowledgeService);
   private discoveryStore = inject(DiscoveryStore);
+  private graphCanvasColdStart = inject(GraphCanvasColdStartService);
 
   // Navigation API subscriptions
   private notesSub: Subscription | null = null;
@@ -130,6 +132,7 @@ export class AppComponent implements OnInit, OnDestroy {
       }
       this.orchestrator.completePhase('runtime_load');
       this.setBootStep(runtimeLoadPromise ? 'phoenix:runtime:complete' : 'phoenix:runtime:skipped:web:complete');
+      this.graphCanvasColdStart.startGlobal();
 
       if (nativePhoenixRuntime) {
         this.setBootStep('dexie:hydrate:start');

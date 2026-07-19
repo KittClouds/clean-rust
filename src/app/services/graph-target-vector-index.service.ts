@@ -8,6 +8,11 @@ import {
     type GraphEncoderVectorQueryOptions,
     type GraphEncoderVectorQueryResult,
 } from '../graph-rebuild/graph-encoder-vector-index';
+import {
+    buildNativeGraphEncoderNeighborhoods,
+    nativeGraphEncoderIndexAvailable,
+    type NativeGraphEncoderNeighborhoodBuild,
+} from '../graph-rebuild/graph-encoder-vector-index-native';
 import { assertGraphEvidenceTargetRegistry } from '../graph-rebuild/graph-evidence-target-registry';
 import { embeddingTargetText } from '../graph-rebuild/graph-rebuild-embedding-signatures';
 import type { GraphRebuildSnapshot } from '../graph-rebuild/graph-rebuild-snapshot';
@@ -25,6 +30,10 @@ export interface GraphTargetVectorIndexBuildOptions extends GraphEncoderVectorIn
 @Injectable({ providedIn: 'root' })
 export class GraphTargetVectorIndexService {
     private readonly indexes = new Map<string, GraphEncoderVectorIndex>();
+    private readonly nativeBuildReceipts = new Map<
+        string,
+        NativeGraphEncoderNeighborhoodBuild['receipt']
+    >();
 
     constructor(private readonly encoder: EmbeddingWorkerService) {}
 
@@ -32,7 +41,14 @@ export class GraphTargetVectorIndexService {
         return this.indexes.get(snapshotId);
     }
 
+    nativeBuildReceipt(
+        snapshotId: string,
+    ): NativeGraphEncoderNeighborhoodBuild['receipt'] | undefined {
+        return this.nativeBuildReceipts.get(snapshotId);
+    }
+
     evict(snapshotId: string): boolean {
+        this.nativeBuildReceipts.delete(snapshotId);
         return this.indexes.delete(snapshotId);
     }
 
@@ -90,7 +106,7 @@ export class GraphTargetVectorIndexService {
             values = encoded.values;
             dimensions = encoded.dims;
         }
-        const index = buildGraphEncoderVectorIndex(snapshot, {
+        const page = {
             modelId: model.id,
             modelVersion: options.modelVersion || model.localModel.modelId,
             executionProvider: 'transformers-worker',
@@ -99,14 +115,34 @@ export class GraphTargetVectorIndexService {
             targetIds: targets.map((target) => target.id),
             values,
             normalized: true,
-        }, options);
+        } as const;
+        let nativeBuild: NativeGraphEncoderNeighborhoodBuild | undefined;
+        if (targets.length && nativeGraphEncoderIndexAvailable()) {
+            try {
+                nativeBuild = await buildNativeGraphEncoderNeighborhoods(page, options);
+            } catch (error) {
+                console.debug('[GraphTargetVectorIndex] Packed native build fell back to deterministic TS', error);
+            }
+        }
+        let index: GraphEncoderVectorIndex;
+        try {
+            index = buildGraphEncoderVectorIndex(snapshot, page, options, nativeBuild);
+        } catch (error) {
+            if (!nativeBuild) throw error;
+            console.debug('[GraphTargetVectorIndex] Native receipt failed validation; rebuilding in TS', error);
+            nativeBuild = undefined;
+            index = buildGraphEncoderVectorIndex(snapshot, page, options);
+        }
         installGraphEncoderVectorIndex(snapshot, index);
         this.indexes.delete(snapshot.id);
+        this.nativeBuildReceipts.delete(snapshot.id);
         this.indexes.set(snapshot.id, index);
+        if (nativeBuild) this.nativeBuildReceipts.set(snapshot.id, nativeBuild.receipt);
         while (this.indexes.size > 2) {
             const oldest = this.indexes.keys().next().value as string | undefined;
             if (!oldest) break;
             this.indexes.delete(oldest);
+            this.nativeBuildReceipts.delete(oldest);
         }
         if (snapshot.authorityContract) sealGraphSnapshotAuthority(snapshot);
         return index;

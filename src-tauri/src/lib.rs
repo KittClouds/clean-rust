@@ -3,6 +3,7 @@ mod gfm_retrieval_shadow;
 mod graph_galaxy;
 mod graph_run_store;
 mod graph_scene_packet;
+mod graph_vector_index;
 mod native_decision_rpc;
 mod nli_claim_rpc;
 mod phoenix_rpc;
@@ -12,10 +13,15 @@ use phoenix_rpc::{PhoenixApi, PhoenixApiImpl};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    let taurpc_handler = taurpc::create_ipc_handler(PhoenixApiImpl::default().into_handler());
     tauri::Builder::default()
-        .invoke_handler(taurpc::create_ipc_handler(
-            PhoenixApiImpl::default().into_handler(),
-        ))
+        .invoke_handler(move |invoke: tauri::ipc::Invoke<tauri::Wry>| {
+            if invoke.message.command() == "build_graph_encoder_index_packed" {
+                graph_vector_index::handle_packed_invoke(invoke)
+            } else {
+                taurpc_handler(invoke)
+            }
+        })
         .run(tauri::generate_context!())
         .expect("error while running Phoenix Tauri shell");
 }

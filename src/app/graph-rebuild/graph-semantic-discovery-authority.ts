@@ -86,6 +86,13 @@ export function assertGraphSemanticDiscoveriesRemainCandidates(
     };
 }
 
+export function bindGraphSemanticDiscoverySnapshotIdentity(snapshot: GraphRebuildSnapshot): void {
+    for (const candidateSurface of candidateSurfaces(snapshot)) {
+        const record = objectRecord(candidateSurface.value);
+        if (record && 'sourceSnapshotId' in record) record['sourceSnapshotId'] = snapshot.id;
+    }
+}
+
 function candidateSurfaces(snapshot: GraphRebuildSnapshot): CandidateSurface[] {
     return [
         surface('embedding graph postprocess', snapshot.embeddingGraphPostProcess, ['backboneEdges', 'bridgeEdges']),

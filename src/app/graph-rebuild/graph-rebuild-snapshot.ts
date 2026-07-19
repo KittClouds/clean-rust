@@ -2655,6 +2655,26 @@ export interface GraphSnapshotAuthorityContract {
     counts: GraphSnapshotAuthorityCounts;
 }
 
+export interface GraphInteractiveRunAuthorityReceipt {
+    schemaVersion: 'phoenix-interactive-graph-run-authority/v1';
+    inputIdentity: string;
+    snapshotId: string;
+    scopeId: string;
+    durable: {
+        schemaVersion: 'phoenix-graph-run-durable-receipt/v1';
+        runHandle: string;
+        scopeId: string;
+        snapshotId: string;
+        manifestId: string;
+        changedSections: number;
+        reusedSections: number;
+        encodedSections: number;
+        compressedSections: number;
+        rawBytesWritten: number;
+        compressedBytesWritten: number;
+    };
+}
+
 export interface GraphRebuildSnapshot {
     schemaVersion: 'phoenix-graph-rebuild/v1';
     id: string;
@@ -2724,6 +2744,7 @@ export interface GraphRebuildSnapshot {
     documentCompilerSummary?: GraphDocumentCompilerSummary;
     graphTruthCommitLedger?: GraphTruthCommitLedger;
     authorityContract?: GraphSnapshotAuthorityContract;
+    interactiveRunAuthority?: GraphInteractiveRunAuthorityReceipt;
     documentGraphMutationLedger?: GraphDocumentGraphMutationLedger;
     operatorMutationJournal?: GraphOperatorMutationJournal;
     calendarRegistrySummary?: GraphCalendarRegistryBridgeSummary;

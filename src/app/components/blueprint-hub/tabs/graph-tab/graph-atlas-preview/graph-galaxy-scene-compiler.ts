@@ -28,11 +28,10 @@ let warnedWorkerFallback = false;
 const sceneCache = new Map<string, Promise<GalaxySceneV2>>();
 const sceneCacheWeights = new Map<string, number>();
 const sharedScenePages = new GalaxyScenePacketV2SharedPagePool();
-// Retain the five immutable manifold scenes plus one transient query scene only while
-// their packed resident element count remains small. Large graphs fail closed toward
-// the active scene instead of multiplying corpus-sized browser state.
-const MAX_CACHED_SCENES = 6;
-const MAX_CACHED_SCENE_ELEMENTS = 100_000;
+// Retain only the active expanded scene. Other manifolds are rebuilt through the
+// authoritative worker lane instead of multiplying corpus-sized browser state.
+const MAX_CACHED_SCENES = 1;
+const MAX_CACHED_SCENE_ELEMENTS = 40_000;
 let sceneWorker: Worker | null | undefined;
 let nextWorkerRequestId = 0;
 const workerRequests = new Map<number, {
@@ -53,7 +52,57 @@ export async function compileGalaxyScene(
     renderIdentity = '',
     sourceMode: GalaxySceneSourceMode = 'entities',
 ): Promise<GalaxySceneV2> {
-    const cacheKey = renderIdentity ? `${renderIdentity}\u0000${sourceMode}\u0000${galaxySceneCompilationSettingsKey(settings)}` : '';
+    return compileGalaxySceneWithPolicy(backend, entities, edges, settings, renderIdentity, sourceMode, false);
+}
+
+export async function compileAuthoritativeGalaxyScene(
+    backend: PhoenixBackendService,
+    entities: GalaxyRenderableNode[],
+    edges: GalaxyInputEdge[],
+    settings: GalaxyRenderSettings,
+    renderIdentity: string,
+    sourceMode: GalaxySceneSourceMode,
+): Promise<GalaxySceneV2> {
+    if (!renderIdentity) throw new Error('Authoritative packed scene compilation requires a render identity.');
+    return compileGalaxySceneWithPolicy(backend, entities, edges, settings, renderIdentity, sourceMode, true);
+}
+
+export function seedAuthoritativeGalaxyScenePacket(
+    packet: GalaxyScenePacketV2,
+    settings: GalaxyRenderSettings,
+    renderIdentity: string,
+    sourceMode: GalaxySceneSourceMode,
+): GalaxySceneV2 {
+    if (!renderIdentity) throw new Error('Authoritative packed scene installation requires a render identity.');
+    if (packet.manifest.generationId !== galaxySceneGenerationId(renderIdentity)) {
+        throw new Error('Authoritative packed scene generation does not match its render identity.');
+    }
+    if (packet.manifest.authorityReceipt !== renderIdentity) {
+        throw new Error('Authoritative packed scene receipt does not match its render identity.');
+    }
+    if (packet.manifest.sourceMode !== sourceMode) {
+        throw new Error('Authoritative packed scene source mode does not match its cache lane.');
+    }
+    const cacheKey = galaxySceneCacheKey(renderIdentity, sourceMode, settings);
+    const scene = unpackGalaxyScenePacketV2(sharedScenePages.reuse(packet));
+    const resident = Promise.resolve(scene);
+    evictStaleSceneVariant(renderIdentity, cacheKey);
+    sceneCache.set(cacheKey, resident);
+    sceneCacheWeights.set(cacheKey, scene.ids.length + scene.edgePairs.length / 2);
+    trimSceneCache(cacheKey);
+    return scene;
+}
+
+async function compileGalaxySceneWithPolicy(
+    backend: PhoenixBackendService,
+    entities: GalaxyRenderableNode[],
+    edges: GalaxyInputEdge[],
+    settings: GalaxyRenderSettings,
+    renderIdentity: string,
+    sourceMode: GalaxySceneSourceMode,
+    failClosed: boolean,
+): Promise<GalaxySceneV2> {
+    const cacheKey = renderIdentity ? galaxySceneCacheKey(renderIdentity, sourceMode, settings) : '';
     const cached = cacheKey ? sceneCache.get(cacheKey) : undefined;
     if (cached) {
         const weight = sceneCacheWeights.get(cacheKey) || 0;
@@ -64,7 +113,7 @@ export async function compileGalaxyScene(
         graphGalaxyRuntimeMeter.recordCompilerSource('cache');
         return cached;
     }
-    const pending = compileChangedGalaxyScene(backend, entities, edges, settings, sourceMode, renderIdentity);
+    const pending = compileChangedGalaxyScene(backend, entities, edges, settings, sourceMode, renderIdentity, failClosed);
     if (cacheKey) {
         evictStaleSceneVariant(renderIdentity, cacheKey);
         sceneCache.set(cacheKey, pending);
@@ -80,6 +129,14 @@ export async function compileGalaxyScene(
         });
     }
     return pending;
+}
+
+function galaxySceneCacheKey(
+    renderIdentity: string,
+    sourceMode: GalaxySceneSourceMode,
+    settings: GalaxyRenderSettings,
+): string {
+    return `${renderIdentity}\u0000${sourceMode}\u0000${galaxySceneCompilationSettingsKey(settings)}`;
 }
 
 export function galaxySceneCompilationSettingsKey(settings: GalaxyRenderSettings): string {
@@ -128,6 +185,7 @@ async function compileChangedGalaxyScene(
     settings: GalaxyRenderSettings,
     sourceMode: GalaxySceneSourceMode,
     renderIdentity: string,
+    failClosed: boolean,
 ): Promise<GalaxySceneV2> {
     const hasGalaxyMetadata = entities.some((entity) => Boolean(entity.metadata?.galaxyId));
     const hasAtlasLayout = entities.some((entity) =>
@@ -142,10 +200,16 @@ async function compileChangedGalaxyScene(
                 return scene;
             }
         } catch (error) {
+            if (failClosed) {
+                throw new Error('Authoritative packed scene worker failed; main-thread compilation is forbidden.', { cause: error });
+            }
             if (!warnedWorkerFallback) {
                 warnedWorkerFallback = true;
                 console.warn('[GraphGalaxyScene] Scene worker unavailable; using local exact compiler.', error);
             }
+        }
+        if (failClosed) {
+            throw new Error('Authoritative packed scene worker is unavailable; main-thread compilation is forbidden.');
         }
         graphGalaxyRuntimeMeter.recordCompilerSource('local');
         return galaxySceneToV2(buildGalaxyScene(entities, edges, settings), sourceMode);
@@ -189,6 +253,9 @@ async function compileChangedGalaxyScene(
         };
         return galaxySceneToV2(nativeScene, sourceMode);
     } catch (error) {
+        if (failClosed) {
+            throw new Error('Authoritative native scene compiler failed; local scene compilation is forbidden.', { cause: error });
+        }
         if (!warnedNativeFallback) {
             warnedNativeFallback = true;
             console.warn('[GraphGalaxyScene] Native scene compiler unavailable; using local scene builder.', error);
