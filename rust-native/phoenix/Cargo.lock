@@ -1275,6 +1275,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "fs2"
+version = "0.4.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9564fc758e15025b46aa6643b1b77d047d1a56a1aea6e01002ac0c7026876213"
+dependencies = [
+ "libc",
+ "winapi",
+]
+
+[[package]]
 name = "fst"
 version = "0.4.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2652,6 +2662,76 @@ dependencies = [
  "smallvec",
  "wasm-bindgen",
  "wee_alloc",
+]
+
+[[package]]
+name = "phoenix-discovery-community"
+version = "0.1.1"
+dependencies = [
+ "blake3",
+ "hashbrown 0.15.5",
+ "memmap2",
+ "phoenix-discovery-view",
+ "phoenix-graph-kernel",
+ "rayon",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "thiserror 1.0.69",
+ "zerocopy 0.7.35",
+]
+
+[[package]]
+name = "phoenix-discovery-query"
+version = "0.1.1"
+dependencies = [
+ "blake3",
+ "hashbrown 0.15.5",
+ "phoenix-discovery-community",
+ "phoenix-discovery-view",
+ "phoenix-graph-kernel",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "thiserror 1.0.69",
+]
+
+[[package]]
+name = "phoenix-discovery-runtime"
+version = "0.1.1"
+dependencies = [
+ "blake3",
+ "bm25_turbo",
+ "fs2",
+ "hashbrown 0.15.5",
+ "phoenix-discovery-community",
+ "phoenix-discovery-query",
+ "phoenix-discovery-view",
+ "phoenix-graph-kernel",
+ "phoenix-store-native-core",
+ "phoenix-store-overgraph",
+ "phoenix-types",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "thiserror 1.0.69",
+]
+
+[[package]]
+name = "phoenix-discovery-view"
+version = "0.1.1"
+dependencies = [
+ "blake3",
+ "hashbrown 0.15.5",
+ "memmap2",
+ "phoenix-graph-kernel",
+ "rayon",
+ "serde",
+ "serde_json",
+ "smallvec",
+ "tempfile",
+ "thiserror 1.0.69",
+ "zerocopy 0.7.35",
 ]
 
 [[package]]

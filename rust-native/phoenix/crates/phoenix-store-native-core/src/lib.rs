@@ -501,6 +501,18 @@ pub struct AnnManifest {
     pub metric: String,
 }
 
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SemanticIndexAuthorityReceipt {
+    pub index_generation: u64,
+    pub index_digest: String,
+    pub model_id: String,
+    pub model_version: String,
+    pub dimension: usize,
+    pub metric: String,
+    pub payload_count: usize,
+}
+
 #[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct AnnPackedSegments {
@@ -853,6 +865,16 @@ pub trait PhoenixSemanticIndexStore {
 
     fn semantic_vector_dim(&self) -> usize {
         SEMANTIC_VECTOR_DIM
+    }
+
+    fn semantic_leaf_index_authority_for_model(
+        &self,
+        _model_id: &str,
+        _model_version: &str,
+        _dimension: usize,
+        _scope: &ScopeKey,
+    ) -> Result<Option<SemanticIndexAuthorityReceipt>, StoreError> {
+        Ok(None)
     }
 
     fn upsert_semantic_leaf_vectors(

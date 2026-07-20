@@ -44,8 +44,8 @@ use phoenix_store_native_core::{
     PhoenixRelationPatchStore, PhoenixSemanticGraphPatchStore, PhoenixSemanticIndexStore,
     PhoenixStateSchemaPatchStore, PhoenixTemporalPatchStore, PreparedDocumentPersistTelemetry,
     PreparedDocumentSegmentPersistTelemetry, PreparedIngestContext, SemanticDocumentNeighbor,
-    SemanticNeighbor, SemanticNodeNeighbor, SnapshotEnvelope, SnapshotPartition, StoreError,
-    ALL_RELATIONS, SEMANTIC_MODEL_ID, SEMANTIC_VECTOR_DIM,
+    SemanticIndexAuthorityReceipt, SemanticNeighbor, SemanticNodeNeighbor, SnapshotEnvelope,
+    SnapshotPartition, StoreError, ALL_RELATIONS, SEMANTIC_MODEL_ID, SEMANTIC_VECTOR_DIM,
 };
 use phoenix_types::{IndexedSpan, IngestDocument, ScopeKey, SessionId};
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
@@ -4122,6 +4122,59 @@ impl PhoenixRelationMentionSeedStore for PhoenixOvergraphStore {
 }
 
 impl PhoenixSemanticIndexStore for PhoenixOvergraphStore {
+    fn semantic_leaf_index_authority_for_model(
+        &self,
+        model_id: &str,
+        model_version: &str,
+        dimension: usize,
+        scope: &ScopeKey,
+    ) -> Result<Option<SemanticIndexAuthorityReceipt>, StoreError> {
+        let model_version = model_version.trim();
+        if model_version.is_empty() {
+            return Err(StoreError::Query(
+                "semantic index authority requires an encoder version".to_owned(),
+            ));
+        }
+        let Some(manifest) = self.load_ann_manifest_for_model(
+            model_id,
+            dimension,
+            scope,
+            AnnIndexFamily::Leaf,
+            None,
+        )?
+        else {
+            return Ok(None);
+        };
+        let cache_path = self.ann_cache_generation_path(&manifest.index, manifest.generation_id);
+        let manifest_bytes =
+            serde_json::to_vec(&manifest).map_err(|error| StoreError::Query(error.to_string()))?;
+        let mut hasher = blake3::Hasher::new();
+        hasher.update(b"phoenix-semantic-index-authority/v1\0");
+        hasher.update(&manifest_bytes);
+        hasher.update(model_version.as_bytes());
+        hasher.update(&[0]);
+        let mut file = std::fs::File::open(&cache_path)
+            .map_err(|error| StoreError::Query(error.to_string()))?;
+        let mut buffer = [0_u8; 64 * 1024];
+        loop {
+            let read = std::io::Read::read(&mut file, &mut buffer)
+                .map_err(|error| StoreError::Query(error.to_string()))?;
+            if read == 0 {
+                break;
+            }
+            hasher.update(&buffer[..read]);
+        }
+        Ok(Some(SemanticIndexAuthorityReceipt {
+            index_generation: manifest.generation_id.0,
+            index_digest: hasher.finalize().to_hex().to_string(),
+            model_id: manifest.model_id,
+            model_version: model_version.to_owned(),
+            dimension: manifest.dimension,
+            metric: manifest.metric,
+            payload_count: manifest.count,
+        }))
+    }
+
     fn upsert_semantic_leaf_vectors(
         &self,
         rows: &[NativeSemanticLeafVectorRecord],
@@ -5819,6 +5872,37 @@ mod tests {
             leaf_hits.first().map(|hit| hit.span_id.as_str()),
             Some("span-a")
         );
+        let leaf_authority = store
+            .semantic_leaf_index_authority_for_model(
+                SEMANTIC_MODEL_ID,
+                "test-encoder-v1",
+                SEMANTIC_VECTOR_DIM,
+                &scope,
+            )
+            .expect("read leaf authority")
+            .expect("leaf authority exists");
+        let repeated_authority = store
+            .semantic_leaf_index_authority_for_model(
+                SEMANTIC_MODEL_ID,
+                "test-encoder-v1",
+                SEMANTIC_VECTOR_DIM,
+                &scope,
+            )
+            .expect("read repeated leaf authority")
+            .expect("repeated leaf authority exists");
+        let revised_encoder = store
+            .semantic_leaf_index_authority_for_model(
+                SEMANTIC_MODEL_ID,
+                "test-encoder-v2",
+                SEMANTIC_VECTOR_DIM,
+                &scope,
+            )
+            .expect("read revised encoder authority")
+            .expect("revised encoder authority exists");
+        assert_eq!(leaf_authority, repeated_authority);
+        assert_eq!(leaf_authority.payload_count, 2);
+        assert_eq!(leaf_authority.index_digest.len(), 64);
+        assert_ne!(leaf_authority.index_digest, revised_encoder.index_digest);
 
         let node_hits = store
             .query_semantic_node_neighbors(&semantic_test_vector(0), &scope, "entity", None, 2, 8)
