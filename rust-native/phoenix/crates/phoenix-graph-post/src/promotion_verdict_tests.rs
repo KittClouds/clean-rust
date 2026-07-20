@@ -168,6 +168,7 @@ fn receipt(
         .into_iter()
         .collect(),
         model_id: Some("modernbert-nli".into()),
+        discovery_origin: None,
         proposals: vec![GraphProposalObservation {
             proposal_id: proposal_id.into(),
             atom: atom(),

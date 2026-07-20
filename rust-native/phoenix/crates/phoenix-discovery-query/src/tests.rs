@@ -136,6 +136,22 @@ fn prepared_query_is_deterministic_bounded_and_receipted() {
     assert!(!first.receipt.fallback_used);
     assert_eq!(first.receipt.score_policy_version, "1");
     assert_eq!(first.receipt.score_policy_digest.len(), 64);
+    assert_eq!(
+        first.receipt.source_snapshot_digest,
+        source.manifest().source_snapshot_digest
+    );
+    assert_eq!(
+        first.receipt.evidence_registry_digest,
+        source.manifest().evidence_registry_digest
+    );
+    assert_eq!(
+        first.receipt.discovery_payload_digest,
+        source.manifest().payload_digest
+    );
+    assert_eq!(
+        first.receipt.community_policy_digest,
+        communities.manifest().community_policy_digest
+    );
     for path in &first.paths {
         assert!(!path.score.evidence_quality.available);
         assert_eq!(path.score.evidence_quality.value_micros, 0);
@@ -239,8 +255,66 @@ fn seed_sink_and_high_degree_expansion_never_escape_caps() {
         .unwrap();
     assert_eq!(response.receipt.resolved_seeds, 32);
     assert!(response.receipt.exhaustion.seed_candidates);
+    assert!(response.receipt.lexical_seed_receipt.truncated);
+    assert!(response.receipt.pruning.seed_candidates > 0);
+    assert!(response.receipt.pruning.edge_scan > 0);
     assert!(response.receipt.total_examined_edges <= 16_384);
     assert!(response.receipt.returned_paths <= 24);
+}
+
+#[test]
+fn cancellation_is_observed_on_a_bounded_checkpoint_and_publishes_no_paths() {
+    let root = tempfile::tempdir().unwrap();
+    let (source, communities, policy) = artifacts(root.path(), 81, 300);
+    let resolver = FixedResolver {
+        generation: 81,
+        digest: source.manifest().artifact_digest.clone(),
+        lexical: vec![SeedHit {
+            node: node(&source, "n0"),
+            raw_score_micros: 1_000_000,
+            score_micros: 1_000_000,
+        }],
+        vector: Vec::new(),
+    };
+    let limits = QueryLimits::interactive();
+    let runtime = PreparedDiscoveryQuery::prepare(
+        &source,
+        &communities,
+        &policy,
+        &DiscoveryScorePolicy::phoenix_discovery_v1(),
+        limits,
+    )
+    .unwrap();
+    let mut scratch = QueryScratch::new(limits).unwrap();
+    let checks = std::cell::Cell::new(0_u32);
+    let cancellation = || {
+        let next = checks.get().saturating_add(1);
+        checks.set(next);
+        next >= 2
+    };
+    let response = runtime
+        .execute_with_cancellation(
+            PreparedQueryRequest {
+                query: "cancel",
+                query_vector: None,
+                narrative_time: None,
+            },
+            &resolver,
+            &mut scratch,
+            &cancellation,
+        )
+        .unwrap();
+
+    assert!(response.paths.is_empty());
+    assert_eq!(response.receipt.returned_paths, 0);
+    assert!(response.receipt.cancellation.requested);
+    assert!(response.receipt.cancellation.observed);
+    assert_eq!(
+        response.receipt.cancellation.phase,
+        Some(crate::CancellationPhase::Ppr)
+    );
+    assert_eq!(response.receipt.cancellation.checks, 2);
+    assert_eq!(response.receipt.total_examined_edges, 0);
 }
 
 #[test]

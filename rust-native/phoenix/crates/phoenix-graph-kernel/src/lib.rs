@@ -69,10 +69,10 @@ pub use galaxy_store_query::{
     GALAXY_REGION_RESULT_LIMIT,
 };
 pub use learning::{
-    project_graph_proposal_outcomes, GraphProposalBatchReceipt, GraphProposalFeatures,
-    GraphProposalObservation, GraphProposalOutcome, GraphProposalOutcomeKind,
-    GraphProposalReceiptError, GraphProposalStatus, GRAPH_PROPOSAL_FEATURE_DIM,
-    GRAPH_PROPOSAL_RECEIPT_SCHEMA_VERSION,
+    project_graph_proposal_outcomes, DiscoveryPathProposalOrigin, GraphProposalBatchReceipt,
+    GraphProposalFeatures, GraphProposalObservation, GraphProposalOutcome,
+    GraphProposalOutcomeKind, GraphProposalReceiptError, GraphProposalStatus,
+    GRAPH_PROPOSAL_FEATURE_DIM, GRAPH_PROPOSAL_RECEIPT_SCHEMA_VERSION,
 };
 pub use query_view::{KernelQuerySurface, KernelQueryView};
 pub use region::{expand_snapshot_region, KernelExpandedRegion};

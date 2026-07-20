@@ -1,4 +1,5 @@
 use super::PhoenixOvergraphStore;
+use crate::graph_learning_origin::{decode_model_slot, encode_model_slot};
 use compact_str::CompactString;
 use hashbrown::HashMap;
 use memmap2::Mmap;
@@ -293,6 +294,7 @@ impl PhoenixGraphLearningStore for PhoenixOvergraphStore {
 
 fn encode_receipt(receipt: &GraphProposalBatchReceipt) -> Result<Vec<u8>, StoreError> {
     let mut arena = StringArena::default();
+    let model_slot = encode_model_slot(receipt)?;
     for value in [
         receipt.receipt_id.as_str(),
         receipt.scope_key.as_str(),
@@ -300,7 +302,7 @@ fn encode_receipt(receipt: &GraphProposalBatchReceipt) -> Result<Vec<u8>, StoreE
         receipt.compiler_policy.compiler_version.as_str(),
         receipt.compiler_policy.policy_id.as_str(),
         receipt.compiler_policy.policy_version.as_str(),
-        receipt.model_id.as_deref().unwrap_or_default(),
+        model_slot.as_str(),
     ] {
         arena.intern(value);
     }
@@ -418,10 +420,7 @@ fn encode_receipt(receipt: &GraphProposalBatchReceipt) -> Result<Vec<u8>, StoreE
             receipt.compiler_policy.policy_version.as_str(),
             arena_offset,
         )?,
-        model_id: arena.binary_ref(
-            receipt.model_id.as_deref().unwrap_or_default(),
-            arena_offset,
-        )?,
+        model_id: arena.binary_ref(model_slot.as_str(), arena_offset)?,
         payload_checksum: checksum64(&payload).to_le_bytes(),
     };
     let mut bytes = Vec::with_capacity(total_len);
@@ -606,7 +605,7 @@ fn decode_view(view: &ReceiptView<'_>) -> Result<GraphProposalBatchReceipt, Stor
         });
     }
 
-    let model_id = view.string(view.header.model_id)?;
+    let (model_id, discovery_origin) = decode_model_slot(view.string(view.header.model_id)?)?;
     let receipt = GraphProposalBatchReceipt {
         schema_version: u16::from_le_bytes(view.header.schema_version),
         receipt_id: CompactString::new(view.string(view.header.receipt_id)?),
@@ -620,7 +619,8 @@ fn decode_view(view: &ReceiptView<'_>) -> Result<GraphProposalBatchReceipt, Stor
             policy_version: CompactString::new(view.string(view.header.policy_version)?),
         },
         source_generations,
-        model_id: (!model_id.is_empty()).then(|| CompactString::new(model_id)),
+        model_id,
+        discovery_origin,
         proposals,
     };
     receipt

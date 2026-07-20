@@ -48,6 +48,8 @@ pub(crate) struct BeamState {
 }
 
 pub struct QueryScratch {
+    pub(crate) cancellation: crate::control::CancellationTracker,
+    pub(crate) pruning: crate::PruningCounters,
     pub(crate) residual: HashMap<u32, u64>,
     pub(crate) reserve: HashMap<u32, u64>,
     pub(crate) queue: BinaryHeap<QueueEntry>,
@@ -68,6 +70,8 @@ impl QueryScratch {
         let states = usize::from(limits.beam_width);
         let expansions = states.saturating_mul(usize::from(limits.fanout_per_state));
         Ok(Self {
+            cancellation: crate::control::CancellationTracker::default(),
+            pruning: crate::PruningCounters::default(),
             residual: HashMap::with_capacity(vertices),
             reserve: HashMap::with_capacity(vertices),
             queue: BinaryHeap::with_capacity(vertices.min(8_192)),
@@ -85,6 +89,8 @@ impl QueryScratch {
     }
 
     pub(crate) fn clear(&mut self) {
+        self.cancellation = crate::control::CancellationTracker::default();
+        self.pruning = crate::PruningCounters::default();
         self.residual.clear();
         self.reserve.clear();
         self.queue.clear();

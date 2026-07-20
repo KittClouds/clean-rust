@@ -1,7 +1,9 @@
 use crate::budget::{EdgeBudget, EdgePhase};
 use crate::score::confidence_micros;
 use crate::scratch::{Neighbor, QueryScratch, QueueEntry};
-use crate::{BudgetExhaustion, DiscoveryQueryError, QueryLimits};
+use crate::{
+    BudgetExhaustion, CancellationPhase, CancellationProbe, DiscoveryQueryError, QueryLimits,
+};
 use phoenix_discovery_view::AssertedDiscoveryView;
 use std::num::NonZeroU64;
 
@@ -9,6 +11,7 @@ const PPR_MASS: u64 = 1_000_000_000;
 const RESTART_MICROS: u64 = 150_000;
 const MIN_QUEUE_MASS: u64 = 64;
 
+#[derive(Clone, Copy, Debug, Default)]
 pub(crate) struct PprStats {
     pub visited: u32,
     pub pushes: u32,
@@ -21,6 +24,7 @@ pub(crate) fn run_ppr(
     scratch: &mut QueryScratch,
     budget: &mut EdgeBudget,
     exhaustion: &mut BudgetExhaustion,
+    cancellation: &dyn CancellationProbe,
 ) -> Result<PprStats, DiscoveryQueryError> {
     let score_sum: u64 = scratch
         .seeds
@@ -53,8 +57,16 @@ pub(crate) fn run_ppr(
     let mut pushes = 0_u32;
     let push_cap = limits.ppr_visited_vertices.saturating_mul(8);
     while let Some(entry) = scratch.queue.pop() {
+        if pushes & 63 == 0
+            && scratch
+                .cancellation
+                .check(cancellation, CancellationPhase::Ppr)
+        {
+            break;
+        }
         if pushes >= push_cap {
             exhaustion.ppr_vertices = true;
+            scratch.pruning.ppr_vertices = scratch.pruning.ppr_vertices.saturating_add(1);
             break;
         }
         let current = scratch.residual.get(&entry.node).copied().unwrap_or(0);
@@ -65,6 +77,7 @@ pub(crate) fn run_ppr(
             && scratch.reserve.len() >= limits.ppr_visited_vertices as usize
         {
             exhaustion.ppr_vertices = true;
+            scratch.pruning.ppr_vertices = scratch.pruning.ppr_vertices.saturating_add(1);
             break;
         }
         scratch.residual.insert(entry.node, 0);
@@ -80,6 +93,7 @@ pub(crate) fn run_ppr(
             scratch,
             budget,
             exhaustion,
+            cancellation,
         )?;
         let weight_sum: u64 = scratch
             .neighbors
@@ -97,6 +111,7 @@ pub(crate) fn run_ppr(
                     && scratch.residual.len() >= limits.ppr_visited_vertices as usize
                 {
                     exhaustion.ppr_vertices = true;
+                    scratch.pruning.ppr_vertices = scratch.pruning.ppr_vertices.saturating_add(1);
                     continue;
                 }
                 let updated = scratch.residual.entry(neighbor.target).or_default();
@@ -113,7 +128,7 @@ pub(crate) fn run_ppr(
             *scratch.reserve.entry(entry.node).or_default() += onward;
         }
         pushes += 1;
-        if exhaustion.total_edges || exhaustion.ppr_edges {
+        if exhaustion.total_edges || exhaustion.ppr_edges || scratch.cancellation.observed() {
             break;
         }
     }
@@ -133,14 +148,30 @@ pub(crate) fn collect_neighbors(
     scratch: &mut QueryScratch,
     budget: &mut EdgeBudget,
     exhaustion: &mut BudgetExhaustion,
+    cancellation: &dyn CancellationProbe,
 ) -> Result<(), DiscoveryQueryError> {
     scratch.neighbors.clear();
     let outgoing = view.outgoing_edges(node)?;
     let scan_cap = usize::from(limits.edge_scan_per_state);
     if outgoing.len() > scan_cap {
         exhaustion.fanout = true;
+        scratch.pruning.edge_scan = scratch
+            .pruning
+            .edge_scan
+            .saturating_add((outgoing.len() - scan_cap).min(u32::MAX as usize) as u32);
     }
     for edge_index in outgoing.iter().take(scan_cap) {
+        if budget.total_used() & 63 == 0
+            && scratch.cancellation.check(
+                cancellation,
+                match phase {
+                    EdgePhase::Ppr => CancellationPhase::Ppr,
+                    EdgePhase::Beam => CancellationPhase::Beam,
+                },
+            )
+        {
+            break;
+        }
         if !budget.take(phase, exhaustion) {
             break;
         }
@@ -148,6 +179,8 @@ pub(crate) fn collect_neighbors(
         let family_weight = u32::from(weights[edge.family.code() as usize]);
         let quality = family_weight.saturating_mul(confidence_micros(edge.confidence)) / 1_000;
         if quality == 0 {
+            scratch.pruning.zero_quality_edges =
+                scratch.pruning.zero_quality_edges.saturating_add(1);
             continue;
         }
         scratch.neighbors.push(Neighbor {
@@ -166,6 +199,11 @@ pub(crate) fn collect_neighbors(
             .then_with(|| left.edge_hash.cmp(&right.edge_hash))
     });
     if scratch.neighbors.len() > usize::from(limits.fanout_per_state) {
+        let pruned = scratch.neighbors.len() - usize::from(limits.fanout_per_state);
+        scratch.pruning.fanout_neighbors = scratch
+            .pruning
+            .fanout_neighbors
+            .saturating_add(pruned.min(u32::MAX as usize) as u32);
         scratch
             .neighbors
             .truncate(usize::from(limits.fanout_per_state));

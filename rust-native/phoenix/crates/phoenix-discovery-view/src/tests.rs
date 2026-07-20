@@ -1,11 +1,14 @@
 use crate::{
-    write_asserted_discovery_view, AssertedDiscoveryView, DiscoveryAuthorityBinding,
-    DiscoveryRelationFamily, DiscoveryRelationPolicy, DiscoveryViewRegistry,
+    write_asserted_discovery_view, write_asserted_discovery_view_from_source,
+    AssertedDiscoveryView, DiscoveryAuthorityBinding, DiscoveryRelationFamily,
+    DiscoveryRelationPolicy, DiscoveryViewError, DiscoveryViewRegistry,
+    PagedAssertedDiscoverySource,
 };
 use phoenix_graph_kernel::{
     KernelBiTemporal, KernelEdge, KernelEdgeType, KernelGraphLayer, KernelGraphSnapshot,
     KernelProvenance, KernelRelationClass, KernelVertex, KernelVertexClass, KernelVertexId,
 };
+use std::cell::Cell;
 use std::io::{Read, Seek, SeekFrom, Write};
 use std::sync::{Arc, Barrier};
 
@@ -64,6 +67,27 @@ fn writes_and_reopens_bidirectional_asserted_csr_with_evidence() {
         view.evidence_external_id(evidence).unwrap(),
         "evidence-edge-ab"
     );
+}
+
+#[test]
+fn mmap_discovery_view_replays_as_an_exact_paged_source() {
+    let source_root = tempfile::tempdir().unwrap();
+    let target_root = tempfile::tempdir().unwrap();
+    let authority = authority(41);
+    let policy = DiscoveryRelationPolicy::phoenix_asserted_v1();
+    let source_manifest =
+        write_asserted_discovery_view(&fixture(), &authority, &policy, source_root.path()).unwrap();
+    let source =
+        AssertedDiscoveryView::open(source_root.path().join(&source_manifest.artifact_digest))
+            .unwrap();
+    source.validate_payload().unwrap();
+    let replayed =
+        write_asserted_discovery_view_from_source(&source, &authority, &policy, target_root.path())
+            .unwrap();
+    assert_eq!(replayed.payload_digest, source_manifest.payload_digest);
+    assert_eq!(replayed.binary_bytes, source_manifest.binary_bytes);
+    assert_eq!(replayed.excluded_candidate_edges, 1);
+    assert_eq!(replayed.admitted_candidate_edges, 0);
 }
 
 #[test]
@@ -255,6 +279,100 @@ fn manifest_tampering_breaks_the_recomputed_content_address() {
     value["sourceSnapshotId"] = "tampered".into();
     std::fs::write(path, serde_json::to_vec(&value).unwrap()).unwrap();
     assert!(AssertedDiscoveryView::open(directory).is_err());
+}
+
+struct TestPagedSource {
+    generation: Cell<u64>,
+    mutate_after_edges: bool,
+    nodes: Vec<(u64, KernelVertex)>,
+    edges: Vec<(u64, u64, KernelEdge)>,
+    candidates: usize,
+}
+
+impl PagedAssertedDiscoverySource for TestPagedSource {
+    fn generation(&self) -> Result<u64, DiscoveryViewError> {
+        Ok(self.generation.get())
+    }
+
+    fn node_count(&self) -> Result<usize, DiscoveryViewError> {
+        Ok(self.nodes.len())
+    }
+
+    fn asserted_edge_count(&self) -> Result<usize, DiscoveryViewError> {
+        Ok(self.edges.len())
+    }
+
+    fn candidate_edge_count(&self) -> Result<usize, DiscoveryViewError> {
+        Ok(self.candidates)
+    }
+
+    fn visit_nodes(
+        &self,
+        _page_size: usize,
+        visitor: &mut dyn FnMut(u64, &KernelVertex) -> Result<(), DiscoveryViewError>,
+    ) -> Result<(), DiscoveryViewError> {
+        for (storage, node) in &self.nodes {
+            visitor(*storage, node)?;
+        }
+        Ok(())
+    }
+
+    fn visit_asserted_edges(
+        &self,
+        _page_size: usize,
+        visitor: &mut dyn FnMut(u64, u64, &KernelEdge) -> Result<(), DiscoveryViewError>,
+    ) -> Result<(), DiscoveryViewError> {
+        for (source, target, edge) in &self.edges {
+            visitor(*source, *target, edge)?;
+        }
+        if self.mutate_after_edges {
+            self.generation.set(self.generation.get() + 1);
+        }
+        Ok(())
+    }
+}
+
+#[test]
+fn paged_source_rejects_noncanonical_nodes_without_sorting_rich_records() {
+    let root = tempfile::tempdir().unwrap();
+    let source = TestPagedSource {
+        generation: Cell::new(31),
+        mutate_after_edges: false,
+        nodes: vec![
+            (1, vertex("b", KernelVertexClass::Entity, &[])),
+            (2, vertex("a", KernelVertexClass::Entity, &[])),
+        ],
+        edges: Vec::new(),
+        candidates: 0,
+    };
+    let error = write_asserted_discovery_view_from_source(
+        &source,
+        &authority(31),
+        &DiscoveryRelationPolicy::phoenix_asserted_v1(),
+        root.path(),
+    )
+    .unwrap_err();
+    assert!(error.to_string().contains("not strictly canonical"));
+}
+
+#[test]
+fn paged_source_rejects_generation_change_during_single_pass_pack() {
+    let root = tempfile::tempdir().unwrap();
+    let source = TestPagedSource {
+        generation: Cell::new(37),
+        mutate_after_edges: true,
+        nodes: vec![(1, vertex("a", KernelVertexClass::Entity, &[]))],
+        edges: Vec::new(),
+        candidates: 7,
+    };
+    let error = write_asserted_discovery_view_from_source(
+        &source,
+        &authority(37),
+        &DiscoveryRelationPolicy::phoenix_asserted_v1(),
+        root.path(),
+    )
+    .unwrap_err();
+    assert!(error.to_string().contains("generation changed"));
 }
 
 fn fixture() -> KernelGraphSnapshot {

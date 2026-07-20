@@ -1,6 +1,7 @@
+use crate::path_receipt::{build_path_receipt, validate_path_receipt, DiscoveryPathReceipt};
 use fs2::FileExt;
 use phoenix_discovery_query::{
-    BudgetExhaustion, DiscoveryPath, PreparedQueryReceipt, PreparedQueryResponse, SeedChannel,
+    BudgetExhaustion, PreparedQueryReceipt, PreparedQueryResponse, SeedChannel,
 };
 use serde::{Deserialize, Serialize};
 use std::fs::{self, OpenOptions};
@@ -8,8 +9,8 @@ use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicU64, Ordering};
 
-const CANDIDATE_SCHEMA: &str = "phoenix-discovery-candidate/v1";
-const QUERY_RUN_SCHEMA: &str = "phoenix-discovery-query-run/v1";
+const CANDIDATE_SCHEMA: &str = "phoenix-discovery-candidate/v2";
+const QUERY_RUN_SCHEMA: &str = "phoenix-discovery-query-run/v2";
 const REVIEW_SCHEMA: &str = "phoenix-discovery-review-event/v1";
 static TEMP_NONCE: AtomicU64 = AtomicU64::new(0);
 
@@ -58,9 +59,9 @@ pub struct DiscoveryCandidateArtifact {
     pub seed_receipt_digest: String,
     pub score_policy_digest: String,
     pub canonical_path_digest: String,
+    pub path_receipt_id: String,
     pub competing_path_digests: Vec<String>,
     pub exhaustion: BudgetExhaustion,
-    pub path: DiscoveryPath,
     pub initial_review_status: String,
     pub topology_writes: u32,
 }
@@ -74,6 +75,7 @@ pub struct DiscoveryQueryRunArtifact {
     pub query_digest: String,
     pub candidate_ids: Vec<String>,
     pub candidate_path_digests: Vec<String>,
+    pub path_receipt_ids: Vec<String>,
     pub exhaustion: BudgetExhaustion,
     pub receipt: PreparedQueryReceipt,
     pub topology_writes: u32,
@@ -82,6 +84,7 @@ pub struct DiscoveryQueryRunArtifact {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct LedgerPublication {
     pub run: DiscoveryQueryRunArtifact,
+    pub path_receipts: Vec<DiscoveryPathReceipt>,
     pub candidates: Vec<DiscoveryCandidateArtifact>,
 }
 
@@ -126,6 +129,7 @@ impl DiscoveryCandidateLedger {
     pub fn open(root: impl AsRef<Path>) -> Result<Self, Box<dyn std::error::Error>> {
         let root = root.as_ref().to_path_buf();
         fs::create_dir_all(root.join("candidates"))?;
+        fs::create_dir_all(root.join("receipts"))?;
         fs::create_dir_all(root.join("runs"))?;
         fs::create_dir_all(root.join("reviews"))?;
         Ok(Self { root })
@@ -143,13 +147,20 @@ impl DiscoveryCandidateLedger {
             )));
         }
         let query_digest = domain_hash(b"phoenix-discovery-query/v1\0", query.as_bytes());
-        let path_digests = response
+        let path_receipts = response
             .paths
             .iter()
-            .map(canonical_path_digest)
+            .map(|path| build_path_receipt(&query_digest, path, &response.receipt))
             .collect::<Result<Vec<_>, _>>()?;
+        for receipt in &path_receipts {
+            publish_json(&self.path_receipt_path(&receipt.receipt_id), receipt)?;
+        }
+        let path_digests = path_receipts
+            .iter()
+            .map(|receipt| receipt.canonical_path_digest.clone())
+            .collect::<Vec<_>>();
         let mut candidates = Vec::with_capacity(response.paths.len());
-        for (index, path) in response.paths.iter().enumerate() {
+        for index in 0..response.paths.len() {
             let mut competing = path_digests.clone();
             competing.remove(index);
             competing.sort_unstable();
@@ -170,9 +181,9 @@ impl DiscoveryCandidateLedger {
                 seed_receipt_digest: response.receipt.seed_receipt_digest.clone(),
                 score_policy_digest: response.receipt.score_policy_digest.clone(),
                 canonical_path_digest: path_digests[index].clone(),
+                path_receipt_id: path_receipts[index].receipt_id.clone(),
                 competing_path_digests: competing,
                 exhaustion: response.receipt.exhaustion,
-                path: path.clone(),
                 initial_review_status: "pending".to_owned(),
                 topology_writes: 0,
             };
@@ -190,6 +201,10 @@ impl DiscoveryCandidateLedger {
             .iter()
             .map(|candidate| candidate.candidate_id.clone())
             .collect::<Vec<_>>();
+        let path_receipt_ids = path_receipts
+            .iter()
+            .map(|receipt| receipt.receipt_id.clone())
+            .collect::<Vec<_>>();
         let run_id = query_run_identity(&query_digest, &candidate_ids, &response.receipt)?;
         let run = DiscoveryQueryRunArtifact {
             schema_version: QUERY_RUN_SCHEMA.to_owned(),
@@ -198,12 +213,17 @@ impl DiscoveryCandidateLedger {
             query_digest,
             candidate_ids,
             candidate_path_digests: path_digests,
+            path_receipt_ids,
             exhaustion: response.receipt.exhaustion,
             receipt: response.receipt.clone(),
             topology_writes: 0,
         };
         publish_json(&self.root.join("runs").join(&run_id).join("run.json"), &run)?;
-        Ok(LedgerPublication { run, candidates })
+        Ok(LedgerPublication {
+            run,
+            path_receipts,
+            candidates,
+        })
     }
 
     #[allow(clippy::too_many_arguments)]
@@ -234,9 +254,39 @@ impl DiscoveryCandidateLedger {
         }
         let candidate: DiscoveryCandidateArtifact =
             serde_json::from_slice(&fs::read(&candidate_path)?)?;
-        if candidate.candidate_id != candidate_id || candidate.topology_writes != 0 {
+        let expected_candidate_id = candidate_identity(
+            candidate.graph_generation,
+            &candidate.discovery_digest,
+            &candidate.query_digest,
+            &candidate.seed_receipt_digest,
+            &candidate.score_policy_digest,
+            &candidate.canonical_path_digest,
+        );
+        if candidate.schema_version != CANDIDATE_SCHEMA
+            || candidate.candidate_id != candidate_id
+            || candidate.candidate_id != expected_candidate_id
+            || !is_digest(&candidate.path_receipt_id)
+            || candidate.topology_writes != 0
+            || candidate.initial_review_status != "pending"
+            || candidate
+                .competing_path_digests
+                .iter()
+                .any(|digest| !is_digest(digest))
+        {
             return Err(Box::new(LedgerError::Invalid(
                 "review candidate artifact failed its immutable identity contract".to_owned(),
+            )));
+        }
+        let path_receipt = self.load_path_receipt(&candidate.path_receipt_id)?;
+        if path_receipt.canonical_path_digest != candidate.canonical_path_digest
+            || path_receipt.query_digest != candidate.query_digest
+            || path_receipt.authority.graph_generation != candidate.graph_generation
+            || path_receipt.authority.discovery_artifact_digest != candidate.discovery_digest
+            || path_receipt.authority.seed_receipt_digest != candidate.seed_receipt_digest
+            || path_receipt.authority.score_policy_digest != candidate.score_policy_digest
+        {
+            return Err(Box::new(LedgerError::Invalid(
+                "candidate path receipt link violates immutable authority".to_owned(),
             )));
         }
         let _head_lock = ReviewHeadLock::acquire(&self.root, candidate_id)?;
@@ -336,9 +386,42 @@ impl DiscoveryCandidateLedger {
         }
         Ok(latest)
     }
+
+    fn path_receipt_path(&self, receipt_id: &str) -> PathBuf {
+        self.root
+            .join("receipts")
+            .join(receipt_id)
+            .join("receipt.json")
+    }
+
+    pub(crate) fn load_path_receipt(
+        &self,
+        receipt_id: &str,
+    ) -> Result<DiscoveryPathReceipt, Box<dyn std::error::Error>> {
+        let path = self.path_receipt_path(receipt_id);
+        if !path.exists() {
+            return Err(Box::new(LedgerError::Invalid(
+                "candidate path receipt is missing".to_owned(),
+            )));
+        }
+        let receipt = serde_json::from_slice::<DiscoveryPathReceipt>(&fs::read(path)?)?;
+        if receipt.receipt_id != receipt_id {
+            return Err(Box::new(LedgerError::Invalid(
+                "candidate path receipt identity does not match its link".to_owned(),
+            )));
+        }
+        validate_path_receipt(&receipt)?;
+        Ok(receipt)
+    }
 }
 
 fn validate_query_receipt(receipt: &PreparedQueryReceipt) -> Result<(), LedgerError> {
+    let limits_digest = hex_digest(
+        receipt
+            .limits
+            .digest()
+            .map_err(|error| LedgerError::Invalid(error.to_string()))?,
+    );
     let seed_bytes =
         serde_json::to_vec(&(&receipt.lexical_seed_receipt, &receipt.vector_seed_receipt))?;
     let seed_digest = blake3::hash(&seed_bytes).to_hex().to_string();
@@ -362,9 +445,24 @@ fn validate_query_receipt(receipt: &PreparedQueryReceipt) -> Result<(), LedgerEr
                 .all(|hit| (1..=1_000_000).contains(&hit.score_micros))
     });
     if receipt.generation == 0
+        || receipt.source_snapshot_id.trim().is_empty()
+        || !is_digest(&receipt.source_snapshot_digest)
+        || !is_digest(&receipt.evidence_registry_digest)
         || !is_digest(&receipt.discovery_digest)
+        || !is_digest(&receipt.discovery_payload_digest)
+        || !is_digest(&receipt.community_digest)
+        || !is_digest(&receipt.community_payload_digest)
+        || receipt.community_policy_id.trim().is_empty()
+        || receipt.community_policy_version.trim().is_empty()
+        || !is_digest(&receipt.community_policy_digest)
+        || !is_digest(&receipt.relation_policy_digest)
         || !is_digest(&receipt.seed_receipt_digest)
+        || !is_digest(&receipt.limits_digest)
+        || receipt.limits_digest != limits_digest
+        || receipt.score_policy_id.trim().is_empty()
+        || receipt.score_policy_version.trim().is_empty()
         || !is_digest(&receipt.score_policy_digest)
+        || receipt.mode != receipt.limits.mode
         || receipt.seed_receipt_digest != seed_digest
         || !seed_receipts_valid
         || receipt.lexical_candidates != receipt.lexical_seed_receipt.accepted
@@ -376,7 +474,15 @@ fn validate_query_receipt(receipt: &PreparedQueryReceipt) -> Result<(), LedgerEr
         || receipt.total_examined_edges > receipt.limits.total_examined_edges
         || receipt.ppr_examined_edges > receipt.limits.ppr_examined_edges
         || receipt.ppr_visited_vertices > receipt.limits.ppr_visited_vertices
+        || receipt.total_examined_edges
+            != receipt
+                .ppr_examined_edges
+                .saturating_add(receipt.beam_examined_edges)
         || receipt.returned_paths > u32::from(receipt.limits.returned_paths)
+        || receipt.cancellation.requested != receipt.cancellation.observed
+        || (receipt.cancellation.observed && receipt.returned_paths != 0)
+        || (receipt.cancellation.observed && receipt.cancellation.phase.is_none())
+        || (!receipt.cancellation.observed && receipt.cancellation.phase.is_some())
         || receipt.admitted_candidate_edges != 0
         || receipt.topology_writes != 0
         || receipt.fallback_used
@@ -392,18 +498,8 @@ fn is_digest(value: &str) -> bool {
     value.len() == 64 && value.bytes().all(|byte| byte.is_ascii_hexdigit())
 }
 
-fn canonical_path_digest(path: &DiscoveryPath) -> Result<String, LedgerError> {
-    let mut hasher = blake3::Hasher::new();
-    hasher.update(b"phoenix-discovery-canonical-path/v1\0");
-    for node in &path.node_identities {
-        hasher.update(&node.hash.to_le_bytes());
-        hasher.update(&node.collision.to_le_bytes());
-    }
-    for edge in &path.edges {
-        hasher.update(&edge.identity.hash.to_le_bytes());
-        hasher.update(&edge.identity.collision.to_le_bytes());
-    }
-    Ok(hasher.finalize().to_hex().to_string())
+fn hex_digest(bytes: [u8; 32]) -> String {
+    blake3::Hash::from_bytes(bytes).to_hex().to_string()
 }
 
 fn candidate_identity(
@@ -430,7 +526,7 @@ fn query_run_identity(
     receipt: &PreparedQueryReceipt,
 ) -> Result<String, LedgerError> {
     content_id(
-        b"phoenix-discovery-query-run-identity/v1\0",
+        b"phoenix-discovery-query-run-identity/v2\0",
         &(query_digest, candidates, receipt),
     )
 }

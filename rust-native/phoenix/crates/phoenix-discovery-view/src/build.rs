@@ -6,6 +6,7 @@ use crate::format::{
     SECTION_ALIGNMENT, SECTION_COUNT,
 };
 use crate::{DiscoveryRelationFamily, DiscoveryRelationPolicy, DiscoveryViewError};
+use crate::{PagedAssertedDiscoverySource, DISCOVERY_SOURCE_PAGE_SIZE};
 use hashbrown::{HashMap, HashSet};
 use phoenix_graph_kernel::{KernelEdge, KernelGraphLayer, KernelGraphSnapshot, KernelVertex};
 use rayon::prelude::*;
@@ -15,6 +16,13 @@ use std::io::{BufWriter, Seek, SeekFrom, Write};
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicU64, Ordering};
 use zerocopy::AsBytes;
+
+#[path = "binary_writer.rs"]
+mod binary_writer;
+use binary_writer::BinaryWriter;
+#[path = "source_build.rs"]
+mod source_build;
+use source_build::write_source_sections;
 
 static BUILD_SEQUENCE: AtomicU64 = AtomicU64::new(1);
 
@@ -56,17 +64,74 @@ pub fn write_asserted_discovery_view(
     authority.validate()?;
     policy.validate()?;
     let policy_digest = policy.digest()?;
-    let prepared = PreparedColumns::from_snapshot(snapshot)?;
+    let prepared = CanonicalSource::from_snapshot(snapshot)?;
     let root = artifact_root.as_ref();
     fs::create_dir_all(root)?;
     let temporary = temporary_build_directory(root, authority.generation)?;
 
     let result = write_prepared(
-        &prepared,
+        prepared,
         authority,
         policy,
         policy_digest,
         snapshot.candidate_edges.len(),
+        &temporary,
+    );
+    let (manifest, artifact_digest) = match result {
+        Ok(value) => value,
+        Err(error) => {
+            let _ = fs::remove_dir_all(&temporary);
+            return Err(error);
+        }
+    };
+    let final_directory = root.join(hex(&artifact_digest));
+    match fs::rename(&temporary, &final_directory) {
+        Ok(()) => return Ok(manifest),
+        Err(_) if final_directory.exists() => {
+            fs::remove_dir_all(&temporary)?;
+            let existing = crate::AssertedDiscoveryView::open(&final_directory)?;
+            if existing.manifest() == &manifest {
+                return Ok(manifest);
+            }
+        }
+        Err(error) => {
+            let _ = fs::remove_dir_all(&temporary);
+            return Err(error.into());
+        }
+    }
+    Err(DiscoveryViewError::Invalid(format!(
+        "content address {} resolves to a different manifest",
+        manifest.artifact_digest
+    )))
+}
+
+pub fn write_asserted_discovery_view_from_source(
+    source: &impl PagedAssertedDiscoverySource,
+    authority: &DiscoveryAuthorityBinding,
+    policy: &DiscoveryRelationPolicy,
+    artifact_root: impl AsRef<Path>,
+) -> Result<DiscoveryViewManifest, DiscoveryViewError> {
+    authority.validate()?;
+    policy.validate()?;
+    let source_generation = source.generation()?;
+    if source_generation != authority.generation {
+        return Err(DiscoveryViewError::Invalid(format!(
+            "asserted source generation {source_generation} does not match authority generation {}",
+            authority.generation
+        )));
+    }
+    let policy_digest = policy.digest()?;
+    let root = artifact_root.as_ref();
+    fs::create_dir_all(root)?;
+    let excluded_candidate_edges = source.candidate_edge_count()?;
+    let temporary = temporary_build_directory(root, authority.generation)?;
+
+    let result = write_source(
+        source,
+        authority,
+        policy,
+        policy_digest,
+        excluded_candidate_edges,
         &temporary,
     );
     let (manifest, artifact_digest) = match result {
@@ -113,7 +178,7 @@ fn temporary_build_directory(root: &Path, generation: u64) -> Result<PathBuf, Di
 }
 
 fn write_prepared(
-    prepared: &PreparedColumns,
+    prepared: CanonicalSource<'_>,
     authority: &DiscoveryAuthorityBinding,
     policy: &DiscoveryRelationPolicy,
     policy_digest: [u8; 32],
@@ -127,8 +192,66 @@ fn write_prepared(
         .write(true)
         .open(&binary_path)?;
     let mut writer = BinaryWriter::new(file)?;
-    prepared.write_sections(&mut writer)?;
+    let metadata = prepared.write_sections(&mut writer)?;
     let (mut file, sections, payload_digest, binary_bytes) = writer.finish()?;
+    finish_written(
+        metadata,
+        authority,
+        policy,
+        policy_digest,
+        excluded_candidate_edges,
+        directory,
+        &mut file,
+        sections,
+        payload_digest,
+        binary_bytes,
+    )
+}
+
+fn write_source(
+    source: &impl PagedAssertedDiscoverySource,
+    authority: &DiscoveryAuthorityBinding,
+    policy: &DiscoveryRelationPolicy,
+    policy_digest: [u8; 32],
+    excluded_candidate_edges: usize,
+    directory: &Path,
+) -> Result<(DiscoveryViewManifest, [u8; 32]), DiscoveryViewError> {
+    let binary_path = directory.join(BINARY_FILE);
+    let file = OpenOptions::new()
+        .create_new(true)
+        .read(true)
+        .write(true)
+        .open(&binary_path)?;
+    let mut writer = BinaryWriter::new(file)?;
+    let metadata = write_source_sections(source, policy, &mut writer)?;
+    let (mut file, sections, payload_digest, binary_bytes) = writer.finish()?;
+    finish_written(
+        metadata,
+        authority,
+        policy,
+        policy_digest,
+        excluded_candidate_edges,
+        directory,
+        &mut file,
+        sections,
+        payload_digest,
+        binary_bytes,
+    )
+}
+
+#[allow(clippy::too_many_arguments)]
+fn finish_written(
+    metadata: PreparedMetadata,
+    authority: &DiscoveryAuthorityBinding,
+    policy: &DiscoveryRelationPolicy,
+    policy_digest: [u8; 32],
+    excluded_candidate_edges: usize,
+    directory: &Path,
+    file: &mut File,
+    sections: [SectionHeader; SECTION_COUNT],
+    payload_digest: [u8; 32],
+    binary_bytes: u64,
+) -> Result<(DiscoveryViewManifest, [u8; 32]), DiscoveryViewError> {
     let artifact_digest = content_address(
         authority.generation,
         &authority.source_snapshot_id,
@@ -137,14 +260,14 @@ fn write_prepared(
         policy_digest,
         payload_digest,
         excluded_candidate_edges as u64,
-        &prepared.relations,
+        &metadata.relations,
     );
     let header = BinaryHeader::new(
         authority.generation,
-        prepared.node_hashes.len(),
-        prepared.edge_hashes.len(),
-        prepared.edge_temporal_flags.len(),
-        prepared.evidence_hashes.len(),
+        metadata.node_count,
+        metadata.edge_count,
+        metadata.temporal_edge_count,
+        metadata.evidence_count,
         excluded_candidate_edges,
         artifact_digest,
         payload_digest,
@@ -177,18 +300,18 @@ fn write_prepared(
         relation_policy_id: policy.policy_id.clone(),
         relation_policy_version: policy.policy_version.clone(),
         relation_policy_digest: hex(&policy_digest),
-        node_count: prepared.node_hashes.len() as u64,
-        edge_count: prepared.edge_hashes.len() as u64,
-        temporal_edge_count: prepared.edge_temporal_flags.len() as u64,
-        evidence_identity_count: prepared.evidence_hashes.len() as u64,
-        node_evidence_links: prepared.node_evidence_indices.len() as u64,
-        edge_evidence_links: prepared.edge_evidence_indices.len() as u64,
+        node_count: metadata.node_count as u64,
+        edge_count: metadata.edge_count as u64,
+        temporal_edge_count: metadata.temporal_edge_count as u64,
+        evidence_identity_count: metadata.evidence_count as u64,
+        node_evidence_links: metadata.node_evidence_links as u64,
+        edge_evidence_links: metadata.edge_evidence_links as u64,
         excluded_candidate_edges: excluded_candidate_edges as u64,
         admitted_candidate_edges: 0,
         binary_file: BINARY_FILE.to_owned(),
         binary_bytes,
         sections: section_manifest,
-        relations: prepared.relations.clone(),
+        relations: metadata.relations,
     };
     let manifest_bytes = serde_json::to_vec(&manifest)?;
     let mut manifest_file = OpenOptions::new()
@@ -200,116 +323,28 @@ fn write_prepared(
     Ok((manifest, artifact_digest))
 }
 
-struct BinaryWriter {
-    writer: BufWriter<File>,
-    position: u64,
-    payload_hasher: blake3::Hasher,
-    sections: [SectionHeader; SECTION_COUNT],
-    section_index: usize,
-}
-
-impl BinaryWriter {
-    fn new(file: File) -> Result<Self, DiscoveryViewError> {
-        let mut writer = BufWriter::new(file);
-        writer.write_all(&vec![0_u8; BINARY_HEADER_BYTES])?;
-        let mut value = Self {
-            writer,
-            position: BINARY_HEADER_BYTES as u64,
-            payload_hasher: blake3::Hasher::new(),
-            sections: [SectionHeader::default(); SECTION_COUNT],
-            section_index: 0,
-        };
-        value.align(false)?;
-        Ok(value)
-    }
-
-    fn section<T: AsBytes>(
-        &mut self,
-        kind: SectionKind,
-        values: &[T],
-    ) -> Result<(), DiscoveryViewError> {
-        self.align(true)?;
-        let bytes = values.as_bytes();
-        self.sections[self.section_index] =
-            SectionHeader::new(kind, std::mem::size_of::<T>(), self.position, values.len());
-        self.section_index += 1;
-        self.writer.write_all(bytes)?;
-        self.payload_hasher.update(bytes);
-        self.position += bytes.len() as u64;
-        Ok(())
-    }
-
-    fn bytes(&mut self, kind: SectionKind, values: &[u8]) -> Result<(), DiscoveryViewError> {
-        self.section(kind, values)
-    }
-
-    fn align(&mut self, hash_padding: bool) -> Result<(), DiscoveryViewError> {
-        let aligned = self.position.div_ceil(SECTION_ALIGNMENT) * SECTION_ALIGNMENT;
-        let padding = (aligned - self.position) as usize;
-        if padding > 0 {
-            let zeros = [0_u8; SECTION_ALIGNMENT as usize];
-            self.writer.write_all(&zeros[..padding])?;
-            if hash_padding {
-                self.payload_hasher.update(&zeros[..padding]);
-            }
-            self.position = aligned;
-        }
-        Ok(())
-    }
-
-    fn finish(
-        mut self,
-    ) -> Result<(File, [SectionHeader; SECTION_COUNT], [u8; 32], u64), DiscoveryViewError> {
-        if self.section_index != SECTION_COUNT {
-            return Err(DiscoveryViewError::Invalid(format!(
-                "wrote {} discovery sections, expected {SECTION_COUNT}",
-                self.section_index
-            )));
-        }
-        self.writer.flush()?;
-        let digest = *self.payload_hasher.finalize().as_bytes();
-        let file = self
-            .writer
-            .into_inner()
-            .map_err(|error| error.into_error())?;
-        Ok((file, self.sections, digest, self.position))
-    }
-}
-
-struct PreparedColumns {
-    node_hashes: Vec<LeU64>,
-    node_collisions: Vec<LeU16>,
-    node_kinds: Vec<LeU16>,
-    node_evidence_offsets: Vec<LeU64>,
-    node_evidence_indices: Vec<LeU32>,
-    edge_hashes: Vec<LeU64>,
-    edge_collisions: Vec<LeU16>,
-    edge_sources: Vec<LeU32>,
-    edge_targets: Vec<LeU32>,
-    edge_relations: Vec<LeU16>,
-    edge_families: Vec<LeU16>,
-    edge_confidences: Vec<LeF32>,
-    edge_temporal_indices: Vec<LeU32>,
-    edge_temporal_flags: Vec<u8>,
-    edge_valid_from: Vec<LeI64>,
-    edge_valid_to: Vec<LeI64>,
-    edge_recorded_at: Vec<LeI64>,
-    edge_expired_at: Vec<LeI64>,
-    edge_evidence_offsets: Vec<LeU64>,
-    edge_evidence_indices: Vec<LeU32>,
-    evidence_hashes: Vec<LeU64>,
-    evidence_collisions: Vec<LeU16>,
-    outgoing_offsets: Vec<LeU64>,
-    outgoing_edges: Vec<LeU32>,
-    incoming_offsets: Vec<LeU64>,
-    incoming_edges: Vec<LeU32>,
-    identity_refs: Vec<IdentityRefRecord>,
-    identity_slab: Vec<u8>,
+struct CanonicalSource<'a> {
+    vertices: Vec<&'a KernelVertex>,
+    dense: HashMap<&'a str, u32>,
+    edges: Vec<&'a KernelEdge>,
+    evidence: Vec<&'a str>,
+    evidence_dense: HashMap<&'a str, u32>,
+    relation_dense: HashMap<String, u16>,
     relations: Vec<DiscoveryRelationEntry>,
 }
 
-impl PreparedColumns {
-    fn from_snapshot(snapshot: &KernelGraphSnapshot) -> Result<Self, DiscoveryViewError> {
+struct PreparedMetadata {
+    node_count: usize,
+    edge_count: usize,
+    temporal_edge_count: usize,
+    evidence_count: usize,
+    node_evidence_links: usize,
+    edge_evidence_links: usize,
+    relations: Vec<DiscoveryRelationEntry>,
+}
+
+impl<'a> CanonicalSource<'a> {
+    fn from_snapshot(snapshot: &'a KernelGraphSnapshot) -> Result<Self, DiscoveryViewError> {
         require_u32_capacity(snapshot.vertices.len(), "vertex")?;
         require_u32_capacity(snapshot.asserted_edges.len(), "edge")?;
         let mut vertices = snapshot.vertices.iter().collect::<Vec<_>>();
@@ -350,23 +385,65 @@ impl PreparedColumns {
         let relations = relation_dictionary(&edges)?;
         let relation_dense = relations
             .iter()
-            .map(|entry| (entry.relation.as_str(), entry.code))
+            .map(|entry| (entry.relation.clone(), entry.code))
             .collect::<HashMap<_, _>>();
 
-        let (node_hashes, node_collisions) = stable_string_identities(
-            b"phoenix-discovery-node/v1\0",
-            &vertices
-                .iter()
-                .map(|vertex| vertex.id.0.as_str())
-                .collect::<Vec<_>>(),
-        )?;
-        let (evidence_hashes, evidence_collisions) =
-            stable_string_identities(b"phoenix-discovery-evidence/v1\0", &evidence)?;
-        let (edge_hashes, edge_collisions) = stable_edge_identities(&edges)?;
+        Ok(Self {
+            vertices,
+            dense,
+            edges,
+            evidence,
+            evidence_dense,
+            relation_dense,
+            relations,
+        })
+    }
+
+    fn write_sections(
+        self,
+        writer: &mut BinaryWriter,
+    ) -> Result<PreparedMetadata, DiscoveryViewError> {
+        let Self {
+            vertices,
+            dense,
+            edges,
+            evidence,
+            evidence_dense,
+            relation_dense,
+            relations,
+        } = self;
+        let node_count = vertices.len();
+        let edge_count = edges.len();
+        let evidence_count = evidence.len();
+
+        let node_identities = vertices
+            .iter()
+            .map(|vertex| vertex.id.0.as_str())
+            .collect::<Vec<_>>();
+        let (node_hashes, node_collisions) =
+            stable_string_identities(b"phoenix-discovery-node/v1\0", &node_identities)?;
+        writer.section(SectionKind::NodeStableHash, &node_hashes)?;
+        writer.section(SectionKind::NodeCollision, &node_collisions)?;
+        drop((node_identities, node_hashes, node_collisions));
+
+        let node_kinds = vertices
+            .iter()
+            .map(|vertex| LeU16::new(vertex_kind_code(&vertex.class)))
+            .collect::<Vec<_>>();
+        writer.section(SectionKind::NodeKind, &node_kinds)?;
+        drop(node_kinds);
+
         let (node_evidence_offsets, node_evidence_indices) =
             vertex_evidence_columns(&vertices, &evidence_dense)?;
-        let (edge_evidence_offsets, edge_evidence_indices) =
-            edge_evidence_columns(&edges, &evidence_dense)?;
+        let node_evidence_links = node_evidence_indices.len();
+        writer.section(SectionKind::NodeEvidenceOffsets, &node_evidence_offsets)?;
+        writer.section(SectionKind::NodeEvidenceIndices, &node_evidence_indices)?;
+        drop((node_evidence_offsets, node_evidence_indices));
+
+        let (edge_hashes, edge_collisions) = stable_edge_identities(&edges)?;
+        writer.section(SectionKind::EdgeStableHash, &edge_hashes)?;
+        writer.section(SectionKind::EdgeCollision, &edge_collisions)?;
+        drop((edge_hashes, edge_collisions));
 
         let mut edge_sources = Vec::with_capacity(edges.len());
         let mut edge_targets = Vec::with_capacity(edges.len());
@@ -406,26 +483,19 @@ impl PreparedColumns {
                 edge_temporal_indices.push(LeU32::new(u32::MAX));
             }
         }
-        let (outgoing_offsets, outgoing_edges) =
-            adjacency(vertices.len(), edge_sources.iter().map(|value| value.get()))?;
-        let (incoming_offsets, incoming_edges) =
-            adjacency(vertices.len(), edge_targets.iter().map(|value| value.get()))?;
-        let (identity_refs, identity_slab) = identity_slab(&vertices, &evidence)?;
-        drop(relation_dense);
-
-        Ok(Self {
-            node_hashes,
-            node_collisions,
-            node_kinds: vertices
-                .iter()
-                .map(|vertex| LeU16::new(vertex_kind_code(&vertex.class)))
-                .collect(),
-            node_evidence_offsets,
-            node_evidence_indices,
-            edge_hashes,
-            edge_collisions,
-            edge_sources,
-            edge_targets,
+        writer.section(SectionKind::EdgeSource, &edge_sources)?;
+        writer.section(SectionKind::EdgeTarget, &edge_targets)?;
+        writer.section(SectionKind::EdgeRelation, &edge_relations)?;
+        writer.section(SectionKind::EdgeFamily, &edge_families)?;
+        writer.section(SectionKind::EdgeConfidence, &edge_confidences)?;
+        writer.section(SectionKind::EdgeTemporalIndex, &edge_temporal_indices)?;
+        writer.section(SectionKind::EdgeTemporalFlags, &edge_temporal_flags)?;
+        writer.section(SectionKind::EdgeValidFrom, &edge_valid_from)?;
+        writer.section(SectionKind::EdgeValidTo, &edge_valid_to)?;
+        writer.section(SectionKind::EdgeRecordedAt, &edge_recorded_at)?;
+        writer.section(SectionKind::EdgeExpiredAt, &edge_expired_at)?;
+        let temporal_edge_count = edge_temporal_flags.len();
+        drop((
             edge_relations,
             edge_families,
             edge_confidences,
@@ -435,62 +505,48 @@ impl PreparedColumns {
             edge_valid_to,
             edge_recorded_at,
             edge_expired_at,
-            edge_evidence_offsets,
-            edge_evidence_indices,
-            evidence_hashes,
-            evidence_collisions,
-            outgoing_offsets,
-            outgoing_edges,
-            incoming_offsets,
-            incoming_edges,
-            identity_refs,
-            identity_slab,
+            relation_dense,
+            dense,
+        ));
+
+        let (edge_evidence_offsets, edge_evidence_indices) =
+            edge_evidence_columns(&edges, &evidence_dense)?;
+        let edge_evidence_links = edge_evidence_indices.len();
+        writer.section(SectionKind::EdgeEvidenceOffsets, &edge_evidence_offsets)?;
+        writer.section(SectionKind::EdgeEvidenceIndices, &edge_evidence_indices)?;
+        drop((edge_evidence_offsets, edge_evidence_indices, evidence_dense));
+
+        let (evidence_hashes, evidence_collisions) =
+            stable_string_identities(b"phoenix-discovery-evidence/v1\0", &evidence)?;
+        writer.section(SectionKind::EvidenceStableHash, &evidence_hashes)?;
+        writer.section(SectionKind::EvidenceCollision, &evidence_collisions)?;
+        drop((evidence_hashes, evidence_collisions));
+
+        let (outgoing_offsets, outgoing_edges) =
+            adjacency(node_count, edge_sources.iter().map(|value| value.get()))?;
+        writer.section(SectionKind::OutgoingOffsets, &outgoing_offsets)?;
+        writer.section(SectionKind::OutgoingEdges, &outgoing_edges)?;
+        drop((outgoing_offsets, outgoing_edges, edge_sources));
+
+        let (incoming_offsets, incoming_edges) =
+            adjacency(node_count, edge_targets.iter().map(|value| value.get()))?;
+        writer.section(SectionKind::IncomingOffsets, &incoming_offsets)?;
+        writer.section(SectionKind::IncomingEdges, &incoming_edges)?;
+        drop((incoming_offsets, incoming_edges, edge_targets));
+
+        let (identity_refs, identity_slab) = identity_slab(&vertices, &evidence)?;
+        writer.section(SectionKind::IdentityRefs, &identity_refs)?;
+        writer.bytes(SectionKind::IdentitySlab, &identity_slab)?;
+
+        Ok(PreparedMetadata {
+            node_count,
+            edge_count,
+            temporal_edge_count,
+            evidence_count,
+            node_evidence_links,
+            edge_evidence_links,
             relations,
         })
-    }
-
-    fn write_sections(&self, writer: &mut BinaryWriter) -> Result<(), DiscoveryViewError> {
-        writer.section(SectionKind::NodeStableHash, &self.node_hashes)?;
-        writer.section(SectionKind::NodeCollision, &self.node_collisions)?;
-        writer.section(SectionKind::NodeKind, &self.node_kinds)?;
-        writer.section(
-            SectionKind::NodeEvidenceOffsets,
-            &self.node_evidence_offsets,
-        )?;
-        writer.section(
-            SectionKind::NodeEvidenceIndices,
-            &self.node_evidence_indices,
-        )?;
-        writer.section(SectionKind::EdgeStableHash, &self.edge_hashes)?;
-        writer.section(SectionKind::EdgeCollision, &self.edge_collisions)?;
-        writer.section(SectionKind::EdgeSource, &self.edge_sources)?;
-        writer.section(SectionKind::EdgeTarget, &self.edge_targets)?;
-        writer.section(SectionKind::EdgeRelation, &self.edge_relations)?;
-        writer.section(SectionKind::EdgeFamily, &self.edge_families)?;
-        writer.section(SectionKind::EdgeConfidence, &self.edge_confidences)?;
-        writer.section(SectionKind::EdgeTemporalIndex, &self.edge_temporal_indices)?;
-        writer.section(SectionKind::EdgeTemporalFlags, &self.edge_temporal_flags)?;
-        writer.section(SectionKind::EdgeValidFrom, &self.edge_valid_from)?;
-        writer.section(SectionKind::EdgeValidTo, &self.edge_valid_to)?;
-        writer.section(SectionKind::EdgeRecordedAt, &self.edge_recorded_at)?;
-        writer.section(SectionKind::EdgeExpiredAt, &self.edge_expired_at)?;
-        writer.section(
-            SectionKind::EdgeEvidenceOffsets,
-            &self.edge_evidence_offsets,
-        )?;
-        writer.section(
-            SectionKind::EdgeEvidenceIndices,
-            &self.edge_evidence_indices,
-        )?;
-        writer.section(SectionKind::EvidenceStableHash, &self.evidence_hashes)?;
-        writer.section(SectionKind::EvidenceCollision, &self.evidence_collisions)?;
-        writer.section(SectionKind::OutgoingOffsets, &self.outgoing_offsets)?;
-        writer.section(SectionKind::OutgoingEdges, &self.outgoing_edges)?;
-        writer.section(SectionKind::IncomingOffsets, &self.incoming_offsets)?;
-        writer.section(SectionKind::IncomingEdges, &self.incoming_edges)?;
-        writer.section(SectionKind::IdentityRefs, &self.identity_refs)?;
-        writer.bytes(SectionKind::IdentitySlab, &self.identity_slab)?;
-        Ok(())
     }
 }
 

@@ -35,6 +35,7 @@ fn receipt(id: &str, generation: u64, count: usize) -> GraphProposalBatchReceipt
         .into_iter()
         .collect(),
         model_id: Some("promotion-test-v1".into()),
+        discovery_origin: None,
         proposals: (0..count)
             .map(|index| GraphProposalObservation {
                 proposal_id: format!("proposal-{generation}-{index}").into(),

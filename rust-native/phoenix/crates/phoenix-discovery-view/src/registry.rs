@@ -1,7 +1,8 @@
 use crate::format::hex;
 use crate::{
-    write_asserted_discovery_view, AssertedDiscoveryView, DiscoveryAuthorityBinding,
-    DiscoveryRelationPolicy, DiscoveryViewError, DiscoveryViewManifest,
+    write_asserted_discovery_view, write_asserted_discovery_view_from_source,
+    AssertedDiscoveryView, DiscoveryAuthorityBinding, DiscoveryRelationPolicy, DiscoveryViewError,
+    DiscoveryViewManifest, PagedAssertedDiscoverySource,
 };
 use phoenix_graph_kernel::KernelGraphSnapshot;
 use serde::{Deserialize, Serialize};
@@ -102,6 +103,42 @@ impl DiscoveryViewRegistry {
         }
         let manifest =
             write_asserted_discovery_view(snapshot, authority, policy, self.objects_root())?;
+        let expected = DiscoveryGenerationReceipt::from_manifest(&manifest);
+        self.install_receipt(&expected)?;
+        Ok(expected)
+    }
+
+    pub fn publish_from_source(
+        &self,
+        source: &impl PagedAssertedDiscoverySource,
+        authority: &DiscoveryAuthorityBinding,
+        policy: &DiscoveryRelationPolicy,
+    ) -> Result<DiscoveryGenerationReceipt, DiscoveryViewError> {
+        fs::create_dir_all(self.objects_root())?;
+        fs::create_dir_all(self.generations_root())?;
+        let receipt_path = self.receipt_path(authority.generation);
+        if receipt_path.exists() {
+            let existing = self.receipt(authority.generation)?;
+            let policy_digest = hex(&policy.digest()?);
+            if existing.source_snapshot_id == authority.source_snapshot_id
+                && existing.source_snapshot_digest == hex(&authority.source_snapshot_digest)
+                && existing.evidence_registry_digest == hex(&authority.evidence_registry_digest)
+                && existing.relation_policy_digest == policy_digest
+            {
+                self.open_generation(authority.generation)?;
+                return Ok(existing);
+            }
+            return Err(DiscoveryViewError::GenerationConflict {
+                generation: authority.generation,
+                existing: existing.artifact_digest,
+            });
+        }
+        let manifest = write_asserted_discovery_view_from_source(
+            source,
+            authority,
+            policy,
+            self.objects_root(),
+        )?;
         let expected = DiscoveryGenerationReceipt::from_manifest(&manifest);
         self.install_receipt(&expected)?;
         Ok(expected)

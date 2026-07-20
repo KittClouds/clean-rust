@@ -559,6 +559,7 @@ fn proposal_receipt() -> GraphProposalBatchReceipt {
         }]
         .into(),
         model_id: None,
+        discovery_origin: None,
         proposals: vec![GraphProposalObservation {
             proposal_id: "proposal-1".into(),
             atom: GraphTruthAtomKey::Vertex {

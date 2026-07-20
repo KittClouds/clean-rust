@@ -24,6 +24,10 @@ import {
 import type { GalaxySceneSourceMode } from '../graph-galaxy-scene-v2';
 import { GALAXY_RENDERER_V3_SCHEMA, type GalaxyRendererV3Backend } from './galaxy-renderer-v3-contract';
 import { normalizeGalaxyRendererV3Settings } from './galaxy-renderer-v3-input-adapter';
+import {
+    GALAXY_RENDERER_V3_CLICK_TRAVEL_LIMIT,
+    galaxyRendererV3SuppressNodeActivation,
+} from './galaxy-renderer-v3-interaction';
 import { galaxyRendererV3Metrics } from './galaxy-renderer-v3-metrics';
 import { GalaxyRendererV3PacketSource } from './galaxy-renderer-v3-packet-source';
 
@@ -119,11 +123,16 @@ export class GraphGalaxyCanvasV3Component implements AfterViewInit, OnChanges, O
     private inputVersion = 0;
     private buildQueued = false;
     private dragging = false;
+    private nodeDragging = false;
     private panning = false;
     private pointerMoved = false;
+    private pointerTravel = 0;
+    private pointerDownAt = 0;
+    private suppressNextClick = false;
     private lastPointerX = 0;
     private lastPointerY = 0;
     private hoverToken = 0;
+    private pointerSession = 0;
     private animationFrame = 0;
 
     ngAfterViewInit(): void {
@@ -143,11 +152,15 @@ export class GraphGalaxyCanvasV3Component implements AfterViewInit, OnChanges, O
             this.backend?.setMode(this.viewMode === 'map' ? '2d' : '3d');
             this.backend?.render();
         }
+        if (changes['settings']) {
+            this.backend?.setSettings(this.currentSettings());
+            this.syncAnimation();
+        }
         if (changes['surfaceActive']) {
             this.syncAnimation();
             if (this.surfaceActive) this.queueBuild();
         }
-        if (changes['entities'] || changes['edges'] || changes['settings'] || changes['sourceMode'] || changes['sceneIdentity']) {
+        if (changes['entities'] || changes['edges'] || changes['sourceMode'] || changes['sceneIdentity']) {
             this.inputVersion++;
             this.queueBuild();
         }
@@ -189,12 +202,31 @@ export class GraphGalaxyCanvasV3Component implements AfterViewInit, OnChanges, O
     onPointerDown(event: PointerEvent): void {
         if (this.shadowMode || !this.backend) return;
         event.preventDefault();
+        const backend = this.backend;
+        const pointer = this.pointer(event);
+        const session = ++this.pointerSession;
         this.dragging = true;
         this.panning = event.altKey || event.button === 1 || event.button === 2;
+        this.nodeDragging = false;
         this.pointerMoved = false;
+        this.pointerTravel = 0;
+        this.pointerDownAt = event.timeStamp;
+        this.suppressNextClick = false;
         this.lastPointerX = event.clientX;
         this.lastPointerY = event.clientY;
         this.canvasRef.nativeElement.setPointerCapture(event.pointerId);
+        if (!this.panning && event.button === 0 && this.currentSettings().nodeDragMode !== 'camera') {
+            void backend.pick(pointer).then((id) => {
+                if (!id || this.destroyed || !this.dragging || session !== this.pointerSession) return;
+                this.nodeDragging = backend.beginNodeDrag(id, pointer);
+                if (this.nodeDragging) {
+                    backend.setHoveredIdentity(id);
+                    const entity = this.entityForIdentity(id);
+                    this.entityHovered.emit(entity);
+                    this.objectHovered.emit({ kind: 'node', id });
+                }
+            });
+        }
     }
 
     onPointerMove(event: PointerEvent): void {
@@ -207,14 +239,24 @@ export class GraphGalaxyCanvasV3Component implements AfterViewInit, OnChanges, O
         const dy = event.clientY - this.lastPointerY;
         this.lastPointerX = event.clientX;
         this.lastPointerY = event.clientY;
-        this.pointerMoved ||= Math.abs(dx) + Math.abs(dy) > 3;
-        this.panning ? this.backend.pan(dx, dy) : this.backend.rotate(dx, dy);
+        this.pointerTravel += Math.hypot(dx, dy);
+        this.pointerMoved ||= this.pointerTravel > GALAXY_RENDERER_V3_CLICK_TRAVEL_LIMIT;
+        if (this.nodeDragging) this.backend.dragNode(this.pointer(event));
+        else this.panning ? this.backend.pan(dx, dy) : this.backend.rotate(dx, dy);
         this.backend.render();
     }
 
     onPointerUp(event: PointerEvent): void {
         if (!this.dragging) return;
+        this.suppressNextClick = galaxyRendererV3SuppressNodeActivation(
+            this.nodeDragging,
+            this.pointerTravel,
+            Math.max(0, event.timeStamp - this.pointerDownAt),
+        );
+        this.pointerSession++;
+        this.backend?.endNodeDrag();
         this.dragging = false;
+        this.nodeDragging = false;
         this.panning = false;
         if (this.canvasRef.nativeElement.hasPointerCapture(event.pointerId)) {
             this.canvasRef.nativeElement.releasePointerCapture(event.pointerId);
@@ -223,6 +265,11 @@ export class GraphGalaxyCanvasV3Component implements AfterViewInit, OnChanges, O
 
     onPointerLeave(): void {
         this.hoverToken++;
+        this.pointerSession++;
+        this.backend?.endNodeDrag();
+        this.dragging = false;
+        this.nodeDragging = false;
+        this.panning = false;
         this.backend?.setHoveredIdentity(null);
         if (!this.shadowMode) {
             this.entityHovered.emit(null);
@@ -238,6 +285,10 @@ export class GraphGalaxyCanvasV3Component implements AfterViewInit, OnChanges, O
     }
 
     async onClick(event: MouseEvent): Promise<void> {
+        if (this.suppressNextClick) {
+            this.suppressNextClick = false;
+            return;
+        }
         if (this.shadowMode || this.pointerMoved || !this.backend) return;
         const id = await this.backend.pick(this.pointer(event));
         if (!id || this.destroyed) return;
@@ -289,6 +340,7 @@ export class GraphGalaxyCanvasV3Component implements AfterViewInit, OnChanges, O
                 corpus: { nodes: this.entities.length, edges: this.edges.length },
             }, settings);
             if (this.destroyed || version !== this.inputVersion) return;
+            backend.setSettings(this.currentSettings());
             backend.setMode(this.viewMode === 'map' ? '2d' : '3d');
             backend.setSelectedIdentities(this.selectedEntityIds);
             backend.render();

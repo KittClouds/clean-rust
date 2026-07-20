@@ -4,11 +4,11 @@ use phoenix_types::{
 };
 
 use crate::{
-    project_graph_proposal_outcomes, GraphProposalBatchReceipt, GraphProposalFeatures,
-    GraphProposalObservation, GraphProposalOutcomeKind, GraphProposalStatus, GraphTruthAtomKey,
-    GraphTruthCommit, KernelEdge, KernelEdgeType, KernelGraphLayer, KernelMutationBatch,
-    KernelMutationScope, KernelRelationClass, KernelVertexId,
-    GRAPH_PROPOSAL_RECEIPT_SCHEMA_VERSION,
+    project_graph_proposal_outcomes, DiscoveryPathProposalOrigin, GraphProposalBatchReceipt,
+    GraphProposalFeatures, GraphProposalObservation, GraphProposalOutcomeKind,
+    GraphProposalReceiptError, GraphProposalStatus, GraphTruthAtomKey, GraphTruthCommit,
+    KernelEdge, KernelEdgeType, KernelGraphLayer, KernelMutationBatch, KernelMutationScope,
+    KernelRelationClass, KernelVertexId, GRAPH_PROPOSAL_RECEIPT_SCHEMA_VERSION,
 };
 
 #[test]
@@ -68,6 +68,32 @@ fn uncommitted_and_reverted_proposals_remain_distinct() {
     assert_eq!(outcomes[1].outcome, GraphProposalOutcomeKind::Uncommitted);
 }
 
+#[test]
+fn discovery_origin_can_name_one_atom_but_never_promote_a_path() {
+    let mut value = receipt("a".repeat(64).as_str(), "proposal-1", 3);
+    value.proposals[0].status = GraphProposalStatus::Generated;
+    value.proposals[0].evidence_refs.push("evidence-1".into());
+    value.discovery_origin = Some(DiscoveryPathProposalOrigin {
+        source_path_receipt_id: "b".repeat(64).into(),
+        identified_by_user_id: "human-1".into(),
+        identification_rationale: "one missing atom".into(),
+        supporting_path_node_indices: [0, 1].into_iter().collect(),
+        supporting_path_edge_indices: [0].into_iter().collect(),
+    });
+    value.validate().expect("one explicit atom is valid");
+
+    let mut second = value.proposals[0].clone();
+    second.proposal_id = "proposal-2".into();
+    second.atom = GraphTruthAtomKey::edge("entity:a", "state:c", "semantic::state_support");
+    value.proposals.push(second);
+    assert_eq!(
+        value.validate(),
+        Err(GraphProposalReceiptError::DiscoveryProposalMustNameOneAtom(
+            2
+        ))
+    );
+}
+
 fn receipt(id: &str, proposal_id: &str, generation: u64) -> GraphProposalBatchReceipt {
     GraphProposalBatchReceipt {
         schema_version: GRAPH_PROPOSAL_RECEIPT_SCHEMA_VERSION,
@@ -83,6 +109,7 @@ fn receipt(id: &str, proposal_id: &str, generation: u64) -> GraphProposalBatchRe
         .into_iter()
         .collect(),
         model_id: None,
+        discovery_origin: None,
         proposals: vec![GraphProposalObservation {
             proposal_id: proposal_id.into(),
             atom: GraphTruthAtomKey::edge("entity:a", "state:b", "semantic::state_support"),

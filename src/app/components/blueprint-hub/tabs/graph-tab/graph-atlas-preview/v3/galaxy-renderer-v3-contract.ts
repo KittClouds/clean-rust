@@ -21,6 +21,9 @@ export interface GalaxyRendererV3Metrics {
     gpuBytes: number;
     installMs: number;
     firstPixelMs: number;
+    sceneComputeMs: number;
+    sceneReadbackBytes: number;
+    nodeSizeScratchBytes: number;
     frames: number;
     failures: number;
 }
@@ -39,6 +42,9 @@ export interface GalaxyRendererV3Backend {
     resetCamera(): void;
     fitToGraph(): void;
     focusIdentity(identity: string): void;
+    beginNodeDrag(identity: string, pointer: GraphRendererPointer): boolean;
+    dragNode(pointer: GraphRendererPointer): boolean;
+    endNodeDrag(): void;
     setSelectedIdentities(identities: readonly string[]): void;
     setHoveredIdentity(identity: string | null): void;
     pick(pointer: GraphRendererPointer): Promise<string | null>;

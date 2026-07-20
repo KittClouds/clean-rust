@@ -54,10 +54,12 @@ use serde_json::Value;
 mod canonical_reward_producer;
 #[cfg(test)]
 mod canonical_reward_producer_tests;
+mod discovery_source_cache;
 mod graph_checkpoint_policy;
 mod graph_kernel_replay_audit;
 #[cfg(test)]
 mod graph_kernel_replay_audit_tests;
+mod graph_learning_origin;
 mod graph_learning_persistence;
 #[cfg(test)]
 mod graph_learning_persistence_tests;
@@ -146,6 +148,7 @@ const PROP_JOURNAL_BYTES: &str = "journal_bytes";
 const PROP_REPLAY_COST_US: &str = "replay_cost_us";
 const PROP_SEQ: &str = "seq";
 const PROP_SOURCE_REVISION: &str = "source_revision";
+const PROP_DISCOVERY_SOURCE_CACHE_SCHEMA: &str = "discovery_source_cache_schema";
 const PROP_CREATED_AT: &str = "created_at";
 const PROP_UPDATED_AT: &str = "updated_at";
 const PROP_KIND: &str = "kind";
@@ -337,6 +340,8 @@ pub struct PhoenixOvergraphStore {
     scope_runtime_document_cache: Mutex<Vec<Arc<scope_runtime::CachedScopeDocumentProjection>>>,
     scope_runtime_image_cache: Mutex<Vec<Arc<scope_runtime::CachedScopeRuntimeImage>>>,
     ann_query_state_cache: Mutex<HashMap<AnnQueryCacheKey, Arc<CachedAnnQueryState>>>,
+    discovery_source_view_cache:
+        Mutex<Option<(u64, Arc<phoenix_discovery_view::AssertedDiscoveryView>)>>,
     live_kernel_generation: AtomicU64,
     live_kernel_snapshot: Mutex<Option<KernelGraphSnapshot>>,
     graph_proposal_receipt_index: Mutex<graph_learning_persistence::GraphProposalReceiptIndex>,
@@ -366,6 +371,7 @@ impl PhoenixOvergraphStore {
             scope_runtime_document_cache: Mutex::new(Vec::new()),
             scope_runtime_image_cache: Mutex::new(Vec::new()),
             ann_query_state_cache: Mutex::new(HashMap::new()),
+            discovery_source_view_cache: Mutex::new(None),
             live_kernel_generation: AtomicU64::new(u64::MAX),
             live_kernel_snapshot: Mutex::new(None),
             graph_proposal_receipt_index: Mutex::new(Default::default()),
@@ -418,6 +424,7 @@ impl PhoenixOvergraphStore {
         if let Ok(mut guard) = self.ann_query_state_cache.lock() {
             *guard = HashMap::new();
         }
+        self.clear_discovery_source_cache();
         self.invalidate_live_kernel_snapshot();
     }
 
@@ -2877,6 +2884,8 @@ impl PhoenixOvergraphStore {
         source_revision: &str,
         snapshot: &KernelGraphSnapshot,
     ) -> Result<KernelCheckpointData, StoreError> {
+        let discovery_source =
+            self.prepare_discovery_source_cache(generation, source_revision, snapshot)?;
         let checkpoint = KernelCheckpointData {
             meta: KernelCheckpointMeta {
                 checkpoint_id: format!("kernel-checkpoint-{generation}"),
@@ -2897,6 +2906,10 @@ impl PhoenixOvergraphStore {
                             PROP_SOURCE_REVISION,
                             PropValue::String(source_revision.to_owned()),
                         ),
+                        (
+                            PROP_DISCOVERY_SOURCE_CACHE_SCHEMA,
+                            PropValue::String(discovery_source_cache::CACHE_SCHEMA.to_owned()),
+                        ),
                         (PROP_CREATED_AT, PropValue::Int(checkpoint.meta.created_at)),
                         (PROP_RECORD, PropValue::Bytes(encode_record(&checkpoint)?)),
                     ]),
@@ -2906,6 +2919,7 @@ impl PhoenixOvergraphStore {
             .map_err(store_query_error)?;
         self.compact_kernel_journal_with_engine(engine, generation)?;
         self.publish_kernel_topology_with_engine(engine, snapshot)?;
+        self.install_discovery_source_cache(&discovery_source)?;
         self.cache_live_kernel_snapshot(generation, snapshot.clone());
         Ok(checkpoint)
     }

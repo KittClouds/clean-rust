@@ -351,6 +351,7 @@ fn build_audit_receipt(
             source_generations
         },
         model_id: None,
+        discovery_origin: None,
         proposals: vec![GraphProposalObservation {
             proposal_id: format!("proposal:{commit_id}").into(),
             atom,

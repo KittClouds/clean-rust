@@ -117,6 +117,7 @@ pub(crate) fn build_graph_projection_proposal_receipt(
             },
             source_generations: source_generations.iter().cloned().collect(),
             model_id: model.map(|value| value.model_id.clone()),
+            discovery_origin: None,
             proposals: rows,
         };
         receipt
@@ -208,6 +209,7 @@ pub(crate) fn build_semantic_proposal_receipt(
             },
             source_generations: semantic_source_generations(sidecar).into_iter().collect(),
             model_id: model.map(|value| value.model_id.clone()),
+            discovery_origin: None,
             proposals,
         };
         receipt

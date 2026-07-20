@@ -41,6 +41,18 @@ pub struct GraphProposalFeatures(pub [i16; GRAPH_PROPOSAL_FEATURE_DIM]);
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
+pub struct DiscoveryPathProposalOrigin {
+    pub source_path_receipt_id: CompactString,
+    pub identified_by_user_id: CompactString,
+    pub identification_rationale: CompactString,
+    #[serde(default)]
+    pub supporting_path_node_indices: SmallVec<[u32; 4]>,
+    #[serde(default)]
+    pub supporting_path_edge_indices: SmallVec<[u32; 4]>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct GraphProposalObservation {
     pub proposal_id: CompactString,
     pub atom: GraphTruthAtomKey,
@@ -67,6 +79,8 @@ pub struct GraphProposalBatchReceipt {
     #[serde(default)]
     pub source_generations: SmallVec<[GraphTruthSourceGenerationRef; 4]>,
     pub model_id: Option<CompactString>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub discovery_origin: Option<DiscoveryPathProposalOrigin>,
     pub proposals: Vec<GraphProposalObservation>,
 }
 
@@ -142,8 +156,70 @@ impl GraphProposalBatchReceipt {
                 ));
             }
         }
+        self.validate_discovery_origin()?;
         Ok(())
     }
+
+    fn validate_discovery_origin(&self) -> Result<(), GraphProposalReceiptError> {
+        let Some(origin) = self.discovery_origin.as_ref() else {
+            return Ok(());
+        };
+        if origin.source_path_receipt_id.len() != 64
+            || !origin
+                .source_path_receipt_id
+                .bytes()
+                .all(|byte| byte.is_ascii_hexdigit())
+        {
+            return Err(GraphProposalReceiptError::InvalidDiscoveryPathReceiptId);
+        }
+        if origin.identified_by_user_id.trim().is_empty() {
+            return Err(GraphProposalReceiptError::EmptyDiscoveryIdentifier);
+        }
+        if origin.identification_rationale.trim().is_empty() {
+            return Err(GraphProposalReceiptError::EmptyDiscoveryRationale);
+        }
+        if self.proposals.len() != 1 {
+            return Err(GraphProposalReceiptError::DiscoveryProposalMustNameOneAtom(
+                self.proposals.len(),
+            ));
+        }
+        if self.model_id.is_some() {
+            return Err(GraphProposalReceiptError::DiscoveryProposalHasModel);
+        }
+        let proposal = &self.proposals[0];
+        if proposal.status != GraphProposalStatus::Generated {
+            return Err(GraphProposalReceiptError::DiscoveryProposalAlreadyReviewed);
+        }
+        if origin.supporting_path_edge_indices.is_empty() {
+            return Err(GraphProposalReceiptError::MissingDiscoveryPathSupport);
+        }
+        let required_nodes = match &proposal.atom {
+            GraphTruthAtomKey::Vertex { .. } => 1,
+            GraphTruthAtomKey::Edge { .. } => 2,
+        };
+        if origin.supporting_path_node_indices.len() < required_nodes {
+            return Err(GraphProposalReceiptError::MissingDiscoveryPathSupport);
+        }
+        if proposal.evidence_refs.is_empty()
+            || proposal
+                .evidence_refs
+                .iter()
+                .any(|evidence| evidence.trim().is_empty())
+        {
+            return Err(GraphProposalReceiptError::MissingDiscoveryEvidence);
+        }
+        if has_duplicates(&origin.supporting_path_node_indices)
+            || has_duplicates(&origin.supporting_path_edge_indices)
+        {
+            return Err(GraphProposalReceiptError::DuplicateDiscoveryPathSupport);
+        }
+        Ok(())
+    }
+}
+
+fn has_duplicates(values: &[u32]) -> bool {
+    let mut seen = HashSet::with_capacity(values.len());
+    values.iter().any(|value| !seen.insert(*value))
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -247,6 +323,15 @@ pub enum GraphProposalReceiptError {
     DuplicateAtom(GraphTruthAtomKey),
     InvalidShadowScore(u16),
     InvalidCommitAtoms,
+    InvalidDiscoveryPathReceiptId,
+    EmptyDiscoveryIdentifier,
+    EmptyDiscoveryRationale,
+    DiscoveryProposalMustNameOneAtom(usize),
+    DiscoveryProposalHasModel,
+    DiscoveryProposalAlreadyReviewed,
+    MissingDiscoveryPathSupport,
+    MissingDiscoveryEvidence,
+    DuplicateDiscoveryPathSupport,
 }
 
 impl fmt::Display for GraphProposalReceiptError {

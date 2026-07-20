@@ -220,6 +220,7 @@ fn receipt(
         .into_iter()
         .collect(),
         model_id: None,
+        discovery_origin: None,
         proposals: vec![GraphProposalObservation {
             proposal_id: proposal_id.into(),
             atom: atom(state_id),

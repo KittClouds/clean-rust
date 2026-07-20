@@ -5,10 +5,10 @@ use crate::score::{confidence_micros, probability_log2_micros};
 pub use crate::scratch::QueryScratch;
 use crate::scratch::{BeamState, PathLink};
 use crate::{
-    BoundedSeedSink, BudgetExhaustion, DiscoveryPath, DiscoveryQueryError, DiscoveryScorePolicy,
-    EdgeReceipt, PathScoreReceipt, PreparedQueryReceipt, PreparedQueryRequest,
-    PreparedQueryResponse, PreparedSeedResolver, QueryLimits, QueryStableId, SeedChannel,
-    SeedChannelReceipt,
+    BoundedSeedSink, BudgetExhaustion, CancellationPhase, CancellationProbe, DiscoveryPath,
+    DiscoveryQueryError, DiscoveryScorePolicy, EdgeReceipt, NeverCancel, PathScoreReceipt,
+    PreparedQueryReceipt, PreparedQueryRequest, PreparedQueryResponse, PreparedSeedResolver,
+    QueryLimits, QueryStableId, SeedChannel, SeedChannelReceipt,
 };
 use hashbrown::HashMap;
 use phoenix_discovery_community::DeterministicCommunityArtifact;
@@ -76,6 +76,16 @@ impl<'a> PreparedDiscoveryQuery<'a> {
         resolver: &R,
         scratch: &mut QueryScratch,
     ) -> Result<PreparedQueryResponse, DiscoveryQueryError> {
+        self.execute_with_cancellation(request, resolver, scratch, &NeverCancel)
+    }
+
+    pub fn execute_with_cancellation<R: PreparedSeedResolver>(
+        &self,
+        request: PreparedQueryRequest<'_>,
+        resolver: &R,
+        scratch: &mut QueryScratch,
+        cancellation: &dyn CancellationProbe,
+    ) -> Result<PreparedQueryResponse, DiscoveryQueryError> {
         self.validate_resolver(resolver)?;
         scratch.clear();
         let mut exhaustion = BudgetExhaustion::default();
@@ -87,32 +97,73 @@ impl<'a> PreparedDiscoveryQuery<'a> {
             vector_seed_receipt,
         ) = self.resolve_seeds(&request, resolver, scratch, &mut exhaustion)?;
         let seed_receipt_digest = seed_receipt_digest(&lexical_seed_receipt, &vector_seed_receipt)?;
-        self.fuse_seeds(scratch);
+        scratch.pruning.seed_candidates = lexical_seed_receipt
+            .examined
+            .saturating_sub(lexical_seed_receipt.accepted)
+            .saturating_add(
+                vector_seed_receipt
+                    .examined
+                    .saturating_sub(vector_seed_receipt.accepted),
+            );
+        scratch
+            .cancellation
+            .check(cancellation, CancellationPhase::SeedResolution);
         let mut edge_budget = EdgeBudget::new(
             self.limits.total_examined_edges,
             self.limits.ppr_examined_edges,
         );
-        let ppr = run_ppr(
-            self.discovery,
-            &self.relation_weights,
-            self.limits,
-            scratch,
-            &mut edge_budget,
-            &mut exhaustion,
-        )?;
-        self.run_beam(
-            scratch,
-            &mut edge_budget,
-            &mut exhaustion,
-            request.narrative_time,
-        )?;
-        let paths =
-            self.select_and_materialize(scratch, &mut exhaustion, request.narrative_time)?;
+        let mut ppr = crate::ppr::PprStats::default();
+        if !scratch.cancellation.observed() {
+            self.fuse_seeds(scratch);
+            ppr = run_ppr(
+                self.discovery,
+                &self.relation_weights,
+                self.limits,
+                scratch,
+                &mut edge_budget,
+                &mut exhaustion,
+                cancellation,
+            )?;
+        }
+        if !scratch.cancellation.observed() {
+            self.run_beam(
+                scratch,
+                &mut edge_budget,
+                &mut exhaustion,
+                request.narrative_time,
+                cancellation,
+            )?;
+        }
+        let mut paths = if scratch.cancellation.observed() {
+            Vec::new()
+        } else {
+            self.select_and_materialize(
+                scratch,
+                &mut exhaustion,
+                request.narrative_time,
+                cancellation,
+            )?
+        };
+        if scratch.cancellation.observed() {
+            paths.clear();
+            scratch.pruning.path_candidates =
+                scratch.candidates.len().min(u32::MAX as usize) as u32;
+        }
+        let discovery_manifest = self.discovery.manifest();
+        let community_manifest = self.communities.manifest();
         let receipt = PreparedQueryReceipt {
-            generation: self.discovery.manifest().generation,
-            discovery_digest: self.discovery.manifest().artifact_digest.clone(),
-            community_digest: self.communities.manifest().artifact_digest.clone(),
-            relation_policy_digest: self.discovery.manifest().relation_policy_digest.clone(),
+            generation: discovery_manifest.generation,
+            source_snapshot_id: discovery_manifest.source_snapshot_id.clone(),
+            source_snapshot_digest: discovery_manifest.source_snapshot_digest.clone(),
+            evidence_registry_digest: discovery_manifest.evidence_registry_digest.clone(),
+            discovery_digest: discovery_manifest.artifact_digest.clone(),
+            discovery_payload_digest: discovery_manifest.payload_digest.clone(),
+            community_digest: community_manifest.artifact_digest.clone(),
+            community_payload_digest: community_manifest.payload_digest.clone(),
+            community_policy_id: community_manifest.community_policy_id.clone(),
+            community_policy_version: community_manifest.community_policy_version.clone(),
+            community_policy_digest: community_manifest.community_policy_digest.clone(),
+            relation_policy_digest: discovery_manifest.relation_policy_digest.clone(),
             score_policy_id: self.score_policy.policy_id.clone(),
             score_policy_version: self.score_policy.policy_version.clone(),
             score_policy_digest: hex(self.score_policy_digest),
@@ -134,6 +185,8 @@ impl<'a> PreparedDiscoveryQuery<'a> {
             total_examined_edges: edge_budget.total_used(),
             returned_paths: paths.len() as u32,
             exhaustion,
+            pruning: scratch.pruning,
+            cancellation: scratch.cancellation.receipt(),
             admitted_candidate_edges: 0,
             topology_writes: 0,
             fallback_used: false,
@@ -254,9 +307,18 @@ impl<'a> PreparedDiscoveryQuery<'a> {
         budget: &mut EdgeBudget,
         exhaustion: &mut BudgetExhaustion,
         narrative_time: Option<i64>,
+        cancellation: &dyn CancellationProbe,
     ) -> Result<(), DiscoveryQueryError> {
         let ppr_max = scratch.reserve.values().copied().max().unwrap_or(1);
-        for &(node, seed_score_micros) in &scratch.seeds {
+        for seed_index in 0..scratch.seeds.len() {
+            if seed_index & 15 == 0
+                && scratch
+                    .cancellation
+                    .check(cancellation, CancellationPhase::Beam)
+            {
+                return Ok(());
+            }
+            let (node, seed_score_micros) = scratch.seeds[seed_index];
             let link = scratch.paths.len() as u32;
             scratch.paths.push(PathLink {
                 node,
@@ -276,12 +338,26 @@ impl<'a> PreparedDiscoveryQuery<'a> {
             scratch.candidates.push(state);
         }
         sort_states(self.discovery, &scratch.paths, &mut scratch.beam)?;
-        scratch.beam.truncate(usize::from(self.limits.beam_width));
+        if scratch.beam.len() > usize::from(self.limits.beam_width) {
+            let pruned = scratch.beam.len() - usize::from(self.limits.beam_width);
+            scratch.pruning.beam_states = scratch
+                .pruning
+                .beam_states
+                .saturating_add(pruned.min(u32::MAX as usize) as u32);
+            scratch.beam.truncate(usize::from(self.limits.beam_width));
+        }
 
         for _hop in 1..=self.limits.hops {
             scratch.next_beam.clear();
             let current = std::mem::take(&mut scratch.beam);
-            for state in current.iter().copied() {
+            for (state_index, state) in current.iter().copied().enumerate() {
+                if state_index & 15 == 0
+                    && scratch
+                        .cancellation
+                        .check(cancellation, CancellationPhase::Beam)
+                {
+                    break;
+                }
                 let node = scratch.paths[state.link as usize].node;
                 collect_neighbors(
                     self.discovery,
@@ -292,10 +368,13 @@ impl<'a> PreparedDiscoveryQuery<'a> {
                     scratch,
                     budget,
                     exhaustion,
+                    cancellation,
                 )?;
                 for neighbor_index in 0..scratch.neighbors.len() {
                     let neighbor = scratch.neighbors[neighbor_index];
                     if path_contains(&scratch.paths, state.link, neighbor.target) {
+                        scratch.pruning.cycle_states =
+                            scratch.pruning.cycle_states.saturating_add(1);
                         continue;
                     }
                     let link = scratch.paths.len() as u32;
@@ -314,13 +393,18 @@ impl<'a> PreparedDiscoveryQuery<'a> {
                         score,
                     });
                 }
-                if exhaustion.total_edges {
+                if exhaustion.total_edges || scratch.cancellation.observed() {
                     break;
                 }
             }
             sort_states(self.discovery, &scratch.paths, &mut scratch.next_beam)?;
             if scratch.next_beam.len() > usize::from(self.limits.beam_width) {
                 exhaustion.beam_width = true;
+                let pruned = scratch.next_beam.len() - usize::from(self.limits.beam_width);
+                scratch.pruning.beam_states = scratch
+                    .pruning
+                    .beam_states
+                    .saturating_add(pruned.min(u32::MAX as usize) as u32);
                 scratch
                     .next_beam
                     .truncate(usize::from(self.limits.beam_width));
@@ -338,7 +422,8 @@ impl<'a> PreparedDiscoveryQuery<'a> {
             scratch.beam = current;
             scratch.beam.clear();
             std::mem::swap(&mut scratch.beam, &mut scratch.next_beam);
-            if scratch.beam.is_empty() || exhaustion.total_edges {
+            if scratch.beam.is_empty() || exhaustion.total_edges || scratch.cancellation.observed()
+            {
                 break;
             }
         }
@@ -347,18 +432,33 @@ impl<'a> PreparedDiscoveryQuery<'a> {
 
     fn select_and_materialize(
         &self,
-        scratch: &QueryScratch,
+        scratch: &mut QueryScratch,
         exhaustion: &mut BudgetExhaustion,
         narrative_time: Option<i64>,
+        cancellation: &dyn CancellationProbe,
     ) -> Result<Vec<DiscoveryPath>, DiscoveryQueryError> {
         let mut selected = Vec::with_capacity(usize::from(self.limits.returned_paths));
         let mut selected_links = Vec::with_capacity(usize::from(self.limits.returned_paths));
         let mut used = vec![false; scratch.candidates.len()];
         let ppr_max = scratch.reserve.values().copied().max().unwrap_or(1);
         while selected.len() < usize::from(self.limits.returned_paths) {
+            if scratch
+                .cancellation
+                .check(cancellation, CancellationPhase::Selection)
+            {
+                break;
+            }
             let mut best: Option<(usize, i64, Option<u32>)> = None;
-            for (index, state) in scratch.candidates.iter().enumerate() {
-                if used[index] {
+            for (index, is_used) in used.iter().copied().enumerate() {
+                if index & 63 == 0
+                    && scratch
+                        .cancellation
+                        .check(cancellation, CancellationPhase::Selection)
+                {
+                    break;
+                }
+                let state = scratch.candidates[index];
+                if is_used {
                     continue;
                 }
                 let redundancy = (!selected_links.is_empty()).then(|| {
@@ -380,6 +480,9 @@ impl<'a> PreparedDiscoveryQuery<'a> {
                     best = Some((index, adjusted, redundancy));
                 }
             }
+            if scratch.cancellation.observed() {
+                break;
+            }
             let Some((index, _adjusted, redundancy)) = best else {
                 break;
             };
@@ -395,12 +498,19 @@ impl<'a> PreparedDiscoveryQuery<'a> {
             selected.push(self.materialize_path(scratch, link, score, exhaustion)?);
         }
         exhaustion.returned_paths = scratch.candidates.len() > selected.len();
+        scratch.pruning.path_candidates = scratch.pruning.path_candidates.saturating_add(
+            scratch
+                .candidates
+                .len()
+                .saturating_sub(selected.len())
+                .min(u32::MAX as usize) as u32,
+        );
         Ok(selected)
     }
 
     fn materialize_path(
         &self,
-        scratch: &QueryScratch,
+        scratch: &mut QueryScratch,
         link: u32,
         score: PathScoreReceipt,
         exhaustion: &mut BudgetExhaustion,
@@ -425,6 +535,12 @@ impl<'a> PreparedDiscoveryQuery<'a> {
                 let cap = usize::from(self.limits.evidence_per_edge);
                 let evidence_truncated = evidence.len() > cap;
                 exhaustion.evidence |= evidence_truncated;
+                if evidence_truncated {
+                    scratch.pruning.evidence_refs = scratch
+                        .pruning
+                        .evidence_refs
+                        .saturating_add((evidence.len() - cap).min(u32::MAX as usize) as u32);
+                }
                 let identities = evidence
                     .iter()
                     .take(cap)

@@ -35,6 +35,9 @@ export function emptyGalaxyRendererV3Metrics(): GalaxyRendererV3Metrics {
         gpuBytes: 0,
         installMs: 0,
         firstPixelMs: 0,
+        sceneComputeMs: 0,
+        sceneReadbackBytes: 0,
+        nodeSizeScratchBytes: 0,
         frames: 0,
         failures: 0,
     };

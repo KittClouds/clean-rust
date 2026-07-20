@@ -30,6 +30,38 @@ pub struct BudgetExhaustion {
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
+pub struct PruningCounters {
+    pub seed_candidates: u32,
+    pub ppr_vertices: u32,
+    pub edge_scan: u32,
+    pub zero_quality_edges: u32,
+    pub fanout_neighbors: u32,
+    pub cycle_states: u32,
+    pub beam_states: u32,
+    pub path_candidates: u32,
+    pub evidence_refs: u32,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum CancellationPhase {
+    SeedResolution,
+    Ppr,
+    Beam,
+    Selection,
+}
+
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CancellationReceipt {
+    pub checks: u32,
+    pub requested: bool,
+    pub observed: bool,
+    pub phase: Option<CancellationPhase>,
+}
+
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct SignalContribution {
     pub available: bool,
     pub value_micros: i64,
@@ -78,8 +110,16 @@ pub struct DiscoveryPath {
 #[serde(rename_all = "camelCase")]
 pub struct PreparedQueryReceipt {
     pub generation: u64,
+    pub source_snapshot_id: String,
+    pub source_snapshot_digest: String,
+    pub evidence_registry_digest: String,
     pub discovery_digest: String,
+    pub discovery_payload_digest: String,
     pub community_digest: String,
+    pub community_payload_digest: String,
+    pub community_policy_id: String,
+    pub community_policy_version: String,
+    pub community_policy_digest: String,
     pub relation_policy_digest: String,
     pub score_policy_id: String,
     pub score_policy_version: String,
@@ -102,6 +142,8 @@ pub struct PreparedQueryReceipt {
     pub total_examined_edges: u32,
     pub returned_paths: u32,
     pub exhaustion: BudgetExhaustion,
+    pub pruning: PruningCounters,
+    pub cancellation: CancellationReceipt,
     pub admitted_candidate_edges: u64,
     pub topology_writes: u32,
     pub fallback_used: bool,

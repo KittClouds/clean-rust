@@ -12,6 +12,7 @@ fs2 = "0.4"
 hashbrown.workspace = true
 phoenix-discovery-query = { path = "../phoenix-discovery-query" }
 phoenix-discovery-view = { path = "../phoenix-discovery-view" }
+phoenix-graph-kernel = { path = "../phoenix-graph-kernel" }
 phoenix-store-native-core = { path = "../phoenix-store-native-core" }
 phoenix-store-overgraph = { path = "../phoenix-store-overgraph" }
 phoenix-types = { path = "../phoenix-types" }
@@ -21,5 +22,5 @@ thiserror.workspace = true
 
 [dev-dependencies]
 phoenix-discovery-community = { path = "../phoenix-discovery-community" }
-phoenix-graph-kernel = { path = "../phoenix-graph-kernel" }
+phoenix-graph-post = { path = "../phoenix-graph-post" }
 tempfile = "3.23"
