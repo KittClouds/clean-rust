@@ -4,7 +4,10 @@ mod graph_galaxy;
 mod graph_generation_query;
 mod graph_run_store;
 mod graph_scene_packet;
+#[cfg(feature = "vector-wgpu-shadow")]
+mod graph_vector_gpu_shadow;
 mod graph_vector_index;
+mod graph_vector_index_wire;
 mod native_decision_rpc;
 mod nli_claim_rpc;
 mod phoenix_rpc;

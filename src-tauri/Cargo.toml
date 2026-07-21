@@ -4,6 +4,10 @@ version = "0.1.0"
 edition = "2021"
 publish = false
 
+[features]
+default = []
+vector-wgpu-shadow = ["dep:vector-wgpu-kernel"]
+
 [lib]
 name = "phoenix_tauri_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
@@ -43,6 +47,7 @@ taurpc = "0.7.1"
 tokio = { version = "1", features = ["full"] }
 tokenizers = { version = "0.22.2", default-features = false, features = ["onig"] }
 zstd = "0.13"
+vector-wgpu-kernel = { path = "../rust-native/phoenix-spikes/vector-wgpu-kernel", optional = true }
 
 [patch.crates-io]
 esaxx-rs = { path = "../rust-native/phoenix-gliner-smoke/vendor/esaxx-rs" }

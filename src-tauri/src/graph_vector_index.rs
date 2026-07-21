@@ -1,9 +1,13 @@
+use crate::graph_vector_index_wire::{
+    checked_product, read_f64, read_u16, read_u32, read_u32_page, read_u64, write_u16, write_u32,
+    write_u64,
+};
 use hashbrown::HashMap;
 use memmap2::{Mmap, MmapOptions};
 use std::time::Instant;
 use tauri::{
-    ipc::{Invoke, InvokeBody, InvokeError, Response},
     Runtime,
+    ipc::{Invoke, InvokeBody, InvokeError, Response},
 };
 
 const REQUEST_MAGIC: &[u8; 8] = b"PHXVIDX2";
@@ -29,6 +33,8 @@ struct PackedIndexRequest {
     target_hashes: Vec<u32>,
     lexical_ranks: Vec<u32>,
     vectors: Mmap,
+    #[cfg(feature = "vector-wgpu-shadow")]
+    corpus_digest: [u8; 32],
     digest: [u8; 32],
 }
 
@@ -52,7 +58,7 @@ pub(crate) fn handle_packed_invoke<R: Runtime>(invoke: Invoke<R>) -> bool {
             let packet = match body {
                 InvokeBody::Raw(bytes) => PackedIndexRequest::parse(&bytes)?,
                 InvokeBody::Json(_) => {
-                    return Err("packed vector index requires an octet-stream body".into())
+                    return Err("packed vector index requires an octet-stream body".into());
                 }
             };
             build_index(packet)?.encode()
@@ -145,6 +151,16 @@ impl PackedIndexRequest {
             .make_read_only()
             .map_err(|error| format!("seal vector mmap: {error}"))?;
         validate_vectors(&vectors, rows, dimensions)?;
+        #[cfg(feature = "vector-wgpu-shadow")]
+        let corpus_digest = {
+            let mut corpus_hasher = blake3::Hasher::new();
+            corpus_hasher.update(b"phoenix-vector-corpus-v1");
+            corpus_hasher.update(&(rows as u64).to_le_bytes());
+            corpus_hasher.update(&(dimensions as u64).to_le_bytes());
+            corpus_hasher.update(&bytes[ranks_offset..vectors_offset]);
+            corpus_hasher.update(&bytes[vectors_offset..]);
+            *corpus_hasher.finalize().as_bytes()
+        };
         let digest = *blake3::hash(bytes).as_bytes();
         Ok(Self {
             rows,
@@ -159,6 +175,8 @@ impl PackedIndexRequest {
             target_hashes,
             lexical_ranks,
             vectors,
+            #[cfg(feature = "vector-wgpu-shadow")]
+            corpus_digest,
             digest,
         })
     }
@@ -181,13 +199,18 @@ impl PackedIndexRequest {
 }
 
 fn build_index(request: PackedIndexRequest) -> Result<BuildOutput, String> {
-    build_index_with(request, cosine_row, simd_available())
+    #[cfg(feature = "vector-wgpu-shadow")]
+    let enable_gpu_shadow = crate::graph_vector_gpu_shadow::requested();
+    #[cfg(not(feature = "vector-wgpu-shadow"))]
+    let enable_gpu_shadow = false;
+    build_index_with_mode(request, cosine_row, simd_available(), enable_gpu_shadow)
 }
 
-fn build_index_with(
+fn build_index_with_mode(
     request: PackedIndexRequest,
     score_row: fn(&[f32], usize, usize, usize) -> f64,
     used_simd: bool,
+    enable_gpu_shadow: bool,
 ) -> Result<BuildOutput, String> {
     let started = Instant::now();
     let signatures = build_signatures(&request);
@@ -200,27 +223,14 @@ fn build_index_with(
     let mut evaluated_pairs = 0_u64;
 
     for source in 0..request.rows {
-        let mut candidate_count = 0;
-        let mark = source as u32 + 1;
-        for band in 0..request.lsh_bands {
-            if candidate_count >= request.max_candidates {
-                break;
-            }
-            let signature = signatures[source * request.lsh_bands + band];
-            let key = bucket_key(band, request.lsh_bits, signature)?;
-            if let Some(bucket) = buckets.get(&key) {
-                candidate_count = add_bucket_candidates(
-                    &mut candidate_rows,
-                    &mut candidate_marks,
-                    candidate_count,
-                    bucket,
-                    source,
-                    request.target_hashes[source],
-                    request.max_candidates,
-                    mark,
-                );
-            }
-        }
+        let candidate_count = gather_ann_candidates(
+            &request,
+            &signatures,
+            &buckets,
+            source,
+            &mut candidate_rows,
+            &mut candidate_marks,
+        )?;
         let mut top_count = 0;
         for &target in &candidate_rows[..candidate_count] {
             evaluated_pairs += 1;
@@ -248,6 +258,43 @@ fn build_index_with(
         }
         neighborhoods.push(row);
     }
+    #[cfg(feature = "vector-wgpu-shadow")]
+    if enable_gpu_shadow {
+        candidate_marks.fill(0);
+        let receipt = crate::graph_vector_gpu_shadow::verify(
+            crate::graph_vector_gpu_shadow::ResidencyKey {
+                generation: request.generation,
+                rows: request.rows as u32,
+                dimensions: request.dimensions as u32,
+                corpus_digest: request.corpus_digest,
+            },
+            crate::graph_vector_gpu_shadow::ShadowInput {
+                values: request.values(),
+                lexical_ranks: &request.lexical_ranks,
+                rows: request.rows,
+                dimensions: request.dimensions,
+                top_k: request.neighborhood_k,
+                max_candidates: request.max_candidates,
+                minimum_similarity: request.minimum_similarity,
+                generation: request.generation,
+                authoritative: &neighborhoods,
+            },
+            |source, candidates| {
+                gather_ann_candidates(
+                    &request,
+                    &signatures,
+                    &buckets,
+                    source,
+                    candidates,
+                    &mut candidate_marks,
+                )
+            },
+            |source, target| score_row(request.values(), request.dimensions, source, target),
+        );
+        crate::graph_vector_gpu_shadow::emit(&receipt);
+    }
+    #[cfg(not(feature = "vector-wgpu-shadow"))]
+    let _ = enable_gpu_shadow;
     Ok(BuildOutput {
         neighborhoods,
         evaluated_pairs,
@@ -260,6 +307,38 @@ fn build_index_with(
         used_simd,
         duration_micros: started.elapsed().as_micros().min(u64::MAX as u128) as u64,
     })
+}
+
+fn gather_ann_candidates(
+    request: &PackedIndexRequest,
+    signatures: &[u32],
+    buckets: &HashMap<u32, Vec<u32>>,
+    source: usize,
+    out: &mut [u32],
+    marks: &mut [u32],
+) -> Result<usize, String> {
+    let mut count = 0;
+    let mark = source as u32 + 1;
+    for band in 0..request.lsh_bands {
+        if count >= request.max_candidates {
+            break;
+        }
+        let signature = signatures[source * request.lsh_bands + band];
+        let key = bucket_key(band, request.lsh_bits, signature)?;
+        if let Some(bucket) = buckets.get(&key) {
+            count = add_bucket_candidates(
+                out,
+                marks,
+                count,
+                bucket,
+                source,
+                request.target_hashes[source],
+                request.max_candidates,
+                mark,
+            );
+        }
+    }
+    Ok(count)
 }
 
 fn build_signatures(request: &PackedIndexRequest) -> Vec<u32> {
@@ -391,13 +470,13 @@ fn cosine_row_scalar(values: &[f32], dimensions: usize, left: usize, right: usiz
 unsafe fn cosine_row_avx2(values: &[f32], dimensions: usize, left: usize, right: usize) -> f64 {
     #[cfg(target_arch = "x86")]
     use std::arch::x86::{
-        __m256d, _mm256_add_pd, _mm256_cvtps_pd, _mm256_mul_pd, _mm256_setzero_pd,
-        _mm256_storeu_pd, _mm_loadu_ps,
+        __m256d, _mm_loadu_ps, _mm256_add_pd, _mm256_cvtps_pd, _mm256_mul_pd, _mm256_setzero_pd,
+        _mm256_storeu_pd,
     };
     #[cfg(target_arch = "x86_64")]
     use std::arch::x86_64::{
-        __m256d, _mm256_add_pd, _mm256_cvtps_pd, _mm256_mul_pd, _mm256_setzero_pd,
-        _mm256_storeu_pd, _mm_loadu_ps,
+        __m256d, _mm_loadu_ps, _mm256_add_pd, _mm256_cvtps_pd, _mm256_mul_pd, _mm256_setzero_pd,
+        _mm256_storeu_pd,
     };
     let left_offset = left * dimensions;
     let right_offset = right * dimensions;
@@ -490,7 +569,7 @@ fn validate_vectors(bytes: &[u8], rows: usize, dimensions: usize) -> Result<(), 
             norm_squared += value as f64 * value as f64;
         }
         let norm = norm_squared.sqrt();
-        if !(norm > 0.0) || (norm - 1.0).abs() > 0.025 {
+        if norm <= 0.0 || (norm - 1.0).abs() > 0.025 {
             return Err(format!("packed vector row {row} is not unit normalized"));
         }
     }
@@ -504,13 +583,6 @@ fn validate_lexical_ranks(ranks: &[u32]) -> Result<(), String> {
         }
     }
     Ok(())
-}
-
-fn read_u32_page(bytes: &[u8]) -> Vec<u32> {
-    bytes
-        .chunks_exact(4)
-        .map(|word| u32::from_le_bytes(word.try_into().unwrap()))
-        .collect()
 }
 
 fn lsh_dimension(band: usize, bit: usize, dimensions: usize) -> usize {
@@ -528,49 +600,12 @@ fn quantize_score(score: f64) -> i32 {
     ((score.clamp(-1.0, 1.0) * 1_000_000.0) + 0.5).floor() as i32
 }
 
-fn checked_product(left: usize, right: usize, label: &str) -> Result<usize, String> {
-    left.checked_mul(right)
-        .ok_or_else(|| format!("packed vector {label} overflow"))
-}
-
-fn read_u16(bytes: &[u8], offset: usize) -> Result<u16, String> {
-    Ok(u16::from_le_bytes(read_array(bytes, offset)?))
-}
-
-fn read_u32(bytes: &[u8], offset: usize) -> Result<u32, String> {
-    Ok(u32::from_le_bytes(read_array(bytes, offset)?))
-}
-
-fn read_u64(bytes: &[u8], offset: usize) -> Result<u64, String> {
-    Ok(u64::from_le_bytes(read_array(bytes, offset)?))
-}
-
-fn read_f64(bytes: &[u8], offset: usize) -> Result<f64, String> {
-    Ok(f64::from_le_bytes(read_array(bytes, offset)?))
-}
-
-fn read_array<const N: usize>(bytes: &[u8], offset: usize) -> Result<[u8; N], String> {
-    bytes
-        .get(offset..offset + N)
-        .ok_or_else(|| "packed vector header is truncated".to_string())?
-        .try_into()
-        .map_err(|_| "packed vector header width drift".to_string())
-}
-
-fn write_u16(bytes: &mut [u8], offset: usize, value: u16) {
-    bytes[offset..offset + 2].copy_from_slice(&value.to_le_bytes());
-}
-
-fn write_u32(bytes: &mut [u8], offset: usize, value: u32) {
-    bytes[offset..offset + 4].copy_from_slice(&value.to_le_bytes());
-}
-
-fn write_u64(bytes: &mut [u8], offset: usize, value: u64) {
-    bytes[offset..offset + 8].copy_from_slice(&value.to_le_bytes());
-}
+#[cfg(test)]
+#[path = "graph_vector_index_golden_tests.rs"]
+mod golden_tests;
 
 #[cfg(test)]
-mod tests {
+pub(super) mod tests {
     use super::*;
 
     #[test]
@@ -590,54 +625,17 @@ mod tests {
 
     #[test]
     fn scalar_oracle_and_runtime_kernel_build_identical_neighborhoods() {
-        let scalar = build_index_with(fixture_request(240, 64, 8, 48), cosine_row_scalar, false)
-            .expect("build scalar oracle");
+        let scalar = build_index_with_mode(
+            fixture_request(240, 64, 8, 48),
+            cosine_row_scalar,
+            false,
+            false,
+        )
+        .expect("build scalar oracle");
         let runtime =
             build_index(fixture_request(240, 64, 8, 48)).expect("build runtime neighborhoods");
         assert_eq!(runtime.evaluated_pairs, scalar.evaluated_pairs);
         assert_eq!(runtime.neighborhoods, scalar.neighborhoods);
-    }
-
-    #[test]
-    fn runtime_kernel_matches_the_typescript_neighborhood_golden() {
-        let rows = 240;
-        let dimensions = 8;
-        let mut target_ids = (0..rows)
-            .map(|row| format!("embed:chunk:note-scale:block:{row}"))
-            .collect::<Vec<_>>();
-        target_ids.sort();
-        let mut lexical_order = (0..rows).collect::<Vec<_>>();
-        lexical_order.sort_by(|left, right| target_ids[*left].cmp(&target_ids[*right]));
-        let mut lexical_ranks = vec![0_u32; rows];
-        for (rank, row) in lexical_order.into_iter().enumerate() {
-            lexical_ranks[row] = rank as u32;
-        }
-        let mut bytes = fixture_packet(rows, dimensions, 4, 12);
-        let hashes_offset = REQUEST_HEADER_BYTES;
-        let ranks_offset = hashes_offset + rows * 4;
-        let vectors_offset = ranks_offset + rows * 4;
-        for row in 0..rows {
-            write_u32(
-                &mut bytes,
-                hashes_offset + row * 4,
-                hash_text(&target_ids[row]),
-            );
-            write_u32(&mut bytes, ranks_offset + row * 4, lexical_ranks[row]);
-            let mut vector = [0_f32; 8];
-            vector[0] = 1.0;
-            vector[1] = (row % 3) as f32 * 0.05;
-            vector[2] = ((row + 1) % 3) as f32 * 0.025;
-            normalize_row(&mut vector);
-            for (dimension, value) in vector.iter().enumerate() {
-                let offset = vectors_offset + (row * dimensions + dimension) * 4;
-                bytes[offset..offset + 4].copy_from_slice(&value.to_le_bytes());
-            }
-        }
-        let output = build_index(PackedIndexRequest::parse(&bytes).unwrap()).unwrap();
-        assert_eq!(
-            neighborhood_hash(&target_ids, &output.neighborhoods),
-            0x64db_fb68
-        );
     }
 
     #[test]
@@ -673,15 +671,19 @@ mod tests {
     fn packed_request_rejects_length_and_rank_drift() {
         let mut bytes = fixture_packet(8, 4, 2, 4);
         bytes.pop();
-        assert!(PackedIndexRequest::parse(&bytes)
-            .unwrap_err()
-            .contains("length drift"));
+        assert!(
+            PackedIndexRequest::parse(&bytes)
+                .unwrap_err()
+                .contains("length drift")
+        );
         let mut bytes = fixture_packet(8, 4, 2, 4);
         let ranks_offset = REQUEST_HEADER_BYTES + 8 * 4;
         write_u32(&mut bytes, ranks_offset + 4, 8);
-        assert!(PackedIndexRequest::parse(&bytes)
-            .unwrap_err()
-            .contains("outside the row set"));
+        assert!(
+            PackedIndexRequest::parse(&bytes)
+                .unwrap_err()
+                .contains("outside the row set")
+        );
     }
 
     fn fixture_request(
@@ -693,7 +695,12 @@ mod tests {
         PackedIndexRequest::parse(&fixture_packet(rows, dimensions, k, max_candidates)).unwrap()
     }
 
-    fn fixture_packet(rows: usize, dimensions: usize, k: usize, max_candidates: usize) -> Vec<u8> {
+    pub(super) fn fixture_packet(
+        rows: usize,
+        dimensions: usize,
+        k: usize,
+        max_candidates: usize,
+    ) -> Vec<u8> {
         let vector_bytes = rows * dimensions * 4;
         let mut bytes = vec![0_u8; REQUEST_HEADER_BYTES + rows * 8 + vector_bytes];
         bytes[..8].copy_from_slice(REQUEST_MAGIC);
@@ -735,7 +742,7 @@ mod tests {
         bytes
     }
 
-    fn normalize_row(row: &mut [f32]) {
+    pub(super) fn normalize_row(row: &mut [f32]) {
         let norm = row
             .iter()
             .map(|value| *value as f64 * *value as f64)
@@ -744,48 +751,5 @@ mod tests {
         for value in row {
             *value = (*value as f64 / norm) as f32;
         }
-    }
-
-    fn neighborhood_hash(target_ids: &[String], rows: &[Vec<(u32, i32)>]) -> u32 {
-        let mut hash = 0x811c_9dc5;
-        for (source, neighbors) in rows.iter().enumerate() {
-            hash = fnv_word(hash, hash_text(&target_ids[source]));
-            for (rank, &(target, micro_score)) in neighbors.iter().enumerate() {
-                hash = fnv_word(hash, hash_text(&target_ids[target as usize]));
-                hash = fnv_word(
-                    hash,
-                    hash_text(&format!("{}:{}", rank + 1, score_text(micro_score))),
-                );
-            }
-        }
-        hash
-    }
-
-    fn score_text(micro_score: i32) -> String {
-        if micro_score % 1_000_000 == 0 {
-            return (micro_score / 1_000_000).to_string();
-        }
-        let mut text = format!("{:.6}", micro_score as f64 / 1_000_000.0);
-        while text.ends_with('0') {
-            text.pop();
-        }
-        text
-    }
-
-    fn hash_text(value: &str) -> u32 {
-        let mut hash = 0x811c_9dc5_u32;
-        for code_unit in value.encode_utf16() {
-            hash ^= code_unit as u32;
-            hash = hash.wrapping_mul(0x0100_0193);
-        }
-        hash
-    }
-
-    fn fnv_word(mut hash: u32, word: u32) -> u32 {
-        for byte in word.to_le_bytes() {
-            hash ^= byte as u32;
-            hash = hash.wrapping_mul(0x0100_0193);
-        }
-        hash
     }
 }
