@@ -174,9 +174,13 @@ type GraphRebuildProjectionCacheEntry = {
 
 const projectionCacheBySnapshot = new WeakMap<GraphRebuildSnapshot, GraphRebuildProjectionCacheEntry>();
 const projectionCacheByIdentity = new Map<string, GraphRebuildProjectionCacheEntry>();
+
+export function releaseGraphRebuildEmbeddingAtlasGeneration(identity: string): boolean {
+    return identity ? projectionCacheByIdentity.delete(identity) : false;
+}
 const MAX_RESIDENT_PROJECTION_IDENTITIES = 1;
-const MAX_RESIDENT_PROJECTIONS_PER_IDENTITY = 1;
-const MAX_RESIDENT_PROJECTION_ELEMENTS = 40_000;
+const MAX_RESIDENT_PROJECTIONS_PER_IDENTITY = 5;
+const MAX_RESIDENT_PROJECTION_ELEMENTS = 160_000;
 
 export function cachedGraphRebuildEmbeddingAtlas(
     snapshot: GraphRebuildSnapshot,

@@ -146,6 +146,11 @@ import type {
 import type { GraphCompilerDualWriteSidecar } from './graph-compiler-read-model';
 import type { CalendarRegistrySnapshot } from '../lib/fantasy-calendar/calendar-registry-snapshot';
 import {
+    assertGraphGenerationReceipt,
+    type GraphGenerationArtifactRef,
+    type GraphGenerationReceiptV2,
+} from './graph-generation-receipt';
+import {
     assertGraphSnapshotAuthority,
     graphSnapshotContentHash,
     graphSnapshotStableContentValue,
@@ -169,12 +174,15 @@ import {
     DIAGNOSTIC_SNAPSHOT_DOCUMENT_KEY,
     GRAPH_MODEL_V2_OVERGRAPH_DOCUMENT_KEY,
     GRAPH_REBUILD_NAMESPACE,
+    GENERATION_RECEIPT_DOCUMENT_KEY,
     RECEIPT_DOCUMENT_KEY,
     SNAPSHOT_DOCUMENT_KEY,
     graphIndexReceiptToScopedDocument,
+    graphGenerationReceiptToScopedDocument,
     postProcessCacheDocumentKey,
     postProcessCacheToScopedDocument,
     scopedDocumentToGraphIndexReceipt,
+    scopedDocumentToGraphGenerationReceipt,
     scopedDocumentToPostProcessCache,
     type GraphRebuildPostProcessCache,
 } from './graph-rebuild-persistence-contract';
@@ -189,9 +197,12 @@ export {
     DIAGNOSTIC_SNAPSHOT_DOCUMENT_KEY,
     GRAPH_MODEL_V2_OVERGRAPH_DOCUMENT_KEY,
     GRAPH_REBUILD_NAMESPACE,
+    GENERATION_RECEIPT_DOCUMENT_KEY,
     graphIndexReceiptToScopedDocument,
+    graphGenerationReceiptToScopedDocument,
     postProcessCacheToScopedDocument,
     scopedDocumentToGraphIndexReceipt,
+    scopedDocumentToGraphGenerationReceipt,
     type GraphRebuildPostProcessCache,
 } from './graph-rebuild-persistence-contract';
 
@@ -404,6 +415,23 @@ export interface NativeGraphRunPersistReceipt {
     compressedBytesWritten: number;
 }
 
+interface NativeGraphGenerationQueryResponse {
+    schemaVersion: 'phoenix-graph-generation-asserted-query/v1';
+    manifest: {
+        schemaVersion: string;
+        artifactDigest: string;
+        payloadDigest: string;
+        generation: number;
+        sourceSnapshotId: string;
+        sourceSnapshotDigest: string;
+        nodeCount: number;
+        edgeCount: number;
+        excludedCandidateEdges: number;
+        admittedCandidateEdges: number;
+        binaryBytes: number;
+    };
+}
+
 type StoryContinuityRows = Pick<GraphStoryContinuityContract,
     | 'events'
     | 'boundaryReceipts'
@@ -537,6 +565,37 @@ export class GraphRebuildService {
         return snapshotId && this.activeNativeGraphRun?.snapshotId === snapshotId
             ? this.activeNativeGraphRun.runHandle
             : null;
+    }
+
+    async prepareAssertedQueryArtifact(
+        snapshot: GraphRebuildSnapshot,
+    ): Promise<GraphGenerationArtifactRef> {
+        const authority = assertGraphSnapshotAuthority(snapshot);
+        if (this.phoenix.target !== 'native') {
+            throw new Error('Asserted query artifacts require the native mmap runtime.');
+        }
+        const response = await this.phoenix.storeCommand('graphGeneration:prepareAssertedQuery', {
+            snapshot: graphRebuildSnapshotToNativeQueryPayload(snapshot),
+            authorityHash: authority.contentHash,
+        }) as NativeGraphGenerationQueryResponse | null;
+        const manifest = response?.manifest;
+        if (response?.schemaVersion !== 'phoenix-graph-generation-asserted-query/v1'
+            || !manifest
+            || manifest.sourceSnapshotId !== snapshot.id
+            || !manifest.artifactDigest
+            || !manifest.payloadDigest
+            || manifest.admittedCandidateEdges !== 0) {
+            throw new Error('Native asserted query artifact failed authority validation.');
+        }
+        return {
+            schemaVersion: 'phoenix-graph-generation-artifact-ref/v1',
+            kind: 'asserted-query',
+            status: 'ready',
+            id: `asserted-query:${snapshot.id}:${manifest.artifactDigest}`,
+            digest: manifest.payloadDigest,
+            schema: manifest.schemaVersion,
+            byteLength: manifest.binaryBytes,
+        };
     }
 
     residentNativeGraphRunHandle(): string | null {
@@ -1348,6 +1407,16 @@ export class GraphRebuildService {
         }
     }
 
+    async loadPersistedSnapshotShell(scopeId: string): Promise<GraphRebuildSnapshot | null> {
+        const current = this.snapshotState();
+        if (current?.scopeId === scopeId) return current;
+        const document = await this.store.getScopedDocument(scopeId, GRAPH_REBUILD_NAMESPACE, SNAPSHOT_DOCUMENT_KEY);
+        const shell = document ? scopedDocumentToGraphRebuildSnapshot(document) : null;
+        if (!shell) return null;
+        assertGraphCanvasBootSnapshotShell(shell);
+        return shell;
+    }
+
     private async loadPersistedSnapshotFromStore(scopeId: string): Promise<GraphRebuildSnapshot | null> {
         const document = await this.store.getScopedDocument(scopeId, GRAPH_REBUILD_NAMESPACE, SNAPSHOT_DOCUMENT_KEY);
         const persisted = document ? scopedDocumentToGraphRebuildSnapshot(document) : null;
@@ -1457,6 +1526,43 @@ export class GraphRebuildService {
             await this.persistOperatorMutationJournal(reconciled.operatorMutationJournal, reconciled.scopeKind);
         }
         await this.persistSnapshot(reconciled);
+    }
+
+    async persistGenerationReceipt(
+        receipt: GraphGenerationReceiptV2,
+    ): Promise<PhoenixContentMutationTiming> {
+        await assertGraphGenerationReceipt(receipt);
+        return this.store.upsertScopedDocument(graphGenerationReceiptToScopedDocument(receipt));
+    }
+
+    async loadPersistedGenerationReceipt(scopeId: string): Promise<GraphGenerationReceiptV2 | null> {
+        const document = await this.store.getScopedDocument(
+            scopeId,
+            GRAPH_REBUILD_NAMESPACE,
+            GENERATION_RECEIPT_DOCUMENT_KEY,
+        );
+        const receipt = document ? scopedDocumentToGraphGenerationReceipt(document) : null;
+        if (!receipt) return null;
+        await assertGraphGenerationReceipt(receipt);
+        return receipt;
+    }
+
+    releaseRichSnapshot(
+        receipt: GraphGenerationReceiptV2,
+        shell: GraphRebuildSnapshot,
+    ): boolean {
+        const current = this.snapshotState();
+        if (!current
+            || current.id !== receipt.snapshotId
+            || current.scopeId !== receipt.scopeId
+            || current.authorityContract?.contentHash !== receipt.authority.contentHash) return false;
+        assertGraphCanvasBootSnapshotShell(shell);
+        if (shell.generationReceiptId !== receipt.receiptId
+            || shell.generationDigestSha256 !== receipt.digestSha256) {
+            throw new Error('Compact graph generation shell receipt drift.');
+        }
+        this.snapshotState.set(shell);
+        return true;
     }
 
     async applyOperatorReviewDecision(
@@ -2048,6 +2154,37 @@ export function graphRebuildSnapshotToNativeAnalysisPayload(snapshot: GraphRebui
         edges: [],
         counters: snapshot.counters,
         documentCompilerSummary: nativeCompilerDocumentCompilerSummary(snapshot),
+    };
+}
+
+export function graphRebuildSnapshotToNativeQueryPayload(snapshot: GraphRebuildSnapshot): GraphRebuildSnapshot {
+    return {
+        schemaVersion: snapshot.schemaVersion,
+        id: snapshot.id,
+        source: snapshot.source,
+        scopeKind: snapshot.scopeKind,
+        scopeId: snapshot.scopeId,
+        noteIds: snapshot.noteIds,
+        builtAt: snapshot.builtAt,
+        chunks: snapshot.chunks,
+        mentions: [],
+        entityAnchors: [],
+        relationships: snapshot.relationships,
+        events: snapshot.events,
+        episodes: snapshot.episodes,
+        chunkSemanticBridges: [],
+        episodeConnections: [],
+        episodeProjectionEdges: [],
+        temporalEdges: snapshot.temporalEdges,
+        causalEdges: snapshot.causalEdges,
+        memoryState: [],
+        memoryGovernanceCandidates: [],
+        embeddingTargets: snapshot.embeddingTargets,
+        embeddingVectors: [],
+        projectionRefs: [],
+        nodes: snapshot.nodes,
+        edges: snapshot.edges,
+        counters: snapshot.counters,
     };
 }
 
@@ -2916,6 +3053,23 @@ export function graphRebuildSnapshotPersistenceView(
     return persisted;
 }
 
+export function graphGenerationSnapshotShell(
+    snapshot: GraphRebuildSnapshot,
+    receipt: GraphGenerationReceiptV2,
+): GraphRebuildSnapshot {
+    if (!receipt.releaseAuthorized
+        || snapshot.id !== receipt.snapshotId
+        || snapshot.scopeId !== receipt.scopeId
+        || snapshot.authorityContract?.contentHash !== receipt.authority.contentHash) {
+        throw new Error('Graph generation is not authorized for compact-shell release.');
+    }
+    const shell = graphRebuildSnapshotPersistenceView(snapshot, []);
+    shell.generationReceiptId = receipt.receiptId;
+    shell.generationDigestSha256 = receipt.digestSha256;
+    assertGraphCanvasBootSnapshotShell(shell);
+    return shell;
+}
+
 export function scopedDocumentToGraphRebuildContentBlob(
     document: StoreScopedDocument,
 ): GraphRebuildContentBlobPayload | null {
@@ -3543,6 +3697,23 @@ function folderContextForNote(note: Note, folder?: Folder): GraphRebuildNoteFold
 
 function elapsedMs(started: number): number {
     return Math.max(0, Math.round(performance.now() - started));
+}
+
+export function assertGraphCanvasBootSnapshotShell(snapshot: GraphRebuildSnapshot): void {
+    const authority = snapshot.authorityContract;
+    if (!snapshot.id || !snapshot.scopeId || !authority?.contentHash) {
+        throw new Error('Graph canvas boot snapshot shell requires a complete authority identity.');
+    }
+    if (authority.snapshotId !== snapshot.id || authority.scopeId !== snapshot.scopeId) {
+        throw new Error('Graph canvas boot snapshot shell authority identity drift.');
+    }
+    const manifest = snapshot.contentManifest;
+    if (!manifest || manifest.snapshotId !== snapshot.id || manifest.scopeId !== snapshot.scopeId) {
+        throw new Error('Graph canvas boot snapshot shell content manifest drift.');
+    }
+    if (authority.counts.embeddingTargets !== snapshot.counters.embeddingTargets) {
+        throw new Error('Graph canvas boot snapshot shell target count drift.');
+    }
 }
 
 async function loadDynamicNoteChunks(noteIds: string[]): Promise<GraphRebuildChunk[]> {

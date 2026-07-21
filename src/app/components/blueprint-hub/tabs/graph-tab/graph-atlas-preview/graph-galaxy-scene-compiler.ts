@@ -17,6 +17,7 @@ import {
     unpackGalaxyScenePacketV2,
 } from './graph-galaxy-scene-packet-v2';
 import type { GalaxyScenePacketV2 } from './graph-galaxy-scene-packet-v2.model';
+import { galaxySceneCompilationSettingsKey } from './graph-galaxy-scene-compilation-key';
 import {
     galaxySceneToV2,
     type GalaxySceneSourceMode,
@@ -44,6 +45,19 @@ entityColorStore.subscribe(() => {
     sceneCacheWeights.clear();
 });
 
+export function releaseGalaxySceneCompilerGeneration(generationId: string): number {
+    if (!generationId) return 0;
+    const prefix = `${generationId}\u0000`;
+    let released = 0;
+    for (const key of [...sceneCache.keys()]) {
+        if (!key.startsWith(prefix)) continue;
+        sceneCache.delete(key);
+        sceneCacheWeights.delete(key);
+        released += 1;
+    }
+    return released;
+}
+
 export async function compileGalaxyScene(
     backend: PhoenixBackendService,
     entities: GalaxyRenderableNode[],
@@ -54,6 +68,8 @@ export async function compileGalaxyScene(
 ): Promise<GalaxySceneV2> {
     return compileGalaxySceneWithPolicy(backend, entities, edges, settings, renderIdentity, sourceMode, false);
 }
+
+export { galaxySceneCompilationSettingsKey } from './graph-galaxy-scene-compilation-key';
 
 export async function compileAuthoritativeGalaxyScene(
     backend: PhoenixBackendService,
@@ -137,17 +153,6 @@ function galaxySceneCacheKey(
     settings: GalaxyRenderSettings,
 ): string {
     return `${renderIdentity}\u0000${sourceMode}\u0000${galaxySceneCompilationSettingsKey(settings)}`;
-}
-
-export function galaxySceneCompilationSettingsKey(settings: GalaxyRenderSettings): string {
-    return JSON.stringify({
-        layoutMode: settings.layoutMode,
-        sourceMode: settings.sourceMode,
-        embeddingTopologyMode: settings.embeddingTopologyMode,
-        nodeDistance: settings.nodeDistance,
-        edgeLength: settings.edgeLength,
-        edgeCurveStrength: settings.edgeCurveStrength,
-    });
 }
 
 function evictStaleSceneVariant(renderIdentity: string, nextKey: string): void {

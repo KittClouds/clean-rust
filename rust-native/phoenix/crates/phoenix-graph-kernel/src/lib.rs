@@ -24,6 +24,7 @@ mod galaxy_store_build;
 mod galaxy_store_delta;
 mod galaxy_store_format;
 mod galaxy_store_query;
+mod galaxy_store_sort;
 mod learning;
 mod pcst_region;
 mod query_view;

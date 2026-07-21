@@ -51,7 +51,10 @@ fn main() -> Result<(), String> {
             })
             .collect::<Result<Vec<_>, &str>>()?;
         selections.sort_unstable_by_key(|value| value["decidedAt"].as_i64().unwrap_or_default());
-        println!("{}", serde_json::to_string(&selections).map_err(|error| error.to_string())?);
+        println!(
+            "{}",
+            serde_json::to_string(&selections).map_err(|error| error.to_string())?
+        );
         return Ok(());
     }
     let mut cohorts = BTreeMap::<String, Cohort>::new();

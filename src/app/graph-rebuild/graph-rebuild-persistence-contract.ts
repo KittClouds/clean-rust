@@ -4,11 +4,16 @@ import type {
     GraphRebuildScopeKind,
     GraphRebuildSnapshot,
 } from './graph-rebuild-snapshot';
+import {
+    GRAPH_GENERATION_RECEIPT_SCHEMA,
+    type GraphGenerationReceiptV2,
+} from './graph-generation-receipt';
 
 export const GRAPH_REBUILD_NAMESPACE = 'phoenix_graph_rebuild_v1';
 export const SNAPSHOT_DOCUMENT_KEY = 'snapshot';
 export const DIAGNOSTIC_SNAPSHOT_DOCUMENT_KEY = 'snapshot:diagnostic';
 export const RECEIPT_DOCUMENT_KEY = 'receipt';
+export const GENERATION_RECEIPT_DOCUMENT_KEY = 'generation-receipt-v2';
 export const GRAPH_MODEL_V2_OVERGRAPH_DOCUMENT_KEY = 'graph-model-v2-overgraph';
 const POST_PROCESS_CACHE_PREFIX = 'postprocess-cache';
 
@@ -42,6 +47,33 @@ export function scopedDocumentToGraphIndexReceipt(document: StoreScopedDocument)
     try {
         const parsed = JSON.parse(document.payload) as GraphIndexRunReceipt;
         return parsed?.schemaVersion === 'phoenix-graph-index-run/v1' ? parsed : null;
+    } catch {
+        return null;
+    }
+}
+
+export function graphGenerationReceiptToScopedDocument(
+    receipt: GraphGenerationReceiptV2,
+): StoreScopedDocument {
+    const now = Date.now();
+    return {
+        id: `${GRAPH_REBUILD_NAMESPACE}:${receipt.scopeId}:${GENERATION_RECEIPT_DOCUMENT_KEY}`,
+        scopeFolderId: receipt.scopeId,
+        narrativeId: receipt.scopeKind === 'narrative' ? receipt.scopeId : '',
+        namespace: GRAPH_REBUILD_NAMESPACE,
+        documentKey: GENERATION_RECEIPT_DOCUMENT_KEY,
+        payload: JSON.stringify(receipt),
+        createdAt: receipt.builtAt || now,
+        updatedAt: now,
+    };
+}
+
+export function scopedDocumentToGraphGenerationReceipt(
+    document: StoreScopedDocument,
+): GraphGenerationReceiptV2 | null {
+    try {
+        const parsed = JSON.parse(document.payload) as GraphGenerationReceiptV2;
+        return parsed?.schemaVersion === GRAPH_GENERATION_RECEIPT_SCHEMA ? parsed : null;
     } catch {
         return null;
     }

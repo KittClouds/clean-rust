@@ -190,6 +190,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(target_arch = "wasm32")]
     fn wasm_chunk_text_returns_valid_json() {
         let result = chunk_text("Hello world. Goodbye moon.", 500, 100);
         let parsed: Vec<Chunk> = serde_json::from_str(&result).expect("valid JSON");
@@ -197,6 +198,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(target_arch = "wasm32")]
     fn wasm_sentence_ranges_returns_valid_json() {
         let result = sentence_ranges("Dr. Luffy ran. Mr. Zoro stayed.");
         let parsed: Vec<Chunk> = serde_json::from_str(&result).expect("valid JSON");

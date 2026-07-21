@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, OnDestroy, Output, computed, effect, inject, signal } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, Output, computed, effect, inject, signal, untracked } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import type { RegisteredEntity } from '../../../../lib/registry';
@@ -23,8 +23,16 @@ import {
     type GraphLensNote,
     type GraphLensState,
 } from './graph-lens';
-import { sameGraphRenderIdentity } from './graph-render-identity';
+import {
+    graphSnapshotHasHydratedCanvasPayload,
+    shouldReplaceGraphRenderSnapshot,
+} from './graph-render-identity';
 import { GraphCanvasColdStartService } from '../../../../services/graph-canvas-cold-start.service';
+import { GraphGenerationLifetimeService } from '../../../../services/graph-generation-lifetime.service';
+import {
+    isGalaxyRendererV3Enabled,
+    resolveGalaxyRendererAuthority,
+} from './graph-atlas-preview/v3/galaxy-renderer-v3-authority';
 
 const GRAPH_LENS_STATE_KEY = 'graph.lens.state.v1';
 const GRAPH_LENS_MODES = new Set<GraphLensMode>(['global', 'narrative', 'note', 'multiNote']);
@@ -119,6 +127,8 @@ function readPersistedGraphLensState(): GraphLensState {
                 (atlasModeChange)="atlasModeChange.emit($event)"
                 (atlasSearchChange)="atlasSearchChange.emit($event)"
                 (sourceRequested)="jumpToCanvasSource($event)"
+                (firstPixelRendered)="onCanvasFirstPixelRendered($event)"
+                (metadataRequested)="hydrateGraphMetadata()"
                 (lensModeChange)="setLensMode($event)">
             </app-graph-atlas-preview>
             }
@@ -132,6 +142,7 @@ export class GraphLensWorkspaceComponent implements OnDestroy {
     private readonly editor = inject(EditorService);
     private readonly hub = inject(BlueprintHubService);
     private readonly graphCanvasColdStart = inject(GraphCanvasColdStartService);
+    private readonly graphGenerationLifetime = inject(GraphGenerationLifetimeService, { optional: true });
     private readonly narrativeEntitiesSignal = signal<RegisteredEntity[]>([]);
     private readonly narrativeEdgesSignal = signal<AtlasPreviewEdge[]>([]);
     private readonly graphRebuildSnapshotSignal = signal<GraphRebuildSnapshot | null>(null);
@@ -142,6 +153,9 @@ export class GraphLensWorkspaceComponent implements OnDestroy {
     private membershipToken = 0;
     private noteToken = 0;
     private graphSnapshotLoadToken = 0;
+    private metadataHydration: Promise<void> | null = null;
+    private metadataHydrationKey = '';
+    private readonly firstPixelWaiters = new Map<string, Set<(rendered: boolean) => void>>();
     private removeAnchorListeners: (() => void) | null = null;
 
     @Input() set narrativeEntities(value: RegisteredEntity[] | null | undefined) {
@@ -215,10 +229,45 @@ export class GraphLensWorkspaceComponent implements OnDestroy {
         this.bindAnchorEvents();
         effect(() => void this.refreshMemberships(this.lens()));
         effect(() => void this.loadPersistedGraphSnapshot(this.lens()));
+        effect(() => {
+            const shell = this.graphGenerationLifetime?.releasedShell();
+            if (!shell || resolveGalaxyRendererAuthority() !== 'v3-visible') return;
+            const current = untracked(() => this.graphRebuildSnapshotSignal());
+            if (current?.id === shell.id
+                && current.scopeId === shell.scopeId
+                && current.authorityContract?.contentHash === shell.authorityContract?.contentHash) {
+                this.graphRebuildSnapshotSignal.set(shell);
+            }
+        });
     }
 
     ngOnDestroy(): void {
         this.removeAnchorListeners?.();
+        for (const waiters of this.firstPixelWaiters.values()) {
+            for (const resolve of waiters) resolve(false);
+        }
+        this.firstPixelWaiters.clear();
+    }
+
+    onCanvasFirstPixelRendered(sceneIdentity: string): void {
+        const generationId = sceneIdentity.split('\u0000', 1)[0] || '';
+        const waiters = this.firstPixelWaiters.get(generationId);
+        if (!waiters) return;
+        this.firstPixelWaiters.delete(generationId);
+        for (const resolve of waiters) resolve(true);
+    }
+
+    hydrateGraphMetadata(): void {
+        const current = this.graphRebuildSnapshotSignal();
+        if (graphSnapshotHasHydratedCanvasPayload(current)) return;
+        const normalized = normalizeGraphLensForBuild(this.lens());
+        const token = this.graphSnapshotLoadToken;
+        void this.hydratePersistedGraphSnapshot(normalized.scopeId, token, true).catch((error) => {
+            if (token !== this.graphSnapshotLoadToken) return;
+            const message = error instanceof Error ? error.message : String(error);
+            this.graphSnapshotFailure.set(`Authoritative canvas metadata unavailable: ${message}`);
+            console.error('[GraphLensWorkspace] On-demand canvas metadata load failed closed.', error);
+        });
     }
 
     usesNotes(): boolean {
@@ -319,22 +368,62 @@ export class GraphLensWorkspaceComponent implements OnDestroy {
         })));
     }
 
-    private async loadPersistedGraphSnapshot(lens: GraphLensState): Promise<void> {
+    private async loadPersistedGraphSnapshot(lens: GraphLensState, forcePacked = false): Promise<void> {
+        const loadStartedAt = performance.now();
         const token = ++this.graphSnapshotLoadToken;
         const normalized = normalizeGraphLensForBuild(lens);
         this.graphSnapshotLoading.set(true);
         this.graphSnapshotFailure.set(null);
         try {
-            const snapshot = await this.graphRebuild.loadPersistedSnapshot(normalized.scopeId);
-            if (snapshot) {
-                await this.graphCanvasColdStart.preparePersistedManifold(snapshot);
-            }
-            if (token === this.graphSnapshotLoadToken) {
-                if (!sameGraphRenderIdentity(this.graphRebuildSnapshotSignal(), snapshot)) {
-                    this.graphRebuildSnapshotSignal.set(snapshot);
+            const rendererAuthority = resolveGalaxyRendererAuthority();
+            const packedOnly = rendererAuthority === 'v3-visible';
+            let firstPixelPublished = false;
+            let firstPixelReady: Promise<boolean> | null = null;
+            let packedSnapshot: GraphRebuildSnapshot | null = null;
+            const current = untracked(() => this.graphRebuildSnapshotSignal());
+            if ((forcePacked || current?.scopeId !== normalized.scopeId)
+                && isGalaxyRendererV3Enabled(rendererAuthority)) {
+                const boot = await this.graphCanvasColdStart.preparePersistedFirstPixel(
+                    normalized.scopeId,
+                    undefined,
+                    forcePacked,
+                );
+                if (token !== this.graphSnapshotLoadToken) return;
+                packedSnapshot = boot;
+                if (boot && shouldReplaceGraphRenderSnapshot(this.graphRebuildSnapshotSignal(), boot)) {
+                    firstPixelReady = this.waitForCanvasFirstPixel(boot.authorityContract?.contentHash || boot.id);
+                    this.graphRebuildSnapshotSignal.set(boot);
+                    this.graphSnapshotLoading.set(false);
+                    firstPixelPublished = true;
                 }
-                this.graphSnapshotStaleSignal.set(false);
             }
+            if (firstPixelPublished) {
+                const rendered = await firstPixelReady;
+                const firstPixelMs = Math.max(0, Math.round(performance.now() - loadStartedAt));
+                if (rendered) {
+                    console.info(`[GraphLensWorkspace] Packed V3 first pixel rendered in ${firstPixelMs} ms before metadata hydration.`);
+                } else {
+                    console.warn(`[GraphLensWorkspace] Packed V3 first-pixel receipt timed out after ${firstPixelMs} ms.`);
+                }
+                await nextAnimationFrame();
+                if (token !== this.graphSnapshotLoadToken) return;
+            }
+            const currentSnapshot = untracked(() => this.graphRebuildSnapshotSignal());
+            const residentPackedShell = !forcePacked
+                && currentSnapshot?.scopeId === normalized.scopeId
+                && !graphSnapshotHasHydratedCanvasPayload(currentSnapshot);
+            if (packedOnly) {
+                if (packedSnapshot || residentPackedShell) {
+                    this.graphSnapshotStaleSignal.set(false);
+                    this.graphSnapshotLoading.set(false);
+                    return;
+                }
+                this.graphSnapshotFailure.set(
+                    'Authoritative packed V3 scene unavailable. Force Rebuild must publish a new packed generation.',
+                );
+                return;
+            }
+            await this.hydratePersistedGraphSnapshot(normalized.scopeId, token, firstPixelPublished);
         } catch (error) {
             if (token === this.graphSnapshotLoadToken) {
                 const message = error instanceof Error ? error.message : String(error);
@@ -344,6 +433,55 @@ export class GraphLensWorkspaceComponent implements OnDestroy {
         } finally {
             if (token === this.graphSnapshotLoadToken) this.graphSnapshotLoading.set(false);
         }
+    }
+
+    private hydratePersistedGraphSnapshot(
+        scopeId: string,
+        token: number,
+        afterFirstPixel: boolean,
+    ): Promise<void> {
+        const key = `${token}\u0000${scopeId}`;
+        if (this.metadataHydration && this.metadataHydrationKey === key) return this.metadataHydration;
+        const metadataStartedAt = performance.now();
+        const hydration = (async () => {
+            const snapshot = await this.graphRebuild.loadPersistedSnapshot(scopeId);
+            if (token !== this.graphSnapshotLoadToken) return;
+            if (shouldReplaceGraphRenderSnapshot(this.graphRebuildSnapshotSignal(), snapshot)) {
+                this.graphRebuildSnapshotSignal.set(snapshot);
+            }
+            this.graphSnapshotStaleSignal.set(false);
+            this.graphSnapshotLoading.set(false);
+            if (!snapshot) return;
+            if (afterFirstPixel) {
+                console.info(
+                    `[GraphLensWorkspace] Full authoritative canvas metadata hydrated on demand in ${Math.max(0, Math.round(performance.now() - metadataStartedAt))} ms.`,
+                );
+            }
+            await this.graphCanvasColdStart.preparePersistedManifold(snapshot);
+        })().finally(() => {
+            if (this.metadataHydration === hydration) {
+                this.metadataHydration = null;
+                this.metadataHydrationKey = '';
+            }
+        });
+        this.metadataHydration = hydration;
+        this.metadataHydrationKey = key;
+        return hydration;
+    }
+
+    private waitForCanvasFirstPixel(generationId: string): Promise<boolean> {
+        return new Promise((resolve) => {
+            let timer = 0;
+            const finish = (rendered: boolean) => {
+                if (timer) window.clearTimeout(timer);
+                this.firstPixelWaiters.get(generationId)?.delete(finish);
+                resolve(rendered);
+            };
+            const waiters = this.firstPixelWaiters.get(generationId) ?? new Set<(rendered: boolean) => void>();
+            waiters.add(finish);
+            this.firstPixelWaiters.set(generationId, waiters);
+            timer = window.setTimeout(() => finish(false), 5_000);
+        });
     }
 
     private bindAnchorEvents(): void {
@@ -356,7 +494,7 @@ export class GraphLensWorkspaceComponent implements OnDestroy {
                 normalized.scopeId,
                 this.graphRebuildSnapshotSignal(),
             )) return;
-            void this.loadPersistedGraphSnapshot(this.lens());
+            void this.loadPersistedGraphSnapshot(this.lens(), true);
         };
         window.addEventListener('graph-rebuild-anchors-changed', markStale);
         window.addEventListener('entities-changed', markStale);

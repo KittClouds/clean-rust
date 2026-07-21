@@ -9,7 +9,7 @@ import {
 } from 'three/tsl';
 
 import type { GraphRendererMode, GraphRendererPointer } from '../graph-renderer-port';
-import type { GalaxyRenderSettings } from '../graph-galaxy-engine';
+import type { GalaxyRenderableNode, GalaxyRenderSettings } from '../graph-galaxy-engine';
 import type {
     GalaxyRendererV3Backend,
     GalaxyRendererV3Generation,
@@ -19,8 +19,12 @@ import type {
 import { galaxyRendererV3Metrics } from './galaxy-renderer-v3-metrics';
 import { GalaxyRendererV3GpuPages } from './galaxy-renderer-v3-gpu-pages';
 import {
+    buildGalaxyRendererV3GuideSurface,
+    syncGalaxyRendererV3GuidePresentation,
+    type GalaxyRendererV3GuideSurface,
+} from './galaxy-renderer-v3-guide-surface';
+import {
     captureGalaxyRendererV3Positions,
-    GALAXY_RENDERER_V3_CPU_PICK_LIMIT,
     GALAXY_RENDERER_V3_DRAG_NODE_LIMIT,
     GALAXY_RENDERER_V3_NEIGHBOR_LIMIT,
     GalaxyRendererV3InteractionState,
@@ -28,9 +32,11 @@ import {
 } from './galaxy-renderer-v3-interaction';
 import {
     galaxyRendererV3NodeIds,
+    galaxyRendererV3NodeDetails,
     galaxyRendererV3PacketResidentBytes,
-    galaxyRendererV3ResidentPages,
+    galaxyRendererV3PacketResources,
 } from './galaxy-renderer-v3-packet-view';
+import { GalaxyRendererV3ScreenPickIndex } from './galaxy-renderer-v3-screen-pick-index';
 
 type DisposableGalaxyObject = THREE.Object3D & {
     geometry?: THREE.BufferGeometry;
@@ -77,8 +83,10 @@ export class GalaxyRendererV3WebGpuBackend implements GalaxyRendererV3Backend {
     private mode: GraphRendererMode = '3d';
     private nodeIds: string[] | null = null;
     private nodeIndexById: Map<string, number> | null = null;
+    private readonly nodeDescriptions = new Map<string, GalaxyRenderableNode>();
     private nodeObject: THREE.Sprite | null = null;
     private edgeObject: THREE.LineSegments | null = null;
+    private guideSurface: GalaxyRendererV3GuideSurface | null = null;
     private overlayObject: THREE.Sprite | null = null;
     private readonly retiredObjects: DisposableGalaxyObject[] = [];
     private readonly retiredGpuPages: GalaxyRendererV3GpuPages[] = [];
@@ -87,6 +95,10 @@ export class GalaxyRendererV3WebGpuBackend implements GalaxyRendererV3Backend {
     private readonly pointerNdc = new THREE.Vector2();
     private readonly pointerRaycaster = new THREE.Raycaster();
     private readonly pickPosition = new THREE.Vector3();
+    private readonly pickIndex = new GalaxyRendererV3ScreenPickIndex();
+    private pickIndexDirty = true;
+    private pickIndexWidth = 0;
+    private pickIndexHeight = 0;
     private readonly zoomAnchor = new THREE.Vector3();
     private readonly zoomPlane = new THREE.Plane();
     private readonly zoomNormal = new THREE.Vector3();
@@ -143,7 +155,8 @@ export class GalaxyRendererV3WebGpuBackend implements GalaxyRendererV3Backend {
         const epoch = ++this.generationEpoch;
         await this.waitForGpuIdle();
         if (epoch !== this.generationEpoch || this.disposed) return;
-        const pages = galaxyRendererV3ResidentPages(generation.packet);
+        const resources = galaxyRendererV3PacketResources(generation.packet);
+        const pages = resources.residentPages;
         const gpuPages = new GalaxyRendererV3GpuPages(pages.nodeCount, pages);
         this.clearResidentObjects();
         const reduction = await gpuPages.reduceSceneRadius(this.renderer);
@@ -160,9 +173,14 @@ export class GalaxyRendererV3WebGpuBackend implements GalaxyRendererV3Backend {
         this.settings = settings;
         this.nodeIds = null;
         this.nodeIndexById = null;
+        this.nodeDescriptions.clear();
+        this.invalidatePickIndex();
         this.fitRadius = reduction.radius;
         this.nodeObject = buildNodeSurface(this.pages, gpuPages, this.nodeFocusAttribute);
         this.edgeObject = buildEdgeSurface(this.pages, gpuPages, this.edgeFocusAttribute, settings);
+        this.guideSurface = buildGalaxyRendererV3GuideSurface(resources.guideDetails);
+        syncGalaxyRendererV3GuidePresentation(this.guideSurface, settings);
+        this.root.add(this.guideSurface.root);
         if (this.edgeObject) this.root.add(this.edgeObject);
         if (this.nodeObject) this.root.add(this.nodeObject);
         this.applyMode();
@@ -195,12 +213,14 @@ export class GalaxyRendererV3WebGpuBackend implements GalaxyRendererV3Backend {
     setSettings(settings: GalaxyRenderSettings): void {
         this.settings = settings;
         this.syncEdgePresentation();
+        syncGalaxyRendererV3GuidePresentation(this.guideSurface, settings);
         this.render();
     }
 
     setMode(mode: GraphRendererMode): void {
         this.mode = mode;
         this.applyMode();
+        this.invalidatePickIndex();
         this.render();
     }
 
@@ -220,6 +240,7 @@ export class GalaxyRendererV3WebGpuBackend implements GalaxyRendererV3Backend {
             this.renderer.setPixelRatio(Math.max(1, Math.min(2, dpr)));
             this.renderer.setSize(this.viewportWidth, this.viewportHeight, false);
         }
+        this.invalidatePickIndex();
         this.render();
     }
 
@@ -242,6 +263,7 @@ export class GalaxyRendererV3WebGpuBackend implements GalaxyRendererV3Backend {
     rotate(deltaX: number, deltaY: number): void {
         this.root.rotation.y += deltaX * 0.006;
         this.root.rotation.x = clamp(this.root.rotation.x + deltaY * 0.006, -1.35, 1.35);
+        this.invalidatePickIndex();
         this.render();
     }
 
@@ -249,6 +271,7 @@ export class GalaxyRendererV3WebGpuBackend implements GalaxyRendererV3Backend {
         const scale = this.mode === '2d' ? this.fitRadius / 600 : this.perspective.position.z / 900;
         this.root.position.x += deltaX * scale;
         this.root.position.y -= deltaY * scale;
+        this.invalidatePickIndex();
         this.render();
     }
 
@@ -264,6 +287,7 @@ export class GalaxyRendererV3WebGpuBackend implements GalaxyRendererV3Backend {
             this.perspective.position.z = nextDistance;
         }
         if (anchored) this.restorePointerAnchor(pointer, this.zoomAnchor);
+        this.invalidatePickIndex();
         this.render();
     }
 
@@ -276,6 +300,7 @@ export class GalaxyRendererV3WebGpuBackend implements GalaxyRendererV3Backend {
         this.orthographic.lookAt(0, 0, 0);
         this.orthographic.zoom = 1;
         this.orthographic.updateProjectionMatrix();
+        this.invalidatePickIndex();
         this.render();
     }
 
@@ -285,6 +310,7 @@ export class GalaxyRendererV3WebGpuBackend implements GalaxyRendererV3Backend {
         this.perspective.position.set(0, 0, distance);
         this.perspective.lookAt(0, 0, 0);
         this.orthographic.zoom = 1;
+        this.invalidatePickIndex();
         this.resize(this.viewportWidth, this.viewportHeight, 1);
     }
 
@@ -297,6 +323,7 @@ export class GalaxyRendererV3WebGpuBackend implements GalaxyRendererV3Backend {
             -this.pages.positions3d[offset + 1],
             -this.pages.positions3d[offset + 2],
         );
+        this.invalidatePickIndex();
         this.render();
     }
 
@@ -348,6 +375,7 @@ export class GalaxyRendererV3WebGpuBackend implements GalaxyRendererV3Backend {
             if (this.mode !== '2d') positions[neighborOffset + 2] += dz * pull;
         }
         this.gpuPages.updatePositions(positions);
+        this.invalidatePickIndex();
         this.render();
         return true;
     }
@@ -361,6 +389,7 @@ export class GalaxyRendererV3WebGpuBackend implements GalaxyRendererV3Backend {
                 this.dragRestorePositions,
             );
             this.gpuPages.updatePositions(this.pages.positions3d);
+            this.invalidatePickIndex();
             this.render();
         }
         this.dragIndex = -1;
@@ -385,32 +414,35 @@ export class GalaxyRendererV3WebGpuBackend implements GalaxyRendererV3Backend {
 
     async pick(pointer: GraphRendererPointer): Promise<string | null> {
         const pages = this.pages;
-        if (!pages?.nodeCount || pages.nodeCount > GALAXY_RENDERER_V3_CPU_PICK_LIMIT) return null;
-        this.scene.updateMatrixWorld(true);
-        const camera = this.activeCamera();
-        camera.updateMatrixWorld(true);
-        let bestIndex = -1;
-        let bestDistance = Number.POSITIVE_INFINITY;
-        let bestDepth = Number.POSITIVE_INFINITY;
-        for (let index = 0; index < pages.nodeCount; index++) {
-            this.pickPosition.fromArray(pages.positions3d, index * 3).applyMatrix4(this.root.matrixWorld).project(camera);
-            if (this.pickPosition.z < -1 || this.pickPosition.z > 1) continue;
-            const screenX = (this.pickPosition.x * 0.5 + 0.5) * pointer.width;
-            const screenY = (-this.pickPosition.y * 0.5 + 0.5) * pointer.height;
-            const dx = pointer.x - screenX;
-            const dy = pointer.y - screenY;
-            const distance = dx * dx + dy * dy;
-            const radius = Math.max(7, clamp(pages.radii[index] * 1.65, 1.5, 18) * 0.7 + 3);
-            if (distance > radius * radius) continue;
-            if (distance < bestDistance || (distance === bestDistance && this.pickPosition.z < bestDepth)) {
-                bestIndex = index;
-                bestDistance = distance;
-                bestDepth = this.pickPosition.z;
-            }
+        if (!pages?.nodeCount) return null;
+        if (this.pickIndexDirty || this.pickIndexWidth !== pointer.width || this.pickIndexHeight !== pointer.height) {
+            this.rebuildPickIndex(pointer.width, pointer.height);
         }
+        const bestIndex = this.pickIndex.pick(pointer.x, pointer.y, pages.radii);
         if (bestIndex < 0) return null;
         if (!this.nodeIds) this.nodeIds = galaxyRendererV3NodeIds(this.generation!.packet);
         return this.nodeIds[bestIndex] || null;
+    }
+
+    describeIdentity(identity: string): GalaxyRenderableNode | null {
+        const cached = this.nodeDescriptions.get(identity);
+        if (cached) return cached;
+        const index = this.identityIndex(identity);
+        if (index < 0 || !this.generation) return null;
+        const detail = galaxyRendererV3NodeDetails(this.generation.packet, [index]).get(index);
+        if (!detail) return null;
+        const node: GalaxyRenderableNode = {
+            id: identity,
+            label: detail.label || identity,
+            kind: detail.kind,
+            metadata: { packedDetail: true },
+        };
+        if (this.nodeDescriptions.size >= 256) {
+            const oldest = this.nodeDescriptions.keys().next().value;
+            if (oldest) this.nodeDescriptions.delete(oldest);
+        }
+        this.nodeDescriptions.set(identity, node);
+        return node;
     }
 
     dispose(): void {
@@ -428,6 +460,34 @@ export class GalaxyRendererV3WebGpuBackend implements GalaxyRendererV3Backend {
 
     private activeCamera(): THREE.Camera {
         return this.mode === '2d' ? this.orthographic : this.perspective;
+    }
+
+    private invalidatePickIndex(): void {
+        this.pickIndexDirty = true;
+    }
+
+    private rebuildPickIndex(width: number, height: number): void {
+        const pages = this.pages;
+        if (!pages) return;
+        this.scene.updateMatrixWorld(true);
+        const camera = this.activeCamera();
+        camera.updateMatrixWorld(true);
+        this.pickIndex.begin(pages.nodeCount, width, height);
+        for (let index = 0; index < pages.nodeCount; index++) {
+            this.pickPosition.fromArray(pages.positions3d, index * 3)
+                .applyMatrix4(this.root.matrixWorld)
+                .project(camera);
+            this.pickIndex.project(
+                index,
+                (this.pickPosition.x * 0.5 + 0.5) * width,
+                (-this.pickPosition.y * 0.5 + 0.5) * height,
+                this.pickPosition.z,
+            );
+        }
+        this.pickIndex.seal();
+        this.pickIndexWidth = width;
+        this.pickIndexHeight = height;
+        this.pickIndexDirty = false;
     }
 
     private applyMode(): void {
@@ -465,9 +525,9 @@ export class GalaxyRendererV3WebGpuBackend implements GalaxyRendererV3Backend {
     private applyFocusPresentation(): void {
         if (!this.interactionState || !this.nodeFocusAttribute || !this.edgeFocusAttribute) return;
         const focusId = this.hoveredId || this.selectedIds[0] || null;
-        this.interactionState.applyFocus(focusId ? this.identityIndex(focusId) : -1);
-        this.nodeFocusAttribute.needsUpdate = true;
-        this.edgeFocusAttribute.needsUpdate = true;
+        const update = this.interactionState.applyFocus(focusId ? this.identityIndex(focusId) : -1);
+        markFocusAttribute(this.nodeFocusAttribute, update.changedNodes, update.fullUpload);
+        markFocusAttribute(this.edgeFocusAttribute, update.changedEdges, update.fullUpload);
         this.render();
     }
 
@@ -537,9 +597,11 @@ export class GalaxyRendererV3WebGpuBackend implements GalaxyRendererV3Backend {
         this.retireObject(this.overlayObject);
         this.retireObject(this.nodeObject);
         this.retireObject(this.edgeObject);
+        this.retireObject(this.guideSurface?.root ?? null);
         this.overlayObject = null;
         this.nodeObject = null;
         this.edgeObject = null;
+        this.guideSurface = null;
         if (this.gpuPages) this.retiredGpuPages.push(this.gpuPages);
         this.gpuPages = null;
         this.interactionState = null;
@@ -548,6 +610,9 @@ export class GalaxyRendererV3WebGpuBackend implements GalaxyRendererV3Backend {
         this.dragIndex = -1;
         this.dragNeighbors = new Uint32Array(0);
         this.pages = null;
+        this.pickIndex.begin(0, 1, 1);
+        this.pickIndex.seal();
+        this.invalidatePickIndex();
     }
 
     private retireObject(object: DisposableGalaxyObject | null): void {
@@ -676,12 +741,30 @@ function denseEdgeOpacity(edgeCount: number): number {
     return clamp(0.2 / Math.sqrt(Math.max(1, edgeCount / 1_500)), 0.018, 0.18);
 }
 
+function markFocusAttribute(
+    attribute: THREE.InstancedBufferAttribute,
+    changedIndexes: Uint32Array,
+    fullUpload: boolean,
+): void {
+    if (!fullUpload && !changedIndexes.length) return;
+    attribute.clearUpdateRanges();
+    if (!fullUpload && changedIndexes.length <= 256) {
+        for (const index of changedIndexes) attribute.addUpdateRange(index, 1);
+    }
+    attribute.needsUpdate = true;
+}
+
 function disposeDetachedObject(object: DisposableGalaxyObject): void {
-    // Three.js shares one internal quad geometry across every Sprite instance.
-    // Disposing it here invalidates the next node/overlay draw submission.
-    if (!(object instanceof THREE.Sprite)) object.geometry?.dispose();
-    const materials = Array.isArray(object.material) ? object.material : object.material ? [object.material] : [];
-    for (const material of materials) material.dispose();
+    object.traverse((child) => {
+        const drawable = child as DisposableGalaxyObject;
+        // Three.js shares one internal quad geometry across every Sprite instance.
+        // Disposing it here invalidates the next node/overlay draw submission.
+        if (!(drawable instanceof THREE.Sprite)) drawable.geometry?.dispose();
+        const materials = Array.isArray(drawable.material)
+            ? drawable.material
+            : drawable.material ? [drawable.material] : [];
+        for (const material of materials) material.dispose();
+    });
 }
 
 function clamp(value: number, min: number, max: number): number {

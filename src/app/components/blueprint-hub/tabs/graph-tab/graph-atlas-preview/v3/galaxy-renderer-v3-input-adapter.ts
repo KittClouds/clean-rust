@@ -1,4 +1,5 @@
 import { mergeGalaxySettings, type GalaxyRenderSettings } from '../graph-galaxy-engine';
+import { galaxySceneCompilationSettingsKey } from '../graph-galaxy-scene-compilation-key';
 import type { GalaxySceneSourceMode } from '../graph-galaxy-scene-v2';
 
 /**
@@ -10,4 +11,13 @@ export function normalizeGalaxyRendererV3Settings(
     sourceMode: GalaxySceneSourceMode,
 ): GalaxyRenderSettings {
     return mergeGalaxySettings({ ...settings, sourceMode });
+}
+
+export function galaxyRendererV3SettingsRequireCompilation(
+    previous: Partial<GalaxyRenderSettings> | null | undefined,
+    current: Partial<GalaxyRenderSettings> | null | undefined,
+    sourceMode: GalaxySceneSourceMode,
+): boolean {
+    return galaxySceneCompilationSettingsKey(normalizeGalaxyRendererV3Settings(previous, sourceMode))
+        !== galaxySceneCompilationSettingsKey(normalizeGalaxyRendererV3Settings(current, sourceMode));
 }

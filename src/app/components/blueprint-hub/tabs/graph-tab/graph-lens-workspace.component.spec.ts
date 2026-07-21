@@ -44,32 +44,41 @@ vi.mock('../../../../lib/dexie/settings.service', () => ({
 import {
     GraphLensWorkspaceComponent,
 } from './graph-lens-workspace.component';
-import { graphSnapshotRenderIdentity, sameGraphRenderIdentity } from './graph-render-identity';
+import {
+    graphSnapshotRenderIdentity,
+    sameGraphRenderIdentity,
+    shouldReplaceGraphRenderSnapshot,
+} from './graph-render-identity';
 import { GraphRebuildService } from '../../../../graph-rebuild/graph-rebuild.service';
 import { PhoenixProjectionService } from '../../../../services/phoenix-projection.service';
 import { NoteEditorStore } from '../../../../lib/store/note-editor.store';
 import { EditorService } from '../../../../services/editor.service';
 import { BlueprintHubService } from '../../blueprint-hub.service';
 import { GraphCanvasColdStartService } from '../../../../services/graph-canvas-cold-start.service';
+import { GALAXY_RENDERER_V3_AUTHORITY_KEY } from './graph-atlas-preview/v3/galaxy-renderer-v3-authority';
 
 let latestEffectScheduler: ReturnType<typeof createImmediateEffectScheduler> | null = null;
 
 describe('GraphLensWorkspaceComponent read-only snapshot loading', () => {
     let injector: EnvironmentInjector;
     let graphRebuild: ReturnType<typeof createGraphRebuildMock>;
+    let coldStart: ReturnType<typeof createColdStartMock>;
     let component: GraphLensWorkspaceComponent;
     let effectScheduler: ReturnType<typeof createImmediateEffectScheduler>;
     let snapshotToLoad: any;
 
     beforeEach(() => {
         settingsMock.store.clear();
+        localStorage.clear();
+        window.history.replaceState({}, '', '?graphRenderer=legacy-visible');
         snapshotToLoad = null;
         graphRebuild = createGraphRebuildMock();
+        coldStart = createColdStartMock();
         effectScheduler = createImmediateEffectScheduler();
         latestEffectScheduler = effectScheduler;
         injector = createEnvironmentInjector([
             { provide: GraphRebuildService, useValue: graphRebuild },
-            { provide: GraphCanvasColdStartService, useValue: createColdStartMock() },
+            { provide: GraphCanvasColdStartService, useValue: coldStart },
             { provide: PhoenixProjectionService, useValue: createProjectionMock() },
             ...sourceNavigationProviders(),
             { provide: ChangeDetectionScheduler, useValue: { notify: vi.fn(), runningTick: false } },
@@ -81,6 +90,7 @@ describe('GraphLensWorkspaceComponent read-only snapshot loading', () => {
     afterEach(() => {
         component?.ngOnDestroy();
         injector?.destroy();
+        window.history.replaceState({}, '', '/');
         vi.clearAllMocks();
     });
 
@@ -110,6 +120,68 @@ describe('GraphLensWorkspaceComponent read-only snapshot loading', () => {
         expect(graphRebuild.buildAndPersistSnapshot).not.toHaveBeenCalled();
     });
 
+    it('keeps an authoritative V3 first-pixel shell packed until metadata is explicitly requested', async () => {
+        const shell = renderPayloadSnapshot(false);
+        const hydrated = renderPayloadSnapshot(true);
+        window.history.replaceState({}, '', '/');
+        localStorage.setItem(GALAXY_RENDERER_V3_AUTHORITY_KEY, 'v3-visible');
+        snapshotToLoad = hydrated;
+        component.ngOnDestroy();
+        injector.destroy();
+        graphRebuild = createGraphRebuildMock();
+        coldStart = createColdStartMock();
+        coldStart.preparePersistedFirstPixel.mockResolvedValue(shell);
+        effectScheduler = createImmediateEffectScheduler();
+        latestEffectScheduler = effectScheduler;
+        injector = createEnvironmentInjector([
+            { provide: GraphRebuildService, useValue: graphRebuild },
+            { provide: GraphCanvasColdStartService, useValue: coldStart },
+            { provide: PhoenixProjectionService, useValue: createProjectionMock() },
+            ...sourceNavigationProviders(),
+            { provide: ChangeDetectionScheduler, useValue: { notify: vi.fn(), runningTick: false } },
+            { provide: EffectScheduler, useValue: effectScheduler },
+        ], Injector.create({ providers: [] }) as unknown as EnvironmentInjector);
+        component = runInInjectionContext(injector, () => new GraphLensWorkspaceComponent());
+
+        await flushAsync();
+        component.onCanvasFirstPixelRendered('authority:a\u0000receipt');
+        await flushAsync();
+
+        expect(component.graphRebuildSnapshot()).toBe(shell);
+        expect(graphRebuild.loadPersistedSnapshot).not.toHaveBeenCalled();
+
+        component.hydrateGraphMetadata();
+        await flushAsync();
+
+        expect(graphRebuild.loadPersistedSnapshot).toHaveBeenCalledOnce();
+        expect(component.graphRebuildSnapshot()).toBe(hydrated);
+    });
+
+    it('fails closed instead of hydrating rich snapshot rows when the packed V3 generation is missing', async () => {
+        window.history.replaceState({}, '', '/');
+        localStorage.setItem(GALAXY_RENDERER_V3_AUTHORITY_KEY, 'v3-visible');
+        component.ngOnDestroy();
+        injector.destroy();
+        graphRebuild = createGraphRebuildMock();
+        coldStart = createColdStartMock();
+        effectScheduler = createImmediateEffectScheduler();
+        latestEffectScheduler = effectScheduler;
+        injector = createEnvironmentInjector([
+            { provide: GraphRebuildService, useValue: graphRebuild },
+            { provide: GraphCanvasColdStartService, useValue: coldStart },
+            { provide: PhoenixProjectionService, useValue: createProjectionMock() },
+            ...sourceNavigationProviders(),
+            { provide: ChangeDetectionScheduler, useValue: { notify: vi.fn(), runningTick: false } },
+            { provide: EffectScheduler, useValue: effectScheduler },
+        ], Injector.create({ providers: [] }) as unknown as EnvironmentInjector);
+        component = runInInjectionContext(injector, () => new GraphLensWorkspaceComponent());
+
+        await flushAsync();
+
+        expect(graphRebuild.loadPersistedSnapshot).not.toHaveBeenCalled();
+        expect(component.graphSnapshotFailure()).toContain('packed V3 scene unavailable');
+    });
+
     it('hydrates the lens from Dexie settings and persists later scope changes', async () => {
         settingsMock.store.set('graph.lens.state.v1', {
             mode: 'multiNote',
@@ -119,11 +191,12 @@ describe('GraphLensWorkspaceComponent read-only snapshot loading', () => {
         component?.ngOnDestroy();
         injector?.destroy();
         graphRebuild = createGraphRebuildMock();
+        coldStart = createColdStartMock();
         effectScheduler = createImmediateEffectScheduler();
         latestEffectScheduler = effectScheduler;
         injector = createEnvironmentInjector([
             { provide: GraphRebuildService, useValue: graphRebuild },
-            { provide: GraphCanvasColdStartService, useValue: createColdStartMock() },
+            { provide: GraphCanvasColdStartService, useValue: coldStart },
             { provide: PhoenixProjectionService, useValue: createProjectionMock() },
             ...sourceNavigationProviders(),
             { provide: ChangeDetectionScheduler, useValue: { notify: vi.fn(), runningTick: false } },
@@ -170,6 +243,21 @@ describe('GraphLensWorkspaceComponent read-only snapshot loading', () => {
         expect(sameGraphRenderIdentity(first, renderSnapshot('snapshot-a', 'authority-b'))).toBe(false);
     });
 
+    it('upgrades a compact first-pixel shell exactly once when hydrated render rows arrive', () => {
+        const shell = renderPayloadSnapshot(false);
+        const hydrated = renderPayloadSnapshot(true);
+
+        expect(shouldReplaceGraphRenderSnapshot(null, shell)).toBe(true);
+        expect(shouldReplaceGraphRenderSnapshot(shell, hydrated)).toBe(true);
+        expect(shouldReplaceGraphRenderSnapshot(hydrated, shell)).toBe(false);
+        expect(shouldReplaceGraphRenderSnapshot(hydrated, {
+            ...shell,
+            generationReceiptId: 'graph-generation:global:snapshot:a',
+            generationDigestSha256: `sha256-${'a'.repeat(64)}`,
+        })).toBe(true);
+        expect(shouldReplaceGraphRenderSnapshot(hydrated, { ...hydrated })).toBe(false);
+    });
+
     function createGraphRebuildMock() {
         return {
             loadPersistedSnapshot: vi.fn(async () => snapshotToLoad),
@@ -178,7 +266,10 @@ describe('GraphLensWorkspaceComponent read-only snapshot loading', () => {
     }
 
     function createColdStartMock() {
-        return { preparePersistedManifold: vi.fn(async () => undefined) };
+        return {
+            preparePersistedFirstPixel: vi.fn(async () => null),
+            preparePersistedManifold: vi.fn(async () => undefined),
+        };
     }
 });
 
@@ -187,6 +278,18 @@ function renderSnapshot(id: string, contentHash: string): any {
         id,
         scopeId: 'global',
         authorityContract: { contentHash },
+    };
+}
+
+function renderPayloadSnapshot(hydrated: boolean): any {
+    return {
+        ...renderSnapshot('snapshot:a', 'authority:a'),
+        counters: { embeddingTargets: 2 },
+        authorityContract: {
+            contentHash: 'authority:a',
+            counts: { embeddingTargets: 2 },
+        },
+        embeddingTargets: hydrated ? [{ id: 'a' }, { id: 'b' }] : [],
     };
 }
 

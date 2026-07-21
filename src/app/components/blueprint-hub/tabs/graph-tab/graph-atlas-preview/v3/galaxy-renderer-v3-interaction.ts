@@ -1,7 +1,6 @@
 const DIMMED_NODE_OPACITY = 0.14;
 const DIMMED_EDGE_OPACITY = 0.08;
 
-export const GALAXY_RENDERER_V3_CPU_PICK_LIMIT = 4_096;
 export const GALAXY_RENDERER_V3_DRAG_NODE_LIMIT = 384;
 export const GALAXY_RENDERER_V3_NEIGHBOR_LIMIT = 128;
 export const GALAXY_RENDERER_V3_FOCUS_EDGE_LIMIT = 4_096;
@@ -12,6 +11,12 @@ export interface GalaxyRendererV3Neighborhood {
     nodes: Uint32Array;
     edges: Uint32Array;
     truncated: boolean;
+}
+
+export interface GalaxyRendererV3FocusUpdate extends GalaxyRendererV3Neighborhood {
+    changedNodes: Uint32Array;
+    changedEdges: Uint32Array;
+    fullUpload: boolean;
 }
 
 export function galaxyRendererV3SuppressNodeActivation(
@@ -53,6 +58,8 @@ export class GalaxyRendererV3InteractionState {
 
     private readonly offsets: Uint32Array;
     private readonly incidentEdges: Uint32Array;
+    private focusedNode = -1;
+    private focusedNeighborhood = emptyNeighborhood();
 
     constructor(
         readonly nodeCount: number,
@@ -67,16 +74,34 @@ export class GalaxyRendererV3InteractionState {
         this.incidentEdges = index.incidentEdges;
     }
 
-    applyFocus(nodeIndex: number): GalaxyRendererV3Neighborhood {
+    applyFocus(nodeIndex: number): GalaxyRendererV3FocusUpdate {
         if (nodeIndex < 0 || nodeIndex >= this.nodeCount) {
+            if (this.focusedNode < 0) return emptyFocusUpdate();
             this.nodeOpacity.fill(1);
             this.edgeOpacity.fill(1);
-            return emptyNeighborhood();
+            this.focusedNode = -1;
+            this.focusedNeighborhood = emptyNeighborhood();
+            return { ...emptyNeighborhood(), changedNodes: new Uint32Array(0), changedEdges: new Uint32Array(0), fullUpload: true };
         }
-        this.nodeOpacity.fill(DIMMED_NODE_OPACITY);
-        this.edgeOpacity.fill(DIMMED_EDGE_OPACITY);
-        this.nodeOpacity[nodeIndex] = 1;
+        if (nodeIndex === this.focusedNode) {
+            return { ...this.focusedNeighborhood, changedNodes: new Uint32Array(0), changedEdges: new Uint32Array(0), fullUpload: false };
+        }
         const neighborhood = this.neighborhood(nodeIndex, GALAXY_RENDERER_V3_FOCUS_EDGE_LIMIT);
+        const firstFocus = this.focusedNode < 0;
+        const changedNodes = firstFocus
+            ? new Uint32Array(0)
+            : uniqueIndexes(this.focusedNode, this.focusedNeighborhood.nodes, nodeIndex, neighborhood.nodes);
+        const changedEdges = firstFocus
+            ? new Uint32Array(0)
+            : uniqueIndexesFrom(this.focusedNeighborhood.edges, neighborhood.edges);
+        if (firstFocus) {
+            this.nodeOpacity.fill(DIMMED_NODE_OPACITY);
+            this.edgeOpacity.fill(DIMMED_EDGE_OPACITY);
+        } else {
+            for (const node of changedNodes) this.nodeOpacity[node] = DIMMED_NODE_OPACITY;
+            for (const edge of changedEdges) this.edgeOpacity[edge] = DIMMED_EDGE_OPACITY;
+        }
+        this.nodeOpacity[nodeIndex] = 1;
         for (const edge of neighborhood.edges) {
             const source = this.edgePairs[edge * 2];
             const target = this.edgePairs[edge * 2 + 1];
@@ -84,7 +109,9 @@ export class GalaxyRendererV3InteractionState {
             if (source < this.nodeOpacity.length) this.nodeOpacity[source] = 1;
             if (target < this.nodeOpacity.length) this.nodeOpacity[target] = 1;
         }
-        return neighborhood;
+        this.focusedNode = nodeIndex;
+        this.focusedNeighborhood = neighborhood;
+        return { ...neighborhood, changedNodes, changedEdges, fullUpload: firstFocus };
     }
 
     neighborhood(nodeIndex: number, limit: number): GalaxyRendererV3Neighborhood {
@@ -130,4 +157,27 @@ export function buildIncidentCsr(nodeCount: number, edgePairs: Uint32Array): {
 
 function emptyNeighborhood(): GalaxyRendererV3Neighborhood {
     return { nodes: new Uint32Array(0), edges: new Uint32Array(0), truncated: false };
+}
+
+function emptyFocusUpdate(): GalaxyRendererV3FocusUpdate {
+    return { ...emptyNeighborhood(), changedNodes: new Uint32Array(0), changedEdges: new Uint32Array(0), fullUpload: false };
+}
+
+function uniqueIndexes(
+    leftIdentity: number,
+    left: Uint32Array,
+    rightIdentity: number,
+    right: Uint32Array,
+): Uint32Array {
+    const indexes = new Set<number>([leftIdentity, rightIdentity]);
+    for (const index of left) indexes.add(index);
+    for (const index of right) indexes.add(index);
+    return Uint32Array.from(indexes);
+}
+
+function uniqueIndexesFrom(left: Uint32Array, right: Uint32Array): Uint32Array {
+    const indexes = new Set<number>();
+    for (const index of left) indexes.add(index);
+    for (const index of right) indexes.add(index);
+    return Uint32Array.from(indexes);
 }

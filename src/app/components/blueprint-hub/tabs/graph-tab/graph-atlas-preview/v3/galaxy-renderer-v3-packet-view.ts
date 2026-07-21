@@ -1,5 +1,7 @@
 import {
     assertGalaxyScenePacketV2,
+    decodeGalaxyScenePacketV2GuideDetails,
+    type GalaxyScenePacketV2GuideDetails,
 } from '../graph-galaxy-scene-packet-v2';
 import type {
     GalaxyScenePacketV2,
@@ -18,9 +20,27 @@ const EDGE_ALPHA = 'manifold/edge-alpha';
 const EDGE_FLAGS = 'manifold/edge-flags';
 const STRING_OFFSETS = 'detail/string-offsets';
 const STRING_SLAB = 'detail/string-slab';
+const SCENE_DETAILS = 'detail/scene-extras';
+
+export interface GalaxyRendererV3PacketResources {
+    residentPages: GalaxyRendererV3ResidentPages;
+    guideDetails: GalaxyScenePacketV2GuideDetails;
+}
 
 export function galaxyRendererV3ResidentPages(packet: GalaxyScenePacketV2): GalaxyRendererV3ResidentPages {
     assertGalaxyScenePacketV2(packet);
+    return residentPagesFromValidatedPacket(packet);
+}
+
+export function galaxyRendererV3PacketResources(packet: GalaxyScenePacketV2): GalaxyRendererV3PacketResources {
+    assertGalaxyScenePacketV2(packet);
+    return {
+        residentPages: residentPagesFromValidatedPacket(packet),
+        guideDetails: decodeGalaxyScenePacketV2GuideDetails(page(packet, SCENE_DETAILS)),
+    };
+}
+
+function residentPagesFromValidatedPacket(packet: GalaxyScenePacketV2): GalaxyRendererV3ResidentPages {
     return {
         nodeCount: packet.manifest.nodeCount,
         edgeCount: packet.manifest.edgeCount,
@@ -46,6 +66,24 @@ export function galaxyRendererV3Labels(packet: GalaxyScenePacketV2, indexes: rea
     const range = packet.manifest.stringRanges.nodeLabels;
     const requested = new Set(indexes.filter((index) => index >= 0 && index < range.count));
     return decodeSelectedStrings(packet, range, requested);
+}
+
+export function galaxyRendererV3NodeDetails(
+    packet: GalaxyScenePacketV2,
+    indexes: readonly number[],
+): Map<number, { label: string; kind: string }> {
+    assertGalaxyScenePacketV2(packet);
+    const requested = new Set(indexes.filter((index) => index >= 0 && index < packet.manifest.nodeCount));
+    const labels = decodeSelectedStrings(packet, packet.manifest.stringRanges.nodeLabels, requested);
+    const kinds = decodeSelectedStrings(packet, packet.manifest.stringRanges.nodeKinds, requested);
+    const output = new Map<number, { label: string; kind: string }>();
+    for (const index of requested) {
+        output.set(index, {
+            label: labels.get(index) || '',
+            kind: kinds.get(index) || 'graph-node',
+        });
+    }
+    return output;
 }
 
 export function galaxyRendererV3PacketResidentBytes(packet: GalaxyScenePacketV2): number {

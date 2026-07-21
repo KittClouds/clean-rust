@@ -23,7 +23,10 @@ import {
 } from '../graph-galaxy-engine';
 import type { GalaxySceneSourceMode } from '../graph-galaxy-scene-v2';
 import { GALAXY_RENDERER_V3_SCHEMA, type GalaxyRendererV3Backend } from './galaxy-renderer-v3-contract';
-import { normalizeGalaxyRendererV3Settings } from './galaxy-renderer-v3-input-adapter';
+import {
+    galaxyRendererV3SettingsRequireCompilation,
+    normalizeGalaxyRendererV3Settings,
+} from './galaxy-renderer-v3-input-adapter';
 import {
     GALAXY_RENDERER_V3_CLICK_TRAVEL_LIMIT,
     galaxyRendererV3SuppressNodeActivation,
@@ -38,10 +41,9 @@ import { GalaxyRendererV3PacketSource } from './galaxy-renderer-v3-packet-source
         '[attr.data-v3-status]': 'status',
         '[attr.data-v3-failure]': 'failure || null',
         '[attr.data-v3-resident]': 'residentCount',
-        '[attr.data-v3-shadow]': 'shadowMode',
     },
     template: `
-        <div class="v3-shell" [class.v3-shadow]="shadowMode">
+        <div class="v3-shell">
             <canvas
                 #canvas
                 class="v3-canvas"
@@ -55,15 +57,13 @@ import { GalaxyRendererV3PacketSource } from './galaxy-renderer-v3-packet-source
                 (dblclick)="onDoubleClick($event)"
                 (contextmenu)="$event.preventDefault()"
             ></canvas>
-            @if (!shadowMode) {
-                <div class="v3-meter" aria-label="Galaxy Renderer V3 counters">
-                    <span><b>v3</b>{{ status }}</span>
-                    <span><b>corpus</b>{{ corpusCount }}</span>
-                    <span><b>resident</b>{{ residentCount }}</span>
-                    <span><b>gpu</b>{{ gpuMiB }} MiB</span>
-                </div>
-            }
-            @if (failure && !shadowMode) {
+            <div class="v3-meter" aria-label="Galaxy Renderer V3 counters">
+                <span><b>v3</b>{{ status }}</span>
+                <span><b>corpus</b>{{ corpusCount }}</span>
+                <span><b>resident</b>{{ residentCount }}</span>
+                <span><b>gpu</b>{{ gpuMiB }} MiB</span>
+            </div>
+            @if (failure) {
                 <div class="v3-failure" role="alert">
                     <b>V3 failed closed</b>
                     <span>{{ failure }}</span>
@@ -76,7 +76,6 @@ import { GalaxyRendererV3PacketSource } from './galaxy-renderer-v3-packet-source
         .v3-shell { position: relative; height: 100%; overflow: hidden; background: #02040a; }
         .v3-canvas { display: block; width: 100%; height: 100%; min-height: 360px; touch-action: none; user-select: none; cursor: grab; }
         .v3-canvas:active { cursor: grabbing; }
-        .v3-shadow { visibility: hidden; pointer-events: none; }
         .v3-meter { position: absolute; left: 12px; bottom: 10px; z-index: 7; display: flex; gap: 8px; pointer-events: none; color: rgba(203,213,225,.7); font: 600 9px/1.1 ui-monospace, monospace; letter-spacing: .06em; text-transform: uppercase; }
         .v3-meter span { display: inline-flex; gap: 4px; padding: 5px 7px; border: 1px solid rgba(71,85,105,.28); border-radius: 5px; background: rgba(2,6,14,.7); }
         .v3-meter b { color: rgba(94,234,212,.82); }
@@ -97,13 +96,13 @@ export class GraphGalaxyCanvasV3Component implements AfterViewInit, OnChanges, O
     @Input() sceneIdentity = '';
     @Input() surfaceActive = true;
     @Input() lassoEnabled = false;
-    @Input() shadowMode = false;
 
     @Output() entitySelected = new EventEmitter<GalaxyRenderableNode>();
     @Output() entityHovered = new EventEmitter<GalaxyRenderableNode | null>();
     @Output() objectSelected = new EventEmitter<GraphCanvasHit>();
     @Output() objectHovered = new EventEmitter<GraphCanvasHit | null>();
     @Output() batchSelected = new EventEmitter<string[]>();
+    @Output() firstPixelRendered = new EventEmitter<string>();
 
     @ViewChild('canvas', { static: true }) private canvasRef!: ElementRef<HTMLCanvasElement>;
 
@@ -114,6 +113,7 @@ export class GraphGalaxyCanvasV3Component implements AfterViewInit, OnChanges, O
     gpuMiB = '0.0';
 
     private readonly packetSource = new GalaxyRendererV3PacketSource();
+    private readonly entityByIdentity = new Map<string, GalaxyRenderableNode>();
     private backend: GalaxyRendererV3Backend | null = null;
     private backendLoad: Promise<GalaxyRendererV3Backend> | null = null;
     private resizeObserver: ResizeObserver | null = null;
@@ -132,6 +132,9 @@ export class GraphGalaxyCanvasV3Component implements AfterViewInit, OnChanges, O
     private lastPointerX = 0;
     private lastPointerY = 0;
     private hoverToken = 0;
+    private hoverFrame = 0;
+    private pendingHoverPointer: GraphRendererPointer | null = null;
+    private hoveredIdentity: string | null = null;
     private pointerSession = 0;
     private animationFrame = 0;
 
@@ -144,6 +147,14 @@ export class GraphGalaxyCanvasV3Component implements AfterViewInit, OnChanges, O
     }
 
     ngOnChanges(changes: SimpleChanges): void {
+        if (changes['entities']) this.indexEntities();
+        const settingsRequireCompilation = !!changes['settings']
+            && !changes['settings'].firstChange
+            && galaxyRendererV3SettingsRequireCompilation(
+                changes['settings'].previousValue,
+                changes['settings'].currentValue,
+                this.sourceMode,
+            );
         if (changes['selectedEntityIds']) {
             this.backend?.setSelectedIdentities(this.selectedEntityIds);
             this.backend?.render();
@@ -160,7 +171,7 @@ export class GraphGalaxyCanvasV3Component implements AfterViewInit, OnChanges, O
             this.syncAnimation();
             if (this.surfaceActive) this.queueBuild();
         }
-        if (changes['entities'] || changes['edges'] || changes['sourceMode'] || changes['sceneIdentity']) {
+        if (changes['entities'] || changes['edges'] || changes['sourceMode'] || changes['sceneIdentity'] || settingsRequireCompilation) {
             this.inputVersion++;
             this.queueBuild();
         }
@@ -170,6 +181,7 @@ export class GraphGalaxyCanvasV3Component implements AfterViewInit, OnChanges, O
         this.destroyed = true;
         this.inputVersion++;
         if (this.animationFrame) cancelAnimationFrame(this.animationFrame);
+        if (this.hoverFrame) cancelAnimationFrame(this.hoverFrame);
         this.resizeObserver?.disconnect();
         this.packetSource.dispose();
         this.backend?.dispose();
@@ -200,11 +212,12 @@ export class GraphGalaxyCanvasV3Component implements AfterViewInit, OnChanges, O
     }
 
     onPointerDown(event: PointerEvent): void {
-        if (this.shadowMode || !this.backend) return;
+        if (!this.backend) return;
         event.preventDefault();
         const backend = this.backend;
         const pointer = this.pointer(event);
         const session = ++this.pointerSession;
+        this.cancelQueuedHover();
         this.dragging = true;
         this.panning = event.altKey || event.button === 1 || event.button === 2;
         this.nodeDragging = false;
@@ -220,6 +233,7 @@ export class GraphGalaxyCanvasV3Component implements AfterViewInit, OnChanges, O
                 if (!id || this.destroyed || !this.dragging || session !== this.pointerSession) return;
                 this.nodeDragging = backend.beginNodeDrag(id, pointer);
                 if (this.nodeDragging) {
+                    this.hoveredIdentity = id;
                     backend.setHoveredIdentity(id);
                     const entity = this.entityForIdentity(id);
                     this.entityHovered.emit(entity);
@@ -230,9 +244,9 @@ export class GraphGalaxyCanvasV3Component implements AfterViewInit, OnChanges, O
     }
 
     onPointerMove(event: PointerEvent): void {
-        if (this.shadowMode || !this.backend) return;
+        if (!this.backend) return;
         if (!this.dragging) {
-            void this.updateHover(this.pointer(event));
+            this.queueHover(this.pointer(event));
             return;
         }
         const dx = event.clientX - this.lastPointerX;
@@ -265,20 +279,20 @@ export class GraphGalaxyCanvasV3Component implements AfterViewInit, OnChanges, O
 
     onPointerLeave(): void {
         this.hoverToken++;
+        this.cancelQueuedHover();
         this.pointerSession++;
         this.backend?.endNodeDrag();
         this.dragging = false;
         this.nodeDragging = false;
         this.panning = false;
+        this.hoveredIdentity = null;
         this.backend?.setHoveredIdentity(null);
-        if (!this.shadowMode) {
-            this.entityHovered.emit(null);
-            this.objectHovered.emit(null);
-        }
+        this.entityHovered.emit(null);
+        this.objectHovered.emit(null);
     }
 
     onWheel(event: WheelEvent): void {
-        if (this.shadowMode || !this.backend) return;
+        if (!this.backend) return;
         event.preventDefault();
         this.backend.zoomAt(event.deltaY, this.pointer(event));
         this.backend.render();
@@ -289,7 +303,7 @@ export class GraphGalaxyCanvasV3Component implements AfterViewInit, OnChanges, O
             this.suppressNextClick = false;
             return;
         }
-        if (this.shadowMode || this.pointerMoved || !this.backend) return;
+        if (this.pointerMoved || !this.backend) return;
         const id = await this.backend.pick(this.pointer(event));
         if (!id || this.destroyed) return;
         const entity = this.entityForIdentity(id);
@@ -298,7 +312,7 @@ export class GraphGalaxyCanvasV3Component implements AfterViewInit, OnChanges, O
     }
 
     async onDoubleClick(event: MouseEvent): Promise<void> {
-        if (this.shadowMode || !this.backend) return;
+        if (!this.backend) return;
         const id = await this.backend.pick(this.pointer(event));
         id ? this.focusEntity(id) : this.fitToGraph();
     }
@@ -314,22 +328,39 @@ export class GraphGalaxyCanvasV3Component implements AfterViewInit, OnChanges, O
 
     private async build(version: number): Promise<void> {
         if (this.destroyed || !this.surfaceActive) return;
-        this.setStatus('packing');
         const settings = normalizeGalaxyRendererV3Settings(this.settings, this.sourceMode);
         const generationId = this.sceneIdentity.split('\u0000', 1)[0] || `v3-ephemeral-${version}`;
         const authorityReceipt = this.sceneIdentity || `${generationId}:unreceipted`;
+        const resident = this.sceneIdentity
+            ? this.packetSource.resident(authorityReceipt, generationId, this.sourceMode)
+            : null;
+        if (this.sourceMode === 'embeddings' && this.sceneIdentity) {
+            if (!resident) {
+                this.setStatus('waiting');
+                const backend = await this.ensureBackend();
+                if (this.destroyed || version !== this.inputVersion) return;
+                await this.ensureMounted(backend);
+                this.packetSource.waitForResident(authorityReceipt, generationId, this.sourceMode, () => {
+                    if (this.destroyed || version !== this.inputVersion) return;
+                    this.inputVersion++;
+                    this.queueBuild();
+                });
+                return;
+            }
+            this.setStatus('restoring');
+        }
         try {
-            const [backend, packet] = await Promise.all([
-                this.ensureBackend(),
-                this.packetSource.compile({
+            if (!resident) this.setStatus('packing');
+            const [backend, packet] = resident
+                ? await Promise.all([this.ensureBackend(), Promise.resolve(resident)])
+                : await Promise.all([this.ensureBackend(), this.packetSource.compile({
                     entities: this.entities,
                     edges: this.edges,
                     settings,
                     sourceMode: this.sourceMode,
                     generationId,
                     authorityReceipt,
-                }),
-            ]);
+                })]);
             if (this.destroyed || version !== this.inputVersion) return;
             await this.ensureMounted(backend);
             await backend.openGeneration({
@@ -337,16 +368,18 @@ export class GraphGalaxyCanvasV3Component implements AfterViewInit, OnChanges, O
                 generationId,
                 authorityReceipt,
                 packet,
-                corpus: { nodes: this.entities.length, edges: this.edges.length },
+                corpus: { nodes: packet.manifest.nodeCount, edges: packet.manifest.edgeCount },
             }, settings);
             if (this.destroyed || version !== this.inputVersion) return;
             backend.setSettings(this.currentSettings());
             backend.setMode(this.viewMode === 'map' ? '2d' : '3d');
             backend.setSelectedIdentities(this.selectedEntityIds);
             backend.render();
+            this.corpusCount = packet.manifest.nodeCount + packet.manifest.edgeCount;
             this.failure = '';
             this.setStatus('first-pixel');
             this.refreshMetrics();
+            this.firstPixelRendered.emit(this.sceneIdentity);
             this.syncAnimation();
         } catch (error) {
             if (this.destroyed || version !== this.inputVersion) return;
@@ -407,14 +440,46 @@ export class GraphGalaxyCanvasV3Component implements AfterViewInit, OnChanges, O
         const token = ++this.hoverToken;
         const id = await this.backend?.pick(pointer) || null;
         if (this.destroyed || token !== this.hoverToken) return;
+        if (id === this.hoveredIdentity) return;
+        this.hoveredIdentity = id;
         this.backend?.setHoveredIdentity(id);
         const entity = id ? this.entityForIdentity(id) : null;
         this.entityHovered.emit(entity);
         this.objectHovered.emit(id ? { kind: 'node', id } : null);
     }
 
+    private queueHover(pointer: GraphRendererPointer): void {
+        this.pendingHoverPointer = pointer;
+        if (this.hoverFrame) return;
+        this.hoverFrame = requestAnimationFrame(() => {
+            this.hoverFrame = 0;
+            const pending = this.pendingHoverPointer;
+            this.pendingHoverPointer = null;
+            if (pending && !this.destroyed && !this.dragging) void this.updateHover(pending);
+        });
+    }
+
+    private cancelQueuedHover(): void {
+        if (this.hoverFrame) cancelAnimationFrame(this.hoverFrame);
+        this.hoverFrame = 0;
+        this.pendingHoverPointer = null;
+    }
+
     private entityForIdentity(identity: string): GalaxyRenderableNode | null {
-        return this.entities.find((item) => item.id === identity || item.metadata?.sourceEntityId === identity) || null;
+        return this.entityByIdentity.get(identity)
+            || this.backend?.describeIdentity(identity)
+            || null;
+    }
+
+    private indexEntities(): void {
+        this.entityByIdentity.clear();
+        for (const entity of this.entities) {
+            this.entityByIdentity.set(entity.id, entity);
+            const sourceIdentity = entity.metadata?.sourceEntityId;
+            if (typeof sourceIdentity === 'string' && sourceIdentity) {
+                this.entityByIdentity.set(sourceIdentity, entity);
+            }
+        }
     }
 
     private pointer(event: MouseEvent): GraphRendererPointer {
@@ -434,7 +499,6 @@ export class GraphGalaxyCanvasV3Component implements AfterViewInit, OnChanges, O
     private refreshMetrics(): void {
         const metrics = this.backend?.metrics;
         if (!metrics) return;
-        this.corpusCount = this.entities.length + this.edges.length;
         this.residentCount = metrics.residentNodes + metrics.residentEdges;
         this.gpuMiB = (metrics.gpuBytes / (1024 * 1024)).toFixed(1);
         this.changeDetector.markForCheck();

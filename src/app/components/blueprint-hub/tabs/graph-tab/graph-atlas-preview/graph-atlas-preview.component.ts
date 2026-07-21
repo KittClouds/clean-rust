@@ -16,6 +16,10 @@ import { BlueprintHubService } from '../../../blueprint-hub.service';
 import type { GraphRebuildCounters, GraphRebuildSnapshot } from '../../../../../graph-rebuild/graph-rebuild-snapshot';
 import { buildGraphProjectionContractReport } from '../../../../../graph-rebuild/graph-projection-contract-report';
 import { type EmbeddingAtlasData, type EmbeddingQueryTrace, type EmbeddingSourcePreview } from './graph-embedding-atlas';
+import {
+    graphRebuildOwnsEmbeddingView,
+    resolveEmbeddingAtlasAuthority,
+} from './graph-embedding-source-authority';
 import { manifoldAdapter } from './graph-manifold-atlas';
 import { cachedGraphRebuildEmbeddingAtlas, graphRebuildEmbeddingTargetCount } from './graph-rebuild-embedding-atlas';
 import { loadManifoldProjection, manifoldProjectionRequestKey } from './graph-manifold-projection-loader';
@@ -58,12 +62,16 @@ import {
     type GalaxyRenderSettings,
     type GalaxySphereSurfaceMode,
 } from './graph-galaxy-engine';
+import { galaxySceneIdentity } from './graph-galaxy-scene-identity';
 import type { GraphLensMode, GraphLensState } from '../graph-lens';
 import { buildGraphAtlasReadContext, graphLensState, type GraphAtlasReadContext } from './graph-atlas-read-context';
 import { projectionSummaryRequestsRefresh } from './graph-atlas-refresh-summary';
 import { getSetting, setSetting } from '../../../../../lib/dexie/settings.service';
 import { buildGraphCanvasInventory } from './graph-canvas-inventory';
-import { graphSnapshotRenderIdentity } from '../graph-render-identity';
+import {
+    graphSnapshotHasHydratedCanvasPayload,
+    shouldReplaceGraphRenderSnapshot,
+} from '../graph-render-identity';
 import { graphProjectionParityApplies } from './graph-projection-parity';
 import { buildActiveAtlasSlice, normalizeGraphKind } from './graph-active-atlas-slice';
 
@@ -326,7 +334,7 @@ function readPersistedAtlasViewState(): PersistedAtlasViewState {
                         }
                     </div>
                     }
-                    @if (activeNodeCount() === 0) {
+                    @if (activeNodeCount() === 0 && !graphProjectionPreparing()) {
                     <div class="flex h-full min-h-[430px] items-center justify-center rounded-none border border-dashed border-white/10 text-center">
                         <div>
                             <p class="text-lg font-semibold text-white">{{ emptyTitle() }}</p>
@@ -347,16 +355,14 @@ function readPersistedAtlasViewState(): PersistedAtlasViewState {
                     @if (rendererV3Enabled) {
                     <app-graph-galaxy-canvas-v3 #galaxyCanvas
                         class="block h-full min-h-0 w-full"
-                        [class.absolute]="rendererAuthority === 'v3-shadow'"
-                        [class.inset-0]="rendererAuthority === 'v3-shadow'"
-                        [class.pointer-events-none]="rendererAuthority === 'v3-shadow'"
                         [entities]="activeNodes()" [edges]="activeEdges()" [settings]="settings" [selectedEntityIds]="canvasSelectedNodeIds()"
                         [sceneIdentity]="activeSceneIdentity()"
                         [queryFocus]="canvasQueryFocus()" [viewMode]="viewMode" [sourceMode]="atlasMode" [surfaceActive]="isAtlasSurfaceActive()"
-                        [lassoEnabled]="lassoEnabled()" [shadowMode]="rendererAuthority === 'v3-shadow'"
+                        [lassoEnabled]="lassoEnabled()"
                         (entityHovered)="hoveredEntity = $event"
                         (objectSelected)="onCanvasObjectSelected($event)" (objectHovered)="hoveredCanvasHit.set($event)"
-                        (batchSelected)="onCanvasBatchSelected($event)"></app-graph-galaxy-canvas-v3>
+                        (batchSelected)="onCanvasBatchSelected($event)"
+                        (firstPixelRendered)="firstPixelRendered.emit($event)"></app-graph-galaxy-canvas-v3>
                     }
                     @if (settings.detailCardsVisible) {
                     <app-graph-canvas-inspector
@@ -1022,7 +1028,7 @@ export class GraphAtlasPreviewComponent implements OnInit, OnDestroy {
     private _selectedNoteIds: string[] = [];
     private readonly readContextEpoch = signal(0);
     private readonly graphSnapshotSignal = signal<GraphRebuildSnapshot | null>(null);
-    private graphSnapshotIdentity = '';
+    private readonly graphRebuildProjectionEpoch = signal(0);
     private readonly unsubscribeColors = entityColorStore.subscribe(() => this.refreshGraphInventoryFromSnapshot());
 
     @Input() entities: GalaxyRenderableNode[] = [];
@@ -1031,15 +1037,14 @@ export class GraphAtlasPreviewComponent implements OnInit, OnDestroy {
     @Input() graphCounters: GraphRebuildCounters | null = null;
     @Input() set graphSnapshot(value: GraphRebuildSnapshot | null | undefined) {
         const snapshot = value ?? null;
-        const identity = graphSnapshotRenderIdentity(snapshot);
-        if (snapshot === this.graphSnapshotSignal() || (identity && identity === this.graphSnapshotIdentity)) return;
-        this.graphSnapshotIdentity = identity;
+        if (!shouldReplaceGraphRenderSnapshot(this.graphSnapshotSignal(), snapshot)) return;
         this.graphSnapshotSignal.set(snapshot);
         if (snapshot) {
             this.refreshGraphInventoryFromSnapshot();
         }
         else this.graphInventory.set(EMPTY_GRAPH_INVENTORY);
         this.activeGraphCache = null;
+        this.bumpReadContext();
     }
     @Input() set committedGraphInventory(value: GraphInventory | null | undefined) {
         if (!this.graphSnapshotSignal()) this.graphInventory.set(value ?? EMPTY_GRAPH_INVENTORY);
@@ -1071,6 +1076,8 @@ export class GraphAtlasPreviewComponent implements OnInit, OnDestroy {
     @Output() lensModeChange = new EventEmitter<GraphLensMode>();
     @Output() atlasSearchChange = new EventEmitter<string>();
     @Output() sourceRequested = new EventEmitter<GraphCanvasSourceRequest>();
+    @Output() firstPixelRendered = new EventEmitter<string>();
+    @Output() metadataRequested = new EventEmitter<void>();
     @ViewChild('galaxyCanvas') private galaxyCanvas?: GraphGalaxyCanvasControl;
 
     private readonly persistedViewState = readPersistedAtlasViewState();
@@ -1094,6 +1101,7 @@ export class GraphAtlasPreviewComponent implements OnInit, OnDestroy {
     readonly pathSelectedNodeIds = signal<string[]>([]);
     private canvasSingleSelectionId: string | null = null;
     private canvasSingleSelection: readonly string[] = [];
+    private selectedPackedEntity: GalaxyRenderableNode | null = null;
     queryText = signal('');
     queryTrace = signal<EmbeddingQueryTrace | null>(null);
     readonly manifoldMode = this.machine.manifoldMode;
@@ -1107,6 +1115,7 @@ export class GraphAtlasPreviewComponent implements OnInit, OnDestroy {
     });
     readonly embeddingAtlas = computed(() => this.embeddingAtlasByMode()[this.manifoldMode()]);
     readonly graphRebuildEmbeddingAtlas = computed(() => {
+        this.graphRebuildProjectionEpoch();
         const snapshot = this.graphSnapshotSignal();
         if (!snapshot) return null;
         return graphRebuildEmbeddingTargetCount(snapshot) > 0
@@ -1127,7 +1136,7 @@ export class GraphAtlasPreviewComponent implements OnInit, OnDestroy {
     }));
     readonly projectionContract = computed(() => {
         const inventory = this.graphInventory();
-        const atlas = this.graphRebuildEmbeddingAtlas() ?? this.embeddingAtlas();
+        const atlas = this.displayEmbeddingAtlas();
         return buildGraphProjectionContractReport(this.graphSnapshotSignal(), {
             graphNodes: inventory.nodes.length,
             embeddingNodes: atlas.nodes.length,
@@ -1396,9 +1405,13 @@ export class GraphAtlasPreviewComponent implements OnInit, OnDestroy {
         }
         this.batchSelectedNodeIds.set([]);
         if (this.settings.detailCardsVisible) {
+            this.selectedPackedEntity = this.hoveredEntity?.id === hit.id ? this.hoveredEntity : null;
             this.selectedCanvasHit.set(hit);
             this.pathSelectedNodeIds.set([hit.id]);
             this.selectedEntityId = hit.id;
+            if (!graphCanvasInspectorRecord(hit, this.activeNodes(), this.activeEdges())) {
+                this.metadataRequested.emit();
+            }
             return;
         }
         this.selectedCanvasHit.set(null);
@@ -1427,6 +1440,7 @@ export class GraphAtlasPreviewComponent implements OnInit, OnDestroy {
         this.batchSelectedNodeIds.set([]);
         this.pathSelectedNodeIds.set([]);
         this.selectedEntityId = null;
+        this.selectedPackedEntity = null;
     }
 
     canvasSelectedNodeIds(): readonly string[] {
@@ -1446,11 +1460,15 @@ export class GraphAtlasPreviewComponent implements OnInit, OnDestroy {
     }
 
     canvasInspectorRecord() {
-        return graphCanvasInspectorRecord(this.selectedCanvasHit(), this.activeNodes(), this.activeEdges());
+        const record = graphCanvasInspectorRecord(this.selectedCanvasHit(), this.activeNodes(), this.activeEdges());
+        if (record || !this.selectedPackedEntity) return record;
+        return graphCanvasInspectorRecord(this.selectedCanvasHit(), [this.selectedPackedEntity], []);
     }
 
     canvasHoverRecord() {
-        return graphCanvasInspectorRecord(this.hoveredCanvasHit(), this.activeNodes(), this.activeEdges());
+        const record = graphCanvasInspectorRecord(this.hoveredCanvasHit(), this.activeNodes(), this.activeEdges());
+        if (record || !this.hoveredEntity) return record;
+        return graphCanvasInspectorRecord(this.hoveredCanvasHit(), [this.hoveredEntity], []);
     }
 
     canvasBatchRecords() {
@@ -1685,8 +1703,16 @@ export class GraphAtlasPreviewComponent implements OnInit, OnDestroy {
     }
 
     activeSceneIdentity(): string {
+        this.graphRebuildProjectionEpoch();
         const snapshot = this.graphSnapshotSignal();
         if (!snapshot || (this.atlasMode !== 'graph' && !this.usesGraphRebuildEmbeddingAtlas())) return '';
+        if (this.atlasMode === 'embeddings' && !graphSnapshotHasHydratedCanvasPayload(snapshot)) {
+            const residentIdentity = this.graphCanvasColdStart.residentFirstPixelSceneIdentity(
+                snapshot,
+                this.manifoldMode(),
+            );
+            if (residentIdentity) return residentIdentity;
+        }
         return this.sceneIdentityForManifold(
             snapshot,
             this.manifoldMode(),
@@ -1782,7 +1808,7 @@ export class GraphAtlasPreviewComponent implements OnInit, OnDestroy {
     }
 
     isAtlasSurfaceActive(): boolean {
-        return this.activeNodeCount() > 0
+        return (this.activeNodeCount() > 0 || this.graphProjectionPreparing())
             && this.hubService.activeTab() === 'graph'
             && (this.hubService.isPageMode() || this.hubService.isHubOpen());
     }
@@ -1895,14 +1921,15 @@ export class GraphAtlasPreviewComponent implements OnInit, OnDestroy {
         traceIdentity = '',
     ): string {
         const graphIdentity = snapshot.authorityContract?.contentHash || snapshot.id;
-        return [
+        return galaxySceneIdentity({
             graphIdentity,
-            atlasMode,
-            mode,
-            this.canvasLens(),
-            this.graphKindFilter(),
+            sourceMode: atlasMode,
+            manifold: mode,
+            settings: this.settings,
+            canvasLens: this.canvasLens(),
+            graphKindFilter: this.graphKindFilter(),
             traceIdentity,
-        ].join('\u0000');
+        });
     }
 
     private currentProjectionLabel(): string {
@@ -1910,11 +1937,20 @@ export class GraphAtlasPreviewComponent implements OnInit, OnDestroy {
     }
 
     private displayEmbeddingAtlas(): EmbeddingAtlasData {
-        return this.graphRebuildEmbeddingAtlas() ?? this.embeddingAtlas();
+        return resolveEmbeddingAtlasAuthority(
+            this.atlasMode,
+            this.graphSnapshotSignal(),
+            this.graphRebuildEmbeddingAtlas(),
+            this.embeddingAtlas(),
+        );
     }
 
     usesGraphRebuildEmbeddingAtlas(): boolean {
-        return this.atlasMode === 'embeddings' && !!this.graphRebuildEmbeddingAtlas();
+        return graphRebuildOwnsEmbeddingView(this.atlasMode, this.graphSnapshotSignal());
+    }
+
+    graphProjectionPreparing(): boolean {
+        return this.usesGraphRebuildEmbeddingAtlas() && !this.graphRebuildEmbeddingAtlas();
     }
 
     private async refreshCurrentProjectionView(context: GraphAtlasReadContext): Promise<void> {
@@ -2122,17 +2158,43 @@ export class GraphAtlasPreviewComponent implements OnInit, OnDestroy {
     }
 
     private async refreshEmbeddingAtlas(context: GraphAtlasReadContext, manifold: AtlasManifoldMode, force = false): Promise<void> {
-        const requestKey = manifoldProjectionRequestKey(this.graphSnapshotSignal(), manifold, context.key);
+        const snapshot = this.graphSnapshotSignal();
+        const requestKey = manifoldProjectionRequestKey(snapshot, manifold, context.key);
+        const graphProjectionRequired = !!snapshot && graphRebuildEmbeddingTargetCount(snapshot) > 0;
+        const graphProjectionResident = !graphProjectionRequired
+            || !!cachedGraphRebuildEmbeddingAtlas(snapshot!, manifold);
+        if (graphProjectionRequired && !graphSnapshotHasHydratedCanvasPayload(snapshot)) {
+            if (this.rendererAuthority === 'v3-visible') {
+                const load = this.machine.beginManifoldLoad(manifold);
+                try {
+                    const packed = await this.graphCanvasColdStart.preparePersistedFirstPixel(snapshot!.scopeId, manifold);
+                    if (!packed) throw new Error(`Authoritative packed ${manifold} scene is unavailable.`);
+                    this.graphRebuildProjectionEpoch.update((epoch) => epoch + 1);
+                    this.atlasLoadedKeys.set(manifold, requestKey);
+                    this.machine.finishManifoldLoad(load, `${this.currentProjectionLabel()} packed manifold ready`, {
+                        owner: 'graph-atlas-preview-v3-packed',
+                        sourceLabel: 'persisted-galaxy-scene-packet-v2',
+                        nativeRoundTrips: 0,
+                    });
+                } catch (error) {
+                    this.machine.failManifoldLoad(load, error);
+                }
+            }
+            return;
+        }
         if (!force && this.atlasLoadingKeys.get(manifold) === requestKey) return;
-        if (!force && this.atlasLoadedKeys.get(manifold) === requestKey && this.machine.manifoldStatuses()[manifold] === 'ready') return;
+        if (!force
+            && graphProjectionResident
+            && this.atlasLoadedKeys.get(manifold) === requestKey
+            && this.machine.manifoldStatuses()[manifold] === 'ready') return;
 
         this.atlasLoadingKeys.set(manifold, requestKey);
         const load = this.machine.beginManifoldLoad(manifold);
         try {
             const adapter = manifoldAdapter(manifold);
-            const snapshot = this.graphSnapshotSignal();
-            if (snapshot && graphRebuildEmbeddingTargetCount(snapshot) > 0) {
+            if (graphProjectionRequired) {
                 await this.graphCanvasColdStart.prepareManifold(snapshot, manifold);
+                this.graphRebuildProjectionEpoch.update((epoch) => epoch + 1);
             }
             const projection = await loadManifoldProjection(
                 snapshot,

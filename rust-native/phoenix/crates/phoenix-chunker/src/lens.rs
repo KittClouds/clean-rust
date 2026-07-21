@@ -482,33 +482,49 @@ pub fn build_lens_chunks(input: &LensChunkInput<'_>, config: &LensChunkerConfig)
         return Vec::new();
     }
 
-    let mut drafts = Vec::new();
+    let mut by_key = BTreeMap::<(LensKind, usize, usize, String), LensChunk>::new();
     if config.enabled_lenses.contains(&LensKind::Entity) {
-        build_entity_lens(input, config, &index, &mut drafts);
+        build_and_finalize_lens(input, config, &index, &mut by_key, |drafts| {
+            build_entity_lens(input, config, &index, drafts);
+        });
     }
     if config.enabled_lenses.contains(&LensKind::Relationship) {
-        build_relationship_lens(input, config, &index, &mut drafts);
+        build_and_finalize_lens(input, config, &index, &mut by_key, |drafts| {
+            build_relationship_lens(input, config, &index, drafts);
+        });
     }
     if config.enabled_lenses.contains(&LensKind::Event) {
-        build_event_lens(input, config, &index, &mut drafts);
+        build_and_finalize_lens(input, config, &index, &mut by_key, |drafts| {
+            build_event_lens(input, config, &index, drafts);
+        });
     }
     if config.enabled_lenses.contains(&LensKind::Temporal) {
-        build_temporal_lens(input, config, &index, &mut drafts);
+        build_and_finalize_lens(input, config, &index, &mut by_key, |drafts| {
+            build_temporal_lens(input, config, &index, drafts);
+        });
     }
     if config.enabled_lenses.contains(&LensKind::Causal) {
-        build_causal_lens(input, config, &index, &mut drafts);
+        build_and_finalize_lens(input, config, &index, &mut by_key, |drafts| {
+            build_causal_lens(input, config, &index, drafts);
+        });
     }
     if config.enabled_lenses.contains(&LensKind::Attribute) {
-        build_attribute_lens(input, config, &index, &mut drafts);
+        build_and_finalize_lens(input, config, &index, &mut by_key, |drafts| {
+            build_attribute_lens(input, config, &index, drafts);
+        });
     }
     if config.enabled_lenses.contains(&LensKind::Worldbuilding) {
-        build_worldbuilding_lens(input, config, &index, &mut drafts);
+        build_and_finalize_lens(input, config, &index, &mut by_key, |drafts| {
+            build_worldbuilding_lens(input, config, &index, drafts);
+        });
     }
     if config.enabled_lenses.contains(&LensKind::Evidence) {
-        build_evidence_lens(input, config, &index, &mut drafts);
+        build_and_finalize_lens(input, config, &index, &mut by_key, |drafts| {
+            build_evidence_lens(input, config, &index, drafts);
+        });
     }
 
-    finalize_lens_chunks(input, config, &index, drafts)
+    by_key.into_values().collect()
 }
 
 fn build_entity_lens(
@@ -886,13 +902,27 @@ fn build_evidence_lens(
     }
 }
 
-fn finalize_lens_chunks(
+fn build_and_finalize_lens<F>(
+    input: &LensChunkInput<'_>,
+    config: &LensChunkerConfig,
+    index: &LensBuildIndex,
+    by_key: &mut BTreeMap<(LensKind, usize, usize, String), LensChunk>,
+    build: F,
+) where
+    F: FnOnce(&mut Vec<DraftLensChunk>),
+{
+    let mut drafts = Vec::new();
+    build(&mut drafts);
+    finalize_lens_chunks_into(input, config, index, drafts, by_key);
+}
+
+fn finalize_lens_chunks_into(
     input: &LensChunkInput<'_>,
     config: &LensChunkerConfig,
     index: &LensBuildIndex,
     drafts: Vec<DraftLensChunk>,
-) -> Vec<LensChunk> {
-    let mut by_key = BTreeMap::<(LensKind, usize, usize, String), LensChunk>::new();
+    by_key: &mut BTreeMap<(LensKind, usize, usize, String), LensChunk>,
+) {
     for mut draft in drafts {
         clamp_to_document(input.text, &mut draft.range);
         trim_oversized_range(input.text, config.max_lens_chunk_bytes, &mut draft.range);
@@ -901,12 +931,9 @@ fn finalize_lens_chunks(
         }
         let base_window = base_chunk_window(input.base_chunks, draft.range);
         let slice = &input.text[draft.range.0..draft.range.1];
-        let mention_ids = draft.mention_ids.iter().copied().collect::<Vec<_>>();
         let surfaces = draft.surfaces.iter().cloned().collect::<Vec<_>>();
         let trigger_terms = draft.trigger_terms.iter().cloned().collect::<Vec<_>>();
-        let surface_hit_ids = draft.surface_hit_ids.iter().cloned().collect::<Vec<_>>();
         let cue_hit_ids = draft.cue_hit_ids.iter().cloned().collect::<Vec<_>>();
-        let source_hint_ids = draft.source_hint_ids.iter().cloned().collect::<Vec<_>>();
         let stable_key = stable_chunk_key(
             draft.lens,
             draft.range,
@@ -914,12 +941,18 @@ fn finalize_lens_chunks(
             &trigger_terms,
             &cue_hit_ids,
         );
+        let id = format!(
+            "lens-{}-{:016x}",
+            lens_name(draft.lens),
+            stable_hash(stable_key.as_bytes())
+        );
+        let map_key = (draft.lens, draft.range.0, draft.range.1, id.clone());
+        if by_key.contains_key(&map_key) {
+            continue;
+        }
+
         let chunk = LensChunk {
-            id: format!(
-                "lens-{}-{:016x}",
-                lens_name(draft.lens),
-                stable_hash(stable_key.as_bytes())
-            ),
+            id,
             lens: draft.lens,
             start: draft.range.0,
             end: draft.range.1,
@@ -927,19 +960,16 @@ fn finalize_lens_chunks(
             base_chunk_end: base_window.1,
             sentence_start: draft.sentence_range.0.min(index.sentences.ranges.len()),
             sentence_end: draft.sentence_range.1.min(index.sentences.ranges.len()),
-            mention_ids,
+            mention_ids: draft.mention_ids.into_iter().collect(),
             surfaces,
             trigger_terms,
-            surface_hit_ids,
+            surface_hit_ids: draft.surface_hit_ids.into_iter().collect(),
             cue_hit_ids,
-            source_hint_ids,
+            source_hint_ids: draft.source_hint_ids.into_iter().collect(),
             content_hash: stable_hash(slice.as_bytes()),
         };
-        by_key
-            .entry((chunk.lens, chunk.start, chunk.end, chunk.id.clone()))
-            .or_insert(chunk);
+        by_key.insert(map_key, chunk);
     }
-    by_key.into_values().collect()
 }
 
 impl DraftLensChunk {

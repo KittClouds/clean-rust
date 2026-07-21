@@ -3,7 +3,10 @@ import { describe, expect, it, vi } from 'vitest';
 import type { GraphRebuildSnapshot } from '../../../../../graph-rebuild/graph-rebuild-snapshot';
 import type { AtlasManifoldMode } from '../../../../../services/manifold-atlas.types';
 import type { EmbeddingAtlasData } from './graph-embedding-atlas';
-import { buildGraphRebuildEmbeddingAtlas } from './graph-rebuild-embedding-atlas';
+import {
+    buildGraphRebuildEmbeddingAtlas,
+    seedGraphRebuildEmbeddingAtlas,
+} from './graph-rebuild-embedding-atlas';
 import { loadManifoldProjection, manifoldProjectionRequestKey } from './graph-manifold-projection-loader';
 
 const MODES: readonly AtlasManifoldMode[] = ['hybrid', 'hopf', 'lorentz', 'product', 'siegel'];
@@ -41,17 +44,36 @@ describe('manifold projection switching', () => {
         expect(loadNative).not.toHaveBeenCalled();
     });
 
-    it('evicts inactive expanded projections for an unchanged snapshot', async () => {
+    it('keeps all five small projections hot for an unchanged snapshot', async () => {
         const snapshot = projectionSnapshot(96);
         const loadNative = vi.fn<() => Promise<EmbeddingAtlasData>>();
         buildGraphRebuildEmbeddingAtlas(snapshot, 'hybrid');
         const firstHybrid = await loadManifoldProjection(snapshot, 'hybrid', loadNative);
 
         for (const mode of MODES.slice(1)) buildGraphRebuildEmbeddingAtlas(snapshot, mode);
+        const secondHybrid = await loadManifoldProjection(snapshot, 'hybrid', loadNative);
+
+        expect(secondHybrid.atlas).toBe(firstHybrid.atlas);
+        expect(firstHybrid.atlas.nodes).toHaveLength(96);
+        expect(loadNative).not.toHaveBeenCalled();
+    });
+
+    it('evicts the oldest projection when the resident element ceiling is crossed', async () => {
+        const snapshot = projectionSnapshot(96);
+        const loadNative = vi.fn<() => Promise<EmbeddingAtlasData>>();
+        const firstHybrid = buildGraphRebuildEmbeddingAtlas(snapshot, 'hybrid');
+        const repeatedNode = firstHybrid.nodes[0]!;
+
+        for (const mode of MODES.slice(1)) {
+            seedGraphRebuildEmbeddingAtlas(snapshot, mode, {
+                ...firstHybrid,
+                nodes: Array(40_001).fill(repeatedNode),
+            });
+        }
+
         await expect(loadManifoldProjection(snapshot, 'hybrid', loadNative)).rejects.toThrow(
             'synchronous rebuild is forbidden',
         );
-        expect(firstHybrid.atlas.nodes).toHaveLength(96);
         expect(loadNative).not.toHaveBeenCalled();
     });
 

@@ -10,6 +10,10 @@ const EMPTY_PACKET_LABEL = 'rust atlas packet missing';
 const MAX_CACHED_INVENTORIES = 4;
 const graphCanvasInventoryCache = new Map<string, GraphInventory>();
 
+export function releaseGraphCanvasInventoryGeneration(identity: string): boolean {
+    return identity ? graphCanvasInventoryCache.delete(identity) : false;
+}
+
 entityColorStore.subscribe(() => graphCanvasInventoryCache.clear());
 
 /**

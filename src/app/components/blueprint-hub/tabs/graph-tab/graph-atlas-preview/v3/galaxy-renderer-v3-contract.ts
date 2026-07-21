@@ -1,5 +1,5 @@
 import type { GraphRendererMode, GraphRendererPointer } from '../graph-renderer-port';
-import type { GalaxyRenderSettings } from '../graph-galaxy-engine';
+import type { GalaxyRenderableNode, GalaxyRenderSettings } from '../graph-galaxy-engine';
 import type { GalaxyScenePacketV2 } from '../graph-galaxy-scene-packet-v2.model';
 
 export const GALAXY_RENDERER_V3_SCHEMA = 'phoenix-galaxy-renderer/v3' as const;
@@ -48,6 +48,7 @@ export interface GalaxyRendererV3Backend {
     setSelectedIdentities(identities: readonly string[]): void;
     setHoveredIdentity(identity: string | null): void;
     pick(pointer: GraphRendererPointer): Promise<string | null>;
+    describeIdentity(identity: string): GalaxyRenderableNode | null;
     dispose(): void;
 }
 

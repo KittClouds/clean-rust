@@ -4569,6 +4569,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "phoenix-discovery-view"
+version = "0.1.1"
+dependencies = [
+ "blake3",
+ "hashbrown 0.15.5",
+ "memmap2",
+ "phoenix-graph-kernel 0.1.1",
+ "rayon",
+ "serde",
+ "serde_json",
+ "smallvec",
+ "thiserror 1.0.69",
+ "zerocopy 0.7.35",
+]
+
+[[package]]
 name = "phoenix-document-index"
 version = "0.1.1"
 dependencies = [
@@ -5363,6 +5379,7 @@ dependencies = [
  "lz4_flex",
  "memmap2",
  "overgraph",
+ "phoenix-discovery-view",
  "phoenix-document-index",
  "phoenix-graph-kernel 0.1.1",
  "phoenix-hyperbolic 0.1.1",
@@ -5400,6 +5417,7 @@ dependencies = [
  "ort",
  "ort-sys",
  "phoenix-api",
+ "phoenix-discovery-view",
  "phoenix-document-index",
  "phoenix-graph-kernel 0.1.1",
  "phoenix-graph-post",

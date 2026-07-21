@@ -3,6 +3,7 @@ use crate::galaxy_store_format::{
     GalaxyManifoldManifest, GalaxyPageHeader, GalaxyPageKind, GalaxyPageManifest,
     GalaxyStoreManifest, GalaxyStringRef, GalaxyTileRecord, GALAXY_STORE_SCHEMA_VERSION,
 };
+use crate::galaxy_store_sort::MortonRadixScratch;
 use crate::{GalaxyGraphPack, GalaxyStoreError};
 use hashbrown::HashMap;
 use rustc_hash::FxHasher;
@@ -16,6 +17,11 @@ use zerocopy::AsBytes;
 
 type FastBuildHasher = BuildHasherDefault<FxHasher>;
 type FastMap<K, V> = HashMap<K, V, FastBuildHasher>;
+
+struct GalaxyGenerationBuildScratch {
+    pages: Vec<GalaxyPageManifest>,
+    morton_sort: MortonRadixScratch,
+}
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -90,11 +96,14 @@ fn build_generation(
     options: GalaxyGraphStoreBuildOptions,
     generation_hash: u64,
 ) -> Result<GalaxyStoreManifest, GalaxyStoreError> {
-    let mut pages = Vec::with_capacity(24 + manifolds.len() * 24);
-    write_identity_pages(pack, root, generation_hash, &mut pages)?;
-    write_node_pages(pack, root, generation_hash, &mut pages)?;
-    write_edge_pages(pack, root, generation_hash, &mut pages)?;
-    write_csr_pages(pack, root, generation_hash, &mut pages)?;
+    let mut scratch = GalaxyGenerationBuildScratch {
+        pages: Vec::with_capacity(24 + manifolds.len() * 24),
+        morton_sort: MortonRadixScratch::new(),
+    };
+    write_identity_pages(pack, root, generation_hash, &mut scratch.pages)?;
+    write_node_pages(pack, root, generation_hash, &mut scratch.pages)?;
+    write_edge_pages(pack, root, generation_hash, &mut scratch.pages)?;
+    write_csr_pages(pack, root, generation_hash, &mut scratch.pages)?;
 
     let mut manifold_manifests = Vec::with_capacity(manifolds.len());
     for manifold in manifolds {
@@ -105,7 +114,7 @@ fn build_generation(
             generation_hash,
             options.tile_bits,
             options.lod_levels,
-            &mut pages,
+            &mut scratch,
         )?);
     }
 
@@ -117,7 +126,7 @@ fn build_generation(
         node_count: pack.nodes.len() as u64,
         edge_count: pack.edges.len() as u64,
         skipped_edges: pack.skipped_edges as u64,
-        pages,
+        pages: scratch.pages,
         manifolds: manifold_manifests,
     };
     let bytes = serde_json::to_vec_pretty(&manifest)?;
@@ -411,7 +420,7 @@ fn write_manifold_pages(
     generation_hash: u64,
     tile_bits: u8,
     lod_levels: u8,
-    pages: &mut Vec<GalaxyPageManifest>,
+    scratch: &mut GalaxyGenerationBuildScratch,
 ) -> Result<GalaxyManifoldManifest, GalaxyStoreError> {
     let stem = input.manifold.file_stem();
     let (bounds_min, bounds_max) = position_bounds(&input.positions);
@@ -426,8 +435,8 @@ fn write_manifold_pages(
         z.push(position[2]);
         keys.push(morton_key(position, bounds_min, bounds_max));
     }
-    let mut order: Vec<u32> = (0..input.positions.len() as u32).collect();
-    order.sort_unstable_by_key(|node| (keys[*node as usize], *node));
+    let order = scratch.morton_sort.sort(&keys)?;
+    let pages = &mut scratch.pages;
     let mut node_tiles = vec![0u64; input.positions.len()];
     let base_shift = 63 - u32::from(tile_bits) * 3;
     for node in 0..input.positions.len() {
@@ -470,7 +479,7 @@ fn write_manifold_pages(
         Some(input.manifold),
         0,
         generation_hash,
-        &order,
+        order,
         pages,
     )?;
     write_page(
@@ -499,7 +508,7 @@ fn write_manifold_pages(
     let mut edge_bundle_counts = Vec::with_capacity(lod_levels as usize);
     for lod in 0..lod_levels {
         let bits = tile_bits.saturating_sub(lod.saturating_mul(2)).max(1);
-        let (lod_nodes, node_to_lod) = build_lod_nodes(pack, &input.positions, &keys, &order, bits);
+        let (lod_nodes, node_to_lod) = build_lod_nodes(pack, &input.positions, &keys, order, bits);
         let bundles = build_edge_bundles(pack, &node_to_lod);
         if lod == 0 {
             let tiles = lod_nodes

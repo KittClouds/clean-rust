@@ -17,21 +17,36 @@ describe('Galaxy Renderer V3 bounded interaction state', () => {
     });
 
     it('keeps the hovered node and every bounded incident neighbor illuminated', () => {
-        const state = new GalaxyRendererV3InteractionState(4, Uint32Array.of(0, 1, 1, 2, 1, 3));
+        const state = new GalaxyRendererV3InteractionState(5, Uint32Array.of(0, 1, 1, 2, 1, 3));
 
         const neighborhood = state.applyFocus(1);
 
         expect(Array.from(neighborhood.nodes)).toEqual([0, 2, 3]);
-        expect(Array.from(state.nodeOpacity)).toEqual([1, 1, 1, 1]);
+        expect(neighborhood.fullUpload).toBe(true);
+        expect(Array.from(state.nodeOpacity, round2)).toEqual([1, 1, 1, 1, 0.14]);
         expect(Array.from(state.edgeOpacity)).toEqual([1, 1, 1]);
+    });
+
+    it('updates only the previous and next neighborhoods while hover moves', () => {
+        const state = new GalaxyRendererV3InteractionState(5, Uint32Array.of(0, 1, 1, 2, 1, 3));
+        state.applyFocus(1);
+
+        const update = state.applyFocus(0);
+
+        expect(update.fullUpload).toBe(false);
+        expect(Array.from(update.changedNodes).sort()).toEqual([0, 1, 2, 3]);
+        expect(Array.from(update.changedEdges).sort()).toEqual([0, 1, 2]);
+        expect(Array.from(state.nodeOpacity, round2)).toEqual([1, 1, 0.14, 0.14, 0.14]);
+        expect(Array.from(state.edgeOpacity, round2)).toEqual([1, 0.08, 0.08]);
     });
 
     it('restores the unfiltered presentation when hover clears', () => {
         const state = new GalaxyRendererV3InteractionState(3, Uint32Array.of(0, 1));
         state.applyFocus(0);
 
-        state.applyFocus(-1);
+        const update = state.applyFocus(-1);
 
+        expect(update.fullUpload).toBe(true);
         expect(Array.from(state.nodeOpacity)).toEqual([1, 1, 1]);
         expect(Array.from(state.edgeOpacity)).toEqual([1]);
     });
@@ -74,3 +89,7 @@ describe('Galaxy Renderer V3 bounded interaction state', () => {
         expect(Array.from(positions)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9]);
     });
 });
+
+function round2(value: number): number {
+    return Math.round(value * 100) / 100;
+}

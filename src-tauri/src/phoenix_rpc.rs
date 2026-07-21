@@ -12,6 +12,7 @@ use crate::gfm_retrieval_shadow::{
     DesktopGfmShadowQueryRequest, DesktopGfmShadowResponse,
 };
 use crate::graph_galaxy::{compile_scene, DesktopGalaxyScene, DesktopGalaxySceneRequest};
+use crate::graph_generation_query::prepare_graph_generation_query;
 use crate::graph_run_store::{
     load_immutable_artifact, load_manifest_for_handle, load_section, persist_immutable_artifact,
     section_identity, DurableGraphRunReceipt, GraphRunStoreTxn,
@@ -2176,6 +2177,36 @@ impl PhoenixApi for PhoenixApiImpl {
                 .map_err(|error| format!("invalid store command payload JSON: {error}"))?
         };
 
+        if command == "graphGeneration:prepareAssertedQuery" {
+            let snapshot_value = payload
+                .get("snapshot")
+                .cloned()
+                .ok_or_else(|| "graph generation query payload missing snapshot".to_owned())?;
+            let snapshot = serde_json::from_value::<GraphRebuildSnapshot>(snapshot_value)
+                .map_err(|error| format!("invalid graph generation snapshot: {error}"))?;
+            let authority_hash = payload
+                .get("authorityHash")
+                .and_then(Value::as_str)
+                .ok_or_else(|| "graph generation query payload missing authorityHash".to_owned())?;
+            let root = {
+                let guard = self.lock_state()?;
+                desktop_graph_run_store_path(guard.host.config())
+                    .and_then(|path| {
+                        path.parent()
+                            .map(|parent| parent.join("graph-generation-query"))
+                    })
+                    .ok_or_else(|| "graph generation query storage is unavailable".to_owned())?
+            };
+            let manifest = prepare_graph_generation_query(&snapshot, authority_hash, &root)?;
+            return serialize_json(&json!({
+                "success": true,
+                "payload": {
+                    "schemaVersion": "phoenix-graph-generation-asserted-query/v1",
+                    "manifest": manifest,
+                },
+                "error": null,
+            }));
+        }
         if command == "graphRebuild:compileDualWrite" {
             let snapshot_value = payload.get("snapshot").cloned().unwrap_or(payload);
             let mut snapshot = serde_json::from_value::<GraphRebuildSnapshot>(snapshot_value)

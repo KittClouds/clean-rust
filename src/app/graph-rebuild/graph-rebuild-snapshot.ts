@@ -2683,6 +2683,8 @@ export interface GraphRebuildSnapshot {
     scopeId: string;
     noteIds: string[];
     builtAt: number;
+    generationReceiptId?: string;
+    generationDigestSha256?: string;
     chunks: GraphRebuildChunk[];
     mentions: GraphRebuildMention[];
     entityAnchors: GraphRebuildEntityAnchor[];
@@ -2879,6 +2881,8 @@ export interface GraphIndexRunReceipt {
     layerReceipts: GraphIndexLayerReceipt[];
     snapshotId?: string;
     authorityContract?: GraphSnapshotAuthorityContract;
+    generationReceiptId?: string;
+    generationDigestSha256?: string;
     counters: GraphRebuildCounters;
     dropReasons: GraphRebuildDropReasons;
     message: string;

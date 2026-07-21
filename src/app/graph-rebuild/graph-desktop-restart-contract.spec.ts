@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { buildGraphRebuildSnapshot } from './graph-rebuild-builder';
 import { assertRunReceiptParity } from './graph-rebuild-pipeline.service';
 import {
+    assertGraphCanvasBootSnapshotShell,
     graphRebuildSnapshotContentBlobEntries,
     graphRebuildSnapshotContentBlobDocuments,
     graphRebuildSnapshotPersistenceView,
@@ -38,6 +39,7 @@ describe('desktop graph snapshot restart contract', () => {
         expect(persisted).toBeTruthy();
         expect(persisted?.nodes).toEqual([]);
         expect(persisted?.embeddingTargets).toEqual([]);
+        expect(() => assertGraphCanvasBootSnapshotShell(persisted!)).not.toThrow();
 
         const blobs = Object.fromEntries(graphRebuildSnapshotContentBlobDocuments(before).map((document) => {
             const blob = scopedDocumentToGraphRebuildContentBlob(document);
@@ -63,6 +65,18 @@ describe('desktop graph snapshot restart contract', () => {
         expect(embed.nodes.every((node) => packetTargetIds.has(node.id))).toBe(true);
         expect(embed.edges.length).toBeGreaterThan(0);
         expect(embed.nodes.some((node) => node.metadata?.['signalParentIds'])).toBe(true);
+    });
+
+    it('rejects a canvas boot shell whose compact authority identity was changed', () => {
+        const snapshot = restartFixture();
+        sealGraphSnapshotAuthority(snapshot);
+        const persisted = scopedDocumentToGraphRebuildSnapshot(graphRebuildSnapshotToScopedDocument(snapshot))!;
+        persisted.authorityContract = {
+            ...persisted.authorityContract!,
+            snapshotId: 'snapshot:other',
+        };
+
+        expect(() => assertGraphCanvasBootSnapshotShell(persisted)).toThrow(/authority identity drift/);
     });
 
     it('rebinds stable candidate blobs to the authoritative snapshot identity', () => {

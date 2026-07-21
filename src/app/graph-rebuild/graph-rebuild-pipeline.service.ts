@@ -9,6 +9,10 @@ import { AtlasCapabilityRuntimeService } from '../services/atlas-capability-runt
 import { NerService } from '../services/ner.service';
 import { phoenixTransportAudit, type PhoenixTransportAuditSnapshot } from '../services/phoenix-transport-audit';
 import { PhoenixStoreService, type PhoenixContentMutationTiming } from '../services/phoenix-store.service';
+import { GraphGenerationLifetimeService } from '../services/graph-generation-lifetime.service';
+import { GraphCanvasColdStartService } from '../services/graph-canvas-cold-start.service';
+import type { GalaxySceneGenerationIndexReceipt } from '../components/blueprint-hub/tabs/graph-tab/graph-atlas-preview/graph-galaxy-scene-packet-persistence';
+import { resolveGalaxyRendererAuthority } from '../components/blueprint-hub/tabs/graph-tab/graph-atlas-preview/v3/galaxy-renderer-v3-authority';
 import { buildGraphRebuildDeltaPostProcessPlan, deltaPostProcessPlanCounters, type GraphRebuildDeltaPostProcessPlan } from './graph-rebuild-delta-postprocess-plan';
 import { buildGraphRebuildEdgeJudgmentPlan, edgeJudgmentPlanCounters } from './graph-rebuild-edge-type-judgment-plan';
 import { embeddingProfileFromModelSelection } from './graph-rebuild-embedding-signatures';
@@ -20,9 +24,19 @@ import {
     buildReviewAdjudicationRunCertificate,
     type GraphReviewAdjudicationRunCertificate,
 } from './graph-review-adjudication-certificate';
-import { GraphRebuildService, type NativeGraphRunPersistReceipt } from './graph-rebuild.service';
+import {
+    graphGenerationSnapshotShell,
+    GraphRebuildService,
+    type NativeGraphRunPersistReceipt,
+} from './graph-rebuild.service';
 import { buildSiegelBackboneProjectionReceipt } from './graph-rebuild-siegel-backbone';
 import { assertGraphSnapshotAuthority } from './graph-snapshot-authority';
+import {
+    buildGraphGenerationReceipt,
+    withGraphGenerationArtifact,
+    type GraphGenerationArtifactRef,
+    type GraphGenerationReceiptV2,
+} from './graph-generation-receipt';
 import type {
     GraphIndexModelReadiness,
     GraphIndexPostProcessMode,
@@ -101,6 +115,7 @@ type ScopedDocument = {
 type InteractiveRunReuseState = {
     identity: string;
     snapshot: GraphRebuildSnapshot;
+    generationReceipt?: GraphGenerationReceiptV2;
 };
 
 type PostCommitDiagnosticInput = {
@@ -134,10 +149,13 @@ export class GraphRebuildPipelineService {
     private readonly atlasRuntime = inject(AtlasCapabilityRuntimeService);
     private readonly ner = inject(NerService);
     private readonly store = inject(PhoenixStoreService);
+    private readonly generationLifetime = inject(GraphGenerationLifetimeService, { optional: true });
+    private readonly graphCanvasColdStart = inject(GraphCanvasColdStartService, { optional: true });
     private readonly runningState = signal(false);
     private readonly entityLinkerWarmState = signal(false);
     private readonly lastReceiptState = signal<GraphIndexRunReceipt | null>(null);
     private readonly lastSnapshotState = signal<GraphRebuildSnapshot | null>(null);
+    private readonly lastGenerationReceiptState = signal<GraphGenerationReceiptV2 | null>(null);
     private receiptPersistenceQueue: Promise<void> = Promise.resolve();
     private readonly receiptPersistence = new GraphCoalescingAsyncQueue<string, ReceiptPersistenceJob>(
         deferReceiptPersistenceTurn,
@@ -150,10 +168,16 @@ export class GraphRebuildPipelineService {
     private readonly interactiveCapabilityCache = new Map<string, unknown>();
     private interactiveRunReuseState: InteractiveRunReuseState | null = null;
     private reusedRunReceiptSerial = 0;
+    private generationArtifactQueue: Promise<void> = Promise.resolve();
 
     readonly running = computed(() => this.runningState());
     readonly lastReceipt = computed(() => this.lastReceiptState());
     readonly lastSnapshot = computed(() => this.lastSnapshotState());
+    readonly lastGenerationReceipt = computed(() => this.lastGenerationReceiptState());
+
+    constructor() {
+        this.graphCanvasColdStart?.onGenerationIndex((index) => this.acceptSceneGenerationIndex(index));
+    }
 
     modelReadiness(request: GraphIndexRunRequest): GraphIndexModelReadiness[] {
         const options = this.atlasOptions(request);
@@ -408,6 +432,21 @@ export class GraphRebuildPipelineService {
                 snapshot: completedSnapshot,
                 message: `Build Graph produced ${completedSnapshot.counters.nodes} nodes, ${completedSnapshot.counters.edges} edges, and ${completedSnapshot.counters.embeddingTargets} targets.`,
             });
+            const generationReceipt = durabilityMode === 'interactive'
+                && completedSnapshot.contentManifest
+                && completedSnapshot.interactiveRunAuthority
+                ? await buildGraphGenerationReceipt({
+                    snapshot: completedSnapshot,
+                    runReceipt: receipt,
+                    inputIdentity: interactiveIdentityValue!,
+                })
+                : null;
+            if (generationReceipt) {
+                receipt.generationReceiptId = generationReceipt.receiptId;
+                receipt.generationDigestSha256 = generationReceipt.digestSha256;
+                await this.generationLifetime?.accept(generationReceipt);
+                this.lastGenerationReceiptState.set(generationReceipt);
+            }
             await this.publishRunReceipt(receipt, completedSnapshot, true);
             if (durabilityMode === 'interactive') {
                 appendInteractivePostCommitStage(stageReceipts, completedSnapshot);
@@ -418,7 +457,12 @@ export class GraphRebuildPipelineService {
                 this.interactiveRunReuseState = {
                     identity: interactiveIdentityValue!,
                     snapshot: completedSnapshot,
+                    generationReceipt: generationReceipt || undefined,
                 };
+                if (generationReceipt) {
+                    void this.persistGenerationReceipt(generationReceipt);
+                    void this.prepareGenerationArtifacts(generationReceipt, completedSnapshot);
+                }
                 this.scheduleInteractivePostCommitWork({
                     scope,
                     snapshotId: completedSnapshot.id,
@@ -530,6 +574,25 @@ export class GraphRebuildPipelineService {
         modelReadiness: GraphIndexModelReadiness[];
     }): Promise<PipelineResult> {
         const state = this.interactiveRunReuseState;
+        const residentGeneration = state
+            && state.identity === input.identity
+            && state.generationReceipt?.inputIdentity === input.identity
+            ? state.generationReceipt
+            : null;
+        const persistedGeneration = residentGeneration
+            || await this.graphRebuild.loadPersistedGenerationReceipt(input.scope.scopeId);
+        if (!persistedGeneration) {
+            throw new Error(
+                'Delta cannot reconstruct: persisted graph predates the compact generation fast lane. '
+                + 'Automatic cold fallback is disabled; run one explicit Force Rebuild to migrate it.',
+            );
+        }
+        if (persistedGeneration.inputIdentity !== input.identity) {
+            throw new Error(
+                'Graph inputs changed and no sealed graph matches them. '
+                + 'Delta cannot reconstruct; use explicit Force Rebuild.',
+            );
+        }
         const residentSnapshot = state
             && state.identity === input.identity
             && this.lastSnapshotState()?.id === state.snapshot.id
@@ -537,33 +600,23 @@ export class GraphRebuildPipelineService {
                 === state.snapshot.authorityContract?.contentHash
             ? state.snapshot
             : null;
-        const persistedSnapshot = this.graphRebuild.snapshot?.() || null;
+        const currentSnapshot = this.graphRebuild.snapshot?.() || null;
         const restoredSnapshot = !residentSnapshot
-            && persistedSnapshot?.interactiveRunAuthority?.inputIdentity === input.identity
-            ? persistedSnapshot
+            ? currentSnapshot?.scopeId === input.scope.scopeId
+                ? currentSnapshot
+                : await this.graphRebuild.loadPersistedSnapshotShell(input.scope.scopeId)
             : null;
         const snapshot = residentSnapshot || restoredSnapshot;
         if (!snapshot) {
-            if (persistedSnapshot && !persistedSnapshot.interactiveRunAuthority) {
-                throw new Error(
-                    'Persisted graph predates the authoritative restart fast lane. '
-                    + 'Automatic cold fallback is disabled; run one explicit Force Rebuild to migrate it.',
-                );
-            }
-            if (persistedSnapshot) {
-                throw new Error(
-                    'Graph inputs changed and no sealed graph matches them. '
-                    + 'Delta cannot reconstruct; use explicit Force Rebuild.',
-                );
-            }
             throw new Error(
                 'No authoritative sealed graph exists for this scope. '
                 + 'Delta cannot reconstruct; use explicit Force Rebuild.',
             );
         }
+        assertGenerationSnapshotIdentity(persistedGeneration, snapshot);
 
         const reuseStarted = performance.now();
-        const authority = assertGraphSnapshotAuthority(snapshot);
+        const authority = persistedGeneration.authority;
         const persistStarted = performance.now();
         const durable = residentSnapshot
             ? await this.graphRebuild.persistResidentNativeGraphRun?.(snapshot)
@@ -605,10 +658,12 @@ export class GraphRebuildPipelineService {
         const projectionReceipts = PROJECTION_CAPABILITIES.map((projection) =>
             snapshotOwnedProjectionReceipt(projection.mode, reusedSnapshot, authority),
         );
-        projectionReceipts.push(await buildSiegelBackboneProjectionReceipt(reusedSnapshot, {
-            nativeReceipt: this.graphRebuild.nativeSiegelReceipt?.(reusedSnapshot.id),
-            allowRuntimeNative: false,
-        }));
+        projectionReceipts.push(graphGenerationSnapshotIsCompact(reusedSnapshot)
+            ? snapshotOwnedProjectionReceipt('siegel', reusedSnapshot, authority)
+            : await buildSiegelBackboneProjectionReceipt(reusedSnapshot, {
+                nativeReceipt: this.graphRebuild.nativeSiegelReceipt?.(reusedSnapshot.id),
+                allowRuntimeNative: false,
+            }));
         appendTransportTimingStage(stageReceipts, input.transportStarted, phoenixTransportAudit.snapshot());
 
         const completedAt = Date.now();
@@ -629,12 +684,116 @@ export class GraphRebuildPipelineService {
             snapshot: reusedSnapshot,
             message: `Reused sealed graph ${reusedSnapshot.id}; semantic input identity is unchanged.`,
         });
+        receipt.generationReceiptId = persistedGeneration.receiptId;
+        receipt.generationDigestSha256 = persistedGeneration.digestSha256;
         await this.publishRunReceipt(receipt, reusedSnapshot, true);
         appendInteractivePostCommitStage(stageReceipts, reusedSnapshot);
         this.refreshLayerReceipts(receipt, reusedSnapshot);
         this.enqueueRunReceiptPersistence(receipt);
-        this.interactiveRunReuseState = { identity: input.identity, snapshot: reusedSnapshot };
+        this.interactiveRunReuseState = {
+            identity: input.identity,
+            snapshot: reusedSnapshot,
+            generationReceipt: persistedGeneration,
+        };
         return { receipt, snapshot: reusedSnapshot };
+    }
+
+    private async persistGenerationReceipt(receipt: GraphGenerationReceiptV2): Promise<void> {
+        try {
+            await this.graphRebuild.persistGenerationReceipt(receipt);
+        } catch (error) {
+            console.warn('[GraphRebuildPipeline] Generation receipt persistence failed', error);
+        }
+    }
+
+    private async prepareGenerationArtifacts(
+        receipt: GraphGenerationReceiptV2,
+        snapshot: GraphRebuildSnapshot,
+    ): Promise<void> {
+        try {
+            const assertedQuery = await this.graphRebuild.prepareAssertedQueryArtifact(snapshot);
+            await this.queueGenerationArtifact(receipt.receiptId, 'assertedQuery', assertedQuery);
+        } catch (error) {
+            console.warn('[GraphRebuildPipeline] Asserted query artifact preparation failed closed', error);
+        }
+        if (resolveGalaxyRendererAuthority() === 'v3-visible') {
+            try {
+                await this.graphCanvasColdStart?.preparePersistedManifold(snapshot);
+            } catch (error) {
+                console.warn('[GraphRebuildPipeline] Packed V3 generation preparation failed closed', error);
+            }
+        }
+        const sceneIndex = this.graphCanvasColdStart?.generationIndex();
+        if (sceneIndex) this.acceptSceneGenerationIndex(sceneIndex);
+    }
+
+    private acceptSceneGenerationIndex(index: GalaxySceneGenerationIndexReceipt): void {
+        const receipt = this.lastGenerationReceiptState();
+        if (!receipt
+            || index.scopeId !== receipt.scopeId
+            || index.snapshotId !== receipt.snapshotId
+            || index.generationId !== receipt.authority.contentHash) return;
+        void this.queueGenerationArtifact(receipt.receiptId, 'sceneIndex', {
+            schemaVersion: 'phoenix-graph-generation-artifact-ref/v1',
+            kind: 'scene-index',
+            status: 'ready',
+            id: `scene-index:${index.snapshotId}:${index.digestSha256}`,
+            digest: index.digestSha256,
+            schema: index.schemaVersion,
+            byteLength: index.totalBytes,
+        });
+    }
+
+    private queueGenerationArtifact(
+        receiptId: string,
+        key: 'assertedQuery' | 'sceneIndex',
+        artifact: GraphGenerationArtifactRef,
+    ): Promise<void> {
+        const queued = this.generationArtifactQueue.then(async () => {
+            const current = this.lastGenerationReceiptState();
+            if (!current || current.receiptId !== receiptId) return;
+            const updated = await withGraphGenerationArtifact(current, key, artifact);
+            this.lastGenerationReceiptState.set(updated);
+            if (this.interactiveRunReuseState?.generationReceipt?.receiptId === receiptId) {
+                this.interactiveRunReuseState = { ...this.interactiveRunReuseState, generationReceipt: updated };
+            }
+            await this.generationLifetime?.accept(updated);
+            await this.persistGenerationReceipt(updated);
+            if (updated.releaseAuthorized) await this.releaseCurrentGeneration(updated);
+        });
+        this.generationArtifactQueue = queued.catch((error) => {
+            console.warn('[GraphRebuildPipeline] Generation artifact publication failed closed', error);
+        });
+        return queued;
+    }
+
+    private async releaseCurrentGeneration(receipt: GraphGenerationReceiptV2): Promise<void> {
+        const lifetime = this.generationLifetime;
+        const snapshot = this.lastSnapshotState();
+        if (resolveGalaxyRendererAuthority() !== 'v3-visible'
+            || !lifetime || !snapshot || snapshot.generationReceiptId === receipt.receiptId) return;
+        this.cancelScheduledPostCommitDiagnostic?.();
+        this.cancelScheduledPostCommitDiagnostic = null;
+        this.postCommitDiagnosticToken += 1;
+        await this.postCommitDiagnosticQueue;
+        const current = this.lastSnapshotState();
+        if (!current
+            || current.id !== receipt.snapshotId
+            || current.authorityContract?.contentHash !== receipt.authority.contentHash) return;
+        const shell = graphGenerationSnapshotShell(current, receipt);
+        await lifetime.releaseRichGeneration(receipt, shell, () => {
+            if (!this.graphRebuild.releaseRichSnapshot(receipt, shell)) {
+                throw new Error(`Graph generation ${receipt.receiptId} lost its current snapshot root.`);
+            }
+            this.lastSnapshotState.set(shell);
+            if (this.interactiveRunReuseState?.generationReceipt?.receiptId === receipt.receiptId) {
+                this.interactiveRunReuseState = {
+                    ...this.interactiveRunReuseState,
+                    snapshot: shell,
+                    generationReceipt: receipt,
+                };
+            }
+        });
     }
 
     private buildRunReceipt(input: {
@@ -2158,6 +2317,27 @@ function snapshotOwnedProjectionReceipt(
 export function assertRunReceiptParity(receipt: GraphIndexRunReceipt, snapshot: GraphRebuildSnapshot): void {
     const contract = assertGraphSnapshotAuthority(snapshot);
     assertRunReceiptParityAgainstContract(receipt, snapshot, contract);
+}
+
+export function graphGenerationSnapshotIsCompact(snapshot: GraphRebuildSnapshot): boolean {
+    return Boolean(snapshot.generationReceiptId && snapshot.generationDigestSha256);
+}
+
+export function assertGenerationSnapshotIdentity(
+    receipt: GraphGenerationReceiptV2,
+    snapshot: GraphRebuildSnapshot,
+): void {
+    if (snapshot.id !== receipt.snapshotId
+        || snapshot.scopeId !== receipt.scopeId
+        || snapshot.authorityContract?.contentHash !== receipt.authority.contentHash
+        || snapshot.interactiveRunAuthority?.inputIdentity !== receipt.inputIdentity) {
+        throw new Error('Compact graph generation shell authority drift.');
+    }
+    if (graphGenerationSnapshotIsCompact(snapshot)
+        && (snapshot.generationReceiptId !== receipt.receiptId
+            || snapshot.generationDigestSha256 !== receipt.digestSha256)) {
+        throw new Error('Compact graph generation shell receipt drift.');
+    }
 }
 
 function assertRunReceiptParityWithContract(

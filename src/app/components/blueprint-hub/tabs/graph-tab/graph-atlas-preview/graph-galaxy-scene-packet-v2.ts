@@ -50,6 +50,11 @@ interface GalaxyScenePacketV2Details {
     hierarchyHints?: GalaxySceneV2['hierarchyHints'];
 }
 
+export type GalaxyScenePacketV2GuideDetails = Pick<
+    GalaxyScenePacketV2Details,
+    'hopfRibbons' | 'lorentzGuides'
+>;
+
 interface StringSlab {
     offsets: Uint32Array;
     bytes: Uint8Array;
@@ -392,6 +397,20 @@ function encodeSceneDetails(scene: GalaxySceneV2): Uint8Array {
 
 function decodeSceneDetails(bytes: Uint8Array): GalaxyScenePacketV2Details {
     return JSON.parse(new TextDecoder().decode(bytes), typedArrayReviver) as GalaxyScenePacketV2Details;
+}
+
+/**
+ * Decodes only the bounded guide families from an already authority-checked
+ * scene-extras page. Packet ownership and hashing remain the caller's job.
+ */
+export function decodeGalaxyScenePacketV2GuideDetails(
+    buffer: ArrayBuffer,
+): GalaxyScenePacketV2GuideDetails {
+    const details = decodeSceneDetails(new Uint8Array(buffer));
+    return {
+        hopfRibbons: details.hopfRibbons ?? [],
+        lorentzGuides: details.lorentzGuides ?? [],
+    };
 }
 
 function typedArrayReplacer(_key: string, value: unknown): unknown {

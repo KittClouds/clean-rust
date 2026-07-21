@@ -1147,6 +1147,7 @@ function receiptForPersistenceTest(
 }
 
 function createGraphRebuildMock() {
+    let generationReceipt: any = null;
     return {
         assertBuildPolicyAuthorized: vi.fn(),
         buildAndPersistSnapshot: vi.fn(async (request: { interactiveInputIdentity?: string }) => authorityReadySnapshot({
@@ -1280,6 +1281,20 @@ function createGraphRebuildMock() {
         })),
         snapshot: vi.fn(() => null as GraphRebuildSnapshot | null),
         loadPersistedSnapshot: vi.fn(async () => null),
+        loadPersistedSnapshotShell: vi.fn(async () => null),
+        loadPersistedGenerationReceipt: vi.fn(async () => generationReceipt),
+        persistGenerationReceipt: vi.fn(async (receipt: any) => {
+            generationReceipt = receipt;
+        }),
+        prepareAssertedQueryArtifact: vi.fn(async () => ({
+            schemaVersion: 'phoenix-graph-generation-artifact-ref/v1' as const,
+            kind: 'asserted-query' as const,
+            status: 'ready' as const,
+            id: 'asserted-query:snapshot-1',
+            digest: `sha256-${'b'.repeat(64)}`,
+            schema: 'phoenix-discovery-view/v1',
+            byteLength: 1024,
+        })),
         loadPersistedRunReceipt: vi.fn(async () => null),
         loadPostProcessCache: vi.fn(async () => null),
         persistRunReceipt: vi.fn(async () => receiptStoreTiming()),
@@ -1343,6 +1358,8 @@ async function flushReceiptPersistence(service: GraphRebuildPipelineService): Pr
 async function flushPostCommitDiagnostics(service: GraphRebuildPipelineService): Promise<void> {
     const queue = (service as any)?.postCommitDiagnosticQueue as Promise<void> | undefined;
     await queue;
+    const generationQueue = (service as any)?.generationArtifactQueue as Promise<void> | undefined;
+    await generationQueue;
 }
 
 async function waitForReceiptPersistenceStart(): Promise<void> {
@@ -1474,6 +1491,13 @@ function authorityReadySnapshot(input: Partial<GraphRebuildSnapshot>): GraphRebu
         },
     };
     sealGraphSnapshotAuthority(snapshot);
+    snapshot.contentManifest = {
+        schemaVersion: 'phoenix-graph-rebuild-content-manifest/v1',
+        snapshotId: snapshot.id,
+        scopeId: snapshot.scopeId,
+        builtAt: snapshot.builtAt,
+        refs: {},
+    };
     return snapshot;
 }
 

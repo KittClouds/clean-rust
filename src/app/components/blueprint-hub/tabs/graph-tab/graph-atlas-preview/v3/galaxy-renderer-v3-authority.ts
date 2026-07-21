@@ -1,10 +1,9 @@
 export const GALAXY_RENDERER_V3_AUTHORITY_KEY = 'phoenix.graph.rendererAuthority.v3';
 
-export type GalaxyRendererAuthority = 'legacy-visible' | 'v3-shadow' | 'v3-visible';
+export type GalaxyRendererAuthority = 'legacy-visible' | 'v3-visible';
 
 const AUTHORITIES = new Set<GalaxyRendererAuthority>([
     'legacy-visible',
-    'v3-shadow',
     'v3-visible',
 ]);
 
@@ -14,21 +13,15 @@ export function resolveGalaxyRendererAuthority(
 ): GalaxyRendererAuthority {
     const requested = new URLSearchParams(search).get('graphRenderer');
     if (isGalaxyRendererAuthority(requested)) return requested;
-    if (stored === 'v3-visible') return 'v3-shadow';
-    return isGalaxyRendererAuthority(stored) ? stored : 'legacy-visible';
-}
-
-export function setGalaxyRendererAuthority(authority: GalaxyRendererAuthority): void {
-    if (typeof localStorage === 'undefined') return;
-    localStorage.setItem(GALAXY_RENDERER_V3_AUTHORITY_KEY, authority);
+    return stored === 'v3-visible' ? stored : 'v3-visible';
 }
 
 export function isGalaxyRendererV3Enabled(authority: GalaxyRendererAuthority): boolean {
-    return authority === 'v3-shadow' || authority === 'v3-visible';
+    return authority === 'v3-visible';
 }
 
 export function isGalaxyRendererLegacyVisible(authority: GalaxyRendererAuthority): boolean {
-    return authority !== 'v3-visible';
+    return authority === 'legacy-visible';
 }
 
 function readStoredAuthority(): string | null {

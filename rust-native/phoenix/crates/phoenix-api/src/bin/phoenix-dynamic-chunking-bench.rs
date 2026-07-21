@@ -144,7 +144,7 @@ fn run(config: Config) -> Result<DynamicChunkingBenchReport, String> {
     for case in cases {
         reports.push(run_case(case, config.profile_lenses)?);
     }
-    let graph_layer_audit = audit_graph_layers(&reports);
+    let graph_layer_audit = audit_graph_layers(&reports, config.fixture == FixtureSelection::All);
 
     let shortrun = reports
         .iter()
@@ -359,7 +359,10 @@ fn print_text_report(report: &DynamicChunkingBenchReport) {
     println!("regressionTargets={:?}", report.regression_targets);
 }
 
-fn audit_graph_layers(cases: &[BenchCaseReport]) -> GraphLayerAudit {
+fn audit_graph_layers(
+    cases: &[BenchCaseReport],
+    require_synthetic_fixtures: bool,
+) -> GraphLayerAudit {
     let mut checks = Vec::new();
     if let Some(case) = find_case(cases, "docs/shortrun.md") {
         for lens in [
@@ -419,7 +422,7 @@ fn audit_graph_layers(cases: &[BenchCaseReport]) -> GraphLayerAudit {
             1,
             "temporal cue fixture should generate temporal graph edges",
         ));
-    } else {
+    } else if require_synthetic_fixtures {
         checks.push(layer_check(
             "temporal fixture present",
             0,
@@ -441,7 +444,7 @@ fn audit_graph_layers(cases: &[BenchCaseReport]) -> GraphLayerAudit {
             1,
             "causal fixture endpoints should materialize event identities",
         ));
-    } else {
+    } else if require_synthetic_fixtures {
         checks.push(layer_check(
             "causal fixture present",
             0,
@@ -463,7 +466,7 @@ fn audit_graph_layers(cases: &[BenchCaseReport]) -> GraphLayerAudit {
             1,
             "worldbuilding fixture should preserve attribute/state chunks",
         ));
-    } else {
+    } else if require_synthetic_fixtures {
         checks.push(layer_check(
             "worldbuilding fixture present",
             0,

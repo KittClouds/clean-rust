@@ -17,6 +17,8 @@ import { buildGraphRebuildEmbeddingAtlas } from '../components/blueprint-hub/tab
 
 interface GraphManifoldPrewarmJob {
     manifold: AtlasManifoldMode;
+    publishAtlas: boolean;
+    shareSearchIndex: boolean;
     scene?: {
         settings: GalaxyRenderSettings;
         renderIdentity: string;
@@ -25,24 +27,43 @@ interface GraphManifoldPrewarmJob {
 }
 
 interface GraphManifoldPrewarmRequest {
+    requestId: number;
     generationId: string;
-    snapshot: GraphRebuildSnapshot;
+    snapshot?: GraphRebuildSnapshot;
     jobs: GraphManifoldPrewarmJob[];
     entityColors: Record<string, string>;
     graphNodeColors: Record<string, string>;
 }
 
+let residentGenerationId = '';
+let residentSnapshot: GraphRebuildSnapshot | null = null;
+
 addEventListener('message', ({ data }: MessageEvent<GraphManifoldPrewarmRequest>) => {
-    const { generationId, snapshot, jobs } = data;
+    void processRequest(data);
+});
+
+async function processRequest(data: GraphManifoldPrewarmRequest): Promise<void> {
+    const { requestId, generationId, jobs } = data;
     try {
+        if (data.snapshot) {
+            residentGenerationId = generationId;
+            residentSnapshot = data.snapshot;
+        }
+        if (!residentSnapshot || residentGenerationId !== generationId) {
+            throw new Error(`Graph manifold prewarm snapshot ${generationId} is not resident.`);
+        }
         entityColorStore.setColors(data.entityColors as Parameters<typeof entityColorStore.setColors>[0]);
         for (const [kind, hsl] of Object.entries(data.graphNodeColors)) {
             entityColorStore.setGraphNodeColor(kind, hsl);
         }
-        for (const { manifold, scene: sceneRequest } of jobs) {
-            const atlas = buildGraphRebuildEmbeddingAtlas(snapshot, manifold);
+        for (const { manifold, publishAtlas, shareSearchIndex, scene: sceneRequest } of jobs) {
+            const atlas = buildGraphRebuildEmbeddingAtlas(residentSnapshot, manifold);
+            const publishedAtlas = publishAtlas
+                ? (shareSearchIndex ? { ...atlas, searchIndex: [] } : atlas)
+                : undefined;
             if (!sceneRequest) {
-                postMessage({ generationId, manifold, atlas });
+                postMessage({ requestId, generationId, manifold, atlas: publishedAtlas });
+                await yieldToPriorityRequests();
                 continue;
             }
             const scene = galaxySceneToV2(
@@ -54,15 +75,21 @@ addEventListener('message', ({ data }: MessageEvent<GraphManifoldPrewarmRequest>
                 authorityReceipt: sceneRequest.renderIdentity,
             });
             postMessage(
-                { generationId, manifold, atlas, packet },
+                { requestId, generationId, manifold, atlas: publishedAtlas, packet },
                 galaxyScenePacketV2TransferList(packet),
             );
+            await yieldToPriorityRequests();
         }
-        postMessage({ generationId, complete: true });
+        postMessage({ requestId, generationId, complete: true });
     } catch (error) {
         postMessage({
+            requestId,
             generationId,
             error: error instanceof Error ? error.message : String(error),
         });
     }
-});
+}
+
+function yieldToPriorityRequests(): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve, 0));
+}

@@ -20,18 +20,20 @@ describe('Galaxy Renderer V3 isolation', () => {
     it('never disposes the quad geometry shared by Three.js sprites', () => {
         const backend = source('galaxy-renderer-v3-webgpu-backend.ts');
 
-        expect(backend).toContain('if (!(object instanceof THREE.Sprite)) object.geometry?.dispose();');
+        expect(backend).toContain('if (!(drawable instanceof THREE.Sprite)) drawable.geometry?.dispose();');
     });
 
-    it('applies settings in place without reopening the graph generation', () => {
+    it('applies presentation settings in place and recompiles geometry settings', () => {
         const backend = source('galaxy-renderer-v3-webgpu-backend.ts');
         const component = source('graph-galaxy-canvas-v3.component.ts');
         const settingsBody = backend.slice(backend.indexOf('setSettings('), backend.indexOf('setMode('));
 
         expect(settingsBody).not.toContain('openGeneration');
         expect(settingsBody).toContain('syncEdgePresentation');
+        expect(settingsBody).toContain('syncGalaxyRendererV3GuidePresentation');
         expect(component).toContain("this.backend?.setSettings(this.currentSettings())");
-        expect(component).not.toContain("changes['edges'] || changes['settings']");
+        expect(component).toContain('galaxyRendererV3SettingsRequireCompilation(');
+        expect(component).toContain('settingsRequireCompilation');
     });
 
     it('restores displaced presentation rows only for stretch mode', () => {
@@ -48,6 +50,27 @@ describe('Galaxy Renderer V3 isolation', () => {
         expect(adapter).toContain('buildGalaxyScene');
         expect(adapter).toContain('packGalaxyScenePacketV2');
         expect(packetSource).toContain('galaxy-renderer-v3-legacy-input-adapter.worker');
+    });
+
+    it('keeps the V3 surface mounted while an authoritative manifold is preparing', () => {
+        const preview = source('../graph-atlas-preview.component.ts');
+        const component = source('graph-galaxy-canvas-v3.component.ts');
+
+        expect(preview).toContain('activeNodeCount() === 0 && !graphProjectionPreparing()');
+        expect(preview).toContain('this.activeNodeCount() > 0 || this.graphProjectionPreparing()');
+        expect(preview).toContain('graphProjectionRequired && !graphSnapshotHasHydratedCanvasPayload(snapshot)');
+        const packedBranch = preview.slice(
+            preview.indexOf('graphProjectionRequired && !graphSnapshotHasHydratedCanvasPayload(snapshot)'),
+            preview.indexOf("if (!force && this.atlasLoadingKeys.get(manifold)"),
+        );
+        expect(packedBranch).not.toContain('metadataRequested.emit');
+        expect(packedBranch).toContain('this.machine.failManifoldLoad(load, error)');
+        expect(component).toContain("this.sourceMode === 'embeddings' && this.sceneIdentity");
+        expect(component).not.toContain("this.sourceMode === 'embeddings' && this.sceneIdentity && this.entities.length === 0");
+        expect(component).toContain('this.entityByIdentity.get(identity)');
+        expect(component).toContain('this.packetSource.waitForResident(authorityReceipt, generationId, this.sourceMode');
+        expect(component).toContain('await this.ensureMounted(backend);');
+        expect(component).toContain('this.firstPixelRendered.emit(this.sceneIdentity);');
     });
 
     it('refuses promotion until every independent proof gate passes', () => {

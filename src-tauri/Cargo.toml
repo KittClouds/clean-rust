@@ -22,6 +22,7 @@ phoenix-graph-rebuild = { path = "../rust-native/phoenix/crates/phoenix-graph-re
 phoenix-graph-api = { package = "phoenix-api", path = "../rust-native/phoenix/crates/phoenix-api" }
 phoenix-graph-post = { path = "../rust-native/phoenix/crates/phoenix-graph-post" }
 phoenix-graph-kernel = { path = "../rust-native/phoenix/crates/phoenix-graph-kernel" }
+phoenix-discovery-view = { path = "../rust-native/phoenix/crates/phoenix-discovery-view" }
 phoenix-store-native-core = { path = "../rust-native/phoenix/crates/phoenix-store-native-core" }
 phoenix-store-overgraph = { path = "../rust-native/phoenix/crates/phoenix-store-overgraph" }
 phoenix-document-index = { path = "../rust-native/phoenix/crates/phoenix-document-index" }

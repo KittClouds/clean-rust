@@ -7,25 +7,27 @@ import {
 } from './galaxy-renderer-v3-authority';
 
 describe('Galaxy Renderer V3 authority', () => {
-    it('keeps legacy as the immutable default', () => {
-        expect(resolveGalaxyRendererAuthority('', null)).toBe('legacy-visible');
-        expect(resolveGalaxyRendererAuthority('?graphRenderer=unknown', 'broken')).toBe('legacy-visible');
+    it('keeps V3 authoritative when storage is absent or invalid', () => {
+        expect(resolveGalaxyRendererAuthority('', null)).toBe('v3-visible');
+        expect(resolveGalaxyRendererAuthority('?graphRenderer=unknown', 'broken')).toBe('v3-visible');
     });
 
     it('allows an explicit query flag to override persisted A/B state', () => {
-        expect(resolveGalaxyRendererAuthority('?graphRenderer=v3-shadow', 'v3-visible')).toBe('v3-shadow');
+        expect(resolveGalaxyRendererAuthority('?graphRenderer=v3-shadow', 'v3-visible')).toBe('v3-visible');
         expect(resolveGalaxyRendererAuthority('?graphRenderer=legacy-visible', 'v3-visible')).toBe('legacy-visible');
         expect(resolveGalaxyRendererAuthority('?graphRenderer=v3-visible', 'legacy-visible')).toBe('v3-visible');
     });
 
-    it('downgrades a persisted visible flag to shadow until promotion is explicit', () => {
-        expect(resolveGalaxyRendererAuthority('', 'v3-visible')).toBe('v3-shadow');
+    it('keeps an explicit persisted promotion and rejects stale demotions across restart', () => {
+        expect(resolveGalaxyRendererAuthority('', 'v3-visible')).toBe('v3-visible');
+        expect(resolveGalaxyRendererAuthority('', 'v3-shadow')).toBe('v3-visible');
+        expect(resolveGalaxyRendererAuthority('', 'legacy-visible')).toBe('v3-visible');
     });
 
-    it('never aliases a V3 failure mode to the legacy renderer', () => {
-        expect(isGalaxyRendererV3Enabled('v3-shadow')).toBe(true);
+    it('mounts exactly one renderer for every valid authority', () => {
         expect(isGalaxyRendererV3Enabled('v3-visible')).toBe(true);
-        expect(isGalaxyRendererLegacyVisible('v3-shadow')).toBe(true);
+        expect(isGalaxyRendererV3Enabled('legacy-visible')).toBe(false);
         expect(isGalaxyRendererLegacyVisible('v3-visible')).toBe(false);
+        expect(isGalaxyRendererLegacyVisible('legacy-visible')).toBe(true);
     });
 });

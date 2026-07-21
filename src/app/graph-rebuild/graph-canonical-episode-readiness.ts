@@ -21,7 +21,9 @@ export interface CanonicalEpisodeAssignmentReadiness {
     attached: number;
     created: number;
     abstained: number;
-    chronologicalSpanDays: number;
+    chronologicalSpanMs: number;
+    chronologicalSpanLabel: string;
+    chronologicalSpanGate: 'waiting' | 'passed';
     averageCandidates: number;
     candidateCountRange: string;
     linked: number;
@@ -34,6 +36,10 @@ export interface CanonicalEpisodeAssignmentReadiness {
     plumbingGate: 'waiting' | 'passed';
     pilotGate: 'waiting' | 'passed';
     researchCountGate: 'waiting' | 'passed';
+    datasetRole: 'train-only';
+    datasetEligibilityGate: 'blocked';
+    splitWitnesses: 'unavailable';
+    promotionGate: 'locked';
 }
 
 export interface CanonicalEpisodeAssignmentResearchSurface {
@@ -51,16 +57,20 @@ export async function loadCanonicalEpisodeAssignmentReadiness(
         surface.nativeRewardObservationCensus().then(nativeRewardCensus),
     ]);
     const mature = rewards.matureCanonicalEpisodeAssignments;
+    const chronologicalSpanMs = chronologicalSpan(decisions);
     return {
         decisions: decisions.canonicalEpisodeAssignmentLabels,
         attached: decisions.canonicalEpisodeAttachLabels,
         created: decisions.canonicalEpisodeCreateLabels,
         abstained: decisions.canonicalEpisodeAbstainLabels,
-        chronologicalSpanDays: chronologicalSpanDays(decisions),
-        averageCandidates: decisions.canonicalEpisodeAssignmentLabels === 0
-            ? 0
-            : decisions.canonicalEpisodeCandidateCountTotal
-                / decisions.canonicalEpisodeAssignmentLabels,
+        chronologicalSpanMs,
+        chronologicalSpanLabel: formatChronologicalSpan(chronologicalSpanMs),
+        chronologicalSpanGate: chronologicalSpanMs >= 86_400_000 ? 'passed' : 'waiting',
+        averageCandidates:
+            decisions.canonicalEpisodeAssignmentLabels === 0
+                ? 0
+                : decisions.canonicalEpisodeCandidateCountTotal /
+                  decisions.canonicalEpisodeAssignmentLabels,
         candidateCountRange: `${decisions.canonicalEpisodeCandidateCountMin}-${decisions.canonicalEpisodeCandidateCountMax}`,
         linked: decisions.graphTruthLinkedDecisions,
         partiallyObserved: rewards.partiallyObservedDecisions,
@@ -72,6 +82,11 @@ export async function loadCanonicalEpisodeAssignmentReadiness(
         plumbingGate: mature >= 10 ? 'passed' : 'waiting',
         pilotGate: mature >= 100 ? 'passed' : 'waiting',
         researchCountGate: mature >= 1_000 ? 'passed' : 'waiting',
+        // A single live corpus census cannot certify validation/test separation or leakage.
+        datasetRole: 'train-only',
+        datasetEligibilityGate: 'blocked',
+        splitWitnesses: 'unavailable',
+        promotionGate: 'locked',
     };
 }
 
@@ -129,7 +144,10 @@ function canonicalRewardProducerReport(value: unknown): CanonicalRewardProducerR
         throw new Error('Canonical reward observer returned an invalid schema.');
     }
     const nextEligibleAt = row['nextEligibleAt'];
-    if (nextEligibleAt !== null && (typeof nextEligibleAt !== 'number' || !Number.isFinite(nextEligibleAt))) {
+    if (
+        nextEligibleAt !== null &&
+        (typeof nextEligibleAt !== 'number' || !Number.isFinite(nextEligibleAt))
+    ) {
         throw new Error('Canonical reward observer returned an invalid horizon.');
     }
     return {
@@ -163,15 +181,28 @@ function nullableTimestamp(row: Record<string, unknown>, key: string): number | 
     return value;
 }
 
-function chronologicalSpanDays(census: NativeDecisionCensus): number {
+function chronologicalSpan(census: NativeDecisionCensus): number {
     const first = census.canonicalEpisodeFirstObservedAt;
     const last = census.canonicalEpisodeLastObservedAt;
     if (first === null || last === null) return 0;
-    return Math.max(1, Math.ceil((last - first) / 86_400_000));
+    return Math.max(0, last - first);
+}
+
+function formatChronologicalSpan(spanMs: number): string {
+    if (spanMs === 0) return '0 min';
+    const totalMinutes = Math.round(spanMs / 60_000);
+    if (totalMinutes === 0) return '<1 min';
+    if (totalMinutes < 60) return `${totalMinutes} min`;
+    const totalHours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    if (totalHours < 24) return minutes === 0 ? `${totalHours}h` : `${totalHours}h ${minutes}m`;
+    const days = Math.floor(totalHours / 24);
+    const hours = totalHours % 24;
+    return hours === 0 ? `${days}d` : `${days}d ${hours}h`;
 }
 
 function object(value: unknown): Record<string, unknown> | null {
     return value && typeof value === 'object' && !Array.isArray(value)
-        ? value as Record<string, unknown>
+        ? (value as Record<string, unknown>)
         : null;
 }

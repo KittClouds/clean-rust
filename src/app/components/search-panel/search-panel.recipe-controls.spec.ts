@@ -23,7 +23,7 @@ describe('SearchPanelComponent recipe controls', () => {
         expect(template).toContain('(click)="runModernBertNliReview()"');
     });
 
-    it('routes the adjudicated semantic recipe through the NLI capability contract', () => {
+    it('keeps the adjudicated semantic recipe quarantined while preserving its NLI contract', () => {
         expect(ATLAS_GRAPH_BUILD_RECIPE_IDS).toContain('adjudicatedSemanticGraph');
 
         const recipe = atlasRecipeDefinitionById('adjudicatedSemanticGraph');
@@ -31,8 +31,8 @@ describe('SearchPanelComponent recipe controls', () => {
 
         expect(recipe.requiredCapabilities).toContain('nliAdjudication');
         expect(recipe.requiredLanes).toContain('nli');
-        expect(recipe.backendRoute).toContain('semantic:listNliJudgmentInputs');
-        expect(recipe.backendRoute).toContain('semantic:applyNliJudgments');
+        expect(recipe.backendRoute).toContain('QUARANTINED');
+        expect(recipe.backendRoute).toContain('legacy atlas_rich_scan');
         expect(capability.backendRoute).toContain('NliWorkerService.classifyStream');
     });
 });

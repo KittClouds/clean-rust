@@ -20,6 +20,11 @@ describe('AttributesTabComponent', () => {
         expect(template).toContain('(nextPageRequested)="loadNextAtlasProofPage()"');
         expect(template).toContain('(actionRequested)="dispatchRoomAction($event)"');
         expect(template).toContain('(roomChange)="setOperatingRoom($event)"');
+        expect(template).toContain('Volume thresholds only · not dataset eligibility');
+        expect(template).toContain('readiness.chronologicalSpanLabel');
+        expect(template).toContain('readiness.datasetRole');
+        expect(template).toContain('Split/leakage witnesses');
+        expect(template).not.toContain('readiness.chronologicalSpanDays');
 
         expect(template).not.toContain('reviewAdjudicationContract');
         expect(template).not.toContain('reviewDeck()');
