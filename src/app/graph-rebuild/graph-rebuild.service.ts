@@ -143,6 +143,16 @@ import type {
     GraphRebuildScopeKind,
     GraphRebuildSnapshot,
 } from './graph-rebuild-snapshot';
+import type { GraphRebuildReplayManifest } from './graph-rebuild-replay-contract';
+import {
+    assertGraphForceV2ShadowResult,
+    buildGraphForceV2RequestFromAuthority,
+    buildGraphForceV2Request,
+    buildGraphForceV2ShadowRequestFromAuthority,
+    buildGraphForceV2ShadowRequest,
+    type GraphForceAuthorityPersistReceipt,
+    type GraphForceRebuildV2ShadowResult,
+} from './graph-force-rebuild-v2';
 import type { GraphCompilerDualWriteSidecar } from './graph-compiler-read-model';
 import type { CalendarRegistrySnapshot } from '../lib/fantasy-calendar/calendar-registry-snapshot';
 import {
@@ -390,6 +400,8 @@ export interface NativeGraphRunPage {
         retrievalViolations: number;
     };
     projection: NativeSnapshotAnalysisOutput;
+    analysisSource: 'computed' | 'resident_verified' | 'durable_verified';
+    analysisKernelMicros: number;
 }
 
 export interface NativeGraphRunPagingState {
@@ -520,6 +532,7 @@ export interface GraphRebuildBuildRequest {
     diagnosticBaseSnapshotRunSerial?: number;
     candidateCount?: number;
     calendarRegistrySnapshot?: CalendarRegistrySnapshot;
+    replayManifest?: GraphRebuildReplayManifest;
 }
 
 type GraphRebuildBuildTimingNumberKey = {
@@ -600,6 +613,74 @@ export class GraphRebuildService {
 
     residentNativeGraphRunHandle(): string | null {
         return this.activeNativeGraphRun?.runHandle || null;
+    }
+
+    async verifyForceV2Shadow(
+        replay: GraphRebuildReplayManifest,
+        snapshot: GraphRebuildSnapshot,
+    ): Promise<GraphForceRebuildV2ShadowResult> {
+        const request = buildGraphForceV2ShadowRequest(replay, snapshot);
+        const result = await this.phoenix.forceRebuildV2Shadow(request) as GraphForceRebuildV2ShadowResult;
+        return assertGraphForceV2ShadowResult(result, request);
+    }
+
+    async verifyForceV2(
+        replay: GraphRebuildReplayManifest,
+        snapshot: GraphRebuildSnapshot,
+    ): Promise<GraphForceRebuildV2ShadowResult> {
+        const shadowRequest = buildGraphForceV2ShadowRequest(replay, snapshot);
+        const result = await this.phoenix.forceRebuildV2(
+            buildGraphForceV2Request(replay, snapshot),
+        ) as GraphForceRebuildV2ShadowResult;
+        return assertGraphForceV2ShadowResult(result, shadowRequest);
+    }
+
+    async verifyForceV2FromAuthority(
+        replay: GraphRebuildReplayManifest,
+        authority: NonNullable<GraphIndexRunReceipt['verifiedForceAuthority']>,
+    ): Promise<{ result: GraphForceRebuildV2ShadowResult; snapshot: GraphRebuildSnapshot }> {
+        const shadowRequest = buildGraphForceV2ShadowRequestFromAuthority(replay, authority);
+        const raw = await this.phoenix.forceRebuildV2(
+            buildGraphForceV2RequestFromAuthority(replay, authority),
+        ) as GraphForceRebuildV2ShadowResult;
+        const result = assertGraphForceV2ShadowResult(raw, shadowRequest);
+        const snapshot = result.authorityPacket;
+        if (!snapshot) throw new Error('PHX_FORCE_V2_AUTHORITY_PACKET_MISSING: native packet is required.');
+        assertGraphCanvasBootSnapshotShell(snapshot);
+        const previousRun = this.activeNativeGraphRun;
+        this.activeNativeGraphRun = { snapshotId: snapshot.id, runHandle: result.runHandle };
+        this.nativeGraphRunPagingState.set(null);
+        this.snapshotState.set(snapshot);
+        if (previousRun && previousRun.runHandle !== result.runHandle) {
+            void this.releaseNativeGraphRunLease(previousRun.runHandle);
+        }
+        return { result, snapshot };
+    }
+
+    async persistForceV2Authority(
+        snapshot: GraphRebuildSnapshot,
+        receipt: GraphGenerationReceiptV2,
+    ): Promise<GraphForceAuthorityPersistReceipt> {
+        const durable = snapshot.interactiveRunAuthority?.durable;
+        const authorityHash = snapshot.authorityContract?.contentHash;
+        if (!durable || !authorityHash || durable.snapshotId !== snapshot.id) {
+            throw new Error('PHX_FORCE_V2_AUTHORITY_REQUIRED: sealed native durability is required.');
+        }
+        const authorityPacket = verifiedForceSnapshotShell(snapshot, receipt);
+        const result = await this.phoenix.persistForceV2Authority({
+            scopeId: snapshot.scopeId,
+            snapshotId: snapshot.id,
+            authorityHash,
+            manifestId: durable.manifestId,
+            authorityPacket,
+        }) as GraphForceAuthorityPersistReceipt;
+        if (result.schemaVersion !== 'phoenix-force-v2-authority-persist/v1'
+            || !result.artifactId || result.rawBytes <= 0 || result.rawBytes > 256 * 1024
+            || !Number.isFinite(result.serializerMicros)
+            || !Number.isFinite(result.atomicPersistMicros)) {
+            throw new Error('PHX_FORCE_V2_AUTHORITY_PERSIST_INVALID: native authority receipt failed validation.');
+        }
+        return result;
     }
 
     nativeSiegelReceipt(snapshotId: string): unknown {
@@ -980,7 +1061,6 @@ export class GraphRebuildService {
                 noteTexts,
                 timings,
                 durabilityMode,
-                request.interactiveInputIdentity,
             );
             const packetConstructionStarted = performance.now();
             const interactivePacketAttached = durabilityMode === 'interactive'
@@ -1011,6 +1091,14 @@ export class GraphRebuildService {
                 previousSnapshot,
                 hasNonemptySourceText: Object.values(noteTexts).some((text) => text.trim().length > 0),
             });
+            if (durabilityMode === 'interactive') {
+                await this.persistNativeGraphRunForVerifiedForce(
+                    snapshot,
+                    timings,
+                    request.interactiveInputIdentity,
+                    request.replayManifest,
+                );
+            }
             const primaryNoOpSnapshot = currentSnapshot?.scopeId === snapshot.scopeId
                 ? currentSnapshot
                 : previousSnapshot;
@@ -1070,7 +1158,6 @@ export class GraphRebuildService {
         noteTexts: Record<string, string>,
         timings: GraphRebuildBuildTimings,
         durabilityMode: GraphBuildDurabilityMode,
-        interactiveInputIdentity?: string,
     ): Promise<void> {
         const started = performance.now();
         if (this.phoenix.target !== 'native') {
@@ -1172,7 +1259,8 @@ export class GraphRebuildService {
             continuityReviewRequired: continuityCounters.reviewRequired,
         };
         timings.nativeSnapshotAnalysisMs = elapsedMs(started);
-        timings.nativeSnapshotAnalysisRustMicros = native.timing.totalMicros;
+        timings.nativeSnapshotAnalysisRustMicros = page.analysisKernelMicros;
+        timings.nativeSnapshotAnalysisSource = page.analysisSource;
         timings.nativeGraphRunArenaReused = page.arena.reused ? 1 : 0;
         timings.nativeGraphRunArenaResidentBytes = page.arena.residentBytes;
         timings.nativeGraphRunArenaActiveLeases = page.arena.activeLeases;
@@ -1199,29 +1287,59 @@ export class GraphRebuildService {
         timings.nativeMemoryGovernanceRetrievalExperimentRustMicros = native.timing.retrievalBuildMicros;
         timings.nativePromotionVerdictRows = native.promotion.certificate.audit.total;
         timings.nativePromotionVerdictRustMicros = native.timing.verdictBuildMicros;
-        if (durabilityMode === 'interactive') {
-            const persistStarted = performance.now();
-            const durable = await this.phoenix.persistGraphRun(page.runHandle) as NativeGraphRunPersistReceipt;
-            this.assertNativeGraphRunPersistReceipt(durable, snapshot, page.runHandle);
-            if (interactiveInputIdentity) {
-                snapshot.interactiveRunAuthority = {
-                    schemaVersion: 'phoenix-interactive-graph-run-authority/v1',
-                    inputIdentity: interactiveInputIdentity,
-                    snapshotId: snapshot.id,
-                    scopeId: snapshot.scopeId,
-                    durable,
-                };
-            }
-            timings.nativeGraphRunPersistMs = elapsedMs(persistStarted);
-            timings.nativeGraphRunChangedSections = durable.changedSections;
-            timings.nativeGraphRunReusedSections = durable.reusedSections;
-            timings.nativeGraphRunEncodedSections = durable.encodedSections;
-            timings.nativeGraphRunCompressedSections = durable.compressedSections;
-            timings.nativeGraphRunRawBytesWritten = durable.rawBytesWritten;
-            timings.nativeGraphRunCompressedBytesWritten = durable.compressedBytesWritten;
-        } else {
+        if (durabilityMode !== 'interactive') {
             void this.phoenix.closeGraphRun(page.runHandle);
         }
+    }
+
+    private async persistNativeGraphRunForVerifiedForce(
+        snapshot: GraphRebuildSnapshot,
+        timings: GraphRebuildBuildTimings,
+        interactiveInputIdentity?: string,
+        replay?: GraphRebuildReplayManifest,
+    ): Promise<void> {
+        const runHandle = this.nativeGraphRunHandle(snapshot.id);
+        if (!runHandle) throw new Error('Native graph run was not retained through authority sealing.');
+        const persistStarted = performance.now();
+        const durable = await this.phoenix.persistGraphRun(runHandle, {
+            authorityHash: snapshot.authorityContract?.contentHash || '',
+            forceReplayBinding: replay ? {
+                schemaVersion: 'phoenix-verified-force/v2',
+                cohortId: replay.cohortId,
+                sourceMode: replay.sourceMode,
+                dependencyIdentity: replay.dependencyIdentity,
+                documentSha256: Object.fromEntries(replay.documents.map((row) => [row.noteId, row.sha256])),
+                documents: replay.documents.map((row) => ({
+                    noteId: row.noteId,
+                    sha256: row.sha256,
+                    jsCodeUnitChars: row.jsCodeUnitChars,
+                    utf8Bytes: row.utf8Bytes,
+                    version: row.version,
+                    updatedAt: row.updatedAt,
+                })),
+                dynamicNerId: replay.model.dynamicNerId,
+                embeddingModelId: replay.model.embeddingModelId,
+                embeddingDimension: replay.model.embeddingDimensionLabel,
+                nliModelId: replay.model.nliModelId,
+            } : undefined,
+        }) as NativeGraphRunPersistReceipt;
+        this.assertNativeGraphRunPersistReceipt(durable, snapshot, runHandle);
+        if (interactiveInputIdentity) {
+            snapshot.interactiveRunAuthority = {
+                schemaVersion: 'phoenix-interactive-graph-run-authority/v1',
+                inputIdentity: interactiveInputIdentity,
+                snapshotId: snapshot.id,
+                scopeId: snapshot.scopeId,
+                durable,
+            };
+        }
+        timings.nativeGraphRunPersistMs = elapsedMs(persistStarted);
+        timings.nativeGraphRunChangedSections = durable.changedSections;
+        timings.nativeGraphRunReusedSections = durable.reusedSections;
+        timings.nativeGraphRunEncodedSections = durable.encodedSections;
+        timings.nativeGraphRunCompressedSections = durable.compressedSections;
+        timings.nativeGraphRunRawBytesWritten = durable.rawBytesWritten;
+        timings.nativeGraphRunCompressedBytesWritten = durable.compressedBytesWritten;
     }
 
     private assertNativeGraphRunPersistReceipt(
@@ -3062,6 +3180,24 @@ export function graphGenerationSnapshotShell(
         || snapshot.scopeId !== receipt.scopeId
         || snapshot.authorityContract?.contentHash !== receipt.authority.contentHash) {
         throw new Error('Graph generation is not authorized for compact-shell release.');
+    }
+    const shell = graphRebuildSnapshotPersistenceView(snapshot, []);
+    shell.generationReceiptId = receipt.receiptId;
+    shell.generationDigestSha256 = receipt.digestSha256;
+    assertGraphCanvasBootSnapshotShell(shell);
+    return shell;
+}
+
+export function verifiedForceSnapshotShell(
+    snapshot: GraphRebuildSnapshot,
+    receipt: GraphGenerationReceiptV2,
+): GraphRebuildSnapshot {
+    const durable = snapshot.interactiveRunAuthority?.durable;
+    const analysis = receipt.artifacts.analysisRun;
+    if (!durable || analysis.status !== 'ready' || analysis.digest !== durable.manifestId
+        || snapshot.id !== receipt.snapshotId || snapshot.scopeId !== receipt.scopeId
+        || snapshot.authorityContract?.contentHash !== receipt.authority.contentHash) {
+        throw new Error('Verified FORCE authority requires sealed snapshot and native analysis parity.');
     }
     const shell = graphRebuildSnapshotPersistenceView(snapshot, []);
     shell.generationReceiptId = receipt.receiptId;

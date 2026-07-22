@@ -3,14 +3,20 @@ import { dirname, resolve } from 'node:path';
 import WebSocket from 'ws';
 
 const args = parseArgs(process.argv.slice(2));
-if (args.documents.length !== 2) {
+if (!args.exactReplay && args.documents.length !== 2) {
   throw new Error('Pass exactly two --document paths.');
+}
+if (args.exactReplay && (args.documents.length || args.mutationLocality)) {
+  throw new Error('--exact-replay cannot be combined with document or mutation-locality inputs.');
 }
 
 const documents = await Promise.all(args.documents.map(async (path, index) => ({
   title: args.titles[index] || `Benchmark document ${index + 1}`,
   text: await readFile(resolve(path), 'utf8'),
 })));
+const exactReplay = args.exactReplay
+  ? JSON.parse(await readFile(resolve(args.exactReplay), 'utf8'))
+  : null;
 const target = await waitForTarget(args.port);
 const cdp = await connectCdp(target.webSocketDebuggerUrl);
 
@@ -19,12 +25,13 @@ try {
   await cdp.call('Runtime.enable');
   await cdp.call('Page.navigate', { url: `http://127.0.0.1:4200/?graphPerf=1` });
   await waitForHarness(cdp);
-  const method = args.mutationLocality ? 'runMutationLocality' : 'run';
-  const expression = `window.__PHOENIX_GRAPH_BUILD_BASELINE__.${method}(${JSON.stringify({
+  const method = exactReplay ? 'runExactReplay' : args.mutationLocality ? 'runMutationLocality' : 'run';
+  const input = exactReplay || {
     documents,
     warmForceRuns: args.warmRuns,
     deltaRuns: args.deltaRuns,
-  })})`;
+  };
+  const expression = `window.__PHOENIX_GRAPH_BUILD_BASELINE__.${method}(${JSON.stringify(input)})`;
   const response = await cdp.call('Runtime.evaluate', {
     expression,
     awaitPromise: true,
@@ -42,7 +49,13 @@ try {
   console.log(`[graph-desktop-baseline] wrote ${output}`);
   console.log(JSON.stringify(args.mutationLocality
     ? report
-    : { summary: report.summary, parity: report.parity }, null, 2));
+    : {
+      summary: report.summary,
+      parity: report.parity,
+      execution: report.execution,
+      machine: report.machine,
+      performanceGate: report.performanceGate,
+    }, null, 2));
 } finally {
   cdp.close();
 }
@@ -50,7 +63,7 @@ try {
 function parseArgs(argv) {
   const result = {
     documents: [], titles: [], port: 9222, warmRuns: 10, deltaRuns: 10,
-    mutationLocality: false,
+    mutationLocality: false, exactReplay: null,
     output: 'target/graph-build-baselines/two-document-desktop.json',
   };
   for (let index = 0; index < argv.length; index += 1) {
@@ -61,6 +74,7 @@ function parseArgs(argv) {
     else if (value === '--warm-runs') result.warmRuns = Number(argv[++index]);
     else if (value === '--delta-runs') result.deltaRuns = Number(argv[++index]);
     else if (value === '--output') result.output = argv[++index];
+    else if (value === '--exact-replay') result.exactReplay = argv[++index];
     else if (value === '--mutation-locality') result.mutationLocality = true;
     else throw new Error(`Unknown argument: ${value}`);
   }

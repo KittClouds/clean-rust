@@ -9,6 +9,7 @@ import { AtlasCapabilityRuntimeService } from '../services/atlas-capability-runt
 import { NerService } from '../services/ner.service';
 import { phoenixTransportAudit, type PhoenixTransportAuditSnapshot } from '../services/phoenix-transport-audit';
 import { PhoenixStoreService, type PhoenixContentMutationTiming } from '../services/phoenix-store.service';
+import { PhoenixBackendService } from '../services/phoenix-backend.service';
 import { GraphGenerationLifetimeService } from '../services/graph-generation-lifetime.service';
 import { GraphCanvasColdStartService } from '../services/graph-canvas-cold-start.service';
 import type { GalaxySceneGenerationIndexReceipt } from '../components/blueprint-hub/tabs/graph-tab/graph-atlas-preview/graph-galaxy-scene-packet-persistence';
@@ -57,6 +58,13 @@ import type {
     GraphRebuildSnapshot,
 } from './graph-rebuild-snapshot';
 import { GraphCoalescingAsyncQueue } from './graph-coalescing-async-queue';
+import {
+    attachGraphReceiptSpans,
+    buildGraphReplayManifest,
+    GRAPH_FORCE_V1_PATH_ID,
+    GRAPH_FORCE_V2_PATH_ID,
+    type GraphRebuildReplayManifest,
+} from './graph-rebuild-replay-contract';
 
 const POSTPROCESS_FACT_CAPABILITIES: AtlasCapabilityId[] = [
     'nliAdjudication',
@@ -77,6 +85,7 @@ const PROJECTION_CAPABILITIES: Array<{ capability: AtlasCapabilityId; mode: Grap
 const POST_COMMIT_DIAGNOSTIC_DEBOUNCE_MS = 250;
 const POST_COMMIT_DIAGNOSTIC_IDLE_TIMEOUT_MS = 2_000;
 const INTERACTIVE_PERSISTED_RECEIPT_STAGE_IDS = new Set([
+    'verifiedForceV2',
     'interactiveIdentityReuse',
     'dynamicNer',
     'nliAdjudication',
@@ -91,6 +100,7 @@ const INTERACTIVE_PERSISTED_RECEIPT_STAGE_IDS = new Set([
     'transportOps',
     'uiCommit',
     'postCommitEnrichment',
+    'forceV2AuthorityPersist',
 ]);
 
 interface GraphNerDeltaResult {
@@ -149,6 +159,7 @@ export class GraphRebuildPipelineService {
     private readonly atlasRuntime = inject(AtlasCapabilityRuntimeService);
     private readonly ner = inject(NerService);
     private readonly store = inject(PhoenixStoreService);
+    private readonly phoenix = inject(PhoenixBackendService);
     private readonly generationLifetime = inject(GraphGenerationLifetimeService, { optional: true });
     private readonly graphCanvasColdStart = inject(GraphCanvasColdStartService, { optional: true });
     private readonly runningState = signal(false);
@@ -169,6 +180,7 @@ export class GraphRebuildPipelineService {
     private interactiveRunReuseState: InteractiveRunReuseState | null = null;
     private reusedRunReceiptSerial = 0;
     private generationArtifactQueue: Promise<void> = Promise.resolve();
+    private generationArtifactPending = 0;
 
     readonly running = computed(() => this.runningState());
     readonly lastReceipt = computed(() => this.lastReceiptState());
@@ -233,6 +245,9 @@ export class GraphRebuildPipelineService {
             return this.reuseAuthoritativeInteractiveGraph(request);
         }
         const durabilityMode = request.durabilityMode || 'interactive';
+        if (verifiedForceV2Required(request)) {
+            return this.buildVerifiedForceV2(request);
+        }
         const modelReadiness = this.modelReadiness(request);
         const graphCold = modelReadiness
             .filter((model) => model.id === 'dynamicNer')
@@ -253,6 +268,7 @@ export class GraphRebuildPipelineService {
         let resumeContentCheckpoints: (() => void) | null = null;
         let acceptedNerOccurrences: EntityOccurrence[] = [];
         let interactiveIdentityValue: string | undefined;
+        let replayManifest: GraphRebuildReplayManifest | undefined;
         try {
             const docs = await this.loadScopedDocuments(request.scope.noteIds);
             const scope = expandScopeNoteIds(request.scope, docs);
@@ -266,6 +282,9 @@ export class GraphRebuildPipelineService {
             if (durabilityMode === 'interactive') {
                 interactiveIdentityValue = await interactiveRunIdentity(scope, docs, entities, request);
             }
+            replayManifest = await this.replayManifest(
+                scope, request, docs, entities, GRAPH_FORCE_V1_PATH_ID, 0,
+            );
 
             const nerStage = await this.runStage('dynamicNer', 'Dynamic NER + Alex Deltas', async () => {
                 const delta = await this.runNerDeltas(docs);
@@ -338,6 +357,7 @@ export class GraphRebuildPipelineService {
                     interactiveInputIdentity: interactiveIdentityValue,
                     embeddingStagePolicy: request.embeddingStagePolicy,
                     candidateCount: nerStage.counters['candidates'] || 0,
+                    replayManifest,
                     calendarRegistrySnapshot: request.calendarRegistrySnapshot,
                 });
                 snapshotRef.value = snapshot;
@@ -430,6 +450,9 @@ export class GraphRebuildPipelineService {
                 stageReceipts,
                 projectionReceipts,
                 snapshot: completedSnapshot,
+                replayManifest,
+                pathId: GRAPH_FORCE_V1_PATH_ID,
+                fallbackCount: 0,
                 message: `Build Graph produced ${completedSnapshot.counters.nodes} nodes, ${completedSnapshot.counters.edges} edges, and ${completedSnapshot.counters.embeddingTargets} targets.`,
             });
             const generationReceipt = durabilityMode === 'interactive'
@@ -444,6 +467,25 @@ export class GraphRebuildPipelineService {
             if (generationReceipt) {
                 receipt.generationReceiptId = generationReceipt.receiptId;
                 receipt.generationDigestSha256 = generationReceipt.digestSha256;
+                const forceAuthority = await this.graphRebuild.persistForceV2Authority(
+                    completedSnapshot,
+                    generationReceipt,
+                );
+                stageReceipts.push(instrumentationStage(
+                    'forceV2AuthorityPersist',
+                    'Verified FORCE Authority',
+                    (forceAuthority.serializerMicros + forceAuthority.atomicPersistMicros) / 1_000,
+                    {
+                        rawBytes: forceAuthority.rawBytes,
+                        compressedBytes: forceAuthority.compressedBytes,
+                        encoded: forceAuthority.encoded ? 1 : 0,
+                        serializerMicros: forceAuthority.serializerMicros,
+                        atomicPersistMicros: forceAuthority.atomicPersistMicros,
+                        serializerBudgetPassed: forceAuthority.serializerMicros <= 50_000 ? 1 : 0,
+                        atomicPersistBudgetPassed: forceAuthority.atomicPersistMicros <= 120_000 ? 1 : 0,
+                    },
+                    'Compact snapshot authority persisted natively for fail-closed verified FORCE replay.',
+                ));
                 await this.generationLifetime?.accept(generationReceipt);
                 this.lastGenerationReceiptState.set(generationReceipt);
             }
@@ -495,6 +537,9 @@ export class GraphRebuildPipelineService {
                 stageReceipts,
                 projectionReceipts,
                 snapshot,
+                replayManifest,
+                pathId: GRAPH_FORCE_V1_PATH_ID,
+                fallbackCount: 0,
                 status: 'failed',
                 message: error instanceof Error ? error.message : String(error),
             });
@@ -503,6 +548,151 @@ export class GraphRebuildPipelineService {
             throw error;
         } finally {
             resumeContentCheckpoints?.();
+            this.runningState.set(false);
+        }
+    }
+
+    async buildVerifiedForceV2(request: GraphIndexRunRequest): Promise<PipelineResult> {
+        if (this.runningState()) throw new Error('Full Atlas Index is already running.');
+        if (request.policy !== 'force' || (request.durabilityMode || 'interactive') !== 'interactive') {
+            throw new Error('PHX_FORCE_V2_OPERATION_REQUIRED: v2 is an interactive FORCE-only contract.');
+        }
+        this.runningState.set(true);
+        const runStarted = Date.now();
+        const transportStarted = phoenixTransportAudit.snapshot();
+        let replayManifest: GraphRebuildReplayManifest | undefined;
+        try {
+            if (!this.phoenix.currentRuntimeInfo()) {
+                await this.phoenix.initRuntime(false);
+            }
+            const persistedReceipt = await this.graphRebuild.loadPersistedRunReceipt(request.scope.scopeId);
+            const entities = smartGraphRegistry.getAllEntities().length
+                ? smartGraphRegistry.getAllEntities()
+                : request.entities;
+            const dependencyIdentity = await graphDependencyIdentity(
+                persistedReceipt?.replayManifest?.scope || request.scope,
+                entities,
+                request,
+            );
+            replayManifest = requireVerifiedForceReplay(request, persistedReceipt, dependencyIdentity);
+            const nativeStarted = performance.now();
+            const verified = await this.graphRebuild.verifyForceV2FromAuthority(
+                replayManifest,
+                persistedReceipt!.verifiedForceAuthority!,
+            );
+            const nativeMs = elapsedTimingMs(nativeStarted);
+            const replay = replayManifestForVerifiedForceV2(
+                replayManifest,
+                this.phoenix.currentRuntimeInfo(),
+                verified.result,
+                {
+                    documentBodyEntries: this.scopedDocumentBodyCache.size,
+                    capabilityEntries: this.interactiveCapabilityCache.size,
+                    residentInteractiveRun: this.interactiveRunReuseState !== null,
+                    nativeRuntimeReady: this.phoenix.isReady,
+                },
+                {
+                    receiptPersistencePending: this.receiptPersistence.pendingCount(),
+                    postCommitDiagnosticScheduled: this.cancelScheduledPostCommitDiagnostic !== null,
+                    postCommitDiagnosticToken: this.postCommitDiagnosticToken,
+                    generationArtifactPending: this.generationArtifactPending,
+                },
+            );
+            const durable = verified.snapshot.interactiveRunAuthority?.durable;
+            if (!durable || !verified.snapshot.buildTimings) {
+                throw new Error('PHX_FORCE_V2_AUTHORITY_PACKET_INVALID: native packet lacks durable timing authority.');
+            }
+            const snapshot: GraphRebuildSnapshot = {
+                ...verified.snapshot,
+                buildTimings: reusedGraphBuildTimings(verified.snapshot.buildTimings, {
+                    ...durable,
+                    changedSections: 0,
+                    reusedSections: verified.result.verifiedSections.length,
+                    encodedSections: 0,
+                    compressedSections: 0,
+                    rawBytesWritten: 0,
+                    compressedBytesWritten: 0,
+                }, nativeMs, 0),
+            };
+            const stageReceipts: GraphIndexStageReceipt[] = [instrumentationStage(
+                'verifiedForceV2',
+                'Verified FORCE v2',
+                nativeMs,
+                {
+                    pathVerified: 1,
+                    fallbackCount: verified.result.fallbackCount,
+                    nativeCrossings: verified.result.nativeCrossings,
+                    sourceBodyReads: verified.result.sourceBodyReads,
+                    sourceUtf8Bytes: verified.result.sourceUtf8Bytes,
+                    transportedSourceBytes: verified.result.transportedSourceBytes,
+                    sourceVersionEnvelopeChanged: verified.result.sourceVersionEnvelopeChanged ? 1 : 0,
+                    criticalResponseBytes: verified.result.criticalResponseBytes,
+                    verifiedSections: verified.result.verifiedSections.length,
+                    analysisKernelMicros: verified.result.analysisKernelMicros,
+                },
+                'Rust verified live source hashes, the immutable eight-section DAG, and compact snapshot authority.',
+            )];
+            appendVerifiedForceGraphTruthContractStage(stageReceipts, snapshot);
+            const authority = snapshot.authorityContract!;
+            const projectionReceipts = [...PROJECTION_CAPABILITIES.map((projection) =>
+                snapshotOwnedProjectionReceipt(projection.mode, snapshot, authority),
+            ), snapshotOwnedProjectionReceipt('siegel', snapshot, authority)];
+            appendTransportTimingStage(stageReceipts, transportStarted, phoenixTransportAudit.snapshot());
+            const completedAt = Date.now();
+            const receipt = this.buildRunReceipt({
+                idPrefix: `graph-atlas:verified-force-v2:${++this.reusedRunReceiptSerial}`,
+                scope: replay.scope,
+                policy: 'force',
+                postProcessMode: 'full',
+                durabilityMode: 'interactive',
+                postProcessCacheHit: true,
+                modelSelection: request.modelSelection,
+                modelReadiness: this.modelReadiness({ ...request, scope: replay.scope }),
+                startedAt: runStarted,
+                completedAt,
+                stageReceipts,
+                projectionReceipts,
+                snapshot,
+                replayManifest: replay,
+                pathId: GRAPH_FORCE_V2_PATH_ID,
+                fallbackCount: 0,
+                message: `Verified unchanged native graph ${snapshot.id}; ${verified.result.verifiedSections.length} durable sections reused.`,
+            });
+            receipt.generationReceiptId = persistedReceipt!.generationReceiptId;
+            receipt.generationDigestSha256 = persistedReceipt!.generationDigestSha256;
+            await this.publishRunReceipt(receipt, snapshot, true);
+            appendInteractivePostCommitStage(stageReceipts, snapshot);
+            this.refreshLayerReceipts(receipt, snapshot);
+            this.enqueueRunReceiptPersistence(receipt);
+            this.interactiveRunReuseState = {
+                identity: snapshot.interactiveRunAuthority!.inputIdentity,
+                snapshot,
+            };
+            return { receipt, snapshot };
+        } catch (error) {
+            const completedAt = Date.now();
+            const failedReceipt = this.buildRunReceipt({
+                idPrefix: 'graph-atlas:verified-force-v2:rejected',
+                scope: request.scope,
+                policy: 'force',
+                postProcessMode: 'full',
+                durabilityMode: 'interactive',
+                modelSelection: request.modelSelection,
+                modelReadiness: this.modelReadiness(request),
+                startedAt: runStarted,
+                completedAt,
+                stageReceipts: [],
+                projectionReceipts: [],
+                snapshot: null,
+                replayManifest,
+                pathId: GRAPH_FORCE_V2_PATH_ID,
+                fallbackCount: 0,
+                status: 'failed',
+                message: error instanceof Error ? error.message : String(error),
+            });
+            this.lastReceiptState.set(failedReceipt);
+            throw error;
+        } finally {
             this.runningState.set(false);
         }
     }
@@ -749,17 +939,22 @@ export class GraphRebuildPipelineService {
         key: 'assertedQuery' | 'sceneIndex',
         artifact: GraphGenerationArtifactRef,
     ): Promise<void> {
+        this.generationArtifactPending += 1;
         const queued = this.generationArtifactQueue.then(async () => {
-            const current = this.lastGenerationReceiptState();
-            if (!current || current.receiptId !== receiptId) return;
-            const updated = await withGraphGenerationArtifact(current, key, artifact);
-            this.lastGenerationReceiptState.set(updated);
-            if (this.interactiveRunReuseState?.generationReceipt?.receiptId === receiptId) {
-                this.interactiveRunReuseState = { ...this.interactiveRunReuseState, generationReceipt: updated };
+            try {
+                const current = this.lastGenerationReceiptState();
+                if (!current || current.receiptId !== receiptId) return;
+                const updated = await withGraphGenerationArtifact(current, key, artifact);
+                this.lastGenerationReceiptState.set(updated);
+                if (this.interactiveRunReuseState?.generationReceipt?.receiptId === receiptId) {
+                    this.interactiveRunReuseState = { ...this.interactiveRunReuseState, generationReceipt: updated };
+                }
+                await this.generationLifetime?.accept(updated);
+                await this.persistGenerationReceipt(updated);
+                if (updated.releaseAuthorized) await this.releaseCurrentGeneration(updated);
+            } finally {
+                this.generationArtifactPending = Math.max(0, this.generationArtifactPending - 1);
             }
-            await this.generationLifetime?.accept(updated);
-            await this.persistGenerationReceipt(updated);
-            if (updated.releaseAuthorized) await this.releaseCurrentGeneration(updated);
         });
         this.generationArtifactQueue = queued.catch((error) => {
             console.warn('[GraphRebuildPipeline] Generation artifact publication failed closed', error);
@@ -812,6 +1007,9 @@ export class GraphRebuildPipelineService {
         stageReceipts: GraphIndexStageReceipt[];
         projectionReceipts: GraphIndexProjectionReceipt[];
         snapshot: GraphRebuildSnapshot | null;
+        replayManifest?: GraphRebuildReplayManifest;
+        pathId?: string;
+        fallbackCount?: number;
         status?: GraphIndexRunStatus;
         message: string;
     }): GraphIndexRunReceipt {
@@ -840,12 +1038,65 @@ export class GraphRebuildPipelineService {
             counters: input.snapshot?.counters || emptyCounters(),
             dropReasons: input.snapshot?.counters.dropReasons || emptyDropReasons(),
             message: input.message,
+            replayManifest: input.replayManifest,
+            pathId: input.pathId,
+            fallbackCount: input.fallbackCount,
+            verifiedForceAuthority: input.snapshot?.interactiveRunAuthority?.durable
+                && input.snapshot.authorityContract?.contentHash
+                ? {
+                    schemaVersion: 'phoenix-verified-force-authority-ref/v1',
+                    snapshotId: input.snapshot.id,
+                    authorityHash: input.snapshot.authorityContract.contentHash,
+                    manifestId: input.snapshot.interactiveRunAuthority.durable.manifestId,
+                    runHandle: input.snapshot.interactiveRunAuthority.durable.runHandle,
+                }
+                : undefined,
         };
+        Object.assign(receipt, attachGraphReceiptSpans(receipt.id, receipt.stageReceipts));
         this.refreshLayerReceipts(receipt, input.snapshot);
         return receipt;
     }
 
+    private replayManifest(
+        scope: GraphIndexRunScope,
+        request: GraphIndexRunRequest,
+        documents: ScopedDocument[],
+        entities: GraphIndexRunRequest['entities'],
+        pathId: string,
+        fallbackCount: number,
+    ): Promise<GraphRebuildReplayManifest> {
+        return graphDependencyIdentity(scope, entities, request).then((dependencyIdentity) => buildGraphReplayManifest({
+            scope,
+            action: request.policy === 'force' ? 'force' : 'delta',
+            documents: documents.map((document) => ({
+                noteId: document.id,
+                title: document.title,
+                text: document.plainText,
+                version: document.version,
+                updatedAt: document.updatedAt,
+            })),
+            model: request.modelSelection,
+            dependencyIdentity,
+            runtime: this.phoenix.currentRuntimeInfo(),
+            cache: {
+                documentBodyEntries: this.scopedDocumentBodyCache.size,
+                capabilityEntries: this.interactiveCapabilityCache.size,
+                residentInteractiveRun: this.interactiveRunReuseState !== null,
+                nativeRuntimeReady: this.phoenix.isReady,
+            },
+            queues: {
+                receiptPersistencePending: this.receiptPersistence.pendingCount(),
+                postCommitDiagnosticScheduled: this.cancelScheduledPostCommitDiagnostic !== null,
+                postCommitDiagnosticToken: this.postCommitDiagnosticToken,
+                generationArtifactPending: this.generationArtifactPending,
+            },
+            pathId,
+            fallbackCount,
+        }));
+    }
+
     private refreshLayerReceipts(receipt: GraphIndexRunReceipt, snapshot: GraphRebuildSnapshot | null): void {
+        Object.assign(receipt, attachGraphReceiptSpans(receipt.id, receipt.stageReceipts));
         receipt.layerReceipts = buildGraphIndexLayerReceipts({ receipt, snapshot });
     }
 
@@ -1843,6 +2094,23 @@ function appendSignalCoverageStages(
 
 function appendGraphTruthContractStage(stageReceipts: GraphIndexStageReceipt[], snapshot: GraphRebuildSnapshot): void {
     const contract = assertGraphSnapshotAuthority(snapshot);
+    appendGraphTruthContractReceipt(stageReceipts, contract, 0);
+}
+
+function appendVerifiedForceGraphTruthContractStage(
+    stageReceipts: GraphIndexStageReceipt[],
+    snapshot: GraphRebuildSnapshot,
+): void {
+    const contract = snapshot.authorityContract;
+    if (!contract) throw new Error(`PHX_FORCE_V2_COMPACT_AUTHORITY_INVALID: authority missing for ${snapshot.id}`);
+    appendGraphTruthContractReceipt(stageReceipts, contract, 1);
+}
+
+function appendGraphTruthContractReceipt(
+    stageReceipts: GraphIndexStageReceipt[],
+    contract: GraphSnapshotAuthorityContract,
+    compactNativeShell: number,
+): void {
     const counts = contract.counts;
     stageReceipts.push(instrumentationStage(
         'snapshotAuthorityContract',
@@ -1850,6 +2118,7 @@ function appendGraphTruthContractStage(stageReceipts: GraphIndexStageReceipt[], 
         0,
         {
             authorityParity: 1,
+            compactNativeShell,
             chunks: counts.chunks,
             mentions: counts.mentions,
             anchors: counts.anchors,
@@ -2462,8 +2731,10 @@ function appendInteractivePostCommitStage(
             diagnosticDebounceMs: POST_COMMIT_DIAGNOSTIC_DEBOUNCE_MS,
             diagnosticOneFlightQueue: 1,
             diagnosticCancelOnNewerSnapshot: 1,
-            packetObjects: snapshot.atlasPacket?.objects.length || 0,
-            packetTargets: snapshot.atlasPacket?.manifoldTargets.length || 0,
+            packetObjects: snapshot.atlasPacket?.objects.length
+                || snapshot.authorityContract?.counts.packetObjects || 0,
+            packetTargets: snapshot.atlasPacket?.manifoldTargets.length
+                || snapshot.authorityContract?.counts.packetTargets || 0,
         },
         'Native enrichment plus MemoryGraphRAG/discourse diagnostics are debounced, idle-scheduled, and queued outside the interactive UI path',
     ));
@@ -2627,6 +2898,8 @@ function compactInteractiveReceiptForPersistence(receipt: GraphIndexRunReceipt):
 function compactStageReceiptForPersistence(stage: GraphIndexStageReceipt): GraphIndexStageReceipt {
     return {
         id: stage.id,
+        spanId: stage.spanId,
+        parentSpanId: stage.parentSpanId,
         label: stage.label,
         status: stage.status,
         startedAt: stage.startedAt,
@@ -2773,6 +3046,128 @@ function stableCalendarRegistryIdentity(
     return stable;
 }
 
+function requireVerifiedForceReplay(
+    request: GraphIndexRunRequest,
+    receipt: GraphIndexRunReceipt | null,
+    dependencyIdentity: string,
+): GraphRebuildReplayManifest {
+    const replay = receipt?.replayManifest;
+    if (!receipt || !replay) {
+        throw new Error('PHX_FORCE_V2_REPLAY_MISSING: no exact persisted replay manifest exists for this scope.');
+    }
+    const native = receipt.verifiedForceAuthority;
+    if (!native || native.schemaVersion !== 'phoenix-verified-force-authority-ref/v1'
+        || !native.manifestId || !native.runHandle) {
+        throw new Error('PHX_FORCE_V2_DURABLE_AUTHORITY_REQUIRED: no sealed native run reference exists.');
+    }
+    if (replay.action !== 'force' || replay.sourceMode !== 'scoped-note-store'
+        || replay.scope.scopeId !== request.scope.scopeId
+        || receipt.scope.scopeId !== request.scope.scopeId
+        || receipt.snapshotId !== native.snapshotId
+        || receipt.authorityContract?.contentHash !== native.authorityHash) {
+        throw new Error('PHX_FORCE_V2_REPLAY_MISMATCH: persisted replay, receipt, and sealed native authority differ.');
+    }
+    const requestedIds = [...request.scope.noteIds].sort();
+    const replayIds = replay.documents.map((row) => row.noteId).sort();
+    if (requestedIds.length && JSON.stringify(requestedIds) !== JSON.stringify(replayIds)) {
+        throw new Error('PHX_FORCE_V2_NOTE_SET_CHANGED: requested note membership differs from the frozen replay.');
+    }
+    if (canonicalJson(request.modelSelection) !== canonicalJson(replay.model)) {
+        throw new Error('PHX_FORCE_V2_MODEL_CHANGED: requested model selection differs from the frozen replay.');
+    }
+    if (replay.dependencyIdentity !== dependencyIdentity) {
+        throw new Error(
+            `PHX_FORCE_V2_DEPENDENCY_CHANGED: ${dependencyIdentity} != frozen ${replay.dependencyIdentity}.`,
+        );
+    }
+    return replay;
+}
+
+function verifiedForceV2Required(request: GraphIndexRunRequest): boolean {
+    return request.policy === 'force' && (request.durabilityMode || 'interactive') === 'interactive';
+}
+
+async function graphDependencyIdentity(
+    scope: GraphIndexRunScope,
+    entities: GraphIndexRunRequest['entities'],
+    request: GraphIndexRunRequest,
+): Promise<string> {
+    return sha256Text(canonicalJson({
+        schemaVersion: 'phoenix-graph-dependency-identity/v1',
+        scope: {
+            kind: scope.kind,
+            scopeId: scope.scopeId,
+            noteIds: [...scope.noteIds].sort(),
+        },
+        entities: entities.map((entity) => ({
+            id: entity.id,
+            label: entity.label,
+            aliases: [...(entity.aliases || [])].sort(),
+            kind: entity.kind,
+            firstNote: entity.firstNote || null,
+        })).sort((left, right) => left.id.localeCompare(right.id)),
+        modelSelection: request.modelSelection,
+        embeddingStagePolicy: normalizedEmbeddingStagePolicy(request.embeddingStagePolicy),
+        calendarRegistrySnapshot: stableCalendarRegistryIdentity(request.calendarRegistrySnapshot),
+        postProcessMode: 'full',
+    }));
+}
+
+function replayManifestForVerifiedForceV2(
+    replay: GraphRebuildReplayManifest,
+    runtime: ReturnType<PhoenixBackendService['currentRuntimeInfo']>,
+    result: {
+        sourceBodyReads: number;
+        sourceUtf8Bytes: number;
+        transportedSourceBytes: number;
+        fallbackCount: number;
+        sourceDocuments: Array<{
+            noteId: string;
+            version: number | null;
+            updatedAt: number | null;
+        }>;
+        sourceVersionEnvelopeChanged: boolean;
+    },
+    cache: GraphRebuildReplayManifest['cache'],
+    queues: GraphRebuildReplayManifest['queues'],
+): GraphRebuildReplayManifest {
+    if (!runtime?.ready || !runtime.binaryBlake3 || !runtime.nativeGraphContract) {
+        throw new Error('PHX_FORCE_V2_RUNTIME_IDENTITY_MISSING: exact native binary identity is required.');
+    }
+    if (result.fallbackCount !== 0 || result.sourceBodyReads !== replay.documents.length
+        || result.sourceUtf8Bytes !== replay.aggregate.utf8Bytes || result.transportedSourceBytes !== 0) {
+        throw new Error('PHX_FORCE_V2_SOURCE_TELEMETRY_MISMATCH: native source accounting differs from the replay manifest.');
+    }
+    return {
+        ...replay,
+        documents: replay.documents.map((document, index) => ({
+            ...document,
+            version: result.sourceDocuments[index].version,
+            updatedAt: result.sourceDocuments[index].updatedAt,
+        })),
+        runtime: {
+            buildGitSha: runtime.buildGitSha,
+            buildProfile: runtime.buildProfile,
+            target: runtime.target,
+            storage: runtime.storage,
+            schemaVersion: runtime.schemaVersion,
+            binaryBlake3: runtime.binaryBlake3,
+            nativeGraphContract: runtime.nativeGraphContract,
+        },
+        cache: { ...cache },
+        queues: { ...queues },
+        memory: {
+            measurement: 'instrumented-boundaries',
+            documentBodyMaterializations: result.sourceBodyReads,
+            documentBodyCopies: 0,
+            documentUtf8Bytes: result.sourceUtf8Bytes,
+            unmeasuredAllocatorEvents: 1,
+        },
+        pathId: GRAPH_FORCE_V2_PATH_ID,
+        fallbackCount: 0,
+    };
+}
+
 function reusedGraphBuildTimings(
     previous: GraphRebuildBuildTimings | undefined,
     durable: NativeGraphRunPersistReceipt,
@@ -2820,6 +3215,7 @@ function reusedGraphBuildTimings(
         stateCommitMs: 0,
         nativeSnapshotAnalysisMs: 0,
         nativeSnapshotAnalysisRustMicros: 0,
+        nativeSnapshotAnalysisSource: 'durable_verified',
         nativeGraphRunArenaReused: 1,
         nativeGraphRunArenaResidentBytes: undefined,
         nativeGraphRunArenaActiveLeases: undefined,

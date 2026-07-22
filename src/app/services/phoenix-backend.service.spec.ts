@@ -64,4 +64,11 @@ describe('PhoenixBackendService native runtime guard', () => {
         await expect(service.atlasRichScan({ documents: [{ text: 'must not cross' }] }))
             .rejects.toThrow(ATLAS_RICH_SCAN_QUARANTINE_MESSAGE);
     });
+
+    it('fails closed when the verified FORCE v2 capability is absent', async () => {
+        const service = runInInjectionContext(injector, () => new PhoenixBackendService());
+
+        await expect(service.forceRebuildV2Shadow({ contractVersion: 'phoenix-verified-force/v2' }))
+            .rejects.toThrow('PHX_FORCE_V2_CAPABILITY_MISSING');
+    });
 });

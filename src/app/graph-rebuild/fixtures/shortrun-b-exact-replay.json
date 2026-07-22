@@ -1,0 +1,50 @@
+{
+  "scope": {
+    "kind": "global",
+    "scopeId": "global",
+    "label": "Global",
+    "noteIds": [
+      "05dbbd93-e0f7-4fb2-937e-92a2352dcbae"
+    ]
+  },
+  "documents": [
+    {
+      "noteId": "05dbbd93-e0f7-4fb2-937e-92a2352dcbae",
+      "sha256": "9beafe8bd23317e118d218d99a21a21d53ed61371d6fbf60d76b0f0eedc9b8c7",
+      "version": 1784695640956,
+      "updatedAt": 1784695640956
+    }
+  ],
+  "cohortId": "sha256:7c05668b27e65e9ce8b082167bfcfc5a1dfb9ff3e8cda26baaa1eb7303350856",
+  "counts": {
+    "nodes": 96,
+    "edges": 1208,
+    "targets": 3599,
+    "chunks": 129,
+    "anchors": 1791
+  },
+  "modelSelection": {
+    "dynamicNerId": "dynamic_ner",
+    "embeddingModelId": "jina-v5-nano-retrieval",
+    "embeddingModelLabel": "Jina v5 Nano",
+    "embeddingDimensionLabel": "768d",
+    "nliModelId": "onnx-community/ModernBERT-base-nli"
+  },
+  "embeddingStagePolicy": {
+    "enabledLanes": [
+      "document_spine",
+      "chunk_spine",
+      "entity_anchor",
+      "relationship_fact",
+      "temporal_fact",
+      "causal_fact",
+      "memory_state",
+      "event_identity",
+      "anchor_evidence",
+      "cooccurrence_weak"
+    ],
+    "entityLinkerEnabled": true
+  },
+  "warmupRuns": 2,
+  "measuredRuns": 21
+}

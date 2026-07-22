@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
     graphBuildParity,
     graphBuildPerformanceGate,
+    graphBuildVerifiedForceGate,
     summarizeGraphBuildLane,
     type GraphBuildBaselineRunRow,
 } from './graph-build-baseline-report';
@@ -28,9 +29,13 @@ describe('graph build baseline report', () => {
         });
     });
 
-    it('enforces the one-second target and three-second p95 ceiling', () => {
-        const passing = summarizeGraphBuildLane([row(1, 900), row(2, 2_500)]);
-        const failing = summarizeGraphBuildLane([row(1, 1_100), row(2, 3_100)]);
+    it('requires 21 trials with p50, p95, and every run below the one-second hard ceiling', () => {
+        const passingRows = Array.from({ length: 21 }, (_, index) => row(index + 1, 600 + index * 10));
+        const failingRows = passingRows.map((value, index) => index === 20
+            ? { ...value, wallMs: 1_001 }
+            : value);
+        const passing = summarizeGraphBuildLane(passingRows);
+        const failing = summarizeGraphBuildLane(failingRows);
 
         expect(graphBuildPerformanceGate(passing, passing)).toMatchObject({ passed: true });
         expect(graphBuildPerformanceGate(passing, failing)).toMatchObject({
@@ -38,6 +43,15 @@ describe('graph build baseline report', () => {
             deltaPassed: false,
             passed: false,
         });
+        expect(graphBuildVerifiedForceGate(passing, passingRows)).toMatchObject({
+            timingPassed: true,
+            executionContractPassed: true,
+            passed: true,
+        });
+        expect(graphBuildVerifiedForceGate(passing, [
+            ...passingRows.slice(0, 20),
+            { ...passingRows[20], fallbackCount: 1 },
+        ])).toMatchObject({ executionContractPassed: false, passed: false });
     });
 });
 
@@ -66,6 +80,7 @@ function row(iteration: number, wallMs: number): GraphBuildBaselineRunRow {
         snapshotSemanticIndexEntries: 4000, snapshotSemanticAvoidedIndexBuilds: 300,
         snapshotSemanticAvoidedIndexEntries: 300000, packetConstructionMs: 20,
         authoritySealMs: 30, nativeAnalysisRustMicros: 1000,
+        nativeAnalysisSource: 'durable_verified',
         nativeGraphRunArenaReused: 1, nativeGraphRunArenaResidentBytes: 100,
         nativeGraphRunArenaActiveLeases: 1, nativeGraphRunPageProjectionMicros: 100,
         nativeGraphRunDetailRows: 10, nativeGraphRunReturnedDetailRows: 8,
@@ -80,5 +95,7 @@ function row(iteration: number, wallMs: number): GraphBuildBaselineRunRow {
         transportResponseBytesUnavailableCalls: 0, transportEncodeMs: 2,
         transportDecodeMs: 3, transportEncodeTimingUnavailableCalls: 0,
         transportDecodeTimingUnavailableCalls: 0, transportOffenders: '', noTopologyWrites: true,
+        cohortId: 'sha256:cohort', pathId: 'native_verified_force_v2', fallbackCount: 0,
+        documentBodyCopies: 0, unmeasuredAllocatorEvents: 0,
     };
 }

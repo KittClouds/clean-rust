@@ -2,6 +2,7 @@ mod document_index_read;
 mod gfm_retrieval_shadow;
 mod graph_galaxy;
 mod graph_generation_query;
+mod graph_force_rebuild_v2;
 mod graph_run_store;
 mod graph_scene_packet;
 #[cfg(feature = "vector-wgpu-shadow")]

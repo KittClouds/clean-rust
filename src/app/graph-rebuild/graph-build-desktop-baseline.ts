@@ -3,20 +3,25 @@ import * as ops from '../lib/operations';
 import { smartGraphRegistry } from '../lib/registry';
 import { PhoenixStoreService } from '../services/phoenix-store.service';
 import { PhoenixBackendService } from '../services/phoenix-backend.service';
+import { CalendarService } from '../services/calendar.service';
 import { GraphRebuildPipelineService } from './graph-rebuild-pipeline.service';
 import { GraphRebuildService } from './graph-rebuild.service';
 import type { GraphIndexRunRequest, GraphRebuildSnapshot } from './graph-rebuild-snapshot';
 import {
     GRAPH_BUILD_BASELINE_CERTIFICATE_SCHEMA_VERSION,
+    GRAPH_BUILD_REPLAY_MEASURED_RUNS,
+    GRAPH_BUILD_REPLAY_WARMUP_RUNS,
     graphBuildIdentityHash,
     graphBuildParity,
     graphBuildPerformanceGate,
     graphBuildRunRow,
+    graphBuildVerifiedForceGate,
     sha256,
     summarizeGraphBuildLane,
     type GraphBuildBaselineCertificate,
     type GraphBuildBaselineLane,
     type GraphBuildBaselineRunRow,
+    type GraphBuildVerifiedForceGate,
 } from './graph-build-baseline-report';
 
 export interface GraphBuildDesktopBaselineInput {
@@ -34,10 +39,58 @@ export interface GraphBuildMutationLocalityCertificate {
     performancePassed: boolean;
 }
 
+export interface GraphBuildExactReplayInput {
+    scope: GraphIndexRunRequest['scope'];
+    documents: Array<{
+        noteId: string;
+        sha256: string;
+        version: number | null;
+        updatedAt: number | null;
+    }>;
+    cohortId: string;
+    counts: { nodes: number; edges: number; targets: number; chunks: number; anchors: number };
+    modelSelection: GraphIndexRunRequest['modelSelection'];
+    embeddingStagePolicy?: GraphIndexRunRequest['embeddingStagePolicy'];
+    warmupRuns?: number;
+    measuredRuns?: number;
+}
+
+export interface GraphBuildExactReplayCertificate {
+    schemaVersion: 'phoenix-verified-force-replay-certificate/v1';
+    generatedAt: string;
+    scopeId: string;
+    cohortId: string;
+    replayManifest: GraphBuildBaselineCertificate['replayManifest'];
+    warmupRuns: number;
+    measuredRuns: number;
+    runs: GraphBuildBaselineRunRow[];
+    summary: ReturnType<typeof summarizeGraphBuildLane>;
+    parity: ReturnType<typeof graphBuildParity>;
+    execution: {
+        exactSeedMatched: boolean;
+        cohortStable: boolean;
+        pathId: 'native_verified_force_v2';
+        fallbackCount: 0;
+        machineEligible: boolean;
+    };
+    machine: {
+        hardwareConcurrency: number;
+        visibilityState: string;
+        eventLoopDriftMs: number;
+        nativeRuntimeReady: boolean;
+        nativeGraphContract: string;
+        binaryBlake3: string;
+        buildGitSha: string;
+        queuesIdleBefore: boolean;
+    };
+    performanceGate: GraphBuildVerifiedForceGate;
+}
+
 declare global {
     interface Window {
         __PHOENIX_GRAPH_BUILD_BASELINE__?: {
             run(input: GraphBuildDesktopBaselineInput): Promise<GraphBuildBaselineCertificate>;
+            runExactReplay(input: GraphBuildExactReplayInput): Promise<GraphBuildExactReplayCertificate>;
             runMutationLocality(input: GraphBuildDesktopBaselineInput): Promise<GraphBuildMutationLocalityCertificate>;
             evictArenaAndReadFirstPage(): Promise<unknown>;
             pageAllNativeProofRows(): Promise<unknown>;
@@ -51,19 +104,110 @@ export class GraphBuildDesktopBaselineService {
     private readonly graphRebuild = inject(GraphRebuildService);
     private readonly store = inject(PhoenixStoreService);
     private readonly phoenix = inject(PhoenixBackendService);
+    private readonly calendar = inject(CalendarService);
     private lastMeasuredRunHandle: string | null = null;
+    private lastReplayManifest: GraphBuildBaselineCertificate['replayManifest'] = null;
+
+    async runExactReplay(input: GraphBuildExactReplayInput): Promise<GraphBuildExactReplayCertificate> {
+        if (this.pipeline.running()) throw new Error('Graph pipeline is already running.');
+        const seed = await this.graphRebuild.loadPersistedRunReceipt(input.scope.scopeId);
+        const mismatches = exactReplaySeedMismatches(input, seed);
+        if (mismatches.length) {
+            throw new Error(`PHX_FORCE_V2_REPLAY_SEED_MISMATCH: ${mismatches.join('; ')}`);
+        }
+        await this.settleBackgroundWork();
+        if (!this.phoenix.currentRuntimeInfo()) await this.phoenix.initRuntime(false);
+        const driftStarted = performance.now();
+        await new Promise<void>((resolve) => setTimeout(resolve, 100));
+        const eventLoopDriftMs = Math.max(0, performance.now() - driftStarted - 100);
+        const runtime = this.phoenix.currentRuntimeInfo() as any;
+        const replay = seed!.replayManifest!;
+        const queuesIdleBefore = replay.queues.receiptPersistencePending === 0
+            && replay.queues.generationArtifactPending === 0
+            && !replay.queues.postCommitDiagnosticScheduled;
+        const machineEligible = runtime?.ready === true
+            && runtime?.nativeGraphContract === 'phoenix-verified-force/v2'
+            && document.visibilityState === 'visible'
+            && eventLoopDriftMs <= 25
+            && queuesIdleBefore;
+        if (!machineEligible) {
+            throw new Error(
+                'PHX_FORCE_V2_MACHINE_INELIGIBLE: '
+                + `runtimeReady=${runtime?.ready === true} `
+                + `contract=${runtime?.nativeGraphContract || 'missing'} `
+                + `visibility=${document.visibilityState} `
+                + `eventLoopDriftMs=${Math.round(eventLoopDriftMs * 100) / 100} `
+                + `queuesIdle=${queuesIdleBefore}.`,
+            );
+        }
+        const request: GraphIndexRunRequest = {
+            scope: input.scope,
+            policy: 'force',
+            durabilityMode: 'interactive',
+            modelSelection: input.modelSelection,
+            embeddingStagePolicy: input.embeddingStagePolicy,
+            calendarRegistrySnapshot: this.calendar.calendarRegistrySnapshot(),
+            entities: smartGraphRegistry.getAllEntities(),
+        };
+        const warmupRuns = Math.max(GRAPH_BUILD_REPLAY_WARMUP_RUNS, Math.min(5,
+            Math.floor(input.warmupRuns ?? GRAPH_BUILD_REPLAY_WARMUP_RUNS)));
+        const measuredRuns = Math.max(GRAPH_BUILD_REPLAY_MEASURED_RUNS, Math.min(50,
+            Math.floor(input.measuredRuns ?? GRAPH_BUILD_REPLAY_MEASURED_RUNS)));
+        for (let index = 0; index < warmupRuns; index += 1) {
+            await this.measureRun('warm_force', -(index + 1), request);
+        }
+        const rows: GraphBuildBaselineRunRow[] = [];
+        for (let index = 0; index < measuredRuns; index += 1) {
+            rows.push(await this.measureRun('warm_force', index + 1, request));
+        }
+        const summary = summarizeGraphBuildLane(rows);
+        const parity = graphBuildParity(rows);
+        const cohortStable = rows.every((row) => row.cohortId === input.cohortId);
+        const gate = graphBuildVerifiedForceGate(summary, rows);
+        gate.passed = gate.passed && parity.exactIdentity && parity.exactAuthority
+            && parity.exactCounts && parity.noTopologyWrites && cohortStable;
+        return {
+            schemaVersion: 'phoenix-verified-force-replay-certificate/v1',
+            generatedAt: new Date().toISOString(),
+            scopeId: input.scope.scopeId,
+            cohortId: input.cohortId,
+            replayManifest: this.lastReplayManifest,
+            warmupRuns,
+            measuredRuns,
+            runs: rows,
+            summary,
+            parity,
+            execution: {
+                exactSeedMatched: true,
+                cohortStable,
+                pathId: 'native_verified_force_v2',
+                fallbackCount: 0,
+                machineEligible,
+            },
+            machine: {
+                hardwareConcurrency: navigator.hardwareConcurrency || 0,
+                visibilityState: document.visibilityState,
+                eventLoopDriftMs: Math.round(eventLoopDriftMs * 100) / 100,
+                nativeRuntimeReady: runtime.ready,
+                nativeGraphContract: runtime.nativeGraphContract || '',
+                binaryBlake3: runtime.binaryBlake3 || '',
+                buildGitSha: runtime.buildGitSha || '',
+                queuesIdleBefore,
+            },
+            performanceGate: gate,
+        };
+    }
 
     async evictArenaAndReadFirstPage(): Promise<unknown> {
-        const runHandle = this.lastMeasuredRunHandle;
+        const runHandle = await this.resolveNativeRunHandle();
         if (!runHandle) throw new Error('No active native graph run handle is available.');
-        if (!await this.phoenix.closeGraphRun(runHandle)) {
-            throw new Error('Active native graph run was not resident before eviction.');
-        }
-        return this.phoenix.readGraphRunPage({ runHandle, offset: 0, limit: 1 });
+        const residentClosed = await this.phoenix.closeGraphRun(runHandle);
+        const page = await this.phoenix.readGraphRunPage({ runHandle, offset: 0, limit: 1 }) as any;
+        return { ...page, evictionState: residentClosed ? 'resident_closed' : 'already_cold' };
     }
 
     async pageAllNativeProofRows(): Promise<unknown> {
-        const runHandle = this.lastMeasuredRunHandle;
+        const runHandle = await this.resolveNativeRunHandle();
         if (!runHandle) throw new Error('No active native graph run handle is available.');
         const keys = new Set<string>();
         let offset = 0;
@@ -92,6 +236,12 @@ export class GraphBuildDesktopBaselineService {
             throw new Error(`Native proof paging incomplete: ${keys.size} != ${detailRows}`);
         }
         return { runHandle, pages, detailRows, uniqueRows: keys.size, complete: true };
+    }
+
+    private async resolveNativeRunHandle(): Promise<string | null> {
+        if (this.lastMeasuredRunHandle) return this.lastMeasuredRunHandle;
+        const receipt = await this.graphRebuild.loadPersistedRunReceipt('global');
+        return receipt?.verifiedForceAuthority?.runHandle || null;
     }
 
     async runMutationLocality(
@@ -215,6 +365,9 @@ export class GraphBuildDesktopBaselineService {
                     dimension: baseRequest.modelSelection.embeddingDimensionLabel,
                     nliModelId: baseRequest.modelSelection.nliModelId,
                 },
+                replayManifest: this.lastReplayManifest,
+                cohortStable: rows.length > 0
+                    && rows.every((row) => row.cohortId !== '' && row.cohortId === rows[0].cohortId),
                 runs: rows,
                 summary: {
                     cold_force: coldSummary,
@@ -261,6 +414,7 @@ export class GraphBuildDesktopBaselineService {
     ): Promise<GraphBuildBaselineRunRow> {
         const started = performance.now();
         const result = await this.pipeline.buildGraph(request);
+        this.lastReplayManifest = result.receipt.replayManifest || null;
         this.lastMeasuredRunHandle = this.graphRebuild.residentNativeGraphRunHandle();
         const wallMs = performance.now() - started;
         const settleStarted = performance.now();
@@ -309,11 +463,46 @@ export function installGraphBuildDesktopBaseline(injector: Injector): void {
     const harness = injector.get(GraphBuildDesktopBaselineService);
     window.__PHOENIX_GRAPH_BUILD_BASELINE__ = {
         run: (input) => harness.run(input),
+        runExactReplay: (input) => harness.runExactReplay(input),
         runMutationLocality: (input) => harness.runMutationLocality(input),
         evictArenaAndReadFirstPage: () => harness.evictArenaAndReadFirstPage(),
         pageAllNativeProofRows: () => harness.pageAllNativeProofRows(),
     };
     console.info('[GraphBaseline] desktop baseline harness ready');
+}
+
+function exactReplaySeedMismatches(
+    input: GraphBuildExactReplayInput,
+    seed: Awaited<ReturnType<GraphRebuildService['loadPersistedRunReceipt']>>,
+): string[] {
+    if (!seed?.replayManifest) return ['persisted replay manifest missing'];
+    const replay = seed.replayManifest;
+    const mismatches: string[] = [];
+    if (!seed.verifiedForceAuthority) mismatches.push('sealed native authority reference missing');
+    if (replay.cohortId !== input.cohortId) mismatches.push(`cohort ${replay.cohortId} != ${input.cohortId}`);
+    if (replay.scope.scopeId !== input.scope.scopeId) mismatches.push('scope identity differs');
+    const expectedDocuments = [...input.documents].sort((a, b) => a.noteId.localeCompare(b.noteId));
+    const actualDocuments = replay.documents.map(({ noteId, sha256, version, updatedAt }) => ({
+        noteId, sha256, version, updatedAt,
+    })).sort((a, b) => a.noteId.localeCompare(b.noteId));
+    if (JSON.stringify(actualDocuments) !== JSON.stringify(expectedDocuments)) {
+        mismatches.push(`document identities ${JSON.stringify(actualDocuments)} != ${JSON.stringify(expectedDocuments)}`);
+    }
+    const counts = seed.counters;
+    const actualCounts = {
+        nodes: counts.nodes,
+        edges: counts.edges,
+        targets: counts.embeddingTargets,
+        chunks: counts.chunks,
+        anchors: counts.acceptedAnchors,
+    };
+    if (JSON.stringify(actualCounts) !== JSON.stringify(input.counts)) {
+        mismatches.push(`topology ${JSON.stringify(actualCounts)} != ${JSON.stringify(input.counts)}`);
+    }
+    if (JSON.stringify(replay.model) !== JSON.stringify(input.modelSelection)) {
+        mismatches.push('model selection differs');
+    }
+    return mismatches;
 }
 
 function nativeProofPageKeys(projection: any): string[] {

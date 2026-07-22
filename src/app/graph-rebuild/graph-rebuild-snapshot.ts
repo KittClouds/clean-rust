@@ -33,6 +33,7 @@ import type { GraphRebuildCpuProfiler } from './graph-rebuild-cpu-profile';
 import type { GraphPromotionVerdictCertificate } from './graph-promotion-verdict';
 import type { GraphReviewAdjudicationRunCertificate } from './graph-review-adjudication-certificate';
 import type { GraphStoryContinuityContract } from './graph-story-continuity';
+import type { GraphRebuildReplayManifest } from './graph-rebuild-replay-contract';
 
 export type GraphRebuildScopeKind = 'global' | 'folder' | 'narrative' | 'note' | 'multiNote';
 export type GraphRebuildAnchorSource = EntityOccurrence['source'] | 'accepted_suggestion';
@@ -2812,6 +2813,8 @@ export interface GraphIndexStageReceipt {
     outputCount: number;
     counters: Record<string, number>;
     message: string;
+    spanId?: string;
+    parentSpanId?: string;
 }
 
 export interface GraphIndexProjectionReceipt {
@@ -2886,6 +2889,18 @@ export interface GraphIndexRunReceipt {
     counters: GraphRebuildCounters;
     dropReasons: GraphRebuildDropReasons;
     message: string;
+    spanId?: string;
+    parentSpanId?: null;
+    pathId?: string;
+    fallbackCount?: number;
+    replayManifest?: GraphRebuildReplayManifest;
+    verifiedForceAuthority?: {
+        schemaVersion: 'phoenix-verified-force-authority-ref/v1';
+        snapshotId: string;
+        authorityHash: string;
+        manifestId: string;
+        runHandle: string;
+    };
 }
 
 export interface GraphRebuildCandidate {

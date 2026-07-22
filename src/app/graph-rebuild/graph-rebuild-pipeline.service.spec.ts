@@ -40,6 +40,7 @@ import { GraphRebuildService } from './graph-rebuild.service';
 import { AtlasCapabilityRuntimeService } from '../services/atlas-capability-runtime.service';
 import { NerService } from '../services/ner.service';
 import { PhoenixStoreService } from '../services/phoenix-store.service';
+import { PhoenixBackendService } from '../services/phoenix-backend.service';
 import { PhoenixUiApiService } from '../services/phoenix-ui-api.service';
 import type { GraphIndexRunReceipt, GraphIndexRunRequest, GraphRebuildSnapshot } from './graph-rebuild-snapshot';
 import { sealGraphSnapshotAuthority } from './graph-snapshot-authority';
@@ -96,6 +97,19 @@ describe('GraphRebuildPipelineService', () => {
             { provide: AtlasCapabilityRuntimeService, useValue: atlasRuntime },
             { provide: NerService, useValue: ner },
             { provide: PhoenixStoreService, useValue: store },
+            { provide: PhoenixBackendService, useValue: {
+                isReady: true,
+                currentRuntimeInfo: () => ({
+                    ready: true,
+                    buildGitSha: 'test',
+                    buildProfile: 'test',
+                    target: 'test',
+                    storage: 'test',
+                    schemaVersion: 'test',
+                    binaryBlake3: 'b3-test',
+                    nativeGraphContract: 'phoenix-verified-force/v2',
+                }),
+            } },
             { provide: PhoenixUiApiService, useValue: phoenixUiApi },
         ], Injector.create({ providers: [] }) as unknown as EnvironmentInjector);
         service = runInInjectionContext(injector, () => new GraphRebuildPipelineService());
@@ -218,60 +232,63 @@ describe('GraphRebuildPipelineService', () => {
         ]));
     });
 
-    it('reuses unchanged interactive capability results without native probe crossings', async () => {
-        const buildRequest = { ...request(), policy: 'force' as const };
+    it('routes interactive FORCE exclusively through verified native v2', async () => {
+        const seeded = await seedVerifiedForceV2(service, graphRebuild, ner, atlasRuntime);
 
-        await service.buildGraph(buildRequest);
-        await service.buildGraph(buildRequest);
+        const result = await service.buildGraph({ ...request(), durabilityMode: 'interactive' });
 
-        expect(atlasRuntime.runCapability).toHaveBeenCalledTimes(6);
-        expect(atlasRuntime.runCapability.mock.calls.map(([capability]) => capability)).toEqual([
-            'nliAdjudication',
-            'relationGraph',
-            'temporalGraph',
-            'eventIdentity',
-            'memoryState',
-            'causalGraph',
-        ]);
+        expect(result.receipt.pathId).toBe('native_verified_force_v2');
+        expect(result.receipt.fallbackCount).toBe(0);
+        expect(result.receipt.snapshotId).toBe(seeded.snapshot.id);
+        expect(graphRebuild.verifyForceV2FromAuthority).toHaveBeenCalledTimes(1);
+        expect(ner.scanDynamicBatch).not.toHaveBeenCalled();
+        expect(atlasRuntime.runCapability).not.toHaveBeenCalled();
+        expect(graphRebuild.buildAndPersistSnapshot).not.toHaveBeenCalled();
+        await flushReceiptPersistence(service);
+        const persisted = graphRebuild.persistRunReceipt.mock.calls.at(-1)?.[0] as GraphIndexRunReceipt;
+        expect(persisted.stageReceipts.find((stage) => stage.id === 'verifiedForceV2'))
+            .toMatchObject({
+                spanId: expect.stringContaining(':verifiedForceV2'),
+                parentSpanId: persisted.spanId,
+                counters: { pathVerified: 1, fallbackCount: 0 },
+            });
     });
 
-    it('terminates an unchanged interactive run before NER and snapshot reconstruction', async () => {
-        graphRebuild.persistResidentNativeGraphRun.mockResolvedValue(nativeDurableReuseReceipt());
-        const buildRequest = { ...request(), policy: 'force' as const };
-
-        const first = await service.buildGraph(buildRequest);
-        const second = await service.buildGraph({ ...buildRequest, policy: 'delta' });
-        await flushReceiptPersistence(service);
-
-        expect(second.snapshot).not.toBe(first.snapshot);
-        expect(second.snapshot.id).toBe(first.snapshot.id);
-        expect(second.snapshot.authorityContract).toEqual(first.snapshot.authorityContract);
-        expect(second.snapshot.buildTimings).toMatchObject({
-            snapshotBuildMs: 0,
-            snapshotSemanticLedgersMs: 0,
-            nativeGraphRunChangedSections: 0,
-            nativeGraphRunReusedSections: 7,
-            snapshotStoreDocuments: 0,
-            snapshotWrittenContentBlobs: 0,
+    it('refreshes observable note versions without changing the verified content cohort', async () => {
+        const seeded = await seedVerifiedForceV2(service, graphRebuild, ner, atlasRuntime, {
+            version: 3,
+            updatedAt: 4,
         });
-        expect(second.receipt.id).not.toBe(first.receipt.id);
-        expect(second.receipt.stageReceipts).toEqual(expect.arrayContaining([
-            expect.objectContaining({
-                id: 'interactiveIdentityReuse',
-                counters: expect.objectContaining({
-                    identityMatched: 1,
-                    authorityVerified: 1,
-                    changedSections: 0,
-                    reusedSections: 7,
-                }),
-            }),
-        ]));
-        expect(second.receipt.layerReceipts
-            .filter((layer) => layer.id !== 'transport-boundary' && layer.status !== 'complete')
-            .map((layer) => `${layer.id}:${layer.status}`)).toEqual([]);
-        expect(ner.scanDynamicBatch).toHaveBeenCalledTimes(1);
-        expect(graphRebuild.buildAndPersistSnapshot).toHaveBeenCalledTimes(1);
-        expect(graphRebuild.persistResidentNativeGraphRun).toHaveBeenCalledTimes(1);
+
+        const result = await service.buildGraph({ ...request(), durabilityMode: 'interactive' });
+
+        expect(result.receipt.replayManifest?.cohortId).toBe(seeded.receipt.replayManifest?.cohortId);
+        expect(result.receipt.replayManifest?.documents[0]).toMatchObject({ version: 3, updatedAt: 4 });
+        expect(result.receipt.stageReceipts.find((stage) => stage.id === 'verifiedForceV2')?.counters)
+            .toMatchObject({ sourceVersionEnvelopeChanged: 1 });
+    });
+
+    it('fails closed when interactive FORCE has no exact persisted replay', async () => {
+        await expect(service.buildGraph({ ...request(), durabilityMode: 'interactive' }))
+            .rejects.toThrow('PHX_FORCE_V2_REPLAY_MISSING');
+
+        expect(ner.scanDynamicBatch).not.toHaveBeenCalled();
+        expect(atlasRuntime.runCapability).not.toHaveBeenCalled();
+        expect(graphRebuild.buildAndPersistSnapshot).not.toHaveBeenCalled();
+    });
+
+    it('never enters legacy reconstruction after a native v2 rejection', async () => {
+        await seedVerifiedForceV2(service, graphRebuild, ner, atlasRuntime);
+        graphRebuild.verifyForceV2FromAuthority.mockRejectedValueOnce(
+            new Error('PHX_FORCE_V2_SECTION_INVALID: durable section rejected'),
+        );
+
+        await expect(service.buildGraph({ ...request(), durabilityMode: 'interactive' }))
+            .rejects.toThrow('PHX_FORCE_V2_SECTION_INVALID');
+
+        expect(ner.scanDynamicBatch).not.toHaveBeenCalled();
+        expect(atlasRuntime.runCapability).not.toHaveBeenCalled();
+        expect(graphRebuild.buildAndPersistSnapshot).not.toHaveBeenCalled();
     });
 
     it('makes Delta structurally reuse-only when no authoritative graph exists', async () => {
@@ -283,109 +300,12 @@ describe('GraphRebuildPipelineService', () => {
             }],
         }));
 
-        await expect(service.buildGraph({ ...request(), policy: 'delta' }))
+        await expect(service.buildGraph({ ...request(), policy: 'delta', durabilityMode: 'interactive' }))
             .rejects.toThrow('Delta cannot reconstruct');
 
         expect(ner.scanDynamicBatch).not.toHaveBeenCalled();
         expect(atlasRuntime.runCapability).not.toHaveBeenCalled();
         expect(graphRebuild.buildAndPersistSnapshot).not.toHaveBeenCalled();
-    });
-
-    it('restores the authoritative unchanged fast lane after a frontend restart', async () => {
-        const buildRequest = { ...request(), policy: 'force' as const };
-        const first = await service.buildGraph(buildRequest);
-        graphRebuild.snapshot.mockReturnValue(first.snapshot);
-        graphRebuild.restorePersistedNativeGraphRun.mockResolvedValue(nativeDurableReuseReceipt());
-        const restarted = runInInjectionContext(injector, () => new GraphRebuildPipelineService());
-        notesMock.rows[0] = {
-            ...notesMock.rows[0],
-            version: 999,
-            updatedAt: 999,
-        };
-        const restartedRequest = {
-            ...buildRequest,
-            calendarRegistrySnapshot: {
-                ...buildRequest.calendarRegistrySnapshot!,
-                id: 'calendar-registry:rebuilt-envelope',
-                builtAt: 999,
-            },
-            entities: buildRequest.entities.map((entity) => ({
-                ...entity,
-                registeredAt: 999,
-                totalMentions: 999,
-                lastSeenDate: new Date(999),
-            })),
-        };
-
-        const second = await restarted.buildGraph({ ...restartedRequest, policy: 'delta' });
-        await flushReceiptPersistence(restarted);
-
-        expect(second.snapshot.id).toBe(first.snapshot.id);
-        expect(second.receipt.stageReceipts).toEqual(expect.arrayContaining([
-            expect.objectContaining({ id: 'interactiveIdentityReuse' }),
-        ]));
-        expect(graphRebuild.restorePersistedNativeGraphRun).toHaveBeenCalledTimes(1);
-        expect(graphRebuild.buildAndPersistSnapshot).toHaveBeenCalledTimes(1);
-        expect(ner.scanDynamicBatch).toHaveBeenCalledTimes(1);
-    });
-
-    it('fails closed when unchanged identity cannot be durably reused', async () => {
-        graphRebuild.persistResidentNativeGraphRun.mockResolvedValue(null);
-        const buildRequest = { ...request(), policy: 'force' as const };
-
-        await service.buildGraph(buildRequest);
-        await expect(service.buildGraph({ ...buildRequest, policy: 'delta' }))
-            .rejects.toThrow('Automatic cold fallback is disabled');
-
-        expect(ner.scanDynamicBatch).toHaveBeenCalledTimes(1);
-        expect(graphRebuild.buildAndPersistSnapshot).toHaveBeenCalledTimes(1);
-    });
-
-    it('allows only explicit force policy to replace an unavailable durable fast lane', async () => {
-        graphRebuild.persistResidentNativeGraphRun.mockResolvedValue(null);
-        const buildRequest = { ...request(), policy: 'force' as const };
-
-        await service.buildGraph(buildRequest);
-        await service.buildGraph(buildRequest);
-
-        expect(ner.scanDynamicBatch).toHaveBeenCalledTimes(2);
-        expect(graphRebuild.buildAndPersistSnapshot).toHaveBeenCalledTimes(2);
-    });
-
-    it('invalidates whole-run reuse when document content changes', async () => {
-        graphRebuild.persistResidentNativeGraphRun.mockResolvedValue(nativeDurableReuseReceipt());
-        const buildRequest = { ...request(), policy: 'force' as const };
-
-        await service.buildGraph(buildRequest);
-        notesMock.rows[0] = {
-            ...notesMock.rows[0],
-            markdownContent: 'Kai met Hazel. Hazel contradicted Kai.',
-            version: 3,
-            updatedAt: 11,
-        };
-        await service.buildGraph(buildRequest);
-
-        expect(graphRebuild.persistResidentNativeGraphRun).not.toHaveBeenCalled();
-        expect(ner.scanDynamicBatch).toHaveBeenCalledTimes(2);
-        expect(graphRebuild.buildAndPersistSnapshot).toHaveBeenCalledTimes(2);
-    });
-
-    it('rejects changed Delta inputs without crossing into cold reconstruction', async () => {
-        const buildRequest = { ...request(), policy: 'force' as const };
-        const first = await service.buildGraph(buildRequest);
-        graphRebuild.snapshot.mockReturnValue(first.snapshot);
-        notesMock.rows[0] = {
-            ...notesMock.rows[0],
-            markdownContent: 'Kai met Hazel. Hazel contradicted Kai.',
-            version: 3,
-            updatedAt: 11,
-        };
-
-        await expect(service.buildGraph({ ...buildRequest, policy: 'delta' }))
-            .rejects.toThrow('Delta cannot reconstruct');
-
-        expect(ner.scanDynamicBatch).toHaveBeenCalledTimes(1);
-        expect(graphRebuild.buildAndPersistSnapshot).toHaveBeenCalledTimes(1);
     });
 
     it('debounces post-commit work and cancels stale diagnostics before they start', async () => {
@@ -752,6 +672,7 @@ function request(): GraphIndexRunRequest {
     return {
         scope: { kind: 'note', scopeId: 'note:note-1', label: 'Short Run', noteIds: ['note-1'] },
         policy: 'force',
+        durabilityMode: 'diagnostic',
         modelSelection: {
             dynamicNerId: 'dynamic_ner',
             embeddingModelId: 'mongodb-leaf-mt',
@@ -762,6 +683,88 @@ function request(): GraphIndexRunRequest {
         calendarRegistrySnapshot: calendarRegistrySnapshot(),
         entities: registryMock.entities,
     };
+}
+
+async function seedVerifiedForceV2(
+    service: GraphRebuildPipelineService,
+    graphRebuild: ReturnType<typeof createGraphRebuildMock>,
+    ner: ReturnType<typeof createNerMock>,
+    atlasRuntime: ReturnType<typeof createAtlasRuntimeMock>,
+    sourceVersionEnvelope?: { version: number; updatedAt: number },
+) {
+    const legacy = await service.buildGraph(request());
+    const durable = nativeDurableReuseReceipt();
+    const snapshot: GraphRebuildSnapshot = {
+        ...legacy.snapshot,
+        interactiveRunAuthority: {
+            schemaVersion: 'phoenix-interactive-graph-run-authority/v1',
+            inputIdentity: 'sha256:interactive-input',
+            snapshotId: legacy.snapshot.id,
+            scopeId: legacy.snapshot.scopeId,
+            durable,
+        },
+    };
+    const authorityHash = snapshot.authorityContract!.contentHash;
+    const replay = legacy.receipt.replayManifest!;
+    const receipt: GraphIndexRunReceipt = {
+        ...legacy.receipt,
+        durabilityMode: 'interactive',
+        snapshotId: snapshot.id,
+        authorityContract: snapshot.authorityContract,
+        verifiedForceAuthority: {
+            schemaVersion: 'phoenix-verified-force-authority-ref/v1',
+            snapshotId: snapshot.id,
+            authorityHash,
+            manifestId: durable.manifestId,
+            runHandle: durable.runHandle,
+        },
+    };
+    const verifiedSections = [
+        'bridge', 'continuity', 'governance', 'hyperedges',
+        'metadata', 'promotion', 'retrieval', 'siegel',
+    ].map((name) => ({ name, identity: `b3-${name}`, rowCount: 1, rawBytes: 100, compressedBytes: 50 }));
+    graphRebuild.loadPersistedRunReceipt.mockResolvedValue(receipt);
+    graphRebuild.verifyForceV2FromAuthority.mockResolvedValue({
+        result: {
+            schemaVersion: 'phoenix-force-rebuild-v2-shadow-result/v1',
+            contractVersion: 'phoenix-verified-force/v2',
+            pathId: 'native_verified_force_v2',
+            fallbackCount: 0,
+            status: 'durable_verified',
+            scopeId: snapshot.scopeId,
+            snapshotId: snapshot.id,
+            authorityHash,
+            manifestId: durable.manifestId,
+            runHandle: durable.runHandle,
+            analysisSource: 'durable_verified',
+            analysisKernelMicros: 0,
+            verifiedSections,
+            criticalResponseBytes: 24_000,
+            nativeCrossings: 2,
+            sourceBodyReads: replay.documents.length,
+            sourceUtf8Bytes: replay.aggregate.utf8Bytes,
+            transportedSourceBytes: 0,
+            sourceDocuments: replay.documents.map((document) => ({
+                noteId: document.noteId,
+                sha256: document.sha256,
+                jsCodeUnitChars: document.jsCodeUnitChars,
+                utf8Bytes: document.utf8Bytes,
+                version: sourceVersionEnvelope?.version ?? document.version,
+                updatedAt: sourceVersionEnvelope?.updatedAt ?? document.updatedAt,
+            })),
+            sourceVersionEnvelopeChanged: sourceVersionEnvelope !== undefined,
+            authorityPacket: snapshot,
+            parentSpanId: 'span:root',
+            spanId: 'span:v2',
+            error: null,
+        },
+        snapshot,
+    });
+    ner.scanDynamicBatch.mockClear();
+    atlasRuntime.runCapability.mockClear();
+    graphRebuild.buildAndPersistSnapshot.mockClear();
+    graphRebuild.verifyForceV2FromAuthority.mockClear();
+    return { receipt, snapshot };
 }
 
 function calendarRegistrySnapshot(): CalendarRegistrySnapshot {
@@ -1285,6 +1288,18 @@ function createGraphRebuildMock() {
         loadPersistedGenerationReceipt: vi.fn(async () => generationReceipt),
         persistGenerationReceipt: vi.fn(async (receipt: any) => {
             generationReceipt = receipt;
+        }),
+        persistForceV2Authority: vi.fn(async () => ({
+            schemaVersion: 'phoenix-force-v2-authority-persist/v1',
+            artifactId: 'b3-force-authority',
+            rawBytes: 24_000,
+            compressedBytes: 8_000,
+            encoded: true,
+            serializerMicros: 500,
+            atomicPersistMicros: 2_000,
+        })),
+        verifyForceV2FromAuthority: vi.fn(async () => {
+            throw new Error('verified FORCE v2 test seed is missing');
         }),
         prepareAssertedQueryArtifact: vi.fn(async () => ({
             schemaVersion: 'phoenix-graph-generation-artifact-ref/v1' as const,

@@ -47,6 +47,7 @@ console.log(JSON.stringify({
   schemaVersion: page.schemaVersion,
   source: page.source,
   runHandle: page.runHandle,
+  evictionState: page.evictionState,
   returnedDetailRows: page.returnedDetailRows,
   noTopologyWrites: page.projection?.noTopologyWrites,
 }));

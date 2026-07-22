@@ -199,14 +199,20 @@ pub(crate) fn section_identity(root: &str, name: &str, dependencies: &[String]) 
     format!("b3-{}", hasher.finalize().to_hex())
 }
 
-#[cfg(test)]
-fn load_manifest(root: &Path, scope_id: &str) -> Result<Option<DurableGraphRunManifest>, String> {
+pub(crate) fn load_manifest_for_scope(
+    root: &Path,
+    scope_id: &str,
+) -> Result<Option<DurableGraphRunManifest>, String> {
     read_json(
         &root
             .join("scopes")
             .join(scope_key(scope_id))
             .join("manifest.json"),
     )
+}
+
+pub(crate) fn section_blob_exists(root: &Path, section: &DurableSectionRef) -> bool {
+    root.join("blobs").join(format!("{}.zst", section.identity)).is_file()
 }
 
 pub(crate) fn load_manifest_for_handle(
@@ -304,7 +310,7 @@ fn manifest_identity(
     format!("b3-{}", hasher.finalize().to_hex())
 }
 
-fn scope_key(scope_id: &str) -> String {
+pub(crate) fn scope_key(scope_id: &str) -> String {
     format!("b3-{}", blake3::hash(scope_id.as_bytes()).to_hex())
 }
 
@@ -373,7 +379,7 @@ fn write_immutable_json<T: Serialize>(path: &Path, value: &T) -> Result<(), Stri
     write_immutable(path, &bytes)
 }
 
-fn atomic_json<T: Serialize>(path: &Path, value: &T) -> Result<(), String> {
+pub(crate) fn atomic_json<T: Serialize>(path: &Path, value: &T) -> Result<(), String> {
     if let Some(parent) = path.parent() {
         fs::create_dir_all(parent)
             .map_err(|error| format!("create {}: {error}", parent.display()))?;
@@ -554,7 +560,7 @@ mod tests {
                 &RefuseEncoding
             )
             .is_err());
-        let manifest = load_manifest(&root, "scope:failure").unwrap().unwrap();
+        let manifest = load_manifest_for_scope(&root, "scope:failure").unwrap().unwrap();
         assert_eq!(manifest.manifest_id, prior.manifest_id);
         let receipt: DurableGraphRunReceipt = read_json(
             &root

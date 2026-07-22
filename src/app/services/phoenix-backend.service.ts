@@ -26,6 +26,7 @@ import type {
 } from './phoenix-document-index.model';
 import type {
     DesktopMentionBatchRequest,
+    DesktopRuntimeInfo,
 } from '../generated/phoenix-taurpc';
 import { rejectAtlasRichScan } from './atlas-rich-scan-quarantine';
 
@@ -89,6 +90,28 @@ export interface PhoenixGraphRunOpenResult {
         textHash: string;
         candidates: Array<{ key: string; token: string; kind: string; score: number; count: number; status: number }>;
     }>;
+}
+export interface PhoenixGraphRunPersistOptions {
+    authorityHash?: string;
+    forceReplayBinding?: {
+        schemaVersion: string;
+        cohortId: string;
+        sourceMode: string;
+        dependencyIdentity: string;
+        documentSha256: Record<string, string>;
+        documents: Array<{
+            noteId: string;
+            sha256: string;
+            jsCodeUnitChars: number;
+            utf8Bytes: number;
+            version: number | null;
+            updatedAt: number | null;
+        }>;
+        dynamicNerId: string;
+        embeddingModelId: string;
+        embeddingDimension: string;
+        nliModelId: string;
+    };
 }
 
 const PHOENIX_CONTENT_COMMAND_TIMEOUT_MS = 10_000;
@@ -205,7 +228,10 @@ export type PhoenixNativeBridge = Pick<PhoenixWasmService, 'isReady' | PhoenixNa
     analyzeGraphSnapshot?(request: unknown): Promise<unknown>;
     queryGfmShadow?(request: PhoenixGfmShadowQueryRequest): Promise<PhoenixGfmShadowReceipt>;
     readGraphRunPage?(request: PhoenixGraphRunPageRequest): Promise<unknown>;
-    persistGraphRun?(runHandle: string): Promise<unknown>;
+    persistGraphRun?(runHandle: string, options?: PhoenixGraphRunPersistOptions): Promise<unknown>;
+    forceRebuildV2Shadow?(request: unknown): Promise<unknown>;
+    forceRebuildV2(request: unknown): Promise<unknown>;
+    persistForceV2Authority(request: unknown): Promise<unknown>;
     beginNativeOperatorDecision?(request: unknown): Promise<unknown>;
     completeNativeOperatorDecision?(request: unknown): Promise<unknown>;
     commitCanonicalEpisodeAssignment?(request: unknown): Promise<unknown>;
@@ -261,6 +287,11 @@ export function detectPhoenixRuntimeTarget(): PhoenixRuntimeTarget {
 export class PhoenixBackendService {
     private readonly injector = inject(Injector);
     private wasmInstance: PhoenixWasmService | null = null;
+    private runtimeInfoValue: DesktopRuntimeInfo | null = null;
+
+    currentRuntimeInfo(): DesktopRuntimeInfo | null {
+        return this.runtimeInfoValue;
+    }
 
     get target(): PhoenixRuntimeTarget {
         return detectPhoenixRuntimeTarget();
@@ -298,9 +329,11 @@ export class PhoenixBackendService {
     }
 
     async initRuntime(forceReset = false): Promise<any> {
-        return this.target === 'native'
+        const info = await (this.target === 'native'
             ? this.requireNativeBridge().initRuntime(forceReset)
-            : this.wasm.initRuntime(forceReset);
+            : this.wasm.initRuntime(forceReset));
+        if (this.target === 'native') this.runtimeInfoValue = info as DesktopRuntimeInfo;
+        return info;
     }
 
     async createSession(
@@ -401,13 +434,38 @@ export class PhoenixBackendService {
         return bridge.readGraphRunPage(request);
     }
 
-    async persistGraphRun(runHandle: string): Promise<unknown> {
+    async persistGraphRun(runHandle: string, options: PhoenixGraphRunPersistOptions = {}): Promise<unknown> {
         if (this.target !== 'native') {
             throw new Error('PhoenixBackendService.persistGraphRun() requires the native runtime.');
         }
         const bridge = this.requireNativeBridge();
         if (!bridge.persistGraphRun) throw new Error('Native graph run persistence RPC is unavailable.');
-        return bridge.persistGraphRun(runHandle);
+        return bridge.persistGraphRun(runHandle, options);
+    }
+
+    async forceRebuildV2Shadow(request: unknown): Promise<unknown> {
+        if (this.target !== 'native') {
+            throw new Error('PHX_FORCE_V2_NATIVE_REQUIRED: verified FORCE v2 requires the native runtime.');
+        }
+        const bridge = this.requireNativeBridge();
+        if (!bridge.forceRebuildV2Shadow) {
+            throw new Error('PHX_FORCE_V2_CAPABILITY_MISSING: the native v2 contract is not registered.');
+        }
+        return bridge.forceRebuildV2Shadow(request);
+    }
+
+    async forceRebuildV2(request: unknown): Promise<unknown> {
+        if (this.target !== 'native') {
+            throw new Error('PHX_FORCE_V2_NATIVE_REQUIRED: verified FORCE v2 requires the native runtime.');
+        }
+        return this.requireNativeBridge().forceRebuildV2(request);
+    }
+
+    async persistForceV2Authority(request: unknown): Promise<unknown> {
+        if (this.target !== 'native') {
+            throw new Error('PHX_FORCE_V2_NATIVE_REQUIRED: verified FORCE v2 requires the native runtime.');
+        }
+        return this.requireNativeBridge().persistForceV2Authority(request);
     }
 
     async beginNativeOperatorDecision(request: unknown): Promise<unknown> {

@@ -12,10 +12,20 @@ use crate::gfm_retrieval_shadow::{
     DesktopGfmShadowQueryRequest, DesktopGfmShadowResponse,
 };
 use crate::graph_galaxy::{compile_scene, DesktopGalaxyScene, DesktopGalaxySceneRequest};
+use crate::graph_force_rebuild_v2::{
+    persist_authority_packet as persist_force_v2_authority_packet,
+    rejected_release as reject_force_rebuild_v2,
+    release_to_shadow_request as force_rebuild_v2_shadow_request,
+    verify_shadow as verify_force_rebuild_v2_shadow, DesktopForceRebuildV2Request,
+    DesktopForceAuthorityPersistReceipt, DesktopForceAuthorityPersistRequest,
+    DesktopForceRebuildV2ShadowRequest, DesktopForceRebuildV2ShadowResult,
+    DesktopForceReplayDocumentV2, DurableForceReplayBindingV2,
+};
 use crate::graph_generation_query::prepare_graph_generation_query;
 use crate::graph_run_store::{
-    load_immutable_artifact, load_manifest_for_handle, load_section, persist_immutable_artifact,
-    section_identity, DurableGraphRunReceipt, GraphRunStoreTxn,
+    load_immutable_artifact, load_manifest_for_handle, load_manifest_for_scope, load_section,
+    persist_immutable_artifact, section_identity, DurableGraphRunManifest, DurableGraphRunReceipt,
+    GraphRunStoreTxn,
 };
 use crate::graph_scene_packet::{
     compile_packet, GraphScenePacket, GraphScenePacketEdgeInput, GraphScenePacketInput,
@@ -71,6 +81,7 @@ use phoenix_types::{
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
+use sha2::{Digest as ShaDigest, Sha256};
 
 const GRAPH_RUN_ARENA_CAPACITY: usize = 8;
 const GRAPH_RUN_ARENA_RESIDENT_BYTES: usize = 256 * 1024 * 1024;
@@ -300,6 +311,7 @@ struct GraphRunContent {
     document_compiler: Option<phoenix_graph_rebuild::GraphDocumentCompilerSummary>,
     analysis: Arc<DesktopSnapshotAnalysisResponse>,
     gfm_graph: Option<Arc<phoenix_revision_impact::InferenceGraph>>,
+    analysis_source: &'static str,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -339,10 +351,16 @@ struct DurableAnalysisMetadata {
     schema_version: String,
     source: String,
     no_topology_writes: bool,
+    #[serde(default)]
+    force_replay_binding: Option<DurableForceReplayBindingV2>,
+    #[serde(default)]
+    authority_hash: String,
 }
 
 struct DurableGraphRunLoad {
     snapshot_id: String,
+    section_roots: BTreeMap<String, String>,
+    document_compiler: Option<phoenix_graph_rebuild::GraphDocumentCompilerSummary>,
     analysis: DesktopSnapshotAnalysisResponse,
 }
 
@@ -360,6 +378,11 @@ pub struct DesktopGraphRunPageRequest {
 #[serde(rename_all = "camelCase")]
 pub struct DesktopGraphRunPersistRequest {
     run_handle: String,
+    #[serde(default)]
+    #[specta(type = serde_json::Value)]
+    force_replay_binding: Option<DurableForceReplayBindingV2>,
+    #[serde(default)]
+    authority_hash: String,
 }
 
 #[taurpc::ipc_type]
@@ -395,6 +418,8 @@ pub struct DesktopGraphRunPage {
     counts: DesktopGraphRunCounts,
     #[specta(type = serde_json::Value)]
     projection: DesktopSnapshotAnalysisResponse,
+    analysis_source: &'static str,
+    analysis_kernel_micros: f64,
 }
 
 #[taurpc::ipc_type]
@@ -964,6 +989,8 @@ pub struct DesktopRuntimeInfo {
     pub relation_count: u32,
     pub relation_counts: Vec<DesktopRelationCount>,
     pub diagnostics: Vec<DesktopDiagnostic>,
+    pub binary_blake3: String,
+    pub native_graph_contract: String,
 }
 
 #[taurpc::ipc_type]
@@ -1460,6 +1487,15 @@ pub trait PhoenixApi {
     async fn open_graph_run(
         request: DesktopGraphRunOpenRequest,
     ) -> Result<DesktopGraphRunOpenResponse, String>;
+    async fn force_rebuild_v2_shadow(
+        request: DesktopForceRebuildV2ShadowRequest,
+    ) -> Result<DesktopForceRebuildV2ShadowResult, String>;
+    async fn force_rebuild_v2(
+        request: DesktopForceRebuildV2Request,
+    ) -> Result<DesktopForceRebuildV2ShadowResult, String>;
+    async fn persist_force_v2_authority(
+        request: DesktopForceAuthorityPersistRequest,
+    ) -> Result<DesktopForceAuthorityPersistReceipt, String>;
     async fn analyze_graph_snapshot(
         request: DesktopSnapshotAnalysisRequest,
     ) -> Result<DesktopGraphRunPage, String>;
@@ -1525,6 +1561,68 @@ impl PhoenixApi for PhoenixApiImpl {
             Err(_) => return desktop_runtime_info(None, None),
         };
         desktop_runtime_info(guard.host.config(), guard.last_init.as_ref())
+    }
+
+    async fn force_rebuild_v2_shadow(
+        self,
+        request: DesktopForceRebuildV2ShadowRequest,
+    ) -> Result<DesktopForceRebuildV2ShadowResult, String> {
+        let config = self.lock_state()?.host.config().cloned();
+        let Some(root) = desktop_graph_run_store_path(config.as_ref()) else {
+            return Ok(verify_force_rebuild_v2_shadow(Path::new(""), request));
+        };
+        Ok(verify_force_rebuild_v2_shadow(&root, request))
+    }
+
+    async fn force_rebuild_v2(
+        self,
+        request: DesktopForceRebuildV2Request,
+    ) -> Result<DesktopForceRebuildV2ShadowResult, String> {
+        let (root, documents) = {
+            let guard = self.lock_state()?;
+            let root = desktop_graph_run_store_path(guard.host.config());
+            let documents = load_force_replay_documents(&guard.host, &request);
+            (root, documents)
+        };
+        let documents = match documents {
+            Ok(documents) => documents,
+            Err(message) => {
+                let code = message.split_once(':')
+                    .map(|(prefix, _)| prefix)
+                    .filter(|prefix| prefix.starts_with("PHX_FORCE_V2_"))
+                    .unwrap_or("PHX_FORCE_V2_SOURCE_READ_FAILED")
+                    .to_owned();
+                return Ok(reject_force_rebuild_v2(request, &code, message));
+            }
+        };
+        let Some(root) = root else {
+            return Ok(reject_force_rebuild_v2(
+                request,
+                "PHX_FORCE_V2_DURABLE_STORE_REQUIRED",
+                "Native durable graph storage is required.",
+            ));
+        };
+        let source_body_reads = count_for_wire(documents.len());
+        let source_utf8_bytes = documents.iter().map(|row| row.utf8_bytes as u64).sum::<u64>();
+        let mut result = verify_force_rebuild_v2_shadow(
+            &root,
+            force_rebuild_v2_shadow_request(request, documents),
+        );
+        result.source_body_reads = source_body_reads;
+        result.source_utf8_bytes = source_utf8_bytes as f64;
+        result.transported_source_bytes = 0.0;
+        result.critical_response_bytes = serde_json::to_vec(&result).map_or(0, |bytes| bytes.len()) as f64;
+        Ok(result)
+    }
+
+    async fn persist_force_v2_authority(
+        self,
+        request: DesktopForceAuthorityPersistRequest,
+    ) -> Result<DesktopForceAuthorityPersistReceipt, String> {
+        let config = self.lock_state()?.host.config().cloned();
+        let root = desktop_graph_run_store_path(config.as_ref())
+            .ok_or_else(|| "PHX_FORCE_V2_DURABLE_STORE_REQUIRED".to_owned())?;
+        persist_force_v2_authority_packet(&root, request)
     }
 
     async fn init_runtime(self, request: DesktopInitRequest) -> Result<DesktopRuntimeInfo, String> {
@@ -1873,21 +1971,35 @@ impl PhoenixApi for PhoenixApiImpl {
         let section_roots = graph_analysis_section_roots(&request, &documents)?;
         let document_compiler = request.snapshot.document_compiler_summary.clone();
         let identity = graph_analysis_identity(&section_roots);
-        let (reusable, slot) = {
+        let reusable = {
             let mut coordinator = self
                 .graph_runs
                 .lock()
                 .map_err(|_| "graph run coordinator lock poisoned".to_owned())?;
-            if let Some(content) = coordinator.reusable(&identity)? {
-                (Some(content), None)
-            } else {
-                (None, Some(coordinator.analysis_slot(&identity)?))
-            }
+            coordinator.reusable(&identity)?
         };
         let content = if let Some(content) = reusable {
             content
+        } else if let Some(durable) = {
+            let config = self.lock_state()?.host.config().cloned();
+            let root = desktop_graph_run_store_path(config.as_ref());
+            root.as_deref().map_or(Ok(None), |root| {
+                load_verified_durable_graph_run(root, &scope_id, &section_roots)
+            })?
+        } {
+            Arc::new(GraphRunContent {
+                section_roots: durable.section_roots,
+                document_compiler: durable.document_compiler,
+                analysis: Arc::new(durable.analysis),
+                gfm_graph: None,
+                analysis_source: "durable_verified",
+            })
         } else {
-            let slot = slot.expect("analysis slot exists for a cache miss");
+            let slot = self
+                .graph_runs
+                .lock()
+                .map_err(|_| "graph run coordinator lock poisoned".to_owned())?
+                .analysis_slot(&identity)?;
             slot.get_or_init(|| {
                 let gfm_graph = build_gfm_shadow_graph(&request.snapshot).ok().map(Arc::new);
                 let analysis = self.analyze_graph_snapshot_request(request, &documents)?;
@@ -1896,6 +2008,7 @@ impl PhoenixApi for PhoenixApiImpl {
                     document_compiler,
                     analysis: Arc::new(analysis),
                     gfm_graph,
+                    analysis_source: "computed",
                 }))
             })
             .clone()?
@@ -1983,7 +2096,13 @@ impl PhoenixApi for PhoenixApiImpl {
             .map_err(|_| "graph run coordinator lock poisoned".to_owned())?
             .get(&request.run_handle)
             .ok_or_else(|| format!("graph run is closed or expired: {}", request.run_handle))?;
-        let receipt = persist_graph_run_entry(&root, &request.run_handle, entry.as_ref())?;
+        let receipt = persist_graph_run_entry(
+            &root,
+            &request.run_handle,
+            entry.as_ref(),
+            request.force_replay_binding,
+            request.authority_hash,
+        )?;
         Ok(desktop_durable_graph_run_receipt(receipt))
     }
 
@@ -2443,8 +2562,10 @@ impl PhoenixApiImpl {
         };
         let durable;
         let source_snapshot_id;
+        let content_analysis_source;
         let analysis = if let Some(entry) = resident.as_ref() {
             source_snapshot_id = entry.snapshot_id.as_str();
+            content_analysis_source = entry.content.analysis_source;
             entry.content.analysis.as_ref()
         } else {
             let config = {
@@ -2456,6 +2577,7 @@ impl PhoenixApiImpl {
             durable = load_durable_graph_run(&root, run_handle)?
                 .ok_or_else(|| format!("graph run is closed or expired: {run_handle}"))?;
             source_snapshot_id = durable.snapshot_id.as_str();
+            content_analysis_source = "durable_verified";
             &durable.analysis
         };
         let limit = requested_limit.clamp(1, GRAPH_RUN_MAX_PAGE_ROWS);
@@ -2494,6 +2616,14 @@ impl PhoenixApiImpl {
         }
         let next_offset = (offset.saturating_add(returned_detail_rows) < max_rows)
             .then_some(offset.saturating_add(returned_detail_rows) as u32);
+        let analysis_source = if content_analysis_source == "computed"
+            && arena.as_ref().is_some_and(|stats| stats.reused)
+        {
+            "resident_verified"
+        } else {
+            content_analysis_source
+        };
+        let analysis_kernel_micros = projection.timing.total_micros;
         Ok(DesktopGraphRunPage {
             schema_version: "phoenix-graph-run-page/v1",
             source: "rust",
@@ -2526,6 +2656,8 @@ impl PhoenixApiImpl {
             ),
             counts: graph_run_counts(analysis),
             projection,
+            analysis_source,
+            analysis_kernel_micros,
         })
     }
 
@@ -3606,6 +3738,8 @@ fn persist_graph_run_entry(
     root: &std::path::Path,
     run_handle: &str,
     entry: &GraphRunEntry,
+    force_replay_binding: Option<DurableForceReplayBindingV2>,
+    authority_hash: String,
 ) -> Result<DurableGraphRunReceipt, String> {
     let mut transaction = GraphRunStoreTxn::open(
         root.to_path_buf(),
@@ -3677,8 +3811,27 @@ fn persist_graph_run_entry(
         schema_version: analysis.schema_version.to_owned(),
         source: analysis.source.to_owned(),
         no_topology_writes: analysis.no_topology_writes,
+        force_replay_binding,
+        authority_hash,
     };
-    persist!("metadata", 1, &metadata);
+    let metadata_root = entry
+        .content
+        .section_roots
+        .get("metadata")
+        .ok_or_else(|| "graph run section dependency is missing: metadata".to_owned())?;
+    let metadata_bytes = serde_json::to_vec(&metadata)
+        .map_err(|error| format!("encode durable graph run metadata identity: {error}"))?;
+    let dependencies = vec![
+        metadata_root.clone(),
+        format!("content:b3-{}", blake3::hash(&metadata_bytes).to_hex()),
+    ];
+    transaction.persist_section(
+        "metadata",
+        section_identity(metadata_root, "metadata", &dependencies),
+        1,
+        dependencies,
+        &metadata,
+    )?;
     transaction.commit()
 }
 
@@ -3689,36 +3842,103 @@ fn load_durable_graph_run(
     let Some(manifest) = load_manifest_for_handle(root, run_handle)? else {
         return Ok(None);
     };
-    fn decode<T: DeserializeOwned>(
-        root: &std::path::Path,
-        manifest: &crate::graph_run_store::DurableGraphRunManifest,
-        name: &str,
-    ) -> Result<T, String> {
-        let section = manifest
-            .sections
-            .get(name)
-            .ok_or_else(|| format!("durable graph run section is missing: {name}"))?;
-        let bytes = load_section(root, section)?;
-        serde_json::from_slice(&bytes)
-            .map_err(|error| format!("decode durable graph run section {name}: {error}"))
+    let roots = durable_manifest_section_roots(&manifest)?;
+    load_durable_graph_run_manifest(root, manifest, roots).map(Some)
+}
+
+fn load_verified_durable_graph_run(
+    root: &Path,
+    scope_id: &str,
+    expected_roots: &BTreeMap<String, String>,
+) -> Result<Option<DurableGraphRunLoad>, String> {
+    let Some(manifest) = load_manifest_for_scope(root, scope_id)? else {
+        return Ok(None);
+    };
+    if manifest.sections.get("metadata")
+        .is_some_and(|section| section.dependencies.len() == 1)
+    {
+        // Pre-v2 metadata omitted the replay-binding content dependency. It is
+        // a migration cache miss here; verified FORCE v2 still rejects it.
+        return Ok(None);
     }
-    let metadata: DurableAnalysisMetadata = decode(root, &manifest, "metadata")?;
+    let actual_roots = durable_manifest_section_roots(&manifest)?;
+    if &actual_roots != expected_roots {
+        return Ok(None);
+    }
+    load_durable_graph_run_manifest(root, manifest, actual_roots).map(Some)
+}
+
+fn durable_manifest_section_roots(
+    manifest: &DurableGraphRunManifest,
+) -> Result<BTreeMap<String, String>, String> {
+    if manifest.sections.len() != 8 {
+        return Err(format!(
+            "durable graph run section count mismatch: {}",
+            manifest.sections.len()
+        ));
+    }
+    manifest
+        .sections
+        .iter()
+        .map(|(name, section)| {
+            let Some(root) = section.dependencies.first() else {
+                return Err(format!("durable graph run section dependency mismatch: {name}"));
+            };
+            let valid_dependency_shape = if name == "metadata" {
+                section.dependencies.len() == 2
+                    && section.dependencies[1].starts_with("content:b3-")
+            } else {
+                section.dependencies.len() == 1
+            };
+            if !valid_dependency_shape {
+                return Err(format!("durable graph run section dependency mismatch: {name}"));
+            }
+            if section_identity(root, name, &section.dependencies) != section.identity {
+                return Err(format!("durable graph run section identity mismatch: {name}"));
+            }
+            Ok((name.clone(), root.clone()))
+        })
+        .collect()
+}
+
+fn decode_durable_section<T: DeserializeOwned>(
+    root: &Path,
+    manifest: &DurableGraphRunManifest,
+    name: &str,
+) -> Result<T, String> {
+    let section = manifest
+        .sections
+        .get(name)
+        .ok_or_else(|| format!("durable graph run section is missing: {name}"))?;
+    let bytes = load_section(root, section)?;
+    serde_json::from_slice(&bytes)
+        .map_err(|error| format!("decode durable graph run section {name}: {error}"))
+}
+
+fn load_durable_graph_run_manifest(
+    root: &Path,
+    manifest: DurableGraphRunManifest,
+    section_roots: BTreeMap<String, String>,
+) -> Result<DurableGraphRunLoad, String> {
+    let metadata: DurableAnalysisMetadata = decode_durable_section(root, &manifest, "metadata")?;
     if metadata.schema_version != "phoenix-graph-snapshot-analysis-native-output/v1"
         || metadata.source != "rust"
     {
         return Err("durable graph run metadata contract mismatch".to_owned());
     }
-    Ok(Some(DurableGraphRunLoad {
+    Ok(DurableGraphRunLoad {
         snapshot_id: manifest.snapshot_id.clone(),
+        section_roots,
+        document_compiler: decode_durable_section(root, &manifest, "hyperedges")?,
         analysis: DesktopSnapshotAnalysisResponse {
             schema_version: "phoenix-graph-snapshot-analysis-native-output/v1",
             source: "rust",
-            bridge: decode(root, &manifest, "bridge")?,
-            continuity: decode(root, &manifest, "continuity")?,
-            governance: decode(root, &manifest, "governance")?,
-            retrieval: decode(root, &manifest, "retrieval")?,
-            promotion: decode(root, &manifest, "promotion")?,
-            siegel: decode(root, &manifest, "siegel")?,
+            bridge: decode_durable_section(root, &manifest, "bridge")?,
+            continuity: decode_durable_section(root, &manifest, "continuity")?,
+            governance: decode_durable_section(root, &manifest, "governance")?,
+            retrieval: decode_durable_section(root, &manifest, "retrieval")?,
+            promotion: decode_durable_section(root, &manifest, "promotion")?,
+            siegel: decode_durable_section(root, &manifest, "siegel")?,
             no_topology_writes: metadata.no_topology_writes,
             timing: DesktopSnapshotAnalysisTiming {
                 bridge_build_micros: 0.0,
@@ -3729,7 +3949,7 @@ fn load_durable_graph_run(
                 total_micros: 0.0,
             },
         },
-    }))
+    })
 }
 
 fn desktop_durable_graph_run_receipt(
@@ -3885,7 +4105,27 @@ fn desktop_runtime_info(
                     .collect()
             })
             .unwrap_or_default(),
+        binary_blake3: runtime_binary_blake3(),
+        native_graph_contract: "phoenix-verified-force/v2".to_owned(),
     }
+}
+
+fn runtime_binary_blake3() -> String {
+    static IDENTITY: OnceLock<String> = OnceLock::new();
+    IDENTITY
+        .get_or_init(|| {
+            let result = std::env::current_exe()
+                .map_err(|error| format!("current executable: {error}"))
+                .and_then(|path| {
+                    let file = std::fs::File::open(&path)
+                        .map_err(|error| format!("open {}: {error}", path.display()))?;
+                    let mapped = unsafe { memmap2::MmapOptions::new().map(&file) }
+                        .map_err(|error| format!("mmap {}: {error}", path.display()))?;
+                    Ok(format!("b3-{}", blake3::hash(&mapped).to_hex()))
+                });
+            result.unwrap_or_else(|error| format!("unavailable:{error}"))
+        })
+        .clone()
 }
 
 fn default_runtime_config() -> RuntimeConfig {
@@ -4442,6 +4682,66 @@ fn store_relation_rows(host: &PhoenixNativeHost, relation: &str) -> Result<Vec<V
         .and_then(Value::as_array)
         .cloned()
         .unwrap_or_default())
+}
+
+fn load_force_replay_documents(
+    host: &PhoenixNativeHost,
+    request: &DesktopForceRebuildV2Request,
+) -> Result<Vec<DesktopForceReplayDocumentV2>, String> {
+    let note_ids = &request.note_ids;
+    if note_ids.is_empty() {
+        return Err("Verified FORCE requires at least one exact note ID.".to_owned());
+    }
+    let (command, payload) = if request.scope_kind == "global" {
+        ("note:list", json!({ "includeBody": true }))
+    } else {
+        ("note:listByIds", json!({ "ids": note_ids, "noteIds": note_ids, "includeBody": true }))
+    };
+    let result = host
+        .store_command(StoreCommandRequest {
+            command: command.to_owned(),
+            payload,
+        })
+        .map_err(|error| error.to_string())?;
+    let value = serde_json::to_value(result)
+        .map_err(|error| format!("encode native note read: {error}"))?;
+    if !value.get("success").and_then(Value::as_bool).unwrap_or(false) {
+        return Err(value.get("error").and_then(Value::as_str)
+            .unwrap_or("native note read failed").to_owned());
+    }
+    let rows = value.get("payload").and_then(Value::as_array)
+        .ok_or_else(|| "native note read returned no row array".to_owned())?;
+    if request.scope_kind == "global" {
+        let expected = note_ids.iter().map(String::as_str).collect::<BTreeSet<_>>();
+        let actual = rows.iter().filter_map(|row| row.get("id").and_then(Value::as_str))
+            .collect::<BTreeSet<_>>();
+        if actual != expected {
+            return Err("PHX_FORCE_V2_SCOPE_MEMBERSHIP_CHANGED: global note membership differs from the replay manifest".to_owned());
+        }
+    }
+    let by_id = rows.iter().filter_map(|row| {
+        let id = row.get("id").and_then(Value::as_str)?;
+        Some((id, row))
+    }).collect::<BTreeMap<_, _>>();
+    note_ids.iter().map(|note_id| {
+        let row = by_id.get(note_id.as_str())
+            .ok_or_else(|| format!("native note body is missing: {note_id}"))?;
+        let text = row.get("markdownContent")
+            .or_else(|| row.get("markdown_content"))
+            .or_else(|| row.get("content"))
+            .and_then(Value::as_str)
+            .ok_or_else(|| format!("native note body is unavailable: {note_id}"))?;
+        let sha256 = format!("{:x}", Sha256::digest(text.as_bytes()));
+        Ok(DesktopForceReplayDocumentV2 {
+            note_id: note_id.clone(),
+            sha256,
+            js_code_unit_chars: count_for_wire(text.encode_utf16().count()),
+            utf8_bytes: count_for_wire(text.len()),
+            version: row.get("version").and_then(Value::as_f64),
+            updated_at: row.get("updatedAt").or_else(|| row.get("updated_at"))
+                .and_then(Value::as_f64),
+        })
+    }).collect()
 }
 
 fn semantic_rows_to_payload(
@@ -7100,6 +7400,181 @@ mod tests {
     }
 
     #[test]
+    fn fresh_process_reconstructs_all_verified_sections_before_analysis_kernels() {
+        let root = tempfile::tempdir().unwrap();
+        let api = PhoenixApiImpl::default();
+        let request = DesktopSnapshotAnalysisRequest {
+            run_handle: None,
+            snapshot: empty_graph_snapshot("snapshot-1", "scope:durable-reuse"),
+            documents: Vec::new(),
+            document_semantic_summary: None,
+            document_semantic_handle: None,
+            retrieval_candidates: Vec::new(),
+            receipts: Vec::new(),
+            commits: Vec::new(),
+            user_overrides: Vec::new(),
+            siegel: None,
+        };
+        let roots = graph_analysis_section_roots(&request, &[]).unwrap();
+        let analysis = api.analyze_graph_snapshot_request(request, &[]).unwrap();
+        let expected_counts = serde_json::to_value(graph_run_counts(&analysis)).unwrap();
+        let entry = GraphRunEntry {
+            scope_id: "scope:durable-reuse".to_owned(),
+            snapshot_id: "snapshot-1".to_owned(),
+            content: Arc::new(GraphRunContent {
+                section_roots: roots.clone(),
+                document_compiler: Some(Default::default()),
+                analysis: Arc::new(analysis),
+                gfm_graph: None,
+                analysis_source: "computed",
+            }),
+        };
+        let receipt = persist_graph_run_entry(
+            root.path(),
+            "run-1",
+            &entry,
+            None,
+            "authority-1".to_owned(),
+        ).unwrap();
+        assert_eq!(receipt.changed_sections, 8);
+
+        let loaded = load_verified_durable_graph_run(
+            root.path(),
+            "scope:durable-reuse",
+            &roots,
+        ).unwrap().unwrap();
+        assert_eq!(loaded.section_roots.len(), 8);
+        assert_eq!(loaded.analysis.timing.total_micros, 0.0);
+        assert_eq!(serde_json::to_value(graph_run_counts(&loaded.analysis)).unwrap(), expected_counts);
+        assert_eq!(loaded.document_compiler, Some(Default::default()));
+    }
+
+    #[test]
+    fn replay_binding_change_replaces_only_metadata_section() {
+        let root = tempfile::tempdir().unwrap();
+        let api = PhoenixApiImpl::default();
+        let request = DesktopSnapshotAnalysisRequest {
+            run_handle: None,
+            snapshot: empty_graph_snapshot("snapshot-1", "scope:binding-change"),
+            documents: Vec::new(),
+            document_semantic_summary: None,
+            document_semantic_handle: None,
+            retrieval_candidates: Vec::new(),
+            receipts: Vec::new(),
+            commits: Vec::new(),
+            user_overrides: Vec::new(),
+            siegel: None,
+        };
+        let roots = graph_analysis_section_roots(&request, &[]).unwrap();
+        let analysis = api.analyze_graph_snapshot_request(request, &[]).unwrap();
+        let entry = GraphRunEntry {
+            scope_id: "scope:binding-change".to_owned(),
+            snapshot_id: "snapshot-1".to_owned(),
+            content: Arc::new(GraphRunContent {
+                section_roots: roots,
+                document_compiler: Some(Default::default()),
+                analysis: Arc::new(analysis),
+                gfm_graph: None,
+                analysis_source: "computed",
+            }),
+        };
+        persist_graph_run_entry(root.path(), "run-1", &entry, None, "authority".to_owned())
+            .unwrap();
+        let binding = DurableForceReplayBindingV2 {
+            schema_version: "phoenix-verified-force/v2".to_owned(),
+            cohort_id: "sha256:cohort".to_owned(),
+            source_mode: "scoped-note-store".to_owned(),
+            dependency_identity: "sha256:dependencies".to_owned(),
+            document_sha256: BTreeMap::new(),
+            documents: Vec::new(),
+            dynamic_ner_id: "dynamic_ner".to_owned(),
+            embedding_model_id: "jina-v5-nano".to_owned(),
+            embedding_dimension: "768d".to_owned(),
+            nli_model_id: "modernbert-nli".to_owned(),
+        };
+        let receipt = persist_graph_run_entry(
+            root.path(),
+            "run-2",
+            &entry,
+            Some(binding.clone()),
+            "authority".to_owned(),
+        ).unwrap();
+
+        assert_eq!(receipt.changed_sections, 1);
+        assert_eq!(receipt.reused_sections, 7);
+        let manifest = load_manifest_for_handle(root.path(), "run-2").unwrap().unwrap();
+        let metadata: DurableAnalysisMetadata =
+            decode_durable_section(root.path(), &manifest, "metadata").unwrap();
+        assert_eq!(metadata.force_replay_binding, Some(binding));
+    }
+
+    #[test]
+    fn pre_v2_metadata_shape_is_a_migration_cache_miss() {
+        let root = tempfile::tempdir().unwrap();
+        let mut transaction = GraphRunStoreTxn::open(
+            root.path().to_path_buf(),
+            "run:legacy",
+            "scope:legacy",
+            "snapshot:legacy",
+        ).unwrap();
+        let mut roots = BTreeMap::new();
+        for name in [
+            "bridge", "continuity", "governance", "hyperedges",
+            "metadata", "promotion", "retrieval", "siegel",
+        ] {
+            let dependency = format!("root:{name}");
+            let dependencies = vec![dependency.clone()];
+            roots.insert(name.to_owned(), dependency.clone());
+            transaction.persist_section(
+                name,
+                section_identity(&dependency, name, &dependencies),
+                0,
+                dependencies,
+                &serde_json::json!({}),
+            ).unwrap();
+        }
+        transaction.commit().unwrap();
+
+        assert!(load_verified_durable_graph_run(root.path(), "scope:legacy", &roots)
+            .unwrap()
+            .is_none());
+    }
+
+    fn empty_graph_snapshot(id: &str, scope_id: &str) -> GraphRebuildSnapshot {
+        GraphRebuildSnapshot {
+            schema_version: "phoenix-graph-rebuild/v1".into(),
+            id: id.into(),
+            source: "test".into(),
+            scope_kind: phoenix_graph_rebuild::GraphScopeKind::Global,
+            scope_id: scope_id.into(),
+            note_ids: Vec::new(),
+            built_at: 0,
+            chunks: Vec::new(),
+            mentions: Vec::new(),
+            entity_anchors: Vec::new(),
+            relationships: Vec::new(),
+            events: Vec::new(),
+            episodes: Vec::new(),
+            episode_projection_edges: Vec::new(),
+            temporal_edges: Vec::new(),
+            causal_edges: Vec::new(),
+            memory_state: Vec::new(),
+            memory_governance_candidates: Vec::new(),
+            embedding_targets: Vec::new(),
+            embedding_vectors: Vec::new(),
+            projection_refs: Vec::new(),
+            nodes: Vec::new(),
+            edges: Vec::new(),
+            calendar_registry_summary: None,
+            document_sidecar_summary: None,
+            document_review_summary: None,
+            document_compiler_summary: Some(Default::default()),
+            discourse_spine_summary: None,
+            counters: Default::default(),
+        }
+    }
+
+    #[test]
     fn graph_run_lease_tokens_are_generation_checked_not_raw_digests() {
         let mut coordinator = GraphRunCoordinator::default();
 
@@ -7133,6 +7608,8 @@ mod tests {
         assert_eq!(info.target, "native");
         assert_eq!(info.storage, "nativeLocal");
         assert!(!info.build_git_sha.is_empty());
+        assert!(info.binary_blake3.starts_with("b3-") || info.binary_blake3.starts_with("unavailable:"));
+        assert_eq!(info.native_graph_contract, "phoenix-verified-force/v2");
         assert!(matches!(info.build_profile.as_str(), "debug" | "release"));
         assert!(!info.feature_flags.graptor);
         assert!(!info.feature_flags.gldr);

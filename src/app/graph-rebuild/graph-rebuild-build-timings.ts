@@ -37,6 +37,7 @@ export interface GraphRebuildBuildTimings {
     stateCommitMs: number;
     nativeSnapshotAnalysisMs?: number;
     nativeSnapshotAnalysisRustMicros?: number;
+    nativeSnapshotAnalysisSource?: 'computed' | 'resident_verified' | 'durable_verified';
     nativeGraphRunArenaReused?: number;
     nativeGraphRunArenaResidentBytes?: number;
     nativeGraphRunArenaActiveLeases?: number;

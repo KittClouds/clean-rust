@@ -1,9 +1,16 @@
 import type { GraphIndexRunReceipt, GraphRebuildSnapshot } from './graph-rebuild-snapshot';
+import type { GraphRebuildReplayManifest } from './graph-rebuild-replay-contract';
 
 export const GRAPH_BUILD_BASELINE_CERTIFICATE_SCHEMA_VERSION =
-    'phoenix-graph-build-baseline-certificate/v2' as const;
-export const GRAPH_BUILD_WARM_TARGET_P50_MS = 1_000;
-export const GRAPH_BUILD_WARM_CEILING_P95_MS = 3_000;
+    'phoenix-graph-build-baseline-certificate/v3' as const;
+export const GRAPH_BUILD_REPLAY_WARMUP_RUNS = 2;
+export const GRAPH_BUILD_REPLAY_MEASURED_RUNS = 21;
+export const GRAPH_BUILD_WARM_TARGET_P50_MS = 750;
+export const GRAPH_BUILD_WARM_CEILING_P95_MS = 900;
+export const GRAPH_BUILD_WARM_CEILING_MAX_MS = 1_000;
+export const GRAPH_BUILD_WARNING_P50_MS = 650;
+export const GRAPH_BUILD_WARNING_P95_MS = 800;
+export const GRAPH_BUILD_WARNING_MAX_MS = 900;
 
 export type GraphBuildBaselineLane = 'cold_force' | 'warm_force' | 'delta';
 
@@ -61,6 +68,7 @@ export interface GraphBuildBaselineRunRow {
     packetConstructionMs: number;
     authoritySealMs: number;
     nativeAnalysisRustMicros: number;
+    nativeAnalysisSource: string;
     nativeGraphRunArenaReused: number;
     nativeGraphRunArenaResidentBytes: number;
     nativeGraphRunArenaActiveLeases: number;
@@ -89,12 +97,18 @@ export interface GraphBuildBaselineRunRow {
     transportDecodeTimingUnavailableCalls: number;
     transportOffenders: string;
     noTopologyWrites: boolean;
+    cohortId: string;
+    pathId: string;
+    fallbackCount: number;
+    documentBodyCopies: number;
+    unmeasuredAllocatorEvents: number;
 }
 
 export interface GraphBuildBaselineLaneSummary {
     runs: number;
     wallP50Ms: number;
     wallP95Ms: number;
+    wallMaxMs: number;
     receiptSettleP50Ms: number;
     receiptSettleP95Ms: number;
     transportP50Ms: number;
@@ -145,6 +159,8 @@ export interface GraphBuildBaselineCertificate {
     scopeId: string;
     documents: Array<{ title: string; chars: number; sha256: string }>;
     model: { embeddingModelId: string; dimension: string; nliModelId: string };
+    replayManifest: GraphRebuildReplayManifest | null;
+    cohortStable: boolean;
     runs: GraphBuildBaselineRunRow[];
     summary: Record<GraphBuildBaselineLane, GraphBuildBaselineLaneSummary>;
     parity: {
@@ -155,13 +171,33 @@ export interface GraphBuildBaselineCertificate {
         mismatchedRuns: string[];
     };
     performanceGate: {
+        minimumMeasuredRuns: number;
         targetP50Ms: number;
         ceilingP95Ms: number;
+        ceilingMaxMs: number;
+        warningP50Ms: number;
+        warningP95Ms: number;
+        warningMaxMs: number;
+        warningPassed: boolean;
         warmPassed: boolean;
         deltaPassed: boolean;
         passed: boolean;
     };
     cleanup: { notesDeleted: number; scopedDocumentsDeleted: number };
+}
+
+export interface GraphBuildVerifiedForceGate {
+    minimumMeasuredRuns: number;
+    targetP50Ms: number;
+    ceilingP95Ms: number;
+    ceilingMaxMs: number;
+    warningP50Ms: number;
+    warningP95Ms: number;
+    warningMaxMs: number;
+    warningPassed: boolean;
+    timingPassed: boolean;
+    executionContractPassed: boolean;
+    passed: boolean;
 }
 
 export async function graphBuildIdentityHash(snapshot: GraphRebuildSnapshot): Promise<string> {
@@ -256,6 +292,7 @@ export function graphBuildRunRow(
         packetConstructionMs: timing?.packetConstructionMs || 0,
         authoritySealMs: timing?.authoritySealMs || 0,
         nativeAnalysisRustMicros: timing?.nativeSnapshotAnalysisRustMicros || 0,
+        nativeAnalysisSource: timing?.nativeSnapshotAnalysisSource || 'unavailable',
         nativeGraphRunArenaReused: timing?.nativeGraphRunArenaReused || 0,
         nativeGraphRunArenaResidentBytes: timing?.nativeGraphRunArenaResidentBytes || 0,
         nativeGraphRunArenaActiveLeases: timing?.nativeGraphRunArenaActiveLeases || 0,
@@ -284,6 +321,11 @@ export function graphBuildRunRow(
         transportDecodeTimingUnavailableCalls: transportCounters['transportDecodeTimingUnavailableCalls'] || 0,
         transportOffenders: transport?.message || '',
         noTopologyWrites: graphBuildNoTopologyProof(snapshot),
+        cohortId: receipt.replayManifest?.cohortId || '',
+        pathId: receipt.pathId || 'unavailable',
+        fallbackCount: receipt.fallbackCount ?? -1,
+        documentBodyCopies: receipt.replayManifest?.memory.documentBodyCopies || 0,
+        unmeasuredAllocatorEvents: receipt.replayManifest?.memory.unmeasuredAllocatorEvents ?? 1,
     };
 }
 
@@ -292,6 +334,7 @@ export function summarizeGraphBuildLane(rows: GraphBuildBaselineRunRow[]): Graph
         runs: rows.length,
         wallP50Ms: percentile(rows.map((row) => row.wallMs), 0.5),
         wallP95Ms: percentile(rows.map((row) => row.wallMs), 0.95),
+        wallMaxMs: round(Math.max(0, ...rows.map((row) => row.wallMs))),
         receiptSettleP50Ms: percentile(rows.map((row) => row.receiptSettleMs), 0.5),
         receiptSettleP95Ms: percentile(rows.map((row) => row.receiptSettleMs), 0.95),
         transportP50Ms: percentile(rows.map((row) => row.transportTotalMs), 0.5),
@@ -360,16 +403,59 @@ export function graphBuildPerformanceGate(
     delta: GraphBuildBaselineLaneSummary,
 ): GraphBuildBaselineCertificate['performanceGate'] {
     const passes = (lane: GraphBuildBaselineLaneSummary) =>
-        lane.wallP50Ms <= GRAPH_BUILD_WARM_TARGET_P50_MS
-        && lane.wallP95Ms <= GRAPH_BUILD_WARM_CEILING_P95_MS;
+        lane.runs >= GRAPH_BUILD_REPLAY_MEASURED_RUNS
+        && lane.wallP50Ms <= GRAPH_BUILD_WARM_TARGET_P50_MS
+        && lane.wallP95Ms <= GRAPH_BUILD_WARM_CEILING_P95_MS
+        && lane.wallMaxMs <= GRAPH_BUILD_WARM_CEILING_MAX_MS;
+    const warningPassed = warm.runs >= GRAPH_BUILD_REPLAY_MEASURED_RUNS
+        && warm.wallP50Ms <= GRAPH_BUILD_WARNING_P50_MS
+        && warm.wallP95Ms <= GRAPH_BUILD_WARNING_P95_MS
+        && warm.wallMaxMs <= GRAPH_BUILD_WARNING_MAX_MS;
     const warmPassed = passes(warm);
     const deltaPassed = passes(delta);
     return {
+        minimumMeasuredRuns: GRAPH_BUILD_REPLAY_MEASURED_RUNS,
         targetP50Ms: GRAPH_BUILD_WARM_TARGET_P50_MS,
         ceilingP95Ms: GRAPH_BUILD_WARM_CEILING_P95_MS,
+        ceilingMaxMs: GRAPH_BUILD_WARM_CEILING_MAX_MS,
+        warningP50Ms: GRAPH_BUILD_WARNING_P50_MS,
+        warningP95Ms: GRAPH_BUILD_WARNING_P95_MS,
+        warningMaxMs: GRAPH_BUILD_WARNING_MAX_MS,
+        warningPassed,
         warmPassed,
         deltaPassed,
         passed: warmPassed && deltaPassed,
+    };
+}
+
+export function graphBuildVerifiedForceGate(
+    summary: GraphBuildBaselineLaneSummary,
+    rows: GraphBuildBaselineRunRow[],
+): GraphBuildVerifiedForceGate {
+    const timingPassed = summary.runs >= GRAPH_BUILD_REPLAY_MEASURED_RUNS
+        && summary.wallP50Ms <= GRAPH_BUILD_WARM_TARGET_P50_MS
+        && summary.wallP95Ms <= GRAPH_BUILD_WARM_CEILING_P95_MS
+        && summary.wallMaxMs <= GRAPH_BUILD_WARM_CEILING_MAX_MS;
+    const warningPassed = summary.runs >= GRAPH_BUILD_REPLAY_MEASURED_RUNS
+        && summary.wallP50Ms <= GRAPH_BUILD_WARNING_P50_MS
+        && summary.wallP95Ms <= GRAPH_BUILD_WARNING_P95_MS
+        && summary.wallMaxMs <= GRAPH_BUILD_WARNING_MAX_MS;
+    const executionContractPassed = rows.length === summary.runs
+        && rows.every((row) => row.pathId === 'native_verified_force_v2'
+            && row.fallbackCount === 0
+            && row.cohortId !== '');
+    return {
+        minimumMeasuredRuns: GRAPH_BUILD_REPLAY_MEASURED_RUNS,
+        targetP50Ms: GRAPH_BUILD_WARM_TARGET_P50_MS,
+        ceilingP95Ms: GRAPH_BUILD_WARM_CEILING_P95_MS,
+        ceilingMaxMs: GRAPH_BUILD_WARM_CEILING_MAX_MS,
+        warningP50Ms: GRAPH_BUILD_WARNING_P50_MS,
+        warningP95Ms: GRAPH_BUILD_WARNING_P95_MS,
+        warningMaxMs: GRAPH_BUILD_WARNING_MAX_MS,
+        warningPassed,
+        timingPassed,
+        executionContractPassed,
+        passed: timingPassed && executionContractPassed,
     };
 }
 

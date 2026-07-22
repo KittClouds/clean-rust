@@ -16,6 +16,7 @@ import type {
     PhoenixMentionBatchRequest,
     PhoenixMentionBatchResult,
     PhoenixGraphRunOpenResult,
+    PhoenixGraphRunPersistOptions,
 } from './phoenix-backend.service';
 import {
     errorMessage,
@@ -347,11 +348,39 @@ class PhoenixTaurpcBridge implements PhoenixNativeBridge {
         );
     }
 
-    async persistGraphRun(runHandle: string): Promise<unknown> {
+    async persistGraphRun(runHandle: string, options: PhoenixGraphRunPersistOptions = {}): Promise<unknown> {
         await this.loadRuntime();
         return phoenixTransportAudit.measureTypedRpc(
             'phoenix.persist_graph_run',
-            () => this.rpc.phoenix.persist_graph_run({ runHandle }),
+            () => this.rpc.phoenix.persist_graph_run({
+                runHandle,
+                forceReplayBinding: options.forceReplayBinding,
+                authorityHash: options.authorityHash || '',
+            }),
+        );
+    }
+
+    async forceRebuildV2Shadow(request: unknown): Promise<unknown> {
+        await this.loadRuntime();
+        return phoenixTransportAudit.measureTypedRpc(
+            'phoenix.force_rebuild_v2_shadow',
+            () => this.rpc.phoenix.force_rebuild_v2_shadow(request as never),
+        );
+    }
+
+    async forceRebuildV2(request: unknown): Promise<unknown> {
+        await this.loadRuntime();
+        return phoenixTransportAudit.measureTypedRpc(
+            'phoenix.force_rebuild_v2',
+            () => this.rpc.phoenix.force_rebuild_v2(request as never),
+        );
+    }
+
+    async persistForceV2Authority(request: unknown): Promise<unknown> {
+        await this.loadRuntime();
+        return phoenixTransportAudit.measureTypedRpc(
+            'phoenix.persist_force_v2_authority',
+            () => this.rpc.phoenix.persist_force_v2_authority(request as never),
         );
     }
 
