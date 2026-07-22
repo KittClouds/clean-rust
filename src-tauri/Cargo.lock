@@ -2582,6 +2582,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "graph-analytics-wgpu-kernel"
+version = "0.1.0"
+dependencies = [
+ "bytemuck",
+ "pollster",
+ "thiserror 2.0.18",
+ "wgpu",
+]
+
+[[package]]
 name = "gtk"
 version = "0.18.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4752,6 +4762,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "phoenix-discovery-community"
+version = "0.1.1"
+dependencies = [
+ "blake3",
+ "graph-analytics-wgpu-kernel",
+ "hashbrown 0.15.5",
+ "memmap2",
+ "phoenix-discovery-view",
+ "phoenix-graph-kernel 0.1.1",
+ "rayon",
+ "serde",
+ "serde_json",
+ "thiserror 1.0.69",
+ "zerocopy 0.7.35",
+]
+
+[[package]]
 name = "phoenix-discovery-view"
 version = "0.1.1"
 dependencies = [
@@ -5593,6 +5620,7 @@ dependencies = [
  "base64 0.22.1",
  "blake3",
  "flate2",
+ "graph-analytics-wgpu-kernel",
  "half",
  "hashbrown 0.15.5",
  "hound",
@@ -5600,6 +5628,7 @@ dependencies = [
  "ort",
  "ort-sys",
  "phoenix-api",
+ "phoenix-discovery-community",
  "phoenix-discovery-view",
  "phoenix-document-index",
  "phoenix-graph-kernel 0.1.1",

@@ -11,16 +11,16 @@ use crate::gfm_retrieval_shadow::{
     build_gfm_shadow_graph, execute_gfm_shadow_query, unavailable_gfm_shadow_response,
     DesktopGfmShadowQueryRequest, DesktopGfmShadowResponse,
 };
-use crate::graph_galaxy::{compile_scene, DesktopGalaxyScene, DesktopGalaxySceneRequest};
 use crate::graph_force_rebuild_v2::{
     persist_authority_packet as persist_force_v2_authority_packet,
     rejected_release as reject_force_rebuild_v2,
     release_to_shadow_request as force_rebuild_v2_shadow_request,
-    verify_shadow as verify_force_rebuild_v2_shadow, DesktopForceRebuildV2Request,
-    DesktopForceAuthorityPersistReceipt, DesktopForceAuthorityPersistRequest,
+    verify_shadow as verify_force_rebuild_v2_shadow, DesktopForceAuthorityPersistReceipt,
+    DesktopForceAuthorityPersistRequest, DesktopForceRebuildV2Request,
     DesktopForceRebuildV2ShadowRequest, DesktopForceRebuildV2ShadowResult,
     DesktopForceReplayDocumentV2, DurableForceReplayBindingV2,
 };
+use crate::graph_galaxy::{compile_scene, DesktopGalaxyScene, DesktopGalaxySceneRequest};
 use crate::graph_generation_query::prepare_graph_generation_query;
 use crate::graph_run_store::{
     load_immutable_artifact, load_manifest_for_handle, load_manifest_for_scope, load_section,
@@ -938,6 +938,8 @@ pub struct PhoenixApiImpl {
     state: Arc<Mutex<PhoenixDesktopState>>,
     graph_runs: Arc<Mutex<GraphRunCoordinator>>,
     gfm_shadow_generation: Arc<AtomicU32>,
+    #[cfg(feature = "graph-analytics-wgpu-shadow")]
+    offline_analytics: Arc<crate::graph_offline_analytics::OfflineAnalyticsCoordinator>,
     tts: NativeTtsService,
 }
 
@@ -1587,7 +1589,8 @@ impl PhoenixApi for PhoenixApiImpl {
         let documents = match documents {
             Ok(documents) => documents,
             Err(message) => {
-                let code = message.split_once(':')
+                let code = message
+                    .split_once(':')
                     .map(|(prefix, _)| prefix)
                     .filter(|prefix| prefix.starts_with("PHX_FORCE_V2_"))
                     .unwrap_or("PHX_FORCE_V2_SOURCE_READ_FAILED")
@@ -1603,7 +1606,10 @@ impl PhoenixApi for PhoenixApiImpl {
             ));
         };
         let source_body_reads = count_for_wire(documents.len());
-        let source_utf8_bytes = documents.iter().map(|row| row.utf8_bytes as u64).sum::<u64>();
+        let source_utf8_bytes = documents
+            .iter()
+            .map(|row| row.utf8_bytes as u64)
+            .sum::<u64>();
         let mut result = verify_force_rebuild_v2_shadow(
             &root,
             force_rebuild_v2_shadow_request(request, documents),
@@ -1611,7 +1617,8 @@ impl PhoenixApi for PhoenixApiImpl {
         result.source_body_reads = source_body_reads;
         result.source_utf8_bytes = source_utf8_bytes as f64;
         result.transported_source_bytes = 0.0;
-        result.critical_response_bytes = serde_json::to_vec(&result).map_or(0, |bytes| bytes.len()) as f64;
+        result.critical_response_bytes =
+            serde_json::to_vec(&result).map_or(0, |bytes| bytes.len()) as f64;
         Ok(result)
     }
 
@@ -2317,11 +2324,31 @@ impl PhoenixApi for PhoenixApiImpl {
                     .ok_or_else(|| "graph generation query storage is unavailable".to_owned())?
             };
             let manifest = prepare_graph_generation_query(&snapshot, authority_hash, &root)?;
+            #[cfg(feature = "graph-analytics-wgpu-shadow")]
+            let community_shadow = Some(
+                self.offline_analytics
+                    .run_community_artifact_shadow(
+                        &crate::graph_offline_analytics::OfflineCommunityArtifactJob {
+                            generation: manifest.generation,
+                            source_artifact_digest: manifest.artifact_digest.clone(),
+                            source_artifact_root: root
+                                .join("objects")
+                                .join(&manifest.artifact_digest),
+                            shadow_artifact_root: root.join("community-shadow"),
+                            mode:
+                                crate::graph_offline_analytics::OfflineAnalyticsMode::AutoQualified,
+                        },
+                    )
+                    .map_err(|error| error.to_string())?,
+            );
+            #[cfg(not(feature = "graph-analytics-wgpu-shadow"))]
+            let community_shadow = Option::<Value>::None;
             return serialize_json(&json!({
                 "success": true,
                 "payload": {
                     "schemaVersion": "phoenix-graph-generation-asserted-query/v1",
                     "manifest": manifest,
+                    "communityShadow": community_shadow,
                 },
                 "error": null,
             }));
@@ -2532,6 +2559,13 @@ impl PhoenixApi for PhoenixApiImpl {
 }
 
 impl PhoenixApiImpl {
+    #[cfg(feature = "graph-analytics-wgpu-shadow")]
+    pub fn offline_analytics_coordinator(
+        &self,
+    ) -> Arc<crate::graph_offline_analytics::OfflineAnalyticsCoordinator> {
+        Arc::clone(&self.offline_analytics)
+    }
+
     fn lock_state(&self) -> Result<std::sync::MutexGuard<'_, PhoenixDesktopState>, String> {
         self.state
             .lock()
@@ -3854,7 +3888,9 @@ fn load_verified_durable_graph_run(
     let Some(manifest) = load_manifest_for_scope(root, scope_id)? else {
         return Ok(None);
     };
-    if manifest.sections.get("metadata")
+    if manifest
+        .sections
+        .get("metadata")
         .is_some_and(|section| section.dependencies.len() == 1)
     {
         // Pre-v2 metadata omitted the replay-binding content dependency. It is
@@ -3882,7 +3918,9 @@ fn durable_manifest_section_roots(
         .iter()
         .map(|(name, section)| {
             let Some(root) = section.dependencies.first() else {
-                return Err(format!("durable graph run section dependency mismatch: {name}"));
+                return Err(format!(
+                    "durable graph run section dependency mismatch: {name}"
+                ));
             };
             let valid_dependency_shape = if name == "metadata" {
                 section.dependencies.len() == 2
@@ -3891,10 +3929,14 @@ fn durable_manifest_section_roots(
                 section.dependencies.len() == 1
             };
             if !valid_dependency_shape {
-                return Err(format!("durable graph run section dependency mismatch: {name}"));
+                return Err(format!(
+                    "durable graph run section dependency mismatch: {name}"
+                ));
             }
             if section_identity(root, name, &section.dependencies) != section.identity {
-                return Err(format!("durable graph run section identity mismatch: {name}"));
+                return Err(format!(
+                    "durable graph run section identity mismatch: {name}"
+                ));
             }
             Ok((name.clone(), root.clone()))
         })
@@ -4695,7 +4737,10 @@ fn load_force_replay_documents(
     let (command, payload) = if request.scope_kind == "global" {
         ("note:list", json!({ "includeBody": true }))
     } else {
-        ("note:listByIds", json!({ "ids": note_ids, "noteIds": note_ids, "includeBody": true }))
+        (
+            "note:listByIds",
+            json!({ "ids": note_ids, "noteIds": note_ids, "includeBody": true }),
+        )
     };
     let result = host
         .store_command(StoreCommandRequest {
@@ -4705,43 +4750,64 @@ fn load_force_replay_documents(
         .map_err(|error| error.to_string())?;
     let value = serde_json::to_value(result)
         .map_err(|error| format!("encode native note read: {error}"))?;
-    if !value.get("success").and_then(Value::as_bool).unwrap_or(false) {
-        return Err(value.get("error").and_then(Value::as_str)
-            .unwrap_or("native note read failed").to_owned());
+    if !value
+        .get("success")
+        .and_then(Value::as_bool)
+        .unwrap_or(false)
+    {
+        return Err(value
+            .get("error")
+            .and_then(Value::as_str)
+            .unwrap_or("native note read failed")
+            .to_owned());
     }
-    let rows = value.get("payload").and_then(Value::as_array)
+    let rows = value
+        .get("payload")
+        .and_then(Value::as_array)
         .ok_or_else(|| "native note read returned no row array".to_owned())?;
     if request.scope_kind == "global" {
         let expected = note_ids.iter().map(String::as_str).collect::<BTreeSet<_>>();
-        let actual = rows.iter().filter_map(|row| row.get("id").and_then(Value::as_str))
+        let actual = rows
+            .iter()
+            .filter_map(|row| row.get("id").and_then(Value::as_str))
             .collect::<BTreeSet<_>>();
         if actual != expected {
             return Err("PHX_FORCE_V2_SCOPE_MEMBERSHIP_CHANGED: global note membership differs from the replay manifest".to_owned());
         }
     }
-    let by_id = rows.iter().filter_map(|row| {
-        let id = row.get("id").and_then(Value::as_str)?;
-        Some((id, row))
-    }).collect::<BTreeMap<_, _>>();
-    note_ids.iter().map(|note_id| {
-        let row = by_id.get(note_id.as_str())
-            .ok_or_else(|| format!("native note body is missing: {note_id}"))?;
-        let text = row.get("markdownContent")
-            .or_else(|| row.get("markdown_content"))
-            .or_else(|| row.get("content"))
-            .and_then(Value::as_str)
-            .ok_or_else(|| format!("native note body is unavailable: {note_id}"))?;
-        let sha256 = format!("{:x}", Sha256::digest(text.as_bytes()));
-        Ok(DesktopForceReplayDocumentV2 {
-            note_id: note_id.clone(),
-            sha256,
-            js_code_unit_chars: count_for_wire(text.encode_utf16().count()),
-            utf8_bytes: count_for_wire(text.len()),
-            version: row.get("version").and_then(Value::as_f64),
-            updated_at: row.get("updatedAt").or_else(|| row.get("updated_at"))
-                .and_then(Value::as_f64),
+    let by_id = rows
+        .iter()
+        .filter_map(|row| {
+            let id = row.get("id").and_then(Value::as_str)?;
+            Some((id, row))
         })
-    }).collect()
+        .collect::<BTreeMap<_, _>>();
+    note_ids
+        .iter()
+        .map(|note_id| {
+            let row = by_id
+                .get(note_id.as_str())
+                .ok_or_else(|| format!("native note body is missing: {note_id}"))?;
+            let text = row
+                .get("markdownContent")
+                .or_else(|| row.get("markdown_content"))
+                .or_else(|| row.get("content"))
+                .and_then(Value::as_str)
+                .ok_or_else(|| format!("native note body is unavailable: {note_id}"))?;
+            let sha256 = format!("{:x}", Sha256::digest(text.as_bytes()));
+            Ok(DesktopForceReplayDocumentV2 {
+                note_id: note_id.clone(),
+                sha256,
+                js_code_unit_chars: count_for_wire(text.encode_utf16().count()),
+                utf8_bytes: count_for_wire(text.len()),
+                version: row.get("version").and_then(Value::as_f64),
+                updated_at: row
+                    .get("updatedAt")
+                    .or_else(|| row.get("updated_at"))
+                    .and_then(Value::as_f64),
+            })
+        })
+        .collect()
 }
 
 fn semantic_rows_to_payload(
@@ -7429,23 +7495,20 @@ mod tests {
                 analysis_source: "computed",
             }),
         };
-        let receipt = persist_graph_run_entry(
-            root.path(),
-            "run-1",
-            &entry,
-            None,
-            "authority-1".to_owned(),
-        ).unwrap();
+        let receipt =
+            persist_graph_run_entry(root.path(), "run-1", &entry, None, "authority-1".to_owned())
+                .unwrap();
         assert_eq!(receipt.changed_sections, 8);
 
-        let loaded = load_verified_durable_graph_run(
-            root.path(),
-            "scope:durable-reuse",
-            &roots,
-        ).unwrap().unwrap();
+        let loaded = load_verified_durable_graph_run(root.path(), "scope:durable-reuse", &roots)
+            .unwrap()
+            .unwrap();
         assert_eq!(loaded.section_roots.len(), 8);
         assert_eq!(loaded.analysis.timing.total_micros, 0.0);
-        assert_eq!(serde_json::to_value(graph_run_counts(&loaded.analysis)).unwrap(), expected_counts);
+        assert_eq!(
+            serde_json::to_value(graph_run_counts(&loaded.analysis)).unwrap(),
+            expected_counts
+        );
         assert_eq!(loaded.document_compiler, Some(Default::default()));
     }
 
@@ -7498,11 +7561,14 @@ mod tests {
             &entry,
             Some(binding.clone()),
             "authority".to_owned(),
-        ).unwrap();
+        )
+        .unwrap();
 
         assert_eq!(receipt.changed_sections, 1);
         assert_eq!(receipt.reused_sections, 7);
-        let manifest = load_manifest_for_handle(root.path(), "run-2").unwrap().unwrap();
+        let manifest = load_manifest_for_handle(root.path(), "run-2")
+            .unwrap()
+            .unwrap();
         let metadata: DurableAnalysisMetadata =
             decode_durable_section(root.path(), &manifest, "metadata").unwrap();
         assert_eq!(metadata.force_replay_binding, Some(binding));
@@ -7516,28 +7582,39 @@ mod tests {
             "run:legacy",
             "scope:legacy",
             "snapshot:legacy",
-        ).unwrap();
+        )
+        .unwrap();
         let mut roots = BTreeMap::new();
         for name in [
-            "bridge", "continuity", "governance", "hyperedges",
-            "metadata", "promotion", "retrieval", "siegel",
+            "bridge",
+            "continuity",
+            "governance",
+            "hyperedges",
+            "metadata",
+            "promotion",
+            "retrieval",
+            "siegel",
         ] {
             let dependency = format!("root:{name}");
             let dependencies = vec![dependency.clone()];
             roots.insert(name.to_owned(), dependency.clone());
-            transaction.persist_section(
-                name,
-                section_identity(&dependency, name, &dependencies),
-                0,
-                dependencies,
-                &serde_json::json!({}),
-            ).unwrap();
+            transaction
+                .persist_section(
+                    name,
+                    section_identity(&dependency, name, &dependencies),
+                    0,
+                    dependencies,
+                    &serde_json::json!({}),
+                )
+                .unwrap();
         }
         transaction.commit().unwrap();
 
-        assert!(load_verified_durable_graph_run(root.path(), "scope:legacy", &roots)
-            .unwrap()
-            .is_none());
+        assert!(
+            load_verified_durable_graph_run(root.path(), "scope:legacy", &roots)
+                .unwrap()
+                .is_none()
+        );
     }
 
     fn empty_graph_snapshot(id: &str, scope_id: &str) -> GraphRebuildSnapshot {
@@ -7608,7 +7685,9 @@ mod tests {
         assert_eq!(info.target, "native");
         assert_eq!(info.storage, "nativeLocal");
         assert!(!info.build_git_sha.is_empty());
-        assert!(info.binary_blake3.starts_with("b3-") || info.binary_blake3.starts_with("unavailable:"));
+        assert!(
+            info.binary_blake3.starts_with("b3-") || info.binary_blake3.starts_with("unavailable:")
+        );
         assert_eq!(info.native_graph_contract, "phoenix-verified-force/v2");
         assert!(matches!(info.build_profile.as_str(), "debug" | "release"));
         assert!(!info.feature_flags.graptor);

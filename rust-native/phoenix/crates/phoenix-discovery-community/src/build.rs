@@ -26,6 +26,27 @@ pub fn write_deterministic_community_artifact(
     let graph = SemanticCoreGraph::build(source, relation_policy, policy)?;
     let partition = deterministic_leiden(&graph, policy)?;
     let metrics = compute_metrics(&graph, &partition, policy)?;
+    write_prepared_community_artifact(
+        source,
+        relation_policy,
+        policy,
+        &graph,
+        &partition,
+        &metrics,
+        artifact_root,
+    )
+}
+
+#[allow(clippy::too_many_arguments)]
+pub(crate) fn write_prepared_community_artifact(
+    source: &AssertedDiscoveryView,
+    relation_policy: &DiscoveryRelationPolicy,
+    policy: &DeterministicCommunityPolicy,
+    graph: &SemanticCoreGraph,
+    partition: &PartitionResult,
+    metrics: &CommunityMetrics,
+    artifact_root: impl AsRef<Path>,
+) -> Result<CommunityArtifactManifest, CommunityArtifactError> {
     let root = artifact_root.as_ref();
     fs::create_dir_all(root)?;
     let temporary = temporary_directory(root, source.manifest().generation)?;
@@ -33,9 +54,9 @@ pub fn write_deterministic_community_artifact(
         source,
         relation_policy,
         policy,
-        &graph,
-        &partition,
-        &metrics,
+        graph,
+        partition,
+        metrics,
         &temporary,
     );
     let manifest = match result {

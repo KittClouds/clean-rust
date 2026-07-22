@@ -40,6 +40,16 @@ impl SemanticCoreGraph {
         relation_policy: &DiscoveryRelationPolicy,
         community_policy: &DeterministicCommunityPolicy,
     ) -> Result<Self, CommunityArtifactError> {
+        let mut graph = Self::build_unpartitioned(view, relation_policy, community_policy)?;
+        graph.install_cpu_components()?;
+        Ok(graph)
+    }
+
+    pub(crate) fn build_unpartitioned(
+        view: &AssertedDiscoveryView,
+        relation_policy: &DiscoveryRelationPolicy,
+        community_policy: &DeterministicCommunityPolicy,
+    ) -> Result<Self, CommunityArtifactError> {
         relation_policy.validate()?;
         if view.manifest().relation_policy_digest != hex(&relation_policy.digest()?) {
             return Err(CommunityArtifactError::Invalid(
@@ -107,18 +117,100 @@ impl SemanticCoreGraph {
         edges.par_sort_unstable_by_key(|edge| (edge.source, edge.target));
         edges = collapse_parallel(edges)?;
         let (offsets, neighbors) = adjacency(node_count, &edges)?;
-        let components = weak_components(node_count, &core_nodes, &edges, &stable)?;
         Ok(Self {
             node_count,
             stable,
             core_nodes,
-            component_of_node: components.node_component,
-            component_offsets: components.offsets,
-            component_nodes: components.nodes,
+            component_of_node: Vec::new(),
+            component_offsets: Vec::new(),
+            component_nodes: Vec::new(),
             edges,
             offsets,
             neighbors,
         })
+    }
+
+    pub(crate) fn install_component_labels(
+        &mut self,
+        labels: Vec<u32>,
+    ) -> Result<(), CommunityArtifactError> {
+        if labels.len() != self.node_count {
+            return Err(CommunityArtifactError::Invalid(
+                "component labels do not match graph node count".to_owned(),
+            ));
+        }
+        let mut rows = Vec::with_capacity(self.core_nodes.len());
+        let mut core_mask = vec![false; self.node_count];
+        for &node in &self.core_nodes {
+            core_mask[node as usize] = true;
+            let component = labels[node as usize];
+            if component == u32::MAX {
+                return Err(CommunityArtifactError::Invalid(
+                    "core node is missing a component label".to_owned(),
+                ));
+            }
+            rows.push((component, node));
+        }
+        for (node, &label) in labels.iter().enumerate() {
+            if label != u32::MAX && !core_mask[node] {
+                return Err(CommunityArtifactError::Invalid(
+                    "non-core node has a component label".to_owned(),
+                ));
+            }
+        }
+        rows.par_sort_unstable_by_key(|(component, node)| {
+            (*component, stable_key(self.stable[*node as usize]))
+        });
+        let mut offsets = vec![0_u64];
+        let mut nodes = Vec::with_capacity(rows.len());
+        let mut expected = 0_u32;
+        let mut previous = None;
+        for (component, node) in rows {
+            if previous != Some(component) {
+                if previous.is_some() {
+                    offsets.push(nodes.len() as u64);
+                    expected = expected.checked_add(1).ok_or_else(|| {
+                        CommunityArtifactError::Invalid("component count exceeds u32".to_owned())
+                    })?;
+                }
+                if component != expected {
+                    return Err(CommunityArtifactError::Invalid(
+                        "component labels are not canonical and dense".to_owned(),
+                    ));
+                }
+                previous = Some(component);
+            }
+            nodes.push(node);
+        }
+        if previous.is_some() {
+            offsets.push(nodes.len() as u64);
+        }
+        for edge in &self.edges {
+            if labels[edge.source as usize] != labels[edge.target as usize] {
+                return Err(CommunityArtifactError::Invalid(
+                    "component labels split an admitted semantic edge".to_owned(),
+                ));
+            }
+        }
+        self.install_components(WeakComponentColumns {
+            node_component: labels,
+            offsets,
+            nodes,
+        });
+        Ok(())
+    }
+
+    pub(crate) fn install_cpu_components(&mut self) -> Result<(), CommunityArtifactError> {
+        let components =
+            weak_components(self.node_count, &self.core_nodes, &self.edges, &self.stable)?;
+        self.install_components(components);
+        Ok(())
+    }
+
+    fn install_components(&mut self, components: WeakComponentColumns) {
+        self.component_of_node = components.node_component;
+        self.component_offsets = components.offsets;
+        self.component_nodes = components.nodes;
     }
 
     pub fn neighbors(&self, node: u32) -> &[Neighbor] {

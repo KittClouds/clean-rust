@@ -442,6 +442,45 @@ interface NativeGraphGenerationQueryResponse {
         admittedCandidateEdges: number;
         binaryBytes: number;
     };
+    communityShadow: {
+        manifest: {
+            artifactDigest: string;
+            payloadDigest: string;
+            generation: number;
+            binaryBytes: number;
+        };
+        receipt: NativeOfflineCommunityReceipt;
+    } | null;
+}
+
+export interface NativeOfflineCommunityReceipt {
+    schemaVersion: 'phoenix-offline-community-artifact-shadow/v1';
+    executionPathId: 'community_cpu_deterministic_v1' | 'community_gpu_wgpu_resident_v1';
+    selectionReason: 'cpu_required' | 'gpu_required'
+        | 'structural_gpu_crossover_met' | 'below_structural_gpu_crossover';
+    generation: number;
+    sourceArtifactDigest: string;
+    artifactDigest: string;
+    payloadDigest: string;
+    nodes: number;
+    coreNodes: number;
+    selectedEdges: number;
+    fallbackCount: 0;
+    residentUploads: 0 | 1;
+    runtimeReused: boolean;
+    runtimeInitMicros: number;
+    wallMicros: number;
+    gpuPrepareMicros: number;
+    gpuExecuteMicros: number;
+    gpuReadbackMicros: number;
+    cpuPipelineMicros: number;
+    cpuLeidenMicros: number;
+    cpuMetricsMicros: number;
+    sealMicros: number;
+    residentBytes: number;
+    readbackBytes: number;
+    adapter: string | null;
+    productionPublished: false;
 }
 
 type StoryContinuityRows = Pick<GraphStoryContinuityContract,
@@ -555,6 +594,7 @@ export class GraphRebuildService {
     private readonly documentSemanticArtifactHandleByIdentity = new Map<string, string>();
     private readonly persistedSnapshotLoads = new Map<string, Promise<GraphRebuildSnapshot | null>>();
     private readonly rejectedPersistedSnapshotScopes = new Map<string, string>();
+    private readonly offlineCommunityReceiptState = signal<NativeOfflineCommunityReceipt | null>(null);
     private activeNativeGraphRun: { snapshotId: string; runHandle: string } | null = null;
     private nativeStoryContinuityHydration: {
         snapshotId: string;
@@ -569,6 +609,7 @@ export class GraphRebuildService {
     readonly error = computed(() => this.errorState());
     readonly lastBuildTimings = computed(() => this.lastBuildTimingsState());
     readonly nativeGraphRunPaging = computed(() => this.nativeGraphRunPagingState());
+    readonly offlineCommunityReceipt = computed(() => this.offlineCommunityReceiptState());
 
     currentSnapshotRunSerial(): number {
         return this.primarySnapshotRunSerial;
@@ -599,6 +640,26 @@ export class GraphRebuildService {
             || !manifest.payloadDigest
             || manifest.admittedCandidateEdges !== 0) {
             throw new Error('Native asserted query artifact failed authority validation.');
+        }
+        const community = response.communityShadow;
+        if (community) {
+            const receipt = community.receipt;
+            const gpuPath = receipt.executionPathId === 'community_gpu_wgpu_resident_v1';
+            if (receipt.schemaVersion !== 'phoenix-offline-community-artifact-shadow/v1'
+                || receipt.generation !== manifest.generation
+                || receipt.sourceArtifactDigest !== manifest.artifactDigest
+                || receipt.artifactDigest !== community.manifest.artifactDigest
+                || receipt.payloadDigest !== community.manifest.payloadDigest
+                || receipt.fallbackCount !== 0
+                || receipt.productionPublished !== false
+                || receipt.residentUploads !== (gpuPath ? 1 : 0)
+                || (gpuPath && !receipt.adapter)
+                || (!gpuPath && receipt.adapter !== null)) {
+                throw new Error('Native offline community shadow receipt failed authority validation.');
+            }
+            this.offlineCommunityReceiptState.set(receipt);
+        } else {
+            this.offlineCommunityReceiptState.set(null);
         }
         return {
             schemaVersion: 'phoenix-graph-generation-artifact-ref/v1',

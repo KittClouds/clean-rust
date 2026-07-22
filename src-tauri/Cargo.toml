@@ -7,6 +7,10 @@ publish = false
 [features]
 default = []
 vector-wgpu-shadow = ["dep:vector-wgpu-kernel"]
+graph-analytics-wgpu-shadow = [
+  "dep:graph-analytics-wgpu-kernel",
+  "dep:phoenix-discovery-community",
+]
 
 [lib]
 name = "phoenix_tauri_lib"
@@ -27,6 +31,7 @@ phoenix-graph-api = { package = "phoenix-api", path = "../rust-native/phoenix/cr
 phoenix-graph-post = { path = "../rust-native/phoenix/crates/phoenix-graph-post" }
 phoenix-graph-kernel = { path = "../rust-native/phoenix/crates/phoenix-graph-kernel" }
 phoenix-discovery-view = { path = "../rust-native/phoenix/crates/phoenix-discovery-view" }
+phoenix-discovery-community = { path = "../rust-native/phoenix/crates/phoenix-discovery-community", features = ["wgpu-shadow"], optional = true }
 phoenix-store-native-core = { path = "../rust-native/phoenix/crates/phoenix-store-native-core" }
 phoenix-store-overgraph = { path = "../rust-native/phoenix/crates/phoenix-store-overgraph" }
 phoenix-document-index = { path = "../rust-native/phoenix/crates/phoenix-document-index" }
@@ -49,6 +54,7 @@ tokio = { version = "1", features = ["full"] }
 tokenizers = { version = "0.22.2", default-features = false, features = ["onig"] }
 zstd = "0.13"
 vector-wgpu-kernel = { path = "../rust-native/phoenix-spikes/vector-wgpu-kernel", optional = true }
+graph-analytics-wgpu-kernel = { path = "../rust-native/phoenix-spikes/graph-analytics-wgpu-kernel", optional = true }
 
 [patch.crates-io]
 esaxx-rs = { path = "../rust-native/phoenix-gliner-smoke/vendor/esaxx-rs" }

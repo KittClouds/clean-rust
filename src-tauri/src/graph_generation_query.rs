@@ -252,6 +252,42 @@ mod tests {
             .join(&manifest.artifact_digest)
             .join(&manifest.binary_file)
             .is_file());
+        #[cfg(feature = "graph-analytics-wgpu-shadow")]
+        {
+            let coordinator =
+                crate::graph_offline_analytics::OfflineAnalyticsCoordinator::default();
+            let shadow = coordinator
+                .run_community_artifact_shadow(
+                    &crate::graph_offline_analytics::OfflineCommunityArtifactJob {
+                        generation: manifest.generation,
+                        source_artifact_digest: manifest.artifact_digest.clone(),
+                        source_artifact_root: directory
+                            .path()
+                            .join("objects")
+                            .join(&manifest.artifact_digest),
+                        shadow_artifact_root: directory.path().join("community-shadow"),
+                        mode: crate::graph_offline_analytics::OfflineAnalyticsMode::AutoQualified,
+                    },
+                )
+                .unwrap();
+            assert_eq!(
+                shadow.receipt.execution_path_id,
+                "community_cpu_deterministic_v1"
+            );
+            assert_eq!(
+                shadow.receipt.selection_reason,
+                "below_structural_gpu_crossover"
+            );
+            assert_eq!(shadow.receipt.fallback_count, 0);
+            assert_eq!(shadow.receipt.resident_uploads, 0);
+            assert!(!shadow.receipt.production_published);
+            assert!(directory
+                .path()
+                .join("community-shadow")
+                .join(&shadow.manifest.artifact_digest)
+                .join(&shadow.manifest.binary_file)
+                .is_file());
+        }
     }
 
     fn fixture_edge(source: &str, target: &str, relation: &str) -> KernelEdge {

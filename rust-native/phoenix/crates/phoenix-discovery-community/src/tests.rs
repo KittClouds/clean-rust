@@ -156,6 +156,67 @@ fn repeated_builds_are_byte_identical_and_payload_corruption_fails_closed() {
     }
 }
 
+#[cfg(feature = "wgpu-shadow")]
+#[test]
+fn reopened_mmap_gpu_shadow_seals_byte_identical_cpu_leiden_artifact() {
+    let root = tempfile::tempdir().unwrap();
+    let source = source_view(root.path(), &fixture(true), 57);
+    let source_root = source.root().to_path_buf();
+    let source_digest = source.manifest().artifact_digest.clone();
+    drop(source);
+    let source = AssertedDiscoveryView::open(&source_root).unwrap();
+    assert_eq!(source.manifest().artifact_digest, source_digest);
+    let relation_policy = DiscoveryRelationPolicy::phoenix_asserted_v1();
+    let policy = DeterministicCommunityPolicy::phoenix_semantic_core_v1();
+    let cpu = write_deterministic_community_artifact(
+        &source,
+        &relation_policy,
+        &policy,
+        root.path().join("cpu"),
+    )
+    .unwrap();
+    let runtime = match graph_analytics_wgpu_kernel::GpuGraphAnalyticsRuntime::request(
+        2 * 1024 * 1024 * 1024,
+    ) {
+        Ok(runtime) => runtime,
+        Err(error) => {
+            eprintln!("GPU shadow parity skipped: {error}");
+            return;
+        }
+    };
+    let gpu = crate::write_deterministic_community_artifact_wgpu_shadow(
+        &source,
+        &relation_policy,
+        &policy,
+        &runtime,
+        root.path().join("gpu"),
+    )
+    .unwrap();
+    assert_eq!(gpu.manifest, cpu);
+    assert_eq!(gpu.receipt.fallback_count, 0);
+    assert_eq!(gpu.receipt.resident_uploads, 1);
+    assert_eq!(gpu.receipt.prepartition_dispatches, 1);
+    assert_eq!(gpu.receipt.postpartition_dispatches, 1);
+    assert!(gpu.receipt.stable_component_canonicalization);
+    assert_eq!(
+        gpu.receipt.authoritative_partition_path,
+        "deterministic_rust_leiden_v1"
+    );
+    assert!(!gpu.receipt.production_published);
+    let cpu_root = root.path().join("cpu").join(&cpu.artifact_digest);
+    let gpu_root = root.path().join("gpu").join(&gpu.manifest.artifact_digest);
+    assert_eq!(
+        std::fs::read(cpu_root.join("communities.bin")).unwrap(),
+        std::fs::read(gpu_root.join("communities.bin")).unwrap()
+    );
+    assert_eq!(
+        std::fs::read(cpu_root.join("manifest.json")).unwrap(),
+        std::fs::read(gpu_root.join("manifest.json")).unwrap()
+    );
+    let reopened = DeterministicCommunityArtifact::open(gpu_root).unwrap();
+    reopened.validate_payload().unwrap();
+}
+
 #[test]
 fn bridge_receipts_are_decomposed_and_rank_boundary_nodes() {
     let root = tempfile::tempdir().unwrap();

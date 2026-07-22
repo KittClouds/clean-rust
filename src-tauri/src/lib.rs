@@ -2,6 +2,8 @@ mod document_index_read;
 mod gfm_retrieval_shadow;
 mod graph_galaxy;
 mod graph_generation_query;
+#[cfg(feature = "graph-analytics-wgpu-shadow")]
+pub mod graph_offline_analytics;
 mod graph_force_rebuild_v2;
 mod graph_run_store;
 mod graph_scene_packet;
@@ -14,7 +16,8 @@ mod nli_claim_rpc;
 mod phoenix_rpc;
 mod tts;
 
-use phoenix_rpc::{PhoenixApi, PhoenixApiImpl};
+use phoenix_rpc::PhoenixApi;
+pub use phoenix_rpc::PhoenixApiImpl;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
