@@ -4,24 +4,14 @@
 
     <app-graph-entity-sidebar
         [entities]="entities()"
-        [suggestions]="suggestions()"
         [selectedEntity]="activeEntity()"
-        [linkCount]="atlasEdges().length"
-        [lensMode]="graphLensMode()"
-        [isScanning]="isScanningSuggestions()"
-        [scanError]="suggestionError()"
-        [contextId]="stewardContextId()"
         [searchText]="atlasSearch()"
         (entitySelected)="selectEntity($event)"
         (editEntityRequested)="editEntity($event)"
         (deleteEntityRequested)="deleteEntityFromSidebar($event)"
         (addEntityRequested)="openCreator()"
-        (flushRequested)="flushRegistry()"
-        (acceptSuggestionRequested)="acceptSuggestion($event)"
-        (rejectSuggestionRequested)="rejectSuggestion($event)"
         (styleRequested)="toggleStyleDrawer()"
-        (searchTextChange)="atlasSearch.set($event)"
-        (lensModeChange)="graphLensMode.set($event)">
+        (searchTextChange)="atlasSearch.set($event)">
     </app-graph-entity-sidebar>
 
     <main class="relative z-10 flex min-w-0 flex-1 flex-col">
@@ -61,7 +51,7 @@
                     (entitySelected)="selectEntity($event)"
                     (addEntityRequested)="openCreator()"
                     (scanRequested)="runSuggestionScan('canvas', $event)"
-                    (styleRequested)="toggleStyleDrawer()"
+                    (styleRequested)="toggleStyleDrawer($event)"
                     (atlasModeChange)="atlasMode.set($event)"
                     (atlasSearchChange)="atlasSearch.set($event)"
                     (lensModeChange)="graphLensMode.set($event)"></app-graph-lens-workspace>
@@ -76,7 +66,10 @@
     </main>
 
     @if (isStyleDrawerOpen()) {
-    <app-graph-style-drawer [initialKind]="styleTargetKind()" (close)="closeStyleDrawer()"></app-graph-style-drawer>
+    <app-graph-style-drawer
+        [initialKind]="styleTargetKind()"
+        [initialGraphNodeKind]="styleTargetGraphNodeKind()"
+        (close)="closeStyleDrawer()"></app-graph-style-drawer>
     }
 </div>
 

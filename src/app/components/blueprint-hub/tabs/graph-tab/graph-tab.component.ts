@@ -17,11 +17,8 @@ import { NerService } from '../../../../services/ner.service';
 import { PhoenixProjectionService } from '../../../../services/phoenix-projection.service';
 import { PhoenixMachineControlService } from '../../../../services/phoenix-machine-control.service';
 import { EntitySelectionService } from '../../../../lib/services/entity-selection.service';
-import { AtlasScanCoordinatorService } from '../../../../services/atlas-scan-coordinator.service';
 import type { AtlasMode } from './graph-atlas-preview/graph-atlas-preview.component';
 import type { GraphLensState } from './graph-lens';
-import { buildGraphAtlasReadContext } from './graph-atlas-preview/graph-atlas-read-context';
-import { clearRejectedSuggestionFeedback } from '../../../../lib/entity-learning/entity-feedback';
 
 @Component({
     selector: 'app-graph-tab',
@@ -45,7 +42,6 @@ export class GraphTabComponent {
     private projection = inject(PhoenixProjectionService);
     private machine = inject(PhoenixMachineControlService);
     private entitySelection = inject(EntitySelectionService);
-    private atlasScan = inject(AtlasScanCoordinatorService);
 
     // State — entities now derived from ScopeService signal
     entities = computed(() => this.projection.entities());
@@ -54,6 +50,8 @@ export class GraphTabComponent {
     isCreatorOpen = signal(false);
     editingEntity = signal<EntityCreatorData | undefined>(undefined);
     isStyleDrawerOpen = signal(false);
+    styleTargetKindOverride = signal<string | null>(null);
+    styleTargetGraphNodeKind = signal<string | null>(null);
     atlasSearch = signal('');
     atlasMode = signal<AtlasMode>('graph');
 
@@ -62,11 +60,10 @@ export class GraphTabComponent {
     activeScope = this.scopeService.activeScope;
 
     suggestions = this.nerService.suggestions;
-    isScanningSuggestions = computed(() => this.nerService.isAnalyzing() || this.atlasScan.running());
+    isScanningSuggestions = computed(() => this.nerService.isAnalyzing());
     activeSuggestionProvider = this.nerService.activeProvider;
-    suggestionError = computed(() => this.atlasScan.error() || this.nerService.errorMessage());
+    suggestionError = computed(() => this.nerService.errorMessage());
 
-    totalEntities = computed(() => this.entities().length);
     activeEntity = computed(() => {
         const local = this.selectedEntity();
         if (local) return local;
@@ -104,8 +101,7 @@ export class GraphTabComponent {
 
         return edges;
     });
-    styleTargetKind = computed(() => this.activeEntity()?.kind ?? 'CHARACTER');
-    stewardContextId = computed(() => this.machineScope());
+    styleTargetKind = computed(() => this.styleTargetKindOverride() ?? this.activeEntity()?.kind ?? 'CHARACTER');
 
     // No manual registry subscription needed — entities are a computed signal
 
@@ -123,7 +119,15 @@ export class GraphTabComponent {
         this.selectedEntity.set(null);
     }
 
-    toggleStyleDrawer() {
+    toggleStyleDrawer(styleKey?: string | null | void) {
+        if (typeof styleKey === 'string' && styleKey.trim()) {
+            this.styleTargetKindOverride.set(styleKey);
+            this.styleTargetGraphNodeKind.set(styleKey);
+            this.isStyleDrawerOpen.set(true);
+            return;
+        }
+        this.styleTargetKindOverride.set(null);
+        this.styleTargetGraphNodeKind.set(null);
         this.isStyleDrawerOpen.update((open) => !open);
     }
 
@@ -204,19 +208,6 @@ export class GraphTabComponent {
         }
     }
 
-    async flushRegistry() {
-        if (confirm(`Delete all ${this.totalEntities()} entities? This cannot be undone.`)) {
-            const cleared = await smartGraphRegistry.clearAll();
-            const clearedRejects = await Promise.all([
-                clearRejectedSuggestionFeedback('atlas_surface'),
-                clearRejectedSuggestionFeedback('dynamic_ner'),
-            ]);
-            if (cleared === 0 && clearedRejects.every((count) => count === 0)) return;
-            this.selectedEntity.set(null);
-            this.entitySelection.clear();
-        }
-    }
-
     async runSuggestionScan(source: 'sidebar' | 'canvas' = 'sidebar', lens?: GraphLensState) {
         if (this.atlasMode() !== 'embeddings') {
             const currentNote = this.noteStore.currentNote();
@@ -229,30 +220,9 @@ export class GraphTabComponent {
             });
             return;
         }
-        try {
-            const context = buildGraphAtlasReadContext(lens || {
-                mode: this.graphLensMode(),
-                primaryNoteId: null,
-                selectedNoteIds: [],
-            });
-            this.machine.setScope(context.noteIds[0] || 'global');
-            await this.atlasScan.runRichEmbeddingScan({
-                source,
-                requireActiveNote: false,
-                lensMode: context.lensMode,
-                noteIds: context.noteIds,
-            });
-        } catch (err) {
-            console.error('[GraphTab] Semantic Atlas scan failed', err);
-        }
-    }
-
-    async acceptSuggestion(id: string) {
-        await this.nerService.acceptSuggestion(id);
-    }
-
-    async rejectSuggestion(id: string) {
-        await this.nerService.rejectSuggestion(id);
+        void source;
+        void lens;
+        this.machine.setNotice('Legacy Atlas scan is quarantined. Run Full Atlas to refresh the graph safely.');
     }
 
     getColor(kind: string): string {

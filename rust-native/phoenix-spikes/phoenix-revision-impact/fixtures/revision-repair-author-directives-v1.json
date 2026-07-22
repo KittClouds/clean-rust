@@ -1,0 +1,153 @@
+{
+  "schemaVersion": "phoenix.author-repair-directives/v1",
+  "sourceReviewToken": "e9000b873589196a",
+  "reviewedBy": "author:workspace-owner",
+  "reviewedAtUnixMs": 1784295149199,
+  "cases": [
+    {
+      "caseId": "gold:delayed_reveal",
+      "directiveId": "edit:reassign_causal_attribution:iriane_event_trail",
+      "template": "reassign_causal_attribution",
+      "targetSceneIds": [
+        "scene:chapter_5_iriane_assignment",
+        "scene:chapter_8_temporal_signature",
+        "scene:chapter_10_hazel_assumption"
+      ],
+      "intent": "Silas knows nothing about Kai until chapter twelve. Iriane independently reconstructs a trail of unintended consequences left by Silas's missing best friend.",
+      "requiredOutcomes": [
+        "Remove Silas from Iriane's discovery chain.",
+        "Assign temporal-signature recognition to Iriane or her evidence.",
+        "Keep Hazel's Silas theory only as an explicitly incorrect suspicion.",
+        "Preserve chapter twelve as Silas's first knowledge of Kai and the unknown son revelation."
+      ],
+      "rejectedTemplates": [
+        "shift_reveal",
+        "restore_original_fact"
+      ]
+    },
+    {
+      "caseId": "gold:earlier_death",
+      "directiveId": "edit:rebind_warning_to_prerecorded_message:mara",
+      "template": "rebind_action_to_prior_record",
+      "targetSceneIds": [
+        "scene:chapter_9_mara_warning",
+        "scene:chapter_11_faction_response",
+        "scene:chapter_12_resurrection_rumor"
+      ],
+      "intent": "Mara is definitively dead. Kai receives a warning she recorded before dying; later resurrection stories are false rumors caused by ambiguous evidence surrounding her death.",
+      "requiredOutcomes": [
+        "Insert Mara's recording event before her death.",
+        "Replace Mara's live chapter-nine action with playback or delivery of the recording.",
+        "Ground the faction response in Mara's prior plans or recorded warning.",
+        "Type the resurrection story as an attributed false rumor rather than resurrection truth."
+      ],
+      "rejectedTemplates": [
+        "move_state_transition"
+      ]
+    },
+    {
+      "caseId": "gold:changed_witness",
+      "directiveId": "edit:reclassify_testimony_as_hidden_deception:tamsin",
+      "template": "reclassify_assertion_as_deception",
+      "targetSceneIds": [
+        "scene:chapter_7_tamsin_testimony",
+        "scene:chapter_9_court_trusts_tamsin"
+      ],
+      "intent": "Orin is the actual witness. Tamsin deliberately lies, the court believes her, and the deception is revealed later.",
+      "requiredOutcomes": [
+        "Remove the requirement that Tamsin personally witnessed the collapse.",
+        "Require Tamsin to know enough details and intend deception.",
+        "Represent the court's conclusion as belief in Tamsin's false testimony.",
+        "Preserve the later reveal that Tamsin lied."
+      ],
+      "rejectedTemplates": [
+        "restore_original_fact"
+      ]
+    },
+    {
+      "caseId": "gold:changed_power_limitation",
+      "directiveId": "edit:split_power_rule_into_safe_limit_and_overdraw:kai",
+      "template": "add_costed_capability_overdraw",
+      "targetSceneIds": [
+        "scene:chapter_6_three_step_escape",
+        "scene:chapter_10_training_strategy",
+        "scene:chapter_12_artifact_amplification"
+      ],
+      "intent": "Kai's safe limit is two steps. An unaided third step causes physical injury and unconsciousness. The artifact temporarily raises the safe limit to three.",
+      "requiredOutcomes": [
+        "Replace the absolute two-step ceiling with a two-step safe threshold.",
+        "Insert physical injury and unconsciousness immediately after an unaided third step.",
+        "Require recovery before Kai can act normally again.",
+        "Set the artifact-equipped safe limit to exactly three steps."
+      ],
+      "rejectedTemplates": [
+        "restore_original_fact",
+        "revise_requirement_bearing_statement"
+      ]
+    },
+    {
+      "caseId": "gold:changed_travel_duration",
+      "directiveId": "edit:route_arrival_through_constrained_portal",
+      "template": "add_constrained_travel_method",
+      "targetSceneIds": [
+        "scene:chapter_7_portal_rumor",
+        "scene:chapter_8_same_evening_arrival",
+        "scene:chapter_9_pursuit_pressure"
+      ],
+      "intent": "Ordinary travel takes eight hours. A real portal provides an alternative route with fixed endpoints, costly activation, limited passengers, and a long cooldown; the longer journey increases pursuit tension.",
+      "requiredOutcomes": [
+        "Keep the eight-hour ordinary travel duration authoritative.",
+        "Establish the portal as real before it supports the arrival.",
+        "Validate fixed endpoints, activation cost, passenger limit, and cooldown.",
+        "Rebuild pursuit timing around the constrained portal and longer ordinary route."
+      ],
+      "rejectedTemplates": [
+        "move_state_transition",
+        "restore_original_fact"
+      ]
+    },
+    {
+      "caseId": "gold:removed_relationship",
+      "directiveId": "edit:reframe_confidant_access_as_espionage:hazel",
+      "template": "reclassify_access_as_espionage",
+      "targetSceneIds": [
+        "scene:chapter_5_public_alliance",
+        "scene:chapter_6_hazel_uses_private_channel",
+        "scene:chapter_11_betrayal"
+      ],
+      "intent": "Hazel stole private-channel access. Her public alliance with Silas is a performance hiding mutual distrust; she later exposes him and sabotages their shared objective.",
+      "requiredOutcomes": [
+        "Replace confidant-derived access with theft.",
+        "Represent the public alliance as strategic performance rather than personal trust.",
+        "Replace intimate betrayal weight with public exposure and objective sabotage.",
+        "Preserve that the alliance loses its usefulness after Hazel acts."
+      ],
+      "rejectedTemplates": [
+        "move_state_transition",
+        "restore_original_fact"
+      ]
+    },
+    {
+      "caseId": "gold:changed_possession",
+      "directiveId": "edit:rebind_vault_key_use_and_suspicion_to_hazel",
+      "template": "rebind_possession_dependent_action",
+      "targetSceneIds": [
+        "scene:chapter_8_duplicate_key_rumor",
+        "scene:chapter_9_kai_opens_vault",
+        "scene:chapter_10_silas_suspects_kai"
+      ],
+      "intent": "Hazel possesses the unique chronal key. Kai knows this before the vault, trusts her cooperation, and accompanies her; Silas's possession-based suspicion shifts to Hazel.",
+      "requiredOutcomes": [
+        "Keep possession of the chronal key with Hazel.",
+        "Make Hazel present and responsible for using the key at the vault.",
+        "Represent Kai's role as cooperation that depends on Hazel.",
+        "Shift possession-based suspicion from Kai to Hazel.",
+        "Type duplicate-key claims as false rumors, not object-identity uncertainty."
+      ],
+      "rejectedTemplates": [
+        "transfer_possession_earlier",
+        "restore_original_fact"
+      ]
+    }
+  ]
+}

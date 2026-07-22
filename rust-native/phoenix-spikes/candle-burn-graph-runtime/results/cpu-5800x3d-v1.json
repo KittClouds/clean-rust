@@ -1,0 +1,107 @@
+{
+  "schemaVersion": "phoenix-candle-burn-graph-runtime-spike-certificate/v1",
+  "recordedOn": "2026-07-12",
+  "host": {
+    "cpu": "AMD Ryzen 7 5800X3D 8-Core Processor",
+    "physicalCores": 8,
+    "logicalProcessors": 16,
+    "toolchain": "rustc 1.96.0 x86_64-pc-windows-msvc",
+    "llvm": "22.1.2"
+  },
+  "contract": {
+    "model": "dense-16x16-relu-16x1",
+    "sourceRowsMmap": true,
+    "denseStagingAllocations": 1,
+    "warmups": 10,
+    "runsPerCase": 7,
+    "alternatingRunOrder": true,
+    "scalarParityTolerance": 0.0001,
+    "evaluator": "phoenix-ranking-evaluation/v1"
+  },
+  "frameworks": {
+    "candle": {
+      "version": "0.11.0",
+      "backend": "cpu",
+      "binaryBytes": 1011200
+    },
+    "burn": {
+      "version": "0.21.0",
+      "backend": "flex-cpu",
+      "binaryBytes": 1415680
+    }
+  },
+  "cases": [
+    {
+      "rows": 4000,
+      "iterations": 500,
+      "artifactBlake3": "b3-7b73f0956a779fbbba128bd06461bba8e35e1390430d021a24a9b4d74da1aa62",
+      "scoreBlake3": "b3-e7212195f42a03399674e433b079ef0cd6bb71f2d71b8f1ff76fa3c09c084b3f",
+      "candle": {
+        "inferenceMedianUs": 104,
+        "inferenceMinUs": 101,
+        "inferenceMaxUs": 120,
+        "workingSetMedianBytes": 6397952
+      },
+      "burn": {
+        "inferenceMedianUs": 227,
+        "inferenceMinUs": 214,
+        "inferenceMaxUs": 231,
+        "workingSetMedianBytes": 5197824
+      }
+    },
+    {
+      "rows": 40000,
+      "iterations": 100,
+      "artifactBlake3": "b3-4f5bdf924156bfbe9d2cdfd59440b890e41a17a8689d18b5215c041c8b5098ce",
+      "artifactBytes": 3200056,
+      "scoreBlake3": "b3-e8cc29b168eff3475999b3577f596e5e049ab11e801e99c672a8347f9a1a526c",
+      "candle": {
+        "inferenceMedianUs": 1133,
+        "inferenceMinUs": 1116,
+        "inferenceMaxUs": 1171,
+        "artifactOpenMedianUs": 1951,
+        "denseStagingMedianUs": 5862,
+        "tensorCreateMedianUs": 21,
+        "outputCopyMedianUs": 5,
+        "evaluationMedianUs": 1491,
+        "workingSetMedianBytes": 12136448
+      },
+      "burn": {
+        "inferenceMedianUs": 1748,
+        "inferenceMinUs": 1636,
+        "inferenceMaxUs": 1777,
+        "artifactOpenMedianUs": 2019,
+        "denseStagingMedianUs": 5933,
+        "tensorCreateMedianUs": 25,
+        "outputCopyMedianUs": 109,
+        "evaluationMedianUs": 1389,
+        "workingSetMedianBytes": 10629120
+      }
+    },
+    {
+      "rows": 400000,
+      "iterations": 20,
+      "artifactBlake3": "b3-d71102c81e979ec3b7df3337f8f0f37408f612a6128ada8e0d5e0a372d6100b3",
+      "scoreBlake3": "b3-01e062eb1d1ebd240bfdbbb868eb8a5c1924d882a3d1388cef5f99b7e16c2a74",
+      "candle": {
+        "inferenceMedianUs": 10696,
+        "inferenceMinUs": 10391,
+        "inferenceMaxUs": 11482,
+        "workingSetMedianBytes": 68632576
+      },
+      "burn": {
+        "inferenceMedianUs": 16304,
+        "inferenceMinUs": 16078,
+        "inferenceMaxUs": 16788,
+        "workingSetMedianBytes": 66383872
+      }
+    }
+  ],
+  "parity": {
+    "maxAbsError": 0.000000029802322,
+    "scoreDigestEqual": true,
+    "filteredMrr": 1.0,
+    "hitsAt1": 1.0
+  },
+  "decision": "candle-for-graph-runtime-v1"
+}

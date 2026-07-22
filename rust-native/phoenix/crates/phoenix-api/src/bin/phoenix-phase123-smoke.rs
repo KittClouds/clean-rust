@@ -3,7 +3,7 @@ use std::fs;
 use std::path::{Path, PathBuf};
 
 use phoenix_alex::{Lexicon, SurfaceHit, SurfaceHitKind};
-use phoenix_chunker::{
+use phoenix_chunker_native::{
     build_lens_chunks, build_structural_substrate, ChunkerConfig, GraphBuildContext, GraphDelta,
     LensChunk, LensChunkConsumer, LensChunkHint, LensChunkHintKind, LensChunkHintSource,
     LensChunkInput, LensChunkerConfig, LensKind, LensMention, LensMentionEdge, LensMentionEdgeKind,
@@ -509,7 +509,7 @@ fn tokenize_for_ner(text: &str) -> (Vec<TokenSpan>, Vec<SentenceSpan>) {
         tokens.push(token_span(text, s, text.len()));
     }
 
-    let sentences = phoenix_chunker::api::sentence_ranges(text)
+    let sentences = phoenix_chunker_native::api::sentence_ranges(text)
         .into_iter()
         .enumerate()
         .map(|(index, (start, end))| SentenceSpan {

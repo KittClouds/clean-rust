@@ -460,11 +460,13 @@ fn locate_token_index(
     sentence_range: TextRange,
     target: TextRange,
 ) -> Option<usize> {
-    tokens
+    let start = tokens.partition_point(|token| token.range.end <= sentence_range.start);
+    tokens[start..]
         .iter()
+        .take_while(|token| token.range.start < sentence_range.end)
         .enumerate()
         .find(|(_, token)| contains(sentence_range, token.range) && overlaps(token.range, target))
-        .map(|(index, _)| index)
+        .map(|(offset, _)| start + offset)
 }
 
 fn contains(outer: TextRange, inner: TextRange) -> bool {

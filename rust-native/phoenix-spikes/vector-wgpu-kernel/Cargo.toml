@@ -1,0 +1,20 @@
+[package]
+name = "vector-wgpu-kernel"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[dependencies]
+bytemuck = { version = "1.23", features = ["derive"] }
+hashbrown = "0.15"
+pollster = "1.0"
+thiserror = "2.0"
+wgpu = "30.0"
+
+[[bench]]
+name = "bounded_rerank"
+harness = false
+
+[[bench]]
+name = "preprocess"
+harness = false

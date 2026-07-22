@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+    cachedEditorBodyMatchesAuthoritativeHeader,
+    canRevealCachedEditorNote,
     createSessionPositionFromLegacy,
     getFallbackActiveNoteIdFromTabs,
     normalizeEditorSessionState,
@@ -128,5 +130,20 @@ describe('note editor session helpers', () => {
         expect(getFallbackActiveNoteIdFromTabs([
             { noteId: 'note-1', active: false },
         ])).toBe('note-1');
+    });
+
+    it('reveals only complete cached bodies and retains them only at authoritative revision parity', () => {
+        const cached = { id: 'note-1', version: 12, updatedAt: 100, hasBody: true };
+
+        expect(canRevealCachedEditorNote(cached)).toBe(true);
+        expect(canRevealCachedEditorNote({ ...cached, hasBody: false })).toBe(false);
+        expect(cachedEditorBodyMatchesAuthoritativeHeader(
+            { id: 'note-1', version: 12, updatedAt: 999 },
+            cached,
+        )).toBe(true);
+        expect(cachedEditorBodyMatchesAuthoritativeHeader(
+            { id: 'note-1', version: 13, updatedAt: 100 },
+            cached,
+        )).toBe(false);
     });
 });

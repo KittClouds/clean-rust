@@ -8,7 +8,7 @@ import type {
     GraphRebuildTemporalEdge,
 } from './graph-rebuild-snapshot';
 
-const MAX_EMBEDDING_TARGETS = 960;
+const MAX_EMBEDDING_WORK_TARGETS = 960;
 const NOTE_TARGET_BUDGET = 48;
 const CHUNK_TARGET_BUDGET = 220;
 const STORY_EDGE_TARGET_BUDGET = 160;
@@ -45,36 +45,48 @@ export function selectGraphRebuildEmbeddingTargetPlan(
     const enabledLanes = enabledStageLanes(stagePolicy);
     const eligible = annotated.filter((target) => isStructureRoot(target) || enabledLanes.has(target.lane || 'unknown'));
     const disabled = annotated.filter((target) => !isStructureRoot(target) && !enabledLanes.has(target.lane || 'unknown'));
-    const selected = selectEmbeddingTargets(eligible, relationships, temporalEdges, causalEdges);
-    const selectedIds = new Set(selected.map((target) => target.id));
-    const admitted = selected.map((target) => ({
+    const queued = selectEmbeddingTargets(eligible, relationships, temporalEdges, causalEdges);
+    const queuedIds = new Set(queued.map((target) => target.id));
+    const admitted = queued.map((target) => ({
         ...target,
         admissionStatus: 'admitted' as const,
+        workStatus: 'queued' as const,
         admissionReason: target.admissionReason || 'admitted_by_hierarchical_plan',
     }));
-    const deferredByBudget = eligible
-        .filter((target) => !selectedIds.has(target.id))
+    const deferredByScheduler = eligible
+        .filter((target) => !queuedIds.has(target.id))
         .map((target) => ({
             ...target,
             admissionStatus: 'deferred' as const,
+            workStatus: 'deferred_by_scheduler' as const,
             structuralRole: 'deferred' as const,
             deferReason: targetDeferReason(target),
         }));
     const deferredByPolicy = disabled.map((target) => ({
         ...target,
         admissionStatus: 'deferred' as const,
+        workStatus: 'deferred_by_policy' as const,
         structuralRole: 'deferred' as const,
         deferReason: 'lane_disabled_by_stage_policy',
     }));
-    const deferred = [...deferredByBudget, ...deferredByPolicy];
+    const deferred = [...deferredByScheduler, ...deferredByPolicy];
+    const canonicalTargets = canonicalTargetOrder([...admitted, ...deferred]);
     return {
         schemaVersion: 'phoenix-signal-target-plan/v1',
         candidateCount: annotated.length,
         admittedCount: admitted.length,
         deferredCount: deferred.length,
-        maxAdmitted: MAX_EMBEDDING_TARGETS,
-        lanes: buildLaneReceipts([...admitted, ...deferred]),
-        targets: admitted,
+        maxAdmitted: MAX_EMBEDDING_WORK_TARGETS,
+        canonicalCount: canonicalTargets.length,
+        queuedCount: admitted.length,
+        schedulerDeferredCount: deferredByScheduler.length,
+        policyDeferredCount: deferredByPolicy.length,
+        maxQueued: MAX_EMBEDDING_WORK_TARGETS,
+        queuedTargetIds: admitted.map((target) => target.id),
+        schedulerDeferredTargetIds: deferredByScheduler.map((target) => target.id),
+        policyDeferredTargetIds: deferredByPolicy.map((target) => target.id),
+        lanes: buildLaneReceipts(canonicalTargets),
+        targets: canonicalTargets,
     };
 }
 
@@ -87,13 +99,14 @@ function selectEmbeddingTargets(
     const selected = new Map<string, GraphRebuildEmbeddingTarget>();
     const byKind = groupTargetsByKind(targets);
     const byLane = groupTargetsByLane(targets);
+    const targetById = new Map(targets.map((target) => [target.id, target]));
     const entityById = new Map((byKind.get('entity') || []).map((target) => [target.entityId || target.sourceId, target]));
     const eventById = new Map((byKind.get('event') || []).map((target) => [target.sourceId, target]));
     const relationshipById = new Map(relationships.map((relationship) => [relationship.id, relationship]));
     const storyEdgeById = new Map([...temporalEdges, ...causalEdges].map((edge) => [edge.id, edge]));
     const addGroup = (group: Array<GraphRebuildEmbeddingTarget | undefined>): boolean => {
         const missing = group.filter((target): target is GraphRebuildEmbeddingTarget => !!target && !selected.has(target.id));
-        if (selected.size + missing.length > MAX_EMBEDDING_TARGETS) return false;
+        if (selected.size + missing.length > MAX_EMBEDDING_WORK_TARGETS) return false;
         for (const target of missing) selected.set(target.id, target);
         return true;
     };
@@ -115,10 +128,16 @@ function selectEmbeddingTargets(
     }
     for (const target of ranked(byLane.get('relationship_fact') || []).slice(0, RELATION_TARGET_BUDGET)) {
         const relationship = relationshipById.get(target.sourceId);
+        const situationRoleTargets = target.sourceId.startsWith('fact:document-hyperedge:')
+            ? (target.parentIds || [])
+                .filter((id) => id.startsWith('embed:entity:') || id.startsWith('embed:atom:'))
+                .map((id) => targetById.get(id))
+            : [];
         addGroup([
             target,
             relationship ? entityById.get(relationship.sourceEntityId) : undefined,
             relationship ? entityById.get(relationship.targetEntityId) : undefined,
+            ...situationRoleTargets,
         ]);
     }
     addMany(ranked(byKind.get('entity') || []), ENTITY_TARGET_BUDGET);
@@ -157,8 +176,12 @@ function targetLane(target: GraphRebuildEmbeddingTarget): GraphRebuildSignalTarg
     if (kind === 'note') return 'document_spine';
     if (kind === 'structureroot') return structureRootLane(target);
     if (kind === 'chunk') return 'chunk_spine';
+    if (kind === 'episode') return 'document_spine';
     if (kind === 'entity') return 'entity_anchor';
     if (kind === 'anchor') return 'anchor_evidence';
+    if (kind === 'concept') return 'entity_linker';
+    if (kind === 'evidencespan') return 'anchor_evidence';
+    if (kind === 'documentunit') return 'chunk_spine';
     if (kind === 'event') return 'event_identity';
     if (kind === 'temporalfact') return 'temporal_fact';
     if (kind === 'causalfact') return 'causal_fact';
@@ -176,7 +199,7 @@ function targetStructuralRole(
 ): GraphRebuildEmbeddingTarget['structuralRole'] {
     if (isStructureRoot(target)) return 'root';
     switch (lane) {
-        case 'document_spine': return 'root';
+        case 'document_spine': return normalizeKind(target.kind) === 'episode' ? 'spine' : 'root';
         case 'chunk_spine': return 'spine';
         case 'entity_anchor': return 'child';
         case 'relationship_fact':
@@ -222,7 +245,7 @@ function targetTier(target: GraphRebuildEmbeddingTarget, lane: GraphRebuildSigna
 }
 
 function targetDeferReason(target: GraphRebuildEmbeddingTarget): string {
-    if (isStructureRoot(target)) return 'structure_root_exceeded_embedding_budget';
+    if (isStructureRoot(target)) return 'structure_root_deferred_by_scheduler';
     if (target.lane === 'cooccurrence_weak') return 'weak_cooccurrence_not_promoted';
     if (target.lane === 'entity_linker') return 'entity_linker_requires_final_linking';
     if (target.lane === 'anchor_evidence') return 'raw_anchor_evidence_not_promoted';
@@ -312,11 +335,21 @@ function coverageFillOrder(targets: GraphRebuildEmbeddingTarget[]): GraphRebuild
     return [...targets].sort((left, right) => coverageWeight(right) - coverageWeight(left) || targetOrder(left, right));
 }
 
+function canonicalTargetOrder(targets: GraphRebuildEmbeddingTarget[]): GraphRebuildEmbeddingTarget[] {
+    return [...targets].sort((left, right) =>
+        (left.admissionTier ?? 9) - (right.admissionTier ?? 9)
+        || String(left.noteId || '').localeCompare(String(right.noteId || ''))
+        || coverageWeight(right) - coverageWeight(left)
+        || left.id.localeCompare(right.id),
+    );
+}
+
 function coverageWeight(target: GraphRebuildEmbeddingTarget): number {
     const kind = normalizeKind(target.kind);
     if (kind === 'note') return 980;
     if (kind === 'structureroot') return 970;
     if (kind === 'chunk') return 960;
+    if (kind === 'episode') return 950;
     if (kind === 'causalfact') return 940;
     if (kind === 'temporalfact') return 930;
     if (kind === 'event') return 910;
@@ -344,6 +377,7 @@ function targetScore(target: GraphRebuildEmbeddingTarget): number {
         kind === 'causalfact' ? 830 :
         kind === 'temporalfact' ? 810 :
         kind === 'event' ? 780 :
+        kind === 'episode' ? 760 :
         kind === 'memorystate' ? 720 :
         kind === 'note' ? 680 :
         kind === 'chunk' ? 620 :

@@ -1,4 +1,5 @@
 import type { EntityOccurrence } from '../lib/dexie/db';
+import type { CalendarRegistrySnapshot } from '../lib/fantasy-calendar/calendar-registry-snapshot';
 import type { RegisteredEntity } from '../lib/registry';
 import type {
     GraphCompileReceipts,
@@ -8,6 +9,31 @@ import type {
     GraphCompilerSource,
 } from './graph-compiler-read-model';
 import type { GraphModelV2Snapshot } from './graph-model-v2';
+import type { GraphCalendarRegistryBridgeSummary } from './graph-calendar-registry-bridge';
+import type { GraphMemoryGraphRagBridgeSummary } from './graph-memory-graphrag-bridge';
+import type { GraphCrossDocumentBridgeRunCertificate } from './graph-cross-document-bridge-certificate';
+import type { GraphDiscourseSpineSummary } from './graph-discourse-spine';
+import type { GraphDiscourseBridgeCandidateSummary } from './graph-discourse-bridge-candidates';
+import type { GraphDiscourseBridgeAdjudicationSummary } from './graph-discourse-bridge-adjudication';
+import type { GraphDiscourseEvalLedgerSummary } from './graph-discourse-eval-ledger';
+import type { GraphDiscoursePromotionSurfaceSummary } from './graph-discourse-promotion-surface';
+import type { GraphDiscourseCompilerOverlaySummary } from './graph-discourse-compiler-overlay';
+import type { HopfResonanceSpace } from './graph-hopf-resonance-space';
+import type { GraphDocumentSidecarSummary } from './graph-document-sidecar';
+import type { GraphDocumentProfileSummary } from './graph-document-profile';
+import type { GraphDocumentSemanticSummary } from './graph-document-semantic';
+import type { GraphDocumentReviewSummary } from './graph-document-review';
+import type { GraphDocumentCompilerSummary } from './graph-document-compiler';
+import type { GraphDocumentGraphMutationLedger } from './graph-document-durable-commit';
+import type { GraphOperatorMutationJournal } from './graph-operator-mutation-journal';
+import type { GraphTruthCommitLedger } from './graph-truth-commit-ledger';
+import type { GraphAtlasPacket } from './graph-atlas-packet';
+import type { GraphRebuildBuildTimings } from './graph-rebuild-build-timings';
+import type { GraphRebuildCpuProfiler } from './graph-rebuild-cpu-profile';
+import type { GraphPromotionVerdictCertificate } from './graph-promotion-verdict';
+import type { GraphReviewAdjudicationRunCertificate } from './graph-review-adjudication-certificate';
+import type { GraphStoryContinuityContract } from './graph-story-continuity';
+import type { GraphRebuildReplayManifest } from './graph-rebuild-replay-contract';
 
 export type GraphRebuildScopeKind = 'global' | 'folder' | 'narrative' | 'note' | 'multiNote';
 export type GraphRebuildAnchorSource = EntityOccurrence['source'] | 'accepted_suggestion';
@@ -169,6 +195,252 @@ export interface GraphRebuildEpisode {
     label: string;
 }
 
+export type GraphRebuildChunkSemanticBridgeType =
+    | 'setup_payoff'
+    | 'cause_effect'
+    | 'state_delta'
+    | 'relationship_delta'
+    | 'topic_continuation'
+    | 'evidence_reframe'
+    | 'motif_echo'
+    | 'route_continuity';
+
+export const GRAPH_REBUILD_CHUNK_SEMANTIC_BRIDGE_SCHEMA_VERSION = 'phoenix-chunk-semantic-bridge/v1' as const;
+export const GRAPH_REBUILD_CHUNK_SEMANTIC_BRIDGE_COMMIT_POLICY = 'no_topology_commit' as const;
+export const GRAPH_REBUILD_CHUNK_SEMANTIC_BRIDGE_NO_TOPOLOGY_COMMIT =
+    'chunk_semantic_bridge_candidate:no_topology_commit' as const;
+
+export type GraphRebuildChunkSemanticBridgeSchemaVersion =
+    typeof GRAPH_REBUILD_CHUNK_SEMANTIC_BRIDGE_SCHEMA_VERSION;
+
+export type GraphRebuildChunkSemanticBridgeCommitPolicy =
+    typeof GRAPH_REBUILD_CHUNK_SEMANTIC_BRIDGE_COMMIT_POLICY;
+
+export type GraphRebuildChunkSemanticBridgeStatus =
+    | 'candidate'
+    | 'overlay_only';
+
+export interface GraphRebuildChunkSemanticBridge {
+    schemaVersion: GraphRebuildChunkSemanticBridgeSchemaVersion;
+    id: string;
+    bridgeType: GraphRebuildChunkSemanticBridgeType;
+    sourceChunkId: string;
+    targetChunkId: string;
+    sourceEventId?: string;
+    targetEventId?: string;
+    sourceEpisodeId?: string;
+    targetEpisodeId?: string;
+    claim: string;
+    evidenceIds: string[];
+    supportingEntityIds: string[];
+    confidence: number;
+    status: GraphRebuildChunkSemanticBridgeStatus;
+    commitPolicy: GraphRebuildChunkSemanticBridgeCommitPolicy;
+    semanticVerbs: string[];
+    sourceCue?: string;
+    targetCue?: string;
+    rationale: string[];
+}
+
+export type GraphRebuildEpisodeConnectionKind =
+    | 'episode_temporal'
+    | 'episode_causal'
+    | 'episode_wormhole';
+
+export type GraphRebuildEpisodeConnectionStatus =
+    | 'derived'
+    | 'overlay_only';
+
+export interface GraphRebuildEpisodeConnection {
+    id: string;
+    kind: GraphRebuildEpisodeConnectionKind;
+    sourceEpisodeId: string;
+    targetEpisodeId: string;
+    relationType: string;
+    eventEdgeIds: string[];
+    chunkBridgeIds?: string[];
+    bridgeType?: GraphRebuildChunkSemanticBridgeType;
+    claim?: string;
+    evidenceIds: string[];
+    sharedEntityIds: string[];
+    confidence: number;
+    status: GraphRebuildEpisodeConnectionStatus;
+    semanticVerbs?: string[];
+    rationale: string[];
+}
+
+export type GraphRebuildEpisodeProjectionEdgeKind =
+    | 'document_contains_episode'
+    | 'episode_contains_event'
+    | 'episode_contains_chunk'
+    | 'episode_temporal'
+    | 'episode_causal'
+    | 'episode_wormhole_candidate';
+
+export type GraphRebuildEpisodeProjectionEdgeStatus =
+    | 'structural'
+    | 'derived'
+    | 'candidate_overlay';
+
+export interface GraphRebuildEpisodeProjectionEdge {
+    schemaVersion: 'phoenix-episode-projection-edge/v1';
+    id: string;
+    kind: GraphRebuildEpisodeProjectionEdgeKind;
+    sourceId: string;
+    targetId: string;
+    sourceTargetId: string;
+    targetTargetId: string;
+    noteId?: string;
+    episodeId?: string;
+    sourceEpisodeId?: string;
+    targetEpisodeId?: string;
+    eventId?: string;
+    chunkId?: string;
+    episodeConnectionId?: string;
+    relationType: string;
+    evidenceIds: string[];
+    confidence: number;
+    status: GraphRebuildEpisodeProjectionEdgeStatus;
+    noTopologyCommit: true;
+    rationale: string[];
+}
+
+export const GRAPH_MEMORY_GOVERNANCE_SCHEMA_VERSION = 'phoenix-memory-governance-candidate/v1' as const;
+export const GRAPH_MEMORY_GOVERNANCE_COMMIT_POLICY = 'no_topology_commit' as const;
+export const GRAPH_MEMORY_GOVERNANCE_NO_TOPOLOGY_COMMIT =
+    'memory_governance_candidate:no_topology_commit' as const;
+
+export type GraphMemoryGovernanceTargetKind = 'chunk' | 'episode';
+
+export type GraphMemoryGovernanceAction =
+    | 'retain'
+    | 'attenuate'
+    | 'compress'
+    | 'quarantine'
+    | 'retire';
+
+export type GraphMemoryGovernanceStatus = 'candidate';
+
+export interface GraphMemoryGovernanceSignals {
+    age: number;
+    accessFrequency: number;
+    redundancy: number;
+    contradictionRisk: number;
+    causalImportance: number;
+    narrativeSalience: number;
+    retrievalUtility: number;
+    evidenceStrength: number;
+    userPinned: boolean;
+}
+
+export interface GraphMemoryGovernanceCandidate {
+    schemaVersion: typeof GRAPH_MEMORY_GOVERNANCE_SCHEMA_VERSION;
+    id: string;
+    targetId: string;
+    targetKind: GraphMemoryGovernanceTargetKind;
+    action: GraphMemoryGovernanceAction;
+    reason: string;
+    evidenceIds: string[];
+    supportingEntityIds: string[];
+    relatedEventIds: string[];
+    relatedChunkIds: string[];
+    signals: GraphMemoryGovernanceSignals;
+    confidence: number;
+    status: GraphMemoryGovernanceStatus;
+    commitPolicy: typeof GRAPH_MEMORY_GOVERNANCE_COMMIT_POLICY;
+    noTopologyCommit: true;
+    rationale: string[];
+}
+
+export const GRAPH_MEMORY_GOVERNANCE_RETRIEVAL_EXPERIMENT_SCHEMA_VERSION =
+    'phoenix-memory-governance-retrieval-weighting-experiment/v1' as const;
+
+export interface GraphMemoryGovernanceRetrievalCandidate {
+    id: string;
+    targetId: string;
+    targetKind: GraphMemoryGovernanceTargetKind;
+    score: number;
+}
+
+export interface GraphMemoryGovernanceRetrievalPreviewSummary {
+    candidateCount: number;
+    governedCount: number;
+    retainedCount: number;
+    attenuatedCount: number;
+    compressedCount: number;
+    unchangedCount: number;
+    changedRankCount: number;
+    promotedCount: number;
+    demotedCount: number;
+}
+
+export interface GraphMemoryGovernanceRetrievalWeightPolicy {
+    id: string;
+    retainConfidenceBoost: number;
+    retainCausalBoost: number;
+    retainRetrievalBoost: number;
+    compressConfidenceBoost: number;
+    compressNarrativeBoost: number;
+    compressMaxBoost: number;
+    compressScoreCeiling: number;
+    compressFanoutDampening: number;
+    attenuateConfidencePenalty: number;
+    quarantineMultiplier: number;
+    retireMultiplier: number;
+}
+
+export interface GraphMemoryGovernanceRetrievalPreviewRow {
+    id: string;
+    targetId: string;
+    targetKind: GraphMemoryGovernanceTargetKind;
+    originalRank: number;
+    adjustedRank: number;
+    originalScore: number;
+    adjustedScore: number;
+    scoreDelta: number;
+    governanceCandidateId?: string;
+    governanceAction?: GraphMemoryGovernanceAction;
+    governanceConfidence?: number;
+    reason?: string;
+    rationale: string[];
+    noTopologyCommit: true;
+}
+
+export interface GraphMemoryGovernanceRetrievalFullRowProof {
+    rowCount: number;
+    noTopologyRows: number;
+    compressionDominance: GraphMemoryGovernanceCompressionDominanceProof;
+}
+
+export interface GraphMemoryGovernanceCompressionDominanceProof {
+    passed: boolean;
+    compressedRows: number;
+    policyRows: number;
+    boundedRows: number;
+    maxPositiveDelta: number;
+    maxAdjustedScore: number;
+    violationCount: number;
+    violations: string[];
+}
+
+export interface GraphMemoryGovernanceRetrievalWeightingVariant {
+    policy: GraphMemoryGovernanceRetrievalWeightPolicy;
+    summary: GraphMemoryGovernanceRetrievalPreviewSummary;
+    fullRowProof?: GraphMemoryGovernanceRetrievalFullRowProof;
+    topRows: GraphMemoryGovernanceRetrievalPreviewRow[];
+    meanAbsRankDeltaMillis: number;
+    retainedMeanScoreDeltaMillis: number;
+    compressedMeanScoreDeltaMillis: number;
+    attenuatedMeanScoreDeltaMillis: number;
+}
+
+export interface GraphMemoryGovernanceRetrievalWeightingExperiment {
+    schemaVersion: typeof GRAPH_MEMORY_GOVERNANCE_RETRIEVAL_EXPERIMENT_SCHEMA_VERSION;
+    baselinePolicyId: string;
+    variants: GraphMemoryGovernanceRetrievalWeightingVariant[];
+    noTopologyCommit: true;
+}
+
 export interface GraphRebuildTemporalEdge {
     id: string;
     sourceId: string;
@@ -321,6 +593,24 @@ export interface GraphRebuildMemoryState {
     evidenceIds: string[];
 }
 
+export interface GraphRebuildVisualTrace {
+    source: 'rust_atlas_packet' | 'graph_rebuild_embedding_target';
+    sourceId: string;
+    family: string;
+    packetSnapshotId?: string;
+    packetScopeId?: string;
+    sourceContract?: string;
+    vectorContract?: string;
+    identityAuthority?: string;
+    packetObjectId?: string;
+    packetTargetId?: string;
+    objectKind?: string;
+    targetKind?: string;
+    noteIds?: string[];
+    chunkIds?: string[];
+    evidenceIds?: string[];
+}
+
 export interface GraphRebuildEmbeddingTarget {
     id: string;
     kind: GraphRebuildEmbeddingTargetKind;
@@ -338,11 +628,18 @@ export interface GraphRebuildEmbeddingTarget {
     evidenceIds: string[];
     lane?: GraphRebuildSignalTargetLane;
     structuralRole?: GraphRebuildSignalStructuralRole;
+    styleKey?: string;
+    documentUnitKind?: string;
+    stateContextKind?: string;
+    atlasFamily?: string;
+    atlasStatus?: string;
     admissionTier?: number;
     admissionStatus?: GraphRebuildSignalAdmissionStatus;
+    workStatus?: GraphRebuildSignalWorkStatus;
     admissionReason?: string;
     deferReason?: string;
     parentIds?: string[];
+    visualTrace?: GraphRebuildVisualTrace;
 }
 
 export type GraphRebuildSignalTargetLane =
@@ -372,6 +669,11 @@ export type GraphRebuildSignalStructuralRole =
 
 export type GraphRebuildSignalAdmissionStatus = 'admitted' | 'deferred';
 
+export type GraphRebuildSignalWorkStatus =
+    | 'queued'
+    | 'deferred_by_scheduler'
+    | 'deferred_by_policy';
+
 export interface GraphRebuildSignalTargetLaneReceipt {
     lane: GraphRebuildSignalTargetLane;
     candidates: number;
@@ -386,7 +688,40 @@ export interface GraphRebuildEmbeddingTargetPlan {
     admittedCount: number;
     deferredCount: number;
     maxAdmitted: number;
+    canonicalCount: number;
+    queuedCount: number;
+    schedulerDeferredCount: number;
+    policyDeferredCount: number;
+    maxQueued: number;
+    queuedTargetIds: string[];
+    schedulerDeferredTargetIds: string[];
+    policyDeferredTargetIds: string[];
     lanes: GraphRebuildSignalTargetLaneReceipt[];
+}
+
+export type GraphEvidenceTargetObjectKind =
+    | 'entity'
+    | 'relationship'
+    | 'event'
+    | 'episode'
+    | 'temporal_edge'
+    | 'causal_edge'
+    | 'memory_state';
+
+export interface GraphEvidenceTargetRegistryContract {
+    schemaVersion: 'phoenix-evidence-target-registry/v1';
+    authority: 'deterministic_graph_processing';
+    sourceSnapshotId: string;
+    sourceScopeId: string;
+    canonicalTargets: number;
+    exposedTargets: number;
+    chunks: number;
+    typedGraphObjects: number;
+    supportTargets: number;
+    evidenceLinks: number;
+    duplicateTargets: number;
+    orphanTargets: number;
+    identityHash: string;
 }
 
 export interface GraphRebuildEmbeddingVector {
@@ -394,6 +729,47 @@ export interface GraphRebuildEmbeddingVector {
     modelId: string;
     dims: number;
     generation: number;
+}
+
+export interface GraphEncoderCandidateNeighbor {
+    targetId: string;
+    score: number;
+    rank: number;
+}
+
+export interface GraphEncoderCandidateNeighborhood {
+    sourceTargetId: string;
+    neighbors: GraphEncoderCandidateNeighbor[];
+}
+
+export interface GraphEncoderVectorIndexContract {
+    schemaVersion: 'phoenix-encoder-vector-index/v1';
+    authority: 'real_encoder';
+    sourceSnapshotId: string;
+    sourceRegistryHash: string;
+    modelId: string;
+    modelVersion: string;
+    executionProvider: 'native-rust' | 'transformers-worker' | 'external-encoder';
+    dimensions: number;
+    generation: number;
+    vectorCount: number;
+    normalized: true;
+    metric: 'cosine';
+    indexMethod: 'bounded-lsh';
+    candidateOnly: true;
+    committedTopologyWrites: 0;
+    neighborhoodK: number;
+    minimumSimilarity: number;
+    lshBands: number;
+    lshBits: number;
+    maxCandidatesPerTarget: number;
+    evaluatedPairs: number;
+    neighborhoodCount: number;
+    neighborCount: number;
+    missingRegistryTargets: number;
+    rejectedVectors: number;
+    indexHash: string;
+    neighborhoodHash: string;
 }
 
 export type GraphRebuildEmbeddingTaskProfile =
@@ -1182,7 +1558,7 @@ export interface GraphSemanticAdjudicationReceipt {
     judgmentId?: string;
     state: GraphSemanticAdjudicationState;
     reversible: true;
-    mutationAllowed: boolean;
+    mutationAllowed: false;
     invariant: string;
     evidenceTargetIds: string[];
     affectedGraphAtomIds: string[];
@@ -1227,7 +1603,7 @@ export interface GraphSemanticAdjudicationDecision {
     mutationId?: string;
     affectedGraphAtomIds: string[];
     affectedGraphFactIds: string[];
-    ledgerOnly: boolean;
+    ledgerOnly: true;
     createdAt: number;
 }
 
@@ -1341,6 +1717,509 @@ export interface GraphSemanticEvalLedgerSummary {
     counters: GraphSemanticEvalLedgerCounters;
 }
 
+export type GraphDiscourseSpineTargetKind = 'document_root' | 'document' | 'chunk';
+export type GraphDiscourseSpineLabelKind =
+    | 'domain'
+    | 'story_aspect'
+    | 'narrative_function'
+    | 'evidence_role'
+    | 'temporal_scope'
+    | 'tone_mood'
+    | 'world_context';
+export type GraphDiscourseSpineClusterKind = 'domain_region' | 'aspect_region' | 'document_family';
+export type GraphDiscourseSpineBridgeKind = 'resonance' | 'resolution';
+export type GraphDiscourseSpineBridgeStatus = 'proposed' | 'deferred' | 'rejected';
+
+export interface GraphDiscourseSpineLabel {
+    id: string;
+    targetId: string;
+    targetKind: GraphDiscourseSpineTargetKind;
+    labelKind: GraphDiscourseSpineLabelKind;
+    value: string;
+    score: number;
+    cues: string[];
+    rationale: string;
+    receiptId: string;
+}
+
+export interface GraphDiscourseSpineCluster {
+    id: string;
+    kind: GraphDiscourseSpineClusterKind;
+    label: string;
+    targetIds: string[];
+    medoidTargetId: string;
+    score: number;
+    rationale: string[];
+    receiptId: string;
+}
+
+export interface GraphDiscourseSpineScorePart {
+    id: string;
+    score: number;
+    weight: number;
+}
+
+export interface GraphDiscourseSpineScoringBundle {
+    semanticScore: number;
+    labelAgreement: number;
+    entityOverlap: number;
+    distanceScore: number;
+    corefPressure: number;
+    finalScore: number;
+    scoreParts: GraphDiscourseSpineScorePart[];
+}
+
+export interface GraphDiscourseSpineBridge {
+    id: string;
+    kind: GraphDiscourseSpineBridgeKind;
+    status: GraphDiscourseSpineBridgeStatus;
+    sourceTargetId: string;
+    targetTargetId: string;
+    sourceKind: GraphDiscourseSpineTargetKind;
+    targetKind: GraphDiscourseSpineTargetKind;
+    label: string;
+    evidenceTargetIds: string[];
+    sharedLabelIds: string[];
+    sharedEntityIds: string[];
+    scoringBundle: GraphDiscourseSpineScoringBundle;
+    rationale: string[];
+    adjudicationState: 'proposed';
+    mutationAllowed: false;
+    receiptId: string;
+    createdAt: number;
+}
+
+export interface GraphDiscourseSpineReceipt {
+    id: string;
+    labelId?: string;
+    clusterId?: string;
+    bridgeId?: string;
+    reversible: true;
+    mutationAllowed: false;
+    invariant: 'discourse_spine_no_topology_commit';
+    evidenceTargetIds: string[];
+    undoHint: string;
+    detail: string;
+}
+
+export interface GraphDiscourseSpineCounters {
+    targetCount: number;
+    documentRoots: number;
+    documents: number;
+    chunks: number;
+    labelCount: number;
+    clusterCount: number;
+    bridgeCount: number;
+    resonanceCandidates: number;
+    resolutionCandidates: number;
+    proposedBridges: number;
+    deferredBridges: number;
+    rejectedBridges: number;
+    receiptCount: number;
+    reversibleReceiptCount: number;
+    mutationAllowedCount: number;
+    byLabelKind: Record<string, number>;
+    byClusterKind: Record<string, number>;
+    byBridgeKind: Record<string, number>;
+}
+
+export type GraphDiscourseBridgeCandidateKind =
+    | 'discourse_resonance'
+    | 'cross_doc_resolution'
+    | 'document_cluster_review';
+export type GraphDiscourseBridgeCandidateStatus = 'proposed' | 'deferred' | 'rejected';
+export type GraphDiscourseBridgeEvalKind =
+    | 'accepted_looking_resonance'
+    | 'weak_resonance'
+    | 'cross_doc_resolver_pressure'
+    | 'entity_overlap_without_meaning'
+    | 'meaning_overlap_without_entity';
+export type GraphDiscourseBridgeRerankLabelKind =
+    | 'meaningful_resonance'
+    | 'cross_doc_resolution'
+    | 'document_cluster_review'
+    | 'weak_resonance'
+    | 'entity_only_overlap'
+    | 'meaning_only_overlap'
+    | 'reject_noise';
+
+export interface GraphDiscourseBridgeRerankLabel {
+    id: string;
+    kind: GraphDiscourseBridgeRerankLabelKind;
+    query: string;
+    threshold: number;
+    candidateKinds: GraphDiscourseBridgeCandidateKind[];
+}
+
+export interface GraphDiscourseBridgeCandidate {
+    id: string;
+    kind: GraphDiscourseBridgeCandidateKind;
+    status: GraphDiscourseBridgeCandidateStatus;
+    sourceBridgeId?: string;
+    sourceClusterId?: string;
+    sourceTargetId: string;
+    targetTargetId: string;
+    evidenceTargetIds: string[];
+    sharedLabelIds: string[];
+    sharedEntityIds: string[];
+    score: number;
+    scoringBundle: GraphDiscourseSpineScoringBundle;
+    rationale: string[];
+    reversibleReceiptIds: string[];
+    mutationAllowed: false;
+    createdAt: number;
+}
+
+export interface GraphDiscourseBridgeRerankInput {
+    id: string;
+    candidateId: string;
+    candidateKind: GraphDiscourseBridgeCandidateKind;
+    passage: string;
+    labelIds: string[];
+    queryLabels: string[];
+    evidenceTargetIds: string[];
+    maxPassageChars: number;
+}
+
+export interface GraphDiscourseBridgeRerankScore {
+    labelId: string;
+    labelKind: GraphDiscourseBridgeRerankLabelKind;
+    query: string;
+    score: number;
+    source: GraphSemanticRerankScoreSource;
+    rationale: string;
+}
+
+export interface GraphDiscourseBridgeRerankJudgment {
+    id: string;
+    candidateId: string;
+    candidateKind: GraphDiscourseBridgeCandidateKind;
+    inputId: string;
+    decision: GraphSemanticRerankDecision;
+    topLabelId: string;
+    topLabelKind: GraphDiscourseBridgeRerankLabelKind;
+    modelId: string;
+    runner: 'gliclass-query-label-rerank';
+    scoreSource: GraphSemanticRerankScoreSource;
+    relevanceScore: number;
+    calibratedScore: number;
+    scores: GraphDiscourseBridgeRerankScore[];
+    evidenceTargetIds: string[];
+    rationale: string[];
+    reversibleReceiptId: string;
+}
+
+export interface GraphDiscourseBridgeEvalRow {
+    id: string;
+    kind: GraphDiscourseBridgeEvalKind;
+    candidateId: string;
+    judgmentId: string;
+    bridgeId?: string;
+    expectedLabelKind: GraphDiscourseBridgeRerankLabelKind;
+    score: number;
+    passed: boolean;
+    failureModes: string[];
+    evidenceTargetIds: string[];
+    flags: string[];
+    rationale: string[];
+}
+
+export interface GraphDiscourseBridgeCandidateReceipt {
+    id: string;
+    candidateId?: string;
+    judgmentId?: string;
+    evalRowId?: string;
+    reversible: true;
+    mutationAllowed: false;
+    invariant: 'discourse_bridge_candidates_no_topology_commit';
+    evidenceTargetIds: string[];
+    undoHint: string;
+    detail: string;
+}
+
+export interface GraphDiscourseBridgeCandidateCounters {
+    byCandidateKind: Record<string, number>;
+    byStatus: Record<string, number>;
+    byDecision: Record<string, number>;
+    byEvalKind: Record<string, number>;
+    byScoreSource: Record<string, number>;
+    candidateCount: number;
+    inputCount: number;
+    judgmentCount: number;
+    evalRowCount: number;
+    passedEvalRows: number;
+    failedEvalRows: number;
+    receiptCount: number;
+    reversibleReceiptCount: number;
+    mutationAllowedCount: number;
+    plannedModelCalls: number;
+    acceptedLookingResonance: number;
+    weakResonance: number;
+    crossDocResolverPressure: number;
+    entityOverlapWithoutMeaning: number;
+    meaningOverlapWithoutEntity: number;
+    maxCandidates: number;
+    maxPassageChars: number;
+}
+
+export type GraphDiscourseBridgeAdjudicationState =
+    | 'proposed'
+    | 'supported'
+    | 'accepted'
+    | 'deferred'
+    | 'rejected'
+    | 'invalidated'
+    | 'superseded';
+
+export interface GraphDiscourseBridgeAdjudicationScorePart {
+    id: string;
+    score: number;
+    weight: number;
+}
+
+export interface GraphDiscourseBridgeAdjudicationScoringBundle {
+    candidateScore: number;
+    spineFinalScore: number;
+    rerankRelevance: number;
+    rerankCalibrated: number;
+    rerankSource: GraphSemanticRerankScoreSource | 'missing_rerank';
+    topLabelKind?: GraphDiscourseBridgeRerankLabelKind;
+    evalScore: number;
+    evalPassed: boolean;
+    finalScore: number;
+    scoreParts: GraphDiscourseBridgeAdjudicationScorePart[];
+}
+
+export interface GraphDiscourseBridgeAdjudicationDecision {
+    id: string;
+    proposalNodeId: string;
+    supportedNodeId: string;
+    candidateId: string;
+    candidateKind: GraphDiscourseBridgeCandidateKind;
+    sourceBridgeId?: string;
+    sourceClusterId?: string;
+    judgmentId?: string;
+    evalRowId?: string;
+    state: GraphDiscourseBridgeAdjudicationState;
+    sourceHypothesis: string;
+    evidenceTargetIds: string[];
+    scoringBundle: GraphDiscourseBridgeAdjudicationScoringBundle;
+    rationale: string[];
+    undoReceiptId: string;
+    affectedGraphAtomIds: string[];
+    affectedGraphFactIds: string[];
+    ledgerOnly: true;
+    mutationAllowed: false;
+    createdAt: number;
+}
+
+export interface GraphDiscourseBridgeAdjudicationReceipt {
+    id: string;
+    candidateId: string;
+    judgmentId?: string;
+    evalRowId?: string;
+    state: GraphDiscourseBridgeAdjudicationState;
+    reversible: true;
+    mutationAllowed: false;
+    invariant: 'discourse_bridge_adjudication_ledger_only';
+    evidenceTargetIds: string[];
+    affectedGraphAtomIds: string[];
+    affectedGraphFactIds: string[];
+    undoHint: string;
+    detail: string;
+}
+
+export interface GraphDiscourseBridgeAdjudicationCounters {
+    byState: Record<string, number>;
+    byCandidateKind: Record<string, number>;
+    decisionCount: number;
+    acceptedCount: number;
+    supportedCount: number;
+    deferredCount: number;
+    rejectedCount: number;
+    invalidatedCount: number;
+    supersededCount: number;
+    receiptCount: number;
+    reversibleReceiptCount: number;
+    ledgerOnlyCount: number;
+    topologyCommitCount: number;
+    mutationAllowedCount: number;
+    compactRowCount: number;
+}
+
+export type GraphDiscourseEvalLedgerLabel =
+    | 'accepted_candidate'
+    | 'rejected_candidate'
+    | 'ambiguous_case'
+    | 'model_disagreement'
+    | 'manifold_disagreement';
+
+export interface GraphDiscourseEvalLedgerEntry {
+    id: string;
+    candidateId: string;
+    decisionId: string;
+    label: GraphDiscourseEvalLedgerLabel;
+    candidateKind: GraphDiscourseBridgeCandidateKind;
+    adjudicationState: GraphDiscourseBridgeAdjudicationState;
+    sourceHypothesis: string;
+    evidenceTargetIds: string[];
+    score: number;
+    scoringBundle: GraphDiscourseBridgeAdjudicationScoringBundle;
+    rerank?: {
+        judgmentId: string;
+        decision: GraphSemanticRerankDecision;
+        scoreSource: GraphSemanticRerankScoreSource;
+        topLabelKind: GraphDiscourseBridgeRerankLabelKind;
+        relevanceScore: number;
+        calibratedScore: number;
+    };
+    candidateEval?: {
+        evalRowId: string;
+        kind: GraphDiscourseBridgeEvalKind;
+        expectedLabelKind: GraphDiscourseBridgeRerankLabelKind;
+        score: number;
+        passed: boolean;
+        failureModes: string[];
+    };
+    discourseReceipts: {
+        semanticScore: number;
+        labelAgreement: number;
+        entityOverlap: number;
+        distanceScore: number;
+        corefPressure: number;
+        finalScore: number;
+    };
+    flags: string[];
+    beforeGraph: {
+        edgeCount: number;
+        factIds: string[];
+        edgeIds: string[];
+    };
+    afterGraph: {
+        edgeCount: number;
+        factIds: string[];
+        edgeIds: string[];
+    };
+    userCorrectionIds: string[];
+    rationale: string[];
+}
+
+export interface GraphDiscourseEvalLedgerCounters {
+    rowCount: number;
+    byLabel: Record<string, number>;
+    byCandidateKind: Record<string, number>;
+    byState: Record<string, number>;
+    acceptedCandidates: number;
+    rejectedCandidates: number;
+    ambiguousCases: number;
+    userCorrections: number;
+    modelDisagreements: number;
+    manifoldDisagreements: number;
+    evalDisagreements: number;
+    graphChangeRows: number;
+    resonanceRows: number;
+    resolutionRows: number;
+    clusterReviewRows: number;
+}
+
+export type GraphDiscoursePromotionHintKind =
+    | 'chunk_wormhole'
+    | 'document_cluster'
+    | 'cross_doc_resolution';
+
+export interface GraphDiscoursePromotionCompilerHint {
+    id: string;
+    kind: GraphDiscoursePromotionHintKind;
+    sourceLedgerEntryId: string;
+    candidateId: string;
+    decisionId: string;
+    sourceTargetId: string;
+    targetTargetId?: string;
+    memberTargetIds: string[];
+    evidenceTargetIds: string[];
+    proposedEdgeType?: string;
+    confidence: number;
+    status: 'read_model_only';
+    mutationAllowed: false;
+    rationale: string[];
+}
+
+export interface GraphDiscourseChunkWormhole {
+    id: string;
+    sourceLedgerEntryId: string;
+    candidateId: string;
+    decisionId: string;
+    sourceTargetId: string;
+    targetTargetId: string;
+    score: number;
+    label: GraphDiscourseEvalLedgerLabel;
+    state: GraphDiscourseBridgeAdjudicationState;
+    evidenceTargetIds: string[];
+    flags: string[];
+    compilerHintId: string;
+    mutationAllowed: false;
+}
+
+export interface GraphDiscourseDocumentClusterView {
+    id: string;
+    sourceLedgerEntryId: string;
+    candidateId: string;
+    decisionId: string;
+    sourceClusterId?: string;
+    medoidTargetId: string;
+    memberTargetIds: string[];
+    score: number;
+    label: GraphDiscourseEvalLedgerLabel;
+    state: GraphDiscourseBridgeAdjudicationState;
+    flags: string[];
+    compilerHintId: string;
+    mutationAllowed: false;
+}
+
+export interface GraphDiscourseResolverCandidateView {
+    id: string;
+    sourceLedgerEntryId: string;
+    candidateId: string;
+    decisionId: string;
+    sourceTargetId: string;
+    targetTargetId: string;
+    sharedEntityIds: string[];
+    score: number;
+    label: GraphDiscourseEvalLedgerLabel;
+    state: GraphDiscourseBridgeAdjudicationState;
+    evidenceTargetIds: string[];
+    flags: string[];
+    compilerHintId: string;
+    mutationAllowed: false;
+}
+
+export interface GraphDiscoursePromotionReceipt {
+    id: string;
+    sourceLedgerEntryId: string;
+    compilerHintId: string;
+    reversible: true;
+    mutationAllowed: false;
+    invariant: 'discourse_promotion_surface_no_topology_commit';
+    evidenceTargetIds: string[];
+    undoHint: string;
+    detail: string;
+}
+
+export interface GraphDiscoursePromotionCounters {
+    byHintKind: Record<string, number>;
+    byLabel: Record<string, number>;
+    chunkWormholeCount: number;
+    documentClusterCount: number;
+    resolverCandidateCount: number;
+    compilerHintCount: number;
+    receiptCount: number;
+    reversibleReceiptCount: number;
+    graphPatchCount: number;
+    mutationAllowedCount: number;
+    acceptedRows: number;
+    ambiguousRows: number;
+}
+
 export interface GraphRebuildEntityLinkCounters {
     candidateMentions: number;
     candidateLinks: number;
@@ -1408,12 +2287,74 @@ export interface GraphRebuildCounters {
     rejectedRelationships: number;
     events: number;
     episodes: number;
+    chunkSemanticBridges?: number;
+    chunkSetupPayoffBridges?: number;
+    chunkCauseEffectBridges?: number;
+    chunkStateDeltaBridges?: number;
+    chunkRelationshipDeltaBridges?: number;
+    chunkTopicContinuationBridges?: number;
+    chunkEvidenceReframeBridges?: number;
+    chunkMotifEchoBridges?: number;
+    chunkRouteContinuityBridges?: number;
+    episodeConnections?: number;
+    episodeTemporalConnections?: number;
+    episodeCausalConnections?: number;
+    episodeWormholeConnections?: number;
+    episodeProjectionEdges?: number;
+    episodeProjectionStructuralEdges?: number;
+    episodeProjectionDerivedEdges?: number;
+    episodeProjectionCandidateEdges?: number;
     temporalEdges: number;
     causalEdges: number;
     memoryState: number;
+    memoryGovernanceCandidates?: number;
+    memoryGovernanceBuildMicros?: number;
+    memoryGovernanceRetain?: number;
+    memoryGovernanceAttenuate?: number;
+    memoryGovernanceCompress?: number;
+    memoryGovernanceQuarantine?: number;
+    memoryGovernanceRetire?: number;
+    memoryGovernanceRetrievalCandidates?: number;
+    memoryGovernanceRetrievalGoverned?: number;
+    memoryGovernanceRetrievalChangedRanks?: number;
+    memoryGovernanceRetrievalPolicies?: number;
+    promotionVerdictRows?: number;
+    promotionVerdictAcceptable?: number;
+    promotionVerdictBlocked?: number;
+    promotionVerdictAlreadyCommitted?: number;
+    promotionVerdictRollbackAvailable?: number;
+    reviewAdjudicationTotalRows?: number;
+    reviewAdjudicationEligibleRows?: number;
+    reviewAdjudicationExcludedRows?: number;
+    reviewAdjudicationDuplicateRows?: number;
+    reviewAdjudicationJudgedRows?: number;
+    reviewAdjudicationAppliedRows?: number;
+    reviewAdjudicationTopologyWrites?: number;
+    reviewAdjudicationDimension?: number;
+    continuityEvents?: number;
+    continuityBoundaryReceipts?: number;
+    continuityEpisodes?: number;
+    continuityTemporalCandidates?: number;
+    continuityCausalCandidates?: number;
+    continuityStateIntervals?: number;
+    continuityEpisodeConnections?: number;
+    continuityConflicts?: number;
+    continuityCrossDocumentConnections?: number;
+    continuityReviewRequired?: number;
     embeddingTargets: number;
+    evidenceRegistryExposedTargets?: number;
+    evidenceRegistryChunks?: number;
+    evidenceRegistryTypedGraphObjects?: number;
+    evidenceRegistryEvidenceLinks?: number;
+    encoderIndexedTargets?: number;
+    encoderCandidateNeighborhoods?: number;
+    encoderCandidateNeighbors?: number;
+    encoderEvaluatedPairs?: number;
     embeddingTargetCandidates?: number;
+    embeddingQueuedTargets?: number;
     embeddingTargetDeferred?: number;
+    embeddingSchedulerDeferredTargets?: number;
+    embeddingPolicyDeferredTargets?: number;
     embeddingDocumentSpine?: number;
     embeddingChunkSpine?: number;
     embeddingEntityAnchors?: number;
@@ -1472,29 +2413,267 @@ export interface GraphRebuildCounters {
     semanticEvalModelDisagreements?: number;
     semanticEvalManifoldDisagreements?: number;
     semanticEvalGraphChangeRows?: number;
+    hopfResonanceAssignments?: number;
+    hopfResonanceOccupiedCells?: number;
+    hopfResonanceFibers?: number;
+    hopfResonanceDocCharts?: number;
+    hopfResonanceBraids?: number;
+    hopfResonanceDroppedTargets?: number;
+    hopfResonanceMutationAllowed?: number;
+    memoryGraphRagRecords?: number;
+    memoryGraphRagSchemaRecords?: number;
+    memoryGraphRagFactRecords?: number;
+    memoryGraphRagPassageRecords?: number;
+    memoryGraphRagEvalRows?: number;
+    memoryGraphRagPassedEvalRows?: number;
+    memoryGraphRagReceipts?: number;
+    memoryGraphRagMutationAllowed?: number;
+    discourseSpineTargets?: number;
+    discourseSpineLabels?: number;
+    discourseSpineClusters?: number;
+    discourseSpineBridges?: number;
+    discourseSpineResonance?: number;
+    discourseSpineResolution?: number;
+    discourseSpineReceipts?: number;
+    discourseSpineMutationAllowed?: number;
+    discourseBridgeCandidates?: number;
+    discourseBridgeInputs?: number;
+    discourseBridgeJudgments?: number;
+    discourseBridgeEvalRows?: number;
+    discourseBridgeReceipts?: number;
+    discourseBridgePlannedModelCalls?: number;
+    discourseBridgeMutationAllowed?: number;
+    discourseBridgeAdjudicationDecisions?: number;
+    discourseBridgeAdjudicationAccepted?: number;
+    discourseBridgeAdjudicationSupported?: number;
+    discourseBridgeAdjudicationDeferred?: number;
+    discourseBridgeAdjudicationRejected?: number;
+    discourseBridgeAdjudicationReceipts?: number;
+    discourseBridgeAdjudicationLedgerOnly?: number;
+    discourseBridgeAdjudicationTopologyCommits?: number;
+    discourseBridgeAdjudicationMutationAllowed?: number;
+    discourseEvalLedgerRows?: number;
+    discourseEvalAcceptedCandidates?: number;
+    discourseEvalRejectedCandidates?: number;
+    discourseEvalAmbiguousCases?: number;
+    discourseEvalModelDisagreements?: number;
+    discourseEvalManifoldDisagreements?: number;
+    discourseEvalGraphChangeRows?: number;
+    discoursePromotionChunkWormholes?: number;
+    discoursePromotionDocumentClusters?: number;
+    discoursePromotionResolverCandidates?: number;
+    discoursePromotionCompilerHints?: number;
+    discoursePromotionReceipts?: number;
+    discoursePromotionGraphPatches?: number;
+    discoursePromotionMutationAllowed?: number;
+    discourseCompilerOverlayEdges?: number;
+    discourseCompilerOverlayChunkWormholes?: number;
+    discourseCompilerOverlayDocumentClusters?: number;
+    discourseCompilerOverlayResolvers?: number;
+    discourseCompilerOverlayReceipts?: number;
+    discourseCompilerOverlayGraphPatches?: number;
+    discourseCompilerOverlayMutationAllowed?: number;
+    calendarRegistryAnchors?: number;
+    calendarRegistryReceipts?: number;
+    calendarRegistryAcceptedTemporalReceipts?: number;
+    calendarRegistryRealEpochReceipts?: number;
+    calendarRegistryCustomOrdinalReceipts?: number;
+    calendarRegistryMutationAllowed?: number;
     entityLinking?: GraphRebuildEntityLinkCounters;
     meaningFrameChunks?: number;
+    documentSidecarUnits?: number;
+    documentSidecarSections?: number;
+    documentSidecarRegions?: number;
+    documentSidecarRhetoricalUnits?: number;
+    documentSidecarRetrievalUnits?: number;
+    documentSidecarGraphFacts?: number;
+    documentSidecarSituationInstances?: number;
+    documentSidecarStateIntervals?: number;
+    documentSidecarEventOrderings?: number;
+    documentSidecarTemporalConflicts?: number;
+    documentSidecarEvidenceSpans?: number;
+    documentSidecarAnchorPromotions?: number;
+    documentSemanticPropositions?: number;
+    documentSemanticArguments?: number;
+    documentSemanticResolvedArguments?: number;
+    documentSemanticRoleAnnotations?: number;
+    documentSemanticUnresolvedRoleSurfaces?: number;
+    documentSemanticRoleFailureReasons?: number;
+    documentSemanticFrameAnnotations?: number;
+    documentSemanticLexicalFrames?: number;
+    documentSemanticFallbackFrames?: number;
+    documentSemanticLowConfidenceFrames?: number;
+    documentSemanticFrameFailureReasons?: number;
+    documentSemanticFactualityAnnotations?: number;
+    documentSemanticScopedFactuality?: number;
+    documentSemanticAttributedFactuality?: number;
+    documentSemanticQuotedFactuality?: number;
+    documentSemanticConditionalFactuality?: number;
+    documentSemanticSpeechOrBeliefFrames?: number;
+    documentSemanticLowConfidenceFactuality?: number;
+    documentSemanticFactualityFailureReasons?: number;
+    documentSemanticArgumentRecoveries?: number;
+    documentSemanticLocalCoreferenceRecoveries?: number;
+    documentSemanticAliasContinuityRecoveries?: number;
+    documentSemanticOmittedSubjectRecoveries?: number;
+    documentSemanticQuoteSpeakerRecoveries?: number;
+    documentSemanticRepeatedEventLinks?: number;
+    documentSemanticWindowArgumentCompletions?: number;
+    documentSemanticLowConfidenceRecoveries?: number;
+    documentSemanticRecoveryFailureReasons?: number;
+    documentSemanticSituationInstances?: number;
+    documentSemanticStateIntervals?: number;
+    documentSemanticEventOrderings?: number;
+    documentSemanticExplicitEventOrderings?: number;
+    documentSemanticRecurrenceOrderings?: number;
+    documentSemanticPersistentStateIntervals?: number;
+    documentSemanticTerminatedStateIntervals?: number;
+    documentSemanticTemporalConflicts?: number;
+    documentSemanticWorldStateIneligibleSituations?: number;
+    documentSemanticNegated?: number;
+    documentSemanticModal?: number;
+    documentSemanticConditional?: number;
+    documentSemanticAttributed?: number;
+    documentSemanticQuoted?: number;
+    documentSemanticQuestions?: number;
+    documentSemanticDirectives?: number;
+    documentSemanticNary?: number;
+    documentSemanticReviewable?: number;
+    documentSemanticLedgerOnly?: number;
+    documentSemanticPredicateModifiers?: number;
+    documentSemanticPredicateNoise?: number;
+    documentReviewRows?: number;
+    documentReviewActionableRows?: number;
+    documentReviewStateRecords?: number;
+    documentReviewActions?: number;
+    documentReviewReceipts?: number;
+    documentReviewReversibleReceipts?: number;
+    documentReviewProposedRows?: number;
+    documentReviewAcceptedRows?: number;
+    documentReviewRejectedRows?: number;
+    documentReviewMutedRows?: number;
+    documentReviewPromotedToAnchorRows?: number;
+    documentReviewCompiledToGraphRows?: number;
+    documentReviewLedgerOnlyRows?: number;
+    operatorMutationIntents?: number;
+    operatorMutationActive?: number;
+    operatorMutationApplied?: number;
+    operatorMutationConflicted?: number;
+    operatorMutationUndone?: number;
+    operatorMutationReceipts?: number;
+    documentCompilerEntityMentions?: number;
+    documentCompilerRelationCandidates?: number;
+    documentCompilerHyperedges?: number;
+    documentCompilerNaryHyperedges?: number;
+    documentCompilerEvidenceEdges?: number;
+    documentCompilerCrossDocBridges?: number;
+    documentCompilerStructureEdges?: number;
+    documentCompilerRetrievalOverlays?: number;
+    documentCompilerTopologyDiffs?: number;
+    documentCompilerTopologyCommits?: number;
+    documentCompilerNativeCompileCandidates?: number;
+    documentCompilerLedgerOnly?: number;
+    documentCompilerOverlayOnly?: number;
+    documentCompilerReviewable?: number;
+    documentCompilerBlocked?: number;
+    documentCompilerReceipts?: number;
+    documentCompilerReversibleReceipts?: number;
+    documentCompilerMutationAllowed?: number;
+    documentCompilerHighConfidenceFacts?: number;
+    documentCompilerReviewedFacts?: number;
+    documentCompilerAmbiguousFacts?: number;
     eventAspects?: number;
     dropReasons: GraphRebuildDropReasons;
     resolution?: GraphRebuildResolutionCounters;
 }
 
-export interface GraphRebuildBuildTimings {
-    occurrenceLoadMs: number;
-    chunkLoadMs: number;
-    noteTextLoadMs: number;
-    noteFolderLoadMs: number;
-    dbLoadMs: number;
-    occurrenceRecoverMs: number;
-    snapshotBuildMs: number;
-    stateCommitMs: number;
-    snapshotPersistMs: number;
-    snapshotSerializeMs: number;
-    snapshotStoreMs: number;
-    snapshotEventMs: number;
-    snapshotPayloadChars: number;
-    dbOpsMs: number;
-    totalMs: number;
+export type { GraphRebuildBuildTimings } from './graph-rebuild-build-timings';
+
+export type GraphRebuildContentBlobField =
+    | 'sourceRows'
+    | 'renderRows'
+    | 'embeddingTargets'
+    | 'embeddingTargetPlan'
+    | 'embeddingGraphPostProcess'
+    | 'graphModelV2'
+    | 'semanticCandidateSummary'
+    | 'manifoldSpecializationSummary'
+    | 'storyContinuity'
+    | 'atlasPacket';
+
+export interface GraphRebuildContentBlobRef {
+    schemaVersion: 'phoenix-graph-rebuild-content-blob-ref/v1';
+    field: GraphRebuildContentBlobField;
+    hash: string;
+    documentKey: string;
+    sourceSchemaVersion: string;
+    rawChars: number;
+    payloadChars: number;
+    compressedBytes: number;
+    itemCount?: number;
+    createdAt: number;
+}
+
+export interface GraphRebuildContentManifest {
+    schemaVersion: 'phoenix-graph-rebuild-content-manifest/v1';
+    snapshotId: string;
+    scopeId: string;
+    builtAt: number;
+    refs: Partial<Record<GraphRebuildContentBlobField, GraphRebuildContentBlobRef>>;
+}
+
+export const GRAPH_SNAPSHOT_LIVE_AUTHORITY = 'graph_rebuild_live_contract' as const;
+
+export type GraphSnapshotAuthority = typeof GRAPH_SNAPSHOT_LIVE_AUTHORITY;
+
+export interface GraphSnapshotAuthorityCounts {
+    notes: number;
+    chunks: number;
+    mentions: number;
+    anchors: number;
+    relationships: number;
+    events: number;
+    temporalEdges: number;
+    causalEdges: number;
+    memoryState: number;
+    coreferenceRecoveries: number;
+    nodes: number;
+    edges: number;
+    embeddingTargets: number;
+    admittedEmbeddingTargets: number;
+    packetObjects: number;
+    packetTargets: number;
+    packetParentLinks: number;
+    packetFamilies: Record<string, number>;
+}
+
+export interface GraphSnapshotAuthorityContract {
+    schemaVersion: 'phoenix-graph-snapshot-authority/v1';
+    authority: GraphSnapshotAuthority;
+    snapshotId: string;
+    scopeId: string;
+    contentHash: string;
+    counts: GraphSnapshotAuthorityCounts;
+}
+
+export interface GraphInteractiveRunAuthorityReceipt {
+    schemaVersion: 'phoenix-interactive-graph-run-authority/v1';
+    inputIdentity: string;
+    snapshotId: string;
+    scopeId: string;
+    durable: {
+        schemaVersion: 'phoenix-graph-run-durable-receipt/v1';
+        runHandle: string;
+        scopeId: string;
+        snapshotId: string;
+        manifestId: string;
+        changedSections: number;
+        reusedSections: number;
+        encodedSections: number;
+        compressedSections: number;
+        rawBytesWritten: number;
+        compressedBytesWritten: number;
+    };
 }
 
 export interface GraphRebuildSnapshot {
@@ -1505,18 +2684,31 @@ export interface GraphRebuildSnapshot {
     scopeId: string;
     noteIds: string[];
     builtAt: number;
+    generationReceiptId?: string;
+    generationDigestSha256?: string;
     chunks: GraphRebuildChunk[];
     mentions: GraphRebuildMention[];
     entityAnchors: GraphRebuildEntityAnchor[];
     relationships: GraphRebuildRelationship[];
     events: GraphRebuildEvent[];
     episodes: GraphRebuildEpisode[];
+    chunkSemanticBridges?: GraphRebuildChunkSemanticBridge[];
+    crossDocumentBridgeCertificate?: GraphCrossDocumentBridgeRunCertificate;
+    episodeConnections?: GraphRebuildEpisodeConnection[];
+    episodeProjectionEdges?: GraphRebuildEpisodeProjectionEdge[];
     temporalEdges: GraphRebuildTemporalEdge[];
     causalEdges: GraphRebuildCausalEdge[];
     memoryState: GraphRebuildMemoryState[];
+    memoryGovernanceCandidates?: GraphMemoryGovernanceCandidate[];
+    memoryGovernanceRetrievalExperiment?: GraphMemoryGovernanceRetrievalWeightingExperiment;
+    promotionVerdictCertificate?: GraphPromotionVerdictCertificate;
+    reviewAdjudicationCertificate?: GraphReviewAdjudicationRunCertificate;
+    storyContinuity?: GraphStoryContinuityContract;
     embeddingTargets: GraphRebuildEmbeddingTarget[];
     embeddingTargetPlan?: GraphRebuildEmbeddingTargetPlan;
+    evidenceTargetRegistry?: GraphEvidenceTargetRegistryContract;
     embeddingVectors: GraphRebuildEmbeddingVector[];
+    encoderVectorIndex?: GraphEncoderVectorIndexContract;
     embeddingProfile?: GraphRebuildEmbeddingProfile;
     embeddingModelAdapter?: GraphRebuildEmbeddingModelAdapter;
     embeddingGraphPostProcess?: GraphRebuildEmbeddingGraphPostProcess;
@@ -1528,6 +2720,7 @@ export interface GraphRebuildSnapshot {
     graphCompileReceipts?: GraphCompileReceipts;
     graphCompilerSource?: GraphCompilerSource;
     projectedUiGraph?: GraphCompilerProjectedUiEdge[];
+    atlasPacket?: GraphAtlasPacket;
     graphModelV2?: GraphModelV2Snapshot;
     graphAwareLinkSuggestions?: GraphRebuildLinkSuggestion[];
     entityLinkSuggestions?: GraphRebuildEntityLinkSuggestion[];
@@ -1539,6 +2732,26 @@ export interface GraphRebuildSnapshot {
     semanticRerankSummary?: GraphSemanticRerankSummary;
     semanticAdjudicationSummary?: GraphSemanticAdjudicationDAGSummary;
     semanticEvalLedgerSummary?: GraphSemanticEvalLedgerSummary;
+    hopfResonanceSpace?: HopfResonanceSpace;
+    memoryGraphRagBridgeSummary?: GraphMemoryGraphRagBridgeSummary;
+    discourseSpineSummary?: GraphDiscourseSpineSummary;
+    discourseBridgeCandidateSummary?: GraphDiscourseBridgeCandidateSummary;
+    discourseBridgeAdjudicationSummary?: GraphDiscourseBridgeAdjudicationSummary;
+    discourseEvalLedgerSummary?: GraphDiscourseEvalLedgerSummary;
+    discoursePromotionSurfaceSummary?: GraphDiscoursePromotionSurfaceSummary;
+    discourseCompilerOverlaySummary?: GraphDiscourseCompilerOverlaySummary;
+    documentSidecarSummary?: GraphDocumentSidecarSummary;
+    documentSemanticSummary?: GraphDocumentSemanticSummary;
+    documentSemanticArtifactHandle?: string;
+    documentReviewSummary?: GraphDocumentReviewSummary;
+    documentCompilerSummary?: GraphDocumentCompilerSummary;
+    graphTruthCommitLedger?: GraphTruthCommitLedger;
+    authorityContract?: GraphSnapshotAuthorityContract;
+    interactiveRunAuthority?: GraphInteractiveRunAuthorityReceipt;
+    documentGraphMutationLedger?: GraphDocumentGraphMutationLedger;
+    operatorMutationJournal?: GraphOperatorMutationJournal;
+    calendarRegistrySummary?: GraphCalendarRegistryBridgeSummary;
+    contentManifest?: GraphRebuildContentManifest;
     counters: GraphRebuildCounters;
     buildTimings?: GraphRebuildBuildTimings;
     resolutionSuggestions?: GraphRebuildResolutionSuggestion[];
@@ -1546,6 +2759,7 @@ export interface GraphRebuildSnapshot {
 
 export type GraphIndexPolicy = 'delta' | 'force';
 export type GraphIndexPostProcessMode = 'core' | 'full';
+export type GraphBuildDurabilityMode = 'interactive' | 'durable' | 'diagnostic';
 export type GraphIndexRunStatus = 'blocked' | 'running' | 'completed' | 'failed';
 export type GraphIndexStageStatus = 'blocked' | 'skipped' | 'running' | 'completed' | 'failed';
 export type GraphIndexProjectionMode = 'hybrid' | 'hopf' | 'lorentz' | 'product' | 'siegel';
@@ -1574,8 +2788,10 @@ export interface GraphIndexRunRequest {
     scope: GraphIndexRunScope;
     policy: GraphIndexPolicy;
     postProcessMode?: GraphIndexPostProcessMode;
+    durabilityMode?: GraphBuildDurabilityMode;
     modelSelection: GraphIndexModelSelection;
     embeddingStagePolicy?: GraphIndexEmbeddingStagePolicy;
+    calendarRegistrySnapshot?: CalendarRegistrySnapshot;
     entities: RegisteredEntity[];
 }
 
@@ -1597,6 +2813,8 @@ export interface GraphIndexStageReceipt {
     outputCount: number;
     counters: Record<string, number>;
     message: string;
+    spanId?: string;
+    parentSpanId?: string;
 }
 
 export interface GraphIndexProjectionReceipt {
@@ -1608,6 +2826,39 @@ export interface GraphIndexProjectionReceipt {
     targetCount: number;
     vectorCount: number;
     counters?: Record<string, number>;
+    snapshotId?: string;
+    snapshotHash?: string;
+    message: string;
+}
+
+export type GraphIndexLayerKind =
+    | 'input'
+    | 'model'
+    | 'truth'
+    | 'native'
+    | 'authority'
+    | 'persistence'
+    | 'projection'
+    | 'diagnostic'
+    | 'transport'
+    | 'ui';
+
+export type GraphIndexLayerStatus = 'complete' | 'partial' | 'skipped' | 'failed';
+
+export interface GraphIndexLayerReceipt {
+    id: string;
+    label: string;
+    kind: GraphIndexLayerKind;
+    status: GraphIndexLayerStatus;
+    owner: string;
+    source: string;
+    consumes: string[];
+    produces: string[];
+    stageIds: string[];
+    projectionModes?: GraphIndexProjectionMode[];
+    authority?: string;
+    contentHash?: string;
+    counters: Record<string, number>;
     message: string;
 }
 
@@ -1620,6 +2871,7 @@ export interface GraphIndexRunReceipt {
     status: GraphIndexRunStatus;
     modelSelection: GraphIndexModelSelection;
     postProcessMode?: GraphIndexPostProcessMode;
+    durabilityMode?: GraphBuildDurabilityMode;
     postProcessFingerprint?: string;
     postProcessDiscoveryFingerprint?: string;
     postProcessCacheHit?: boolean;
@@ -1629,10 +2881,26 @@ export interface GraphIndexRunReceipt {
     durationMs: number;
     stageReceipts: GraphIndexStageReceipt[];
     projectionReceipts: GraphIndexProjectionReceipt[];
+    layerReceipts: GraphIndexLayerReceipt[];
     snapshotId?: string;
+    authorityContract?: GraphSnapshotAuthorityContract;
+    generationReceiptId?: string;
+    generationDigestSha256?: string;
     counters: GraphRebuildCounters;
     dropReasons: GraphRebuildDropReasons;
     message: string;
+    spanId?: string;
+    parentSpanId?: null;
+    pathId?: string;
+    fallbackCount?: number;
+    replayManifest?: GraphRebuildReplayManifest;
+    verifiedForceAuthority?: {
+        schemaVersion: 'phoenix-verified-force-authority-ref/v1';
+        snapshotId: string;
+        authorityHash: string;
+        manifestId: string;
+        runHandle: string;
+    };
 }
 
 export interface GraphRebuildCandidate {
@@ -1659,6 +2927,12 @@ export interface BuildGraphRebuildSnapshotInput {
     candidateCount?: number;
     builtAt?: number;
     graphCompilerSidecar?: GraphCompilerDualWriteSidecar;
+    calendarRegistrySnapshot?: CalendarRegistrySnapshot;
+    documentProfileSummary?: GraphDocumentProfileSummary;
+    documentSemanticSummary?: GraphDocumentSemanticSummary;
+    operatorMutationJournal?: GraphOperatorMutationJournal;
+    durabilityMode?: GraphBuildDurabilityMode;
+    cpuProfiler?: GraphRebuildCpuProfiler;
 }
 
 export interface GraphRebuildNoteFolderContext {

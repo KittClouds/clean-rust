@@ -1,0 +1,23 @@
+[package]
+name = "gfm-wgpu-kernel"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[dependencies]
+bytemuck = { version = "1.23", features = ["derive"] }
+pollster = "1.0"
+thiserror = "2.0"
+wgpu = "30.0"
+
+[dev-dependencies]
+g-reasoner-34m-parity = { path = "../g-reasoner-34m-parity" }
+gfm-rag-8m-parity = { path = "../gfm-rag-8m-parity" }
+
+[[bench]]
+name = "distmult_gpu"
+harness = false
+
+[[bench]]
+name = "resident_chain"
+harness = false

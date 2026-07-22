@@ -1,6 +1,6 @@
 use phoenix_store_native_core::{
-    PhoenixGraphPatchStore, PhoenixLexicalQueryStore, PhoenixSemanticGraphPatchStore,
-    PhoenixSemanticIndexStore,
+    PhoenixGraphKernelStoreV2, PhoenixGraphPatchStore, PhoenixLexicalQueryStore,
+    PhoenixSemanticGraphPatchStore, PhoenixSemanticIndexStore,
 };
 use phoenix_types::ScopeKey;
 use serde::{Deserialize, Serialize};
@@ -57,10 +57,16 @@ pub struct GraphRetrievedWorldStateQueryRequest {
     pub valid_at: Option<i64>,
     pub recorded_at: Option<i64>,
     pub include_candidate_graph: bool,
+    #[serde(default = "default_world_state_truth_plane")]
+    pub truth_plane: GraphTruthPlane,
     pub seed_limit: usize,
     pub oversample: usize,
     pub expansion_hops: usize,
     pub region_node_limit: usize,
+}
+
+fn default_world_state_truth_plane() -> GraphTruthPlane {
+    GraphTruthPlane::WorldState
 }
 
 impl Default for GraphRetrievedWorldStateQueryRequest {
@@ -72,6 +78,7 @@ impl Default for GraphRetrievedWorldStateQueryRequest {
             valid_at: Some(now_ms()),
             recorded_at: None,
             include_candidate_graph: true,
+            truth_plane: GraphTruthPlane::WorldState,
             seed_limit: 8,
             oversample: 20,
             expansion_hops: 2,
@@ -220,7 +227,7 @@ pub fn open_retrieved_query_session<S>(
     scope: &ScopeKey,
 ) -> Result<Option<ScopeQuerySession>, GraphQueryError>
 where
-    S: PhoenixGraphPatchStore + PhoenixSemanticGraphPatchStore,
+    S: PhoenixGraphPatchStore + PhoenixSemanticGraphPatchStore + PhoenixGraphKernelStoreV2,
 {
     open_scope_query_session(store, scope)
 }
@@ -243,6 +250,7 @@ pub fn retrieved_world_state<S>(
 ) -> Result<Option<GraphRetrievedWorldStateAnswer>, GraphQueryError>
 where
     S: PhoenixGraphPatchStore
+        + PhoenixGraphKernelStoreV2
         + PhoenixLexicalQueryStore
         + PhoenixSemanticGraphPatchStore
         + PhoenixSemanticIndexStore,
@@ -268,6 +276,7 @@ pub fn retrieved_history<S>(
 ) -> Result<Option<GraphRetrievedHistoryAnswer>, GraphQueryError>
 where
     S: PhoenixGraphPatchStore
+        + PhoenixGraphKernelStoreV2
         + PhoenixLexicalQueryStore
         + PhoenixSemanticGraphPatchStore
         + PhoenixSemanticIndexStore,
@@ -293,6 +302,7 @@ pub fn retrieved_causal_explanation<S>(
 ) -> Result<Option<GraphRetrievedCausalExplanationAnswer>, GraphQueryError>
 where
     S: PhoenixGraphPatchStore
+        + PhoenixGraphKernelStoreV2
         + PhoenixLexicalQueryStore
         + PhoenixSemanticGraphPatchStore
         + PhoenixSemanticIndexStore,
@@ -307,6 +317,7 @@ pub fn retrieved_query<S>(
 ) -> Result<Option<GraphRetrievedQueryAnswer>, GraphQueryError>
 where
     S: PhoenixGraphPatchStore
+        + PhoenixGraphKernelStoreV2
         + PhoenixLexicalQueryStore
         + PhoenixSemanticGraphPatchStore
         + PhoenixSemanticIndexStore,

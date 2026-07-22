@@ -63,6 +63,7 @@ GoKitt/.gocache/
 # Rust target directories
 /target/
 **/target/
+**/.cargo-target-*/
 
 # Large artifacts/binaries
 *.onnx

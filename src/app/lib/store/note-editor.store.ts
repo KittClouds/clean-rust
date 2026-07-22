@@ -19,6 +19,7 @@ import {
     LEGACY_ACTIVE_NOTE_KEY,
     LEGACY_EDITOR_POSITION_KEY,
     OPEN_TABS_STORAGE_KEY,
+    canRevealCachedEditorNote,
     createSessionPositionFromLegacy,
     getFallbackActiveNoteIdFromTabs,
     normalizeEditorSessionState,
@@ -33,6 +34,11 @@ export class NoteEditorStore {
     private readonly isBrowser: boolean;
     private editorSessionState: EditorSessionState = { activeNoteId: null };
     private legacyKeysMigrated = false;
+    private initialSession: {
+        session: EditorSessionState | null;
+        fallbackNoteId: string | null;
+        legacyPosition?: LegacyEditorPosition;
+    } | null = null;
 
     /** ID of the currently open note (null = no note open) */
     readonly activeNoteId = signal<string | null>(null);
@@ -76,8 +82,8 @@ export class NoteEditorStore {
         this.isBrowser = isPlatformBrowser(platformId);
         console.log('[NoteEditorStore] Constructor called');
 
-        // NOTE: restoreActiveNote() is NOT called here.
-        // It must be called AFTER Dexie hydration completes (by app.component).
+        // AppComponent may reveal a revisioned Dexie body immediately, then
+        // restoreActiveNote() reconciles it after native hydration completes.
 
         this.saveSubject.pipe(
             debounceTime(300)
@@ -133,6 +139,30 @@ export class NoteEditorStore {
     }
 
     /**
+     * Reveal a complete cached active note without waiting for native recovery.
+     * The authoritative restore still runs after hydration and may replace it.
+     */
+    async restoreCachedActiveNote(): Promise<boolean> {
+        if (!this.isBrowser) return false;
+
+        const resolved = await this.loadInitialEditorSession();
+        const targetNoteId = resolved.session?.activeNoteId ?? resolved.fallbackNoteId;
+        if (!targetNoteId) return false;
+
+        const cachedNote = await db.notes.get(targetNoteId);
+        if (!canRevealCachedEditorNote(cachedNote)) return false;
+
+        const resolvedPosition = this.resolveRestorablePosition(cachedNote, resolved.legacyPosition);
+        this.pendingPosition = resolvedPosition;
+        this.editorSessionState = resolvedPosition
+            ? { activeNoteId: targetNoteId, position: resolvedPosition }
+            : { activeNoteId: targetNoteId };
+        this.activeNoteId.set(targetNoteId);
+        console.log(`[NoteEditorStore] Revealed cached active note: ${targetNoteId}`);
+        return true;
+    }
+
+    /**
      * Restore the previously-active note from Dexie settings.
      * MUST be called AFTER Dexie hydration from Phoenix is complete.
      */
@@ -156,6 +186,7 @@ export class NoteEditorStore {
             if (!noteHeader) {
                 console.log(`[NoteEditorStore] Note ${targetNoteId} no longer exists; clearing editor session`);
                 this.clearStoredEditorSession();
+                this.activeNoteId.set(null);
                 return;
             }
 
@@ -183,6 +214,12 @@ export class NoteEditorStore {
         const position = this.pendingPosition;
         this.pendingPosition = null;
         return position;
+    }
+
+    async hasStoredActiveNoteIntent(): Promise<boolean> {
+        if (!this.isBrowser) return false;
+        const resolved = await this.loadInitialEditorSession();
+        return Boolean(resolved.session?.activeNoteId ?? resolved.fallbackNoteId);
     }
 
     /**
@@ -404,14 +441,18 @@ export class NoteEditorStore {
         fallbackNoteId: string | null;
         legacyPosition?: LegacyEditorPosition;
     }> {
+        if (this.initialSession) {
+            return this.initialSession;
+        }
         const sessionSetting = await db.settings.get(EDITOR_SESSION_KEY);
         const normalizedSession = normalizeEditorSessionState(sessionSetting?.value);
         if (normalizedSession) {
             this.legacyKeysMigrated = true;
-            return {
+            this.initialSession = {
                 session: normalizedSession,
                 fallbackNoteId: null,
             };
+            return this.initialSession;
         }
 
         const legacyActiveSetting = await db.settings.get(LEGACY_ACTIVE_NOTE_KEY);
@@ -422,17 +463,19 @@ export class NoteEditorStore {
         const legacyPosition = normalizeLegacyEditorPosition(legacyPositionSetting?.value);
 
         if (legacyActiveNoteId) {
-            return {
+            this.initialSession = {
                 session: { activeNoteId: legacyActiveNoteId },
                 fallbackNoteId: null,
                 legacyPosition,
             };
+            return this.initialSession;
         }
 
         const tabsSetting = await db.settings.get(OPEN_TABS_STORAGE_KEY);
-        return {
+        this.initialSession = {
             session: null,
             fallbackNoteId: getFallbackActiveNoteIdFromTabs(tabsSetting?.value),
         };
+        return this.initialSession;
     }
 }

@@ -1,0 +1,30 @@
+[package]
+name = "phoenix-discovery-community"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[features]
+default = []
+wgpu-shadow = ["dep:graph-analytics-wgpu-kernel"]
+
+[dependencies]
+blake3 = "1.8"
+graph-analytics-wgpu-kernel = { path = "../../../phoenix-spikes/graph-analytics-wgpu-kernel", optional = true }
+hashbrown.workspace = true
+memmap2.workspace = true
+phoenix-discovery-view = { path = "../phoenix-discovery-view" }
+phoenix-graph-kernel = { path = "../phoenix-graph-kernel" }
+rayon = "1.11"
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+zerocopy.workspace = true
+
+[dev-dependencies]
+tempfile = "3.23"
+
+[[bin]]
+name = "discovery-community-bench"
+path = "src/bin/discovery_community_bench.rs"

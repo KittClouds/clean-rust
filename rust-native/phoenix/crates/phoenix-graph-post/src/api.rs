@@ -1,8 +1,10 @@
 //! Stable public entrypoints for the graph projection compiler.
 //!
 //! This stage compiles a shadow claim/event/state/view projection from
-//! post-ingest sidecars and persists it as a `GraphScopeSidecar` without
-//! disturbing the ingest hot path.
+//! immutable post-ingest sidecars, stores proposal metadata in a
+//! `GraphScopeSidecar`, and appends the asserted projection batch through the
+//! graph truth commit lane. Query entrypoints hydrate asserted truth from
+//! committed kernel state; sidecars are only candidate/explanation inputs.
 
 use phoenix_graph::GraphBackendError;
 use phoenix_graph_kernel::{
@@ -14,17 +16,20 @@ use phoenix_graph_kernel::{
 use phoenix_semantic_v2::{GraphScopeSidecar, SemanticGraphScopeSidecar};
 use phoenix_store_native_core::{
     PhoenixArchiveStoreV2, PhoenixCausalPatchStore, PhoenixEventIdentityPatchStore,
-    PhoenixGraphPatchStore, PhoenixMemoryPatchStore, PhoenixScopeRuntimeStore,
-    PhoenixSemanticGraphPatchStore, PhoenixTemporalPatchStore, StoreError,
+    PhoenixGraphKernelStoreV2, PhoenixGraphLearningStore, PhoenixGraphPatchStore,
+    PhoenixMemoryPatchStore, PhoenixScopeRuntimeStore, PhoenixSemanticGraphPatchStore,
+    PhoenixTemporalPatchStore, StoreError,
 };
+pub use phoenix_types::GraphTruthPlane;
 use phoenix_types::{ScopeKey, SessionId};
 use serde::{Deserialize, Serialize};
 
 use crate::phase4_contract::{
     GraphPathRerankScore, GraphPhase4RerankScore, GraphStructuralRerankScore,
 };
-pub use crate::query_session::open_scope_query_session_from_sidecars;
-pub use crate::query_session::{open_scope_query_session, ScopeQuerySession};
+pub use crate::query_session::{
+    open_scope_query_session, open_scope_query_session_from_committed_snapshot, ScopeQuerySession,
+};
 pub use crate::retrieval::{
     open_retrieved_query_session, retrieved_causal_explanation,
     retrieved_causal_explanation_with_session, retrieved_history, retrieved_history_with_session,
@@ -52,20 +57,7 @@ pub enum GraphQueryError {
     Kernel(#[from] GraphBackendError),
 }
 
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub enum GraphTruthPlane {
-    WorldState,
-    Reported,
-    Conditional,
-    Hypothetical,
-    Planned,
-    Mixed,
-    #[default]
-    Unknown,
-}
-
-#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct GraphWorldStateQueryRequest {
     pub entity_id: String,
@@ -73,6 +65,25 @@ pub struct GraphWorldStateQueryRequest {
     pub valid_at: Option<i64>,
     pub recorded_at: Option<i64>,
     pub include_candidate_graph: bool,
+    #[serde(default = "default_world_state_truth_plane")]
+    pub truth_plane: GraphTruthPlane,
+}
+
+fn default_world_state_truth_plane() -> GraphTruthPlane {
+    GraphTruthPlane::WorldState
+}
+
+impl Default for GraphWorldStateQueryRequest {
+    fn default() -> Self {
+        Self {
+            entity_id: String::new(),
+            slot_key: String::new(),
+            valid_at: None,
+            recorded_at: None,
+            include_candidate_graph: false,
+            truth_plane: GraphTruthPlane::WorldState,
+        }
+    }
 }
 
 #[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
@@ -400,7 +411,7 @@ pub fn persist_patch_sidecar<S>(
     created_at: i64,
 ) -> Result<phoenix_semantic_v2::GraphScopeSidecar, StoreError>
 where
-    S: PhoenixGraphPatchStore + PhoenixSemanticGraphPatchStore,
+    S: PhoenixGraphPatchStore + PhoenixGraphKernelStoreV2 + PhoenixGraphLearningStore,
 {
     persist_graph_patch_sidecar(store, batch, created_at)
 }
@@ -412,7 +423,7 @@ pub fn persist_patch_sidecar_with_existing<S>(
     existing: Option<&phoenix_semantic_v2::GraphScopeSidecar>,
 ) -> Result<phoenix_semantic_v2::GraphScopeSidecar, StoreError>
 where
-    S: PhoenixGraphPatchStore,
+    S: PhoenixGraphPatchStore + PhoenixGraphKernelStoreV2 + PhoenixGraphLearningStore,
 {
     persist_graph_patch_sidecar_with_existing_impl(store, batch, created_at, existing)
 }
@@ -425,7 +436,7 @@ pub fn current_slot<S>(
     recorded_at: Option<i64>,
 ) -> Result<Option<GraphRankedSlotAnswer>, GraphQueryError>
 where
-    S: PhoenixGraphPatchStore + PhoenixSemanticGraphPatchStore,
+    S: PhoenixGraphPatchStore + PhoenixSemanticGraphPatchStore + PhoenixGraphKernelStoreV2,
 {
     slot_at(
         store,
@@ -436,6 +447,7 @@ where
             valid_at: Some(now_ms()),
             recorded_at,
             include_candidate_graph: false,
+            truth_plane: GraphTruthPlane::WorldState,
         },
     )
 }
@@ -446,7 +458,7 @@ pub fn slot_at<S>(
     request: &GraphWorldStateQueryRequest,
 ) -> Result<Option<GraphRankedSlotAnswer>, GraphQueryError>
 where
-    S: PhoenixGraphPatchStore + PhoenixSemanticGraphPatchStore,
+    S: PhoenixGraphPatchStore + PhoenixSemanticGraphPatchStore + PhoenixGraphKernelStoreV2,
 {
     let _timer = measure_graph_runtime(GraphRuntimeMetric::RankedWorldState);
     let Some(kernel) = load_projection_kernel(store, scope)? else {
@@ -465,6 +477,7 @@ where
         include_candidate_graph: request.include_candidate_graph,
     });
     Ok(Some(rank_world_state_answer(
+        request.truth_plane,
         &snapshot.vertices,
         &snapshot.candidate_edges,
         &answer,
@@ -487,7 +500,12 @@ pub fn slot_at_with_session(
         recorded_at: request.recorded_at,
         include_candidate_graph: request.include_candidate_graph,
     });
-    rank_world_state_answer(&snapshot.vertices, &snapshot.candidate_edges, &answer)
+    rank_world_state_answer(
+        request.truth_plane,
+        &snapshot.vertices,
+        &snapshot.candidate_edges,
+        &answer,
+    )
 }
 
 pub fn what_is_unresolved<S>(
@@ -496,7 +514,7 @@ pub fn what_is_unresolved<S>(
     request: &KernelUnresolvedQueryRequest,
 ) -> Result<Option<Vec<KernelStateIssue>>, GraphQueryError>
 where
-    S: PhoenixGraphPatchStore + PhoenixSemanticGraphPatchStore,
+    S: PhoenixGraphPatchStore + PhoenixSemanticGraphPatchStore + PhoenixGraphKernelStoreV2,
 {
     let Some(kernel) = load_projection_kernel(store, scope)? else {
         return Ok(None);
@@ -517,7 +535,7 @@ pub fn what_changed<S>(
     request: &KernelWhatChangedRequest,
 ) -> Result<Option<Vec<KernelStateChange>>, GraphQueryError>
 where
-    S: PhoenixGraphPatchStore + PhoenixSemanticGraphPatchStore,
+    S: PhoenixGraphPatchStore + PhoenixSemanticGraphPatchStore + PhoenixGraphKernelStoreV2,
 {
     let Some(kernel) = load_projection_kernel(store, scope)? else {
         return Ok(None);
@@ -538,7 +556,7 @@ pub fn history<S>(
     request: &GraphHistoryQueryRequest,
 ) -> Result<Option<GraphRankedHistoryAnswer>, GraphQueryError>
 where
-    S: PhoenixGraphPatchStore + PhoenixSemanticGraphPatchStore,
+    S: PhoenixGraphPatchStore + PhoenixSemanticGraphPatchStore + PhoenixGraphKernelStoreV2,
 {
     let _timer = measure_graph_runtime(GraphRuntimeMetric::RankedHistory);
     let Some(kernel) = load_projection_kernel(store, scope)? else {
@@ -632,7 +650,7 @@ pub fn causal_explanation<S>(
     request: &GraphCausalExplanationQueryRequest,
 ) -> Result<Option<GraphRankedCausalExplanationAnswer>, GraphQueryError>
 where
-    S: PhoenixGraphPatchStore + PhoenixSemanticGraphPatchStore,
+    S: PhoenixGraphPatchStore + PhoenixSemanticGraphPatchStore + PhoenixGraphKernelStoreV2,
 {
     let _timer = measure_graph_runtime(GraphRuntimeMetric::RankedCausalExplanation);
     let Some(kernel) = load_projection_kernel(store, scope)? else {
@@ -707,7 +725,7 @@ pub fn ranked_query<S>(
     request: &GraphRankedQueryRequest,
 ) -> Result<Option<GraphRankedQueryAnswer>, GraphQueryError>
 where
-    S: PhoenixGraphPatchStore + PhoenixSemanticGraphPatchStore,
+    S: PhoenixGraphPatchStore + PhoenixSemanticGraphPatchStore + PhoenixGraphKernelStoreV2,
 {
     match request {
         GraphRankedQueryRequest::WorldState { request } => slot_at(store, scope, request)
@@ -742,23 +760,34 @@ pub fn ranked_query_with_session(
 }
 
 pub(crate) fn rank_world_state_answer(
+    requested_plane: GraphTruthPlane,
     vertices: &[KernelVertex],
     candidate_edges: &[KernelEdge],
     answer: &KernelSlotAnswer,
 ) -> GraphRankedSlotAnswer {
     let claim_by_id = claim_vertex_index(vertices);
+    let vertex_by_id = vertex_index(vertices);
 
     let mut candidates = Vec::new();
     if let Some(active) = answer.active_state.as_ref() {
         candidates.push(rank_candidate(
+            requested_plane,
             active,
             answer,
             candidate_edges,
             &claim_by_id,
+            &vertex_by_id,
         ));
     }
     for state in &answer.competing_states {
-        candidates.push(rank_candidate(state, answer, candidate_edges, &claim_by_id));
+        candidates.push(rank_candidate(
+            requested_plane,
+            state,
+            answer,
+            candidate_edges,
+            &claim_by_id,
+            &vertex_by_id,
+        ));
     }
     candidates.sort_by(|left, right| {
         right
@@ -820,6 +849,7 @@ pub fn rank_history_answer(
     gaps: &[KernelStateIssue],
 ) -> GraphRankedHistoryAnswer {
     let claim_by_id = claim_vertex_index(graph_vertices);
+    let vertex_by_id = vertex_index(graph_vertices);
     let mut candidates = changes
         .iter()
         .map(|change| {
@@ -831,6 +861,7 @@ pub fn rank_history_answer(
                 conflicts,
                 gaps,
                 &claim_by_id,
+                &vertex_by_id,
                 request.truth_plane,
                 request.since_valid_at,
                 until_valid_at,
@@ -1004,13 +1035,16 @@ pub fn candidate_graph_batch_for_query<'a>(
         .map(|sidecar| &sidecar.candidate_graph_batch)
 }
 
-pub(crate) fn projection_kernel_from_batch_refs(
-    graph_batch: &KernelMutationBatch,
+pub(crate) fn projection_kernel_from_committed_snapshot(
+    snapshot: phoenix_graph_kernel::KernelGraphSnapshot,
     candidate_graph_batch: Option<&KernelMutationBatch>,
 ) -> Result<PhoenixGraphKernel, GraphQueryError> {
     let _timer = measure_graph_runtime(GraphRuntimeMetric::BuildProjectionKernel);
-    PhoenixGraphKernel::from_projection_batches(graph_batch, candidate_graph_batch)
-        .map_err(GraphQueryError::from)
+    let mut kernel = PhoenixGraphKernel::from_snapshot(snapshot, None);
+    if let Some(candidate_graph_batch) = candidate_graph_batch {
+        kernel.apply_kernel_batch(candidate_graph_batch.clone())?;
+    }
+    Ok(kernel)
 }
 
 pub(crate) fn load_projection_kernel<S>(
@@ -1018,35 +1052,48 @@ pub(crate) fn load_projection_kernel<S>(
     scope: &ScopeKey,
 ) -> Result<Option<PhoenixGraphKernel>, GraphQueryError>
 where
-    S: PhoenixGraphPatchStore + PhoenixSemanticGraphPatchStore,
+    S: PhoenixGraphPatchStore + PhoenixSemanticGraphPatchStore + PhoenixGraphKernelStoreV2,
 {
     let _timer = measure_graph_runtime(GraphRuntimeMetric::LoadProjectionKernel);
-    let Some(graph_sidecar) = store.load_graph_patch_sidecar(scope)? else {
-        return Ok(None);
-    };
+    let snapshot = store.load_live_kernel_snapshot()?;
+    let graph_sidecar = store.load_graph_patch_sidecar(scope)?;
     let semantic_sidecar = store.load_semantic_graph_patch_sidecar(scope)?;
-    let candidate_graph_batch =
-        candidate_graph_batch_for_query(&graph_sidecar, semantic_sidecar.as_ref());
-    let asserted_vertices = graph_sidecar.graph_batch.vertices.len();
-    let asserted_edges = graph_sidecar.graph_batch.edges.len();
+    let candidate_graph_batch = graph_sidecar
+        .as_ref()
+        .and_then(|sidecar| candidate_graph_batch_for_query(sidecar, semantic_sidecar.as_ref()));
+    let asserted_vertices = snapshot.vertices.len();
+    let asserted_edges = snapshot.asserted_edges.len();
     let candidate_edges = candidate_graph_batch.map_or(0, |batch| batch.edges.len());
-    let kernel =
-        projection_kernel_from_batch_refs(&graph_sidecar.graph_batch, candidate_graph_batch)?;
+    if asserted_vertices == 0
+        && asserted_edges == 0
+        && snapshot.candidate_edges.is_empty()
+        && candidate_edges == 0
+    {
+        return Ok(None);
+    }
+    let kernel = projection_kernel_from_committed_snapshot(snapshot, candidate_graph_batch)?;
     record_projection_kernel_load(asserted_vertices, asserted_edges, candidate_edges);
     Ok(Some(kernel))
 }
 
 fn rank_candidate(
+    requested_plane: GraphTruthPlane,
     state: &phoenix_graph_kernel::KernelSlotState,
     answer: &KernelSlotAnswer,
     candidate_edges: &[KernelEdge],
     claim_by_id: &std::collections::BTreeMap<String, &KernelVertex>,
+    vertex_by_id: &std::collections::BTreeMap<&str, &KernelVertex>,
 ) -> GraphRankedStateCandidate {
     let (claim_vertices, supporting_modalities, supporting_source_classes) =
         claim_context_for_supporting_claims(state.supporting_claim_ids.as_slice(), claim_by_id);
-    let truth_plane = derive_truth_plane(&supporting_modalities);
-    let plane_allowed = plane_allowed_for(GraphTruthPlane::WorldState, truth_plane);
-    let plane_gate = plane_gate(GraphTruthPlane::WorldState, truth_plane);
+    let truth_plane = state_candidate_truth_plane(
+        state,
+        vertex_by_id,
+        claim_vertices.as_slice(),
+        supporting_modalities.as_slice(),
+    );
+    let plane_allowed = plane_allowed_for(requested_plane, truth_plane);
+    let plane_gate = plane_gate(requested_plane, truth_plane);
     let status_prior = status_prior(state.status.as_deref());
     let support_strength = support_strength(state, claim_vertices.as_slice());
     let temporal_fitness = temporal_fitness(&state.temporal);
@@ -1091,49 +1138,29 @@ fn rank_candidate(
 }
 
 fn derive_truth_plane(modalities: &[String]) -> GraphTruthPlane {
-    let mut saw_world = false;
-    let mut saw_reported = false;
-    let mut saw_conditional = false;
-    let mut saw_hypothetical = false;
-    let mut saw_planned = false;
+    GraphTruthPlane::from_modalities(modalities.iter().map(String::as_str))
+}
 
-    for modality in modalities {
-        match modality.as_str() {
-            "asserted" | "observed" | "inferred" => saw_world = true,
-            "reported" => saw_reported = true,
-            "conditional" => saw_conditional = true,
-            "hypothetical" => saw_hypothetical = true,
-            "planned" => saw_planned = true,
-            _ => {}
-        }
+fn state_candidate_truth_plane(
+    state: &phoenix_graph_kernel::KernelSlotState,
+    vertex_by_id: &std::collections::BTreeMap<&str, &KernelVertex>,
+    claim_vertices: &[&KernelVertex],
+    supporting_modalities: &[String],
+) -> GraphTruthPlane {
+    if let Some(plane) = vertex_by_id
+        .get(state.state_vertex_id.as_str())
+        .and_then(|vertex| committed_vertex_truth_plane(vertex))
+    {
+        return plane;
     }
-
-    let count = [
-        saw_world,
-        saw_reported,
-        saw_conditional,
-        saw_hypothetical,
-        saw_planned,
-    ]
-    .into_iter()
-    .filter(|value| *value)
-    .count();
-    if count > 1 {
-        return GraphTruthPlane::Mixed;
+    if let Some(plane) = merge_truth_planes(
+        claim_vertices
+            .iter()
+            .filter_map(|vertex| committed_vertex_truth_plane(vertex)),
+    ) {
+        return plane;
     }
-    if saw_world {
-        GraphTruthPlane::WorldState
-    } else if saw_reported {
-        GraphTruthPlane::Reported
-    } else if saw_conditional {
-        GraphTruthPlane::Conditional
-    } else if saw_hypothetical {
-        GraphTruthPlane::Hypothetical
-    } else if saw_planned {
-        GraphTruthPlane::Planned
-    } else {
-        GraphTruthPlane::Unknown
-    }
+    derive_truth_plane(supporting_modalities)
 }
 
 fn status_prior(status: Option<&str>) -> f64 {
@@ -1223,6 +1250,7 @@ fn rank_history_candidate(
     conflicts: &[KernelStateIssue],
     gaps: &[KernelStateIssue],
     claim_by_id: &std::collections::BTreeMap<String, &KernelVertex>,
+    vertex_by_id: &std::collections::BTreeMap<&str, &KernelVertex>,
     requested_plane: GraphTruthPlane,
     since_valid_at: i64,
     until_valid_at: i64,
@@ -1232,7 +1260,12 @@ fn rank_history_candidate(
             change.state.supporting_claim_ids.as_slice(),
             claim_by_id,
         );
-    let truth_plane = derive_truth_plane(&supporting_modalities);
+    let truth_plane = state_candidate_truth_plane(
+        &change.state,
+        vertex_by_id,
+        claim_vertices.as_slice(),
+        supporting_modalities.as_slice(),
+    );
     let plane_allowed = plane_allowed_for(requested_plane, truth_plane);
     let plane_gate = plane_gate(requested_plane, truth_plane);
     let status_prior = status_prior(change.state.status.as_deref());
@@ -1522,7 +1555,8 @@ fn rank_causal_path(
     candidate: &KernelCausalPathCandidateView<'_>,
 ) -> GraphRankedCausalPath {
     let supporting_modalities = candidate.supporting_modalities.clone();
-    let truth_plane = derive_truth_plane(&supporting_modalities);
+    let truth_plane =
+        causal_path_truth_plane(vertex_by_id, candidate, supporting_modalities.as_slice());
     let plane_allowed = plane_allowed_for(request.truth_plane, truth_plane);
     let plane_gate = plane_gate(request.truth_plane, truth_plane);
     let path_stability = candidate.features.path_stability;
@@ -1606,6 +1640,31 @@ fn rank_causal_path(
         event_rerank: None,
         graph_structural_rerank: None,
     }
+}
+
+fn causal_path_truth_plane(
+    vertex_by_id: &std::collections::BTreeMap<&str, &KernelVertex>,
+    candidate: &KernelCausalPathCandidateView<'_>,
+    supporting_modalities: &[String],
+) -> GraphTruthPlane {
+    if let Some(plane) =
+        merge_truth_planes(candidate.path_vertex_ids.iter().filter_map(|vertex_id| {
+            vertex_by_id
+                .get(*vertex_id)
+                .and_then(|vertex| committed_vertex_truth_plane(vertex))
+        }))
+    {
+        return plane;
+    }
+    if let Some(plane) = merge_truth_planes(
+        candidate
+            .path_edges
+            .iter()
+            .filter_map(|edge| committed_edge_truth_plane(edge)),
+    ) {
+        return plane;
+    }
+    derive_truth_plane(supporting_modalities)
 }
 
 fn causal_query_time_alignment(
@@ -1698,6 +1757,90 @@ fn normalize_modality_label(label: &str) -> Option<&'static str> {
     }
 }
 
+fn committed_vertex_truth_plane(vertex: &KernelVertex) -> Option<GraphTruthPlane> {
+    truth_plane_from_metadata(&vertex.attributes)
+        .or_else(|| truth_plane_from_metadata(&vertex.value))
+}
+
+fn committed_edge_truth_plane(edge: &KernelEdge) -> Option<GraphTruthPlane> {
+    truth_plane_from_metadata(&edge.attributes)
+        .or_else(|| edge.data.as_ref().and_then(truth_plane_from_metadata))
+}
+
+fn truth_plane_from_metadata(value: &serde_json::Value) -> Option<GraphTruthPlane> {
+    truth_plane_field(value, "truthPlane")
+        .or_else(|| truth_plane_field(value, "truth_plane"))
+        .or_else(|| nested_truth_plane_field(value, "truth"))
+        .or_else(|| nested_truth_plane_field(value, "graphTruth"))
+}
+
+fn nested_truth_plane_field(value: &serde_json::Value, key: &str) -> Option<GraphTruthPlane> {
+    value.get(key).and_then(|nested| {
+        truth_plane_field(nested, "plane")
+            .or_else(|| truth_plane_field(nested, "truthPlane"))
+            .or_else(|| truth_plane_field(nested, "truth_plane"))
+    })
+}
+
+fn truth_plane_field(value: &serde_json::Value, key: &str) -> Option<GraphTruthPlane> {
+    value
+        .get(key)
+        .and_then(serde_json::Value::as_str)
+        .and_then(graph_truth_plane_label)
+}
+
+fn graph_truth_plane_label(label: &str) -> Option<GraphTruthPlane> {
+    let value = label.trim();
+    if value.eq_ignore_ascii_case("worldState")
+        || value.eq_ignore_ascii_case("world")
+        || value.eq_ignore_ascii_case("asserted")
+        || value.eq_ignore_ascii_case("observed")
+        || value.eq_ignore_ascii_case("inferred")
+        || value.eq_ignore_ascii_case("negated")
+    {
+        return Some(GraphTruthPlane::WorldState);
+    }
+    if value.eq_ignore_ascii_case("reported")
+        || value.eq_ignore_ascii_case("reportedSpeech")
+        || value.eq_ignore_ascii_case("attributedClaim")
+    {
+        return Some(GraphTruthPlane::Reported);
+    }
+    if value.eq_ignore_ascii_case("conditional") {
+        return Some(GraphTruthPlane::Conditional);
+    }
+    if value.eq_ignore_ascii_case("hypothetical") {
+        return Some(GraphTruthPlane::Hypothetical);
+    }
+    if value.eq_ignore_ascii_case("planned") {
+        return Some(GraphTruthPlane::Planned);
+    }
+    if value.eq_ignore_ascii_case("mixed") {
+        return Some(GraphTruthPlane::Mixed);
+    }
+    if value.eq_ignore_ascii_case("unknown") {
+        return Some(GraphTruthPlane::Unknown);
+    }
+    None
+}
+
+fn merge_truth_planes(
+    planes: impl IntoIterator<Item = GraphTruthPlane>,
+) -> Option<GraphTruthPlane> {
+    let mut merged = None;
+    for plane in planes {
+        if !plane.is_assertable() {
+            return Some(plane);
+        }
+        match merged {
+            None => merged = Some(plane),
+            Some(existing) if existing == plane => {}
+            Some(_) => return Some(GraphTruthPlane::Mixed),
+        }
+    }
+    merged
+}
+
 fn collect_timeline_issues(
     vertices: &[KernelVertex],
     issue_kind: &str,
@@ -1788,12 +1931,7 @@ fn history_recency_score(
 fn plane_allowed_for(requested_plane: GraphTruthPlane, candidate_plane: GraphTruthPlane) -> bool {
     match requested_plane {
         GraphTruthPlane::Unknown | GraphTruthPlane::Mixed => true,
-        GraphTruthPlane::WorldState => {
-            matches!(
-                candidate_plane,
-                GraphTruthPlane::WorldState | GraphTruthPlane::Unknown
-            )
-        }
+        GraphTruthPlane::WorldState => candidate_plane == GraphTruthPlane::WorldState,
         GraphTruthPlane::Reported
         | GraphTruthPlane::Conditional
         | GraphTruthPlane::Hypothetical
@@ -1846,16 +1984,93 @@ fn now_ms() -> i64 {
 mod tests {
     use super::*;
     use phoenix_graph_kernel::{
-        KernelBiTemporal, KernelEdge, KernelEdgeType, KernelGraphLayer, KernelMutationBatch,
+        GraphTruthCommit, KernelBiTemporal, KernelCheckpointData, KernelEdge, KernelEdgeType,
+        KernelGraphLayer, KernelGraphSnapshot, KernelJournalEntry, KernelMutationBatch,
         KernelMutationScope, KernelProvenance, KernelRelationClass, KernelVertex,
-        KernelVertexClass, KernelVertexId,
+        KernelVertexClass, KernelVertexId, PhoenixGraphKernel,
     };
     use phoenix_semantic_v2::{GraphScopeSidecar, SemanticGraphScopeSidecar};
-    use phoenix_store_native_core::{PhoenixGraphPatchStore, PhoenixSemanticGraphPatchStore};
+    use phoenix_store_native_core::{
+        GraphTruthCommitAppend, PhoenixGraphKernelStoreV2, PhoenixGraphPatchStore,
+        PhoenixSemanticGraphPatchStore,
+    };
 
     #[derive(Clone, Default)]
     struct TestGraphStore {
         sidecar: Option<GraphScopeSidecar>,
+    }
+
+    impl PhoenixGraphKernelStoreV2 for TestGraphStore {
+        fn init_graph_kernel_schema(&self) -> Result<(), StoreError> {
+            Ok(())
+        }
+
+        fn load_live_kernel_snapshot(&self) -> Result<KernelGraphSnapshot, StoreError> {
+            self.sidecar
+                .as_ref()
+                .map(|sidecar| {
+                    PhoenixGraphKernel::from_projection_batches(&sidecar.graph_batch, None)
+                        .map(|kernel| kernel.snapshot_kernel())
+                        .map_err(|error| StoreError::Query(error.to_string()))
+                })
+                .unwrap_or_else(|| Ok(KernelGraphSnapshot::default()))
+        }
+
+        fn load_kernel_checkpoint(&self) -> Result<Option<KernelCheckpointData>, StoreError> {
+            Ok(None)
+        }
+
+        fn write_kernel_checkpoint(
+            &self,
+            _generation: u64,
+            _source_revision: &str,
+            snapshot: &KernelGraphSnapshot,
+        ) -> Result<KernelCheckpointData, StoreError> {
+            Ok(KernelCheckpointData {
+                snapshot: snapshot.clone(),
+                ..Default::default()
+            })
+        }
+
+        fn load_kernel_journal_after(
+            &self,
+            _generation: u64,
+        ) -> Result<Vec<KernelJournalEntry>, StoreError> {
+            Ok(Vec::new())
+        }
+
+        fn append_graph_truth_commit(
+            &self,
+            _commit: &GraphTruthCommit,
+        ) -> Result<GraphTruthCommitAppend, StoreError> {
+            Ok(GraphTruthCommitAppend::Appended)
+        }
+
+        fn load_graph_truth_commit(
+            &self,
+            _commit_id: &str,
+        ) -> Result<Option<GraphTruthCommit>, StoreError> {
+            Ok(None)
+        }
+
+        fn load_graph_truth_commits(&self) -> Result<Vec<GraphTruthCommit>, StoreError> {
+            Ok(Vec::new())
+        }
+
+        fn kernel_generation_for_commit(
+            &self,
+            _commit_id: &str,
+        ) -> Result<Option<u64>, StoreError> {
+            Ok(None)
+        }
+
+        fn kernel_current_generation(&self) -> Result<u64, StoreError> {
+            Ok(0)
+        }
+
+        fn kernel_journal_len(&self) -> Result<usize, StoreError> {
+            Ok(0)
+        }
     }
 
     impl PhoenixGraphPatchStore for TestGraphStore {
@@ -1968,6 +2183,69 @@ mod tests {
         assert!(answer.selected.is_none());
         assert_eq!(answer.candidates.len(), 1);
         assert_eq!(answer.candidates[0].truth_plane, GraphTruthPlane::Reported);
+    }
+
+    #[test]
+    fn current_slot_fails_closed_for_unknown_and_modal_planes() {
+        let scope = ScopeKey::default();
+        let store = TestGraphStore {
+            sidecar: Some(sidecar_for_states(vec![
+                test_claim_with_committed_plane("claim-world", GraphTruthPlane::WorldState),
+                test_claim_without_plane("claim-unknown"),
+                test_claim_with_committed_plane(
+                    "claim-hypothetical",
+                    GraphTruthPlane::Hypothetical,
+                ),
+                test_state_with_committed_plane(
+                    "state-world",
+                    "alice",
+                    "entity.employer",
+                    "Acme",
+                    0.74,
+                    "claim-world",
+                    GraphTruthPlane::WorldState,
+                ),
+                test_state(
+                    "state-unknown",
+                    "alice",
+                    "entity.employer",
+                    "UnmarkedRumorCo",
+                    0.99,
+                    "claim-unknown",
+                ),
+                test_state_with_committed_plane(
+                    "state-hypothetical",
+                    "alice",
+                    "entity.employer",
+                    "MaybeCo",
+                    0.98,
+                    "claim-hypothetical",
+                    GraphTruthPlane::Hypothetical,
+                ),
+            ])),
+        };
+
+        let answer = current_slot(&store, &scope, "alice", "entity.employer", Some(100))
+            .expect("query")
+            .expect("ranked answer");
+        assert!(!answer.abstain);
+        assert_eq!(
+            answer
+                .selected
+                .as_ref()
+                .map(|candidate| candidate.state.value.as_str()),
+            Some("Acme")
+        );
+        assert!(answer.candidates.iter().any(|candidate| {
+            candidate.state.value == "UnmarkedRumorCo"
+                && candidate.truth_plane == GraphTruthPlane::Unknown
+                && !candidate.plane_allowed
+        }));
+        assert!(answer.candidates.iter().any(|candidate| {
+            candidate.state.value == "MaybeCo"
+                && candidate.truth_plane == GraphTruthPlane::Hypothetical
+                && !candidate.plane_allowed
+        }));
     }
 
     #[test]
@@ -2318,6 +2596,22 @@ mod tests {
         }
     }
 
+    fn test_claim_without_plane(claim_id: &str) -> KernelVertex {
+        let mut vertex = test_claim(claim_id, "reported");
+        vertex
+            .value
+            .as_object_mut()
+            .expect("claim value object")
+            .remove("modality");
+        vertex
+    }
+
+    fn test_claim_with_committed_plane(claim_id: &str, plane: GraphTruthPlane) -> KernelVertex {
+        let mut vertex = test_claim_without_plane(claim_id);
+        stamp_test_truth_plane(&mut vertex.attributes, plane);
+        vertex
+    }
+
     fn test_state(
         state_id: &str,
         entity_id: &str,
@@ -2384,6 +2678,39 @@ mod tests {
         vertex.temporal.valid_from = valid_from;
         vertex.temporal.valid_to = valid_to;
         vertex
+    }
+
+    fn test_state_with_committed_plane(
+        state_id: &str,
+        entity_id: &str,
+        slot_key: &str,
+        value: &str,
+        confidence: f64,
+        claim_id: &str,
+        plane: GraphTruthPlane,
+    ) -> KernelVertex {
+        let mut vertex = test_state(state_id, entity_id, slot_key, value, confidence, claim_id);
+        stamp_test_truth_plane(&mut vertex.attributes, plane);
+        vertex
+    }
+
+    fn stamp_test_truth_plane(value: &mut serde_json::Value, plane: GraphTruthPlane) {
+        value.as_object_mut().expect("metadata object").insert(
+            "truthPlane".to_owned(),
+            serde_json::Value::String(test_truth_plane_label(plane).to_owned()),
+        );
+    }
+
+    fn test_truth_plane_label(plane: GraphTruthPlane) -> &'static str {
+        match plane {
+            GraphTruthPlane::WorldState => "worldState",
+            GraphTruthPlane::Reported => "reported",
+            GraphTruthPlane::Conditional => "conditional",
+            GraphTruthPlane::Hypothetical => "hypothetical",
+            GraphTruthPlane::Planned => "planned",
+            GraphTruthPlane::Mixed => "mixed",
+            GraphTruthPlane::Unknown => "unknown",
+        }
     }
 
     fn test_event(

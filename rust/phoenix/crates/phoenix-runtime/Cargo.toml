@@ -33,6 +33,7 @@ phoenix-kernel = { path = "../phoenix-kernel" }
 phoenix-lex = { path = "../phoenix-lex" }
 phoenix-om = { path = "../phoenix-om" }
 phoenix-om-graptor = { path = "../phoenix-om-graptor", optional = true }
+phoenix-research = { path = "../phoenix-research" }
 phoenix-runtime-native = { path = "../phoenix-runtime-native" }
 phoenix-scanner = { path = "../phoenix-scanner" }
 phoenix-semantic-v2 = { path = "../phoenix-semantic-v2" }
@@ -43,6 +44,7 @@ phoenix-store-overgraph = { path = "../phoenix-store-overgraph" }
 phoenix-structure = { path = "../phoenix-structure" }
 phoenix-triverse-v2 = { path = "../phoenix-triverse-v2" }
 phoenix-types = { path = "../phoenix-types" }
+hashbrown.workspace = true
 rustc-hash.workspace = true
 serde.workspace = true
 serde_json.workspace = true

@@ -57,6 +57,7 @@ export type GraphCompilerEvidenceKind =
     | 'modelVote'
     | 'adjudicationVote'
     | 'eventReference'
+    | 'calendarRegistry'
     | 'mentionGraphEdge';
 export type GraphCompilerEvidenceBundleKind =
     | 'span'
@@ -143,6 +144,12 @@ export interface GraphCompilerFactLike {
     status: GraphRebuildAdjudicationStatus | 'prepared' | string;
     evidenceIds: string[];
     confidence: number;
+    semanticSituationId?: string;
+    semanticFrame?: string;
+    factuality?: string;
+    stateIntervalIds?: string[];
+    eventOrderingIds?: string[];
+    temporalConflictIds?: string[];
     compression?: GraphCompilerFactBundleCompression | null;
     commitment?: GraphCompilerFactBundleCommitment | null;
 }
@@ -155,6 +162,10 @@ export interface GraphCompilerFactRole {
     role: string;
     atomId: string;
     confidence: number;
+    semanticRole?: string;
+    slotType?: string;
+    required?: boolean;
+    resolved?: boolean;
 }
 
 export interface GraphCompilerProjectedEdge {
@@ -209,7 +220,7 @@ export interface GraphCompilerProjectedUiEdge extends Omit<GraphRebuildEdge, 'ty
 
 export interface GraphCompilerDualWriteSidecar {
     factGraph: GraphCompilerOutput;
-    projectedUiGraph: GraphCompilerProjectedUiEdge[];
+    projectedUiGraph?: GraphCompilerProjectedUiEdge[];
     receipts?: GraphCompileReceipts;
 }
 
@@ -235,7 +246,7 @@ export function attachGraphCompilerReadModels(
     snapshot.graphCompiler = sidecar.factGraph;
     snapshot.graphCompileReceipts = sidecar.receipts || sidecar.factGraph.receipts;
     snapshot.graphCompilerSource = source;
-    snapshot.projectedUiGraph = sidecar.projectedUiGraph;
+    snapshot.projectedUiGraph = sidecar.projectedUiGraph || projectUiGraphFromCompilerOutput(sidecar.factGraph);
     snapshot.graphModelV2 = buildGraphModelV2FromCompilerOutput(snapshot.id, sidecar.factGraph);
     return snapshot;
 }
@@ -253,6 +264,10 @@ export function buildGraphModelV2FromCompilerOutput(
         role: graphModelRole(role.role),
         targetAtomId: role.atomId,
         confidence: role.confidence,
+        semanticRole: role.semanticRole,
+        slotType: role.slotType,
+        required: role.required,
+        resolved: role.resolved,
     }));
     const projectionEdges = dedupeProjectionEdges(output.projectedEdges.map(graphModelProjectionEdge));
     const laneRoots = graphModelLaneRoots(output.scopeId, atoms, bundles, facts, styleTags);
@@ -339,7 +354,22 @@ function pushGraphModelAtom(atoms: GraphModelV2Atom[], seen: Set<string>, atomRo
 function graphModelFact(fact: GraphCompilerRelationFact, styleTags: GraphModelV2StyleTag[]): GraphModelV2RelationFact {
     const family = factFamily(fact.predicate);
     styleTags.push(styleTag(fact.id, 'fact', 'relationFamily', family), styleTag(fact.id, 'fact', 'stage', fact.status));
-    return { id: fact.id, family, relationType: fact.predicate, lane: signalLane(fact.lane), status: graphStatus(fact.status), confidence: fact.confidence, evidenceIds: fact.evidenceIds, sourceRecordId: fact.sourceRecordId };
+    return {
+        id: fact.id,
+        family,
+        relationType: fact.predicate,
+        lane: signalLane(fact.lane),
+        status: graphStatus(fact.status),
+        confidence: fact.confidence,
+        evidenceIds: fact.evidenceIds,
+        sourceRecordId: fact.sourceRecordId,
+        semanticSituationId: fact.semanticSituationId,
+        semanticFrame: fact.semanticFrame,
+        factuality: fact.factuality,
+        stateIntervalIds: fact.stateIntervalIds,
+        eventOrderingIds: fact.eventOrderingIds,
+        temporalConflictIds: fact.temporalConflictIds,
+    };
 }
 
 function graphModelBundle(bundle: GraphCompilerFactBundle, styleTags: GraphModelV2StyleTag[]): GraphModelV2FactBundle {
@@ -376,7 +406,7 @@ function graphModelAtomKind(kind: GraphCompilerAtomKind): GraphModelV2AtomKind |
 }
 
 function graphModelRole(roleName: string): GraphModelV2FactRole['role'] {
-    if (['subject', 'source', 'target', 'actor', 'speaker', 'listener', 'cause', 'effect', 'object', 'location', 'time', 'state', 'leftMention', 'rightMention', 'evidence'].includes(roleName)) return roleName as GraphModelV2FactRole['role'];
+    if (['subject', 'source', 'target', 'actor', 'speaker', 'listener', 'cause', 'effect', 'object', 'agent', 'bearer', 'experiencer', 'topic', 'recipient', 'theme', 'location', 'time', 'manner', 'instrument', 'purpose', 'condition', 'state', 'leftMention', 'rightMention', 'evidence'].includes(roleName)) return roleName as GraphModelV2FactRole['role'];
     return 'evidence';
 }
 

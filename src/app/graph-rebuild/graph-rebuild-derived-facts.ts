@@ -7,19 +7,36 @@ import type {
     GraphRebuildEventAspect,
     GraphRebuildEventAspectKind,
     GraphRebuildEventCompletion,
+    GraphRebuildChunkSemanticBridge,
+    GraphRebuildChunkSemanticBridgeType,
     GraphRebuildEpisode,
+    GraphRebuildEpisodeConnection,
+    GraphRebuildEpisodeProjectionEdge,
     GraphRebuildEvent,
     GraphRebuildMemoryState,
     GraphRebuildRelationship,
+    GraphRebuildSnapshot,
     GraphRebuildTemporalEdge,
 } from './graph-rebuild-snapshot';
+import type { GraphCrossDocumentBridgeRunCertificate } from './graph-cross-document-bridge-certificate';
+import {
+    buildGraphEpisodeProjectionEdges,
+    episodeProjectionEdgeCounters,
+} from './graph-episode-projection';
 import { buildGraphRebuildCausalEdges } from './graph-rebuild-causal-graph';
+import {
+    assertChunkSemanticBridgeCandidateOnly,
+    chunkSemanticBridgeTypeRank,
+} from './graph-rebuild-chunk-semantic-bridges';
 
 export interface DerivedGraphRebuildFacts {
     relationships: GraphRebuildRelationship[];
     edges: GraphRebuildEdge[];
     events: GraphRebuildEvent[];
     episodes: GraphRebuildEpisode[];
+    chunkSemanticBridges: GraphRebuildChunkSemanticBridge[];
+    episodeConnections: GraphRebuildEpisodeConnection[];
+    episodeProjectionEdges: GraphRebuildEpisodeProjectionEdge[];
     temporalEdges: GraphRebuildTemporalEdge[];
     causalEdges: GraphRebuildCausalEdge[];
     memoryState: GraphRebuildMemoryState[];
@@ -72,7 +89,55 @@ export function deriveGraphRebuildFacts(
     const episodes = buildEpisodes(events);
     const temporalEdges = buildTemporalEdges(events);
     const causalEdges = buildGraphRebuildCausalEdges(events, chunks, noteTexts, causalSidecar);
-    return { relationships, edges, events, episodes, temporalEdges, causalEdges, memoryState };
+    const chunkSemanticBridges = assertChunkSemanticBridgeCandidateOnly([]);
+    const episodeConnections = buildEpisodeConnections(episodes, events, temporalEdges, causalEdges, chunkSemanticBridges);
+    const episodeProjectionEdges = buildGraphEpisodeProjectionEdges(episodes, events, chunks, episodeConnections);
+    return { relationships, edges, events, episodes, chunkSemanticBridges, episodeConnections, episodeProjectionEdges, temporalEdges, causalEdges, memoryState };
+}
+
+export function applyNativeChunkSemanticBridgeCandidates(
+    snapshot: GraphRebuildSnapshot,
+    candidates: GraphRebuildChunkSemanticBridge[],
+    crossDocumentCertificate?: GraphCrossDocumentBridgeRunCertificate,
+): void {
+    const chunkSemanticBridges = assertChunkSemanticBridgeCandidateOnly(attachChunkBridgeEpisodeIds(
+        candidates,
+        snapshot.episodes || [],
+        snapshot.events || [],
+    ));
+    const episodeConnections = buildEpisodeConnections(
+        snapshot.episodes || [],
+        snapshot.events || [],
+        snapshot.temporalEdges || [],
+        snapshot.causalEdges || [],
+        chunkSemanticBridges,
+    );
+    snapshot.chunkSemanticBridges = chunkSemanticBridges;
+    snapshot.crossDocumentBridgeCertificate = crossDocumentCertificate;
+    snapshot.episodeConnections = episodeConnections;
+    snapshot.episodeProjectionEdges = buildGraphEpisodeProjectionEdges(
+        snapshot.episodes || [],
+        snapshot.events || [],
+        snapshot.chunks || [],
+        episodeConnections,
+    );
+    snapshot.counters = {
+        ...snapshot.counters,
+        chunkSemanticBridges: chunkSemanticBridges.length,
+        chunkSetupPayoffBridges: countChunkSemanticBridges(chunkSemanticBridges, 'setup_payoff'),
+        chunkCauseEffectBridges: countChunkSemanticBridges(chunkSemanticBridges, 'cause_effect'),
+        chunkStateDeltaBridges: countChunkSemanticBridges(chunkSemanticBridges, 'state_delta'),
+        chunkRelationshipDeltaBridges: countChunkSemanticBridges(chunkSemanticBridges, 'relationship_delta'),
+        chunkTopicContinuationBridges: countChunkSemanticBridges(chunkSemanticBridges, 'topic_continuation'),
+        chunkEvidenceReframeBridges: countChunkSemanticBridges(chunkSemanticBridges, 'evidence_reframe'),
+        chunkMotifEchoBridges: countChunkSemanticBridges(chunkSemanticBridges, 'motif_echo'),
+        chunkRouteContinuityBridges: countChunkSemanticBridges(chunkSemanticBridges, 'route_continuity'),
+        episodeConnections: episodeConnections.length,
+        episodeTemporalConnections: episodeConnections.filter((connection) => connection.kind === 'episode_temporal').length,
+        episodeCausalConnections: episodeConnections.filter((connection) => connection.kind === 'episode_causal').length,
+        episodeWormholeConnections: episodeConnections.filter((connection) => connection.kind === 'episode_wormhole').length,
+        ...episodeProjectionEdgeCounters(snapshot.episodeProjectionEdges),
+    };
 }
 
 function uniqueEntities(bucket: GraphRebuildEntityAnchor[]): EntityInChunk[] {
@@ -150,7 +215,6 @@ function pairWindow(lower: string, chunk: GraphRebuildChunk, left: EntityInChunk
 }
 
 function inferRelationType(window: PairWindow, chunk?: GraphRebuildChunk): string | null {
-    const text = window.text;
     const between = window.between;
     if ((chunk?.meaningFrame?.role === 'authority_chain' || chunk?.meaningFrame?.authorityCues.length) && hasAny(between, AUTHORITY_RELATION_CUES)) return 'command_or_service_tie';
     if ((chunk?.meaningFrame?.role === 'evidence_block' || chunk?.meaningFrame?.evidenceCues.length) && hasAny(between, EVIDENCE_RELATION_CUES)) return 'documented_in';
@@ -267,17 +331,199 @@ function inferMemoryKey(text: string): string | null {
 
 function buildEpisodes(events: GraphRebuildEvent[]): GraphRebuildEpisode[] {
     const episodes: GraphRebuildEpisode[] = [];
-    for (let index = 0; index < events.length; index += 12) {
-        const group = events.slice(index, index + 12);
-        episodes.push({
-            id: `episode:${group[0]?.noteId || 'unknown'}:${episodes.length}`,
-            noteId: group[0]?.noteId || '',
-            eventIds: group.map((event) => event.id),
-            entityIds: unique(group.flatMap((event) => event.entityIds)),
-            label: `Episode ${episodes.length + 1}`,
-        });
+    for (const noteEvents of eventsByNote(events)) {
+        for (let index = 0; index < noteEvents.length; index += 12) {
+            const group = noteEvents.slice(index, index + 12);
+            const ordinal = Math.floor(index / 12);
+            episodes.push({
+                id: `episode:${group[0]?.noteId || 'unknown'}:${ordinal}`,
+                noteId: group[0]?.noteId || '',
+                eventIds: group.map((event) => event.id),
+                entityIds: unique(group.flatMap((event) => event.entityIds)),
+                label: `Episode ${ordinal + 1}`,
+            });
+        }
     }
     return episodes;
+}
+
+function buildEpisodeConnections(
+    episodes: GraphRebuildEpisode[],
+    events: GraphRebuildEvent[],
+    temporalEdges: GraphRebuildTemporalEdge[],
+    causalEdges: GraphRebuildCausalEdge[],
+    chunkSemanticBridges: GraphRebuildChunkSemanticBridge[],
+): GraphRebuildEpisodeConnection[] {
+    const eventEpisode = episodeByEventId(episodes);
+    const eventById = new Map(events.map((event) => [event.id, event]));
+    const connections = new Map<string, GraphRebuildEpisodeConnection>();
+    for (const edge of temporalEdges) {
+        addEpisodeEdge(connections, 'episode_temporal', 'derived', edge, eventEpisode, eventById);
+    }
+    for (const edge of causalEdges) {
+        addEpisodeEdge(connections, 'episode_causal', 'derived', edge, eventEpisode, eventById);
+    }
+    const structuralKeys = new Set([...connections.values()].map((connection) =>
+        `${connection.sourceEpisodeId}->${connection.targetEpisodeId}`,
+    ));
+    for (const connection of buildEpisodeSemanticWormholes(episodes, events, chunkSemanticBridges, structuralKeys)) {
+        connections.set(connection.id, connection);
+    }
+    return [...connections.values()].sort((left, right) =>
+        episodeConnectionRank(left.kind) - episodeConnectionRank(right.kind)
+        || left.sourceEpisodeId.localeCompare(right.sourceEpisodeId)
+        || left.targetEpisodeId.localeCompare(right.targetEpisodeId)
+        || right.confidence - left.confidence,
+    );
+}
+
+function addEpisodeEdge(
+    connections: Map<string, GraphRebuildEpisodeConnection>,
+    kind: 'episode_temporal' | 'episode_causal',
+    status: 'derived',
+    edge: GraphRebuildTemporalEdge | GraphRebuildCausalEdge,
+    eventEpisode: Map<string, GraphRebuildEpisode>,
+    eventById: Map<string, GraphRebuildEvent>,
+): void {
+    const sourceEpisode = eventEpisode.get(edge.sourceId);
+    const targetEpisode = eventEpisode.get(edge.targetId);
+    if (!sourceEpisode || !targetEpisode || sourceEpisode.id === targetEpisode.id) return;
+    const relationType = kind === 'episode_temporal'
+        ? `episode_${edge.relationType}`
+        : `episode_${edge.relationType}`;
+    const id = `${kind}:${sourceEpisode.id}:${relationType}:${targetEpisode.id}`;
+    const sourceEvent = eventById.get(edge.sourceId);
+    const targetEvent = eventById.get(edge.targetId);
+    const sharedEntityIds = intersect(sourceEpisode.entityIds, targetEpisode.entityIds);
+    const current = connections.get(id);
+    const eventEdgeIds = current ? unique([...current.eventEdgeIds, edge.id]) : [edge.id];
+    const evidenceIds = current ? unique([...current.evidenceIds, ...edge.evidenceIds]) : [...edge.evidenceIds];
+    connections.set(id, {
+        id,
+        kind,
+        sourceEpisodeId: sourceEpisode.id,
+        targetEpisodeId: targetEpisode.id,
+        relationType,
+        eventEdgeIds,
+        evidenceIds,
+        sharedEntityIds,
+        confidence: current ? Math.max(current.confidence, edge.confidence) : edge.confidence,
+        status,
+        rationale: [
+            `${kind}:event_edge_aggregate`,
+            `event_edges:${eventEdgeIds.length}`,
+            sourceEvent && targetEvent ? `boundary:${sourceEvent.label}->${targetEvent.label}` : '',
+            sharedEntityIds.length ? `shared_entities:${sharedEntityIds.length}` : '',
+        ].filter(Boolean),
+    });
+}
+
+function buildEpisodeSemanticWormholes(
+    episodes: GraphRebuildEpisode[],
+    events: GraphRebuildEvent[],
+    chunkSemanticBridges: GraphRebuildChunkSemanticBridge[],
+    structuralKeys: Set<string>,
+): GraphRebuildEpisodeConnection[] {
+    const episodeByEvent = episodeByEventId(episodes);
+    const episodeById = new Map(episodes.map((episode) => [episode.id, episode]));
+    const eventById = new Map(events.map((event) => [event.id, event]));
+    const eventByChunk = new Map(events.filter((event) => event.chunkId).map((event) => [event.chunkId as string, event]));
+    const byPair = new Map<string, GraphRebuildEpisodeConnection>();
+    for (const bridge of chunkSemanticBridges) {
+        const sourceEvent = bridge.sourceEventId ? eventById.get(bridge.sourceEventId) : eventByChunk.get(bridge.sourceChunkId);
+        const targetEvent = bridge.targetEventId ? eventById.get(bridge.targetEventId) : eventByChunk.get(bridge.targetChunkId);
+        const sourceEpisode = bridge.sourceEpisodeId
+            ? episodeById.get(bridge.sourceEpisodeId)
+            : sourceEvent ? episodeByEvent.get(sourceEvent.id) : undefined;
+        const targetEpisode = bridge.targetEpisodeId
+            ? episodeById.get(bridge.targetEpisodeId)
+            : targetEvent ? episodeByEvent.get(targetEvent.id) : undefined;
+        if (!sourceEpisode || !targetEpisode || sourceEpisode.id === targetEpisode.id) continue;
+        if (structuralKeys.has(`${sourceEpisode.id}->${targetEpisode.id}`)) continue;
+        const relationType = `episode_${bridge.bridgeType}`;
+        const id = `episode_wormhole:${sourceEpisode.id}:${bridge.bridgeType}:${targetEpisode.id}`;
+        const current = byPair.get(id);
+        const chunkBridgeIds = unique([...(current?.chunkBridgeIds || []), bridge.id]);
+        byPair.set(id, {
+            id,
+            kind: 'episode_wormhole',
+            sourceEpisodeId: sourceEpisode.id,
+            targetEpisodeId: targetEpisode.id,
+            relationType,
+            bridgeType: bridge.bridgeType,
+            claim: current?.claim || bridge.claim,
+            eventEdgeIds: [],
+            chunkBridgeIds,
+            evidenceIds: unique([...(current?.evidenceIds || []), ...bridge.evidenceIds]),
+            sharedEntityIds: unique([...(current?.sharedEntityIds || []), ...bridge.supportingEntityIds]),
+            confidence: current ? Math.max(current.confidence, bridge.confidence) : bridge.confidence,
+            status: 'overlay_only',
+            semanticVerbs: unique([...(current?.semanticVerbs || []), ...bridge.semanticVerbs]),
+            rationale: unique([
+                ...(current?.rationale || []),
+                'episode_wormhole_overlay:no_topology_commit',
+                'chunk_semantic_bridge_rollup',
+                `bridge_type:${bridge.bridgeType}`,
+                `chunk_bridge_count:${chunkBridgeIds.length}`,
+            ]),
+        });
+    }
+    return [...byPair.values()]
+        .map((connection) => ({
+            ...connection,
+            confidence: clamp(connection.confidence + Math.min(0.08, (connection.chunkBridgeIds?.length || 0) * 0.01), 0, 0.9),
+        }))
+        .sort((left, right) =>
+            chunkSemanticBridgeTypeRank(left.bridgeType || 'topic_continuation') - chunkSemanticBridgeTypeRank(right.bridgeType || 'topic_continuation')
+            || right.confidence - left.confidence
+            || left.id.localeCompare(right.id),
+        )
+        .slice(0, 32);
+}
+
+function attachChunkBridgeEpisodeIds(
+    bridges: GraphRebuildChunkSemanticBridge[],
+    episodes: GraphRebuildEpisode[],
+    events: GraphRebuildEvent[],
+): GraphRebuildChunkSemanticBridge[] {
+    const episodeByEvent = episodeByEventId(episodes);
+    const eventById = new Map(events.map((event) => [event.id, event]));
+    const eventByChunk = new Map(events.filter((event) => event.chunkId).map((event) => [event.chunkId as string, event]));
+    return bridges.map((bridge) => {
+        const sourceEvent = bridge.sourceEventId ? eventById.get(bridge.sourceEventId) : eventByChunk.get(bridge.sourceChunkId);
+        const targetEvent = bridge.targetEventId ? eventById.get(bridge.targetEventId) : eventByChunk.get(bridge.targetChunkId);
+        return {
+            ...bridge,
+            sourceEpisodeId: bridge.sourceEpisodeId || (sourceEvent ? episodeByEvent.get(sourceEvent.id)?.id : undefined),
+            targetEpisodeId: bridge.targetEpisodeId || (targetEvent ? episodeByEvent.get(targetEvent.id)?.id : undefined),
+        };
+    });
+}
+
+function countChunkSemanticBridges(
+    bridges: GraphRebuildChunkSemanticBridge[],
+    bridgeType: GraphRebuildChunkSemanticBridgeType,
+): number {
+    return bridges.filter((bridge) => bridge.bridgeType === bridgeType).length;
+}
+
+function episodeByEventId(episodes: GraphRebuildEpisode[]): Map<string, GraphRebuildEpisode> {
+    const out = new Map<string, GraphRebuildEpisode>();
+    for (const episode of episodes) {
+        for (const eventId of episode.eventIds) out.set(eventId, episode);
+    }
+    return out;
+}
+
+function episodeConnectionRank(kind: GraphRebuildEpisodeConnection['kind']): number {
+    if (kind === 'episode_temporal') return 0;
+    if (kind === 'episode_causal') return 1;
+    return 2;
+}
+
+function intersect(left: string[], right: string[]): string[] {
+    const rightSet = new Set(right);
+    return unique(left.filter((value) => rightSet.has(value)));
 }
 
 function buildTemporalEdges(events: GraphRebuildEvent[]): GraphRebuildTemporalEdge[] {
@@ -318,6 +564,10 @@ function hasAny(text: string, needles: readonly string[]): boolean {
 
 function unique<T>(values: T[]): T[] {
     return [...new Set(values)];
+}
+
+function clamp(value: number, min: number, max: number): number {
+    return Math.max(min, Math.min(max, Number.isFinite(value) ? value : min));
 }
 
 const HABITUAL_CUES = ['keeps ', 'kept ', 'every ', 'often', 'usually', 'always', 'again', 'repeated'] as const;

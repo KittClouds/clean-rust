@@ -46,7 +46,13 @@ vi.mock('../api/pretty-text-api', () => ({
     getPhoenixUiApi: () => prettyTextApiMock,
 }));
 
-import { getNotesByIds, setPhoenixStoreBridge, updateNote, type Note } from './operations';
+import {
+    commitNoteTransaction,
+    getNotesByIds,
+    setPhoenixStoreBridge,
+    updateNote,
+    type Note,
+} from './operations';
 
 describe('operations note recovery', () => {
     beforeEach(() => {
@@ -106,6 +112,87 @@ describe('operations note recovery', () => {
         expect(notes.map((note) => note.id)).toEqual(['cached-note', 'native-note']);
         expect(notes.map((note) => note.markdownContent)).toEqual(['cached body', 'native']);
     });
+
+    it('warms Dexie with native batch note bodies', async () => {
+        const store = createStoreMock();
+        store.getNotesByIds.mockResolvedValue([storeNote({ id: 'native-note', markdownContent: 'full body' })]);
+        setPhoenixStoreBridge(store as any);
+
+        await getNotesByIds(['native-note']);
+
+        expect(notesMock.put).toHaveBeenCalledWith(expect.objectContaining({
+            id: 'native-note',
+            markdownContent: 'full body',
+            hasBody: true,
+        }));
+    });
+
+    it('publishes a committed Canvas transaction and invalidates note projections', async () => {
+        const store = createStoreMock();
+        const committed = storeNote({
+            id: 'note-1',
+            content: JSON.stringify({ type: 'doc', content: [{ type: 'paragraph' }] }),
+            markdownContent: 'after',
+            version: 102,
+            updatedAt: 102,
+        });
+        store.commitNoteTransaction.mockResolvedValue({
+            transactionId: 'txn-1',
+            status: 'committed',
+            note: committed,
+            expectedRevision: 101,
+            actualRevision: 102,
+            timing: { totalMs: 4 },
+        });
+        setPhoenixStoreBridge(store as any);
+
+        const result = await commitNoteTransaction({
+            transactionId: 'txn-1',
+            noteId: 'note-1',
+            expectedRevision: 101,
+            content: { type: 'doc', content: [{ type: 'paragraph' }] },
+            markdownContent: 'after',
+        });
+
+        expect(result).toEqual(expect.objectContaining({
+            status: 'committed',
+            expectedRevision: 101,
+            actualRevision: 102,
+            commitMs: 4,
+        }));
+        expect(notesMock.put).toHaveBeenCalledWith(expect.objectContaining({
+            id: 'note-1',
+            markdownContent: 'after',
+            version: 102,
+        }));
+        expect(store.scheduleDocumentSemanticMaterialization).toHaveBeenCalledWith(committed);
+    });
+
+    it('does not warm or reindex a Canvas transaction conflict', async () => {
+        const store = createStoreMock();
+        store.commitNoteTransaction.mockResolvedValue({
+            transactionId: 'txn-2',
+            status: 'conflict',
+            note: storeNote({ id: 'note-1', version: 202, updatedAt: 202 }),
+            expectedRevision: 101,
+            actualRevision: 202,
+            timing: { totalMs: 0 },
+        });
+        setPhoenixStoreBridge(store as any);
+
+        const result = await commitNoteTransaction({
+            transactionId: 'txn-2',
+            noteId: 'note-1',
+            expectedRevision: 101,
+            content: { type: 'doc', content: [] },
+            markdownContent: 'staged',
+        });
+
+        expect(result.status).toBe('conflict');
+        expect(result.actualRevision).toBe(202);
+        expect(notesMock.put).not.toHaveBeenCalled();
+        expect(prettyTextApiMock.upsertNote).not.toHaveBeenCalled();
+    });
 });
 
 function createStoreMock() {
@@ -115,6 +202,8 @@ function createStoreMock() {
         getNote: vi.fn(async () => null),
         getNotesByIds: vi.fn(async () => []),
         upsertNote: vi.fn(async () => undefined),
+        commitNoteTransaction: vi.fn(),
+        scheduleDocumentSemanticMaterialization: vi.fn(),
     };
 }
 

@@ -108,7 +108,7 @@ describe('atlas command status model', () => {
 
         expect(status.sidecars.map((sidecar) => [sidecar.label, sidecar.detail])).toEqual([
             ['Semantic sidecar', 'idle 384d'],
-            ['Hybrid space', 'ready'],
+            ['Hybrid embedding manifold', 'ready'],
             ['Hopf projection', 'stale'],
             ['Lorentz forest', 'loading'],
             ['Product manifold', 'idle'],
@@ -147,11 +147,18 @@ describe('atlas command status model', () => {
         expect(status.capabilityLayers.flatMap((layer) => layer.capabilities).map((capability) => capability.id))
             .toContain('causalGraph');
         expect(status.sleepingCapabilities.map((capability) => capability.id)).toEqual([
+            'dynamicSurface',
+            'dynamicChunking',
+            'mentionGraph',
+            'evidenceGraph',
+            'surfaceGraph',
+            'assertedKernel',
             'relationGraph',
             'temporalGraph',
             'eventIdentity',
             'memoryState',
             'causalGraph',
+            'semanticAtlas',
             'semanticCandidate',
             'nliAdjudication',
             'lorentzForest',
@@ -160,7 +167,8 @@ describe('atlas command status model', () => {
         expect(status.sleepingCapabilities.find((capability) => capability.id === 'temporalGraph')?.status).toBe('idle');
         expect(status.sleepingCapabilities.find((capability) => capability.id === 'causalGraph')?.detail).toContain('read-only native store probe');
         expect(status.sleepingCapabilities.find((capability) => capability.id === 'relationGraph')?.status).toBe('ready');
-        expect(status.sleepingCapabilities.find((capability) => capability.id === 'semanticCandidate')?.status).toBe('ready');
+        expect(status.sleepingCapabilities.find((capability) => capability.id === 'semanticCandidate')?.status).toBe('sleeping');
+        expect(status.sleepingCapabilities.find((capability) => capability.id === 'semanticCandidate')?.detail).toContain('QUARANTINED:');
     });
 
     it('does not mark the whole command console running for passive manifold loads', () => {

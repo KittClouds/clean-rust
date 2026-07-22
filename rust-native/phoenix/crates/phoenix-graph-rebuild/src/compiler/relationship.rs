@@ -116,6 +116,12 @@ fn promote_fact(
         status: relationship.status.clone(),
         evidence_ids: evidence_ids.clone(),
         confidence: relationship.confidence,
+        semantic_situation_id: None,
+        semantic_frame: None,
+        factuality: None,
+        state_interval_ids: Vec::new(),
+        event_ordering_ids: Vec::new(),
+        temporal_conflict_ids: Vec::new(),
     });
     output.atoms.push(GraphAtom {
         id: atom_id("relationFact", &fact_id),
@@ -205,6 +211,10 @@ fn role(
         role: role_name.into(),
         atom_id,
         confidence,
+        semantic_role: None,
+        slot_type: None,
+        required: None,
+        resolved: None,
     });
 }
 

@@ -11,6 +11,10 @@ phoenix-types = { path = "../phoenix-types" }
 scirs2-graph = { version = "0.4.1", features = ["parallel"] }
 hashbrown.workspace = true
 rustc-hash.workspace = true
+compact_str.workspace = true
 serde.workspace = true
 serde_json.workspace = true
+smallvec.workspace = true
 zerocopy.workspace = true
+memmap2.workspace = true
+xxhash-rust.workspace = true

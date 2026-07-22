@@ -7,14 +7,26 @@ authors.workspace = true
 
 [dependencies]
 arc-swap.workspace = true
+compact_str.workspace = true
 lz4_flex.workspace = true
+hashbrown.workspace = true
+memmap2.workspace = true
 overgraph.workspace = true
 rmp-serde.workspace = true
 serde.workspace = true
 serde_json.workspace = true
+smallvec.workspace = true
+zerocopy.workspace = true
+blake3 = "1.8"
 phoenix-hyperbolic = { path = "../phoenix-hyperbolic" }
+phoenix-graph-kernel = { path = "../phoenix-graph-kernel" }
+phoenix-document-index = { path = "../phoenix-document-index" }
+phoenix-discovery-view = { path = "../phoenix-discovery-view" }
 phoenix-kernel = { path = "../phoenix-kernel" }
 phoenix-semantic-v2 = { path = "../phoenix-semantic-v2" }
 phoenix-store-native-core = { path = "../phoenix-store-native-core" }
 phoenix-types = { path = "../phoenix-types" }
 bm25_turbo.workspace = true
+
+[dev-dependencies]
+tempfile = "3"

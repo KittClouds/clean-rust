@@ -78,10 +78,9 @@ export function createWidget(span: DecorationSpan): HTMLElement {
         // Inline modes: no pill background, keep text editable and lightweight.
         widget.className = 'entity-widget entity-widget-subtle';
         const colorStyle = api.getStyle(span) || getEditingStyle(span);
-        const backgroundReset = mode === 'gradient' ? '' : 'background: transparent;';
-        widget.style.cssText = `${colorStyle} ${backgroundReset} padding: 0; border: none; border-radius: 0; display: inline; box-shadow: none; cursor: pointer;`;
+        widget.style.cssText = `${colorStyle} padding: 0; border: none; border-radius: 0; display: inline; box-shadow: none; cursor: pointer;`;
     } else {
-        // Normal pill mode (Vivid/Clean/Focus)
+        // Vivid and Clean preserve the original inline widget treatment.
         widget.className = api.getClass(span) + ' entity-widget';
         widget.style.cssText = api.getStyle(span);
         widget.style.cursor = 'pointer';

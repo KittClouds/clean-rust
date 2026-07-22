@@ -4,12 +4,12 @@
 //! single-file `mmap` structure. It is designed specifically for hyperbolic
 //! vectors (Poincaré ball) using `f32`.
 
-pub mod poincare;
 pub mod lorentz_tree;
+pub mod poincare;
 pub mod product_manifold;
 mod product_manifold_math;
-pub mod siegel_finsler;
 pub mod shard;
+pub mod siegel_finsler;
 pub mod tangent;
 
 #[cfg(test)]

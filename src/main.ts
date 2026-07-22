@@ -60,6 +60,13 @@ bootstrapApplication(AppComponent, appConfig)
     (window as any).__angularInjector = appRef.injector;
     console.log('[Main] Angular bootstrapped, injector exposed');
 
+    if (new URLSearchParams(window.location.search).get('graphPerf') === '1') {
+      const { installGraphBuildDesktopBaseline } = await import(
+        './app/graph-rebuild/graph-build-desktop-baseline'
+      );
+      installGraphBuildDesktopBaseline(appRef.injector);
+    }
+
     // =============================================================================
     // Phase 3: Dev Session Monitor (HMR Memory Leak Prevention)
     // =============================================================================

@@ -4,6 +4,14 @@ version = "0.1.0"
 edition = "2021"
 publish = false
 
+[features]
+default = []
+vector-wgpu-shadow = ["dep:vector-wgpu-kernel"]
+graph-analytics-wgpu-shadow = [
+  "dep:graph-analytics-wgpu-kernel",
+  "dep:phoenix-discovery-community",
+]
+
 [lib]
 name = "phoenix_tauri_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
@@ -13,9 +21,24 @@ tauri-build = { version = "2", features = [] }
 
 [dependencies]
 hashbrown = "0.15"
+blake3 = "1.8"
+base64 = "0.22"
+flate2 = "1"
+memmap2 = "0.9"
 phoenix-native = { path = "../rust/phoenix/crates/phoenix-native" }
 phoenix-graph-rebuild = { path = "../rust-native/phoenix/crates/phoenix-graph-rebuild" }
+phoenix-graph-api = { package = "phoenix-api", path = "../rust-native/phoenix/crates/phoenix-api" }
+phoenix-graph-post = { path = "../rust-native/phoenix/crates/phoenix-graph-post" }
+phoenix-graph-kernel = { path = "../rust-native/phoenix/crates/phoenix-graph-kernel" }
+phoenix-discovery-view = { path = "../rust-native/phoenix/crates/phoenix-discovery-view" }
+phoenix-discovery-community = { path = "../rust-native/phoenix/crates/phoenix-discovery-community", features = ["wgpu-shadow"], optional = true }
+phoenix-store-native-core = { path = "../rust-native/phoenix/crates/phoenix-store-native-core" }
+phoenix-store-overgraph = { path = "../rust-native/phoenix/crates/phoenix-store-overgraph" }
+phoenix-document-index = { path = "../rust-native/phoenix/crates/phoenix-document-index" }
 phoenix-hyperbolic = { path = "../rust/phoenix/crates/phoenix-hyperbolic" }
+phoenix-revision-impact = { path = "../rust-native/phoenix-spikes/phoenix-revision-impact" }
+phoenix-revision-inference = { path = "../rust-native/phoenix-spikes/phoenix-revision-inference", features = ["encoders"] }
+phoenix-rel-post = { path = "../rust-native/phoenix/crates/phoenix-rel-post" }
 phoenix-types = { path = "../rust/phoenix/crates/phoenix-types" }
 half = "2"
 hound = "3.5"
@@ -23,8 +46,20 @@ ort = { version = "=2.0.0-rc.9", default-features = false, features = ["ndarray"
 ort-sys = "=2.0.0-rc.9"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-specta = { version = "=2.0.0-rc.22", features = ["derive"] }
-tauri = { version = "2", features = [] }
+sha2 = "0.10"
+specta = { version = "=2.0.0-rc.22", features = ["derive", "serde_json"] }
+tauri = { version = "2", features = ["devtools"] }
 taurpc = "0.7.1"
 tokio = { version = "1", features = ["full"] }
 tokenizers = { version = "0.22.2", default-features = false, features = ["onig"] }
+zstd = "0.13"
+vector-wgpu-kernel = { path = "../rust-native/phoenix-spikes/vector-wgpu-kernel", optional = true }
+graph-analytics-wgpu-kernel = { path = "../rust-native/phoenix-spikes/graph-analytics-wgpu-kernel", optional = true }
+
+[patch.crates-io]
+esaxx-rs = { path = "../rust-native/phoenix-gliner-smoke/vendor/esaxx-rs" }
+scirs2-text = { path = "../rust-native/phoenix/vendor/scirs2-text" }
+
+[dev-dependencies]
+tauri = { version = "2", features = ["test"] }
+tempfile = "3"

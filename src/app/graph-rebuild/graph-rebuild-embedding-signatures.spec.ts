@@ -103,4 +103,33 @@ describe('embedding model adapter boundary', () => {
             dimensions: 1024,
         });
     });
+
+    it('keeps EmbeddingGemma as a durable 768d semantic topology contract', () => {
+        const profile = normalizeEmbeddingProfile({
+            modelId: 'embeddinggemma-300m',
+            modelLabel: 'EmbeddingGemma 300M',
+        });
+
+        expect(profile).toMatchObject({
+            modelId: 'embeddinggemma-300m',
+            modelLabel: 'EmbeddingGemma 300M',
+            modelFamily: 'embeddinggemma',
+            dimensionLabel: '768d',
+            nativeDimensions: 768,
+            selectedDimensions: 768,
+            taskProfile: 'semantic_topology',
+            topologySupport: 'derived',
+            normalized: true,
+            normalization: 'unit_l2',
+            supportsMultiVector: false,
+        });
+        expect(profile.vectorHeads).toEqual([{
+            id: 'dense',
+            kind: 'dense',
+            dimensions: 768,
+            normalized: true,
+            required: true,
+            purpose: 'single dense semantic vector',
+        }]);
+    });
 });

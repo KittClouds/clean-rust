@@ -1,8 +1,15 @@
 //! Canonical discovery and orchestration façade for Phoenix post-ingest
 //! pipeline stages.
 
+mod canonical_episode_assignment;
 pub mod depth_audit;
+mod native_operator_decision;
+mod native_reward_observation;
 mod pipeline_scheduler;
+
+pub use canonical_episode_assignment::*;
+pub use native_operator_decision::*;
+pub use native_reward_observation::*;
 
 use serde::{Deserialize, Serialize};
 
@@ -10,23 +17,40 @@ use phoenix_alex::{api as alex_api, AlexError, Lexicon};
 use phoenix_causal_post::api as causal_api;
 use phoenix_er_post::api as er_api;
 use phoenix_event_identity_post::api as event_identity_api;
+use phoenix_graph_kernel::{project_graph_proposal_outcomes, GraphProposalOutcome};
 use phoenix_graph_post::api as graph_api;
+use phoenix_graph_rebuild::GraphDocumentCompilerSummary;
+use phoenix_graph_research::{
+    certify_evaluation_protocol, derive_train_topology_features, freeze_graph_research_snapshot,
+    run_baseline_ladder_for_protocol, run_structural_ranking_baselines, tensorize_frozen_graph,
+    BaselineLadderReport, EvaluationPolicy, FrozenGraphResearchBundle, FrozenGraphResearchError,
+    FrozenGraphResearchInput, FrozenGraphResearchPaths, FrozenTensorBundle, FrozenTensorPaths,
+    RankingEvaluationError, RankingEvaluationReport, ResearchEvaluationError,
+    ResearchEvaluationProtocol, TemporalSplitPolicy, TensorizationPolicy,
+    TrainTopologyFeaturePolicy, TrainTopologyFeatureSnapshot,
+};
 use phoenix_memory_post::api as memory_api;
 use phoenix_rel_post::api as rel_api;
 use phoenix_state_schema_post::api as state_schema_api;
 use phoenix_store_native_core::{
-    PhoenixArchiveStoreV2, PhoenixCausalPatchStore, PhoenixErPatchStore,
-    PhoenixEventIdentityPatchStore, PhoenixGraphPatchStore, PhoenixLexicalQueryStore,
-    PhoenixMemoryPatchStore, PhoenixRelationPatchStore, PhoenixScopeRuntimeStore,
-    PhoenixSemanticGraphPatchStore, PhoenixSemanticIndexStore, PhoenixStateSchemaPatchStore,
-    PhoenixTemporalPatchStore, StoreError,
+    NativeDecisionReceiptAppend, PhoenixArchiveStoreV2, PhoenixCausalPatchStore,
+    PhoenixErPatchStore, PhoenixEventIdentityPatchStore, PhoenixGraphKernelStoreV2,
+    PhoenixGraphLearningStore, PhoenixGraphPatchStore, PhoenixLexicalQueryStore,
+    PhoenixMemoryPatchStore, PhoenixNativeDecisionStore, PhoenixRelationPatchStore,
+    PhoenixScopeRuntimeStore, PhoenixSemanticGraphPatchStore, PhoenixSemanticIndexStore,
+    PhoenixStateSchemaPatchStore, PhoenixTemporalPatchStore, StoreError,
 };
 use phoenix_temporal_post::api as temporal_api;
-use phoenix_types::{LexiconEntry, ScopeKey, SessionId};
+use phoenix_types::{
+    resolve_complete_native_decision_outcomes, LexiconEntry, NativeDecisionOutcomeReceipt,
+    NativeDecisionReceipt, NativeDecisionReceiptError, NativeResolvedDecisionCandidate, ScopeKey,
+    SessionId,
+};
 pub use pipeline_scheduler::{
     PipelineGenerationContext, PipelineRunMetrics, PipelineRunRequest, PipelineRunShape,
     PipelineStage, PipelineStageStatus, ScopeGenerationKey, StageProductEnvelope,
 };
+use std::path::Path;
 
 #[derive(Debug, thiserror::Error)]
 pub enum PipelineApiError {
@@ -36,6 +60,35 @@ pub enum PipelineApiError {
     Alex(#[from] AlexError),
     #[error(transparent)]
     Relation(#[from] phoenix_rel_post::GlirelWorkerError),
+    #[error(transparent)]
+    DecisionReceipt(#[from] NativeDecisionReceiptError),
+}
+
+#[derive(Debug, thiserror::Error)]
+pub enum GraphResearchExportError {
+    #[error(transparent)]
+    Store(#[from] StoreError),
+    #[error(transparent)]
+    Research(#[from] FrozenGraphResearchError),
+    #[error(transparent)]
+    Evaluation(#[from] ResearchEvaluationError),
+    #[error(transparent)]
+    Ranking(#[from] RankingEvaluationError),
+    #[error("cannot freeze graph research data without a kernel checkpoint")]
+    MissingCheckpoint,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct GraphResearchTensorExportPaths {
+    pub research: FrozenGraphResearchPaths,
+    pub tensors: FrozenTensorPaths,
+}
+
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct GraphResearchEvaluation {
+    pub protocol: ResearchEvaluationProtocol,
+    pub baselines: BaselineLadderReport,
 }
 
 #[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
@@ -316,7 +369,10 @@ where
         created_at: i64,
     ) -> Result<GraphRunReport, PipelineApiError>
     where
-        S: PhoenixGraphPatchStore + PhoenixSemanticGraphPatchStore,
+        S: PhoenixGraphPatchStore
+            + PhoenixGraphKernelStoreV2
+            + PhoenixGraphLearningStore
+            + PhoenixSemanticGraphPatchStore,
     {
         pipeline_scheduler::run_graph_pipeline(
             &self.store,
@@ -331,7 +387,10 @@ where
         created_at: i64,
     ) -> Result<SidecarContinuityRunReport, PipelineApiError>
     where
-        S: PhoenixGraphPatchStore + PhoenixSemanticGraphPatchStore,
+        S: PhoenixGraphPatchStore
+            + PhoenixGraphKernelStoreV2
+            + PhoenixGraphLearningStore
+            + PhoenixSemanticGraphPatchStore,
     {
         pipeline_scheduler::run_sidecar_continuity_pipeline(
             &self.store,
@@ -410,15 +469,15 @@ pub struct ChunkerStageApi;
 
 impl ChunkerStageApi {
     pub fn sentence_ranges(&self, text: &str) -> Vec<(usize, usize)> {
-        phoenix_chunker::api::sentence_ranges(text)
+        phoenix_chunker_native::api::sentence_ranges(text)
     }
 
     pub fn build_chunks(
         &self,
         text: &str,
-        config: &phoenix_chunker::ChunkerConfig,
-    ) -> Vec<phoenix_chunker::Chunk> {
-        phoenix_chunker::api::chunk_ranges(text, config)
+        config: &phoenix_chunker_native::ChunkerConfig,
+    ) -> Vec<phoenix_chunker_native::Chunk> {
+        phoenix_chunker_native::api::chunk_ranges(text, config)
     }
 }
 
@@ -580,6 +639,7 @@ where
     S: PhoenixArchiveStoreV2
         + PhoenixCausalPatchStore
         + PhoenixEventIdentityPatchStore
+        + PhoenixGraphKernelStoreV2
         + PhoenixGraphPatchStore
         + PhoenixLexicalQueryStore
         + PhoenixMemoryPatchStore
@@ -593,6 +653,231 @@ where
         session_id: Option<&SessionId>,
     ) -> Result<Vec<phoenix_graph_post::GraphScopeReviewBatch>, StoreError> {
         graph_api::derive_batches(self.store, session_id)
+    }
+
+    pub fn proposal_outcomes(&self) -> Result<Vec<GraphProposalOutcome>, StoreError>
+    where
+        S: PhoenixGraphLearningStore,
+    {
+        let receipts = self.store.load_graph_proposal_receipts()?;
+        let commits = self.store.load_graph_truth_commits()?;
+        project_graph_proposal_outcomes(&receipts, &commits)
+            .map_err(|error| StoreError::Schema(error.to_string()))
+    }
+
+    pub fn record_native_decision(
+        &self,
+        receipt: &NativeDecisionReceipt,
+    ) -> Result<NativeDecisionReceiptAppend, StoreError>
+    where
+        S: PhoenixNativeDecisionStore,
+    {
+        self.store.append_native_decision_receipt(receipt)
+    }
+
+    pub fn record_native_decision_outcome(
+        &self,
+        receipt: &NativeDecisionOutcomeReceipt,
+    ) -> Result<NativeDecisionReceiptAppend, StoreError>
+    where
+        S: PhoenixNativeDecisionStore,
+    {
+        self.store.append_native_decision_outcome_receipt(receipt)
+    }
+
+    pub fn native_decisions(&self) -> Result<Vec<NativeDecisionReceipt>, StoreError>
+    where
+        S: PhoenixNativeDecisionStore,
+    {
+        self.store.load_native_decision_receipts()
+    }
+
+    pub fn resolved_native_decision_outcomes(
+        &self,
+        decision_receipt_id: &str,
+        frozen_at: i64,
+    ) -> Result<Vec<NativeResolvedDecisionCandidate>, PipelineApiError>
+    where
+        S: PhoenixNativeDecisionStore,
+    {
+        let decision = self
+            .store
+            .load_native_decision_receipt(decision_receipt_id)?
+            .ok_or_else(|| {
+                StoreError::Query(format!(
+                    "native decision receipt '{decision_receipt_id}' was not found"
+                ))
+            })?;
+        let outcomes = self
+            .store
+            .load_native_decision_outcome_receipts(decision_receipt_id)?;
+        resolve_complete_native_decision_outcomes(&decision, &outcomes, frozen_at)
+            .map_err(Into::into)
+    }
+
+    pub fn freeze_research_snapshot(
+        &self,
+        root: impl AsRef<Path>,
+        frozen_at_ms: i64,
+        split_policy: TemporalSplitPolicy,
+        document_compiler: Option<&GraphDocumentCompilerSummary>,
+        document_compiler_observed_at_ms: Option<i64>,
+    ) -> Result<FrozenGraphResearchPaths, GraphResearchExportError>
+    where
+        S: PhoenixGraphLearningStore,
+    {
+        let checkpoint = self
+            .store
+            .load_kernel_checkpoint()?
+            .ok_or(GraphResearchExportError::MissingCheckpoint)?;
+        let commits = self.store.load_graph_truth_commits()?;
+        let proposal_receipts = self.store.load_graph_proposal_receipts()?;
+        let snapshot = freeze_graph_research_snapshot(FrozenGraphResearchInput {
+            checkpoint: &checkpoint,
+            commits: &commits,
+            proposal_receipts: &proposal_receipts,
+            document_compiler,
+            document_compiler_observed_at_ms,
+            frozen_at_ms,
+            split_policy,
+        })?;
+        FrozenGraphResearchBundle::write(&snapshot, root).map_err(Into::into)
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    pub fn freeze_research_tensors(
+        &self,
+        research_root: impl AsRef<Path>,
+        tensor_root: impl AsRef<Path>,
+        frozen_at_ms: i64,
+        split_policy: TemporalSplitPolicy,
+        tensor_policy: TensorizationPolicy,
+        document_compiler: Option<&GraphDocumentCompilerSummary>,
+        document_compiler_observed_at_ms: Option<i64>,
+    ) -> Result<GraphResearchTensorExportPaths, GraphResearchExportError>
+    where
+        S: PhoenixGraphLearningStore,
+    {
+        let checkpoint = self
+            .store
+            .load_kernel_checkpoint()?
+            .ok_or(GraphResearchExportError::MissingCheckpoint)?;
+        let commits = self.store.load_graph_truth_commits()?;
+        let proposal_receipts = self.store.load_graph_proposal_receipts()?;
+        let research = freeze_graph_research_snapshot(FrozenGraphResearchInput {
+            checkpoint: &checkpoint,
+            commits: &commits,
+            proposal_receipts: &proposal_receipts,
+            document_compiler,
+            document_compiler_observed_at_ms,
+            frozen_at_ms,
+            split_policy,
+        })?;
+        let tensors = tensorize_frozen_graph(&research, tensor_policy)?;
+        let research_paths = FrozenGraphResearchBundle::write(&research, research_root)?;
+        let tensor_paths = FrozenTensorBundle::write(&tensors, tensor_root)?;
+        Ok(GraphResearchTensorExportPaths {
+            research: research_paths,
+            tensors: tensor_paths,
+        })
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    pub fn evaluate_research_baselines(
+        &self,
+        frozen_at_ms: i64,
+        split_policy: TemporalSplitPolicy,
+        tensor_policy: TensorizationPolicy,
+        evaluation_policy: EvaluationPolicy,
+        document_compiler: Option<&GraphDocumentCompilerSummary>,
+        document_compiler_observed_at_ms: Option<i64>,
+    ) -> Result<GraphResearchEvaluation, GraphResearchExportError>
+    where
+        S: PhoenixGraphLearningStore,
+    {
+        let checkpoint = self
+            .store
+            .load_kernel_checkpoint()?
+            .ok_or(GraphResearchExportError::MissingCheckpoint)?;
+        let commits = self.store.load_graph_truth_commits()?;
+        let proposal_receipts = self.store.load_graph_proposal_receipts()?;
+        let research = freeze_graph_research_snapshot(FrozenGraphResearchInput {
+            checkpoint: &checkpoint,
+            commits: &commits,
+            proposal_receipts: &proposal_receipts,
+            document_compiler,
+            document_compiler_observed_at_ms,
+            frozen_at_ms,
+            split_policy,
+        })?;
+        let tensors = tensorize_frozen_graph(&research, tensor_policy)?;
+        let protocol = certify_evaluation_protocol(&research, &tensors, evaluation_policy.clone())?;
+        let baselines = run_baseline_ladder_for_protocol(&tensors, &protocol)?;
+        Ok(GraphResearchEvaluation {
+            protocol,
+            baselines,
+        })
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    pub fn derive_research_topology_features(
+        &self,
+        frozen_at_ms: i64,
+        split_policy: TemporalSplitPolicy,
+        tensor_policy: TensorizationPolicy,
+        evaluation_policy: EvaluationPolicy,
+        feature_policy: TrainTopologyFeaturePolicy,
+        document_compiler: Option<&GraphDocumentCompilerSummary>,
+        document_compiler_observed_at_ms: Option<i64>,
+    ) -> Result<TrainTopologyFeatureSnapshot, GraphResearchExportError>
+    where
+        S: PhoenixGraphLearningStore,
+    {
+        let checkpoint = self
+            .store
+            .load_kernel_checkpoint()?
+            .ok_or(GraphResearchExportError::MissingCheckpoint)?;
+        let commits = self.store.load_graph_truth_commits()?;
+        let proposal_receipts = self.store.load_graph_proposal_receipts()?;
+        let research = freeze_graph_research_snapshot(FrozenGraphResearchInput {
+            checkpoint: &checkpoint,
+            commits: &commits,
+            proposal_receipts: &proposal_receipts,
+            document_compiler,
+            document_compiler_observed_at_ms,
+            frozen_at_ms,
+            split_policy,
+        })?;
+        let tensors = tensorize_frozen_graph(&research, tensor_policy)?;
+        let protocol = certify_evaluation_protocol(&research, &tensors, evaluation_policy)?;
+        derive_train_topology_features(&research, &tensors, &protocol, feature_policy)
+            .map_err(Into::into)
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    pub fn evaluate_structural_rankings(
+        &self,
+        frozen_at_ms: i64,
+        split_policy: TemporalSplitPolicy,
+        tensor_policy: TensorizationPolicy,
+        evaluation_policy: EvaluationPolicy,
+        feature_policy: TrainTopologyFeaturePolicy,
+        document_compiler: Option<&GraphDocumentCompilerSummary>,
+        document_compiler_observed_at_ms: Option<i64>,
+    ) -> Result<RankingEvaluationReport, GraphResearchExportError>
+    where
+        S: PhoenixGraphLearningStore,
+    {
+        let features = self.derive_research_topology_features(
+            frozen_at_ms,
+            split_policy,
+            tensor_policy,
+            evaluation_policy,
+            feature_policy,
+            document_compiler,
+            document_compiler_observed_at_ms,
+        )?;
+        run_structural_ranking_baselines(&features).map_err(Into::into)
     }
 
     pub fn current_slot(

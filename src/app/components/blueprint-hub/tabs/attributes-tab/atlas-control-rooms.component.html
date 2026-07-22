@@ -1,0 +1,213 @@
+<section class="atlas-room-workspace">
+    <nav class="atlas-room-tabs" aria-label="Atlas Control rooms">
+        @for (roomId of roomIds(); track roomId) {
+        <button
+            type="button"
+            class="atlas-room-tab"
+            [class.atlas-room-tab-active]="selectedRoomId() === roomId"
+            (click)="selectRoom(roomId)">
+            <span>{{ contract().roomsById[roomId].label }}</span>
+            <strong>{{ contract().roomsById[roomId].totalRows }}</strong>
+        </button>
+        }
+    </nav>
+
+    <header class="atlas-room-header">
+        <div>
+            <span class="atlas-room-kicker">Blueprint operating room</span>
+            <h2>{{ activeRoom().label }}</h2>
+            <p>{{ activeRoom().purpose }}</p>
+        </div>
+        <div class="atlas-room-coverage" [attr.data-coverage]="activeRoom().coverage">
+            <strong>{{ activeRoom().totalRows }}</strong>
+            <span>ledger rows</span>
+            <small>{{ activeRoom().visibleRows }} loaded / {{ activeRoom().coverage }}</small>
+        </div>
+    </header>
+
+    <div class="atlas-room-inventory" aria-label="Room inventories">
+        @for (inventory of inventories(); track inventory.id) {
+        <button
+            type="button"
+            class="atlas-inventory-card"
+            [class.atlas-inventory-card-active]="selectedInventoryId() === inventory.id"
+            [disabled]="inventory.visibleRows === 0"
+            [title]="inventory.visibleRows ? inventory.label : 'No loaded rows in this projection'"
+            (click)="selectInventory(inventory.id)">
+            <span>{{ inventory.label }}</span>
+            <strong>{{ inventory.totalRows }}</strong>
+            <small>{{ inventory.visibleRows }} inspectable</small>
+        </button>
+        }
+    </div>
+
+    <div class="atlas-room-toolbar">
+        <label class="atlas-room-search">
+            <lucide-icon [img]="SearchIcon" class="h-4 w-4"></lucide-icon>
+            <input
+                type="search"
+                [value]="query()"
+                [placeholder]="'Filter ' + activeRoom().label.toLowerCase()"
+                (input)="updateQuery($any($event.target).value)" />
+            @if (query()) {
+            <button type="button" title="Clear filter" (click)="clearQuery()">
+                <lucide-icon [img]="XIcon" class="h-4 w-4"></lucide-icon>
+            </button>
+            }
+        </label>
+        <div class="atlas-room-actions">
+            @for (action of roomActions(); track action.id) {
+            <button
+                type="button"
+                [disabled]="!action.enabled"
+                [title]="action.enabled ? action.label : action.disabledReason"
+                (click)="dispatch(action)">
+                @if (action.action === 'add_entity') {
+                <lucide-icon [img]="PlusIcon" class="h-4 w-4"></lucide-icon>
+                }
+                <span>{{ action.label }}</span>
+            </button>
+            }
+        </div>
+    </div>
+
+    <div class="atlas-room-body">
+        <section class="atlas-room-queue" aria-label="Room rows">
+            <header>
+                <span>{{ selectedInventoryId() ? contract().inventoryById[selectedInventoryId()!].label : activeRoom().label + ' inventory' }}</span>
+                <strong>{{ filteredRowIds().length }} rows</strong>
+            </header>
+            <div class="atlas-room-row-list">
+                @for (row of visibleRows(); track row.identity.id) {
+                <button
+                    type="button"
+                    class="atlas-room-row"
+                    [class.atlas-room-row-active]="isSelectedRow(row.identity.id)"
+                    (click)="selectRow(row.identity.id)">
+                    <span class="atlas-room-row-title">
+                        <strong>{{ row.label }}</strong>
+                        <em>{{ percent(row.confidence) }}</em>
+                    </span>
+                    <span>{{ row.detail }}</span>
+                    <small>{{ row.identity.kind }} / {{ row.state }}</small>
+                </button>
+                } @empty {
+                <div class="atlas-room-empty">
+                    @if (activeRoom().totalRows > 0 && paging().nextOffset != null) {
+                    <strong>Proof rows are still native</strong>
+                    <span>Load this room's next verified page to inspect it.</span>
+                    } @else {
+                    <strong>{{ activeRoom().emptyState.title }}</strong>
+                    <span>{{ activeRoom().emptyState.detail }}</span>
+                    }
+                </div>
+                }
+                @if (filteredRowIds().length > visibleRows().length) {
+                <div class="atlas-room-limit">Showing {{ visibleRows().length }} of {{ filteredRowIds().length }} matching rows.</div>
+                }
+                @if (paging().status === 'loading') {
+                <div class="atlas-room-limit">Loading verified native proof rows...</div>
+                } @else if (paging().status === 'expired' || paging().status === 'error') {
+                <button type="button" class="atlas-room-page-action" (click)="requestNextPage()">
+                    Retry native proof page
+                </button>
+                <div class="atlas-room-limit">{{ paging().error }}</div>
+                } @else if (paging().nextOffset != null) {
+                <button type="button" class="atlas-room-page-action" (click)="requestNextPage()">
+                    Load next proof page
+                </button>
+                } @else if (paging().status === 'complete' && paging().totalRows > 0) {
+                <div class="atlas-room-limit">All {{ paging().totalRows }} native proof rows inspected.</div>
+                }
+            </div>
+        </section>
+
+        <aside class="atlas-room-inspector">
+            @if (selectedRow(); as row) {
+            <header>
+                <span>{{ row.identity.lane }}</span>
+                <h3>{{ row.label }}</h3>
+                <p>{{ row.detail }}</p>
+            </header>
+            <dl>
+                <div><dt>State</dt><dd>{{ row.state }}</dd></div>
+                <div><dt>Source</dt><dd>{{ row.identity.sourceContract }}</dd></div>
+                <div><dt>Kind</dt><dd>{{ row.identity.kind }}</dd></div>
+                <div><dt>Evidence</dt><dd>{{ row.evidenceIds.length }}</dd></div>
+                <div><dt>Receipts</dt><dd>{{ row.receiptIds.length }}</dd></div>
+                <div><dt>Confidence</dt><dd>{{ percent(row.confidence) }}</dd></div>
+            </dl>
+            @if (row.tags.length) {
+            <div class="atlas-room-tags">
+                @for (tag of row.tags.slice(0, 8); track tag) { <span>{{ tag }}</span> }
+            </div>
+            }
+            @if (row.sourceExcerpt || row.targetExcerpt) {
+            <section class="atlas-cross-document-excerpts" aria-label="Cross-document source excerpts">
+                <article>
+                    <span>Source document</span>
+                    <strong>{{ row.noteId || row.sourceIds[0] }}</strong>
+                    <p>{{ row.sourceExcerpt || 'No source excerpt available.' }}</p>
+                </article>
+                <article>
+                    <span>Target document</span>
+                    <strong>{{ row.targetDocumentId || row.targetIds[0] }}</strong>
+                    <p>{{ row.targetExcerpt || 'No target excerpt available.' }}</p>
+                </article>
+            </section>
+            }
+            @if (row.episodeAssignmentOptions.length) {
+            <section class="atlas-assignment-options" aria-label="Canonical episode choices">
+                <header>
+                    <span>Decision inbox</span>
+                    <strong>{{ committedAssignmentRowIds().has(row.identity.id) ? 'Committed' : assignmentBusyRowId() === row.identity.id ? 'Writing receipt…' : 'Choose with authority' }}</strong>
+                </header>
+                @for (option of row.episodeAssignmentOptions; track option.kind + ':' + option.episodeId) {
+                <button
+                    type="button"
+                    [disabled]="!!assignmentBusyRowId() || committedAssignmentRowIds().has(row.identity.id)"
+                    [class.atlas-assignment-proposed]="option.proposed"
+                    (click)="dispatchAssignment(row, option)">
+                    <span>{{ option.proposed ? 'Compiler proposal' : option.kind.replaceAll('_', ' ') }}</span>
+                    <strong>{{ option.label }}</strong>
+                    <small>{{ option.detail }}</small>
+                </button>
+                }
+                <p>No choice is applied automatically. The complete candidate group is frozen before this action.</p>
+            </section>
+            }
+            <div class="atlas-row-actions">
+                @for (action of rowActions(); track action.id) {
+                <button
+                    type="button"
+                    [disabled]="!action.enabled"
+                    [title]="action.enabled ? action.label : action.disabledReason"
+                    (click)="dispatch(action, row.identity.id)">
+                    {{ action.label }}
+                </button>
+                }
+            </div>
+            @if (row.receiptPolicy.required) {
+            <div class="atlas-receipt-proof">
+                <strong>{{ row.receiptPolicy.kind }}</strong>
+                <span>{{ row.receiptPolicy.reversible ? 'Reversible' : 'Recorded' }}</span>
+            </div>
+            }
+            } @else {
+            <div class="atlas-room-empty">
+                <strong>No row selected</strong>
+                <span>{{ activeRoom().emptyState.detail }}</span>
+            </div>
+            }
+        </aside>
+    </div>
+
+    <footer class="atlas-room-proofs">
+        @for (item of proofRows(); track item.id) {
+        <span [attr.data-status]="item.proof.status" [title]="item.proof.detail">
+            <b>{{ item.proof.status }}</b>
+            {{ item.id }}
+        </span>
+        }
+    </footer>
+</section>

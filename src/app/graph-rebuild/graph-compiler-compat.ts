@@ -70,6 +70,22 @@ function buildCompatibilityGraphCompilerOutput(snapshot: GraphRebuildSnapshot): 
         atoms.push(atom('event', atomId('event', event.id), event.id, event.label, event.noteId, event.chunkId, event.entityIds[0], [evidenceId]));
     }
     for (const state of snapshot.memoryState) atoms.push(atom('state', atomId('state', state.id), state.id, state.key, state.noteId, undefined, state.entityId, state.evidenceIds.map(anchorEvidenceId)));
+    for (const receipt of snapshot.calendarRegistrySummary?.receipts || []) {
+        if (receipt.status !== 'accepted_temporal_receipt' || receipt.mutationAllowed) continue;
+        const evidenceId = `evidence:calendar:${receipt.id}`;
+        const noteId = receipt.sourceNoteIds[0];
+        pushEvidence({ id: evidenceId, kind: 'calendarRegistry', noteId, sourceId: receipt.id, confidence: 0.86 });
+        atoms.push(atom(
+            'timeAnchor',
+            receipt.affectedGraphAtoms[0] || atomId('timeAnchor', receipt.calendarAnchorId),
+            receipt.calendarAnchorId,
+            receipt.displayDate,
+            noteId,
+            undefined,
+            undefined,
+            [evidenceId],
+        ));
+    }
 
     for (const relationship of snapshot.relationships) {
         const id = `fact:relationship:${relationship.id}`;
@@ -130,7 +146,7 @@ function computeReceipts(output: GraphCompilerOutput): GraphCompileReceipts {
     const roots = new Map<GraphCompilerFactLane, GraphRootReceipt>();
     const root = (lane: GraphCompilerFactLane) => roots.get(lane) || roots.set(lane, { lane, ...emptyCounters() }).get(lane)!;
     for (const atomRow of output.atoms) root(compilerLaneForAtom(atomRow.kind)).atoms += 1;
-    for (const evidence of output.evidenceAnchors) root('anchorEvidence').evidenceAnchors += 1;
+    root('anchorEvidence').evidenceAnchors += output.evidenceAnchors.length;
     for (const bundle of output.bundles) root(bundle.lane).bundles += 1;
     for (const fact of output.facts) root(fact.lane).facts += 1;
     const factLane = new Map(output.facts.map((fact) => [fact.id, fact.lane]));

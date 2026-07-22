@@ -1,0 +1,230 @@
+.atlas-workflow-strip {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(0, 0, 0, 0.16);
+    padding: 12px 18px;
+}
+
+.atlas-research-readiness {
+    display: grid;
+    gap: 9px;
+    padding: 10px 18px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(2, 8, 12, 0.86);
+}
+
+.atlas-research-readiness > header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.atlas-research-readiness > header div {
+    display: grid;
+    gap: 2px;
+}
+
+.atlas-research-readiness span,
+.atlas-research-readiness small {
+    color: #73818a;
+    font-size: 9px;
+    font-weight: 850;
+    text-transform: uppercase;
+}
+
+.atlas-research-readiness > header strong {
+    color: #dfe8e8;
+    font-size: 12px;
+}
+
+.atlas-research-readiness > header button {
+    min-height: 30px;
+    padding: 0 11px;
+    color: #8ce9dc;
+    background: #091416;
+    border: 1px solid #1c4b48;
+    cursor: pointer;
+}
+
+.atlas-readiness-metrics {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+}
+
+.atlas-readiness-metrics article,
+.atlas-count-gate-cards article,
+.atlas-dataset-eligibility {
+    display: grid;
+    min-width: 0;
+    gap: 2px;
+    padding: 7px 9px;
+    background: #070e13;
+    border: 1px solid #18252c;
+}
+
+.atlas-readiness-metrics article strong,
+.atlas-count-gate-cards article strong,
+.atlas-dataset-eligibility strong {
+    overflow: hidden;
+    color: #f3f8f7;
+    font-size: 16px;
+    font-variant-numeric: tabular-nums;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.atlas-readiness-truth {
+    display: grid;
+    grid-template-columns: minmax(0, 3fr) minmax(260px, 2fr);
+    gap: 6px;
+}
+
+.atlas-count-gates {
+    display: grid;
+    gap: 5px;
+}
+
+.atlas-count-gates > header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 0 2px;
+}
+
+.atlas-count-gate-cards {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+}
+
+.atlas-count-gate-cards article[data-gate='passed'] {
+    border-color: #216f65;
+    box-shadow: inset 2px 0 0 #22c7b6;
+}
+
+.atlas-count-gate-cards article[data-gate='passed'] strong {
+    color: #78ead9;
+}
+
+.atlas-readiness-metrics small,
+.atlas-count-gate-cards small {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.atlas-dataset-eligibility {
+    align-content: center;
+    border-color: #5f4920;
+    background: linear-gradient(110deg, rgba(217, 153, 34, 0.1), transparent 66%), #0b0e10;
+    box-shadow: inset 2px 0 0 #d99a22;
+}
+
+.atlas-dataset-eligibility strong {
+    color: #f2c75d;
+    text-transform: uppercase;
+}
+
+.atlas-dataset-eligibility small {
+    line-height: 1.35;
+}
+
+.atlas-readiness-empty {
+    color: #7f8c94;
+    font-size: 11px;
+}
+
+.atlas-workflow-step {
+    display: grid;
+    min-width: 0;
+    min-height: 76px;
+    align-content: center;
+    gap: 4px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.085);
+    border-radius: 8px;
+    background:
+        linear-gradient(135deg, rgba(20, 184, 166, 0.08), transparent 58%), rgba(3, 7, 12, 0.74);
+    padding: 10px 12px;
+}
+
+.atlas-workflow-step span,
+.atlas-workflow-step small {
+    overflow: hidden;
+    color: rgb(161 161 170);
+    font-size: 9px;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    text-overflow: ellipsis;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.atlas-workflow-step strong {
+    overflow: hidden;
+    color: rgb(250 250 250);
+    font-size: 24px;
+    font-weight: 950;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+    text-overflow: ellipsis;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.atlas-workflow-step small {
+    color: rgb(113 113 122);
+    font-size: 8px;
+}
+
+.atlas-workflow-ready {
+    border-color: rgba(45, 212, 191, 0.28);
+    background:
+        linear-gradient(135deg, rgba(13, 148, 136, 0.16), transparent 58%), rgba(3, 7, 12, 0.76);
+}
+
+.atlas-workflow-ready strong {
+    color: var(--ui-accent-bright);
+}
+
+.atlas-workflow-review {
+    border-color: rgba(196, 181, 253, 0.24);
+    background:
+        linear-gradient(135deg, rgba(88, 28, 135, 0.18), transparent 58%), rgba(3, 7, 12, 0.76);
+}
+
+.atlas-workflow-warning {
+    border-color: rgba(251, 191, 36, 0.34);
+    background:
+        linear-gradient(135deg, rgba(120, 53, 15, 0.2), transparent 58%), rgba(3, 7, 12, 0.76);
+}
+
+.atlas-workflow-warning strong {
+    color: rgb(253 224 71);
+}
+
+.atlas-workflow-quiet {
+    opacity: 0.78;
+}
+
+@media (max-width: 1120px) {
+    .atlas-readiness-truth {
+        grid-template-columns: 1fr;
+    }
+
+    .atlas-workflow-strip {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 720px) {
+    .atlas-readiness-metrics,
+    .atlas-count-gate-cards {
+        grid-template-columns: 1fr;
+    }
+}

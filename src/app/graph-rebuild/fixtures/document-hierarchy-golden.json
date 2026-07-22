@@ -1,0 +1,44 @@
+{
+  "schemaVersion": "phoenix-document-hierarchy-golden/v1",
+  "cases": [
+    {
+      "name": "nested siblings skipped levels and promotion",
+      "noteId": "hierarchy-golden",
+      "text": "# Book\n\nBook opening.\n\n## Chapter One\n\nChapter one body.\n\n### Scene A\n\nScene A body.\n\n#### Beat A\n\nBeat A body.\n\n## Chapter Two\n\nChapter two body.\n\n#### Deep Jump\n\nDeep jump body.\n\n### Scene B\n\nScene B body.\n\n# Appendix\n\nAppendix body.\n\n## Notes\n\nNotes body.",
+      "sections": [
+        { "label": "Book", "kind": "section", "depth": 1, "parent": "Document", "startsAt": "# Book", "endsBefore": "# Appendix" },
+        { "label": "Chapter One", "kind": "subsection", "depth": 2, "parent": "Book", "startsAt": "## Chapter One", "endsBefore": "## Chapter Two" },
+        { "label": "Scene A", "kind": "subsection", "depth": 3, "parent": "Chapter One", "startsAt": "### Scene A", "endsBefore": "## Chapter Two" },
+        { "label": "Beat A", "kind": "subsection", "depth": 4, "parent": "Scene A", "startsAt": "#### Beat A", "endsBefore": "## Chapter Two" },
+        { "label": "Chapter Two", "kind": "subsection", "depth": 2, "parent": "Book", "startsAt": "## Chapter Two", "endsBefore": "# Appendix" },
+        { "label": "Deep Jump", "kind": "subsection", "depth": 4, "parent": "Chapter Two", "startsAt": "#### Deep Jump", "endsBefore": "### Scene B" },
+        { "label": "Scene B", "kind": "subsection", "depth": 3, "parent": "Chapter Two", "startsAt": "### Scene B", "endsBefore": "# Appendix" },
+        { "label": "Appendix", "kind": "section", "depth": 1, "parent": "Document", "startsAt": "# Appendix", "endsBefore": null },
+        { "label": "Notes", "kind": "subsection", "depth": 2, "parent": "Appendix", "startsAt": "## Notes", "endsBefore": null }
+      ],
+      "paragraphs": [
+        { "text": "Book opening.", "parent": "Book", "ancestors": ["Book", "Document"] },
+        { "text": "Chapter one body.", "parent": "Chapter One", "ancestors": ["Chapter One", "Book", "Document"] },
+        { "text": "Beat A body.", "parent": "Beat A", "ancestors": ["Beat A", "Scene A", "Chapter One", "Book", "Document"] },
+        { "text": "Deep jump body.", "parent": "Deep Jump", "ancestors": ["Deep Jump", "Chapter Two", "Book", "Document"] },
+        { "text": "Scene B body.", "parent": "Scene B", "ancestors": ["Scene B", "Chapter Two", "Book", "Document"] },
+        { "text": "Notes body.", "parent": "Notes", "ancestors": ["Notes", "Appendix", "Document"] }
+      ]
+    },
+    {
+      "name": "rootless levels do not invent ancestors",
+      "noteId": "hierarchy-rootless-golden",
+      "text": "### Orphan Topic\n\nOrphan body.\n\n#### Detail\n\nDetail body.\n\n## Promoted Topic\n\nPromoted body.",
+      "sections": [
+        { "label": "Orphan Topic", "kind": "subsection", "depth": 3, "parent": "Document", "startsAt": "### Orphan Topic", "endsBefore": "## Promoted Topic" },
+        { "label": "Detail", "kind": "subsection", "depth": 4, "parent": "Orphan Topic", "startsAt": "#### Detail", "endsBefore": "## Promoted Topic" },
+        { "label": "Promoted Topic", "kind": "subsection", "depth": 2, "parent": "Document", "startsAt": "## Promoted Topic", "endsBefore": null }
+      ],
+      "paragraphs": [
+        { "text": "Orphan body.", "parent": "Orphan Topic", "ancestors": ["Orphan Topic", "Document"] },
+        { "text": "Detail body.", "parent": "Detail", "ancestors": ["Detail", "Orphan Topic", "Document"] },
+        { "text": "Promoted body.", "parent": "Promoted Topic", "ancestors": ["Promoted Topic", "Document"] }
+      ]
+    }
+  ]
+}

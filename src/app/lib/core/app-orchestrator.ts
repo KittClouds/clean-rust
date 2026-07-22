@@ -12,7 +12,7 @@ export type BootPhase =
     | 'shell'         // Phase 0: UI shell visible, spinner shown
     | 'runtime_load'  // Phase 1: Phoenix runtime loaded (not yet hydrated)
     | 'registry'      // Phase 2: SmartGraphRegistry hydrated from Dexie cache
-    | 'runtime_hydrate' // Phase 3: Phoenix initialized with entities from registry
+    | 'runtime_hydrate' // Phase 3: Phoenix content recovered; optional indexes remain deferred
     | 'ready'         // Phase 4: App interactive, note can open, editor usable
     | 'background';   // Phase 5: Background hydration and sync finished
 

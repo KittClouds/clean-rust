@@ -12,9 +12,10 @@ use phoenix_semantic_v2::{
 use phoenix_state_schema_post::api as state_schema_api;
 use phoenix_store_native_core::{
     PhoenixArchiveStoreV2, PhoenixCausalPatchStore, PhoenixErPatchStore,
-    PhoenixEventIdentityPatchStore, PhoenixGraphPatchStore, PhoenixMemoryPatchStore,
-    PhoenixRelationPatchStore, PhoenixScopeRuntimeStore, PhoenixSemanticGraphPatchStore,
-    PhoenixStateSchemaPatchStore, PhoenixTemporalPatchStore, ScopeImageSpec,
+    PhoenixEventIdentityPatchStore, PhoenixGraphKernelStoreV2, PhoenixGraphLearningStore,
+    PhoenixGraphPatchStore, PhoenixMemoryPatchStore, PhoenixRelationPatchStore,
+    PhoenixScopeRuntimeStore, PhoenixSemanticGraphPatchStore, PhoenixStateSchemaPatchStore,
+    PhoenixTemporalPatchStore, ScopeImageSpec,
 };
 use phoenix_temporal_post::api as temporal_api;
 
@@ -387,6 +388,8 @@ where
     S: PhoenixArchiveStoreV2
         + PhoenixScopeRuntimeStore
         + PhoenixGraphPatchStore
+        + PhoenixGraphKernelStoreV2
+        + PhoenixGraphLearningStore
         + PhoenixSemanticGraphPatchStore,
 {
     let mut context = PipelineGenerationContext::new(store, request)?;
@@ -460,6 +463,8 @@ where
         + PhoenixStateSchemaPatchStore
         + PhoenixMemoryPatchStore
         + PhoenixGraphPatchStore
+        + PhoenixGraphKernelStoreV2
+        + PhoenixGraphLearningStore
         + PhoenixSemanticGraphPatchStore,
 {
     let mut context = PipelineGenerationContext::new(store, request)?;
@@ -1010,7 +1015,10 @@ fn run_graph_stage<S>(
     created_at: i64,
 ) -> Result<StageProductEnvelope<GraphScopeSidecar>, PipelineApiError>
 where
-    S: PhoenixGraphPatchStore + PhoenixSemanticGraphPatchStore,
+    S: PhoenixGraphPatchStore
+        + PhoenixSemanticGraphPatchStore
+        + PhoenixGraphKernelStoreV2
+        + PhoenixGraphLearningStore,
 {
     let batch = graph_api::derive_batch_from_analysis(
         analysis,

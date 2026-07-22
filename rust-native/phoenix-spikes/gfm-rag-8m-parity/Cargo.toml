@@ -1,0 +1,48 @@
+[package]
+name = "gfm-rag-8m-parity"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[features]
+default = []
+mpnet-onnx = ["dep:ort", "dep:ort-sys", "dep:tokenizers"]
+
+[dependencies]
+blake3 = "1.8"
+bytemuck = { version = "1.23", features = ["derive"] }
+candle-core = "0.11.0"
+candle-nn = "0.11.0"
+hashbrown = { version = "0.15", features = ["serde"] }
+memchr = "2.7"
+memmap2 = "0.9"
+phoenix-model-hot-cache = { path = "../phoenix-model-hot-cache" }
+rayon = "1.12"
+safetensors = "0.8"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+sha2 = "0.10"
+thiserror = "2.0"
+wide = "0.7.33"
+zerocopy = { version = "0.7", features = ["derive"] }
+
+ort = { version = "=2.0.0-rc.9", default-features = false, features = ["load-dynamic", "ndarray"], optional = true }
+ort-sys = { version = "=2.0.0-rc.9", default-features = false, optional = true }
+tokenizers = { version = "=0.22.2", default-features = false, features = ["onig"], optional = true }
+
+[dev-dependencies]
+approx = "0.5"
+tempfile = "3.20"
+
+[[bin]]
+name = "gfm-parity"
+path = "src/bin/gfm_parity.rs"
+
+[[bin]]
+name = "gfm-perf"
+path = "src/bin/gfm_perf.rs"
+
+[[bin]]
+name = "gfm-mpnet-smoke"
+path = "src/bin/gfm_mpnet_smoke.rs"
+required-features = ["mpnet-onnx"]

@@ -3,7 +3,6 @@ import type {
     GraphRebuildEntityLinkSuggestion,
     GraphRebuildFinalLinkPatch,
     GraphRebuildLinkSuggestion,
-    GraphRebuildRelationship,
     GraphRebuildResolutionSuggestion,
     GraphRebuildShadowLink,
     GraphRebuildSnapshot,
@@ -18,6 +17,7 @@ import type {
     GraphSemanticTaskSourceKind,
     GraphSemanticTaskStatus,
 } from './graph-rebuild-snapshot';
+import type { GraphSemanticDerivationContext } from './graph-semantic-derivation-context';
 
 interface TaskDraft {
     taskKind: GraphSemanticTaskKind;
@@ -39,14 +39,15 @@ const MAX_EVIDENCE_IDS = 24;
 export function buildGraphSemanticTaskSummary(
     snapshot: GraphRebuildSnapshot,
     generatedAt = snapshot.builtAt,
+    context?: GraphSemanticDerivationContext,
 ) {
     const builder = new SemanticTaskBuilder(snapshot.id, generatedAt);
     addLinkPredictionTasks(builder, snapshot);
     addEdgeClassificationTasks(builder, snapshot);
     addNodeClassificationTasks(builder, snapshot);
-    addGraphCompletionTasks(builder, snapshot);
+    addGraphCompletionTasks(builder, snapshot, context);
     addCommunityDetectionTasks(builder, snapshot);
-    addAnomalyDetectionTasks(builder, snapshot);
+    addAnomalyDetectionTasks(builder, snapshot, context);
     addPathReasoningTasks(builder, snapshot);
     return builder.summary();
 }
@@ -169,14 +170,20 @@ function addNodeClassificationTasks(builder: SemanticTaskBuilder, snapshot: Grap
     }
 }
 
-function addGraphCompletionTasks(builder: SemanticTaskBuilder, snapshot: GraphRebuildSnapshot): void {
+function addGraphCompletionTasks(
+    builder: SemanticTaskBuilder,
+    snapshot: GraphRebuildSnapshot,
+    context?: GraphSemanticDerivationContext,
+): void {
     for (const suggestion of (snapshot.graphAwareLinkSuggestions || []).filter((row) => row.kind === 'missing_triangle')) {
         addMissingEdgeTask(builder, suggestion);
     }
     for (const edge of snapshot.embeddingGraphPostProcess?.bridgeEdges || []) addBridgeCompletionTask(builder, edge);
     for (const suggestion of snapshot.resolutionSuggestions || []) addMissingIdentityTask(builder, suggestion);
     for (const patch of snapshot.finalLinkPatchLog?.patches || []) addPatchCompletionTask(builder, patch);
-    for (const chunk of snapshot.chunks.filter((row) => row.meaningFrame?.eventCues.length && !snapshot.events.some((event) => event.chunkId === row.id)).slice(0, 32)) {
+    const eventChunkIds = context?.eventChunkIds()
+        || new Set(snapshot.events.map((event) => event.chunkId).filter(Boolean));
+    for (const chunk of snapshot.chunks.filter((row) => row.meaningFrame?.eventCues.length && !eventChunkIds.has(row.id)).slice(0, 32)) {
         builder.add({
             taskKind: 'graph_completion',
             proposalKind: 'missing_frame',
@@ -213,8 +220,13 @@ function addCommunityDetectionTasks(builder: SemanticTaskBuilder, snapshot: Grap
     }
 }
 
-function addAnomalyDetectionTasks(builder: SemanticTaskBuilder, snapshot: GraphRebuildSnapshot): void {
-    const targetRows = new Map((snapshot.embeddingGraphPostProcess?.targets || []).map((row) => [row.targetId, row]));
+function addAnomalyDetectionTasks(
+    builder: SemanticTaskBuilder,
+    snapshot: GraphRebuildSnapshot,
+    context?: GraphSemanticDerivationContext,
+): void {
+    const targetRows = context?.targetRows()
+        || new Map((snapshot.embeddingGraphPostProcess?.targets || []).map((row) => [row.targetId, row]));
     for (const targetId of snapshot.embeddingGraphPostProcess?.outlierTargetIds || []) {
         const row = targetRows.get(targetId);
         builder.add({

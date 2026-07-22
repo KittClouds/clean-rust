@@ -1,74 +1,65 @@
 import type {
-    GraphRebuildEdge,
     GraphRebuildSnapshot,
     GraphSemanticAdjudicationCounters,
     GraphSemanticAdjudicationDecision,
     GraphSemanticAdjudicationDAGSummary,
-    GraphSemanticAdjudicationMutation,
     GraphSemanticAdjudicationReceipt,
     GraphSemanticAdjudicationScoringBundle,
     GraphSemanticAdjudicationState,
     GraphSemanticCandidate,
     GraphSemanticRerankJudgment,
 } from './graph-rebuild-snapshot';
+import type { GraphSemanticDerivationContext } from './graph-semantic-derivation-context';
+import { GRAPH_SEMANTIC_DISCOVERY_POLICY } from './graph-asserted-truth-authority';
 
 const MAX_DECISIONS = 192;
 const ACCEPT_THRESHOLD = 0.64;
 
+interface SemanticPromotionPreview {
+    edgeId: string;
+    edgeType: string;
+    sourceEntityId: string;
+    targetEntityId: string;
+    factIds: string[];
+}
+
 export function buildGraphSemanticAdjudicationDAGSummary(
     snapshot: GraphRebuildSnapshot,
     generatedAt = snapshot.builtAt,
+    context?: GraphSemanticDerivationContext,
 ): GraphSemanticAdjudicationDAGSummary {
     const candidates = snapshot.semanticCandidateSummary?.candidates || [];
-    const judgments = new Map((snapshot.semanticRerankSummary?.judgments || []).map((row) => [row.candidateId, row]));
-    const builder = new SemanticAdjudicationBuilder(snapshot, generatedAt);
+    const judgments = context?.judgmentRows()
+        || new Map((snapshot.semanticRerankSummary?.judgments || []).map((row) => [row.candidateId, row]));
+    const builder = new SemanticAdjudicationBuilder(snapshot, generatedAt, context);
     for (const candidate of candidates.slice(0, MAX_DECISIONS)) {
         builder.add(candidate, judgments.get(candidate.id));
     }
     return builder.summary();
 }
 
-export function applyGraphSemanticAdjudicationMutations(
-    snapshot: GraphRebuildSnapshot,
-    summary: GraphSemanticAdjudicationDAGSummary | undefined,
-): void {
-    if (!summary) return;
-    const seen = new Set(snapshot.edges.map((edge) => edge.id));
-    for (const mutation of summary.mutations) {
-        if (mutation.status !== 'applied' || mutation.operation !== 'add_semantic_edge') continue;
-        if (!mutation.createdEdge || seen.has(mutation.createdEdge.id)) continue;
-        snapshot.edges.push(mutation.createdEdge);
-        seen.add(mutation.createdEdge.id);
-    }
-    snapshot.edges.sort((left, right) =>
-        right.weight - left.weight
-        || left.type.localeCompare(right.type)
-        || left.id.localeCompare(right.id));
-}
-
 class SemanticAdjudicationBuilder {
     private readonly decisions: GraphSemanticAdjudicationDecision[] = [];
-    private readonly mutations: GraphSemanticAdjudicationMutation[] = [];
     private readonly receipts: GraphSemanticAdjudicationReceipt[] = [];
     private readonly acceptedKeys = new Set<string>();
 
-    constructor(private readonly snapshot: GraphRebuildSnapshot, private readonly generatedAt: number) {}
+    constructor(
+        private readonly snapshot: GraphRebuildSnapshot,
+        private readonly generatedAt: number,
+        private readonly context?: GraphSemanticDerivationContext,
+    ) {}
 
     add(candidate: GraphSemanticCandidate, judgment: GraphSemanticRerankJudgment | undefined): void {
         const proposalId = `adjudication-proposal:${slug(candidate.id)}`;
         const supportedId = `adjudication-supported:${slug(candidate.id)}`;
         const scoringBundle = scoringBundleFor(candidate, judgment);
-        const mutationDraft = mutationFor(this.snapshot, candidate, judgment, this.generatedAt);
-        const duplicateKey = mutationDraft ? mutationKey(mutationDraft) : '';
+        const promotionPreview = promotionPreviewFor(this.snapshot, candidate, judgment, this.context);
+        const duplicateKey = promotionPreview ? promotionKey(promotionPreview) : '';
         const alreadyAccepted = duplicateKey ? this.acceptedKeys.has(duplicateKey) : false;
-        const state = decisionState(candidate, judgment, mutationDraft, alreadyAccepted);
-        const receipt = receiptFor(candidate, state, mutationDraft, judgment);
-        const mutation = state === 'accepted' && mutationDraft
-            ? { ...mutationDraft, undoReceiptId: receipt.id }
-            : undefined;
+        const state = decisionState(candidate, judgment, promotionPreview, alreadyAccepted);
+        const receipt = receiptFor(candidate, state, judgment);
 
         if (duplicateKey && state === 'accepted') this.acceptedKeys.add(duplicateKey);
-        if (mutation) this.mutations.push(mutation);
         this.receipts.push(receipt);
         this.decisions.push({
             id: `adjudication-decision:${slug(candidate.id)}`,
@@ -81,12 +72,11 @@ class SemanticAdjudicationBuilder {
             sourceHypothesis: sourceHypothesis(candidate),
             evidenceTargetIds: evidenceTargets(candidate),
             scoringBundle,
-            rationale: rationaleFor(candidate, judgment, state, mutationDraft, alreadyAccepted),
+            rationale: rationaleFor(candidate, judgment, state, promotionPreview, alreadyAccepted),
             undoReceiptId: receipt.id,
-            mutationId: mutation?.id,
-            affectedGraphAtomIds: mutation?.affectedGraphAtomIds || [],
-            affectedGraphFactIds: mutation?.affectedGraphFactIds || [],
-            ledgerOnly: state !== 'accepted',
+            affectedGraphAtomIds: [],
+            affectedGraphFactIds: [],
+            ledgerOnly: true,
             createdAt: this.generatedAt,
         });
     }
@@ -103,9 +93,9 @@ class SemanticAdjudicationBuilder {
             states: ['proposed', 'supported', 'accepted', 'deferred', 'rejected', 'invalidated', 'superseded'],
             dagEdges: decisions.flatMap((decision) => dagEdgesFor(decision)),
             decisions,
-            mutations: this.mutations,
+            mutations: [],
             receipts: this.receipts,
-            counters: adjudicationCounters(decisions, this.mutations, this.receipts),
+            counters: adjudicationCounters(decisions, this.receipts),
         };
     }
 }
@@ -113,7 +103,7 @@ class SemanticAdjudicationBuilder {
 function decisionState(
     candidate: GraphSemanticCandidate,
     judgment: GraphSemanticRerankJudgment | undefined,
-    mutation: GraphSemanticAdjudicationMutation | undefined,
+    promotionPreview: SemanticPromotionPreview | undefined,
     alreadyAccepted: boolean,
 ): GraphSemanticAdjudicationState {
     if (candidate.status === 'blocked') return 'invalidated';
@@ -122,58 +112,38 @@ function decisionState(
     if (judgment.decision === 'reject') return 'rejected';
     if (judgment.decision === 'defer' || judgment.decision === 'review') return 'deferred';
     if (judgment.calibratedScore < ACCEPT_THRESHOLD) return 'supported';
-    return mutation ? 'accepted' : 'supported';
+    return promotionPreview ? 'accepted' : 'supported';
 }
 
-function mutationFor(
+function promotionPreviewFor(
     snapshot: GraphRebuildSnapshot,
     candidate: GraphSemanticCandidate,
     judgment: GraphSemanticRerankJudgment | undefined,
-    createdAt: number,
-): GraphSemanticAdjudicationMutation | undefined {
+    context?: GraphSemanticDerivationContext,
+): SemanticPromotionPreview | undefined {
     if (!judgment || judgment.decision !== 'accept') return undefined;
     if (candidate.kind === 'missing_frame' || candidate.kind === 'contradiction_review' || candidate.kind === 'outlier_review') return undefined;
-    const pair = entityPairFor(snapshot, candidate);
+    const pair = entityPairFor(snapshot, candidate, context);
     if (!pair) return undefined;
     const edgeType = edgeTypeFor(candidate);
     const edgeId = `semantic-adjudication:${edgeType}:${slug(`${candidate.id}:${pair[0]}:${pair[1]}`)}`;
-    const factId = `fact:semantic-adjudication:${slug(edgeId)}`;
-    const atomIds = [`atom:entity:${pair[0]}`, `atom:entity:${pair[1]}`];
-    const edge: GraphRebuildEdge = {
-        id: edgeId,
-        sourceId: pair[0],
-        targetId: pair[1],
-        type: edgeType,
-        weight: round(Math.max(candidate.rank, judgment.calibratedScore)),
-        confidence: judgment.calibratedScore,
-        evidenceAnchorIds: candidate.evidenceIds.slice(0, 16),
-        scopeKeys: [`semantic-adjudication:${snapshot.scopeId}`],
-        noteIds: evidenceNoteIds(snapshot, candidate),
-    };
     return {
-        id: `adjudication-mutation:${slug(edgeId)}`,
-        decisionId: `adjudication-decision:${slug(candidate.id)}`,
-        candidateId: candidate.id,
-        operation: 'add_semantic_edge',
-        status: 'applied',
-        createdEdgeId: edge.id,
-        createdFactIds: [factId],
-        affectedGraphAtomIds: atomIds,
-        affectedGraphFactIds: [factId],
-        createdEdge: edge,
-        undoReceiptId: '',
-        reversiblePatch: {
-            undoOperation: 'remove_semantic_edge_and_fact',
-            removeEdgeId: edge.id,
-            removeFactIds: [factId],
-        },
-        createdAt,
+        edgeId,
+        edgeType,
+        sourceEntityId: pair[0],
+        targetEntityId: pair[1],
+        factIds: [`fact:semantic-adjudication:${slug(edgeId)}`],
     };
 }
 
-function entityPairFor(snapshot: GraphRebuildSnapshot, candidate: GraphSemanticCandidate): [string, string] | null {
-    const anchors = new Map(snapshot.entityAnchors.map((anchor) => [anchor.id, anchor.entityId]));
-    const nodeIds = snapshot.nodes.map((node) => node.entityId);
+function entityPairFor(
+    snapshot: GraphRebuildSnapshot,
+    candidate: GraphSemanticCandidate,
+    context?: GraphSemanticDerivationContext,
+): [string, string] | null {
+    const anchors = context?.anchorEntityIds()
+        || new Map(snapshot.entityAnchors.map((anchor) => [anchor.id, anchor.entityId]));
+    const nodeIds = context?.nodeEntityIds() || snapshot.nodes.map((node) => node.entityId);
     const found: string[] = [];
     const tokens = [
         ...candidate.sourceTargetIds,
@@ -223,7 +193,6 @@ function scoringBundleFor(
 function receiptFor(
     candidate: GraphSemanticCandidate,
     state: GraphSemanticAdjudicationState,
-    mutation: GraphSemanticAdjudicationMutation | undefined,
     judgment: GraphSemanticRerankJudgment | undefined,
 ): GraphSemanticAdjudicationReceipt {
     return {
@@ -232,14 +201,12 @@ function receiptFor(
         judgmentId: judgment?.id,
         state,
         reversible: true,
-        mutationAllowed: state === 'accepted',
-        invariant: state === 'accepted' ? 'phase5_reversible_topology_commit' : 'phase5_ledger_only_no_topology_commit',
+        mutationAllowed: false,
+        invariant: GRAPH_SEMANTIC_DISCOVERY_POLICY,
         evidenceTargetIds: evidenceTargets(candidate),
-        affectedGraphAtomIds: state === 'accepted' ? mutation?.affectedGraphAtomIds || [] : [],
-        affectedGraphFactIds: state === 'accepted' ? mutation?.affectedGraphFactIds || [] : [],
-        undoHint: mutation
-            ? `remove edge ${mutation.createdEdgeId} and facts ${mutation.createdFactIds.join(',')}`
-            : 'ledger-only decision; remove this decision row to undo evaluation',
+        affectedGraphAtomIds: [],
+        affectedGraphFactIds: [],
+        undoHint: 'ledger-only decision; remove this decision row to undo evaluation',
         detail: `${candidate.kind} ${state}${judgment ? ` from ${judgment.topLabelKind}` : ' without rerank judgment'}`,
     };
 }
@@ -253,19 +220,18 @@ function dagEdgesFor(decision: GraphSemanticAdjudicationDecision): Array<{ from:
 
 function adjudicationCounters(
     decisions: GraphSemanticAdjudicationDecision[],
-    mutations: GraphSemanticAdjudicationMutation[],
     receipts: GraphSemanticAdjudicationReceipt[],
 ): GraphSemanticAdjudicationCounters {
     return {
         byState: countBy(decisions, (row) => row.state),
         byCandidateKind: countBy(decisions, (row) => row.candidateKind),
         decisionCount: decisions.length,
-        mutationCount: mutations.length,
-        appliedMutationCount: mutations.filter((row) => row.status === 'applied').length,
-        ledgerOnlyCount: decisions.filter((row) => row.ledgerOnly).length,
+        mutationCount: 0,
+        appliedMutationCount: 0,
+        ledgerOnlyCount: decisions.length,
         receiptCount: receipts.length,
         reversibleReceiptCount: receipts.filter((row) => row.reversible).length,
-        topologyCommitCount: receipts.filter((row) => row.mutationAllowed).length,
+        topologyCommitCount: 0,
     };
 }
 
@@ -284,14 +250,16 @@ function rationaleFor(
     candidate: GraphSemanticCandidate,
     judgment: GraphSemanticRerankJudgment | undefined,
     state: GraphSemanticAdjudicationState,
-    mutation: GraphSemanticAdjudicationMutation | undefined,
+    promotionPreview: SemanticPromotionPreview | undefined,
     alreadyAccepted: boolean,
 ): string[] {
     return [
         `state:${state}`,
         judgment ? `rerank:${judgment.decision}:${judgment.calibratedScore}` : 'rerank:missing',
         alreadyAccepted ? 'superseded_by_prior_equivalent_mutation' : '',
-        mutation ? `topology_commit:${mutation.operation}:${mutation.createdEdgeId}` : 'ledger_only:no_safe_topology_target',
+        promotionPreview
+            ? `promotion_preview:${promotionPreview.edgeId}:${promotionPreview.factIds.join(',')}:no_topology_commit`
+            : 'ledger_only:no_safe_topology_target',
         ...candidate.rationale.slice(0, 5),
     ].filter(Boolean);
 }
@@ -303,19 +271,8 @@ function edgeTypeFor(candidate: GraphSemanticCandidate): string {
     return 'semantic-relation-link';
 }
 
-function mutationKey(mutation: GraphSemanticAdjudicationMutation): string {
-    const edge = mutation.createdEdge;
-    return edge ? `${edge.sourceId}|${edge.targetId}|${edge.type}` : mutation.id;
-}
-
-function evidenceNoteIds(snapshot: GraphRebuildSnapshot, candidate: GraphSemanticCandidate): string[] {
-    const noteIds = new Set<string>();
-    const anchors = new Map(snapshot.entityAnchors.map((anchor) => [anchor.id, anchor.noteId]));
-    for (const id of candidate.evidenceIds) {
-        const noteId = anchors.get(id);
-        if (noteId) noteIds.add(noteId);
-    }
-    return [...noteIds].sort();
+function promotionKey(preview: SemanticPromotionPreview): string {
+    return `${preview.sourceEntityId}|${preview.targetEntityId}|${preview.edgeType}`;
 }
 
 function stateRank(state: GraphSemanticAdjudicationState): number {

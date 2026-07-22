@@ -5,7 +5,7 @@ use std::time::Instant;
 
 use phoenix_alex::Lexicon;
 use phoenix_api::{PhoenixPipelineApi, SidecarContinuityRunReport};
-use phoenix_chunker::ChunkerConfig;
+use phoenix_chunker_native::ChunkerConfig;
 use phoenix_dynamic_ner::{MentionStatus, PhoenixNerEngineBuilder, SurfaceNerInput};
 use phoenix_graph_kernel::KernelGraphSnapshot;
 use phoenix_ingest_overgraph::{InvarantV3Config, PhoenixInvarantV3};
@@ -239,7 +239,7 @@ fn run_once(
     let total_started = Instant::now();
 
     let started = Instant::now();
-    let base_chunks = phoenix_chunker::api::default_chunk_ranges(&input.text);
+    let base_chunks = phoenix_chunker_native::api::default_chunk_ranges(&input.text);
     let lens_chunk_count_by_lens = lens_chunk_counts(&input.text);
     let chunker_us = elapsed_us(started);
 
@@ -453,7 +453,7 @@ fn lens_chunk_counts(text: &str) -> BTreeMap<String, usize> {
     .map(|(name, config)| {
         (
             name.to_owned(),
-            phoenix_chunker::api::chunk_ranges(text, &config).len(),
+            phoenix_chunker_native::api::chunk_ranges(text, &config).len(),
         )
     })
     .collect()
@@ -600,10 +600,7 @@ fn load_cases(
 }
 
 fn extract_chapter_case(text: &str, chapter: usize) -> Result<CaseInput, String> {
-    let mut headings = text
-        .match_indices("## Chapter ")
-        .map(|(offset, _)| offset)
-        .collect::<Vec<_>>();
+    let mut headings = chapter_heading_offsets(text);
     if headings.is_empty() {
         return Err("no chapter headings found in shortrun.md".to_owned());
     }
@@ -629,6 +626,34 @@ fn extract_chapter_case(text: &str, chapter: usize) -> Result<CaseInput, String>
         source_path: format!("docs/shortrun.md#chapter-{chapter}"),
         text: slice,
     })
+}
+
+fn chapter_heading_offsets(text: &str) -> Vec<usize> {
+    let mut headings = text
+        .match_indices("## Chapter ")
+        .map(|(offset, _)| offset)
+        .collect::<Vec<_>>();
+    if !headings.is_empty() {
+        headings.sort_unstable();
+        return headings;
+    }
+    let mut offset = 0usize;
+    for line in text.split_inclusive('\n') {
+        let trimmed = line.trim_start();
+        let heading_offset = offset + line.len().saturating_sub(trimmed.len());
+        offset += line.len();
+        let Some(rest) = trimmed.strip_prefix("Chapter ") else {
+            continue;
+        };
+        let Some((number, _)) = rest.split_once(':') else {
+            continue;
+        };
+        if !number.is_empty() && number.bytes().all(|byte| byte.is_ascii_digit()) {
+            headings.push(heading_offset);
+        }
+    }
+    headings.sort_unstable();
+    headings
 }
 
 fn story_lexicon() -> Result<Lexicon, String> {
@@ -682,7 +707,7 @@ fn tokenize_for_ner(text: &str) -> (Vec<TokenSpan>, Vec<SentenceSpan>) {
         tokens.push(token_span(text, s, text.len()));
     }
 
-    let sentences = phoenix_chunker::api::sentence_ranges(text)
+    let sentences = phoenix_chunker_native::api::sentence_ranges(text)
         .into_iter()
         .enumerate()
         .map(|(index, (start, end))| SentenceSpan {

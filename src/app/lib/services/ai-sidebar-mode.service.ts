@@ -9,7 +9,6 @@ export interface CanvasSelectionContext {
     text: string;
     clipId?: string;
     createdAt: number;
-    autoApplyEligible: boolean;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -27,13 +26,12 @@ export class AiSidebarModeService {
         this.modeSignal.set(mode);
     }
 
-    switchToCanvas(selection?: Omit<CanvasSelectionContext, 'createdAt' | 'autoApplyEligible'>): void {
+    switchToCanvas(selection?: Omit<CanvasSelectionContext, 'createdAt'>): void {
         this.modeSignal.set('canvas');
         if (selection) {
             this.selectionContextSignal.set({
                 ...selection,
                 createdAt: Date.now(),
-                autoApplyEligible: true,
             });
         }
         this.requestComposerFocus();
@@ -48,7 +46,7 @@ export class AiSidebarModeService {
         this.composerFocusTicketSignal.update((value) => value + 1);
     }
 
-    setSelectionContext(selection: Omit<CanvasSelectionContext, 'createdAt' | 'autoApplyEligible'> | null): void {
+    setSelectionContext(selection: Omit<CanvasSelectionContext, 'createdAt'> | null): void {
         if (!selection) {
             this.selectionContextSignal.set(null);
             return;
@@ -56,16 +54,6 @@ export class AiSidebarModeService {
         this.selectionContextSignal.set({
             ...selection,
             createdAt: Date.now(),
-            autoApplyEligible: true,
-        });
-    }
-
-    markSelectionAutoApplyUsed(): void {
-        const current = this.selectionContextSignal();
-        if (!current) return;
-        this.selectionContextSignal.set({
-            ...current,
-            autoApplyEligible: false,
         });
     }
 

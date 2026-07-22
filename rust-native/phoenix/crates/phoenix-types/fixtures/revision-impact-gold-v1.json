@@ -1,0 +1,413 @@
+{
+  "schemaVersion": "phoenix-revision-impact-gold/v1",
+  "contractSchemaVersion": 1,
+  "cases": [
+    {
+      "caseId": "gold:delayed_reveal",
+      "family": "delayed_reveal",
+      "title": "Silas learns Kai exists in chapter twelve instead of chapter four",
+      "mutation": {
+        "kind": "shift_validity",
+        "factId": "fact:silas_knows_kai",
+        "newInterval": {
+          "validFrom": 1200,
+          "validToExclusive": null
+        }
+      },
+      "expectedImpacts": [
+        {
+          "sceneId": "scene:chapter_5_iriane_assignment",
+          "classification": "broken",
+          "constraintKinds": [
+            "requires_knowledge"
+          ],
+          "rationale": "Iriane says Silas sent her specifically for Kai before Silas can know Kai exists."
+        },
+        {
+          "sceneId": "scene:chapter_8_temporal_signature",
+          "classification": "broken",
+          "constraintKinds": [
+            "requires_knowledge"
+          ],
+          "rationale": "Silas identifies Kai's temporal signature before the shifted reveal."
+        },
+        {
+          "sceneId": "scene:chapter_10_hazel_assumption",
+          "classification": "suspicious",
+          "constraintKinds": [
+            "causal_support"
+          ],
+          "rationale": "Hazel's assumption that Silas is already involved loses its strongest support."
+        }
+      ],
+      "expectedUnknowns": [
+        {
+          "sceneId": "scene:chapter_6_combat",
+          "missingPlanes": [
+            "capability"
+          ],
+          "rationale": "The combat appears unrelated, but capability-rule coverage is intentionally unavailable."
+        }
+      ],
+      "reasonableRepairs": [
+        {
+          "repairId": "edit:reassign_causal_attribution:iriane_event_trail",
+          "kind": "reassign_causal_attribution",
+          "targetSceneIds": [
+            "scene:chapter_5_iriane_assignment",
+            "scene:chapter_8_temporal_signature",
+            "scene:chapter_10_hazel_assumption"
+          ],
+          "rationale": "Keep Silas wholly unaware until chapter twelve while Iriane independently follows unintended consequences of the missing friend's past actions."
+        }
+      ],
+      "reviewStatus": "author_reviewed",
+      "reviewedBy": "author:workspace-owner",
+      "reviewedAtUnixMs": 1784295149199
+    },
+    {
+      "caseId": "gold:earlier_death",
+      "family": "earlier_death",
+      "title": "Mara dies before the siege instead of after it",
+      "mutation": {
+        "kind": "change_state",
+        "subjectId": "entity:mara",
+        "stateKind": "alive",
+        "replacement": {
+          "kind": "boolean",
+          "value": false
+        },
+        "validFrom": 700
+      },
+      "expectedImpacts": [
+        {
+          "sceneId": "scene:chapter_9_mara_warning",
+          "classification": "broken",
+          "constraintKinds": [
+            "requires_alive"
+          ],
+          "rationale": "Mara directly warns Kai after the revised death boundary."
+        },
+        {
+          "sceneId": "scene:chapter_11_faction_response",
+          "classification": "suspicious",
+          "constraintKinds": [
+            "causal_support"
+          ],
+          "rationale": "The faction response still works, but its stated motivation depends on Mara's later actions."
+        }
+      ],
+      "expectedUnknowns": [
+        {
+          "sceneId": "scene:chapter_12_resurrection_rumor",
+          "missingPlanes": [
+            "lifecycle",
+            "capability"
+          ],
+          "rationale": "The scene may be legal if resurrection exists, but that rule plane is not covered."
+        }
+      ],
+      "reasonableRepairs": [
+        {
+          "repairId": "edit:rebind_warning_to_prerecorded_message:mara",
+          "kind": "rebind_action_to_prior_record",
+          "targetSceneIds": [
+            "scene:chapter_9_mara_warning",
+            "scene:chapter_11_faction_response",
+            "scene:chapter_12_resurrection_rumor"
+          ],
+          "rationale": "Keep Mara definitively dead, deliver her prerecorded warning later, ground the faction response in her legacy and type resurrection claims as false rumors."
+        }
+      ],
+      "reviewStatus": "author_reviewed",
+      "reviewedBy": "author:workspace-owner",
+      "reviewedAtUnixMs": 1784295149199
+    },
+    {
+      "caseId": "gold:changed_witness",
+      "family": "changed_witness",
+      "title": "Orin witnesses the bridge collapse instead of Tamsin",
+      "mutation": {
+        "kind": "supersede_fact",
+        "factId": "fact:tamsin_witnessed_bridge_collapse",
+        "replacement": {
+          "kind": "entity",
+          "value": "entity:orin"
+        },
+        "validFrom": 400
+      },
+      "expectedImpacts": [
+        {
+          "sceneId": "scene:chapter_7_tamsin_testimony",
+          "classification": "broken",
+          "constraintKinds": [
+            "requires_witness"
+          ],
+          "rationale": "Tamsin gives a first-person account of an event she no longer witnessed."
+        },
+        {
+          "sceneId": "scene:chapter_9_court_trusts_tamsin",
+          "classification": "suspicious",
+          "constraintKinds": [
+            "motivation"
+          ],
+          "rationale": "The court's trust in Tamsin loses the testimony that motivated it."
+        }
+      ],
+      "expectedUnknowns": [
+        {
+          "sceneId": "scene:chapter_8_blind_spot",
+          "missingPlanes": [
+            "belief",
+            "identity"
+          ],
+          "rationale": "A second observer may still exist, but observer identity and belief coverage are incomplete."
+        }
+      ],
+      "reasonableRepairs": [
+        {
+          "repairId": "edit:reclassify_testimony_as_hidden_deception:tamsin",
+          "kind": "reclassify_assertion_as_deception",
+          "targetSceneIds": [
+            "scene:chapter_7_tamsin_testimony",
+            "scene:chapter_9_court_trusts_tamsin"
+          ],
+          "rationale": "Keep Orin as the witness, make Tamsin's first-person testimony a deliberate lie, preserve the court's belief and reveal the deception later."
+        }
+      ],
+      "reviewStatus": "author_reviewed",
+      "reviewedBy": "author:workspace-owner",
+      "reviewedAtUnixMs": 1784295149199
+    },
+    {
+      "caseId": "gold:changed_power_limitation",
+      "family": "changed_power_limitation",
+      "title": "Kai can take only two temporal steps before recovery",
+      "mutation": {
+        "kind": "supersede_fact",
+        "factId": "fact:kai_temporal_step_limit",
+        "replacement": {
+          "kind": "integer",
+          "value": 2
+        },
+        "validFrom": 300
+      },
+      "expectedImpacts": [
+        {
+          "sceneId": "scene:chapter_6_three_step_escape",
+          "classification": "broken",
+          "constraintKinds": [
+            "requires_state"
+          ],
+          "rationale": "Kai performs three consecutive temporal steps without the required recovery."
+        },
+        {
+          "sceneId": "scene:chapter_10_training_strategy",
+          "classification": "suspicious",
+          "constraintKinds": [
+            "causal_support"
+          ],
+          "rationale": "The training strategy assumes the former higher limit and becomes less convincing."
+        }
+      ],
+      "expectedUnknowns": [
+        {
+          "sceneId": "scene:chapter_12_artifact_amplification",
+          "missingPlanes": [
+            "capability"
+          ],
+          "rationale": "The artifact may override the limitation, but amplification rules are unavailable."
+        }
+      ],
+      "reasonableRepairs": [
+        {
+          "repairId": "edit:split_power_rule_into_safe_limit_and_overdraw:kai",
+          "kind": "add_costed_capability_overdraw",
+          "targetSceneIds": [
+            "scene:chapter_6_three_step_escape",
+            "scene:chapter_10_training_strategy",
+            "scene:chapter_12_artifact_amplification"
+          ],
+          "rationale": "Treat two steps as Kai's safe limit, make an unaided third cause physical injury and unconsciousness, and let the artifact raise the safe limit to exactly three."
+        }
+      ],
+      "reviewStatus": "author_reviewed",
+      "reviewedBy": "author:workspace-owner",
+      "reviewedAtUnixMs": 1784295149199
+    },
+    {
+      "caseId": "gold:changed_travel_duration",
+      "family": "changed_travel_duration",
+      "title": "Travel from Veyra to the northern fort takes eight hours",
+      "mutation": {
+        "kind": "supersede_fact",
+        "factId": "fact:veyra_to_northern_fort_travel_minutes",
+        "replacement": {
+          "kind": "duration_minutes",
+          "value": 480
+        },
+        "validFrom": 0
+      },
+      "expectedImpacts": [
+        {
+          "sceneId": "scene:chapter_8_same_evening_arrival",
+          "classification": "broken",
+          "constraintKinds": [
+            "requires_reachability",
+            "requires_temporal_order"
+          ],
+          "rationale": "The party arrives before the revised minimum travel interval can elapse."
+        },
+        {
+          "sceneId": "scene:chapter_9_pursuit_pressure",
+          "classification": "suspicious",
+          "constraintKinds": [
+            "foreshadowing"
+          ],
+          "rationale": "The pursuit remains possible, but its compressed timing loses tension and clarity."
+        }
+      ],
+      "expectedUnknowns": [
+        {
+          "sceneId": "scene:chapter_7_portal_rumor",
+          "missingPlanes": [
+            "location",
+            "capability"
+          ],
+          "rationale": "A portal could restore reachability, but its existence and travel rules are not covered."
+        }
+      ],
+      "reasonableRepairs": [
+        {
+          "repairId": "edit:route_arrival_through_constrained_portal",
+          "kind": "add_constrained_travel_method",
+          "targetSceneIds": [
+            "scene:chapter_7_portal_rumor",
+            "scene:chapter_8_same_evening_arrival",
+            "scene:chapter_9_pursuit_pressure"
+          ],
+          "rationale": "Keep ordinary travel at eight hours while establishing a real portal with fixed endpoints, costly activation, limited passengers and a long cooldown."
+        }
+      ],
+      "reviewStatus": "author_reviewed",
+      "reviewedBy": "author:workspace-owner",
+      "reviewedAtUnixMs": 1784295149199
+    },
+    {
+      "caseId": "gold:removed_relationship",
+      "family": "removed_relationship",
+      "title": "Hazel and Silas were never trusted confidants",
+      "mutation": {
+        "kind": "change_state",
+        "subjectId": "entity:hazel",
+        "stateKind": "relationship:silas",
+        "replacement": {
+          "kind": "text",
+          "value": "none"
+        },
+        "validFrom": 0
+      },
+      "expectedImpacts": [
+        {
+          "sceneId": "scene:chapter_6_hazel_uses_private_channel",
+          "classification": "broken",
+          "constraintKinds": [
+            "requires_state"
+          ],
+          "rationale": "Hazel uses access that was established through the removed confidant relationship."
+        },
+        {
+          "sceneId": "scene:chapter_11_betrayal",
+          "classification": "suspicious",
+          "constraintKinds": [
+            "motivation"
+          ],
+          "rationale": "The betrayal loses emotional weight without the former relationship."
+        }
+      ],
+      "expectedUnknowns": [
+        {
+          "sceneId": "scene:chapter_5_public_alliance",
+          "missingPlanes": [
+            "relationship",
+            "belief"
+          ],
+          "rationale": "A public alliance may still explain cooperation, but that distinction is not fully covered."
+        }
+      ],
+      "reasonableRepairs": [
+        {
+          "repairId": "edit:reframe_confidant_access_as_espionage:hazel",
+          "kind": "reclassify_access_as_espionage",
+          "targetSceneIds": [
+            "scene:chapter_5_public_alliance",
+            "scene:chapter_6_hazel_uses_private_channel",
+            "scene:chapter_11_betrayal"
+          ],
+          "rationale": "Make Hazel's private access theft, the public alliance a performance hiding mutual distrust and the later break an exposure plus sabotage of their shared objective."
+        }
+      ],
+      "reviewStatus": "author_reviewed",
+      "reviewedBy": "author:workspace-owner",
+      "reviewedAtUnixMs": 1784295149199
+    },
+    {
+      "caseId": "gold:changed_possession",
+      "family": "changed_possession",
+      "title": "Hazel possesses the chronal key instead of Kai",
+      "mutation": {
+        "kind": "change_state",
+        "subjectId": "entity:kai",
+        "stateKind": "possession:chronal_key",
+        "replacement": {
+          "kind": "entity",
+          "value": "entity:hazel"
+        },
+        "validFrom": 600
+      },
+      "expectedImpacts": [
+        {
+          "sceneId": "scene:chapter_9_kai_opens_vault",
+          "classification": "broken",
+          "constraintKinds": [
+            "requires_possession"
+          ],
+          "rationale": "Kai opens the vault with an object now possessed by Hazel."
+        },
+        {
+          "sceneId": "scene:chapter_10_silas_suspects_kai",
+          "classification": "suspicious",
+          "constraintKinds": [
+            "causal_support"
+          ],
+          "rationale": "Silas's suspicion of Kai loses possession of the key as supporting evidence."
+        }
+      ],
+      "expectedUnknowns": [
+        {
+          "sceneId": "scene:chapter_8_duplicate_key_rumor",
+          "missingPlanes": [
+            "possession",
+            "identity"
+          ],
+          "rationale": "A duplicate key could preserve the scene, but unique-object identity is not certified."
+        }
+      ],
+      "reasonableRepairs": [
+        {
+          "repairId": "edit:rebind_vault_key_use_and_suspicion_to_hazel",
+          "kind": "rebind_possession_dependent_action",
+          "targetSceneIds": [
+            "scene:chapter_8_duplicate_key_rumor",
+            "scene:chapter_9_kai_opens_vault",
+            "scene:chapter_10_silas_suspects_kai"
+          ],
+          "rationale": "Keep the unique key with Hazel, make Kai knowingly depend on her at the vault, shift possession-based suspicion to Hazel and type duplicate-key claims as false rumors."
+        }
+      ],
+      "reviewStatus": "author_reviewed",
+      "reviewedBy": "author:workspace-owner",
+      "reviewedAtUnixMs": 1784295149199
+    }
+  ]
+}

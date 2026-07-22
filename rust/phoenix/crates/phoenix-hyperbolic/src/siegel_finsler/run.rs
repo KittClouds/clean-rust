@@ -36,7 +36,7 @@ pub struct SiegelEdgeInput {
     pub weight_milli: Option<u16>,
 }
 
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SiegelKernelRunReceipt {
     pub contract: SiegelFinslerContract,

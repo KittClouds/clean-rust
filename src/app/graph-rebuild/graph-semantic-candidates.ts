@@ -12,6 +12,7 @@ import type {
     GraphSemanticTaskScore,
     GraphSemanticTaskSummary,
 } from './graph-rebuild-snapshot';
+import type { GraphSemanticDerivationContext } from './graph-semantic-derivation-context';
 
 interface CandidateDraft {
     kind: GraphSemanticCandidateKind;
@@ -45,12 +46,13 @@ export function buildGraphSemanticCandidateSummary(
     snapshot: GraphRebuildSnapshot,
     tasks: GraphSemanticTaskSummary | undefined,
     generatedAt = snapshot.builtAt,
+    context?: GraphSemanticDerivationContext,
 ): GraphSemanticCandidateSummary {
     const builder = new SemanticCandidateBuilder(snapshot.id, generatedAt);
     for (const task of tasks?.tasks || []) addCandidateFromTask(builder, task);
     addCandidatesFromEmbeddingBridges(builder, snapshot);
-    addCandidatesFromOutliers(builder, snapshot);
-    addCandidatesFromUnframedChunks(builder, snapshot);
+    addCandidatesFromOutliers(builder, snapshot, context);
+    addCandidatesFromUnframedChunks(builder, snapshot, context);
     return builder.summary();
 }
 
@@ -109,8 +111,13 @@ function addCandidatesFromEmbeddingBridges(builder: SemanticCandidateBuilder, sn
     }
 }
 
-function addCandidatesFromOutliers(builder: SemanticCandidateBuilder, snapshot: GraphRebuildSnapshot): void {
-    const targetRows = new Map((snapshot.embeddingGraphPostProcess?.targets || []).map((row) => [row.targetId, row]));
+function addCandidatesFromOutliers(
+    builder: SemanticCandidateBuilder,
+    snapshot: GraphRebuildSnapshot,
+    context?: GraphSemanticDerivationContext,
+): void {
+    const targetRows = context?.targetRows()
+        || new Map((snapshot.embeddingGraphPostProcess?.targets || []).map((row) => [row.targetId, row]));
     for (const targetId of snapshot.embeddingGraphPostProcess?.outlierTargetIds || []) {
         const row = targetRows.get(targetId);
         const confidence = round(clamp(row?.outlierScore || 0.72, 0, 1));
@@ -133,8 +140,13 @@ function addCandidatesFromOutliers(builder: SemanticCandidateBuilder, snapshot: 
     }
 }
 
-function addCandidatesFromUnframedChunks(builder: SemanticCandidateBuilder, snapshot: GraphRebuildSnapshot): void {
-    const eventChunkIds = new Set(snapshot.events.map((event) => event.chunkId).filter(Boolean));
+function addCandidatesFromUnframedChunks(
+    builder: SemanticCandidateBuilder,
+    snapshot: GraphRebuildSnapshot,
+    context?: GraphSemanticDerivationContext,
+): void {
+    const eventChunkIds = context?.eventChunkIds()
+        || new Set(snapshot.events.map((event) => event.chunkId).filter(Boolean));
     for (const chunk of snapshot.chunks) {
         const cues = chunk.meaningFrame?.eventCues || [];
         if (!cues.length || eventChunkIds.has(chunk.id)) continue;

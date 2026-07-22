@@ -104,6 +104,7 @@ export type ChatRunStatus =
     | 'cancelled';
 
 export interface RunOptions {
+    strategy?: 'agent' | 'deep_research';
     finalProvider: string;
     finalModel: string;
     plannerModel?: string;
@@ -119,6 +120,14 @@ export interface RunOptions {
     scopeId?: string;
     baseSystemPrompt?: string;
     initialExternalContext?: string;
+    canvasTarget?: {
+        noteUri: string;
+        noteId: string;
+        baseRevision: number;
+        editorRevision: number;
+        from: number;
+        to: number;
+    };
 }
 
 export interface CapabilityProfile {
@@ -226,6 +235,7 @@ export interface ChatRun {
 export interface ChatRunEvent {
     id: string;
     runId: string;
+    sequence: number;
     phase: string;
     kind: string;
     label: string;
@@ -234,6 +244,17 @@ export interface ChatRunEvent {
     payload?: string;
     latencyMs?: number;
     createdAt: number;
+}
+
+export interface ChatContextCompactionReceipt {
+    schemaVersion: 'phoenix-chat-context-compaction/v1';
+    runId: string;
+    compacted: boolean;
+    beforeBytes: number;
+    afterBytes: number;
+    removedMessages: number;
+    historyArtifact?: string;
+    summaryArtifact?: string;
 }
 
 export interface ChatToolCall {
@@ -1107,6 +1128,60 @@ export class PhoenixChatService {
         }
     }
 
+    async putPlannerArtifact(
+        runId: string,
+        kind: string,
+        payload: unknown,
+        pinned = false,
+        key?: string,
+    ): Promise<ChatWorkspaceArtifact | null> {
+        await this.ensureInitialized();
+        if (!this.usesNativeChatBackend()) return null;
+        try {
+            const artifact = await this.phoenix.storeCommand('chat:putPlannerArtifact', {
+                runId,
+                kind,
+                payload,
+                pinned,
+                ...(key ? { key } : {}),
+            });
+            return artifact ? toChatWorkspaceArtifact(artifact) : null;
+        } catch (error) {
+            console.error('[PhoenixChatService] Put planner artifact error:', error);
+            return null;
+        }
+    }
+
+    async appendRunEvent(
+        runId: string,
+        event: Omit<ChatRunEvent, 'id' | 'runId' | 'sequence' | 'createdAt'>,
+    ): Promise<ChatRunEvent | null> {
+        await this.ensureInitialized();
+        if (!this.usesNativeChatBackend()) return null;
+        try {
+            const stored = await this.phoenix.storeCommand('chat:appendRunEvent', { runId, ...event });
+            return stored ? toChatRunEvent(stored) : null;
+        } catch (error) {
+            console.error('[PhoenixChatService] Append run event error:', error);
+            return null;
+        }
+    }
+
+    async compactRunContext(
+        runId: string,
+        summary: Record<string, unknown>,
+        maxBytes = 24_000,
+    ): Promise<ChatContextCompactionReceipt | null> {
+        await this.ensureInitialized();
+        if (!this.usesNativeChatBackend()) return null;
+        try {
+            return await this.phoenix.storeCommand('chat:compactContext', { runId, summary, maxBytes });
+        } catch (error) {
+            console.error('[PhoenixChatService] Compact run context error:', error);
+            return null;
+        }
+    }
+
     private usesNativeChatBackend(): boolean {
         return this.phoenix.target === 'native';
     }
@@ -1198,6 +1273,7 @@ function toCapabilityProfile(raw: any): CapabilityProfile {
 
 function toRunOptions(raw: any): RunOptions {
     return {
+        strategy: raw?.strategy === 'deep_research' ? 'deep_research' : 'agent',
         finalProvider: stringValue(raw?.finalProvider),
         finalModel: stringValue(raw?.finalModel),
         plannerModel: raw?.plannerModel ? String(raw.plannerModel) : undefined,
@@ -1214,6 +1290,16 @@ function toRunOptions(raw: any): RunOptions {
         baseSystemPrompt: raw?.baseSystemPrompt ? String(raw.baseSystemPrompt) : undefined,
         initialExternalContext: raw?.initialExternalContext
             ? String(raw.initialExternalContext)
+            : undefined,
+        canvasTarget: raw?.canvasTarget
+            ? {
+                noteUri: stringValue(raw.canvasTarget.noteUri),
+                noteId: stringValue(raw.canvasTarget.noteId),
+                baseRevision: numeric(raw.canvasTarget.baseRevision),
+                editorRevision: numeric(raw.canvasTarget.editorRevision),
+                from: numeric(raw.canvasTarget.from),
+                to: numeric(raw.canvasTarget.to),
+            }
             : undefined,
     };
 }
@@ -1245,6 +1331,7 @@ function toChatRunEvent(raw: any): ChatRunEvent {
     return {
         id: stringValue(raw?.id),
         runId: stringValue(raw?.runId),
+        sequence: numeric(raw?.sequence, 0),
         phase: stringValue(raw?.phase),
         kind: stringValue(raw?.kind),
         label: stringValue(raw?.label),

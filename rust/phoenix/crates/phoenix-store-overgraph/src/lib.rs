@@ -1,4 +1,4 @@
-use std::cell::RefCell;
+use std::cell::{Cell, RefCell};
 use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
 
@@ -13,14 +13,32 @@ use serde_json::Value;
 const ROW_JSON_PROP: &str = "row_json";
 const RELATION_PROP: &str = "relation";
 const RELATION_TYPE_BASE: u32 = 50_000;
+const AUTO_FLUSH_LOGICAL_BYTES: usize = 8 * 1024 * 1024;
+
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct OvergraphFlushReport {
+    pub flushed: bool,
+    pub wal_bytes_before: u64,
+    pub wal_bytes_after: u64,
+    pub segment_count: usize,
+}
 
 pub struct PhoenixOvergraphStore {
     path: PathBuf,
     engine: RefCell<DatabaseEngine>,
+    logical_bytes_since_flush: Cell<usize>,
+    logical_flush_threshold: usize,
 }
 
 impl PhoenixOvergraphStore {
     pub fn open(path: impl AsRef<Path>) -> Result<Self, StoreError> {
+        Self::open_with_flush_threshold(path, AUTO_FLUSH_LOGICAL_BYTES)
+    }
+
+    fn open_with_flush_threshold(
+        path: impl AsRef<Path>,
+        logical_flush_threshold: usize,
+    ) -> Result<Self, StoreError> {
         let path = path.as_ref().to_path_buf();
         std::fs::create_dir_all(&path).map_err(|error| StoreError::Init(error.to_string()))?;
         let engine =
@@ -28,11 +46,55 @@ impl PhoenixOvergraphStore {
         Ok(Self {
             path,
             engine: RefCell::new(engine),
+            logical_bytes_since_flush: Cell::new(0),
+            logical_flush_threshold,
         })
     }
 
     pub fn path(&self) -> &Path {
         &self.path
+    }
+
+    pub fn flush(&self) -> Result<OvergraphFlushReport, StoreError> {
+        let wal_bytes_before = self.wal_bytes_on_disk()?;
+        let mut engine = self.engine.borrow_mut();
+        let flushed = engine.flush().map_err(overgraph_query_error)?.is_some();
+        let segment_count = engine.stats().segment_count;
+        drop(engine);
+        self.logical_bytes_since_flush.set(0);
+        Ok(OvergraphFlushReport {
+            flushed,
+            wal_bytes_before,
+            wal_bytes_after: self.wal_bytes_on_disk()?,
+            segment_count,
+        })
+    }
+
+    fn record_logical_write(&self, bytes: usize) -> Result<(), StoreError> {
+        let total = self.logical_bytes_since_flush.get().saturating_add(bytes);
+        self.logical_bytes_since_flush.set(total);
+        if self.logical_flush_threshold > 0 && total >= self.logical_flush_threshold {
+            self.flush()?;
+        }
+        Ok(())
+    }
+
+    fn wal_bytes_on_disk(&self) -> Result<u64, StoreError> {
+        let mut bytes = 0u64;
+        for entry in fs_entries(&self.path)? {
+            let entry = entry.map_err(|error| StoreError::Query(error.to_string()))?;
+            let name = entry.file_name();
+            let name = name.to_string_lossy();
+            if name.starts_with("wal_") && name.ends_with(".wal") {
+                bytes = bytes.saturating_add(
+                    entry
+                        .metadata()
+                        .map_err(|error| StoreError::Query(error.to_string()))?
+                        .len(),
+                );
+            }
+        }
+        Ok(bytes)
     }
 }
 
@@ -81,12 +143,17 @@ impl PhoenixNativeRowStore for PhoenixOvergraphStore {
         }
         let type_id = relation_type_id(relation);
         let mut inputs = Vec::with_capacity(rows.len());
+        let mut logical_bytes = 0usize;
         for row in rows {
             let key = row_key(relation, row)?;
+            let (props, row_bytes) = row_props(relation, row)?;
+            logical_bytes = logical_bytes
+                .saturating_add(key.len())
+                .saturating_add(row_bytes);
             inputs.push(NodeInput {
                 type_id,
                 key,
-                props: row_props(relation, row)?,
+                props,
                 weight: 1.0,
                 dense_vector: None,
                 sparse_vector: None,
@@ -96,6 +163,7 @@ impl PhoenixNativeRowStore for PhoenixOvergraphStore {
             .borrow_mut()
             .batch_upsert_nodes(&inputs)
             .map_err(overgraph_query_error)?;
+        self.record_logical_write(logical_bytes)?;
         Ok(())
     }
 
@@ -108,6 +176,7 @@ impl PhoenixNativeRowStore for PhoenixOvergraphStore {
         relation_spec(relation)?;
         let type_id = relation_type_id(relation);
         let mut deleted = 0usize;
+        let mut logical_bytes = 0usize;
         let mut engine = self.engine.borrow_mut();
         for row in rows {
             let key = row_key(relation, row)?;
@@ -117,13 +186,17 @@ impl PhoenixNativeRowStore for PhoenixOvergraphStore {
             {
                 engine.delete_node(node.id).map_err(overgraph_query_error)?;
                 deleted += 1;
+                logical_bytes = logical_bytes.saturating_add(key.len() + 32);
             }
         }
+        drop(engine);
+        self.record_logical_write(logical_bytes)?;
         Ok(deleted)
     }
 
     fn clear_relations(&self, relations: &[&str]) -> Result<(), StoreError> {
         let mut engine = self.engine.borrow_mut();
+        let mut deleted = 0usize;
         for relation in relations {
             relation_spec(relation)?;
             for node in engine
@@ -131,8 +204,11 @@ impl PhoenixNativeRowStore for PhoenixOvergraphStore {
                 .map_err(overgraph_query_error)?
             {
                 engine.delete_node(node.id).map_err(overgraph_query_error)?;
+                deleted += 1;
             }
         }
+        drop(engine);
+        self.record_logical_write(deleted.saturating_mul(32))?;
         Ok(())
     }
 
@@ -170,19 +246,24 @@ impl PhoenixNativeRowStore for PhoenixOvergraphStore {
     }
 }
 
-fn row_props(relation: &str, row: &Value) -> Result<BTreeMap<String, PropValue>, StoreError> {
+fn row_props(
+    relation: &str,
+    row: &Value,
+) -> Result<(BTreeMap<String, PropValue>, usize), StoreError> {
     let mut props = BTreeMap::new();
     props.insert(
         RELATION_PROP.to_owned(),
         PropValue::String(relation.to_owned()),
     );
-    props.insert(
-        ROW_JSON_PROP.to_owned(),
-        PropValue::String(
-            serde_json::to_string(row).map_err(|error| StoreError::Query(error.to_string()))?,
-        ),
-    );
-    Ok(props)
+    let row_json =
+        serde_json::to_string(row).map_err(|error| StoreError::Query(error.to_string()))?;
+    let row_bytes = row_json.len();
+    props.insert(ROW_JSON_PROP.to_owned(), PropValue::String(row_json));
+    Ok((props, row_bytes))
+}
+
+fn fs_entries(path: &Path) -> Result<std::fs::ReadDir, StoreError> {
+    std::fs::read_dir(path).map_err(|error| StoreError::Query(error.to_string()))
 }
 
 fn row_from_prop(prop: PropValue) -> Result<Value, StoreError> {
@@ -270,6 +351,12 @@ mod tests {
                 json!({"id":"n1","version":1,"world_id":null,"narrative_id":null,"entity_kind":null,"title":"One","body":"Aella","updated_at":1,"deleted":false}),
             )
             .expect("put row");
+        store
+            .put_row(
+                "notes",
+                json!({"id":"n1","version":1,"world_id":null,"narrative_id":null,"entity_kind":null,"title":"Updated","body":"Aella","updated_at":2,"deleted":false}),
+            )
+            .expect("update row in place");
         assert_eq!(store.fetch_rows("notes").expect("fetch").len(), 1);
         let snapshot = store
             .export_snapshot_partition(SnapshotPartition::Content)
@@ -279,8 +366,28 @@ mod tests {
         store.import_snapshot(&snapshot).expect("import");
         let rows = store.fetch_rows("notes").expect("fetch restored");
         assert_eq!(rows[0]["id"], "n1");
+        assert_eq!(rows[0]["title"], "Updated");
         assert_eq!(store.delete_rows("notes", &rows).expect("delete"), 1);
         assert!(store.fetch_rows("notes").expect("deleted").is_empty());
+        let _ = std::fs::remove_dir_all(path);
+    }
+
+    #[test]
+    fn logical_write_budget_flushes_repeated_key_updates() {
+        let path = std::env::temp_dir().join(format!("phoenix-overgraph-flush-test-{}", now_ms()));
+        let store = PhoenixOvergraphStore::open_with_flush_threshold(&path, 128).expect("open");
+        for version in 1..=3 {
+            store
+                .put_row(
+                    "notes",
+                    json!({"id":"n1","version":1,"world_id":null,"narrative_id":null,"entity_kind":null,"title":"Repeated","body":"Aella crossed the threshold","updated_at":version,"deleted":false}),
+                )
+                .expect("upsert repeated key");
+        }
+        assert_eq!(store.logical_bytes_since_flush.get(), 0);
+        let report = store.flush().expect("final flush");
+        assert!(report.segment_count > 0);
+        assert_eq!(store.fetch_rows("notes").expect("fetch").len(), 1);
         let _ = std::fs::remove_dir_all(path);
     }
 }

@@ -16,6 +16,7 @@ import type {
     GraphSemanticRerankScoreSource,
     GraphSemanticRerankSummary,
 } from './graph-rebuild-snapshot';
+import type { GraphSemanticDerivationContext } from './graph-semantic-derivation-context';
 
 const GLICLASS_INSTRUCT_MODEL_ID = 'knowledgator/gliclass-instruct-base-v1.0';
 const RUNNER = 'gliclass-query-label-rerank' as const;
@@ -56,8 +57,10 @@ export function buildGraphSemanticRerankSummary(
     candidates: GraphSemanticCandidateSummary | undefined,
     manifolds: GraphManifoldSpecializationSummary | undefined,
     generatedAt = snapshot.builtAt,
+    context?: GraphSemanticDerivationContext,
 ): GraphSemanticRerankSummary {
-    const manifoldById = new Map((manifolds?.contributions || []).map((row) => [row.id, row]));
+    const manifoldById = context?.contributionRows()
+        || new Map((manifolds?.contributions || []).map((row) => [row.id, row]));
     const builder = new SemanticRerankBuilder(snapshot.id, generatedAt);
     for (const candidate of selectCandidates(candidates?.candidates || [])) {
         const contributions = (candidate.manifoldContributionIds || [])

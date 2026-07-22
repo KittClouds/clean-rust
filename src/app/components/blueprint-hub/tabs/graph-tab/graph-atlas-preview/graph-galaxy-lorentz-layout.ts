@@ -1,4 +1,4 @@
-import type { GalaxyEdge, GalaxyLorentzGuide, GalaxyNode, Rgb } from './graph-galaxy-engine';
+import type { GalaxyEdge, GalaxyLorentzGuide, GalaxyNode, GalaxyRenderSourceMode, Rgb } from './graph-galaxy-engine';
 import { relationFamilyFromText } from './graph-relation-visual-style';
 import {
     TAU,
@@ -7,11 +7,12 @@ import {
     capRingSegments,
     causalConeDirection,
     clamp,
+    contractShellRadiusForNode,
     derivedRole,
     documentTreeDirection,
     dominantLane,
+    enforceHierarchyShellContract,
     fallbackLane,
-    finite,
     firstNumber,
     firstText,
     laneDirection,
@@ -31,16 +32,21 @@ import {
     tangentFrame,
     temporalRingDirection,
     vectorOf,
+    hierarchyShellBandForNode,
+    hierarchyShellBandsInOrder,
     type Vec3,
 } from './graph-galaxy-hierarchy-caps';
+import { arrangeEmbeddingShellRings } from './graph-galaxy-caps-rings';
 
 const CAP_SCENE_RADIUS = 2.18;
-const MAX_CAP_GUIDES = 40;
+const MAX_CAP_BOUNDARY_GUIDES = 24;
+const MAX_FALLBACK_BOUNDARY_CAPS_PER_LAYER = 2;
 const MAX_MEMBERSHIP_GUIDES = 260;
 
 interface CapInfo extends Rgb {
     id: string;
     lane: string;
+    parentIds: string[];
     center: Vec3;
     indexes: number[];
     radiusSum: number;
@@ -60,14 +66,20 @@ interface HierarchyInfo {
     ambiguity: number;
     targetRadius: number;
     direction: Vec3;
+    parentCapIds: string[];
     confidence: number;
 }
 
-export function applyLorentzTreeLayout(nodes: GalaxyNode[], links: GalaxyEdge[], options: { productTopologyGeometry?: boolean } = {}): GalaxyLorentzGuide[] {
-    void options;
-    if (!nodes.length) return [];
+interface LorentzTreeLayoutOptions {
+    productTopologyGeometry?: boolean;
+    sourceMode?: GalaxyRenderSourceMode;
+}
 
-    const infos = nodes.map(hierarchyInfo);
+export function applyLorentzTreeLayout(nodes: GalaxyNode[], links: GalaxyEdge[], options: LorentzTreeLayoutOptions = {}): GalaxyLorentzGuide[] {
+    if (!nodes.length) return [];
+    const embedCapContract = options.sourceMode === 'embeddings';
+
+    const infos = nodes.map((node) => hierarchyInfo(node, embedCapContract));
     const caps = buildCaps(nodes, infos);
     const capById = new Map(caps.map((cap) => [cap.id, cap]));
 
@@ -85,14 +97,24 @@ export function applyLorentzTreeLayout(nodes: GalaxyNode[], links: GalaxyEdge[],
     }
 
     relaxCapLinks(nodes, links, infos);
+    confineNodesToCaps(nodes, infos, capById);
     for (let index = 0; index < nodes.length; index++) {
         projectNodeToRadius(nodes[index], infos[index].targetRadius);
         nodes[index].depth = clamp(length(vectorOf(nodes[index])) / CAP_SCENE_RADIUS, 0, 1);
-        nodes[index].baseX = nodes[index].x;
-        nodes[index].baseY = nodes[index].y;
-        nodes[index].baseZ = nodes[index].z;
     }
     tuneCapLinks(nodes, links, infos);
+    enforceHierarchyShellContract(nodes);
+    confineNodesToCaps(nodes, infos, capById);
+    if (embedCapContract) {
+        arrangeEmbeddingShellRings(nodes, infos, capById);
+        enforceHierarchyShellContract(nodes);
+    }
+    for (const node of nodes) {
+        node.depth = clamp(length(vectorOf(node)) / CAP_SCENE_RADIUS, 0, 1);
+        node.baseX = node.x;
+        node.baseY = node.y;
+        node.baseZ = node.z;
+    }
 
     return [
         ...buildCapBoundaryGuides(caps),
@@ -102,7 +124,7 @@ export function applyLorentzTreeLayout(nodes: GalaxyNode[], links: GalaxyEdge[],
     ];
 }
 
-function hierarchyInfo(node: GalaxyNode): HierarchyInfo {
+function hierarchyInfo(node: GalaxyNode, embedCapContract: boolean): HierarchyInfo {
     const metadata = node.entity.metadata || {};
     const product = record(metadata['product']);
     const region = record(product['region']);
@@ -131,7 +153,7 @@ function hierarchyInfo(node: GalaxyNode): HierarchyInfo {
     const level = hierarchyLevel(node, role, lane, lorentz, primary, specificity);
     return {
         id: node.entity.id,
-        capId: capIdFor(node, lane, product, region, lorentz, primary),
+        capId: capIdFor(node, lane, product, region, lorentz, primary, embedCapContract),
         lane,
         role,
         treeKind,
@@ -139,8 +161,9 @@ function hierarchyInfo(node: GalaxyNode): HierarchyInfo {
         phase,
         specificity,
         ambiguity,
-        targetRadius: hierarchyRadius(node, specificity, role, lane, confidence, ambiguity),
+        targetRadius: hierarchyRadius(node, specificity, role, lane, confidence, ambiguity, embedCapContract),
         direction: rawDirection(node, lorentz),
+        parentCapIds: parentCapIdsFor(lorentz, primary),
         confidence,
     };
 }
@@ -155,6 +178,7 @@ function buildCaps(nodes: GalaxyNode[], infos: HierarchyInfo[]): CapInfo[] {
             cap = {
                 id: info.capId,
                 lane: info.lane,
+                parentIds: [],
                 center: { x: 0, y: 0, z: 0 },
                 indexes: [],
                 radiusSum: 0,
@@ -164,35 +188,104 @@ function buildCaps(nodes: GalaxyNode[], infos: HierarchyInfo[]): CapInfo[] {
             };
             byId.set(info.capId, cap);
         }
+        for (const parentId of info.parentCapIds) {
+            if (parentId && parentId !== info.capId && !cap.parentIds.includes(parentId)) cap.parentIds.push(parentId);
+        }
         const lane = laneDirection(info.lane);
-        cap.center.x += info.direction.x * 0.74 + lane.x * 0.26;
-        cap.center.y += info.direction.y * 0.74 + lane.y * 0.26;
-        cap.center.z += info.direction.z * 0.74 + lane.z * 0.26;
+        const concentration = clamp(0.86 + info.confidence * 0.28 + info.specificity * 0.18 - info.ambiguity * 0.14, 0.62, 1.28);
+        cap.center.x += (info.direction.x * 0.82 + lane.x * 0.18) * concentration;
+        cap.center.y += (info.direction.y * 0.82 + lane.y * 0.18) * concentration;
+        cap.center.z += (info.direction.z * 0.82 + lane.z * 0.18) * concentration;
         cap.indexes.push(index);
         cap.radiusSum += info.targetRadius;
         cap.ambiguitySum += info.ambiguity;
         cap.importance += 1 + Math.max(0, nodes[index].entity.totalMentions || 0) * 0.15 + info.confidence;
     }
-    return [...byId.values()]
+    const caps = [...byId.values()]
         .map((cap) => ({ ...cap, center: normalize(cap.center, laneDirection(cap.lane)) }))
         .sort((left, right) => right.importance - left.importance || left.id.localeCompare(right.id));
+    applyCapContainment(caps);
+    return caps;
+}
+
+function parentCapIdsFor(lorentz: Record<string, unknown>, primary: Record<string, unknown>): string[] {
+    const direct = arrayText(lorentz['parentCapIds']);
+    const single = firstText(lorentz['parentCapId'], primary['parentCapId']);
+    return [...new Set([...direct, single].filter(Boolean))];
+}
+
+function arrayText(value: unknown): string[] {
+    return Array.isArray(value) ? value.map((item) => String(item || '').trim()).filter(Boolean) : [];
+}
+
+function applyCapContainment(caps: CapInfo[]): void {
+    const byId = new Map(caps.map((cap) => [cap.id, cap]));
+    for (let pass = 0; pass < 6; pass++) {
+        for (const cap of caps) {
+            const parents = cap.parentIds.map((id) => byId.get(id)).filter((item): item is CapInfo => Boolean(item));
+            if (!parents.length) continue;
+            const parentCenter = normalize(parents.reduce((sum, parent) => add(sum, parent.center), { x: 0, y: 0, z: 0 }), parents[0].center);
+            const lane = laneDirection(cap.lane);
+            const weight = containmentWeight(cap);
+            cap.center = normalize(add(add(scale(parentCenter, weight), scale(cap.center, 1 - weight)), scale(lane, 0.04)), parentCenter);
+        }
+    }
+}
+
+function containmentWeight(cap: CapInfo): number {
+    const id = cap.id.toLowerCase();
+    if (/^document:[^:]+:root:/.test(id)) return 0.94;
+    if (/^document:[^:]+:chunk:/.test(id)) return 0.9;
+    if (/^identity:|:facts:|:memory|:temporal|:causal|event:/.test(id)) return 0.84;
+    return 0.78;
 }
 
 function hierarchyDirection(info: HierarchyInfo, cap: CapInfo): Vec3 {
     const lane = laneDirection(info.lane);
     const frame = tangentFrame(cap.center);
     const orbit = add(scale(frame.a, Math.cos(info.phase * TAU)), scale(frame.b, Math.sin(info.phase * TAU)));
-    const spread = clamp(0.08 + info.ambiguity * 0.28 + (info.role === 'bridge' ? 0.08 : 0), 0.06, 0.42);
-    const base = normalize(add(add(scale(info.direction, 0.53), scale(cap.center, 0.31)), scale(lane, 0.16)), cap.center);
+    const spread = capNodeAperture(info);
+    const base = normalize(add(add(scale(cap.center, 0.78), scale(info.direction, 0.16)), scale(lane, 0.06)), cap.center);
     let shaped = normalize(add(scale(base, 1 - spread), scale(orbit, spread)), cap.center);
     if (info.lane === 'temporal') {
-        shaped = normalize(add(scale(shaped, 0.56), scale(temporalRingDirection(info.phase), 0.44)), shaped);
+        shaped = normalize(add(scale(shaped, 0.82), scale(temporalRingDirection(info.phase), 0.18)), shaped);
     } else if (info.lane === 'causal') {
-        shaped = normalize(add(scale(shaped, 0.64), scale(causalConeDirection(info.phase, info.level), 0.36)), shaped);
+        shaped = normalize(add(scale(shaped, 0.84), scale(causalConeDirection(info.phase, info.level), 0.16)), shaped);
     } else if (info.lane === 'document') {
-        shaped = normalize(add(scale(shaped, 0.7), scale(documentTreeDirection(info.phase, info.level), 0.3)), shaped);
+        shaped = normalize(add(scale(shaped, 0.86), scale(documentTreeDirection(info.phase, info.level), 0.14)), shaped);
     }
-    return shaped;
+    return limitDirectionToCap(shaped, cap.center, spread);
+}
+
+function confineNodesToCaps(nodes: GalaxyNode[], infos: HierarchyInfo[], capById: Map<string, CapInfo>): void {
+    for (let index = 0; index < nodes.length; index++) {
+        const info = infos[index];
+        const cap = capById.get(info.capId);
+        if (!cap) continue;
+        const direction = limitDirectionToCap(normalize(vectorOf(nodes[index]), info.direction), cap.center, capNodeAperture(info));
+        nodes[index].x = direction.x * info.targetRadius;
+        nodes[index].y = direction.y * info.targetRadius;
+        nodes[index].z = direction.z * info.targetRadius;
+    }
+}
+
+function capNodeAperture(info: HierarchyInfo): number {
+    if (!info.parentCapIds.length && info.level <= 1) return clamp(0.2 + info.ambiguity * 0.08, 0.16, 0.32);
+    if (info.level <= 1) return clamp(0.14 + info.ambiguity * 0.08, 0.1, 0.22);
+    if (info.level === 2) return clamp(0.12 + info.ambiguity * 0.08, 0.08, 0.2);
+    if (info.level === 3) return clamp(0.08 + info.ambiguity * 0.04, 0.06, 0.13);
+    return clamp(0.06 + info.ambiguity * 0.04, 0.04, 0.11);
+}
+
+function limitDirectionToCap(direction: Vec3, center: Vec3, aperture: number): Vec3 {
+    const normalizedCenter = normalize(center, { x: 0, y: 0, z: 1 });
+    const normalizedDirection = normalize(direction, normalizedCenter);
+    const dot = normalizedDirection.x * normalizedCenter.x + normalizedDirection.y * normalizedCenter.y + normalizedDirection.z * normalizedCenter.z;
+    const minDot = Math.cos(aperture);
+    if (dot >= minDot) return normalizedDirection;
+    const tangent = normalize(add(normalizedDirection, scale(normalizedCenter, -dot)), tangentFrame(normalizedCenter).a);
+    const sin = Math.sin(aperture);
+    return normalize(add(scale(normalizedCenter, minDot), scale(tangent, sin)), normalizedCenter);
 }
 
 function relaxCapLinks(nodes: GalaxyNode[], links: GalaxyEdge[], infos: HierarchyInfo[]): void {
@@ -280,7 +373,7 @@ function tuneCapLinks(nodes: GalaxyNode[], links: GalaxyEdge[], infos: Hierarchy
 }
 
 function buildCapBoundaryGuides(caps: CapInfo[]): GalaxyLorentzGuide[] {
-    return caps.slice(0, MAX_CAP_GUIDES).map((cap) => {
+    return visibleBoundaryCaps(caps).map((cap) => {
         const count = cap.indexes.length || 1;
         const radius = cap.radiusSum / count;
         const ambiguity = cap.ambiguitySum / count;
@@ -299,6 +392,68 @@ function buildCapBoundaryGuides(caps: CapInfo[]): GalaxyLorentzGuide[] {
             b: cap.b,
         };
     });
+}
+
+function visibleBoundaryCaps(caps: CapInfo[]): CapInfo[] {
+    const containers = sortBoundaryCaps(caps.filter(isFolderOrSharedCap));
+    const documentCaps = sortBoundaryCaps(caps.filter(isDocumentContainerCap));
+    const primary = containers.length ? containers : documentCaps;
+    if (primary.length) return primary.slice(0, MAX_CAP_BOUNDARY_GUIDES);
+    return fallbackBoundaryCaps(caps);
+}
+
+function fallbackBoundaryCaps(caps: CapInfo[]): CapInfo[] {
+    const selected: CapInfo[] = [];
+    const byLayer = new Map<string, number>();
+    for (const cap of sortBoundaryCaps(caps.filter((item) => !isNestedDocumentCap(item)))) {
+        const layer = fallbackBoundaryLayer(cap);
+        const used = byLayer.get(layer) || 0;
+        if (used >= MAX_FALLBACK_BOUNDARY_CAPS_PER_LAYER) continue;
+        selected.push(cap);
+        byLayer.set(layer, used + 1);
+        if (selected.length >= MAX_CAP_BOUNDARY_GUIDES) break;
+    }
+    return selected;
+}
+
+function sortBoundaryCaps(caps: CapInfo[]): CapInfo[] {
+    return [...caps].sort((left, right) =>
+        boundaryPriority(right) - boundaryPriority(left)
+        || right.importance - left.importance
+        || left.id.localeCompare(right.id),
+    );
+}
+
+function boundaryPriority(cap: CapInfo): number {
+    const id = cap.id.toLowerCase();
+    if (id.startsWith('folder:')) return 5;
+    if (isSharedDocumentCapId(id)) return 4;
+    if (isDocumentContainerCap(cap)) return 3;
+    if (!cap.parentIds.length) return 2;
+    return 1;
+}
+
+function isFolderOrSharedCap(cap: CapInfo): boolean {
+    const id = cap.id.toLowerCase();
+    return id.startsWith('folder:') || isSharedDocumentCapId(id);
+}
+
+function isSharedDocumentCapId(id: string): boolean {
+    return /wormhole|document[_:-]?cluster|shared[_:-]?document|linked[_:-]?note/.test(id);
+}
+
+function isDocumentContainerCap(cap: CapInfo): boolean {
+    return /^document:[^:]+$/.test(cap.id.toLowerCase());
+}
+
+function isNestedDocumentCap(cap: CapInfo): boolean {
+    return /^document:[^:]+:/.test(cap.id.toLowerCase());
+}
+
+function fallbackBoundaryLayer(cap: CapInfo): string {
+    const id = cap.id.toLowerCase();
+    if (id.startsWith('cap:')) return id.split(':').slice(0, 2).join(':');
+    return cap.lane || 'semantic';
 }
 
 function buildMembershipGuides(nodes: GalaxyNode[], links: GalaxyEdge[], infos: HierarchyInfo[]): GalaxyLorentzGuide[] {
@@ -329,23 +484,17 @@ function buildMembershipGuides(nodes: GalaxyNode[], links: GalaxyEdge[], infos: 
 }
 
 function buildLevelShellGuides(): GalaxyLorentzGuide[] {
-    const shells = [
-        { level: 0, radius: 2.08, kind: 'documentStructure', weight: 0.52 },
-        { level: 1, radius: 1.72, kind: 'semantic', weight: 0.44 },
-        { level: 2, radius: 1.42, kind: 'identity', weight: 0.38 },
-        { level: 3, radius: 1.04, kind: 'evidence', weight: 0.32 },
-    ];
-    return shells.map((shell) => ({
-        id: `caps:shell:${shell.level}`,
+    return hierarchyShellBandsInOrder().map((shell) => ({
+        id: `caps:shell:${shell.id}`,
         nodeIds: [],
         positions3d: shellRingSegments(shell.radius),
         importance: 0.2,
         treeId: 'caps:shells',
-        treeKind: shell.kind,
-        level: shell.level,
+        treeKind: shell.id === 'documentRoot' ? 'documentStructure' : shell.id === 'fact' ? 'relationship' : shell.id,
+        level: shell.rank,
         guideKind: 'levelShell',
-        guideWeight: shell.weight,
-        ...rgbForKind(shell.kind),
+        guideWeight: clamp(0.52 - shell.rank * 0.035, 0.24, 0.52),
+        ...rgbForKind(shell.id === 'documentRoot' ? 'documentStructure' : shell.id === 'fact' ? 'relationship' : shell.id),
     }));
 }
 
@@ -416,10 +565,13 @@ function hierarchyRadius(
     lane: string,
     confidence: number,
     ambiguity: number,
+    embedCapContract: boolean,
 ): number {
     const lorentz = record(node.entity.metadata?.['lorentz']);
+    const contractRadius = embedCapContract ? hierarchyContractRadius(node, lane) : NaN;
+    if (Number.isFinite(contractRadius)) return contractShellRadiusForNode(node, contractRadius);
     const explicitRadius = Number(lorentz['shellRadius']);
-    if (Number.isFinite(explicitRadius)) return clamp(explicitRadius, 0.38, CAP_SCENE_RADIUS * 0.985);
+    if (Number.isFinite(explicitRadius)) return contractShellRadiusForNode(node, clamp(explicitRadius, 0.38, CAP_SCENE_RADIUS * 0.985));
     const sourceType = String(node.entity.metadata?.sourceType || node.entity.kind || '').toLowerCase();
     const kind = String(node.entity.kind || '').toLowerCase();
     let radius = hierarchyShellRadius(sourceType, kind, lane);
@@ -434,7 +586,34 @@ function hierarchyRadius(
         radius = clamp(radius, 1.28, 1.58);
     }
     if (lane === 'temporal') radius = clamp(radius, 1.08, 1.72);
-    return clamp(radius, 0.38, CAP_SCENE_RADIUS * 0.985);
+    return contractShellRadiusForNode(node, clamp(radius, 0.38, CAP_SCENE_RADIUS * 0.985));
+}
+
+function hierarchyContractRadius(node: GalaxyNode, lane: string): number {
+    const band = hierarchyShellBandForNode(node);
+    if (band) return band.radius;
+    const metadata = node.entity.metadata || {};
+    const sourceType = graphText(metadata['sourceType'], node.entity.kind);
+    const kind = graphText(node.entity.kind, metadata['atlasKind']);
+    const styleKey = graphText(metadata['styleKey'], metadata['graphColorKind'], metadata['graphKind']);
+    const family = graphText(metadata['atlasFamily'], metadata['graphFamily']);
+    const structuralRole = graphText(metadata['atlasStructuralRole'], metadata['structuralRole']);
+    const documentUnitKind = graphText(metadata['atlasDocumentUnitKind'], metadata['documentUnitKind']);
+    const stateContextKind = graphText(metadata['atlasStateContextKind'], metadata['stateContextKind']);
+    const text = `${sourceType} ${kind} ${styleKey} ${family} ${structuralRole} ${documentUnitKind} ${stateContextKind} ${lane}`.toLowerCase();
+    if (/\b(note|document)\b/.test(text) && !/structure.?root|root:/.test(text)) return 2.1;
+    if (/structure.?root|root:/.test(text) || structuralRole === 'root') return 1.78;
+    if (/anchor|mention|evidence/.test(text) || structuralRole === 'evidence') return 1.14;
+    if (/chunk|leaf|claim|action.?block|contrast|looked|glanced/.test(text)) return 1.46;
+    if (/memory|state|context|decision|rank.?status|service|affiliation|family.?context/.test(text)) return 0.58;
+    if (/event|temporal|causal/.test(text)) return 1.06;
+    if (/graph.?fact|relationship|relation/.test(text)) return 0.98;
+    if (/entity|character|location|creature|npc|item|network|group/.test(text)) return 0.86;
+    return NaN;
+}
+
+function graphText(...values: unknown[]): string {
+    return values.map((value) => String(value || '').trim()).filter(Boolean).join(' ').toLowerCase();
 }
 
 function hierarchyShellRadius(sourceType: string, kind: string, lane: string): number {
@@ -474,9 +653,11 @@ function capIdFor(
     region: Record<string, unknown>,
     lorentz: Record<string, unknown>,
     primary: Record<string, unknown>,
+    embedCapContract: boolean,
 ): string {
+    const documentCapId = embedCapContract ? documentContainmentCapIdFor(node, lorentz, primary) : '';
     const structuralCapId = structuralCapIdFor(node, lane);
-    return firstText(
+    const detailedCapId = firstText(
         lorentz['capId'],
         structuralCapId,
         node.entity.metadata?.['embeddingClusterId'],
@@ -486,6 +667,34 @@ function capIdFor(
         primary['treeId'],
         `lane:${lane}`,
     );
+    return embedCapContract
+        ? firstText(detailedCapId, documentCapId, `lane:${lane}`)
+        : detailedCapId;
+}
+
+function documentContainmentCapIdFor(node: GalaxyNode, lorentz: Record<string, unknown>, primary: Record<string, unknown>): string {
+    const metadata = node.entity.metadata || {};
+    const noteIds = arrayText(metadata['noteIds']);
+    const noteId = firstText(
+        metadata['noteId'],
+        noteIds[0],
+        /note|document|doc/.test(String(metadata['sourceType'] || node.entity.kind || '').toLowerCase()) ? metadata['sourceId'] : '',
+    );
+    if (noteId) return `document:${noteId}`;
+    return firstText(
+        documentCapRoot(lorentz['capId']),
+        documentCapRoot(primary['capId']),
+        documentCapRoot(lorentz['parentCapId']),
+        documentCapRoot(primary['parentCapId']),
+        ...arrayText(lorentz['parentCapIds']).map(documentCapRoot),
+        ...arrayText(primary['parentCapIds']).map(documentCapRoot),
+    );
+}
+
+function documentCapRoot(value: unknown): string {
+    const text = String(value || '').trim();
+    const match = /^document:([^:]+)/.exec(text);
+    return match ? `document:${match[1]}` : '';
 }
 
 function structuralCapIdFor(node: GalaxyNode, lane: string): string {

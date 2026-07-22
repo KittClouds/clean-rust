@@ -10,16 +10,20 @@ import type {
     GraphSemanticEvalLedgerSummary,
     GraphSemanticRerankJudgment,
 } from './graph-rebuild-snapshot';
+import type { GraphSemanticDerivationContext } from './graph-semantic-derivation-context';
 
 const MAX_LEDGER_ROWS = 192;
 
 export function buildGraphSemanticEvalLedgerSummary(
     snapshot: GraphRebuildSnapshot,
     generatedAt = snapshot.builtAt,
+    context?: GraphSemanticDerivationContext,
 ): GraphSemanticEvalLedgerSummary {
     const candidates = new Map((snapshot.semanticCandidateSummary?.candidates || []).map((row) => [row.id, row]));
-    const judgments = new Map((snapshot.semanticRerankSummary?.judgments || []).map((row) => [row.candidateId, row]));
-    const contributions = new Map((snapshot.manifoldSpecializationSummary?.contributions || []).map((row) => [row.id, row]));
+    const judgments = context?.judgmentRows()
+        || new Map((snapshot.semanticRerankSummary?.judgments || []).map((row) => [row.candidateId, row]));
+    const contributions = context?.contributionRows()
+        || new Map((snapshot.manifoldSpecializationSummary?.contributions || []).map((row) => [row.id, row]));
     const mutations = new Map((snapshot.semanticAdjudicationSummary?.mutations || []).map((row) => [row.id, row]));
     const entries: GraphSemanticEvalLedgerEntry[] = [];
 
@@ -61,6 +65,7 @@ function entryFor(
     const label = labelFor(decision);
     const modelDisagreement = modelDisagrees(decision, judgment);
     const manifoldDisagreement = manifoldDisagrees(manifolds);
+    const correctionIds = userCorrectionIds(snapshot, candidate);
     return {
         id: `eval-ledger:${slug(decision.id)}`,
         candidateId: candidate.id,
@@ -94,7 +99,8 @@ function entryFor(
             decision.state === 'accepted' ? 'accepted_candidate' : '',
             decision.state === 'rejected' || decision.state === 'invalidated' ? 'rejected_candidate' : '',
             mutation ? 'before_after_graph_change' : '',
-            userCorrectionFlag(snapshot, candidate),
+            mutation ? 'graph_rebuild_live_contract_graph_change' : '',
+            correctionIds.length ? 'user_correction' : '',
         ]),
         beforeGraph: {
             edgeCount: snapshot.counters.edges - (snapshot.semanticAdjudicationSummary?.counters.appliedMutationCount || 0),
@@ -106,7 +112,7 @@ function entryFor(
             factIds: mutation?.createdFactIds || [],
             edgeIds: mutation?.createdEdgeId ? [mutation.createdEdgeId] : [],
         },
-        userCorrectionIds: userCorrectionIds(snapshot, candidate),
+        userCorrectionIds: correctionIds,
         rationale: decision.rationale.slice(0, 8),
     };
 }
@@ -168,10 +174,6 @@ function userCorrectionIds(snapshot: GraphRebuildSnapshot, candidate: GraphSeman
             .filter((patch) => patch.evidenceIds.some((id) => evidence.has(id)))
             .map((patch) => patch.id),
     ].slice(0, 8);
-}
-
-function userCorrectionFlag(snapshot: GraphRebuildSnapshot, candidate: GraphSemanticCandidate): string {
-    return userCorrectionIds(snapshot, candidate).length ? 'user_correction' : '';
 }
 
 function evalLedgerCounters(entries: GraphSemanticEvalLedgerEntry[]): GraphSemanticEvalLedgerCounters {

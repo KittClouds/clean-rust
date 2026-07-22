@@ -34,8 +34,7 @@ import { FONT_FAMILIES, FONT_SIZES } from '../../../../lib/constants/fonts';
 import type { EntityKind } from '../../../../lib/Scanner/types';
 import { RightSidebarService } from '../../../../lib/services/right-sidebar.service';
 import { AiSidebarModeService } from '../../../../lib/services/ai-sidebar-mode.service';
-import { PhoenixChatService } from '../../../../lib/services/phoenix-chat.service';
-import { EditorAgentWorkspaceService } from '../../../../lib/services/editor-agent-workspace.service';
+import { CanvasAgentRunService } from '../../../../lib/services/canvas-agent-run.service';
 import { TtsService } from '../../../../services/tts.service';
 
 @Component({
@@ -243,8 +242,7 @@ export class EditorToolbarComponent {
         private readonly chatContextClipStore: ChatContextClipStore,
         private readonly rightSidebar: RightSidebarService,
         private readonly aiSidebarMode: AiSidebarModeService,
-        private readonly phoenixChat: PhoenixChatService,
-        private readonly workspace: EditorAgentWorkspaceService,
+        private readonly canvasRuns: CanvasAgentRunService,
         private readonly ttsService: TtsService,
     ) { }
 
@@ -324,71 +322,25 @@ export class EditorToolbarComponent {
             }
 
             const prompts: Record<string, string> = {
-                'improve': 'Improve this text for clarity, flow, and impact. Only output the improved text, nothing else.',
-                'shorten': 'Shorten this text while preserving its meaning. Only output the shortened text, nothing else.',
-                'fix': 'Fix all grammar, spelling, and punctuation errors in this text. Only output the corrected text, nothing else.',
-                'continue': 'Continue writing from this text in the same style and tone. Only output the continuation, nothing else.',
+                'improve': 'Improve this selected text for clarity, flow, and impact.',
+                'shorten': 'Shorten this selected text while preserving its meaning.',
+                'fix': 'Fix all grammar, spelling, and punctuation errors in this selected text.',
+                'continue': 'Replace this selected text with the original selection followed by a continuation in the same style and tone.',
             };
-            const systemPrompt = prompts[item.id] || prompts['improve'];
-            const snapshot = this.workspace.getSnapshot();
-            const session = item.id === 'continue'
-                ? this.workspace.beginStreamInsert(to, snapshot?.revision)
-                : this.workspace.beginStreamReplace(from, to, snapshot?.revision);
-            if (!session.ok || !session.sessionId) {
-                alert(`AI Error: ${session.error || 'Unable to start a streamed edit session.'}`);
-                return;
-            }
-
-            let streamedText = '';
-            let streamEditFailed: string | null = null;
-            let sessionClosed = false;
-            const closeFailedSession = (message: string, preservePartial: boolean) => {
-                if (sessionClosed) return;
-                sessionClosed = true;
-                const cancelResult = this.workspace.cancelStreamEdit(session.sessionId!, { preservePartial });
-                if (!cancelResult.ok) {
-                    console.error('[AI] Failed to close streamed edit session:', cancelResult.error);
-                }
-                alert(`AI Error: ${message}`);
-            };
-
+            const instruction = prompts[item.id] || prompts['improve'];
+            this.rightSidebar.open();
+            this.rightSidebar.setActivePanel('ai');
+            this.aiSidebarMode.switchToCanvas({
+                noteId: this.noteId ?? null,
+                from,
+                to,
+                text: selectedText,
+            });
             this.hide.emit();
-            await this.phoenixChat.streamChat(
-                [{ role: 'user', content: selectedText }],
-                {
-                    onChunk: (chunk) => {
-                        if (sessionClosed || streamEditFailed) return;
-                        streamedText += chunk;
-                        const appendResult = this.workspace.appendStreamChunk(session.sessionId!, chunk);
-                        if (!appendResult.ok) {
-                            streamEditFailed = appendResult.error || 'Failed to append streamed edit chunk.';
-                        }
-                    },
-                    onComplete: async () => {
-                        if (streamEditFailed) {
-                            closeFailedSession(streamEditFailed, streamedText.length > 0);
-                            return;
-                        }
-                        if (streamedText.length === 0) {
-                            closeFailedSession('The model returned no text.', false);
-                            return;
-                        }
-
-                        const finalResult = await this.workspace.finalizeStreamEdit(session.sessionId!);
-                        if (!finalResult.ok) {
-                            closeFailedSession(finalResult.error || 'Failed to finalize streamed edit.', streamedText.length > 0);
-                            return;
-                        }
-
-                        sessionClosed = true;
-                        console.log(`[AI] ${item.id} complete`);
-                    },
-                    onError: (error) => {
-                        console.error('[AI] Phoenix stream error:', error);
-                        closeFailedSession(error.message, streamedText.length > 0);
-                    },
-                },
-                systemPrompt
+            await this.canvasRuns.startSelectionRun(
+                instruction,
+                { from, to, empty: false, text: selectedText },
+                'toolbar',
             );
         } catch (e) {
             console.error('[AI] Action failed:', e);

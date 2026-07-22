@@ -14,16 +14,17 @@ import { KnowledgeService } from './services/knowledge.service';
 import { getNavigationApi } from './api/navigation-api';
 import { NotesService } from './lib/dexie/notes.service';
 import { NoteEditorStore } from './lib/store/note-editor.store';
+import { cachedEditorBodyMatchesAuthoritativeHeader } from './lib/store/note-editor-session';
 import { DiscoveryStore } from './lib/store/discoveryStore';
 import { setPhoenixStoreBridge } from './lib/operations';
 import * as ops from './lib/operations';
-import { FactSheetService } from './components/fact-sheets/fact-sheet.service';
 import { db, type Entity as DexieEntity } from './lib/dexie/db';
 import { loadSettings } from './lib/dexie/settings.service';
 import { PhoenixUiApiService } from './services/phoenix-ui-api.service';
 import { PhoenixStoreService, type StoreBootSnapshot } from './services/phoenix-store.service';
 import { detectPhoenixRuntimeTarget } from './services/phoenix-backend.service';
 import { phoenixTransportAudit } from './services/phoenix-transport-audit';
+import { GraphCanvasColdStartService } from './services/graph-canvas-cold-start.service';
 import {
   PhoenixWasmMismatchError,
   isPhoenixWasmMismatchError,
@@ -53,13 +54,14 @@ export class AppComponent implements OnInit, OnDestroy {
   private noteEditorStore = inject(NoteEditorStore);
   private knowledgeService = inject(KnowledgeService);
   private discoveryStore = inject(DiscoveryStore);
-  private factSheetService = inject(FactSheetService);
+  private graphCanvasColdStart = inject(GraphCanvasColdStartService);
 
   // Navigation API subscriptions
   private notesSub: Subscription | null = null;
   private navUnsubscribe: (() => void) | null = null;
   private bootStep = 'boot:start';
   private bootWatchdog: ReturnType<typeof setInterval> | null = null;
+  private shellRevealed = false;
   fatalBootError: FatalBootErrorState | null = null;
 
   async ngOnInit() {
@@ -84,22 +86,38 @@ export class AppComponent implements OnInit, OnDestroy {
     console.log('[AppComponent] Starting orchestrated boot...');
 
     try {
-      this.setBootStep('settings:start');
-      await phoenixTransportAudit.measureBootPhase('settings.load', async () => {
+      const nativePhoenixRuntime = detectPhoenixRuntimeTarget() === 'native';
+      if (nativePhoenixRuntime) {
+        setPhoenixStoreBridge(this.phoenixStore);
+      }
+
+      this.setBootStep('critical-path:start');
+      const settingsPromise = phoenixTransportAudit.measureBootPhase('settings.load', async () => {
         await loadSettings();
         highlightingStore.reloadFromStorage();
       });
-      this.setBootStep('settings:complete');
-
-      const nativePhoenixRuntime = detectPhoenixRuntimeTarget() === 'native';
-      this.setBootStep('seed:start');
       const seedPromise = phoenixTransportAudit.measureBootPhase('seed.schemas', () => seedDefaultSchemas());
-      let runtimeLoadPromise: Promise<void> | null = null;
-      if (nativePhoenixRuntime) {
-        this.setBootStep('phoenix:runtime:start');
-        runtimeLoadPromise = phoenixTransportAudit.measureBootPhase('phoenix.runtime', () => this.phoenixUiApi.loadRuntime());
-      } else {
-        this.setBootStep('phoenix:runtime:skipped:web');
+      const runtimeLoadPromise = nativePhoenixRuntime
+        ? phoenixTransportAudit.measureBootPhase('phoenix.runtime', () => this.phoenixUiApi.loadRuntime())
+        : null;
+
+      await settingsPromise;
+      this.setBootStep('settings:complete');
+      const hasStoredActiveNote = await this.noteEditorStore.hasStoredActiveNoteIntent();
+      const cachedActiveNoteRevealed = hasStoredActiveNote
+        ? await this.noteEditorStore.restoreCachedActiveNote()
+        : false;
+      this.shellRevealed = true;
+      this.spinner.hide();
+      this.setBootStep(cachedActiveNoteRevealed
+        ? 'shell:cached-active-note:interactive'
+        : 'shell:cached:interactive');
+      console.log(cachedActiveNoteRevealed
+        ? '[AppComponent] Cached active note revealed before native hydration.'
+        : '[AppComponent] Cached shell revealed before native hydration.');
+
+      this.setBootStep('seed:start');
+      if (!runtimeLoadPromise) {
         console.info('[AppComponent] Phoenix native runtime unavailable in web mode; using Dexie/UI-only boot.');
       }
 
@@ -114,10 +132,9 @@ export class AppComponent implements OnInit, OnDestroy {
       }
       this.orchestrator.completePhase('runtime_load');
       this.setBootStep(runtimeLoadPromise ? 'phoenix:runtime:complete' : 'phoenix:runtime:skipped:web:complete');
+      this.graphCanvasColdStart.startGlobal();
 
       if (nativePhoenixRuntime) {
-        setPhoenixStoreBridge(this.phoenixStore);
-
         this.setBootStep('dexie:hydrate:start');
         try {
           await phoenixTransportAudit.measureBootPhase('dexie.hydrate', () => this.hydrateDexieFromPhoenix());
@@ -144,17 +161,6 @@ export class AppComponent implements OnInit, OnDestroy {
       this.orchestrator.completePhase('registry');
       this.setBootStep('registry+editor:complete');
 
-      if (nativePhoenixRuntime) {
-        this.setBootStep('phoenix:hydrateWithEntities:start');
-        await phoenixTransportAudit.measureBootPhase(
-          'phoenix.dictionaryHydrate',
-          () => this.phoenixUiApi.hydrateWithEntities(),
-        );
-        console.log('[AppComponent] Phoenix hydrated with entities');
-        this.setBootStep('phoenix:hydrateWithEntities:complete');
-      } else {
-        this.setBootStep('phoenix:hydrateWithEntities:skipped:web');
-      }
       this.orchestrator.completePhase('runtime_hydrate');
 
       this.orchestrator.completePhase('ready');
@@ -162,20 +168,26 @@ export class AppComponent implements OnInit, OnDestroy {
       phoenixTransportAudit.printSummary('boot ready');
 
       this.setBootStep('background:start');
-      const factSheetPromise = (async () => {
-        if (!nativePhoenixRuntime) {
-          console.info('[AppComponent] FactSheet backend sync skipped for web runtime.');
-          return;
-        }
-        try {
-          await this.factSheetService.syncToBackend();
-          console.log('[AppComponent] FactSheet schemas synced (background)');
-        } catch (err) {
-          console.error('[AppComponent] FactSheet sync failed:', err);
-        }
-      })();
+      const dictionaryPromise = nativePhoenixRuntime
+        ? smartGraphRegistry.rebuildDictionaryNow()
+        : Promise.resolve();
+      const nativeMaintenancePromise = nativePhoenixRuntime
+        ? (async () => {
+            try {
+              await this.phoenixStore.checkpointContentIfNeeded();
+              const report = await this.phoenixStore.flushNativeStore();
+              if (report) {
+                console.log(
+                  `[AppComponent] Native store maintenance: WAL ${report.walBytesBefore} -> ${report.walBytesAfter} bytes, segments=${report.segmentCount}`,
+                );
+              }
+            } catch (error) {
+              console.warn('[AppComponent] Native store maintenance deferred:', error);
+            }
+          })()
+        : Promise.resolve();
 
-      void Promise.all([factSheetPromise]).then(() => {
+      void Promise.all([dictionaryPromise, nativeMaintenancePromise]).then(() => {
         this.orchestrator.completePhase('background');
         this.setBootStep('background:complete');
       });
@@ -189,9 +201,10 @@ export class AppComponent implements OnInit, OnDestroy {
       }
     } finally {
       this.stopBootWatchdog();
-      // Minimum display time for spinner
-      await new Promise(resolve => setTimeout(resolve, 300));
-      this.spinner.hide();
+      if (!this.shellRevealed) {
+        await new Promise(resolve => setTimeout(resolve, 300));
+        this.spinner.hide();
+      }
     }
   }
 
@@ -212,14 +225,18 @@ export class AppComponent implements OnInit, OnDestroy {
         'dexie.snapshotFetch',
         () => this.phoenixStore.getBootSnapshot(),
       );
-      const localEntities = await db.entities.toArray();
+      const [localEntities, localNotes] = await Promise.all([
+        db.entities.toArray(),
+        db.notes.toArray(),
+      ]);
       const phoenixEntities = snapshot.entities.map(e => this.toEntity(e));
       const {
         entities: mergedEntities,
         repairs: entityRepairs,
       } = this.mergeHydratedEntities(phoenixEntities, localEntities);
       const eventNoteMap = new Map(snapshot.eventNotes.map(note => [note.id, note] as const));
-      const localNoteCount = await db.notes.count();
+      const localNoteMap = new Map(localNotes.map(note => [note.id, note] as const));
+      const localNoteCount = localNotes.length;
       const preserveLocalContent =
         this.phoenixUiApi.runtimeTarget === 'native' &&
         snapshot.noteHeaders.length === 0 &&
@@ -234,7 +251,16 @@ export class AppComponent implements OnInit, OnDestroy {
           await Promise.all(clears);
 
           if (!preserveLocalContent && snapshot.noteHeaders.length > 0) {
-            await db.notes.bulkPut(snapshot.noteHeaders.map(n => this.toNote(n, eventNoteMap.get(n.id))));
+            await db.notes.bulkPut(snapshot.noteHeaders.map((note) => {
+              const authoritativeBody = eventNoteMap.get(note.id);
+              const cachedBody = localNoteMap.get(note.id);
+              const reusableBody = authoritativeBody ?? (
+                cachedEditorBodyMatchesAuthoritativeHeader(note, cachedBody)
+                  ? cachedBody
+                  : undefined
+              );
+              return this.toNote(note, reusableBody);
+            }));
           }
           if (mergedEntities.length > 0) await db.entities.bulkPut(mergedEntities);
           if (!preserveLocalContent && snapshot.edges.length > 0) await db.edges.bulkPut(snapshot.edges.map(e => this.toEdge(e)));

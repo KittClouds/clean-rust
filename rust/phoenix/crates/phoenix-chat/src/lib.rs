@@ -397,6 +397,7 @@ impl PhoenixChat {
             &ChatRunEvent {
                 id: generate_id("event", now),
                 run_id: run.id.clone(),
+                sequence: 0,
                 phase: "run".to_owned(),
                 kind: "status".to_owned(),
                 label: "Queued".to_owned(),
@@ -416,6 +417,7 @@ impl PhoenixChat {
             &ChatRunEvent {
                 id: generate_id("event", run.updated_at),
                 run_id: run.id.clone(),
+                sequence: 0,
                 phase: "gather".to_owned(),
                 kind: "status".to_owned(),
                 label: "Gathering context".to_owned(),
@@ -461,6 +463,7 @@ impl PhoenixChat {
             &ChatRunEvent {
                 id: generate_id("event", run.updated_at),
                 run_id: run.id.clone(),
+                sequence: 0,
                 phase: "answer".to_owned(),
                 kind: "status".to_owned(),
                 label: if planner_enabled {
@@ -548,6 +551,7 @@ impl PhoenixChat {
             &ChatRunEvent {
                 id: generate_id("event", run.updated_at),
                 run_id: run.id.clone(),
+                sequence: 0,
                 phase: "stream".to_owned(),
                 kind: "stream".to_owned(),
                 label: "Streaming answer".to_owned(),
@@ -604,6 +608,7 @@ impl PhoenixChat {
             &ChatRunEvent {
                 id: generate_id("event", run.updated_at),
                 run_id: run.id.clone(),
+                sequence: 0,
                 phase: "stream".to_owned(),
                 kind: "stream".to_owned(),
                 label: if final_error.is_some() {
@@ -644,6 +649,7 @@ impl PhoenixChat {
             &ChatRunEvent {
                 id: generate_id("event", run.updated_at),
                 run_id: run.id.clone(),
+                sequence: 0,
                 phase: "run".to_owned(),
                 kind: "status".to_owned(),
                 label: "Cancelled".to_owned(),
@@ -682,8 +688,8 @@ impl PhoenixChat {
             .collect::<Result<Vec<_>, _>>()?;
         events.sort_by(|left, right| {
             right
-                .created_at
-                .cmp(&left.created_at)
+                .sequence
+                .cmp(&left.sequence)
                 .then_with(|| left.id.cmp(&right.id))
         });
         events.truncate(limit);
@@ -735,6 +741,7 @@ impl PhoenixChat {
                     &ChatRunEvent {
                         id: generate_id("event", now),
                         run_id: run.id.clone(),
+                        sequence: 0,
                         phase: "executing_tools".to_owned(),
                         kind: "tool".to_owned(),
                         label: call.tool_name.clone(),
@@ -779,6 +786,7 @@ impl PhoenixChat {
                     &ChatRunEvent {
                         id: generate_id("event", now),
                         run_id: run.id.clone(),
+                        sequence: 0,
                         phase: "awaiting_approval".to_owned(),
                         kind: "tool".to_owned(),
                         label: call.tool_name.clone(),
@@ -804,6 +812,7 @@ impl PhoenixChat {
                     &ChatRunEvent {
                         id: generate_id("event", now),
                         run_id: run.id.clone(),
+                        sequence: 0,
                         phase: "executing_tools".to_owned(),
                         kind: "tool".to_owned(),
                         label: call.tool_name.clone(),
@@ -926,6 +935,7 @@ impl PhoenixChat {
             &ChatRunEvent {
                 id: generate_id("event", now),
                 run_id: run.id.clone(),
+                sequence: 0,
                 phase: "awaiting_approval".to_owned(),
                 kind: "status".to_owned(),
                 label: approval.tool_name.clone(),
@@ -1036,21 +1046,45 @@ impl PhoenixChat {
         store: &dyn ChatStore,
         event: &ChatRunEvent,
     ) -> Result<(), StoreError> {
+        self.persist_ordered_event(store, event).map(|_| ())
+    }
+
+    pub fn persist_ordered_event(
+        &self,
+        store: &dyn ChatStore,
+        event: &ChatRunEvent,
+    ) -> Result<ChatRunEvent, StoreError> {
+        let mut ordered = event.clone();
+        if ordered.sequence == 0 {
+            ordered.sequence = store
+                .fetch_rows("chat_run_events")?
+                .into_iter()
+                .filter(|row| row.get("run_id").and_then(Value::as_str) == Some(&event.run_id))
+                .filter_map(|row| row.get("sequence").and_then(Value::as_u64))
+                .max()
+                .unwrap_or(0)
+                .saturating_add(1);
+        }
+        if ordered.id.is_empty() {
+            ordered.id = format!("event:{}:{}", ordered.run_id, ordered.sequence);
+        }
         store.put_row(
             "chat_run_events",
             json!({
-                "id": event.id,
-                "run_id": event.run_id,
-                "phase": event.phase,
-                "kind": event.kind,
-                "label": event.label,
-                "detail": event.detail,
-                "status": event.status,
-                "payload": event.payload,
-                "latency_ms": event.latency_ms,
-                "created_at": event.created_at,
+                "id": ordered.id,
+                "run_id": ordered.run_id,
+                "sequence": ordered.sequence,
+                "phase": ordered.phase,
+                "kind": ordered.kind,
+                "label": ordered.label,
+                "detail": ordered.detail,
+                "status": ordered.status,
+                "payload": ordered.payload,
+                "latency_ms": ordered.latency_ms,
+                "created_at": ordered.created_at,
             }),
-        )
+        )?;
+        Ok(ordered)
     }
 
     fn get_message(
@@ -1091,8 +1125,8 @@ impl PhoenixChat {
             .map(event_from_row)
             .collect::<Result<Vec<_>, _>>()?;
         events.sort_by(|left, right| {
-            left.created_at
-                .cmp(&right.created_at)
+            left.sequence
+                .cmp(&right.sequence)
                 .then_with(|| left.id.cmp(&right.id))
         });
         Ok(events)
@@ -1455,6 +1489,10 @@ fn event_from_row(row: Value) -> Result<ChatRunEvent, StoreError> {
     Ok(ChatRunEvent {
         id: string_field(object, "id"),
         run_id: string_field(object, "run_id"),
+        sequence: object
+            .get("sequence")
+            .and_then(Value::as_u64)
+            .unwrap_or_default(),
         phase: string_field(object, "phase"),
         kind: string_field(object, "kind"),
         label: string_field(object, "label"),
@@ -1655,7 +1693,7 @@ mod tests {
     use std::collections::HashMap;
 
     use phoenix_store_native_core::StoreError;
-    use phoenix_types::{ChatRunStatus, RunOptions};
+    use phoenix_types::{ChatRunEvent, ChatRunStatus, RunOptions};
     use serde_json::Value;
 
     use super::{ChatStore, PhoenixChat};
@@ -1773,5 +1811,49 @@ mod tests {
         assert!(matches!(completed.run.status, ChatRunStatus::Completed));
         assert_eq!(completed.tool_calls.len(), 0);
         assert_eq!(completed.approvals.len(), 0);
+    }
+
+    #[test]
+    fn run_events_receive_durable_monotonic_sequences_even_at_the_same_timestamp() {
+        let chat = PhoenixChat::default();
+        let store = store();
+        let thread = chat
+            .create_thread(&store, Some("world-1"), Some("narrative-1"), Some("Thread"))
+            .expect("thread");
+        let run = chat
+            .start_run(
+                &store,
+                &thread.id.0,
+                "Inspect the app",
+                RunOptions::default(),
+            )
+            .expect("run");
+        let event = |label: &str| ChatRunEvent {
+            id: String::new(),
+            run_id: run.id.clone(),
+            sequence: 0,
+            phase: "tool_running".to_owned(),
+            kind: "command".to_owned(),
+            label: label.to_owned(),
+            detail: None,
+            status: Some("done".to_owned()),
+            payload: None,
+            latency_ms: None,
+            created_at: 42,
+        };
+
+        let first = chat
+            .persist_ordered_event(&store, &event("first"))
+            .expect("first event");
+        let second = chat
+            .persist_ordered_event(&store, &event("second"))
+            .expect("second event");
+        let events = chat.list_run_events(&store, &run.id).expect("events");
+
+        assert_eq!(second.sequence, first.sequence + 1);
+        assert_ne!(first.id, second.id);
+        assert!(events
+            .windows(2)
+            .all(|pair| pair[0].sequence < pair[1].sequence));
     }
 }

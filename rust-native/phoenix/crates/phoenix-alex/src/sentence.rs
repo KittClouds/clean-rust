@@ -1,5 +1,5 @@
 pub fn split_sentence_ranges(text: &str) -> Vec<(usize, usize)> {
-    phoenix_chunker::split_sentence_ranges(text)
+    phoenix_chunker_native::split_sentence_ranges(text)
 }
 
 #[cfg(test)]

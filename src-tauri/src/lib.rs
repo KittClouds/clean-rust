@@ -1,15 +1,59 @@
+mod document_index_read;
+mod gfm_retrieval_shadow;
 mod graph_galaxy;
+mod graph_generation_query;
+#[cfg(feature = "graph-analytics-wgpu-shadow")]
+pub mod graph_offline_analytics;
+mod graph_force_rebuild_v2;
+mod graph_run_store;
+mod graph_scene_packet;
+#[cfg(feature = "vector-wgpu-shadow")]
+mod graph_vector_gpu_shadow;
+mod graph_vector_index;
+mod graph_vector_index_wire;
+mod native_decision_rpc;
+mod nli_claim_rpc;
 mod phoenix_rpc;
 mod tts;
 
-use phoenix_rpc::{PhoenixApi, PhoenixApiImpl};
+use phoenix_rpc::PhoenixApi;
+pub use phoenix_rpc::PhoenixApiImpl;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    let taurpc_handler = taurpc::create_ipc_handler(PhoenixApiImpl::default().into_handler());
     tauri::Builder::default()
-        .invoke_handler(taurpc::create_ipc_handler(
-            PhoenixApiImpl::default().into_handler(),
-        ))
+        .invoke_handler(move |invoke: tauri::ipc::Invoke<tauri::Wry>| {
+            if invoke.message.command() == "build_graph_encoder_index_packed" {
+                graph_vector_index::handle_packed_invoke(invoke)
+            } else {
+                taurpc_handler(invoke)
+            }
+        })
         .run(tauri::generate_context!())
         .expect("error while running Phoenix Tauri shell");
+}
+
+#[cfg(test)]
+mod contract_tests {
+    use super::*;
+
+    #[test]
+    fn export_phoenix_contract() {
+        let _handler = taurpc::create_ipc_handler::<_, tauri::test::MockRuntime>(
+            PhoenixApiImpl::default().into_handler(),
+        );
+        let path = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("../src/app/generated/phoenix-taurpc.ts");
+        let generated = std::fs::read_to_string(&path).expect("read generated TauRPC contract");
+        let normalized = generated
+            .lines()
+            .map(str::trim_end)
+            .collect::<Vec<_>>()
+            .join("\n")
+            + "\n";
+        if generated != normalized {
+            std::fs::write(path, normalized).expect("normalize generated TauRPC contract");
+        }
+    }
 }

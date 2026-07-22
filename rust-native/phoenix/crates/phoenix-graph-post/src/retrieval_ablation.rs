@@ -6,7 +6,8 @@ use phoenix_graph_kernel::{
     KernelWalkSeedFamily, KernelWhatChangedRequest,
 };
 use phoenix_store_native_core::{
-    PhoenixGraphPatchStore, PhoenixSemanticGraphPatchStore, PhoenixSemanticIndexStore,
+    PhoenixGraphKernelStoreV2, PhoenixGraphPatchStore, PhoenixSemanticGraphPatchStore,
+    PhoenixSemanticIndexStore,
 };
 use phoenix_types::ScopeKey;
 use serde::{Deserialize, Serialize};
@@ -121,7 +122,10 @@ pub fn evaluate_world_state_retrieval_ablation_cases<S>(
     cases: &[GraphRetrievalAblationCase],
 ) -> Result<Option<Vec<GraphRetrievalAblationCaseResult>>, GraphQueryError>
 where
-    S: PhoenixGraphPatchStore + PhoenixSemanticGraphPatchStore + PhoenixSemanticIndexStore,
+    S: PhoenixGraphPatchStore
+        + PhoenixSemanticGraphPatchStore
+        + PhoenixSemanticIndexStore
+        + PhoenixGraphKernelStoreV2,
 {
     let Some(kernel) = load_projection_kernel(store, scope)? else {
         return Ok(None);
@@ -159,6 +163,7 @@ where
         let (region_snapshot, mut region) =
             world_region_for_case(*case, &snapshot, &view, request, &seeds);
         let base = rank_world_state_answer(
+            request.truth_plane,
             &region_snapshot.vertices,
             &region_snapshot.candidate_edges,
             &slot_at_snapshot(&region_snapshot, &query),
@@ -199,7 +204,10 @@ pub fn evaluate_history_retrieval_ablation_cases<S>(
     cases: &[GraphRetrievalAblationCase],
 ) -> Result<Option<Vec<GraphRetrievalAblationCaseResult>>, GraphQueryError>
 where
-    S: PhoenixGraphPatchStore + PhoenixSemanticGraphPatchStore + PhoenixSemanticIndexStore,
+    S: PhoenixGraphPatchStore
+        + PhoenixSemanticGraphPatchStore
+        + PhoenixSemanticIndexStore
+        + PhoenixGraphKernelStoreV2,
 {
     let Some(kernel) = load_projection_kernel(store, scope)? else {
         return Ok(None);
@@ -277,7 +285,10 @@ pub fn evaluate_causal_retrieval_ablation_cases<S>(
     cases: &[GraphRetrievalAblationCase],
 ) -> Result<Option<Vec<GraphRetrievalAblationCaseResult>>, GraphQueryError>
 where
-    S: PhoenixGraphPatchStore + PhoenixSemanticGraphPatchStore + PhoenixSemanticIndexStore,
+    S: PhoenixGraphPatchStore
+        + PhoenixSemanticGraphPatchStore
+        + PhoenixSemanticIndexStore
+        + PhoenixGraphKernelStoreV2,
 {
     let Some(kernel) = load_projection_kernel(store, scope)? else {
         return Ok(None);

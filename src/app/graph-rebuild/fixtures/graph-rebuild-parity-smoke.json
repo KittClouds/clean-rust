@@ -42,6 +42,17 @@
     { "entityId": "e-hazel", "entityLabel": "Hazel", "entityKind": "CHARACTER", "surface": "Hazel", "sourceStart": 60, "sourceEnd": 65, "source": "Some(ExactCanonical)", "confidence": 1 },
     { "entityId": "e-kai", "entityLabel": "Kai", "entityKind": "CHARACTER", "surface": "Kai", "sourceStart": 79, "sourceEnd": 82, "source": "Some(ExactCanonical)", "confidence": 1 }
   ],
+  "nativeEmbeddingTargetKindCounts": {
+    "anchor": 3,
+    "chunk": 1,
+    "entity": 3,
+    "episode": 1,
+    "event": 1,
+    "graphFact": 1,
+    "memoryState": 3,
+    "note": 1,
+    "structureRoot": 5
+  },
   "expected": {
     "relationships": [
       { "id": "relationship:e-hazel:anchored-cooccurrence:e-kai", "relationType": "co_occurs_with", "status": "review" },
@@ -52,11 +63,12 @@
     "eventCount": 1,
     "memoryStateCount": 3,
     "embeddingTargetKindCounts": {
-      "anchor": 3,
+      "anchor": 6,
       "chunk": 1,
       "entity": 3,
+      "episode": 1,
       "event": 1,
-      "graphFact": 1,
+      "graphFact": 4,
       "memoryState": 3,
       "note": 1,
       "structureRoot": 5

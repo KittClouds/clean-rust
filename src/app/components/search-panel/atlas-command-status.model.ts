@@ -19,6 +19,7 @@ import {
     type AtlasCapabilityId,
     type AtlasRecipeId,
 } from './atlas-capability.model';
+import { buildAdaptiveGraphRebuildChunks } from '../../graph-rebuild/graph-rebuild-meaning-frames';
 
 export type AtlasPipelineStageId = 'scope' | 'surface' | 'ner' | 'graph' | 'semantic' | 'sidecars' | 'retrieval';
 export type { AtlasRecipeId } from './atlas-capability.model';
@@ -147,15 +148,14 @@ export const ATLAS_RECIPES: AtlasRecipe[] = ATLAS_CAPABILITY_RECIPES.map((recipe
     primary: recipe.primary,
 }));
 
-const CHUNK_SIZE = 500;
-const CHUNK_OVERLAP = 100;
+const CHUNK_SIZE = 460;
+const CHUNK_OVERLAP = 64;
 
-export function estimateDynamicChunks(notes: Array<{ content: string }>, chunkSize = CHUNK_SIZE, overlap = CHUNK_OVERLAP): number {
-    const step = Math.max(1, chunkSize - overlap);
-    return notes.reduce((total, note) => {
-        const estimatedTokens = Math.ceil((note.content || '').trim().length / 4);
-        if (estimatedTokens <= 0) return total;
-        return total + Math.max(1, Math.ceil(Math.max(1, estimatedTokens - overlap) / step));
+export function estimateDynamicChunks(notes: Array<{ id?: string; content: string }>): number {
+    return notes.reduce((total, note, index) => {
+        const text = String(note.content || '');
+        if (!text.trim()) return total;
+        return total + buildAdaptiveGraphRebuildChunks(note.id || `estimate:${index}`, text).length;
     }, 0);
 }
 
@@ -194,7 +194,7 @@ export function buildAtlasCommandStatus(input: AtlasCommandStatusInput): AtlasCo
             overlap: CHUNK_OVERLAP,
             sentenceBoundaries: true,
             estimatedChunks: input.estimatedChunks,
-            source: 'runtime default',
+            source: 'adaptive graph rebuild',
         },
         lastRun: {
             label: input.lastSummary?.label || 'No completed command yet',
@@ -260,7 +260,7 @@ function buildStages(input: AtlasCommandStatusInput, counts: AtlasInventoryCount
 function buildSidecars(input: AtlasCommandStatusInput): AtlasInventoryMetric[] {
     return [
         { label: 'Semantic sidecar', value: null, detail: `${input.vectorStatus} ${input.embeddingDimensionLabel}`, source: input.embeddingModelLabel },
-        { label: 'Hybrid space', value: null, detail: input.manifoldStatuses.hybrid, source: 'Hybrid' },
+        { label: 'Hybrid embedding manifold', value: null, detail: input.manifoldStatuses.hybrid, source: 'Hybrid' },
         { label: 'Hopf projection', value: null, detail: input.manifoldStatuses.hopf, source: 'Hopf' },
         { label: 'Lorentz forest', value: null, detail: input.manifoldStatuses.lorentz, source: 'Lorentz' },
         { label: 'Product manifold', value: null, detail: input.manifoldStatuses.product, source: 'Product' },
@@ -322,6 +322,10 @@ function capabilityDetail(
     input: AtlasCommandStatusInput,
     counts: AtlasInventoryCounts,
 ): string {
+    if (!capability.runnable && capability.backendRoute.startsWith('QUARANTINED:')) {
+        return capability.backendRoute;
+    }
+
     if (capability.uiCoverage === 'sleeping') {
         return `${capability.mutationPolicy}; backend types/sidecars detected, not exposed as a runnable recipe yet`;
     }

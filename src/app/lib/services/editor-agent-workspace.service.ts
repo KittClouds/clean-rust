@@ -1,10 +1,16 @@
 import { DOCUMENT, isPlatformBrowser } from '@angular/common';
 import { DestroyRef, Inject, Injectable, PLATFORM_ID, computed, effect, inject, signal } from '@angular/core';
-import { editorViewCtx } from '@milkdown/kit/core';
+import { editorViewCtx, parserCtx, serializerCtx } from '@milkdown/kit/core';
 import { TextSelection } from '@milkdown/kit/prose/state';
 import type { EditorView } from '@milkdown/kit/prose/view';
 import { EditorService } from '../../services/editor.service';
 import { NoteEditorStore } from '../store/note-editor.store';
+import {
+    CANVAS_NOTE_TRANSACTION_KIND,
+    createCanvasNoteUri,
+    formatCanvasReplacementDiff,
+    type CanvasStagedNoteTransaction,
+} from './canvas-note-transaction';
 
 export interface WorkspaceSelectionSnapshot {
     from: number;
@@ -44,6 +50,12 @@ export interface WorkspaceStreamingEditResult extends WorkspaceEditResult {
     insertedLength?: number;
     restoredOriginal?: boolean;
     preservedPartial?: boolean;
+}
+
+export interface WorkspaceStageResult {
+    ok: boolean;
+    transaction?: CanvasStagedNoteTransaction;
+    error?: string;
 }
 
 interface WorkspaceStreamingSession {
@@ -143,6 +155,110 @@ export class EditorAgentWorkspaceService {
             selection,
             blocks: this.getBlocks(),
         };
+    }
+
+    stageReplaceText(
+        runId: string,
+        from: number,
+        to: number,
+        replacement: string,
+        expectedEditorRevision?: number,
+    ): WorkspaceStageResult {
+        const startedAt = performance.now();
+        const view = this.getEditorView();
+        const note = this.noteEditorStore.currentNote();
+        const crepe = this.editorService.getCrepe();
+        if (!view || !note || !crepe) {
+            return { ok: false, error: 'no open note/editor' };
+        }
+
+        const baseEditorRevision = this.computeRevision(view);
+        if (expectedEditorRevision !== undefined && expectedEditorRevision !== baseEditorRevision) {
+            return {
+                ok: false,
+                error: `revision mismatch: expected ${expectedEditorRevision}, got ${baseEditorRevision}`,
+            };
+        }
+        const range = this.normalizeRange(view, from, to);
+        if (!range) return { ok: false, error: 'invalid range' };
+
+        try {
+            const serializer = crepe.editor.ctx.get(serializerCtx);
+            const baseDoc = view.state.doc;
+            const stagedDoc = view.state.tr.insertText(replacement, range.from, range.to).doc;
+            const noteUri = createCanvasNoteUri(note.narrativeId, note.id);
+            const beforeText = baseDoc.textBetween(range.from, range.to, '\n', '\n');
+            const baseStoreRevision = note.version ?? note.updatedAt;
+            const transaction: CanvasStagedNoteTransaction = {
+                kind: CANVAS_NOTE_TRANSACTION_KIND,
+                transactionId: this.generateId('canvas-txn'),
+                runId,
+                noteUri,
+                noteId: note.id,
+                noteTitle: note.title || note.id,
+                baseStoreRevision,
+                baseEditorRevision,
+                stagedEditorRevision: this.hashString(JSON.stringify(stagedDoc.toJSON())),
+                from: range.from,
+                to: range.to,
+                beforeText,
+                replacement,
+                baseContent: baseDoc.toJSON(),
+                baseMarkdown: serializer(baseDoc),
+                stagedContent: stagedDoc.toJSON(),
+                stagedMarkdown: serializer(stagedDoc),
+                diffPreview: formatCanvasReplacementDiff({
+                    noteUri,
+                    baseRevision: baseStoreRevision,
+                    from: range.from,
+                    to: range.to,
+                    beforeText,
+                    replacement,
+                }),
+                stagedAt: Date.now(),
+                stageMs: performance.now() - startedAt,
+            };
+            return { ok: true, transaction };
+        } catch (error) {
+            return { ok: false, error: this.toErrorMessage(error) };
+        }
+    }
+
+    getDocumentRevision(noteId: string): number | null {
+        const note = this.noteEditorStore.currentNote();
+        const view = this.getEditorView();
+        return note?.id === noteId && view ? this.computeRevision(view) : null;
+    }
+
+    applyDocumentProjection(noteId: string, content: object): WorkspaceEditResult {
+        const note = this.noteEditorStore.currentNote();
+        const view = this.getEditorView();
+        if (!note || !view || note.id !== noteId) {
+            return { ok: false, noteId, error: 'no matching open note/editor' };
+        }
+        try {
+            const beforeRevision = this.computeRevision(view);
+            const nextDoc = view.state.schema.nodeFromJSON(content);
+            view.dispatch(view.state.tr.replaceWith(0, view.state.doc.content.size, nextDoc.content));
+            this.refreshLiveSelection();
+            return {
+                ok: true,
+                noteId,
+                beforeRevision,
+                afterRevision: this.computeRevision(view),
+            };
+        } catch (error) {
+            return { ok: false, noteId, error: this.toErrorMessage(error) };
+        }
+    }
+
+    parseMarkdownProjection(markdown: string): object {
+        const crepe = this.editorService.getCrepe();
+        if (!crepe) throw new Error('Canvas markdown parser is unavailable without an initialized editor.');
+        const parser = crepe.editor.ctx.get(parserCtx);
+        const content = parser(markdown)?.toJSON?.();
+        if (!content || content.type !== 'doc') throw new Error('Canvas markdown parser returned an invalid document.');
+        return content;
     }
 
     async replaceText(

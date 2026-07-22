@@ -46,6 +46,7 @@ interface TTSPipeline {
 // ============================================================================
 
 const MODEL_ID = 'onnx-community/Supertonic-TTS-2-ONNX';
+const MODEL_LABEL = 'Supertonic TTS 2 browser compatibility model';
 
 // Configure transformers.js for web worker environment
 env.allowLocalModels = false;
@@ -137,7 +138,7 @@ async function loadModel(): Promise<void> {
     }
 
     isModelLoading = true;
-    console.log('[TTS Worker] Loading Supertonic TTS model...');
+    console.log(`[TTS Worker] Loading ${MODEL_LABEL}...`);
 
     try {
         const loadedPipeline = await (pipeline as any)('text-to-speech', MODEL_ID, {

@@ -2,20 +2,17 @@
 // Highlighting Mode Settings - Pure TypeScript Store with Dexie persistence
 // Controls how entities are decorated in the editor with LIVE updates
 
-import type { EntityKind } from '../Scanner/types';
 import { getSetting, setSetting } from '../dexie/settings.service';
 
 // ============================================
 // TYPES
 // ============================================
 
-export type HighlightMode = 'clean' | 'vivid' | 'subtle' | 'gradient' | 'focus' | 'off';
+export type HighlightMode = 'clean' | 'vivid' | 'subtle' | 'gradient' | 'off';
 
 export interface HighlightSettings {
     /** Current highlighting mode */
     mode: HighlightMode;
-    /** Entity kinds to highlight in Focus mode (multiple selection) */
-    focusEntityKinds: EntityKind[];
     /** Whether to show wikilink decorations */
     showWikilinks: boolean;
     /** Whether to show tag decorations */
@@ -29,7 +26,6 @@ export interface HighlightSettings {
 /** Default settings - Clean mode as default */
 export const DEFAULT_HIGHLIGHT_SETTINGS: HighlightSettings = {
     mode: 'vivid',
-    focusEntityKinds: [],
     showWikilinks: true,
     showTags: true,
     showMentions: true,
@@ -42,7 +38,6 @@ export const HIGHLIGHT_MODE_LABELS: Record<HighlightMode, string> = {
     vivid: 'Vivid',
     subtle: 'Subtle',
     gradient: 'Gradient',
-    focus: 'Focus',
     off: 'Off',
 };
 
@@ -50,9 +45,8 @@ export const HIGHLIGHT_MODE_LABELS: Record<HighlightMode, string> = {
 export const HIGHLIGHT_MODE_DESCRIPTIONS: Record<HighlightMode, string> = {
     clean: 'Plain text rendering with entity metadata still attached',
     vivid: 'Full colorful highlighting - all entities always visible',
-    subtle: 'Solid inline text without pill chrome',
+    subtle: 'Static gradient text without pill chrome or motion',
     gradient: 'Gradient inline text without pill chrome',
-    focus: 'Only highlight selected entity types',
     off: 'No entity highlighting',
 };
 
@@ -114,10 +108,6 @@ class HighlightingStore {
         return this.settings.mode;
     }
 
-    getFocusEntityKinds(): EntityKind[] {
-        return this.settings.focusEntityKinds;
-    }
-
     reloadFromStorage(): void {
         const next = this.loadFromStorage();
         if (this.settingsEqual(this.settings, next)) {
@@ -145,30 +135,24 @@ class HighlightingStore {
         this.notify();
     }
 
-    setFocusEntityKinds(kinds: EntityKind[]): void {
-        this.settings = { ...this.settings, focusEntityKinds: kinds };
-        this.saveToStorage();
-        this.notify();
-    }
-
-    toggleFocusKind(kind: EntityKind): void {
-        const kinds = this.settings.focusEntityKinds;
-        const newKinds = kinds.includes(kind)
-            ? kinds.filter(k => k !== kind)
-            : [...kinds, kind];
-        this.settings = { ...this.settings, focusEntityKinds: newKinds };
-        this.saveToStorage();
-        this.notify();
-    }
-
     // ============================================
     // PERSISTENCE
     // ============================================
 
     private loadFromStorage(): HighlightSettings {
-        const stored = getSetting<Partial<HighlightSettings> | null>(STORAGE_KEY, null);
+        const stored = getSetting<(Omit<Partial<HighlightSettings>, 'mode'> & { mode?: string }) | null>(STORAGE_KEY, null);
         if (stored) {
-            return { ...DEFAULT_HIGHLIGHT_SETTINGS, ...stored };
+            const persistedMode = stored.mode;
+            const mode = persistedMode === 'focus'
+                ? 'subtle'
+                : this.isHighlightMode(persistedMode) ? persistedMode : DEFAULT_HIGHLIGHT_SETTINGS.mode;
+            return {
+                mode,
+                showWikilinks: stored.showWikilinks ?? DEFAULT_HIGHLIGHT_SETTINGS.showWikilinks,
+                showTags: stored.showTags ?? DEFAULT_HIGHLIGHT_SETTINGS.showTags,
+                showMentions: stored.showMentions ?? DEFAULT_HIGHLIGHT_SETTINGS.showMentions,
+                showTemporal: stored.showTemporal ?? DEFAULT_HIGHLIGHT_SETTINGS.showTemporal,
+            };
         }
         return { ...DEFAULT_HIGHLIGHT_SETTINGS };
     }
@@ -182,9 +166,15 @@ class HighlightingStore {
             && left.showWikilinks === right.showWikilinks
             && left.showTags === right.showTags
             && left.showMentions === right.showMentions
-            && left.showTemporal === right.showTemporal
-            && left.focusEntityKinds.length === right.focusEntityKinds.length
-            && left.focusEntityKinds.every((kind, index) => kind === right.focusEntityKinds[index]);
+            && left.showTemporal === right.showTemporal;
+    }
+
+    private isHighlightMode(mode: string | undefined): mode is HighlightMode {
+        return mode === 'clean'
+            || mode === 'vivid'
+            || mode === 'subtle'
+            || mode === 'gradient'
+            || mode === 'off';
     }
 
     reset(): void {

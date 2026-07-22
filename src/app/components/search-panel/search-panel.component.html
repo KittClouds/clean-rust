@@ -1,5 +1,4 @@
 <div
-  #workbenchScroll
   class="workbench-scroll flex h-full w-full flex-col gap-2 overflow-y-auto overflow-x-hidden bg-sidebar-background p-2 custom-scrollbar">
 
   <section class="atlas-banner">
@@ -100,6 +99,29 @@
         </button>
       </div>
 
+      <div class="stage8-workflow">
+        <span class="stage8-workflow-step" [ngClass]="graphModelsReady() ? 'stage8-step-ready' : 'stage8-step-waiting'">
+          <b>1</b>
+          <strong>Models</strong>
+          <small>{{ graphModelsReady() ? 'warm' : 'stage' }}</small>
+        </span>
+        <span class="stage8-workflow-step" [ngClass]="stage8ContractStepClass('workflow-graph-build')">
+          <b>2</b>
+          <strong>Graph</strong>
+          <small>{{ atlasControlCardValue('workflow-graph-build') }} edges</small>
+        </span>
+        <span class="stage8-workflow-step" [ngClass]="stage8ContractStepClass('workflow-nli-pairs')">
+          <b>3</b>
+          <strong>NLI</strong>
+          <small>{{ atlasControlCardValue('workflow-nli-pairs') }} pairs</small>
+        </span>
+        <span class="stage8-workflow-step" [ngClass]="stage8ContractStepClass('workflow-review-ledger')">
+          <b>4</b>
+          <strong>Review</strong>
+          <small>{{ atlasControlCardValue('workflow-review-ledger') }} rows</small>
+        </span>
+      </div>
+
       <div class="stage8-router" [ngClass]="'stage8-tone-' + stage8.router.tone">
         <span class="stage8-router-dot"></span>
         <span class="stage8-router-main">
@@ -114,6 +136,87 @@
           <span class="stage8-router-chip">{{ stage8.router.gate }}</span>
           <span class="stage8-router-chip">{{ stage8.router.budget }}</span>
         </span>
+      </div>
+
+      <div class="stage8-truth-review" [ngClass]="'stage8-tone-' + stage8.truthReview.tone">
+        <div class="stage8-truth-review-head">
+          <span>Truth Review</span>
+          <strong>{{ stage8.truthReview.status }}</strong>
+        </div>
+        <div class="stage8-truth-review-main">
+          <span>
+            <strong>{{ stage8.truthReview.modelLabel }}</strong>
+            <small>{{ stage8.truthReview.dimensionLabel }} / {{ stage8.truthReview.contractDetail }}</small>
+          </span>
+          <button type="button" class="stage8-truth-review-action" (click)="runTruthReviewLane()"
+            [disabled]="isTruthReviewLaneDisabled()">
+            <ng-icon [name]="truthReviewLaneBusy() ? 'lucideLoader2' : 'lucideSearch'" class="h-3.5 w-3.5"
+              [class.animate-spin]="truthReviewLaneBusy()"></ng-icon>
+            {{ truthReviewLaneButtonLabel() }}
+          </button>
+        </div>
+        <div class="stage8-nli-controls" [ngClass]="'stage8-tone-' + modernBertNliTone()">
+          <span class="stage8-nli-chip">
+            <b>NLI</b>
+            <em>{{ modernBertNliStatusLabel() }}</em>
+          </span>
+          <small>{{ modernBertNliDetail() }}</small>
+          <span class="stage8-nli-actions">
+            <em>ModernBERT gates</em>
+            <button type="button" class="stage8-truth-review-action" (click)="loadModernBertNli()"
+              [disabled]="isModernBertNliLoadDisabled()">
+              <ng-icon [name]="activeLaneWarm() === 'nli' ? 'lucideLoader2' : 'lucideMicrochip'"
+                class="h-3.5 w-3.5" [class.animate-spin]="activeLaneWarm() === 'nli'"></ng-icon>
+              {{ modernBertNliLoadButtonLabel() }}
+            </button>
+            <button type="button" class="stage8-truth-review-action" (click)="runModernBertNliReview()"
+              [disabled]="isModernBertNliReviewDisabled()">
+              <ng-icon [name]="nliReviewRunning() ? 'lucideLoader2' : 'lucideSearch'" class="h-3.5 w-3.5"
+                [class.animate-spin]="nliReviewRunning()"></ng-icon>
+              {{ modernBertNliReviewButtonLabel() }}
+            </button>
+          </span>
+        </div>
+        <div class="stage8-truth-review-ledger">
+          <span>{{ stage8.truthReview.cacheDetail }}</span>
+          <span>{{ stage8.truthReview.timingDetail }}</span>
+          <span>{{ stage8.truthReview.candidateDetail }}</span>
+        </div>
+        <div class="stage8-truth-review-ledger">
+          <span>{{ stage8.reviewAdjudication.totalDetail }}</span>
+          <span>{{ stage8.reviewAdjudication.eligibleDetail }}</span>
+          <span>{{ stage8.reviewAdjudication.excludedDetail }}</span>
+          <span>{{ stage8.reviewAdjudication.judgedDetail }}</span>
+        </div>
+        <small class="stage8-truth-review-error">
+          {{ stage8.reviewAdjudication.inputDetail }} / {{ stage8.reviewAdjudication.reasonDetail }}
+        </small>
+        <small class="stage8-truth-review-error" *ngIf="stage8.reviewAdjudication.actionDisabled">
+          {{ stage8.reviewAdjudication.actionReason }}
+        </small>
+        <small class="stage8-truth-review-error" *ngIf="stage8.truthReview.error">{{ stage8.truthReview.error }}</small>
+      </div>
+
+      <div class="stage8-contract" [ngClass]="'stage8-tone-' + stage8.contract.status">
+        <div class="stage8-contract-main">
+          <span>Projection contract</span>
+          <strong>{{ stage8.contract.summary }}</strong>
+          <small>Graph = topology / Embed = target projection</small>
+        </div>
+        <div class="stage8-contract-ledger">
+          <span>
+            <b>{{ stage8.contract.compilerLabel }}</b>
+            <small>{{ stage8.contract.pipelineLabel }}</small>
+          </span>
+          <span>
+            <b>{{ stage8.contract.semanticCoordinatesLabel }}</b>
+            <small>{{ stage8.contract.vectorDetail }}</small>
+          </span>
+          <span>
+            <b>{{ stage8.contract.parityLabel }}</b>
+            <small>{{ stage8.contract.parityDetail }}</small>
+          </span>
+        </div>
       </div>
 
       <div class="stage8-lanes">
@@ -172,32 +275,41 @@
     </details>
 
     <div class="recipe-actions full-atlas-actions">
-      <button type="button" class="secondary-action warm-required-action" [ngClass]="fullAtlasModelsReady() ? 'warm-ready' : 'warm-cold'"
-        (click)="loadFullAtlasModels()" [disabled]="fullAtlasBusy()">
+      <button type="button" class="secondary-action warm-required-action" [ngClass]="graphModelsReady() ? 'warm-ready' : 'warm-cold'"
+        (click)="loadGraphModels()" [disabled]="fullAtlasBusy()">
         <ng-icon [name]="fullAtlasBusy() ? 'lucideLoader2' : 'lucideMicrochip'" class="h-3.5 w-3.5"
           [class.animate-spin]="fullAtlasBusy()"></ng-icon>
         {{ loadModelsButtonLabel() }}
       </button>
-      <button type="button" class="primary-action" (click)="buildCoreAtlas()"
-        [disabled]="isFullAtlasBuildDisabled()">
+      <button type="button" class="primary-action" (click)="buildGraphAtlas()"
+        [disabled]="isGraphBuildDisabled()">
         <ng-icon [name]="fullAtlasBusy() ? 'lucideLoader2' : 'lucideSparkles'" class="h-3.5 w-3.5"
           [class.animate-spin]="fullAtlasBusy()"></ng-icon>
         {{ fullAtlasBuildButtonLabel() }}
       </button>
-      <button type="button" class="secondary-action postprocess-action" (click)="postProcessAtlas()"
-        [disabled]="isPostProcessDisabled()">
-        <ng-icon [name]="fullAtlasBusy() ? 'lucideLoader2' : 'lucideGitBranch'" class="h-3.5 w-3.5"
-          [class.animate-spin]="fullAtlasBusy()"></ng-icon>
-        {{ postProcessButtonLabel() }}
-      </button>
-      <button type="button" class="secondary-action" (click)="openGraphLens()">
-        <ng-icon name="lucideLayers" class="h-3.5 w-3.5"></ng-icon>
-        Open Graph
+      <button type="button" class="secondary-action postprocess-action" (click)="embedAtlas()"
+        [disabled]="isEmbedAtlasDisabled()">
+        <ng-icon [name]="vectorStatus() === 'loading' || vectorStatus() === 'indexing' ? 'lucideLoader2' : 'lucideZap'"
+          class="h-3.5 w-3.5" [class.animate-spin]="vectorStatus() === 'loading' || vectorStatus() === 'indexing'"></ng-icon>
+        {{ embedAtlasButtonLabel() }}
       </button>
     </div>
 
+    <details class="full-atlas-advanced">
+      <summary>Diagnostics: entity suggestions</summary>
+      <div class="recipe-actions full-atlas-actions">
+        <button type="button" class="secondary-action ner-suggestions-action"
+          title="Run Dynamic NER and populate entity suggestions without rebuilding the graph"
+          (click)="runEntitySuggestionStage()" [disabled]="isRunNerDisabled()">
+          <ng-icon [name]="nerSuggestionRunning() ? 'lucideLoader2' : 'lucideCpu'" class="h-3.5 w-3.5"
+            [class.animate-spin]="nerSuggestionRunning()"></ng-icon>
+          {{ nerSuggestionsButtonLabel() }}
+        </button>
+      </div>
+    </details>
+
     <div class="last-run">
-      <span>Last run</span>
+      <span>{{ lastRunHeading() }}</span>
       <strong>{{ lastRunStatus().label }}</strong>
       <small>{{ lastRunStatus().detail }}<ng-container *ngIf="lastRunStatus().durationMs !== null"> / {{
           lastRunStatus().durationMs }} ms</ng-container></small>

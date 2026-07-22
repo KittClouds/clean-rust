@@ -23,7 +23,6 @@ describe('highlightingStore', () => {
 
         storedSetting = {
             mode: 'gradient',
-            focusEntityKinds: ['CHARACTER'],
             showWikilinks: true,
             showTags: true,
             showMentions: true,
@@ -34,10 +33,25 @@ describe('highlightingStore', () => {
         highlightingStore.reloadFromStorage();
 
         expect(highlightingStore.getMode()).toBe('gradient');
-        expect(highlightingStore.getFocusEntityKinds()).toEqual(['CHARACTER']);
         expect(listener).toHaveBeenCalledTimes(1);
 
         unsubscribe();
+    });
+
+    it('migrates the removed focus mode to static subtle highlighting', async () => {
+        storedSetting = {
+            mode: 'focus',
+            focusEntityKinds: ['CHARACTER'],
+            showWikilinks: true,
+            showTags: true,
+            showMentions: true,
+            showTemporal: true,
+        };
+
+        const { highlightingStore } = await import('./highlightingStore');
+
+        expect(highlightingStore.getMode()).toBe('subtle');
+        expect(highlightingStore.getSnapshot()).not.toHaveProperty('focusEntityKinds');
     });
 
     it('does not notify when persisted settings match the current snapshot', async () => {

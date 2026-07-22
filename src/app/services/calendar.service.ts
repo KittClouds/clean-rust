@@ -34,6 +34,7 @@ import {
 import { generateOrbitalCalendar } from '../lib/fantasy-calendar/orbital';
 import { ScopedTimelineEventStoreService } from '../lib/services/scoped-timeline-event-store.service';
 import { CalendarNoteSnapshotService } from '../lib/services/calendar-note-snapshot.service';
+import { buildCalendarRegistrySnapshot } from '../lib/fantasy-calendar/calendar-registry-snapshot';
 import * as ops from '../lib/operations';
 
 export interface CalendarEventTargetNote {
@@ -146,12 +147,33 @@ export class CalendarService {
             }));
     });
 
-
     readonly periods = signal<Period[]>([]);
     readonly viewDate = signal<FantasyDate>({ year: 1, monthIndex: 0, dayIndex: 0 });
     readonly highlightedEventId = signal<string | null>(null);
     readonly editorScope = signal<EditorScope>('day');
     readonly isGenerating = signal<boolean>(false);
+
+    readonly calendarRegistrySnapshot = computed(() => {
+        const scope = this.scopeService.resolvedScope();
+        const folders = this.allFolders();
+        const folderMap = new Map(folders.map(folder => [folder.id, folder] as const));
+        const datedFolders = folders
+            .filter(folder => !!folder.metadata?.date && this.isFolderInScope(folder, scope, folderMap));
+        const datedFolderIds = new Set(datedFolders.map(folder => folder.id));
+        return buildCalendarRegistrySnapshot({
+            calendar: this.calendar(),
+            periods: this.periods(),
+            events: this.events().filter(event => !datedFolderIds.has(event.id)),
+            datedFolders,
+            scope: {
+                kind: scope.type,
+                scopeId: scope.scopeFolderId,
+                narrativeId: scope.narrativeId,
+                folderId: scope.scopeFolderId,
+                noteIds: scope.selectedNoteId ? [scope.selectedNoteId] : [],
+            },
+        });
+    });
 
     // === COMPUTED VALUES ===
     readonly currentMonth = computed(() => {

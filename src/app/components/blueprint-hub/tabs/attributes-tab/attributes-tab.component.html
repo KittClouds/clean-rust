@@ -1,0 +1,96 @@
+<div class="atlas-control-shell">
+    <header class="atlas-control-header">
+        <div>
+            <span>Blueprint Hub</span>
+            <h2>Atlas Control</h2>
+        </div>
+        <div class="atlas-control-ledger">
+            @for (card of headerCards(); track card.id) {
+            <span><strong>{{ card.valueLabel }}</strong> {{ card.label }}</span>
+            }
+        </div>
+    </header>
+
+    <section class="atlas-research-readiness" aria-label="Canonical episode research readiness">
+        <header>
+            <div>
+                <span>Chronological decision corpus</span>
+                <strong>Episode assignment readiness</strong>
+            </div>
+            <button
+                type="button"
+                [disabled]="assignmentReadinessState() === 'loading'"
+                (click)="refreshAssignmentReadiness()">
+                {{ assignmentReadinessState() === 'loading' ? 'Reconciling…' : 'Refresh census' }}
+            </button>
+        </header>
+        @if (assignmentReadiness(); as readiness) {
+        <div class="atlas-readiness-metrics">
+            <article><span>Decisions</span><strong>{{ readiness.decisions }}</strong><small>{{ readiness.attached }} attach / {{ readiness.created }} create / {{ readiness.abstained }} abstain</small></article>
+            <article><span>Mature</span><strong>{{ readiness.mature }}</strong><small>{{ readiness.stable }} stable / {{ readiness.revised }} revised</small></article>
+            <article><span>Pending 24h</span><strong>{{ readiness.pendingHorizons }}</strong><small>{{ readiness.nextEligibleAt ? (readiness.nextEligibleAt | date:'MMM d, h:mm a') : 'No pending horizon' }}</small></article>
+        </div>
+        <div class="atlas-readiness-truth">
+            <section class="atlas-count-gates" aria-label="Volume count gates">
+                <header><span>Count gates</span><small>Volume thresholds only · not dataset eligibility</small></header>
+                <div class="atlas-count-gate-cards">
+                    <article [attr.data-gate]="readiness.plumbingGate"><span>Plumbing</span><strong>{{ readiness.mature }}/10</strong><small>{{ readiness.plumbingGate }} · count only</small></article>
+                    <article [attr.data-gate]="readiness.pilotGate"><span>Pilot</span><strong>{{ readiness.mature }}/100</strong><small>{{ readiness.pilotGate }} · count only</small></article>
+                    <article [attr.data-gate]="readiness.researchCountGate"><span>Research volume</span><strong>{{ readiness.mature }}/1000</strong><small>{{ readiness.researchCountGate }} · {{ readiness.averageCandidates | number:'1.1-1' }} avg candidates · {{ readiness.candidateCountRange }} range</small></article>
+                </div>
+            </section>
+            <article class="atlas-dataset-eligibility" [attr.data-gate]="readiness.datasetEligibilityGate">
+                <span>Dataset eligibility</span>
+                <strong>{{ readiness.datasetRole }}</strong>
+                <small>{{ readiness.chronologicalSpanLabel }} source span · {{ readiness.chronologicalSpanGate === 'passed' ? '24h span passed' : '24h span not met' }}</small>
+                <small>Split/leakage witnesses {{ readiness.splitWitnesses }} · promotion {{ readiness.promotionGate }}</small>
+            </article>
+        </div>
+        } @else {
+        <div class="atlas-readiness-empty">
+            {{ assignmentReadinessState() === 'unavailable' ? 'Native decision authority is available in Phoenix Desktop.' : assignmentReadinessState() === 'error' ? 'Native readiness census unavailable.' : 'Loading native decision authority…' }}
+        </div>
+        }
+    </section>
+
+    <section class="atlas-workflow-strip" aria-label="Atlas workflow status">
+        @for (step of workflowSteps(); track step.id) {
+        <article
+            class="atlas-workflow-step"
+            [class.atlas-workflow-ready]="step.tone === 'ready'"
+            [class.atlas-workflow-review]="step.tone === 'review'"
+            [class.atlas-workflow-warning]="step.tone === 'warning'"
+            [class.atlas-workflow-quiet]="step.tone === 'quiet'">
+            <span>{{ step.label }}</span>
+            <strong>{{ step.value }}</strong>
+            <small>{{ step.detail }}</small>
+        </article>
+        }
+    </section>
+
+    <main class="atlas-control-grid">
+        <section class="atlas-control-pane atlas-control-index" aria-label="Atlas build controls">
+            <app-search-panel class="atlas-control-panel-fill"></app-search-panel>
+        </section>
+
+        <section class="atlas-control-pane atlas-control-rooms" aria-label="Atlas operating rooms">
+            <app-atlas-control-rooms
+                class="atlas-control-panel-fill"
+                [contract]="atlasControlContract()"
+                [paging]="atlasProofPaging()"
+                [selectedRoomId]="selectedRoomId()"
+                [assignmentBusyRowId]="assignmentBusyRowId()"
+                [committedAssignmentRowIds]="committedAssignmentRowIds()"
+                (roomChange)="setOperatingRoom($event)"
+                (nextPageRequested)="loadNextAtlasProofPage()"
+                (actionRequested)="dispatchRoomAction($event)">
+            </app-atlas-control-rooms>
+        </section>
+    </main>
+</div>
+
+<app-entity-creator-dialog
+    [(visible)]="isCreatorOpen"
+    [editEntity]="editingEntity()"
+    (save)="onSaveEntity($event)">
+</app-entity-creator-dialog>

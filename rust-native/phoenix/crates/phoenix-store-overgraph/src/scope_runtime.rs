@@ -15,7 +15,7 @@ use phoenix_store_native_core::{
 use phoenix_types::ScopeKey;
 use serde::{Deserialize, Serialize};
 
-use crate::{decode_archive, encode_archive, load_segment_payload, store_query_error};
+use crate::{decode_archive, encode_archive, store_query_error};
 use crate::{DatabaseEngine, PhoenixOvergraphStore, StoreError};
 
 const SCOPE_RUNTIME_CACHE_LIMIT: usize = 64;
@@ -379,62 +379,71 @@ impl PhoenixOvergraphStore {
                     key, manifest.document_id, manifest.revision
                 )));
             };
-            let payload = load_segment_payload(&node)?;
             match segment_ref.kind {
                 DocumentSegmentKind::StringArena => {
-                    archive.tokens = crate::decode_segment_payload(&payload)?;
+                    archive.tokens = crate::decode_segment_payload_from_node(&self.path, &node)?;
                 }
                 DocumentSegmentKind::SentenceTable => {
-                    archive.sentences = crate::decode_segment_payload(&payload)?;
+                    archive.sentences = crate::decode_segment_payload_from_node(&self.path, &node)?;
                 }
                 DocumentSegmentKind::MentionTable => {
-                    archive.mentions = crate::decode_segment_payload(&payload)?;
+                    archive.mentions = crate::decode_segment_payload_from_node(&self.path, &node)?;
                 }
                 DocumentSegmentKind::ResolverLinkTable => {
-                    archive.resolver_links = crate::decode_segment_payload(&payload)?;
+                    archive.resolver_links =
+                        crate::decode_segment_payload_from_node(&self.path, &node)?;
                 }
                 DocumentSegmentKind::ResolvedMentionTable => {
-                    archive.resolved_mentions = crate::decode_segment_payload(&payload)?;
+                    archive.resolved_mentions =
+                        crate::decode_segment_payload_from_node(&self.path, &node)?;
                 }
                 DocumentSegmentKind::AliasConfirmationTable => {
-                    archive.alias_confirmations = crate::decode_segment_payload(&payload)?;
+                    archive.alias_confirmations =
+                        crate::decode_segment_payload_from_node(&self.path, &node)?;
                 }
                 DocumentSegmentKind::CorefClusterTable => {
-                    archive.coref_clusters = crate::decode_segment_payload(&payload)?;
+                    archive.coref_clusters =
+                        crate::decode_segment_payload_from_node(&self.path, &node)?;
                 }
                 DocumentSegmentKind::CausalSubstrateTable => {
-                    archive.causal_substrate = Some(crate::decode_segment_payload(&payload)?);
+                    archive.causal_substrate =
+                        Some(crate::decode_segment_payload_from_node(&self.path, &node)?);
                 }
                 DocumentSegmentKind::TemporalSubstrateTable => {
-                    archive.temporal_substrate = Some(crate::decode_segment_payload(&payload)?);
+                    archive.temporal_substrate =
+                        Some(crate::decode_segment_payload_from_node(&self.path, &node)?);
                 }
                 DocumentSegmentKind::EventIdentitySubstrateTable => {
                     archive.event_identity_substrate =
-                        Some(crate::decode_segment_payload(&payload)?);
+                        Some(crate::decode_segment_payload_from_node(&self.path, &node)?);
                 }
                 DocumentSegmentKind::ChunkTable => {
-                    archive.chunks = crate::decode_segment_payload(&payload)?;
+                    archive.chunks = crate::decode_segment_payload_from_node(&self.path, &node)?;
                 }
                 DocumentSegmentKind::EntityTable => {
-                    archive.entities = crate::decode_segment_payload(&payload)?;
+                    archive.entities = crate::decode_segment_payload_from_node(&self.path, &node)?;
                 }
                 DocumentSegmentKind::RelationTable => {
-                    archive.relations = crate::decode_segment_payload(&payload)?;
+                    archive.relations = crate::decode_segment_payload_from_node(&self.path, &node)?;
                 }
                 DocumentSegmentKind::EvidenceTable => {
-                    archive.evidence_spans = crate::decode_segment_payload(&payload)?;
+                    archive.evidence_spans =
+                        crate::decode_segment_payload_from_node(&self.path, &node)?;
                 }
                 DocumentSegmentKind::LexicalPostings => {
-                    lexical = Some(crate::decode_segment_payload(&payload)?);
+                    lexical = Some(crate::decode_segment_payload_from_node(&self.path, &node)?);
                 }
                 DocumentSegmentKind::NarrativeHitTable => {
-                    archive.relation_candidates = crate::decode_segment_payload(&payload)?;
+                    archive.relation_candidates =
+                        crate::decode_segment_payload_from_node(&self.path, &node)?;
                 }
                 DocumentSegmentKind::GraphMutation => {
-                    archive.graph_batch = crate::decode_segment_payload(&payload)?;
+                    archive.graph_batch =
+                        crate::decode_segment_payload_from_node(&self.path, &node)?;
                 }
                 DocumentSegmentKind::StructureRelations => {
-                    archive.structure = Some(crate::decode_segment_payload(&payload)?);
+                    archive.structure =
+                        Some(crate::decode_segment_payload_from_node(&self.path, &node)?);
                 }
                 DocumentSegmentKind::BoundaryTable => {}
             }

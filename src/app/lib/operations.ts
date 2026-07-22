@@ -222,6 +222,9 @@ export async function updateNote(id: string, updates: Partial<Note>): Promise<No
     const now = Date.now();
     const merged = { ...existing, ...updates, updatedAt: now, version: now };
     await store.upsertNote(merged as StoreNote);
+    if (updates.content !== undefined || updates.markdownContent !== undefined) {
+        store.scheduleDocumentSemanticMaterialization(merged as StoreNote);
+    }
     const note = { ...storeNoteToNote(merged as StoreNote), hasBody: true };
     warmDexieNote(note);
 
@@ -241,6 +244,116 @@ export async function updateNote(id: string, updates: Partial<Note>): Promise<No
     return note;
 }
 
+export interface NoteTransactionCommitResult {
+    transactionId: string;
+    status: 'committed' | 'already_committed' | 'conflict';
+    note: Note;
+    expectedRevision: number;
+    actualRevision: number;
+    commitMs: number;
+    indexInvalidationMs: number;
+}
+
+export interface MultiNoteTransactionCommitResult {
+    transactionId: string;
+    status: 'committed' | 'already_committed' | 'conflict';
+    notes: Note[];
+    conflicts: Array<{
+        noteId: string;
+        expectedRevision: number | null;
+        actualRevision: number | null;
+        reason: 'revision_changed' | 'already_exists' | 'missing' | 'scope_changed' | 'partial_state';
+    }>;
+    commitMs: number;
+    indexInvalidationMs: number;
+}
+
+export async function commitNoteTransaction(input: {
+    transactionId: string;
+    noteId: string;
+    expectedRevision: number;
+    content: object;
+    markdownContent: string;
+}): Promise<NoteTransactionCommitResult> {
+    const store = await waitForStore();
+    const result = await store.commitNoteTransaction({
+        transactionId: input.transactionId,
+        noteId: input.noteId,
+        expectedRevision: input.expectedRevision,
+        content: JSON.stringify(input.content),
+        markdownContent: input.markdownContent,
+    });
+    const note = { ...storeNoteToNote(result.note), hasBody: true };
+
+    let indexInvalidationMs = 0;
+    if (result.status !== 'conflict') {
+        warmDexieNote(note);
+        const indexStarted = performance.now();
+        await syncNoteToDocStoreNow(note);
+        store.scheduleDocumentSemanticMaterialization(result.note);
+        await refreshNoteStructureProjection(note);
+        indexInvalidationMs = performance.now() - indexStarted;
+    }
+
+    return {
+        transactionId: result.transactionId,
+        status: result.status,
+        note,
+        expectedRevision: result.expectedRevision,
+        actualRevision: result.actualRevision,
+        commitMs: result.timing.totalMs,
+        indexInvalidationMs,
+    };
+}
+
+export async function commitMultiNoteTransaction(input: {
+    transactionId: string;
+    mutations: Array<{
+        noteId: string;
+        expectedRevision: number | null;
+        after: Note;
+    }>;
+    signal?: AbortSignal;
+}): Promise<MultiNoteTransactionCommitResult> {
+    const store = await waitForStore();
+    const before = new Map<string, StoreNoteHeader | null>();
+    for (const mutation of input.mutations) {
+        before.set(mutation.noteId, await store.getNoteHeader(mutation.noteId));
+    }
+    const result = await store.commitMultiNoteTransaction({
+        transactionId: input.transactionId,
+        mutations: input.mutations.map((mutation) => ({
+            noteId: mutation.noteId,
+            expectedRevision: mutation.expectedRevision,
+            after: PhoenixStoreService.fromDexieNote(mutation.after),
+        })),
+        signal: input.signal,
+    });
+    const notes = result.notes.map((note) => ({ ...storeNoteToNote(note), hasBody: true }));
+
+    let indexInvalidationMs = 0;
+    if (result.status !== 'conflict') {
+        const indexStarted = performance.now();
+        for (let index = 0; index < notes.length; index++) {
+            const note = notes[index];
+            warmDexieNote(note);
+            await syncNoteToDocStoreNow(note);
+            store.scheduleDocumentSemanticMaterialization(result.notes[index]);
+            await refreshNoteStructureProjection(note);
+            schedulePriorGlobalContextRefresh(before.get(note.id) || undefined);
+        }
+        indexInvalidationMs = performance.now() - indexStarted;
+    }
+    return {
+        transactionId: result.transactionId,
+        status: result.status,
+        notes,
+        conflicts: result.conflicts,
+        commitMs: result.timing.totalMs,
+        indexInvalidationMs,
+    };
+}
+
 function syncNoteToDocStore(note: Note): void {
     import('../api/pretty-text-api').then((api) => {
         const phoenixUiApi = (api as any).getPhoenixUiApi?.();
@@ -255,6 +368,22 @@ function syncNoteToDocStore(note: Note): void {
             );
         }
     }).catch(() => { });
+}
+
+async function syncNoteToDocStoreNow(note: Note): Promise<void> {
+    try {
+        const api = await import('../api/pretty-text-api');
+        const phoenixUiApi = (api as any).getPhoenixUiApi?.();
+        if (!phoenixUiApi) return;
+        const text = note.markdownContent || (typeof note.content === 'string' ? note.content : JSON.stringify(note.content));
+        await phoenixUiApi.upsertNote(note.id, text, note.updatedAt, {
+            title: note.title,
+            narrativeId: note.narrativeId,
+            folderPath: note.folderId,
+        });
+    } catch (error) {
+        console.warn('[Operations] Canvas transaction DocStore invalidation failed:', error);
+    }
 }
 
 export async function deleteNote(id: string): Promise<void> {
@@ -313,7 +442,9 @@ export async function getNotesByIds(ids: string[]): Promise<Note[]> {
         return cached.filter(Boolean).map((note) => note as unknown as Note);
     }
     const notes = await store.getNotesByIds(ids);
-    const byId = new Map<string, Note>(notes.map((note) => [note.id, { ...storeNoteToNote(note), hasBody: true }]));
+    const fullNotes = notes.map((note) => ({ ...storeNoteToNote(note), hasBody: true }));
+    for (const note of fullNotes) warmDexieNote(note);
+    const byId = new Map<string, Note>(fullNotes.map((note) => [note.id, note]));
     const missingIds = ids.filter((id) => !byId.has(id));
     if (missingIds.length) {
         const cached = await db.notes.bulkGet(missingIds);

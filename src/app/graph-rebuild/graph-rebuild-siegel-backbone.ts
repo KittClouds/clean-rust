@@ -22,6 +22,8 @@ interface DirectedPair {
 
 interface SiegelBackboneReceiptOptions {
     nativeRunner?: SiegelNativeRunner | null;
+    nativeReceipt?: unknown;
+    allowRuntimeNative?: boolean;
 }
 
 type SiegelNativeRunner = (request: SiegelNativeRunRequest) => Promise<SiegelNativeRunReceipt>;
@@ -70,10 +72,16 @@ export async function buildSiegelBackboneProjectionReceipt(
         return receipt(startedAt, snapshot, {}, 'Siegel-Finsler backbone skipped; no embedding targets');
     }
 
-    const nativeRunner = options.nativeRunner ?? runtimeNativeRunner();
+    if (options.nativeReceipt && typeof options.nativeReceipt === 'object') {
+        return receiptFromNative(startedAt, snapshot, options.nativeReceipt as SiegelNativeRunReceipt);
+    }
+
+    const nativeRunner = options.allowRuntimeNative === false
+        ? options.nativeRunner || null
+        : options.nativeRunner ?? runtimeNativeRunner();
     if (nativeRunner) {
         try {
-            const nativeReceipt = await nativeRunner(nativeRequest(snapshot));
+            const nativeReceipt = await nativeRunner(graphRebuildSiegelNativeRequest(snapshot));
             return receiptFromNative(startedAt, snapshot, nativeReceipt);
         } catch {
             return fallbackReceipt(startedAt, snapshot, { siegelNativeError: 1 });
@@ -130,7 +138,7 @@ function fallbackReceipt(
     };
 }
 
-function nativeRequest(snapshot: GraphRebuildSnapshot): SiegelNativeRunRequest {
+export function graphRebuildSiegelNativeRequest(snapshot: GraphRebuildSnapshot): SiegelNativeRunRequest {
     const pairs = directedPairs(snapshot);
     return {
         genus: SIEGEL_GENUS,

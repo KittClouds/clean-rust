@@ -3,9 +3,7 @@ import type {
     GraphRebuildCausalEdge,
     GraphRebuildEdge,
     GraphRebuildEmbeddingTarget,
-    GraphRebuildEvent,
     GraphRebuildMemoryState,
-    GraphRebuildNode,
     GraphRebuildRelationship,
     GraphRebuildSignalTargetLane,
     GraphRebuildSnapshot,
@@ -53,8 +51,18 @@ export type GraphModelV2RoleKind =
     | 'cause'
     | 'effect'
     | 'object'
+    | 'agent'
+    | 'bearer'
+    | 'experiencer'
+    | 'topic'
+    | 'recipient'
+    | 'theme'
     | 'location'
     | 'time'
+    | 'manner'
+    | 'instrument'
+    | 'purpose'
+    | 'condition'
     | 'state'
     | 'leftMention'
     | 'rightMention'
@@ -95,6 +103,12 @@ export interface GraphModelV2RelationFact {
     confidence: number;
     evidenceIds: string[];
     sourceRecordId: string;
+    semanticSituationId?: string;
+    semanticFrame?: string;
+    factuality?: string;
+    stateIntervalIds?: string[];
+    eventOrderingIds?: string[];
+    temporalConflictIds?: string[];
 }
 
 export interface GraphModelV2FactBundleCompression {
@@ -163,6 +177,10 @@ export interface GraphModelV2FactRole {
     role: GraphModelV2RoleKind;
     targetAtomId: string;
     confidence: number;
+    semanticRole?: string;
+    slotType?: string;
+    required?: boolean;
+    resolved?: boolean;
 }
 
 export interface GraphModelV2StyleTag {

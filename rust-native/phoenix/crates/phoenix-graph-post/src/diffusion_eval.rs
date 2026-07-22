@@ -4,7 +4,8 @@ use phoenix_graph_kernel::{
     KernelViewRequest, KernelWhatChangedRequest,
 };
 use phoenix_store_native_core::{
-    PhoenixGraphPatchStore, PhoenixSemanticGraphPatchStore, PhoenixSemanticIndexStore,
+    PhoenixGraphKernelStoreV2, PhoenixGraphPatchStore, PhoenixSemanticGraphPatchStore,
+    PhoenixSemanticIndexStore,
 };
 use phoenix_types::ScopeKey;
 use serde::{Deserialize, Serialize};
@@ -81,7 +82,10 @@ pub fn evaluate_world_state_diffusion_cases<S>(
     cases: &[GraphDiffusionCase],
 ) -> Result<Option<Vec<GraphDiffusionCaseResult>>, GraphQueryError>
 where
-    S: PhoenixGraphPatchStore + PhoenixSemanticGraphPatchStore + PhoenixSemanticIndexStore,
+    S: PhoenixGraphPatchStore
+        + PhoenixSemanticGraphPatchStore
+        + PhoenixSemanticIndexStore
+        + PhoenixGraphKernelStoreV2,
 {
     let Some(kernel) = load_projection_kernel(store, scope)? else {
         return Ok(None);
@@ -111,6 +115,7 @@ where
         },
     );
     let mut ranked = rank_world_state_answer(
+        request.truth_plane,
         &region_snapshot.vertices,
         &region_snapshot.candidate_edges,
         &answer,
@@ -147,7 +152,10 @@ pub fn evaluate_history_diffusion_cases<S>(
     cases: &[GraphDiffusionCase],
 ) -> Result<Option<Vec<GraphDiffusionCaseResult>>, GraphQueryError>
 where
-    S: PhoenixGraphPatchStore + PhoenixSemanticGraphPatchStore + PhoenixSemanticIndexStore,
+    S: PhoenixGraphPatchStore
+        + PhoenixSemanticGraphPatchStore
+        + PhoenixSemanticIndexStore
+        + PhoenixGraphKernelStoreV2,
 {
     let Some(kernel) = load_projection_kernel(store, scope)? else {
         return Ok(None);
@@ -249,7 +257,10 @@ pub fn evaluate_causal_diffusion_cases<S>(
     cases: &[GraphDiffusionCase],
 ) -> Result<Option<Vec<GraphDiffusionCaseResult>>, GraphQueryError>
 where
-    S: PhoenixGraphPatchStore + PhoenixSemanticGraphPatchStore + PhoenixSemanticIndexStore,
+    S: PhoenixGraphPatchStore
+        + PhoenixSemanticGraphPatchStore
+        + PhoenixSemanticIndexStore
+        + PhoenixGraphKernelStoreV2,
 {
     let Some(kernel) = load_projection_kernel(store, scope)? else {
         return Ok(None);

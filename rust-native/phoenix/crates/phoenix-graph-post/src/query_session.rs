@@ -2,15 +2,17 @@ use phoenix_graph_kernel::{
     KernelGraphSnapshot, KernelQueryView, KernelViewRequest, PhoenixGraphKernel,
 };
 use phoenix_semantic_v2::{GraphScopeSidecar, SemanticGraphScopeSidecar};
-use phoenix_store_native_core::{PhoenixGraphPatchStore, PhoenixSemanticGraphPatchStore};
+use phoenix_store_native_core::{
+    PhoenixGraphKernelStoreV2, PhoenixGraphPatchStore, PhoenixSemanticGraphPatchStore,
+};
 use phoenix_types::ScopeKey;
 use rustc_hash::FxHashMap;
 use std::cell::RefCell;
 use std::sync::Arc;
 
 use crate::api::{
-    candidate_graph_batch_for_query, load_projection_kernel, projection_kernel_from_batch_refs,
-    GraphQueryError,
+    candidate_graph_batch_for_query, load_projection_kernel,
+    projection_kernel_from_committed_snapshot, GraphQueryError,
 };
 use crate::query_units::{QueryUnitIndexCacheKey, QueryUnitLexicalIndex};
 use crate::retrieval::GraphRetrievedSeed;
@@ -123,7 +125,7 @@ pub fn open_scope_query_session<S>(
     scope: &ScopeKey,
 ) -> Result<Option<ScopeQuerySession>, GraphQueryError>
 where
-    S: PhoenixGraphPatchStore + PhoenixSemanticGraphPatchStore,
+    S: PhoenixGraphPatchStore + PhoenixSemanticGraphPatchStore + PhoenixGraphKernelStoreV2,
 {
     let Some(kernel) = load_projection_kernel(store, scope)? else {
         return Ok(None);
@@ -135,15 +137,15 @@ where
     }))
 }
 
-pub fn open_scope_query_session_from_sidecars(
+pub fn open_scope_query_session_from_committed_snapshot(
     scope: &ScopeKey,
-    graph_sidecar: &GraphScopeSidecar,
+    snapshot: KernelGraphSnapshot,
+    graph_sidecar: Option<&GraphScopeSidecar>,
     semantic_sidecar: Option<&SemanticGraphScopeSidecar>,
 ) -> Result<ScopeQuerySession, GraphQueryError> {
-    let kernel = projection_kernel_from_batch_refs(
-        &graph_sidecar.graph_batch,
-        candidate_graph_batch_for_query(graph_sidecar, semantic_sidecar),
-    )?;
+    let candidate_graph_batch = graph_sidecar
+        .and_then(|sidecar| candidate_graph_batch_for_query(sidecar, semantic_sidecar));
+    let kernel = projection_kernel_from_committed_snapshot(snapshot, candidate_graph_batch)?;
     Ok(ScopeQuerySession {
         scope: scope.clone(),
         kernel,
@@ -244,18 +246,20 @@ mod tests {
         }
     }
 
+    fn empty_snapshot() -> KernelGraphSnapshot {
+        KernelGraphSnapshot::default()
+    }
+
     #[test]
-    fn open_session_from_sidecars_reuses_loaded_projection_inputs() {
+    fn open_session_from_committed_snapshot_reuses_loaded_projection_inputs() {
         let scope = ScopeKey {
             world_id: Some("world".to_owned()),
             ..Default::default()
         };
-        let graph_sidecar = GraphScopeSidecar {
-            scope: scope.clone(),
-            ..Default::default()
-        };
 
-        let session = open_scope_query_session_from_sidecars(&scope, &graph_sidecar, None).unwrap();
+        let session =
+            open_scope_query_session_from_committed_snapshot(&scope, empty_snapshot(), None, None)
+                .unwrap();
         let snapshot = session.view_as_of(KernelViewRequest {
             valid_at: None,
             recorded_at: None,
@@ -278,7 +282,13 @@ mod tests {
             scope: scope.clone(),
             ..Default::default()
         };
-        let session = open_scope_query_session_from_sidecars(&scope, &graph_sidecar, None).unwrap();
+        let session = open_scope_query_session_from_committed_snapshot(
+            &scope,
+            empty_snapshot(),
+            Some(&graph_sidecar),
+            None,
+        )
+        .unwrap();
         let key = SeedQueryCacheKey {
             surface: SeedQuerySurface::EntitySlot {
                 entity_id: "alice".to_owned(),
@@ -316,7 +326,13 @@ mod tests {
             scope: scope.clone(),
             ..Default::default()
         };
-        let session = open_scope_query_session_from_sidecars(&scope, &graph_sidecar, None).unwrap();
+        let session = open_scope_query_session_from_committed_snapshot(
+            &scope,
+            empty_snapshot(),
+            Some(&graph_sidecar),
+            None,
+        )
+        .unwrap();
         let embedding = vec![0.25_f32, 0.5, 0.75];
 
         assert!(session
@@ -339,7 +355,13 @@ mod tests {
             scope: scope.clone(),
             ..Default::default()
         };
-        let session = open_scope_query_session_from_sidecars(&scope, &graph_sidecar, None).unwrap();
+        let session = open_scope_query_session_from_committed_snapshot(
+            &scope,
+            empty_snapshot(),
+            Some(&graph_sidecar),
+            None,
+        )
+        .unwrap();
         let key = QueryUnitIndexCacheKey {
             valid_at: None,
             recorded_at: None,
@@ -369,7 +391,13 @@ mod tests {
             scope: scope.clone(),
             ..Default::default()
         };
-        let session = open_scope_query_session_from_sidecars(&scope, &graph_sidecar, None).unwrap();
+        let session = open_scope_query_session_from_committed_snapshot(
+            &scope,
+            empty_snapshot(),
+            Some(&graph_sidecar),
+            None,
+        )
+        .unwrap();
         let request = KernelViewRequest {
             include_candidate_graph: true,
             ..KernelViewRequest::default()

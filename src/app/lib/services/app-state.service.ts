@@ -51,13 +51,14 @@ export class AppStateService {
     private stateSignal = toSignal(this.state$, {
         initialValue: undefined as UIState | undefined
     });
+    private localState = signal<UIState | undefined>(undefined);
 
     // ─────────────────────────────────────────────────────────────
     // Computed State Slices (for convenience)
     // ─────────────────────────────────────────────────────────────
 
     /** Full state object (with defaults applied) */
-    readonly state = computed(() => this.stateSignal() ?? getDefaultUIState());
+    readonly state = computed(() => this.localState() ?? this.stateSignal() ?? getDefaultUIState());
 
     // Sidebar states
     readonly leftSidebarMode = computed(() => this.state().leftSidebarMode);
@@ -100,6 +101,16 @@ export class AppStateService {
         }
 
         effect(() => {
+            const persisted = this.stateSignal();
+            if (persisted) {
+                const current = this.localState();
+                if (!current || persisted.updatedAt >= current.updatedAt) {
+                    this.localState.set(persisted);
+                }
+            }
+        });
+
+        effect(() => {
             const panel = this.stateSignal()?.rightSidebarActivePanel;
             const normalized = normalizeRightSidebarPanel(panel);
             if (panel && panel !== normalized) {
@@ -115,7 +126,9 @@ export class AppStateService {
     private async ensureStateExists(): Promise<void> {
         const existing = await db.uiState.get(STATE_ID);
         if (!existing) {
-            await db.uiState.put(getDefaultUIState());
+            const defaults = getDefaultUIState();
+            this.localState.set(defaults);
+            await db.uiState.put(defaults);
             console.log('[AppStateService] Created default UI state');
         }
     }
@@ -127,12 +140,12 @@ export class AppStateService {
     private async updateState(partial: Partial<UIState>): Promise<void> {
         if (!this.isBrowser) return;
 
-        const current = await db.uiState.get(STATE_ID);
         const updated: UIState = {
-            ...(current ?? getDefaultUIState()),
+            ...this.state(),
             ...partial,
             updatedAt: Date.now()
         };
+        this.localState.set(updated);
         await db.uiState.put(updated);
     }
 

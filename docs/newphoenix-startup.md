@@ -18,26 +18,27 @@ The Angular dev server listens at `http://localhost:4200`.
 Run this in a second terminal while `npm start` is still running:
 
 ```powershell
-$env:CARGO_TARGET_DIR='G:\cargo-targets\Angular-build\tauri-dev'
 npm run desktop:dev
 ```
 
 Equivalent direct command:
 
 ```powershell
-$env:CARGO_TARGET_DIR='G:\cargo-targets\Angular-build\tauri-dev'
+$env:CARGO_TARGET_DIR='D:\cargo-targets\Angular-build\tauri-dev'
 cargo run --manifest-path "src-tauri\Cargo.toml"
 ```
 
 ### Production Build Smoke
 
 ```powershell
-npm run build
-$env:CARGO_TARGET_DIR='G:\cargo-targets\Angular-build\tauri-release'
-cargo build --release --manifest-path "src-tauri\Cargo.toml"
+npm run desktop:build
 ```
 
-`npm run desktop:build` runs both steps in sequence.
+The checked-in desktop commands use these fixed target families:
+
+- `desktop:dev`, `desktop:check`, `desktop:test`, and `desktop:contract` use `D:\cargo-targets\Angular-build\tauri-dev`.
+- `desktop:build` uses `D:\cargo-targets\Angular-build\tauri-release`.
+- `desktop:contract` regenerates TauRPC bindings through the real IPC handler and fails if the committed TypeScript contract is stale.
 
 ## Native Rust Workspace
 
@@ -47,7 +48,7 @@ Current native post-ingest, Dynamic NER, Semantic Atlas, graph, and store work l
 rust-native/phoenix
 ```
 
-Use `CARGO_TARGET_DIR` on `G:` to avoid polluting the repo and to keep build artifacts out of the branch:
+Use `CARGO_TARGET_DIR` on `D:` to avoid polluting the repo and to keep build artifacts out of the branch:
 
 ```powershell
 $env:CARGO_TARGET_DIR='D:\cargo-targets\Angular-build\tauri-dev'

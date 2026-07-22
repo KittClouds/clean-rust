@@ -11,15 +11,19 @@ use phoenix_semantic_v2::{
 };
 use phoenix_store_native_core::{
     NativeSemanticNodeVectorRecord, PhoenixArchiveStoreV2, PhoenixEventIdentityPatchStore,
-    PhoenixGraphPatchStore, PhoenixMemoryPatchStore, PhoenixSemanticGraphPatchStore,
-    PhoenixSemanticIndexStore, SEMANTIC_MODEL_ID, SEMANTIC_VECTOR_DIM,
+    PhoenixGraphKernelStoreV2, PhoenixGraphLearningStore, PhoenixGraphPatchStore,
+    PhoenixMemoryPatchStore, PhoenixSemanticGraphPatchStore, PhoenixSemanticIndexStore,
+    SEMANTIC_MODEL_ID,
 };
 use phoenix_types::{ScopeKey, SessionId};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
+use std::collections::BTreeMap;
 use thiserror::Error;
 
-use crate::semantic::{semantic_embedder, SemanticEmbedConfig};
+use crate::promotion_lanes::append_semantic_phase5_promotion_commits;
+use crate::semantic::SemanticEmbedConfig;
+use crate::semantic_embedding_runtime::embed_texts_flat_cached;
 use crate::semantic_graph_causal_gap::collect_missing_intermediate_cause_edges;
 use crate::semantic_graph_contradiction::collect_contradictory_support_region_edges;
 use crate::semantic_graph_event::collect_related_event_edges;
@@ -44,6 +48,9 @@ pub struct SemanticGraphConfig {
     pub neighbor_limit: usize,
     pub oversample: usize,
     pub min_score_millis: u32,
+    pub index_node_vectors: bool,
+    pub include_chunk_nodes: bool,
+    pub include_event_nodes: bool,
 }
 
 impl Default for SemanticGraphConfig {
@@ -54,6 +61,9 @@ impl Default for SemanticGraphConfig {
             neighbor_limit: 3,
             oversample: 12,
             min_score_millis: 540,
+            index_node_vectors: true,
+            include_chunk_nodes: true,
+            include_event_nodes: true,
         }
     }
 }
@@ -82,7 +92,105 @@ pub struct SemanticGraphReviewBatch {
     pub graph_generation: Option<u64>,
     pub memory_generation: Option<u64>,
     pub event_identity_generation: Option<u64>,
+    pub embedding_cache_hits: usize,
+    pub embedding_cache_misses: usize,
     pub sidecar: SemanticGraphScopeSidecar,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+struct SemanticGraphBuildResult {
+    sidecar: SemanticGraphScopeSidecar,
+    embedding_cache_hits: usize,
+    embedding_cache_misses: usize,
+}
+
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SemanticGraphInputProfile {
+    pub scope: ScopeKey,
+    pub scope_key: String,
+    pub node_count: usize,
+    pub unique_text_count: usize,
+    pub duplicate_text_count: usize,
+    pub total_text_bytes: usize,
+    pub max_text_bytes: usize,
+    pub node_kind_counts: BTreeMap<String, usize>,
+    pub unique_text_counts_by_kind: BTreeMap<String, usize>,
+}
+
+pub fn profile_semantic_graph_inputs_from_store<S>(
+    store: &S,
+    scope: &ScopeKey,
+) -> Result<Option<SemanticGraphInputProfile>, SemanticGraphError>
+where
+    S: PhoenixArchiveStoreV2 + PhoenixMemoryPatchStore + PhoenixEventIdentityPatchStore,
+{
+    let archives = store.load_latest_document_archives(Some(scope))?;
+    let memory_sidecar = store.load_memory_patch_sidecar(scope)?;
+    let event_identity_sidecar = store.load_event_identity_patch_sidecar(scope)?;
+    if archives.is_empty() && memory_sidecar.is_none() && event_identity_sidecar.is_none() {
+        return Ok(None);
+    }
+    let scope_key = archives
+        .first()
+        .map(|archive| archive.manifest.scope_key.clone())
+        .or_else(|| {
+            memory_sidecar
+                .as_ref()
+                .map(|sidecar| scope_storage_key(&sidecar.scope))
+        })
+        .or_else(|| {
+            event_identity_sidecar
+                .as_ref()
+                .map(|sidecar| scope_storage_key(&sidecar.scope))
+        })
+        .unwrap_or_else(|| scope_storage_key(scope));
+    let prototypes = build_prototypes(
+        &archives,
+        event_identity_sidecar.as_ref(),
+        memory_sidecar.as_ref(),
+    );
+    Ok(Some(profile_semantic_graph_inputs(
+        scope,
+        &scope_key,
+        &prototypes,
+    )))
+}
+
+fn profile_semantic_graph_inputs(
+    scope: &ScopeKey,
+    scope_key: &str,
+    prototypes: &[Prototype],
+) -> SemanticGraphInputProfile {
+    let mut node_kind_counts = BTreeMap::<String, usize>::new();
+    let mut seen_by_kind = HashSet::<(&'static str, u64)>::new();
+    let mut unique_text_counts_by_kind = BTreeMap::<String, usize>::new();
+    let mut seen_texts = HashSet::<u64>::new();
+    let mut total_text_bytes = 0usize;
+    let mut max_text_bytes = 0usize;
+    for prototype in prototypes {
+        let kind = node_kind_label(prototype.node_kind).to_owned();
+        *node_kind_counts.entry(kind.clone()).or_default() += 1;
+        let text_hash = prototype.semantic_node.text_hash;
+        if seen_by_kind.insert((prototype.ann_kind, text_hash)) {
+            *unique_text_counts_by_kind.entry(kind).or_default() += 1;
+        }
+        seen_texts.insert(text_hash);
+        let text_bytes = prototype.text.len();
+        total_text_bytes = total_text_bytes.saturating_add(text_bytes);
+        max_text_bytes = max_text_bytes.max(text_bytes);
+    }
+    SemanticGraphInputProfile {
+        scope: scope.clone(),
+        scope_key: scope_key.to_owned(),
+        node_count: prototypes.len(),
+        unique_text_count: seen_texts.len(),
+        duplicate_text_count: prototypes.len().saturating_sub(seen_texts.len()),
+        total_text_bytes,
+        max_text_bytes,
+        node_kind_counts,
+        unique_text_counts_by_kind,
+    }
 }
 
 pub fn derive_semantic_graph_review_batch_from_store<S>(
@@ -142,7 +250,7 @@ where
                 .as_ref()
                 .and_then(|sidecar| sidecar.session_id.clone())
         });
-    let sidecar = build_semantic_graph_sidecar(
+    let build = build_semantic_graph_sidecar_with_stats(
         store,
         scope,
         &scope_key,
@@ -165,7 +273,9 @@ where
         event_identity_generation: event_identity_sidecar
             .as_ref()
             .map(|sidecar| sidecar.generation),
-        sidecar,
+        embedding_cache_hits: build.embedding_cache_hits,
+        embedding_cache_misses: build.embedding_cache_misses,
+        sidecar: build.sidecar,
     }))
 }
 
@@ -174,8 +284,9 @@ pub fn persist_semantic_graph_patch_sidecar<S>(
     sidecar: &SemanticGraphScopeSidecar,
 ) -> Result<(), SemanticGraphError>
 where
-    S: PhoenixSemanticGraphPatchStore,
+    S: PhoenixSemanticGraphPatchStore + PhoenixGraphKernelStoreV2 + PhoenixGraphLearningStore,
 {
+    append_semantic_phase5_promotion_commits(store, sidecar)?;
     store.persist_semantic_graph_patch_sidecar(sidecar)?;
     Ok(())
 }
@@ -196,29 +307,75 @@ pub fn build_semantic_graph_sidecar<S>(
 where
     S: PhoenixSemanticIndexStore,
 {
+    Ok(build_semantic_graph_sidecar_with_stats(
+        store,
+        scope,
+        scope_key,
+        scope_ord,
+        session_id,
+        archives,
+        graph_sidecar,
+        event_identity_sidecar,
+        memory_sidecar,
+        config,
+        created_at,
+    )?
+    .sidecar)
+}
+
+fn build_semantic_graph_sidecar_with_stats<S>(
+    store: &S,
+    scope: &ScopeKey,
+    scope_key: &str,
+    scope_ord: ScopeOrd,
+    session_id: Option<&SessionId>,
+    archives: &[DocumentArchive],
+    graph_sidecar: Option<&GraphScopeSidecar>,
+    event_identity_sidecar: Option<&EventIdentityScopeSidecar>,
+    memory_sidecar: Option<&MemoryScopeSidecar>,
+    config: &SemanticGraphConfig,
+    created_at: i64,
+) -> Result<SemanticGraphBuildResult, SemanticGraphError>
+where
+    S: PhoenixSemanticIndexStore,
+{
     let dependency_manifest = semantic_dependency_manifest(
         graph_sidecar.map(|sidecar| sidecar.generation),
         memory_sidecar.map(|sidecar| sidecar.generation),
         event_identity_sidecar.map(|sidecar| sidecar.generation),
     );
     let lifecycle_policy = default_candidate_lifecycle_policy(config.min_score_millis);
-    let prototypes = build_prototypes(archives, event_identity_sidecar, memory_sidecar);
-    let model = semantic_embedder(&config.embed)?;
+    let mut prototypes = build_prototypes(archives, event_identity_sidecar, memory_sidecar);
+    retain_configured_prototypes(&mut prototypes, config);
+    let model_id = semantic_model_id(&config.embed);
+    let embedding_dim = config.embed.profile.target_dim();
     let texts = prototypes
         .iter()
         .map(|prototype| prototype.text.as_str())
         .collect::<Vec<_>>();
-    let embeddings = model.embed_slices_flat(&texts)?;
-    if embeddings.rows() != prototypes.len() || embeddings.dims() != SEMANTIC_VECTOR_DIM {
+    let (unique_texts, prototype_to_unique) = dedupe_embedding_texts(&texts);
+    let unique_embeddings = embed_texts_flat_cached(&config.embed, &unique_texts)?;
+    if unique_embeddings.rows != unique_texts.len() || unique_embeddings.dims != embedding_dim {
         return Err(SemanticGraphError::EmbeddingShape(format!(
             "expected {} rows x {} dims, got {} rows x {} dims",
-            prototypes.len(),
-            SEMANTIC_VECTOR_DIM,
-            embeddings.rows(),
-            embeddings.dims()
+            unique_texts.len(),
+            embedding_dim,
+            unique_embeddings.rows,
+            unique_embeddings.dims
         )));
     }
-    let embedding_rows = EmbeddingRows::from_batch(&embeddings);
+    let expanded_embeddings =
+        expand_embedding_rows(&unique_embeddings, &prototype_to_unique, embedding_dim)?;
+    let embedding_rows =
+        EmbeddingRows::from_flat(&expanded_embeddings, prototypes.len(), embedding_dim)
+            .ok_or_else(|| {
+                SemanticGraphError::EmbeddingShape(format!(
+            "expanded embedding batch shape mismatch: expected {} rows x {} dims, got {} values",
+            prototypes.len(),
+            embedding_dim,
+            expanded_embeddings.len()
+        ))
+            })?;
     let mut workspace = SemanticNeighborWorkspace::new(
         scope.folder_id.clone(),
         scope.folder_path.clone(),
@@ -270,35 +427,41 @@ where
         config.min_score_millis,
     ));
     drop(workspace);
-    let row_values = embeddings.into_rows();
-    let rows = prototypes
-        .iter()
-        .zip(row_values)
-        .map(|(prototype, values)| NativeSemanticNodeVectorRecord {
-            scope: scope.clone(),
-            node_id: prototype.node_id.clone(),
-            node_kind: prototype.ann_kind.to_owned(),
-            document_id: prototype.document_id.clone(),
-            note_id: prototype.note_id.clone(),
-            narrative_id: prototype.narrative_id.clone(),
-            folder_id: scope.folder_id.clone(),
-            folder_path: scope.folder_path.clone(),
-            values,
-            evidence_refs: prototype.evidence_refs.clone(),
-            updated_at: created_at,
-        })
-        .collect::<Vec<_>>();
-    store.upsert_semantic_node_vectors_native_owned(rows)?;
-    let mut warmed_kinds = prototypes
-        .iter()
-        .map(|prototype| prototype.ann_kind)
-        .collect::<Vec<_>>();
-    warmed_kinds.sort_unstable();
-    warmed_kinds.dedup();
-    for &kind in &warmed_kinds {
-        store.warm_semantic_node_index(scope, kind)?;
+    if config.index_node_vectors {
+        let rows = prototypes
+            .iter()
+            .zip(expanded_embeddings.chunks_exact(embedding_dim))
+            .map(|(prototype, values)| NativeSemanticNodeVectorRecord {
+                scope: scope.clone(),
+                node_id: prototype.node_id.clone(),
+                node_kind: prototype.ann_kind.to_owned(),
+                document_id: prototype.document_id.clone(),
+                note_id: prototype.note_id.clone(),
+                narrative_id: prototype.narrative_id.clone(),
+                folder_id: scope.folder_id.clone(),
+                folder_path: scope.folder_path.clone(),
+                values: values.to_vec(),
+                evidence_refs: prototype.evidence_refs.clone(),
+                updated_at: created_at,
+            })
+            .collect::<Vec<_>>();
+        store.upsert_semantic_node_vectors_native_owned_for_model(model_id, rows)?;
+        let mut warmed_kinds = prototypes
+            .iter()
+            .map(|prototype| prototype.ann_kind)
+            .collect::<Vec<_>>();
+        warmed_kinds.sort_unstable();
+        warmed_kinds.dedup();
+        for &kind in &warmed_kinds {
+            store.warm_semantic_node_index_for_model(model_id, embedding_dim, scope, kind)?;
+        }
+        store.warm_semantic_node_indexes_for_model(
+            model_id,
+            embedding_dim,
+            scope,
+            &warmed_kinds,
+        )?;
     }
-    store.warm_semantic_node_indexes(scope, &warmed_kinds)?;
     if candidates
         .iter()
         .any(|candidate| needs_nli_review(candidate.family))
@@ -311,31 +474,101 @@ where
     let (mut candidates, lifecycle_stats) =
         retain_live_candidates(candidates, graph_sidecar, &lifecycle_policy);
     candidates.sort_by(|left, right| left.edge_id.cmp(&right.edge_id));
-    let batch = compile_candidate_graph_batch(scope_key, &prototypes, &candidates, created_at);
+    let batch =
+        compile_candidate_graph_batch(scope_key, &prototypes, &candidates, created_at, model_id);
     let summary = summarize(&prototypes, &candidates, &lifecycle_stats);
-    Ok(SemanticGraphScopeSidecar {
-        scope: scope.clone(),
-        scope_key: scope_key.to_owned(),
-        scope_ord: Some(scope_ord),
-        session_id: session_id.cloned(),
-        updated_at: created_at,
-        generation: created_at as u64,
-        model_id: SEMANTIC_MODEL_ID.to_owned(),
-        embedding_profile: config.embed.profile.label().to_owned(),
-        embedding_dim: SEMANTIC_VECTOR_DIM,
-        dependency_manifest,
-        candidate_lifecycle_policy: lifecycle_policy,
-        candidate_nodes: prototypes
-            .iter()
-            .map(|prototype| prototype.semantic_node.clone())
-            .collect(),
-        candidate_edges: candidates,
-        candidate_graph_batch: batch,
-        graph_generation: dependency_manifest.graph_generation,
-        memory_generation: dependency_manifest.memory_generation,
-        event_identity_generation: dependency_manifest.event_identity_generation,
-        summary,
+    Ok(SemanticGraphBuildResult {
+        embedding_cache_hits: unique_embeddings.cache_hits,
+        embedding_cache_misses: unique_embeddings.cache_misses,
+        sidecar: SemanticGraphScopeSidecar {
+            scope: scope.clone(),
+            scope_key: scope_key.to_owned(),
+            scope_ord: Some(scope_ord),
+            session_id: session_id.cloned(),
+            updated_at: created_at,
+            generation: created_at as u64,
+            model_id: model_id.to_owned(),
+            embedding_profile: config.embed.profile.label().to_owned(),
+            embedding_dim,
+            dependency_manifest,
+            candidate_lifecycle_policy: lifecycle_policy,
+            candidate_nodes: prototypes
+                .iter()
+                .map(|prototype| prototype.semantic_node.clone())
+                .collect(),
+            candidate_edges: candidates,
+            candidate_graph_batch: batch,
+            graph_generation: dependency_manifest.graph_generation,
+            memory_generation: dependency_manifest.memory_generation,
+            event_identity_generation: dependency_manifest.event_identity_generation,
+            summary,
+        },
     })
+}
+
+pub(crate) fn retain_configured_prototypes(
+    prototypes: &mut Vec<Prototype>,
+    config: &SemanticGraphConfig,
+) {
+    if !config.include_chunk_nodes {
+        prototypes.retain(|prototype| prototype.node_kind != SemanticGraphNodeKind::Chunk);
+    }
+    if !config.include_event_nodes {
+        prototypes.retain(|prototype| prototype.node_kind != SemanticGraphNodeKind::Event);
+    }
+}
+
+pub(crate) fn dedupe_embedding_texts<'a>(texts: &[&'a str]) -> (Vec<&'a str>, Vec<usize>) {
+    let mut unique_texts = Vec::new();
+    let mut unique_by_text = HashMap::<&'a str, usize>::new();
+    let mut row_map = Vec::with_capacity(texts.len());
+    for &text in texts {
+        let index = match unique_by_text.get(text).copied() {
+            Some(index) => index,
+            None => {
+                let index = unique_texts.len();
+                unique_texts.push(text);
+                unique_by_text.insert(text, index);
+                index
+            }
+        };
+        row_map.push(index);
+    }
+    (unique_texts, row_map)
+}
+
+fn expand_embedding_rows(
+    unique_embeddings: &crate::semantic::SemanticEmbeddingBatch,
+    prototype_to_unique: &[usize],
+    embedding_dim: usize,
+) -> Result<Vec<f32>, SemanticGraphError> {
+    let mut values = Vec::with_capacity(prototype_to_unique.len().saturating_mul(embedding_dim));
+    for &unique_index in prototype_to_unique {
+        let start = unique_index.saturating_mul(embedding_dim);
+        let end = start.saturating_add(embedding_dim);
+        let Some(row) = unique_embeddings.values.get(start..end) else {
+            return Err(SemanticGraphError::EmbeddingShape(format!(
+                "missing deduped embedding row {unique_index}"
+            )));
+        };
+        if row.len() != embedding_dim {
+            return Err(SemanticGraphError::EmbeddingShape(format!(
+                "deduped embedding row shape mismatch: expected {embedding_dim}, got {}",
+                row.len()
+            )));
+        }
+        values.extend_from_slice(row);
+    }
+    Ok(values)
+}
+
+fn semantic_model_id(config: &SemanticEmbedConfig) -> &str {
+    let model_id = config.model_id.trim();
+    if model_id.is_empty() {
+        SEMANTIC_MODEL_ID
+    } else {
+        model_id
+    }
 }
 
 fn collect_candidate_edges(
@@ -412,6 +645,7 @@ pub(crate) fn compile_candidate_graph_batch(
     prototypes: &[Prototype],
     candidates: &[SemanticGraphEdgeCandidate],
     created_at: i64,
+    model_id: &str,
 ) -> KernelMutationBatch {
     let prototype_by_id = prototypes
         .iter()
@@ -424,7 +658,7 @@ pub(crate) fn compile_candidate_graph_batch(
         if prototype.node_id.starts_with(SEMANTIC_UNIT_PREFIX)
             && seen_vertices.insert(prototype.node_id.as_str())
         {
-            vertices.push(candidate_vertex(prototype, created_at));
+            vertices.push(candidate_vertex(prototype, created_at, model_id));
         }
     }
     for candidate in candidates {
@@ -444,7 +678,7 @@ pub(crate) fn compile_candidate_graph_batch(
                         prototype.node_kind,
                         SemanticGraphNodeKind::Chunk | SemanticGraphNodeKind::Entity
                     ) {
-                        vertices.push(candidate_vertex(prototype, created_at));
+                        vertices.push(candidate_vertex(prototype, created_at, model_id));
                     }
                 }
             }
@@ -481,7 +715,7 @@ pub(crate) fn compile_candidate_graph_batch(
             temporal: Default::default(),
             provenance: KernelProvenance {
                 resolver: Some("semantic-graph".to_owned()),
-                source: Some(SEMANTIC_MODEL_ID.to_owned()),
+                source: Some(model_id.to_owned()),
                 confidence: Some(candidate.score_millis as f64 / 1000.0),
                 evidence_refs: candidate.evidence_refs.clone(),
             },
@@ -499,7 +733,7 @@ pub(crate) fn compile_candidate_graph_batch(
     }
 }
 
-fn candidate_vertex(prototype: &Prototype, created_at: i64) -> KernelVertex {
+fn candidate_vertex(prototype: &Prototype, created_at: i64, model_id: &str) -> KernelVertex {
     KernelVertex {
         id: KernelVertexId(prototype.node_id.clone()),
         kind: prototype.ann_kind.to_owned(),
@@ -524,7 +758,7 @@ fn candidate_vertex(prototype: &Prototype, created_at: i64) -> KernelVertex {
         },
         provenance: KernelProvenance {
             resolver: Some("semantic-graph".to_owned()),
-            source: Some(SEMANTIC_MODEL_ID.to_owned()),
+            source: Some(model_id.to_owned()),
             confidence: Some(1.0),
             evidence_refs: prototype.evidence_refs.clone(),
         },

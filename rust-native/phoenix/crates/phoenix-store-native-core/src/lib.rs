@@ -1,7 +1,8 @@
-pub use phoenix_chunker::ChunkLens;
+pub use phoenix_chunker_native::ChunkLens;
 use phoenix_graph::{GraphMutationBatch, GraptorGraph};
 use phoenix_graph_kernel::{
-    KernelCheckpointData, KernelGraphSnapshot, KernelJournalEntry, KernelMutationBatch,
+    GraphProposalBatchReceipt, GraphTruthCommit, KernelCheckpointData, KernelGraphSnapshot,
+    KernelJournalEntry,
 };
 use phoenix_semantic_v2::{
     AliasPosting, CausalScopeSidecar, DirtyScopeRecord, DocumentArchive, DocumentManifest,
@@ -10,7 +11,11 @@ use phoenix_semantic_v2::{
     RelationScopePatchSidecar, ScopeLexSidecar, ScopeOrd, SemanticGraphScopeSidecar,
     SessionArchive, SessionOrd, StateSchemaScopeSidecar, TemporalScopeSidecar,
 };
-use phoenix_types::{IndexedSpan, IngestDocument, ScopeKey, SessionId};
+use phoenix_types::{
+    IndexedSpan, IngestDocument, NativeDecisionOutcomeReceipt, NativeDecisionReceipt,
+    NativeDecisionRewardEvidenceReceipt, NativeDecisionRewardObservationReceipt, ScopeKey,
+    SessionId,
+};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::{BTreeSet, HashMap};
@@ -31,6 +36,14 @@ pub use scope_runtime::{
 pub const SEMANTIC_VECTOR_DIM: usize = 384;
 pub const SEMANTIC_MODEL_ID: &str = "MongoDB/mdbr-leaf-mt";
 
+pub fn default_semantic_model_id() -> String {
+    SEMANTIC_MODEL_ID.to_owned()
+}
+
+pub const fn default_semantic_vector_dim() -> usize {
+    SEMANTIC_VECTOR_DIM
+}
+
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SnapshotEnvelope {
@@ -39,6 +52,50 @@ pub struct SnapshotEnvelope {
     pub created_at: i64,
     pub relations: std::collections::BTreeMap<String, Vec<Value>>,
     pub checksum: Option<String>,
+}
+
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct PreparedDocumentSegmentPersistTelemetry {
+    pub document_id: String,
+    pub kind: String,
+    pub ordinal: u32,
+    pub row_count: u32,
+    pub compressed_bytes: usize,
+    pub uncompressed_bytes: usize,
+    pub prepare_us: u64,
+    pub payload_write_us: u64,
+    pub storage: String,
+}
+
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct PreparedDocumentPersistTelemetry {
+    pub total_us: u64,
+    pub document_count: usize,
+    pub segment_count: usize,
+    pub dirty_scope_count: usize,
+    pub node_count: usize,
+    pub manifest_prepare_us: u64,
+    pub segment_prepare_us: u64,
+    pub segment_payload_write_us: u64,
+    pub dirty_scope_prepare_us: u64,
+    pub batch_upsert_us: u64,
+    pub session_archive_us: u64,
+    pub cache_invalidate_us: u64,
+    pub manifest_record_bytes: usize,
+    pub manifest_stored_bytes: usize,
+    pub segment_payload_bytes: usize,
+    pub segment_external_bytes: usize,
+    pub segment_inline_bytes: usize,
+    pub segment_uncompressed_bytes: usize,
+    pub document_index_shard_count: usize,
+    pub document_index_shards_written: usize,
+    pub document_index_shards_reused: usize,
+    pub document_index_bytes: usize,
+    pub document_index_write_us: u64,
+    pub dirty_scope_record_bytes: usize,
+    pub segments: Vec<PreparedDocumentSegmentPersistTelemetry>,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -420,6 +477,10 @@ pub struct AnnIndexKey {
     pub scope_ord: ScopeOrd,
     pub family: AnnIndexFamily,
     pub kind: Option<String>,
+    #[serde(default = "default_semantic_model_id")]
+    pub model_id: String,
+    #[serde(default = "default_semantic_vector_dim")]
+    pub dimension: usize,
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
@@ -438,6 +499,18 @@ pub struct AnnManifest {
     pub ef_construction: usize,
     pub level_mult: f32,
     pub metric: String,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SemanticIndexAuthorityReceipt {
+    pub index_generation: u64,
+    pub index_digest: String,
+    pub model_id: String,
+    pub model_version: String,
+    pub dimension: usize,
+    pub metric: String,
+    pub payload_count: usize,
 }
 
 #[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
@@ -596,6 +669,47 @@ pub trait PhoenixArchiveStoreV2 {
         touched_scopes: &[DirtyScopeRecord],
         created_at: i64,
     ) -> Result<(), StoreError>;
+    fn persist_prepared_documents_with_telemetry(
+        &self,
+        prepared: &[PreparedDocument],
+        session_archive: Option<&SessionArchive>,
+        touched_scopes: &[DirtyScopeRecord],
+        created_at: i64,
+    ) -> Result<PreparedDocumentPersistTelemetry, StoreError> {
+        let started = std::time::Instant::now();
+        self.persist_prepared_documents(prepared, session_archive, touched_scopes, created_at)?;
+        let mut telemetry = PreparedDocumentPersistTelemetry {
+            total_us: started.elapsed().as_micros() as u64,
+            document_count: prepared.len(),
+            segment_count: prepared
+                .iter()
+                .map(|document| document.segments.len())
+                .sum(),
+            dirty_scope_count: touched_scopes.len(),
+            ..PreparedDocumentPersistTelemetry::default()
+        };
+        for document in prepared {
+            for segment in &document.segments {
+                telemetry.segment_payload_bytes += segment.payload.len();
+                telemetry.segment_inline_bytes += segment.payload.len();
+                telemetry.segment_uncompressed_bytes += segment.header.uncompressed_len as usize;
+                telemetry
+                    .segments
+                    .push(PreparedDocumentSegmentPersistTelemetry {
+                        document_id: document.manifest.document_id.clone(),
+                        kind: format!("{:?}", segment.header.kind()),
+                        ordinal: segment.header.ordinal,
+                        row_count: segment.header.row_count,
+                        compressed_bytes: segment.payload.len(),
+                        uncompressed_bytes: segment.header.uncompressed_len as usize,
+                        prepare_us: 0,
+                        payload_write_us: 0,
+                        storage: "inline".to_owned(),
+                    });
+            }
+        }
+        Ok(telemetry)
+    }
     fn persist_session_archive(
         &self,
         archive: &SessionArchive,
@@ -753,23 +867,64 @@ pub trait PhoenixSemanticIndexStore {
         SEMANTIC_VECTOR_DIM
     }
 
+    fn semantic_leaf_index_authority_for_model(
+        &self,
+        _model_id: &str,
+        _model_version: &str,
+        _dimension: usize,
+        _scope: &ScopeKey,
+    ) -> Result<Option<SemanticIndexAuthorityReceipt>, StoreError> {
+        Ok(None)
+    }
+
     fn upsert_semantic_leaf_vectors(
         &self,
         rows: &[NativeSemanticLeafVectorRecord],
     ) -> Result<(), StoreError>;
+    fn upsert_semantic_leaf_vectors_for_model(
+        &self,
+        model_id: &str,
+        rows: &[NativeSemanticLeafVectorRecord],
+    ) -> Result<(), StoreError> {
+        let _ = model_id;
+        self.upsert_semantic_leaf_vectors(rows)
+    }
     fn upsert_semantic_document_vectors_native(
         &self,
         rows: &[NativeSemanticDocumentVectorRecord],
     ) -> Result<(), StoreError>;
+    fn upsert_semantic_document_vectors_native_for_model(
+        &self,
+        model_id: &str,
+        rows: &[NativeSemanticDocumentVectorRecord],
+    ) -> Result<(), StoreError> {
+        let _ = model_id;
+        self.upsert_semantic_document_vectors_native(rows)
+    }
     fn upsert_semantic_node_vectors_native(
         &self,
         rows: &[NativeSemanticNodeVectorRecord],
     ) -> Result<(), StoreError>;
+    fn upsert_semantic_node_vectors_native_for_model(
+        &self,
+        model_id: &str,
+        rows: &[NativeSemanticNodeVectorRecord],
+    ) -> Result<(), StoreError> {
+        let _ = model_id;
+        self.upsert_semantic_node_vectors_native(rows)
+    }
     fn upsert_semantic_node_vectors_native_owned(
         &self,
         rows: Vec<NativeSemanticNodeVectorRecord>,
     ) -> Result<(), StoreError> {
         self.upsert_semantic_node_vectors_native(&rows)
+    }
+    fn upsert_semantic_node_vectors_native_owned_for_model(
+        &self,
+        model_id: &str,
+        rows: Vec<NativeSemanticNodeVectorRecord>,
+    ) -> Result<(), StoreError> {
+        self.upsert_semantic_node_vectors_native_for_model(model_id, &rows)
     }
     fn query_semantic_neighbors(
         &self,
@@ -802,6 +957,27 @@ pub trait PhoenixSemanticIndexStore {
         limit: usize,
         oversample: usize,
     ) -> Result<Vec<SemanticNodeNeighbor>, StoreError>;
+    fn query_semantic_node_neighbors_for_model(
+        &self,
+        model_id: &str,
+        dimension: usize,
+        query_vector: &[f32],
+        scope: &ScopeKey,
+        kind: &str,
+        exclude_node_id: Option<&str>,
+        limit: usize,
+        oversample: usize,
+    ) -> Result<Vec<SemanticNodeNeighbor>, StoreError> {
+        let _ = (model_id, dimension);
+        self.query_semantic_node_neighbors(
+            query_vector,
+            scope,
+            kind,
+            exclude_node_id,
+            limit,
+            oversample,
+        )
+    }
     /// Query semantic node neighbors across multiple kinds using one merged ranking.
     ///
     /// Implementations must return a single globally ranked result set across the
@@ -819,7 +995,38 @@ pub trait PhoenixSemanticIndexStore {
         limit: usize,
         oversample: usize,
     ) -> Result<Vec<SemanticNodeNeighbor>, StoreError>;
+    fn query_semantic_node_neighbors_by_kinds_for_model(
+        &self,
+        model_id: &str,
+        dimension: usize,
+        query_vector: &[f32],
+        scope: &ScopeKey,
+        kinds: &[&str],
+        exclude_node_id: Option<&str>,
+        limit: usize,
+        oversample: usize,
+    ) -> Result<Vec<SemanticNodeNeighbor>, StoreError> {
+        let _ = (model_id, dimension);
+        self.query_semantic_node_neighbors_by_kinds(
+            query_vector,
+            scope,
+            kinds,
+            exclude_node_id,
+            limit,
+            oversample,
+        )
+    }
     fn warm_semantic_node_index(&self, scope: &ScopeKey, kind: &str) -> Result<(), StoreError>;
+    fn warm_semantic_node_index_for_model(
+        &self,
+        model_id: &str,
+        dimension: usize,
+        scope: &ScopeKey,
+        kind: &str,
+    ) -> Result<(), StoreError> {
+        let _ = (model_id, dimension);
+        self.warm_semantic_node_index(scope, kind)
+    }
     fn warm_semantic_node_indexes(
         &self,
         scope: &ScopeKey,
@@ -827,6 +1034,18 @@ pub trait PhoenixSemanticIndexStore {
     ) -> Result<(), StoreError> {
         for kind in normalized_semantic_node_kinds(kinds) {
             self.warm_semantic_node_index(scope, kind)?;
+        }
+        Ok(())
+    }
+    fn warm_semantic_node_indexes_for_model(
+        &self,
+        model_id: &str,
+        dimension: usize,
+        scope: &ScopeKey,
+        kinds: &[&str],
+    ) -> Result<(), StoreError> {
+        for kind in normalized_semantic_node_kinds(kinds) {
+            self.warm_semantic_node_index_for_model(model_id, dimension, scope, kind)?;
         }
         Ok(())
     }
@@ -888,6 +1107,7 @@ pub trait PhoenixDirectGraphStoreV2 {
 
 pub trait PhoenixGraphKernelStoreV2 {
     fn init_graph_kernel_schema(&self) -> Result<(), StoreError>;
+    fn load_live_kernel_snapshot(&self) -> Result<KernelGraphSnapshot, StoreError>;
     fn load_kernel_checkpoint(&self) -> Result<Option<KernelCheckpointData>, StoreError>;
     fn write_kernel_checkpoint(
         &self,
@@ -899,23 +1119,100 @@ pub trait PhoenixGraphKernelStoreV2 {
         &self,
         generation: u64,
     ) -> Result<Vec<KernelJournalEntry>, StoreError>;
-    fn append_kernel_batch(
+    fn append_graph_truth_commit(
         &self,
-        generation: u64,
-        source_revision: &str,
-        batch: &KernelMutationBatch,
-        created_at: i64,
-    ) -> Result<(), StoreError>;
-    fn append_kernel_commit_marker(
+        commit: &GraphTruthCommit,
+    ) -> Result<GraphTruthCommitAppend, StoreError>;
+    fn load_graph_truth_commit(
         &self,
-        generation: u64,
-        source_revision: &str,
         commit_id: &str,
-        created_at: i64,
-    ) -> Result<(), StoreError>;
+    ) -> Result<Option<GraphTruthCommit>, StoreError>;
+    fn load_graph_truth_commits(&self) -> Result<Vec<GraphTruthCommit>, StoreError>;
     fn kernel_generation_for_commit(&self, commit_id: &str) -> Result<Option<u64>, StoreError>;
     fn kernel_current_generation(&self) -> Result<u64, StoreError>;
     fn kernel_journal_len(&self) -> Result<usize, StoreError>;
+}
+
+pub trait PhoenixGraphLearningStore {
+    fn append_graph_proposal_receipt(
+        &self,
+        receipt: &GraphProposalBatchReceipt,
+    ) -> Result<GraphProposalReceiptAppend, StoreError>;
+    fn load_graph_proposal_receipt(
+        &self,
+        receipt_id: &str,
+    ) -> Result<Option<GraphProposalBatchReceipt>, StoreError>;
+    fn load_graph_proposal_receipts(&self) -> Result<Vec<GraphProposalBatchReceipt>, StoreError>;
+}
+
+pub trait PhoenixNativeDecisionStore {
+    fn append_native_decision_receipt(
+        &self,
+        receipt: &NativeDecisionReceipt,
+    ) -> Result<NativeDecisionReceiptAppend, StoreError>;
+    fn append_native_decision_outcome_receipt(
+        &self,
+        receipt: &NativeDecisionOutcomeReceipt,
+    ) -> Result<NativeDecisionReceiptAppend, StoreError>;
+    fn load_native_decision_receipt(
+        &self,
+        receipt_id: &str,
+    ) -> Result<Option<NativeDecisionReceipt>, StoreError>;
+    fn load_native_decision_receipt_by_decision_id(
+        &self,
+        decision_id: &str,
+    ) -> Result<Option<NativeDecisionReceipt>, StoreError>;
+    fn load_native_decision_receipts(&self) -> Result<Vec<NativeDecisionReceipt>, StoreError>;
+    fn load_native_decision_outcome_receipt(
+        &self,
+        receipt_id: &str,
+    ) -> Result<Option<NativeDecisionOutcomeReceipt>, StoreError>;
+    fn load_native_decision_outcome_receipts(
+        &self,
+        decision_receipt_id: &str,
+    ) -> Result<Vec<NativeDecisionOutcomeReceipt>, StoreError>;
+    fn append_native_decision_reward_evidence(
+        &self,
+        receipt: &NativeDecisionRewardEvidenceReceipt,
+    ) -> Result<NativeDecisionReceiptAppend, StoreError>;
+    fn load_native_decision_reward_evidence(
+        &self,
+        receipt_id: &str,
+    ) -> Result<Option<NativeDecisionRewardEvidenceReceipt>, StoreError>;
+    fn load_native_decision_reward_evidence_for_decision(
+        &self,
+        decision_receipt_id: &str,
+    ) -> Result<Vec<NativeDecisionRewardEvidenceReceipt>, StoreError>;
+    fn append_native_decision_reward_observation(
+        &self,
+        receipt: &NativeDecisionRewardObservationReceipt,
+    ) -> Result<NativeDecisionReceiptAppend, StoreError>;
+    fn load_native_decision_reward_observation(
+        &self,
+        receipt_id: &str,
+    ) -> Result<Option<NativeDecisionRewardObservationReceipt>, StoreError>;
+    fn load_native_decision_reward_observations(
+        &self,
+        decision_receipt_id: &str,
+    ) -> Result<Vec<NativeDecisionRewardObservationReceipt>, StoreError>;
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum GraphTruthCommitAppend {
+    Appended,
+    AlreadyPresent { commit_id: String, generation: u64 },
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum GraphProposalReceiptAppend {
+    Appended { byte_len: usize },
+    AlreadyPresent { receipt_id: String },
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum NativeDecisionReceiptAppend {
+    Appended { byte_len: usize },
+    AlreadyPresent { receipt_id: String },
 }
 
 pub trait PhoenixNativeStore: PhoenixNativeRowStore + PhoenixGraphDurabilityStore {}

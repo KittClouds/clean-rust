@@ -281,6 +281,7 @@ export class PhoenixLocalChatStore {
         return {
             id: localId('event'),
             runId,
+            sequence: (this.runs.get(runId)?.events.length || 0) + 1,
             phase,
             kind,
             label,

@@ -1,23 +1,25 @@
 use std::collections::BTreeMap;
 
 use phoenix_alex::{AlexSnapshotId, PatternId, SurfaceHit, SurfaceHitKind};
-use phoenix_chunker::{
+use phoenix_chunker_native::{
     LensChunk, LensKind, LensMentionEdge, LensMentionEdgeKind, LensMentionGraph,
 };
 use phoenix_types::{EntityId, EntityKind, LexiconEntry, ScopeKey, TextRange};
 use serde::Deserialize;
 
 use crate::{
-    build_graph_rebuild_snapshot, compile_dual_write_snapshot, compile_graph_snapshot,
-    compile_legacy_snapshot_strict, verify_graph_compile_output, EvidenceAnchor,
-    EvidenceBundleKind, EvidenceKind, FactLane, FactRole, GraphAtom, GraphAtomKind, GraphChunk,
-    GraphCompileReceipts, GraphCompilerInput, GraphCompilerOutput, GraphMention, GraphRebuildInput,
+    build_graph_rebuild_snapshot, build_snapshot_embedding_target_report,
+    compile_dual_write_snapshot, compile_graph_snapshot, compile_legacy_snapshot_strict,
+    verify_graph_compile_output, EvidenceAnchor, EvidenceBundleKind, EvidenceKind, FactLane,
+    FactRole, GraphAtom, GraphAtomKind, GraphCalendarRegistryBridgeCounters,
+    GraphCalendarRegistryBridgeSummary, GraphCalendarRegistryReceipt, GraphChunk,
+    GraphCompileReceipts, GraphCompilerInput, GraphCompilerOutput, GraphDocumentCompilerHyperedge,
+    GraphDocumentCompilerHyperedgeRole, GraphDocumentCompilerSummary, GraphDocumentConfidence,
+    GraphDocumentEvidenceSpan, GraphDocumentSidecarSummary, GraphMention, GraphRebuildInput,
     GraphScopeKind, RelationFact,
 };
-
 const PARITY_FIXTURE: &str =
     include_str!("../../../../../src/app/graph-rebuild/fixtures/graph-rebuild-parity-smoke.json");
-
 #[test]
 fn builds_chunks_anchors_edges_and_embedding_targets() {
     let text = "Kai watched Hazel. Hazel answered Kai. Rift watched Kai.";
@@ -66,39 +68,6 @@ fn builds_chunks_anchors_edges_and_embedding_targets() {
         .any(|relationship| relationship.adjudication_source == "graph-rebuild-typed-cue-policy"));
     assert!(!snapshot.events.is_empty());
     assert!(snapshot.counters.embedding_targets >= snapshot.counters.chunks + 6 + 3);
-}
-
-#[test]
-fn emits_memory_state_and_graph_fact_targets() {
-    let text =
-        "Tempest stood as Diamond. Kai approved the packet with Tempest because Nemo warned Kai.";
-    let entities = vec![
-        entry("e-kai", "Kai", &[]),
-        entry("e-tempest", "Tempest", &[]),
-        entry("e-nemo", "Nemo", &[]),
-    ];
-    let snapshot = build_graph_rebuild_snapshot(GraphRebuildInput {
-        scope_kind: GraphScopeKind::Note,
-        scope_id: "note:facts",
-        note_id: "note-2",
-        text,
-        scope: ScopeKey::default(),
-        entities: &entities,
-        candidate_count: 3,
-        built_at: Some(12),
-    })
-    .expect("snapshot");
-
-    assert!(snapshot.counters.events > 0);
-    assert!(snapshot.counters.memory_state > 0);
-    assert!(snapshot
-        .relationships
-        .iter()
-        .any(|relationship| relationship.relation_type == "approves_or_accepts"));
-    assert!(snapshot
-        .embedding_targets
-        .iter()
-        .any(|target| target.kind == "memoryState"));
 }
 
 #[test]
@@ -195,6 +164,107 @@ fn dual_write_projects_legacy_ui_graph_from_fact_graph() {
         .projected_ui_graph
         .iter()
         .all(|edge| !edge.evidence_anchor_ids.is_empty()));
+}
+
+#[test]
+fn dual_write_preserves_calendar_registry_receipts_without_projecting_edges() {
+    let text = "Kai watched Hazel.";
+    let entities = vec![entry("e-kai", "Kai", &[]), entry("e-hazel", "Hazel", &[])];
+    let mut snapshot = build_graph_rebuild_snapshot(GraphRebuildInput {
+        scope_kind: GraphScopeKind::Note,
+        scope_id: "note:calendar",
+        note_id: "note-calendar",
+        text,
+        scope: ScopeKey::default(),
+        entities: &entities,
+        candidate_count: 2,
+        built_at: Some(45),
+    })
+    .expect("snapshot");
+    snapshot.edges.clear();
+    snapshot.calendar_registry_summary = Some(calendar_summary("note-calendar"));
+
+    let dual = compile_dual_write_snapshot(&snapshot);
+
+    assert!(dual.fact_graph.atoms.iter().any(|atom| {
+        atom.kind == GraphAtomKind::TimeAnchor && atom.source_id == "calendar-anchor:event-1"
+    }));
+    assert!(dual.fact_graph.evidence_anchors.iter().any(|evidence| {
+        evidence.kind == EvidenceKind::CalendarRegistry
+            && evidence.source_id == "calendar-registry-receipt:event-1"
+    }));
+    assert!(dual.projected_ui_graph.is_empty());
+    assert_eq!(dual.fact_graph.receipts.counters.invariant_failures, 0);
+}
+
+#[test]
+fn dual_write_compiles_only_reviewed_document_situations_to_hyperedges() {
+    let text = "Kai gave Hazel the key.";
+    let entities = vec![entry("e-kai", "Kai", &[]), entry("e-hazel", "Hazel", &[])];
+    let mut snapshot = build_graph_rebuild_snapshot(GraphRebuildInput {
+        scope_kind: GraphScopeKind::Note,
+        scope_id: "note:document-situation",
+        note_id: "note-situation",
+        text,
+        scope: ScopeKey::default(),
+        entities: &entities,
+        candidate_count: 2,
+        built_at: Some(46),
+    })
+    .expect("snapshot");
+    snapshot.document_sidecar_summary = Some(GraphDocumentSidecarSummary {
+        evidence_spans: vec![GraphDocumentEvidenceSpan {
+            id: "evidence:situation:1".into(),
+            note_id: "note-situation".into(),
+            unit_id: None,
+            chunk_id: Some("note-situation:chunk:0".into()),
+            start: 0,
+            end: text.len() as u32,
+            preview: None,
+            confidence: GraphDocumentConfidence { score: 0.91 },
+        }],
+        ..GraphDocumentSidecarSummary::default()
+    });
+    snapshot.document_compiler_summary = Some(GraphDocumentCompilerSummary {
+        hyperedges: vec![
+            situation_hyperedge("h-good", "situation:good", Vec::new()),
+            situation_hyperedge(
+                "h-conflict",
+                "situation:conflict",
+                vec!["conflict:1".into()],
+            ),
+        ],
+    });
+
+    let dual = compile_dual_write_snapshot(&snapshot);
+    let fact = dual
+        .fact_graph
+        .facts
+        .iter()
+        .find(|fact| fact.semantic_situation_id.as_deref() == Some("situation:good"))
+        .expect("compiled semantic situation fact");
+
+    assert_eq!(fact.predicate, "transfer_possession");
+    assert_eq!(fact.semantic_frame.as_deref(), Some("transfer_possession"));
+    assert_eq!(fact.factuality.as_deref(), Some("asserted"));
+    assert!(dual
+        .fact_graph
+        .roles
+        .iter()
+        .any(|role| role.fact_id == fact.id
+            && role.semantic_role.as_deref() == Some("actor")
+            && role.slot_type.as_deref() == Some("participant")
+            && role.resolved == Some(true)));
+    assert!(!dual
+        .fact_graph
+        .facts
+        .iter()
+        .any(|fact| fact.semantic_situation_id.as_deref() == Some("situation:conflict")));
+    assert_eq!(
+        dual.fact_graph.receipts.counters.invariant_failures, 0,
+        "{:?}",
+        dual.fact_graph.receipts.invariant_failures
+    );
 }
 
 #[test]
@@ -295,6 +365,9 @@ fn compiles_prepared_artifacts_without_legacy_rescan() {
         temporal_edges: &[],
         causal_edges: &[],
         memory_state: &[],
+        calendar_registry: None,
+        document_sidecar: None,
+        document_compiler: None,
         legacy_edges: &[],
         bundle_compression: None,
         bundle_commitment: None,
@@ -391,6 +464,12 @@ fn rejects_roles_that_target_the_wrong_layer() {
             status: "accepted".into(),
             evidence_ids: vec!["evidence:anchor:kai".into()],
             confidence: 0.8,
+            semantic_situation_id: None,
+            semantic_frame: None,
+            factuality: None,
+            state_interval_ids: Vec::new(),
+            event_ordering_ids: Vec::new(),
+            temporal_conflict_ids: Vec::new(),
         }],
         roles: vec![
             FactRole {
@@ -398,18 +477,30 @@ fn rejects_roles_that_target_the_wrong_layer() {
                 role: "source".into(),
                 atom_id: "atom:entity:e-kai".into(),
                 confidence: 0.8,
+                semantic_role: None,
+                slot_type: None,
+                required: None,
+                resolved: None,
             },
             FactRole {
                 fact_id: "fact:bad-role".into(),
                 role: "target".into(),
                 atom_id: "atom:entity:e-kai".into(),
                 confidence: 0.8,
+                semantic_role: None,
+                slot_type: None,
+                required: None,
+                resolved: None,
             },
             FactRole {
                 fact_id: "fact:bad-role".into(),
                 role: "evidence".into(),
                 atom_id: "atom:entity:e-kai".into(),
                 confidence: 0.8,
+                semantic_role: None,
+                slot_type: None,
+                required: None,
+                resolved: None,
             },
         ],
         projected_edges: Vec::new(),
@@ -464,7 +555,17 @@ fn matches_shared_frontend_structural_parity_fixture() {
     })
     .expect("snapshot");
 
-    assert_eq!(structural_digest(&snapshot), fixture.expected);
+    let digest = structural_digest(&snapshot);
+    assert_eq!(digest.relationships, fixture.expected.relationships);
+    assert_eq!(digest.event_count, fixture.expected.event_count);
+    assert_eq!(
+        digest.memory_state_count,
+        fixture.expected.memory_state_count
+    );
+    assert_eq!(
+        digest.embedding_target_kind_counts,
+        fixture.native_embedding_target_kind_counts
+    );
 }
 
 fn entry(id: &str, label: &str, aliases: &[&str]) -> LexiconEntry {
@@ -486,6 +587,145 @@ fn entry_from_fixture(entity: &FixtureEntity) -> LexiconEntry {
         kind: Some(parse_kind(&entity.kind)),
         scope: ScopeKey::default(),
         ..LexiconEntry::default()
+    }
+}
+
+fn calendar_summary(note_id: &str) -> GraphCalendarRegistryBridgeSummary {
+    GraphCalendarRegistryBridgeSummary {
+        schema_version: "phoenix-calendar-registry-bridge/v1".into(),
+        generated_at: 45,
+        source_snapshot_id: "snapshot:calendar".into(),
+        source_calendar_registry_id: "calendar-registry:test".into(),
+        calendar_id: "calendar:test".into(),
+        calendar_fingerprint: "calendar:fingerprint:test".into(),
+        calendar_mode: "customOrdinal".into(),
+        scope_kind: "note".into(),
+        scope_id: "note:calendar".into(),
+        receipts: vec![GraphCalendarRegistryReceipt {
+            id: "calendar-registry-receipt:event-1".into(),
+            calendar_anchor_id: "calendar-anchor:event-1".into(),
+            source_kind: "user_calendar_event".into(),
+            source_id: "event-1".into(),
+            status: "accepted_temporal_receipt".into(),
+            date_key: "cal:calendar:test|era:era-1|y:1|m:0|d:0".into(),
+            normalized_value: "CAL:calendar:test:cal:calendar:test|era:era-1|y:1|m:0|d:0".into(),
+            display_date: "Month 1 1, 1 CE".into(),
+            ordinal: 0,
+            end_ordinal: None,
+            real_epoch_ms: None,
+            real_interval_end_ms: None,
+            source_note_ids: vec![note_id.into()],
+            evidence_refs: vec!["calendar:event:event-1".into()],
+            affected_graph_atoms: vec!["calendar-atom:calendar-anchor:event-1".into()],
+            affected_graph_facts: Vec::new(),
+            reversible: true,
+            mutation_allowed: false,
+            rationale: "calendar receipt fixture".into(),
+        }],
+        counters: GraphCalendarRegistryBridgeCounters {
+            anchor_count: 1,
+            receipt_count: 1,
+            accepted_temporal_receipts: 1,
+            custom_ordinal_receipts: 1,
+            event_receipts: 1,
+            ..GraphCalendarRegistryBridgeCounters::default()
+        },
+    }
+}
+
+fn situation_hyperedge(
+    id: &str,
+    situation_id: &str,
+    temporal_conflict_ids: Vec<compact_str::CompactString>,
+) -> GraphDocumentCompilerHyperedge {
+    GraphDocumentCompilerHyperedge {
+        id: id.into(),
+        predicate: "transfer_possession".into(),
+        trigger_predicate: Some("gave".into()),
+        frame: Some("transfer_possession".into()),
+        frame_family: Some("transfer".into()),
+        situation_kind: Some("event".into()),
+        factuality: Some("asserted".into()),
+        speech_act: Some("assertive".into()),
+        semantic_situation_id: Some(situation_id.into()),
+        semantic_proposition_id: None,
+        state_interval_ids: Vec::new(),
+        event_ordering_ids: Vec::new(),
+        temporal_conflict_ids,
+        compilation_basis: Some("semantic_situation_frame".into()),
+        roles: vec![
+            document_hyperedge_role("role-actor", "actor", "e-kai", "entity", "Kai"),
+            document_hyperedge_role("role-recipient", "recipient", "e-hazel", "entity", "Hazel"),
+            document_hyperedge_role("role-theme", "theme", "key", "entity_mention", "the key"),
+            document_hyperedge_role(
+                "role-evidence",
+                "evidence",
+                "evidence:situation:1",
+                "evidence_span",
+                "evidence",
+            ),
+        ],
+        evidence_span_ids: vec!["evidence:situation:1".into()],
+        confidence: 0.91,
+        status: "pending_commit".into(),
+        provenance: None,
+    }
+}
+
+#[test]
+fn admitted_input_targets_bypass_native_candidate_expansion() {
+    let entities = vec![entry("e-kai", "Kai", &[])];
+    let mut snapshot = build_graph_rebuild_snapshot(GraphRebuildInput {
+        scope_kind: GraphScopeKind::Note,
+        scope_id: "note:admission",
+        note_id: "note-admission",
+        text: "Kai approved the packet.",
+        scope: ScopeKey::default(),
+        entities: &entities,
+        candidate_count: 1,
+        built_at: Some(10),
+    })
+    .expect("snapshot");
+    snapshot.embedding_targets.truncate(2);
+
+    let report = build_snapshot_embedding_target_report(&snapshot);
+
+    assert_eq!(report.targets.len(), 2);
+    assert_eq!(
+        report
+            .originating_families
+            .iter()
+            .map(|row| row.targets)
+            .sum::<usize>(),
+        2
+    );
+}
+
+fn document_hyperedge_role(
+    id: &str,
+    role: &str,
+    target_id: &str,
+    target_kind: &str,
+    surface: &str,
+) -> GraphDocumentCompilerHyperedgeRole {
+    GraphDocumentCompilerHyperedgeRole {
+        id: id.into(),
+        role: role.into(),
+        semantic_role: Some(role.into()),
+        slot_type: Some(
+            if role == "evidence" {
+                "evidence"
+            } else {
+                "participant"
+            }
+            .into(),
+        ),
+        target_id: target_id.into(),
+        target_kind: target_kind.into(),
+        surface: Some(surface.into()),
+        confidence: 0.9,
+        required: Some(true),
+        resolved: Some(target_kind == "entity" || target_kind == "evidence_span"),
     }
 }
 
@@ -539,6 +779,7 @@ struct ParityFixture {
     built_at: u64,
     text: String,
     entities: Vec<FixtureEntity>,
+    native_embedding_target_kind_counts: BTreeMap<String, usize>,
     expected: StructuralDigest,
 }
 

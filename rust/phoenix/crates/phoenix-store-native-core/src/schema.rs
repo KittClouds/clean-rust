@@ -1,3 +1,6 @@
+mod research_schema;
+use research_schema::*;
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum PhoenixColumnType {
     String,
@@ -861,6 +864,13 @@ pub const ALL_RELATIONS: &[PhoenixRelationSpec] = &[
     PhoenixRelationSpec::new("chat_run_events", CHAT_RUN_EVENTS),
     PhoenixRelationSpec::new("chat_tool_calls", CHAT_TOOL_CALLS),
     PhoenixRelationSpec::new("chat_approval_requests", CHAT_APPROVAL_REQUESTS),
+    PhoenixRelationSpec::new("research_runs", RESEARCH_RUNS),
+    PhoenixRelationSpec::new("research_queries", RESEARCH_QUERIES),
+    PhoenixRelationSpec::new("research_sources", RESEARCH_SOURCES),
+    PhoenixRelationSpec::new("research_claims", RESEARCH_CLAIMS),
+    PhoenixRelationSpec::new("research_citations", RESEARCH_CITATIONS),
+    PhoenixRelationSpec::new("research_gaps", RESEARCH_GAPS),
+    PhoenixRelationSpec::new("research_receipts", RESEARCH_RECEIPTS),
     PhoenixRelationSpec::new("hnsw_index", HNSW_INDEX),
     PhoenixRelationSpec::new("docid_map", DOCID_MAP),
     PhoenixRelationSpec::new("chunkid_map", CHUNKID_MAP),
@@ -939,6 +949,13 @@ pub const CONTENT_SNAPSHOT_RELATIONS: &[&str] = &[
     "chat_run_events",
     "chat_tool_calls",
     "chat_approval_requests",
+    "research_runs",
+    "research_queries",
+    "research_sources",
+    "research_claims",
+    "research_citations",
+    "research_gaps",
+    "research_receipts",
     "spans",
     "wormholes",
     "span_mentions",

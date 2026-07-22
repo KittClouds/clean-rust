@@ -9,6 +9,20 @@ mod phase4_scoring;
 mod phase4_scoring_support;
 mod phase4_scoring_text;
 mod phase5_path_rerank;
+mod promotion_lane_policy;
+mod promotion_lanes;
+#[cfg(test)]
+mod promotion_lanes_tests;
+pub mod promotion_learner;
+#[cfg(test)]
+mod promotion_learner_tests;
+mod promotion_receipts;
+pub mod promotion_training;
+#[cfg(test)]
+mod promotion_training_tests;
+pub mod promotion_verdict;
+#[cfg(test)]
+mod promotion_verdict_tests;
 mod query_session;
 mod query_units;
 mod retrieval;
@@ -20,7 +34,9 @@ pub mod retrieval_receipts;
 mod retrieval_world;
 mod runtime_telemetry;
 pub mod semantic;
+mod semantic_embedding_runtime;
 pub mod semantic_graph;
+pub mod semantic_service;
 mod signal_quality;
 pub mod smoke_support;
 
@@ -75,6 +91,7 @@ pub use worker::{
 
 pub fn clear_graph_thread_local_caches() {
     retrieval_common::clear_query_embedder_cache();
+    semantic_embedding_runtime::clear_semantic_embedder_cache();
     phase4_scoring_support::clear_phase4_scorer_cache();
 }
 

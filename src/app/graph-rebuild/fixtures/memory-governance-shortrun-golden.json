@@ -1,0 +1,210 @@
+{
+  "schemaVersion": "phoenix-memory-governance-shortrun-golden/v1",
+  "source": {
+    "path": "docs/shortrun.md",
+    "scenario": "zero-shot-build-graph-shortrun",
+    "authority": "rust"
+  },
+  "governanceContract": {
+    "schemaVersion": "phoenix-memory-governance-candidate/v1",
+    "commitPolicy": "no_topology_commit",
+    "noTopologyCommitGuard": "memory_governance_candidate:no_topology_commit",
+    "candidateOnly": true,
+    "requiredFields": [
+      "schemaVersion",
+      "id",
+      "targetId",
+      "targetKind",
+      "action",
+      "reason",
+      "evidenceIds",
+      "supportingEntityIds",
+      "relatedEventIds",
+      "relatedChunkIds",
+      "signals",
+      "confidence",
+      "status",
+      "commitPolicy",
+      "noTopologyCommit",
+      "rationale"
+    ]
+  },
+  "counts": {
+    "total": 410,
+    "byAction": {
+      "attenuate": 24,
+      "compress": 12,
+      "quarantine": 35,
+      "retain": 339
+    },
+    "byTargetAction": {
+      "chunk:attenuate": 24,
+      "chunk:quarantine": 35,
+      "chunk:retain": 339,
+      "episode:compress": 12
+    }
+  },
+  "confidence": {
+    "compressDistinct": 8,
+    "compressMinMillis": 717,
+    "compressMaxMillis": 837
+  },
+  "performanceBudget": {
+    "maxSnapshotBuildMicros": 500000,
+    "maxGovernanceBuildMicros": 100000
+  },
+  "samples": [
+    {
+      "schemaVersion": "phoenix-memory-governance-candidate/v1",
+      "id": "memory_governance:episode:compress:episode:shortrun:8",
+      "targetId": "episode:shortrun:8",
+      "targetKind": "episode",
+      "action": "compress",
+      "reason": "episode_can_compact_child_chunks",
+      "status": "candidate",
+      "commitPolicy": "no_topology_commit",
+      "noTopologyCommit": true,
+      "confidence": 0.837,
+      "evidenceCount": 60,
+      "supportingEntityCount": 8,
+      "relatedEventCount": 12,
+      "relatedChunkCount": 12,
+      "rationale": [
+        "memory_governance_candidate:no_topology_commit",
+        "memory_governance:retrieval_policy_overlay",
+        "reason:episode_can_compact_child_chunks",
+        "audit:episode_events:12",
+        "audit:episode_chunks:12",
+        "audit:evidence:60",
+        "audit:entities:8",
+        "audit:causal_degree:4",
+        "audit:temporal_degree:24"
+      ]
+    },
+    {
+      "schemaVersion": "phoenix-memory-governance-candidate/v1",
+      "id": "memory_governance:episode:compress:episode:shortrun:11",
+      "targetId": "episode:shortrun:11",
+      "targetKind": "episode",
+      "action": "compress",
+      "reason": "episode_can_compact_child_chunks",
+      "status": "candidate",
+      "commitPolicy": "no_topology_commit",
+      "noTopologyCommit": true,
+      "confidence": 0.717,
+      "evidenceCount": 14,
+      "supportingEntityCount": 6,
+      "relatedEventCount": 4,
+      "relatedChunkCount": 4,
+      "rationale": [
+        "memory_governance_candidate:no_topology_commit",
+        "memory_governance:retrieval_policy_overlay",
+        "reason:episode_can_compact_child_chunks",
+        "audit:episode_events:4",
+        "audit:episode_chunks:4",
+        "audit:evidence:14",
+        "audit:entities:6",
+        "audit:temporal_degree:3"
+      ]
+    },
+    {
+      "schemaVersion": "phoenix-memory-governance-candidate/v1",
+      "id": "memory_governance:chunk:retain:shortrun:chunk:113",
+      "targetId": "shortrun:chunk:113",
+      "targetKind": "chunk",
+      "action": "retain",
+      "reason": "chunk_has_causal_or_memory_state_signal",
+      "status": "candidate",
+      "commitPolicy": "no_topology_commit",
+      "noTopologyCommit": true,
+      "confidence": 0.827,
+      "evidenceCount": 5,
+      "supportingEntityCount": 2,
+      "relatedEventCount": 1,
+      "relatedChunkCount": 0,
+      "rationale": [
+        "memory_governance_candidate:no_topology_commit",
+        "memory_governance:retrieval_policy_overlay",
+        "reason:chunk_has_causal_or_memory_state_signal",
+        "audit:causal_degree:2",
+        "audit:events:1"
+      ]
+    },
+    {
+      "schemaVersion": "phoenix-memory-governance-candidate/v1",
+      "id": "memory_governance:chunk:retain:shortrun:chunk:210",
+      "targetId": "shortrun:chunk:210",
+      "targetKind": "chunk",
+      "action": "retain",
+      "reason": "chunk_has_causal_or_memory_state_signal",
+      "status": "candidate",
+      "commitPolicy": "no_topology_commit",
+      "noTopologyCommit": true,
+      "confidence": 0.827,
+      "evidenceCount": 7,
+      "supportingEntityCount": 3,
+      "relatedEventCount": 1,
+      "relatedChunkCount": 0,
+      "rationale": [
+        "memory_governance_candidate:no_topology_commit",
+        "memory_governance:retrieval_policy_overlay",
+        "reason:chunk_has_causal_or_memory_state_signal",
+        "audit:causal_degree:2",
+        "audit:events:1"
+      ]
+    },
+    {
+      "schemaVersion": "phoenix-memory-governance-candidate/v1",
+      "id": "memory_governance:chunk:quarantine:shortrun:chunk:135",
+      "targetId": "shortrun:chunk:135",
+      "targetKind": "chunk",
+      "action": "quarantine",
+      "reason": "chunk_entity_salience_dominated_by_celebrity_surface",
+      "status": "candidate",
+      "commitPolicy": "no_topology_commit",
+      "noTopologyCommit": true,
+      "confidence": 0.776,
+      "evidenceCount": 2,
+      "supportingEntityCount": 2,
+      "relatedEventCount": 0,
+      "relatedChunkCount": 0,
+      "rationale": [
+        "memory_governance_candidate:no_topology_commit",
+        "memory_governance:retrieval_policy_overlay",
+        "reason:chunk_entity_salience_dominated_by_celebrity_surface",
+        "audit:celebrity_entity_dominance",
+        "audit:dominant_entity_pressure:0.83",
+        "audit:no_events",
+        "audit:weak_evidence:2",
+        "audit:no_causal_edges",
+        "audit:no_memory_state"
+      ]
+    },
+    {
+      "schemaVersion": "phoenix-memory-governance-candidate/v1",
+      "id": "memory_governance:chunk:attenuate:shortrun:chunk:118",
+      "targetId": "shortrun:chunk:118",
+      "targetKind": "chunk",
+      "action": "attenuate",
+      "reason": "chunk_has_no_events_or_entity_evidence",
+      "status": "candidate",
+      "commitPolicy": "no_topology_commit",
+      "noTopologyCommit": true,
+      "confidence": 0.52,
+      "evidenceCount": 0,
+      "supportingEntityCount": 0,
+      "relatedEventCount": 0,
+      "relatedChunkCount": 0,
+      "rationale": [
+        "memory_governance_candidate:no_topology_commit",
+        "memory_governance:retrieval_policy_overlay",
+        "reason:chunk_has_no_events_or_entity_evidence",
+        "audit:no_events",
+        "audit:no_anchor_or_event_evidence",
+        "audit:no_supporting_entities",
+        "audit:no_causal_edges",
+        "audit:no_memory_state"
+      ]
+    }
+  ]
+}

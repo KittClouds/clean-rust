@@ -1,0 +1,40 @@
+[package]
+name = "phoenix-candle-burn-spike"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[features]
+default = []
+candle-runtime = ["dep:candle-core"]
+burn-runtime = ["dep:burn"]
+
+[dependencies]
+blake3 = "1.8"
+candle-core = { version = "0.11.0", optional = true }
+burn = { version = "0.21.0", default-features = false, features = ["std", "flex"], optional = true }
+phoenix-graph-research = { path = "../../phoenix/crates/phoenix-graph-research" }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+# Keep the standalone lock aligned with Phoenix's patched SciRS2 surface.
+scirs2-core = "=0.4.1"
+scirs2-graph = "=0.4.1"
+
+[[bin]]
+name = "candle-graph-spike"
+path = "src/bin/candle_graph_spike.rs"
+required-features = ["candle-runtime"]
+
+[[bin]]
+name = "burn-graph-spike"
+path = "src/bin/burn_graph_spike.rs"
+required-features = ["burn-runtime"]
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+strip = "symbols"
+
+[patch.crates-io]
+scirs2-text = { path = "../../phoenix/vendor/scirs2-text" }

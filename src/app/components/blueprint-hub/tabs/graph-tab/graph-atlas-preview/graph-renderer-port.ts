@@ -1,5 +1,7 @@
 import type { GalaxySceneV2 } from './graph-galaxy-scene-v2';
 import type { GalaxyRenderSettings } from './graph-galaxy-engine';
+import type { GraphCanvasHit } from './graph-canvas-interaction';
+import type { GalaxyInteractionRect, GalaxyPathOverlay } from './graph-galaxy-interaction.model';
 
 export type GraphRendererMode = '3d' | '2d';
 
@@ -30,7 +32,12 @@ export interface GraphRendererPort {
     tickForces(): boolean;
     hasActiveForces(): boolean;
     selectNode(id: string | null): void;
+    selectNodes(ids: readonly string[]): void;
+    setPathOverlay(overlay: GalaxyPathOverlay | null): void;
     hoverNode(id: string | null): void;
     pick(pointer: GraphRendererPointer): string | null;
+    pickObject(pointer: GraphRendererPointer): GraphCanvasHit | null;
+    nodesInRect(rect: GalaxyInteractionRect): string[];
+    interactionViewProjection(): Float32Array;
     dispose(): void;
 }

@@ -6,12 +6,12 @@ use phoenix_graph_kernel::PhoenixGraphKernel;
 use std::sync::{Arc, Mutex};
 
 pub use phoenix_graph_kernel::{
-    entity_sidecar_from_snapshot, KernelBiTemporal, KernelCalendarFacet, KernelCheckpointData,
-    KernelCheckpointMeta, KernelEdge, KernelEdgeType, KernelEntityCandidate, KernelEntityFacet,
-    KernelEntityResolveRequest, KernelEntitySidecar, KernelGraphLayer, KernelGraphSnapshot,
-    KernelJournalEntry, KernelMutationBatch, KernelMutationScope, KernelProvenance,
-    KernelRelationClass, KernelResolutionFacet, KernelVertex, KernelVertexClass, KernelVertexId,
-    KernelViewRequest,
+    entity_sidecar_from_snapshot, GraphTruthCommit, KernelBiTemporal, KernelCalendarFacet,
+    KernelCheckpointData, KernelCheckpointMeta, KernelEdge, KernelEdgeType, KernelEntityCandidate,
+    KernelEntityFacet, KernelEntityResolveRequest, KernelEntitySidecar, KernelGraphLayer,
+    KernelGraphSnapshot, KernelJournalEntry, KernelMutationBatch, KernelMutationScope,
+    KernelProvenance, KernelRelationClass, KernelResolutionFacet, KernelVertex, KernelVertexClass,
+    KernelVertexId, KernelViewRequest,
 };
 
 pub struct DeterministicKernel {

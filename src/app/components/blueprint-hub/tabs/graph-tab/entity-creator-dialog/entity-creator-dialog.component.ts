@@ -5,11 +5,11 @@ import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { CheckboxModule } from 'primeng/checkbox';
-import { LucideAngularModule, User, MapPin, Users, Package, Shield, Calendar, Lightbulb, Sparkles, Plus, X } from 'lucide-angular';
-import { entityColorStore } from '../../../../../lib/store/entityColorStore';
+import { LucideAngularModule, User, MapPin, Users, Package, Network, Calendar, Lightbulb, Sparkles, Plus, X } from 'lucide-angular';
+import { entityColorStore, normalizeEntityKind } from '../../../../../lib/store/entityColorStore';
 
 // Entity kinds and icons (colors come from entityColorStore)
-const ENTITY_KINDS = ['CHARACTER', 'LOCATION', 'NPC', 'ITEM', 'FACTION', 'EVENT', 'CONCEPT'] as const;
+const ENTITY_KINDS = ['CHARACTER', 'LOCATION', 'NPC', 'ITEM', 'NETWORK', 'EVENT', 'CONCEPT'] as const;
 type EntityKind = typeof ENTITY_KINDS[number] | string;
 
 const ENTITY_ICONS: Record<string, any> = {
@@ -17,7 +17,8 @@ const ENTITY_ICONS: Record<string, any> = {
     'LOCATION': MapPin,
     'NPC': Users,
     'ITEM': Package,
-    'FACTION': Shield,
+    'FACTION': Network,
+    'NETWORK': Network,
     'EVENT': Calendar,
     'CONCEPT': Lightbulb,
 };
@@ -339,7 +340,7 @@ export class EntityCreatorDialogComponent implements OnChanges {
             if (this.editEntity) {
                 this.syncAvailableKinds(this.editEntity.kind);
                 this.label = this.editEntity.label;
-                this.selectedKind.set(this.editEntity.kind);
+                this.selectedKind.set(this.canonicalKind(this.editEntity.kind));
                 this.aliases = [...this.editEntity.aliases];
             } else {
                 this.resetForm();
@@ -398,11 +399,15 @@ export class EntityCreatorDialogComponent implements OnChanges {
 
     private syncAvailableKinds(activeKind?: string) {
         const kinds = [...ENTITY_KINDS, ...this.customKinds()];
-        const normalizedActiveKind = activeKind?.trim().toUpperCase();
+        const normalizedActiveKind = activeKind ? this.canonicalKind(activeKind) : undefined;
         if (normalizedActiveKind && !kinds.includes(normalizedActiveKind as any)) {
             kinds.push(normalizedActiveKind);
         }
         this.allKinds = Array.from(new Set(kinds));
+    }
+
+    private canonicalKind(kind: string): string {
+        return normalizeEntityKind(kind) || kind.trim().toUpperCase();
     }
 
     onCancel() {
