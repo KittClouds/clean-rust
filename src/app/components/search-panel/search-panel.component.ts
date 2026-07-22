@@ -42,6 +42,7 @@ import {
 } from '../../graph-rebuild/graph-review-adjudication-certificate';
 import { CalendarService } from '../../services/calendar.service';
 import { PhoenixBackendService } from '../../services/phoenix-backend.service';
+import { GraphTargetVectorIndexService } from '../../services/graph-target-vector-index.service';
 import { EmbeddingModelRegistry } from '../../lib/embeddings/models/ModelRegistry';
 import type {
   GraphIndexProjectionReceipt,
@@ -345,6 +346,7 @@ export class SearchPanelComponent implements OnInit {
   private readonly fullAtlasPipeline = inject(GraphRebuildPipelineService);
   private readonly calendar = inject(CalendarService);
   private readonly phoenix = inject(PhoenixBackendService);
+  private readonly graphTargetVectors = inject(GraphTargetVectorIndexService);
 
   readonly query = this.machine.query;
   readonly indexScope = this.machine.scope;
@@ -863,6 +865,13 @@ export class SearchPanelComponent implements OnInit {
       }
       if (!this.embeddingModelReady()) return;
       await this.indexVectorNotes();
+      const snapshot = this.fullAtlasPipeline.lastSnapshot();
+      if (snapshot) {
+        await this.graphTargetVectors.build(snapshot, {
+          modelId: this.selectedModel(),
+          generation: snapshot.builtAt,
+        });
+      }
       this.notice.set(`${this.currentModelLabel()} is staged for Atlas embeddings. Graph topology was not rebuilt.`);
     } catch (err) {
       this.error.set(this.toErrorMessage(err));

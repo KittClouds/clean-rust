@@ -51,6 +51,7 @@ import { buildReviewAdjudicationRunCertificate } from '../../graph-rebuild/graph
 import { PhoenixUiApiService } from '../../services/phoenix-ui-api.service';
 import { PhoenixBackendService } from '../../services/phoenix-backend.service';
 import { CalendarService } from '../../services/calendar.service';
+import { GraphTargetVectorIndexService } from '../../services/graph-target-vector-index.service';
 
 describe('SearchPanelComponent model recipe lifecycle', () => {
     let injector: EnvironmentInjector;
@@ -62,6 +63,7 @@ describe('SearchPanelComponent model recipe lifecycle', () => {
     let phoenix: ReturnType<typeof createPhoenixBackendMock>;
     let fullAtlasPipeline: ReturnType<typeof createFullAtlasPipelineMock>;
     let graphRebuild: ReturnType<typeof createGraphRebuildMock>;
+    let graphTargetVectors: { build: ReturnType<typeof vi.fn> };
 
     beforeEach(() => {
         dbNotesMock.rows.clear();
@@ -75,6 +77,7 @@ describe('SearchPanelComponent model recipe lifecycle', () => {
         phoenix = createPhoenixBackendMock();
         fullAtlasPipeline = createFullAtlasPipelineMock();
         graphRebuild = createGraphRebuildMock();
+        graphTargetVectors = { build: vi.fn(async () => undefined) };
         const parentInjector = Injector.create({ providers: [] }) as unknown as EnvironmentInjector;
         injector = createEnvironmentInjector([
             { provide: NotesService, useValue: createNotesMock() },
@@ -88,6 +91,7 @@ describe('SearchPanelComponent model recipe lifecycle', () => {
             { provide: PhoenixBackendService, useValue: phoenix },
             { provide: GraphRebuildPipelineService, useValue: fullAtlasPipeline },
             { provide: GraphRebuildService, useValue: graphRebuild },
+            { provide: GraphTargetVectorIndexService, useValue: graphTargetVectors },
             { provide: PhoenixProjectionService, useValue: {
                 entities: computed(() => []),
                 entityCount: computed(() => 50),
@@ -277,6 +281,13 @@ describe('SearchPanelComponent model recipe lifecycle', () => {
                 content: expect.stringContaining('Aella'),
             }),
         ]);
+        expect(graphTargetVectors.build).toHaveBeenCalledWith(
+            expect.objectContaining({ builtAt: 123 }),
+            expect.objectContaining({
+                modelId: 'jina-v5-nano-retrieval',
+                generation: 123,
+            }),
+        );
     });
 
     it('runs the Stage 8 truth-review bridge as candidate-only cached work', async () => {
@@ -833,10 +844,12 @@ function createFullAtlasPipelineMock() {
                     },
                 ],
             };
+            const snapshot = { builtAt: 123, counters: { nodes: 2, edges: 1, embeddingTargets: 3 } };
             lastReceipt.set(receipt);
+            lastSnapshot.set(snapshot);
             return {
                 receipt,
-                snapshot: { counters: { nodes: 2, edges: 1, embeddingTargets: 3 } },
+                snapshot,
             };
         }),
     };
