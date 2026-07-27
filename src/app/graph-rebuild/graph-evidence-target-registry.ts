@@ -1,5 +1,6 @@
 import type {
     GraphEvidenceTargetObjectKind,
+    GraphEvidenceTargetRegistryPage,
     GraphEvidenceTargetRegistryContract,
     GraphRebuildEmbeddingTarget,
     GraphRebuildSnapshot,
@@ -41,9 +42,11 @@ export function buildGraphEvidenceTargetRegistry(snapshot: GraphRebuildSnapshot)
         .filter((row) => row.status === 'accepted')
         .map((row) => row.id));
     const memoryRows = new Set(snapshot.memoryState.map((row) => row.id));
+    const registryPage = verifiedRegistryPage(snapshot);
     const evidenceRows = new Set([
         ...snapshot.entityAnchors.map((row) => row.id),
         ...(snapshot.documentSidecarSummary?.evidenceSpans || []).map((row) => row.id),
+        ...(registryPage?.documentEvidenceIds || []),
     ]);
 
     const chunks: GraphRebuildEmbeddingTarget[] = [];
@@ -113,6 +116,7 @@ export function buildGraphEvidenceTargetRegistry(snapshot: GraphRebuildSnapshot)
 }
 
 export function sealGraphEvidenceTargetRegistry(snapshot: GraphRebuildSnapshot): GraphEvidenceTargetRegistry {
+    snapshot.evidenceTargetRegistryPage = buildRegistryPage(snapshot);
     const registry = buildGraphEvidenceTargetRegistry(snapshot);
     assertHealthyRegistry(snapshot.id, registry.contract);
     snapshot.evidenceTargetRegistry = registry.contract;
@@ -121,6 +125,30 @@ export function sealGraphEvidenceTargetRegistry(snapshot: GraphRebuildSnapshot):
     snapshot.counters.evidenceRegistryTypedGraphObjects = registry.contract.typedGraphObjects;
     snapshot.counters.evidenceRegistryEvidenceLinks = registry.contract.evidenceLinks;
     return registry;
+}
+
+function buildRegistryPage(snapshot: GraphRebuildSnapshot): GraphEvidenceTargetRegistryPage {
+    const documentEvidenceIds = [...new Set([
+        ...(snapshot.evidenceTargetRegistryPage?.documentEvidenceIds || []),
+        ...(snapshot.documentSidecarSummary?.evidenceSpans || []).map((row) => row.id),
+    ])].sort();
+    return {
+        schemaVersion: 'phoenix-evidence-target-registry-page/v1',
+        sourceSnapshotId: snapshot.id,
+        sourceScopeId: snapshot.scopeId,
+        documentEvidenceIds,
+    };
+}
+
+function verifiedRegistryPage(snapshot: GraphRebuildSnapshot): GraphEvidenceTargetRegistryPage | undefined {
+    const page = snapshot.evidenceTargetRegistryPage;
+    if (!page) return undefined;
+    if (page.schemaVersion !== 'phoenix-evidence-target-registry-page/v1'
+        || page.sourceSnapshotId !== snapshot.id
+        || page.sourceScopeId !== snapshot.scopeId) {
+        throw new Error(`Graph evidence target registry page drift for ${snapshot.id}`);
+    }
+    return page;
 }
 
 export function assertGraphEvidenceTargetRegistry(snapshot: GraphRebuildSnapshot): GraphEvidenceTargetRegistry {

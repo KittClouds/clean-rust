@@ -159,6 +159,49 @@ describe('GraphRebuildPipelineService', () => {
         expect(atlasRuntime.warmModelLane).not.toHaveBeenCalledWith('nli', expect.any(Object));
     });
 
+    it('restores exact compact generation content for embedding after a fresh pipeline start', async () => {
+        const shell = {
+            id: 'snapshot-lease-1',
+            scopeId: 'global',
+            authorityContract: { contentHash: 'authority-lease-1' },
+            interactiveRunAuthority: { inputIdentity: 'input-lease-1' },
+            generationReceiptId: 'receipt-lease-1',
+            generationDigestSha256: 'digest-lease-1',
+            contentManifest: {
+                refs: { evidenceTargetRegistryPage: { key: 'page-1' } },
+            },
+        } as GraphRebuildSnapshot;
+        const receipt = {
+            receiptId: 'receipt-lease-1',
+            digestSha256: 'digest-lease-1',
+            snapshotId: 'snapshot-lease-1',
+            scopeId: 'global',
+            inputIdentity: 'input-lease-1',
+            authority: { contentHash: 'authority-lease-1' },
+        };
+        const hydrated = { ...shell, embeddingTargets: [{ id: 'target-1' }] } as GraphRebuildSnapshot;
+        graphRebuild.loadPersistedSnapshotShell.mockResolvedValueOnce(shell);
+        graphRebuild.loadPersistedGenerationReceipt.mockResolvedValueOnce(receipt);
+        graphRebuild.loadVerifiedGenerationSnapshotContent.mockResolvedValueOnce(hydrated);
+
+        await expect(service.loadSnapshotContentForEmbedding('global')).resolves.toBe(hydrated);
+
+        expect(graphRebuild.loadPersistedSnapshotShell).toHaveBeenCalledWith('global');
+        expect(graphRebuild.loadVerifiedGenerationSnapshotContent).toHaveBeenCalledWith(shell);
+    });
+
+    it('requires explicit migration for a resident legacy snapshot before embedding', async () => {
+        graphRebuild.snapshot.mockReturnValue({
+            id: 'legacy-snapshot',
+            scopeId: 'global',
+        } as GraphRebuildSnapshot);
+
+        await expect(service.loadSnapshotContentForEmbedding('global'))
+            .rejects.toThrow('PHX_GRAPH_CONTENT_LEASE_CAPABILITY_MISSING');
+
+        expect(graphRebuild.loadVerifiedGenerationSnapshotContent).not.toHaveBeenCalled();
+    });
+
     it('builds the graph in one pass without invoking Semantic Atlas', async () => {
         atlasRuntime.capabilityState.mockImplementation((capability: string) => ({
             requiredModels: [{
@@ -275,6 +318,42 @@ describe('GraphRebuildPipelineService', () => {
         expect(ner.scanDynamicBatch).not.toHaveBeenCalled();
         expect(atlasRuntime.runCapability).not.toHaveBeenCalled();
         expect(graphRebuild.buildAndPersistSnapshot).not.toHaveBeenCalled();
+    });
+
+    it('offers a named one-time bootstrap without weakening ordinary FORCE rejection', async () => {
+        const result = await service.bootstrapVerifiedForceV2({
+            ...request(),
+            durabilityMode: 'interactive',
+        });
+
+        expect(result.receipt.pathId).toBe('explicit_force_v2_bootstrap_v1');
+        expect(result.receipt.fallbackCount).toBe(0);
+        expect(result.receipt.message).toContain('Explicit V2 bootstrap');
+        expect(graphRebuild.buildAndPersistSnapshot).toHaveBeenCalledTimes(1);
+        expect(graphRebuild.persistForceV2Authority).toHaveBeenCalledTimes(1);
+        expect(result.receipt.verifiedForceAuthority).toMatchObject({
+            schemaVersion: 'phoenix-verified-force-authority-ref/v1',
+            snapshotId: result.snapshot.id,
+        });
+    });
+
+    it('allows explicit bootstrap only to migrate a missing durable registry page', async () => {
+        graphRebuild.loadPersistedRunReceipt.mockResolvedValueOnce({
+            replayManifest: { schemaVersion: 'phoenix-graph-rebuild-replay-manifest/v1' },
+        });
+        graphRebuild.loadPersistedSnapshotShell.mockResolvedValueOnce({
+            id: 'old-snapshot',
+            scopeId: 'global',
+            contentManifest: { refs: {} },
+        } as GraphRebuildSnapshot);
+
+        const result = await service.bootstrapVerifiedForceV2({
+            ...request(),
+            durabilityMode: 'interactive',
+        });
+
+        expect(result.receipt.pathId).toBe('explicit_force_v2_bootstrap_v1');
+        expect(graphRebuild.buildAndPersistSnapshot).toHaveBeenCalledTimes(1);
     });
 
     it('never enters legacy reconstruction after a native v2 rejection', async () => {
@@ -1285,6 +1364,7 @@ function createGraphRebuildMock() {
         snapshot: vi.fn(() => null as GraphRebuildSnapshot | null),
         loadPersistedSnapshot: vi.fn(async () => null),
         loadPersistedSnapshotShell: vi.fn(async () => null),
+        loadVerifiedGenerationSnapshotContent: vi.fn(async (snapshot: GraphRebuildSnapshot) => snapshot),
         loadPersistedGenerationReceipt: vi.fn(async () => generationReceipt),
         persistGenerationReceipt: vi.fn(async (receipt: any) => {
             generationReceipt = receipt;

@@ -102,6 +102,13 @@ export function hydrateGraphSnapshotContent(
             targets: snapshot.embeddingTargets,
         } as GraphRebuildEmbeddingTargetPlan;
     }
+    if (snapshot.evidenceTargetRegistryPage) {
+        snapshot.evidenceTargetRegistryPage = {
+            ...snapshot.evidenceTargetRegistryPage,
+            sourceSnapshotId: snapshot.id,
+            sourceScopeId: snapshot.scopeId,
+        };
+    }
     // Content blobs are keyed by stable semantic content, so a newer snapshot may
     // legitimately reuse a blob written under an older snapshot identity.
     bindGraphSemanticDiscoverySnapshotIdentity(snapshot);

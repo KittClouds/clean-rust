@@ -230,6 +230,22 @@ export class GraphLensWorkspaceComponent implements OnDestroy {
         effect(() => void this.refreshMemberships(this.lens()));
         effect(() => void this.loadPersistedGraphSnapshot(this.lens()));
         effect(() => {
+            const published = this.graphRebuild.snapshot();
+            const scopeId = normalizeGraphLensForBuild(this.lens()).scopeId;
+            if (!published || published.scopeId !== scopeId) return;
+            const current = untracked(() => this.graphRebuildSnapshotSignal());
+            if (!shouldReplaceGraphRenderSnapshot(current, published)) return;
+            // A live build is newer than any cold-start read already in flight.
+            // Invalidate those reads before publishing so they cannot restore the
+            // registry-only first-pixel scene over the verified graph generation.
+            this.graphSnapshotLoadToken += 1;
+            this.graphRebuildSnapshotSignal.set(published);
+            this.graphSnapshotStaleSignal.set(false);
+            this.graphSnapshotFailure.set(null);
+            this.graphSnapshotLoading.set(false);
+            void this.preparePublishedGraphSnapshot(published, this.graphSnapshotLoadToken);
+        });
+        effect(() => {
             const shell = this.graphGenerationLifetime?.releasedShell();
             if (!shell || resolveGalaxyRendererAuthority() !== 'v3-visible') return;
             const current = untracked(() => this.graphRebuildSnapshotSignal());
@@ -409,17 +425,21 @@ export class GraphLensWorkspaceComponent implements OnDestroy {
                 if (token !== this.graphSnapshotLoadToken) return;
             }
             const currentSnapshot = untracked(() => this.graphRebuildSnapshotSignal());
-            const residentPackedShell = !forcePacked
-                && currentSnapshot?.scopeId === normalized.scopeId
-                && !graphSnapshotHasHydratedCanvasPayload(currentSnapshot);
+            const residentAuthoritativeSnapshot = currentSnapshot?.scopeId === normalized.scopeId;
             if (packedOnly) {
-                if (packedSnapshot || residentPackedShell) {
+                if (packedSnapshot || residentAuthoritativeSnapshot) {
                     this.graphSnapshotStaleSignal.set(false);
                     this.graphSnapshotLoading.set(false);
                     return;
                 }
-                this.graphSnapshotFailure.set(
-                    'Authoritative packed V3 scene unavailable. Force Rebuild must publish a new packed generation.',
+                // The packed generation owns parsed graph and embedding views, but it
+                // does not own the independent registry-entity projection. Keep the
+                // registry canvas available without hydrating legacy snapshot rows.
+                this.graphRebuildSnapshotSignal.set(null);
+                this.graphSnapshotStaleSignal.set(false);
+                this.graphSnapshotLoading.set(false);
+                console.info(
+                    `[GraphLensWorkspace] Packed V3 generation unavailable for ${normalized.scopeId}; registry-only canvas remains available.`,
                 );
                 return;
             }
@@ -467,6 +487,30 @@ export class GraphLensWorkspaceComponent implements OnDestroy {
         this.metadataHydration = hydration;
         this.metadataHydrationKey = key;
         return hydration;
+    }
+
+    private async preparePublishedGraphSnapshot(
+        published: GraphRebuildSnapshot,
+        token: number,
+    ): Promise<void> {
+        try {
+            const content = graphSnapshotHasHydratedCanvasPayload(published)
+                ? published
+                : await this.graphRebuild.loadVerifiedGenerationSnapshotContent(published);
+            if (token !== this.graphSnapshotLoadToken) return;
+            const current = untracked(() => this.graphRebuildSnapshotSignal());
+            if (current?.id !== published.id
+                || current.scopeId !== published.scopeId
+                || current.authorityContract?.contentHash !== published.authorityContract?.contentHash) return;
+            // Rich rows are a transient compiler input. The workspace retains only
+            // the compact authoritative shell while the resident scene pages own rendering.
+            await this.graphCanvasColdStart.preparePersistedManifold(content);
+        } catch (error) {
+            if (token !== this.graphSnapshotLoadToken) return;
+            const message = error instanceof Error ? error.message : String(error);
+            this.graphSnapshotFailure.set(`Authoritative packed V3 scene unavailable: ${message}`);
+            console.error('[GraphLensWorkspace] Published graph scene preparation failed closed.', error);
+        }
     }
 
     private waitForCanvasFirstPixel(generationId: string): Promise<boolean> {

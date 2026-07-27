@@ -158,6 +158,7 @@ export interface GalaxySceneV2 {
     positions2d: Float32Array;
     radii: Float32Array;
     colors: Float32Array;
+    paletteSlots: Uint8Array;
     edgePairs: Uint32Array;
     edgeIds: string[];
     edgeTypes: string[];
@@ -188,6 +189,7 @@ export function galaxySceneToV2(scene: GalaxyScene, sourceMode: GalaxySceneSourc
     const positions2d = new Float32Array(nodeCount * 3);
     const radii = new Float32Array(nodeCount);
     const colors = new Float32Array(nodeCount * 3);
+    const paletteSlots = new Uint8Array(nodeCount);
     const hasHybridShell = scene.nodes.some((node) => !!node.hybridShellPoint || !!node.hybridShell);
     const hasHybridCommitment = scene.nodes.some((node) => !!node.hybridCommitmentPoint || !!node.hybridCommitment);
     const hasHierarchyShells = scene.nodes.some((node) => hierarchyShellBandForNode(node));
@@ -216,6 +218,7 @@ export function galaxySceneToV2(scene: GalaxyScene, sourceMode: GalaxySceneSourc
         writePosition(positions2d, index, node.x, node.y, 0);
         radii[index] = node.radius;
         writeColor(colors, index, node);
+        paletteSlots[index] = node.paletteSlot;
         if (hybridShellPositions) {
             const point = node.hybridShellPoint ?? node.hybridShell?.point ?? node;
             writePosition(hybridShellPositions, index, point.x, point.y, point.z);
@@ -292,6 +295,7 @@ export function galaxySceneToV2(scene: GalaxyScene, sourceMode: GalaxySceneSourc
         positions2d,
         radii,
         colors,
+        paletteSlots,
         edgePairs,
         edgeIds,
         edgeTypes,

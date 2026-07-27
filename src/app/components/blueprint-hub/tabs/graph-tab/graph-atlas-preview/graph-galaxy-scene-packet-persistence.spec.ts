@@ -5,6 +5,7 @@ import {
     assertPersistedGalaxySceneMatches,
     galaxySceneGenerationIndexReceipt,
     galaxyScenePacketPersistenceRecords,
+    restoreGalaxyScenePacketHotPersistenceRecords,
     restoreGalaxyScenePacketPersistenceRecords,
     type GalaxyScenePacketPersistenceIdentity,
 } from './graph-galaxy-scene-packet-persistence';
@@ -26,6 +27,23 @@ describe('Galaxy scene packet restart persistence', () => {
         expect(restored.snapshotShell.id).toBe(identity().snapshotId);
         expect(Object.keys(restored.packet.pages)).toEqual(Object.keys(packet.pages));
         assertPersistedGalaxySceneMatches(restored, identity());
+    });
+
+    it('restores only resident first-pixel pages and leaves detail bytes on demand', () => {
+        const packet = packGalaxyScenePacketV2(scene(), packetContext());
+        const records = galaxyScenePacketPersistenceRecords(identity(), packet, snapshotShell(), 42);
+        const residentIds = new Set(packet.manifest.pages
+            .filter((page) => page.loadPolicy === 'resident')
+            .map((page) => page.id));
+        const restored = restoreGalaxyScenePacketHotPersistenceRecords(
+            records.receipt,
+            records.pages.filter((page) => residentIds.has(page.pageId)),
+            records.pages.length,
+        );
+
+        expect(Object.keys(restored.packet.pages).every((pageId) => residentIds.has(pageId))).toBe(true);
+        expect(restored.packet.pages['detail/groups']).toBeUndefined();
+        expect(restored.packet.manifest.pages.some((page) => page.id === 'detail/groups')).toBe(true);
     });
 
     it('fails closed when a persisted binary page is changed', () => {
@@ -157,6 +175,7 @@ function scene(): GalaxySceneV2 {
         basePositions3d: new Float32Array([1, 2, 3]),
         radii: new Float32Array([2]),
         colors: new Float32Array([0.1, 0.2, 0.3]),
+        paletteSlots: new Uint8Array([0xff]),
         galaxyOpacity: new Float32Array([1]),
         screenPositions2d: new Float32Array(2),
         edgeIds: [],

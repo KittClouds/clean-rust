@@ -2,14 +2,18 @@ import { describe, expect, it } from 'vitest';
 
 import {
     assertGalaxyScenePacketV2,
+    galaxyScenePacketV2VerificationSnapshot,
     galaxySceneIdentityCollisionPages,
     galaxyScenePacketV2TransferList,
     GalaxyScenePacketV2SharedPagePool,
     GALAXY_SCENE_PACKET_LITTLE_ENDIAN_RUNTIME,
+    openGalaxyScenePacketV2Page,
     packGalaxyScenePacketV2,
     unpackGalaxyScenePacketV2,
+    verifyGalaxyScenePacketV2,
 } from './graph-galaxy-scene-packet-v2';
 import type { GalaxySceneV2 } from './graph-galaxy-scene-v2';
+import type { TransitPlan } from './graph-transit-plan';
 
 describe('GalaxyScenePacketV2', () => {
     it('fails closed unless typed pages use the declared little-endian runtime', () => {
@@ -39,6 +43,8 @@ describe('GalaxyScenePacketV2', () => {
         expect(Array.from(restored.positions2d)).toEqual(Array.from(source.positions2d));
         expect(Array.from(restored.radii)).toEqual(Array.from(source.radii));
         expect(Array.from(restored.colors)).toEqual(Array.from(source.colors));
+        expect(Array.from(restored.paletteSlots)).toEqual(Array.from(source.paletteSlots));
+        expect(packet.manifest.pages.some((page) => page.id === 'manifold/node-palette-slots-u8')).toBe(true);
         expect(Array.from(restored.edgePairs)).toEqual(Array.from(source.edgePairs));
         expect(restored.edgeIds).toEqual(source.edgeIds);
         expect(restored.edgeTypes).toEqual(source.edgeTypes);
@@ -51,18 +57,22 @@ describe('GalaxyScenePacketV2', () => {
         expect(Array.from(restored.runtimeIndex?.incidentEdges ?? [])).toEqual([0, 0]);
     });
 
-    it('keeps JSON manifest metadata-only and moves strings into on-demand slabs', () => {
+    it('keeps the manifest metadata-only and removes the monolithic JSON extras page', () => {
         const packet = packGalaxyScenePacketV2(scene(), {
             generationId: 'snapshot:g2',
             authorityReceipt: 'authority:g2',
         });
         const manifestJson = JSON.stringify(packet.manifest);
         const detailPages = packet.manifest.pages.filter((page) => page.domain === 'detail');
+        const guidePages = packet.manifest.pages.filter((page) => page.domain === 'guide');
 
         expect(manifestJson).not.toContain('Secret Node Label');
         expect(manifestJson).not.toContain('node:a');
-        expect(detailPages.length).toBeGreaterThanOrEqual(3);
+        expect(detailPages.map((page) => page.id)).toEqual(['detail/groups']);
         expect(detailPages.every((page) => page.loadPolicy === 'on-demand')).toBe(true);
+        expect(guidePages.length).toBe(8);
+        expect(guidePages.every((page) => page.loadPolicy === 'resident')).toBe(true);
+        expect(packet.manifest.pages.some((page) => page.id === 'detail/scene-extras')).toBe(false);
         expect(Object.values(packet.pages).every((page) => page instanceof ArrayBuffer)).toBe(true);
         expect(manifestJson).not.toMatch(/[A-Za-z0-9+/]{80,}={0,2}/);
     });
@@ -149,6 +159,110 @@ describe('GalaxyScenePacketV2', () => {
         expect(() => unpackGalaxyScenePacketV2(packet)).toThrow(/hash drift/);
     });
 
+    it('fails closed when a persisted packet lacks the compact guide encoding contract', () => {
+        const packet = packGalaxyScenePacketV2(scene(), {
+            generationId: 'snapshot:old-guide-encoding',
+            authorityReceipt: 'authority:old-guide-encoding',
+        });
+        const incompatible = structuredClone(packet);
+        delete (incompatible.manifest as Partial<typeof incompatible.manifest>).guideEncoding;
+
+        expect(() => verifyGalaxyScenePacketV2(incompatible)).toThrow(
+            'GALAXY_SCENE_PACKET_V2_GUIDE_ENCODING_UNSUPPORTED',
+        );
+    });
+
+    it('fails closed when a persisted packet lacks the resident node-palette contract', () => {
+        const packet = packGalaxyScenePacketV2(scene(), {
+            generationId: 'snapshot:old-node-palette',
+            authorityReceipt: 'authority:old-node-palette',
+        });
+        const incompatible = structuredClone(packet);
+        incompatible.manifest.pages = incompatible.manifest.pages.filter(
+            (page) => page.id !== 'manifold/node-palette-slots-u8',
+        );
+        delete incompatible.pages['manifold/node-palette-slots-u8'];
+
+        expect(() => verifyGalaxyScenePacketV2(incompatible)).toThrow(
+            'GALAXY_SCENE_PACKET_V2_NODE_PALETTE_UNSUPPORTED',
+        );
+    });
+
+    it('hashes hot pages at ingress and each on-demand page only on first open', () => {
+        const packet = packGalaxyScenePacketV2(scene(), {
+            generationId: 'snapshot:verified',
+            authorityReceipt: 'authority:verified',
+        });
+        const hotPageCount = packet.manifest.pages.filter((page) => page.loadPolicy === 'resident').length;
+        const verified = verifyGalaxyScenePacketV2(packet);
+
+        expect(galaxyScenePacketV2VerificationSnapshot(verified)).toMatchObject({
+            branded: true,
+            verifiedPages: hotPageCount,
+            hashCount: hotPageCount,
+        });
+        openGalaxyScenePacketV2Page(verified, 'detail/groups');
+        const afterFirstOpen = galaxyScenePacketV2VerificationSnapshot(verified);
+        openGalaxyScenePacketV2Page(verified, 'detail/groups');
+
+        expect(afterFirstOpen.verifiedPages).toBe(hotPageCount + 1);
+        expect(galaxyScenePacketV2VerificationSnapshot(verified)).toEqual(afterFirstOpen);
+    });
+
+    it('stores guide coordinates as packed Float32 pages with exact round-trip geometry', () => {
+        const source = scene();
+        source.lorentzGuides = [{
+            id: 'transit:route:a-b',
+            nodeIds: ['node:a', 'node:b'],
+            positions3d: new Float32Array([0, 1, 2, 3, 4, 5]),
+            positions2d: new Float32Array([0, 1, 0, 3, 4, 0]),
+            color: { r: 12 / 255, g: 34 / 255, b: 56 / 255 },
+            sourceColor: { r: 78 / 255, g: 90 / 255, b: 123 / 255 },
+            importance: 0.75,
+            guideWeight: 0.5,
+            treeId: 'transit',
+            treeKind: 'route',
+            level: 3,
+            guideKind: 'membership',
+        }];
+        const packet = packGalaxyScenePacketV2(source, {
+            generationId: 'snapshot:guides',
+            authorityReceipt: 'authority:guides',
+        });
+        const restored = unpackGalaxyScenePacketV2(packet).lorentzGuides[0];
+
+        expect(packet.pages['guide/positions-f32'].byteLength).toBe(source.lorentzGuides[0].positions3d.byteLength);
+        expect(Array.from(restored.positions3d)).toEqual(Array.from(source.lorentzGuides[0].positions3d));
+        expect(Array.from(restored.positions2d)).toEqual(Array.from(source.lorentzGuides[0].positions2d));
+        expect(restored).toMatchObject({
+            id: 'transit:route:a-b', treeId: 'transit', treeKind: 'route', level: 3,
+        });
+    });
+
+    it('keeps transit, hierarchy, and relation semantics in independent on-demand pages', () => {
+        const source = scene();
+        source.transitPlan = emptyTransitPlan();
+        source.hierarchyHints = [];
+        source.relationControls = [];
+        const packet = packGalaxyScenePacketV2(source, {
+            generationId: 'snapshot:details',
+            authorityReceipt: 'authority:details',
+        });
+        const details = packet.manifest.pages.filter((page) => page.domain === 'detail');
+        const restored = unpackGalaxyScenePacketV2(packet);
+
+        expect(details.map((page) => page.id)).toEqual([
+            'detail/groups',
+            'detail/transit-plan',
+            'detail/relation-controls',
+            'detail/hierarchy-hints',
+        ]);
+        expect(details.every((page) => page.loadPolicy === 'on-demand')).toBe(true);
+        expect(restored.transitPlan).toEqual(source.transitPlan);
+        expect(restored.relationControls).toEqual([]);
+        expect(restored.hierarchyHints).toEqual([]);
+    });
+
     it('records only true numeric-key collisions and their exact members', () => {
         const collisions = galaxySceneIdentityCollisionPages(
             ['alpha', 'beta', 'alpha', 'gamma'],
@@ -165,6 +279,29 @@ describe('GalaxyScenePacketV2', () => {
         expect(Array.from(collisions.members)).toEqual([0, 2, 1]);
     });
 });
+
+function emptyTransitPlan(): TransitPlan {
+    return {
+        schemaVersion: 'graph-transit-plan/v1',
+        stations: [],
+        routes: [],
+        regions: [],
+        receipt: {
+            schemaVersion: 'graph-transit-plan/v1',
+            stationCount: 0,
+            routeCount: 0,
+            regionCount: 0,
+            packetBackedStations: 0,
+            packetBackedRoutes: 0,
+            droppedUntracedNodes: 0,
+            missingEndpointRoutes: 0,
+            edgeTraceFallbackRoutes: 0,
+            familyCounts: {},
+            laneCounts: {},
+            routeLaneCounts: {},
+        },
+    };
+}
 
 function scene(): GalaxySceneV2 {
     return {
@@ -198,6 +335,7 @@ function scene(): GalaxySceneV2 {
             12 / 255, 34 / 255, 56 / 255,
             78 / 255, 90 / 255, 123 / 255,
         ]),
+        paletteSlots: new Uint8Array([0xff, 0xff]),
         edgePairs: new Uint32Array([0, 1]),
         edgeIds: ['edge:a-b'],
         edgeTypes: ['evidence'],

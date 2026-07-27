@@ -245,6 +245,29 @@ describe('SearchPanelComponent model recipe lifecycle', () => {
         expect(machine.requestGraphFocus).toHaveBeenCalled();
     });
 
+    it('offers explicit V2 bootstrap only after ordinary FORCE fails closed on missing replay', async () => {
+        const pipeline = injector.get(GraphRebuildPipelineService) as unknown as ReturnType<typeof createFullAtlasPipelineMock>;
+        component.setBuildPolicy('force');
+        pipeline.buildGraph.mockRejectedValueOnce(new Error(
+            'PHX_FORCE_V2_REPLAY_MISSING: no exact persisted replay manifest exists for this scope.',
+        ));
+
+        await component.buildGraphAtlas();
+        expect(component.forceV2BootstrapRequired()).toBe(true);
+
+        await component.bootstrapVerifiedForceV2();
+        expect(pipeline.bootstrapVerifiedForceV2).toHaveBeenCalledWith(expect.objectContaining({
+            policy: 'force',
+            durabilityMode: 'interactive',
+        }));
+        expect(machine.requestGraphFocus).toHaveBeenCalled();
+
+        component.error.set(
+            'PHX_GRAPH_CONTENT_LEASE_CAPABILITY_MISSING: durable evidence registry page requires explicit V2 bootstrap.',
+        );
+        expect(component.forceV2BootstrapRequired()).toBe(true);
+    });
+
     it('keeps Jina out of Build Graph and uses it only for Embed Atlas', async () => {
         const pipeline = injector.get(GraphRebuildPipelineService) as unknown as ReturnType<typeof createFullAtlasPipelineMock>;
         pipeline.graphModelsReady.mockReturnValue(true);
@@ -281,6 +304,7 @@ describe('SearchPanelComponent model recipe lifecycle', () => {
                 content: expect.stringContaining('Aella'),
             }),
         ]);
+        expect(pipeline.loadSnapshotContentForEmbedding).toHaveBeenCalledWith('note:note-1');
         expect(graphTargetVectors.build).toHaveBeenCalledWith(
             expect.objectContaining({ builtAt: 123 }),
             expect.objectContaining({
@@ -852,6 +876,11 @@ function createFullAtlasPipelineMock() {
                 snapshot,
             };
         }),
+        bootstrapVerifiedForceV2: vi.fn(async () => ({
+            receipt: { message: 'Explicit V2 bootstrap produced 2 nodes, 1 edges, and 3 targets.' },
+            snapshot: {},
+        })),
+        loadSnapshotContentForEmbedding: vi.fn(async (_scopeId: string) => lastSnapshot()),
     };
 }
 

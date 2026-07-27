@@ -354,6 +354,13 @@ export class SearchPanelComponent implements OnInit {
   readonly results = signal<SearchResultView[]>([]);
   readonly notice = this.machine.notice;
   readonly error = this.machine.error;
+  readonly forceV2BootstrapRequired = computed(() =>
+    this.buildPolicy() === 'force'
+    && (
+      this.error()?.startsWith('PHX_FORCE_V2_REPLAY_MISSING:') === true
+      || this.error()?.startsWith('PHX_GRAPH_CONTENT_LEASE_CAPABILITY_MISSING:') === true
+    ),
+  );
   readonly isSearching = signal(false);
   readonly searchTime = signal(0);
 
@@ -856,6 +863,23 @@ export class SearchPanelComponent implements OnInit {
     }
   }
 
+  async bootstrapVerifiedForceV2(): Promise<void> {
+    if (!this.forceV2BootstrapRequired() || this.fullAtlasBusy()) return;
+    this.error.set(null);
+    try {
+      const result = await this.fullAtlasPipeline.bootstrapVerifiedForceV2({
+        ...this.fullAtlasRequest(),
+        policy: 'force',
+        postProcessMode: 'full',
+        durabilityMode: 'interactive',
+      });
+      this.notice.set(result.receipt.message);
+      this.openGraphLens();
+    } catch (err) {
+      this.error.set(this.toErrorMessage(err));
+    }
+  }
+
   async embedAtlas(): Promise<void> {
     if (this.isEmbedAtlasDisabled()) return;
     this.error.set(null);
@@ -865,13 +889,13 @@ export class SearchPanelComponent implements OnInit {
       }
       if (!this.embeddingModelReady()) return;
       await this.indexVectorNotes();
-      const snapshot = this.fullAtlasPipeline.lastSnapshot();
-      if (snapshot) {
-        await this.graphTargetVectors.build(snapshot, {
-          modelId: this.selectedModel(),
-          generation: snapshot.builtAt,
-        });
-      }
+      const snapshot = await this.fullAtlasPipeline.loadSnapshotContentForEmbedding(
+        this.fullAtlasRequest().scope.scopeId,
+      );
+      await this.graphTargetVectors.build(snapshot, {
+        modelId: this.selectedModel(),
+        generation: snapshot.builtAt,
+      });
       this.notice.set(`${this.currentModelLabel()} is staged for Atlas embeddings. Graph topology was not rebuilt.`);
     } catch (err) {
       this.error.set(this.toErrorMessage(err));

@@ -157,12 +157,83 @@ describe('GraphLensWorkspaceComponent read-only snapshot loading', () => {
         expect(component.graphRebuildSnapshot()).toBe(hydrated);
     });
 
-    it('fails closed instead of hydrating rich snapshot rows when the packed V3 generation is missing', async () => {
+    it('keeps registry entities accessible without hydrating rich rows when packed V3 is missing', async () => {
         window.history.replaceState({}, '', '/');
         localStorage.setItem(GALAXY_RENDERER_V3_AUTHORITY_KEY, 'v3-visible');
         component.ngOnDestroy();
         injector.destroy();
         graphRebuild = createGraphRebuildMock();
+        coldStart = createColdStartMock();
+        effectScheduler = createImmediateEffectScheduler();
+        latestEffectScheduler = effectScheduler;
+        injector = createEnvironmentInjector([
+            { provide: GraphRebuildService, useValue: graphRebuild },
+            { provide: GraphCanvasColdStartService, useValue: coldStart },
+            { provide: PhoenixProjectionService, useValue: createProjectionMock([{
+                id: 'entity:amara',
+                label: 'Amara',
+                kind: 'CHARACTER',
+                aliases: [],
+                totalMentions: 1,
+            }]) },
+            ...sourceNavigationProviders(),
+            { provide: ChangeDetectionScheduler, useValue: { notify: vi.fn(), runningTick: false } },
+            { provide: EffectScheduler, useValue: effectScheduler },
+        ], Injector.create({ providers: [] }) as unknown as EnvironmentInjector);
+        component = runInInjectionContext(injector, () => new GraphLensWorkspaceComponent());
+
+        await flushAsync();
+
+        expect(graphRebuild.loadPersistedSnapshot).not.toHaveBeenCalled();
+        expect(component.graphSnapshotFailure()).toBeNull();
+        expect(component.graphRebuildSnapshot()).toBeNull();
+        expect(component.lensedGraph().entities.map((entity) => entity.id)).toEqual(['entity:amara']);
+    });
+
+    it('keeps a published FORCE graph authoritative over a late registry-only cold start', async () => {
+        const delayedBoot = deferred<any>();
+        const published = renderPayloadSnapshot(true);
+        window.history.replaceState({}, '', '/');
+        localStorage.setItem(GALAXY_RENDERER_V3_AUTHORITY_KEY, 'v3-visible');
+        component.ngOnDestroy();
+        injector.destroy();
+        graphRebuild = createGraphRebuildMock();
+        coldStart = createColdStartMock();
+        coldStart.preparePersistedFirstPixel.mockReturnValue(delayedBoot.promise);
+        effectScheduler = createImmediateEffectScheduler();
+        latestEffectScheduler = effectScheduler;
+        injector = createEnvironmentInjector([
+            { provide: GraphRebuildService, useValue: graphRebuild },
+            { provide: GraphCanvasColdStartService, useValue: coldStart },
+            { provide: PhoenixProjectionService, useValue: createProjectionMock() },
+            ...sourceNavigationProviders(),
+            { provide: ChangeDetectionScheduler, useValue: { notify: vi.fn(), runningTick: false } },
+            { provide: EffectScheduler, useValue: effectScheduler },
+        ], Injector.create({ providers: [] }) as unknown as EnvironmentInjector);
+        component = runInInjectionContext(injector, () => new GraphLensWorkspaceComponent());
+
+        await flushAsync();
+        graphRebuild.publishSnapshot(published);
+        await flushAsync();
+
+        expect(component.graphRebuildSnapshot()).toBe(published);
+
+        delayedBoot.resolve(null);
+        await flushAsync();
+
+        expect(component.graphRebuildSnapshot()).toBe(published);
+        expect(component.graphSnapshotFailure()).toBeNull();
+    });
+
+    it('builds resident V3 pages from verified durable content without retaining rich rows', async () => {
+        const shell = renderPayloadSnapshot(false);
+        const hydrated = renderPayloadSnapshot(true);
+        window.history.replaceState({}, '', '/');
+        localStorage.setItem(GALAXY_RENDERER_V3_AUTHORITY_KEY, 'v3-visible');
+        component.ngOnDestroy();
+        injector.destroy();
+        graphRebuild = createGraphRebuildMock();
+        graphRebuild.loadVerifiedGenerationSnapshotContent.mockResolvedValue(hydrated);
         coldStart = createColdStartMock();
         effectScheduler = createImmediateEffectScheduler();
         latestEffectScheduler = effectScheduler;
@@ -177,9 +248,12 @@ describe('GraphLensWorkspaceComponent read-only snapshot loading', () => {
         component = runInInjectionContext(injector, () => new GraphLensWorkspaceComponent());
 
         await flushAsync();
+        graphRebuild.publishSnapshot(shell);
+        await flushAsync();
 
-        expect(graphRebuild.loadPersistedSnapshot).not.toHaveBeenCalled();
-        expect(component.graphSnapshotFailure()).toContain('packed V3 scene unavailable');
+        expect(graphRebuild.loadVerifiedGenerationSnapshotContent).toHaveBeenCalledWith(shell);
+        expect(coldStart.preparePersistedManifold).toHaveBeenCalledWith(hydrated);
+        expect(component.graphRebuildSnapshot()).toBe(shell);
     });
 
     it('hydrates the lens from Dexie settings and persists later scope changes', async () => {
@@ -259,8 +333,12 @@ describe('GraphLensWorkspaceComponent read-only snapshot loading', () => {
     });
 
     function createGraphRebuildMock() {
+        const publishedSnapshot = signal<any>(null);
         return {
+            snapshot: publishedSnapshot,
+            publishSnapshot: (snapshot: any) => publishedSnapshot.set(snapshot),
             loadPersistedSnapshot: vi.fn(async () => snapshotToLoad),
+            loadVerifiedGenerationSnapshotContent: vi.fn(async (snapshot: any) => snapshot),
             buildAndPersistSnapshot: vi.fn(async () => null),
         };
     }
@@ -293,9 +371,9 @@ function renderPayloadSnapshot(hydrated: boolean): any {
     };
 }
 
-function createProjectionMock() {
+function createProjectionMock(entities: any[] = []) {
     return {
-        entities: signal([]),
+        entities: signal(entities),
         getEdgesForEntity: vi.fn(() => []),
     };
 }
@@ -327,6 +405,14 @@ function createImmediateEffectScheduler() {
             scheduled.delete(effect);
         }),
     };
+}
+
+function deferred<T>() {
+    let resolve!: (value: T | PromiseLike<T>) => void;
+    const promise = new Promise<T>((settle) => {
+        resolve = settle;
+    });
+    return { promise, resolve };
 }
 
 async function flushAsync(): Promise<void> {

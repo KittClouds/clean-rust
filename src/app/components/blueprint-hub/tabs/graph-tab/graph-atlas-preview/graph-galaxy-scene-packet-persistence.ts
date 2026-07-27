@@ -4,10 +4,13 @@ import type { GraphRebuildSnapshot } from '../../../../../graph-rebuild/graph-re
 import type { AtlasManifoldMode } from '../../../../../services/manifold-atlas.types';
 import {
     assertGalaxyScenePacketV2,
+    openDetachedGalaxyScenePacketV2Page,
+    verifyGalaxyScenePacketV2,
 } from './graph-galaxy-scene-packet-v2';
 import type {
     GalaxyScenePacketV2,
     GalaxyScenePacketV2Manifest,
+    VerifiedGalaxyScenePacketV2,
 } from './graph-galaxy-scene-packet-v2.model';
 
 const DATABASE_NAME = 'phoenix-galaxy-scene-v3-cache';
@@ -114,8 +117,41 @@ export async function loadPersistedGalaxyScenePacket(
 ): Promise<PersistedGalaxyScenePacket | null> {
     const receipt = await database.receipts.get(galaxyScenePacketSlotKey(scopeId, manifold));
     if (!receipt) return null;
-    const pages = await database.pages.where('slotKey').equals(receipt.slotKey).toArray();
-    return restoreGalaxyScenePacketPersistenceRecords({ receipt, pages });
+    const persistedPageCount = await database.pages.where('slotKey').equals(receipt.slotKey).count();
+    const residentPageIds = receipt.manifest.pages
+        .filter((page) => page.loadPolicy === 'resident')
+        .map((page) => page.id);
+    const loaded = await database.pages.bulkGet(
+        residentPageIds.map((pageId) => galaxyScenePacketPageKey(receipt.slotKey, pageId)),
+    );
+    if (loaded.some((page) => !page)) {
+        throw new Error('Persisted galaxy scene is missing a resident first-pixel page.');
+    }
+    return restoreGalaxyScenePacketHotPersistenceRecords(
+        receipt,
+        loaded as GalaxyScenePacketPageRecord[],
+        persistedPageCount,
+    );
+}
+
+/** Loads and verifies exactly one non-resident page without retaining it in the hot registry. */
+export async function loadPersistedGalaxyScenePacketPage(
+    scopeId: string,
+    manifold: AtlasManifoldMode,
+    packet: VerifiedGalaxyScenePacketV2,
+    pageId: string,
+): Promise<ArrayBuffer> {
+    const receipt = await database.receipts.get(galaxyScenePacketSlotKey(scopeId, manifold));
+    if (!receipt
+        || receipt.generationId !== packet.manifest.generationId
+        || receipt.authorityReceipt !== packet.manifest.authorityReceipt) {
+        throw new Error('Persisted galaxy scene page authority does not match the hot packet.');
+    }
+    const page = await database.pages.get(galaxyScenePacketPageKey(receipt.slotKey, pageId));
+    if (!page || page.slotKey !== receipt.slotKey || page.pageId !== pageId) {
+        throw new Error(`Persisted galaxy scene is missing on-demand page: ${pageId}`);
+    }
+    return openDetachedGalaxyScenePacketV2Page(packet, pageId, page.buffer);
 }
 
 export async function loadPersistedGalaxySceneGenerationIndex(
@@ -218,20 +254,7 @@ export function restoreGalaxyScenePacketPersistenceRecords(
     records: GalaxyScenePacketPersistenceRecords,
 ): PersistedGalaxyScenePacket {
     const { receipt } = records;
-    if (receipt.schemaVersion !== RECEIPT_SCHEMA) {
-        throw new Error(`Unsupported persisted galaxy scene receipt: ${receipt.schemaVersion}`);
-    }
-    if (receipt.slotKey !== galaxyScenePacketSlotKey(receipt.scopeId, receipt.manifold)) {
-        throw new Error('Persisted galaxy scene slot identity drift.');
-    }
-    const snapshotShellJson = JSON.stringify(receipt.snapshotShell);
-    if (snapshotShellJson.length > MAX_BOOT_SNAPSHOT_CHARS) {
-        throw new Error('Persisted galaxy scene boot shell exceeds its bounded contract.');
-    }
-    if (hashText(snapshotShellJson) !== receipt.snapshotShellHash) {
-        throw new Error('Persisted galaxy scene boot shell hash drift.');
-    }
-    assertSnapshotShellIdentity(receipt, receipt.snapshotShell);
+    assertPersistenceReceipt(receipt);
     const expectedPageIds = new Set(receipt.pageIds);
     if (records.pages.length !== expectedPageIds.size) {
         throw new Error('Persisted galaxy scene page count drift.');
@@ -249,17 +272,35 @@ export function restoreGalaxyScenePacketPersistenceRecords(
     const packet: GalaxyScenePacketV2 = { manifest: receipt.manifest, pages };
     assertPersistenceIdentity(receipt, packet);
     assertGalaxyScenePacketV2(packet);
-    return {
-        identity: {
-            scopeId: receipt.scopeId,
-            snapshotId: receipt.snapshotId,
-            generationId: receipt.generationId,
-            manifold: receipt.manifold,
-            authorityReceipt: receipt.authorityReceipt,
-        },
-        snapshotShell: receipt.snapshotShell,
-        packet,
-    };
+    return persistedPacket(receipt, packet);
+}
+
+export function restoreGalaxyScenePacketHotPersistenceRecords(
+    receipt: GalaxyScenePacketReceiptRecord,
+    records: readonly GalaxyScenePacketPageRecord[],
+    persistedPageCount: number,
+): PersistedGalaxyScenePacket {
+    assertPersistenceReceipt(receipt);
+    if (persistedPageCount !== receipt.pageIds.length) {
+        throw new Error('Persisted galaxy scene page count drift.');
+    }
+    const expectedIds = new Set(receipt.manifest.pages
+        .filter((page) => page.loadPolicy === 'resident')
+        .map((page) => page.id));
+    if (records.length !== expectedIds.size) {
+        throw new Error('Persisted galaxy scene resident page count drift.');
+    }
+    const pages: Record<string, ArrayBuffer> = {};
+    for (const page of records) {
+        if (page.slotKey !== receipt.slotKey || !expectedIds.has(page.pageId) || pages[page.pageId]) {
+            throw new Error(`Persisted galaxy scene resident page identity drift: ${page.pageId}`);
+        }
+        pages[page.pageId] = page.buffer;
+    }
+    const packet: GalaxyScenePacketV2 = { manifest: receipt.manifest, pages };
+    assertPersistenceIdentity(receipt, packet);
+    verifyGalaxyScenePacketV2(packet);
+    return persistedPacket(receipt, packet);
 }
 
 export function assertPersistedGalaxySceneMatches(
@@ -289,6 +330,45 @@ function assertPersistenceIdentity(
     if (packet.manifest.sourceMode !== 'embeddings') {
         throw new Error('Only authoritative embedding scenes may enter the restart cache.');
     }
+}
+
+function assertPersistenceReceipt(receipt: GalaxyScenePacketReceiptRecord): void {
+    if (receipt.schemaVersion !== RECEIPT_SCHEMA) {
+        throw new Error(`Unsupported persisted galaxy scene receipt: ${receipt.schemaVersion}`);
+    }
+    if (receipt.slotKey !== galaxyScenePacketSlotKey(receipt.scopeId, receipt.manifold)) {
+        throw new Error('Persisted galaxy scene slot identity drift.');
+    }
+    const manifestPageIds = receipt.manifest.pages.map((page) => page.id);
+    if (receipt.pageIds.length !== manifestPageIds.length
+        || receipt.pageIds.some((pageId, index) => pageId !== manifestPageIds[index])) {
+        throw new Error('Persisted galaxy scene receipt page manifest drift.');
+    }
+    const snapshotShellJson = JSON.stringify(receipt.snapshotShell);
+    if (snapshotShellJson.length > MAX_BOOT_SNAPSHOT_CHARS) {
+        throw new Error('Persisted galaxy scene boot shell exceeds its bounded contract.');
+    }
+    if (hashText(snapshotShellJson) !== receipt.snapshotShellHash) {
+        throw new Error('Persisted galaxy scene boot shell hash drift.');
+    }
+    assertSnapshotShellIdentity(receipt, receipt.snapshotShell);
+}
+
+function persistedPacket(
+    receipt: GalaxyScenePacketReceiptRecord,
+    packet: GalaxyScenePacketV2,
+): PersistedGalaxyScenePacket {
+    return {
+        identity: {
+            scopeId: receipt.scopeId,
+            snapshotId: receipt.snapshotId,
+            generationId: receipt.generationId,
+            manifold: receipt.manifold,
+            authorityReceipt: receipt.authorityReceipt,
+        },
+        snapshotShell: receipt.snapshotShell,
+        packet,
+    };
 }
 
 function assertSnapshotShellIdentity(

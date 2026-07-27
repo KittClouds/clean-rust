@@ -53,6 +53,17 @@ describe('graph evidence target registry', () => {
         );
     });
 
+    it('reconstructs the exact registry from the compact durable evidence page', () => {
+        const snapshot = fixture();
+        const expected = snapshot.evidenceTargetRegistry;
+        expect(snapshot.evidenceTargetRegistryPage?.documentEvidenceIds.length).toBeGreaterThan(0);
+
+        delete snapshot.documentSidecarSummary;
+        const restored = buildGraphEvidenceTargetRegistry(snapshot);
+
+        expect(restored.contract).toEqual(expected);
+    });
+
     it('fails closed when canonical target identities collide', () => {
         const snapshot = fixture();
         snapshot.embeddingTargets.push({ ...snapshot.embeddingTargets[0] });

@@ -9,6 +9,7 @@ import {
 } from 'three/tsl';
 
 import type { GalaxyRendererV3ResidentPages } from './galaxy-renderer-v3-contract';
+import { refreshGalaxyNodePaletteRgba8 } from '../graph-galaxy-node-palette';
 
 const MINIMUM_SCENE_RADIUS_SQUARED_BITS = 0x3f80_0000;
 const SCENE_RADIUS_READBACK_BYTES = Uint32Array.BYTES_PER_ELEMENT;
@@ -24,6 +25,7 @@ export class GalaxyRendererV3GpuPages {
     readonly capacity: number;
     readonly positionsAttribute: THREE.StorageBufferAttribute;
     readonly radiiAttribute: THREE.StorageBufferAttribute;
+    readonly nodeColorsAttribute: THREE.InstancedBufferAttribute;
     readonly positions: ReturnType<typeof vec4Storage>;
     readonly radii: ReturnType<typeof floatStorage>;
 
@@ -32,6 +34,7 @@ export class GalaxyRendererV3GpuPages {
     private readonly sceneRadiusReadback = new THREE.ReadbackBuffer(SCENE_RADIUS_READBACK_BYTES);
     private readonly positionWords: Float32Array;
     private readonly radiusWords: Float32Array;
+    private readonly nodeColorWords: Uint8Array;
     private readonly sceneRadiusWords = new Uint32Array([MINIMUM_SCENE_RADIUS_SQUARED_BITS]);
     private nodeCount = 0;
 
@@ -41,23 +44,37 @@ export class GalaxyRendererV3GpuPages {
         // avoids Three.js' implicit vec3-to-vec4 repack on every update.
         this.positionWords = new Float32Array(this.capacity * 4);
         this.radiusWords = new Float32Array(this.capacity);
+        this.nodeColorWords = new Uint8Array(this.capacity * 4);
         this.positionsAttribute = new THREE.StorageBufferAttribute(this.positionWords, 4);
         this.positionsAttribute.name = 'galaxy-v3-positions';
         this.radiiAttribute = new THREE.StorageBufferAttribute(this.radiusWords, 1);
         this.radiiAttribute.name = 'galaxy-v3-radii';
+        this.nodeColorsAttribute = new THREE.InstancedBufferAttribute(this.nodeColorWords, 4, true);
+        this.nodeColorsAttribute.name = 'galaxy-v3-node-colors';
         this.positions = vec4Storage(this.positionsAttribute, this.capacity).toReadOnly();
         this.radii = floatStorage(this.radiiAttribute, this.capacity).toReadOnly();
         this.sceneRadiusBitsAttribute = new THREE.StorageBufferAttribute(this.sceneRadiusWords, 1);
         this.sceneRadiusBitsAttribute.name = 'galaxy-v3-scene-radius-bits';
         this.sceneRadiusReadback.name = 'galaxy-v3-scene-radius';
         this.sceneRadiusBits = uintStorage(this.sceneRadiusBitsAttribute, 1).toAtomic();
-        this.update(nodeCount, pages);
+        this.install(nodeCount, pages);
     }
 
-    private update(nodeCount: number, pages: GalaxyRendererV3ResidentPages): void {
+    canFit(nodeCount: number): boolean {
+        return nodeCount <= this.capacity;
+    }
+
+    install(nodeCount: number, pages: GalaxyRendererV3ResidentPages): void {
+        if (!this.canFit(nodeCount)) {
+            throw new Error(`Galaxy Renderer V3 GPU capacity ${this.capacity} cannot fit ${nodeCount} nodes.`);
+        }
+        if (pages.positions3d.length < nodeCount * 3 || pages.radii.length < nodeCount) {
+            throw new Error('Galaxy Renderer V3 GPU page lengths do not match the resident node count.');
+        }
         this.nodeCount = nodeCount;
         writePositions(this.positionWords, pages.positions3d, nodeCount);
         this.radiusWords.set(pages.radii.subarray(0, nodeCount));
+        this.refreshNodeColors(pages);
         this.sceneRadiusWords[0] = MINIMUM_SCENE_RADIUS_SQUARED_BITS;
         this.positionsAttribute.needsUpdate = true;
         this.radiiAttribute.needsUpdate = true;
@@ -75,6 +92,16 @@ export class GalaxyRendererV3GpuPages {
     updatePositions(positions3d: Float32Array): void {
         writePositions(this.positionWords, positions3d, this.nodeCount);
         this.positionsAttribute.needsUpdate = true;
+    }
+
+    refreshNodeColors(pages: GalaxyRendererV3ResidentPages): void {
+        refreshGalaxyNodePaletteRgba8(
+            this.nodeColorWords,
+            pages.nodeColorsRgba8,
+            pages.nodePaletteSlots,
+            this.nodeCount,
+        );
+        this.nodeColorsAttribute.needsUpdate = true;
     }
 
     async reduceSceneRadius(renderer: THREE.WebGPURenderer): Promise<GalaxyRendererV3SceneReduction> {
@@ -107,6 +134,7 @@ export class GalaxyRendererV3GpuPages {
     dispose(): void {
         this.positionsAttribute.dispose();
         this.radiiAttribute.dispose();
+        this.nodeColorsAttribute.dispose();
         this.sceneRadiusBitsAttribute.dispose();
         this.sceneRadiusReadback.dispose();
     }

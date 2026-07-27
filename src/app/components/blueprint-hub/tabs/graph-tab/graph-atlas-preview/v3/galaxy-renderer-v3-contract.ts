@@ -1,6 +1,6 @@
 import type { GraphRendererMode, GraphRendererPointer } from '../graph-renderer-port';
 import type { GalaxyRenderableNode, GalaxyRenderSettings } from '../graph-galaxy-engine';
-import type { GalaxyScenePacketV2 } from '../graph-galaxy-scene-packet-v2.model';
+import type { VerifiedGalaxyScenePacketV2 } from '../graph-galaxy-scene-packet-v2.model';
 
 export const GALAXY_RENDERER_V3_SCHEMA = 'phoenix-galaxy-renderer/v3' as const;
 
@@ -8,7 +8,7 @@ export interface GalaxyRendererV3Generation {
     schemaVersion: typeof GALAXY_RENDERER_V3_SCHEMA;
     generationId: string;
     authorityReceipt: string;
-    packet: GalaxyScenePacketV2;
+    packet: VerifiedGalaxyScenePacketV2;
     corpus: { nodes: number; edges: number };
 }
 
@@ -33,6 +33,7 @@ export interface GalaxyRendererV3Backend {
     mount(canvas: HTMLCanvasElement): Promise<void>;
     openGeneration(generation: GalaxyRendererV3Generation, settings: GalaxyRenderSettings): Promise<void>;
     setSettings(settings: GalaxyRenderSettings): void;
+    refreshPalette(): void;
     setMode(mode: GraphRendererMode): void;
     resize(width: number, height: number, dpr: number): void;
     render(): void;
@@ -58,6 +59,7 @@ export interface GalaxyRendererV3ResidentPages {
     positions3d: Float32Array;
     radii: Float32Array;
     nodeColorsRgba8: Uint8Array;
+    nodePaletteSlots: Uint8Array;
     nodeFlags: Uint8Array;
     nodeIdentityKeys: Uint32Array;
     edgePairs: Uint32Array;

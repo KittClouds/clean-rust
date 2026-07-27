@@ -5,6 +5,7 @@ import {
     buildGalaxyScene,
     hasRelationControlNodes,
     hslToRgb,
+    resolveGalaxyNodePaletteSlot,
     resolveGalaxyNodeColorHsl,
     type GalaxyInputEdge,
     type GalaxyRenderableNode,
@@ -245,6 +246,8 @@ async function compileChangedGalaxyScene(
                 const color = hslToRgb(source ? resolveGalaxyNodeColorHsl(source) : resolveGalaxyNodeColorHsl(node.entity));
                 return {
                     ...node,
+                    entity: source || node.entity,
+                    paletteSlot: resolveGalaxyNodePaletteSlot(source || node.entity),
                     ...color,
                     sx: 0,
                     sy: 0,

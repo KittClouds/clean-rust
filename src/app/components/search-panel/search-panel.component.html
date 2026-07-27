@@ -287,6 +287,12 @@
           [class.animate-spin]="fullAtlasBusy()"></ng-icon>
         {{ fullAtlasBuildButtonLabel() }}
       </button>
+      @if (forceV2BootstrapRequired()) {
+        <button type="button" class="secondary-action" (click)="bootstrapVerifiedForceV2()"
+          [disabled]="fullAtlasBusy()" title="One-time explicit migration; never selected as a FORCE fallback">
+          Bootstrap V2 Graph
+        </button>
+      }
       <button type="button" class="secondary-action postprocess-action" (click)="embedAtlas()"
         [disabled]="isEmbedAtlasDisabled()">
         <ng-icon [name]="vectorStatus() === 'loading' || vectorStatus() === 'indexing' ? 'lucideLoader2' : 'lucideZap'"

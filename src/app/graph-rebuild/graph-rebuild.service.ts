@@ -593,6 +593,7 @@ export class GraphRebuildService {
     private readonly documentSemanticSummaryByIdentity = new Map<string, GraphDocumentSemanticSummary>();
     private readonly documentSemanticArtifactHandleByIdentity = new Map<string, string>();
     private readonly persistedSnapshotLoads = new Map<string, Promise<GraphRebuildSnapshot | null>>();
+    private readonly generationSnapshotContentLoads = new Map<string, Promise<GraphRebuildSnapshot>>();
     private readonly rejectedPersistedSnapshotScopes = new Map<string, string>();
     private readonly offlineCommunityReceiptState = signal<NativeOfflineCommunityReceipt | null>(null);
     private activeNativeGraphRun: { snapshotId: string; runHandle: string } | null = null;
@@ -1594,6 +1595,64 @@ export class GraphRebuildService {
         if (!shell) return null;
         assertGraphCanvasBootSnapshotShell(shell);
         return shell;
+    }
+
+    async loadVerifiedGenerationSnapshotContent(
+        expectedShell: GraphRebuildSnapshot,
+    ): Promise<GraphRebuildSnapshot> {
+        assertGraphCanvasBootSnapshotShell(expectedShell);
+        if (!expectedShell.generationReceiptId || !expectedShell.generationDigestSha256) {
+            throw new Error(
+                'PHX_GRAPH_CONTENT_LEASE_REQUIRED: compact snapshot must be bound to a generation receipt.',
+            );
+        }
+        if (!expectedShell.contentManifest?.refs.evidenceTargetRegistryPage) {
+            throw new Error(
+                'PHX_GRAPH_CONTENT_LEASE_CAPABILITY_MISSING: durable evidence registry page requires explicit V2 bootstrap.',
+            );
+        }
+        const key = `${expectedShell.scopeId}\u0000${expectedShell.id}\u0000${expectedShell.generationReceiptId}`;
+        const activeLoad = this.generationSnapshotContentLoads.get(key);
+        if (activeLoad) return activeLoad;
+        const load = this.loadVerifiedGenerationSnapshotContentFromStore(expectedShell);
+        this.generationSnapshotContentLoads.set(key, load);
+        try {
+            return await load;
+        } finally {
+            if (this.generationSnapshotContentLoads.get(key) === load) {
+                this.generationSnapshotContentLoads.delete(key);
+            }
+        }
+    }
+
+    private async loadVerifiedGenerationSnapshotContentFromStore(
+        expectedShell: GraphRebuildSnapshot,
+    ): Promise<GraphRebuildSnapshot> {
+        const document = await this.store.getScopedDocument(
+            expectedShell.scopeId,
+            GRAPH_REBUILD_NAMESPACE,
+            SNAPSHOT_DOCUMENT_KEY,
+        );
+        const persisted = document ? scopedDocumentToGraphRebuildSnapshot(document) : null;
+        if (!persisted) {
+            throw new Error(
+                `PHX_GRAPH_CONTENT_LEASE_PRIMARY_MISSING: no durable snapshot exists for ${expectedShell.scopeId}.`,
+            );
+        }
+        assertGenerationContentLeaseIdentity(expectedShell, persisted);
+        let authorized: GraphRebuildSnapshot | null = null;
+        try {
+            const hydrated = await this.hydratePersistedSnapshot(persisted);
+            authorized = authorizeGraphRebuildSnapshotForLoad(hydrated, (error) => { throw error; });
+        } catch (error) {
+            const message = error instanceof Error ? error.message : String(error);
+            throw new Error(`PHX_GRAPH_CONTENT_LEASE_AUTHORITY_REJECTED: ${message}`);
+        }
+        if (!authorized) {
+            throw new Error('PHX_GRAPH_CONTENT_LEASE_AUTHORITY_REJECTED: hydrated snapshot was not authorized.');
+        }
+        assertGenerationContentLeaseIdentity(expectedShell, authorized);
+        return authorized;
     }
 
     private async loadPersistedSnapshotFromStore(scopeId: string): Promise<GraphRebuildSnapshot | null> {
@@ -3069,6 +3128,7 @@ export interface GraphRebuildContentBlobEntry {
 const SNAPSHOT_CONTENT_BLOB_FIELDS: GraphRebuildContentBlobField[] = [
     'sourceRows',
     'renderRows',
+    'evidenceTargetRegistryPage',
     'embeddingTargets',
     'embeddingTargetPlan',
     'embeddingGraphPostProcess',
@@ -3193,6 +3253,7 @@ export function graphRebuildSnapshotPersistenceView(
     persisted.projectionRefs = [];
     persisted.nodes = [];
     persisted.edges = [];
+    delete persisted.evidenceTargetRegistryPage;
     delete persisted.embeddingTargetPlan;
     delete persisted.embeddingGraphPostProcess;
     delete persisted.structuralPostProcess;
@@ -3247,6 +3308,25 @@ export function graphGenerationSnapshotShell(
     shell.generationDigestSha256 = receipt.digestSha256;
     assertGraphCanvasBootSnapshotShell(shell);
     return shell;
+}
+
+function assertGenerationContentLeaseIdentity(
+    expected: GraphRebuildSnapshot,
+    candidate: GraphRebuildSnapshot,
+): void {
+    const expectedAuthority = expected.authorityContract;
+    const candidateAuthority = candidate.authorityContract;
+    if (candidate.id !== expected.id
+        || candidate.scopeId !== expected.scopeId
+        || candidateAuthority?.contentHash !== expectedAuthority?.contentHash
+        || candidate.interactiveRunAuthority?.inputIdentity
+            !== expected.interactiveRunAuthority?.inputIdentity
+        || candidate.contentManifest?.snapshotId !== expected.contentManifest?.snapshotId
+        || candidate.contentManifest?.scopeId !== expected.contentManifest?.scopeId) {
+        throw new Error(
+            `PHX_GRAPH_CONTENT_LEASE_IDENTITY_DRIFT: durable content does not match generation ${expected.id}.`,
+        );
+    }
 }
 
 export function verifiedForceSnapshotShell(
@@ -3768,6 +3848,8 @@ function snapshotContentBlobValue(
                 structuralPostProcess: snapshot.structuralPostProcess,
                 projectedUiGraph: snapshot.projectedUiGraph,
             });
+        case 'evidenceTargetRegistryPage':
+            return snapshot.evidenceTargetRegistryPage;
         case 'embeddingTargets':
             return snapshot.embeddingTargets;
         case 'embeddingTargetPlan':

@@ -724,6 +724,13 @@ export interface GraphEvidenceTargetRegistryContract {
     identityHash: string;
 }
 
+export interface GraphEvidenceTargetRegistryPage {
+    schemaVersion: 'phoenix-evidence-target-registry-page/v1';
+    sourceSnapshotId: string;
+    sourceScopeId: string;
+    documentEvidenceIds: string[];
+}
+
 export interface GraphRebuildEmbeddingVector {
     targetId: string;
     modelId: string;
@@ -2592,6 +2599,7 @@ export type { GraphRebuildBuildTimings } from './graph-rebuild-build-timings';
 export type GraphRebuildContentBlobField =
     | 'sourceRows'
     | 'renderRows'
+    | 'evidenceTargetRegistryPage'
     | 'embeddingTargets'
     | 'embeddingTargetPlan'
     | 'embeddingGraphPostProcess'
@@ -2707,6 +2715,7 @@ export interface GraphRebuildSnapshot {
     embeddingTargets: GraphRebuildEmbeddingTarget[];
     embeddingTargetPlan?: GraphRebuildEmbeddingTargetPlan;
     evidenceTargetRegistry?: GraphEvidenceTargetRegistryContract;
+    evidenceTargetRegistryPage?: GraphEvidenceTargetRegistryPage;
     embeddingVectors: GraphRebuildEmbeddingVector[];
     encoderVectorIndex?: GraphEncoderVectorIndexContract;
     embeddingProfile?: GraphRebuildEmbeddingProfile;

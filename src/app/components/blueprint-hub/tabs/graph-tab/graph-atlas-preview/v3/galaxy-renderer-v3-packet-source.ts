@@ -1,6 +1,9 @@
 import { DEFAULT_GRAPH_NODE_COLORS, entityColorStore } from '../../../../../../lib/store/entityColorStore';
 import type { GalaxyInputEdge, GalaxyRenderableNode, GalaxyRenderSettings } from '../graph-galaxy-engine';
-import type { GalaxyScenePacketV2 } from '../graph-galaxy-scene-packet-v2.model';
+import type {
+    GalaxyScenePacketV2,
+    VerifiedGalaxyScenePacketV2,
+} from '../graph-galaxy-scene-packet-v2.model';
 import {
     cachedGalaxyScenePacket,
     seedGalaxyScenePacket,
@@ -9,7 +12,7 @@ import {
 import type { GalaxySceneSourceMode } from '../graph-galaxy-scene-v2';
 
 interface PendingPacket {
-    resolve: (packet: GalaxyScenePacketV2) => void;
+    resolve: (packet: VerifiedGalaxyScenePacketV2) => void;
     reject: (error: Error) => void;
     request: GalaxyRendererV3PacketCompileRequest;
 }
@@ -33,7 +36,7 @@ export class GalaxyRendererV3PacketSource {
         authorityReceipt: string,
         generationId: string,
         sourceMode: GalaxySceneSourceMode,
-    ): GalaxyScenePacketV2 | null {
+    ): VerifiedGalaxyScenePacketV2 | null {
         return cachedGalaxyScenePacket(authorityReceipt, generationId, sourceMode);
     }
 
@@ -56,7 +59,7 @@ export class GalaxyRendererV3PacketSource {
         });
     }
 
-    compile(request: GalaxyRendererV3PacketCompileRequest): Promise<GalaxyScenePacketV2> {
+    compile(request: GalaxyRendererV3PacketCompileRequest): Promise<VerifiedGalaxyScenePacketV2> {
         const resident = this.resident(
             request.authorityReceipt,
             request.generationId,
@@ -70,7 +73,7 @@ export class GalaxyRendererV3PacketSource {
             Object.keys(DEFAULT_GRAPH_NODE_COLORS)
                 .map((kind) => [kind, entityColorStore.getRawGraphNodeHsl(kind)]),
         );
-        return new Promise<GalaxyScenePacketV2>((resolve, reject) => {
+        return new Promise<VerifiedGalaxyScenePacketV2>((resolve, reject) => {
             this.pending.set(id, { resolve, reject, request });
             worker.postMessage({
                 id,
@@ -116,8 +119,7 @@ export class GalaxyRendererV3PacketSource {
                     pending.reject(new Error('Galaxy Renderer V3 packet receipt does not match its compilation request.'));
                     return;
                 }
-                seedGalaxyScenePacket(data.packet);
-                pending.resolve(data.packet);
+                pending.resolve(seedGalaxyScenePacket(data.packet));
             } else {
                 pending.reject(new Error(data.error || 'Galaxy Renderer V3 packet compilation failed.'));
             }

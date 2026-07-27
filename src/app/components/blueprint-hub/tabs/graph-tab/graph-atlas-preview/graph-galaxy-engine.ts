@@ -20,6 +20,11 @@ import { relationFamilyFromText } from './graph-relation-visual-style';
 import { buildTransitBackboneGuides } from './graph-transit-backbone-guides';
 import { applyTransitLayout } from './graph-transit-layout';
 import { buildTransitPlan, type TransitPlan } from './graph-transit-plan';
+import {
+    GALAXY_NODE_PALETTE_UNBOUND,
+    galaxyEntityPaletteSlot,
+    galaxyGraphPaletteSlot,
+} from './graph-galaxy-node-palette';
 
 export type GalaxyLabelMode = 'hover' | 'selected' | 'important' | 'always' | 'off';
 export type GalaxyEdgeMode = 'curved' | 'straight' | 'tube' | 'hidden';
@@ -266,6 +271,7 @@ export interface Rgb {
 
 export interface GalaxyNode extends Rgb {
     entity: GalaxyRenderableNode;
+    paletteSlot: number;
     x: number;
     y: number;
     z: number;
@@ -464,6 +470,7 @@ export function buildGalaxyScene(
         const z = seeded ? clamp(entity.atlasZ!, -2.25, 2.25) : Math.sin(angle) * radial * 0.95 + kindBias * 0.26;
         return {
             entity,
+            paletteSlot: resolveGalaxyNodePaletteSlot(entity),
             x,
             y: yy,
             z,
@@ -2244,6 +2251,35 @@ export function resolveGalaxyNodeColorHsl(entity: GalaxyRenderableNode): string 
     if (entityKind) return entityColorStore.getRawHsl(entityKind);
 
     return entity.colorHsl || entityColorStore.getRawHsl(entity.kind);
+}
+
+export function resolveGalaxyNodePaletteSlot(entity: GalaxyRenderableNode): number {
+    if (isAtlasChunkRenderableNode(entity)) return galaxyGraphPaletteSlot('chunk');
+
+    const metadata = entity.metadata || {};
+    const structuralColorKind = firstGraphNodeColorKind(
+        stringValue(metadata['styleKey']),
+        stringValue(metadata['atlasKind']),
+        stringValue(metadata['sourceType']),
+        stringValue(metadata['graphKind']),
+        entity.kind,
+    );
+    if (structuralColorKind) return galaxyGraphPaletteSlot(structuralColorKind);
+
+    const graphColorKind = firstGraphNodeColorKind(
+        stringValue(metadata['graphColorKind']),
+        stringValue(metadata['graphRelationFamily']),
+        stringValue(metadata['graphKind']),
+    );
+    if (graphColorKind) return galaxyGraphPaletteSlot(graphColorKind);
+
+    const entityKind = firstEntityColorKind(
+        stringValue(metadata['entityKind']),
+        stringValue(metadata['graphColorKind']),
+        stringValue(metadata['graphKind']),
+        entity.kind,
+    );
+    return entityKind ? galaxyEntityPaletteSlot(entityKind) : GALAXY_NODE_PALETTE_UNBOUND;
 }
 
 export function isAtlasChunkRenderableNode(entity: Pick<GalaxyRenderableNode, 'id' | 'kind' | 'metadata'>): boolean {

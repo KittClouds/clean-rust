@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
-import { packGalaxyScenePacketV2 } from '../graph-galaxy-scene-packet-v2';
+import {
+    packGalaxyScenePacketV2,
+    galaxyScenePacketV2VerificationSnapshot,
+    verifyGalaxyScenePacketV2,
+} from '../graph-galaxy-scene-packet-v2';
 import type { GalaxySceneV2 } from '../graph-galaxy-scene-v2';
 import {
     galaxyRendererV3Labels,
@@ -13,23 +17,24 @@ import {
 
 describe('Galaxy Renderer V3 packed boundary', () => {
     it('installs typed views over transferred pages without object expansion', () => {
-        const packet = packGalaxyScenePacketV2(scene(), {
+        const packet = verifyGalaxyScenePacketV2(packGalaxyScenePacketV2(scene(), {
             generationId: 'generation:v3',
             authorityReceipt: 'receipt:v3',
-        });
+        }));
         const pages = galaxyRendererV3ResidentPages(packet);
 
         expect(pages.positions3d.buffer).toBe(packet.pages['manifold/positions-3d']);
         expect(pages.edgePairs.buffer).toBe(packet.pages['shared/edge-pairs']);
         expect(pages.nodeColorsRgba8.buffer).toBe(packet.pages['manifold/node-colors-rgba8']);
+        expect(pages.nodePaletteSlots.buffer).toBe(packet.pages['manifold/node-palette-slots-u8']);
         expect(Array.from(pages.edgePairs)).toEqual([0, 1]);
     });
 
     it('keeps identity and labels lazy until interaction asks for them', () => {
-        const packet = packGalaxyScenePacketV2(scene(), {
+        const packet = verifyGalaxyScenePacketV2(packGalaxyScenePacketV2(scene(), {
             generationId: 'generation:detail',
             authorityReceipt: 'receipt:detail',
-        });
+        }));
 
         expect(galaxyRendererV3NodeIds(packet)).toEqual(['node:a', 'node:b']);
         expect(galaxyRendererV3Labels(packet, [1])).toEqual(new Map([[1, 'Node B']]));
@@ -40,16 +45,21 @@ describe('Galaxy Renderer V3 packed boundary', () => {
         expect(galaxyRendererV3PacketResidentBytes(packet)).toBeLessThan(
             Object.values(packet.pages).reduce((sum, page) => sum + page.byteLength, 0),
         );
+        const verified = galaxyScenePacketV2VerificationSnapshot(packet);
+        galaxyRendererV3NodeIds(packet);
+        galaxyRendererV3Labels(packet, [0, 1]);
+        galaxyRendererV3NodeDetails(packet, [0, 1]);
+        expect(galaxyScenePacketV2VerificationSnapshot(packet)).toEqual(verified);
     });
 
     it('decodes bounded guide families beside the resident pages in one authority check', () => {
         const source = scene();
         source.hopfRibbons = [hopfGuide()];
         source.lorentzGuides = [routeGuide()];
-        const packet = packGalaxyScenePacketV2(source, {
+        const packet = verifyGalaxyScenePacketV2(packGalaxyScenePacketV2(source, {
             generationId: 'generation:guides',
             authorityReceipt: 'receipt:guides',
-        });
+        }));
 
         const resources = galaxyRendererV3PacketResources(packet);
 
@@ -66,7 +76,7 @@ describe('Galaxy Renderer V3 packed boundary', () => {
         });
         new Uint8Array(packet.pages['manifold/positions-3d'])[0] ^= 0xff;
 
-        expect(() => galaxyRendererV3ResidentPages(packet)).toThrow(/hash drift/);
+        expect(() => galaxyRendererV3ResidentPages(verifyGalaxyScenePacketV2(packet))).toThrow(/hash drift/);
     });
 });
 
@@ -90,6 +100,7 @@ function scene(): GalaxySceneV2 {
         positions2d: new Float32Array([0, 1, 0, 3, 4, 0]),
         radii: new Float32Array([1, 2]),
         colors: new Float32Array([1, 0, 0, 0, 1, 0]),
+        paletteSlots: new Uint8Array([0xff, 0xff]),
         edgePairs: new Uint32Array([0, 1]),
         edgeIds: ['edge:a-b'],
         edgeTypes: ['evidence'],

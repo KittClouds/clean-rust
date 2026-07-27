@@ -7,6 +7,8 @@ import { PhoenixStoreService } from '../services/phoenix-store.service';
 import type { EntityOccurrence } from '../lib/dexie/db';
 import type { RegisteredEntity } from '../lib/registry';
 import { buildGraphRebuildSnapshot } from './graph-rebuild-builder';
+import { assertGraphEvidenceTargetRegistry } from './graph-evidence-target-registry';
+import { sealGraphSnapshotAuthority } from './graph-snapshot-authority';
 import {
     GraphRebuildService,
     attachInteractiveAtlasPacketForSnapshotTargets,
@@ -69,6 +71,102 @@ describe('GraphRebuildService persisted snapshot loading', () => {
             blobs.map((blob) => blob.documentKey),
         );
         expect(store.getScopedDocument).toHaveBeenCalledTimes(1);
+        injector.destroy();
+    });
+
+    it('leases exact generation content without reinstalling rich rows in the hot snapshot state', async () => {
+        const snapshot = buildGraphRebuildSnapshot({
+            scopeKind: 'global',
+            scopeId: 'global',
+            noteIds: ['note-1'],
+            entities: [entity('entity-kai', 'Kai')],
+            chunks: [{ id: 'note-1:chunk:0', noteId: 'note-1', start: 0, end: 3, ordinal: 0, source: 'dynamic-chunking' }],
+            occurrences: [occurrence('note-1', 'entity-kai', 0, 3)],
+            noteTexts: { 'note-1': 'Kai' },
+            builtAt: 42,
+        });
+        attachInteractiveAtlasPacketForSnapshotTargets(snapshot);
+        sealGraphSnapshotAuthority(snapshot);
+        const primary = graphRebuildSnapshotToScopedDocument(snapshot);
+        const shell = scopedDocumentToGraphRebuildSnapshot(primary)!;
+        shell.generationReceiptId = 'generation-receipt-1';
+        shell.generationDigestSha256 = 'sha256-generation-1';
+        const blobs = graphRebuildSnapshotContentBlobDocuments(snapshot);
+        const store = {
+            getScopedDocument: vi.fn(async () => primary),
+            getScopedDocumentsByKeys: vi.fn(async () => blobs),
+        };
+        const injector = createEnvironmentInjector([
+            { provide: PhoenixStoreService, useValue: store },
+            { provide: PhoenixBackendService, useValue: { target: 'web' } },
+        ], Injector.create({ providers: [] }));
+        const service = runInInjectionContext(injector, () => new GraphRebuildService());
+
+        const loaded = await service.loadVerifiedGenerationSnapshotContent(shell);
+
+        expect(loaded.embeddingTargets).toEqual(snapshot.embeddingTargets);
+        expect(assertGraphEvidenceTargetRegistry(loaded).contract).toEqual(snapshot.evidenceTargetRegistry);
+        expect(service.snapshot()).toBeNull();
+        expect(store.getScopedDocument).toHaveBeenCalledTimes(1);
+        expect(store.getScopedDocumentsByKeys).toHaveBeenCalledTimes(1);
+        injector.destroy();
+    });
+
+    it('fails closed when a compact generation points at different durable snapshot content', async () => {
+        const expected = buildGraphRebuildSnapshot({
+            scopeKind: 'global',
+            scopeId: 'global',
+            noteIds: ['note-1'],
+            entities: [entity('entity-kai', 'Kai')],
+            chunks: [{ id: 'note-1:chunk:0', noteId: 'note-1', start: 0, end: 3, ordinal: 0, source: 'dynamic-chunking' }],
+            occurrences: [occurrence('note-1', 'entity-kai', 0, 3)],
+            noteTexts: { 'note-1': 'Kai' },
+            builtAt: 42,
+        });
+        attachInteractiveAtlasPacketForSnapshotTargets(expected);
+        sealGraphSnapshotAuthority(expected);
+        const expectedPrimary = graphRebuildSnapshotToScopedDocument(expected);
+        const shell = scopedDocumentToGraphRebuildSnapshot(expectedPrimary)!;
+        shell.generationReceiptId = 'generation-receipt-1';
+        shell.generationDigestSha256 = 'sha256-generation-1';
+        const drifted = { ...shell, id: 'snapshot-drifted' };
+        const store = {
+            getScopedDocument: vi.fn(async () => graphRebuildSnapshotToScopedDocument(drifted)),
+            getScopedDocumentsByKeys: vi.fn(async () => []),
+        };
+        const injector = createEnvironmentInjector([
+            { provide: PhoenixStoreService, useValue: store },
+            { provide: PhoenixBackendService, useValue: { target: 'web' } },
+        ], Injector.create({ providers: [] }));
+        const service = runInInjectionContext(injector, () => new GraphRebuildService());
+
+        await expect(service.loadVerifiedGenerationSnapshotContent(shell))
+            .rejects.toThrow('PHX_GRAPH_CONTENT_LEASE_IDENTITY_DRIFT');
+        expect(store.getScopedDocumentsByKeys).not.toHaveBeenCalled();
+        injector.destroy();
+    });
+
+    it('requires explicit migration when an older generation has no durable registry page', async () => {
+        const snapshot = buildGraphRebuildSnapshot({
+            scopeKind: 'global', scopeId: 'global', noteIds: [], entities: [], chunks: [],
+            occurrences: [], noteTexts: {}, builtAt: 42,
+        });
+        attachInteractiveAtlasPacketForSnapshotTargets(snapshot);
+        sealGraphSnapshotAuthority(snapshot);
+        const shell = scopedDocumentToGraphRebuildSnapshot(graphRebuildSnapshotToScopedDocument(snapshot))!;
+        shell.generationReceiptId = 'generation-receipt-1';
+        shell.generationDigestSha256 = 'sha256-generation-1';
+        delete shell.contentManifest?.refs.evidenceTargetRegistryPage;
+        const store = { getScopedDocument: vi.fn(), getScopedDocumentsByKeys: vi.fn() };
+        const injector = createEnvironmentInjector([
+            { provide: PhoenixStoreService, useValue: store },
+            { provide: PhoenixBackendService, useValue: { target: 'web' } },
+        ], Injector.create({ providers: [] }));
+        const service = runInInjectionContext(injector, () => new GraphRebuildService());
+
+        await expect(service.loadVerifiedGenerationSnapshotContent(shell))
+            .rejects.toThrow('PHX_GRAPH_CONTENT_LEASE_CAPABILITY_MISSING');
+        expect(store.getScopedDocument).not.toHaveBeenCalled();
         injector.destroy();
     });
 

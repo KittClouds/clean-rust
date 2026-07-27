@@ -3,7 +3,19 @@ import {
     type GalaxySceneV2,
 } from './graph-galaxy-scene-v2';
 import {
+    decodeGalaxySceneGuidePages,
+    GALAXY_GUIDE_PAGE_IDS,
+    packGalaxySceneGuidePages,
+    type GalaxyScenePacketV2GuideDetails,
+} from './graph-galaxy-scene-guide-pages';
+import { galaxyScenePacketHashBuffer, galaxyScenePacketHashText } from './graph-galaxy-scene-packet-hash';
+import {
+    assertGalaxyScenePacketV2,
+    openGalaxyScenePacketV2Page,
+} from './graph-galaxy-scene-packet-verification';
+import {
     GALAXY_SCENE_PACKET_V2_SCHEMA,
+    GALAXY_SCENE_PACKET_V2_NODE_PALETTE_PAGE,
     type GalaxyScenePacketV2,
     type GalaxyScenePacketV2CollisionPages,
     type GalaxyScenePacketV2Context,
@@ -13,7 +25,18 @@ import {
     type GalaxyScenePacketV2PageDomain,
     type GalaxyScenePacketV2PageManifest,
     type GalaxyScenePacketV2StringRange,
+    type VerifiedGalaxyScenePacketV2,
 } from './graph-galaxy-scene-packet-v2.model';
+
+export {
+    assertGalaxyScenePacketV2,
+    galaxyScenePacketV2VerificationSnapshot,
+    openDetachedGalaxyScenePacketV2Page,
+    openGalaxyScenePacketV2Page,
+    projectVerifiedGalaxyScenePacketV2,
+    verifyGalaxyScenePacketV2,
+} from './graph-galaxy-scene-packet-verification';
+export type { GalaxyScenePacketV2GuideDetails } from './graph-galaxy-scene-guide-pages';
 
 const NODE_IDENTITY_KEYS = 'shared/node-identity-keys';
 const EDGE_IDENTITY_KEYS = 'shared/edge-identity-keys';
@@ -25,6 +48,7 @@ const EDGE_COLLISION_MEMBERS = 'shared/edge-collision-members';
 const POSITIONS_3D = 'manifold/positions-3d';
 const RADII = 'manifold/radii';
 const NODE_COLORS = 'manifold/node-colors-rgba8';
+const NODE_PALETTE_SLOTS = GALAXY_SCENE_PACKET_V2_NODE_PALETTE_PAGE;
 const NODE_FLAGS = 'manifold/node-flags';
 const EDGE_COLORS = 'manifold/edge-colors-rgba8';
 const EDGE_ALPHA = 'manifold/edge-alpha';
@@ -35,25 +59,14 @@ const HIERARCHY_SHELL_RADII = 'manifold/hierarchy-shell-radii';
 const HIERARCHY_SHELL_RANKS = 'manifold/hierarchy-shell-ranks';
 const STRING_OFFSETS = 'detail/string-offsets';
 const STRING_SLAB = 'detail/string-slab';
-const SCENE_DETAILS = 'detail/scene-extras';
+const GROUPS = 'detail/groups';
+const TRANSIT_PLAN = 'detail/transit-plan';
+const RELATION_CONTROLS = 'detail/relation-controls';
+const BUSEMANN_HOROSPHERES = 'detail/busemann-horospheres';
+const HYBRID_RECEIPTS = 'detail/hybrid-receipts';
+const HIERARCHY_HINTS = 'detail/hierarchy-hints';
 export const GALAXY_SCENE_PACKET_LITTLE_ENDIAN_RUNTIME =
     new Uint8Array(new Uint32Array([0x01020304]).buffer)[0] === 0x04;
-
-interface GalaxyScenePacketV2Details {
-    groups: GalaxySceneV2['groups'];
-    hopfRibbons: GalaxySceneV2['hopfRibbons'];
-    lorentzGuides: GalaxySceneV2['lorentzGuides'];
-    transitPlan?: GalaxySceneV2['transitPlan'];
-    relationControls?: GalaxySceneV2['relationControls'];
-    busemannHorospheres?: GalaxySceneV2['busemannHorospheres'];
-    hybridReceipts?: GalaxySceneV2['hybridReceipts'];
-    hierarchyHints?: GalaxySceneV2['hierarchyHints'];
-}
-
-export type GalaxyScenePacketV2GuideDetails = Pick<
-    GalaxyScenePacketV2Details,
-    'hopfRibbons' | 'lorentzGuides'
->;
 
 interface StringSlab {
     offsets: Uint32Array;
@@ -126,28 +139,29 @@ export function packGalaxyScenePacketV2(
     addPage(pages, pageManifests, POSITIONS_3D, 'manifold', 'resident', 'f32-le', scene.positions3d, pageContext);
     addPage(pages, pageManifests, RADII, 'manifold', 'resident', 'f32-le', scene.radii, pageContext);
     addPage(pages, pageManifests, NODE_COLORS, 'manifold', 'resident', 'rgba8', packRgbAsRgba8(scene.colors), pageContext);
+    addPage(pages, pageManifests, NODE_PALETTE_SLOTS, 'manifold', 'resident', 'u8', scene.paletteSlots, pageContext);
     addPage(pages, pageManifests, NODE_FLAGS, 'manifold', 'resident', 'u8', scene.hopfRoles ?? new Uint8Array(scene.ids.length), pageContext);
     addPage(pages, pageManifests, EDGE_COLORS, 'manifold', 'resident', 'rgba8', packRgbAsRgba8(scene.edgeColors), pageContext);
     addPage(pages, pageManifests, EDGE_ALPHA, 'manifold', 'resident', 'f32-le', scene.edgeAlpha, pageContext);
     addPage(pages, pageManifests, EDGE_FLAGS, 'manifold', 'resident', 'u8', scene.edgeKinds, pageContext);
-    addOptionalPage(pages, pageManifests, HYBRID_SHELL_POSITIONS, 'f32-le', scene.hybridShellPositions, pageContext);
-    addOptionalPage(pages, pageManifests, HYBRID_COMMITMENT_POSITIONS, 'f32-le', scene.hybridCommitmentPositions, pageContext);
-    addOptionalPage(pages, pageManifests, HIERARCHY_SHELL_RADII, 'f32-le', scene.hierarchyShellRadii, pageContext);
-    addOptionalPage(pages, pageManifests, HIERARCHY_SHELL_RANKS, 'u8', scene.hierarchyShellRanks, pageContext);
-    addPage(pages, pageManifests, STRING_OFFSETS, 'detail', 'on-demand', 'u32-le', strings.offsets, pageContext);
-    addPage(pages, pageManifests, STRING_SLAB, 'detail', 'on-demand', 'utf8', strings.bytes, pageContext);
-    addPage(
-        pages,
-        pageManifests,
-        SCENE_DETAILS,
-        'detail',
-        'on-demand',
-        'utf8-json',
-        encodeSceneDetails(scene),
-        pageContext,
-    );
+    addOptionalDetailPage(pages, pageManifests, HYBRID_SHELL_POSITIONS, 'f32-le', scene.hybridShellPositions, pageContext);
+    addOptionalDetailPage(pages, pageManifests, HYBRID_COMMITMENT_POSITIONS, 'f32-le', scene.hybridCommitmentPositions, pageContext);
+    addOptionalDetailPage(pages, pageManifests, HIERARCHY_SHELL_RADII, 'f32-le', scene.hierarchyShellRadii, pageContext);
+    addOptionalDetailPage(pages, pageManifests, HIERARCHY_SHELL_RANKS, 'u8', scene.hierarchyShellRanks, pageContext);
+    addPage(pages, pageManifests, STRING_OFFSETS, 'shared', 'resident', 'u32-le', strings.offsets, pageContext);
+    addPage(pages, pageManifests, STRING_SLAB, 'shared', 'resident', 'utf8', strings.bytes, pageContext);
+    const guidePages = packGalaxySceneGuidePages(scene);
+    for (const [id, view] of Object.entries(guidePages)) {
+        addPage(pages, pageManifests, id, 'guide', 'resident', guideEncoding(id), view, pageContext);
+    }
+    addJsonPage(pages, pageManifests, GROUPS, scene.groups, pageContext);
+    addOptionalJsonPage(pages, pageManifests, TRANSIT_PLAN, scene.transitPlan, pageContext);
+    addOptionalJsonPage(pages, pageManifests, RELATION_CONTROLS, scene.relationControls, pageContext);
+    addOptionalJsonPage(pages, pageManifests, BUSEMANN_HOROSPHERES, scene.busemannHorospheres, pageContext);
+    addOptionalJsonPage(pages, pageManifests, HYBRID_RECEIPTS, scene.hybridReceipts, pageContext);
+    addOptionalJsonPage(pages, pageManifests, HIERARCHY_HINTS, scene.hierarchyHints, pageContext);
 
-    const contentHash = hashText(pageManifests.map((page) => `${page.id}:${page.contentHash}`).join('|'));
+    const contentHash = galaxyScenePacketHashText(pageManifests.map((page) => `${page.id}:${page.contentHash}`).join('|'));
     return {
         manifest: {
             schemaVersion: GALAXY_SCENE_PACKET_V2_SCHEMA,
@@ -156,6 +170,7 @@ export function packGalaxyScenePacketV2(
             sourceMode: scene.sourceMode,
             identityEncoding: 'fnv1a32-dual-u64',
             positionEncoding: 'float32-tile-local',
+            guideEncoding: 'binary-guides-v1',
             tileOrigin: [0, 0, 0],
             nodeCount: scene.ids.length,
             edgeCount: scene.edgePairs.length / 2,
@@ -174,11 +189,11 @@ export function unpackGalaxyScenePacketV2(packet: GalaxyScenePacketV2): GalaxySc
     assertGalaxyScenePacketV2(packet);
     const { manifest, pages } = packet;
     const strings = decodeStringSlab(
-        new Uint32Array(requiredPage(pages, STRING_OFFSETS)),
-        new Uint8Array(requiredPage(pages, STRING_SLAB)),
+        new Uint32Array(openGalaxyScenePacketV2Page(packet, STRING_OFFSETS)),
+        new Uint8Array(openGalaxyScenePacketV2Page(packet, STRING_SLAB)),
     );
-    const details = decodeSceneDetails(new Uint8Array(requiredPage(pages, SCENE_DETAILS)));
-    const positions3d = new Float32Array(requiredPage(pages, POSITIONS_3D));
+    const guides = decodeGalaxySceneGuidePages((id) => openGalaxyScenePacketV2Page(packet, id));
+    const positions3d = new Float32Array(openGalaxyScenePacketV2Page(packet, POSITIONS_3D));
     const hopfCellRange = manifest.stringRanges.nodeHopfCellIds || manifest.stringRanges.nodeHopfBaseIds;
     const hopfFiberRange = manifest.stringRanges.nodeHopfFiberIds || hopfCellRange;
     const hopfLaneRange = manifest.stringRanges.nodeHopfLaneIds || hopfFiberRange;
@@ -195,22 +210,23 @@ export function unpackGalaxyScenePacketV2(packet: GalaxyScenePacketV2): GalaxySc
         hopfFiberIds: stringsInRange(strings, hopfFiberRange),
         hopfLaneIds: stringsInRange(strings, hopfLaneRange),
         hopfRoles: new Uint8Array(requiredPage(pages, NODE_FLAGS)),
-        groups: details.groups,
-        hopfRibbons: details.hopfRibbons,
-        lorentzGuides: details.lorentzGuides,
-        transitPlan: details.transitPlan,
-        relationControls: details.relationControls,
-        busemannHorospheres: details.busemannHorospheres,
+        groups: decodeJsonPage(packet, GROUPS, []),
+        hopfRibbons: guides.hopfRibbons,
+        lorentzGuides: guides.lorentzGuides,
+        transitPlan: decodeOptionalJsonPage(packet, TRANSIT_PLAN),
+        relationControls: decodeOptionalJsonPage(packet, RELATION_CONTROLS),
+        busemannHorospheres: decodeOptionalJsonPage(packet, BUSEMANN_HOROSPHERES),
         hybridShellPositions: optionalFloat32Page(pages, HYBRID_SHELL_POSITIONS),
         hybridCommitmentPositions: optionalFloat32Page(pages, HYBRID_COMMITMENT_POSITIONS),
-        hybridReceipts: details.hybridReceipts,
+        hybridReceipts: decodeOptionalJsonPage(packet, HYBRID_RECEIPTS),
         hierarchyShellRadii: optionalFloat32Page(pages, HIERARCHY_SHELL_RADII),
         hierarchyShellRanks: optionalUint8Page(pages, HIERARCHY_SHELL_RANKS),
-        hierarchyHints: details.hierarchyHints,
+        hierarchyHints: decodeOptionalJsonPage(packet, HIERARCHY_HINTS),
         positions3d,
         positions2d: flattenPositions2d(positions3d),
         radii: new Float32Array(requiredPage(pages, RADII)),
         colors: unpackRgba8AsRgb(new Uint8Array(requiredPage(pages, NODE_COLORS))),
+        paletteSlots: new Uint8Array(requiredPage(pages, NODE_PALETTE_SLOTS)),
         edgePairs: new Uint32Array(requiredPage(pages, EDGE_PAIRS)),
         edgeIds: stringsInRange(strings, manifest.stringRanges.edgeIds),
         edgeTypes: stringsInRange(strings, manifest.stringRanges.edgeTypes),
@@ -222,31 +238,6 @@ export function unpackGalaxyScenePacketV2(packet: GalaxyScenePacketV2): GalaxySc
 
 export function galaxyScenePacketV2TransferList(packet: GalaxyScenePacketV2): Transferable[] {
     return Object.values(packet.pages);
-}
-
-export function assertGalaxyScenePacketV2(packet: GalaxyScenePacketV2): void {
-    if (packet.manifest.schemaVersion !== GALAXY_SCENE_PACKET_V2_SCHEMA) {
-        throw new Error(`Unsupported galaxy scene packet: ${packet.manifest.schemaVersion}`);
-    }
-    if (!packet.manifest.generationId || !packet.manifest.authorityReceipt) {
-        throw new Error('Galaxy scene packet requires generation and authority receipt.');
-    }
-    for (const page of packet.manifest.pages) {
-        const buffer = packet.pages[page.id];
-        if (!buffer) throw new Error(`Galaxy scene packet missing page: ${page.id}`);
-        if (buffer.byteLength !== page.byteLength) throw new Error(`Galaxy scene page length drift: ${page.id}`);
-        if (hashBuffer(buffer) !== page.contentHash) throw new Error(`Galaxy scene page hash drift: ${page.id}`);
-        if (page.generationId !== packet.manifest.generationId || page.tileId !== packet.manifest.tileId || page.lod !== packet.manifest.lod) {
-            throw new Error(`Galaxy scene page ownership drift: ${page.id}`);
-        }
-        if (page.authorityReceipt !== packet.manifest.authorityReceipt) {
-            throw new Error(`Galaxy scene page authority drift: ${page.id}`);
-        }
-    }
-    const contentHash = hashText(packet.manifest.pages.map((page) => `${page.id}:${page.contentHash}`).join('|'));
-    if (contentHash !== packet.manifest.contentHash) {
-        throw new Error('Galaxy scene packet manifest hash drift.');
-    }
 }
 
 function assertGalaxyScenePacketLittleEndianRuntime(): void {
@@ -305,7 +296,7 @@ function addCollisionPages(
     addPage(pages, manifests, memberId, 'shared', 'resident', 'u32-le', collisions.members, context);
 }
 
-function addOptionalPage(
+function addOptionalDetailPage(
     pages: Record<string, ArrayBuffer>,
     manifests: GalaxyScenePacketV2PageManifest[],
     id: string,
@@ -313,7 +304,7 @@ function addOptionalPage(
     view: ArrayBufferView | undefined,
     context: Pick<GalaxyScenePacketV2PageManifest, 'generationId' | 'tileId' | 'lod' | 'authorityReceipt'>,
 ): void {
-    if (view) addPage(pages, manifests, id, 'manifold', 'resident', encoding, view, context);
+    if (view) addPage(pages, manifests, id, 'detail', 'on-demand', encoding, view, context);
 }
 
 function addPage(
@@ -336,7 +327,7 @@ function addPage(
         elementCount: elementCount(view),
         byteLength: buffer.byteLength,
         ...context,
-        contentHash: hashBuffer(buffer),
+        contentHash: galaxyScenePacketHashBuffer(buffer),
     });
 }
 
@@ -381,52 +372,10 @@ function stringsInRange(strings: string[], range: GalaxyScenePacketV2StringRange
     return strings.slice(range.start, range.start + range.count);
 }
 
-function encodeSceneDetails(scene: GalaxySceneV2): Uint8Array {
-    const details: GalaxyScenePacketV2Details = {
-        groups: scene.groups,
-        hopfRibbons: scene.hopfRibbons,
-        lorentzGuides: scene.lorentzGuides,
-        transitPlan: scene.transitPlan,
-        relationControls: scene.relationControls,
-        busemannHorospheres: scene.busemannHorospheres,
-        hybridReceipts: scene.hybridReceipts,
-        hierarchyHints: scene.hierarchyHints,
-    };
-    return new TextEncoder().encode(JSON.stringify(details, typedArrayReplacer));
-}
-
-function decodeSceneDetails(bytes: Uint8Array): GalaxyScenePacketV2Details {
-    return JSON.parse(new TextDecoder().decode(bytes), typedArrayReviver) as GalaxyScenePacketV2Details;
-}
-
-/**
- * Decodes only the bounded guide families from an already authority-checked
- * scene-extras page. Packet ownership and hashing remain the caller's job.
- */
 export function decodeGalaxyScenePacketV2GuideDetails(
-    buffer: ArrayBuffer,
+    packet: VerifiedGalaxyScenePacketV2,
 ): GalaxyScenePacketV2GuideDetails {
-    const details = decodeSceneDetails(new Uint8Array(buffer));
-    return {
-        hopfRibbons: details.hopfRibbons ?? [],
-        lorentzGuides: details.lorentzGuides ?? [],
-    };
-}
-
-function typedArrayReplacer(_key: string, value: unknown): unknown {
-    if (value instanceof Float32Array) return { __galaxyTypedArray: 'f32', values: Array.from(value) };
-    if (value instanceof Uint32Array) return { __galaxyTypedArray: 'u32', values: Array.from(value) };
-    if (value instanceof Uint8Array) return { __galaxyTypedArray: 'u8', values: Array.from(value) };
-    return value;
-}
-
-function typedArrayReviver(_key: string, value: unknown): unknown {
-    if (!value || typeof value !== 'object' || !('__galaxyTypedArray' in value)) return value;
-    const encoded = value as { __galaxyTypedArray: string; values: number[] };
-    if (encoded.__galaxyTypedArray === 'f32') return Float32Array.from(encoded.values);
-    if (encoded.__galaxyTypedArray === 'u32') return Uint32Array.from(encoded.values);
-    if (encoded.__galaxyTypedArray === 'u8') return Uint8Array.from(encoded.values);
-    return value;
+    return decodeGalaxySceneGuidePages((id) => openGalaxyScenePacketV2Page(packet, id));
 }
 
 function packRgbAsRgba8(rgb: Float32Array): Uint8Array {
@@ -495,16 +444,39 @@ function fnv1a32(value: string, seed: number): number {
     return hash;
 }
 
-function hashBuffer(buffer: ArrayBuffer): string {
-    let low = 0x811c9dc5;
-    let high = 0x9e3779b9;
-    for (const byte of new Uint8Array(buffer)) {
-        low = Math.imul(low ^ byte, 0x01000193) >>> 0;
-        high = Math.imul(high ^ byte, 0x85ebca6b) >>> 0;
-    }
-    return `fnv1a64:${high.toString(16).padStart(8, '0')}${low.toString(16).padStart(8, '0')}`;
+function guideEncoding(id: string): GalaxyScenePacketV2Encoding {
+    if (id === GALAXY_GUIDE_PAGE_IDS.colors) return 'f64-le';
+    if (id === GALAXY_GUIDE_PAGE_IDS.positions) return 'f32-le';
+    if (id === GALAXY_GUIDE_PAGE_IDS.stringSlab) return 'utf8';
+    return 'u32-le';
 }
 
-function hashText(value: string): string {
-    return hashBuffer(new TextEncoder().encode(value).buffer as ArrayBuffer);
+function addJsonPage<T>(
+    pages: Record<string, ArrayBuffer>,
+    manifests: GalaxyScenePacketV2PageManifest[],
+    id: string,
+    value: T,
+    context: Pick<GalaxyScenePacketV2PageManifest, 'generationId' | 'tileId' | 'lod' | 'authorityReceipt'>,
+): void {
+    addPage(pages, manifests, id, 'detail', 'on-demand', 'utf8-json', new TextEncoder().encode(JSON.stringify(value)), context);
+}
+
+function addOptionalJsonPage<T>(
+    pages: Record<string, ArrayBuffer>,
+    manifests: GalaxyScenePacketV2PageManifest[],
+    id: string,
+    value: T | undefined,
+    context: Pick<GalaxyScenePacketV2PageManifest, 'generationId' | 'tileId' | 'lod' | 'authorityReceipt'>,
+): void {
+    if (value !== undefined) addJsonPage(pages, manifests, id, value, context);
+}
+
+function decodeJsonPage<T>(packet: VerifiedGalaxyScenePacketV2, id: string, fallback: T): T {
+    if (!packet.manifest.pages.some((page) => page.id === id)) return fallback;
+    return JSON.parse(new TextDecoder().decode(openGalaxyScenePacketV2Page(packet, id))) as T;
+}
+
+function decodeOptionalJsonPage<T>(packet: VerifiedGalaxyScenePacketV2, id: string): T | undefined {
+    if (!packet.manifest.pages.some((page) => page.id === id)) return undefined;
+    return decodeJsonPage<T | undefined>(packet, id, undefined);
 }

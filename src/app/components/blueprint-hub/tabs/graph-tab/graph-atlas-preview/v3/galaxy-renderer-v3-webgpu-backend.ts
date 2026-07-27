@@ -18,6 +18,7 @@ import type {
 } from './galaxy-renderer-v3-contract';
 import { galaxyRendererV3Metrics } from './galaxy-renderer-v3-metrics';
 import { GalaxyRendererV3GpuPages } from './galaxy-renderer-v3-gpu-pages';
+import { GalaxyRendererV3Overlay } from './galaxy-renderer-v3-overlay';
 import {
     buildGalaxyRendererV3GuideSurface,
     syncGalaxyRendererV3GuidePresentation,
@@ -87,7 +88,7 @@ export class GalaxyRendererV3WebGpuBackend implements GalaxyRendererV3Backend {
     private nodeObject: THREE.Sprite | null = null;
     private edgeObject: THREE.LineSegments | null = null;
     private guideSurface: GalaxyRendererV3GuideSurface | null = null;
-    private overlayObject: THREE.Sprite | null = null;
+    private overlay: GalaxyRendererV3Overlay | null = null;
     private readonly retiredObjects: DisposableGalaxyObject[] = [];
     private readonly retiredGpuPages: GalaxyRendererV3GpuPages[] = [];
     private selectedIds: readonly string[] = [];
@@ -157,11 +158,15 @@ export class GalaxyRendererV3WebGpuBackend implements GalaxyRendererV3Backend {
         if (epoch !== this.generationEpoch || this.disposed) return;
         const resources = galaxyRendererV3PacketResources(generation.packet);
         const pages = resources.residentPages;
-        const gpuPages = new GalaxyRendererV3GpuPages(pages.nodeCount, pages);
-        this.clearResidentObjects();
+        const reuseGpuPages = Boolean(this.gpuPages?.canFit(pages.nodeCount));
+        const gpuPages = reuseGpuPages
+            ? this.gpuPages!
+            : new GalaxyRendererV3GpuPages(pages.nodeCount, pages);
+        if (reuseGpuPages) gpuPages.install(pages.nodeCount, pages);
+        this.clearResidentObjects(reuseGpuPages);
         const reduction = await gpuPages.reduceSceneRadius(this.renderer);
         if (epoch !== this.generationEpoch || this.disposed) {
-            gpuPages.dispose();
+            if (!reuseGpuPages) gpuPages.dispose();
             return;
         }
         this.generation = generation;
@@ -183,6 +188,7 @@ export class GalaxyRendererV3WebGpuBackend implements GalaxyRendererV3Backend {
         this.root.add(this.guideSurface.root);
         if (this.edgeObject) this.root.add(this.edgeObject);
         if (this.nodeObject) this.root.add(this.nodeObject);
+        this.ensureOverlayCapacity(pages.nodeCount);
         this.applyMode();
         this.fitToGraph();
         const installMs = performance.now() - started;
@@ -215,6 +221,12 @@ export class GalaxyRendererV3WebGpuBackend implements GalaxyRendererV3Backend {
         this.syncEdgePresentation();
         syncGalaxyRendererV3GuidePresentation(this.guideSurface, settings);
         this.render();
+    }
+
+    refreshPalette(): void {
+        if (!this.pages || !this.gpuPages) return;
+        this.gpuPages.refreshNodeColors(this.pages);
+        this.rebuildOverlay();
     }
 
     setMode(mode: GraphRendererMode): void {
@@ -348,8 +360,7 @@ export class GalaxyRendererV3WebGpuBackend implements GalaxyRendererV3Backend {
             this.pages.positions3d,
             this.dragRestoreIndexes,
         );
-        this.retireObject(this.overlayObject);
-        this.overlayObject = null;
+        this.overlay?.clear();
         return true;
     }
 
@@ -453,6 +464,11 @@ export class GalaxyRendererV3WebGpuBackend implements GalaxyRendererV3Backend {
         this.renderer = null;
         void idleTask.finally(() => {
             this.clearResidentObjects();
+            if (this.overlay) {
+                this.root.remove(this.overlay.object);
+                this.overlay.dispose();
+                this.overlay = null;
+            }
             this.disposeRetiredResources(true);
             renderer?.dispose();
         });
@@ -504,9 +520,10 @@ export class GalaxyRendererV3WebGpuBackend implements GalaxyRendererV3Backend {
     }
 
     private rebuildOverlay(): void {
-        this.retireObject(this.overlayObject);
-        this.overlayObject = null;
-        if (!this.pages) return;
+        if (!this.pages) {
+            this.overlay?.clear();
+            return;
+        }
         const indexes = new Set<number>();
         for (const id of this.selectedIds) {
             const index = this.identityIndex(id);
@@ -516,10 +533,19 @@ export class GalaxyRendererV3WebGpuBackend implements GalaxyRendererV3Backend {
             const index = this.identityIndex(this.hoveredId);
             if (index >= 0) indexes.add(index);
         }
-        if (!indexes.size) return;
-        this.overlayObject = buildOverlaySurface(this.pages, [...indexes]);
-        this.root.add(this.overlayObject);
+        this.ensureOverlayCapacity(this.pages.nodeCount);
+        this.overlay!.update(this.pages, indexes);
         this.render();
+    }
+
+    private ensureOverlayCapacity(nodeCount: number): void {
+        if (this.overlay?.canFit(nodeCount)) return;
+        if (this.overlay) {
+            this.root.remove(this.overlay.object);
+            this.overlay.dispose();
+        }
+        this.overlay = new GalaxyRendererV3Overlay(nodeCount);
+        this.root.add(this.overlay.object);
     }
 
     private applyFocusPresentation(): void {
@@ -593,17 +619,18 @@ export class GalaxyRendererV3WebGpuBackend implements GalaxyRendererV3Backend {
         return Boolean(this.pointerRaycaster.ray.intersectPlane(plane, out));
     }
 
-    private clearResidentObjects(): void {
-        this.retireObject(this.overlayObject);
+    private clearResidentObjects(preserveGpuPages = false): void {
         this.retireObject(this.nodeObject);
         this.retireObject(this.edgeObject);
         this.retireObject(this.guideSurface?.root ?? null);
-        this.overlayObject = null;
+        this.overlay?.clear();
         this.nodeObject = null;
         this.edgeObject = null;
         this.guideSurface = null;
-        if (this.gpuPages) this.retiredGpuPages.push(this.gpuPages);
-        this.gpuPages = null;
+        if (!preserveGpuPages) {
+            if (this.gpuPages) this.retiredGpuPages.push(this.gpuPages);
+            this.gpuPages = null;
+        }
         this.interactionState = null;
         this.nodeFocusAttribute = null;
         this.edgeFocusAttribute = null;
@@ -663,11 +690,10 @@ function buildNodeSurface(
     focus: THREE.InstancedBufferAttribute,
 ): THREE.Sprite | null {
     if (!pages.nodeCount) return null;
-    const colors = new THREE.InstancedBufferAttribute(pages.nodeColorsRgba8, 4, true);
     const focusNode = instancedBufferAttribute<'float'>(focus, 'float');
     const material = new THREE.PointsNodeMaterial({
         positionNode: gpuPages.nodePositionNode(),
-        colorNode: instancedBufferAttribute<'vec4'>(colors, 'vec4').rgb.mul(focusNode),
+        colorNode: instancedBufferAttribute<'vec4'>(gpuPages.nodeColorsAttribute, 'vec4').rgb.mul(focusNode),
         opacityNode: shapeCircle(),
         sizeNode: gpuPages.nodeSizeNode(),
         sizeAttenuation: false,
@@ -709,32 +735,6 @@ function buildEdgeSurface(
     lines.frustumCulled = false;
     lines.renderOrder = 2;
     return lines;
-}
-
-function buildOverlaySurface(pages: GalaxyRendererV3ResidentPages, indexes: readonly number[]): THREE.Sprite {
-    const positions = new Float32Array(indexes.length * 3);
-    const sizes = new Float32Array(indexes.length);
-    const colors = new Float32Array(indexes.length * 3);
-    for (let output = 0; output < indexes.length; output++) {
-        const source = indexes[output];
-        positions.set(pages.positions3d.subarray(source * 3, source * 3 + 3), output * 3);
-        sizes[output] = Math.max(8, pages.radii[source] * 4.2);
-        colors.set([0.78, 1, 0.96], output * 3);
-    }
-    const material = new THREE.PointsNodeMaterial({
-        positionNode: instancedBufferAttribute(new THREE.InstancedBufferAttribute(positions, 3), 'vec3'),
-        colorNode: instancedBufferAttribute(new THREE.InstancedBufferAttribute(colors, 3), 'vec3'),
-        opacityNode: shapeCircle(),
-        sizeNode: instancedBufferAttribute(new THREE.InstancedBufferAttribute(sizes, 1), 'float'),
-        sizeAttenuation: false,
-        transparent: true,
-        depthWrite: false,
-        alphaToCoverage: true,
-    });
-    const sprite = new THREE.Sprite(material);
-    sprite.count = indexes.length;
-    sprite.renderOrder = 8;
-    return sprite;
 }
 
 function denseEdgeOpacity(edgeCount: number): number {

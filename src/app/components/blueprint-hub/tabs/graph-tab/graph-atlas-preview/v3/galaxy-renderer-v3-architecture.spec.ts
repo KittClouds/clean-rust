@@ -52,6 +52,17 @@ describe('Galaxy Renderer V3 isolation', () => {
         expect(packetSource).toContain('galaxy-renderer-v3-legacy-input-adapter.worker');
     });
 
+    it('keeps whole-packet JSON expansion and rehashing out of the V3 hot path', () => {
+        const packet = source('../graph-galaxy-scene-packet-v2.ts');
+        const packetView = source('galaxy-renderer-v3-packet-view.ts');
+
+        expect(packet).not.toContain('detail/scene-extras');
+        expect(packet).not.toContain('typedArrayReplacer');
+        expect(packetView).not.toContain('assertGalaxyScenePacketV2');
+        expect(packetView).toContain('VerifiedGalaxyScenePacketV2');
+        expect(packetView).toContain('openGalaxyScenePacketV2Page');
+    });
+
     it('keeps the V3 surface mounted while an authoritative manifold is preparing', () => {
         const preview = source('../graph-atlas-preview.component.ts');
         const component = source('graph-galaxy-canvas-v3.component.ts');

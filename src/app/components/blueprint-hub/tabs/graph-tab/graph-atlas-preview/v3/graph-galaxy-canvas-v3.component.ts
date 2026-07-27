@@ -22,6 +22,7 @@ import {
     type GalaxyRenderSettings,
 } from '../graph-galaxy-engine';
 import type { GalaxySceneSourceMode } from '../graph-galaxy-scene-v2';
+import { entityColorStore } from '../../../../../../lib/store/entityColorStore';
 import { GALAXY_RENDERER_V3_SCHEMA, type GalaxyRendererV3Backend } from './galaxy-renderer-v3-contract';
 import {
     galaxyRendererV3SettingsRequireCompilation,
@@ -115,6 +116,9 @@ export class GraphGalaxyCanvasV3Component implements AfterViewInit, OnChanges, O
     private readonly packetSource = new GalaxyRendererV3PacketSource();
     private readonly entityByIdentity = new Map<string, GalaxyRenderableNode>();
     private backend: GalaxyRendererV3Backend | null = null;
+    private readonly unsubscribeColors = entityColorStore.subscribe(() => {
+        this.backend?.refreshPalette();
+    });
     private backendLoad: Promise<GalaxyRendererV3Backend> | null = null;
     private resizeObserver: ResizeObserver | null = null;
     private viewReady = false;
@@ -183,6 +187,7 @@ export class GraphGalaxyCanvasV3Component implements AfterViewInit, OnChanges, O
         if (this.animationFrame) cancelAnimationFrame(this.animationFrame);
         if (this.hoverFrame) cancelAnimationFrame(this.hoverFrame);
         this.resizeObserver?.disconnect();
+        this.unsubscribeColors();
         this.packetSource.dispose();
         this.backend?.dispose();
         const canvas = this.canvasRef?.nativeElement;

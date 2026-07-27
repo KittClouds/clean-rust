@@ -84,6 +84,8 @@ const PROJECTION_CAPABILITIES: Array<{ capability: AtlasCapabilityId; mode: Grap
 
 const POST_COMMIT_DIAGNOSTIC_DEBOUNCE_MS = 250;
 const POST_COMMIT_DIAGNOSTIC_IDLE_TIMEOUT_MS = 2_000;
+const EXPLICIT_FORCE_V2_BOOTSTRAP = Symbol('explicit-force-v2-bootstrap');
+const GRAPH_FORCE_V2_BOOTSTRAP_PATH_ID = 'explicit_force_v2_bootstrap_v1';
 const INTERACTIVE_PERSISTED_RECEIPT_STAGE_IDS = new Set([
     'verifiedForceV2',
     'interactiveIdentityReuse',
@@ -236,7 +238,56 @@ export class GraphRebuildPipelineService {
         }
     }
 
-    async buildGraph(request: GraphIndexRunRequest): Promise<PipelineResult> {
+    async loadSnapshotContentForEmbedding(scopeId: string): Promise<GraphRebuildSnapshot> {
+        const resident = this.lastSnapshotState();
+        const serviceSnapshot = this.graphRebuild.snapshot?.() || null;
+        const snapshot = resident?.scopeId === scopeId
+            ? resident
+            : serviceSnapshot?.scopeId === scopeId
+                ? serviceSnapshot
+                : await this.graphRebuild.loadPersistedSnapshotShell(scopeId);
+        if (!snapshot) {
+            throw new Error('PHX_EMBED_GRAPH_GENERATION_MISSING: build or restore an authoritative graph first.');
+        }
+        if (!snapshot.contentManifest?.refs.evidenceTargetRegistryPage) {
+            throw new Error(
+                'PHX_GRAPH_CONTENT_LEASE_CAPABILITY_MISSING: durable evidence registry page requires explicit V2 bootstrap.',
+            );
+        }
+        if (!graphGenerationSnapshotIsCompact(snapshot)) return snapshot;
+        const residentReceipt = this.lastGenerationReceiptState();
+        const receipt = residentReceipt?.receiptId === snapshot.generationReceiptId
+            ? residentReceipt
+            : await this.graphRebuild.loadPersistedGenerationReceipt(snapshot.scopeId);
+        if (!receipt) {
+            throw new Error('PHX_EMBED_GRAPH_RECEIPT_MISSING: compact graph generation receipt is unavailable.');
+        }
+        assertGenerationSnapshotIdentity(receipt, snapshot);
+        const hydrated = await this.graphRebuild.loadVerifiedGenerationSnapshotContent(snapshot);
+        assertGenerationSnapshotIdentity(receipt, hydrated);
+        return hydrated;
+    }
+
+    async bootstrapVerifiedForceV2(request: GraphIndexRunRequest): Promise<PipelineResult> {
+        if (request.policy !== 'force' || (request.durabilityMode || 'interactive') !== 'interactive') {
+            throw new Error('PHX_FORCE_V2_BOOTSTRAP_OPERATION_REQUIRED: bootstrap is an interactive FORCE-only operation.');
+        }
+        const persisted = await this.graphRebuild.loadPersistedRunReceipt(request.scope.scopeId);
+        const shell = await this.graphRebuild.loadPersistedSnapshotShell(request.scope.scopeId);
+        const contentPageMigrationRequired = Boolean(
+            shell && !shell.contentManifest?.refs.evidenceTargetRegistryPage,
+        );
+        if ((persisted?.replayManifest || persisted?.verifiedForceAuthority) && !contentPageMigrationRequired) {
+            throw new Error('PHX_FORCE_V2_BOOTSTRAP_NOT_ALLOWED: verified FORCE authority already exists for this scope.');
+        }
+        return this.buildGraph(request, EXPLICIT_FORCE_V2_BOOTSTRAP);
+    }
+
+    async buildGraph(
+        request: GraphIndexRunRequest,
+        bootstrapToken?: typeof EXPLICIT_FORCE_V2_BOOTSTRAP,
+    ): Promise<PipelineResult> {
+        const explicitBootstrap = bootstrapToken === EXPLICIT_FORCE_V2_BOOTSTRAP;
         if (this.runningState()) {
             throw new Error('Full Atlas Index is already running.');
         }
@@ -245,9 +296,12 @@ export class GraphRebuildPipelineService {
             return this.reuseAuthoritativeInteractiveGraph(request);
         }
         const durabilityMode = request.durabilityMode || 'interactive';
-        if (verifiedForceV2Required(request)) {
+        if (verifiedForceV2Required(request) && !explicitBootstrap) {
             return this.buildVerifiedForceV2(request);
         }
+        const forcePathId = explicitBootstrap
+            ? GRAPH_FORCE_V2_BOOTSTRAP_PATH_ID
+            : GRAPH_FORCE_V1_PATH_ID;
         const modelReadiness = this.modelReadiness(request);
         const graphCold = modelReadiness
             .filter((model) => model.id === 'dynamicNer')
@@ -283,7 +337,7 @@ export class GraphRebuildPipelineService {
                 interactiveIdentityValue = await interactiveRunIdentity(scope, docs, entities, request);
             }
             replayManifest = await this.replayManifest(
-                scope, request, docs, entities, GRAPH_FORCE_V1_PATH_ID, 0,
+                scope, request, docs, entities, forcePathId, 0,
             );
 
             const nerStage = await this.runStage('dynamicNer', 'Dynamic NER + Alex Deltas', async () => {
@@ -451,9 +505,11 @@ export class GraphRebuildPipelineService {
                 projectionReceipts,
                 snapshot: completedSnapshot,
                 replayManifest,
-                pathId: GRAPH_FORCE_V1_PATH_ID,
+                pathId: forcePathId,
                 fallbackCount: 0,
-                message: `Build Graph produced ${completedSnapshot.counters.nodes} nodes, ${completedSnapshot.counters.edges} edges, and ${completedSnapshot.counters.embeddingTargets} targets.`,
+                message: explicitBootstrap
+                    ? `Explicit V2 bootstrap produced ${completedSnapshot.counters.nodes} nodes, ${completedSnapshot.counters.edges} edges, and ${completedSnapshot.counters.embeddingTargets} targets.`
+                    : `Build Graph produced ${completedSnapshot.counters.nodes} nodes, ${completedSnapshot.counters.edges} edges, and ${completedSnapshot.counters.embeddingTargets} targets.`,
             });
             const generationReceipt = durabilityMode === 'interactive'
                 && completedSnapshot.contentManifest
@@ -538,7 +594,7 @@ export class GraphRebuildPipelineService {
                 projectionReceipts,
                 snapshot,
                 replayManifest,
-                pathId: GRAPH_FORCE_V1_PATH_ID,
+                pathId: forcePathId,
                 fallbackCount: 0,
                 status: 'failed',
                 message: error instanceof Error ? error.message : String(error),
