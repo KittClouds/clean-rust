@@ -84,7 +84,7 @@ pub use nli::{NliError, NliModel, NliModelMetadata, NliPairJudgment, NliScorer, 
 pub use nli_claim::{
     adjudicate_claims_with_nli, ClassificationVote, NliClaimAdjudication,
     NliClaimAdjudicationOptions, NliClaimDecisionKind, NliClaimInput, NliClaimPurpose,
-    NliClaimVote,
+    NliClaimVote, NLI_CLAIM_INPUT_SCHEMA_VERSION,
 };
 pub use nli_stage::NliAdjudicationBatchOptions;
 pub use seed_worker::{

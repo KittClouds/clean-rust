@@ -1,0 +1,19 @@
+[package]
+name = "phoenix-analysis-bridge"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+publish = false
+
+[dependencies]
+anyhow.workspace = true
+blake3 = "1.8"
+compact_str.workspace = true
+memmap2.workspace = true
+phoenix-alex = { path = "../phoenix-alex" }
+phoenix-analysis-contract = { path = "../../../../phoenix-native/crates/phoenix-analysis-contract" }
+phoenix-chunker = { path = "../phoenix-chunker" }
+phoenix-dynamic-ner = { path = "../phoenix-dynamic-ner" }
+phoenix-rel-post = { path = "../phoenix-rel-post" }
+phoenix-types = { path = "../phoenix-types" }

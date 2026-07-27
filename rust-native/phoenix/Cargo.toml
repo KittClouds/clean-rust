@@ -1,6 +1,7 @@
 [workspace]
 members = [
     "crates/phoenix-api",
+    "crates/phoenix-analysis-bridge",
     "crates/phoenix-alex",
     "crates/phoenix-analytics",
     "crates/phoenix-automata",
@@ -73,6 +74,7 @@ license = "MIT"
 authors = ["KittClouds"]
 
 [workspace.dependencies]
+anyhow = "1.0"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 itoa = "1.0"

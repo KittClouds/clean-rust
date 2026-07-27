@@ -184,7 +184,8 @@ impl SurfaceRouter {
             .collect();
         scored.sort_by(|a, b| b.1.cmp(&a.1).then_with(|| a.0.cmp(&b.0)));
 
-        let mut marked_model = vec![false; sentences.len()];
+        let mut model_windows =
+            Vec::<(usize, usize)>::with_capacity(self.max_model_windows.min(sentences.len()));
 
         for (sent_idx, _priority) in &scored {
             let need = &needs[*sent_idx];
@@ -195,30 +196,18 @@ impl SurfaceRouter {
             }
 
             if Self::needs_model_discovery(need) {
-                // Mark this sentence + padding for model discovery.
+                // Keep each expensive seed in its own tightly bounded context.
+                // Merging neighboring seeds can turn a long narrative into one
+                // transformer input and make model memory grow superlinearly.
                 let start = sent_idx.saturating_sub(MODEL_SENTENCE_PAD);
                 let end = (*sent_idx + MODEL_SENTENCE_PAD + 1).min(sentences.len());
-                for slot in &mut marked_model[start..end] {
-                    *slot = true;
+                if !model_windows.contains(&(start, end)) {
+                    model_windows.push((start, end));
+                    model_window_count += 1;
                 }
-                model_window_count += 1;
             }
         }
-
-        // Merge contiguous marked sentences into model-discovery windows.
-        let mut model_windows = Vec::<(usize, usize)>::new();
-        let mut i = 0usize;
-        while i < marked_model.len() {
-            if !marked_model[i] {
-                i += 1;
-                continue;
-            }
-            let start = i;
-            while i < marked_model.len() && marked_model[i] {
-                i += 1;
-            }
-            model_windows.push((start, i));
-        }
+        model_windows.sort_unstable();
 
         let semantic_hints = semantic_label_router
             .map(|router| {
@@ -379,6 +368,64 @@ mod tests {
     #[test]
     fn default_model_window_budget_stays_tight() {
         assert_eq!(SurfaceRouter::default().max_model_windows, 20);
+    }
+
+    #[test]
+    fn adjacent_model_seeds_never_merge_into_an_unbounded_window() {
+        let text = "A.\nB.\nC.\nD.\nE.\nF.\nG.\nH.\n";
+        let sentences = text
+            .split_inclusive('\n')
+            .scan(0_u32, |start, sentence| {
+                let end = *start + sentence.len() as u32;
+                let span = SentenceSpan {
+                    index: 0,
+                    range: TextRange { start: *start, end },
+                };
+                *start = end;
+                Some(span)
+            })
+            .enumerate()
+            .map(|(index, mut sentence)| {
+                sentence.index = index;
+                sentence
+            })
+            .collect::<Vec<_>>();
+        let needs = vec![
+            NerNeedVector {
+                has_repeated_unknown_surface: true,
+                ..Default::default()
+            };
+            sentences.len()
+        ];
+        let routes = SurfaceRouter {
+            max_model_windows: sentences.len(),
+        }
+        .plan_routes(
+            text,
+            &sentences,
+            &needs,
+            &DynamicSchemaBuilder::default(),
+            &[],
+            &[],
+            None,
+            None,
+        );
+        let model_windows = routes
+            .iter()
+            .filter_map(|route| match route {
+                NerRoute::ModelDiscovery {
+                    window_start_sentence,
+                    window_end_sentence,
+                    ..
+                } => Some((*window_start_sentence, *window_end_sentence)),
+                _ => None,
+            })
+            .collect::<Vec<_>>();
+
+        assert!(model_windows.len() > 1);
+        assert!(model_windows
+            .iter()
+            .all(|(start, end)| end.saturating_sub(*start) <= 3));
     }
 
     #[test]

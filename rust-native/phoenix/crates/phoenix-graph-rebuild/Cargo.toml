@@ -39,3 +39,7 @@ path = "examples/memory_governance_adversarial_certificate.rs"
 [[example]]
 name = "story_continuity_audit"
 path = "examples/story_continuity_audit.rs"
+
+[[example]]
+name = "live_cohort_rebuild"
+path = "examples/live_cohort_rebuild.rs"

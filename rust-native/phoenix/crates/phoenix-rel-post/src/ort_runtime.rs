@@ -68,31 +68,41 @@ pub fn load_session_with_intra_threads(
     path: &Path,
     intra_threads: usize,
 ) -> Result<Session, ort::Error> {
+    load_session_with_intra_threads_and_memory_pattern(path, intra_threads, true)
+}
+
+pub fn load_session_with_intra_threads_and_memory_pattern(
+    path: &Path,
+    intra_threads: usize,
+    enable_memory_pattern: bool,
+) -> Result<Session, ort::Error> {
     configure_preferred_ort_dylib_path();
-    build_session(path, intra_threads, OrtExecutionProviderPreference::Cpu)
+    build_session(
+        path,
+        intra_threads,
+        OrtExecutionProviderPreference::Cpu,
+        enable_memory_pattern,
+    )
 }
 
 pub fn load_nli_session(path: &Path) -> Result<Session, ort::Error> {
-    load_session_with_execution_provider(path, recommended_thread_count(), nli_ort_preference())
-}
-
-pub fn load_session_with_execution_provider(
-    path: &Path,
-    intra_threads: usize,
-    preference: OrtExecutionProviderPreference,
-) -> Result<Session, ort::Error> {
+    let preference = nli_ort_preference();
     configure_preferred_ort_dylib_path_for(preference);
-    build_session(path, intra_threads, preference)
+    // NLI pairs have document-dependent token lengths. A retained CPU memory
+    // pattern keeps the largest ModernBERT activation arena alive for the whole
+    // bridge process, which is hostile to bounded one-shot publication.
+    build_session(path, recommended_thread_count(), preference, false)
 }
 
 fn build_session(
     path: &Path,
     intra_threads: usize,
     preference: OrtExecutionProviderPreference,
+    enable_memory_pattern: bool,
 ) -> Result<Session, ort::Error> {
     let builder = Session::builder()?
         .with_optimization_level(GraphOptimizationLevel::Level3)?
-        .with_memory_pattern(!preference.prefers_gpu())?
+        .with_memory_pattern(enable_memory_pattern)?
         .with_parallel_execution(false)?
         .with_inter_threads(1)?
         .with_intra_threads(intra_threads.max(1))?;

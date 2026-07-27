@@ -16,7 +16,9 @@ use crate::gliner_bi_tensors::{
     decode_token_predictions_for_word_ranges, extract_logits, word_ranges_for_input_spans,
     GlinerBiTextTensors,
 };
-use crate::ort_runtime::{load_session_with_intra_threads, recommended_thread_count};
+use crate::ort_runtime::{
+    load_session_with_intra_threads_and_memory_pattern, recommended_thread_count,
+};
 
 const DEFAULT_BI_BATCH_SIZE: usize = 2;
 const GLINER_BI_BATCH_SIZE_ENV: &str = "PHOENIX_GLINER_BI_BATCH_SIZE";
@@ -267,8 +269,16 @@ impl GlinerBiModel {
             .map_err(|error| GlinerBiError::ModelLoad(format!("text tokenizer: {error}")))?;
         let labels_tokenizer = Tokenizer::from_file(&labels_tokenizer_path)
             .map_err(|error| GlinerBiError::ModelLoad(format!("labels tokenizer: {error}")))?;
-        let session = load_session_with_intra_threads(&model_path, gliner_bi_thread_count())
-            .map_err(|error| GlinerBiError::ModelLoad(format!("session: {error}")))?;
+        // GLiNER accepts document-dependent sequence and span dimensions. ORT's CPU
+        // memory-pattern planner retains the largest dynamic activation arena it
+        // observes, turning one long window into process-lifetime multi-GiB
+        // residency. Let ORT allocate each dynamic run to its actual shape instead.
+        let session = load_session_with_intra_threads_and_memory_pattern(
+            &model_path,
+            gliner_bi_thread_count(),
+            false,
+        )
+        .map_err(|error| GlinerBiError::ModelLoad(format!("session: {error}")))?;
         let label_inputs = detect_label_input_mode(model_dir, &session)?;
 
         let root_config = load_json::<GlinerRootConfig>(&model_dir.join("gliner_config.json"))
@@ -400,16 +410,45 @@ impl GlinerBiModel {
         self.predict_texts_with_label_set(texts, label_set.as_ref(), options)
     }
 
+    pub fn predict_texts_with_options_batched(
+        &self,
+        texts: &[&str],
+        labels: &[String],
+        options: &GlinerBiPredictOptions,
+        max_batch_size: usize,
+    ) -> Result<Vec<GlinerBiSequencePrediction>, GlinerBiError> {
+        if texts.is_empty() || labels.is_empty() {
+            return Ok(Vec::new());
+        }
+        let label_set = self.cached_label_set(labels)?;
+        self.predict_texts_with_label_set_batched(
+            texts,
+            label_set.as_ref(),
+            options,
+            max_batch_size,
+        )
+    }
+
     pub fn predict_texts_with_label_set(
         &self,
         texts: &[&str],
         label_set: &GlinerBiLabelSet,
         options: &GlinerBiPredictOptions,
     ) -> Result<Vec<GlinerBiSequencePrediction>, GlinerBiError> {
+        self.predict_texts_with_label_set_batched(texts, label_set, options, gliner_bi_batch_size())
+    }
+
+    pub fn predict_texts_with_label_set_batched(
+        &self,
+        texts: &[&str],
+        label_set: &GlinerBiLabelSet,
+        options: &GlinerBiPredictOptions,
+        max_batch_size: usize,
+    ) -> Result<Vec<GlinerBiSequencePrediction>, GlinerBiError> {
         if texts.is_empty() || label_set.label_count() == 0 {
             return Ok(Vec::new());
         }
-        let batch_size = gliner_bi_batch_size();
+        let batch_size = max_batch_size.max(1);
         if batch_size <= 1 || texts.len() <= 1 || self.output_mode == GlinerBiOutputMode::Token {
             return self.predict_texts_sequential(texts, label_set, options);
         }
