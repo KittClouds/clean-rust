@@ -1,7 +1,8 @@
 use anyhow::{Context, Result};
 use compact_str::CompactString;
 use phoenix_analysis_contract::{
-    AnalysisEntity, AnalysisEntityKind, AnalysisMention, NliCandidate, NliCandidateKind,
+    AnalysisEntity, AnalysisEntityKind, AnalysisMention, CandidateEvidenceBinding, NliCandidate,
+    NliCandidateKind,
 };
 use phoenix_dynamic_ner::{
     DiscoveredSpan, DynamicNerModel, DynamicSchemaBuilder, EntityLabel, LabelPack, LocalMentionId,
@@ -25,10 +26,12 @@ pub struct NerRun {
     pub entities: Vec<AnalysisEntity>,
     pub mentions: Vec<AnalysisMention>,
     pub candidates: Vec<NliCandidate>,
+    pub candidate_evidence: Vec<CandidateEvidenceBinding>,
     pub chunk_count: usize,
     pub sentence_count: usize,
     pub chunker_micros: u64,
     pub dynamic_ner_micros: u64,
+    pub structural: phoenix_chunker_native::StructuralSubstrate,
 }
 
 struct AggregatedEntities {
@@ -85,9 +88,10 @@ pub fn run(
         .context("dynamic NER extraction")?;
     let dynamic_ner_micros = elapsed_micros(started);
     let aggregated = aggregate_entities(document_hash, &output.mentions)?;
-    let candidates = build_nli_candidates(
+    let (candidates, candidate_evidence) = build_nli_candidates(
         text,
         &sentences,
+        &substrate.base_chunks,
         &output.mentions,
         &output.mention_graph.edges,
         &aggregated.entity_by_mention,
@@ -98,10 +102,12 @@ pub fn run(
             entities: aggregated.entities,
             mentions: aggregated.mentions,
             candidates,
+            candidate_evidence,
             chunk_count: substrate.base_chunks.len(),
             sentence_count: sentences.len(),
             chunker_micros: chunk_elapsed,
             dynamic_ner_micros,
+            structural: substrate,
         },
         metadata,
     ))
@@ -241,7 +247,7 @@ fn aggregate_entities(
     let mentions = pending
         .into_iter()
         .map(|(packet, entity_id)| AnalysisMention {
-            mention_id: packet.mention_id.0.saturating_add(1),
+            mention_id: published_mention_id(packet.mention_id.0),
             entity_id,
             start: packet.range.start,
             end: packet.range.end,
@@ -279,16 +285,18 @@ fn stable_entity_id(document_hash: &[u8; 32], identity_key: &str) -> u64 {
 fn build_nli_candidates(
     text: &str,
     sentences: &[SentenceSpan],
+    chunks: &[phoenix_chunker_native::BaseChunk],
     packets: &[MentionPacket],
     edges: &[phoenix_dynamic_ner::MentionEdge],
     entity_by_mention: &HashMap<u64, u64>,
     limit: usize,
-) -> Vec<NliCandidate> {
+) -> (Vec<NliCandidate>, Vec<CandidateEvidenceBinding>) {
     let packet_by_id = packets
         .iter()
         .map(|packet| (packet.mention_id.0, packet))
         .collect::<HashMap<_, _>>();
     let mut candidates = BTreeMap::<[u8; 32], NliCandidate>::new();
+    let mut evidence = BTreeMap::<[u8; 32], CandidateEvidenceBinding>::new();
     for edge in edges {
         let (Some(left), Some(right)) = (
             packet_by_id.get(&edge.left.0),
@@ -307,6 +315,9 @@ fn build_nli_candidates(
         else {
             continue;
         };
+        let Some((first_chunk, last_chunk)) = chunk_span(chunks, left.range, right.range) else {
+            continue;
+        };
         let Some(premise) = text.get(premise_start as usize..premise_end as usize) else {
             continue;
         };
@@ -319,9 +330,8 @@ fn build_nli_candidates(
             premise_end,
             kind,
         );
-        candidates
-            .entry(candidate_id)
-            .or_insert_with(|| NliCandidate {
+        if let std::collections::btree_map::Entry::Vacant(entry) = candidates.entry(candidate_id) {
+            entry.insert(NliCandidate {
                 candidate_id,
                 kind,
                 left_entity_id,
@@ -331,11 +341,50 @@ fn build_nli_candidates(
                 premise: premise.to_owned(),
                 hypothesis,
             });
+            evidence.insert(
+                candidate_id,
+                CandidateEvidenceBinding {
+                    candidate_id,
+                    left_mention_id: published_mention_id(edge.left.0),
+                    right_mention_id: published_mention_id(edge.right.0),
+                    premise_start,
+                    premise_end,
+                    first_chunk,
+                    last_chunk,
+                },
+            );
+        }
         if candidates.len() >= limit {
             break;
         }
     }
-    candidates.into_values().collect()
+    (
+        candidates.into_values().collect(),
+        evidence.into_values().collect(),
+    )
+}
+
+#[inline]
+fn published_mention_id(local_mention_id: u64) -> u64 {
+    local_mention_id.saturating_add(1)
+}
+
+fn chunk_span(
+    chunks: &[phoenix_chunker_native::BaseChunk],
+    left: TextRange,
+    right: TextRange,
+) -> Option<(u32, u32)> {
+    let containing = |range: TextRange| {
+        chunks.iter().position(|chunk| {
+            chunk.start <= range.start as usize && chunk.end >= range.end as usize
+        })
+    };
+    let left = containing(left)?;
+    let right = containing(right)?;
+    Some((
+        u32::try_from(left.min(right)).ok()?,
+        u32::try_from(left.max(right)).ok()?,
+    ))
 }
 
 fn enclosing_sentences(sentences: &[SentenceSpan], left: u32, right: u32) -> Option<(u32, u32)> {
@@ -535,4 +584,16 @@ fn token_span(text: &str, start: usize, end: usize) -> TokenSpan {
 
 fn elapsed_micros(started: Instant) -> u64 {
     started.elapsed().as_micros().try_into().unwrap_or(u64::MAX)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::published_mention_id;
+
+    #[test]
+    fn published_evidence_and_mentions_share_the_same_nonzero_id_space() {
+        assert_eq!(published_mention_id(0), 1);
+        assert_eq!(published_mention_id(41), 42);
+        assert_eq!(published_mention_id(u64::MAX), u64::MAX);
+    }
 }

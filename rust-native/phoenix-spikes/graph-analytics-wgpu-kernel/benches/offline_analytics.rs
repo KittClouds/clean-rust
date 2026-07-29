@@ -2,7 +2,7 @@ use std::hint::black_box;
 use std::time::Instant;
 
 use graph_analytics_wgpu_kernel::{
-    cpu_analyze, AnalyticsInput, EdgePolicy, GpuGraphAnalyticsRuntime, PackedEdge, RunConfig,
+    AnalyticsInput, EdgePolicy, GpuGraphAnalyticsRuntime, PackedEdge, RunConfig, cpu_analyze,
 };
 
 fn main() {

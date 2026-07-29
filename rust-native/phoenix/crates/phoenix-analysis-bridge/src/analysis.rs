@@ -1,15 +1,26 @@
 use crate::{identity, ner, nli};
 use anyhow::{Context, Result};
 use phoenix_analysis_contract::{
-    AnalysisStageReceipt, DocumentAnalysisBinding, PhoenixAnalysisRequestV1,
-    PhoenixDocumentAnalysisV1, PhoenixNerArtifactV1, PhoenixNliArtifactV1, ANALYSIS_CONTRACT,
+    capability, AnalysisChunkRecord, AnalysisSentenceRecord, AnalysisSpanRecord,
+    AnalysisStageReceipt, DocumentAnalysisBinding, NliCandidateKind, PhoenixAnalysisRequestV1,
+    PhoenixDocumentAnalysisV1, PhoenixNerArtifactV1, PhoenixNliArtifactV1,
+    PhoenixProducerCoordinatorV1, PhoenixStructuralSubstrateV1, ProducerRunState, SemanticProduct,
+    StructuralDialogueHint, StructuralSentenceQuality, StructuralSpanKind, ANALYSIS_CONTRACT,
+    NO_STRUCTURAL_PARENT, PRODUCER_COORDINATOR_CONTRACT, PRODUCER_QUEUE_CAPACITY,
+    STRUCTURAL_SUBSTRATE_CONTRACT,
 };
 use std::path::{Path, PathBuf};
 
-pub fn analyze(request: &PhoenixAnalysisRequestV1) -> Result<PhoenixDocumentAnalysisV1> {
+pub struct AnalysisOutput {
+    pub analysis: PhoenixDocumentAnalysisV1,
+    pub structural: PhoenixStructuralSubstrateV1,
+    pub coordinator: PhoenixProducerCoordinatorV1,
+}
+
+pub fn analyze(request: &PhoenixAnalysisRequestV1) -> Result<AnalysisOutput> {
     let ner_model_root = PathBuf::from(&request.ner_model_root);
     let nli_model_root = PathBuf::from(&request.nli_model_root);
-    let (ner_run, ner_metadata) = ner::run(
+    let (mut ner_run, ner_metadata) = ner::run(
         &request.binding.source_document_id,
         &request.binding.content_hash,
         &request.text,
@@ -83,6 +94,7 @@ pub fn analyze(request: &PhoenixAnalysisRequestV1) -> Result<PhoenixDocumentAnal
         nli_adjudication_micros: nli_run.adjudication_micros,
         promotion_count: 0,
     };
+    let structural = convert_structural(&request.text, binding.clone(), &ner_run.structural)?;
     let artifact = PhoenixDocumentAnalysisV1 {
         schema: ANALYSIS_CONTRACT.to_owned(),
         ner: PhoenixNerArtifactV1 {
@@ -99,6 +111,276 @@ pub fn analyze(request: &PhoenixAnalysisRequestV1) -> Result<PhoenixDocumentAnal
             promotion_count: 0,
         },
     };
+    let identity_candidates = artifact
+        .nli
+        .nli_candidates
+        .iter()
+        .filter(|candidate| candidate.kind != NliCandidateKind::Related)
+        .count()
+        .min(u32::MAX as usize) as u32;
+    let generic_related = artifact
+        .nli
+        .nli_candidates
+        .iter()
+        .filter(|candidate| candidate.kind == NliCandidateKind::Related)
+        .count()
+        .min(u32::MAX as usize) as u32;
+    let coordinator = PhoenixProducerCoordinatorV1 {
+        schema: PRODUCER_COORDINATOR_CONTRACT.to_owned(),
+        binding: artifact.ner.binding.clone(),
+        queue_capacity: PRODUCER_QUEUE_CAPACITY,
+        queue_high_water: 1,
+        cancellation_observed: false,
+        promotion_count: 0,
+        capabilities: vec![
+            capability(
+                SemanticProduct::DocumentStructure,
+                "phoenix-chunker/structural-v1",
+                ProducerRunState::Produced,
+                Some(
+                    structural
+                        .sentences
+                        .len()
+                        .saturating_add(structural.spans.len())
+                        .min(u32::MAX as usize) as u32,
+                ),
+            ),
+            capability(
+                SemanticProduct::DynamicChunksAndSpans,
+                "phoenix-chunker/structural-v1",
+                ProducerRunState::Produced,
+                Some(structural.chunks.len().min(u32::MAX as usize) as u32),
+            ),
+            capability(
+                SemanticProduct::MentionsAndEvidence,
+                "phoenix-dynamic-ner",
+                ProducerRunState::Produced,
+                Some(artifact.ner.mentions.len().min(u32::MAX as usize) as u32),
+            ),
+            capability(
+                SemanticProduct::CanonicalEntityBindings,
+                "phoenix-native-atlas-registry",
+                ProducerRunState::NotRun,
+                None,
+            ),
+            capability(
+                SemanticProduct::IdentityAliasCoreference,
+                "phoenix-dynamic-ner+ModernBERT-NLI",
+                ProducerRunState::Produced,
+                Some(identity_candidates),
+            ),
+            capability(
+                SemanticProduct::GenericRelatedEvidence,
+                "phoenix-dynamic-ner+ModernBERT-NLI",
+                ProducerRunState::Produced,
+                Some(generic_related),
+            ),
+            capability(
+                SemanticProduct::TypedRelationships,
+                "none",
+                ProducerRunState::Unsupported,
+                None,
+            ),
+            capability(
+                SemanticProduct::EventsTimeline,
+                "none",
+                ProducerRunState::Unsupported,
+                None,
+            ),
+            capability(
+                SemanticProduct::Causality,
+                "none",
+                ProducerRunState::Unsupported,
+                None,
+            ),
+            capability(
+                SemanticProduct::MemoryState,
+                "none",
+                ProducerRunState::Unsupported,
+                None,
+            ),
+            capability(
+                SemanticProduct::ContextualCoOccurrence,
+                "phoenix-scene-compiler/contextual-cooccurrence-v1",
+                ProducerRunState::NotRun,
+                None,
+            ),
+        ],
+        evidence_bindings: std::mem::take(&mut ner_run.candidate_evidence),
+        contextual_evidence_bindings: Vec::new(),
+    };
     artifact.validate().map_err(anyhow::Error::msg)?;
-    Ok(artifact)
+    structural.validate().map_err(anyhow::Error::msg)?;
+    coordinator
+        .validate_preliminary(&artifact, &structural)
+        .map_err(anyhow::Error::msg)?;
+    Ok(AnalysisOutput {
+        analysis: artifact,
+        structural,
+        coordinator,
+    })
+}
+
+fn convert_structural(
+    text: &str,
+    binding: DocumentAnalysisBinding,
+    source: &phoenix_chunker_native::StructuralSubstrate,
+) -> Result<PhoenixStructuralSubstrateV1> {
+    let chunks = source
+        .base_chunks
+        .iter()
+        .map(|record| {
+            Ok(AnalysisChunkRecord {
+                start: checked(record.start, "chunk start")?,
+                end: checked(record.end, "chunk end")?,
+                sentence_start: checked(record.sentence_start, "chunk sentence start")?,
+                sentence_end: checked(record.sentence_end, "chunk sentence end")?,
+                paragraph_start: checked(record.paragraph_start, "chunk paragraph start")?,
+                paragraph_end: checked(record.paragraph_end, "chunk paragraph end")?,
+                chapter_index: record
+                    .chapter_index
+                    .map(|value| checked(value, "chunk chapter"))
+                    .transpose()?
+                    .unwrap_or(NO_STRUCTURAL_PARENT),
+                token_count: checked(record.token_count, "chunk token count")?,
+                content_hash: record.content_hash,
+                dialogue_hint: dialogue(record.dialogue_hint),
+            })
+        })
+        .collect::<Result<Vec<_>>>()?;
+    let sentences = source
+        .sentences
+        .iter()
+        .map(|record| {
+            Ok(AnalysisSentenceRecord {
+                start: checked(record.start, "sentence start")?,
+                end: checked(record.end, "sentence end")?,
+                paragraph_index: checked(record.paragraph_index, "sentence paragraph")?,
+                chapter_index: checked(record.chapter_index, "sentence chapter")?,
+                token_count: checked(record.token_count, "sentence token count")?,
+                content_hash: record.content_hash,
+                quality: sentence_quality(record.quality),
+                dialogue_hint: dialogue(record.dialogue_hint),
+            })
+        })
+        .collect::<Result<Vec<_>>>()?;
+    let mut spans = Vec::with_capacity(source.paragraphs.len() + source.chapters.len());
+    for record in &source.paragraphs {
+        spans.push(AnalysisSpanRecord {
+            kind: StructuralSpanKind::Paragraph,
+            start: checked(record.start, "paragraph start")?,
+            end: checked(record.end, "paragraph end")?,
+            parent_index: checked(record.chapter_index, "paragraph chapter")?,
+            child_start: checked(record.sentence_start, "paragraph sentence start")?,
+            child_end: checked(record.sentence_end, "paragraph sentence end")?,
+            token_count: checked(record.token_count, "paragraph token count")?,
+            content_hash: record.content_hash,
+            label: String::new(),
+            dialogue_hint: dialogue(record.dialogue_hint),
+        });
+    }
+    for record in &source.chapters {
+        spans.push(AnalysisSpanRecord {
+            kind: StructuralSpanKind::Chapter,
+            start: checked(record.start, "chapter start")?,
+            end: checked(record.end, "chapter end")?,
+            parent_index: NO_STRUCTURAL_PARENT,
+            child_start: checked(record.paragraph_start, "chapter paragraph start")?,
+            child_end: checked(record.paragraph_end, "chapter paragraph end")?,
+            token_count: checked(record.token_count, "chapter token count")?,
+            content_hash: record.content_hash,
+            label: record.title.clone(),
+            dialogue_hint: StructuralDialogueHint::None,
+        });
+    }
+    Ok(PhoenixStructuralSubstrateV1 {
+        schema: STRUCTURAL_SUBSTRATE_CONTRACT.to_owned(),
+        binding,
+        source_len: checked(text.len(), "source length")?,
+        chunks,
+        sentences,
+        spans,
+    })
+}
+
+fn checked(value: usize, name: &'static str) -> Result<u32> {
+    u32::try_from(value).with_context(|| format!("{name} exceeds the v1 u32 bound"))
+}
+
+fn dialogue(value: phoenix_chunker_native::DialogueBoundaryHint) -> StructuralDialogueHint {
+    match value {
+        phoenix_chunker_native::DialogueBoundaryHint::None => StructuralDialogueHint::None,
+        phoenix_chunker_native::DialogueBoundaryHint::OpensQuote => {
+            StructuralDialogueHint::OpensQuote
+        }
+        phoenix_chunker_native::DialogueBoundaryHint::ClosesQuote => {
+            StructuralDialogueHint::ClosesQuote
+        }
+        phoenix_chunker_native::DialogueBoundaryHint::QuotedSentence => {
+            StructuralDialogueHint::QuotedSentence
+        }
+        phoenix_chunker_native::DialogueBoundaryHint::DialogueLine => {
+            StructuralDialogueHint::DialogueLine
+        }
+    }
+}
+
+fn sentence_quality(value: phoenix_chunker_native::SentenceQuality) -> StructuralSentenceQuality {
+    match value {
+        phoenix_chunker_native::SentenceQuality::Empty => StructuralSentenceQuality::Empty,
+        phoenix_chunker_native::SentenceQuality::Fragment => StructuralSentenceQuality::Fragment,
+        phoenix_chunker_native::SentenceQuality::Complete => StructuralSentenceQuality::Complete,
+        phoenix_chunker_native::SentenceQuality::RunOn => StructuralSentenceQuality::RunOn,
+        phoenix_chunker_native::SentenceQuality::NoTerminalPunctuation => {
+            StructuralSentenceQuality::NoTerminalPunctuation
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use phoenix_analysis_contract::AnalysisModelIdentity;
+
+    #[test]
+    fn exact_chunker_records_survive_the_bridge_boundary() {
+        let text = "## Chapter 1: Test\n\nAlpha arrived. Beta waited.";
+        let source = phoenix_chunker_native::build_structural_substrate(
+            text,
+            &phoenix_chunker_native::ChunkerConfig::default(),
+        );
+        let identity = AnalysisModelIdentity {
+            model_id: "fixture".into(),
+            artifact_hash: [2; 32],
+            config_hash: [3; 32],
+            runtime_id: "test".into(),
+        };
+        let binding = DocumentAnalysisBinding {
+            source_document_id: "fixture".into(),
+            native_document_id: 1,
+            document_revision: 1,
+            content_hash: *blake3::hash(text.as_bytes()).as_bytes(),
+            analysis_generation: 1,
+            source_registry_revision: 0,
+            target_registry_revision: 1,
+            producer_binary_hash: [1; 32],
+            chunker: identity.clone(),
+            dynamic_ner: identity.clone(),
+            nli: identity,
+        };
+        let converted = convert_structural(text, binding, &source).expect("convert exact records");
+        converted.validate().expect("validate exact records");
+        assert_eq!(converted.chunks.len(), source.base_chunks.len());
+        assert_eq!(converted.sentences.len(), source.sentences.len());
+        for (packed, exact) in converted.chunks.iter().zip(&source.base_chunks) {
+            assert_eq!(
+                (packed.start, packed.end, packed.content_hash),
+                (exact.start as u32, exact.end as u32, exact.content_hash)
+            );
+            assert_eq!(
+                (packed.sentence_start, packed.sentence_end),
+                (exact.sentence_start as u32, exact.sentence_end as u32)
+            );
+        }
+    }
 }

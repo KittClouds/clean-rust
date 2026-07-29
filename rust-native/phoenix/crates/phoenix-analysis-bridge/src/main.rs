@@ -5,7 +5,8 @@ mod nli;
 
 use anyhow::{bail, Context, Result};
 use phoenix_analysis_contract::{
-    open_message, write_analysis_artifact_new, PhoenixAnalysisRequestV1,
+    open_message, write_analysis_artifact_new, write_producer_coordinator_new,
+    write_structural_artifact_new, PhoenixAnalysisRequestV1,
 };
 use std::env;
 use std::path::{Path, PathBuf};
@@ -21,22 +22,37 @@ fn main() -> Result<()> {
     }
     let request_path = path(&mut arguments, "request artifact")?;
     let output_path = path(&mut arguments, "output artifact")?;
+    let structural_path = arguments.next().map(PathBuf::from);
+    let coordinator_path = arguments.next().map(PathBuf::from);
     if arguments.next().is_some() {
         bail!("unexpected extra argument");
     }
     let (_mapping, _hash, request) = open_message::<PhoenixAnalysisRequestV1>(&request_path)
         .context("open verified analysis request")?;
     request.validate().map_err(anyhow::Error::msg)?;
-    let artifact = analysis::analyze(&request).context("run legacy native analysis")?;
-    let artifact_hash =
-        write_analysis_artifact_new(&output_path, &artifact).context("seal analysis artifact")?;
+    let output = analysis::analyze(&request).context("run legacy native analysis")?;
+    let artifact_hash = write_analysis_artifact_new(&output_path, &output.analysis)
+        .context("seal analysis artifact")?;
+    let structural_hash = structural_path
+        .as_ref()
+        .map(|path| write_structural_artifact_new(path, &output.structural))
+        .transpose()
+        .context("seal exact structural substrate")?;
+    let coordinator_hash = coordinator_path
+        .as_ref()
+        .map(|path| write_producer_coordinator_new(path, &output.coordinator))
+        .transpose()
+        .context("seal semantic producer coordinator")?;
     println!(
-        "PHOENIX_ANALYSIS_PUBLISHED path={} hash={} entities={} mentions={} nli={}",
+        "PHOENIX_ANALYSIS_PUBLISHED path={} hash={} structural_hash={} coordinator_hash={} chunks={} entities={} mentions={} nli={}",
         clean(&output_path),
         hex(&artifact_hash),
-        artifact.ner.entities.len(),
-        artifact.ner.mentions.len(),
-        artifact.nli.nli_adjudications.len()
+        structural_hash.as_ref().map_or("not-requested".to_owned(), |hash| hex(hash)),
+        coordinator_hash.as_ref().map_or("not-requested".to_owned(), |hash| hex(hash)),
+        output.structural.chunks.len(),
+        output.analysis.ner.entities.len(),
+        output.analysis.ner.mentions.len(),
+        output.analysis.nli.nli_adjudications.len()
     );
     Ok(())
 }

@@ -1,6 +1,4 @@
-use phoenix_graph_rebuild::{
-    build_graph_rebuild_snapshot, GraphRebuildInput, GraphScopeKind,
-};
+use phoenix_graph_rebuild::{build_graph_rebuild_snapshot, GraphRebuildInput, GraphScopeKind};
 use phoenix_types::{EntityId, EntityKind, LexiconEntry, ScopeKey};
 use serde::Deserialize;
 use std::env;
