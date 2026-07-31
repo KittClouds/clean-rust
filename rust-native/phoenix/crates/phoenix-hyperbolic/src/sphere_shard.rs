@@ -39,7 +39,7 @@ impl SphereShard {
 
     pub fn insert(&mut self, vector: Vec<f32>) -> Result<(), String> {
         if let Some(ref mut builder) = self.builder {
-            builder.insert(vector);
+            builder.insert(vector).map_err(|error| error.to_string())?;
             self.count += 1;
             Ok(())
         } else {

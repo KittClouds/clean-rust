@@ -653,12 +653,14 @@ impl PhoenixOvergraphStore {
         let mut builder =
             HyperbolicHnswBuilder::new(index.dimension, metric, HnswBuildParams::default());
         for vector in vectors {
-            builder.insert(Self::project_ann_vector(
-                index,
-                metric_label,
-                depth,
-                vector,
-            )?);
+            builder
+                .insert(Self::project_ann_vector(
+                    index,
+                    metric_label,
+                    depth,
+                    vector,
+                )?)
+                .map_err(|error| StoreError::Query(error.to_string()))?;
         }
         let packed = builder.into_packed();
         let generation = AnnGenerationId(
@@ -1278,7 +1280,7 @@ impl PhoenixOvergraphStore {
         cache_path: &Path,
     ) -> Result<HyperbolicDiskHnsw<AnnMetric>, StoreError> {
         let metric = AnnMetric::from_label_or_default(manifest.metric.as_str());
-        HyperbolicDiskHnsw::open(&cache_path.to_string_lossy(), metric)
+        HyperbolicDiskHnsw::open_legacy(&cache_path, metric)
             .map_err(|error| StoreError::Query(error.to_string()))
     }
 

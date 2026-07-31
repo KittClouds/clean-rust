@@ -14,7 +14,7 @@ use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
 use crate::poincare::{self, PoincareBall};
-use crate::MetricF32;
+use crate::{MetricF32, MetricIdentity, MetricKind};
 
 const DEFAULT_EPS: f32 = 1e-6;
 const PI: f32 = core::f32::consts::PI;
@@ -502,6 +502,13 @@ impl MetricF32 for HybridInteriorMetric {
     #[inline]
     fn project_to_ball(&self, vector: &mut [f32]) {
         poincare::project_to_ball_inplace(vector, self.curvature, self.eps);
+    }
+
+    fn identity(&self) -> MetricIdentity {
+        MetricIdentity::known(
+            MetricKind::HybridInterior,
+            [self.curvature.to_bits(), self.eps.to_bits(), 0, 0],
+        )
     }
 }
 

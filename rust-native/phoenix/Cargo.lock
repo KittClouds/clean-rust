@@ -3347,7 +3347,10 @@ name = "phoenix-hyperbolic"
 version = "0.1.1"
 dependencies = [
  "bincode",
+ "blake3",
  "bytemuck",
+ "criterion",
+ "hashbrown 0.15.5",
  "memmap2",
  "rand 0.8.5",
  "roaring",
@@ -3355,6 +3358,7 @@ dependencies = [
  "serde",
  "serde_json",
  "smallvec",
+ "tempfile",
  "thiserror 1.0.69",
 ]
 
@@ -3477,6 +3481,19 @@ dependencies = [
  "phoenix-types",
  "serde",
  "smallvec",
+]
+
+[[package]]
+name = "phoenix-qps-experiment"
+version = "0.1.1"
+dependencies = [
+ "bm25_turbo",
+ "compact_str 0.8.1",
+ "criterion",
+ "hashbrown 0.15.5",
+ "pulp",
+ "smallvec",
+ "thiserror 1.0.69",
 ]
 
 [[package]]

@@ -6,7 +6,7 @@
 
 use serde::{Deserialize, Serialize};
 
-use crate::MetricF32;
+use crate::{MetricF32, MetricIdentity, MetricKind};
 
 const EPS: f32 = 1e-6;
 
@@ -142,6 +142,16 @@ impl MetricF32 for SphereMetric {
     #[inline]
     fn project_to_ball(&self, vector: &mut [f32]) {
         Self::normalize_in_place(vector);
+    }
+
+    fn identity(&self) -> MetricIdentity {
+        let kind = match self.distance {
+            SphereDistance::Cosine => MetricKind::SphereCosine,
+            SphereDistance::Chordal => MetricKind::SphereChordal,
+            SphereDistance::ChordalSquared => MetricKind::SphereChordalSquared,
+            SphereDistance::Geodesic => MetricKind::SphereGeodesic,
+        };
+        MetricIdentity::known(kind, [0; 4])
     }
 }
 

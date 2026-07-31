@@ -1,5 +1,5 @@
 use crate::sphere::{SphereDistance, SphereMetric};
-use crate::{MetricF32, PoincareMetric};
+use crate::{MetricF32, MetricIdentity, MetricKind, PoincareMetric};
 
 const EPS: f32 = 1e-6;
 
@@ -197,6 +197,13 @@ impl MetricF32 for LorentzMetric {
     fn project_to_ball(&self, vector: &mut [f32]) {
         self.project_to_hyperboloid(vector);
     }
+
+    fn identity(&self) -> MetricIdentity {
+        MetricIdentity::known(
+            MetricKind::Lorentz,
+            [self.curvature.to_bits(), self.eps.to_bits(), 0, 0],
+        )
+    }
 }
 
 /// Small Euclidean metric for tangent/local refinement lanes.
@@ -237,6 +244,10 @@ impl MetricF32 for EuclideanMetric {
     #[inline]
     fn project_to_ball(&self, _vector: &mut [f32]) {
         // Euclidean tangent/local lanes do not need manifold projection.
+    }
+
+    fn identity(&self) -> MetricIdentity {
+        MetricIdentity::known(MetricKind::Euclidean, [0; 4])
     }
 }
 
@@ -520,6 +531,19 @@ impl MetricF32 for AnnMetric {
             Self::Sphere(metric) => metric.project_to_ball(vector),
             Self::HybridInterior(metric) => metric.project_to_ball(vector),
             Self::Euclidean(metric) => metric.project_to_ball(vector),
+        }
+    }
+
+    fn identity(&self) -> MetricIdentity {
+        match self {
+            Self::Poincare(metric) => metric.identity(),
+            Self::Lorentz(metric) => metric.identity(),
+            Self::Sphere(metric) => metric.identity(),
+            Self::HybridInterior(metric) => MetricIdentity::known(
+                MetricKind::HybridInterior,
+                [metric.curvature.to_bits(), 0, 0, 0],
+            ),
+            Self::Euclidean(metric) => metric.identity(),
         }
     }
 }

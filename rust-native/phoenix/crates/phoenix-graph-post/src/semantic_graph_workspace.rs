@@ -237,7 +237,7 @@ fn build_kind_ann_index(indices: &[usize], embeddings: EmbeddingRows<'_>) -> Opt
         if embedding.len() != dim {
             return None;
         }
-        index.insert(embedding.to_vec());
+        index.insert(embedding.to_vec()).ok()?;
         target_indices.push(prototype_index);
     }
 

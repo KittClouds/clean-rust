@@ -39,7 +39,7 @@ fn sphere_hnsw_roundtrip_prefers_exact_neighbor() {
     let points = sphere_points();
 
     for point in &points {
-        builder.insert(point.clone());
+        builder.insert(point.clone()).expect("insert sphere point");
     }
 
     let path = temp_index_path("sphere-roundtrip");
@@ -59,7 +59,7 @@ fn ann_metric_sphere_runs_through_generic_hnsw() {
     let points = sphere_points();
 
     for point in &points {
-        builder.insert(point.clone());
+        builder.insert(point.clone()).expect("insert sphere point");
     }
 
     let path = temp_index_path("ann-metric-sphere");
@@ -80,7 +80,7 @@ fn ann_metric_sphere_builder_search_reuses_unpacked_graph() {
     let points = sphere_points();
 
     for point in &points {
-        builder.insert(point.clone());
+        builder.insert(point.clone()).expect("insert sphere point");
     }
 
     let hits = builder.search(&points[1], 3, 16);

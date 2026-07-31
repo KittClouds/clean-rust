@@ -174,6 +174,7 @@ impl OrtTextEmbedder {
             &config.model_root,
             &[
                 "onnx\\model_q4f16.onnx",
+                "onnx\\model_q4.onnx",
                 "onnx\\model_quantized.onnx",
                 "onnx\\model_fp16.onnx",
                 "onnx\\model.onnx",
@@ -367,7 +368,36 @@ impl OrtTextEmbedder {
                 .map_err(|error| OrtTextEmbedError::Inference(format!("run: {error}")))?
         };
 
-        let hidden = outputs[0]
+        if let Some(sentence_embedding) = outputs.get("sentence_embedding") {
+            let tensor = sentence_embedding
+                .try_extract_tensor::<f32>()
+                .map_err(|error| {
+                    OrtTextEmbedError::Inference(format!("extract sentence_embedding: {error}"))
+                })?;
+            let view = tensor.view();
+            let shape = view.shape();
+            if shape.len() != 2 || shape[0] != batch_len {
+                return Err(OrtTextEmbedError::Inference(format!(
+                    "expected 2D sentence_embedding for {batch_len} rows, got shape {shape:?}"
+                )));
+            }
+            let hidden_dim = shape[1];
+            let values = view.as_slice().ok_or_else(|| {
+                OrtTextEmbedError::Inference("sentence_embedding was non-contiguous".to_owned())
+            })?;
+            for row in 0..batch_len {
+                let start = row * hidden_dim;
+                self.profile
+                    .project_into(&values[start..start + hidden_dim], &mut rows.values)?;
+                rows.rows += 1;
+            }
+            return Ok(());
+        }
+
+        let hidden_output = outputs
+            .get("last_hidden_state")
+            .unwrap_or_else(|| &outputs[0]);
+        let hidden = hidden_output
             .try_extract_tensor::<f32>()
             .map_err(|error| OrtTextEmbedError::Inference(format!("extract: {error}")))?;
         let view = hidden.view();

@@ -32,6 +32,7 @@ members = [
     "crates/phoenix-numerology",
     "crates/phoenix-om",
     "crates/phoenix-proposition",
+    "crates/phoenix-qps-experiment",
     "crates/phoenix-rel-post",
     "crates/phoenix-scope-analysis",
     "crates/phoenix-store-native-core",
@@ -107,6 +108,7 @@ arc-swap = "1.7"
 overgraph = "0.4.1"
 bm25_turbo = "0.2.0"
 xxhash-rust = { version = "0.8", features = ["xxh3"] }
+blake3 = "1.8"
 
 [profile.release]
 opt-level = 3

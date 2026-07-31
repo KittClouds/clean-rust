@@ -6,21 +6,18 @@ const PASSAGE_PREFIX: &str = "passage: ";
 const JINA_QUERY_PREFIX: &str = "Query: ";
 const JINA_DOCUMENT_PREFIX: &str = "Document: ";
 const MDBR_LEAF_QUERY_PREFIX: &str = "Represent this sentence for searching relevant passages: ";
+const EMBEDDING_GEMMA_QUERY_PREFIX: &str = "task: search result | query: ";
+const EMBEDDING_GEMMA_DOCUMENT_PREFIX: &str = "title: none | text: ";
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub enum TextEmbeddingProfile {
     Truncate128,
     Truncate256,
     Truncate512,
+    #[default]
     Native384,
     Native768,
     Native1024,
-}
-
-impl Default for TextEmbeddingProfile {
-    fn default() -> Self {
-        Self::Native384
-    }
 }
 
 impl TextEmbeddingProfile {
@@ -75,6 +72,8 @@ pub enum TextEmbeddingInputPrefix {
     JinaQuery,
     JinaDocument,
     MdbrLeafQuery,
+    EmbeddingGemmaQuery,
+    EmbeddingGemmaDocument,
 }
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
@@ -119,6 +118,8 @@ impl TextEmbeddingInputPrefix {
             Self::JinaQuery => JINA_QUERY_PREFIX,
             Self::JinaDocument => JINA_DOCUMENT_PREFIX,
             Self::MdbrLeafQuery => MDBR_LEAF_QUERY_PREFIX,
+            Self::EmbeddingGemmaQuery => EMBEDDING_GEMMA_QUERY_PREFIX,
+            Self::EmbeddingGemmaDocument => EMBEDDING_GEMMA_DOCUMENT_PREFIX,
         }
     }
 }
@@ -190,6 +191,26 @@ impl OrtTextEmbedConfig {
             ..Self::mdbr_leaf_mt_query(model_root)
         }
     }
+
+    pub fn embedding_gemma_query(model_root: PathBuf) -> Self {
+        Self {
+            model_root,
+            batch_size: 8,
+            max_length: 2048,
+            profile: TextEmbeddingProfile::Native768,
+            prefix_passage: false,
+            pooling: TextEmbeddingPooling::Mean,
+            input_prefix: TextEmbeddingInputPrefix::EmbeddingGemmaQuery,
+            execution_provider: OrtExecutionProviderPreference::from_env(),
+        }
+    }
+
+    pub fn embedding_gemma_document(model_root: PathBuf) -> Self {
+        Self {
+            input_prefix: TextEmbeddingInputPrefix::EmbeddingGemmaDocument,
+            ..Self::embedding_gemma_query(model_root)
+        }
+    }
 }
 
 #[cfg(test)]
@@ -221,5 +242,16 @@ mod tests {
         assert_eq!(config.pooling, TextEmbeddingPooling::Mean);
         assert_eq!(config.input_prefix, TextEmbeddingInputPrefix::None);
         assert_eq!(config.input_prefix.text(), "");
+    }
+
+    #[test]
+    fn embedding_gemma_uses_official_prefixes_and_native_dimension() {
+        let query = OrtTextEmbedConfig::embedding_gemma_query(PathBuf::from("models/gemma"));
+        let document = OrtTextEmbedConfig::embedding_gemma_document(PathBuf::from("models/gemma"));
+
+        assert_eq!(query.profile, TextEmbeddingProfile::Native768);
+        assert_eq!(query.max_length, 2048);
+        assert_eq!(query.input_prefix.text(), "task: search result | query: ");
+        assert_eq!(document.input_prefix.text(), "title: none | text: ");
     }
 }

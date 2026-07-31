@@ -11,10 +11,18 @@ rand = "0.8"
 serde = { workspace = true, features = ["derive"] }
 bincode = { workspace = true }
 thiserror = { workspace = true }
-bytemuck = "1.14"
+bytemuck = { version = "1.14", features = ["derive"] }
+blake3 = { workspace = true }
+hashbrown = { workspace = true }
 rustc-hash = { workspace = true }
 smallvec = { workspace = true }
 roaring = { workspace = true }
 
 [dev-dependencies]
+criterion = { version = "0.5", default-features = false, features = ["cargo_bench_support"] }
 serde_json = { workspace = true }
+tempfile = "3.14"
+
+[[bench]]
+name = "ann_search"
+harness = false
