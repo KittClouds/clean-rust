@@ -5032,7 +5032,9 @@ name = "phoenix-hyperbolic"
 version = "0.1.1"
 dependencies = [
  "bincode",
+ "blake3",
  "bytemuck",
+ "hashbrown 0.15.5",
  "memmap2",
  "rand 0.8.5",
  "roaring",
@@ -5318,6 +5320,7 @@ dependencies = [
 name = "phoenix-rel-post"
 version = "0.1.1"
 dependencies = [
+ "blake3",
  "gline-rs",
  "half",
  "hashbrown 0.15.5",

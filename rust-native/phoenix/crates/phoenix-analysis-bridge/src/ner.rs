@@ -7,10 +7,11 @@ use phoenix_analysis_contract::{
 use phoenix_dynamic_ner::{
     DiscoveredSpan, DynamicNerModel, DynamicSchemaBuilder, EntityLabel, LabelPack, LocalMentionId,
     MentionEdgeKind, MentionKind, MentionPacket, MentionVote, ModelNerRequest, ModelNerWindow,
-    NerModelError, PhoenixNerEngineBuilder, SurfaceNerInput, VerificationCase,
+    NerModelError, PhoenixNerEngine, PhoenixNerEngineBuilder, SurfaceNerInput, VerificationCase,
 };
 use phoenix_rel_post::{
     GlinerBiModel, GlinerBiOverlapPolicy, GlinerBiPredictOptions, GlinerBiPrediction,
+    OrtCacheStatus,
 };
 use phoenix_types::{
     MentionEntityRef, PosTag, ScopeKey, SentenceSpan, TextRange, TokenClass, TokenSpan,
@@ -21,6 +22,21 @@ use std::time::Instant;
 
 const MAX_NLI_SENTENCE_DISTANCE: u32 = 1;
 const MAX_NLI_PREMISE_BYTES: u32 = 4_096;
+const DEFAULT_GLINER_BATCH_SIZE: usize = 8;
+const MAX_GLINER_BATCH_SIZE: usize = 16;
+
+/// Returns the bounded number of model windows sent to GLiNER together.
+///
+/// Dynamic NER groups windows by label set before this call.  Keeping the
+/// batch bounded avoids a large temporary tensor while eliminating the old
+/// one-window-at-a-time path.
+pub fn batch_size() -> usize {
+    std::env::var("PHOENIX_GLINER_BATCH_SIZE")
+        .ok()
+        .and_then(|raw| raw.parse::<usize>().ok())
+        .map(|value| value.clamp(1, MAX_GLINER_BATCH_SIZE))
+        .unwrap_or(DEFAULT_GLINER_BATCH_SIZE)
+}
 
 pub struct NerRun {
     pub entities: Vec<AnalysisEntity>,
@@ -45,13 +61,66 @@ struct BiBackend {
     threshold: f32,
 }
 
-pub fn run(
+pub struct LoadedNer {
+    engine: PhoenixNerEngine,
+    metadata: phoenix_rel_post::GlinerBiModelMetadata,
+    pub load_micros: u64,
+    pub cache_status: OrtCacheStatus,
+}
+
+impl LoadedNer {
+    pub fn load(model_root: &Path) -> Result<Self> {
+        let started = Instant::now();
+        let (model, ort_info) = GlinerBiModel::load_with_ort_info(model_root)
+            .with_context(|| format!("load GLiNER-BI from {}", model_root.display()))?;
+        let load_micros = elapsed_micros(started);
+        let metadata = model.metadata().clone();
+        let engine = PhoenixNerEngineBuilder::new()
+            .schema(DynamicSchemaBuilder {
+                max_labels: 14,
+                ..Default::default()
+            })
+            .model(Box::new(BiBackend {
+                model,
+                threshold: 0.35,
+            }))
+            .build();
+        Ok(Self {
+            engine,
+            metadata,
+            load_micros,
+            cache_status: ort_info.cache_status,
+        })
+    }
+
+    pub fn metadata(&self) -> &phoenix_rel_post::GlinerBiModelMetadata {
+        &self.metadata
+    }
+
+    pub fn run(
+        &self,
+        document_id: &str,
+        document_hash: &[u8; 32],
+        text: &str,
+        max_nli_candidates: usize,
+    ) -> Result<NerRun> {
+        run_loaded(
+            &self.engine,
+            document_id,
+            document_hash,
+            text,
+            max_nli_candidates,
+        )
+    }
+}
+
+fn run_loaded(
+    engine: &PhoenixNerEngine,
     document_id: &str,
     document_hash: &[u8; 32],
     text: &str,
-    model_root: &Path,
     max_nli_candidates: usize,
-) -> Result<(NerRun, phoenix_rel_post::GlinerBiModelMetadata)> {
+) -> Result<NerRun> {
     let chunk_started = Instant::now();
     let substrate = phoenix_chunker_native::build_structural_substrate(
         text,
@@ -59,19 +128,6 @@ pub fn run(
     );
     let (tokens, sentences) = tokenize(text);
     let chunk_elapsed = elapsed_micros(chunk_started);
-    let model = GlinerBiModel::load(model_root)
-        .with_context(|| format!("load GLiNER-BI from {}", model_root.display()))?;
-    let metadata = model.metadata().clone();
-    let engine = PhoenixNerEngineBuilder::new()
-        .schema(DynamicSchemaBuilder {
-            max_labels: 14,
-            ..Default::default()
-        })
-        .model(Box::new(BiBackend {
-            model,
-            threshold: 0.35,
-        }))
-        .build();
     let scope = ScopeKey::default();
     let started = Instant::now();
     let output = engine
@@ -97,20 +153,17 @@ pub fn run(
         &aggregated.entity_by_mention,
         max_nli_candidates,
     );
-    Ok((
-        NerRun {
-            entities: aggregated.entities,
-            mentions: aggregated.mentions,
-            candidates,
-            candidate_evidence,
-            chunk_count: substrate.base_chunks.len(),
-            sentence_count: sentences.len(),
-            chunker_micros: chunk_elapsed,
-            dynamic_ner_micros,
-            structural: substrate,
-        },
-        metadata,
-    ))
+    Ok(NerRun {
+        entities: aggregated.entities,
+        mentions: aggregated.mentions,
+        candidates,
+        candidate_evidence,
+        chunk_count: substrate.base_chunks.len(),
+        sentence_count: sentences.len(),
+        chunker_micros: chunk_elapsed,
+        dynamic_ner_micros,
+        structural: substrate,
+    })
 }
 
 impl DynamicNerModel for BiBackend {
@@ -166,7 +219,7 @@ impl DynamicNerModel for BiBackend {
             let texts = items.iter().map(|(_, text)| *text).collect::<Vec<_>>();
             let predictions = self
                 .model
-                .predict_texts_with_options_batched(&texts, &labels, &options, 1)
+                .predict_texts_with_options_batched(&texts, &labels, &options, batch_size())
                 .map_err(|error| NerModelError::Inference(error.to_string()))?;
             for prediction in predictions {
                 let Some((request_index, _)) = items.get(prediction.sequence) else {

@@ -1,5 +1,6 @@
 use std::env;
 use std::fs::File;
+use std::ops::Range;
 use std::path::{Path, PathBuf};
 
 use hashbrown::HashMap;
@@ -8,12 +9,19 @@ use ort::session::Session;
 use ort::value::Tensor;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use tokenizers::{tokenizer::TruncationDirection, EncodeInput, PaddingDirection, Tokenizer};
+use tokenizers::{
+    tokenizer::TruncationDirection, EncodeInput, Encoding, PaddingDirection, Tokenizer,
+};
 
-use crate::ort_runtime::{load_nli_session, nli_ort_preference, resolved_ort_dylib_path};
+use crate::ort_cache::OrtSessionLoadInfo;
+use crate::ort_runtime::{load_nli_session_with_info, nli_ort_preference, resolved_ort_dylib_path};
 
 const DEFAULT_NLI_MAX_LENGTH: usize = 2048;
 const MAX_REASONABLE_NLI_LENGTH: usize = 8192;
+const DEFAULT_NLI_ATTENTION_WORK_BUDGET: usize = 4 * 1024 * 1024;
+const MIN_NLI_ATTENTION_WORK_BUDGET: usize = 256 * 1024;
+const MAX_NLI_ATTENTION_WORK_BUDGET: usize = 64 * 1024 * 1024;
+const NLI_ATTENTION_WORK_ENV: &str = "PHOENIX_NLI_MAX_ATTENTION_WORK";
 const REVERSE_DIRECTION_MIN_ENTAILMENT: f32 = 0.50;
 const MODEL_FILE_ENV: &str = "PHOENIX_NLI_ONNX_FILE";
 const MODEL_CANDIDATES: &[&str] = &[
@@ -93,6 +101,12 @@ struct NliLabelMap {
     neutral_idx: usize,
 }
 
+#[derive(Debug, Default, PartialEq, Eq)]
+struct NliMicroBatchPlan {
+    order: Vec<usize>,
+    groups: Vec<Range<usize>>,
+}
+
 impl Default for NliLabelMap {
     fn default() -> Self {
         Self {
@@ -136,9 +150,13 @@ pub trait NliScorer {
 
 impl NliModel {
     pub fn load(model_dir: &Path) -> Result<Self, NliError> {
+        Self::load_with_ort_info(model_dir).map(|(model, _)| model)
+    }
+
+    pub fn load_with_ort_info(model_dir: &Path) -> Result<(Self, OrtSessionLoadInfo), NliError> {
         let model_path = find_model_path(model_dir)?;
         let tokenizer_path = find_existing_path(model_dir, TOKENIZER_CANDIDATES)?;
-        let tokenizer = Tokenizer::from_file(&tokenizer_path)
+        let mut tokenizer = Tokenizer::from_file(&tokenizer_path)
             .map_err(|error| NliError::ModelLoad(error.to_string()))?;
         let (pad_token_id, padding_direction) = tokenizer
             .get_padding()
@@ -149,8 +167,15 @@ impl NliModel {
                     PaddingDirection::Right,
                 )
             });
+        // Hugging Face exports may persist PaddingStrategy::Fixed(2048) in
+        // tokenizer.json. Keeping it here makes every short pair appear to be
+        // a full 2,048-token sequence, defeating length bucketing and forcing
+        // one worst-case transformer submission per candidate. Preserve the
+        // token/direction metadata, disable export-time padding, and pad only
+        // to each bounded microbatch's real maximum in score_encoding_group.
+        tokenizer.with_padding(None);
         let ort_preference = nli_ort_preference();
-        let session = load_nli_session(&model_path)
+        let (session, ort_info) = load_nli_session_with_info(&model_path)
             .map_err(|error| NliError::ModelLoad(error.to_string()))?;
         let export_metadata = load_export_metadata(model_dir);
         let config = load_first_json(model_dir, CONFIG_CANDIDATES);
@@ -186,17 +211,20 @@ impl NliModel {
             input_names,
             output_names,
         };
-        Ok(Self {
-            session,
-            tokenizer,
-            labels,
-            max_length,
-            pad_token_id,
-            padding_direction,
-            input_ids_name,
-            attention_mask_name,
-            metadata,
-        })
+        Ok((
+            Self {
+                session,
+                tokenizer,
+                labels,
+                max_length,
+                pad_token_id,
+                padding_direction,
+                input_ids_name,
+                attention_mask_name,
+                metadata,
+            },
+            ort_info,
+        ))
     }
 
     pub fn metadata(&self) -> &NliModelMetadata {
@@ -222,20 +250,69 @@ impl NliModel {
             .tokenizer
             .encode_batch(inputs, true)
             .map_err(|error| NliError::Inference(error.to_string()))?;
-        let mut sequence_len = 0usize;
         for encoding in &mut encodings {
             if encoding.len() > self.max_length {
                 encoding.truncate(self.max_length, 0, TruncationDirection::Right);
             }
-            sequence_len = sequence_len.max(encoding.len());
         }
-        if sequence_len == 0 {
+        if encodings.iter().any(|encoding| encoding.is_empty()) {
             return Err(NliError::Inference("empty tokenized sequence".to_owned()));
         }
-        let batch_size = encodings.len();
+        let lengths = encodings.iter().map(Encoding::len).collect::<Vec<_>>();
+        let plan = plan_nli_micro_batches(&lengths, nli_attention_work_budget());
+        let min_len = lengths.iter().copied().min().unwrap_or(0);
+        let max_len = lengths.iter().copied().max().unwrap_or(0);
+        let mut padded_tokens = 0usize;
+        let mut attention_work = 0usize;
+        let mut max_group = 0usize;
+        for group in &plan.groups {
+            let indices = &plan.order[group.clone()];
+            let group_len = indices.len();
+            let sequence_len = indices
+                .iter()
+                .map(|&index| lengths[index])
+                .max()
+                .unwrap_or(0);
+            max_group = max_group.max(group_len);
+            padded_tokens = padded_tokens.saturating_add(group_len.saturating_mul(sequence_len));
+            attention_work = attention_work.saturating_add(
+                group_len.saturating_mul(sequence_len.saturating_mul(sequence_len)),
+            );
+        }
+        eprintln!(
+            "PHOENIX_NLI_BATCH_PLAN pairs={} min_tokens={} max_tokens={} groups={} max_group={} padded_tokens={} attention_work={} budget={}",
+            pairs.len(),
+            min_len,
+            max_len,
+            plan.groups.len(),
+            max_group,
+            padded_tokens,
+            attention_work,
+            nli_attention_work_budget()
+        );
+        let mut scores = vec![NliScores::default(); encodings.len()];
+        for group in plan.groups {
+            self.score_encoding_group(&encodings, &plan.order[group], scores.as_mut_slice())?;
+        }
+        Ok(scores)
+    }
+
+    fn score_encoding_group(
+        &self,
+        encodings: &[Encoding],
+        indices: &[usize],
+        scores: &mut [NliScores],
+    ) -> Result<(), NliError> {
+        let sequence_len = indices
+            .iter()
+            .map(|&index| encodings[index].len())
+            .max()
+            .ok_or_else(|| NliError::Inference("empty NLI microbatch".to_owned()))?;
+        let batch_size = indices.len();
         let mut input_ids = Vec::<i64>::with_capacity(batch_size * sequence_len);
         let mut attention_mask = Vec::<i64>::with_capacity(batch_size * sequence_len);
-        for encoding in &encodings {
+        for &index in indices {
+            let encoding = &encodings[index];
             append_padded_i64(
                 &mut input_ids,
                 encoding.get_ids(),
@@ -279,12 +356,11 @@ impl NliModel {
                     values.len()
                 ))
             })?;
-        let mut scores = Vec::with_capacity(batch_size);
-        for row in 0..batch_size {
+        for (row, &original_index) in indices.iter().enumerate() {
             let start = row * row_stride;
-            scores.push(scores_from_logits(&values[start..start + 3], self.labels)?);
+            scores[original_index] = scores_from_logits(&values[start..start + 3], self.labels)?;
         }
-        Ok(scores)
+        Ok(())
     }
 
     pub fn judge_relation(
@@ -348,6 +424,39 @@ impl NliModel {
             )),
         }
     }
+}
+
+pub fn nli_attention_work_budget() -> usize {
+    env::var(NLI_ATTENTION_WORK_ENV)
+        .ok()
+        .and_then(|raw| raw.parse::<usize>().ok())
+        .map(|value| value.clamp(MIN_NLI_ATTENTION_WORK_BUDGET, MAX_NLI_ATTENTION_WORK_BUDGET))
+        .unwrap_or(DEFAULT_NLI_ATTENTION_WORK_BUDGET)
+}
+
+/// Groups similarly sized token sequences under a quadratic attention-work
+/// budget. The returned order is restored after inference, so batching changes
+/// neither candidate identity nor adjudication order.
+fn plan_nli_micro_batches(lengths: &[usize], attention_budget: usize) -> NliMicroBatchPlan {
+    let mut order = (0..lengths.len()).collect::<Vec<_>>();
+    order.sort_unstable_by_key(|&index| lengths[index]);
+    let mut groups = Vec::with_capacity(order.len());
+    let mut start = 0usize;
+    while start < order.len() {
+        let mut end = start + 1;
+        while end < order.len() {
+            let sequence_len = lengths[order[end]];
+            let batch_size = end + 1 - start;
+            let work = batch_size.saturating_mul(sequence_len.saturating_mul(sequence_len));
+            if work > attention_budget {
+                break;
+            }
+            end += 1;
+        }
+        groups.push(start..end);
+        start = end;
+    }
+    NliMicroBatchPlan { order, groups }
 }
 
 impl NliScorer for NliModel {
@@ -659,6 +768,42 @@ mod tests {
         let mut left = Vec::new();
         append_padded_i64(&mut left, &[7, 8], 4, 0, PaddingDirection::Left);
         assert_eq!(left, vec![0, 0, 7, 8]);
+    }
+
+    #[test]
+    fn attention_budget_splits_long_dense_batches_without_losing_order() {
+        let lengths = vec![2048; 32];
+        let plan = plan_nli_micro_batches(&lengths, DEFAULT_NLI_ATTENTION_WORK_BUDGET);
+        assert_eq!(plan.groups.len(), 32);
+        assert!(plan.groups.iter().all(|group| group.len() == 1));
+
+        let mut recovered = plan.order.clone();
+        recovered.sort_unstable();
+        assert_eq!(recovered, (0..lengths.len()).collect::<Vec<_>>());
+    }
+
+    #[test]
+    fn attention_budget_keeps_short_dense_batches_coalesced() {
+        let lengths = vec![200; 32];
+        let plan = plan_nli_micro_batches(&lengths, DEFAULT_NLI_ATTENTION_WORK_BUDGET);
+        assert_eq!(plan.groups, vec![0..32]);
+    }
+
+    #[test]
+    fn attention_batches_bucket_by_length_and_obey_quadratic_budget() {
+        let lengths = vec![512, 64, 1024, 128, 256, 2048, 96];
+        let budget = DEFAULT_NLI_ATTENTION_WORK_BUDGET;
+        let plan = plan_nli_micro_batches(&lengths, budget);
+        for group in &plan.groups {
+            let indices = &plan.order[group.clone()];
+            let max_len = indices
+                .iter()
+                .map(|&index| lengths[index])
+                .max()
+                .expect("non-empty group");
+            let work = indices.len() * max_len * max_len;
+            assert!(work <= budget || indices.len() == 1);
+        }
     }
 
     #[test]

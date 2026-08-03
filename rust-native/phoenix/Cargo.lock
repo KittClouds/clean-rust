@@ -3500,6 +3500,7 @@ dependencies = [
 name = "phoenix-rel-post"
 version = "0.1.1"
 dependencies = [
+ "blake3",
  "gline-rs",
  "half",
  "hashbrown 0.15.5",

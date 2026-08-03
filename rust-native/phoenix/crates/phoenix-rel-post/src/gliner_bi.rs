@@ -16,8 +16,9 @@ use crate::gliner_bi_tensors::{
     decode_token_predictions_for_word_ranges, extract_logits, word_ranges_for_input_spans,
     GlinerBiTextTensors,
 };
+use crate::ort_cache::OrtSessionLoadInfo;
 use crate::ort_runtime::{
-    load_session_with_intra_threads_and_memory_pattern, recommended_thread_count,
+    load_session_with_intra_threads_and_memory_pattern_with_info, recommended_thread_count,
 };
 
 const DEFAULT_BI_BATCH_SIZE: usize = 2;
@@ -252,6 +253,12 @@ struct GlinerRootConfig {
 
 impl GlinerBiModel {
     pub fn load(model_dir: &Path) -> Result<Self, GlinerBiError> {
+        Self::load_with_ort_info(model_dir).map(|(model, _)| model)
+    }
+
+    pub fn load_with_ort_info(
+        model_dir: &Path,
+    ) -> Result<(Self, OrtSessionLoadInfo), GlinerBiError> {
         let model_path = find_model_asset(model_dir)?;
         let text_tokenizer_path =
             find_existing_path(model_dir, &["tokenizer.json", "onnx/tokenizer.json"])?;
@@ -273,7 +280,7 @@ impl GlinerBiModel {
         // memory-pattern planner retains the largest dynamic activation arena it
         // observes, turning one long window into process-lifetime multi-GiB
         // residency. Let ORT allocate each dynamic run to its actual shape instead.
-        let session = load_session_with_intra_threads_and_memory_pattern(
+        let (session, ort_info) = load_session_with_intra_threads_and_memory_pattern_with_info(
             &model_path,
             gliner_bi_thread_count(),
             false,
@@ -332,21 +339,24 @@ impl GlinerBiModel {
                 .collect(),
         };
 
-        Ok(Self {
-            session,
-            text_tokenizer,
-            labels_tokenizer,
-            max_width,
-            text_cls_id,
-            text_sep_id,
-            labels_cls_id,
-            labels_sep_id,
-            label_cache: Mutex::default(),
-            span_cache: Mutex::default(),
-            label_inputs,
-            output_mode,
-            metadata,
-        })
+        Ok((
+            Self {
+                session,
+                text_tokenizer,
+                labels_tokenizer,
+                max_width,
+                text_cls_id,
+                text_sep_id,
+                labels_cls_id,
+                labels_sep_id,
+                label_cache: Mutex::default(),
+                span_cache: Mutex::default(),
+                label_inputs,
+                output_mode,
+                metadata,
+            },
+            ort_info,
+        ))
     }
 
     pub fn metadata(&self) -> &GlinerBiModelMetadata {

@@ -6,6 +6,7 @@ license.workspace = true
 authors.workspace = true
 
 [dependencies]
+blake3.workspace = true
 half = "2"
 hashbrown.workspace = true
 memmap2.workspace = true

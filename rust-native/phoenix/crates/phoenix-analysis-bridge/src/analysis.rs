@@ -1,15 +1,16 @@
 use crate::{identity, ner, nli};
 use anyhow::{Context, Result};
 use phoenix_analysis_contract::{
-    capability, AnalysisChunkRecord, AnalysisSentenceRecord, AnalysisSpanRecord,
-    AnalysisStageReceipt, DocumentAnalysisBinding, NliCandidateKind, PhoenixAnalysisRequestV1,
-    PhoenixDocumentAnalysisV1, PhoenixNerArtifactV1, PhoenixNliArtifactV1,
-    PhoenixProducerCoordinatorV1, PhoenixStructuralSubstrateV1, ProducerRunState, SemanticProduct,
-    StructuralDialogueHint, StructuralSentenceQuality, StructuralSpanKind, ANALYSIS_CONTRACT,
-    NO_STRUCTURAL_PARENT, PRODUCER_COORDINATOR_CONTRACT, PRODUCER_QUEUE_CAPACITY,
-    STRUCTURAL_SUBSTRATE_CONTRACT,
+    capability, AnalysisChunkRecord, AnalysisModelIdentity, AnalysisSentenceRecord,
+    AnalysisSpanRecord, AnalysisStageReceipt, DocumentAnalysisBinding, NliCandidateKind,
+    PhoenixAnalysisRequestV1, PhoenixDocumentAnalysisV1, PhoenixNerArtifactV1,
+    PhoenixNliArtifactV1, PhoenixProducerCoordinatorV1, PhoenixStructuralSubstrateV1,
+    ProducerRunState, SemanticProduct, StructuralDialogueHint, StructuralSentenceQuality,
+    StructuralSpanKind, ANALYSIS_CONTRACT, NO_STRUCTURAL_PARENT, PRODUCER_COORDINATOR_CONTRACT,
+    PRODUCER_QUEUE_CAPACITY, STRUCTURAL_SUBSTRATE_CONTRACT,
 };
 use std::path::{Path, PathBuf};
+use std::time::Instant;
 
 pub struct AnalysisOutput {
     pub analysis: PhoenixDocumentAnalysisV1,
@@ -17,57 +18,88 @@ pub struct AnalysisOutput {
     pub coordinator: PhoenixProducerCoordinatorV1,
 }
 
+pub struct LoadedAnalysisRuntime {
+    ner_root: PathBuf,
+    nli_root: PathBuf,
+    ner: ner::LoadedNer,
+    nli: nli::LoadedNli,
+    identities: ResidentAnalysisIdentities,
+    pub ner_load_micros: u64,
+    pub nli_load_micros: u64,
+    pub total_load_micros: u64,
+    pub ner_cache_hit: bool,
+    pub nli_cache_hit: bool,
+}
+
+#[derive(Clone)]
+struct ResidentAnalysisIdentities {
+    producer_binary_hash: [u8; 32],
+    chunker: AnalysisModelIdentity,
+    dynamic_ner: AnalysisModelIdentity,
+    nli: AnalysisModelIdentity,
+}
+
+impl LoadedAnalysisRuntime {
+    pub fn load(ner_root: &Path, nli_root: &Path) -> Result<Self> {
+        let total_started = Instant::now();
+        // DirectML session construction performs graph optimization and GPU
+        // resource initialization. Building both large sessions concurrently
+        // can exhaust the driver's scheduling budget and trigger a TDR. Model
+        // warmup is infrequent, so serialize it and keep inference resident.
+        let ner = ner::LoadedNer::load(ner_root)?;
+        let nli = nli::LoadedNli::load(nli_root)?;
+        // Hash immutable executable/model assets once while the runtime is
+        // warming. Re-hashing roughly 320 MiB for every unchanged document
+        // run wastes memory bandwidth and adds no authority.
+        let identities = resident_identities(&ner, &nli)?;
+        let ner_load_micros = ner.load_micros;
+        let nli_load_micros = nli.load_micros;
+        let ner_cache_hit = ner.cache_status.is_hit();
+        let nli_cache_hit = nli.cache_status.is_hit();
+        Ok(Self {
+            ner_root: ner_root.to_path_buf(),
+            nli_root: nli_root.to_path_buf(),
+            ner,
+            nli,
+            identities,
+            ner_load_micros,
+            nli_load_micros,
+            total_load_micros: elapsed_micros(total_started),
+            ner_cache_hit,
+            nli_cache_hit,
+        })
+    }
+
+    pub fn analyze(&self, request: &PhoenixAnalysisRequestV1) -> Result<AnalysisOutput> {
+        if Path::new(&request.ner_model_root) != self.ner_root
+            || Path::new(&request.nli_model_root) != self.nli_root
+        {
+            anyhow::bail!("analysis request model roots do not match the resident runtime");
+        }
+        analyze_loaded(request, &self.ner, &self.nli, &self.identities)
+    }
+}
+
 pub fn analyze(request: &PhoenixAnalysisRequestV1) -> Result<AnalysisOutput> {
     let ner_model_root = PathBuf::from(&request.ner_model_root);
     let nli_model_root = PathBuf::from(&request.nli_model_root);
-    let (mut ner_run, ner_metadata) = ner::run(
+    let runtime = LoadedAnalysisRuntime::load(&ner_model_root, &nli_model_root)?;
+    runtime.analyze(request)
+}
+
+fn analyze_loaded(
+    request: &PhoenixAnalysisRequestV1,
+    ner: &ner::LoadedNer,
+    nli: &nli::LoadedNli,
+    identities: &ResidentAnalysisIdentities,
+) -> Result<AnalysisOutput> {
+    let mut ner_run = ner.run(
         &request.binding.source_document_id,
         &request.binding.content_hash,
         &request.text,
-        &ner_model_root,
         request.max_nli_candidates as usize,
     )?;
-    let nli_run = nli::run(&ner_run.candidates, &nli_model_root)?;
-    let executable = std::env::current_exe().context("resolve analysis bridge executable")?;
-    let producer_binary_hash = identity::file_hash(&executable)?;
-    let chunker = identity::identity(
-        "phoenix-chunker/structural-v1",
-        producer_binary_hash,
-        identity::config_hash(b"ChunkerConfig::default;sentence_ranges;structural_substrate"),
-        "rust-native",
-    );
-    let dynamic_ner = identity::identity(
-        "phoenix-dynamic-ner+gliner-bi-base-v2.0",
-        identity::combined_file_hash(&[
-            Path::new(&ner_metadata.model_path),
-            Path::new(&ner_metadata.text_tokenizer_path),
-            Path::new(&ner_metadata.labels_tokenizer_path),
-        ])?,
-        identity::config_hash(
-            b"threshold=0.35;max_labels=14;max_model_windows=20;max_context_sentences=3;\
-              model_window_merge=none;gliner_batch_size=1;ort_memory_pattern=false;overlap=default;\
-              nli_evidence_sentence_distance=1;nli_evidence_max_bytes=4096",
-        ),
-        "ort-2.0.0-rc.9",
-    );
-    let nli = identity::identity(
-        "onnx-community/ModernBERT-base-nli-ONNX",
-        identity::combined_file_hash(&[
-            Path::new(&nli_run.metadata.model_path),
-            Path::new(&nli_run.metadata.tokenizer_path),
-        ])?,
-        identity::config_hash(
-            format!(
-                "max_length={};labels={},{},{};max_pairs_per_batch=1;ort_memory_pattern=false",
-                nli_run.metadata.max_length,
-                nli_run.metadata.contradiction_idx,
-                nli_run.metadata.entailment_idx,
-                nli_run.metadata.neutral_idx
-            )
-            .as_bytes(),
-        ),
-        format!("ort:{}", nli_run.metadata.ort_execution_provider_preference),
-    );
+    let nli_run = nli.run(&ner_run.candidates)?;
     let binding = DocumentAnalysisBinding {
         source_document_id: request.binding.source_document_id.clone(),
         native_document_id: request.binding.native_document_id,
@@ -76,10 +108,10 @@ pub fn analyze(request: &PhoenixAnalysisRequestV1) -> Result<AnalysisOutput> {
         analysis_generation: request.binding.analysis_generation,
         source_registry_revision: request.binding.source_registry_revision,
         target_registry_revision: request.binding.target_registry_revision,
-        producer_binary_hash,
-        chunker,
-        dynamic_ner,
-        nli,
+        producer_binary_hash: identities.producer_binary_hash,
+        chunker: identities.chunker.clone(),
+        dynamic_ner: identities.dynamic_ner.clone(),
+        nli: identities.nli.clone(),
     };
     let receipt = AnalysisStageReceipt {
         chunk_count: ner_run.chunk_count.try_into().unwrap_or(u32::MAX),
@@ -219,6 +251,70 @@ pub fn analyze(request: &PhoenixAnalysisRequestV1) -> Result<AnalysisOutput> {
         structural,
         coordinator,
     })
+}
+
+fn resident_identities(
+    ner: &ner::LoadedNer,
+    nli_runtime: &nli::LoadedNli,
+) -> Result<ResidentAnalysisIdentities> {
+    let executable = std::env::current_exe().context("resolve analysis bridge executable")?;
+    let producer_binary_hash = identity::file_hash(&executable)?;
+    let ner_metadata = ner.metadata();
+    let nli_metadata = nli_runtime.metadata();
+    let chunker = identity::identity(
+        "phoenix-chunker/structural-v1",
+        producer_binary_hash,
+        identity::config_hash(b"ChunkerConfig::default;sentence_ranges;structural_substrate"),
+        "rust-native",
+    );
+    let dynamic_ner = identity::identity(
+        "phoenix-dynamic-ner+gliner-bi-base-v2.0",
+        identity::combined_file_hash(&[
+            Path::new(&ner_metadata.model_path),
+            Path::new(&ner_metadata.text_tokenizer_path),
+            Path::new(&ner_metadata.labels_tokenizer_path),
+        ])?,
+        identity::config_hash(
+            format!(
+                "threshold=0.35;max_labels=14;max_model_windows=20;max_context_sentences=3;\
+              model_window_merge=none;gliner_batch_size={};ort_memory_pattern=false;overlap=default;\
+              nli_evidence_sentence_distance=1;nli_evidence_max_bytes=4096",
+                ner::batch_size()
+            )
+            .as_bytes(),
+        ),
+        "ort-2.0.0-rc.9",
+    );
+    let nli = identity::identity(
+        "onnx-community/ModernBERT-base-nli-ONNX",
+        identity::combined_file_hash(&[
+            Path::new(&nli_metadata.model_path),
+            Path::new(&nli_metadata.tokenizer_path),
+        ])?,
+        identity::config_hash(
+            format!(
+                "max_length={};labels={},{},{};padding=dynamic-microbatch-v1;max_pairs_per_batch={};attention_work_budget={};ort_memory_pattern=false",
+                nli_metadata.max_length,
+                nli_metadata.contradiction_idx,
+                nli_metadata.entailment_idx,
+                nli_metadata.neutral_idx,
+                nli::batch_size(),
+                phoenix_rel_post::nli_attention_work_budget()
+            )
+            .as_bytes(),
+        ),
+        format!("ort:{}", nli_metadata.ort_execution_provider_preference),
+    );
+    Ok(ResidentAnalysisIdentities {
+        producer_binary_hash,
+        chunker,
+        dynamic_ner,
+        nli,
+    })
+}
+
+fn elapsed_micros(started: Instant) -> u64 {
+    started.elapsed().as_micros().try_into().unwrap_or(u64::MAX)
 }
 
 fn convert_structural(

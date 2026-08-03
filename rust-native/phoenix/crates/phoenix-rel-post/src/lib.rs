@@ -22,6 +22,7 @@ mod model_split;
 mod nli;
 mod nli_claim;
 mod nli_stage;
+mod ort_cache;
 mod ort_runtime;
 mod seed_worker;
 #[cfg(test)]
@@ -80,13 +81,17 @@ pub use model_split::{
     default_model_split_contract, model_lane_for_role, PhoenixModelLane, PhoenixModelRole,
     PhoenixModelSplitRule,
 };
-pub use nli::{NliError, NliModel, NliModelMetadata, NliPairJudgment, NliScorer, NliScores};
+pub use nli::{
+    nli_attention_work_budget, NliError, NliModel, NliModelMetadata, NliPairJudgment, NliScorer,
+    NliScores,
+};
 pub use nli_claim::{
     adjudicate_claims_with_nli, ClassificationVote, NliClaimAdjudication,
     NliClaimAdjudicationOptions, NliClaimDecisionKind, NliClaimInput, NliClaimPurpose,
     NliClaimVote, NLI_CLAIM_INPUT_SCHEMA_VERSION,
 };
 pub use nli_stage::NliAdjudicationBatchOptions;
+pub use ort_cache::{OrtCacheStatus, OrtSessionLoadInfo};
 pub use seed_worker::{
     build_relation_mention_seed_sidecar, build_relation_mention_seed_sidecar_from_store,
     persist_relation_mention_seed_sidecar, RelationSeedConfig, RelationSeedReport,

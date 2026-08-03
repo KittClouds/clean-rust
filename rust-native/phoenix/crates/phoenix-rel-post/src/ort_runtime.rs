@@ -2,12 +2,15 @@ use std::env;
 use std::path::{Path, PathBuf};
 use std::sync::Once;
 use std::thread;
+use std::time::Instant;
 
 use ort::execution_providers::{
     CUDAExecutionProvider, DirectMLExecutionProvider, ExecutionProviderDispatch,
 };
 use ort::session::builder::GraphOptimizationLevel;
 use ort::session::Session;
+
+use crate::ort_cache::{self, OrtCacheStatus, OrtSessionLoadInfo};
 
 static ORT_DYLIB_INIT: Once = Once::new();
 const ORT_EP_ENV: &str = "PHOENIX_ORT_EP";
@@ -85,13 +88,29 @@ pub fn load_session_with_intra_threads_and_memory_pattern(
     )
 }
 
-pub fn load_nli_session(path: &Path) -> Result<Session, ort::Error> {
+pub fn load_session_with_intra_threads_and_memory_pattern_with_info(
+    path: &Path,
+    intra_threads: usize,
+    enable_memory_pattern: bool,
+) -> Result<(Session, OrtSessionLoadInfo), ort::Error> {
+    configure_preferred_ort_dylib_path();
+    build_session_with_info(
+        path,
+        intra_threads,
+        OrtExecutionProviderPreference::Cpu,
+        enable_memory_pattern,
+    )
+}
+
+pub fn load_nli_session_with_info(
+    path: &Path,
+) -> Result<(Session, OrtSessionLoadInfo), ort::Error> {
     let preference = nli_ort_preference();
     configure_preferred_ort_dylib_path_for(preference);
     // NLI pairs have document-dependent token lengths. A retained CPU memory
     // pattern keeps the largest ModernBERT activation arena alive for the whole
     // bridge process, which is hostile to bounded one-shot publication.
-    build_session(path, recommended_thread_count(), preference, false)
+    build_session_with_info(path, recommended_thread_count(), preference, false)
 }
 
 fn build_session(
@@ -100,19 +119,86 @@ fn build_session(
     preference: OrtExecutionProviderPreference,
     enable_memory_pattern: bool,
 ) -> Result<Session, ort::Error> {
+    build_session_with_info(path, intra_threads, preference, enable_memory_pattern)
+        .map(|(session, _)| session)
+}
+
+fn build_session_with_info(
+    path: &Path,
+    intra_threads: usize,
+    preference: OrtExecutionProviderPreference,
+    enable_memory_pattern: bool,
+) -> Result<(Session, OrtSessionLoadInfo), ort::Error> {
+    let intra_threads = intra_threads.max(1);
+    let mut cache = ort_cache::prepare(
+        path,
+        preference.as_str(),
+        intra_threads,
+        enable_memory_pattern,
+    );
+    let started = Instant::now();
+    let session = match commit_session(&cache, intra_threads, preference, enable_memory_pattern) {
+        Ok(session) => session,
+        Err(error) if cache.status().is_hit() => {
+            // An optimized artifact can be structurally present but rejected
+            // by a newer ORT/provider build. Retry from source exactly once.
+            eprintln!(
+                "PHOENIX_ORT_OPTIMIZED_CACHE_REJECTED input={} error={error}",
+                cache.input_path().display()
+            );
+            cache.invalidate_hit();
+            commit_session(&cache, intra_threads, preference, enable_memory_pattern).map_err(
+                |retry_error| {
+                    eprintln!(
+                    "PHOENIX_ORT_OPTIMIZED_CACHE_RETRY_FAILED first={error} retry={retry_error}"
+                );
+                    retry_error
+                },
+            )?
+        }
+        Err(error) => return Err(error),
+    };
+    cache.finish();
+    let info = cache.info(started.elapsed().as_micros().try_into().unwrap_or(u64::MAX));
+    if matches!(info.cache_status, OrtCacheStatus::WriteFailed) {
+        eprintln!(
+            "PHOENIX_ORT_OPTIMIZED_CACHE_WRITE_FAILED source={} key={}",
+            path.display(),
+            hex(&info.cache_key)
+        );
+    }
+    Ok((session, info))
+}
+
+fn commit_session(
+    cache: &ort_cache::CachePlan,
+    intra_threads: usize,
+    preference: OrtExecutionProviderPreference,
+    enable_memory_pattern: bool,
+) -> Result<Session, ort::Error> {
+    let optimization_level = if cache.status().is_hit() {
+        GraphOptimizationLevel::Disable
+    } else {
+        GraphOptimizationLevel::Level3
+    };
     let builder = Session::builder()?
-        .with_optimization_level(GraphOptimizationLevel::Level3)?
+        .with_optimization_level(optimization_level)?
         .with_memory_pattern(enable_memory_pattern)?
         .with_parallel_execution(false)?
         .with_inter_threads(1)?
-        .with_intra_threads(intra_threads.max(1))?;
+        .with_intra_threads(intra_threads)?;
+    let builder = if let Some(output_path) = cache.optimized_output_path() {
+        builder.with_optimized_model_path(output_path)?
+    } else {
+        builder
+    };
     let providers = execution_providers_for(preference);
     let builder = if providers.is_empty() {
         builder
     } else {
         builder.with_execution_providers(providers)?
     };
-    builder.commit_from_file(path)
+    builder.commit_from_file(cache.input_path())
 }
 
 pub fn recommended_thread_count() -> usize {
@@ -252,6 +338,16 @@ fn env_i32(name: &str) -> Option<i32> {
 
 fn normalize_env_value(value: &str) -> String {
     value.trim().to_ascii_lowercase().replace(['-', ' '], "_")
+}
+
+fn hex(bytes: &[u8]) -> String {
+    const DIGITS: &[u8; 16] = b"0123456789abcdef";
+    let mut output = String::with_capacity(bytes.len() * 2);
+    for &byte in bytes {
+        output.push(DIGITS[usize::from(byte >> 4)] as char);
+        output.push(DIGITS[usize::from(byte & 0x0f)] as char);
+    }
+    output
 }
 
 #[cfg(test)]
