@@ -10,24 +10,6 @@ export type DesktopDiscoveryCandidate = { key: string; token: string; kind: stri
 
 export type DesktopFeatureFlags = { scanner: boolean; structure: boolean; graptor: boolean; gldr: boolean; semantic: boolean; candidateGraph: boolean }
 
-export type DesktopForceAuthorityPersistReceipt = { schemaVersion: string; artifactId: string; rawBytes: number; compressedBytes: number; encoded: boolean; serializerMicros: number; atomicPersistMicros: number }
-
-export type DesktopForceAuthorityPersistRequest = { scopeId: string; snapshotId: string; authorityHash: string; manifestId: string; authorityPacket: JsonValue }
-
-export type DesktopForceRebuildV2Error = { code: string; message: string; retryable: boolean }
-
-export type DesktopForceRebuildV2Request = { contractVersion: string; operation: string; sourceMode: string; scopeId: string; cohortId: string; scopeKind: string; dependencyIdentity: string; noteIds: string[]; model: DesktopForceReplayModelV2; expectedSnapshotId: string; expectedAuthorityHash: string; expectedManifestId: string | null }
-
-export type DesktopForceRebuildV2ShadowRequest = { contractVersion: string; operation: string; sourceMode: string; scopeId: string; cohortId: string; scopeKind: string; dependencyIdentity: string; documents: DesktopForceReplayDocumentV2[]; model: DesktopForceReplayModelV2; expectedSnapshotId: string; expectedAuthorityHash: string; expectedManifestId: string | null }
-
-export type DesktopForceRebuildV2ShadowResult = { schemaVersion: string; contractVersion: string; pathId: string; fallbackCount: number; status: string; scopeId: string; snapshotId: string; authorityHash: string; manifestId: string; runHandle: string; analysisSource: string; analysisKernelMicros: number; verifiedSections: DesktopForceSectionV2[]; criticalResponseBytes: number; nativeCrossings: number; sourceBodyReads: number; sourceUtf8Bytes: number; transportedSourceBytes: number; sourceDocuments: DesktopForceReplayDocumentV2[]; sourceVersionEnvelopeChanged: boolean; authorityPacket: JsonValue; parentSpanId: string; spanId: string; error: DesktopForceRebuildV2Error | null }
-
-export type DesktopForceReplayDocumentV2 = { noteId: string; sha256: string; jsCodeUnitChars: number; utf8Bytes: number; version: number | null; updatedAt: number | null }
-
-export type DesktopForceReplayModelV2 = { dynamicNerId: string; embeddingModelId: string; embeddingDimension: string; nliModelId: string }
-
-export type DesktopForceSectionV2 = { name: string; identity: string; rowCount: number; rawBytes: number; compressedBytes: number }
-
 export type DesktopGalaxyScene = { nodes: DesktopGalaxySceneNode[]; links: DesktopGalaxySceneEdge[] }
 
 export type DesktopGalaxySceneEdge = { id: string; source: number; target: number; type: string; confidence: number; alpha: number; curve: number; flowOffset: number }
@@ -62,13 +44,13 @@ export type DesktopGraphRunOpenRequest = { documents: DesktopMentionBatchDocumen
 
 export type DesktopGraphRunOpenResponse = { schemaVersion: string; runHandle: string; documents: DesktopGraphRunOpenDocument[]; documentsBuilt: number; documentsReused: number }
 
-export type DesktopGraphRunPage = { schemaVersion: string; source: string; section: string; runHandle: string; offset: number; limit: number; detailRows: number; returnedDetailRows: number; nextOffset: number | null; arena: DesktopGraphRunArenaStats; counts: DesktopGraphRunCounts; projection: JsonValue; analysisSource: string; analysisKernelMicros: number }
+export type DesktopGraphRunPage = { schemaVersion: string; source: string; section: string; runHandle: string; offset: number; limit: number; detailRows: number; returnedDetailRows: number; nextOffset: number | null; arena: DesktopGraphRunArenaStats; counts: DesktopGraphRunCounts; projection: JsonValue }
 
 export type DesktopGraphRunPageRequest = { runHandle: string; offset: number; limit: number; section?: string | null }
 
 export type DesktopGraphRunPersistReceipt = { schemaVersion: string; runHandle: string; scopeId: string; snapshotId: string; manifestId: string; committedAt: number; changedSections: number; reusedSections: number; encodedSections: number; compressedSections: number; rawBytesWritten: number; compressedBytesWritten: number }
 
-export type DesktopGraphRunPersistRequest = { runHandle: string; forceReplayBinding?: JsonValue; authorityHash?: string }
+export type DesktopGraphRunPersistRequest = { runHandle: string }
 
 export type DesktopInitRequest = { forceReset: boolean; storagePath: string | null; storage: string | null }
 
@@ -86,7 +68,7 @@ export type DesktopMentionBatchScope = { worldId: string | null; narrativeId: st
 
 export type DesktopRelationCount = { relation: string; rows: number }
 
-export type DesktopRuntimeInfo = { banner: string; buildGitSha: string; buildProfile: string; target: string; ready: boolean; storage: string; storagePath: string | null; featureFlags: DesktopFeatureFlags; schemaVersion: string; relationCount: number; relationCounts: DesktopRelationCount[]; diagnostics: DesktopDiagnostic[]; binaryBlake3: string; nativeGraphContract: string }
+export type DesktopRuntimeInfo = { banner: string; buildGitSha: string; buildProfile: string; target: string; ready: boolean; storage: string; storagePath: string | null; featureFlags: DesktopFeatureFlags; schemaVersion: string; relationCount: number; relationCounts: DesktopRelationCount[]; diagnostics: DesktopDiagnostic[] }
 
 export type DesktopSnapshotAnalysisRequest = { runHandle?: string | null; snapshot: JsonValue; documents: JsonValue; documentSemanticSummary?: JsonValue; documentSemanticHandle?: string | null; retrievalCandidates?: JsonValue; receipts?: JsonValue; commits?: JsonValue; userOverrides?: JsonValue; siegel?: JsonValue }
 
@@ -108,7 +90,7 @@ export type NativeTtsSynthResult = { sampleRate: number; sampleCount: number; pc
 
 export type NativeTtsTimings = { conditionMs: number; tokenMs: number; decodeMs: number; totalMs: number }
 
-const ARGS_MAP = { 'phoenix':'{"analyze_graph_snapshot":["request"],"analyze_text_json":["request_json"],"atlas_rich_scan_json":["request_json"],"begin_native_operator_decision_json":["request_json"],"boot_snapshot_json":[],"build_structure_json":["request_json"],"close_graph_run":["run_handle"],"close_runtime":[],"commit_canonical_episode_assignment_json":["request_json"],"commit_canonical_episode_assignments_batch_json":["request_json"],"commit_json":["request_json"],"compile_galaxy_scene":["request"],"complete_native_operator_decision_json":["request_json"],"create_session_json":["request_json"],"export_snapshot":["partition"],"force_rebuild_v2":["request"],"force_rebuild_v2_shadow":["request"],"graph_delta_json":["request_json"],"graph_scene_packet_json":["request_json"],"import_snapshot":["bytes"],"ingest_json":["request_json"],"init_runtime":["request"],"link_native_operator_decision_graph_truth_json":["request_json"],"lorentz_forest_build_json":["request_json"],"lorentz_forest_cache_json":["request_json"],"lorentz_forest_query_json":["request_json"],"manifold_snapshot_json":["request_json"],"native_decision_census_json":[],"native_reward_observation_census_json":[],"nli_adjudicate_claims_json":["request_json"],"observe_native_reward_horizons_json":[],"open_graph_run":["request"],"persist_force_v2_authority":["request"],"persist_graph_run":["request"],"query_gfm_shadow":["request"],"query_json":["request_json"],"read_graph_run_page":["request"],"rebuild_json":["request_json"],"record_native_reward_observation_json":["request_json"],"runtime_info":[],"scan_json":["request_json"],"scan_mentions_batch":["request"],"session_state_json":["request_json"],"session_stats_json":["request_json"],"siegel_finsler_receipt_json":["request_json"],"store_command":["command","payload_json"],"tts_load":["request"],"tts_qwen_speak":["request"],"tts_speak":["request"],"tts_status":[],"tts_supertonic_speak":["request"],"tts_unload":[]}' }
+const ARGS_MAP = { 'phoenix':'{"analyze_graph_snapshot":["request"],"analyze_text_json":["request_json"],"atlas_rich_scan_json":["request_json"],"begin_native_operator_decision_json":["request_json"],"boot_snapshot_json":[],"build_structure_json":["request_json"],"close_graph_run":["run_handle"],"close_runtime":[],"commit_canonical_episode_assignment_json":["request_json"],"commit_canonical_episode_assignments_batch_json":["request_json"],"commit_json":["request_json"],"compile_galaxy_scene":["request"],"complete_native_operator_decision_json":["request_json"],"create_session_json":["request_json"],"export_snapshot":["partition"],"graph_delta_json":["request_json"],"graph_scene_packet_json":["request_json"],"import_snapshot":["bytes"],"ingest_json":["request_json"],"init_runtime":["request"],"link_native_operator_decision_graph_truth_json":["request_json"],"lorentz_forest_build_json":["request_json"],"lorentz_forest_cache_json":["request_json"],"lorentz_forest_query_json":["request_json"],"manifold_snapshot_json":["request_json"],"native_decision_census_json":[],"native_reward_observation_census_json":[],"nli_adjudicate_claims_json":["request_json"],"observe_native_reward_horizons_json":[],"open_graph_run":["request"],"persist_graph_run":["request"],"query_gfm_shadow":["request"],"query_json":["request_json"],"read_graph_run_page":["request"],"rebuild_json":["request_json"],"record_native_reward_observation_json":["request_json"],"runtime_info":[],"scan_json":["request_json"],"scan_mentions_batch":["request"],"session_state_json":["request_json"],"session_stats_json":["request_json"],"siegel_finsler_receipt_json":["request_json"],"store_command":["command","payload_json"],"tts_load":["request"],"tts_qwen_speak":["request"],"tts_speak":["request"],"tts_status":[],"tts_supertonic_speak":["request"],"tts_unload":[]}' }
 export type Router = { "phoenix": {analyze_graph_snapshot: (request: DesktopSnapshotAnalysisRequest) => Promise<DesktopGraphRunPage>,
 analyze_text_json: (requestJson: string) => Promise<string>,
 atlas_rich_scan_json: (requestJson: string) => Promise<string>,
@@ -124,8 +106,6 @@ compile_galaxy_scene: (request: DesktopGalaxySceneRequest) => Promise<DesktopGal
 complete_native_operator_decision_json: (requestJson: string) => Promise<string>,
 create_session_json: (requestJson: string) => Promise<string>,
 export_snapshot: (partition: string) => Promise<number[]>,
-force_rebuild_v2: (request: DesktopForceRebuildV2Request) => Promise<DesktopForceRebuildV2ShadowResult>,
-force_rebuild_v2_shadow: (request: DesktopForceRebuildV2ShadowRequest) => Promise<DesktopForceRebuildV2ShadowResult>,
 graph_delta_json: (requestJson: string) => Promise<string>,
 graph_scene_packet_json: (requestJson: string) => Promise<string>,
 import_snapshot: (bytes: number[]) => Promise<DesktopSnapshotImportResult>,
@@ -141,7 +121,6 @@ native_reward_observation_census_json: () => Promise<string>,
 nli_adjudicate_claims_json: (requestJson: string) => Promise<string>,
 observe_native_reward_horizons_json: () => Promise<string>,
 open_graph_run: (request: DesktopGraphRunOpenRequest) => Promise<DesktopGraphRunOpenResponse>,
-persist_force_v2_authority: (request: DesktopForceAuthorityPersistRequest) => Promise<DesktopForceAuthorityPersistReceipt>,
 persist_graph_run: (request: DesktopGraphRunPersistRequest) => Promise<DesktopGraphRunPersistReceipt>,
 query_gfm_shadow: (request: DesktopGfmShadowQueryRequest) => Promise<DesktopGfmShadowResponse>,
 query_json: (requestJson: string) => Promise<string>,

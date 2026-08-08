@@ -43,6 +43,7 @@ members = [
     "crates/phoenix-types",
     "crates/phoenix-index",
     "crates/phoenix-kernel",
+    "crates/phoenix-reweight",
 ]
 exclude = ["sidecars/phoenix-obscura-worker"]
 resolver = "2"
@@ -82,6 +83,7 @@ overgraph = "0.4.1"
 blake3 = "1.8"
 reqwest = { version = "0.12", default-features = false, features = ["blocking", "json", "rustls-tls", "gzip", "brotli", "deflate"] }
 url = "2.5"
+rayon = "1.8"
 
 [profile.release]
 opt-level = 3

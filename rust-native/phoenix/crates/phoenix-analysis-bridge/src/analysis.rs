@@ -440,7 +440,7 @@ mod tests {
 
     #[test]
     fn exact_chunker_records_survive_the_bridge_boundary() {
-        let text = "## Chapter 1: Test\n\nAlpha arrived. Beta waited.";
+        let text = "Chapter 1: Test\n\nAlpha arrived.\n\nChapter 2: Return\n\nBeta waited.";
         let source = phoenix_chunker_native::build_structural_substrate(
             text,
             &phoenix_chunker_native::ChunkerConfig::default(),
@@ -468,6 +468,14 @@ mod tests {
         converted.validate().expect("validate exact records");
         assert_eq!(converted.chunks.len(), source.base_chunks.len());
         assert_eq!(converted.sentences.len(), source.sentences.len());
+        let chapters = converted
+            .spans
+            .iter()
+            .filter(|span| span.kind == StructuralSpanKind::Chapter)
+            .collect::<Vec<_>>();
+        assert_eq!(chapters.len(), 2);
+        assert_eq!(chapters[0].label, "Chapter 1: Test");
+        assert_eq!(chapters[1].label, "Chapter 2: Return");
         for (packed, exact) in converted.chunks.iter().zip(&source.base_chunks) {
             assert_eq!(
                 (packed.start, packed.end, packed.content_hash),

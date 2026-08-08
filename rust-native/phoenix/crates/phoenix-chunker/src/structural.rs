@@ -274,7 +274,7 @@ struct RawChapter {
 }
 
 fn raw_chapter_ranges(text: &str) -> Vec<RawChapter> {
-    let mut headings = markdown_chapter_headings(text);
+    let mut headings = chapter_headings(text);
     if headings.is_empty() {
         let (start, end) = trim_range(text, 0, text.len());
         return vec![RawChapter {
@@ -301,7 +301,7 @@ fn raw_chapter_ranges(text: &str) -> Vec<RawChapter> {
     chapters
 }
 
-fn markdown_chapter_headings(text: &str) -> Vec<(usize, String)> {
+fn chapter_headings(text: &str) -> Vec<(usize, String)> {
     let mut headings = Vec::new();
     let mut line_start = 0usize;
     for line in text.split_inclusive('\n') {
@@ -326,15 +326,43 @@ fn markdown_chapter_headings(text: &str) -> Vec<(usize, String)> {
 }
 
 fn is_chapter_heading(line: &str) -> bool {
-    if !line.starts_with('#') {
+    if line.starts_with('#') {
+        let level = line.bytes().take_while(|byte| *byte == b'#').count();
+        if level == 0 || level > 6 || !line[level..].starts_with(' ') {
+            return false;
+        }
+        return starts_with_chapter_label(line[level..].trim());
+    }
+    is_plain_chapter_heading(line.trim())
+}
+
+fn starts_with_chapter_label(title: &str) -> bool {
+    title
+        .get(..8)
+        .is_some_and(|prefix| prefix.eq_ignore_ascii_case("chapter "))
+}
+
+fn is_plain_chapter_heading(title: &str) -> bool {
+    const MAX_PLAIN_HEADING_BYTES: usize = 160;
+    if title.len() > MAX_PLAIN_HEADING_BYTES || !starts_with_chapter_label(title) {
         return false;
     }
-    let level = line.bytes().take_while(|byte| *byte == b'#').count();
-    if level == 0 || level > 6 || !line[level..].starts_with(' ') {
+    let rest = &title[8..];
+    let designator_len = rest
+        .bytes()
+        .take_while(|byte| {
+            byte.is_ascii_digit()
+                || matches!(
+                    byte.to_ascii_uppercase(),
+                    b'I' | b'V' | b'X' | b'L' | b'C' | b'D' | b'M'
+                )
+        })
+        .count();
+    if designator_len == 0 {
         return false;
     }
-    let title = line[level..].trim();
-    title.to_ascii_lowercase().starts_with("chapter ")
+    let suffix = rest[designator_len..].trim_start();
+    matches!(suffix.chars().next(), None | Some(':' | '-' | '—'))
 }
 
 fn heading_title(line: &str) -> String {
@@ -630,6 +658,49 @@ mod tests {
         for chapter in &substrate.chapters {
             assert!(chapter.paragraph_start <= chapter.paragraph_end);
             assert!(chapter.sentence_start <= chapter.sentence_end);
+        }
+    }
+
+    #[test]
+    fn plain_numbered_chapters_define_authoritative_ranges() {
+        let text = "Chapter 1: Quicksave!?\n\n```\nOpening epigraph.\n```\n\nAlpha arrived.\n\nChapter 2: Story Branching\n\n```\nSecond epigraph.\n```\n\nBeta waited.";
+        let old_chunks = build_chunks(text, &ChunkerConfig::default());
+        let substrate = build_structural_substrate(text, &ChunkerConfig::default());
+
+        assert_eq!(substrate.chapters.len(), 2);
+        assert_eq!(substrate.chapters[0].title, "Chapter 1: Quicksave!?");
+        assert_eq!(substrate.chapters[1].title, "Chapter 2: Story Branching");
+        assert!(substrate
+            .sentences
+            .iter()
+            .any(|span| span.chapter_index == 0));
+        assert!(substrate
+            .sentences
+            .iter()
+            .any(|span| span.chapter_index == 1));
+        assert_eq!(substrate.base_chunks.len(), old_chunks.len());
+        assert!(substrate
+            .base_chunks
+            .iter()
+            .zip(old_chunks)
+            .all(|(base, old)| (base.start, base.end) == (old.start, old.end)));
+    }
+
+    #[test]
+    fn plain_chapter_grammar_rejects_prose_lookalikes() {
+        for heading in [
+            "Chapter 1",
+            "chapter 10: Heroes & Villains",
+            "CHAPTER IV — Return",
+        ] {
+            assert!(is_chapter_heading(heading), "rejected {heading:?}");
+        }
+        for prose in [
+            "Chapter One begins here",
+            "Chapter 1 was difficult to draft.",
+            "Chapterhouse 2: Not a chapter",
+        ] {
+            assert!(!is_chapter_heading(prose), "accepted {prose:?}");
         }
     }
 
