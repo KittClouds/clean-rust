@@ -1,0 +1,61 @@
+[package]
+name = "phoenix-turboquant"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.89"
+license = "MIT"
+description = "Clean-room TurboQuant experiment for immutable Phoenix embedding pages"
+publish = false
+
+[features]
+default = []
+corpus-census = ["dep:phoenix-memory-contract"]
+embedding-runner = ["dep:phoenix-embed"]
+embedding-qualification = ["embedding-runner", "dep:phoenix-chunker"]
+frozen-gate = ["embedding-runner", "dep:phoenix-memory-contract"]
+
+[dependencies]
+anyhow = "1.0"
+blake3 = "1.8"
+bytemuck = { version = "1.23", features = ["derive"] }
+memmap2 = "0.9"
+phoenix-embed = { path = "../../../rust-native/phoenix/crates/phoenix-embed", optional = true }
+phoenix-chunker = { path = "../../../rust-native/phoenix/crates/phoenix-chunker", optional = true }
+phoenix-memory-embeddings = { path = "../../../phoenix-native/crates/phoenix-memory-embeddings" }
+phoenix-memory-contract = { path = "../../../phoenix-native/crates/phoenix-memory-contract", optional = true }
+rayon = "1.11"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+sha2 = "0.10"
+thiserror = "2.0"
+
+[dev-dependencies]
+criterion = "0.7"
+tempfile = "3.20"
+
+[[bench]]
+name = "search"
+harness = false
+
+[[bin]]
+name = "corpus_census"
+path = "src/bin/corpus_census.rs"
+required-features = ["corpus-census"]
+
+[[bin]]
+name = "embed_qualification"
+path = "src/bin/embed_qualification.rs"
+required-features = ["embedding-qualification"]
+
+[[bin]]
+name = "frozen_gate"
+path = "src/bin/frozen_gate.rs"
+required-features = ["frozen-gate"]
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+
+[workspace]
