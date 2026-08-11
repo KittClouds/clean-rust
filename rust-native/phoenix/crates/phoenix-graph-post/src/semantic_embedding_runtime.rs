@@ -121,6 +121,7 @@ fn with_semantic_embedder<R>(
                 prefix_passage: true,
                 pooling: Default::default(),
                 input_prefix: Default::default(),
+                batch_order: Default::default(),
                 execution_provider: config.execution_provider(),
             })?;
             cache.embedders.insert(key.clone(), embedder);

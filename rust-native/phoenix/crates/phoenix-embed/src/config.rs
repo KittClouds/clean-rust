@@ -10,6 +10,22 @@ const EMBEDDING_GEMMA_QUERY_PREFIX: &str = "task: search result | query: ";
 const EMBEDDING_GEMMA_DOCUMENT_PREFIX: &str = "title: none | text: ";
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub enum EmbeddingBatchOrder {
+    #[default]
+    Input,
+    LengthBucketed,
+}
+
+impl EmbeddingBatchOrder {
+    pub fn label(self) -> &'static str {
+        match self {
+            Self::Input => "input",
+            Self::LengthBucketed => "length-bucketed",
+        }
+    }
+}
+
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub enum TextEmbeddingProfile {
     Truncate128,
     Truncate256,
@@ -133,6 +149,7 @@ pub struct OrtTextEmbedConfig {
     pub prefix_passage: bool,
     pub pooling: TextEmbeddingPooling,
     pub input_prefix: TextEmbeddingInputPrefix,
+    pub batch_order: EmbeddingBatchOrder,
     pub execution_provider: OrtExecutionProviderPreference,
 }
 
@@ -146,6 +163,7 @@ impl Default for OrtTextEmbedConfig {
             prefix_passage: false,
             pooling: TextEmbeddingPooling::default(),
             input_prefix: TextEmbeddingInputPrefix::default(),
+            batch_order: EmbeddingBatchOrder::Input,
             execution_provider: OrtExecutionProviderPreference::from_env(),
         }
     }
@@ -161,6 +179,7 @@ impl OrtTextEmbedConfig {
             prefix_passage: false,
             pooling: TextEmbeddingPooling::LastToken,
             input_prefix: TextEmbeddingInputPrefix::JinaQuery,
+            batch_order: EmbeddingBatchOrder::LengthBucketed,
             execution_provider: OrtExecutionProviderPreference::from_env(),
         }
     }
@@ -181,6 +200,7 @@ impl OrtTextEmbedConfig {
             prefix_passage: false,
             pooling: TextEmbeddingPooling::Mean,
             input_prefix: TextEmbeddingInputPrefix::MdbrLeafQuery,
+            batch_order: EmbeddingBatchOrder::Input,
             execution_provider: OrtExecutionProviderPreference::from_env(),
         }
     }
@@ -201,6 +221,7 @@ impl OrtTextEmbedConfig {
             prefix_passage: false,
             pooling: TextEmbeddingPooling::Mean,
             input_prefix: TextEmbeddingInputPrefix::EmbeddingGemmaQuery,
+            batch_order: EmbeddingBatchOrder::LengthBucketed,
             execution_provider: OrtExecutionProviderPreference::from_env(),
         }
     }
@@ -228,10 +249,19 @@ mod tests {
         assert_eq!(config.profile.target_dim(), 384);
         assert_eq!(config.pooling, TextEmbeddingPooling::Mean);
         assert_eq!(config.input_prefix, TextEmbeddingInputPrefix::MdbrLeafQuery);
+        assert_eq!(config.batch_order, EmbeddingBatchOrder::Input);
         assert_eq!(
             config.input_prefix.text(),
             "Represent this sentence for searching relevant passages: "
         );
+    }
+
+    #[test]
+    fn jina_v5_uses_qualified_length_bucketed_batches() {
+        let config = OrtTextEmbedConfig::jina_v5_retrieval_query(PathBuf::from("models/jina"));
+
+        assert_eq!(config.profile, TextEmbeddingProfile::Native768);
+        assert_eq!(config.batch_order, EmbeddingBatchOrder::LengthBucketed);
     }
 
     #[test]
@@ -251,6 +281,7 @@ mod tests {
 
         assert_eq!(query.profile, TextEmbeddingProfile::Native768);
         assert_eq!(query.max_length, 2048);
+        assert_eq!(query.batch_order, EmbeddingBatchOrder::LengthBucketed);
         assert_eq!(query.input_prefix.text(), "task: search result | query: ");
         assert_eq!(document.input_prefix.text(), "title: none | text: ");
     }

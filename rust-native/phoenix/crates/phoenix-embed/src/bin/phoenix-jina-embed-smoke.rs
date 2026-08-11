@@ -3,8 +3,9 @@ use std::path::PathBuf;
 use std::time::Instant;
 
 use phoenix_embed::{
-    default_ort_dylib_path, workspace_root, OrtExecutionProviderPreference, OrtTextEmbedConfig,
-    OrtTextEmbedder, TextEmbeddingInputPrefix, TextEmbeddingPooling, TextEmbeddingProfile,
+    default_ort_dylib_path, workspace_root, EmbeddingBatchOrder, OrtExecutionProviderPreference,
+    OrtTextEmbedConfig, OrtTextEmbedder, TextEmbeddingInputPrefix, TextEmbeddingPooling,
+    TextEmbeddingProfile,
 };
 
 const DEFAULT_MODEL_ROOT: &str = "G:\\phoenix-models\\jina-embeddings-v5-text-nano-retrieval";
@@ -25,6 +26,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         prefix_passage: false,
         pooling: TextEmbeddingPooling::LastToken,
         input_prefix: TextEmbeddingInputPrefix::None,
+        batch_order: EmbeddingBatchOrder::LengthBucketed,
         execution_provider: OrtExecutionProviderPreference::from_env(),
     };
 

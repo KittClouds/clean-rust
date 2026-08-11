@@ -638,6 +638,7 @@ impl ErEmbeddingModel {
             prefix_passage: false,
             pooling: Default::default(),
             input_prefix: Default::default(),
+            batch_order: Default::default(),
             execution_provider: Default::default(),
         })
         .map_err(|error| error.to_string())?;

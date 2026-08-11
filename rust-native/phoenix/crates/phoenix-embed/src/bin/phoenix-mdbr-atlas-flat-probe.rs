@@ -241,6 +241,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         prefix_passage: false,
         pooling: TextEmbeddingPooling::Mean,
         input_prefix: TextEmbeddingInputPrefix::None,
+        batch_order: Default::default(),
         execution_provider: OrtExecutionProviderPreference::from_env(),
     })?;
     let model_load_ms = elapsed_ms(load_started);

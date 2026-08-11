@@ -24,7 +24,7 @@ export interface EmbeddingModelDefinition {
     // Native runner model metadata.
     localModel?: {
         modelId: string;
-        quantization?: 'q8' | 'q4' | 'fp16';
+        quantization?: 'q8' | 'q4' | 'q4f16' | 'fp16';
         memoryMB: number; // Estimated memory usage
     };
 
@@ -85,7 +85,7 @@ export class EmbeddingModelRegistry {
                 costPer1kTokens: 0,
                 localModel: {
                     modelId: 'onnx-community/embeddinggemma-300m-ONNX',
-                    quantization: 'fp16',
+                    quantization: 'q4f16',
                     memoryMB: 920,
                 },
                 description: 'EmbeddingGemma 300M through the native Phoenix Rust semantic runner for high-accuracy semantic topology candidates.',
@@ -104,7 +104,7 @@ export class EmbeddingModelRegistry {
                 costPer1kTokens: 0,
                 localModel: {
                     modelId: 'BAAI/bge-small-en-v1.5',
-                    quantization: 'fp16',
+                    quantization: 'q4',
                     memoryMB: 130,
                 },
                 description: 'BGE Small EN v1.5 through the native Phoenix Rust semantic runner.',

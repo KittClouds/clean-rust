@@ -7,8 +7,9 @@ use std::sync::Mutex;
 use std::time::Instant;
 
 use phoenix_embed::{
-    default_ort_dylib_path, workspace_root, OrtExecutionProviderPreference, OrtTextEmbedConfig,
-    OrtTextEmbedder, TextEmbeddingInputPrefix, TextEmbeddingPooling, TextEmbeddingProfile,
+    default_ort_dylib_path, workspace_root, EmbeddingBatchOrder, OrtExecutionProviderPreference,
+    OrtTextEmbedConfig, OrtTextEmbedder, TextEmbeddingInputPrefix, TextEmbeddingPooling,
+    TextEmbeddingProfile,
 };
 use smallvec::SmallVec;
 
@@ -68,6 +69,7 @@ impl JinaSemanticLabelRouter {
             prefix_passage: false,
             pooling: TextEmbeddingPooling::LastToken,
             input_prefix: TextEmbeddingInputPrefix::None,
+            batch_order: EmbeddingBatchOrder::LengthBucketed,
             execution_provider: OrtExecutionProviderPreference::from_env(),
         };
         let started = Instant::now();
