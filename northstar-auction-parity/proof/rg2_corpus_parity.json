@@ -1,0 +1,461 @@
+{
+  "contract": "NORTHSTAR_MT5_CORPUS_PARITY_V1",
+  "status": "PASS",
+  "source": "sealed_mt5_rg2",
+  "report": {
+    "canonical_corpus_sha256": "9cbad8545db23cba7ccea2bd062aeba700597deb4be19cecbb74647f65ef8413",
+    "run_count": 20,
+    "sealed_file_count": 320,
+    "sealed_bytes": 3915010108,
+    "datasets": {
+      "events": 38957,
+      "attempts": 7764,
+      "episodes": 1462,
+      "context": 49281,
+      "features": 7764,
+      "transits": 628
+    },
+    "runs": [
+      {
+        "run_key": "RG2_DE40_PERIOD_M5_1765756800_1766181300_3308521111094945957",
+        "canonical_instrument": "DE40",
+        "sealed_files": 16,
+        "sealed_bytes": 139527103,
+        "relational": {
+          "counts": {
+            "events": 2596,
+            "attempts": 508,
+            "episodes": 77,
+            "context": 3381,
+            "features": 508,
+            "transits": 43
+          },
+          "attempts_resolved": 507,
+          "attempts_censored": 1,
+          "episodes_resolved": 76,
+          "episodes_censored": 1,
+          "transits_resolved": 43,
+          "transits_censored": 0
+        }
+      },
+      {
+        "run_key": "RG2_DE40_PERIOD_M5_1769990400_1770414900_2017222542755637715",
+        "canonical_instrument": "DE40",
+        "sealed_files": 16,
+        "sealed_bytes": 235841903,
+        "relational": {
+          "counts": {
+            "events": 2221,
+            "attempts": 448,
+            "episodes": 100,
+            "context": 2024,
+            "features": 448,
+            "transits": 33
+          },
+          "attempts_resolved": 447,
+          "attempts_censored": 1,
+          "episodes_resolved": 98,
+          "episodes_censored": 2,
+          "transits_resolved": 33,
+          "transits_censored": 0
+        }
+      },
+      {
+        "run_key": "RG2_DE40_PERIOD_M5_1776038400_1776462900_3312069574877448041",
+        "canonical_instrument": "DE40",
+        "sealed_files": 16,
+        "sealed_bytes": 119389533,
+        "relational": {
+          "counts": {
+            "events": 1368,
+            "attempts": 274,
+            "episodes": 38,
+            "context": 2680,
+            "features": 274,
+            "transits": 17
+          },
+          "attempts_resolved": 273,
+          "attempts_censored": 1,
+          "episodes_resolved": 37,
+          "episodes_censored": 1,
+          "transits_resolved": 17,
+          "transits_censored": 0
+        }
+      },
+      {
+        "run_key": "RG2_FRA40_PERIOD_M5_1764547200_1764978900_5546118285371728057",
+        "canonical_instrument": "FRA40",
+        "sealed_files": 16,
+        "sealed_bytes": 57237507,
+        "relational": {
+          "counts": {
+            "events": 3334,
+            "attempts": 636,
+            "episodes": 86,
+            "context": 3640,
+            "features": 636,
+            "transits": 77
+          },
+          "attempts_resolved": 633,
+          "attempts_censored": 3,
+          "episodes_resolved": 82,
+          "episodes_censored": 4,
+          "transits_resolved": 77,
+          "transits_censored": 0
+        }
+      },
+      {
+        "run_key": "RG2_FRA40_PERIOD_M5_1772409600_1772841300_6520811157212810975",
+        "canonical_instrument": "FRA40",
+        "sealed_files": 16,
+        "sealed_bytes": 141916683,
+        "relational": {
+          "counts": {
+            "events": 1777,
+            "attempts": 355,
+            "episodes": 78,
+            "context": 1669,
+            "features": 355,
+            "transits": 30
+          },
+          "attempts_resolved": 354,
+          "attempts_censored": 1,
+          "episodes_resolved": 77,
+          "episodes_censored": 1,
+          "transits_resolved": 30,
+          "transits_censored": 0
+        }
+      },
+      {
+        "run_key": "RG2_FRA40_PERIOD_M5_1777248000_1777589700_9554760657515700142",
+        "canonical_instrument": "FRA40",
+        "sealed_files": 16,
+        "sealed_bytes": 57741884,
+        "relational": {
+          "counts": {
+            "events": 965,
+            "attempts": 200,
+            "episodes": 57,
+            "context": 1551,
+            "features": 200,
+            "transits": 8
+          },
+          "attempts_resolved": 200,
+          "attempts_censored": 0,
+          "episodes_resolved": 56,
+          "episodes_censored": 1,
+          "transits_resolved": 8,
+          "transits_censored": 0
+        }
+      },
+      {
+        "run_key": "RG2_JPN225_PERIOD_M5_1764547200_1764978900_13582613236484951",
+        "canonical_instrument": "JPN225",
+        "sealed_files": 16,
+        "sealed_bytes": 85614357,
+        "relational": {
+          "counts": {
+            "events": 1573,
+            "attempts": 309,
+            "episodes": 61,
+            "context": 1554,
+            "features": 309,
+            "transits": 31
+          },
+          "attempts_resolved": 309,
+          "attempts_censored": 0,
+          "episodes_resolved": 61,
+          "episodes_censored": 0,
+          "transits_resolved": 31,
+          "transits_censored": 0
+        }
+      },
+      {
+        "run_key": "RG2_JPN225_PERIOD_M5_1766966400_1767398100_17845446579741474672",
+        "canonical_instrument": "JPN225",
+        "sealed_files": 16,
+        "sealed_bytes": 44646921,
+        "relational": {
+          "counts": {
+            "events": 2100,
+            "attempts": 412,
+            "episodes": 86,
+            "context": 2937,
+            "features": 412,
+            "transits": 40
+          },
+          "attempts_resolved": 412,
+          "attempts_censored": 0,
+          "episodes_resolved": 85,
+          "episodes_censored": 1,
+          "transits_resolved": 40,
+          "transits_censored": 0
+        }
+      },
+      {
+        "run_key": "RG2_JPN225_PERIOD_M5_1773619200_1774047300_3195075028303676313",
+        "canonical_instrument": "JPN225",
+        "sealed_files": 16,
+        "sealed_bytes": 123802928,
+        "relational": {
+          "counts": {
+            "events": 1554,
+            "attempts": 313,
+            "episodes": 66,
+            "context": 2516,
+            "features": 313,
+            "transits": 25
+          },
+          "attempts_resolved": 313,
+          "attempts_censored": 0,
+          "episodes_resolved": 64,
+          "episodes_censored": 2,
+          "transits_resolved": 25,
+          "transits_censored": 0
+        }
+      },
+      {
+        "run_key": "RG2_JPN225_PERIOD_M5_1783900800_1784332500_15138704202311374725",
+        "canonical_instrument": "JPN225",
+        "sealed_files": 16,
+        "sealed_bytes": 218773628,
+        "relational": {
+          "counts": {
+            "events": 2207,
+            "attempts": 445,
+            "episodes": 82,
+            "context": 2639,
+            "features": 445,
+            "transits": 30
+          },
+          "attempts_resolved": 444,
+          "attempts_censored": 1,
+          "episodes_resolved": 81,
+          "episodes_censored": 1,
+          "transits_resolved": 30,
+          "transits_censored": 0
+        }
+      },
+      {
+        "run_key": "RG2_US30_PERIOD_M5_1765756800_1766184900_14597027152545731016",
+        "canonical_instrument": "US30",
+        "sealed_files": 16,
+        "sealed_bytes": 295606123,
+        "relational": {
+          "counts": {
+            "events": 1770,
+            "attempts": 357,
+            "episodes": 73,
+            "context": 1864,
+            "features": 357,
+            "transits": 27
+          },
+          "attempts_resolved": 354,
+          "attempts_censored": 3,
+          "episodes_resolved": 69,
+          "episodes_censored": 4,
+          "transits_resolved": 27,
+          "transits_censored": 0
+        }
+      },
+      {
+        "run_key": "RG2_US30_PERIOD_M5_1776038400_1776466500_16278752941905126714",
+        "canonical_instrument": "US30",
+        "sealed_files": 16,
+        "sealed_bytes": 171698215,
+        "relational": {
+          "counts": {
+            "events": 1314,
+            "attempts": 280,
+            "episodes": 62,
+            "context": 2443,
+            "features": 280,
+            "transits": 6
+          },
+          "attempts_resolved": 280,
+          "attempts_censored": 0,
+          "episodes_resolved": 62,
+          "episodes_censored": 0,
+          "transits_resolved": 6,
+          "transits_censored": 0
+        }
+      },
+      {
+        "run_key": "RG2_US30_PERIOD_M5_1777248000_1777676100_6859180431116322748",
+        "canonical_instrument": "US30",
+        "sealed_files": 16,
+        "sealed_bytes": 159592007,
+        "relational": {
+          "counts": {
+            "events": 3239,
+            "attempts": 630,
+            "episodes": 99,
+            "context": 3078,
+            "features": 630,
+            "transits": 68
+          },
+          "attempts_resolved": 629,
+          "attempts_censored": 1,
+          "episodes_resolved": 98,
+          "episodes_censored": 1,
+          "transits_resolved": 68,
+          "transits_censored": 0
+        }
+      },
+      {
+        "run_key": "RG2_US500_PERIOD_M5_1764547200_1764975300_7828061311987021760",
+        "canonical_instrument": "US500",
+        "sealed_files": 16,
+        "sealed_bytes": 135523973,
+        "relational": {
+          "counts": {
+            "events": 2644,
+            "attempts": 527,
+            "episodes": 81,
+            "context": 3499,
+            "features": 527,
+            "transits": 40
+          },
+          "attempts_resolved": 524,
+          "attempts_censored": 3,
+          "episodes_resolved": 78,
+          "episodes_censored": 3,
+          "transits_resolved": 40,
+          "transits_censored": 0
+        }
+      },
+      {
+        "run_key": "RG2_US500_PERIOD_M5_1766361600_1766789700_6275432351093221649",
+        "canonical_instrument": "US500",
+        "sealed_files": 16,
+        "sealed_bytes": 66474897,
+        "relational": {
+          "counts": {
+            "events": 1060,
+            "attempts": 224,
+            "episodes": 34,
+            "context": 1316,
+            "features": 224,
+            "transits": 3
+          },
+          "attempts_resolved": 222,
+          "attempts_censored": 2,
+          "episodes_resolved": 32,
+          "episodes_censored": 2,
+          "transits_resolved": 3,
+          "transits_censored": 0
+        }
+      },
+      {
+        "run_key": "RG2_US500_PERIOD_M5_1773014400_1773442200_10013978319232738791",
+        "canonical_instrument": "US500",
+        "sealed_files": 16,
+        "sealed_bytes": 180405354,
+        "relational": {
+          "counts": {
+            "events": 1807,
+            "attempts": 363,
+            "episodes": 85,
+            "context": 2351,
+            "features": 363,
+            "transits": 31
+          },
+          "attempts_resolved": 362,
+          "attempts_censored": 1,
+          "episodes_resolved": 84,
+          "episodes_censored": 1,
+          "transits_resolved": 31,
+          "transits_censored": 0
+        }
+      },
+      {
+        "run_key": "RG2_US500_PERIOD_M5_1780272000_1780700100_8888579981882631925",
+        "canonical_instrument": "US500",
+        "sealed_files": 16,
+        "sealed_bytes": 205329240,
+        "relational": {
+          "counts": {
+            "events": 2755,
+            "attempts": 540,
+            "episodes": 111,
+            "context": 3420,
+            "features": 540,
+            "transits": 58
+          },
+          "attempts_resolved": 540,
+          "attempts_censored": 0,
+          "episodes_resolved": 111,
+          "episodes_censored": 0,
+          "transits_resolved": 58,
+          "transits_censored": 0
+        }
+      },
+      {
+        "run_key": "RG2_USTEC_PERIOD_M5_1767571200_1767999300_9581645730247380597",
+        "canonical_instrument": "USTEC",
+        "sealed_files": 16,
+        "sealed_bytes": 536685747,
+        "relational": {
+          "counts": {
+            "events": 1874,
+            "attempts": 368,
+            "episodes": 51,
+            "context": 3014,
+            "features": 368,
+            "transits": 29
+          },
+          "attempts_resolved": 368,
+          "attempts_censored": 0,
+          "episodes_resolved": 51,
+          "episodes_censored": 0,
+          "transits_resolved": 29,
+          "transits_censored": 0
+        }
+      },
+      {
+        "run_key": "RG2_USTEC_PERIOD_M5_1776038400_1776466500_3632165528533734308",
+        "canonical_instrument": "USTEC",
+        "sealed_files": 16,
+        "sealed_bytes": 488393125,
+        "relational": {
+          "counts": {
+            "events": 953,
+            "attempts": 197,
+            "episodes": 61,
+            "context": 922,
+            "features": 197,
+            "transits": 9
+          },
+          "attempts_resolved": 197,
+          "attempts_censored": 0,
+          "episodes_resolved": 61,
+          "episodes_censored": 0,
+          "transits_resolved": 9,
+          "transits_censored": 0
+        }
+      },
+      {
+        "run_key": "RG2_USTEC_PERIOD_M5_1784505600_1784933700_16636102961176583068",
+        "canonical_instrument": "USTEC",
+        "sealed_files": 16,
+        "sealed_bytes": 450808980,
+        "relational": {
+          "counts": {
+            "events": 1846,
+            "attempts": 378,
+            "episodes": 74,
+            "context": 2783,
+            "features": 378,
+            "transits": 23
+          },
+          "attempts_resolved": 376,
+          "attempts_censored": 2,
+          "episodes_resolved": 71,
+          "episodes_censored": 3,
+          "transits_resolved": 23,
+          "transits_censored": 0
+        }
+      }
+    ]
+  }
+}

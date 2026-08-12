@@ -12,6 +12,7 @@ mod fingerprint;
 mod product;
 mod publication;
 mod retrieval;
+mod semantic_shadow;
 mod shadow;
 mod state;
 
@@ -38,6 +39,12 @@ pub use product::{
     MAX_TEMPORAL_ENVELOPES_PER_SOURCE, MAX_VOCABULARY_PACKS, NO_MODEL_IDENTITY,
 };
 pub use publication::GenerationPublication;
+pub use semantic_shadow::{
+    ResidentSemanticIndex, SemanticEmbeddingError, SemanticQueryEmbedder, SemanticShadowConfig,
+    SemanticShadowEvaluationReceipt, SemanticShadowEvaluationStatus, SemanticShadowInstallError,
+    SemanticShadowPathId, SemanticShadowRuntimeSnapshot, SemanticShadowStatus,
+    SemanticShadowSubmissionReceipt, SemanticSidecarStatus, PHXQ1_SEMANTIC_SHADOW_PATH,
+};
 pub use shadow::{
     QpsShadowConfig, QpsShadowPathId, QpsShadowQueryShape, QpsShadowReceipt, QpsShadowStatus,
 };
@@ -45,5 +52,7 @@ pub use shadow::{
 pub(crate) use publication::publish_or_reuse;
 pub(crate) use state::{CoordinatorState, StoredConversation, StoredDocument, StoredTurn};
 
+#[cfg(test)]
+mod semantic_shadow_tests;
 #[cfg(test)]
 mod tests;

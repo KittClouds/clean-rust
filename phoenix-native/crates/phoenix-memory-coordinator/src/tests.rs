@@ -17,7 +17,7 @@ use std::time::Duration;
 use tempfile::TempDir;
 
 #[derive(Default)]
-struct FixtureProducer {
+pub(crate) struct FixtureProducer {
     document_calls: AtomicU64,
     turn_calls: AtomicU64,
 }
@@ -968,7 +968,7 @@ fn coordinator(
     DualFaceIngestionCoordinator::new(test_config(artifact_dir), producer).expect("coordinator")
 }
 
-fn test_config(artifact_dir: &std::path::Path) -> CoordinatorConfig {
+pub(crate) fn test_config(artifact_dir: &std::path::Path) -> CoordinatorConfig {
     CoordinatorConfig::new(
         Arc::<[u8]>::from(&b"phoenix/test-workspace"[..]),
         artifact_dir,
@@ -1027,14 +1027,14 @@ fn document_request(id: u64, content: &str) -> IngestDocumentRevision {
     }
 }
 
-fn conversation() -> ConversationKey {
+pub(crate) fn conversation() -> ConversationKey {
     ConversationKey {
         external_id: Arc::from(&b"chat/fixture"[..]),
         started_at_millis: 1_000,
     }
 }
 
-fn committed_turn(
+pub(crate) fn committed_turn(
     ordinal: u32,
     external_id: &'static [u8],
     content: &str,

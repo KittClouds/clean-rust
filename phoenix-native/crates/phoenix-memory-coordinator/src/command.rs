@@ -217,9 +217,12 @@ pub struct ContextPacket {
     /// Optional non-authoritative comparison evidence. This never changes
     /// `items` and is disabled by default.
     pub qps_shadow: QpsShadowReceipt,
+    /// Immediate submission state for the asynchronous PHXQ1 semantic shadow.
+    /// Heavy semantic work never delays or mutates authoritative `items`.
+    pub semantic_shadow: SemanticShadowSubmissionReceipt,
 }
 
-use crate::QpsShadowReceipt;
+use crate::{QpsShadowReceipt, SemanticShadowSubmissionReceipt};
 
 pub const LEXICAL_RECALL_PATH: &str = "phoenix.lexical.positional/v1";
 

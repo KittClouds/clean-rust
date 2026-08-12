@@ -1,0 +1,17 @@
+[package]
+name = "northstar-parity-cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "northstar-parity"
+path = "src/main.rs"
+
+[dependencies]
+northstar-auction-replay = { path = "../northstar-auction-replay" }
+northstar-parity-fixtures = { path = "../northstar-parity-fixtures" }
+northstar-mt5-corpus = { path = "../northstar-mt5-corpus" }
+serde.workspace = true
+serde_json.workspace = true

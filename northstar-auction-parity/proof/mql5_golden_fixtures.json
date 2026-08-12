@@ -1,0 +1,6 @@
+{
+  "contract": "NORTHSTAR_MQL5_GOLDEN_FIXTURES_V1",
+  "status": "PASS",
+  "scenarios": 16,
+  "directional_certificates": 32
+}

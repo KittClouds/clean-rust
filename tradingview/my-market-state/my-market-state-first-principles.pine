@@ -1,0 +1,487 @@
+// This derivative is licensed under CC BY-NC-SA 4.0:
+// https://creativecommons.org/licenses/by-nc-sa/4.0/
+// Cluster profile adapted from © LuxAlgo — "Clusters Volume Profile".
+// Supply/demand behavior ported from the user-supplied
+// Kitt_DailySwingZones_5Day_ROYGB_Optimized.mq5 v1.10.
+//@version=6
+indicator("My Market State — Cluster Ledger", "Mkt Ledger", overlay = true,
+     max_bars_back = 500, max_boxes_count = 500, max_labels_count = 500, max_lines_count = 500)
+
+// Coordinate contract:
+// - Cluster profiles are fixed-lookback objects anchored to real bar indices.
+// - Supply/demand zones are persistent objects anchored to Kitt source bars.
+// - The ledger is a screen-fixed table.
+// No chart viewport variables are used, so zooming cannot change calculations
+// or re-anchor drawings.
+
+string G_CLUSTER = "Cluster engine"
+int lookback = input.int(200, "Lookback", minval = 20, maxval = 500, group = G_CLUSTER)
+int clusterCount = input.int(5, "Clusters", minval = 2, maxval = 10, group = G_CLUSTER)
+int iterations = input.int(50, "K-means iterations", minval = 5, maxval = 50, group = G_CLUSTER)
+
+string G_PROFILE = "Cluster profiles"
+int rowsPerCluster = input.int(20, "Rows per cluster", minval = 4, maxval = 40, group = G_PROFILE)
+int profileWidth = input.int(40, "Maximum width (bars)", minval = 5, maxval = 300, group = G_PROFILE)
+int profileOffset = input.int(4, "Axis offset from latest bar", minval = 0, maxval = 50, group = G_PROFILE,
+     tooltip = "All cluster profiles share this right edge and grow left, keeping them inside the loaded chart area while zooming.")
+bool showPriceDots = input.bool(true, "Cluster price dots", group = G_PROFILE)
+bool showPocLabels = input.bool(true, "POC labels", group = G_PROFILE)
+string dotSizeInput = input.string(size.tiny, "Dot size", options = [size.tiny, size.small, size.normal], group = G_PROFILE)
+
+string G_ZONES = "Supply / demand"
+bool zonesOn = input.bool(true, "Enable zones", group = G_ZONES)
+string zoneCalcTfInput = input.timeframe("", "Calculation timeframe (blank = chart)", group = G_ZONES)
+int daysToKeep = input.int(5, "Broker days", minval = 1, maxval = 5, group = G_ZONES)
+bool showZoneLabels = input.bool(true, "State labels", group = G_ZONES)
+bool preserveRainbowFill = input.bool(true, "Preserve ROYGB fill", group = G_ZONES)
+int rainbowTransparency = input.int(48, "Rainbow transparency", minval = 0, maxval = 100, group = G_ZONES)
+color touchColor = input.color(color.white, "Touch edge", group = G_ZONES)
+color highRejectColor = input.color(#ff4080, "High rejection", group = G_ZONES)
+color lowRejectColor = input.color(color.aqua, "Low rejection", group = G_ZONES)
+color highBreakColor = input.color(color.lime, "High break", group = G_ZONES)
+color lowBreakColor = input.color(color.fuchsia, "Low break", group = G_ZONES)
+color demandColor = #089981
+color supplyColor = #f23645
+
+string G_LEDGER = "Market-state ledger"
+bool showLedger = input.bool(true, "Show ledger", group = G_LEDGER)
+string ledgerCorner = input.string("Bottom left", "Ledger position", options = ["Top right", "Top left", "Bottom right", "Bottom left", "Middle right", "Middle left"], group = G_LEDGER)
+
+var array<color> PALETTE = array.from(#2196f3, #f44336, #4caf50, #ff9800, #9c27b0, #00bcd4, #ffeb3b, #e91e63, #795548, #607d8b)
+
+const int Z_FRESH = 0
+const int Z_TOUCHED = 1
+const int Z_REJECTED = 2
+const int Z_BROKEN = 3
+
+type SDZone
+    float top
+    float bottom
+    bool supply
+    int state
+    int age
+    int dayStart
+    int sourceTime
+    float extreme
+    int touches
+    int rejections
+    int lastTouchTime
+    int lastRejectTime
+    int breakTime
+    box boxId
+    label labelId
+    line lineId
+
+var array<SDZone> demandZones = array.new<SDZone>()
+var array<SDZone> supplyZones = array.new<SDZone>()
+var array<box> clusterBoxes = array.new<box>()
+var array<label> clusterLabels = array.new<label>()
+var array<line> clusterLines = array.new<line>()
+
+var array<float> ledgerPocs = array.new<float>()
+var array<float> ledgerVolumes = array.new<float>()
+var array<float> ledgerLows = array.new<float>()
+var array<float> ledgerHighs = array.new<float>()
+
+f_delete_cluster_drawings() =>
+    while array.size(clusterBoxes) > 0
+        box.delete(array.pop(clusterBoxes))
+    while array.size(clusterLabels) > 0
+        label.delete(array.pop(clusterLabels))
+    while array.size(clusterLines) > 0
+        line.delete(array.pop(clusterLines))
+
+f_delete_zone(SDZone zone) =>
+    if not na(zone.boxId)
+        box.delete(zone.boxId)
+    if not na(zone.labelId)
+        label.delete(zone.labelId)
+    if not na(zone.lineId)
+        line.delete(zone.lineId)
+
+f_kmeans(int count, int k, int passes) =>
+    array<float> prices = array.new<float>(count)
+    array<float> volumes = array.new<float>(count)
+    float minimum = 1e100
+    float maximum = -1e100
+    for i = 0 to count - 1
+        float price = hl2[i]
+        float weight = math.max(nz(volume[i], 0.0), 0.0)
+        array.set(prices, i, price)
+        array.set(volumes, i, weight)
+        minimum := math.min(minimum, price)
+        maximum := math.max(maximum, price)
+
+    array<float> centroids = array.new<float>(k)
+    float step = (maximum - minimum) / (k + 1)
+    for cluster = 0 to k - 1
+        array.set(centroids, cluster, minimum + (cluster + 1) * step)
+
+    array<int> assignments = array.new<int>(count, 0)
+    for pass = 1 to passes
+        for i = 0 to count - 1
+            float price = array.get(prices, i)
+            int bestCluster = 0
+            float bestDistance = 1e100
+            for cluster = 0 to k - 1
+                float distance = math.abs(price - array.get(centroids, cluster))
+                if distance < bestDistance
+                    bestDistance := distance
+                    bestCluster := cluster
+            array.set(assignments, i, bestCluster)
+
+        array<float> weightedPrices = array.new<float>(k, 0.0)
+        array<float> weights = array.new<float>(k, 0.0)
+        for i = 0 to count - 1
+            int cluster = array.get(assignments, i)
+            float weight = array.get(volumes, i)
+            array.set(weightedPrices, cluster, array.get(weightedPrices, cluster) + array.get(prices, i) * weight)
+            array.set(weights, cluster, array.get(weights, cluster) + weight)
+        for cluster = 0 to k - 1
+            float weight = array.get(weights, cluster)
+            if weight > 0
+                array.set(centroids, cluster, array.get(weightedPrices, cluster) / weight)
+    [assignments, centroids]
+
+f_day_color(int age) =>
+    age <= 0 ? color.red : age == 1 ? color.orange : age == 2 ? color.yellow : age == 3 ? color.lime : color.rgb(0, 128, 255)
+
+f_state_name(int state) =>
+    state == Z_TOUCHED ? "TOUCHED" : state == Z_REJECTED ? "REJECTED" : state == Z_BROKEN ? "BROKEN" : "FRESH"
+
+f_new_kitt_zone(bool supply, int age, int dayStart, int sourceTime, float sourceOpen, float sourceHigh, float sourceLow, float sourceClose) =>
+    float top = supply ? sourceHigh : math.min(sourceOpen, sourceClose)
+    float bottom = supply ? math.max(sourceOpen, sourceClose) : sourceLow
+    float extreme = supply ? sourceHigh : sourceLow
+    color dayColor = f_day_color(age)
+    box zoneBox = box.new(sourceTime, top, time, bottom, xloc = xloc.bar_time,
+         bgcolor = color.new(dayColor, rainbowTransparency), border_color = dayColor)
+    label zoneLabel = showZoneLabels ? label.new(time, (top + bottom) * 0.5, "", xloc = xloc.bar_time,
+         style = label.style_label_left, color = color.new(color.black, 100), textcolor = dayColor, size = size.tiny) : na
+    line centerLine = line.new(sourceTime, (top + bottom) * 0.5, time, (top + bottom) * 0.5,
+         xloc = xloc.bar_time, color = color.new(dayColor, 45), style = line.style_dashed)
+    SDZone.new(top = top, bottom = bottom, supply = supply, state = 0, age = age,
+         dayStart = dayStart, sourceTime = sourceTime, extreme = extreme, touches = 0, rejections = 0,
+         lastTouchTime = na, lastRejectTime = na, breakTime = na, boxId = zoneBox, labelId = zoneLabel, lineId = centerLine)
+
+f_register_touch(SDZone zone, int barTime) =>
+    bool changed = false
+    if na(zone.lastTouchTime) or zone.lastTouchTime != barTime
+        zone.lastTouchTime := barTime
+        zone.touches += 1
+        if zone.state == Z_FRESH
+            zone.state := Z_TOUCHED
+        changed := true
+    changed
+
+f_apply_closed_bar(SDZone zone, int barTime, float barHigh, float barLow, float barClose) =>
+    bool changed = false
+    if zone.state != Z_BROKEN and barTime > zone.sourceTime
+        bool overlaps = barHigh >= zone.bottom and barLow <= zone.top
+        if zone.supply
+            if barClose > zone.top
+                zone.state := Z_BROKEN
+                zone.breakTime := barTime
+                changed := true
+            else if overlaps
+                changed := f_register_touch(zone, barTime) or changed
+                if barClose < zone.bottom and (na(zone.lastRejectTime) or zone.lastRejectTime != barTime)
+                    zone.lastRejectTime := barTime
+                    zone.rejections += 1
+                    zone.state := Z_REJECTED
+                    changed := true
+        else
+            if barClose < zone.bottom
+                zone.state := Z_BROKEN
+                zone.breakTime := barTime
+                changed := true
+            else if overlaps
+                changed := f_register_touch(zone, barTime) or changed
+                if barClose > zone.top and (na(zone.lastRejectTime) or zone.lastRejectTime != barTime)
+                    zone.lastRejectTime := barTime
+                    zone.rejections += 1
+                    zone.state := Z_REJECTED
+                    changed := true
+    changed
+
+f_apply_intrabar_touch(SDZone zone, int barTime, float barHigh, float barLow) =>
+    bool changed = false
+    if zone.state != Z_BROKEN and barTime > zone.sourceTime and barHigh >= zone.bottom and barLow <= zone.top
+        changed := f_register_touch(zone, barTime)
+    changed
+
+method updateDrawings(SDZone self, int rightTime, int barDuration) =>
+    color dayColor = f_day_color(self.age)
+    color edgeColor = self.state == Z_TOUCHED ? touchColor : self.state == Z_REJECTED ?
+         (self.supply ? highRejectColor : lowRejectColor) : self.state == Z_BROKEN ?
+         (self.supply ? highBreakColor : lowBreakColor) : dayColor
+    int transparency = preserveRainbowFill ? rainbowTransparency : self.state == Z_TOUCHED ? 52 :
+         self.state == Z_REJECTED ? 44 : self.state == Z_BROKEN ? 62 : 48
+    int width = self.state == Z_FRESH ? 1 : self.state == Z_TOUCHED ? 2 : 3
+    string borderStyle = self.state == Z_TOUCHED or self.state == Z_BROKEN ? line.style_dashed : line.style_solid
+    if not na(self.boxId)
+        box.set_left(self.boxId, self.sourceTime)
+        box.set_right(self.boxId, rightTime)
+        box.set_top(self.boxId, self.top)
+        box.set_bottom(self.boxId, self.bottom)
+        box.set_bgcolor(self.boxId, color.new(dayColor, transparency))
+        box.set_border_color(self.boxId, edgeColor)
+        box.set_border_width(self.boxId, width)
+        box.set_border_style(self.boxId, borderStyle)
+    if not na(self.lineId)
+        float middle = (self.top + self.bottom) * 0.5
+        line.set_xy1(self.lineId, self.sourceTime, middle)
+        line.set_xy2(self.lineId, rightTime, middle)
+        line.set_color(self.lineId, color.new(edgeColor, 45))
+        line.set_style(self.lineId, borderStyle)
+        line.set_width(self.lineId, width)
+    if showZoneLabels and not na(self.labelId)
+        string side = self.supply ? "HIGH" : "LOW"
+        string labelText = "D" + str.tostring(self.age) + " " + side + " | " + f_state_name(self.state) +
+             " | T:" + str.tostring(self.touches) + " R:" + str.tostring(self.rejections)
+        label.set_x(self.labelId, rightTime + barDuration * 2)
+        label.set_y(self.labelId, (self.top + self.bottom) * 0.5)
+        label.set_text(self.labelId, labelText)
+        label.set_textcolor(self.labelId, edgeColor)
+
+f_age_side(array<SDZone> zones) =>
+    int i = array.size(zones) - 1
+    while i >= 0
+        SDZone zone = array.get(zones, i)
+        zone.age += 1
+        if zone.age >= daysToKeep
+            f_delete_zone(zone)
+            array.remove(zones, i)
+        i -= 1
+    true
+
+f_start_kitt_day(int dayStart, int barTime, float barOpen, float barHigh, float barLow, float barClose) =>
+    f_age_side(supplyZones)
+    f_age_side(demandZones)
+    array.unshift(supplyZones, f_new_kitt_zone(true, 0, dayStart, barTime, barOpen, barHigh, barLow, barClose))
+    array.unshift(demandZones, f_new_kitt_zone(false, 0, dayStart, barTime, barOpen, barHigh, barLow, barClose))
+    true
+
+f_update_kitt_current(int dayStart, int barTime, float barOpen, float barHigh, float barLow, float barClose) =>
+    if array.size(supplyZones) == 0 or array.size(demandZones) == 0 or array.get(supplyZones, 0).dayStart != dayStart
+        f_start_kitt_day(dayStart, barTime, barOpen, barHigh, barLow, barClose)
+    else
+        SDZone highZone = array.get(supplyZones, 0)
+        SDZone lowZone = array.get(demandZones, 0)
+        if barHigh > highZone.extreme or (barHigh == highZone.extreme and barTime > highZone.sourceTime)
+            f_delete_zone(highZone)
+            array.set(supplyZones, 0, f_new_kitt_zone(true, 0, dayStart, barTime, barOpen, barHigh, barLow, barClose))
+        if barLow < lowZone.extreme or (barLow == lowZone.extreme and barTime > lowZone.sourceTime)
+            f_delete_zone(lowZone)
+            array.set(demandZones, 0, f_new_kitt_zone(false, 0, dayStart, barTime, barOpen, barHigh, barLow, barClose))
+    for zone in supplyZones
+        f_apply_intrabar_touch(zone, barTime, barHigh, barLow)
+    for zone in demandZones
+        f_apply_intrabar_touch(zone, barTime, barHigh, barLow)
+    true
+
+f_apply_closed_across_zones(int barTime, float barHigh, float barLow, float barClose) =>
+    for zone in supplyZones
+        f_apply_closed_bar(zone, barTime, barHigh, barLow, barClose)
+    for zone in demandZones
+        f_apply_closed_bar(zone, barTime, barHigh, barLow, barClose)
+    true
+
+f_render_kitt_zones() =>
+    int duration = nz(time - time[1], int(nz(timeframe.in_seconds(), 60.0) * 1000))
+    for zone in supplyZones
+        zone.updateDrawings(time, duration)
+    for zone in demandZones
+        zone.updateDrawings(time, duration)
+    true
+
+f_inside_zone(array<SDZone> zones, float price) =>
+    bool inside = false
+    for zone in zones
+        if zone.state != Z_BROKEN and price >= zone.bottom and price <= zone.top
+            inside := true
+            break
+    inside
+
+f_table_position(string corner) =>
+    corner == "Top left" ? position.top_left : corner == "Bottom right" ? position.bottom_right :
+         corner == "Bottom left" ? position.bottom_left : corner == "Middle right" ? position.middle_right :
+         corner == "Middle left" ? position.middle_left : position.top_right
+
+string zoneCalcTf = zoneCalcTfInput == "" ? timeframe.period : zoneCalcTfInput
+float chartSeconds = timeframe.in_seconds()
+float zoneCalcSeconds = timeframe.in_seconds(zoneCalcTf)
+if barstate.isfirst and zoneCalcSeconds < chartSeconds
+    runtime.error("Supply/demand calculation timeframe must be the chart timeframe or higher.")
+
+[zoneTime, zoneOpen, zoneHigh, zoneLow, zoneClose, zoneDay] = request.security(
+     syminfo.tickerid, zoneCalcTf, [time, open, high, low, close, time("D")],
+     gaps = barmerge.gaps_off, lookahead = barmerge.lookahead_off)
+
+var int trackedZoneTime = na
+var float trackedZoneOpen = na
+var float trackedZoneHigh = na
+var float trackedZoneLow = na
+var float trackedZoneClose = na
+bool validZoneSource = zonesOn and not na(zoneTime)
+bool newZoneSourceBar = validZoneSource and (na(trackedZoneTime) or zoneTime != trackedZoneTime)
+
+if validZoneSource
+    if newZoneSourceBar
+        if not na(trackedZoneTime)
+            f_apply_closed_across_zones(trackedZoneTime, trackedZoneHigh, trackedZoneLow, trackedZoneClose)
+        trackedZoneTime := zoneTime
+        trackedZoneOpen := zoneOpen
+        trackedZoneHigh := zoneHigh
+        trackedZoneLow := zoneLow
+        trackedZoneClose := zoneClose
+    else
+        trackedZoneHigh := zoneHigh
+        trackedZoneLow := zoneLow
+        trackedZoneClose := zoneClose
+    f_update_kitt_current(zoneDay, zoneTime, zoneOpen, zoneHigh, zoneLow, zoneClose)
+
+if zonesOn and barstate.islast
+    f_render_kitt_zones()
+
+float ledgerRange = math.max(nz(ta.atr(14), high - low), syminfo.mintick)
+var table ledger = table.new(f_table_position(ledgerCorner), 6, 12, border_width = 1)
+if barstate.isfirst
+    table.merge_cells(ledger, 0, 0, 5, 0)
+
+if barstate.islast and bar_index >= lookback - 1
+    [assignments, centroids] = f_kmeans(lookback, clusterCount, iterations)
+    f_delete_cluster_drawings()
+    array.clear(ledgerPocs)
+    array.clear(ledgerVolumes)
+    array.clear(ledgerLows)
+    array.clear(ledgerHighs)
+
+    int calculationStart = bar_index - lookback + 1
+    int profileAxis = bar_index + profileOffset
+    int labelsUsed = 0
+    int dotBudget = 500 - clusterCount
+
+    for cluster = 0 to clusterCount - 1
+        color clusterColor = array.get(PALETTE, cluster % array.size(PALETTE))
+        array<float> prices = array.new<float>()
+        array<float> volumes = array.new<float>()
+        array<float> highs = array.new<float>()
+        array<float> lows = array.new<float>()
+        float clusterLow = 1e100
+        float clusterHigh = -1e100
+        float clusterVolume = 0.0
+
+        for i = 0 to lookback - 1
+            if array.get(assignments, i) == cluster
+                float price = hl2[i]
+                float weight = math.max(nz(volume[i], 0.0), 0.0)
+                array.push(prices, price)
+                array.push(volumes, weight)
+                array.push(highs, high[i])
+                array.push(lows, low[i])
+                clusterLow := math.min(clusterLow, low[i])
+                clusterHigh := math.max(clusterHigh, high[i])
+                clusterVolume += weight
+                if showPriceDots and labelsUsed < dotBudget
+                    array.push(clusterLabels, label.new(bar_index - i, price, "•", color = color.new(color.black, 100),
+                         textcolor = clusterColor, style = label.style_label_center, size = dotSizeInput))
+                    labelsUsed += 1
+
+        float clusterPoc = na
+        if array.size(prices) > 0
+            float binSize = math.max((clusterHigh - clusterLow) / rowsPerCluster, syminfo.mintick)
+            array<float> binVolumes = array.new<float>(rowsPerCluster, 0.0)
+            for i = 0 to array.size(prices) - 1
+                float candleHigh = array.get(highs, i)
+                float candleLow = array.get(lows, i)
+                float candleVolume = array.get(volumes, i)
+                float candleRange = math.max(candleHigh - candleLow, syminfo.mintick)
+                for bin = 0 to rowsPerCluster - 1
+                    float binBottom = clusterLow + bin * binSize
+                    float binTop = binBottom + binSize
+                    float overlap = math.max(0.0, math.min(candleHigh, binTop) - math.max(candleLow, binBottom))
+                    if overlap > 0
+                        array.set(binVolumes, bin, array.get(binVolumes, bin) + candleVolume * overlap / candleRange)
+
+            float maximumBinVolume = array.max(binVolumes)
+            int pocBin = array.indexof(binVolumes, maximumBinVolume)
+            clusterPoc := clusterLow + (pocBin + 0.5) * binSize
+            for bin = 0 to rowsPerCluster - 1
+                float binVolume = array.get(binVolumes, bin)
+                if binVolume > 0 and array.size(clusterBoxes) < 500
+                    float bottom = clusterLow + bin * binSize
+                    float top = bottom + binSize
+                    int width = math.max(1, int(math.round(binVolume / math.max(maximumBinVolume, 1.0) * profileWidth)))
+                    bool isPoc = bin == pocBin
+                    color fill = isPoc ? clusterColor : color.new(clusterColor, 75)
+                    array.push(clusterBoxes, box.new(profileAxis - width, top, profileAxis, bottom,
+                         xloc = xloc.bar_index, bgcolor = fill, border_color = isPoc ? clusterColor : color.new(clusterColor, 100)))
+                    if isPoc
+                        array.push(clusterLines, line.new(calculationStart, clusterPoc, profileAxis, clusterPoc,
+                             xloc = xloc.bar_index, color = clusterColor, width = 1, style = line.style_dashed))
+                        if showPocLabels
+                            array.push(clusterLabels, label.new(profileAxis + 1, clusterPoc, "C" + str.tostring(cluster + 1),
+                                 xloc = xloc.bar_index, color = color.new(color.black, 100), textcolor = clusterColor,
+                                 style = label.style_label_left, size = size.tiny))
+
+        array.push(ledgerPocs, clusterPoc)
+        array.push(ledgerVolumes, clusterVolume)
+        array.push(ledgerLows, clusterLow)
+        array.push(ledgerHighs, clusterHigh)
+
+    if showLedger
+        table.clear(ledger, 0, 0, 5, 11)
+        float totalVolume = array.sum(ledgerVolumes)
+        float nearestDistance = 1e100
+        int nearestCluster = 0
+        float cog = 0.0
+        float lowestPoc = na
+        float highestPoc = na
+        for cluster = 0 to clusterCount - 1
+            float poc = array.get(ledgerPocs, cluster)
+            float clusterVolume = array.get(ledgerVolumes, cluster)
+            cog += nz(poc, close) * clusterVolume
+            if not na(poc)
+                lowestPoc := na(lowestPoc) ? poc : math.min(lowestPoc, poc)
+                highestPoc := na(highestPoc) ? poc : math.max(highestPoc, poc)
+                float distance = math.abs(close - poc)
+                if distance < nearestDistance
+                    nearestDistance := distance
+                    nearestCluster := cluster
+        cog := totalVolume > 0 ? cog / totalVolume : na
+        bool atSupply = f_inside_zone(supplyZones, close)
+        bool atDemand = f_inside_zone(demandZones, close)
+        string overall = atSupply ? "AT SUPPLY" : atDemand ? "AT DEMAND" : na(lowestPoc) ? "BUILDING" : close > highestPoc ? "DISCOVERY UP" :
+             close < lowestPoc ? "DISCOVERY DOWN" : "ROTATION C" + str.tostring(nearestCluster + 1)
+        color overallColor = atSupply or overall == "DISCOVERY DOWN" ? supplyColor :
+             atDemand or overall == "DISCOVERY UP" ? demandColor : array.get(PALETTE, nearestCluster)
+
+        table.cell(ledger, 0, 0, "MY MARKET STATE · " + overall + (na(cog) ? "" : " · COG " + str.tostring(cog, format.mintick)),
+             text_color = overallColor, bgcolor = color.rgb(30, 30, 30))
+        table.cell(ledger, 0, 1, "CL", text_color = color.silver)
+        table.cell(ledger, 1, 1, "POC", text_color = color.silver)
+        table.cell(ledger, 2, 1, "VOL", text_color = color.silver)
+        table.cell(ledger, 3, 1, "SHARE", text_color = color.silver)
+        table.cell(ledger, 4, 1, "ROLE", text_color = color.silver)
+        table.cell(ledger, 5, 1, "DIST", text_color = color.silver)
+
+        for cluster = 0 to clusterCount - 1
+            int row = cluster + 2
+            color clusterColor = array.get(PALETTE, cluster % array.size(PALETTE))
+            float poc = array.get(ledgerPocs, cluster)
+            float clusterVolume = array.get(ledgerVolumes, cluster)
+            float clusterLowNow = array.get(ledgerLows, cluster)
+            float clusterHighNow = array.get(ledgerHighs, cluster)
+            float share = totalVolume > 0 ? clusterVolume / totalVolume * 100 : 0.0
+            string role = na(poc) ? "EMPTY" : close >= clusterLowNow and close <= clusterHighNow ? "ACTIVE" : poc < close ? "DEMAND" : "SUPPLY"
+            string distance = na(poc) ? "—" : str.tostring((close - poc) / ledgerRange, "#.##") + " ATR"
+            color rowBackground = cluster == nearestCluster ? color.new(clusterColor, 82) : color.new(color.black, 100)
+            table.cell(ledger, 0, row, "C" + str.tostring(cluster + 1), text_color = clusterColor, bgcolor = rowBackground)
+            table.cell(ledger, 1, row, na(poc) ? "—" : str.tostring(poc, format.mintick), text_color = clusterColor, bgcolor = rowBackground)
+            table.cell(ledger, 2, row, str.tostring(clusterVolume, format.volume), text_color = color.white, bgcolor = rowBackground)
+            table.cell(ledger, 3, row, str.tostring(share, "#.0") + "%", text_color = color.white, bgcolor = rowBackground)
+            table.cell(ledger, 4, row, role, text_color = role == "SUPPLY" ? supplyColor : role == "DEMAND" ? demandColor : clusterColor, bgcolor = rowBackground)
+            table.cell(ledger, 5, row, distance, text_color = color.white, bgcolor = rowBackground)
+    else
+        table.clear(ledger, 0, 0, 5, 11)

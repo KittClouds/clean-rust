@@ -210,6 +210,7 @@ impl LexicalRecallIndex {
                     ..LexicalRecallReceipt::default()
                 },
                 qps_shadow: Default::default(),
+                semantic_shadow: Default::default(),
             });
         };
 
@@ -296,6 +297,7 @@ impl LexicalRecallIndex {
             proposed_candidates: candidates.into(),
             lexical: receipt,
             qps_shadow: Default::default(),
+            semantic_shadow: Default::default(),
         })
     }
 }

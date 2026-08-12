@@ -14,7 +14,9 @@ use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 
 use super::artifact::*;
+use super::locality::{GradedCandidateLocality, LocalityCapture};
 use super::partition::MiningPartitions;
+use super::rarity_coverage::{GradedCandidateRarityCoverage, RarityCoverageCapture};
 use super::source::{
     self, near_duplicate_key, QueryKind, SourceDataset, SourceDocument, SourceQuery,
 };
@@ -44,6 +46,8 @@ pub(crate) struct BuildOutputs {
     pub graded: PathBuf,
     pub review: PathBuf,
     pub receipt: PathBuf,
+    pub locality: Option<PathBuf>,
+    pub rarity_coverage: Option<PathBuf>,
 }
 
 pub(crate) fn generate(inputs: &BuildInputs, outputs: &BuildOutputs) -> Result<Publication> {
@@ -67,10 +71,19 @@ pub(crate) fn generate(inputs: &BuildInputs, outputs: &BuildOutputs) -> Result<P
             QueryKind::ScientificClaim,
             SCIFACT_RELEASE_UNIX,
         )?,
+        source::load_beir(
+            &inputs.nfcorpus,
+            "nfcorpus-train",
+            "train",
+            QueryKind::MedicalInformation,
+            NFCORPUS_RELEASE_UNIX,
+        )?,
         source::load_locomo(&inputs.locomo, 0..8)?,
     ];
     let mut training_audits = Vec::with_capacity(training_sets.len());
     let mut review_items = Vec::new();
+    let mut locality = LocalityCapture::new(outputs.locality.is_some());
+    let mut rarity_coverage = RarityCoverageCapture::new(outputs.rarity_coverage.is_some());
     let mut generation = 10_u64;
     for dataset in &training_sets {
         let prepared = PreparedDataset::new(dataset, &key)?;
@@ -84,6 +97,8 @@ pub(crate) fn generate(inputs: &BuildInputs, outputs: &BuildOutputs) -> Result<P
             v2_model_identity,
             &mut generation,
             &mut review_items,
+            &mut locality,
+            &mut rarity_coverage,
         )?);
         training_audits.push(super::fuzzy::append_fuzzy_review_candidates(
             &mut ledger,
@@ -94,6 +109,8 @@ pub(crate) fn generate(inputs: &BuildInputs, outputs: &BuildOutputs) -> Result<P
             v2_model_identity,
             &mut generation,
             &mut review_items,
+            &mut locality,
+            &mut rarity_coverage,
         )?);
     }
     ledger.validate().map_err(anyhow::Error::msg)?;
@@ -108,7 +125,8 @@ pub(crate) fn generate(inputs: &BuildInputs, outputs: &BuildOutputs) -> Result<P
         )?,
         source::load_locomo(&inputs.locomo, 8..10)?,
     ];
-    let (graded, graded_audits) = build_graded(&graded_sets, &key)?;
+    let (graded, graded_audits) =
+        build_graded(&graded_sets, &key, &mut locality, &mut rarity_coverage)?;
     if graded.queries.is_empty() {
         bail!("independent graded suite produced no eligible queries");
     }
@@ -125,6 +143,12 @@ pub(crate) fn generate(inputs: &BuildInputs, outputs: &BuildOutputs) -> Result<P
             items: review_items,
         },
     )?;
+    if let Some(path) = &outputs.locality {
+        locality.write(path, &outputs.ledger, &outputs.graded)?;
+    }
+    if let Some(path) = &outputs.rarity_coverage {
+        rarity_coverage.write(path, &outputs.ledger, &outputs.graded)?;
+    }
     let receipt = GenerationReceipt {
         contract: CONTRACT,
         schema_version: 1,
@@ -137,6 +161,7 @@ pub(crate) fn generate(inputs: &BuildInputs, outputs: &BuildOutputs) -> Result<P
             scifact_qrels: file_identity(&inputs.scifact.join("qrels/train.tsv"))?,
             nfcorpus_corpus: file_identity(&inputs.nfcorpus.join("corpus.jsonl"))?,
             nfcorpus_queries: file_identity(&inputs.nfcorpus.join("queries.jsonl"))?,
+            nfcorpus_train_qrels: file_identity(&inputs.nfcorpus.join("qrels/train.tsv"))?,
             nfcorpus_qrels: file_identity(&inputs.nfcorpus.join("qrels/test.tsv"))?,
             workspace_key_recorded: false,
         },
@@ -146,7 +171,11 @@ pub(crate) fn generate(inputs: &BuildInputs, outputs: &BuildOutputs) -> Result<P
             review_packet: file_identity(&outputs.review)?,
         },
         policy: GenerationPolicy {
-            training_sources: ["SciFact train", "LoCoMo conversations 0-7"],
+            training_sources: [
+                "SciFact train",
+                "NFCorpus train",
+                "LoCoMo conversations 0-7",
+            ],
             graded_sources: ["NFCorpus test", "LoCoMo conversations 8-9"],
             negative_policy: "four V2 hard negatives in the positive constitutional tier",
             judgment_source: JudgmentSourceV3::AutomaticallyMinedNegative,
@@ -189,6 +218,8 @@ fn append_review_candidates(
     v2_model_identity: [u8; 32],
     generation: &mut u64,
     review_items: &mut Vec<ReviewItem>,
+    locality: &mut LocalityCapture,
+    rarity_coverage: &mut RarityCoverageCapture,
 ) -> Result<DatasetAudit> {
     let mut scratch = SearchScratch::default();
     let mut hits = Vec::with_capacity(CANDIDATE_CAP);
@@ -246,6 +277,8 @@ fn append_review_candidates(
                 supersedes: None,
                 contradicts: Box::new([]),
             });
+            locality.capture_pair(&judgment, positive, negative);
+            rarity_coverage.capture_pair(&judgment, positive, negative);
             review_items.push(ReviewItem {
                 judgment_identity: hex(judgment.identity.as_bytes()),
                 dataset: dataset.name,
@@ -275,6 +308,8 @@ fn append_review_candidates(
 fn build_graded(
     datasets: &[SourceDataset],
     key: &WorkspaceIdentityKey,
+    locality: &mut LocalityCapture,
+    rarity_coverage: &mut RarityCoverageCapture,
 ) -> Result<(GradedEvaluationSuite, Vec<DatasetAudit>)> {
     let mut queries = Vec::new();
     let mut audits = Vec::with_capacity(datasets.len());
@@ -296,6 +331,40 @@ fn build_graded(
                 audit.oracle_missing_from_pool += 1;
                 continue;
             }
+            let query_identity = hex(KeyedIdentity::derive(
+                key,
+                b"graded-query",
+                format!("{}:{}", dataset.name, query.id).as_bytes(),
+            )
+            .as_bytes());
+            let locality_candidates = hits
+                .iter()
+                .enumerate()
+                .map(|(v2_order, hit)| GradedCandidateLocality {
+                    document_identity: hex(prepared.document_versions
+                        [hit.external_id as usize - 1]
+                        .as_bytes()),
+                    v2_order,
+                    v2_score_bits: hit.v2_score.to_bits(),
+                    matched_group_locality: hit.matched_group_locality,
+                    relevance_tier: hit.relevance_tier,
+                })
+                .collect::<Vec<_>>();
+            locality.capture_graded(query_identity.clone(), &locality_candidates);
+            let rarity_candidates = hits
+                .iter()
+                .enumerate()
+                .map(|(v2_order, hit)| GradedCandidateRarityCoverage {
+                    document_identity: hex(prepared.document_versions
+                        [hit.external_id as usize - 1]
+                        .as_bytes()),
+                    v2_order,
+                    v2_score_bits: hit.v2_score.to_bits(),
+                    rarity_weighted_group_coverage: hit.rarity_weighted_group_coverage,
+                    relevance_tier: hit.relevance_tier,
+                })
+                .collect::<Vec<_>>();
+            rarity_coverage.capture_graded(query_identity.clone(), &rarity_candidates);
             let candidates = hits
                 .iter()
                 .enumerate()
@@ -318,12 +387,7 @@ fn build_graded(
                 })
                 .collect();
             queries.push(GradedQuery {
-                query_identity: hex(KeyedIdentity::derive(
-                    key,
-                    b"graded-query",
-                    format!("{}:{}", dataset.name, query.id).as_bytes(),
-                )
-                .as_bytes()),
+                query_identity,
                 candidates,
             });
             audit.eligible_queries += 1;
@@ -702,11 +766,16 @@ fn v2_config() -> QpsConfig {
 
 fn ensure_outputs_absent(outputs: &BuildOutputs) -> Result<()> {
     for output in [
-        &outputs.ledger,
-        &outputs.graded,
-        &outputs.review,
-        &outputs.receipt,
-    ] {
+        Some(&outputs.ledger),
+        Some(&outputs.graded),
+        Some(&outputs.review),
+        Some(&outputs.receipt),
+        outputs.locality.as_ref(),
+        outputs.rarity_coverage.as_ref(),
+    ]
+    .into_iter()
+    .flatten()
+    {
         if output.exists() {
             bail!("refusing to overwrite {}", output.display());
         }

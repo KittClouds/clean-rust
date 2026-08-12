@@ -126,6 +126,13 @@ pub struct SearchHit {
     pub phrase: f32,
     pub segment: f32,
     pub exact_field: f32,
+    /// Experimental Phase 8.6 primitive: field-local compactness of all
+    /// matched query groups. This is not part of the canonical V3 schema.
+    pub matched_group_locality: f32,
+    /// Experimental Phase 8.7 primitive: fraction of candidate-independent
+    /// query rarity mass represented by matched groups. This is not part of
+    /// the canonical V3 schema.
+    pub rarity_weighted_group_coverage: f32,
     /// Fixed-width evidence used by the optional learned ranker. Keeping it on
     /// the returned hit makes failures auditable without retaining postings.
     pub rank_features: RankFeatureVector,

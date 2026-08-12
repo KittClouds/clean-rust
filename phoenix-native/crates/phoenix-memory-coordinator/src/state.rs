@@ -37,10 +37,15 @@ pub(crate) struct CoordinatorState<P> {
     pub current: Option<GenerationPublication>,
     lexical_recall: LexicalRecallIndex,
     qps_shadow: crate::shadow::QpsShadowState,
+    semantic_shadow: crate::semantic_shadow::SemanticShadowHandle,
 }
 
 impl<P: DualFaceProducer> CoordinatorState<P> {
-    pub fn new(config: CoordinatorConfig, producer: Arc<P>) -> Result<Self, CoordinatorError> {
+    pub fn new(
+        config: CoordinatorConfig,
+        producer: Arc<P>,
+        semantic_shadow: crate::semantic_shadow::SemanticShadowHandle,
+    ) -> Result<Self, CoordinatorError> {
         validate_registrations(&config)?;
         let namespace_hash = *blake3::hash(&config.namespace_external_identity).as_bytes();
         let lexical_recall = LexicalRecallIndex::empty(config.lexical_recall);
@@ -55,6 +60,7 @@ impl<P: DualFaceProducer> CoordinatorState<P> {
             current: None,
             lexical_recall,
             qps_shadow,
+            semantic_shadow,
         })
     }
 
@@ -170,6 +176,9 @@ impl<P: DualFaceProducer> CoordinatorState<P> {
             request.pending_turn.content.as_ref(),
             &authority_ordinals,
         );
+        packet.semantic_shadow = self
+            .semantic_shadow
+            .deferred(packet.resident_generation_hash);
         Ok(packet)
     }
 
@@ -278,6 +287,8 @@ impl<P: DualFaceProducer> CoordinatorState<P> {
         )?;
         self.published_generation = receipt.published_generation;
         self.current = Some(receipt.clone());
+        self.semantic_shadow
+            .observe_generation(receipt.generation_hash);
         Ok(receipt)
     }
 
@@ -287,6 +298,10 @@ impl<P: DualFaceProducer> CoordinatorState<P> {
         };
         let generation = VerifiedGraphGenerationV3::open(&receipt.path)?;
         Ok(Some(generation.header().generation_hash))
+    }
+
+    pub fn submit_semantic_shadow(&self, query: Arc<str>, generation_hash: Option<[u8; 32]>) {
+        let _ = self.semantic_shadow.submit(query, generation_hash);
     }
 }
 

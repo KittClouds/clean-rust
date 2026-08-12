@@ -12,7 +12,9 @@ hashbrown.workspace = true
 memchr.workspace = true
 phoenix-analysis-contract = { path = "../phoenix-analysis-contract" }
 phoenix-memory-contract = { path = "../phoenix-memory-contract" }
+phoenix-memory-embeddings = { path = "../phoenix-memory-embeddings" }
 phoenix-lexical-qps = { path = "../phoenix-lexical-qps" }
+phoenix-turboquant = { path = "../../../rust-native/phoenix-spikes/phoenix-turboquant" }
 phoenix-workspace = { path = "../phoenix-workspace" }
 thiserror.workspace = true
 

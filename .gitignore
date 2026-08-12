@@ -33,6 +33,12 @@ yarn-error.log
 # Miscellaneous
 /.angular/cache
 /.tmp
+/.env
+/.env.*
+!/.env.example
+*.pem
+*.key
+/docs/key.md
 /.codex/
 /.codex-runtime/
 /.codex-run

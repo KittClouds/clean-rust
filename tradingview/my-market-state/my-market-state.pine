@@ -1,0 +1,1053 @@
+//@version=6
+indicator("My Market State [VolKitt + Kitt]", shorttitle = "My Market State", overlay = true,
+     max_bars_back = 5000, max_lines_count = 500, max_boxes_count = 500, max_labels_count = 500)
+
+// Pine-native port of VolKitt Iteration 2 v2.31 and
+// Kitt DailySwingZones 5-Day ROYGB v1.10. The source indicators remain the
+// behavioral authority. Market Profile uses the same TPO occupancy/POC/value-
+// area rules at a Pine-safe adaptive tick multiple.
+
+const int FRESH = 0
+const int TESTED = 1
+const int ACCEPTED = 2
+const int REJECTED = 3
+const int BROKEN = 4
+const int RECLAIMED = 5
+const int FALL = -1
+const int STABLE = 0
+const int RISE = 1
+const int COMPRESS = -1
+const int EXPAND = 1
+const int HOLLOW = -1
+const int BUILD = 1
+const int Z_FRESH = 0
+const int Z_TOUCHED = 1
+const int Z_REJECTED = 2
+const int Z_BROKEN = 3
+
+string G_CORE = "Cluster core"
+string calcTfInput = input.timeframe("", "Calculation timeframe (blank = chart)", group = G_CORE)
+int lookback = input.int(200, "Lookback", minval = 20, maxval = 500, group = G_CORE)
+int clusterCount = input.int(5, "Clusters", minval = 1, maxval = 10, group = G_CORE)
+int iterations = input.int(50, "K-means iterations", minval = 1, maxval = 100, group = G_CORE)
+int rowsPerCluster = input.int(20, "Density rows / cluster", minval = 2, maxval = 100, group = G_CORE)
+float identityResetBins = input.float(2.5, "Identity reset (bins)", minval = 0.1, group = G_CORE)
+
+string G_MEASURE = "Fair-value measurement"
+int atrPeriod = input.int(100, "ATR period", minval = 2, maxval = 500, group = G_MEASURE)
+int cogBins = input.int(180, "COG density bins", minval = 30, maxval = 500, group = G_MEASURE)
+int velocityBars = input.int(5, "Velocity bars", minval = 1, group = G_MEASURE)
+float motionBins = input.float(0.15, "POC motion threshold (bins)", minval = 0.0, group = G_MEASURE)
+float massMotionPct = input.float(0.05, "Mass motion fraction", minval = 0.0, group = G_MEASURE)
+float widthMotionPct = input.float(0.05, "Width motion fraction", minval = 0.0, group = G_MEASURE)
+
+string G_SENT = "Extreme sentinel memory"
+bool sentinelsOn = input.bool(true, "Enable sentinels", group = G_SENT)
+string sentinelTrigger = input.string("Hybrid", "Trigger distance", options = ["ATR", "Outer gap", "Hybrid"], group = G_SENT)
+string sentinelReset = input.string("Broker day", "Reset", options = ["Broker day", "Re-entry", "Never"], group = G_SENT)
+float armAtr = input.float(0.20, "Arm distance ATR", minval = 0.0, group = G_SENT)
+float armGap = input.float(0.25, "Arm outer-gap fraction", minval = 0.0, group = G_SENT)
+float minStretchAtr = input.float(1.0, "Minimum stretch ATR", minval = 0.0, group = G_SENT)
+float reentryBufferAtr = input.float(0.25, "Re-entry buffer ATR", minval = 0.0, group = G_SENT)
+int reentryBars = input.int(3, "Re-entry bars", minval = 1, group = G_SENT)
+
+string G_VIS = "Core visualization"
+bool showClusters = input.bool(true, "Cluster lines and labels", group = G_VIS)
+bool showCog = input.bool(true, "Center of gravity", group = G_VIS)
+bool showRuler = input.bool(true, "Nearest-level ruler", group = G_VIS)
+bool showDashboard = input.bool(true, "Market-state dashboard", group = G_VIS)
+bool lockViewport = input.bool(true, "Lock drawings to visible window", group = G_VIS,
+     tooltip = "Rebuilds drawing anchors from TradingView's visible left/right bars when the chart is zoomed or scrolled.")
+int offsetBars = input.int(3, "Right-edge inset / offset bars", minval = 0, maxval = 100, group = G_VIS,
+     tooltip = "Visible lock: inset from the viewport edge. Unlocked: projection beyond the latest bar.")
+
+string G_SWING = "Five-day swing zones"
+bool swingOn = input.bool(true, "Enable ROYGB swing zones", group = G_SWING)
+int swingDays = input.int(5, "Days to keep", minval = 1, maxval = 5, group = G_SWING)
+int swingExtend = input.int(24, "Extend right (chart bars)", minval = 1, maxval = 500, group = G_SWING)
+bool swingLabels = input.bool(true, "Zone labels", group = G_SWING)
+bool preserveRainbow = input.bool(true, "Preserve ROYGB fill after interaction", group = G_SWING)
+int rainbowTransparency = input.int(48, "Rainbow fade", minval = 0, maxval = 100, group = G_SWING)
+
+string G_PROFILE = "TPO Market Profile"
+bool profileOn = input.bool(true, "Enable profile", group = G_PROFILE)
+string profileMode = input.string("Daily", "Session period", options = ["Daily", "Weekly", "Monthly", "Intraday"], group = G_PROFILE)
+int sessionsToCount = input.int(2, "Sessions", minval = 1, maxval = 4, group = G_PROFILE)
+int valueAreaPct = input.int(70, "Value area %", minval = 1, maxval = 100, group = G_PROFILE)
+int profileRowsCap = input.int(100, "Maximum rendered rows / session", minval = 20, maxval = 180, group = G_PROFILE)
+int profileTickMultiple = input.int(0, "Price-step ticks (0 = adaptive)", minval = 0, maxval = 10000, group = G_PROFILE)
+bool profileHistogram = input.bool(true, "TPO histogram", group = G_PROFILE)
+bool profileDeveloping = input.bool(false, "Developing POC / VAH / VAL", group = G_PROFILE)
+bool profileRightToLeft = input.bool(true, "Right-to-left histogram", group = G_PROFILE)
+int profileWidthBars = input.int(24, "Maximum histogram width (bars)", minval = 4, maxval = 100, group = G_PROFILE,
+     tooltip = "Normalizes every TPO row to a fixed bar width so zoom does not resize the profile from raw TPO counts.")
+string profileRays = input.string("None", "POC / VA rays", options = ["None", "Previous", "Current", "Previous + Current", "All"], group = G_PROFILE)
+int timeShiftMinutes = input.int(0, "Session time shift (minutes)", minval = -1440, maxval = 1440, group = G_PROFILE)
+bool intraday1On = input.bool(true, "Intraday 1", inline = "i1", group = G_PROFILE)
+string intraday1 = input.session("0000-0600", "", inline = "i1", group = G_PROFILE)
+bool intraday2On = input.bool(true, "Intraday 2", inline = "i2", group = G_PROFILE)
+string intraday2 = input.session("0600-1200", "", inline = "i2", group = G_PROFILE)
+bool intraday3On = input.bool(true, "Intraday 3", inline = "i3", group = G_PROFILE)
+string intraday3 = input.session("1200-1800", "", inline = "i3", group = G_PROFILE)
+bool intraday4On = input.bool(true, "Intraday 4", inline = "i4", group = G_PROFILE)
+string intraday4 = input.session("1800-0000", "", inline = "i4", group = G_PROFILE)
+
+string calcTf = calcTfInput == "" ? timeframe.period : calcTfInput
+float chartSeconds = timeframe.in_seconds()
+float calcSeconds = timeframe.in_seconds(calcTf)
+int visibleLeftIndex = nz(ta.valuewhen(time == chart.left_visible_bar_time, bar_index, 0), math.max(0, bar_index - lookback))
+int visibleRightIndex = nz(ta.valuewhen(time == chart.right_visible_bar_time, bar_index, 0), bar_index)
+int viewportRightIndex = math.max(visibleLeftIndex + 1, visibleRightIndex - offsetBars)
+int viewportRightTime = lockViewport and not na(chart.right_visible_bar_time) ?
+     math.max(chart.left_visible_bar_time, chart.right_visible_bar_time - int(offsetBars * chartSeconds * 1000)) :
+     time + int(offsetBars * chartSeconds * 1000)
+if barstate.isfirst and calcSeconds < chartSeconds
+    runtime.error("Calculation timeframe must be the chart timeframe or higher.")
+
+type LevelState
+    float price = na
+    int birthTime = na
+    int ageBars = 0
+    int touches = 0
+    int rejections = 0
+    float maxBreakDist = 0.0
+    int reclaimSuccess = 0
+    int cumulativeAcceptance = 0
+    int consecutiveAcceptance = 0
+    int status = 0
+    int lastUpdated = na
+    bool touchedThisBar = false
+    int brokenSide = 0
+    float snapCentroid = na
+    float snapMass = na
+    float snapRange = na
+    int snapTime = na
+    int direction = 0
+    int widthState = 0
+    int massState = 0
+
+type Cluster
+    bool valid = false
+    int slot = 0
+    float centroid = na
+    float price = na
+    float zoneLow = na
+    float zoneHigh = na
+    float clusterLow = na
+    float clusterHigh = na
+    float totalMass = 0.0
+    float massShare = 0.0
+    float pocMass = 0.0
+    float binSize = na
+
+type Sentinel
+    bool latched = false
+    bool upper = false
+    float price = na
+    int latchedAt = na
+    int sourceSlot = -1
+    int barsBackInside = 0
+    float maxExcursionAtr = 0.0
+
+type SwingZone
+    bool valid = false
+    bool highSide = false
+    int state = 0
+    int age = 0
+    int dayStart = na
+    int sourceTime = na
+    float zoneLow = na
+    float zoneHigh = na
+    float extreme = na
+    int touches = 0
+    int rejections = 0
+    int lastTouchBar = na
+    int lastRejectBar = na
+    int breakTime = na
+
+type Profile
+    int key = na
+    int slot = 0
+    int startTime = na
+    int endTime = na
+    int startIndex = na
+    int endIndex = na
+    array<int> times
+    array<float> highs
+    array<float> lows
+    array<float> opens
+    array<float> closes
+
+var array<float> srcOpen = array.new<float>()
+var array<float> srcHigh = array.new<float>()
+var array<float> srcLow = array.new<float>()
+var array<float> srcClose = array.new<float>()
+var array<float> srcVolume = array.new<float>()
+var array<int> srcTime = array.new<int>()
+var array<int> srcDay = array.new<int>()
+var array<float> memoryCentroids = array.new<float>()
+var array<LevelState> levelStates = array.new<LevelState>()
+var array<SwingZone> swingZones = array.new<SwingZone>()
+var array<Profile> profiles = array.new<Profile>()
+var Sentinel lowerSentinel = Sentinel.new(upper = false)
+var Sentinel upperSentinel = Sentinel.new(upper = true)
+
+var array<line> coreLines = array.new<line>()
+var array<label> coreLabels = array.new<label>()
+var array<line> miscLines = array.new<line>()
+var array<label> miscLabels = array.new<label>()
+var array<box> swingBoxes = array.new<box>()
+var array<label> swingDrawLabels = array.new<label>()
+var array<box> profileBoxes = array.new<box>()
+var array<line> profileLines = array.new<line>()
+var array<label> profileLabels = array.new<label>()
+
+var array<color> palette = array.from(color.teal, color.rgb(30, 144, 255), color.yellow, color.rgb(255, 99, 71), color.rgb(148, 0, 211), color.rgb(0, 188, 212), color.rgb(255, 235, 59), color.rgb(233, 30, 99), color.rgb(121, 85, 72), color.rgb(96, 125, 139))
+
+f_delete_lines(array<line> xs) =>
+    while array.size(xs) > 0
+        line.delete(array.pop(xs))
+
+f_delete_labels(array<label> xs) =>
+    while array.size(xs) > 0
+        label.delete(array.pop(xs))
+
+f_delete_boxes(array<box> xs) =>
+    while array.size(xs) > 0
+        box.delete(array.pop(xs))
+
+f_state_name(int s) =>
+    s == TESTED ? "TESTED" : s == ACCEPTED ? "ACCEPTED" : s == REJECTED ? "REJECTED" :
+     s == BROKEN ? "BROKEN" : s == RECLAIMED ? "RECLAIMED" : "FRESH"
+
+f_motion_name(int s, string kind) =>
+    kind == "dir" ? (s == RISE ? "RISE" : s == FALL ? "FALL" : "STABLE") :
+     kind == "width" ? (s == EXPAND ? "EXPAND" : s == COMPRESS ? "COMPRESS" : "STABLE") :
+     (s == BUILD ? "BUILD" : s == HOLLOW ? "HOLLOW" : "STABLE")
+
+f_reset_level(LevelState st, float price, float mass, float initialRange, int now) =>
+    st.price := price
+    st.birthTime := now
+    st.ageBars := 0
+    st.touches := 0
+    st.rejections := 0
+    st.maxBreakDist := 0.0
+    st.reclaimSuccess := 0
+    st.cumulativeAcceptance := 0
+    st.consecutiveAcceptance := 0
+    st.status := FRESH
+    st.lastUpdated := now
+    st.touchedThisBar := false
+    st.brokenSide := 0
+    st.snapCentroid := price
+    st.snapMass := mass
+    st.snapRange := initialRange
+    st.snapTime := now
+    st.direction := STABLE
+    st.widthState := STABLE
+    st.massState := STABLE
+
+f_update_level(LevelState st, Cluster obs, float co, float ch, float cl, float cc,
+               int ct, float po, float ph, float pl, float pc, int pt) =>
+    float resetDistance = math.max(obs.binSize * identityResetBins, syminfo.mintick * 5.0)
+    if na(st.price) or math.abs(obs.price - st.price) > resetDistance
+        f_reset_level(st, obs.price, obs.totalMass, obs.clusterHigh - obs.clusterLow, ct)
+    else
+        st.price := obs.price
+        float threshold = math.max(obs.binSize * 0.5, syminfo.mintick * 5.0)
+        if st.lastUpdated != ct and not na(pt)
+            st.ageBars += 1
+            float distanceClose = pc - st.price
+            float absoluteDistance = math.abs(distanceClose)
+            bool inside = absoluteDistance <= obs.binSize * 1.5
+            if inside
+                st.cumulativeAcceptance += 1
+                st.consecutiveAcceptance += 1
+            else
+                st.consecutiveAcceptance := 0
+            int next = st.status
+            bool crossedUp = po < st.price and pc > st.price + threshold
+            bool crossedDown = po > st.price and pc < st.price - threshold
+            bool touched = ph >= st.price and pl <= st.price
+            bool rejected = touched and ((po < st.price and pc < st.price and st.price - pc > threshold) or
+                 (po > st.price and pc > st.price and pc - st.price > threshold))
+            if st.brokenSide != 0
+                st.maxBreakDist := math.max(st.maxBreakDist, absoluteDistance)
+                bool reclaimed = (st.brokenSide == 1 and pc < st.price) or (st.brokenSide == -1 and pc > st.price)
+                if reclaimed
+                    st.reclaimSuccess += 1
+                    st.brokenSide := 0
+                    next := RECLAIMED
+            if crossedUp or crossedDown
+                st.brokenSide := crossedUp ? 1 : -1
+                next := BROKEN
+            else if rejected and next != RECLAIMED
+                st.rejections += 1
+                next := REJECTED
+            else if st.consecutiveAcceptance >= 3 and (next == FRESH or next == TESTED or next == REJECTED)
+                next := ACCEPTED
+            st.status := next
+            st.touchedThisBar := false
+            st.lastUpdated := ct
+        if not st.touchedThisBar and ch >= st.price and cl <= st.price
+            st.touches += 1
+            st.touchedThisBar := true
+            if st.status == FRESH
+                st.status := TESTED
+        if ct - st.snapTime >= velocityBars * int(calcSeconds * 1000)
+            float priceDelta = obs.price - st.snapCentroid
+            float rangeNow = obs.clusterHigh - obs.clusterLow
+            float rangeDelta = rangeNow - st.snapRange
+            float massDelta = obs.totalMass - st.snapMass
+            float motionThreshold = obs.binSize * motionBins
+            st.direction := priceDelta > motionThreshold ? RISE : priceDelta < -motionThreshold ? FALL : STABLE
+            float rangeThreshold = math.max(math.abs(st.snapRange) * widthMotionPct, obs.binSize)
+            st.widthState := rangeDelta > rangeThreshold ? EXPAND : rangeDelta < -rangeThreshold ? COMPRESS : STABLE
+            float massThreshold = math.max(math.abs(st.snapMass) * massMotionPct, 1.0)
+            st.massState := massDelta > massThreshold ? BUILD : massDelta < -massThreshold ? HOLLOW : STABLE
+            st.snapCentroid := obs.price
+            st.snapMass := obs.totalMass
+            st.snapRange := rangeNow
+            st.snapTime := ct
+
+f_kmeans(array<float> prices, array<float> volumes, int k, int iters) =>
+    int n = array.size(prices)
+    array<int> assignments = array.new<int>(n, -1)
+    array<float> centroids = array.new<float>(k, 0.0)
+    float minPrice = array.min(prices)
+    float maxPrice = array.max(prices)
+    float span = math.max(maxPrice - minPrice, syminfo.mintick)
+    bool memoryValid = array.size(memoryCentroids) == k
+    if memoryValid
+        for c = 0 to k - 1
+            float m = array.get(memoryCentroids, c)
+            if m < minPrice - span or m > maxPrice + span
+                memoryValid := false
+    if memoryValid
+        centroids := array.copy(memoryCentroids)
+    else
+        float step = span / (k + 1)
+        for c = 0 to k - 1
+            array.set(centroids, c, minPrice + (c + 1) * step)
+    array.sort(centroids)
+    array<float> sumPv = array.new<float>(k, 0.0)
+    array<float> sumV = array.new<float>(k, 0.0)
+    for iter = 0 to iters - 1
+        bool changed = false
+        for i = 0 to n - 1
+            int best = 0
+            float bestDistance = 1e100
+            for c = 0 to k - 1
+                float distance = math.abs(array.get(prices, i) - array.get(centroids, c))
+                if distance < bestDistance
+                    bestDistance := distance
+                    best := c
+            if array.get(assignments, i) != best
+                array.set(assignments, i, best)
+                changed := true
+        array.fill(sumPv, 0.0)
+        array.fill(sumV, 0.0)
+        for i = 0 to n - 1
+            int c = array.get(assignments, i)
+            float v = array.get(volumes, i)
+            array.set(sumPv, c, array.get(sumPv, c) + array.get(prices, i) * v)
+            array.set(sumV, c, array.get(sumV, c) + v)
+        for c = 0 to k - 1
+            if array.get(sumV, c) > 0.0
+                array.set(centroids, c, array.get(sumPv, c) / array.get(sumV, c))
+        array.sort(centroids)
+        if not changed and iter > 0
+            break
+    for i = 0 to n - 1
+        int best = 0
+        float bestDistance = 1e100
+        for c = 0 to k - 1
+            float distance = math.abs(array.get(prices, i) - array.get(centroids, c))
+            if distance < bestDistance
+                bestDistance := distance
+                best := c
+        array.set(assignments, i, best)
+    array.clear(memoryCentroids)
+    for c = 0 to k - 1
+        array.push(memoryCentroids, array.get(centroids, c))
+    [assignments, centroids]
+
+f_build_clusters() =>
+    int available = array.size(srcTime)
+    int n = math.min(lookback, available)
+    int k = math.min(clusterCount, n)
+    array<Cluster> clusters = array.new<Cluster>()
+    if n >= math.max(k, 5)
+        int first = available - n
+        array<float> prices = array.new<float>(n)
+        array<float> volumes = array.new<float>(n)
+        float totalFieldMass = 0.0
+        for i = 0 to n - 1
+            int at = first + i
+            float v = array.get(srcVolume, at)
+            array.set(prices, i, (array.get(srcHigh, at) + array.get(srcLow, at)) * 0.5)
+            array.set(volumes, i, v)
+            totalFieldMass += v
+        [assignments, centroids] = f_kmeans(prices, volumes, k, iterations)
+        while array.size(levelStates) < k
+            array.push(levelStates, LevelState.new())
+        for c = 0 to k - 1
+            float clusterLow = 1e100
+            float clusterHigh = -1e100
+            float clusterMass = 0.0
+            int members = 0
+            for i = 0 to n - 1
+                if array.get(assignments, i) == c
+                    int at = first + i
+                    clusterLow := math.min(clusterLow, array.get(srcLow, at))
+                    clusterHigh := math.max(clusterHigh, array.get(srcHigh, at))
+                    clusterMass += array.get(volumes, i)
+                    members += 1
+            Cluster obs = Cluster.new(slot = c)
+            if members > 0 and clusterHigh > clusterLow
+                float binSize = math.max((clusterHigh - clusterLow) / rowsPerCluster, syminfo.mintick)
+                array<float> binVolumes = array.new<float>(rowsPerCluster, 0.0)
+                for i = 0 to n - 1
+                    if array.get(assignments, i) == c
+                        int at = first + i
+                        float lo = array.get(srcLow, at)
+                        float hi = array.get(srcHigh, at)
+                        float barRange = math.max(hi - lo, syminfo.mintick)
+                        for b = 0 to rowsPerCluster - 1
+                            float binLow = clusterLow + b * binSize
+                            float overlap = math.min(hi, binLow + binSize) - math.max(lo, binLow)
+                            if overlap > 0.0
+                                array.set(binVolumes, b, array.get(binVolumes, b) + array.get(volumes, i) * overlap / barRange)
+                int pocBin = 0
+                float pocMass = -1.0
+                for b = 0 to rowsPerCluster - 1
+                    if array.get(binVolumes, b) > pocMass
+                        pocMass := array.get(binVolumes, b)
+                        pocBin := b
+                obs.valid := true
+                obs.centroid := array.get(centroids, c)
+                obs.price := clusterLow + (pocBin + 0.5) * binSize
+                obs.zoneLow := clusterLow + pocBin * binSize
+                obs.zoneHigh := obs.zoneLow + binSize
+                obs.clusterLow := clusterLow
+                obs.clusterHigh := clusterHigh
+                obs.totalMass := clusterMass
+                obs.massShare := totalFieldMass > 0.0 ? clusterMass / totalFieldMass : 0.0
+                obs.pocMass := math.max(pocMass, 0.0)
+                obs.binSize := binSize
+                int last = available - 1
+                int prev = available - 2
+                f_update_level(array.get(levelStates, c), obs,
+                     array.get(srcOpen, last), array.get(srcHigh, last), array.get(srcLow, last), array.get(srcClose, last), array.get(srcTime, last),
+                     prev >= 0 ? array.get(srcOpen, prev) : na, prev >= 0 ? array.get(srcHigh, prev) : na,
+                     prev >= 0 ? array.get(srcLow, prev) : na, prev >= 0 ? array.get(srcClose, prev) : na,
+                     prev >= 0 ? array.get(srcTime, prev) : na)
+            array.push(clusters, obs)
+    clusters
+
+f_center_width_atr() =>
+    int available = array.size(srcTime)
+    int n = math.min(lookback, available)
+    int first = available - n
+    float minPrice = 1e100
+    float maxPrice = -1e100
+    for i = 0 to n - 1
+        minPrice := math.min(minPrice, array.get(srcLow, first + i))
+        maxPrice := math.max(maxPrice, array.get(srcHigh, first + i))
+    float binSize = math.max((maxPrice - minPrice) / cogBins, syminfo.mintick)
+    array<float> density = array.new<float>(cogBins, 0.0)
+    for i = 0 to n - 1
+        int at = first + i
+        float lo = array.get(srcLow, at)
+        float hi = array.get(srcHigh, at)
+        float barRange = math.max(hi - lo, syminfo.mintick)
+        int firstBin = math.max(0, math.min(cogBins - 1, int(math.floor((lo - minPrice) / binSize))))
+        int lastBin = math.max(0, math.min(cogBins - 1, int(math.floor((hi - minPrice) / binSize))))
+        for b = firstBin to lastBin
+            float binLow = minPrice + b * binSize
+            float overlap = math.min(hi, binLow + binSize) - math.max(lo, binLow)
+            if overlap > 0.0
+                array.set(density, b, array.get(density, b) + array.get(srcVolume, at) * overlap / barRange)
+    float mass = 0.0
+    float weighted = 0.0
+    for b = 0 to cogBins - 1
+        float m = array.get(density, b)
+        float price = minPrice + (b + 0.5) * binSize
+        mass += m
+        weighted += price * m
+    float center = mass > 0.0 ? weighted / mass : na
+    float variance = 0.0
+    if not na(center)
+        for b = 0 to cogBins - 1
+            float delta = minPrice + (b + 0.5) * binSize - center
+            variance += array.get(density, b) * delta * delta
+    float width = mass > 0.0 ? math.sqrt(math.max(variance / mass, 0.0)) : na
+    int p = math.min(atrPeriod, n - 1)
+    float atr = 0.0
+    if p > 1
+        for i = 0 to p - 1
+            int at = available - 1 - i
+            float prevClose = array.get(srcClose, at - 1)
+            float tr = math.max(array.get(srcHigh, at) - array.get(srcLow, at),
+                 math.max(math.abs(array.get(srcHigh, at) - prevClose), math.abs(array.get(srcLow, at) - prevClose)))
+            atr += tr
+        atr := math.max(atr / p, syminfo.mintick)
+    else
+        atr := syminfo.mintick
+    [center, width, atr]
+
+f_reset_sentinel(Sentinel s) =>
+    s.latched := false
+    s.price := na
+    s.latchedAt := na
+    s.sourceSlot := -1
+    s.barsBackInside := 0
+    s.maxExcursionAtr := 0.0
+
+f_arm_distance(float atr, float outer, float inner) =>
+    float atrDistance = armAtr * math.max(atr, syminfo.mintick)
+    float gapDistance = armGap * math.abs(outer - inner)
+    sentinelTrigger == "ATR" ? atrDistance : sentinelTrigger == "Outer gap" ? gapDistance : math.max(atrDistance, gapDistance)
+
+f_latch(Sentinel s, Cluster c, int now) =>
+    s.latched := true
+    s.price := c.price
+    s.latchedAt := now
+    s.sourceSlot := c.slot
+    s.barsBackInside := 0
+    s.maxExcursionAtr := 0.0
+
+f_update_sentinels(array<Cluster> clusters, float center, float atr, bool newCalcBar) =>
+    int n = array.size(clusters)
+    if not sentinelsOn
+        f_reset_sentinel(lowerSentinel)
+        f_reset_sentinel(upperSentinel)
+    else if n >= 3
+        int last = array.size(srcTime) - 1
+        int currentDay = array.get(srcDay, last)
+        var int sentinelDay = na
+        if sentinelReset == "Broker day"
+            if na(sentinelDay)
+                sentinelDay := currentDay
+            else if currentDay != sentinelDay
+                f_reset_sentinel(lowerSentinel)
+                f_reset_sentinel(upperSentinel)
+                sentinelDay := currentDay
+        if sentinelReset == "Re-entry" and newCalcBar and last > 0
+            float pc = array.get(srcClose, last - 1)
+            float buffer = reentryBufferAtr * math.max(atr, syminfo.mintick)
+            if upperSentinel.latched
+                upperSentinel.barsBackInside := pc <= upperSentinel.price - buffer ? upperSentinel.barsBackInside + 1 : 0
+                if upperSentinel.barsBackInside >= reentryBars
+                    f_reset_sentinel(upperSentinel)
+            if lowerSentinel.latched
+                lowerSentinel.barsBackInside := pc >= lowerSentinel.price + buffer ? lowerSentinel.barsBackInside + 1 : 0
+                if lowerSentinel.barsBackInside >= reentryBars
+                    f_reset_sentinel(lowerSentinel)
+        Cluster lo = array.get(clusters, 0)
+        Cluster li = array.get(clusters, 1)
+        Cluster hi = array.get(clusters, n - 1)
+        Cluster hii = array.get(clusters, n - 2)
+        if lo.valid and li.valid and hi.valid and hii.valid
+            float safeAtr = math.max(atr, syminfo.mintick)
+            float middle = n % 2 == 1 ? array.get(clusters, int(n / 2)).price :
+                 (array.get(clusters, int(n / 2) - 1).price + array.get(clusters, int(n / 2)).price) * 0.5
+            float current = close
+            bool lowTrigger = current <= lo.price + f_arm_distance(atr, lo.price, li.price) and (middle - current) / safeAtr >= minStretchAtr
+            bool highTrigger = current >= hi.price - f_arm_distance(atr, hi.price, hii.price) and (current - middle) / safeAtr >= minStretchAtr
+            if not lowerSentinel.latched and lowTrigger
+                f_latch(lowerSentinel, lo, time)
+            if not upperSentinel.latched and highTrigger
+                f_latch(upperSentinel, hi, time)
+            if lowerSentinel.latched
+                lowerSentinel.maxExcursionAtr := math.max(lowerSentinel.maxExcursionAtr, math.max(0.0, lowerSentinel.price - current) / safeAtr)
+            if upperSentinel.latched
+                upperSentinel.maxExcursionAtr := math.max(upperSentinel.maxExcursionAtr, math.max(0.0, current - upperSentinel.price) / safeAtr)
+
+f_new_zone(bool highSide, int age, int dayStart, int sourceTime, float o, float h, float l, float c) =>
+    SwingZone z = SwingZone.new(valid = true, highSide = highSide, age = age, dayStart = dayStart, sourceTime = sourceTime)
+    z.zoneLow := highSide ? math.max(o, c) : l
+    z.zoneHigh := highSide ? h : math.min(o, c)
+    z.extreme := highSide ? h : l
+    z
+
+f_touch_zone(SwingZone z, int bt) =>
+    if z.lastTouchBar != bt
+        z.lastTouchBar := bt
+        z.touches += 1
+        if z.state == Z_FRESH
+            z.state := Z_TOUCHED
+
+f_apply_zone_closed(SwingZone z, int bt, float bh, float bl, float bc) =>
+    if z.valid and z.state != Z_BROKEN and bt > z.sourceTime
+        bool overlap = bh >= z.zoneLow and bl <= z.zoneHigh
+        if z.highSide
+            if bc > z.zoneHigh
+                z.state := Z_BROKEN
+                z.breakTime := bt
+            else if overlap
+                f_touch_zone(z, bt)
+                if bc < z.zoneLow and z.lastRejectBar != bt
+                    z.lastRejectBar := bt
+                    z.rejections += 1
+                    z.state := Z_REJECTED
+        else
+            if bc < z.zoneLow
+                z.state := Z_BROKEN
+                z.breakTime := bt
+            else if overlap
+                f_touch_zone(z, bt)
+                if bc > z.zoneHigh and z.lastRejectBar != bt
+                    z.lastRejectBar := bt
+                    z.rejections += 1
+                    z.state := Z_REJECTED
+
+f_apply_zone_intrabar(SwingZone z, int bt, float bh, float bl) =>
+    if z.valid and z.state != Z_BROKEN and bt > z.sourceTime and bh >= z.zoneLow and bl <= z.zoneHigh
+        f_touch_zone(z, bt)
+
+f_age_swing_zones() =>
+    int i = array.size(swingZones) - 1
+    while i >= 0
+        SwingZone z = array.get(swingZones, i)
+        z.age += 1
+        if z.age >= swingDays
+            array.remove(swingZones, i)
+        i -= 1
+
+f_swing_start_day(int dayStart, int bt, float bo, float bh, float bl, float bc) =>
+    f_age_swing_zones()
+    array.unshift(swingZones, f_new_zone(false, 0, dayStart, bt, bo, bh, bl, bc))
+    array.unshift(swingZones, f_new_zone(true, 0, dayStart, bt, bo, bh, bl, bc))
+
+f_swing_update_current(int dayStart, int bt, float bo, float bh, float bl, float bc) =>
+    if array.size(swingZones) < 2 or array.get(swingZones, 0).dayStart != dayStart
+        f_swing_start_day(dayStart, bt, bo, bh, bl, bc)
+    else
+        SwingZone hz = array.get(swingZones, 0)
+        SwingZone lz = array.get(swingZones, 1)
+        if bh > hz.extreme or (bh == hz.extreme and bt > hz.sourceTime)
+            array.set(swingZones, 0, f_new_zone(true, 0, dayStart, bt, bo, bh, bl, bc))
+        if bl < lz.extreme or (bl == lz.extreme and bt > lz.sourceTime)
+            array.set(swingZones, 1, f_new_zone(false, 0, dayStart, bt, bo, bh, bl, bc))
+    for i = 0 to array.size(swingZones) - 1
+        f_apply_zone_intrabar(array.get(swingZones, i), bt, bh, bl)
+
+f_profile_new(int key, int slot, int bt, int bi) =>
+    Profile.new(key = key, slot = slot, startTime = bt, endTime = bt, startIndex = bi, endIndex = bi,
+         times = array.new<int>(), highs = array.new<float>(), lows = array.new<float>(),
+         opens = array.new<float>(), closes = array.new<float>())
+
+f_profile_add(Profile p, int bt, int bi, float bo, float bh, float bl, float bc) =>
+    int n = array.size(p.times)
+    if n > 0 and array.get(p.times, n - 1) == bt
+        array.set(p.highs, n - 1, bh)
+        array.set(p.lows, n - 1, bl)
+        array.set(p.closes, n - 1, bc)
+    else
+        array.push(p.times, bt)
+        array.push(p.opens, bo)
+        array.push(p.highs, bh)
+        array.push(p.lows, bl)
+        array.push(p.closes, bc)
+    p.endTime := bt
+    p.endIndex := bi
+
+// Difference-array range adds reproduce the MQL price-by-price TPO counts in
+// O(bars + rows), rather than its O(bars * rows) nested scan.
+f_profile_metrics(Profile p) =>
+    int bars = array.size(p.times)
+    float sessionHigh = array.max(p.highs)
+    float sessionLow = array.min(p.lows)
+    int rawRows = int(math.round((sessionHigh - sessionLow) / syminfo.mintick)) + 1
+    int pineSafeRows = math.min(profileRowsCap, math.max(20, int(460 / sessionsToCount)))
+    int safeMultiple = math.max(1, int(math.ceil(rawRows / pineSafeRows)))
+    int tickMultiple = profileTickMultiple > 0 ? math.max(profileTickMultiple, safeMultiple) : safeMultiple
+    float step = syminfo.mintick * tickMultiple
+    float top = math.round(sessionHigh / step) * step
+    float bottom = math.round(sessionLow / step) * step
+    int rows = math.max(1, int(math.round((top - bottom) / step)) + 1)
+    array<int> diff = array.new<int>(rows + 1, 0)
+    for b = 0 to bars - 1
+        int firstRow = math.max(0, math.min(rows - 1, int(math.ceil((array.get(p.lows, b) - bottom) / step - 1e-9))))
+        int lastRow = math.max(0, math.min(rows - 1, int(math.floor((array.get(p.highs, b) - bottom) / step + 1e-9))))
+        if firstRow <= lastRow
+            array.set(diff, firstRow, array.get(diff, firstRow) + 1)
+            array.set(diff, lastRow + 1, array.get(diff, lastRow + 1) - 1)
+    array<int> counts = array.new<int>(rows, 0)
+    int running = 0
+    int totalTpo = 0
+    int maxTpo = -1
+    int pocRow = 0
+    float center = bottom + (top - bottom) * 0.5
+    float bestCenterDistance = 1e100
+    int r = rows - 1
+    // Build the prefix first from low to high.
+    for i = 0 to rows - 1
+        running += array.get(diff, i)
+        array.set(counts, i, running)
+        totalTpo += running
+    // MQL scans high to low and keeps the center-most tie (higher wins an exact tie).
+    while r >= 0
+        int count = array.get(counts, r)
+        float distance = math.abs(bottom + r * step - center)
+        if count > maxTpo or (count == maxTpo and distance < bestCenterDistance)
+            maxTpo := count
+            pocRow := r
+            bestCenterDistance := distance
+        r -= 1
+    int target = int(totalTpo * valueAreaPct * 0.01)
+    int tpoCount = array.get(counts, pocRow)
+    int up = 1
+    int down = 1
+    while tpoCount < target
+        int above = pocRow + up
+        int below = pocRow - down
+        if ((below < 0) or (above < rows and array.get(counts, above) >= array.get(counts, below))) and above < rows
+            tpoCount += array.get(counts, above)
+            up += 1
+        else if below >= 0
+            tpoCount += array.get(counts, below)
+            down += 1
+        else
+            break
+    float poc = bottom + pocRow * step
+    float vah = poc + up * step
+    float val = poc - down * step + step
+    [poc, vah, val, step, bottom, maxTpo, counts]
+
+f_profile_ray_for(int newestIndex, int total) =>
+    profileRays == "All" or
+     (profileRays == "Current" and newestIndex == 0) or
+     (profileRays == "Previous" and newestIndex == 1) or
+     (profileRays == "Previous + Current" and newestIndex <= 1)
+
+f_render_profiles() =>
+    f_delete_boxes(profileBoxes)
+    f_delete_lines(profileLines)
+    f_delete_labels(profileLabels)
+    int total = array.size(profiles)
+    if profileOn and total > 0
+        int first = math.max(0, total - sessionsToCount)
+        for pi = first to total - 1
+            Profile p = array.get(profiles, pi)
+            int newestIndex = total - 1 - pi
+            bool intersectsViewport = not lockViewport or (p.endIndex >= visibleLeftIndex and p.startIndex <= visibleRightIndex)
+            if intersectsViewport
+                [poc, vah, val, step, bottom, maxTpo, counts] = f_profile_metrics(p)
+                int sessionLeft = lockViewport ? math.max(p.startIndex, visibleLeftIndex) : p.startIndex
+                int sessionRight = lockViewport ? math.min(p.endIndex + 1, viewportRightIndex) : p.endIndex + 1
+                sessionLeft := math.min(sessionLeft, sessionRight)
+                int profileAnchor = profileRightToLeft ? sessionRight : sessionLeft
+                if profileHistogram and sessionRight > sessionLeft and maxTpo > 0
+                    for row = 0 to array.size(counts) - 1
+                        int count = array.get(counts, row)
+                        if count > 0
+                            float level = bottom + row * step
+                            int rowWidth = math.max(1, int(math.round(count / maxTpo * profileWidthBars)))
+                            int left = profileRightToLeft ? (lockViewport ? math.max(visibleLeftIndex, profileAnchor - rowWidth) : profileAnchor - rowWidth) : profileAnchor
+                            int right = profileRightToLeft ? profileAnchor : (lockViewport ? math.min(viewportRightIndex, profileAnchor + rowWidth) : profileAnchor + rowWidth)
+                            color rowColor = count == 1 ? color.new(color.rgb(255, 215, 0), 18) :
+                                 color.new(color.from_gradient(count, 1, math.max(maxTpo, 2), color.blue, color.red), 28)
+                            if right > left
+                                array.push(profileBoxes, box.new(left, level, right, level - step, xloc = xloc.bar_index,
+                                     border_color = rowColor, border_width = 1, bgcolor = rowColor))
+                bool ray = f_profile_ray_for(newestIndex, total)
+                string ext = ray and not lockViewport ? extend.right : extend.none
+                int lineRight = ray and lockViewport ? viewportRightIndex : sessionRight
+                array.push(profileLines, line.new(sessionLeft, poc, lineRight, poc, xloc = xloc.bar_index,
+                     extend = ext, color = color.white, width = 2))
+                array.push(profileLines, line.new(sessionLeft, vah, lineRight, vah, xloc = xloc.bar_index,
+                     extend = ext, color = color.new(color.orange, 0), style = line.style_dotted))
+                array.push(profileLines, line.new(sessionLeft, val, lineRight, val, xloc = xloc.bar_index,
+                     extend = ext, color = color.rgb(250, 128, 114), style = line.style_dotted))
+                array.push(profileLabels, label.new(lineRight, poc,
+                     "POC " + str.tostring(poc, format.mintick) + "\nVAH " + str.tostring(vah, format.mintick) +
+                     "\nVAL " + str.tostring(val, format.mintick), xloc = xloc.bar_index,
+                     style = lockViewport ? label.style_label_right : label.style_label_left,
+                     textcolor = color.white, color = color.new(color.black, 75), size = size.tiny))
+
+f_swing_color(int age) =>
+    age == 0 ? color.red : age == 1 ? color.orange : age == 2 ? color.yellow : age == 3 ? color.lime : color.rgb(0, 128, 255)
+
+f_zone_state_name(int s) => s == Z_TOUCHED ? "TOUCHED" : s == Z_REJECTED ? "REJECTED" : s == Z_BROKEN ? "BROKEN" : "FRESH"
+
+f_render_swings() =>
+    f_delete_boxes(swingBoxes)
+    f_delete_labels(swingDrawLabels)
+    if swingOn
+        int right = lockViewport ? math.max(chart.left_visible_bar_time, viewportRightTime) : time + int(swingExtend * chartSeconds * 1000)
+        for i = 0 to array.size(swingZones) - 1
+            SwingZone z = array.get(swingZones, i)
+            color ageColor = f_swing_color(z.age)
+            color edge = z.state == Z_TOUCHED ? color.white : z.state == Z_REJECTED ?
+                 (z.highSide ? color.rgb(255, 64, 128) : color.aqua) : z.state == Z_BROKEN ?
+                 (z.highSide ? color.lime : color.fuchsia) : ageColor
+            int fade = preserveRainbow ? rainbowTransparency : z.state == Z_BROKEN ? 62 : z.state == Z_REJECTED ? 44 : z.state == Z_TOUCHED ? 52 : 48
+            string style = z.state == Z_TOUCHED or z.state == Z_BROKEN ? line.style_dashed : line.style_solid
+            int width = z.state == Z_FRESH ? 1 : z.state == Z_TOUCHED ? 2 : 3
+            int left = lockViewport ? math.max(z.sourceTime, chart.left_visible_bar_time) : z.sourceTime
+            if left <= right
+                array.push(swingBoxes, box.new(left, z.zoneHigh, right, z.zoneLow, xloc = xloc.bar_time,
+                     border_color = edge, border_width = width, border_style = style, bgcolor = color.new(ageColor, fade)))
+            if swingLabels and left <= right
+                string side = z.highSide ? "HIGH" : "LOW"
+                string txt = "D" + str.tostring(z.age) + " " + side + " | " + f_zone_state_name(z.state) +
+                     " | T:" + str.tostring(z.touches) + " R:" + str.tostring(z.rejections)
+                array.push(swingDrawLabels, label.new(right, (z.zoneHigh + z.zoneLow) * 0.5, txt,
+                     xloc = xloc.bar_time, style = lockViewport ? label.style_label_right : label.style_label_left, textcolor = edge,
+                     color = color.new(color.black, 100), size = size.tiny))
+
+f_level_style(LevelState st, color base) =>
+    color c = st.status == BROKEN ? color.new(base, 25) : base
+    string style = st.status == FRESH or st.status == ACCEPTED ? line.style_solid :
+         st.status == TESTED ? line.style_dashed : line.style_dotted
+    int width = st.status == ACCEPTED or st.status == BROKEN ? 4 : st.status == REJECTED or st.status == RECLAIMED ? 3 : 2
+    [c, style, width]
+
+f_render_core(array<Cluster> clusters, float center, float width, float atr, float velocity) =>
+    f_delete_lines(coreLines)
+    f_delete_labels(coreLabels)
+    f_delete_lines(miscLines)
+    f_delete_labels(miscLabels)
+    int n = array.size(clusters)
+    int lastSrc = array.size(srcTime) - 1
+    int startTime = array.get(srcTime, math.max(0, lastSrc - math.min(lookback, lastSrc + 1) + 1))
+    startTime := lockViewport ? chart.left_visible_bar_time : startTime
+    int right = viewportRightTime
+    string edgeLabelStyle = lockViewport ? label.style_label_right : label.style_label_left
+    float nearest = na
+    float nearestDistance = 1e100
+    int nearestSlot = -1
+    for c = 0 to n - 1
+        Cluster obs = array.get(clusters, c)
+        if obs.valid
+            float d = math.abs(close - obs.price)
+            if d < nearestDistance
+                nearestDistance := d
+                nearest := obs.price
+                nearestSlot := c
+            if showClusters
+                LevelState st = array.get(levelStates, c)
+                color base = array.get(palette, c)
+                [lc, ls, lw] = f_level_style(st, base)
+                bool promotedLow = lowerSentinel.latched and c == 0 and n > 1
+                bool promotedHigh = upperSentinel.latched and c == n - 1 and n > 1
+                if promotedLow
+                    lc := array.get(palette, 1)
+                    ls := line.style_dotted
+                    lw := 3
+                else if promotedHigh
+                    lc := array.get(palette, math.max(n - 2, 0))
+                    ls := line.style_dotted
+                    lw := 3
+                array.push(coreLines, line.new(startTime, obs.price, right, obs.price, xloc = xloc.bar_time, color = lc, style = ls, width = lw))
+                string role = promotedLow ? "ACTIVE-DOWN" : promotedHigh ? "ACTIVE-UP" : f_state_name(st.status)
+                string txt = "C" + str.tostring(c + 1) + " " + role + " POC:" + str.tostring(obs.price, format.mintick) +
+                     " M:" + str.tostring(obs.totalMass, format.volume) + " Age:" + str.tostring(st.ageBars) +
+                     " T:" + str.tostring(st.touches) + " A:" + str.tostring(st.cumulativeAcceptance) + " R:" + str.tostring(st.rejections) +
+                     " [" + f_motion_name(st.direction, "dir") + "|" + f_motion_name(st.widthState, "width") + "|" + f_motion_name(st.massState, "mass") + "]"
+                array.push(coreLabels, label.new(right, obs.price, txt, xloc = xloc.bar_time,
+                     style = edgeLabelStyle, textcolor = lc, color = color.new(color.black, 100), size = size.tiny))
+    if lowerSentinel.latched
+        int lowerStart = lockViewport ? math.max(lowerSentinel.latchedAt, startTime) : lowerSentinel.latchedAt
+        if lowerStart <= right
+            array.push(miscLines, line.new(lowerStart, lowerSentinel.price, right, lowerSentinel.price,
+                 xloc = xloc.bar_time, color = array.get(palette, 0), width = 4))
+        array.push(miscLabels, label.new(right, lowerSentinel.price,
+             "LOW SENTINEL " + str.tostring(lowerSentinel.price, format.mintick) + " Max:" + str.tostring(lowerSentinel.maxExcursionAtr, "#.##") + " ATR",
+             xloc = xloc.bar_time, style = edgeLabelStyle, textcolor = array.get(palette, 0), color = color.new(color.black, 100), size = size.tiny))
+    if upperSentinel.latched
+        int upperStart = lockViewport ? math.max(upperSentinel.latchedAt, startTime) : upperSentinel.latchedAt
+        if upperStart <= right
+            array.push(miscLines, line.new(upperStart, upperSentinel.price, right, upperSentinel.price,
+                 xloc = xloc.bar_time, color = array.get(palette, math.max(n - 1, 0)), width = 4))
+        array.push(miscLabels, label.new(right, upperSentinel.price,
+             "HIGH SENTINEL " + str.tostring(upperSentinel.price, format.mintick) + " Max:" + str.tostring(upperSentinel.maxExcursionAtr, "#.##") + " ATR",
+             xloc = xloc.bar_time, style = edgeLabelStyle, textcolor = array.get(palette, math.max(n - 1, 0)), color = color.new(color.black, 100), size = size.tiny))
+    if showCog and not na(center)
+        array.push(miscLines, line.new(startTime, center, right, center, xloc = xloc.bar_time, color = color.silver, style = line.style_dotted, width = 2))
+        array.push(miscLabels, label.new(right, center,
+             "COG " + str.tostring(center, format.mintick) + " Px:" + str.tostring((close - center) / atr, "#.##") +
+             " ATR v:" + str.tostring(velocity, "#.###"), xloc = xloc.bar_time,
+             style = edgeLabelStyle, textcolor = color.silver, color = color.new(color.black, 100), size = size.tiny))
+    float ruler = nearest
+    string rulerName = "C" + str.tostring(nearestSlot + 1)
+    if lowerSentinel.latched and math.abs(close - lowerSentinel.price) < math.abs(close - ruler)
+        ruler := lowerSentinel.price
+        rulerName := "LOW-SENT"
+    if upperSentinel.latched and math.abs(close - upperSentinel.price) < math.abs(close - ruler)
+        ruler := upperSentinel.price
+        rulerName := "HIGH-SENT"
+    if showRuler and not na(ruler)
+        int rulerStart = lockViewport ? math.min(time, right) : time
+        array.push(miscLines, line.new(rulerStart, close, right, ruler, xloc = xloc.bar_time, color = color.rgb(255, 215, 0), style = line.style_dashed))
+        array.push(miscLabels, label.new(right, ruler, "Delta " + str.tostring((close - ruler) / atr, "#.##") + " ATR -> " + rulerName,
+             xloc = xloc.bar_time, style = edgeLabelStyle, textcolor = color.rgb(255, 215, 0), color = color.new(color.black, 100), size = size.tiny))
+    [nearest, nearestSlot]
+
+f_in_session(string sessionText, int shifted) =>
+    int sh = int(str.tonumber(str.substring(sessionText, 0, 2)))
+    int sm = int(str.tonumber(str.substring(sessionText, 2, 4)))
+    int eh = int(str.tonumber(str.substring(sessionText, 5, 7)))
+    int em = int(str.tonumber(str.substring(sessionText, 7, 9)))
+    int startMinutes = sh * 60 + sm
+    int endMinutes = eh * 60 + em
+    int nowMinutes = hour(shifted) * 60 + minute(shifted)
+    startMinutes < endMinutes ? nowMinutes >= startMinutes and nowMinutes < endMinutes :
+         startMinutes > endMinutes ? nowMinutes >= startMinutes or nowMinutes < endMinutes : true
+
+// Collect the selected calculation-timeframe stream once. The current source
+// candle is updated in place; only a genuine source-time change appends a row.
+[cTime, cOpen, cHigh, cLow, cClose, cVolume, cDay] = request.security(
+     syminfo.tickerid, calcTf, [time, open, high, low, close, volume, time("D")],
+     gaps = barmerge.gaps_off, lookahead = barmerge.lookahead_off)
+
+var int seenCalcTime = na
+bool validSource = not na(cTime)
+bool newCalcBar = validSource and (na(seenCalcTime) or cTime != seenCalcTime)
+bool hadPreviousSource = array.size(srcTime) > 0
+int previousDay = hadPreviousSource ? array.get(srcDay, array.size(srcDay) - 1) : na
+
+if newCalcBar and hadPreviousSource and swingOn
+    int prior = array.size(srcTime) - 1
+    for i = 0 to array.size(swingZones) - 1
+        f_apply_zone_closed(array.get(swingZones, i), array.get(srcTime, prior),
+             array.get(srcHigh, prior), array.get(srcLow, prior), array.get(srcClose, prior))
+
+if validSource
+    float safeVolume = math.max(nz(cVolume, 0.0), 0.0)
+    if newCalcBar
+        array.push(srcTime, cTime)
+        array.push(srcDay, cDay)
+        array.push(srcOpen, cOpen)
+        array.push(srcHigh, cHigh)
+        array.push(srcLow, cLow)
+        array.push(srcClose, cClose)
+        array.push(srcVolume, safeVolume)
+        seenCalcTime := cTime
+        int keep = math.max(lookback, atrPeriod) + 2
+        if array.size(srcTime) > keep
+            array.shift(srcTime)
+            array.shift(srcDay)
+            array.shift(srcOpen)
+            array.shift(srcHigh)
+            array.shift(srcLow)
+            array.shift(srcClose)
+            array.shift(srcVolume)
+    else if array.size(srcTime) > 0
+        int last = array.size(srcTime) - 1
+        array.set(srcDay, last, cDay)
+        array.set(srcOpen, last, cOpen)
+        array.set(srcHigh, last, cHigh)
+        array.set(srcLow, last, cLow)
+        array.set(srcClose, last, cClose)
+        array.set(srcVolume, last, safeVolume)
+    if swingOn
+        if array.size(swingZones) == 0
+            f_swing_update_current(cDay, cTime, cOpen, cHigh, cLow, cClose)
+        else if newCalcBar and cDay != previousDay
+            f_swing_start_day(cDay, cTime, cOpen, cHigh, cLow, cClose)
+        else
+            f_swing_update_current(cDay, cTime, cOpen, cHigh, cLow, cClose)
+
+// Build chart-timeframe profile sessions incrementally.
+int shiftedTime = time + timeShiftMinutes * 60000
+int profileSlot = 0
+int profileKey = na
+var int intradaySequence = 0
+var int previousIntradaySlot = 0
+if profileMode == "Intraday"
+    profileSlot := intraday1On and f_in_session(intraday1, shiftedTime) ? 1 :
+         intraday2On and f_in_session(intraday2, shiftedTime) ? 2 :
+         intraday3On and f_in_session(intraday3, shiftedTime) ? 3 :
+         intraday4On and f_in_session(intraday4, shiftedTime) ? 4 : 0
+    if profileSlot > 0 and (previousIntradaySlot == 0 or profileSlot != previousIntradaySlot)
+        intradaySequence += 1
+    profileKey := profileSlot > 0 ? intradaySequence : na
+    previousIntradaySlot := profileSlot
+else if profileMode == "Daily"
+    profileKey := year(shiftedTime) * 10000 + month(shiftedTime) * 100 + dayofmonth(shiftedTime)
+else if profileMode == "Weekly"
+    profileKey := year(shiftedTime) * 100 + weekofyear(shiftedTime)
+else
+    profileKey := year(shiftedTime) * 100 + month(shiftedTime)
+
+if profileOn and not na(profileKey)
+    bool createProfile = array.size(profiles) == 0 or array.get(profiles, array.size(profiles) - 1).key != profileKey
+    if createProfile
+        array.push(profiles, f_profile_new(profileKey, profileSlot, time, bar_index))
+        while array.size(profiles) > sessionsToCount
+            array.shift(profiles)
+    f_profile_add(array.get(profiles, array.size(profiles) - 1), time, bar_index, open, high, low, close)
+
+float developingPoc = na
+float developingVah = na
+float developingVal = na
+if profileOn and profileDeveloping and array.size(profiles) > 0
+    Profile currentProfile = array.get(profiles, array.size(profiles) - 1)
+    [tempPoc, tempVah, tempVal, tempStep, tempBottom, tempMax, tempCounts] = f_profile_metrics(currentProfile)
+    developingPoc := tempPoc
+    developingVah := tempVah
+    developingVal := tempVal
+
+plot(profileDeveloping ? developingPoc : na, "Developing POC", color = color.lime, linewidth = 4, style = plot.style_linebr)
+plot(profileDeveloping ? developingVah : na, "Developing VAH", color = color.orange, linewidth = 4, style = plot.style_linebr)
+plot(profileDeveloping ? developingVal : na, "Developing VAL", color = color.rgb(250, 128, 114), linewidth = 4, style = plot.style_linebr)
+
+var float cogSnapshot = na
+var int cogSnapshotTime = na
+var float cogVelocity = 0.0
+float displayCenter = na
+float displayWidth = na
+float displayAtr = na
+float displayNearest = na
+int displayNearestSlot = -1
+
+if barstate.islast and array.size(srcTime) >= math.max(clusterCount, 5)
+    array<Cluster> currentClusters = f_build_clusters()
+    [centerNow, widthNow, atrNow] = f_center_width_atr()
+    int currentCalcTime = array.get(srcTime, array.size(srcTime) - 1)
+    if na(cogSnapshotTime) or na(cogSnapshot)
+        cogSnapshot := centerNow
+        cogSnapshotTime := currentCalcTime
+        cogVelocity := 0.0
+    else if currentCalcTime - cogSnapshotTime >= velocityBars * int(calcSeconds * 1000)
+        float elapsedBars = math.max((currentCalcTime - cogSnapshotTime) / (calcSeconds * 1000), 1.0)
+        cogVelocity := ((centerNow - cogSnapshot) / math.max(atrNow, syminfo.mintick)) / elapsedBars
+        cogSnapshot := centerNow
+        cogSnapshotTime := currentCalcTime
+    f_update_sentinels(currentClusters, centerNow, atrNow, newCalcBar and hadPreviousSource)
+    [nearestNow, nearestSlotNow] = f_render_core(currentClusters, centerNow, widthNow, atrNow, cogVelocity)
+    displayCenter := centerNow
+    displayWidth := widthNow
+    displayAtr := atrNow
+    displayNearest := nearestNow
+    displayNearestSlot := nearestSlotNow
+    f_render_swings()
+    f_render_profiles()
+
+var table dashboard = table.new(position.top_right, 2, 6, border_width = 1)
+if barstate.islast
+    if showDashboard and not na(displayAtr)
+        table.cell(dashboard, 0, 0, "MY MARKET STATE", text_color = color.white, bgcolor = color.rgb(35, 35, 35))
+        table.cell(dashboard, 1, 0, calcTf, text_color = color.silver, bgcolor = color.rgb(35, 35, 35))
+        table.cell(dashboard, 0, 1, "Nearest", text_color = color.silver)
+        table.cell(dashboard, 1, 1, "C" + str.tostring(displayNearestSlot + 1) + "  " + str.tostring((close - displayNearest) / displayAtr, "#.##") + " ATR", text_color = color.white)
+        table.cell(dashboard, 0, 2, "COG", text_color = color.silver)
+        table.cell(dashboard, 1, 2, str.tostring((close - displayCenter) / displayAtr, "#.##") + " ATR", text_color = color.white)
+        table.cell(dashboard, 0, 3, "Field width", text_color = color.silver)
+        table.cell(dashboard, 1, 3, str.tostring(displayWidth / displayAtr, "#.##") + " ATR", text_color = color.white)
+        table.cell(dashboard, 0, 4, "COG velocity", text_color = color.silver)
+        table.cell(dashboard, 1, 4, str.tostring(cogVelocity, "#.###") + " ATR/bar", text_color = color.white)
+        table.cell(dashboard, 0, 5, "Sentinels", text_color = color.silver)
+        table.cell(dashboard, 1, 5, "L:" + (lowerSentinel.latched ? "LATCHED" : "tracking") + " U:" + (upperSentinel.latched ? "LATCHED" : "tracking"), text_color = color.white)
+    else
+        table.clear(dashboard, 0, 0, 1, 5)
+
+bool lowerLatchedNow = lowerSentinel.latched
+bool upperLatchedNow = upperSentinel.latched
+bool lowerLatchEvent = lowerLatchedNow and not lowerLatchedNow[1]
+bool upperLatchEvent = upperLatchedNow and not upperLatchedNow[1]
+alertcondition(lowerLatchEvent, "Lower sentinel latched", "My Market State lower sentinel latched")
+alertcondition(upperLatchEvent, "Upper sentinel latched", "My Market State upper sentinel latched")

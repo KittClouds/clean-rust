@@ -41,6 +41,7 @@ pub(super) struct InputReceipt {
     pub(super) scifact_qrels: FileIdentity,
     pub(super) nfcorpus_corpus: FileIdentity,
     pub(super) nfcorpus_queries: FileIdentity,
+    pub(super) nfcorpus_train_qrels: FileIdentity,
     pub(super) nfcorpus_qrels: FileIdentity,
     pub(super) workspace_key_recorded: bool,
 }
@@ -54,7 +55,7 @@ pub(super) struct OutputReceipt {
 
 #[derive(Debug, Serialize)]
 pub(super) struct GenerationPolicy {
-    pub(super) training_sources: [&'static str; 2],
+    pub(super) training_sources: [&'static str; 3],
     pub(super) graded_sources: [&'static str; 2],
     pub(super) negative_policy: &'static str,
     pub(super) judgment_source: JudgmentSourceV3,

@@ -1,0 +1,17 @@
+[package]
+name = "northstar-auction-replay"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+hashbrown.workspace = true
+memmap2.workspace = true
+northstar-auction-contract = { path = "../northstar-auction-contract" }
+northstar-mt5-corpus = { path = "../northstar-mt5-corpus" }
+northstar-parity-fixtures = { path = "../northstar-parity-fixtures" }
+serde.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+thiserror.workspace = true

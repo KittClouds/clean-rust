@@ -10,7 +10,9 @@ use super::build::{
     candidate_pool, hard_negatives, review_document, split_groups, DatasetAudit, PreparedDataset,
     NEGATIVES_PER_POSITIVE, TOP_K,
 };
+use super::locality::LocalityCapture;
 use super::partition::MiningPartitions;
+use super::rarity_coverage::RarityCoverageCapture;
 use super::source::{SourceDataset, SourceQuery};
 
 const TARGET_FUZZY_JUDGMENTS_PER_DATASET: usize = 120;
@@ -25,6 +27,8 @@ pub(super) fn append_fuzzy_review_candidates(
     v2_model_identity: [u8; 32],
     generation: &mut u64,
     review_items: &mut Vec<ReviewItem>,
+    locality: &mut LocalityCapture,
+    rarity_coverage: &mut RarityCoverageCapture,
 ) -> Result<DatasetAudit> {
     let mut scratch = SearchScratch::default();
     let mut hits = Vec::with_capacity(160);
@@ -107,6 +111,8 @@ pub(super) fn append_fuzzy_review_candidates(
                 supersedes: None,
                 contradicts: Box::new([]),
             });
+            locality.capture_pair(&judgment, positive, negative);
+            rarity_coverage.capture_pair(&judgment, positive, negative);
             review_items.push(ReviewItem {
                 judgment_identity: hex(judgment.identity.as_bytes()),
                 dataset: dataset.name,

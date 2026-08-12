@@ -11,8 +11,8 @@ use crate::rank_evidence::{RankEvidenceInputs, RankEvidenceV3, RANK_EVIDENCE_V3_
 use crate::ranker::RankFeatureVector;
 use crate::ranker_v3::LinearRankerV3;
 use crate::score::{
-    measure_field_with_evidence, ordered_fraction, Coherence, CoherenceSignals, GroupMask,
-    PositionedGroups,
+    measure_field_with_evidence, ordered_fraction, Coherence, CoherenceSignals,
+    FieldMeasurementOptions, GroupMask, PositionedGroups,
 };
 use crate::selection::{retain_dense_simd, retain_sparse, RankedCandidate};
 use crate::tokenize::{tokenize_into, TokenOccurrence};
@@ -152,6 +152,7 @@ struct RankFeatureInputs {
 
 #[derive(Clone, Copy, Debug)]
 struct PrimitiveCoherence {
+    matched_group_locality: f32,
     minimum_complete_span: u32,
     minimum_ordered_span: u32,
     ordered_fraction: f32,
@@ -173,6 +174,7 @@ struct CandidateEvidenceContext {
 impl Default for PrimitiveCoherence {
     fn default() -> Self {
         Self {
+            matched_group_locality: 0.0,
             minimum_complete_span: u32::MAX,
             minimum_ordered_span: u32::MAX,
             ordered_fraction: 0.0,
@@ -304,6 +306,7 @@ pub struct SearchScratch {
     dense_candidates: Vec<RankedCandidate>,
     query_expansions: Vec<ResolvedExpansion>,
     query_ranges: Vec<PostingRange>,
+    query_group_rarity: Vec<f32>,
     query_tokens: Vec<TokenOccurrence>,
     query_token_buffer: String,
     position_epoch: u32,
@@ -328,6 +331,15 @@ enum SearchMode {
     Exhaustive,
 }
 
+#[derive(Clone, Copy)]
+struct SearchResolvedRequest<'a> {
+    candidate_top_k: usize,
+    output_limit: usize,
+    mode: SearchMode,
+    v3_ranker: Option<&'a LinearRankerV3>,
+    collect_v3_primitive_evidence: bool,
+}
+
 impl SearchScratch {
     pub fn new() -> Self {
         Self {
@@ -350,6 +362,7 @@ impl SearchScratch {
             dense_candidates: Vec::new(),
             query_expansions: Vec::new(),
             query_ranges: Vec::new(),
+            query_group_rarity: Vec::new(),
             query_tokens: Vec::new(),
             query_token_buffer: String::with_capacity(64),
             position_epoch: 0,
@@ -392,6 +405,7 @@ impl SearchScratch {
         self.dense_candidates.reserve(documents.min(8_192));
         self.query_expansions.reserve(maximum_query_groups);
         self.query_ranges.reserve(maximum_query_groups);
+        self.query_group_rarity.reserve(maximum_query_groups);
         self.query_tokens.reserve(maximum_query_groups);
         self.query_token_buffer.reserve(64);
         self.chosen_postings.reserve(maximum_query_groups);
@@ -412,6 +426,7 @@ impl SearchScratch {
         self.dense_candidates.clear();
         self.query_expansions.clear();
         self.query_ranges.clear();
+        self.query_group_rarity.clear();
     }
 
     fn begin_group(&mut self) {
@@ -441,6 +456,7 @@ impl SearchScratch {
             + self.dense_candidates.capacity()
             + self.query_expansions.capacity()
             + self.query_ranges.capacity()
+            + self.query_group_rarity.capacity()
             + self.query_tokens.capacity()
             + self.query_token_buffer.capacity()
             + self.position_stamp.capacity()
@@ -520,6 +536,7 @@ impl QpsIndex {
             output,
             SearchMode::Bounded,
             None,
+            false,
         )
     }
 
@@ -545,6 +562,7 @@ impl QpsIndex {
             output,
             SearchMode::Bounded,
             Some(model),
+            true,
         )
     }
 
@@ -567,6 +585,7 @@ impl QpsIndex {
             output,
             SearchMode::Bounded,
             None,
+            true,
         )
     }
 
@@ -590,6 +609,7 @@ impl QpsIndex {
             output,
             SearchMode::Bounded,
             Some(model),
+            true,
         )
     }
 
@@ -610,6 +630,7 @@ impl QpsIndex {
             output,
             SearchMode::Exhaustive,
             None,
+            false,
         )
     }
 
@@ -623,6 +644,7 @@ impl QpsIndex {
         output: &mut Vec<SearchHit>,
         mode: SearchMode,
         v3_ranker: Option<&LinearRankerV3>,
+        collect_v3_primitive_evidence: bool,
     ) -> Result<SearchReceipt, QpsError> {
         scratch.prepare(self.documents.len(), self.config.maximum_query_groups);
         scratch.begin_query();
@@ -651,12 +673,15 @@ impl QpsIndex {
             });
         }
         self.search_resolved(
-            candidate_top_k,
-            output_limit,
             scratch,
             output,
-            mode,
-            v3_ranker,
+            SearchResolvedRequest {
+                candidate_top_k,
+                output_limit,
+                mode,
+                v3_ranker,
+                collect_v3_primitive_evidence,
+            },
         )
     }
 
@@ -675,6 +700,7 @@ impl QpsIndex {
             output,
             SearchMode::Bounded,
             None,
+            false,
         )
     }
 
@@ -697,6 +723,7 @@ impl QpsIndex {
             output,
             SearchMode::Bounded,
             Some(model),
+            true,
         )
     }
 
@@ -716,6 +743,7 @@ impl QpsIndex {
             output,
             SearchMode::Bounded,
             None,
+            true,
         )
     }
 
@@ -738,6 +766,7 @@ impl QpsIndex {
             output,
             SearchMode::Bounded,
             Some(model),
+            true,
         )
     }
 
@@ -757,6 +786,7 @@ impl QpsIndex {
             output,
             SearchMode::Exhaustive,
             None,
+            false,
         )
     }
 
@@ -770,6 +800,7 @@ impl QpsIndex {
         output: &mut Vec<SearchHit>,
         mode: SearchMode,
         v3_ranker: Option<&LinearRankerV3>,
+        collect_v3_primitive_evidence: bool,
     ) -> Result<SearchReceipt, QpsError> {
         if groups.is_empty() {
             return Err(QpsError::EmptyQuery);
@@ -814,24 +845,31 @@ impl QpsIndex {
             });
         }
         self.search_resolved(
-            candidate_top_k,
-            output_limit,
             scratch,
             output,
-            mode,
-            v3_ranker,
+            SearchResolvedRequest {
+                candidate_top_k,
+                output_limit,
+                mode,
+                v3_ranker,
+                collect_v3_primitive_evidence,
+            },
         )
     }
 
     fn search_resolved(
         &self,
-        candidate_top_k: usize,
-        output_limit: usize,
         scratch: &mut SearchScratch,
         output: &mut Vec<SearchHit>,
-        mode: SearchMode,
-        v3_ranker: Option<&LinearRankerV3>,
+        request: SearchResolvedRequest<'_>,
     ) -> Result<SearchReceipt, QpsError> {
+        let SearchResolvedRequest {
+            candidate_top_k,
+            output_limit,
+            mode,
+            v3_ranker,
+            collect_v3_primitive_evidence,
+        } = request;
         let total_started = Instant::now();
         let capacity_before = scratch.capacity_fingerprint() + output.capacity();
         output.clear();
@@ -948,7 +986,7 @@ impl QpsIndex {
         });
 
         let coherence_started = Instant::now();
-        let positional_enabled = self.config.proximity_weight != 0.0
+        let need_v2_positional_scoring = self.config.proximity_weight != 0.0
             || self.config.order_weight != 0.0
             || self.config.phrase_weight != 0.0
             || self.config.segment_weight != 0.0
@@ -956,7 +994,14 @@ impl QpsIndex {
                 .field_configs
                 .iter()
                 .any(|field| field.exact_match_bonus != 0.0);
-        let reranked_candidates = if positional_enabled {
+        let need_v3_primitive_evidence = v3_ranker.is_some() || collect_v3_primitive_evidence;
+        let need_positions = need_v2_positional_scoring || need_v3_primitive_evidence;
+        let query_rarity_total = if need_v3_primitive_evidence {
+            self.prepare_query_group_rarity(scratch)
+        } else {
+            0.0
+        };
+        let reranked_candidates = if need_positions {
             scratch.selected_candidates.len() as u32
         } else {
             0
@@ -966,8 +1011,8 @@ impl QpsIndex {
             let document = scratch.selected_candidates[candidate_index];
             let index = document as usize;
             let coverage = scratch.coverage_weight[index] / total_weight;
-            let (coherence, primitive_coherence, opened_positions) = if positional_enabled {
-                self.coherence(document, group_count, scratch)
+            let (coherence, primitive_coherence, opened_positions) = if need_positions {
+                self.coherence(document, group_count, scratch, need_v3_primitive_evidence)
             } else {
                 (Coherence::default(), PrimitiveCoherence::default(), 0)
             };
@@ -1001,7 +1046,7 @@ impl QpsIndex {
                 token_count: self.documents[index].token_count,
                 expansion_quality,
             });
-            let rank_evidence_v3 = self.rank_evidence_v3(
+            let (rank_evidence_v3, rarity_weighted_group_coverage) = self.rank_evidence_v3(
                 CandidateEvidenceContext {
                     document,
                     candidate_rank: candidate_index,
@@ -1011,6 +1056,7 @@ impl QpsIndex {
                     coherence: primitive_coherence,
                 },
                 scratch,
+                query_rarity_total,
             );
             let relevance_tier =
                 rank_evidence_v3.relevance_tier(primitive_coherence.exact_identifier_field);
@@ -1026,6 +1072,8 @@ impl QpsIndex {
                 phrase: coherence.phrase,
                 segment: coherence.segment,
                 exact_field: coherence.exact_field,
+                matched_group_locality: primitive_coherence.matched_group_locality,
+                rarity_weighted_group_coverage,
                 rank_features: features,
                 rank_evidence_v3,
                 relevance_tier,
@@ -1121,7 +1169,8 @@ impl QpsIndex {
         &self,
         context: CandidateEvidenceContext,
         scratch: &SearchScratch,
-    ) -> RankEvidenceV3 {
+        query_rarity_total: f32,
+    ) -> (RankEvidenceV3, f32) {
         let group_count = scratch.query_ranges.len();
         let field_count = self.field_configs.len();
         let mut field_lexical = [0.0_f32; RANK_EVIDENCE_V3_FIELD_SLOTS];
@@ -1133,6 +1182,7 @@ impl QpsIndex {
         let mut quality_minimum = 1.0_f32;
         let mut rarity_sum = 0.0_f32;
         let mut rarity_maximum = 0.0_f32;
+        let mut matched_rarity_mass = 0.0_f32;
         let mut has_expansions = false;
         let mut all_exact_groups = true;
 
@@ -1153,6 +1203,9 @@ impl QpsIndex {
                 continue;
             };
             matched_groups += 1;
+            if query_rarity_total > 0.0 {
+                matched_rarity_mass += scratch.query_group_rarity[group];
+            }
             quality_sum += expansion.quality;
             quality_best = quality_best.max(expansion.quality);
             quality_minimum = quality_minimum.min(expansion.quality);
@@ -1193,7 +1246,7 @@ impl QpsIndex {
             .filter(|value| **value > 0.0)
             .count()
             + usize::from(field_lexical_overflow > 0.0);
-        RankEvidenceV3::from_inputs(RankEvidenceInputs {
+        let evidence = RankEvidenceV3::from_inputs(RankEvidenceInputs {
             lexical: context.lexical,
             field_lexical,
             field_lexical_overflow,
@@ -1220,7 +1273,30 @@ impl QpsIndex {
             field_coverage_fraction: covered_fields as f32 / field_count.max(1) as f32,
             has_expansions,
             all_exact_groups,
-        })
+        });
+        let rarity_weighted_group_coverage = if query_rarity_total > 0.0 {
+            (matched_rarity_mass / query_rarity_total).clamp(0.0, 1.0)
+        } else {
+            0.0
+        };
+        (evidence, rarity_weighted_group_coverage)
+    }
+
+    #[inline]
+    fn prepare_query_group_rarity(&self, scratch: &mut SearchScratch) -> f32 {
+        scratch.query_group_rarity.clear();
+        let mut total = 0.0_f32;
+        for range in &scratch.query_ranges {
+            let start = range.start as usize;
+            let end = range.start.saturating_add(range.len) as usize;
+            let weight = scratch.query_expansions[start..end]
+                .iter()
+                .map(|expansion| expansion.quality * self.term_rarities[expansion.term as usize])
+                .fold(0.0_f32, f32::max);
+            scratch.query_group_rarity.push(weight);
+            total += weight;
+        }
+        total
     }
 
     #[inline]
@@ -1247,6 +1323,7 @@ impl QpsIndex {
         document: u32,
         group_count: usize,
         scratch: &mut SearchScratch,
+        collect_primitive_evidence: bool,
     ) -> (Coherence, PrimitiveCoherence, u32) {
         let field_count = self.field_configs.len();
         let final_field = self.field_range(document, field_count - 1);
@@ -1324,11 +1401,14 @@ impl QpsIndex {
             let (measured, field_evidence) = measure_field_with_evidence(
                 &scratch.positioned_groups[start..cursor],
                 &scratch.chosen_postings,
-                self.field_range(document, field).len,
-                self.field_configs[field].exact_match_bonus,
-                self.config.proximity_decay_tokens,
-                signals,
-                precomputed_order,
+                FieldMeasurementOptions {
+                    field_len: self.field_range(document, field).len,
+                    exact_bonus: self.field_configs[field].exact_match_bonus,
+                    proximity_decay: self.config.proximity_decay_tokens,
+                    signals,
+                    precomputed_order,
+                    collect_primitive_evidence,
+                },
             );
             let total = self.config.proximity_weight * measured.proximity
                 + self.config.order_weight * measured.order
@@ -1342,6 +1422,9 @@ impl QpsIndex {
             primitive.minimum_complete_span = primitive
                 .minimum_complete_span
                 .min(field_evidence.minimum_complete_span);
+            primitive.matched_group_locality = primitive
+                .matched_group_locality
+                .max(field_evidence.matched_group_locality);
             primitive.minimum_ordered_span = primitive
                 .minimum_ordered_span
                 .min(field_evidence.minimum_ordered_span);

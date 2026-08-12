@@ -1,0 +1,18 @@
+{
+  "contract": "NORTHSTAR_MQL5_GOLDEN_PARITY_V1",
+  "status": "PASS",
+  "fixtures": {
+    "contract": "NORTHSTAR_MQL5_GOLDEN_FIXTURES_V1",
+    "status": "PASS",
+    "scenarios": 16,
+    "directional_certificates": 32
+  },
+  "grammar": {
+    "contract": "NORTHSTAR_AUCTION_GRAMMAR_PARITY_V1",
+    "status": "PASS",
+    "scenarios": 16,
+    "directional_ledgers": 32,
+    "semantic_assertions": 128,
+    "boundary_assertions": 56
+  }
+}

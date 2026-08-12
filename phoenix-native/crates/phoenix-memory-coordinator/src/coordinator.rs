@@ -48,6 +48,10 @@ pub struct CoordinatorConfig {
     pub lexical_recall: LexicalRecallConfig,
     /// Explicitly non-authoritative lexical evaluation. Disabled by default.
     pub qps_shadow: crate::QpsShadowConfig,
+    /// Bounded, asynchronous PHXQ1 evaluation. Disabled by default and never
+    /// changes authoritative recall items or ordering.
+    pub semantic_shadow: crate::SemanticShadowConfig,
+    pub semantic_query_embedder: Option<Arc<dyn crate::SemanticQueryEmbedder>>,
 }
 
 impl CoordinatorConfig {
@@ -68,6 +72,8 @@ impl CoordinatorConfig {
             model_identities: model_identities.into(),
             lexical_recall: LexicalRecallConfig::default(),
             qps_shadow: crate::QpsShadowConfig::default(),
+            semantic_shadow: crate::SemanticShadowConfig::default(),
+            semantic_query_embedder: None,
         }
     }
 }
@@ -141,13 +147,18 @@ pub struct DualFaceIngestionCoordinator<P> {
     metrics: Arc<RuntimeMetrics>,
     queue_capacity: usize,
     worker: Option<JoinHandle<()>>,
+    semantic_shadow: crate::semantic_shadow::SemanticShadowController,
     _producer: std::marker::PhantomData<P>,
 }
 
 impl<P: DualFaceProducer> DualFaceIngestionCoordinator<P> {
     pub fn new(config: CoordinatorConfig, producer: Arc<P>) -> Result<Self, CoordinatorError> {
         let queue_capacity = config.queue_capacity;
-        let state = CoordinatorState::new(config, producer)?;
+        let semantic_shadow = crate::semantic_shadow::SemanticShadowController::start(
+            config.semantic_shadow,
+            config.semantic_query_embedder.clone(),
+        );
+        let state = CoordinatorState::new(config, producer, semantic_shadow.handle())?;
         let (sender, receiver) = mpsc::sync_channel(queue_capacity);
         let metrics = Arc::new(RuntimeMetrics {
             queue_depth: AtomicU64::new(0),
@@ -167,6 +178,7 @@ impl<P: DualFaceProducer> DualFaceIngestionCoordinator<P> {
             metrics,
             queue_capacity,
             worker: Some(worker),
+            semantic_shadow,
             _producer: std::marker::PhantomData,
         })
     }
@@ -232,6 +244,41 @@ impl<P: DualFaceProducer> DualFaceIngestionCoordinator<P> {
         self.metrics.snapshot(self.queue_capacity)
     }
 
+    pub fn mark_semantic_sidecars_building(
+        &self,
+        generation_hash: [u8; 32],
+    ) -> Result<(), crate::SemanticShadowInstallError> {
+        self.semantic_shadow.mark_building(generation_hash)
+    }
+
+    pub fn install_semantic_sidecars(
+        &self,
+        embedding_path: impl AsRef<std::path::Path>,
+        quantized_path: impl AsRef<std::path::Path>,
+        generation_hash: [u8; 32],
+    ) -> Result<(), crate::SemanticShadowInstallError> {
+        let index = match crate::ResidentSemanticIndex::open(
+            embedding_path,
+            quantized_path,
+            generation_hash,
+        ) {
+            Ok(index) => Arc::new(index),
+            Err(error) => {
+                self.semantic_shadow.mark_invalid(generation_hash);
+                return Err(error);
+            }
+        };
+        if let Err(error) = self.semantic_shadow.install(index) {
+            self.semantic_shadow.mark_invalid(generation_hash);
+            return Err(error);
+        }
+        Ok(())
+    }
+
+    pub fn semantic_shadow_snapshot(&self) -> crate::SemanticShadowRuntimeSnapshot {
+        self.semantic_shadow.snapshot()
+    }
+
     pub fn shutdown(mut self) -> Result<(), CoordinatorError> {
         self.stop()
     }
@@ -278,7 +325,9 @@ impl<P: DualFaceProducer> DualFaceIngestionCoordinator<P> {
         let Some(worker) = self.worker.take() else {
             return Ok(());
         };
-        worker.join().map_err(|_| CoordinatorError::Shutdown)
+        worker.join().map_err(|_| CoordinatorError::Shutdown)?;
+        self.semantic_shadow.stop();
+        Ok(())
     }
 }
 
@@ -322,12 +371,21 @@ fn run_worker<P: DualFaceProducer>(
                 epoch,
                 reply,
             } => {
-                let result = if metrics.cancellation_epoch.load(Ordering::Acquire) == epoch {
-                    state.recall(request)
+                if metrics.cancellation_epoch.load(Ordering::Acquire) == epoch {
+                    let query = request.pending_turn.content.clone();
+                    match state.recall(request) {
+                        Ok(packet) => {
+                            let generation_hash = packet.resident_generation_hash;
+                            let _ = reply.send(Ok(packet));
+                            state.submit_semantic_shadow(query, generation_hash);
+                        }
+                        Err(error) => {
+                            let _ = reply.send(Err(error));
+                        }
+                    }
                 } else {
-                    Err(CoordinatorError::Cancelled)
-                };
-                let _ = reply.send(result);
+                    let _ = reply.send(Err(CoordinatorError::Cancelled));
+                }
             }
             Work::Turn {
                 request,
@@ -359,6 +417,7 @@ pub(crate) fn validate_registrations(config: &CoordinatorConfig) -> Result<(), C
         || config.lexical_recall.top_k > config.max_context_items
         || config.lexical_recall.maximum_items == 0
         || config.lexical_recall.maximum_candidate_pool < config.lexical_recall.top_k
+        || !config.semantic_shadow.is_valid()
         || config.registrations.len() != ProducerProductV3::ALL.len()
     {
         return Err(CoordinatorError::InvalidCapabilityMatrix);

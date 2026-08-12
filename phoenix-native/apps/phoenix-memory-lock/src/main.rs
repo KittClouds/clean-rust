@@ -312,6 +312,83 @@ fn run() -> Result<()> {
             )?;
             print_json(&receipt)
         }
+        "qps-v3-diagnose-phase8-5" => {
+            let receipt = qps_v3::diagnose_phase8_5(
+                &args.required_path("--model")?,
+                &args.required_path("--phase-6")?,
+                &args.required_path("--phase-4")?,
+                &args.required_path("--phase-3")?,
+                &args.required_path("--graded-suite")?,
+                &args.required_path("--phase-8")?,
+                &args.required_path("--output")?,
+            )?;
+            print_json(&receipt)
+        }
+        "qps-v3-capture-phase8-6-locality" => {
+            let receipt = qps_v3::capture_phase8_6_locality(
+                &manifest,
+                &args.required_path("--phase-3")?,
+                &args.required_path("--suite")?,
+                &args.required_path("--workload")?,
+                &args.required_path("--gold")?,
+                &args.required_path("--output")?,
+            )?;
+            print_json(&receipt)
+        }
+        "qps-v3-capture-phase8-7-rarity-coverage" => {
+            let receipt = qps_v3::capture_phase8_7_rarity_coverage(
+                &manifest,
+                &args.required_path("--phase-3")?,
+                &args.required_path("--suite")?,
+                &args.required_path("--workload")?,
+                &args.required_path("--gold")?,
+                &args.required_path("--output")?,
+            )?;
+            print_json(&receipt)
+        }
+        "qps-v3-diagnose-phase8-6" => {
+            let receipt = qps_v3::diagnose_phase8_6(
+                &args.required_path("--model")?,
+                &args.required_path("--phase-6")?,
+                &args.required_path("--phase-4")?,
+                &args.required_path("--phase-3")?,
+                &args.required_path("--graded-suite")?,
+                &args.required_path("--phase-8")?,
+                &args.required_path("--independent-ledger")?,
+                &args.required_path("--independent-locality")?,
+                &args.required_path("--release-locality")?,
+                &args.required_path("--output")?,
+            )?;
+            print_json(&receipt)
+        }
+        "qps-v3-preflight-phase8-7" => {
+            let receipt = qps_v3::preflight_phase8_7(
+                &args.required_path("--phase-6")?,
+                &args.required_path("--phase-4")?,
+                &args.required_path("--independent-ledger")?,
+                &args.required_path("--graded-suite")?,
+                &args.required_path("--independent-rarity-coverage")?,
+                &args.required_path("--release-rarity-coverage")?,
+                &args.required_path("--output")?,
+            )?;
+            print_json(&receipt)
+        }
+        "qps-v3-diagnose-phase8-7" => {
+            let receipt = qps_v3::diagnose_phase8_7(
+                &args.required_path("--model")?,
+                &args.required_path("--phase-6")?,
+                &args.required_path("--phase-4")?,
+                &args.required_path("--phase-3")?,
+                &args.required_path("--graded-suite")?,
+                &args.required_path("--phase-8")?,
+                &args.required_path("--independent-ledger")?,
+                &args.required_path("--independent-rarity-coverage")?,
+                &args.required_path("--release-rarity-coverage")?,
+                &args.required_path("--preflight")?,
+                &args.required_path("--output")?,
+            )?;
+            print_json(&receipt)
+        }
         "qps-concurrent" => {
             let workers = parse_worker_counts(args.optional("--workers").unwrap_or("1,2,4,8,16"))?;
             let operations_per_worker = args
@@ -378,6 +455,7 @@ fn run() -> Result<()> {
              qps-v3-audit-activation, \
              qps-v3-audit-tree-eligibility, \
              qps-v3-qualify-quality, \
+             qps-v3-diagnose-phase8-5, \
              qps-concurrent, qps-concurrent-workload, \
              or evaluate"
         ),

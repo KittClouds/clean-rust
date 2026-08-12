@@ -15,7 +15,8 @@ use phoenix_memory_coordinator::{
     ContextPacket, CoordinatorConfig, CoordinatorError, CoordinatorMetrics, DocumentProduction,
     DualFaceIngestionCoordinator, DualFaceProducer, GenerationPublication, IngestDocumentRevision,
     IngestTurn, MemoryScope, ProducerRegistrationV3, RegistrationSupport, SemanticCandidateDraft,
-    TurnProduction, VocabularyPackDraft,
+    SemanticQueryEmbedder, SemanticShadowConfig, SemanticShadowInstallError,
+    SemanticShadowRuntimeSnapshot, TurnProduction, VocabularyPackDraft,
 };
 use phoenix_workspace::DocumentLease;
 use std::path::Path;
@@ -54,6 +55,7 @@ pub struct ResidentMemorySnapshot {
     pub pending_document_count: u32,
     pub commands: CoordinatorMetrics,
     pub runtime: ResidentMemoryRuntimeSnapshotV1,
+    pub semantic_shadow: SemanticShadowRuntimeSnapshot,
 }
 
 #[derive(Debug, Error)]
@@ -62,6 +64,8 @@ pub enum ResidentMemoryError {
     Coordinator(#[from] CoordinatorError),
     #[error(transparent)]
     Runtime(#[from] phoenix_memory_runtime::MemoryRuntimeError),
+    #[error(transparent)]
+    SemanticShadow(#[from] SemanticShadowInstallError),
     #[error("resident memory lock is poisoned: {0}")]
     Poisoned(&'static str),
     #[error("no exact structural product is registered for this document revision")]
@@ -157,6 +161,38 @@ impl ResidentMemory {
         registry_revision: u64,
         maximum_context_items: usize,
     ) -> Result<Self, ResidentMemoryError> {
+        Self::open_configured(
+            workspace_path,
+            registry_revision,
+            maximum_context_items,
+            SemanticShadowConfig::default(),
+            None,
+        )
+    }
+
+    pub fn open_with_semantic_shadow(
+        workspace_path: &Path,
+        registry_revision: u64,
+        maximum_context_items: usize,
+        semantic_shadow: SemanticShadowConfig,
+        semantic_query_embedder: Arc<dyn SemanticQueryEmbedder>,
+    ) -> Result<Self, ResidentMemoryError> {
+        Self::open_configured(
+            workspace_path,
+            registry_revision,
+            maximum_context_items,
+            semantic_shadow,
+            Some(semantic_query_embedder),
+        )
+    }
+
+    fn open_configured(
+        workspace_path: &Path,
+        registry_revision: u64,
+        maximum_context_items: usize,
+        semantic_shadow: SemanticShadowConfig,
+        semantic_query_embedder: Option<Arc<dyn SemanticQueryEmbedder>>,
+    ) -> Result<Self, ResidentMemoryError> {
         let producer = Arc::new(KernelMemoryProducer::default());
         let root = workspace_path
             .parent()
@@ -176,6 +212,8 @@ impl ResidentMemory {
             .lexical_recall
             .maximum_candidate_pool
             .max(maximum_context_items);
+        config.semantic_shadow = semantic_shadow;
+        config.semantic_query_embedder = semantic_query_embedder;
         let bounded_commands = DualFaceIngestionCoordinator::new(config, Arc::clone(&producer))?;
         let runtime = RegisteredMemoryRuntimeV1::open(root.join("memory-runtime-v1"))?;
         Ok(Self {
@@ -297,7 +335,58 @@ impl ResidentMemory {
                 .read()
                 .map_err(|_| ResidentMemoryError::Poisoned("memory runtime"))?
                 .snapshot(),
+            semantic_shadow: self.bounded_commands.semantic_shadow_snapshot(),
         })
+    }
+
+    pub fn mark_semantic_sidecars_building(
+        &self,
+        generation_hash: [u8; 32],
+    ) -> Result<(), ResidentMemoryError> {
+        let current = self
+            .publication
+            .read()
+            .map_err(|_| ResidentMemoryError::Poisoned("publication"))?
+            .as_ref()
+            .map(|publication| publication.receipt.generation_hash);
+        if current != Some(generation_hash) {
+            return Err(SemanticShadowInstallError::GenerationMismatch.into());
+        }
+        self.bounded_commands
+            .mark_semantic_sidecars_building(generation_hash)?;
+        Ok(())
+    }
+
+    pub fn install_semantic_sidecars(
+        &self,
+        embedding_path: impl AsRef<Path>,
+        quantized_path: impl AsRef<Path>,
+        generation_hash: [u8; 32],
+    ) -> Result<(), ResidentMemoryError> {
+        let current_before = self
+            .publication
+            .read()
+            .map_err(|_| ResidentMemoryError::Poisoned("publication"))?
+            .as_ref()
+            .map(|publication| publication.receipt.generation_hash);
+        if current_before != Some(generation_hash) {
+            return Err(SemanticShadowInstallError::GenerationMismatch.into());
+        }
+        self.bounded_commands.install_semantic_sidecars(
+            embedding_path,
+            quantized_path,
+            generation_hash,
+        )?;
+        let current_after = self
+            .publication
+            .read()
+            .map_err(|_| ResidentMemoryError::Poisoned("publication"))?
+            .as_ref()
+            .map(|publication| publication.receipt.generation_hash);
+        if current_after != Some(generation_hash) {
+            return Err(SemanticShadowInstallError::GenerationMismatch.into());
+        }
+        Ok(())
     }
 
     pub fn cancel(&self) -> u64 {

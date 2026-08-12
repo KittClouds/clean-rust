@@ -465,6 +465,231 @@ fn dense_simd_lane_stays_bounded_and_warm_scratch_does_not_grow() {
 }
 
 #[test]
+fn locality_capture_is_v2_order_invariant_and_field_permutation_stable() {
+    let config = QpsConfig {
+        proximity_weight: 0.0,
+        order_weight: 0.0,
+        phrase_weight: 0.0,
+        segment_weight: 0.0,
+        maximum_candidate_pool: 160,
+        ..QpsConfig::default()
+    };
+    let fields = Vec::from([
+        FieldConfig::new("left", 1.0, 0.75, 0.0),
+        FieldConfig::new("right", 1.0, 0.75, 0.0),
+    ])
+    .into_boxed_slice();
+    let mut builder = QpsBuilder::new(fields, config).expect("locality builder");
+    for (external_id, values) in [
+        (1, ["alpha beta", "unused"]),
+        (2, ["alpha far far beta", "unused"]),
+        (3, ["alpha", "unused"]),
+        (4, ["alpha beta gamma", "unused"]),
+    ] {
+        builder
+            .insert(DocumentInput {
+                external_id,
+                fields: &values,
+            })
+            .expect("insert locality document");
+    }
+    let index = builder.build().expect("build locality index");
+    let mut serving_scratch = SearchScratch::with_document_capacity(4, 32);
+    let mut evidence_scratch = SearchScratch::with_document_capacity(4, 32);
+    let mut serving = Vec::with_capacity(10);
+    let mut evidence = Vec::with_capacity(160);
+    let serving_receipt = index
+        .search_into("alpha beta gamma", 10, &mut serving_scratch, &mut serving)
+        .expect("V2 serving search");
+    let evidence_receipt = index
+        .search_evidence_into("alpha beta gamma", 10, &mut evidence_scratch, &mut evidence)
+        .expect("locality evidence search");
+    assert_eq!(serving_receipt.position_values_visited, 0);
+    assert!(evidence_receipt.position_values_visited > 0);
+    assert_eq!(
+        serving
+            .iter()
+            .map(|hit| hit.external_id)
+            .collect::<Vec<_>>(),
+        evidence
+            .iter()
+            .map(|hit| hit.external_id)
+            .collect::<Vec<_>>()
+    );
+    for (left, right) in serving.iter().zip(&evidence) {
+        assert_eq!(left.v2_score.to_bits(), right.v2_score.to_bits());
+        assert_eq!(
+            left.rarity_weighted_group_coverage.to_bits(),
+            0.0_f32.to_bits()
+        );
+        assert!(
+            right.rarity_weighted_group_coverage.is_finite()
+                && (0.0..=1.0).contains(&right.rarity_weighted_group_coverage)
+        );
+    }
+    assert!(
+        evidence
+            .iter()
+            .find(|hit| hit.external_id == 1)
+            .expect("adjacent hit")
+            .matched_group_locality
+            > evidence
+                .iter()
+                .find(|hit| hit.external_id == 2)
+                .expect("scattered hit")
+                .matched_group_locality
+    );
+
+    let build_permutation = |values: [&'static str; 2]| {
+        let fields = Vec::from([
+            FieldConfig::new("left", 1.0, 0.75, 0.0),
+            FieldConfig::new("right", 1.0, 0.75, 0.0),
+        ])
+        .into_boxed_slice();
+        let mut builder = QpsBuilder::new(fields, config).expect("permutation builder");
+        builder
+            .insert(DocumentInput {
+                external_id: 1,
+                fields: &values,
+            })
+            .expect("permutation document");
+        builder.build().expect("permutation index")
+    };
+    let first = build_permutation(["alpha beta", "alpha far beta"]);
+    let second = build_permutation(["alpha far beta", "alpha beta"]);
+    let mut scratch = SearchScratch::with_document_capacity(1, 32);
+    let mut hits = Vec::with_capacity(160);
+    first
+        .search_evidence_into("alpha beta", 10, &mut scratch, &mut hits)
+        .expect("first permutation");
+    let first_bits = hits[0].matched_group_locality.to_bits();
+    second
+        .search_evidence_into("alpha beta", 10, &mut scratch, &mut hits)
+        .expect("second permutation");
+    assert_eq!(first_bits, hits[0].matched_group_locality.to_bits());
+}
+
+#[test]
+fn rarity_weighted_group_coverage_values_discriminative_mass_and_uses_group_max() {
+    let config = QpsConfig {
+        proximity_weight: 0.0,
+        order_weight: 0.0,
+        phrase_weight: 0.0,
+        segment_weight: 0.0,
+        maximum_candidate_pool: 160,
+        ..QpsConfig::default()
+    };
+    let fields = Vec::from([FieldConfig::new("body", 1.0, 0.75, 0.0)]).into_boxed_slice();
+    let mut builder = QpsBuilder::new(fields, config).expect("rarity coverage builder");
+    for (external_id, body) in [
+        (1, "commonalpha commonbeta"),
+        (2, "commonalpha rareconcept"),
+        (3, "commonalpha commonbeta aliasone aliastwo"),
+        (4, "commonalpha commonbeta aliasone aliastwo"),
+        (5, "commonalpha commonbeta aliasone aliastwo"),
+        (6, "commonalpha commonbeta aliasone aliastwo"),
+        (7, "anchor"),
+    ] {
+        builder
+            .insert(DocumentInput {
+                external_id,
+                fields: &[body],
+            })
+            .expect("insert rarity coverage document");
+    }
+    let index = builder.build().expect("build rarity coverage index");
+    let common_alpha = [Expansion {
+        term: "commonalpha",
+        quality: 1.0,
+    }];
+    let common_beta = [Expansion {
+        term: "commonbeta",
+        quality: 1.0,
+    }];
+    let rare = [Expansion {
+        term: "rareconcept",
+        quality: 1.0,
+    }];
+    let groups = [
+        QueryGroup {
+            expansions: &common_alpha,
+        },
+        QueryGroup {
+            expansions: &common_beta,
+        },
+        QueryGroup { expansions: &rare },
+    ];
+    let mut scratch = SearchScratch::with_document_capacity(7, 32);
+    let mut hits = Vec::with_capacity(160);
+    index
+        .search_groups_evidence_into(&groups, 10, &mut scratch, &mut hits)
+        .expect("capture rarity-weighted group coverage");
+    let common_only = hits.iter().find(|hit| hit.external_id == 1).unwrap();
+    let rare_match = hits.iter().find(|hit| hit.external_id == 2).unwrap();
+    assert_eq!(
+        common_only.coverage.to_bits(),
+        rare_match.coverage.to_bits()
+    );
+    assert_eq!(
+        common_only.rank_evidence_v3.values[RankEvidenceV3::MATCHED_GROUP_FRACTION].to_bits(),
+        rare_match.rank_evidence_v3.values[RankEvidenceV3::MATCHED_GROUP_FRACTION].to_bits()
+    );
+    assert!(rare_match.rarity_weighted_group_coverage > common_only.rarity_weighted_group_coverage);
+
+    let anchor = [Expansion {
+        term: "anchor",
+        quality: 1.0,
+    }];
+    let rare_only_groups = [
+        QueryGroup { expansions: &rare },
+        QueryGroup {
+            expansions: &anchor,
+        },
+    ];
+    index
+        .search_groups_evidence_into(&rare_only_groups, 10, &mut scratch, &mut hits)
+        .expect("capture single-expansion group weight");
+    let single_max_bits = hits
+        .iter()
+        .find(|hit| hit.external_id == 7)
+        .unwrap()
+        .rarity_weighted_group_coverage
+        .to_bits();
+    let expanded_rare = [
+        Expansion {
+            term: "rareconcept",
+            quality: 1.0,
+        },
+        Expansion {
+            term: "aliasone",
+            quality: 0.1,
+        },
+        Expansion {
+            term: "aliastwo",
+            quality: 0.1,
+        },
+    ];
+    let expanded_groups = [
+        QueryGroup {
+            expansions: &expanded_rare,
+        },
+        QueryGroup {
+            expansions: &anchor,
+        },
+    ];
+    index
+        .search_groups_evidence_into(&expanded_groups, 10, &mut scratch, &mut hits)
+        .expect("capture max-over-expansions group weight");
+    let expanded_max_bits = hits
+        .iter()
+        .find(|hit| hit.external_id == 7)
+        .unwrap()
+        .rarity_weighted_group_coverage
+        .to_bits();
+    assert_eq!(single_max_bits, expanded_max_bits);
+}
+
+#[test]
 fn long_queries_cross_the_old_32_group_boundary_without_truncation() {
     let config = QpsConfig {
         maximum_query_groups: 128,

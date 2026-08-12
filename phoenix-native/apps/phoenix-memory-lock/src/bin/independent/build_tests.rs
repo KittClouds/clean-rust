@@ -29,6 +29,8 @@ fn hit(evidence: RankEvidenceV3) -> SearchHit {
         phrase: 0.0,
         segment: 0.0,
         exact_field: 0.0,
+        matched_group_locality: 0.0,
+        rarity_weighted_group_coverage: 0.0,
         rank_features: phoenix_lexical_qps::RankFeatureVector::default(),
         rank_evidence_v3: evidence,
         relevance_tier: RelevanceTier::CompleteExactGroups,

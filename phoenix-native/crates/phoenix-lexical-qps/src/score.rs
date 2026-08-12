@@ -11,6 +11,7 @@ pub(crate) struct Coherence {
 
 #[derive(Clone, Copy, Debug)]
 pub(crate) struct FieldEvidence {
+    pub matched_group_locality: f32,
     pub minimum_complete_span: u32,
     pub minimum_ordered_span: u32,
     pub ordered_fraction: f32,
@@ -21,6 +22,7 @@ pub(crate) struct FieldEvidence {
 impl Default for FieldEvidence {
     fn default() -> Self {
         Self {
+            matched_group_locality: 0.0,
             minimum_complete_span: u32::MAX,
             minimum_ordered_span: u32::MAX,
             ordered_fraction: 0.0,
@@ -46,6 +48,16 @@ pub(crate) struct CoherenceSignals {
     pub segment: bool,
 }
 
+#[derive(Clone, Copy, Debug)]
+pub(crate) struct FieldMeasurementOptions {
+    pub field_len: u32,
+    pub exact_bonus: f32,
+    pub proximity_decay: f32,
+    pub signals: CoherenceSignals,
+    pub precomputed_order: Option<f32>,
+    pub collect_primitive_evidence: bool,
+}
+
 #[cfg(test)]
 pub(crate) fn measure_field(
     positions: &[PositionedGroups],
@@ -59,11 +71,14 @@ pub(crate) fn measure_field(
     measure_field_with_evidence(
         positions,
         chosen_postings,
-        field_len,
-        exact_bonus,
-        proximity_decay,
-        signals,
-        precomputed_order,
+        FieldMeasurementOptions {
+            field_len,
+            exact_bonus,
+            proximity_decay,
+            signals,
+            precomputed_order,
+            collect_primitive_evidence: true,
+        },
     )
     .0
 }
@@ -71,12 +86,16 @@ pub(crate) fn measure_field(
 pub(crate) fn measure_field_with_evidence(
     positions: &[PositionedGroups],
     chosen_postings: &[Option<u32>],
-    field_len: u32,
-    exact_bonus: f32,
-    proximity_decay: f32,
-    signals: CoherenceSignals,
-    precomputed_order: Option<f32>,
+    options: FieldMeasurementOptions,
 ) -> (Coherence, FieldEvidence) {
+    let FieldMeasurementOptions {
+        field_len,
+        exact_bonus,
+        proximity_decay,
+        signals,
+        precomputed_order,
+        collect_primitive_evidence,
+    } = options;
     if positions.is_empty() {
         return (Coherence::default(), FieldEvidence::default());
     }
@@ -97,14 +116,21 @@ pub(crate) fn measure_field_with_evidence(
     let field_coverage = field_groups as f32 / matched_total as f32;
     let complete_in_field =
         chosen_postings.iter().all(Option::is_some) && field_groups == chosen_postings.len();
-    let minimum_span = if complete_in_field {
+    let need_covering_span =
+        complete_in_field || signals.proximity || (collect_primitive_evidence && field_groups >= 2);
+    let covering_span = if need_covering_span {
         minimum_covering_span(positions, field_mask)
     } else {
         u32::MAX
     };
+    let matched_group_locality = if collect_primitive_evidence && field_groups >= 2 {
+        let excess = covering_span.saturating_sub(field_groups as u32);
+        1.0 / (1.0 + excess as f32)
+    } else {
+        0.0
+    };
     let proximity = if signals.proximity {
-        let span = minimum_covering_span(positions, field_mask);
-        let excess = span.saturating_sub(field_groups as u32) as f32;
+        let excess = covering_span.saturating_sub(field_groups as u32) as f32;
         field_coverage / (1.0 + excess / proximity_decay.max(1.0))
     } else {
         0.0
@@ -116,8 +142,8 @@ pub(crate) fn measure_field_with_evidence(
     } else {
         0.0
     };
-    let phrase_match =
-        (signals.phrase || exact_bonus != 0.0) && exact_phrase(positions, chosen_postings);
+    let phrase_match = (signals.phrase || exact_bonus != 0.0 || collect_primitive_evidence)
+        && exact_phrase(positions, chosen_postings);
     let phrase = if signals.phrase && phrase_match {
         1.0
     } else {
@@ -139,7 +165,12 @@ pub(crate) fn measure_field_with_evidence(
             exact_field,
         },
         FieldEvidence {
-            minimum_complete_span: minimum_span,
+            matched_group_locality,
+            minimum_complete_span: if complete_in_field {
+                covering_span
+            } else {
+                u32::MAX
+            },
             minimum_ordered_span: if complete_in_field {
                 minimum_ordered_span(positions, chosen_postings.len())
             } else {
@@ -342,8 +373,8 @@ impl Iterator for Ones {
 #[cfg(test)]
 mod tests {
     use super::{
-        measure_field, Coherence, CoherenceSignals, GroupMask, PositionedGroups,
-        MAXIMUM_QUERY_GROUPS,
+        measure_field, measure_field_with_evidence, Coherence, CoherenceSignals,
+        FieldMeasurementOptions, GroupMask, PositionedGroups, MAXIMUM_QUERY_GROUPS,
     };
 
     const ALL_SIGNALS: CoherenceSignals = CoherenceSignals {
@@ -380,6 +411,84 @@ mod tests {
         assert_eq!(measured.phrase, 1.0);
         assert_eq!(measured.proximity, 1.0);
         assert_eq!(measured.exact_field, 0.4);
+    }
+
+    #[test]
+    fn matched_group_locality_obeys_phase_8_6_invariants() {
+        let no_signals = CoherenceSignals {
+            proximity: false,
+            order: false,
+            phrase: false,
+            segment: false,
+        };
+        let one_group = vec![position(7, 0)];
+        let (_, single) = measure_field_with_evidence(
+            &one_group,
+            &[Some(1)],
+            FieldMeasurementOptions {
+                field_len: 8,
+                exact_bonus: 0.0,
+                proximity_decay: 12.0,
+                signals: no_signals,
+                precomputed_order: None,
+                collect_primitive_evidence: true,
+            },
+        );
+        assert_eq!(single.matched_group_locality.to_bits(), 0.0_f32.to_bits());
+
+        let adjacent = vec![position(10, 0), position(11, 1)];
+        let (_, compact) = measure_field_with_evidence(
+            &adjacent,
+            &[Some(1), Some(2)],
+            FieldMeasurementOptions {
+                field_len: 12,
+                exact_bonus: 0.0,
+                proximity_decay: 12.0,
+                signals: no_signals,
+                precomputed_order: None,
+                collect_primitive_evidence: true,
+            },
+        );
+        assert_eq!(compact.matched_group_locality.to_bits(), 1.0_f32.to_bits());
+
+        let scattered = vec![position(10, 0), position(20, 1)];
+        let (_, spread) = measure_field_with_evidence(
+            &scattered,
+            &[Some(1), Some(2)],
+            FieldMeasurementOptions {
+                field_len: 21,
+                exact_bonus: 0.0,
+                proximity_decay: 12.0,
+                signals: no_signals,
+                precomputed_order: None,
+                collect_primitive_evidence: true,
+            },
+        );
+        assert!(spread.matched_group_locality < compact.matched_group_locality);
+        assert!((0.0..=1.0).contains(&spread.matched_group_locality));
+        let expected_complete_span_quality =
+            1.0 / (1.0 + spread.minimum_complete_span.saturating_sub(2) as f32);
+        assert_eq!(
+            spread.matched_group_locality.to_bits(),
+            expected_complete_span_quality.to_bits()
+        );
+
+        let (_, repeated) = measure_field_with_evidence(
+            &scattered,
+            &[Some(1), Some(2)],
+            FieldMeasurementOptions {
+                field_len: 21,
+                exact_bonus: 0.0,
+                proximity_decay: 12.0,
+                signals: no_signals,
+                precomputed_order: None,
+                collect_primitive_evidence: true,
+            },
+        );
+        assert_eq!(
+            repeated.matched_group_locality.to_bits(),
+            spread.matched_group_locality.to_bits()
+        );
     }
 
     #[test]
@@ -436,6 +545,15 @@ mod tests {
         let mut mask = GroupMask::default();
         mask.insert(group);
         mask
+    }
+
+    fn position(position: u32, group: usize) -> PositionedGroups {
+        PositionedGroups {
+            position,
+            segment: 0,
+            field: 0,
+            groups: mask(group),
+        }
     }
 
     fn next(state: &mut u32) -> u32 {

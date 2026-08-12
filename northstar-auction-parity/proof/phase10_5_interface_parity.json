@@ -1,0 +1,46 @@
+{
+  "contract": "NORTHSTAR_PHASE10_5_PARITY_V1",
+  "status": "PASS",
+  "interface_version": "MST_RG2_RESEARCH_INTERFACE_V1_1",
+  "corpus_sha256": "9cbad8545db23cba7ccea2bd062aeba700597deb4be19cecbb74647f65ef8413",
+  "analysis_code_sha256": "7000d52d9b4234de19df4ba0b7ddb225ccf9556d095e3589e4018ed57bac60e6",
+  "views": {
+    "attempt_view": 7764,
+    "attempt_chain_view": 7764,
+    "episode_timeline_view": 38957,
+    "transit_view": 628,
+    "node_context_view": 49281
+  },
+  "targets": [
+    {
+      "target": "reclaim_given_break",
+      "eligible_count": 2073,
+      "observed_count": 880,
+      "censored_count": 526
+    },
+    {
+      "target": "initial_acceptance_given_initial_contact",
+      "eligible_count": 5737,
+      "observed_count": 667,
+      "censored_count": 686
+    },
+    {
+      "target": "rejection_given_initial_contact",
+      "eligible_count": 5737,
+      "observed_count": 3504,
+      "censored_count": 686
+    },
+    {
+      "target": "retest_hold_given_retest_contact",
+      "eligible_count": 1267,
+      "observed_count": 763,
+      "censored_count": 16
+    },
+    {
+      "target": "transit_given_episode_acceptance",
+      "eligible_count": 386,
+      "observed_count": 227,
+      "censored_count": 123
+    }
+  ]
+}

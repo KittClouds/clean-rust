@@ -1,0 +1,3 @@
+[submodule "index-fund-prototype"]
+	path = index-fund-prototype
+	url = https://github.com/KittClouds/northstar.git

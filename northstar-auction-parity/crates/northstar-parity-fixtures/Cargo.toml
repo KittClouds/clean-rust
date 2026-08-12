@@ -1,0 +1,10 @@
+[package]
+name = "northstar-parity-fixtures"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+northstar-auction-contract = { path = "../northstar-auction-contract" }
+serde.workspace = true

@@ -282,6 +282,8 @@ impl FrozenCandidate {
             phrase: f32::from_bits(self.phrase_bits),
             segment: f32::from_bits(self.segment_bits),
             exact_field: f32::from_bits(self.exact_field_bits),
+            matched_group_locality: 0.0,
+            rarity_weighted_group_coverage: 0.0,
             rank_features: RankFeatureVector(self.legacy_rank_feature_bits.map(f32::from_bits)),
             rank_evidence_v3: self.rank_evidence_v3,
             relevance_tier: self.relevance_tier,
