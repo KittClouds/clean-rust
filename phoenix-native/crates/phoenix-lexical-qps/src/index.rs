@@ -17,8 +17,8 @@ use crate::score::{
 use crate::selection::{retain_dense_simd, retain_sparse, RankedCandidate};
 use crate::tokenize::{tokenize_into, TokenOccurrence};
 use crate::types::{
-    CandidateSelection, DocumentId, FieldConfig, QpsConfig, QpsError, QueryGroup, SearchHit,
-    SearchReceipt, SearchStageNanos,
+    CandidateSelection, DocumentId, FieldConfig, GroupStrengthBatch, QpsConfig, QpsError,
+    QueryGroup, SearchHit, SearchReceipt, SearchStageNanos,
 };
 
 const NO_CHOICE: u32 = u32::MAX;
@@ -768,6 +768,63 @@ impl QpsIndex {
             Some(model),
             true,
         )
+    }
+
+    /// Reconstructs the selected lexical contribution for every query group
+    /// and returned candidate from the immediately preceding evidence search.
+    ///
+    /// This diagnostic path must be called before `scratch` begins another
+    /// query. It performs no posting traversal and cannot affect the candidate
+    /// pool, V2 score, tier, or final order. Strength is the selected posting's
+    /// expansion-quality-weighted BM25F field contribution transformed by
+    /// `x / (1 + x)`; unmatched groups remain zero.
+    pub fn capture_group_strengths_into(
+        &self,
+        scratch: &SearchScratch,
+        hits: &[SearchHit],
+        output: &mut GroupStrengthBatch,
+    ) -> Result<(), QpsError> {
+        let group_count = scratch.query_ranges.len();
+        if group_count == 0 || group_count > self.config.maximum_query_groups {
+            return Err(QpsError::EmptyQuery);
+        }
+        output.prepare(hits.len(), group_count);
+        let field_count = self.field_configs.len();
+        for (hit_index, hit) in hits.iter().enumerate() {
+            let document = hit.document.0 as usize;
+            if document >= self.documents.len() {
+                return Err(QpsError::InvalidDocument);
+            }
+            let mut reconstructed_lexical = 0.0_f32;
+            for group in 0..group_count {
+                let choice = document * self.config.maximum_query_groups + group;
+                if scratch.choice_stamp[choice] != scratch.epoch {
+                    continue;
+                }
+                let posting = scratch.choices[choice];
+                let expansion = self
+                    .chosen_expansion(group, posting, scratch)
+                    .ok_or(QpsError::InvalidExpansionTerm)?;
+                let field_start = posting as usize * field_count;
+                let contribution = self.posting_field_impacts
+                    [field_start..field_start + field_count]
+                    .iter()
+                    .copied()
+                    .sum::<f32>()
+                    * expansion.quality;
+                if !contribution.is_finite() || contribution < 0.0 {
+                    return Err(QpsError::InvalidExpansionQuality);
+                }
+                reconstructed_lexical += contribution;
+                output.set(hit_index, group, unit_saturating(contribution));
+            }
+            debug_assert!(
+                (reconstructed_lexical - hit.lexical_score).abs()
+                    <= 1.0e-4 * hit.lexical_score.max(1.0),
+                "group-strength decomposition must reproduce lexical evidence"
+            );
+        }
+        Ok(())
     }
 
     /// Exhaustive oracle for explicit expansion groups.

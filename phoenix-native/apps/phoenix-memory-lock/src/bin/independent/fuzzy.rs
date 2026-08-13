@@ -1,8 +1,8 @@
 use anyhow::Result;
 use phoenix_lexical_qps::{
-    rank_evidence_schema_identity_v3, Expansion, JudgmentReasonV3, JudgmentSourceV3, KeyedIdentity,
-    PairwiseJudgmentDraftV3, PairwiseJudgmentV3, QueryGroup, RelevanceLedgerV3, SearchScratch,
-    WorkspaceIdentityKey,
+    rank_evidence_schema_identity_v3, Expansion, GroupStrengthBatch, JudgmentReasonV3,
+    JudgmentSourceV3, KeyedIdentity, PairwiseJudgmentDraftV3, PairwiseJudgmentV3, QueryGroup,
+    RelevanceLedgerV3, SearchScratch, WorkspaceIdentityKey, MAXIMUM_QUERY_GROUPS,
 };
 
 use super::artifact::ReviewItem;
@@ -10,6 +10,7 @@ use super::build::{
     candidate_pool, hard_negatives, review_document, split_groups, DatasetAudit, PreparedDataset,
     NEGATIVES_PER_POSITIVE, TOP_K,
 };
+use super::group_distribution::GroupDistributionCapture;
 use super::locality::LocalityCapture;
 use super::partition::MiningPartitions;
 use super::rarity_coverage::RarityCoverageCapture;
@@ -29,9 +30,11 @@ pub(super) fn append_fuzzy_review_candidates(
     review_items: &mut Vec<ReviewItem>,
     locality: &mut LocalityCapture,
     rarity_coverage: &mut RarityCoverageCapture,
+    group_distribution: &mut GroupDistributionCapture,
 ) -> Result<DatasetAudit> {
     let mut scratch = SearchScratch::default();
     let mut hits = Vec::with_capacity(160);
+    let mut group_strengths = GroupStrengthBatch::with_capacity(160, MAXIMUM_QUERY_GROUPS);
     let mut audit = DatasetAudit::new(dataset);
     for query in &dataset.queries {
         if audit.judgments >= TARGET_FUZZY_JUDGMENTS_PER_DATASET {
@@ -49,6 +52,9 @@ pub(super) fn append_fuzzy_review_candidates(
         prepared
             .index
             .search_groups_evidence_into(&groups, TOP_K, &mut scratch, &mut hits)?;
+        prepared
+            .index
+            .capture_group_strengths_into(&scratch, &hits, &mut group_strengths)?;
         let Some(positive_position) = hits.iter().position(|hit| {
             query
                 .relevant
@@ -113,6 +119,18 @@ pub(super) fn append_fuzzy_review_candidates(
             });
             locality.capture_pair(&judgment, positive, negative);
             rarity_coverage.capture_pair(&judgment, positive, negative);
+            group_distribution.capture_pair(
+                dataset.name,
+                &judgment,
+                positive,
+                negative,
+                group_strengths
+                    .strengths(positive_position)
+                    .expect("positive group-strength row follows search hits"),
+                group_strengths
+                    .strengths(negative_position)
+                    .expect("negative group-strength row follows search hits"),
+            );
             review_items.push(ReviewItem {
                 judgment_identity: hex(judgment.identity.as_bytes()),
                 dataset: dataset.name,

@@ -6,14 +6,16 @@ use anyhow::{bail, Context, Result};
 use hashbrown::HashMap;
 use phoenix_lexical_qps::{
     rank_evidence_schema_identity_v3, DocumentInput, FieldConfig, FrozenHoldoutV3,
-    JudgmentReasonV3, JudgmentSourceV3, KeyedIdentity, LinearRankerV1, PairwiseJudgmentDraftV3,
-    PairwiseJudgmentV3, QpsBuilder, QpsConfig, RankEvidenceV3, RelevanceLedgerV3, RelevanceTier,
-    SearchHit, SearchScratch, SplitGroupProvenanceV3, WorkspaceIdentityKey, MAXIMUM_QUERY_GROUPS,
+    GroupStrengthBatch, JudgmentReasonV3, JudgmentSourceV3, KeyedIdentity, LinearRankerV1,
+    PairwiseJudgmentDraftV3, PairwiseJudgmentV3, QpsBuilder, QpsConfig, RankEvidenceV3,
+    RelevanceLedgerV3, RelevanceTier, SearchHit, SearchScratch, SplitGroupProvenanceV3,
+    WorkspaceIdentityKey, MAXIMUM_QUERY_GROUPS,
 };
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 
 use super::artifact::*;
+use super::group_distribution::{GradedCandidateGroupDistribution, GroupDistributionCapture};
 use super::locality::{GradedCandidateLocality, LocalityCapture};
 use super::partition::MiningPartitions;
 use super::rarity_coverage::{GradedCandidateRarityCoverage, RarityCoverageCapture};
@@ -48,6 +50,7 @@ pub(crate) struct BuildOutputs {
     pub receipt: PathBuf,
     pub locality: Option<PathBuf>,
     pub rarity_coverage: Option<PathBuf>,
+    pub group_distribution: Option<PathBuf>,
 }
 
 pub(crate) fn generate(inputs: &BuildInputs, outputs: &BuildOutputs) -> Result<Publication> {
@@ -84,6 +87,8 @@ pub(crate) fn generate(inputs: &BuildInputs, outputs: &BuildOutputs) -> Result<P
     let mut review_items = Vec::new();
     let mut locality = LocalityCapture::new(outputs.locality.is_some());
     let mut rarity_coverage = RarityCoverageCapture::new(outputs.rarity_coverage.is_some());
+    let mut group_distribution =
+        GroupDistributionCapture::new(outputs.group_distribution.is_some());
     let mut generation = 10_u64;
     for dataset in &training_sets {
         let prepared = PreparedDataset::new(dataset, &key)?;
@@ -99,6 +104,7 @@ pub(crate) fn generate(inputs: &BuildInputs, outputs: &BuildOutputs) -> Result<P
             &mut review_items,
             &mut locality,
             &mut rarity_coverage,
+            &mut group_distribution,
         )?);
         training_audits.push(super::fuzzy::append_fuzzy_review_candidates(
             &mut ledger,
@@ -111,6 +117,7 @@ pub(crate) fn generate(inputs: &BuildInputs, outputs: &BuildOutputs) -> Result<P
             &mut review_items,
             &mut locality,
             &mut rarity_coverage,
+            &mut group_distribution,
         )?);
     }
     ledger.validate().map_err(anyhow::Error::msg)?;
@@ -125,8 +132,13 @@ pub(crate) fn generate(inputs: &BuildInputs, outputs: &BuildOutputs) -> Result<P
         )?,
         source::load_locomo(&inputs.locomo, 8..10)?,
     ];
-    let (graded, graded_audits) =
-        build_graded(&graded_sets, &key, &mut locality, &mut rarity_coverage)?;
+    let (graded, graded_audits) = build_graded(
+        &graded_sets,
+        &key,
+        &mut locality,
+        &mut rarity_coverage,
+        &mut group_distribution,
+    )?;
     if graded.queries.is_empty() {
         bail!("independent graded suite produced no eligible queries");
     }
@@ -148,6 +160,9 @@ pub(crate) fn generate(inputs: &BuildInputs, outputs: &BuildOutputs) -> Result<P
     }
     if let Some(path) = &outputs.rarity_coverage {
         rarity_coverage.write(path, &outputs.ledger, &outputs.graded)?;
+    }
+    if let Some(path) = &outputs.group_distribution {
+        group_distribution.write(path, &outputs.ledger, &outputs.graded)?;
     }
     let receipt = GenerationReceipt {
         contract: CONTRACT,
@@ -220,15 +235,21 @@ fn append_review_candidates(
     review_items: &mut Vec<ReviewItem>,
     locality: &mut LocalityCapture,
     rarity_coverage: &mut RarityCoverageCapture,
+    group_distribution: &mut GroupDistributionCapture,
 ) -> Result<DatasetAudit> {
     let mut scratch = SearchScratch::default();
     let mut hits = Vec::with_capacity(CANDIDATE_CAP);
+    let mut group_strengths =
+        GroupStrengthBatch::with_capacity(CANDIDATE_CAP, MAXIMUM_QUERY_GROUPS);
     let mut audit = DatasetAudit::new(dataset);
     for query in &dataset.queries {
         hits.clear();
         prepared
             .index
             .search_evidence_into(&query.text, TOP_K, &mut scratch, &mut hits)?;
+        prepared
+            .index
+            .capture_group_strengths_into(&scratch, &hits, &mut group_strengths)?;
         let Some(positive_position) = best_positive(&hits, query, prepared) else {
             audit.oracle_missing_from_pool += 1;
             continue;
@@ -279,6 +300,18 @@ fn append_review_candidates(
             });
             locality.capture_pair(&judgment, positive, negative);
             rarity_coverage.capture_pair(&judgment, positive, negative);
+            group_distribution.capture_pair(
+                dataset.name,
+                &judgment,
+                positive,
+                negative,
+                group_strengths
+                    .strengths(positive_position)
+                    .context("positive group-strength row missing")?,
+                group_strengths
+                    .strengths(negative_position)
+                    .context("negative group-strength row missing")?,
+            );
             review_items.push(ReviewItem {
                 judgment_identity: hex(judgment.identity.as_bytes()),
                 dataset: dataset.name,
@@ -310,6 +343,7 @@ fn build_graded(
     key: &WorkspaceIdentityKey,
     locality: &mut LocalityCapture,
     rarity_coverage: &mut RarityCoverageCapture,
+    group_distribution: &mut GroupDistributionCapture,
 ) -> Result<(GradedEvaluationSuite, Vec<DatasetAudit>)> {
     let mut queries = Vec::new();
     let mut audits = Vec::with_capacity(datasets.len());
@@ -317,12 +351,17 @@ fn build_graded(
         let prepared = PreparedDataset::new(dataset, key)?;
         let mut scratch = SearchScratch::default();
         let mut hits = Vec::with_capacity(CANDIDATE_CAP);
+        let mut group_strengths =
+            GroupStrengthBatch::with_capacity(CANDIDATE_CAP, MAXIMUM_QUERY_GROUPS);
         let mut audit = DatasetAudit::new(dataset);
         for query in &dataset.queries {
             hits.clear();
             prepared
                 .index
                 .search_evidence_into(&query.text, TOP_K, &mut scratch, &mut hits)?;
+            prepared
+                .index
+                .capture_group_strengths_into(&scratch, &hits, &mut group_strengths)?;
             if !hits.iter().any(|hit| {
                 query
                     .relevant
@@ -365,6 +404,29 @@ fn build_graded(
                 })
                 .collect::<Vec<_>>();
             rarity_coverage.capture_graded(query_identity.clone(), &rarity_candidates);
+            let group_candidates = hits
+                .iter()
+                .enumerate()
+                .map(|(v2_order, hit)| {
+                    Ok(GradedCandidateGroupDistribution {
+                        document_identity: hex(prepared.document_versions
+                            [hit.external_id as usize - 1]
+                            .as_bytes()),
+                        v2_order,
+                        v2_score_bits: hit.v2_score.to_bits(),
+                        relevance_tier: hit.relevance_tier,
+                        strengths: group_strengths
+                            .strengths(v2_order)
+                            .context("graded group-strength row missing")?
+                            .to_vec(),
+                    })
+                })
+                .collect::<Result<Vec<_>>>()?;
+            group_distribution.capture_graded(
+                dataset.name,
+                query_identity.clone(),
+                group_candidates,
+            );
             let candidates = hits
                 .iter()
                 .enumerate()
@@ -772,6 +834,7 @@ fn ensure_outputs_absent(outputs: &BuildOutputs) -> Result<()> {
         Some(&outputs.receipt),
         outputs.locality.as_ref(),
         outputs.rarity_coverage.as_ref(),
+        outputs.group_distribution.as_ref(),
     ]
     .into_iter()
     .flatten()

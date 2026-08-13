@@ -6,6 +6,8 @@ mod build;
 mod finalize;
 #[path = "independent/fuzzy.rs"]
 mod fuzzy;
+#[path = "independent/group_distribution.rs"]
+mod group_distribution;
 #[path = "independent/locality.rs"]
 mod locality;
 #[path = "independent/merge.rs"]
@@ -58,6 +60,7 @@ fn run() -> Result<()> {
                     receipt: args.required_path("--receipt-output")?,
                     locality: None,
                     rarity_coverage: None,
+                    group_distribution: None,
                 },
             )?;
             println!("{}", serde_json::to_string_pretty(&publication)?);
@@ -78,6 +81,7 @@ fn run() -> Result<()> {
                     receipt: args.required_path("--receipt-output")?,
                     locality: Some(args.required_path("--locality-output")?),
                     rarity_coverage: None,
+                    group_distribution: None,
                 },
             )?;
             println!("{}", serde_json::to_string_pretty(&publication)?);
@@ -98,6 +102,30 @@ fn run() -> Result<()> {
                     receipt: args.required_path("--receipt-output")?,
                     locality: None,
                     rarity_coverage: Some(args.required_path("--rarity-coverage-output")?),
+                    group_distribution: None,
+                },
+            )?;
+            println!("{}", serde_json::to_string_pretty(&publication)?);
+        }
+        "generate-group-distribution-proof" => {
+            let publication = build::generate(
+                &BuildInputs {
+                    workspace_key: args.required_path("--workspace-key")?,
+                    phase_3: args.required_path("--phase-3")?,
+                    locomo: args.required_path("--locomo")?,
+                    scifact: args.required_path("--scifact")?,
+                    nfcorpus: args.required_path("--nfcorpus")?,
+                },
+                &BuildOutputs {
+                    ledger: args.required_path("--ledger-output")?,
+                    graded: args.required_path("--graded-output")?,
+                    review: args.required_path("--review-output")?,
+                    receipt: args.required_path("--receipt-output")?,
+                    locality: None,
+                    rarity_coverage: None,
+                    group_distribution: Some(
+                        args.required_path("--group-distribution-output")?,
+                    ),
                 },
             )?;
             println!("{}", serde_json::to_string_pretty(&publication)?);
@@ -190,7 +218,7 @@ fn run() -> Result<()> {
             println!("{}", serde_json::to_string_pretty(&partitions.audit())?);
         }
         _ => bail!(
-            "expected `generate`, `generate-locality-proof`, `generate-rarity-coverage-proof`, `prepare-review-batch`, `audit-review-batch`, `prepare-review-bundles`, `prepare-confirmation-bundles`, `audit-review-bundles`, `apply-reviews`, `finalize-audited-decisions`, `merge-agent-decisions`, or `audit-locomo-partitions`"
+            "expected `generate`, `generate-locality-proof`, `generate-rarity-coverage-proof`, `generate-group-distribution-proof`, `prepare-review-batch`, `audit-review-batch`, `prepare-review-bundles`, `prepare-confirmation-bundles`, `audit-review-bundles`, `apply-reviews`, `finalize-audited-decisions`, `merge-agent-decisions`, or `audit-locomo-partitions`"
         ),
     }
     Ok(())

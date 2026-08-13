@@ -312,6 +312,27 @@ fn run() -> Result<()> {
             )?;
             print_json(&receipt)
         }
+        "qps-v3-audit-phase8-8-feasibility" => {
+            let receipt = qps_v3::audit_phase8_8_feasibility(
+                &args.required_path("--model")?,
+                &args.required_path("--phase-6")?,
+                &args.required_path("--phase-4")?,
+                &args.required_path("--phase-8-v2")?,
+                &args.required_path("--output")?,
+            )?;
+            print_json(&receipt)
+        }
+        "qps-v3-train-phase8-8" => {
+            let receipt = qps_v3::train_phase8_8(
+                &args.required_path("--baseline-model")?,
+                &args.required_path("--phase-6")?,
+                &args.required_path("--phase-4")?,
+                &args.required_path("--phase-3")?,
+                &args.required_path("--feasibility")?,
+                &args.required_path("--output")?,
+            )?;
+            print_json(&receipt)
+        }
         "qps-v3-diagnose-phase8-5" => {
             let receipt = qps_v3::diagnose_phase8_5(
                 &args.required_path("--model")?,
@@ -342,6 +363,31 @@ fn run() -> Result<()> {
                 &args.required_path("--suite")?,
                 &args.required_path("--workload")?,
                 &args.required_path("--gold")?,
+                &args.required_path("--output")?,
+            )?;
+            print_json(&receipt)
+        }
+        "qps-v3-capture-phase8-9-group-distribution" => {
+            let receipt = qps_v3::capture_phase8_9_group_distribution(
+                &manifest,
+                &args.required_path("--phase-3")?,
+                &args.required_path("--suite")?,
+                &args.required_path("--workload")?,
+                &args.required_path("--gold")?,
+                &args.required_path("--output")?,
+            )?;
+            print_json(&receipt)
+        }
+        "qps-v3-diagnose-phase8-9" => {
+            let receipt = qps_v3::diagnose_phase8_9(
+                &args.required_path("--model")?,
+                &args.required_path("--phase-6")?,
+                &args.required_path("--phase-4")?,
+                &args.required_path("--phase-3")?,
+                &args.required_path("--independent-ledger")?,
+                &args.required_path("--graded-suite")?,
+                &args.required_path("--independent-sidecar")?,
+                &args.required_path("--release-sidecar")?,
                 &args.required_path("--output")?,
             )?;
             print_json(&receipt)
@@ -455,7 +501,11 @@ fn run() -> Result<()> {
              qps-v3-audit-activation, \
              qps-v3-audit-tree-eligibility, \
              qps-v3-qualify-quality, \
+             qps-v3-audit-phase8-8-feasibility, qps-v3-train-phase8-8, \
              qps-v3-diagnose-phase8-5, \
+             qps-v3-capture-phase8-6-locality, qps-v3-diagnose-phase8-6, \
+             qps-v3-capture-phase8-7-rarity-coverage, \
+             qps-v3-preflight-phase8-7, qps-v3-diagnose-phase8-7, \
              qps-concurrent, qps-concurrent-workload, \
              or evaluate"
         ),

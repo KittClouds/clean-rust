@@ -267,25 +267,25 @@ pub(super) fn decode_hex_32(value: &str) -> Result<[u8; 32]> {
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Serialize, Deserialize)]
 pub(super) struct PairwiseEvaluationV3 {
-    judgments: usize,
-    correctly_ordered: usize,
-    non_finite_scores: usize,
-    accuracy: f32,
+    pub(super) judgments: usize,
+    pub(super) correctly_ordered: usize,
+    pub(super) non_finite_scores: usize,
+    pub(super) accuracy: f32,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize)]
 pub(super) struct Phase7QualificationReceipt {
-    deterministic_training: bool,
-    monotonic_non_negative_weights: bool,
-    primitive_feature_schema_only: bool,
-    frozen_identity_normalization: bool,
-    bounded_training_configuration: bool,
-    loss_is_finite_and_improves: bool,
-    development_selected_configuration: bool,
-    configurations_evaluated: usize,
-    development: PairwiseEvaluationV3,
+    pub(super) deterministic_training: bool,
+    pub(super) monotonic_non_negative_weights: bool,
+    pub(super) primitive_feature_schema_only: bool,
+    pub(super) frozen_identity_normalization: bool,
+    pub(super) bounded_training_configuration: bool,
+    pub(super) loss_is_finite_and_improves: bool,
+    pub(super) development_selected_configuration: bool,
+    pub(super) configurations_evaluated: usize,
+    pub(super) development: PairwiseEvaluationV3,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    blind_test: Option<PairwiseEvaluationV3>,
+    pub(super) blind_test: Option<PairwiseEvaluationV3>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

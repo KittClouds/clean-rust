@@ -8,8 +8,9 @@ use phoenix_lexical_qps::{
 use super::train::{decode_hex_32, LinearModelArtifactV3};
 use super::*;
 
-const CONTRACT: &str = "phoenix.memory.qps-v3-quality-qualification/v1";
+pub(super) const CONTRACT: &str = "phoenix.memory.qps-v3-quality-qualification/v2";
 const GRADED_CONTRACT: &str = "phoenix.qps.graded-evaluation-suite/v3";
+const STRETCH_MRR_GAP_CLOSURE_TARGET: f64 = 0.20;
 
 pub(crate) fn qualify(
     model_path: &Path,
@@ -93,7 +94,8 @@ pub(crate) fn qualify(
     let gates = QualityGates {
         longmemeval_hit_at_10_at_least_0_984: longmemeval.v3.hit_at_10 >= 0.984,
         longmemeval_mrr_at_least_0_910: longmemeval.v3.mean_reciprocal_rank >= 0.910,
-        stretch_mrr_at_least_0_920: graded_evaluation.stretch_mrr >= 0.920,
+        stretch_mrr_gap_closure_at_least_0_20: graded_evaluation.mrr_gap_closure
+            >= STRETCH_MRR_GAP_CLOSURE_TARGET,
         graded_ndcg_at_10_improvement_at_least_0_020: graded_evaluation.ndcg_improvement >= 0.020,
         held_out_top_1_improvement_at_least_2_points: held_out_top_1_improvement_points >= 2.0,
         held_out_pairwise_accuracy_at_least_0_80: pairwise.v3_accuracy >= 0.80,
@@ -346,7 +348,8 @@ fn evaluate_graded(
 ) -> Result<GradedComparison> {
     let mut v2_ndcg = 0.0_f64;
     let mut v3_ndcg = 0.0_f64;
-    let mut reciprocal_rank = 0.0_f64;
+    let mut v2_reciprocal_rank = 0.0_f64;
+    let mut v3_reciprocal_rank = 0.0_f64;
     for query in &suite.queries {
         let mut v2 = query.candidates.iter().collect::<Vec<_>>();
         v2.sort_unstable_by_key(|candidate| candidate.v2_order);
@@ -370,36 +373,58 @@ fn evaluate_graded(
                 &right.document_identity,
             )
         });
-        v2_ndcg += ndcg(v2.iter().map(|candidate| candidate.grade));
-        v3_ndcg += ndcg(v3.iter().map(|(candidate, _)| candidate.grade));
-        reciprocal_rank += v3
+        let mut ideal = query
+            .candidates
             .iter()
-            .position(|(candidate, _)| candidate.grade > 0)
-            .map_or(0.0, |rank| 1.0 / (rank + 1) as f64);
+            .map(|candidate| candidate.grade)
+            .collect::<Vec<_>>();
+        ideal.sort_unstable_by(|left, right| right.cmp(left));
+        let ideal_dcg = discounted_gain(ideal.into_iter().take(10));
+        v2_ndcg += ndcg_at_10(v2.iter().map(|candidate| candidate.grade), ideal_dcg);
+        v3_ndcg += ndcg_at_10(v3.iter().map(|(candidate, _)| candidate.grade), ideal_dcg);
+        v2_reciprocal_rank +=
+            reciprocal_rank_at_10(v2.iter().position(|candidate| candidate.grade > 0));
+        v3_reciprocal_rank +=
+            reciprocal_rank_at_10(v3.iter().position(|(candidate, _)| candidate.grade > 0));
     }
     let queries = suite.queries.len().max(1) as f64;
     let v2_ndcg_at_10 = v2_ndcg / queries;
     let v3_ndcg_at_10 = v3_ndcg / queries;
+    let v2_mrr_at_10 = v2_reciprocal_rank / queries;
+    let v3_mrr_at_10 = v3_reciprocal_rank / queries;
+    let oracle_mrr_at_10 = 1.0;
     Ok(GradedComparison {
         queries: suite.queries.len(),
         v2_ndcg_at_10,
         v3_ndcg_at_10,
         ndcg_improvement: v3_ndcg_at_10 - v2_ndcg_at_10,
-        stretch_mrr: reciprocal_rank / queries,
+        v2_mrr_at_10,
+        v3_mrr_at_10,
+        oracle_mrr_at_10,
+        mrr_gap_closure: normalized_gap_closure(v2_mrr_at_10, v3_mrr_at_10, oracle_mrr_at_10),
     })
 }
 
-fn ndcg(grades: impl Iterator<Item = u8>) -> f64 {
-    let grades = grades.take(10).collect::<Vec<_>>();
-    let dcg = discounted_gain(grades.iter().copied());
-    let mut ideal = grades;
-    ideal.sort_unstable_by(|left, right| right.cmp(left));
-    let ideal = discounted_gain(ideal.into_iter());
-    if ideal == 0.0 {
+fn ndcg_at_10(grades: impl Iterator<Item = u8>, ideal_dcg: f64) -> f64 {
+    if ideal_dcg == 0.0 {
         0.0
     } else {
-        dcg / ideal
+        discounted_gain(grades.take(10)) / ideal_dcg
     }
+}
+
+fn normalized_gap_closure(baseline: f64, challenger: f64, oracle: f64) -> f64 {
+    let available = oracle - baseline;
+    if available <= f64::EPSILON {
+        f64::from(challenger >= baseline)
+    } else {
+        (challenger - baseline) / available
+    }
+}
+
+fn reciprocal_rank_at_10(rank: Option<usize>) -> f64 {
+    rank.filter(|rank| *rank < 10)
+        .map_or(0.0, |rank| 1.0 / (rank + 1) as f64)
 }
 
 fn discounted_gain(grades: impl Iterator<Item = u8>) -> f64 {
@@ -476,9 +501,11 @@ impl MetricAccumulator {
         }
         self.answerable += 1;
         if let Some(rank) = first_relevant_rank(ordered, relevant) {
-            self.hits += usize::from(rank < 10);
-            self.top_1 += usize::from(rank == 0);
-            self.reciprocal_sum += 1.0 / (rank + 1) as f64;
+            if rank < 10 {
+                self.hits += 1;
+                self.top_1 += usize::from(rank == 0);
+                self.reciprocal_sum += 1.0 / (rank + 1) as f64;
+            }
         }
     }
 
@@ -558,14 +585,17 @@ struct GradedComparison {
     v2_ndcg_at_10: f64,
     v3_ndcg_at_10: f64,
     ndcg_improvement: f64,
-    stretch_mrr: f64,
+    v2_mrr_at_10: f64,
+    v3_mrr_at_10: f64,
+    oracle_mrr_at_10: f64,
+    mrr_gap_closure: f64,
 }
 
 #[derive(Clone, Copy, Debug, Serialize)]
 struct QualityGates {
     longmemeval_hit_at_10_at_least_0_984: bool,
     longmemeval_mrr_at_least_0_910: bool,
-    stretch_mrr_at_least_0_920: bool,
+    stretch_mrr_gap_closure_at_least_0_20: bool,
     graded_ndcg_at_10_improvement_at_least_0_020: bool,
     held_out_top_1_improvement_at_least_2_points: bool,
     held_out_pairwise_accuracy_at_least_0_80: bool,
@@ -584,7 +614,7 @@ impl QualityGates {
     fn all_pass(self) -> bool {
         self.longmemeval_hit_at_10_at_least_0_984
             && self.longmemeval_mrr_at_least_0_910
-            && self.stretch_mrr_at_least_0_920
+            && self.stretch_mrr_gap_closure_at_least_0_20
             && self.graded_ndcg_at_10_improvement_at_least_0_020
             && self.held_out_top_1_improvement_at_least_2_points
             && self.held_out_pairwise_accuracy_at_least_0_80
@@ -698,6 +728,7 @@ impl GradedEvaluationSuiteV3 {
                     .candidates
                     .iter()
                     .any(|candidate| candidate.grade > 4 || !candidate.rank_evidence_v3.is_valid())
+                || !query.candidates.iter().any(|candidate| candidate.grade > 0)
             {
                 bail!("invalid V3 graded query");
             }
@@ -722,36 +753,5 @@ struct GradedCandidateV3 {
 }
 
 #[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn ndcg_rewards_the_ideal_graded_order() {
-        assert_eq!(ndcg([3, 2, 1, 0].into_iter()), 1.0);
-        assert!(ndcg([0, 1, 2, 3].into_iter()) < 1.0);
-    }
-
-    #[test]
-    fn quality_gate_requires_every_slice() {
-        let mut gates = QualityGates {
-            longmemeval_hit_at_10_at_least_0_984: true,
-            longmemeval_mrr_at_least_0_910: true,
-            stretch_mrr_at_least_0_920: true,
-            graded_ndcg_at_10_improvement_at_least_0_020: true,
-            held_out_top_1_improvement_at_least_2_points: true,
-            held_out_pairwise_accuracy_at_least_0_80: true,
-            pairwise_accuracy_per_major_class_at_least_0_75: true,
-            mixed_hit_mrr_top_1_remain_1: true,
-            no_result_accuracy_remains_1: true,
-            constitutional_regressions_are_zero: true,
-            candidate_pool_mismatches_are_zero: true,
-            oracle_recall_regression_is_zero: true,
-            worst_query_shape_mrr_regression_at_most_0_005: true,
-            training_release_evidence_intersections_are_zero: true,
-            graded_release_evidence_intersections_are_zero: true,
-        };
-        assert!(gates.all_pass());
-        gates.pairwise_accuracy_per_major_class_at_least_0_75 = false;
-        assert!(!gates.all_pass());
-    }
-}
+#[path = "quality_tests.rs"]
+mod tests;

@@ -3,7 +3,7 @@ use super::*;
 const CONTRACT: &str = "phoenix.memory.qps-v3-tree-eligibility/v2";
 const TREE_EVIDENCE_CONTRACT: &str = "phoenix.memory.qps-v3-tree-challenger-evidence/v1";
 const PHASE_5_CONTRACT: &str = "phoenix.memory.qps-v3-corpus-readiness/v2";
-const PHASE_8_CONTRACT: &str = "phoenix.memory.qps-v3-quality-qualification/v1";
+const PHASE_8_CONTRACT: &str = super::quality::CONTRACT;
 const TREE_ARTIFACT_LIMIT_BYTES: u64 = 256 * 1024;
 const TREE_RANK_P99_LIMIT_NANOS: u64 = 15_000;
 

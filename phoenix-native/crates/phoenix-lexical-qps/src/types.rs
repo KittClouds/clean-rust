@@ -143,6 +143,55 @@ pub struct SearchHit {
     pub relevance_tier: crate::RelevanceTier,
 }
 
+/// Offline-only, caller-owned capture of selected per-query-group lexical
+/// evidence. Values are stored hit-major in one flat buffer so evidence
+/// regeneration does not allocate one vector per candidate. This is not read
+/// by candidate generation, V2 scoring, constitutional tiers, or V3 serving.
+#[derive(Clone, Debug, Default, PartialEq)]
+pub struct GroupStrengthBatch {
+    group_count: usize,
+    hit_count: usize,
+    values: Vec<f32>,
+}
+
+impl GroupStrengthBatch {
+    pub fn with_capacity(hit_capacity: usize, group_capacity: usize) -> Self {
+        Self {
+            group_count: 0,
+            hit_count: 0,
+            values: Vec::with_capacity(hit_capacity.saturating_mul(group_capacity)),
+        }
+    }
+
+    pub fn group_count(&self) -> usize {
+        self.group_count
+    }
+
+    pub fn hit_count(&self) -> usize {
+        self.hit_count
+    }
+
+    pub fn strengths(&self, hit_index: usize) -> Option<&[f32]> {
+        if hit_index >= self.hit_count {
+            return None;
+        }
+        let start = hit_index * self.group_count;
+        Some(&self.values[start..start + self.group_count])
+    }
+
+    pub(crate) fn prepare(&mut self, hit_count: usize, group_count: usize) {
+        self.group_count = group_count;
+        self.hit_count = hit_count;
+        self.values.clear();
+        self.values
+            .resize(hit_count.saturating_mul(group_count), 0.0);
+    }
+
+    pub(crate) fn set(&mut self, hit_index: usize, group: usize, value: f32) {
+        self.values[hit_index * self.group_count + group] = value;
+    }
+}
+
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
 pub struct SearchReceipt {
     pub query_groups: u16,
@@ -190,6 +239,8 @@ pub enum QpsError {
     DuplicateExternalId(u64),
     #[error("document ID space is exhausted")]
     DocumentIdOverflow,
+    #[error("search hit document ID is not present in this index")]
+    InvalidDocument,
     #[error("packed index address space is exhausted")]
     IndexAddressOverflow,
     #[error("field ID space is exhausted")]

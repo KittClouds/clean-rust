@@ -69,6 +69,12 @@ pub(crate) use tree_eligibility::audit as audit_tree_eligibility;
 #[path = "quality.rs"]
 mod quality;
 pub(crate) use quality::qualify as qualify_quality;
+#[path = "phase8_8_feasibility.rs"]
+mod phase8_8_feasibility;
+pub(crate) use phase8_8_feasibility::audit as audit_phase8_8_feasibility;
+#[path = "phase8_8_train.rs"]
+mod phase8_8_train;
+pub(crate) use phase8_8_train::train as train_phase8_8;
 #[path = "phase8_5.rs"]
 mod phase8_5;
 pub(crate) use phase8_5::diagnose as diagnose_phase8_5;
@@ -81,6 +87,12 @@ pub(crate) use locality_capture::capture as capture_phase8_6_locality;
 #[path = "rarity_coverage_capture.rs"]
 mod rarity_coverage_capture;
 pub(crate) use rarity_coverage_capture::capture as capture_phase8_7_rarity_coverage;
+#[path = "group_distribution_capture.rs"]
+mod group_distribution_capture;
+pub(crate) use group_distribution_capture::capture as capture_phase8_9_group_distribution;
+#[path = "phase8_9.rs"]
+mod phase8_9;
+pub(crate) use phase8_9::diagnose as diagnose_phase8_9;
 
 const MIXED_CONTRACT: &str = "phoenix.memory.qps-mixed-qualification/v1";
 const ENGINE: &str = "phoenix-qps-v2.01-frozen-for-v3";

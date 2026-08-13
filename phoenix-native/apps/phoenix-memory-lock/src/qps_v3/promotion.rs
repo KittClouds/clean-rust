@@ -14,7 +14,7 @@ use super::*;
 const SHADOW_CONTRACT: &str = "phoenix.memory.qps-v3-shadow/v1";
 const RECONCILIATION_CONTRACT: &str = "phoenix.qps.v3-shadow-reconciliation/v1";
 const ACTIVE_CONTRACT: &str = "phoenix.memory.qps-v3-active-model/v1";
-const QUALITY_CONTRACT: &str = "phoenix.memory.qps-v3-quality-qualification/v1";
+const QUALITY_CONTRACT: &str = super::quality::CONTRACT;
 const PERFORMANCE_CONTRACT: &str = "phoenix.memory.qps-v3-performance-qualification/v1";
 
 pub(crate) fn shadow(

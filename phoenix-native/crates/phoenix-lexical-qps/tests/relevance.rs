@@ -1,7 +1,7 @@
 use phoenix_lexical_qps::{
     rerank_v3_in_place, CandidateSelection, DocumentInput, Expansion, FeatureNormalizationV3,
-    FieldConfig, LinearRankerV3, QpsBuilder, QpsConfig, QueryGroup, RankEvidenceV3, RelevanceTier,
-    SearchScratch, RANK_EVIDENCE_V3_FEATURE_COUNT,
+    FieldConfig, GroupStrengthBatch, LinearRankerV3, QpsBuilder, QpsConfig, QueryGroup,
+    RankEvidenceV3, RelevanceTier, SearchScratch, RANK_EVIDENCE_V3_FEATURE_COUNT,
 };
 
 #[test]
@@ -173,6 +173,92 @@ fn v3_evidence_is_primitive_complete_and_allocation_free_when_warm() {
         fuzzy.rank_evidence_v3.values[RankEvidenceV3::EXACT_GROUP_FRACTION]
             < exact.rank_evidence_v3.values[RankEvidenceV3::EXACT_GROUP_FRACTION]
     );
+}
+
+#[test]
+fn group_strength_capture_is_bounded_deterministic_and_observational() {
+    let fields = [
+        FieldConfig::new("title", 2.5, 0.35, 0.35),
+        FieldConfig::new("body", 1.0, 0.75, 0.10),
+    ];
+    let mut builder = QpsBuilder::new(
+        Vec::from(fields).into_boxed_slice(),
+        QpsConfig {
+            maximum_candidate_pool: 160,
+            maximum_query_groups: 128,
+            ..QpsConfig::default()
+        },
+    )
+    .unwrap();
+    for (external_id, title, body) in [
+        (1, "alpha", "beta gamma"),
+        (2, "alfa", "beta filler gamma"),
+        (3, "alpha", "unrelated"),
+    ] {
+        builder
+            .insert(DocumentInput {
+                external_id,
+                fields: &[title, body],
+            })
+            .unwrap();
+    }
+    let index = builder.build().unwrap();
+    let alpha = [
+        Expansion {
+            term: "alpha",
+            quality: 1.0,
+        },
+        Expansion {
+            term: "alfa",
+            quality: 0.7,
+        },
+    ];
+    let beta = [Expansion {
+        term: "beta",
+        quality: 1.0,
+    }];
+    let missing = [Expansion {
+        term: "delta",
+        quality: 1.0,
+    }];
+    let groups = [
+        QueryGroup { expansions: &alpha },
+        QueryGroup { expansions: &beta },
+        QueryGroup {
+            expansions: &missing,
+        },
+    ];
+    let mut scratch = SearchScratch::with_document_capacity(3, 128);
+    let mut hits = Vec::with_capacity(160);
+    let mut first = GroupStrengthBatch::with_capacity(160, 128);
+    let mut second = GroupStrengthBatch::with_capacity(160, 128);
+
+    index
+        .search_groups_evidence_into(&groups, 10, &mut scratch, &mut hits)
+        .unwrap();
+    let frozen_hits = hits.clone();
+    index
+        .capture_group_strengths_into(&scratch, &hits, &mut first)
+        .unwrap();
+    index
+        .capture_group_strengths_into(&scratch, &hits, &mut second)
+        .unwrap();
+
+    assert_eq!(hits, frozen_hits);
+    assert_eq!(first, second);
+    assert_eq!(first.group_count(), groups.len());
+    assert_eq!(first.hit_count(), hits.len());
+    for (hit_index, hit) in hits.iter().enumerate() {
+        let strengths = first.strengths(hit_index).unwrap();
+        assert!(strengths
+            .iter()
+            .all(|value| value.is_finite() && (0.0..=1.0).contains(value)));
+        assert_eq!(strengths[2].to_bits(), 0.0_f32.to_bits());
+        assert_eq!(
+            strengths.iter().filter(|value| **value > 0.0).count(),
+            hit.rank_evidence_v3.matched_groups as usize
+        );
+    }
 }
 
 #[test]

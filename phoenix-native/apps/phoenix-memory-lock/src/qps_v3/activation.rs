@@ -81,7 +81,7 @@ fn activation_status(
     let Ok(phase_9) = read_qualification::<Phase9Qualification>(phase_9_path) else {
         return ActivationStatusV3::v2(ActivationReasonV3::QualificationCorrupt);
     };
-    if phase_8.contract != "phoenix.memory.qps-v3-quality-qualification/v1"
+    if phase_8.contract != super::quality::CONTRACT
         || phase_9.contract != "phoenix.memory.qps-v3-performance-qualification/v1"
         || !phase_8.phase_8_verified
         || !phase_9.phase_9_verified

@@ -10,6 +10,8 @@ mod ledger_v3;
 mod rank_evidence;
 mod ranker;
 mod ranker_v3;
+mod ranker_v3_lambdarank;
+mod ranker_v3_top_sensitive;
 mod score;
 mod selection;
 mod split_v3;
@@ -40,11 +42,22 @@ pub use ranker_v3::{
     FeatureNormalizationV3, LinearRankerV3, LinearTrainingConfigV3, LinearTrainingReceiptV3,
     LINEAR_RANKER_V3_VERSION, RANK_EVIDENCE_V3_SCHEMA_IDENTITY,
 };
+pub use ranker_v3_lambdarank::{
+    evaluate_query_normalized_lambdarank_v3, train_query_normalized_lambdarank_v3,
+    train_query_normalized_lambdarank_v3_prevalidated, LambdaRankObjectiveReceiptV3,
+};
+pub use ranker_v3_top_sensitive::{
+    evaluate_query_normalized_top_sensitive_ranker_v3,
+    train_query_normalized_top_sensitive_ranker_v3,
+    train_query_normalized_top_sensitive_ranker_v3_prevalidated, QueryNormalizedDevelopmentV3,
+    QueryNormalizedObjectiveReceiptV3, TOP_SENSITIVE_OFF_TOP_FLOOR_V3,
+};
 pub use split_v3::{
     JudgmentSplitV3, LeakageSplitAuditV3, LeakageSplitV3, PrimarySplitV3,
     LEAKAGE_SPLIT_V3_CONTRACT, LEAKAGE_SPLIT_V3_SCHEMA_VERSION, SPLIT_RATIO_TOLERANCE_BPS,
 };
 pub use types::{
-    CandidateSelection, DocumentId, DocumentInput, Expansion, FieldConfig, QpsConfig, QpsError,
-    QueryGroup, SearchHit, SearchReceipt, SearchStageNanos, MAXIMUM_QUERY_GROUPS,
+    CandidateSelection, DocumentId, DocumentInput, Expansion, FieldConfig, GroupStrengthBatch,
+    QpsConfig, QpsError, QueryGroup, SearchHit, SearchReceipt, SearchStageNanos,
+    MAXIMUM_QUERY_GROUPS,
 };
