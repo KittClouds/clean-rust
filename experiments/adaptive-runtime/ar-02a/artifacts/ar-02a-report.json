@@ -1,0 +1,16 @@
+{
+  "protocol": "AR-02A anisotropic Gaussian cells; engineering-only, toy-scale",
+  "dataset": {"train": 96, "validation": 48, "classes": 3, "latent_cells": 12, "dataset_seed": "a20209206c656c6c"},
+  "runtime": {"mlp": "2-8-8-3 ReLU", "commits": 4800, "commits_per_evidence": 4, "verifier_size": 16, "beam": 2, "action_values": [0.0, -0.02, 0.02, -0.01, 0.01, -0.005, 0.005]},
+  "seeds": ["2b7e151628aed2a6", "77a19d3c4e280b51", "1111222233334444"],
+  "methods": [
+    {"name": "same_batch_random", "n": 3, "mean_train_loss": 0.691700002, "mean_validation_loss": 0.755435189, "mean_validation_accuracy": 0.736111, "mean_wall_seconds": 6.135191},
+    {"name": "independent_random", "n": 3, "mean_train_loss": 0.419194281, "mean_validation_loss": 0.462739418, "mean_validation_accuracy": 0.895833, "mean_wall_seconds": 6.161823},
+    {"name": "class_balanced", "n": 3, "mean_train_loss": 0.411257048, "mean_validation_loss": 0.459252119, "mean_validation_accuracy": 0.840278, "mean_wall_seconds": 6.109183},
+    {"name": "latent_stratified", "n": 3, "mean_train_loss": 0.433902134, "mean_validation_loss": 0.501436303, "mean_validation_accuracy": 0.805556, "mean_wall_seconds": 6.107078},
+    {"name": "adamw", "n": 3, "mean_train_loss": 0.028797182, "mean_validation_loss": 0.292199006, "mean_validation_accuracy": 0.923611, "mean_wall_seconds": 0.011719},
+    {"name": "sign", "n": 3, "mean_train_loss": 0.323052615, "mean_validation_loss": 0.253423164, "mean_validation_accuracy": 0.902778, "mean_wall_seconds": 0.010678}
+  ],
+  "integrity": {"all_verifiers_size_16": true, "same_batch_rounds_per_runtime_run": 1200, "validation_used_for_selection": false, "same_proposal_batches_across_runtime_methods": true, "same_initialization_across_methods_per_seed": true},
+  "artifacts": ["gaussian-cells.bin", "ar-02a-runs.csv", "ar-02a-curve.csv"]
+}
