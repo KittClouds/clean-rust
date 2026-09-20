@@ -3376,7 +3376,8 @@ pub use ar02a::{
 mod ar02ar1;
 pub use ar02ar1::{
     PathSourceReport, R1_METHODS, R1_SEEDS, R1RunResult, R1Spec, VerifierKind, run_ar02a_r1,
-    run_path_source_crossover, run_r1_method_for_commits, run_r2_audit,
+    run_path_source_crossover, run_path_source_crossover_with_seeds, run_r1_method_for_commits,
+    run_r2_audit, run_r2_variance_audit,
 };
 
 pub fn dataset_for_tests() -> Dataset {

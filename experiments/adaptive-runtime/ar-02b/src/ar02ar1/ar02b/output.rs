@@ -25,10 +25,17 @@ pub(super) fn write_headers(
     Ok(())
 }
 
-pub(super) fn write_report(path: impl AsRef<Path>, report: PathSourceReport) -> io::Result<()> {
+pub(super) fn write_report(
+    path: impl AsRef<Path>,
+    report: PathSourceReport,
+    artifact_stem: &str,
+) -> io::Result<()> {
     let mut writer = BufWriter::new(File::create(path)?);
     writeln!(writer, "{{")?;
-    writeln!(writer, "  \"schema\": \"adaptive-runtime-ar-02b/v1\",")?;
+    writeln!(
+        writer,
+        "  \"schema\": \"adaptive-runtime-{artifact_stem}/v1\","
+    )?;
     writeln!(writer, "  \"scope\": \"engineering-only, toy-scale\",")?;
     writeln!(
         writer,
@@ -112,13 +119,14 @@ pub(super) fn write_report(path: impl AsRef<Path>, report: PathSourceReport) -> 
 pub(super) fn write_seed_summary(
     path: impl AsRef<Path>,
     outcomes: &[(u64, f64, f64)],
+    seeds: &[u64],
 ) -> io::Result<()> {
     let mut writer = BufWriter::new(File::create(path)?);
     writeln!(
         writer,
         "seed,n,mean_delta_selected_path_h64,mean_delta_control_path_h64,mean_source_interaction_h64,selected_better_selected_path,selected_better_control_path"
     )?;
-    for seed in R1_SEEDS {
+    for &seed in seeds {
         let rows: Vec<_> = outcomes
             .iter()
             .copied()

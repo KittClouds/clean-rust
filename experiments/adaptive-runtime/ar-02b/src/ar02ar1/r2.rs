@@ -742,3 +742,6 @@ mod tests {
         assert!((snapshot.model.loss(validation) - fields[4].parse::<f32>().unwrap()).abs() < 1e-7);
     }
 }
+
+mod variance;
+pub use variance::run_r2_variance_audit;

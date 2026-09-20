@@ -74,28 +74,60 @@ pub fn run_path_source_crossover(
     samples: &[Sample],
     output_dir: impl AsRef<Path>,
 ) -> io::Result<PathSourceReport> {
+    run_path_source_crossover_with_seeds(samples, output_dir, &R1_SEEDS, "ar-02b")
+}
+
+pub fn run_path_source_crossover_with_seeds(
+    samples: &[Sample],
+    output_dir: impl AsRef<Path>,
+    seeds: &[u64],
+    artifact_stem: &str,
+) -> io::Result<PathSourceReport> {
     if samples.len() != TOTAL_SAMPLES {
         return Err(io::Error::new(
             io::ErrorKind::InvalidInput,
             "AR-02B dataset length mismatch",
         ));
     }
+    if seeds.is_empty()
+        || seeds
+            .iter()
+            .enumerate()
+            .any(|(index, seed)| seeds[..index].contains(seed))
+        || artifact_stem.is_empty()
+        || !artifact_stem
+            .bytes()
+            .all(|byte| byte.is_ascii_lowercase() || byte.is_ascii_digit() || byte == b'-')
+    {
+        return Err(io::Error::new(
+            io::ErrorKind::InvalidInput,
+            "AR-02B seed list or artifact stem is invalid",
+        ));
+    }
     let output_dir = output_dir.as_ref();
     std::fs::create_dir_all(output_dir)?;
     let train = &samples[..TRAIN_SAMPLES];
     let (class_index, cell_index, margin_index) = verifier_indices(train);
-    let mut matches = BufWriter::new(File::create(output_dir.join("ar-02b-matches.csv"))?);
-    let mut crossovers = BufWriter::new(File::create(output_dir.join("ar-02b-crossovers.csv"))?);
-    let mut paths = BufWriter::new(File::create(output_dir.join("ar-02b-paths.csv"))?);
-    let mut checkpoints = BufWriter::new(File::create(output_dir.join("ar-02b-checkpoints.csv"))?);
+    let mut matches = BufWriter::new(File::create(
+        output_dir.join(format!("{artifact_stem}-matches.csv")),
+    )?);
+    let mut crossovers = BufWriter::new(File::create(
+        output_dir.join(format!("{artifact_stem}-crossovers.csv")),
+    )?);
+    let mut paths = BufWriter::new(File::create(
+        output_dir.join(format!("{artifact_stem}-paths.csv")),
+    )?);
+    let mut checkpoints = BufWriter::new(File::create(
+        output_dir.join(format!("{artifact_stem}-checkpoints.csv")),
+    )?);
     write_headers(&mut matches, &mut crossovers, &mut paths, &mut checkpoints)?;
 
     let mut report = PathSourceReport {
-        seeds: R1_SEEDS.len(),
+        seeds: seeds.len(),
         ..PathSourceReport::default()
     };
     let mut complete_h64: Vec<(u64, f64, f64)> = Vec::new();
-    for seed in R1_SEEDS {
+    for &seed in seeds {
         let snapshots =
             replay_cell_trajectory(train, seed, &class_index, &cell_index, &margin_index);
         report.snapshots += snapshots.len();
@@ -313,8 +345,16 @@ pub fn run_path_source_crossover(
             .sum::<f64>()
             / count;
     }
-    write_seed_summary(output_dir.join("ar-02b-seeds.csv"), &complete_h64)?;
-    write_report(output_dir.join("ar-02b-report.json"), report)?;
+    write_seed_summary(
+        output_dir.join(format!("{artifact_stem}-seeds.csv")),
+        &complete_h64,
+        seeds,
+    )?;
+    write_report(
+        output_dir.join(format!("{artifact_stem}-report.json")),
+        report,
+        artifact_stem,
+    )?;
     Ok(report)
 }
 

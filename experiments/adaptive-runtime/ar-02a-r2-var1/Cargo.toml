@@ -1,0 +1,11 @@
+[package]
+name = "adaptive-runtime-ar-02a-r2-var1"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.96"
+publish = false
+
+[dependencies]
+adaptive-runtime-ar-02b = { path = "../ar-02b" }
+
+[workspace]
