@@ -1,0 +1,24 @@
+[package]
+name = "adaptive-runtime-ar-01g"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.96"
+publish = false
+
+[dependencies]
+bytemuck = { version = "1.25", features = ["derive"] }
+hashbrown = "0.16"
+memchr = "2.7"
+memmap2 = "0.9"
+wide = "0.7"
+zerocopy = { version = "0.8.56", features = ["derive"] }
+
+[[bench]]
+name = "ar01a"
+harness = false
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+panic = "abort"

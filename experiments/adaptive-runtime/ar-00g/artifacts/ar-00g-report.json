@@ -1,0 +1,15 @@
+{
+  "schema": "adaptive-runtime-ar-00g/v1",
+  "scope": "engineering-only",
+  "epochs": 3000,
+  "primitive_budget_per_epoch": 17,
+  "refresh_epochs": 100,
+  "results": [
+    {"policy": "G0-dynamic-random", "final_loss": 0.01338628, "final_accuracy": 1.00000000, "final_mse": 0.00056536, "selected_primitives": 2902, "programs": 1192, "utility_evaluations": 10151891, "ever_covered_fraction": 1.00000000, "min_pair_coverage": 319, "max_pair_coverage": 409, "mean_pair_coverage": 360.00000000, "coverage_entropy": 4.91134071, "time_to_full_coverage": 47, "frozen_hot_pairs_covered": 12, "frozen_hot_pairs": 12},
+    {"policy": "G1-round-robin", "final_loss": 0.01338627, "final_accuracy": 1.00000000, "final_mse": 0.00056536, "selected_primitives": 2942, "programs": 1168, "utility_evaluations": 10822538, "ever_covered_fraction": 1.00000000, "min_pair_coverage": 289, "max_pair_coverage": 1158, "mean_pair_coverage": 357.61764526, "coverage_entropy": 4.83306885, "time_to_full_coverage": 14, "frozen_hot_pairs_covered": 12, "frozen_hot_pairs": 12},
+    {"policy": "G2-low-coverage", "final_loss": 0.11511200, "final_accuracy": 1.00000000, "final_mse": 0.01976168, "selected_primitives": 1930, "programs": 822, "utility_evaluations": 13575873, "ever_covered_fraction": 0.17647059, "min_pair_coverage": 0, "max_pair_coverage": 1887, "mean_pair_coverage": 332.91177368, "coverage_entropy": 3.17805314, "time_to_full_coverage": null, "frozen_hot_pairs_covered": 4, "frozen_hot_pairs": 12},
+    {"policy": "G3-no-repeat", "final_loss": 0.01369552, "final_accuracy": 1.00000000, "final_mse": 0.00056577, "selected_primitives": 3097, "programs": 1301, "utility_evaluations": 12678705, "ever_covered_fraction": 1.00000000, "min_pair_coverage": 1, "max_pair_coverage": 4171, "mean_pair_coverage": 369.44116211, "coverage_entropy": 2.52184653, "time_to_full_coverage": 20, "frozen_hot_pairs_covered": 12, "frozen_hot_pairs": 12},
+    {"policy": "G4-forbidden-hot-pairs", "final_loss": 0.01691002, "final_accuracy": 1.00000000, "final_mse": 0.00059790, "selected_primitives": 2335, "programs": 985, "utility_evaluations": 12653093, "ever_covered_fraction": 0.91176468, "min_pair_coverage": 0, "max_pair_coverage": 469, "mean_pair_coverage": 342.00000000, "coverage_entropy": 4.81838369, "time_to_full_coverage": null, "frozen_hot_pairs_covered": 0, "frozen_hot_pairs": 12},
+    {"policy": "G5-fresh-topology", "final_loss": 0.38160074, "final_accuracy": 0.75000000, "final_mse": 0.13025194, "selected_primitives": 1808, "programs": 658, "utility_evaluations": 16327015, "ever_covered_fraction": 0.17647059, "min_pair_coverage": 0, "max_pair_coverage": 3077, "mean_pair_coverage": 321.26470947, "coverage_entropy": 2.91602612, "time_to_full_coverage": null, "frozen_hot_pairs_covered": 5, "frozen_hot_pairs": 12}
+  ]
+}
