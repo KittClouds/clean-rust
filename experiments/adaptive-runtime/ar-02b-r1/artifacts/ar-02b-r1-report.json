@@ -1,0 +1,21 @@
+{
+  "schema": "adaptive-runtime-ar-02b-r1/v1",
+  "scope": "engineering-only, toy-scale",
+  "protocol": "P16 proposal; V48 cell-weighted verifier; frozen AR-02A K2 runtime; snapshots at commits 600, 2400, 4200; same-block full 7x7 utility-matched controls; 63-commit P_G/P_C source crossover",
+  "seeds": 9,
+  "snapshots": 27,
+  "pair_program_snapshots": 27,
+  "pair_snapshots_without_controls": 9,
+  "matched_controls": 34,
+  "generated_paths": 52,
+  "complete_crossovers_h64": 33,
+  "invalid_source_paths": 0,
+  "invalid_replay_paths": 1,
+  "mean_delta_selected_path_h64": -2.094453031367e-4,
+  "mean_delta_matched_control_path_h64": -5.937074169968e-5,
+  "mean_source_interaction_h64": -1.500745614370e-4,
+  "sign_categories_h64": {"selected_better_under_both_paths":16,"selected_only_under_selected_path":2,"control_better_under_both_paths":9,"mixed_or_tied":6},
+  "max_telescoping_residual": 0.000000000000e0,
+  "max_source_identity_residual": 0.000000000000e0,
+  "max_parameter_distance_drift": 7.450580596924e-9
+}
