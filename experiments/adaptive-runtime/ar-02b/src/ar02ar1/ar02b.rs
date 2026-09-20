@@ -326,7 +326,7 @@ pub fn run_path_source_crossover_with_seeds(
             }
         }
         eprintln!(
-            "AR-02B seed {seed:016x}: replayed cell-V48 trajectory to commits {:?}",
+            "{artifact_stem} seed {seed:016x}: replayed cell-V48 trajectory to commits {:?}",
             SNAPSHOT_STEPS
         );
     }

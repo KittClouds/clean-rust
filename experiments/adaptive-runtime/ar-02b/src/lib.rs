@@ -161,10 +161,14 @@ impl Model {
         let mut hidden_1 = [0.0; HIDDEN_1];
         for (unit, value) in hidden_1.iter_mut().enumerate() {
             let offset = W1 + unit * 2;
-            *value = (self.parameters[offset] * sample.x0
+            let pre = self.parameters[offset] * sample.x0
                 + self.parameters[offset + 1] * sample.x1
-                + self.parameters[B1 + unit])
-                .max(0.0);
+                + self.parameters[B1 + unit];
+            #[cfg(feature = "tanh")]
+            let activation = pre.tanh();
+            #[cfg(not(feature = "tanh"))]
+            let activation = pre.max(0.0);
+            *value = activation;
         }
         let mut hidden_2 = [0.0; HIDDEN_2];
         for (unit, value) in hidden_2.iter_mut().enumerate() {
@@ -173,7 +177,11 @@ impl Model {
             for input in 0..HIDDEN_1 {
                 pre += self.parameters[offset + input] * hidden_1[input];
             }
-            *value = pre.max(0.0);
+            #[cfg(feature = "tanh")]
+            let activation = pre.tanh();
+            #[cfg(not(feature = "tanh"))]
+            let activation = pre.max(0.0);
+            *value = activation;
         }
         let mut logits = [0.0; CLASSES];
         for (class, logit) in logits.iter_mut().enumerate() {
@@ -240,8 +248,10 @@ impl Model {
             }
             let mut hidden_1_error = [0.0; HIDDEN_1];
             for unit in 0..HIDDEN_2 {
-                let pre_positive = hidden_2[unit] > 0.0;
-                let error = if pre_positive {
+                #[cfg(feature = "tanh")]
+                let error = hidden_2_error[unit] * (1.0 - hidden_2[unit] * hidden_2[unit]);
+                #[cfg(not(feature = "tanh"))]
+                let error = if hidden_2[unit] > 0.0 {
                     hidden_2_error[unit]
                 } else {
                     0.0
@@ -254,6 +264,9 @@ impl Model {
                 }
             }
             for unit in 0..HIDDEN_1 {
+                #[cfg(feature = "tanh")]
+                let error = hidden_1_error[unit] * (1.0 - hidden_1[unit] * hidden_1[unit]);
+                #[cfg(not(feature = "tanh"))]
                 let error = if hidden_1[unit] > 0.0 {
                     hidden_1_error[unit]
                 } else {
@@ -3445,6 +3458,30 @@ mod tests {
         assert_eq!(shortlist_count, 4);
         assert_eq!(exhaustive_count, ACTION_VALUES.len() * ACTION_VALUES.len());
         assert_eq!(SAME_BLOCK_SCHEDULE_PHASES, [0, 17, 36]);
+    }
+
+    #[cfg(feature = "tanh")]
+    #[test]
+    fn tanh_backprop_matches_finite_differences_across_layers() {
+        let dataset = generate_gaussian_cells();
+        let sample = dataset.samples[0];
+        let mut model = Model::initial();
+        let (_, gradient) = model.gradient(std::slice::from_ref(&sample));
+        let epsilon = 1.0e-3;
+        for parameter in [0, 16, 24, 88, 96, 120] {
+            let original = model.parameters[parameter];
+            model.parameters[parameter] = original + epsilon;
+            let plus = model.loss(std::slice::from_ref(&sample));
+            model.parameters[parameter] = original - epsilon;
+            let minus = model.loss(std::slice::from_ref(&sample));
+            model.parameters[parameter] = original;
+            let numeric = (plus - minus) / (2.0 * epsilon);
+            assert!(
+                (numeric - gradient[parameter]).abs() < 2.0e-3,
+                "gradient mismatch at {parameter}: numeric={numeric}, analytic={}",
+                gradient[parameter]
+            );
+        }
     }
 
     #[test]

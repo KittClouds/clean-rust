@@ -13,6 +13,10 @@ memmap2 = "0.9"
 wide = "0.7"
 zerocopy = { version = "0.8.56", features = ["derive"] }
 
+[features]
+default = []
+tanh = []
+
 [profile.release]
 opt-level = 3
 lto = "thin"
