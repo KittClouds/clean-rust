@@ -1,0 +1,18 @@
+{
+  "schema": "adaptive-runtime-ar-01p/v1",
+  "scope": "engineering-only; toy-scale; no biological correspondence; no general optimizer claim",
+  "protocol": "For each N2 same-block matched pair, apply the G3/control initial programs, then replay identical frozen common actions. L0 is the unbranched original G3 stream; L2 is generated from the G3 post-initial state under phase 17. Per-event J is the exact full-train loss-gap increment; class and 8 geometry-stratum means use per-example four-state mixed differences. ReLU masks encode post-activation positivity in both hidden layers. Invalid frozen actions stop a path without replacement.",
+  "seeds": 3,
+  "snapshots": 282,
+  "matched_controls": 389,
+  "comparisons": 778,
+  "path_events": 49014,
+  "invalid_paths": 0,
+  "loss_identity_tolerance": 2.000e-6,
+  "max_telescoping_residual": 0.000000000000e0,
+  "max_event_decomposition_residual": 1.251697540283e-6,
+  "L0_mean_final_gap": -7.776810684670e-5,
+  "L2_mean_final_gap": -6.817097375816e-5,
+  "L0_reversal_rate": 0.62724936,
+  "L2_reversal_rate": 0.62467866
+}

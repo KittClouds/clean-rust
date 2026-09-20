@@ -1,0 +1,3 @@
+stream,comparisons,reversals,reversal_rate,mean_initial_gap,mean_final_gap,mean_cumulative_j,mean_abs_telescoping_residual
+L0-original-frozen,389,244,0.62724936,-1.881290753887e-6,-7.776810684670e-5,-7.588681609281e-5,0.000000000000e0
+L2-phase17-frozen,389,243,0.62467866,-1.881290753887e-6,-6.817097375816e-5,-6.628968300427e-5,0.000000000000e0
