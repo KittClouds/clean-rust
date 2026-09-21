@@ -1,0 +1,11 @@
+{
+  "comparison": "first-order sentinel utility versus exact utility on identical examples",
+  "aggregation": "equal state-panel summaries in this balanced crossed design; panel measurements nested within crossed cells",
+  "panel_sizes": [
+    {"n":8,"state_panel_count":300,"mean_rmse":2.155803936416e-4,"mean_mae":6.535280211261e-5,"mean_spearman":9.941179983526e-1,"mean_pairwise_agreement":9.909969841295e-1},
+    {"n":16,"state_panel_count":300,"mean_rmse":1.691450099010e-4,"mean_mae":5.909970375078e-5,"mean_spearman":9.953709010524e-1,"mean_pairwise_agreement":9.897388431918e-1},
+    {"n":32,"state_panel_count":300,"mean_rmse":1.328596286487e-4,"mean_mae":5.553226099495e-5,"mean_spearman":9.956520176437e-1,"mean_pairwise_agreement":9.877799486099e-1},
+    {"n":64,"state_panel_count":300,"mean_rmse":1.098439225938e-4,"mean_mae":5.226805558810e-5,"mean_spearman":9.954978479443e-1,"mean_pairwise_agreement":9.858916596334e-1},
+    {"n":128,"state_panel_count":300,"mean_rmse":8.551960643752e-5,"mean_mae":4.689359727093e-5,"mean_spearman":9.964525284832e-1,"mean_pairwise_agreement":9.858900721266e-1}
+  ]
+}

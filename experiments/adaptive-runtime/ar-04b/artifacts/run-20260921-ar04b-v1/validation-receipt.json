@@ -1,0 +1,11 @@
+{
+  "candidate_actions": 12750,
+  "crossed_cells": 25,
+  "data_artifacts_hash_checked": 30,
+  "derived_output_hashes_checked": 9,
+  "ranking_metric_rows_independently_recomputed": 3075,
+  "sentinel_score_rows": 510000,
+  "states": 75,
+  "unique_disjoint_sample_rows": 3520,
+  "valid": true
+}
