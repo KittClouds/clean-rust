@@ -101,3 +101,15 @@ runtime benefit.
 AR-04B establishes no controller, no panel-allocation policy, no estimator
 promotion, and no return to AR-03 tuning. Any runtime use requires a separate
 frozen experiment.
+
+## Hypothesis disposition
+
+- **AR-H52 — Independent sentinel evidence partially bridges the
+  training-to-generalization action-ranking gap, with improving alignment
+  through the tested `n=128` frontier. Supported, bounded** to this synthetic
+  task/model/action family and its 96-example final-measurement reference.
+  `n=128` is not established as sufficient.
+- **AR-H53 — First-order sentinel utility preserves exact sentinel
+  action-ranking information at the tested action scale. Supported, bounded.**
+  This is a score-fidelity finding only; gradient acquisition cost and
+  closed-loop utility were not tested.
