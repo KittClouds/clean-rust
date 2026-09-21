@@ -1,0 +1,11 @@
+{
+  "analysis_performed": false,
+  "completed_fit_receipts": 656,
+  "epochs_per_fit": 20,
+  "heldout_policy": "one terminal evaluation pass after optimizer update 1280; no validation reads",
+  "planned_fits": 656,
+  "run_id": "FLY-DROP-00-RUN1",
+  "status": "COLLECTION_COMPLETE",
+  "total_optimizer_steps": 839680,
+  "updates_per_fit": 1280
+}

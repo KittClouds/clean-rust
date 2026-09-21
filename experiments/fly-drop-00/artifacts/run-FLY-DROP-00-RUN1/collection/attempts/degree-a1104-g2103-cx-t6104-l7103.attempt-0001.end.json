@@ -1,0 +1,8 @@
+{
+  "attempt": 1,
+  "finished_unix_ms": 1790020601404,
+  "fit_id": "degree-a1104-g2103-cx-t6104-l7103",
+  "receipt_path": "experiments/fly-drop-00/artifacts/run-FLY-DROP-00-RUN1\\collection\\fit-receipts\\degree-a1104-g2103-cx-t6104-l7103.attempt-0001.json",
+  "receipt_sha256": "80d6b785019368aed1a9191c4dccaeadead2e723f97b4ea4223e4b341586a09e",
+  "status": "complete"
+}

@@ -1,0 +1,23 @@
+{
+  "evaluation_access_audit_basis": "hash-locked runner code and executable plus per-attempt terminal-only access events at update 1280",
+  "expected_fit_receipts": 656,
+  "failures": [],
+  "frozen_source_hashes_unchanged": true,
+  "numerical_status": {
+    "fit_count": 0,
+    "fit_ids": [],
+    "infrastructure_failures": 0,
+    "scientific_numerical_status": "none"
+  },
+  "optimizer_updates_per_fit": 1280,
+  "paired_teacher_learner_cells_verified": 16,
+  "preserved_interrupted_attempt_artifacts": [],
+  "run_code_hashes_unchanged": true,
+  "run_id": "FLY-DROP-00-RUN1",
+  "schema": "FLY-DROP-00-integrity-receipt-v1",
+  "seal_sha256": "9dc9235c1b5ebf8c8a426f793100f9081cd1242523c27bab00331c2921e85918",
+  "status": "PASS",
+  "verified_fit_receipts": 656,
+  "verified_terminal_evaluation_events": 656,
+  "verified_total_optimizer_steps": 839680
+}

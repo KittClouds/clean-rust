@@ -1,0 +1,162 @@
+{
+  "artifact_hashes": {
+    "crossed_factor_summary": {
+      "bytes": 2548,
+      "path": "analysis/crossed-factor-summary.csv",
+      "sha256": "4cb77694fe25da2e53d2eb463ffd1830335d5532fa72dce3a0819c03c0f2b961"
+    },
+    "epoch_metrics": {
+      "bytes": 1309592,
+      "path": "collection/epoch-metrics.csv",
+      "sha256": "43c784c0471783df953816e853226de164b1e573c683ec2f84a304107cd68d87"
+    },
+    "execution_manifest": {
+      "bytes": 2038416,
+      "path": "execution-manifest.json",
+      "sha256": "813ca75372255d500b26beb2b3d7a55eaf437a4c73ff34c8c27d8ecb777d7ebf"
+    },
+    "exploratory_operator_phenotype": {
+      "bytes": 23662,
+      "path": "analysis/exploratory-operator-phenotype.json",
+      "sha256": "9df24ab2541776b987c202381f0cd84a454654d9c582d9fbdd6ad30a0ebd0ba8"
+    },
+    "final_outcomes": {
+      "bytes": 99784,
+      "path": "collection/final-outcomes.csv",
+      "sha256": "5149327690c3ef377d888bd8a41cbebe63fdfb285ea3ec453ca422db8f651ff5"
+    },
+    "integrity_receipt": {
+      "bytes": 853,
+      "path": "integrity-receipt.json",
+      "sha256": "63a9aaa1b4e5ec02f0fe797e69bee567f93e28a857dbf6c3a7069d18a71df21e"
+    },
+    "preflight_receipt": {
+      "bytes": 554,
+      "path": "preflight-receipt.json",
+      "sha256": "73f831f38fe162a6fb9d3c209ef5c5106fcff4911b9cf65b750cbc72d11fa09e"
+    },
+    "primary_bootstrap": {
+      "bytes": 557766,
+      "path": "analysis/primary-bootstrap.json",
+      "sha256": "495153296699533c74f076c506b394b3968f0a77510764d16ff2a16c6625d45e"
+    },
+    "primary_contrast": {
+      "bytes": 3555,
+      "path": "analysis/primary-contrast.json",
+      "sha256": "87c655a35b92ef9084ae460482f9b4108a587b61e0b6916f76a55df12774a334"
+    },
+    "results_md": {
+      "bytes": 1197,
+      "path": "analysis/RESULTS.md",
+      "sha256": "79c483eb1e9f44737cfc1a2297600c9a5bfecafd0a7188ef91181031d7334381"
+    },
+    "run_contract": {
+      "bytes": 20257,
+      "path": "run-contract.json",
+      "sha256": "273294417f579b2974a9dc6f3cb78ea2741363dd62c334017470a50c5c713fce"
+    },
+    "secondary_controls": {
+      "bytes": 1825,
+      "path": "analysis/secondary-controls.json",
+      "sha256": "4a042c0e833db1dc260757a6af171675c074a0ab21e2133b2ae917f52ce099ce"
+    },
+    "trajectory_summary": {
+      "bytes": 11142,
+      "path": "analysis/trajectory-summary.json",
+      "sha256": "ebb5aced5af34bb3c4c393d7a8ce3d3f9de7e29a077b82eac7ee6577aa06d976"
+    }
+  },
+  "build": {
+    "command": "cargo build --offline --release --manifest-path experiments/fly-drop-00-runner/Cargo.toml",
+    "rustc_sha256": "86478e53f769379d7f0ebfa7c9aa97cb76ca92233f79aa2cc0dbee2efaac73c7",
+    "rustflags": "-C target-cpu=native",
+    "target": "D:\\fly-drop-00-run1-target"
+  },
+  "collection": {
+    "fit_receipts": 656,
+    "infrastructure_failures": 0,
+    "numerical_failure_fits": 0,
+    "terminal_evaluation_events": 656,
+    "total_optimizer_steps": 839680,
+    "updates_per_fit": 1280
+  },
+  "created_utc": "2026-09-21T20:33:13.308415+00:00",
+  "disposition": "PRIMARY_TOPOLOGY_EFFECT_NOT_SUPPORTED",
+  "disposition_statement": "Under the frozen 128D algebraic projection M_s=R_s A E_s, the released MaleCNS segment-connection-table arrangement produced no reproducible held-out-loss difference relative to the prospectively frozen degree/weight-context-preserving source shuffle in this synthetic MLP host. This result does not address nonlinear graph computation, recurrence, plasticity, alternate projections, biological function, or other hosts.",
+  "execution_manifest_sha256": "813ca75372255d500b26beb2b3d7a55eaf437a4c73ff34c8c27d8ecb777d7ebf",
+  "integrity_receipt_sha256": "63a9aaa1b4e5ec02f0fe797e69bee567f93e28a857dbf6c3a7069d18a71df21e",
+  "jev_in_scope": false,
+  "pretraining_seal": {
+    "path": "experiments/fly-drop-00/PRETRAINING-SEAL.json",
+    "sha256": "9dc9235c1b5ebf8c8a426f793100f9081cd1242523c27bab00331c2921e85918"
+  },
+  "primary_result": {
+    "bootstrap_95_percentile_ci": [
+      -1.2889172705618393e-05,
+      1.0461046327204131e-05
+    ],
+    "bootstrap_replicates": 20000,
+    "bootstrap_seed": 20260921,
+    "contrast": "mean over adapter, teacher, learner of MaleCNS held-out BCE minus mean degree-shuffle held-out BCE over four graph realizations",
+    "delta": -7.651515645081333e-07
+  },
+  "run_contract_sha256": "273294417f579b2974a9dc6f3cb78ea2741363dd62c334017470a50c5c713fce",
+  "run_id": "FLY-DROP-00-RUN1",
+  "run_source_hashes": [
+    {
+      "bytes": 328,
+      "path": "experiments/fly-drop-00-runner/Cargo.toml",
+      "sha256": "e351404eac9b9551df5b80b48d96e9a44ad6d1485a5959481f6c0d306873ed01"
+    },
+    {
+      "bytes": 6005,
+      "path": "experiments/fly-drop-00-runner/Cargo.lock",
+      "sha256": "8f03476bee8f42a40dc2f27b83aca361efe539d2d7f9ce52bb8d65923b9d5573"
+    },
+    {
+      "bytes": 4540,
+      "path": "experiments/fly-drop-00-runner/src/main.rs",
+      "sha256": "27a4a39c013374dddf9ce6e769205f714af3a7acf51147650c8205f61c44d469"
+    },
+    {
+      "bytes": 5732,
+      "path": "experiments/fly-drop-00-runner/src/model.rs",
+      "sha256": "4f8b969c1d6f862517ef0db95353cec58c8d117bc27b95060c40d38dce5c9034"
+    },
+    {
+      "bytes": 15651,
+      "path": "experiments/fly-drop-00-runner/src/train.rs",
+      "sha256": "50774b9998ce04d28000385257271a3078040a8e43075f6e043100925dfa0cbf"
+    },
+    {
+      "bytes": 1643,
+      "path": "experiments/fly-drop-00-runner/src/util.rs",
+      "sha256": "cf11b8379f57eeb1472eec3f1290306dd94db5b86336980d6b84b32f27a7e49b"
+    },
+    {
+      "bytes": 16218,
+      "path": "experiments/fly-drop-00-runner/scripts/analyze_run.py",
+      "sha256": "49041ba4ad4219be47176053d612c41d4ad8b580ceb26846d95007db889ad500"
+    },
+    {
+      "bytes": 13493,
+      "path": "experiments/fly-drop-00-runner/scripts/check_integrity.py",
+      "sha256": "f78a94210d4dfdc4860e6df4c04073e679a80e159beacfeaf00b9be09b774ce1"
+    },
+    {
+      "bytes": 15487,
+      "path": "experiments/fly-drop-00-runner/scripts/run_preflight.py",
+      "sha256": "a80c2a0de176f29ce3f85195601626ea3c6fb8bace0af04bfdd726ae1444b48e"
+    }
+  ],
+  "runner_executable": {
+    "archived_path": "provenance/fly-drop-00-runner.exe",
+    "archived_sha256": "fc8960569502dd65919fe6549e432fdea375e54a9a202c8a93f2d0efa93a414f",
+    "bytes": 433152,
+    "original_contract_path": "C:\\code land\\clean-rust\\experiments\\fly-drop-00-runner\\target\\release\\fly-drop-00-runner.exe",
+    "sha256": "fc8960569502dd65919fe6549e432fdea375e54a9a202c8a93f2d0efa93a414f"
+  },
+  "schema": "FLY-DROP-00-terminal-result-receipt-v1",
+  "status": "CLOSED",
+  "study_id": "FLY-DROP-00-v0.1"
+}

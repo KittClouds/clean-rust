@@ -1,0 +1,8 @@
+{
+  "attempt": 1,
+  "finished_unix_ms": 1790020868092,
+  "fit_id": "random-a1102-g3101-cx-t6104-l7104",
+  "receipt_path": "experiments/fly-drop-00/artifacts/run-FLY-DROP-00-RUN1\\collection\\fit-receipts\\random-a1102-g3101-cx-t6104-l7104.attempt-0001.json",
+  "receipt_sha256": "44216e7ac10da3eae119d1767742feabb1be83c0ae8e1a5dc47d1db67a94b9a3",
+  "status": "complete"
+}
