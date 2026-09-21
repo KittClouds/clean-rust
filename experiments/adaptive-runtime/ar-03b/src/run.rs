@@ -157,9 +157,14 @@ pub fn run(input_root: &Path, output_dir: &Path) -> Result<(), String> {
         receipt: &receipt,
     };
     output::write_all(output_data).map_err(|error| error.to_string())?;
-    let cost_projection_rows =
-        write_cost_projection(output_dir, &proxy_costs, &verifier_costs, &frontier_summary)
-            .map_err(|error| error.to_string())?;
+    let cost_projection_rows = write_cost_projection(
+        output_dir,
+        &proxy_costs,
+        &verifier_costs,
+        &frontier_summary,
+        &summary_v48,
+    )
+    .map_err(|error| error.to_string())?;
     output::write_report(
         output_dir.join("report.json"),
         output_data,
@@ -548,6 +553,7 @@ fn write_cost_projection(
     proxy_costs: &[ProxyCost],
     verifier_costs: &[VerifierCost],
     frontier: &[crate::records::SummaryRecord],
+    v48_summary: &[crate::records::SummaryRecord],
 ) -> io::Result<usize> {
     let mut refresh_cost = HashMap::<(String, usize), (u128, usize)>::new();
     for row in proxy_costs {
@@ -585,7 +591,7 @@ fn write_cost_projection(
     )?);
     writeln!(
         out,
-        "method,anchor_step,reuse_commits,quality_readout_step,partition_age_at_quality_readout,verifier_examples,refresh_feature_plus_partition_ns,amortized_proxy_ns_per_commit,verifier_elapsed_ns_per_commit,projected_total_ns_per_commit,predicted_rmse_at_readout,observed_rmse_v48_at_readout,readout_phase"
+        "method,anchor_step,reuse_commits,quality_readout_step,partition_age_at_quality_readout,verifier_examples,refresh_feature_plus_partition_ns,amortized_proxy_ns_per_commit,verifier_elapsed_ns_per_commit,projected_total_ns_per_commit,predicted_rmse_at_readout,observed_rmse_v48_at_readout,sign_error_rate_v48_at_readout,selected_program_regret_v48_at_readout,false_authorization_rate_v48_at_readout,readout_phase"
     )?;
     let mut rows_written = 0;
     for method in [
@@ -635,18 +641,49 @@ fn write_cost_projection(
                                 ),
                             )
                         })?;
+                    let v48_quality = if examples == 48 {
+                        let row = v48_summary
+                            .iter()
+                            .find(|row| {
+                                row.level == "overall_equal_cell"
+                                    && row.phase == phase
+                                    && row.state_step == anchor + age
+                                    && row.anchor_step == Some(anchor)
+                                    && row.offset_from_anchor == Some(age)
+                                    && row.partition_age == if reuse == 1 { 0 } else { age }
+                                    && row.method == method
+                                    && row.evidence_examples == 48
+                            })
+                            .ok_or_else(|| {
+                                io::Error::new(
+                                    io::ErrorKind::InvalidData,
+                                    format!(
+                                        "missing V48 decision row for {method}, anchor {anchor}, age {age}"
+                                    ),
+                                )
+                            })?;
+                        Some(row)
+                    } else {
+                        None
+                    };
                     let predicted = quality.predicted_rmse;
-                    let observed_v48 = (examples == 48)
-                        .then_some(quality.observed_rmse_v48)
-                        .flatten();
-                    let observed_v48 =
-                        observed_v48.map_or_else(String::new, |value| value.to_string());
+                    let observed_v48 = v48_quality.and_then(|row| row.observed_rmse_v48);
+                    let sign_error_v48 = v48_quality.and_then(|row| row.sign_error_rate_v48);
+                    let selected_regret_v48 =
+                        v48_quality.and_then(|row| row.selected_program_regret_v48);
+                    let false_authorization_v48 =
+                        v48_quality.and_then(|row| row.false_authorization_rate_v48);
                     let amortized = refresh / reuse as f64;
                     let projected = amortized + verifier_ns;
                     writeln!(
                         out,
-                        "{method},{anchor},{reuse},{},{age},{examples},{refresh:.0},{amortized:.0},{verifier_ns:.0},{projected:.0},{predicted:.12e},{observed_v48},{phase}",
+                        "{method},{anchor},{reuse},{},{age},{examples},{refresh:.0},{amortized:.0},{verifier_ns:.0},{projected:.0},{predicted:.12e},{},{},{},{},{}",
                         anchor + age,
+                        optional_scientific(observed_v48),
+                        optional_scientific(sign_error_v48),
+                        optional_scientific(selected_regret_v48),
+                        optional_scientific(false_authorization_v48),
+                        phase
                     )?;
                     rows_written += 1;
                 }
@@ -661,4 +698,8 @@ fn write_cost_projection(
         ));
     }
     Ok(rows_written)
+}
+
+fn optional_scientific(value: Option<f64>) -> String {
+    value.map_or_else(String::new, |number| format!("{number:.12e}"))
 }
