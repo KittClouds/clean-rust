@@ -1,0 +1,33 @@
+{
+  "experiment": "AR-03A",
+  "status": "diagnostic-only",
+  "training_comparison": false,
+  "validation_accessed": false,
+  "training_examples": 96,
+  "strata": 12,
+  "examples_per_stratum": 8,
+  "panel_size": 48,
+  "panel_replicates": 64,
+  "development_streams": 6,
+  "evaluation_streams": 6,
+  "state_snapshots": 36,
+  "candidate_rows": 8656,
+  "panel_rows": 14976,
+  "development_response_dimensions": 2178,
+  "evaluation_seeds": [
+    "96e104bd3c72a85f",
+    "205ad7c3918e64fb",
+    "d43c6a107e95b281",
+    "5e8f13a2c64970bd",
+    "a17c2d48f03695e2",
+    "3bc9704ea251d68f"
+  ],
+  "summary": [
+    {"method":"development_response_oracle","seed_count":6,"within_stratum_variance":2.366581847260e-5,"predicted_rmse":4.176270718681e-4,"observed_rmse":4.105168636832e-4,"sign_error_rate":0.185127615,"cross_block_regret":3.845390552202e-4,"selected_program_regret":4.665488358060e-4,"false_authorization_rate":0.079861111},
+    {"method":"evaluation_state_response_oracle","seed_count":6,"within_stratum_variance":2.205614675266e-5,"predicted_rmse":4.015799885488e-4,"observed_rmse":4.053289803955e-4,"sign_error_rate":0.181503849,"cross_block_regret":3.710840315136e-4,"selected_program_regret":4.343111255151e-4,"false_authorization_rate":0.067708333},
+    {"method":"gradient_full123","seed_count":6,"within_stratum_variance":2.260796021874e-5,"predicted_rmse":4.064047802773e-4,"observed_rmse":4.041007916854e-4,"sign_error_rate":0.182457060,"cross_block_regret":4.014450323603e-4,"selected_program_regret":4.773506762916e-4,"false_authorization_rate":0.074652778},
+    {"method":"hash_placebo_mean","seed_count":6,"within_stratum_variance":4.836741662095e-5,"predicted_rmse":6.505791622878e-4,"observed_rmse":6.509493438531e-4,"sign_error_rate":0.269265435,"cross_block_regret":5.683599777385e-4,"selected_program_regret":7.168096875458e-4,"false_authorization_rate":0.158420139},
+    {"method":"input_only","seed_count":6,"within_stratum_variance":3.480625936549e-5,"predicted_rmse":5.265783745881e-4,"observed_rmse":5.309693451319e-4,"sign_error_rate":0.222047698,"cross_block_regret":4.613047657504e-4,"selected_program_regret":5.652962544534e-4,"false_authorization_rate":0.104166667},
+    {"method":"state_stats","seed_count":6,"within_stratum_variance":4.608492237011e-5,"predicted_rmse":6.141256583180e-4,"observed_rmse":6.123988054991e-4,"sign_error_rate":0.252929408,"cross_block_regret":5.515755098236e-4,"selected_program_regret":6.912355857143e-4,"false_authorization_rate":0.151909722}
+  ]
+}
