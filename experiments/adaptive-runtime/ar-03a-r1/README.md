@@ -56,4 +56,49 @@ For every scale, report gradient and hash-placebo (plus response-comparator) wit
 
 ## Result
 
-Pending the single frozen diagnostic run.
+### Run identity and integrity
+
+- Frozen protocol/source commit: `98f37dc1` (`exp(ar-03a-r1): freeze gradient geometry portability protocol`).
+- Run: `artifacts/run-20260921-r1/`; release execution took 134.17 s. No validation data were generated or accessed.
+- The generated 96-row dataset has class counts `32/27/37`; its SHA-256 is `02b771fe11bd8fe6c10c1103b0f09ce7bfe398c61105765d336ad2dd79961482`.
+- The ordered 36 model snapshots are preserved in `model-states.bin` and indexed by `states.csv`; SHA-256: `dfc3302d7cd864f6ab523610afb443e4a23fbe27f49c521cc76ba5e43732c3b5`.
+- Integrity counts: 36 states; 6,102 development-action and 6,102 held-out-action rows; 67,680 partition assignments; 702 state/method metrics; 44,928 panel measurements; 54 Taylor rows. Development/evaluation candidate-count checks had zero mismatches. All output values were finite, the JSON report parsed, and independent file hashes matched the report.
+- Development/evaluation stream seeds and the dataset seed were checked against the other AR source records and were distinct. All six evaluation seeds contribute three nested checkpoints; checkpoints and 64 panel replicates are not independent seed-level replications.
+- Preflight: 10 Rust tests pass; strict Clippy passes with `-D warnings`. The release diagnostic completed successfully.
+
+### Held-out response geometry at the frozen training scale (`alpha=1`)
+
+Means below first average checkpoints within each of the six held-out evidence streams, then average the six streams. The primary comparison is candidate-independent full per-example gradient features against the mean of eight hash-placebo partitions.
+
+| Partition | Within-stratum utility variance | Predicted RMSE | Observed panel RMSE | Sign error | Cross-block regret | Selected-program regret | False authorization |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Hash-placebo mean | `2.929e-5` | `5.222e-4` | `5.216e-4` | 31.26% | `5.375e-4` | `6.069e-4` | 17.96% |
+| Input-only | `2.998e-5` | `5.252e-4` | `5.279e-4` | 31.14% | `5.331e-4` | `6.043e-4` | 17.97% |
+| Current-state scalars | `2.868e-5` | `5.126e-4` | `5.147e-4` | 30.85% | `5.335e-4` | `6.009e-4` | 18.06% |
+| **Current-state gradient (171D)** | **`2.309e-5`** | **`4.517e-4`** | **`4.510e-4`** | **29.13%** | **`4.941e-4`** | **`5.520e-4`** | **14.15%** |
+| Development-response oracle | `2.401e-5` | `4.614e-4` | `4.626e-4` | 29.40% | `5.047e-4` | `5.714e-4` | 17.62% |
+| Per-evaluation-state response comparator | `2.280e-5` | `4.495e-4` | `4.482e-4` | 28.78% | `4.728e-4` | `5.300e-4` | 14.15% |
+
+Against the hash-placebo mean, gradient strata reduce within-stratum utility variance by 21.2%, observed panel RMSE by 13.5%, sign error by 2.13 percentage points, cross-block regret by 8.1%, selected-program regret by 9.0%, and false authorization by 3.81 points. The gradient partition improves variance, RMSE, sign error, cross-block regret, and selected-program regret in all six evaluation streams; false authorization improves in five of six. The analytic finite-population RMSE prediction closely tracks observed panel RMSE (gradient: `4.517e-4` predicted, `4.510e-4` observed).
+
+The development-response partition also improves held-out observed RMSE over hash placebo (`4.626e-4` versus `5.216e-4`), indicating some response-partition transfer across streams/actions. The per-state response comparator is diagnostic only, not a guaranteed optimum. Relative to the gap between hash placebo and that comparator, the gradient proxy closes 96.2% of the observed-RMSE gap; treat this ratio descriptively.
+
+### Action-scale sidecar
+
+| `alpha` | Mean held-out Taylor R² | Taylor R² range across 18 nested evaluation states | Gradient RMSE reduction vs hash | Gradient RMSE wins / 6 streams | Selected-regret wins / 6 |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| 0.5 | 0.9926 | 0.9568–0.9991 | 13.56% | 6 | 6 |
+| 1.0 | 0.9868 | 0.9301–0.9974 | 13.54% | 6 | 6 |
+| 2.0 | 0.9755 | 0.9030–0.9919 | 13.44% | 6 | 5 |
+
+Taylor fit weakens as action magnitude grows, as expected, while gradient-partition RMSE advantage remains nearly constant over this three-point diagnostic range. This supports the first-order explanation at the tested scales, but does **not** show that Taylor accuracy mediates the full partition benefit; gradient geometry may retain useful structure beyond the linear utility approximation. No scale other than `alpha=1` was used for training or runtime selection.
+
+## Disposition
+
+**AR-H47 is supported descriptively on this second synthetic substrate**, with important scope limits: one fixed 96-example dataset, one initialization, an eight-dimensional interaction-defined task, six evaluation evidence streams, held-out candidate rank-combinations, and three nested checkpoints per stream. This is a held-out state/action result over the same training-example universe, not generalization to unseen datapoints or an end-to-end optimizer-performance claim.
+
+The result sharpens H44: current-state per-example gradient geometry is a strong candidate-independent proxy for grouping examples with similar local transition responses, and it improves finite-sample verifier estimation beyond arbitrary balanced partitions on this substrate. The scale sidecar is consistent with `u_a(x) ≈ -g_x·delta_a`, but does not isolate it as the sole mechanism. Full 171D gradients are a diagnostic proxy here; their runtime cost and any cheaper approximation remain untested.
+
+**Strongest alternative explanation:** the held-out split is over evidence streams and top-rank action combinations, not over examples, datasets, or initializations. All six evaluation streams reuse one 96-example training set and one initialization, and the tested parameter moves remain locally small enough for Taylor fit to stay high even at `2x`. The observed benefit may therefore be a stable property of this fixed empirical objective/local action family rather than a broadly generalizable feature map. Gradient-stratum computation cost is also not included in the panel-evaluation RMSE and has not been justified as an end-to-end runtime tradeoff.
+
+**Gate cleared for review of one further portability test only.** This run does not authorize AR-03B, using gradient strata in runtime decisions, action-scale training, feature expansion, or an end-to-end training comparison. Preserve the complete diagnostic outputs in this run directory and do not treat the six stream means as broad statistical qualification.
