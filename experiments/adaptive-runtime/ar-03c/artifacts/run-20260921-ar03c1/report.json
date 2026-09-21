@@ -1,0 +1,18 @@
+{
+  "experiment":"AR-03C",
+  "source_revision":"8d03df54b2749dbb1ad87256b0b33114557b0940",
+  "status":"diagnostic-only",
+  "runtime_proxy_used":false,
+  "training_policy_changed":false,
+  "end_to_end_training_comparison":false,
+  "replayed_states":234,
+  "r2_checkpoints_verified":54,
+  "ar03b_snapshots_matched":162,
+  "quality_rows":3672,
+  "partition_cost_rows":1080,
+  "verifier_cost_rows":216,
+  "cost_frontier_rows":900,
+  "partition_methods":["balanced_kmeans","warm_start_balanced_kmeans","projected_order_1d","nearest_centroid_quota_repair","hash_placebo_mean"],
+  "reuse_ages":[1,10,25,50,100],
+  "limitations":["quality for K is the held anchor partition at exact age K","same R2 task family and trajectories","nested streams and checkpoints are not independent cells","component cost projections exclude system overhead"]
+}
