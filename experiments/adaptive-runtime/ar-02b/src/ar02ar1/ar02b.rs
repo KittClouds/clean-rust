@@ -794,3 +794,6 @@ fn bool_csv(value: bool) -> &'static str {
 fn option_f64(value: Option<f64>) -> String {
     value.map_or_else(String::new, |number| format!("{number:.12e}"))
 }
+
+mod ar02d;
+pub use ar02d::{SourceConditioningReport, run_source_conditioning_null};

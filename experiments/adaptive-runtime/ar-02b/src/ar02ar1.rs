@@ -769,5 +769,6 @@ pub use r2::{run_r2_audit, run_r2_variance_audit};
 
 mod ar02b;
 pub use ar02b::{
-    PathSourceReport, run_path_source_crossover, run_path_source_crossover_with_seeds,
+    PathSourceReport, SourceConditioningReport, run_path_source_crossover,
+    run_path_source_crossover_with_seeds, run_source_conditioning_null,
 };
