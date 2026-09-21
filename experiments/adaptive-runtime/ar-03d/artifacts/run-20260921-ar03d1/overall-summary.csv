@@ -1,0 +1,2 @@
+n_cells,equal_cell_projected_evaluation_loss,equal_cell_hash_evaluation_loss,equal_cell_paired_loss_difference,equal_cell_projected_accuracy,equal_cell_hash_accuracy,equal_cell_projected_train_loss,equal_cell_hash_train_loss
+9,1.860913985e0,1.964142183e0,-1.032281982e-1,0.546296,0.522569,2.959961154e-1,3.099379829e-1
