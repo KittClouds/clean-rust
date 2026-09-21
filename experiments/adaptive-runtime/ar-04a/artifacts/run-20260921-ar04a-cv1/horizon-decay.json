@@ -1,0 +1,17 @@
+{
+  "primary_immediate_source": "u0_train",
+  "records": [
+    {"horizon":0,"stage":600,"state_count":25,"mean_spearman":5.362714717281e-2,"mean_top1_agreement":0.080000000,"mean_pairwise_agreement":0.521246808,"mean_immediate_winner_regret":2.418525218964e-3},
+    {"horizon":0,"stage":2400,"state_count":23,"mean_spearman":4.820259053474e-2,"mean_top1_agreement":0.000000000,"mean_pairwise_agreement":0.518171715,"mean_immediate_winner_regret":7.733666378519e-3},
+    {"horizon":0,"stage":4200,"state_count":18,"mean_spearman":1.917807522496e-2,"mean_top1_agreement":0.000000000,"mean_pairwise_agreement":0.506307821,"mean_immediate_winner_regret":1.010239124298e-2},
+    {"horizon":8,"stage":600,"state_count":25,"mean_spearman":4.683124967673e-2,"mean_top1_agreement":0.080000000,"mean_pairwise_agreement":0.518676804,"mean_immediate_winner_regret":2.461458742619e-3},
+    {"horizon":8,"stage":2400,"state_count":23,"mean_spearman":4.473370057583e-2,"mean_top1_agreement":0.000000000,"mean_pairwise_agreement":0.517033648,"mean_immediate_winner_regret":7.807254883814e-3},
+    {"horizon":8,"stage":4200,"state_count":18,"mean_spearman":5.456095030402e-3,"mean_top1_agreement":0.055555556,"mean_pairwise_agreement":0.501387655,"mean_immediate_winner_regret":1.021603963993e-2},
+    {"horizon":32,"stage":600,"state_count":25,"mean_spearman":2.841998872288e-2,"mean_top1_agreement":0.080000000,"mean_pairwise_agreement":0.512094782,"mean_immediate_winner_regret":2.658044695854e-3},
+    {"horizon":32,"stage":2400,"state_count":23,"mean_spearman":3.016372897289e-2,"mean_top1_agreement":0.000000000,"mean_pairwise_agreement":0.511747426,"mean_immediate_winner_regret":7.933131903101e-3},
+    {"horizon":32,"stage":4200,"state_count":18,"mean_spearman":-6.610283157422e-3,"mean_top1_agreement":0.055555556,"mean_pairwise_agreement":0.497241788,"mean_immediate_winner_regret":1.032051830380e-2},
+    {"horizon":128,"stage":600,"state_count":25,"mean_spearman":-1.254280910350e-2,"mean_top1_agreement":0.040000000,"mean_pairwise_agreement":0.498015381,"mean_immediate_winner_regret":3.090357780457e-3},
+    {"horizon":128,"stage":2400,"state_count":23,"mean_spearman":1.424147769952e-2,"mean_top1_agreement":0.000000000,"mean_pairwise_agreement":0.506467479,"mean_immediate_winner_regret":8.231112212868e-3},
+    {"horizon":128,"stage":4200,"state_count":18,"mean_spearman":-1.109750129086e-2,"mean_top1_agreement":0.055555556,"mean_pairwise_agreement":0.495758544,"mean_immediate_winner_regret":1.068335771561e-2}
+  ]
+}
