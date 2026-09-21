@@ -96,4 +96,43 @@ a303ea0000000010 a303ea0000000011 a303ea0000000012
 
 ## Result
 
-Pending the frozen diagnostic run. No outcome-dependent changes to seeds, proxy definitions, action split, or protocol are permitted.
+### Run identity and integrity
+
+- Frozen protocol/source commit: `ef667f6c` (`exp(ar-03a-r2): freeze crossed portability protocol`). Release execution completed in `393.46 s`; outputs are in `artifacts/run-20260921-r2/`. No validation set was generated or read.
+- Preflight: 11 Rust tests pass; strict Clippy (`-D warnings`), formatting check, and optimized release build pass. The 42 frozen dataset, initialization, and stream seeds are unique and do not collide with prior adaptive-runtime records.
+- The run has 108 snapshots: 54 development and 54 evaluation. Every dataset×initialization×role cell has six snapshots from two streams, each at the three frozen checkpoints. The nine cells are the replication units; streams/checkpoints/panels remain nested.
+- Output counts: 36,668 candidate rows (18,334 per action split), 57,888 partition assignments, 38,016 panel rows, 594 state/method metrics, and 54 alpha-1 Taylor records. All 9,167 candidate-block groups have exactly two development and two evaluation actions. All 603 partitions have exactly 12 strata of 8 examples. Output values are finite; report JSON parses. Dataset and ordered model-state hashes in `report.json` independently match the files.
+- Dataset class counts are `31/35/30`, `27/32/37`, and `25/34/37`. Dataset SHA-256 values are `82249938c79f82d2d484780602244f424f3a5b4a831fca666a04229e32491b8c`, `005388d66f614e49a60f15c7ac19a00dd8b35fb0febbefdef93326fa766cd67f`, and `c5ee81741b5cfc7f20db776e42ef612885c28a0c0454bae5bb72c2b6dd2d33f8`.
+
+### Held-out response geometry at alpha 1
+
+Overall estimates first average checkpoints within stream, then the two evaluation streams within each dataset×initialization cell, and finally equally weight the nine cells. The eight hash-placebo partitions are averaged as the control.
+
+| Partition | Within-stratum utility variance | Predicted RMSE | Observed panel RMSE | Sign error | Cross-block regret | Selected-program regret | False authorization |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Hash-placebo mean | `3.5320e-5` | `5.7705e-4` | `5.7748e-4` | 31.69% | `5.0415e-4` | `5.8861e-4` | 19.58% |
+| **Current-state gradient (171D)** | **`2.7200e-5`** | **`4.9300e-4`** | **`4.9251e-4`** | **28.98%** | **`4.6377e-4`** | **`5.3377e-4`** | **16.38%** |
+| Development-response oracle | `2.8970e-5` | `5.1353e-4` | `5.1358e-4` | 29.91% | `4.8132e-4` | `5.5209e-4` | 17.27% |
+| Per-evaluation-state response comparator | `2.6705e-5` | `4.8848e-4` | `4.8955e-4` | 29.10% | `4.6699e-4` | `5.3608e-4` | 16.03% |
+
+Against the hash-placebo mean, gradient partitions reduce overall within-stratum utility variance by 23.0%, predicted RMSE by 14.6%, and observed panel RMSE by 14.7%. Sign error falls by 2.71 percentage points, cross-block regret by 8.0%, selected-program regret by 9.3%, and false authorization by 3.20 points. The analytical finite-population RMSE closely matches panel RMSE (gradient: `4.9300e-4` predicted vs `4.9251e-4` observed; hash: `5.7705e-4` vs `5.7748e-4`).
+
+The gradient proxy beats hash-placebo in **all 9 cells** on within-stratum variance, predicted and observed RMSE, sign error, cross-block regret, and selected-program regret; it lowers false authorization in 8 of 9. Observed-RMSE improvement ranges from 10.1% to 19.2% by cell. The per-cell reduction matrix is:
+
+| Dataset seed index \ Initialization seed index | 0 | 1 | 2 |
+| --- | ---: | ---: | ---: |
+| 0 | 10.1% | 12.4% | 15.9% |
+| 1 | 15.7% | 17.7% | 14.6% |
+| 2 | 14.4% | 14.9% | 19.2% |
+
+Equal-weight dataset-marginal RMSE reductions are 12.4%, 16.0%, and 16.0%; initialization-marginal reductions are 13.1%, 15.0%, and 16.5%. Gradient RMSE also wins in all 18 evaluation streams. The cell-fitted development-response oracle improves observed RMSE over hash-placebo in all 9 cells, showing held-out stream/action transfer within each cell; its partition is fit separately per cell and is not evidence of transfer between different datasets or initializations.
+
+At alpha 1, Taylor `R²` averages `0.9887` across 54 nested evaluation snapshots (range `0.9506–0.9993`). This remains secondary evidence: it is compatible with the local linear response explanation but does not show that Taylor prediction mediates the entire gradient-partition benefit.
+
+### Disposition and limits
+
+**AR-H47 is supported descriptively across new datasets and initializations within this one synthetic generator/model family.** Raw current-state per-example gradients repeatedly organize held-out action responses into more utility-homogeneous strata than arbitrary balanced partitions, and the improvement is consistent across all nine crossed cells for the primary estimator/decision-quality metrics. This extends R1 beyond one empirical objective and one initialization lineage.
+
+The strongest alternative explanation is scope, not a visible failed cell: all three datasets still come from the same eight-dimensional generator, all models use the same `8-8-8-3` ReLU architecture and small frozen action grammar, and the panel audit evaluates the same 96 examples that define each empirical objective. A per-evaluation-state gradient partition is recomputed using full per-example gradients over those 96 examples; its computation cost is not included in the sampling-error comparison and may overwhelm any eventual runtime savings. There are only nine dataset×initialization units. The nested streams/checkpoints and repeated panels must not be counted as additional dataset-level replications. This is not generalization to unseen datapoints, a real dataset, a different architecture, or an end-to-end optimizer result.
+
+**Gate result:** the diagnostic portability criterion is met within the frozen synthetic family. This closes AR-03A-R2 and earns review of a separately specified efficiency/runtime experiment. It does not authorize AR-03B, runtime use of gradient strata, cheaper feature searches, action-aware metrics, or another substrate run. No such follow-on work was started.
