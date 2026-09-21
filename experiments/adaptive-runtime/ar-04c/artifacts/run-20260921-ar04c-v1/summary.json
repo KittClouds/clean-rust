@@ -1,0 +1,10 @@
+{
+  "cell_count": 25,
+  "mean_final_measurement_loss": [
+    4.942043199539e0,
+    3.208658061028e0,
+    7.680076432228e-1
+  ],
+  "fixed_minus_training": -1.733385138512e0,
+  "rotating_minus_training": -4.174035556316e0
+}
