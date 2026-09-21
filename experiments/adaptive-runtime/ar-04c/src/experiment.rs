@@ -279,6 +279,11 @@ fn write_integrity_receipt(
     checkpoints: &[Checkpoint],
     rotating_panels: usize,
 ) -> io::Result<()> {
+    if datasets.len() != protocol::CELL_COUNT {
+        return Err(io::Error::other(
+            "AR-04C dataset bundle cardinality mismatch",
+        ));
+    }
     let output_files = [
         "dataset-manifest.csv",
         "fixed-panel-manifest.csv",
