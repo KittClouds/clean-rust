@@ -1,4 +1,5 @@
 mod analysis;
+mod gliner25;
 mod identity;
 mod ner;
 mod nli;
@@ -18,6 +19,45 @@ fn main() -> Result<()> {
         .next()
         .and_then(|value| value.into_string().ok())
         .context("missing command")?;
+    if command == "probe-ner" {
+        let model = path(&mut arguments, "NER model root")?;
+        let document = path(&mut arguments, "UTF-8 document")?;
+        let runs: usize = arguments
+            .next()
+            .map(|value| value.to_string_lossy().parse())
+            .transpose()
+            .context("invalid probe run count")?
+            .unwrap_or(1);
+        anyhow::ensure!(
+            (1..=10).contains(&runs) && arguments.next().is_none(),
+            "expected 1..10 probe runs"
+        );
+        let text = std::fs::read_to_string(document)?;
+        let loaded = ner::LoadedNer::load(&model)?;
+        for iteration in 0..runs {
+            let run = loaded.run(
+                "probe",
+                blake3::hash(text.as_bytes()).as_bytes(),
+                &text,
+                65_536,
+            )?;
+            println!(
+                "{}",
+                serde_json::json!({
+                    "identity":loaded.identity(), "entities":run.entities.len(),
+                    "iteration":iteration,
+                    "output_hash":blake3::hash(&serde_json::to_vec(&(
+                        &run.entities, &run.mentions, &run.candidates, &run.candidate_evidence
+                    ))?).to_hex().to_string(),
+                    "mentions":run.mentions.len(), "chunks":run.chunk_count,
+                    "sentences":run.sentence_count, "chunker_micros":run.chunker_micros,
+                    "dynamic_ner_micros":run.dynamic_ner_micros,
+                    "graph_publications":0
+                })
+            );
+        }
+        return Ok(());
+    }
     if command == "serve" {
         let ner_root = path(&mut arguments, "Dynamic NER model root")?;
         let nli_root = path(&mut arguments, "NLI model root")?;
