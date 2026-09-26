@@ -1,0 +1,33 @@
+{
+  "protocol": "AR-04D-sentinel-exposure-2026-09-26",
+  "cells": 25,
+  "arms": 7,
+  "population_size": 4096,
+  "mean_final_loss": {
+    "sentinel_k1": 2.982892432213e0,
+    "sentinel_k4_cyclic": 8.122074246407e-1,
+    "sentinel_k16_cyclic": 7.846400666237e-1,
+    "sentinel_k16_blocked": 8.776040029526e-1,
+    "sentinel_k16_pooled": 5.609334027767e-1,
+    "sentinel_k64_cyclic": 7.773353695869e-1,
+    "sentinel_fresh": 7.770871925354e-1
+  },
+  "mean_population_loss": {
+    "sentinel_k1": 3.133755540848e0,
+    "sentinel_k4_cyclic": 8.252442073822e-1,
+    "sentinel_k16_cyclic": 7.803974652290e-1,
+    "sentinel_k16_blocked": 8.767527079582e-1,
+    "sentinel_k16_pooled": 5.430472922325e-1,
+    "sentinel_k64_cyclic": 7.680758476257e-1,
+    "sentinel_fresh": 7.723598575592e-1
+  },
+  "terminal_difference_vs_k1": {
+    "sentinel_k1": 0.000000000000e0,
+    "sentinel_k4_cyclic": -2.170685007572e0,
+    "sentinel_k16_cyclic": -2.198252365589e0,
+    "sentinel_k16_blocked": -2.105288429260e0,
+    "sentinel_k16_pooled": -2.421959029436e0,
+    "sentinel_k64_cyclic": -2.205557062626e0,
+    "sentinel_fresh": -2.205805239677e0
+  }
+}

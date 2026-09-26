@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import csv
+import gzip
 import json
 import sys
 from collections import Counter, defaultdict
@@ -26,7 +27,8 @@ CHECKPOINT_STEPS = {0, 600, 2400, 4200}
 
 
 def rows(path: Path) -> list[dict[str, str]]:
-    with path.open(newline="", encoding="utf-8") as handle:
+    opener = gzip.open if path.suffix == ".gz" else open
+    with opener(path, "rt", newline="", encoding="utf-8") as handle:
         return list(csv.DictReader(handle))
 
 
@@ -101,7 +103,10 @@ def main(root: Path) -> None:
     require({int(row["samples"]) for row in pooled_rows} == {POOLED_SIZE}, "pooled size mismatch")
     require({int(row["source_panel_count"]) for row in pooled_rows} == {16}, "pooled source count mismatch")
 
-    decision_rows = rows(root / "trajectory-decisions.csv")
+    decision_path = root / "trajectory-decisions.csv"
+    if not decision_path.exists():
+        decision_path = root / "trajectory-decisions.csv.gz"
+    decision_rows = rows(decision_path)
     require(len(decision_rows) == CELLS * len(ARMS) * STEPS, "decision artifact cardinality mismatch")
     grouped: defaultdict[tuple[int, str], list[dict[str, str]]] = defaultdict(list)
     for row in decision_rows:

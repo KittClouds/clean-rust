@@ -1,2 +1,3 @@
 /target/
 *.log
+experiments/adaptive-runtime/ar-04d/artifacts/run-20260926-ar04d-v1/trajectory-decisions.csv
