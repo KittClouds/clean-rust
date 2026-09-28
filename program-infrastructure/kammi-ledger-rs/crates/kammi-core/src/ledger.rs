@@ -47,6 +47,8 @@ pub struct Ledger {
     pub(crate) signing: Option<SigningKey>,
     pub(crate) flight: FlightIdentity,
     pub(crate) writer: Value,
+    /// Artifact-verification checkpoint for large loose objects (accelerator only).
+    pub(crate) verified: crate::verify_cache::VerificationCache,
 }
 
 /// A precondition re-checked under the writer lock just before an append.
@@ -56,7 +58,12 @@ impl Ledger {
     /// Replays both journals into memory. Replay reads no clock and repeats every check the
     /// Python daemon performs while indexing.
     pub fn open(store: Store, options: LedgerOptions) -> Result<Ledger> {
+        let verified = crate::verify_cache::VerificationCache::load(store.root(), |head| {
+            Sha256Id::parse(head)
+                .is_ok_and(|id| id == Sha256Id::ZERO || store.main.seq_of_event(&id).is_some())
+        });
         let mut ledger = Ledger {
+            verified,
             store,
             state: State::default(),
             memory: None,
@@ -197,7 +204,17 @@ impl Ledger {
             return false;
         };
         if self.store.objects.contains(&parsed) {
-            return self.store.objects.verify(&parsed).unwrap_or(false);
+            let loose = self.store.objects.loose_path(&parsed);
+            let is_loose = loose.is_file();
+            if is_loose && self.verified.trusted(&parsed, &loose) {
+                return true;
+            }
+            let ok = self.store.objects.verify(&parsed).unwrap_or(false);
+            if ok && is_loose {
+                self.verified
+                    .record(&parsed, &loose, &self.store.main.head().to_string());
+            }
+            return ok;
         }
         matches!(self.store.get_object(&parsed), Ok(Some(_)))
     }

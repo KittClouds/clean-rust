@@ -894,6 +894,7 @@ dependencies = [
  "indexmap",
  "kammi-jcs",
  "kammi-store",
+ "parking_lot",
  "serde_json",
  "tempfile",
  "thiserror 2.0.21",

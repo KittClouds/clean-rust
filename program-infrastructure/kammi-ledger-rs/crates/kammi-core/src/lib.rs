@@ -19,6 +19,7 @@ pub mod rules;
 pub mod safe;
 pub mod state;
 pub mod time;
+pub mod verify_cache;
 
 pub use embed::{Embedder, Embeddings, Input, ModelIdentity, Role};
 pub use error::{LedgerError, Result};
